@@ -370,6 +370,7 @@
     SCPI_COMMAND("SYSTem:MEASure[:SCALar][:VOLTage][:DC]?", scpi_cmd_systemMeasureScalarVoltageDcQ) \
     SCPI_COMMAND("SYSTem:CPU:SNO?", scpi_cmd_systemCpuSnoQ) \
     SCPI_COMMAND("SYSTem:DELay", scpi_cmd_systemDelay) \
+    SCPI_COMMAND("SYSTem:RELay:CYCLes?", scpi_cmd_systemRelayCyclesQ) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \
     SCPI_COMMAND("TRIGger:DLOG[:IMMediate]", scpi_cmd_triggerDlogImmediate) \
@@ -421,4 +422,6 @@
     SCPI_COMMAND("SYSTem:DATE:CLEar", scpi_cmd_systemDateClear) \
     SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear) \
     SCPI_COMMAND("ROUTe:OPEN", scpi_cmd_routeOpen) \
-    SCPI_COMMAND("ROUTe:CLOSe", scpi_cmd_routeClose)
+    SCPI_COMMAND("ROUTe:OPEN?", scpi_cmd_routeOpenQ) \
+    SCPI_COMMAND("ROUTe:CLOSe", scpi_cmd_routeClose) \
+    SCPI_COMMAND("ROUTe:CLOSe?", scpi_cmd_routeCloseQ)

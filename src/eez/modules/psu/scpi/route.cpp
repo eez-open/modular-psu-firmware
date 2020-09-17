@@ -40,6 +40,29 @@ scpi_result_t scpi_cmd_routeOpen(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_routeOpenQ(scpi_t *context) {
+    ChannelList channelList;
+    param_channels(context, channelList);
+    if (channelList.numChannels == 0) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+
+    for (int i = 0; i < channelList.numChannels; i++) {
+        bool isRouteOpen;
+
+        if (!g_slots[channelList.channels[i].slotIndex]->isRouteOpen(channelList.channels[i].subchannelIndex, isRouteOpen, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
+
+        SCPI_ResultBool(context, isRouteOpen);
+    }
+
+    return SCPI_RES_OK;
+}
+
 scpi_result_t scpi_cmd_routeClose(scpi_t *context) {
     ChannelList channelList;
     param_channels(context, channelList);
@@ -51,6 +74,29 @@ scpi_result_t scpi_cmd_routeClose(scpi_t *context) {
     if (!channel_dispatcher::routeClose(channelList, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_routeCloseQ(scpi_t *context) {
+    ChannelList channelList;
+    param_channels(context, channelList);
+    if (channelList.numChannels == 0) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+
+    for (int i = 0; i < channelList.numChannels; i++) {
+        bool isRouteOpen;
+
+        if (!g_slots[channelList.channels[i].slotIndex]->isRouteOpen(channelList.channels[i].subchannelIndex, isRouteOpen, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
+
+        SCPI_ResultBool(context, !isRouteOpen);
     }
 
     return SCPI_RES_OK;

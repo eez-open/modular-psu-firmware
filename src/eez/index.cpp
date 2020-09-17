@@ -77,6 +77,9 @@ void Module::initChannels() {
 void Module::tick() {
 }
 
+void Module::writeUnsavedData() {
+}
+
 void Module::onPowerDown() {
 }
 
@@ -225,6 +228,13 @@ bool Module::setVoltageRange(int subchannelIndex, int8_t range, int *err) {
     return false;
 }
 
+bool Module::isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
 bool Module::routeOpen(ChannelList channelList, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
@@ -233,6 +243,13 @@ bool Module::routeOpen(ChannelList channelList, int *err) {
 }
 
 bool Module::routeClose(ChannelList channelList, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::getRelayCycles(int subchannelIndex, uint32_t &relayCycles, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }

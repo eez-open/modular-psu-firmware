@@ -31,6 +31,7 @@
 #include "eez/hmi.h"
 #include "eez/util.h"
 #include "eez/gui/document.h"
+#include <eez/modules/psu/timer.h>
 #include "eez/modules/psu/psu.h"
 #include "eez/modules/psu/event_queue.h"
 #include "eez/modules/psu/calibration.h"
@@ -66,6 +67,9 @@ static const int NUM_COLUMNS = 6;
 static const int NUM_ROWS = 4;
 static const int MAX_LABEL_LENGTH = 5;
 
+
+static const uint32_t MIN_TO_MS = 60L * 1000L;
+
 struct FromMasterToSlave {
     uint32_t routes;
     float dac1;
@@ -97,6 +101,13 @@ public:
     CalibrationConfiguration calConf[2];
 
     bool relayOn = false;
+    
+    uint32_t signalRelayCycles[NUM_ROWS][NUM_COLUMNS];
+    uint32_t powerRelayCycles;
+
+    uint32_t lastWrittenSignalRelayCycles[NUM_ROWS][NUM_COLUMNS];
+    uint32_t lastWrittenPowerRelayCycles;
+    Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
 
     Smx46Module() {
         moduleType = MODULE_TYPE_DIB_SMX46;
@@ -131,6 +142,15 @@ public:
         data->routes = 0xFFFFFFFF;
 
         memset(calConf, 0, sizeof(calConf));
+
+        memset(signalRelayCycles, 0, NUM_ROWS * NUM_COLUMNS * sizeof(uint32_t));
+        powerRelayCycles = 0;
+    }
+
+    void boot() override {
+        Module::boot();
+
+        loadRelayCylces();
     }
 
     Module *createModule() override {
@@ -164,18 +184,32 @@ public:
 
 #if defined(EEZ_PLATFORM_STM32)
         if (spiReady) {
-        	FromMasterToSlave data;
+#endif
+            FromMasterToSlave data;
 
-            data.routes = routes;
+            uint32_t newRoutes = routes;
+            uint8_t newRelayOn = relayOn ? 1 : 0;
+
+            data.routes = newRoutes;
             data.dac1 = calibrationEnabled[0] && isVoltageCalibrationExists(0) ? calibration::remapValue(dac1, calConf[0].u) : dac1;
             data.dac2 = calibrationEnabled[1] && isVoltageCalibrationExists(1) ? calibration::remapValue(dac2, calConf[1].u) : dac2;
-            data.relayOn = relayOn ? 1 : 0;
+            data.relayOn = newRelayOn;
 
             if (memcmp(output, &data, sizeof(FromMasterToSlave)) != 0) {
+                FromMasterToSlave *oldData = (FromMasterToSlave *)output;
+
+                uint32_t oldRoutes = oldData->routes;
+                uint8_t oldRelayOn = oldData->relayOn;
+
             	memcpy(output, &data, sizeof(FromMasterToSlave));
-            	transfer();
-            	spiReady = false;
+                if (transfer()) {
+                    updateRelayCycles(oldRoutes, newRoutes, oldRelayOn, newRelayOn);
+                }
+#if defined(EEZ_PLATFORM_STM32)
+                spiReady = false;
+#endif
             }
+#if defined(EEZ_PLATFORM_STM32)
         } else {
             int32_t diff = millis() - lastTransferTickCount;
             if (diff > CONF_TRANSFER_TIMEOUT_MS) {
@@ -186,9 +220,9 @@ public:
         }
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        transfer();
-#endif
+        if (relayCyclesWriteInterval.test(micros())) {
+            saveRelayCycles();
+        }
     }
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -197,12 +231,13 @@ public:
     }
 #endif
 
-    void transfer() {
+    bool transfer() {
 #if defined(EEZ_PLATFORM_STM32)
         auto status = bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE);
         if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
             lastTransferTickCount = millis();
+            return true;
         } else {
             if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
                 if (++numCrcErrors >= 10) {
@@ -215,8 +250,14 @@ public:
             } else {
                 DebugTrace("Slot %d SPI transfer error %d\n", slotIndex + 1, status);
             }
+            return false;
         }
 #endif
+        return true;
+    }
+
+    void writeUnsavedData() override {
+        saveRelayCycles();
     }
 
     void onPowerDown() override {
@@ -283,6 +324,28 @@ public:
         return subchannelIndex - 1;
     }
 
+    bool isRouteOpen(int subchannelIndex, bool &isRouteOpen_, int *err) override {
+        subchannelIndex++;
+
+        if (subchannelIndex == 3) {
+            isRouteOpen_ = relayOn;
+        } else {
+            int x = subchannelIndex % 10 - 1;
+            int y = subchannelIndex / 10 - 1;
+
+            if (x < 0 || x >= NUM_COLUMNS || y < 0 || y >= NUM_ROWS) {
+                if (*err) {
+                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                }
+                return false;
+            }
+
+            isRouteOpen_ = isRouteOpen(x, y);
+        }
+
+        return true;
+    }
+
     bool routeOpen(ChannelList channelList, int *err) override {
         uint32_t tempRoutes = routes;
         bool tempRelayOn = relayOn;
@@ -292,14 +355,17 @@ public:
                 tempRelayOn = true;
                 continue;
             }
-            if (subchannelIndex < 11) {
+            
+            int x = subchannelIndex % 10 - 1;
+            int y = subchannelIndex / 10 - 1;
+
+            if (x < 0 || x >= NUM_COLUMNS || y < 0 || y >= NUM_ROWS) {
                 if (*err) {
                     *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
                 }
                 return false;
             }
-            int x = subchannelIndex % 10 - 1;
-            int y = subchannelIndex / 10 - 1;
+
             tempRoutes |= (1 << (y * NUM_COLUMNS + x));
         }
         routes = tempRoutes;
@@ -316,18 +382,43 @@ public:
                 tempRelayOn = false;
                 continue;
             }
-            if (subchannelIndex < 11) {
+
+            int x = subchannelIndex % 10 - 1;
+            int y = subchannelIndex / 10 - 1;
+
+            if (x < 0 || x >= NUM_COLUMNS || y < 0 || y >= NUM_ROWS) {
                 if (*err) {
                     *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
                 }
                 return false;
             }
-            int x = subchannelIndex % 10 - 1;
-            int y = subchannelIndex / 10 - 1;
+
             tempRoutes &= ~(1 << (y * NUM_COLUMNS + x));
         }
         routes = tempRoutes;
         relayOn = tempRelayOn;
+        return true;
+    }
+
+    bool getRelayCycles(int subchannelIndex, uint32_t &relayCycles, int *err) override {
+        subchannelIndex++;
+
+        if (subchannelIndex == 3) {
+            relayCycles = powerRelayCycles;
+        } else {
+            int x = subchannelIndex % 10 - 1;
+            int y = subchannelIndex / 10 - 1;
+
+            if (x < 0 || x >= NUM_COLUMNS || y < 0 || y >= NUM_ROWS) {
+                if (*err) {
+                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                }
+                return false;
+            }
+
+            relayCycles = signalRelayCycles[y][x];
+        }
+
         return true;
     }
 
@@ -432,6 +523,46 @@ public:
 
     void toggleRoute(int x, int y) {
         routes ^= 1 << (y * NUM_COLUMNS + x);
+    }
+
+    void updateRelayCycles(uint32_t oldRoutes, uint32_t newRoutes, uint8_t oldRelayOn, uint8_t newRelayOn) {
+        for (int y = 0; y < NUM_ROWS; y++) {
+            for (int x = 0; x < NUM_COLUMNS; x++) {
+                if ((oldRoutes & (1 << (y * NUM_COLUMNS + x))) == 0 && (newRoutes & (1 << (y * NUM_COLUMNS + x)))) {
+                    signalRelayCycles[y][x]++;
+                }
+            }
+        }
+
+        if (oldRelayOn == 0 && newRelayOn == 1) {
+            powerRelayCycles++;
+        }
+    }
+
+    void loadRelayCylces() {
+        powerRelayCycles = lastWrittenPowerRelayCycles = persist_conf::readCounter(slotIndex, 0);
+
+        for (int y = 0; y < NUM_ROWS; y++) {
+            for (int x = 0; x < NUM_COLUMNS; x++) {
+                signalRelayCycles[y][x] = lastWrittenSignalRelayCycles[y][x] = persist_conf::readCounter(slotIndex, 1 + y * NUM_COLUMNS + x);
+            }
+        }
+    }
+
+    void saveRelayCycles() {
+        if (powerRelayCycles != lastWrittenPowerRelayCycles) {
+            persist_conf::writeCounter(slotIndex, 0, powerRelayCycles);
+            lastWrittenPowerRelayCycles = powerRelayCycles;
+        }
+
+        for (int y = 0; y < NUM_ROWS; y++) {
+            for (int x = 0; x < NUM_COLUMNS; x++) {
+                if (signalRelayCycles[y][x] != lastWrittenSignalRelayCycles[y][x]) {
+                    persist_conf::writeCounter(slotIndex, 1 + y * NUM_COLUMNS + x, signalRelayCycles[y][x]);
+                    lastWrittenSignalRelayCycles[y][x] = signalRelayCycles[y][x];
+                }
+            }
+        }
     }
 };
 
@@ -637,6 +768,22 @@ void data_dib_smx46_relay_on(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
+void data_dib_smx46_signal_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int slotIndex = cursor / (NUM_COLUMNS * NUM_ROWS);
+        int i = cursor % (NUM_COLUMNS * NUM_ROWS);
+        int x = i % NUM_COLUMNS;
+        int y = i / NUM_COLUMNS;
+        value = Value(((Smx46Module *)g_slots[hmi::g_selectedSlotIndex])->signalRelayCycles[y][x], VALUE_TYPE_UINT32);
+    }
+}
+
+void data_dib_smx46_power_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(((Smx46Module *)g_slots[hmi::g_selectedSlotIndex])->powerRelayCycles, VALUE_TYPE_UINT32);
+    }
+}
+
 void action_dib_smx46_toggle_route() {
     int cursor = getFoundWidgetAtDown().cursor;
     int slotIndex = cursor / (NUM_COLUMNS * NUM_ROWS);
@@ -680,6 +827,14 @@ void action_dib_smx46_show_dac1_calibration() {
 void action_dib_smx46_show_dac2_calibration() {
     hmi::g_selectedSubchannelIndex = 1;
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
+}
+
+void action_dib_smx46_show_info() {
+    pushPage(PAGE_ID_DIB_SMX46_INFO);
+}
+
+void action_dib_smx46_show_relay_cycles() {
+    pushPage(PAGE_ID_DIB_SMX46_RELAY_CYCLES);
 }
 
 } // gui

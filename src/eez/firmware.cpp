@@ -401,6 +401,11 @@ void shutdown() {
         }
     }
 
+    //
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        g_slots[slotIndex]->writeUnsavedData();
+    }
+
     if (g_restart) {
         delay(800);
 

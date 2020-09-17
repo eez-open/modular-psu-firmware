@@ -2313,6 +2313,11 @@
       "name": "channel_calibration_value_type_is_selectable",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "slot_serial_info",
+      "type": "string",
+      "defaultValue": "012345678901234567890123"
     }
   ],
   "actions": [
@@ -39921,6 +39926,24 @@
               "size": 15,
               "encoding": 59400
             }
+          },
+          {
+            "encoding": 188,
+            "x": 0,
+            "y": 1,
+            "width": 20,
+            "height": 15,
+            "dx": 19,
+            "glyphBitmap": {
+              "width": 20,
+              "height": 15,
+              "pixelArray": "265c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c250000ebffffffffffffffffffffffffffffffffeb0000ffffffffffffffffffffffffffffffffffff0000ff40040b0b04040604040604ff29ff2c4aff0600ff28b3ffffb100e91b1be900d9fff11128fffc21ff28ff6465ff00ff2828ff0009200e0028ffff30ff28ff2828ff00ff2828ff004c845f0028ff7608ff28ff2828ff00ff6868ff00f7f2ff1f28ff0000ff28ff2828ff00a3ffffff00ff0dff2828ff0000ff28ff4546ff0000032cff00ff1dff2828fff722ff28aeffffac0000001eea00c5ffff2828fffd24ff3b000404000000000001000104ff2844ff0300fffffcfcfcfcfcfcfcfcfcfcfcfcfffdffff0000edffffffffffffffffffffffffffffffffee00002b646464646464646464646464646464642b0000"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 14,
+              "encoding": 63062
+            }
           }
         ]
       },
@@ -64278,6 +64301,26 @@
                 {}
               ]
             }
+          },
+          {
+            "name": "SYSTem:RELay:CYCLes?",
+            "parameters": [
+              {
+                "name": "ch_list",
+                "type": [
+                  {
+                    "type": "channel-list"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
           }
         ]
       },
@@ -65257,6 +65300,26 @@
             }
           },
           {
+            "name": "ROUTe:OPEN?",
+            "parameters": [
+              {
+                "name": "ch_list",
+                "type": [
+                  {
+                    "type": "channel-list"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "boolean"
+                }
+              ]
+            }
+          },
+          {
             "name": "ROUTe:CLOSe",
             "parameters": [
               {
@@ -65271,6 +65334,26 @@
             "response": {
               "type": [
                 {}
+              ]
+            }
+          },
+          {
+            "name": "ROUTe:CLOSe?",
+            "parameters": [
+              {
+                "name": "ch_list",
+                "type": [
+                  {
+                    "type": "channel-list"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "boolean"
+                }
               ]
             }
           }

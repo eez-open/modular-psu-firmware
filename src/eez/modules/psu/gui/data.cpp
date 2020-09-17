@@ -983,13 +983,13 @@ void FOLDER_INFO_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
-bool compare_CHANNEL_INFO_SERIAL_value(const Value &a, const Value &b) {
+
+bool compare_MODULE_SERIAL_INFO_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
 
-void CHANNEL_INFO_SERIAL_value_to_text(const Value &value, char *text, int count) {
-    auto &channel = Channel::get(value.getInt());
-    getModuleSerialInfo(channel.slotIndex, text);
+void MODULE_SERIAL_INFO_value_to_text(const Value &value, char *text, int count) {
+    getModuleSerialInfo(value.getInt(), text);
 }
 
 bool compare_DEBUG_VARIABLE_value(const Value &a, const Value &b) {
@@ -2001,10 +2001,16 @@ void data_channel_info_brand(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
+void data_slot_serial_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_MODULE_SERIAL_INFO);
+    }
+}
+
 void data_channel_info_serial(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = Value(iChannel, VALUE_TYPE_CHANNEL_INFO_SERIAL);
+        value = Value(Channel::get(iChannel).slotIndex, VALUE_TYPE_MODULE_SERIAL_INFO);
     }
 }
 

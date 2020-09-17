@@ -76,6 +76,16 @@
       "name": "relay_on",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "signal_relay_cycles",
+      "type": "integer",
+      "defaultValue": "12345678"
+    },
+    {
+      "name": "power_relay_cycles",
+      "type": "integer",
+      "defaultValue": "3245"
     }
   ],
   "actions": [
@@ -96,6 +106,18 @@
     },
     {
       "name": "show_dac2_calibration"
+    },
+    {
+      "name": "show_info"
+    },
+    {
+      "name": "show_relay_cycles"
+    },
+    {
+      "name": "edit_y_label"
+    },
+    {
+      "name": "edit_x_label"
     }
   ],
   "gui": {
@@ -964,7 +986,7 @@
                 },
                 "action": "show_dac1_calibration",
                 "left": 232,
-                "top": 108,
+                "top": 54,
                 "width": 114,
                 "height": 50,
                 "text": "\\u0097 DAC1 Calibration",
@@ -981,10 +1003,44 @@
                 },
                 "action": "show_dac2_calibration",
                 "left": 350,
-                "top": 108,
+                "top": 54,
                 "width": 114,
                 "height": 50,
                 "text": "\\u0097 DAC2 Calibration",
+                "firstLineIndent": 0,
+                "hangingIndent": 24
+              },
+              {
+                "type": "MultilineText",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "alignHorizontal": "left",
+                  "alignVertical": "top",
+                  "padding": "3"
+                },
+                "action": "show_relay_cycles",
+                "left": 232,
+                "top": 108,
+                "width": 114,
+                "height": 50,
+                "text": "\\u00bc Relay Cycles",
+                "firstLineIndent": 0,
+                "hangingIndent": 24
+              },
+              {
+                "type": "MultilineText",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "alignHorizontal": "left",
+                  "alignVertical": "top",
+                  "padding": "3"
+                },
+                "action": "show_info",
+                "left": 350,
+                "top": 108,
+                "width": 114,
+                "height": 50,
+                "text": "\\u0080 Info",
                 "firstLineIndent": 0,
                 "hangingIndent": 24
               },
@@ -1308,6 +1364,7 @@
                         "inheritFrom": "default_S_right_condensed"
                       },
                       "data": "y_label",
+                      "action": "edit_y_label",
                       "left": 0,
                       "top": 0,
                       "width": 40,
@@ -1346,6 +1403,7 @@
                         "alignHorizontal": "center"
                       },
                       "data": "x_label",
+                      "action": "edit_x_label",
                       "left": 0,
                       "top": 0,
                       "width": 70,
@@ -1654,6 +1712,341 @@
         "width": 158,
         "height": 72,
         "dataContextOverrides": "{\"slot_title_micro\": \"SMX46\"}"
+      },
+      {
+        "name": "info",
+        "description": "Retrieve channel's informations such as how long channel output is active, sensor temperature, self-test result and calibration status (CAL:STAT command). \"Calib. params:\" can be ON, OFF, Uncalibrated, Corrupted. Selecting this option when it's uncalibrated or calibration data is corrupted will lead to Calibration wizard.",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 4,
+            "top": 4,
+            "width": 472,
+            "height": 232,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 132,
+                "height": 32,
+                "text": "Model:"
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "value_M_left"
+                },
+                "data": "slot_info",
+                "left": 132,
+                "top": 0,
+                "width": 332,
+                "height": 32,
+                "displayOption": 0
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left"
+                },
+                "left": 0,
+                "top": 32,
+                "width": 132,
+                "height": 32,
+                "text": "Brand:"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "value_M_left"
+                },
+                "data": "channel_info_brand",
+                "left": 132,
+                "top": 32,
+                "width": 332,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left"
+                },
+                "left": 0,
+                "top": 64,
+                "width": 132,
+                "height": 32,
+                "text": "Serial No.:"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "value_M_left"
+                },
+                "data": "slot_serial_info",
+                "left": 132,
+                "top": 64,
+                "width": 332,
+                "height": 32,
+                "text": ""
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_bgnd",
+                  "font": "Heydings14",
+                  "alignVertical": "center",
+                  "color": "status_line_text",
+                  "backgroundColor": "status_line_background",
+                  "activeColor": "status_line_background",
+                  "activeBackgroundColor": "status_line_text"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "left": 41,
+                "top": 0,
+                "width": 439,
+                "height": 32,
+                "text": "Information"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
+      },
+      {
+        "name": "relay_cycles",
+        "description": "Retrieve channel's informations such as how long channel output is active, sensor temperature, self-test result and calibration status (CAL:STAT command). \"Calib. params:\" can be ON, OFF, Uncalibrated, Corrupted. Selecting this option when it's uncalibrated or calibration data is corrupted will lead to Calibration wizard.",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 5,
+            "top": 5,
+            "width": 470,
+            "height": 232,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_S_left"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 194,
+                "height": 32,
+                "text": "Signal relay cycles:"
+              },
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "routes",
+                "action": "show_configure_routes",
+                "left": 44,
+                "top": 36,
+                "width": 426,
+                "height": 112,
+                "itemWidget": {
+                  "type": "Text",
+                  "style": {
+                    "inheritFrom": "default_S_right_condensed",
+                    "alignHorizontal": "center",
+                    "color": "text_value",
+                    "activeBackgroundColor": "text_value"
+                  },
+                  "data": "signal_relay_cycles",
+                  "left": 0,
+                  "top": 0,
+                  "width": 71,
+                  "height": 28,
+                  "text": ""
+                }
+              },
+              {
+                "type": "List",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "y_labels",
+                "left": 0,
+                "top": 36,
+                "width": 40,
+                "height": 112,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 40,
+                  "height": 28,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_right_condensed"
+                      },
+                      "data": "y_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 40,
+                      "height": 28,
+                      "text": ""
+                    }
+                  ]
+                },
+                "listType": "vertical",
+                "gap": 0
+              },
+              {
+                "type": "List",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "x_labels",
+                "left": 44,
+                "top": 148,
+                "width": 426,
+                "height": 20,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 71,
+                  "height": 20,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_right_condensed",
+                        "alignHorizontal": "center"
+                      },
+                      "data": "x_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 71,
+                      "height": 20,
+                      "text": ""
+                    }
+                  ]
+                },
+                "listType": "horizontal",
+                "gap": 0
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_S_left"
+                },
+                "left": 0,
+                "top": 176,
+                "width": 152,
+                "height": 32,
+                "text": "Power relay cycles:"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "value_S_left"
+                },
+                "data": "power_relay_cycles",
+                "left": 152,
+                "top": 176,
+                "width": 167,
+                "height": 32,
+                "text": ""
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_bgnd",
+                  "font": "Heydings14",
+                  "alignVertical": "center",
+                  "color": "status_line_text",
+                  "backgroundColor": "status_line_background",
+                  "activeColor": "status_line_background",
+                  "activeBackgroundColor": "status_line_text"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "left": 41,
+                "top": 0,
+                "width": 439,
+                "height": 32,
+                "text": "Relay Cycles"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
       }
     ],
     "styles": [],

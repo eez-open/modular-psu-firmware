@@ -1977,6 +1977,27 @@ scpi_result_t scpi_cmd_systemDelay(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_systemRelayCyclesQ(scpi_t *context) {
+    ChannelList channelList;
+    param_channels(context, channelList);
+    if (channelList.numChannels == 0) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+
+    for (int i = 0; i < channelList.numChannels; i++) {
+        uint32_t relayCycles;
+        if (!g_slots[channelList.channels[i].slotIndex]->getRelayCycles(channelList.channels[i].subchannelIndex, relayCycles, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
+        SCPI_ResultUInt32(context, relayCycles);
+    }
+
+    return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

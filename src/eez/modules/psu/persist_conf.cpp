@@ -69,6 +69,7 @@ static const uint16_t CH_CAL_CONF_VERSION = 4;
 static const uint16_t PERSIST_CONF_DEV_CONF_ADDRESS = 128;
 
 static const uint32_t ONTIME_MAGIC = 0xA7F31B3CL;
+static const uint32_t COUNTER_MAGIC = 0XEF8D43B2;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1271,8 +1272,10 @@ void setSlotEnabled(int slotIndex, bool enabled) {
 static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 64;
 static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
 
-static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = 128;
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS + MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE;
 static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 780;
+
+static const uint16_t MODULE_PERSIST_CONF_COUNTERS_ADDRESS = MODULE_PERSIST_CONF_CH_CAL_ADDRESS + MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE;
 
 ModuleConfiguration g_moduleConf[NUM_SLOTS];
 
@@ -1389,6 +1392,60 @@ bool saveChannelCalibration(int slotIndex, int subchannelIndex) {
         sizeof(CalibrationConfiguration),
         MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
+    );
+}
+
+uint32_t readCounter(int slotIndex, int counterIndex) {
+    uint32_t buffer[6];
+
+    for (int i = 0; i < NUM_RETRIES; i++) {
+        bool result = moduleConfRead(
+            slotIndex,
+            (uint8_t *)buffer, 
+            sizeof(buffer), 
+            MODULE_PERSIST_CONF_COUNTERS_ADDRESS + counterIndex * sizeof(buffer),
+            -1
+        );
+
+        // is counter on first location valid?
+        if (result && buffer[0] == COUNTER_MAGIC && buffer[2] == crc32((uint8_t *)(buffer + 0), 8)) {
+            // is counter on second location valid?
+            if (buffer[3] == COUNTER_MAGIC && buffer[5] == crc32((uint8_t *)(buffer + 3), 8)) {
+                // at which location counter is bigger?
+                return buffer[1] > buffer[4] ? buffer[1] : buffer[4];
+            }
+
+            // only first location is valid
+            return buffer[1];
+        } 
+        
+        if (buffer[3] == COUNTER_MAGIC && buffer[5] == crc32((uint8_t *)(buffer + 3), 8)) {
+            // only second location is valid
+            return buffer[4];
+        }
+    }
+
+    // no valid counter stored
+    return 0;
+}
+
+bool writeCounter(int slotIndex, int counterIndex, uint32_t counter) {
+    uint32_t buffer[6];
+
+    // store counter at two locations for extra robustness
+    buffer[0] = COUNTER_MAGIC;
+    buffer[1] = counter;
+    buffer[2] = crc32((uint8_t *)(buffer + 0), 8);
+
+    buffer[3] = COUNTER_MAGIC;
+    buffer[4] = counter;
+    buffer[5] = crc32((uint8_t *)(buffer + 3), 8);
+
+    return moduleConfWrite(
+        slotIndex,
+        (uint8_t *)buffer, 
+        sizeof(buffer), 
+        MODULE_PERSIST_CONF_COUNTERS_ADDRESS + counterIndex * sizeof(buffer)
     );
 }
 

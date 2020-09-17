@@ -166,6 +166,7 @@ struct Module {
     virtual psu::Channel *createPowerChannel(int slotIndex, int channelIndex, int subchannelIndex);
     virtual void initChannels();
     virtual void tick();
+    virtual void writeUnsavedData();
     virtual void onPowerDown();
     virtual void onSpiIrq();
     virtual void onSpiDmaTransferCompleted(int status);
@@ -201,8 +202,11 @@ struct Module {
     virtual bool getVoltageRange(int subchannelIndex, int8_t &range, int *err);
     virtual bool setVoltageRange(int subchannelIndex, int8_t range, int *err);
 
+    virtual bool isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err);
     virtual bool routeOpen(ChannelList channelList, int *err);
     virtual bool routeClose(ChannelList channelList, int *err);
+
+    virtual bool getRelayCycles(int subchannelIndex, uint32_t &relayCycles, int *err);
     
     virtual bool getVoltage(int subchannelIndex, float &value, int *err);
     virtual bool setVoltage(int subchannelIndex, float value, int *err);

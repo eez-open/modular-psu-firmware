@@ -358,6 +358,9 @@ bool saveChannelCalibration(Channel &channel);
 void loadChannelCalibration(int slotIndex, int subchannelIndex);
 bool saveChannelCalibration(int slotIndex, int subchannelIndex);
 
+uint32_t readCounter(int slotIndex, int counterIndex);
+bool writeCounter(int slotIndex, int counterIndex, uint32_t counter);
+
 } // namespace persist_conf
 } // namespace psu
 } // namespace eez
