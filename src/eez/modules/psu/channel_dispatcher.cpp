@@ -420,7 +420,8 @@ float getUSet(const Channel &channel) {
     return channel.u.set;
 }
 
-float getUSet(const Channel *channel, int slotIndex, int subchannelIndex) {
+float getUSet(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         return getUSet(*channel);
     }
@@ -512,11 +513,29 @@ float getUMin(const Channel &channel) {
     return channel.u.min;
 }
 
+float getUMin(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        return getUMin(*channel);
+    }
+
+    return getVoltageMinValue(slotIndex, subchannelIndex);
+}
+
 float getUDef(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
         return Channel::get(0).u.def + Channel::get(1).u.def;
     }
     return channel.u.def;
+}
+
+float getUDef(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        return getUDef(*channel);
+    }
+
+    return getVoltageMinValue(slotIndex, subchannelIndex);
 }
 
 float getUMax(const Channel &channel) {
@@ -539,7 +558,8 @@ float getUMax(const Channel &channel) {
     return channel.u.max;
 }
 
-float getUMax(const Channel *channel, int slotIndex, int subchannelIndex) {
+float getUMax(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         return getUMax(*channel);
     }
@@ -764,7 +784,8 @@ float getISet(const Channel &channel) {
     return channel.i.set;
 }
 
-float getISet(const Channel *channel, int slotIndex, int subchannelIndex) {
+float getISet(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         return getISet(*channel);
     }
@@ -829,7 +850,8 @@ float getIMaxLimit(const Channel &channel) {
     return channel.getMaxCurrentLimit();
 }
 
-float getIMaxLimit(const Channel *channel, int slotIndex, int subchannelIndex) {
+float getIMaxLimit(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         return getIMaxLimit(*channel);
     }
@@ -2140,7 +2162,8 @@ bool setVoltage(int slotIndex, int subchannelIndex, float value, int *err) {
     return g_slots[slotIndex]->setVoltage(subchannelIndex, value, err);
 }
 
-void getVoltageStepValues(Channel *channel, int slotIndex, int subchannelIndex, StepValues *stepValues, bool calibrationMode) {
+void getVoltageStepValues(int slotIndex, int subchannelIndex, StepValues *stepValues, bool calibrationMode) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         channel->getVoltageStepValues(stepValues, calibrationMode);
     } else {
@@ -2149,14 +2172,11 @@ void getVoltageStepValues(Channel *channel, int slotIndex, int subchannelIndex, 
 }
 
 float getVoltageResolution(int slotIndex, int subchannelIndex) {
-    return g_slots[slotIndex]->getVoltageResolution(subchannelIndex);
-}
-
-float getVoltageResolution(Channel *channel, int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         return channel->getVoltageResolution();
     } else {
-        return getVoltageResolution(slotIndex, subchannelIndex);
+        return g_slots[slotIndex]->getVoltageResolution(subchannelIndex);
     }
 }
 
@@ -2176,7 +2196,8 @@ bool setCurrent(int slotIndex, int subchannelIndex, float value, int *err) {
     return g_slots[slotIndex]->setCurrent(subchannelIndex, value, err);
 }
 
-void getCurrentStepValues(Channel *channel, int slotIndex, int subchannelIndex, StepValues *stepValues, bool calibrationMode) {
+void getCurrentStepValues(int slotIndex, int subchannelIndex, StepValues *stepValues, bool calibrationMode) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         channel->getCurrentStepValues(stepValues, calibrationMode);
     } else {
@@ -2185,14 +2206,11 @@ void getCurrentStepValues(Channel *channel, int slotIndex, int subchannelIndex, 
 }
 
 float getCurrentResolution(int slotIndex, int subchannelIndex) {
-    return g_slots[slotIndex]->getCurrentResolution(subchannelIndex);
-}
-
-float getCurrentResolution(Channel *channel, int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         return channel->getCurrentResolution();
     } else {
-        return getCurrentResolution(slotIndex, subchannelIndex);
+        return g_slots[slotIndex]->getCurrentResolution(subchannelIndex);
     }
 }
 

@@ -2163,9 +2163,9 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
                 data_keypad_text(operation, cursor, value);
             } else {
                 if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                    value = MakeValue(channel_dispatcher::getUSet(channel, slotIndex, subchannelIndex), UNIT_VOLT);
+                    value = MakeValue(channel_dispatcher::getUSet(slotIndex, subchannelIndex), UNIT_VOLT);
                 } else {
-                    value = MakeValue(channel_dispatcher::getISet(channel, slotIndex, subchannelIndex), UNIT_AMPER);
+                    value = MakeValue(channel_dispatcher::getISet(slotIndex, subchannelIndex), UNIT_AMPER);
                 }
             }
         } else if (operation == DATA_OPERATION_GET_MIN) {
@@ -2176,9 +2176,9 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
             }
         } else if (operation == DATA_OPERATION_GET_MAX) {
             if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                value = MakeValue(channel_dispatcher::getUMax(channel, slotIndex, subchannelIndex), UNIT_VOLT);
+                value = MakeValue(channel_dispatcher::getUMax(slotIndex, subchannelIndex), UNIT_VOLT);
             } else {
-                value = MakeValue(channel_dispatcher::getIMaxLimit(channel, slotIndex, subchannelIndex), UNIT_AMPER);
+                value = MakeValue(channel_dispatcher::getIMaxLimit(slotIndex, subchannelIndex), UNIT_AMPER);
             }
         } else if (operation == DATA_OPERATION_GET_NAME) {
             value = editPage->getCalibrationValueType() == CALIBRATION_VALUE_U ? "Voltage" : "Current";
@@ -2188,15 +2188,15 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
             value = channel ? 1 : 0;
         } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
             if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                channel_dispatcher::getVoltageStepValues(channel, slotIndex, subchannelIndex, value.getStepValues(), true);
+                channel_dispatcher::getVoltageStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
             } else {
-                channel_dispatcher::getCurrentStepValues(channel, slotIndex, subchannelIndex, value.getStepValues(), true);
+                channel_dispatcher::getCurrentStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
             }
         } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
             if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                value = MakeValue(channel_dispatcher::getVoltageResolution(channel, slotIndex, subchannelIndex) / 10, UNIT_VOLT);
+                value = MakeValue(channel_dispatcher::getVoltageResolution(slotIndex, subchannelIndex) / 10, UNIT_VOLT);
             } else {
-                value = MakeValue(channel_dispatcher::getCurrentResolution(channel, slotIndex, subchannelIndex) / 10, UNIT_AMPER);
+                value = MakeValue(channel_dispatcher::getCurrentResolution(slotIndex, subchannelIndex) / 10, UNIT_AMPER);
             }
         } else if (operation == DATA_OPERATION_SET) {
             editPage->setDacValue(value.getFloat());
@@ -2233,9 +2233,9 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
             }
         } else if (operation == DATA_OPERATION_GET_MAX) {
             if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                value = MakeValue(channel_dispatcher::getUMax(channel, slotIndex, subchannelIndex) + 1.0f, UNIT_VOLT);
+                value = MakeValue(channel_dispatcher::getUMax(slotIndex, subchannelIndex) + 1.0f, UNIT_VOLT);
             } else {
-                value = MakeValue(channel_dispatcher::getIMaxLimit(channel, slotIndex, subchannelIndex) + 0.5f, UNIT_AMPER);
+                value = MakeValue(channel_dispatcher::getIMaxLimit(slotIndex, subchannelIndex) + 0.5f, UNIT_AMPER);
             }
         } else if (operation == DATA_OPERATION_GET_NAME) {
             value = editPage->getCalibrationValueType() == CALIBRATION_VALUE_U ? "Voltage" : "Current";

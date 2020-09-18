@@ -385,7 +385,17 @@ bool get_voltage_param(scpi_t *context, float &value, const Channel *channel,
         return false;
     }
 
-    return get_voltage_from_param(context, param, value, channel, cv);
+    return get_voltage_from_param(context, param, value, channel->slotIndex, channel->subchannelIndex, cv);
+}
+
+bool get_voltage_param(scpi_t *context, float &value, int slotIndex, int subchannelIndex,
+    const Channel::Value *cv) {
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return false;
+    }
+
+    return get_voltage_from_param(context, param, value, slotIndex, subchannelIndex, cv);
 }
 
 bool get_voltage_protection_level_param(scpi_t *context, float &value, float min, float max,
@@ -435,28 +445,22 @@ bool get_duration_param(scpi_t *context, float &value, float min, float max, flo
     return get_duration_from_param(context, param, value, min, max, def);
 }
 
-bool get_voltage_from_param(scpi_t *context, const scpi_number_t &param, float &value,
-                            const Channel *channel, const Channel::Value *cv) {
+bool get_voltage_from_param(scpi_t *context, const scpi_number_t &param, float &value, int slotIndex, int subchannelIndex, const Channel::Value *cv) {
     if (param.special) {
-        if (channel) {
-            if (param.content.tag == SCPI_NUM_MAX) {
-                value = channel_dispatcher::getUMax(*channel);
-            } else if (param.content.tag == SCPI_NUM_MIN) {
-                value = channel_dispatcher::getUMin(*channel);
-            } else if (param.content.tag == SCPI_NUM_DEF) {
-                value = channel_dispatcher::getUDef(*channel);
-            } else if (param.content.tag == SCPI_NUM_UP && cv) {
-                value = cv->set + cv->step;
-                if (value > channel_dispatcher::getUMax(*channel))
-                    value = channel_dispatcher::getUMax(*channel);
-            } else if (param.content.tag == SCPI_NUM_DOWN && cv) {
-                value = cv->set - cv->step;
-                if (value < channel_dispatcher::getUMin(*channel))
-                    value = channel_dispatcher::getUMin(*channel);
-            } else {
-                SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-                return false;
-            }
+        if (param.content.tag == SCPI_NUM_MAX) {
+            value = channel_dispatcher::getUMax(slotIndex, subchannelIndex);
+        } else if (param.content.tag == SCPI_NUM_MIN) {
+            value = channel_dispatcher::getUMin(slotIndex, subchannelIndex);
+        } else if (param.content.tag == SCPI_NUM_DEF) {
+            value = channel_dispatcher::getUDef(slotIndex, subchannelIndex);
+        } else if (param.content.tag == SCPI_NUM_UP && cv) {
+            value = cv->set + cv->step;
+            if (value > channel_dispatcher::getUMax(slotIndex, subchannelIndex))
+                value = channel_dispatcher::getUMax(slotIndex, subchannelIndex);
+        } else if (param.content.tag == SCPI_NUM_DOWN && cv) {
+            value = cv->set - cv->step;
+            if (value < channel_dispatcher::getUMin(slotIndex, subchannelIndex))
+                value = channel_dispatcher::getUMin(slotIndex, subchannelIndex);
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return false;
@@ -469,12 +473,9 @@ bool get_voltage_from_param(scpi_t *context, const scpi_number_t &param, float &
 
         value = (float)param.content.value;
 
-        if (channel) {
-            if (value < channel_dispatcher::getUMin(*channel) ||
-                value > channel_dispatcher::getUMax(*channel)) {
-                SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
-                return false;
-            }
+        if (value < channel_dispatcher::getUMin(slotIndex, subchannelIndex) || value > channel_dispatcher::getUMax(slotIndex, subchannelIndex)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+            return false;
         }
     }
 
@@ -765,7 +766,7 @@ bool get_power_limit_from_param(scpi_t *context, const scpi_number_t &param, flo
     return true;
 }
 
-scpi_result_t result_float(scpi_t *context, Channel *channel, float value, Unit unit) {
+scpi_result_t result_float(scpi_t *context, float value, Unit unit) {
     char buffer[32] = { 0 };
     strcatFloat(buffer, value);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));

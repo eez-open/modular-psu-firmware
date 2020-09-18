@@ -69,7 +69,7 @@ static scpi_result_t set_step(scpi_t *context, Channel::Value *cv, float min_val
     return SCPI_RES_OK;
 }
 
-scpi_result_t get_source_value(scpi_t *context, Channel &channel, Unit unit, float value, float min, float max, float def) {
+scpi_result_t get_source_value(scpi_t *context, Unit unit, float value, float min, float max, float def) {
     int32_t spec;
     if (!SCPI_ParamChoice(context, scpi_special_numbers_def, &spec, false)) {
         if (SCPI_ParamErrorOccurred(context)) {
@@ -88,10 +88,10 @@ scpi_result_t get_source_value(scpi_t *context, Channel &channel, Unit unit, flo
         }
     }
 
-    return result_float(context, &channel, value, unit);
+    return result_float(context, value, unit);
 }
 
-static scpi_result_t get_source_value(scpi_t *context, Channel &channel, Unit unit, float value, float def) {
+static scpi_result_t get_source_value(scpi_t *context, Unit unit, float value, float def) {
     int32_t spec;
     if (!SCPI_ParamChoice(context, scpi_special_numbers_def, &spec, false)) {
         if (SCPI_ParamErrorOccurred(context)) {
@@ -106,7 +106,7 @@ static scpi_result_t get_source_value(scpi_t *context, Channel &channel, Unit un
         }
     }
 
-    return result_float(context, &channel, value, unit);
+    return result_float(context, value, unit);
 }
 
 scpi_result_t get_delay(scpi_t *context, float delay) {
@@ -178,10 +178,10 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitudeQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_AMPER, channel_dispatcher::getISet(*channel),
-                            channel_dispatcher::getIMin(*channel),
-                            channel_dispatcher::getIMax(*channel),
-                            channel_dispatcher::getIDef(*channel));
+    return get_source_value(context, UNIT_AMPER, channel_dispatcher::getISet(*channel),
+        channel_dispatcher::getIMin(*channel),
+        channel_dispatcher::getIMax(*channel),
+        channel_dispatcher::getIDef(*channel));
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
@@ -198,7 +198,7 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
     }
 
     float voltage;
-    if (!get_voltage_param(context, voltage, channel, &channel->u)) {
+    if (!get_voltage_param(context, voltage, slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, channel ? &channel->u : nullptr)) {
         return SCPI_RES_ERR;
     }
 
@@ -248,25 +248,25 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ(scpi_t *context) {
         }
     }
 
-    if (channel) {
-        float u;
-        if (channel->isRemoteProgrammingEnabled()) {
-            u = channel->u.mon_dac;
-        } else {
-            u = channel_dispatcher::getUSet(*channel);
-        }
+    float value;
 
-        return get_source_value(context, *channel, UNIT_VOLT, u, channel_dispatcher::getUMin(*channel),
-                                channel_dispatcher::getUMax(*channel),
-                                channel_dispatcher::getUDef(*channel));
+    if (channel) {
+        if (channel->isRemoteProgrammingEnabled()) {
+            value = channel->u.mon_dac;
+        } else {
+            value = channel_dispatcher::getUSet(*channel);
+        }
     } else {
         int err;
-        float value;
         if (!channel_dispatcher::getVoltage(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, value, &err)) {
             SCPI_ErrorPush(context, err);
         }        
-        return result_float(context, nullptr, value, UNIT_VOLT);
     }
+
+    return get_source_value(context, UNIT_VOLT, value,
+        channel_dispatcher::getUMin(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex),
+        channel_dispatcher::getUMax(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex),
+        channel_dispatcher::getUDef(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -286,7 +286,7 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateStepIncrementQ(scpi_t *context
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_AMPER, channel->i.step, channel->params.I_DEF_STEP);
+    return get_source_value(context, UNIT_AMPER, channel->i.step, channel->params.I_DEF_STEP);
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrement(scpi_t *context) {
@@ -304,7 +304,7 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateStepIncrementQ(scpi_t *context
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_VOLT, channel->u.step, channel->params.U_DEF_STEP);
+    return get_source_value(context, UNIT_VOLT, channel->u.step, channel->params.U_DEF_STEP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,10 +392,11 @@ scpi_result_t scpi_cmd_sourcePowerProtectionLevelQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(
-        context, *channel, UNIT_WATT, channel_dispatcher::getPowerProtectionLevel(*channel),
-        channel_dispatcher::getOppMinLevel(*channel), channel_dispatcher::getOppMaxLevel(*channel),
-        channel_dispatcher::getOppDefaultLevel(*channel));
+    return get_source_value(context, UNIT_WATT, channel_dispatcher::getPowerProtectionLevel(*channel),
+        channel_dispatcher::getOppMinLevel(*channel),
+        channel_dispatcher::getOppMaxLevel(*channel),
+        channel_dispatcher::getOppDefaultLevel(*channel)
+    );
 }
 
 scpi_result_t scpi_cmd_sourcePowerProtectionDelayTime(scpi_t *context) {
@@ -485,8 +486,7 @@ scpi_result_t scpi_cmd_sourceVoltageProtectionLevelQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(
-        context, *channel, UNIT_VOLT, channel_dispatcher::getUProtectionLevel(*channel),
+    return get_source_value(context, UNIT_VOLT, channel_dispatcher::getUProtectionLevel(*channel),
         channel_dispatcher::getUSet(*channel), channel_dispatcher::getUMax(*channel),
         channel_dispatcher::getUMax(*channel));
 }
@@ -708,7 +708,7 @@ scpi_result_t scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitudeQ(scpi_t *con
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_AMPER, channel_dispatcher::getILimit(*channel),
+    return get_source_value(context, UNIT_AMPER, channel_dispatcher::getILimit(*channel),
                             0, channel_dispatcher::getIMaxLimit(*channel),
                             channel_dispatcher::getIMaxLimit(*channel));
 }
@@ -735,7 +735,7 @@ scpi_result_t scpi_cmd_sourceVoltageLimitPositiveImmediateAmplitudeQ(scpi_t *con
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_VOLT, channel_dispatcher::getULimit(*channel),
+    return get_source_value(context, UNIT_VOLT, channel_dispatcher::getULimit(*channel),
                             0, channel_dispatcher::getUMaxLimit(*channel),
                             channel_dispatcher::getUMaxLimit(*channel));
 }
@@ -762,7 +762,7 @@ scpi_result_t scpi_cmd_sourcePowerLimitQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_WATT,
+    return get_source_value(context, UNIT_WATT,
                             channel_dispatcher::getPowerLimit(*channel),
                             channel_dispatcher::getPowerMinLimit(*channel),
                             channel_dispatcher::getPowerMaxLimit(*channel),
@@ -794,7 +794,7 @@ scpi_result_t scpi_cmd_sourceCurrentLevelTriggeredAmplitudeQ(scpi_t *context) {
     }
 
     return get_source_value(
-        context, *channel, UNIT_AMPER, channel_dispatcher::getTriggerCurrent(*channel),
+        context, UNIT_AMPER, channel_dispatcher::getTriggerCurrent(*channel),
         channel_dispatcher::getIMin(*channel), channel_dispatcher::getIMax(*channel),
         channel_dispatcher::getIDef(*channel));
 }
@@ -822,7 +822,7 @@ scpi_result_t scpi_cmd_sourceVoltageLevelTriggeredAmplitudeQ(scpi_t *context) {
     }
 
     return get_source_value(
-        context, *channel, UNIT_VOLT, channel_dispatcher::getTriggerVoltage(*channel),
+        context, UNIT_VOLT, channel_dispatcher::getTriggerVoltage(*channel),
         channel_dispatcher::getUMin(*channel), channel_dispatcher::getUMax(*channel),
         channel_dispatcher::getUDef(*channel));
 }
@@ -1204,7 +1204,7 @@ scpi_result_t scpi_cmd_sourceCurrentRampDurationQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_SECOND, channel->i.rampDuration, RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE_I);
+    return get_source_value(context, UNIT_SECOND, channel->i.rampDuration, RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE_I);
 }
 
 scpi_result_t scpi_cmd_sourceVoltageRampDuration(scpi_t *context) {
@@ -1249,7 +1249,7 @@ scpi_result_t scpi_cmd_sourceVoltageRampDurationQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_SECOND, channel->u.rampDuration, channel->params.U_RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE_U);
+    return get_source_value(context, UNIT_SECOND, channel->u.rampDuration, channel->params.U_RAMP_DURATION_MIN_VALUE, RAMP_DURATION_MAX_VALUE, RAMP_DURATION_DEF_VALUE_U);
 }
 
 scpi_result_t scpi_cmd_sourceDigitalDataByte(scpi_t *context) {

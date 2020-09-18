@@ -48,7 +48,7 @@ float getValuePrecision(const Channel &channel, Unit unit, float value);
 float roundChannelValue(const Channel &channel, Unit unit, float value);
 
 float getUSet(const Channel &channel);
-float getUSet(const Channel *channel, int slotIndex, int subchannelIndex);
+float getUSet(int slotIndex, int subchannelIndex);
 float getUSetUnbalanced(const Channel &channel);
 float getUMon(const Channel &channel);
 float getUMonLast(const Channel &channel);
@@ -57,9 +57,11 @@ float getUMonDacLast(const Channel &channel);
 float getULimit(const Channel &channel);
 float getUMaxLimit(const Channel &channel);
 float getUMin(const Channel &channel);
+float getUMin(int slotIndex, int subchannelIndex);
 float getUDef(const Channel &channel);
+float getUDef(int slotIndex, int subchannelIndex);
 float getUMax(const Channel &channel);
-float getUMax(const Channel *channel, int slotIndex, int subchannelIndex);
+float getUMax(int slotIndex, int subchannelIndex);
 float getUMaxOvpLimit(const Channel &channel);
 float getUMaxOvpLevel(const Channel &channel);
 float getUProtectionLevel(const Channel &channel);
@@ -73,14 +75,14 @@ void setOvpLevel(Channel &channel, float level);
 void setOvpDelay(Channel &channel, float delay);
 
 float getISet(const Channel &channel);
-float getISet(const Channel *channel, int slotIndex, int subchannelIndex);
+float getISet(int slotIndex, int subchannelIndex);
 float getISetUnbalanced(const Channel &channel);
 float getIMon(const Channel &channel);
 float getIMonLast(const Channel &channel);
 float getIMonDac(const Channel &channel);
 float getILimit(const Channel &channel);
 float getIMaxLimit(const Channel &channel);
-float getIMaxLimit(const Channel *channel, int slotIndex, int subchannelIndex);
+float getIMaxLimit(int slotIndex, int subchannelIndex);
 float getIMin(const Channel &channel);
 float getIDef(const Channel &channel);
 float getIMax(const Channel &channel);
@@ -196,17 +198,15 @@ bool routeClose(ChannelList channelList, int *err);
 
 bool getVoltage(int slotIndex, int subchannelIndex, float &value, int *err);
 bool setVoltage(int slotIndex, int subchannelIndex, float value, int *err);
-void getVoltageStepValues(Channel *channel, int slotIndex, int subchannelIndex, StepValues *stepValues, bool calibrationMode);
+void getVoltageStepValues(int slotIndex, int subchannelIndex, StepValues *stepValues, bool calibrationMode);
 float getVoltageResolution(int slotIndex, int subchannelIndex);
-float getVoltageResolution(Channel *channel, int slotIndex, int subchannelIndex);
 float getVoltageMinValue(int slotIndex, int subchannelIndex);
 float getVoltageMaxValue(int slotIndex, int subchannelIndex);
 
 bool getCurrent(int slotIndex, int subchannelIndex, float &value, int *err);
 bool setCurrent(int slotIndex, int subchannelIndex, float value, int *err);
-void getCurrentStepValues(Channel *channel, int slotIndex, int subchannelIndex, StepValues *stepValues, bool calibrationMode);
+void getCurrentStepValues(int slotIndex, int subchannelIndex, StepValues *stepValues, bool calibrationMode);
 float getCurrentResolution(int slotIndex, int subchannelIndex);
-float getCurrentResolution(Channel *channel, int slotIndex, int subchannelIndex);
 float getCurrentMinValue(int slotIndex, int subchannelIndex);
 float getCurrentMaxValue(int slotIndex, int subchannelIndex);
 

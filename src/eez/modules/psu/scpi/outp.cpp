@@ -333,7 +333,7 @@ scpi_result_t scpi_cmd_outputDelayDurationQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, *channel, UNIT_SECOND, channel->outputDelayDuration, OUTPUT_DELAY_DURATION_MIN_VALUE, OUTPUT_DELAY_DURATION_MAX_VALUE, OUTPUT_DELAY_DURATION_DEF_VALUE);
+    return get_source_value(context, UNIT_SECOND, channel->outputDelayDuration, OUTPUT_DELAY_DURATION_MIN_VALUE, OUTPUT_DELAY_DURATION_MAX_VALUE, OUTPUT_DELAY_DURATION_DEF_VALUE);
 }
 
 } // namespace scpi

@@ -335,7 +335,7 @@ scpi_result_t scpi_cmd_systemTemperatureProtectionHighLevelQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    return result_float(context, 0, temperature::sensors[sensor].prot_conf.level, UNIT_CELSIUS);
+    return result_float(context, temperature::sensors[sensor].prot_conf.level, UNIT_CELSIUS);
 }
 
 scpi_result_t scpi_cmd_systemTemperatureProtectionHighState(scpi_t *context) {
@@ -1965,7 +1965,7 @@ scpi_result_t scpi_cmd_systemMeasureScalarVoltageDcQ(scpi_t *context) {
     }
 
     // only choice for now is RTC
-    return result_float(context, 0, mcu::battery::g_battery, UNIT_VOLT);
+    return result_float(context, mcu::battery::g_battery, UNIT_VOLT);
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
     return SCPI_RES_ERR;
