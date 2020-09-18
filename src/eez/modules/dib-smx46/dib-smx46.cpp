@@ -54,6 +54,10 @@ using namespace eez::gui;
 namespace eez {
 namespace dib_smx46 {
 
+enum Smx46LowPriorityThreadMessage {
+    THREAD_MESSAGE_SAVE_RELAY_CYCLES = THREAD_MESSAGE_MODULE_SPECIFIC
+};
+
 static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
 
 static const int32_t CONF_TRANSFER_TIMEOUT_MS = 1000;
@@ -69,7 +73,6 @@ static float DAC_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
 static const int NUM_COLUMNS = 6;
 static const int NUM_ROWS = 4;
 static const int MAX_LABEL_LENGTH = 5;
-
 
 static const uint32_t MIN_TO_MS = 60L * 1000L;
 
@@ -93,21 +96,21 @@ public:
     uint8_t output[BUFFER_SIZE];
     bool spiReady = false;
 
-    uint32_t routes = 0;
+    uint32_t routes;
 
     char xLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
     char yLabels[NUM_ROWS][MAX_LABEL_LENGTH + 1];
 
-    float dac1 = 0.0f;
-    float dac2 = 0.0f;
-    bool calibrationEnabled[2] = { true, true };
+    float dac1;
+    float dac2;
+    bool calibrationEnabled[2];
     CalibrationConfiguration calConf[2];
 
-    bool relayOn = false;
-    
+    bool relayOn;
+
+    // relay cycles counting    
     uint32_t signalRelayCycles[NUM_ROWS][NUM_COLUMNS];
     uint32_t powerRelayCycles;
-
     uint32_t lastWrittenSignalRelayCycles[NUM_ROWS][NUM_COLUMNS];
     uint32_t lastWrittenPowerRelayCycles;
     Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
@@ -132,12 +135,10 @@ public:
         resetConfiguration();
 
         auto data = (FromMasterToSlave *)output;
-        data->routes = 0xFFFFFFFF;
-
-        memset(calConf, 0, sizeof(calConf));
-
-        memset(signalRelayCycles, 0, NUM_ROWS * NUM_COLUMNS * sizeof(uint32_t));
-        powerRelayCycles = 0;
+        data->routes = routes;
+        data->dac1 = dac1;
+        data->dac2 = dac2;
+        data->relayOn = relayOn;
     }
 
     void boot() override {
@@ -217,7 +218,7 @@ public:
 #endif
 
         if (relayCyclesWriteInterval.test(micros())) {
-            saveRelayCycles();
+            sendMessageToLowPriorityThread((LowPriorityThreadMessage)THREAD_MESSAGE_SAVE_RELAY_CYCLES);
         }
     }
 
@@ -288,7 +289,7 @@ public:
     }
 
     struct ProfileParameters {
-        uint32_t routes;
+        unsigned int routes;
         char xLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
         char yLabels[NUM_ROWS][MAX_LABEL_LENGTH + 1];
         float dac1;
@@ -327,7 +328,7 @@ public:
     bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) override {
         auto parameters = (const ProfileParameters *)buffer;
         
-        WRITE_PROPERTY("routes", (unsigned int)parameters->routes);
+        WRITE_PROPERTY("routes", parameters->routes);
 
         for (int i = 0; i < NUM_COLUMNS; i++) {
             char propName[16];
@@ -352,9 +353,7 @@ public:
     bool readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) override {
         auto parameters = (ProfileParameters *)buffer;
 
-        unsigned int routes;
-        READ_PROPERTY("routes", routes);
-        parameters->routes = routes;
+        READ_PROPERTY("routes", parameters->routes);
         
         for (int i = 0; i < NUM_COLUMNS; i++) {
             char propName[16];
@@ -631,13 +630,13 @@ public:
     void updateRelayCycles(uint32_t oldRoutes, uint32_t newRoutes, uint8_t oldRelayOn, uint8_t newRelayOn) {
         for (int y = 0; y < NUM_ROWS; y++) {
             for (int x = 0; x < NUM_COLUMNS; x++) {
-                if ((oldRoutes & (1 << (y * NUM_COLUMNS + x))) == 0 && (newRoutes & (1 << (y * NUM_COLUMNS + x)))) {
+                if (!(oldRoutes & (1 << (y * NUM_COLUMNS + x))) && (newRoutes & (1 << (y * NUM_COLUMNS + x)))) {
                     signalRelayCycles[y][x]++;
                 }
             }
         }
 
-        if (oldRelayOn == 0 && newRelayOn == 1) {
+        if (!oldRelayOn && newRelayOn) {
             powerRelayCycles++;
         }
     }
@@ -886,6 +885,11 @@ void data_dib_smx46_power_relay_cycles(DataOperationEnum operation, Cursor curso
     }
 }
 
+void action_dib_smx46_show_configure_routes() {
+    hmi::selectSlot(getFoundWidgetAtDown().cursor);
+    pushPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+}
+
 void action_dib_smx46_toggle_route() {
     int cursor = getFoundWidgetAtDown().cursor;
     int slotIndex = cursor / (NUM_COLUMNS * NUM_ROWS);
@@ -893,11 +897,7 @@ void action_dib_smx46_toggle_route() {
     int x = i % NUM_COLUMNS;
     int y = i / NUM_COLUMNS;
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
-    if (page) {
-        page->toggleRoute(x, y);
-    } else {
-        ((Smx46Module *)g_slots[slotIndex])->toggleRoute(x, y);
-    }
+    page->toggleRoute(x, y);
 }
 
 void action_dib_smx46_toggle_relay() {
@@ -929,19 +929,27 @@ void action_dib_smx46_edit_y_label() {
     Keypad::startPush("Label: ", g_labelPointer, 1, MAX_LABEL_LENGTH, false, onSetLabel, popPage);
 }
 
-void action_dib_smx46_show_configure_routes() {
-    hmi::selectSlot(getFoundWidgetAtDown().cursor);
-    pushPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+void action_dib_smx46_clear_all_routes() {
+    ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
+    page->routes = 0;
 }
 
-void action_dib_smx46_close_all_routes() {
+void action_dib_smx46_clear_all_labels() {
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
-    if (page) {
-        page->routes = 0;
-    } else {
-        int slotIndex = getFoundWidgetAtDown().cursor;
-        ((Smx46Module *)g_slots[slotIndex])->routes = 0;
+
+    for (int i = 0; i < NUM_COLUMNS; i++) {
+        page->xLabels[i][0] = 'X';
+        page->xLabels[i][1] = '1' + i;
+        page->xLabels[i][2] = 0;
     }
+
+    for (int i = 0; i < NUM_ROWS; i++) {
+        page->yLabels[i][0] = 'Y';
+        page->yLabels[i][1] = '1' + i;
+        page->yLabels[i][2] = 0;
+    }
+
+    refreshScreen();
 }
 
 void action_dib_smx46_show_dac1_calibration() {

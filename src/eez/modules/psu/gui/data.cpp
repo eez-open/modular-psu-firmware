@@ -2045,20 +2045,14 @@ void data_channel_temp(DataOperationEnum operation, Cursor cursor, Value &value)
 }
 
 void data_channel_on_time_total(DataOperationEnum operation, Cursor cursor, Value &value) {
-    int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-    Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
-        value =
-            Value((uint32_t)ontime::g_moduleCounters[channel.slotIndex].getTotalTime(), VALUE_TYPE_ON_TIME_COUNTER);
+        value = Value((uint32_t)ontime::g_moduleCounters[hmi::g_selectedSlotIndex].getTotalTime(), VALUE_TYPE_ON_TIME_COUNTER);
     }
 }
 
 void data_channel_on_time_last(DataOperationEnum operation, Cursor cursor, Value &value) {
-    int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-    Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
-        value =
-            Value((uint32_t)ontime::g_moduleCounters[channel.slotIndex].getLastTime(), VALUE_TYPE_ON_TIME_COUNTER);
+        value = Value((uint32_t)ontime::g_moduleCounters[hmi::g_selectedSlotIndex].getLastTime(), VALUE_TYPE_ON_TIME_COUNTER);
     }
 }
 
@@ -5756,7 +5750,7 @@ void data_slot_index(DataOperationEnum operation, Cursor cursor, Value &value) {
 
 void data_slot_info(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(cursor, VALUE_TYPE_SLOT_INFO);
+        value = Value(cursor != -1 ? cursor : hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_INFO);
     }
 }
 

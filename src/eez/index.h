@@ -176,6 +176,9 @@ struct Module {
     virtual int getChannelSettingsPageId();
     virtual int getSlotSettingsPageId();
 
+    virtual void onLowPriorityThreadMessage(uint8_t type, uint32_t param);
+    virtual void onHighPriorityThreadMessage(uint8_t type, uint32_t param);
+
     virtual void getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer);
     virtual void setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels);
     virtual bool writePowerChannelProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer);

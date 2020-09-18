@@ -99,7 +99,10 @@
       "name": "show_configure_routes"
     },
     {
-      "name": "close_all_routes"
+      "name": "clear_all_routes"
+    },
+    {
+      "name": "clear_all_labels"
     },
     {
       "name": "show_dac1_calibration"
@@ -334,11 +337,11 @@
             "style": {
               "inheritFrom": "default_S_left"
             },
-            "left": 2,
-            "top": 157,
-            "width": 50,
+            "left": 13,
+            "top": 140,
+            "width": 38,
             "height": 32,
-            "text": "DAC 1"
+            "text": "AO1"
           },
           {
             "type": "DisplayData",
@@ -348,8 +351,8 @@
             "data": "dac1",
             "action": "edit",
             "left": 52,
-            "top": 157,
-            "width": 106,
+            "top": 140,
+            "width": 102,
             "height": 32,
             "displayOption": 0
           },
@@ -358,11 +361,11 @@
             "style": {
               "inheritFrom": "default_S_left"
             },
-            "left": 2,
-            "top": 195,
-            "width": 50,
+            "left": 13,
+            "top": 174,
+            "width": 39,
             "height": 32,
-            "text": "DAC 2"
+            "text": "AO2"
           },
           {
             "type": "DisplayData",
@@ -372,10 +375,48 @@
             "data": "dac2",
             "action": "edit",
             "left": 52,
-            "top": 195,
-            "width": 106,
+            "top": 174,
+            "width": 102,
             "height": 32,
             "displayOption": 0
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "relay_on",
+            "action": "toggle_relay",
+            "left": 6,
+            "top": 208,
+            "width": 148,
+            "height": 30,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 148,
+                "height": 30,
+                "text": "Power relay: OFF"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 148,
+                "height": 30,
+                "text": "Power relay: ON"
+              }
+            ]
           }
         ],
         "left": 0,
@@ -558,11 +599,11 @@
             "style": {
               "inheritFrom": "default_S_left"
             },
-            "left": 32,
-            "top": 158,
-            "width": 54,
+            "left": 30,
+            "top": 140,
+            "width": 46,
             "height": 32,
-            "text": "DAC 1"
+            "text": "AO1"
           },
           {
             "type": "DisplayData",
@@ -571,9 +612,9 @@
             },
             "data": "dac1",
             "action": "edit",
-            "left": 86,
-            "top": 158,
-            "width": 131,
+            "left": 76,
+            "top": 140,
+            "width": 134,
             "height": 32,
             "displayOption": 0
           },
@@ -582,11 +623,11 @@
             "style": {
               "inheritFrom": "default_S_left"
             },
-            "left": 32,
-            "top": 198,
-            "width": 54,
+            "left": 30,
+            "top": 174,
+            "width": 46,
             "height": 32,
-            "text": "DAC 2"
+            "text": "AO2"
           },
           {
             "type": "DisplayData",
@@ -595,11 +636,49 @@
             },
             "data": "dac2",
             "action": "edit",
-            "left": 86,
-            "top": 198,
-            "width": 131,
+            "left": 76,
+            "top": 174,
+            "width": 134,
             "height": 32,
             "displayOption": 0
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "relay_on",
+            "action": "toggle_relay",
+            "left": 30,
+            "top": 208,
+            "width": 180,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 180,
+                "height": 32,
+                "text": "Power relay: OFF"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 180,
+                "height": 32,
+                "text": "Power relay: ON"
+              }
+            ]
           }
         ],
         "left": 0,
@@ -872,11 +951,11 @@
             "style": {
               "inheritFrom": "default_S_left"
             },
-            "left": 290,
+            "left": 305,
             "top": 36,
-            "width": 54,
-            "height": 32,
-            "text": "DAC 1"
+            "width": 37,
+            "height": 38,
+            "text": "AO1"
           },
           {
             "type": "DisplayData",
@@ -886,9 +965,9 @@
             "data": "dac1",
             "action": "edit",
             "left": 344,
-            "top": 36,
+            "top": 37,
             "width": 131,
-            "height": 32,
+            "height": 38,
             "displayOption": 0
           },
           {
@@ -896,11 +975,11 @@
             "style": {
               "inheritFrom": "default_S_left"
             },
-            "left": 290,
-            "top": 76,
-            "width": 54,
-            "height": 32,
-            "text": "DAC 2"
+            "left": 305,
+            "top": 81,
+            "width": 39,
+            "height": 38,
+            "text": "AO2"
           },
           {
             "type": "DisplayData",
@@ -910,9 +989,9 @@
             "data": "dac2",
             "action": "edit",
             "left": 344,
-            "top": 76,
+            "top": 81,
             "width": 131,
-            "height": 32,
+            "height": 38,
             "displayOption": 0
           },
           {
@@ -922,10 +1001,10 @@
             },
             "data": "relay_on",
             "action": "toggle_relay",
-            "left": 342,
-            "top": 124,
-            "width": 131,
-            "height": 32,
+            "left": 290,
+            "top": 125,
+            "width": 185,
+            "height": 38,
             "widgets": [
               {
                 "type": "Text",
@@ -935,9 +1014,9 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 131,
-                "height": 32,
-                "text": "Relay OFF"
+                "width": 185,
+                "height": 38,
+                "text": "Power relay: OFF"
               },
               {
                 "type": "Text",
@@ -947,9 +1026,9 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 131,
-                "height": 32,
-                "text": "Relay ON"
+                "width": 185,
+                "height": 38,
+                "text": "Power relay: ON"
               }
             ]
           }
@@ -973,7 +1052,7 @@
             "left": 8,
             "top": 8,
             "width": 464,
-            "height": 231,
+            "height": 224,
             "name": "Settings",
             "widgets": [
               {
@@ -982,14 +1061,14 @@
                   "inheritFrom": "edit_value_active_S_center",
                   "alignHorizontal": "left",
                   "alignVertical": "top",
-                  "padding": "3"
+                  "padding": "13"
                 },
                 "action": "show_dac1_calibration",
-                "left": 232,
-                "top": 54,
-                "width": 114,
+                "left": 0,
+                "top": 0,
+                "width": 228,
                 "height": 50,
-                "text": "\\u0097 DAC1 Calibration",
+                "text": "\\u0097 AO1 Calibration",
                 "firstLineIndent": 0,
                 "hangingIndent": 24
               },
@@ -999,14 +1078,14 @@
                   "inheritFrom": "edit_value_active_S_center",
                   "alignHorizontal": "left",
                   "alignVertical": "top",
-                  "padding": "3"
+                  "padding": "13"
                 },
                 "action": "show_dac2_calibration",
-                "left": 350,
-                "top": 54,
-                "width": 114,
+                "left": 0,
+                "top": 58,
+                "width": 228,
                 "height": 50,
-                "text": "\\u0097 DAC2 Calibration",
+                "text": "\\u0097 AO2 Calibration",
                 "firstLineIndent": 0,
                 "hangingIndent": 24
               },
@@ -1016,12 +1095,12 @@
                   "inheritFrom": "edit_value_active_S_center",
                   "alignHorizontal": "left",
                   "alignVertical": "top",
-                  "padding": "3"
+                  "padding": "13"
                 },
                 "action": "show_relay_cycles",
-                "left": 232,
-                "top": 108,
-                "width": 114,
+                "left": 236,
+                "top": 0,
+                "width": 228,
                 "height": 50,
                 "text": "\\u00bc Relay Cycles",
                 "firstLineIndent": 0,
@@ -1033,57 +1112,33 @@
                   "inheritFrom": "edit_value_active_S_center",
                   "alignHorizontal": "left",
                   "alignVertical": "top",
-                  "padding": "3"
+                  "padding": "13"
                 },
                 "action": "show_info",
-                "left": 350,
-                "top": 108,
-                "width": 114,
+                "left": 236,
+                "top": 58,
+                "width": 228,
                 "height": 50,
                 "text": "\\u0080 Info",
                 "firstLineIndent": 0,
                 "hangingIndent": 24
               },
               {
-                "type": "Select",
+                "type": "MultilineText",
                 "style": {
-                  "inheritFrom": "default"
+                  "inheritFrom": "edit_value_active_S_center",
+                  "alignHorizontal": "left",
+                  "alignVertical": "top",
+                  "padding": "13"
                 },
-                "data": "channel_has_firmware_update",
-                "left": 350,
-                "top": 162,
-                "width": 114,
+                "action": "channel_update_firmware",
+                "left": 236,
+                "top": 116,
+                "width": 228,
                 "height": 50,
-                "widgets": [
-                  {
-                    "type": "Rectangle",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 50,
-                    "invertColors": true
-                  },
-                  {
-                    "type": "MultilineText",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center",
-                      "alignHorizontal": "left",
-                      "alignVertical": "top",
-                      "padding": "3"
-                    },
-                    "action": "channel_update_firmware",
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 50,
-                    "text": "\\u00bb Firmware update",
-                    "firstLineIndent": 0,
-                    "hangingIndent": 24
-                  }
-                ]
+                "text": "\\u00bb Firmware update",
+                "firstLineIndent": 0,
+                "hangingIndent": 24
               }
             ]
           },
@@ -1260,7 +1315,7 @@
                                 "color": "Background",
                                 "borderSize": "1",
                                 "borderRadius": 8,
-                                "borderColor": "text_disabled"
+                                "borderColor": "Action color"
                               },
                               "left": 27,
                               "top": 17,
@@ -1323,6 +1378,8 @@
                               "type": "Rectangle",
                               "style": {
                                 "inheritFrom": "default",
+                                "color": "Action color",
+                                "activeBackgroundColor": "Action color",
                                 "borderSize": "0",
                                 "borderRadius": 7
                               },
@@ -1361,7 +1418,9 @@
                     {
                       "type": "Text",
                       "style": {
-                        "inheritFrom": "default_S_right_condensed"
+                        "inheritFrom": "default_S_right_condensed",
+                        "color": "Action color",
+                        "activeBackgroundColor": "Action color"
                       },
                       "data": "y_label",
                       "action": "edit_y_label",
@@ -1400,7 +1459,9 @@
                       "type": "Text",
                       "style": {
                         "inheritFrom": "default_S_right_condensed",
-                        "alignHorizontal": "center"
+                        "alignHorizontal": "center",
+                        "color": "Action color",
+                        "activeBackgroundColor": "Action color"
                       },
                       "data": "x_label",
                       "action": "edit_x_label",
@@ -1453,7 +1514,7 @@
                 },
                 "left": 41,
                 "top": 0,
-                "width": 199,
+                "width": 147,
                 "height": 32,
                 "text": "Configure routes"
               },
@@ -1463,23 +1524,25 @@
                   "inheritFrom": "bottom_button_textual_S_left",
                   "alignHorizontal": "center"
                 },
-                "action": "close_all_routes",
-                "left": 240,
+                "action": "clear_all_routes",
+                "left": 188,
                 "top": 0,
-                "width": 96,
+                "width": 105,
                 "height": 32,
-                "text": "Close all"
+                "text": "Clear routes"
               },
               {
-                "type": "Rectangle",
+                "type": "Text",
                 "style": {
-                  "inheritFrom": "status_bgnd"
+                  "inheritFrom": "bottom_button_textual_S_left",
+                  "alignHorizontal": "center"
                 },
-                "left": 336,
+                "action": "clear_all_labels",
+                "left": 293,
                 "top": 0,
-                "width": 62,
+                "width": 105,
                 "height": 32,
-                "invertColors": true
+                "text": "Clear labels"
               },
               {
                 "type": "Select",
@@ -1735,7 +1798,7 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 132,
+                "width": 137,
                 "height": 32,
                 "text": "Model:"
               },
@@ -1745,7 +1808,7 @@
                   "inheritFrom": "value_M_left"
                 },
                 "data": "slot_info",
-                "left": 132,
+                "left": 137,
                 "top": 0,
                 "width": 332,
                 "height": 32,
@@ -1757,8 +1820,8 @@
                   "inheritFrom": "default_M_left"
                 },
                 "left": 0,
-                "top": 32,
-                "width": 132,
+                "top": 36,
+                "width": 137,
                 "height": 32,
                 "text": "Brand:"
               },
@@ -1768,8 +1831,8 @@
                   "inheritFrom": "value_M_left"
                 },
                 "data": "channel_info_brand",
-                "left": 132,
-                "top": 32,
+                "left": 137,
+                "top": 36,
                 "width": 332,
                 "height": 32,
                 "text": ""
@@ -1780,8 +1843,8 @@
                   "inheritFrom": "default_M_left"
                 },
                 "left": 0,
-                "top": 64,
-                "width": 132,
+                "top": 72,
+                "width": 137,
                 "height": 32,
                 "text": "Serial No.:"
               },
@@ -1791,11 +1854,57 @@
                   "inheritFrom": "value_M_left"
                 },
                 "data": "slot_serial_info",
-                "left": 132,
-                "top": 64,
+                "left": 137,
+                "top": 72,
                 "width": 332,
                 "height": 32,
                 "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left"
+                },
+                "left": 0,
+                "top": 108,
+                "width": 137,
+                "height": 32,
+                "text": "Total On time:"
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "value_M_left"
+                },
+                "data": "channel_on_time_total",
+                "left": 137,
+                "top": 108,
+                "width": 176,
+                "height": 32,
+                "displayOption": 0
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_M_left"
+                },
+                "left": 0,
+                "top": 144,
+                "width": 137,
+                "height": 32,
+                "text": "Last On time:"
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "value_M_left"
+                },
+                "data": "channel_on_time_last",
+                "left": 137,
+                "top": 144,
+                "width": 176,
+                "height": 32,
+                "displayOption": 0
               }
             ]
           },

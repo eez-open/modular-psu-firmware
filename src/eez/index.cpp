@@ -127,6 +127,12 @@ int Module::getSlotSettingsPageId() {
     return PAGE_ID_SLOT_SETTINGS;
 }
 
+void Module::onLowPriorityThreadMessage(uint8_t type, uint32_t param) {
+}
+
+void Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
+}
+
 void Module::getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) {
 }
 

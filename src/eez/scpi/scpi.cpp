@@ -61,7 +61,7 @@ void resetContext() {
 }
 
 void generateError(int error) {
-    if (!isLowPriorityThread()) {
+    if (g_isBooted && !isLowPriorityThread()) {
         sendMessageToLowPriorityThread(THREAD_MESSAGE_GENERATE_ERROR, error);
     } else {
         if (psu::serial::g_testResult == TEST_OK) {

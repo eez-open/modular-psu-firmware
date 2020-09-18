@@ -396,6 +396,9 @@ void lowPriorityThreadOneIter() {
                     int subchannelIndex = param & 0xFF;
                     persist_conf::saveChannelCalibration(slotIndex, subchannelIndex);
                 }
+            } else if (type >= THREAD_MESSAGE_MODULE_SPECIFIC) {
+                int slotIndex = param & 0xff;
+                g_slots[slotIndex]->onLowPriorityThreadMessage(type, param);
             }
         }
     } else {

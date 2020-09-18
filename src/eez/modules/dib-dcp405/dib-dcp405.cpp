@@ -69,7 +69,7 @@ struct DcpChannel : public Channel {
 	DigitalAnalogConverter dac;
 	IOExpander ioexp;
 
-	TestResult tempSensorTestResult = TEST_NONE;
+	TestResult tempSensorTestResult = TEST_OK;
 
     bool delayed_dp_off;
 	uint32_t delayed_dp_off_start;

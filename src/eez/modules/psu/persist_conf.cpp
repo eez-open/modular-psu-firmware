@@ -1272,10 +1272,11 @@ void setSlotEnabled(int slotIndex, bool enabled) {
 static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 64;
 static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
 
-static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS + MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE;
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = 128;
 static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 780;
 
-static const uint16_t MODULE_PERSIST_CONF_COUNTERS_ADDRESS = MODULE_PERSIST_CONF_CH_CAL_ADDRESS + MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE;
+static const uint16_t MODULE_PERSIST_CONF_COUNTERS_ADDRESS = 2048;
+static const uint32_t COUNTER_SIZE = 64;
 
 ModuleConfiguration g_moduleConf[NUM_SLOTS];
 
@@ -1395,6 +1396,8 @@ bool saveChannelCalibration(int slotIndex, int subchannelIndex) {
     );
 }
 
+static const uint32_t RELAY_COUNTER_SIZE = 64;
+
 uint32_t readCounter(int slotIndex, int counterIndex) {
     uint32_t buffer[6];
 
@@ -1403,7 +1406,7 @@ uint32_t readCounter(int slotIndex, int counterIndex) {
             slotIndex,
             (uint8_t *)buffer, 
             sizeof(buffer), 
-            MODULE_PERSIST_CONF_COUNTERS_ADDRESS + counterIndex * sizeof(buffer),
+            MODULE_PERSIST_CONF_COUNTERS_ADDRESS + counterIndex * COUNTER_SIZE,
             -1
         );
 
@@ -1445,7 +1448,7 @@ bool writeCounter(int slotIndex, int counterIndex, uint32_t counter) {
         slotIndex,
         (uint8_t *)buffer, 
         sizeof(buffer), 
-        MODULE_PERSIST_CONF_COUNTERS_ADDRESS + counterIndex * sizeof(buffer)
+        MODULE_PERSIST_CONF_COUNTERS_ADDRESS + counterIndex * COUNTER_SIZE
     );
 }
 
