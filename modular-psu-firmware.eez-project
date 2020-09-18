@@ -26925,8 +26925,8 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "left": 0,
-                "top": 168,
+                "left": 236,
+                "top": 0,
                 "width": 236,
                 "height": 28,
                 "name": "Firmware",
@@ -26962,7 +26962,7 @@
                   "inheritFrom": "default"
                 },
                 "left": 236,
-                "top": 0,
+                "top": 28,
                 "width": 236,
                 "height": 28,
                 "name": "CPU module",
@@ -26997,11 +26997,11 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "channels",
+                "data": "slots",
                 "left": 236,
-                "top": 28,
+                "top": 56,
                 "width": 236,
-                "height": 168,
+                "height": 84,
                 "itemWidget": {
                   "type": "Container",
                   "style": {
@@ -27017,7 +27017,7 @@
                       "style": {
                         "inheritFrom": "edit_value_S_left"
                       },
-                      "data": "channel_board_info_label",
+                      "data": "slot_index",
                       "left": 0,
                       "top": 0,
                       "width": 114,
@@ -27029,41 +27029,127 @@
                       "style": {
                         "inheritFrom": "default"
                       },
-                      "data": "channel_status",
+                      "data": "slot_test_result",
                       "left": 114,
                       "top": 0,
                       "width": 122,
                       "height": 28,
                       "widgets": [
                         {
-                          "type": "DisplayData",
-                          "style": {
-                            "inheritFrom": "event_error"
-                          },
-                          "data": "channel_board_info_revision",
-                          "left": 0,
-                          "top": 0,
-                          "width": 122,
-                          "height": 28,
-                          "displayOption": 0
-                        },
-                        {
-                          "type": "DisplayData",
+                          "type": "Text",
                           "style": {
                             "inheritFrom": "value_S_left"
                           },
-                          "data": "channel_board_info_revision",
+                          "data": "slot_info",
                           "left": 0,
                           "top": 0,
                           "width": 122,
                           "height": 28,
-                          "displayOption": 0
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left",
+                            "color": "status_warning",
+                            "activeBackgroundColor": "status_warning"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
                         }
                       ]
                     }
                   ]
                 },
                 "listType": "vertical"
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 168,
+                "width": 472,
+                "height": 28,
+                "name": "Serial No",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "Host name:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "value_S_left"
+                    },
+                    "data": "ethernet_host_name",
+                    "left": 114,
+                    "top": 0,
+                    "width": 358,
+                    "height": 28,
+                    "displayOption": 0
+                  }
+                ]
               },
               {
                 "type": "Container",
@@ -27827,16 +27913,22 @@
             "height": 32,
             "widgets": [
               {
-                "type": "Rectangle",
+                "type": "Text",
                 "style": {
-                  "inheritFrom": "default",
-                  "color": "inst_min_header_bgnd",
-                  "activeBackgroundColor": "inst_min_header_bgnd"
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "color": "inst_min_header_text",
+                  "backgroundColor": "inst_min_header_bgnd",
+                  "activeColor": "inst_min_header_bgnd",
+                  "activeBackgroundColor": "inst_min_header_text",
+                  "padding": "0 5"
                 },
+                "data": "slot_title_def",
                 "left": 0,
                 "top": 0,
                 "width": 158,
-                "height": 32
+                "height": 32,
+                "text": ""
               },
               {
                 "type": "Container",
@@ -27849,16 +27941,22 @@
                 "height": 32,
                 "widgets": [
                   {
-                    "type": "Rectangle",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default",
-                      "color": "inst_min_header_bgnd",
-                      "activeBackgroundColor": "inst_min_header_bgnd"
+                      "inheritFrom": "channel1",
+                      "alignHorizontal": "left",
+                      "color": "inst_min_header_text",
+                      "backgroundColor": "inst_min_header_bgnd",
+                      "activeColor": "inst_min_header_bgnd",
+                      "activeBackgroundColor": "inst_min_header_text",
+                      "padding": "0 5"
                     },
-                    "left": 0,
+                    "data": "slot_title_def",
+                    "left": 1,
                     "top": 0,
-                    "width": 108,
-                    "height": 32
+                    "width": 107,
+                    "height": 32,
+                    "text": ""
                   },
                   {
                     "type": "Text",
@@ -27917,16 +28015,22 @@
             "height": 32,
             "widgets": [
               {
-                "type": "Rectangle",
+                "type": "Text",
                 "style": {
-                  "inheritFrom": "default",
-                  "color": "inst_min_header_bgnd",
-                  "activeBackgroundColor": "inst_min_header_bgnd"
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "color": "inst_min_header_text",
+                  "backgroundColor": "inst_min_header_bgnd",
+                  "activeColor": "inst_min_header_bgnd",
+                  "activeBackgroundColor": "inst_min_header_text",
+                  "padding": "0 5"
                 },
+                "data": "slot_title_def",
                 "left": 0,
                 "top": 0,
                 "width": 238,
-                "height": 32
+                "height": 32,
+                "text": ""
               },
               {
                 "type": "Container",
@@ -27939,16 +28043,22 @@
                 "height": 32,
                 "widgets": [
                   {
-                    "type": "Rectangle",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default",
-                      "color": "inst_min_header_bgnd",
-                      "activeBackgroundColor": "inst_min_header_bgnd"
+                      "inheritFrom": "channel1",
+                      "alignHorizontal": "left",
+                      "color": "inst_min_header_text",
+                      "backgroundColor": "inst_min_header_bgnd",
+                      "activeColor": "inst_min_header_bgnd",
+                      "activeBackgroundColor": "inst_min_header_text",
+                      "padding": "0 5"
                     },
-                    "left": 1,
+                    "data": "slot_title_def",
+                    "left": 0,
                     "top": 0,
-                    "width": 187,
-                    "height": 32
+                    "width": 238,
+                    "height": 32,
+                    "text": ""
                   },
                   {
                     "type": "Text",
@@ -28785,16 +28895,22 @@
             "height": 32,
             "widgets": [
               {
-                "type": "Rectangle",
+                "type": "Text",
                 "style": {
-                  "inheritFrom": "default",
-                  "color": "inst_max_header_bgnd",
-                  "activeBackgroundColor": "inst_max_header_bgnd"
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "color": "inst_max_header_text",
+                  "backgroundColor": "inst_max_header_bgnd",
+                  "activeColor": "inst_max_header_bgnd",
+                  "activeBackgroundColor": "inst_max_header_text",
+                  "padding": "0 5"
                 },
+                "data": "slot_title_def",
                 "left": 0,
                 "top": 0,
                 "width": 430,
-                "height": 32
+                "height": 32,
+                "text": ""
               },
               {
                 "type": "Container",
@@ -28807,16 +28923,22 @@
                 "height": 32,
                 "widgets": [
                   {
-                    "type": "Rectangle",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default",
-                      "color": "inst_max_header_bgnd",
-                      "activeBackgroundColor": "inst_max_header_bgnd"
+                      "inheritFrom": "channel1",
+                      "alignHorizontal": "left",
+                      "color": "inst_max_header_text",
+                      "backgroundColor": "inst_max_header_bgnd",
+                      "activeColor": "inst_max_header_bgnd",
+                      "activeBackgroundColor": "inst_max_header_text",
+                      "padding": "0 5"
                     },
-                    "left": 0,
+                    "data": "slot_title_def",
+                    "left": 1,
                     "top": 0,
-                    "width": 380,
-                    "height": 32
+                    "width": 379,
+                    "height": 32,
+                    "text": ""
                   },
                   {
                     "type": "Text",
@@ -28925,16 +29047,22 @@
         "name": "slot_min_error",
         "widgets": [
           {
-            "type": "Rectangle",
+            "type": "Text",
             "style": {
-              "inheritFrom": "default",
-              "color": "inst_min_header_bgnd",
-              "activeBackgroundColor": "inst_min_header_bgnd"
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "color": "inst_min_header_text",
+              "backgroundColor": "inst_min_header_bgnd",
+              "activeColor": "inst_min_header_bgnd",
+              "activeBackgroundColor": "inst_min_header_text",
+              "padding": "0 5"
             },
-            "left": 0,
+            "data": "slot_title_min",
+            "left": 1,
             "top": 0,
-            "width": 192,
-            "height": 24
+            "width": 191,
+            "height": 24,
+            "text": ""
           },
           {
             "type": "Text",
@@ -29024,17 +29152,22 @@
         "name": "slot_micro_error",
         "widgets": [
           {
-            "type": "Rectangle",
+            "type": "Text",
             "style": {
-              "inheritFrom": "default",
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "color": "inst_min_header_text",
               "backgroundColor": "inst_min_header_bgnd",
-              "activeColor": "inst_min_header_bgnd"
+              "activeColor": "inst_min_header_bgnd",
+              "activeBackgroundColor": "inst_min_header_text",
+              "padding": "0 5"
             },
-            "left": 0,
+            "data": "slot_title_micro",
+            "left": 1,
             "top": 0,
-            "width": 158,
+            "width": 157,
             "height": 24,
-            "invertColors": true
+            "text": ""
           },
           {
             "type": "Text",

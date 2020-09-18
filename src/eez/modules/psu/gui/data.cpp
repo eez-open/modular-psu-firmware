@@ -3635,6 +3635,8 @@ void data_ethernet_host_name(DataOperationEnum operation, Cursor cursor, Value &
         SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
             value = page->m_hostName;
+        } else {
+            value = persist_conf::devConf.ethernetHostName;
         }
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(ETHERNET_HOST_NAME_SIZE, VALUE_TYPE_UINT32);
