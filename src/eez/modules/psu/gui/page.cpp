@@ -27,6 +27,8 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/gui/psu.h>
 
+#include <scpi/scpi.h>
+
 using namespace eez::mcu;
 
 namespace eez {
@@ -120,8 +122,20 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, 
 ////////////////////////////////////////
 
 void ToastMessagePage::onEncoder(int counter) {
-    if (counter < 0 || !hasAction()) {
-        popPage();
+    if (counter < 0) {
+        if (hasAction()) {
+            if (messageValue.getType() == VALUE_TYPE_SCPI_ERROR) {
+                if (
+                   messageValue.getFirstInt16() == SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED ||
+                   messageValue.getFirstInt16() == SCPI_ERROR_CURRENT_LIMIT_EXCEEDED || 
+                   messageValue.getFirstInt16() == SCPI_ERROR_POWER_LIMIT_EXCEEDED
+                ) {
+                   popPage();
+                }
+            }
+        } else {
+            popPage();
+        }
     }
 }
 
