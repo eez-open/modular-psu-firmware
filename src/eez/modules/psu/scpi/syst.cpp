@@ -1973,11 +1973,16 @@ scpi_result_t scpi_cmd_systemMeasureScalarVoltageDcQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemDelay(scpi_t *context) {
-    int32_t delayMs;
-    if (!SCPI_ParamInt32(context, &delayMs, false)) {
+    uint32_t delayMs;
+    if (!SCPI_ParamUInt32(context, &delayMs, false)) {
         return SCPI_RES_ERR;
     }
-    
+
+    if (delayMs > 10000) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+        return SCPI_RES_ERR;
+    }
+
     osDelay(delayMs);
 
     return SCPI_RES_OK;
