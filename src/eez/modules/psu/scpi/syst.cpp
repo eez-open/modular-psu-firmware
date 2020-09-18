@@ -1936,6 +1936,12 @@ scpi_result_t scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ(scpi_t *conte
         return SCPI_RES_ERR;
     }
 
+    Channel *channel = temperature::sensors[sensor].getChannel();
+    if (channel && (!isPowerUp() || !channel->isPowerOk())) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        return SCPI_RES_ERR;
+    }
+
     char buffer[256] = { 0 };
     strcatFloat(buffer, temperature::sensors[sensor].measure());
     SCPI_ResultCharacters(context, buffer, strlen(buffer));

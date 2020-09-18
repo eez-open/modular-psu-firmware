@@ -35,17 +35,7 @@ scpi_choice_def_t channelChoice[] = {
     { "CH3", 3 }, 
     { "CH4", 4 }, 
     { "CH5", 5 }, 
-    { "CH6", 6 }, 
-    { "CH7", 7 },
-    { "CH8", 8 },
-    { "CH9", 9 },
-    { "CH10", 10 },
-    { "CH11", 11 },
-    { "CH12", 12 },
-    { "CH13", 13 },
-    { "CH14", 14 },
-    { "CH15", 15 },
-    { "CH16", 16 },
+    { "CH6", 6 },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
@@ -56,17 +46,7 @@ scpi_choice_def_t channelChoiceWithAll[] = {
     { "CH3", 3 }, 
     { "CH4", 4 }, 
     { "CH5", 5 }, 
-    { "CH6", 6 }, 
-    { "CH7", 7 },
-    { "CH8", 8 },
-    { "CH9", 9 },
-    { "CH10", 10 },
-    { "CH11", 11 },
-    { "CH12", 12 },
-    { "CH13", 13 },
-    { "CH14", 14 },
-    { "CH15", 15 },
-    { "CH16", 16 },
+    { "CH6", 6 },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
@@ -151,18 +131,11 @@ bool absoluteChannelIndexToSlotAndSubchannelIndex(int absoluteChannelIndex, Slot
         return true;
     }
         
-    absoluteChannelIndex--;
-
-    int from = 0;
-    int to = 0;
-    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        to = from + getNumSlotChannels(slotIndex);
-        if (absoluteChannelIndex >= from && absoluteChannelIndex < to) {
-            slotAndSubchannelIndex.slotIndex = slotIndex;
-            slotAndSubchannelIndex.subchannelIndex = getSubchannelIndexFromRelativeChannelIndex(slotIndex, absoluteChannelIndex - from);
-            return true;
-        }
-        from = to;
+    if (absoluteChannelIndex < CH_NUM) {
+        Channel &channel = Channel::get(absoluteChannelIndex);
+        slotAndSubchannelIndex.slotIndex = channel.slotIndex;
+        slotAndSubchannelIndex.subchannelIndex = channel.subchannelIndex;
+        return true;
     }
 
     return false;
@@ -264,6 +237,7 @@ void param_channels(scpi_t *context, scpi_parameter_t *parameter, ChannelList &c
             }
 
             if (!checkPowerChannel(context, channel->channelIndex)) {
+                channelList.numChannels = 0;
                 return;
             }
         }
@@ -282,8 +256,9 @@ bool getChannelFromParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchan
 
 bool getChannelFromCommandNumber(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex) {
     int32_t absoluteChannelIndex;
-    SCPI_CommandNumbers(context, &absoluteChannelIndex, 1, -1);
-    if (absoluteChannelIndex != -1) {
+    SCPI_CommandNumbers(context, &absoluteChannelIndex, 1, 0);
+    if (absoluteChannelIndex != 0) {
+        absoluteChannelIndex--;
         if (!absoluteChannelIndexToSlotAndSubchannelIndex(absoluteChannelIndex, slotAndSubchannelIndex)) {
             SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
             return false;
@@ -321,8 +296,9 @@ Channel *getPowerChannelFromCommandNumber(scpi_t *context) {
     Channel *channel;
 
     int32_t absoluteChannelIndex;
-    SCPI_CommandNumbers(context, &absoluteChannelIndex, 1, -1);
-    if (absoluteChannelIndex != -1) {
+    SCPI_CommandNumbers(context, &absoluteChannelIndex, 1, 0);
+    if (absoluteChannelIndex != 0) {
+        absoluteChannelIndex--;
         SlotAndSubchannelIndex slotAndSubchannelIndex;
         if (!absoluteChannelIndexToSlotAndSubchannelIndex(absoluteChannelIndex, slotAndSubchannelIndex)) {
             SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
