@@ -64,12 +64,12 @@ void generateError(int error) {
     if (g_isBooted && !isLowPriorityThread()) {
         sendMessageToLowPriorityThread(THREAD_MESSAGE_GENERATE_ERROR, error);
     } else {
-        if (psu::serial::g_testResult == TEST_OK) {
+        if (psu::serial::g_testResult == TEST_OK && psu::serial::isConnected()) {
             SCPI_ErrorPush(&psu::serial::g_scpiContext, error);
         }
 
 #if OPTION_ETHERNET
-        if (psu::ethernet::g_testResult == TEST_OK) {
+        if (psu::ethernet::g_testResult == TEST_OK && psu::ethernet::isConnected()) {
             SCPI_ErrorPush(&psu::ethernet::g_scpiContext, error);
         }
 #endif
