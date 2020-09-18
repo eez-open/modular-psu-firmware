@@ -128,7 +128,7 @@ bool isAnySensorTripped(Channel *channel) {
 
 void clearChannelProtection(Channel *channel) {
     for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-        if (sensors[i].isChannelSensor(channel)) {
+        if (sensors[i].getChannel() == channel) {
             sensors[i].clearProtection();
         }
     }
@@ -136,7 +136,7 @@ void clearChannelProtection(Channel *channel) {
 
 void disableChannelProtection(Channel *channel) {
     for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-        if (sensors[i].isChannelSensor(channel)) {
+        if (sensors[i].getChannel() == channel) {
             sensors[i].prot_conf.state = 0;
         }
     }
@@ -173,8 +173,8 @@ void TempSensorTemperature::tick(uint32_t tick_usec) {
     }
 }
 
-bool TempSensorTemperature::isChannelSensor(Channel *channel) {
-    return temp_sensor::sensors[sensorIndex].isInstalled() && temp_sensor::sensors[sensorIndex].getChannel();
+Channel *TempSensorTemperature::getChannel() {
+    return temp_sensor::sensors[sensorIndex].isInstalled() ? temp_sensor::sensors[sensorIndex].getChannel() : nullptr;
 }
 
 float TempSensorTemperature::measure() {

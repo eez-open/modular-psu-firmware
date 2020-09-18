@@ -62,7 +62,7 @@ public:
 	bool isInstalled();
 	bool isTestOK();
 	void tick(uint32_t tick_usec);
-	bool isChannelSensor(Channel *channel);
+	Channel *getChannel();
 	float measure();
 	void clearProtection();
 	bool isTripped();
