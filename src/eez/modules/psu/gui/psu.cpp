@@ -327,15 +327,16 @@ void PsuAppContext::stateManagment() {
 
             int16_t eventId = page->messageValue.getFirstInt16();
             int channelIndex = page->messageValue.getSecondInt16();
+            Channel &channel = Channel::get(channelIndex);
 
             bool dismissPage = false;
             
             if (eventId == event_queue::EVENT_ERROR_CH_OVP_TRIPPED) {
-                dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_OVP);
+                dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_OVP) || !channel.isTripped();
             } else if (eventId == event_queue::EVENT_ERROR_CH_OCP_TRIPPED) {
-                dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_OCP);
+                dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_OCP) || !channel.isTripped();
             } else if (eventId == event_queue::EVENT_ERROR_CH_OPP_TRIPPED) {
-                dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_OPP);
+                dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_OPP) || !channel.isTripped();
             } else if (eventId == event_queue::EVENT_ERROR_CH_REMOTE_SENSE_REVERSE_POLARITY_DETECTED) {
                 dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_RPOL);
             }
