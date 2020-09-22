@@ -1040,6 +1040,46 @@
 		<table style="border-collapse: collapse; background: transparent; width: 175.02mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
+					<p class="scpi0">ROUTe</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
+					<p class="scpi1">:CHANnel</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
+					<p class="scpi2">:LABel {&lt;label&gt;},{&lt;chanlist&gt;}</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
+					<p>Sets labels for relay matrix channels </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
+					<p class="scpi1">:CLOSe {&lt;chanlist&gt;}</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
+					<p>Closes (turns on) specified relay matrix channels </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
+					<p class="scpi1">:OPEN {&lt;chanlist&gt;}</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
+					<p>Opens (turns off) specified relay matrix channels </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
 					<p class="scpi0">SIMUlator</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
@@ -2190,6 +2230,14 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
+					<p class="scpi2">:VERSion?</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
+					<p>Returns the channel version number </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
 					<p class="scpi1">:DATE {&lt;yyyy&gt;,&lt;mm&gt;,&lt;dd&gt;}</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
@@ -2510,6 +2558,14 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
+					<p class="scpi1">:PON:OUTPut:DISable {&lt;bool&gt;}</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
+					<p>Sets output state on power up</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
 					<p class="scpi1">:POWer {&lt;bool&gt;}</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
@@ -2522,6 +2578,14 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
 					<p>Enters the BB3 into the standby mode in case of protection trip</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 42%;">
+					<p class="scpi1">:RELay:CYCLes? {&lt;chanlist&gt;}</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 58%;">
+					<p>Returns the cycle count on the specified channels</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
