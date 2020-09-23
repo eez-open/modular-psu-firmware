@@ -938,7 +938,7 @@ bool compare_SLOT_TITLE_SETTINGS_value(const Value &a, const Value &b) {
 void SLOT_TITLE_SETTINGS_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s #%d", slot.moduleName, slotIndex + 1);
+    snprintf(text, count - 1, "%s #%d:", slot.moduleName, slotIndex + 1);
     text[count - 1] = 0;
 }
 
@@ -1502,6 +1502,12 @@ void data_channels_view_mode_in_max(DataOperationEnum operation, Cursor cursor, 
 void data_slot_is_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_slots[hmi::g_selectedSlotIndex]->enabled;
+    }
+}
+
+void data_slot_is_dcpsupply_module(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_slots[hmi::g_selectedSlotIndex]->numPowerChannels > 0;
     }
 }
 

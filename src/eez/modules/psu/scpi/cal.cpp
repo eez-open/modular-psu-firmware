@@ -319,48 +319,82 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = getSelectedPowerChannel(context);
-    if (!channel) {
+    SlotAndSubchannelIndex *slotAndSubchannelIndex = getSelectedChannel(context);
+    if (!slotAndSubchannelIndex) {
+        SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
     }
 
-    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
-        return SCPI_RES_ERR;
-    }
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex);
+    if (channel) {
+        if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
+            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
+            return SCPI_RES_ERR;
+        }
 
-    if (channel->flags.trackingEnabled) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
-        return SCPI_RES_ERR;
-    }
+        if (channel->flags.trackingEnabled) {
+            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
+            return SCPI_RES_ERR;
+        }
 
-    if (!channel->isCalibrationExists()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CAL_PARAMS_MISSING);
-        return SCPI_RES_ERR;
+        if (!channel->isCalibrationExists()) {
+            SCPI_ErrorPush(context, SCPI_ERROR_CAL_PARAMS_MISSING);
+            return SCPI_RES_ERR;
+        }
+    } else {
+        if (!(
+            g_slots[slotAndSubchannelIndex->slotIndex]->isVoltageCalibrationExists(slotAndSubchannelIndex->subchannelIndex) ||
+            g_slots[slotAndSubchannelIndex->slotIndex]->isCurrentCalibrationExists(slotAndSubchannelIndex->subchannelIndex)
+        )) {
+            SCPI_ErrorPush(context, SCPI_ERROR_CAL_PARAMS_MISSING);
+            return SCPI_RES_ERR;
+        }
     }
-
+    
     bool calibrationEnabled;
     if (!SCPI_ParamBool(context, &calibrationEnabled, TRUE)) {
         return SCPI_RES_ERR;
     }
 
-    if (calibrationEnabled == channel->isCalibrationEnabled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
-        return SCPI_RES_ERR;
-    }
+    if (channel) {
+        if (calibrationEnabled == channel->isCalibrationEnabled()) {
+            SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+            return SCPI_RES_ERR;
+        }
 
-    channel->calibrationEnable(calibrationEnabled);
+        channel->calibrationEnable(calibrationEnabled);
+    } else {
+        auto enabled = g_slots[slotAndSubchannelIndex->slotIndex]->isCurrentCalibrationEnabled(slotAndSubchannelIndex->subchannelIndex) ||
+            g_slots[slotAndSubchannelIndex->slotIndex]->isVoltageCalibrationEnabled(slotAndSubchannelIndex->subchannelIndex);
+
+        if (calibrationEnabled == enabled) {
+            SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+            return SCPI_RES_ERR;
+        }
+
+        g_slots[slotAndSubchannelIndex->slotIndex]->enableVoltageCalibration(slotAndSubchannelIndex->subchannelIndex, calibrationEnabled);
+        g_slots[slotAndSubchannelIndex->slotIndex]->enableCurrentCalibration(slotAndSubchannelIndex->subchannelIndex, calibrationEnabled);
+    }
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_calibrationStateQ(scpi_t *context) {
-    Channel *channel = getSelectedPowerChannel(context);
-    if (!channel) {
+    SlotAndSubchannelIndex *slotAndSubchannelIndex = getSelectedChannel(context);
+    if (!slotAndSubchannelIndex) {
+        SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, channel->isCalibrationEnabled());
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex);
+
+    if (channel) {
+        SCPI_ResultBool(context, channel->isCalibrationEnabled());
+    } else {
+        SCPI_ResultBool(context, 
+            g_slots[slotAndSubchannelIndex->slotIndex]->isCurrentCalibrationEnabled(slotAndSubchannelIndex->subchannelIndex) ||
+            g_slots[slotAndSubchannelIndex->slotIndex]->isVoltageCalibrationEnabled(slotAndSubchannelIndex->subchannelIndex));
+    }
 
     return SCPI_RES_OK;
 }

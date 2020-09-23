@@ -97,8 +97,10 @@ void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange
             sprintf(buffer, "%s_point%d_data=%f", prefix, i + 1, calibrationValue.points[i].value);
             SCPI_ResultText(context, buffer);
 
-            sprintf(buffer, "%s_point%d_adc=%f", prefix, i + 1, calibrationValue.points[i].adc);
-            SCPI_ResultText(context, buffer);
+            if (!isNaN(calibrationValue.points[i].adc)) {
+                sprintf(buffer, "%s_point%d_adc=%f", prefix, i + 1, calibrationValue.points[i].adc);
+                SCPI_ResultText(context, buffer);
+            }
         }
     }
 }
@@ -138,10 +140,12 @@ scpi_result_t scpi_cmd_diagnosticInformationAdcQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_diagnosticInformationCalibrationQ(scpi_t *context) {
-    Channel *channel = getPowerChannelFromParam(context);
-    if (!channel) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
+
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
 
     if (calibration::isEnabled()) {
         if (calibration::isRemarkSet()) {
@@ -154,18 +158,36 @@ scpi_result_t scpi_cmd_diagnosticInformationCalibrationQ(scpi_t *context) {
     } else {
         char buffer[128] = { 0 };
 
-        int year, month, day, hour, minute, second;
-        datetime::breakTime(channel->cal_conf.calibrationDate, year, month, day, hour, minute, second);
+        if (channel) {
+            int year, month, day, hour, minute, second;
+            datetime::breakTime(channel->cal_conf.calibrationDate, year, month, day, hour, minute, second);
 
-        sprintf(buffer, "remark=%04d-%02d-%02d %s", year, month, day, channel->cal_conf.calibrationRemark);
-        SCPI_ResultText(context, buffer);
+            sprintf(buffer, "remark=%04d-%02d-%02d %s", year, month, day, channel->cal_conf.calibrationRemark);
+            SCPI_ResultText(context, buffer);
 
-        printCalibrationParameters(context, UNIT_VOLT, -1, channel->isVoltageCalibrationExists(), channel->cal_conf.u);
-        if (channel->hasSupportForCurrentDualRange()) {
-            printCalibrationParameters(context, UNIT_AMPER, 0, channel->isCurrentCalibrationExists(0), channel->cal_conf.i[0]);
-            printCalibrationParameters(context, UNIT_AMPER, 1, channel->isCurrentCalibrationExists(1), channel->cal_conf.i[1]);
+            printCalibrationParameters(context, UNIT_VOLT, -1, channel->isVoltageCalibrationExists(), channel->cal_conf.u);
+            if (channel->hasSupportForCurrentDualRange()) {
+                printCalibrationParameters(context, UNIT_AMPER, 0, channel->isCurrentCalibrationExists(0), channel->cal_conf.i[0]);
+                printCalibrationParameters(context, UNIT_AMPER, 1, channel->isCurrentCalibrationExists(1), channel->cal_conf.i[1]);
+            } else {
+                printCalibrationParameters(context, UNIT_AMPER, -1, channel->isCurrentCalibrationExists(0), channel->cal_conf.i[0]);
+            }
         } else {
-            printCalibrationParameters(context, UNIT_AMPER, -1, channel->isCurrentCalibrationExists(0), channel->cal_conf.i[0]);
+            CalibrationConfiguration *calConf = g_slots[slotAndSubchannelIndex.slotIndex]->getCalibrationConfiguration(slotAndSubchannelIndex.subchannelIndex);
+            if (!calConf) {
+                SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+                return SCPI_RES_ERR;
+            }
+
+            int year, month, day, hour, minute, second;
+            datetime::breakTime(calConf->calibrationDate, year, month, day, hour, minute, second);
+
+            sprintf(buffer, "remark=%04d-%02d-%02d %s", year, month, day, calConf->calibrationRemark);
+            SCPI_ResultText(context, buffer);
+
+            g_slots[slotAndSubchannelIndex.slotIndex]->isVoltageCalibrationExists(slotAndSubchannelIndex.subchannelIndex);
+
+            printCalibrationParameters(context, UNIT_VOLT, -1, g_slots[slotAndSubchannelIndex.slotIndex]->isVoltageCalibrationExists(slotAndSubchannelIndex.subchannelIndex), calConf->u);
         }
     }
 

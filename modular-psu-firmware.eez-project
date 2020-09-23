@@ -2328,6 +2328,11 @@
       "name": "slot_is_enabled",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "slot_is_dcpsupply_module",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -14717,73 +14722,14 @@
               {
                 "type": "Select",
                 "style": {
-                  "inheritFrom": "default",
-                  "color": "status_line_text",
-                  "backgroundColor": "status_line_background",
-                  "activeColor": "status_line_background",
-                  "activeBackgroundColor": "status_line_text"
+                  "inheritFrom": "default"
                 },
-                "data": "channel_is_par_ser_coupled_or_tracked",
+                "data": "slot_is_dcpsupply_module",
                 "left": 0,
                 "top": 0,
                 "width": 480,
                 "height": 32,
                 "widgets": [
-                  {
-                    "type": "Container",
-                    "style": {
-                      "inheritFrom": "default",
-                      "color": "status_line_text",
-                      "backgroundColor": "status_line_background",
-                      "activeColor": "status_line_background",
-                      "activeBackgroundColor": "status_line_text"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 480,
-                    "height": 32,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "channel1",
-                          "font": "Heydings14",
-                          "alignVertical": "center"
-                        },
-                        "action": "show_previous_page",
-                        "left": 0,
-                        "top": 0,
-                        "width": 41,
-                        "height": 32,
-                        "text": "E"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "channel1",
-                          "alignHorizontal": "left"
-                        },
-                        "data": "channel_short_label",
-                        "left": 41,
-                        "top": 0,
-                        "width": 36,
-                        "height": 32,
-                        "text": ""
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "channel1",
-                          "alignHorizontal": "left"
-                        },
-                        "left": 77,
-                        "top": 0,
-                        "width": 403,
-                        "height": 32,
-                        "text": "Calibration"
-                      }
-                    ]
-                  },
                   {
                     "type": "Container",
                     "style": {
@@ -14793,57 +14739,178 @@
                     "top": 0,
                     "width": 480,
                     "height": 32,
+                    "name": "",
                     "widgets": [
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "status_bgnd",
-                          "font": "Heydings14",
-                          "alignVertical": "center",
+                          "inheritFrom": "status_icon_enabled"
+                        },
+                        "action": "show_main_page",
+                        "left": 0,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "H"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_title"
+                        },
+                        "data": "slot_title_settings",
+                        "left": 40,
+                        "top": 0,
+                        "width": 93,
+                        "height": 32,
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_title"
+                        },
+                        "data": "",
+                        "left": 133,
+                        "top": 0,
+                        "width": 347,
+                        "height": 32,
+                        "text": "Calibration"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "status_line_text",
+                      "backgroundColor": "status_line_background",
+                      "activeColor": "status_line_background",
+                      "activeBackgroundColor": "status_line_text"
+                    },
+                    "data": "channel_is_par_ser_coupled_or_tracked",
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default",
                           "color": "status_line_text",
                           "backgroundColor": "status_line_background",
                           "activeColor": "status_line_background",
                           "activeBackgroundColor": "status_line_text"
                         },
-                        "action": "show_previous_page",
                         "left": 0,
                         "top": 0,
-                        "width": 41,
-                        "height": 32,
-                        "text": "E"
-                      },
-                      {
-                        "type": "Select",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "data": "channel_tracking_is_enabled",
-                        "left": 41,
-                        "top": 0,
-                        "width": 439,
+                        "width": 480,
                         "height": 32,
                         "widgets": [
                           {
                             "type": "Text",
                             "style": {
-                              "inheritFrom": "status_title"
+                              "inheritFrom": "channel1",
+                              "font": "Heydings14",
+                              "alignVertical": "center"
                             },
+                            "action": "show_previous_page",
                             "left": 0,
                             "top": 0,
-                            "width": 439,
+                            "width": 41,
                             "height": 32,
-                            "text": "Calibration"
+                            "text": "E"
                           },
                           {
                             "type": "Text",
                             "style": {
-                              "inheritFrom": "status_title"
+                              "inheritFrom": "channel1",
+                              "alignHorizontal": "left"
                             },
+                            "data": "channel_short_label",
+                            "left": 41,
+                            "top": 0,
+                            "width": 36,
+                            "height": 32,
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "channel1",
+                              "alignHorizontal": "left"
+                            },
+                            "left": 77,
+                            "top": 0,
+                            "width": 403,
+                            "height": 32,
+                            "text": "Calibration"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 32,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "status_bgnd",
+                              "font": "Heydings14",
+                              "alignVertical": "center",
+                              "color": "status_line_text",
+                              "backgroundColor": "status_line_background",
+                              "activeColor": "status_line_background",
+                              "activeBackgroundColor": "status_line_text"
+                            },
+                            "action": "show_previous_page",
                             "left": 0,
+                            "top": 0,
+                            "width": 41,
+                            "height": 32,
+                            "text": "E"
+                          },
+                          {
+                            "type": "Select",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "data": "channel_tracking_is_enabled",
+                            "left": 41,
                             "top": 0,
                             "width": 439,
                             "height": 32,
-                            "text": "\\u00a2 Calibration"
+                            "widgets": [
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "status_title"
+                                },
+                                "left": 0,
+                                "top": 0,
+                                "width": 439,
+                                "height": 32,
+                                "text": "Calibration"
+                              },
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "status_title"
+                                },
+                                "left": 0,
+                                "top": 0,
+                                "width": 439,
+                                "height": 32,
+                                "text": "\\u00a2 Calibration"
+                              }
+                            ]
                           }
                         ]
                       }
@@ -15170,100 +15237,163 @@
             "name": "Status line",
             "widgets": [
               {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14"
-                },
-                "action": "show_previous_page",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 32,
-                "text": "E"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left"
-                },
-                "data": "channel_short_label",
-                "left": 41,
-                "top": 0,
-                "width": 36,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left"
-                },
-                "left": 78,
-                "top": 0,
-                "width": 162,
-                "height": 32,
-                "text": "Calibration"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left",
-                  "padding": "0 0 0 4"
-                },
-                "data": "channel_calibration_chart_zoom",
-                "action": "channel_calibration_chart_zoom",
-                "left": 240,
-                "top": 0,
-                "width": 60,
-                "height": 32,
-                "text": ""
-              },
-              {
                 "type": "Select",
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "set_page_dirty",
-                "left": 398,
+                "data": "slot_is_dcpsupply_module",
+                "left": 0,
                 "top": 0,
-                "width": 82,
+                "width": 480,
                 "height": 32,
                 "widgets": [
                   {
                     "type": "Container",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "status_icon_enabled"
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 82,
+                    "width": 480,
                     "height": 32,
+                    "name": "",
                     "widgets": [
                       {
-                        "type": "Rectangle",
+                        "type": "Text",
                         "style": {
-                          "inheritFrom": "channel1"
+                          "inheritFrom": "status_icon_enabled"
                         },
+                        "action": "show_main_page",
                         "left": 0,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "H"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_title"
+                        },
+                        "data": "slot_title_settings",
+                        "left": 40,
+                        "top": 0,
+                        "width": 93,
+                        "height": 32,
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_title"
+                        },
+                        "data": "",
+                        "left": 133,
+                        "top": 0,
+                        "width": 107,
+                        "height": 32,
+                        "text": "Calibration"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_icon_enabled",
+                          "font": "Oswald14",
+                          "alignHorizontal": "left",
+                          "padding": "0 0 0 4"
+                        },
+                        "data": "channel_calibration_chart_zoom",
+                        "action": "channel_calibration_chart_zoom",
+                        "left": 240,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": ""
+                      },
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "set_page_dirty",
+                        "left": 398,
                         "top": 0,
                         "width": 82,
                         "height": 32,
-                        "invertColors": true
+                        "widgets": [
+                          {
+                            "type": "Container",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 82,
+                            "height": 32,
+                            "widgets": [
+                              {
+                                "type": "Rectangle",
+                                "style": {
+                                  "inheritFrom": "status_bgnd"
+                                },
+                                "left": 0,
+                                "top": 0,
+                                "width": 82,
+                                "height": 32,
+                                "invertColors": true
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Container",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 82,
+                            "height": 32,
+                            "widgets": [
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "status_bgnd",
+                                  "font": "Heydings14"
+                                },
+                                "action": "set",
+                                "left": 0,
+                                "top": 0,
+                                "width": 41,
+                                "height": 32,
+                                "text": "_"
+                              },
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "status_bgnd",
+                                  "font": "Heydings14"
+                                },
+                                "action": "discard",
+                                "left": 41,
+                                "top": 0,
+                                "width": 41,
+                                "height": 32,
+                                "text": "X"
+                              }
+                            ]
+                          }
+                        ]
                       }
                     ]
                   },
                   {
                     "type": "Container",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "channel1"
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 82,
+                    "width": 480,
                     "height": 32,
                     "widgets": [
                       {
@@ -15272,25 +15402,126 @@
                           "inheritFrom": "channel1",
                           "font": "Heydings14"
                         },
-                        "action": "set",
+                        "action": "show_previous_page",
                         "left": 0,
                         "top": 0,
                         "width": 41,
                         "height": 32,
-                        "text": "_"
+                        "text": "E"
                       },
                       {
                         "type": "Text",
                         "style": {
                           "inheritFrom": "channel1",
-                          "font": "Heydings14"
+                          "alignHorizontal": "left"
                         },
-                        "action": "discard",
+                        "data": "channel_short_label",
                         "left": 41,
                         "top": 0,
-                        "width": 41,
+                        "width": 36,
                         "height": 32,
-                        "text": "X"
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "channel1",
+                          "alignHorizontal": "left"
+                        },
+                        "left": 78,
+                        "top": 0,
+                        "width": 162,
+                        "height": 32,
+                        "text": "Calibration"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "channel1",
+                          "alignHorizontal": "left",
+                          "padding": "0 0 0 4"
+                        },
+                        "data": "channel_calibration_chart_zoom",
+                        "action": "channel_calibration_chart_zoom",
+                        "left": 240,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": ""
+                      },
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "set_page_dirty",
+                        "left": 398,
+                        "top": 0,
+                        "width": 82,
+                        "height": 32,
+                        "widgets": [
+                          {
+                            "type": "Container",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 82,
+                            "height": 32,
+                            "widgets": [
+                              {
+                                "type": "Rectangle",
+                                "style": {
+                                  "inheritFrom": "channel1"
+                                },
+                                "left": 0,
+                                "top": 0,
+                                "width": 82,
+                                "height": 32,
+                                "invertColors": true
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Container",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 82,
+                            "height": 32,
+                            "widgets": [
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "channel1",
+                                  "font": "Heydings14"
+                                },
+                                "action": "set",
+                                "left": 0,
+                                "top": 0,
+                                "width": 41,
+                                "height": 32,
+                                "text": "_"
+                              },
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "channel1",
+                                  "font": "Heydings14"
+                                },
+                                "action": "discard",
+                                "left": 41,
+                                "top": 0,
+                                "width": 41,
+                                "height": 32,
+                                "text": "X"
+                              }
+                            ]
+                          }
+                        ]
                       }
                     ]
                   }
@@ -15497,69 +15728,172 @@
             "name": "Status line",
             "widgets": [
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14"
+                  "inheritFrom": "default"
                 },
-                "action": "show_previous_page",
+                "data": "slot_is_dcpsupply_module",
                 "left": 0,
                 "top": 0,
-                "width": 41,
+                "width": 480,
                 "height": 32,
-                "text": "E"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left"
-                },
-                "data": "channel_short_label",
-                "left": 41,
-                "top": 0,
-                "width": 36,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left"
-                },
-                "left": 78,
-                "top": 0,
-                "width": 162,
-                "height": 32,
-                "text": "Calibration points"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left",
-                  "padding": "0 0 0 4"
-                },
-                "data": "channel_calibration_chart_zoom",
-                "action": "channel_calibration_chart_zoom",
-                "left": 240,
-                "top": 0,
-                "width": 60,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1"
-                },
-                "action": "ch_settings_calibration_start_calibration",
-                "left": 330,
-                "top": 0,
-                "width": 150,
-                "height": 32,
-                "text": "Recalibrate"
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "status_icon_enabled"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 32,
+                    "name": "",
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_icon_enabled"
+                        },
+                        "action": "show_main_page",
+                        "left": 0,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "H"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_title"
+                        },
+                        "data": "slot_title_settings",
+                        "left": 40,
+                        "top": 0,
+                        "width": 93,
+                        "height": 32,
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_title"
+                        },
+                        "data": "",
+                        "left": 133,
+                        "top": 0,
+                        "width": 153,
+                        "height": 32,
+                        "text": "Calibration points"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_icon_enabled",
+                          "font": "Oswald14",
+                          "alignHorizontal": "left",
+                          "padding": "0 0 0 4"
+                        },
+                        "data": "channel_calibration_chart_zoom",
+                        "action": "channel_calibration_chart_zoom",
+                        "left": 286,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_icon_enabled",
+                          "font": "Oswald14"
+                        },
+                        "action": "ch_settings_calibration_start_calibration",
+                        "left": 346,
+                        "top": 0,
+                        "width": 134,
+                        "height": 32,
+                        "text": "Recalibrate"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "channel1"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "channel1",
+                          "font": "Heydings14"
+                        },
+                        "action": "show_previous_page",
+                        "left": 0,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "E"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "channel1",
+                          "alignHorizontal": "left"
+                        },
+                        "data": "channel_short_label",
+                        "left": 41,
+                        "top": 0,
+                        "width": 36,
+                        "height": 32,
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "channel1",
+                          "alignHorizontal": "left"
+                        },
+                        "left": 78,
+                        "top": 0,
+                        "width": 162,
+                        "height": 32,
+                        "text": "Calibration points"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "channel1",
+                          "alignHorizontal": "left",
+                          "padding": "0 0 0 4"
+                        },
+                        "data": "channel_calibration_chart_zoom",
+                        "action": "channel_calibration_chart_zoom",
+                        "left": 240,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "channel1"
+                        },
+                        "action": "ch_settings_calibration_start_calibration",
+                        "left": 330,
+                        "top": 0,
+                        "width": 150,
+                        "height": 32,
+                        "text": "Recalibrate"
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
