@@ -72,7 +72,6 @@ static float DAC_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
 
 static const int NUM_COLUMNS = 6;
 static const int NUM_ROWS = 4;
-static const int MAX_LABEL_LENGTH = 5;
 
 static const uint32_t MIN_TO_MS = 60L * 1000L;
 
@@ -98,8 +97,8 @@ public:
 
     uint32_t routes;
 
-    char xLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
-    char yLabels[NUM_ROWS][MAX_LABEL_LENGTH + 1];
+    char columnLabels[NUM_COLUMNS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
+    char rowLabels[NUM_ROWS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
 
     float dac1;
     float dac2;
@@ -290,8 +289,8 @@ public:
 
     struct ProfileParameters {
         unsigned int routes;
-        char xLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
-        char yLabels[NUM_ROWS][MAX_LABEL_LENGTH + 1];
+        char columnLabels[NUM_COLUMNS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
+        char rowLabels[NUM_ROWS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
         float dac1;
         float dac2;
         bool relayOn;
@@ -307,8 +306,8 @@ public:
         auto parameters = (ProfileParameters *)buffer;
 
         parameters->routes = routes;
-        memcpy(&parameters->xLabels[0][0], &xLabels[0][0], sizeof(xLabels));
-        memcpy(&parameters->yLabels[0][0], &yLabels[0][0], sizeof(yLabels));
+        memcpy(&parameters->columnLabels[0][0], &columnLabels[0][0], sizeof(columnLabels));
+        memcpy(&parameters->rowLabels[0][0], &rowLabels[0][0], sizeof(rowLabels));
         parameters->dac1 = dac1;
         parameters->dac2 = dac2;
         parameters->relayOn = relayOn;
@@ -318,8 +317,8 @@ public:
         auto parameters = (ProfileParameters *)buffer;
 
         routes = parameters->routes;
-        memcpy(&xLabels[0][0], &parameters->xLabels[0][0], sizeof(xLabels));
-        memcpy(&yLabels[0][0], &parameters->yLabels[0][0], sizeof(yLabels));
+        memcpy(&columnLabels[0][0], &parameters->columnLabels[0][0], sizeof(columnLabels));
+        memcpy(&rowLabels[0][0], &parameters->rowLabels[0][0], sizeof(rowLabels));
         dac1 = parameters->dac1;
         dac2 = parameters->dac2;
         relayOn = parameters->relayOn;
@@ -333,13 +332,13 @@ public:
         for (int i = 0; i < NUM_COLUMNS; i++) {
             char propName[16];
             sprintf(propName, "xLabel%d", i+1);
-            WRITE_PROPERTY(propName, parameters->xLabels[i]);
+            WRITE_PROPERTY(propName, parameters->columnLabels[i]);
         }
 
         for (int i = 0; i < NUM_ROWS; i++) {
             char propName[16];
             sprintf(propName, "yLabel%d", i+1);
-            WRITE_PROPERTY(propName, parameters->yLabels[i]);
+            WRITE_PROPERTY(propName, parameters->rowLabels[i]);
         }
 
         WRITE_PROPERTY("dac1", parameters->dac1);
@@ -358,13 +357,13 @@ public:
         for (int i = 0; i < NUM_COLUMNS; i++) {
             char propName[16];
             sprintf(propName, "xLabel%d", i+1);
-            READ_STRING_PROPERTY(propName, parameters->xLabels[i], MAX_LABEL_LENGTH);
+            READ_STRING_PROPERTY(propName, parameters->columnLabels[i], MAX_SWITCH_MATRIX_LABEL_LENGTH);
         }
 
         for (int i = 0; i < NUM_ROWS; i++) {
             char propName[16];
             sprintf(propName, "yLabel%d", i+1);
-            READ_STRING_PROPERTY(propName, parameters->yLabels[i], MAX_LABEL_LENGTH);
+            READ_STRING_PROPERTY(propName, parameters->rowLabels[i], MAX_SWITCH_MATRIX_LABEL_LENGTH);
         }
 
         READ_PROPERTY("dac1", parameters->dac1);
@@ -379,15 +378,15 @@ public:
         routes = 0;
 
         for (int i = 0; i < NUM_COLUMNS; i++) {
-            xLabels[i][0] = 'X';
-            xLabels[i][1] = '1' + i;
-            xLabels[i][2] = 0;
+            columnLabels[i][0] = 'X';
+            columnLabels[i][1] = '1' + i;
+            columnLabels[i][2] = 0;
         }
 
         for (int i = 0; i < NUM_ROWS; i++) {
-            yLabels[i][0] = 'Y';
-            yLabels[i][1] = '1' + i;
-            yLabels[i][2] = 0;
+            rowLabels[i][0] = 'Y';
+            rowLabels[i][1] = '1' + i;
+            rowLabels[i][2] = 0;
         }
 
         dac1 = 0.0f;
@@ -429,7 +428,7 @@ public:
         subchannelIndex++;
 
         if (subchannelIndex == 3) {
-            isRouteOpen_ = relayOn;
+            isRouteOpen_ = !relayOn;
         } else {
             int x = subchannelIndex % 10 - 1;
             int y = subchannelIndex / 10 - 1;
@@ -448,6 +447,33 @@ public:
     }
 
     bool routeOpen(ChannelList channelList, int *err) override {
+        uint32_t tempRoutes = routes;
+        bool tempRelayOn = relayOn;
+        for (int i = 0; i < channelList.numChannels; i++) {
+            int subchannelIndex = channelList.channels[i].subchannelIndex + 1;
+            if (subchannelIndex == 3) {
+                tempRelayOn = false;
+                continue;
+            }
+
+            int x = subchannelIndex % 10 - 1;
+            int y = subchannelIndex / 10 - 1;
+
+            if (x < 0 || x >= NUM_COLUMNS || y < 0 || y >= NUM_ROWS) {
+                if (*err) {
+                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                }
+                return false;
+            }
+
+            tempRoutes &= ~(1 << (y * NUM_COLUMNS + x));
+        }
+        routes = tempRoutes;
+        relayOn = tempRelayOn;
+        return true;
+    }
+    
+    bool routeClose(ChannelList channelList, int *err) override {
         uint32_t tempRoutes = routes;
         bool tempRelayOn = relayOn;
         for (int i = 0; i < channelList.numChannels; i++) {
@@ -473,31 +499,36 @@ public:
         relayOn = tempRelayOn;
         return true;
     }
+
+    bool getSwitchMatrixNumRows(int &numRows, int *err) override {
+        numRows = NUM_ROWS;
+        return true;
+    }
+
+    bool getSwitchMatrixNumColumns(int &numRows, int *err) override {
+        numRows = NUM_COLUMNS;
+        return true;
+    }
+
+    bool setSwitchMatrixRowLabel(int rowIndex, const char *label, int *err) override {
+        strcpy(rowLabels[rowIndex], label);
+        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_REFRESH_SCREEN);
+        return true;
+    }
     
-    bool routeClose(ChannelList channelList, int *err) override {
-        uint32_t tempRoutes = routes;
-        bool tempRelayOn = relayOn;
-        for (int i = 0; i < channelList.numChannels; i++) {
-            int subchannelIndex = channelList.channels[i].subchannelIndex + 1;
-            if (subchannelIndex == 3) {
-                tempRelayOn = false;
-                continue;
-            }
+    bool getSwitchMatrixRowLabel(int rowIndex, char *label, int *err) override {
+        strcpy(label, rowLabels[rowIndex]);
+        return true;
+    }
 
-            int x = subchannelIndex % 10 - 1;
-            int y = subchannelIndex / 10 - 1;
-
-            if (x < 0 || x >= NUM_COLUMNS || y < 0 || y >= NUM_ROWS) {
-                if (*err) {
-                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
-                }
-                return false;
-            }
-
-            tempRoutes &= ~(1 << (y * NUM_COLUMNS + x));
-        }
-        routes = tempRoutes;
-        relayOn = tempRelayOn;
+    bool setSwitchMatrixColumnLabel(int columnIndex, const char *label, int *err) override {
+        strcpy(columnLabels[columnIndex], label);
+        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_REFRESH_SCREEN);
+        return true;
+    }
+    
+    bool getSwitchMatrixColumnLabel(int columnIndex, char *label, int *err) override {
+        strcpy(label, columnLabels[columnIndex]);
         return true;
     }
 
@@ -620,7 +651,7 @@ public:
     }
 
     bool isRouteOpen(int x, int y) {
-        return routes & (1 << (y * NUM_COLUMNS + x));
+        return !(routes & (1 << (y * NUM_COLUMNS + x)));
     }
 
     void toggleRoute(int x, int y) {
@@ -678,18 +709,18 @@ public:
     void pageAlloc() {
         Smx46Module *module = (Smx46Module *)g_slots[hmi::g_selectedSlotIndex];
 
-        memcpy(xLabels, module->xLabels, sizeof(xLabels));
-        memcpy(xLabelsOrig, module->xLabels, sizeof(xLabels));
+        memcpy(columnLabels, module->columnLabels, sizeof(columnLabels));
+        memcpy(columnLabelsOrig, module->columnLabels, sizeof(columnLabels));
 
-        memcpy(yLabels, module->yLabels, sizeof(yLabels));
-        memcpy(yLabelsOrig, module->yLabels, sizeof(yLabels));
+        memcpy(rowLabels, module->rowLabels, sizeof(rowLabels));
+        memcpy(rowLabelsOrig, module->rowLabels, sizeof(rowLabels));
 
         routes = routesOrig = module->routes;
     }
 
     int getDirty() { 
-        return memcmp(xLabels, xLabelsOrig, sizeof(xLabels)) != 0 || 
-            memcmp(yLabels, yLabelsOrig, sizeof(yLabels)) != 0 ||
+        return memcmp(columnLabels, columnLabelsOrig, sizeof(columnLabels)) != 0 || 
+            memcmp(rowLabels, rowLabelsOrig, sizeof(rowLabels)) != 0 ||
             routes != routesOrig;
     }
 
@@ -697,8 +728,8 @@ public:
         if (getDirty()) {
             Smx46Module *module = (Smx46Module *)g_slots[hmi::g_selectedSlotIndex];
 
-            memcpy(module->xLabels, xLabels, sizeof(xLabels));
-            memcpy(module->yLabels, yLabels, sizeof(yLabels));
+            memcpy(module->columnLabels, columnLabels, sizeof(columnLabels));
+            memcpy(module->rowLabels, rowLabels, sizeof(rowLabels));
             
             module->routes = routes;
         }
@@ -707,20 +738,20 @@ public:
     }
 
     bool isRouteOpen(int x, int y) {
-        return routes & (1 << (y * NUM_COLUMNS + x));
+        return !(routes & (1 << (y * NUM_COLUMNS + x)));
     }
 
     void toggleRoute(int x, int y) {
         routes ^= 1 << (y * NUM_COLUMNS + x);
     }
 
-    char xLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
-    char yLabels[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
+    char columnLabels[NUM_COLUMNS][Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
+    char rowLabels[NUM_COLUMNS][Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
     uint32_t routes = 0;
 
 private:
-    char xLabelsOrig[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
-    char yLabelsOrig[NUM_COLUMNS][MAX_LABEL_LENGTH + 1];
+    char columnLabelsOrig[NUM_COLUMNS][Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
+    char rowLabelsOrig[NUM_COLUMNS][Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
     uint32_t routesOrig = 0;
 };
 
@@ -776,9 +807,9 @@ void data_dib_smx46_x_label(DataOperationEnum operation, Cursor cursor, Value &v
         int i = cursor % NUM_COLUMNS;
         ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
         if (page) {
-            value = (const char *)&page->xLabels[i][0];
+            value = (const char *)&page->columnLabels[i][0];
         } else {
-            value = (const char *)&((Smx46Module *)g_slots[slotIndex])->xLabels[i][0];
+            value = (const char *)&((Smx46Module *)g_slots[slotIndex])->columnLabels[i][0];
         }
     }
 }
@@ -797,9 +828,9 @@ void data_dib_smx46_y_label(DataOperationEnum operation, Cursor cursor, Value &v
         int i = cursor % NUM_ROWS;
         ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
         if (page) {
-            value = (const char *)&page->yLabels[i][0];
+            value = (const char *)&page->rowLabels[i][0];
         } else {
-            value = (const char *)&((Smx46Module *)g_slots[slotIndex])->yLabels[i][0];
+            value = (const char *)&((Smx46Module *)g_slots[slotIndex])->rowLabels[i][0];
         }
     }
 }
@@ -917,16 +948,16 @@ void action_dib_smx46_edit_x_label() {
     int cursor = getFoundWidgetAtDown().cursor;
     int i = cursor % NUM_COLUMNS;
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
-    g_labelPointer = &page->xLabels[i][0];
-    Keypad::startPush("Label: ", g_labelPointer, 1, MAX_LABEL_LENGTH, false, onSetLabel, popPage);
+    g_labelPointer = &page->columnLabels[i][0];
+    Keypad::startPush("Label: ", g_labelPointer, 1, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH, false, onSetLabel, popPage);
 }
 
 void action_dib_smx46_edit_y_label() {
     int cursor = getFoundWidgetAtDown().cursor;
     int i = cursor % NUM_ROWS;
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
-    g_labelPointer = &page->yLabels[i][0];
-    Keypad::startPush("Label: ", g_labelPointer, 1, MAX_LABEL_LENGTH, false, onSetLabel, popPage);
+    g_labelPointer = &page->rowLabels[i][0];
+    Keypad::startPush("Label: ", g_labelPointer, 1, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH, false, onSetLabel, popPage);
 }
 
 void action_dib_smx46_clear_all_routes() {
@@ -938,15 +969,15 @@ void action_dib_smx46_clear_all_labels() {
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
 
     for (int i = 0; i < NUM_COLUMNS; i++) {
-        page->xLabels[i][0] = 'X';
-        page->xLabels[i][1] = '1' + i;
-        page->xLabels[i][2] = 0;
+        page->columnLabels[i][0] = 'X';
+        page->columnLabels[i][1] = '1' + i;
+        page->columnLabels[i][2] = 0;
     }
 
     for (int i = 0; i < NUM_ROWS; i++) {
-        page->yLabels[i][0] = 'Y';
-        page->yLabels[i][1] = '1' + i;
-        page->yLabels[i][2] = 0;
+        page->rowLabels[i][0] = 'Y';
+        page->rowLabels[i][1] = '1' + i;
+        page->rowLabels[i][2] = 0;
     }
 
     refreshScreen();

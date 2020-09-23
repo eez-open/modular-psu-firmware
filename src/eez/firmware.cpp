@@ -141,12 +141,13 @@ void boot() {
         
         g_slots[slotIndex] = getModule(moduleType)->createModule();
         g_slots[slotIndex]->slotIndex = slotIndex;
-        g_slots[slotIndex]->enabled = psu::persist_conf::isSlotEnabled(slotIndex);
+        g_slots[slotIndex]->enabled = true;
         g_slots[slotIndex]->moduleRevision = moduleRevision;
         g_slots[slotIndex]->firmwareInstalled = firmwareInstalled;
         g_slots[slotIndex]->boot();
         
         if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
+            g_slots[slotIndex]->enabled = psu::persist_conf::isSlotEnabled(slotIndex);
             psu::persist_conf::loadModuleConf(slotIndex);
             psu::ontime::g_moduleCounters[slotIndex].init();
 

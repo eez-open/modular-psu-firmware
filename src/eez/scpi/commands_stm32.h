@@ -130,6 +130,16 @@
     SCPI_COMMAND("OUTPut[:STATe]:TRIGgered?", scpi_cmd_outputStateTriggeredQ) \
     SCPI_COMMAND("OUTPut:DELay:DURation", scpi_cmd_outputDelayDuration) \
     SCPI_COMMAND("OUTPut:DELay:DURation?", scpi_cmd_outputDelayDurationQ) \
+    SCPI_COMMAND("ROUTe:CLOSe", scpi_cmd_routeClose) \
+    SCPI_COMMAND("ROUTe:CLOSe?", scpi_cmd_routeCloseQ) \
+    SCPI_COMMAND("ROUTe:OPEN", scpi_cmd_routeOpen) \
+    SCPI_COMMAND("ROUTe:OPEN?", scpi_cmd_routeOpenQ) \
+    SCPI_COMMAND("ROUTe:LABel:ROW", scpi_cmd_routeLabelRow) \
+    SCPI_COMMAND("ROUTe:LABel:ROW?", scpi_cmd_routeLabelRowQ) \
+    SCPI_COMMAND("ROUTe:LABel:COLumn", scpi_cmd_routeLabelColumn) \
+    SCPI_COMMAND("ROUTe:LABel:COLumn?", scpi_cmd_routeLabelColumnQ) \
+    SCPI_COMMAND("ROUTe:LABel:CHANnel", scpi_cmd_routeLabelChannel) \
+    SCPI_COMMAND("ROUTe:LABel:CHANnel?", scpi_cmd_routeLabelChannelQ) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe[:UPPer]", scpi_cmd_senseCurrentDcRangeUpper) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe[:UPPer]?", scpi_cmd_senseCurrentDcRangeUpperQ) \
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:CURRent", scpi_cmd_senseDlogFunctionCurrent) \
@@ -142,31 +152,31 @@
     SCPI_COMMAND("SENSe:DLOG:PERiod?", scpi_cmd_senseDlogPeriodQ) \
     SCPI_COMMAND("SENSe:DLOG:TIME", scpi_cmd_senseDlogTime) \
     SCPI_COMMAND("SENSe:DLOG:TIME?", scpi_cmd_senseDlogTimeQ) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:X:UNIT", scpi_cmd_senseDlogTraceXUnit) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:X:UNIT?", scpi_cmd_senseDlogTraceXUnitQ) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:X:STEP", scpi_cmd_senseDlogTraceXStep) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:X:STEP?", scpi_cmd_senseDlogTraceXStepQ) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:REMark", scpi_cmd_senseDlogTraceRemark) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:REMark?", scpi_cmd_senseDlogTraceRemarkQ) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:X:LABel", scpi_cmd_senseDlogTraceXLabel) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:X:LABel?", scpi_cmd_senseDlogTraceXLabelQ) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:X:SCALe", scpi_cmd_senseDlogTraceXScale) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:X:SCALe?", scpi_cmd_senseDlogTraceXScaleQ) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:X[:RANGe]:MIN", scpi_cmd_senseDlogTraceXRangeMin) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:X[:RANGe]:MIN?", scpi_cmd_senseDlogTraceXRangeMinQ) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:X:STEP", scpi_cmd_senseDlogTraceXStep) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:X:STEP?", scpi_cmd_senseDlogTraceXStepQ) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:X:UNIT", scpi_cmd_senseDlogTraceXUnit) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:X:UNIT?", scpi_cmd_senseDlogTraceXUnitQ) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:X[:RANGe]:MAX", scpi_cmd_senseDlogTraceXRangeMax) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:X[:RANGe]:MAX?", scpi_cmd_senseDlogTraceXRangeMaxQ) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#:UNIT", scpi_cmd_senseDlogTraceYUnit) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#:UNIT?", scpi_cmd_senseDlogTraceYUnitQ) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#:LABel", scpi_cmd_senseDlogTraceYLabel) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#:LABel?", scpi_cmd_senseDlogTraceYLabelQ) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#[:RANGe]:MIN", scpi_cmd_senseDlogTraceYRangeMin) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#[:RANGe]:MIN?", scpi_cmd_senseDlogTraceYRangeMinQ) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#[:RANGe]:MAX", scpi_cmd_senseDlogTraceYRangeMax) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#[:RANGe]:MAX?", scpi_cmd_senseDlogTraceYRangeMaxQ) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:X[:RANGe]:MIN", scpi_cmd_senseDlogTraceXRangeMin) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:X[:RANGe]:MIN?", scpi_cmd_senseDlogTraceXRangeMinQ) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:Y:SCALe", scpi_cmd_senseDlogTraceYScale) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:Y:SCALe?", scpi_cmd_senseDlogTraceYScaleQ) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#:LABel", scpi_cmd_senseDlogTraceYLabel) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#:LABel?", scpi_cmd_senseDlogTraceYLabelQ) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#:UNIT", scpi_cmd_senseDlogTraceYUnit) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#:UNIT?", scpi_cmd_senseDlogTraceYUnitQ) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#[:RANGe]:MAX", scpi_cmd_senseDlogTraceYRangeMax) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#[:RANGe]:MAX?", scpi_cmd_senseDlogTraceYRangeMaxQ) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#[:RANGe]:MIN", scpi_cmd_senseDlogTraceYRangeMin) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:Y#[:RANGe]:MIN?", scpi_cmd_senseDlogTraceYRangeMinQ) \
     SCPI_COMMAND("SENSe:DLOG:TRACe[:DATA]", scpi_cmd_senseDlogTraceData) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:REMark", scpi_cmd_senseDlogTraceRemark) \
-    SCPI_COMMAND("SENSe:DLOG:TRACe:REMark?", scpi_cmd_senseDlogTraceRemarkQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:LIMit[:POSitive][:IMMediate][:AMPLitude]", scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitude) \
     SCPI_COMMAND("[SOURce#]:CURRent:LIMit[:POSitive][:IMMediate][:AMPLitude]?", scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitudeQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:MODE", scpi_cmd_sourceCurrentMode) \
@@ -176,14 +186,14 @@
     SCPI_COMMAND("[SOURce#]:CURRent:PROTection:STATe", scpi_cmd_sourceCurrentProtectionState) \
     SCPI_COMMAND("[SOURce#]:CURRent:PROTection:STATe?", scpi_cmd_sourceCurrentProtectionStateQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:PROTection:TRIPped?", scpi_cmd_sourceCurrentProtectionTrippedQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:RAMP:DURation", scpi_cmd_sourceCurrentRampDuration) \
+    SCPI_COMMAND("[SOURce#]:CURRent:RAMP:DURation?", scpi_cmd_sourceCurrentRampDurationQ) \
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel]:TRIGgered[:AMPLitude]", scpi_cmd_sourceCurrentLevelTriggeredAmplitude) \
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel]:TRIGgered[:AMPLitude]?", scpi_cmd_sourceCurrentLevelTriggeredAmplitudeQ) \
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel][:IMMediate]:STEP[:INCRement]", scpi_cmd_sourceCurrentLevelImmediateStepIncrement) \
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel][:IMMediate]:STEP[:INCRement]?", scpi_cmd_sourceCurrentLevelImmediateStepIncrementQ) \
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel][:IMMediate][:AMPLitude]", scpi_cmd_sourceCurrentLevelImmediateAmplitude) \
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel][:IMMediate][:AMPLitude]?", scpi_cmd_sourceCurrentLevelImmediateAmplitudeQ) \
-    SCPI_COMMAND("[SOURce#]:CURRent:RAMP:DURation", scpi_cmd_sourceCurrentRampDuration) \
-    SCPI_COMMAND("[SOURce#]:CURRent:RAMP:DURation?", scpi_cmd_sourceCurrentRampDurationQ) \
     SCPI_COMMAND("[SOURce#]:LIST:COUNt", scpi_cmd_sourceListCount) \
     SCPI_COMMAND("[SOURce#]:LIST:COUNt?", scpi_cmd_sourceListCountQ) \
     SCPI_COMMAND("[SOURce#]:LIST:CURRent[:LEVel]", scpi_cmd_sourceListCurrentLevel) \
@@ -216,6 +226,8 @@
     SCPI_COMMAND("[SOURce#]:VOLTage:PROTection:TYPE?", scpi_cmd_sourceVoltageProtectionTypeQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:PROTection[:LEVel]", scpi_cmd_sourceVoltageProtectionLevel) \
     SCPI_COMMAND("[SOURce#]:VOLTage:PROTection[:LEVel]?", scpi_cmd_sourceVoltageProtectionLevelQ) \
+    SCPI_COMMAND("[SOURce#]:VOLTage:RAMP:DURation", scpi_cmd_sourceVoltageRampDuration) \
+    SCPI_COMMAND("[SOURce#]:VOLTage:RAMP:DURation?", scpi_cmd_sourceVoltageRampDurationQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:SENSe[:SOURce]", scpi_cmd_sourceVoltageSenseSource) \
     SCPI_COMMAND("[SOURce#]:VOLTage:SENSe[:SOURce]?", scpi_cmd_sourceVoltageSenseSourceQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel]:TRIGgered[:AMPLitude]", scpi_cmd_sourceVoltageLevelTriggeredAmplitude) \
@@ -224,8 +236,6 @@
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate]:STEP[:INCRement]?", scpi_cmd_sourceVoltageLevelImmediateStepIncrementQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate][:AMPLitude]", scpi_cmd_sourceVoltageLevelImmediateAmplitude) \
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate][:AMPLitude]?", scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ) \
-    SCPI_COMMAND("[SOURce#]:VOLTage:RAMP:DURation", scpi_cmd_sourceVoltageRampDuration) \
-    SCPI_COMMAND("[SOURce#]:VOLTage:RAMP:DURation?", scpi_cmd_sourceVoltageRampDurationQ) \
     SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]", scpi_cmd_sourceDigitalDataByte) \
     SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]?", scpi_cmd_sourceDigitalDataByteQ) \
     SCPI_COMMAND("[SOURce#]:MODE", scpi_cmd_sourceMode) \
@@ -265,23 +275,17 @@
     SCPI_COMMAND("SYSTem:BEEPer:STATe?", scpi_cmd_systemBeeperStateQ) \
     SCPI_COMMAND("SYSTem:BEEPer[:IMMediate]", scpi_cmd_systemBeeperImmediate) \
     SCPI_COMMAND("SYSTem:CAPability?", scpi_cmd_systemCapabilityQ) \
-    SCPI_COMMAND("SYSTem:SLOT[:COUNt]?", scpi_cmd_systemSlotCountQ) \
-    SCPI_COMMAND("SYSTem:SLOT:MODel?", scpi_cmd_systemSlotModelQ) \
-    SCPI_COMMAND("SYSTem:SLOT:VERSion?", scpi_cmd_systemSlotVersionQ) \
-    SCPI_COMMAND("SYSTem:SLOT:FIRMware?", scpi_cmd_systemSlotFirmwareQ) \
-    SCPI_COMMAND("SYSTem:SLOT:STATe", scpi_cmd_systemSlotState) \
-    SCPI_COMMAND("SYSTem:SLOT:STATe?", scpi_cmd_systemSlotStateQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:CURRent?", scpi_cmd_systemChannelInformationCurrentQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:ONTime:LAST?", scpi_cmd_systemChannelInformationOntimeLastQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:ONTime:TOTal?", scpi_cmd_systemChannelInformationOntimeTotalQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:POWer?", scpi_cmd_systemChannelInformationPowerQ) \
-    SCPI_COMMAND("SYSTem:CHANnel:OPTion?", scpi_cmd_systemChannelOptionQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:VOLTage?", scpi_cmd_systemChannelInformationVoltageQ) \
     SCPI_COMMAND("SYSTem:CHANnel:MODel?", scpi_cmd_systemChannelModelQ) \
-    SCPI_COMMAND("SYSTem:CHANnel:VERSion?", scpi_cmd_systemChannelVersionQ) \
-    SCPI_COMMAND("SYSTem:CHANnel:SNO?", scpi_cmd_systemChannelSnoQ) \
-    SCPI_COMMAND("SYSTem:CHANnel[:COUNt]?", scpi_cmd_systemChannelCountQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:OPTion?", scpi_cmd_systemChannelOptionQ) \
     SCPI_COMMAND("SYSTem:CHANnel:SLOT?", scpi_cmd_systemChannelSlotQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:SNO?", scpi_cmd_systemChannelSnoQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:VERSion?", scpi_cmd_systemChannelVersionQ) \
+    SCPI_COMMAND("SYSTem:CHANnel[:COUNt]?", scpi_cmd_systemChannelCountQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:ENABle", scpi_cmd_systemCommunicateEnable) \
     SCPI_COMMAND("SYSTem:COMMunicate:ENABle?", scpi_cmd_systemCommunicateEnableQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:ETHernet:ADDRess", scpi_cmd_systemCommunicateEthernetAddress) \
@@ -300,43 +304,49 @@
     SCPI_COMMAND("SYSTem:COMMunicate:ETHernet:PORT?", scpi_cmd_systemCommunicateEthernetPortQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:ETHernet:SMASk", scpi_cmd_systemCommunicateEthernetSmask) \
     SCPI_COMMAND("SYSTem:COMMunicate:ETHernet:SMASk?", scpi_cmd_systemCommunicateEthernetSmaskQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:MQTT:SETTings", scpi_cmd_systemCommunicateMqttSettings) \
+    SCPI_COMMAND("SYSTem:COMMunicate:MQTT:STATe?", scpi_cmd_systemCommunicateMqttStateQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:NTP", scpi_cmd_systemCommunicateNtp) \
     SCPI_COMMAND("SYSTem:COMMunicate:NTP?", scpi_cmd_systemCommunicateNtpQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:RLSTate", scpi_cmd_systemCommunicateRlstate) \
     SCPI_COMMAND("SYSTem:COMMunicate:RLSTate?", scpi_cmd_systemCommunicateRlstateQ) \
-    SCPI_COMMAND("SYSTem:COMMunicate:MQTT:SETTings", scpi_cmd_systemCommunicateMqttSettings) \
-    SCPI_COMMAND("SYSTem:COMMunicate:MQTT:STATe?", scpi_cmd_systemCommunicateMqttStateQ) \
-    SCPI_COMMAND("SYSTem:COMMunicate:USB:MODE", scpi_cmd_systemCommunicateUsbMode) \
-    SCPI_COMMAND("SYSTem:COMMunicate:USB:MODE?", scpi_cmd_systemCommunicateUsbModeQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:USB:CLAss", scpi_cmd_systemCommunicateUsbClass) \
     SCPI_COMMAND("SYSTem:COMMunicate:USB:CLAss?", scpi_cmd_systemCommunicateUsbClassQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:USB:MODE", scpi_cmd_systemCommunicateUsbMode) \
+    SCPI_COMMAND("SYSTem:COMMunicate:USB:MODE?", scpi_cmd_systemCommunicateUsbModeQ) \
+    SCPI_COMMAND("SYSTem:CPU:FIRMware?", scpi_cmd_systemCpuFirmwareQ) \
     SCPI_COMMAND("SYSTem:CPU:INFOrmation:ONTime:LAST?", scpi_cmd_systemCpuInformationOntimeLastQ) \
     SCPI_COMMAND("SYSTem:CPU:INFOrmation:ONTime:TOTal?", scpi_cmd_systemCpuInformationOntimeTotalQ) \
     SCPI_COMMAND("SYSTem:CPU:MODel?", scpi_cmd_systemCpuModelQ) \
+    SCPI_COMMAND("SYSTem:CPU:SNO?", scpi_cmd_systemCpuSnoQ) \
     SCPI_COMMAND("SYSTem:CPU:VERSion?", scpi_cmd_systemCpuVersionQ) \
-    SCPI_COMMAND("SYSTem:CPU:FIRMware?", scpi_cmd_systemCpuFirmwareQ) \
     SCPI_COMMAND("SYSTem:DATE", scpi_cmd_systemDate) \
     SCPI_COMMAND("SYSTem:DATE?", scpi_cmd_systemDateQ) \
-    SCPI_COMMAND("SYSTem:FORMat:DATE", scpi_cmd_systemFormatDate) \
-    SCPI_COMMAND("SYSTem:FORMat:DATE?", scpi_cmd_systemFormatDateQ) \
-    SCPI_COMMAND("SYSTem:FORMat:TIME", scpi_cmd_systemFormatTime) \
-    SCPI_COMMAND("SYSTem:FORMat:TIME?", scpi_cmd_systemFormatTimeQ) \
+    SCPI_COMMAND("SYSTem:DELay", scpi_cmd_systemDelay) \
     SCPI_COMMAND("SYSTem:DIGital:INPut:DATA?", scpi_cmd_systemDigitalInputDataQ) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:DATA", scpi_cmd_systemDigitalOutputData) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:DATA?", scpi_cmd_systemDigitalOutputDataQ) \
-    SCPI_COMMAND("SYSTem:DIGital:PIN#:FUNCtion", scpi_cmd_systemDigitalPinFunction) \
-    SCPI_COMMAND("SYSTem:DIGital:PIN#:FUNCtion?", scpi_cmd_systemDigitalPinFunctionQ) \
-    SCPI_COMMAND("SYSTem:DIGital:PIN#:POLarity", scpi_cmd_systemDigitalPinPolarity) \
-    SCPI_COMMAND("SYSTem:DIGital:PIN#:POLarity?", scpi_cmd_systemDigitalPinPolarityQ) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:DUTY", scpi_cmd_systemDigitalOutputPwmDuty) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:DUTY?", scpi_cmd_systemDigitalOutputPwmDutyQ) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:FREQuency", scpi_cmd_systemDigitalOutputPwmFrequency) \
     SCPI_COMMAND("SYSTem:DIGital:OUTPut:PWM:FREQuency?", scpi_cmd_systemDigitalOutputPwmFrequencyQ) \
+    SCPI_COMMAND("SYSTem:DIGital:PIN#:FUNCtion", scpi_cmd_systemDigitalPinFunction) \
+    SCPI_COMMAND("SYSTem:DIGital:PIN#:FUNCtion?", scpi_cmd_systemDigitalPinFunctionQ) \
+    SCPI_COMMAND("SYSTem:DIGital:PIN#:POLarity", scpi_cmd_systemDigitalPinPolarity) \
+    SCPI_COMMAND("SYSTem:DIGital:PIN#:POLarity?", scpi_cmd_systemDigitalPinPolarityQ) \
     SCPI_COMMAND("SYSTem:ERRor:COUNt?", scpi_cmd_systemErrorCountQ) \
     SCPI_COMMAND("SYSTem:ERRor[:NEXT]?", scpi_cmd_systemErrorNextQ) \
+    SCPI_COMMAND("SYSTem:FAN:SPEed?", scpi_cmd_systemFanSpeedQ) \
+    SCPI_COMMAND("SYSTem:FAN:STATus?", scpi_cmd_systemFanStatusQ) \
+    SCPI_COMMAND("SYSTem:FORMat:DATE", scpi_cmd_systemFormatDate) \
+    SCPI_COMMAND("SYSTem:FORMat:DATE?", scpi_cmd_systemFormatDateQ) \
+    SCPI_COMMAND("SYSTem:FORMat:TIME", scpi_cmd_systemFormatTime) \
+    SCPI_COMMAND("SYSTem:FORMat:TIME?", scpi_cmd_systemFormatTimeQ) \
     SCPI_COMMAND("SYSTem:INHibit?", scpi_cmd_systemInhibitQ) \
     SCPI_COMMAND("SYSTem:KLOCk", scpi_cmd_systemKlock) \
     SCPI_COMMAND("SYSTem:LOCal", scpi_cmd_systemLocal) \
+    SCPI_COMMAND("SYSTem:MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]?", scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ) \
+    SCPI_COMMAND("SYSTem:MEASure[:SCALar][:VOLTage][:DC]?", scpi_cmd_systemMeasureScalarVoltageDcQ) \
     SCPI_COMMAND("SYSTem:PASSword:CALibration:RESet", scpi_cmd_systemPasswordCalibrationReset) \
     SCPI_COMMAND("SYSTem:PASSword:FPANel:RESet", scpi_cmd_systemPasswordFpanelReset) \
     SCPI_COMMAND("SYSTem:PASSword:NEW", scpi_cmd_systemPasswordNew) \
@@ -346,9 +356,13 @@
     SCPI_COMMAND("SYSTem:POWer:PROTection:TRIP", scpi_cmd_systemPowerProtectionTrip) \
     SCPI_COMMAND("SYSTem:POWer:PROTection:TRIP?", scpi_cmd_systemPowerProtectionTripQ) \
     SCPI_COMMAND("SYSTem:POWer?", scpi_cmd_systemPowerQ) \
+    SCPI_COMMAND("SYSTem:RELay:CYCLes?", scpi_cmd_systemRelayCyclesQ) \
     SCPI_COMMAND("SYSTem:REMote", scpi_cmd_systemRemote) \
     SCPI_COMMAND("SYSTem:REStart", scpi_cmd_systemRestart) \
     SCPI_COMMAND("SYSTem:RWLock", scpi_cmd_systemRwlock) \
+    SCPI_COMMAND("SYSTem:SLOT:STATe", scpi_cmd_systemSlotState) \
+    SCPI_COMMAND("SYSTem:SLOT:STATe?", scpi_cmd_systemSlotStateQ) \
+    SCPI_COMMAND("SYSTem:SLOT[:COUNt]?", scpi_cmd_systemSlotCountQ) \
     SCPI_COMMAND("SYSTem:TEMPerature:PROTection[:HIGH]:CLEar", scpi_cmd_systemTemperatureProtectionHighClear) \
     SCPI_COMMAND("SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]", scpi_cmd_systemTemperatureProtectionHighDelayTime) \
     SCPI_COMMAND("SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]?", scpi_cmd_systemTemperatureProtectionHighDelayTimeQ) \
@@ -364,13 +378,9 @@
     SCPI_COMMAND("SYSTem:TIME:ZONE?", scpi_cmd_systemTimeZoneQ) \
     SCPI_COMMAND("SYSTem:TIME?", scpi_cmd_systemTimeQ) \
     SCPI_COMMAND("SYSTem:VERSion?", scpi_cmd_systemVersionQ) \
-    SCPI_COMMAND("SYSTem:FAN:STATus?", scpi_cmd_systemFanStatusQ) \
-    SCPI_COMMAND("SYSTem:FAN:SPEed?", scpi_cmd_systemFanSpeedQ) \
-    SCPI_COMMAND("SYSTem:MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]?", scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ) \
-    SCPI_COMMAND("SYSTem:MEASure[:SCALar][:VOLTage][:DC]?", scpi_cmd_systemMeasureScalarVoltageDcQ) \
-    SCPI_COMMAND("SYSTem:CPU:SNO?", scpi_cmd_systemCpuSnoQ) \
-    SCPI_COMMAND("SYSTem:DELay", scpi_cmd_systemDelay) \
-    SCPI_COMMAND("SYSTem:RELay:CYCLes?", scpi_cmd_systemRelayCyclesQ) \
+    SCPI_COMMAND("SYSTem:SLOT:MODel?", scpi_cmd_systemSlotModelQ) \
+    SCPI_COMMAND("SYSTem:SLOT:VERSion?", scpi_cmd_systemSlotVersionQ) \
+    SCPI_COMMAND("SYSTem:SLOT:FIRMware?", scpi_cmd_systemSlotFirmwareQ) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \
     SCPI_COMMAND("TRIGger:DLOG[:IMMediate]", scpi_cmd_triggerDlogImmediate) \
@@ -420,8 +430,4 @@
     SCPI_COMMAND("DEBUg:DOWNload:FIRMware", scpi_cmd_debugDownloadFirmware) \
     SCPI_COMMAND("DEBUg:EVENt", scpi_cmd_debugEvent) \
     SCPI_COMMAND("SYSTem:DATE:CLEar", scpi_cmd_systemDateClear) \
-    SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear) \
-    SCPI_COMMAND("ROUTe:OPEN", scpi_cmd_routeOpen) \
-    SCPI_COMMAND("ROUTe:OPEN?", scpi_cmd_routeOpenQ) \
-    SCPI_COMMAND("ROUTe:CLOSe", scpi_cmd_routeClose) \
-    SCPI_COMMAND("ROUTe:CLOSe?", scpi_cmd_routeCloseQ)
+    SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear)

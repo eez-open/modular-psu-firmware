@@ -264,7 +264,7 @@ public:
             typedOutput.dac7760[0].voltage = 0; // TODO channel->u.set;
         }
 
-        auto status = bp3c::comm::transferDMA(slotIndex, output, input, BUFFER_SIZE);
+        auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)&typedOutput, input, BUFFER_SIZE);
         if (status != bp3c::comm::TRANSFER_STATUS_OK) {
         	onSpiDmaTransferCompleted(status);
         }

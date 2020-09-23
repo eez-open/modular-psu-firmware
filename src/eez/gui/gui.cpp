@@ -103,6 +103,8 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
         mouse::onMouseButtonUp(param);
     } else if (type == GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED) {
         mouse::onMouseDisconnected();
+    }  else if (type == GUI_QUEUE_MESSAGE_REFRESH_SCREEN) {
+        refreshScreen();
     } else {
         onGuiQueueMessageHook(type, param);
     }

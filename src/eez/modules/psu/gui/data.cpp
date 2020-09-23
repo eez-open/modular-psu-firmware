@@ -887,14 +887,58 @@ void SLOT_INFO_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
-bool compare_SLOT_TITLE_value(const Value &a, const Value &b) {
+bool compare_SLOT_TITLE_DEF_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
 
-void SLOT_TITLE_value_to_text(const Value &value, char *text, int count) {
+void SLOT_TITLE_DEF_value_to_text(const Value &value, char *text, int count) {
+    int slotIndex = value.getInt();
+    auto &slot = *g_slots[slotIndex];
+    snprintf(text, count - 1, "%s", slot.moduleName);
+    text[count - 1] = 0;
+}
+
+bool compare_SLOT_TITLE_MAX_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void SLOT_TITLE_MAX_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
     snprintf(text, count - 1, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+    text[count - 1] = 0;
+}
+
+bool compare_SLOT_TITLE_MIN_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void SLOT_TITLE_MIN_value_to_text(const Value &value, char *text, int count) {
+    int slotIndex = value.getInt();
+    auto &slot = *g_slots[slotIndex];
+    snprintf(text, count - 1, "%s", slot.moduleName);
+    text[count - 1] = 0;
+}
+
+bool compare_SLOT_TITLE_MICRO_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void SLOT_TITLE_MICRO_value_to_text(const Value &value, char *text, int count) {
+    int slotIndex = value.getInt();
+    auto &slot = *g_slots[slotIndex];
+    snprintf(text, count - 1, "%s", slot.moduleName);
+    text[count - 1] = 0;
+}
+
+bool compare_SLOT_TITLE_SETTINGS_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void SLOT_TITLE_SETTINGS_value_to_text(const Value &value, char *text, int count) {
+    int slotIndex = value.getInt();
+    auto &slot = *g_slots[slotIndex];
+    snprintf(text, count - 1, "%s #%d", slot.moduleName, slotIndex + 1);
     text[count - 1] = 0;
 }
 
@@ -1452,6 +1496,12 @@ void data_channels_view_mode_in_default(DataOperationEnum operation, Cursor curs
 void data_channels_view_mode_in_max(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::devConf.channelsViewModeInMax;
+    }
+}
+
+void data_slot_is_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_slots[hmi::g_selectedSlotIndex]->enabled;
     }
 }
 
@@ -5766,25 +5816,31 @@ void data_slot_test_result(DataOperationEnum operation, Cursor cursor, Value &va
 
 void data_slot_title_def(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_DEF);
     }
 }
 
 void data_slot_title_max(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_MAX);
     }
 }
 
 void data_slot_title_min(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_MIN);
     }
 }
 
 void data_slot_title_micro(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE);
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_MICRO);
+    }
+}
+
+void data_slot_title_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_SETTINGS);
     }
 }
 

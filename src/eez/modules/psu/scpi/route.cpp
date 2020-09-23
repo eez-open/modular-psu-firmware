@@ -102,6 +102,198 @@ scpi_result_t scpi_cmd_routeCloseQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_routeLabelRow(scpi_t *context) {
+    int32_t slotIndex;
+    if (!SCPI_ParamInt(context, &slotIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    if (slotIndex < 1 || slotIndex > NUM_SLOTS) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    slotIndex--;
+
+    int32_t rowIndex;
+    if (!SCPI_ParamInt(context, &rowIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    int err;
+    int numRows;
+    if (!g_slots[slotIndex]->getSwitchMatrixNumRows(numRows, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+    if (rowIndex < 1 || rowIndex > numRows) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    rowIndex--;
+
+    const char *str;
+    size_t len;
+    if (!SCPI_ParamCharacters(context, &str, &len, true)) {
+        return SCPI_RES_ERR;
+    }
+    if (len > Module::MAX_SWITCH_MATRIX_LABEL_LENGTH) {
+        SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+        return SCPI_RES_ERR;
+    }
+    if (len < 1) {
+        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_STRING_DATA);
+        return SCPI_RES_ERR;
+    }
+
+    char label[Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
+    strncpy(label, str, len);
+    label[len] = 0;
+
+    if (!g_slots[slotIndex]->setSwitchMatrixRowLabel(rowIndex, label, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_routeLabelRowQ(scpi_t *context) {
+    int32_t slotIndex;
+    if (!SCPI_ParamInt(context, &slotIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    if (slotIndex < 1 || slotIndex > NUM_SLOTS) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    slotIndex--;
+
+    int32_t rowIndex;
+    if (!SCPI_ParamInt(context, &rowIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    int err;
+    int numRows;
+    if (!g_slots[slotIndex]->getSwitchMatrixNumRows(numRows, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+    if (rowIndex < 1 || rowIndex > numRows) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    rowIndex--;
+
+    char label[Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
+    if (!g_slots[slotIndex]->getSwitchMatrixRowLabel(rowIndex, label, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultText(context, label);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_routeLabelColumn(scpi_t *context) {
+    int32_t slotIndex;
+    if (!SCPI_ParamInt(context, &slotIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    if (slotIndex < 1 || slotIndex > NUM_SLOTS) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    slotIndex--;
+
+    int32_t columnIndex;
+    if (!SCPI_ParamInt(context, &columnIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    int err;
+    int numColumns;
+    if (!g_slots[slotIndex]->getSwitchMatrixNumColumns(numColumns, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+    if (columnIndex < 1 || columnIndex > numColumns) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    columnIndex--;
+
+    const char *str;
+    size_t len;
+    if (!SCPI_ParamCharacters(context, &str, &len, true)) {
+        return SCPI_RES_ERR;
+    }
+    if (len > Module::MAX_SWITCH_MATRIX_LABEL_LENGTH) {
+        SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
+        return SCPI_RES_ERR;
+    }
+    if (len < 1) {
+        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_STRING_DATA);
+        return SCPI_RES_ERR;
+    }
+
+    char label[Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
+    strncpy(label, str, len);
+    label[len] = 0;
+
+    if (!g_slots[slotIndex]->setSwitchMatrixColumnLabel(columnIndex, label, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_routeLabelColumnQ(scpi_t *context) {
+    int32_t slotIndex;
+    if (!SCPI_ParamInt(context, &slotIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    if (slotIndex < 1 || slotIndex > NUM_SLOTS) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    slotIndex--;
+
+    int32_t columnIndex;
+    if (!SCPI_ParamInt(context, &columnIndex, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+    int err;
+    int numColumns;
+    if (!g_slots[slotIndex]->getSwitchMatrixNumColumns(numColumns, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+    if (columnIndex < 1 || columnIndex > numColumns) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    columnIndex--;
+
+    char label[Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
+    if (!g_slots[slotIndex]->getSwitchMatrixColumnLabel(columnIndex, label, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultText(context, label);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_routeLabelChannel(scpi_t *context) {
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+}
+
+scpi_result_t scpi_cmd_routeLabelChannelQ(scpi_t *context) {
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

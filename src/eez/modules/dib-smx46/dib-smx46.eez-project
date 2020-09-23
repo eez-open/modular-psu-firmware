@@ -280,6 +280,18 @@
                           "top": 12,
                           "width": 26,
                           "height": 1
+                        },
+                        {
+                          "type": "Rectangle",
+                          "style": {
+                            "inheritFrom": "default",
+                            "borderSize": "0",
+                            "borderRadius": 4
+                          },
+                          "left": 8,
+                          "top": 8,
+                          "width": 9,
+                          "height": 9
                         }
                       ]
                     },
@@ -312,18 +324,6 @@
                           "top": 12,
                           "width": 26,
                           "height": 1
-                        },
-                        {
-                          "type": "Rectangle",
-                          "style": {
-                            "inheritFrom": "default",
-                            "borderSize": "0",
-                            "borderRadius": 4
-                          },
-                          "left": 8,
-                          "top": 8,
-                          "width": 9,
-                          "height": 9
                         }
                       ]
                     }
@@ -542,6 +542,18 @@
                           "top": 12,
                           "width": 40,
                           "height": 1
+                        },
+                        {
+                          "type": "Rectangle",
+                          "style": {
+                            "inheritFrom": "default",
+                            "borderSize": "0",
+                            "borderRadius": 4
+                          },
+                          "left": 15,
+                          "top": 8,
+                          "width": 9,
+                          "height": 9
                         }
                       ]
                     },
@@ -574,18 +586,6 @@
                           "top": 12,
                           "width": 40,
                           "height": 1
-                        },
-                        {
-                          "type": "Rectangle",
-                          "style": {
-                            "inheritFrom": "default",
-                            "borderSize": "0",
-                            "borderRadius": 4
-                          },
-                          "left": 15,
-                          "top": 8,
-                          "width": 9,
-                          "height": 9
                         }
                       ]
                     }
@@ -789,6 +789,50 @@
                         {
                           "type": "Rectangle",
                           "style": {
+                            "inheritFrom": "default"
+                          },
+                          "left": 19,
+                          "top": 0,
+                          "width": 2,
+                          "height": 28
+                        },
+                        {
+                          "type": "Rectangle",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "left": 0,
+                          "top": 13,
+                          "width": 40,
+                          "height": 2
+                        },
+                        {
+                          "type": "Rectangle",
+                          "style": {
+                            "inheritFrom": "default",
+                            "borderSize": "0",
+                            "borderRadius": 5
+                          },
+                          "left": 14,
+                          "top": 8,
+                          "width": 12,
+                          "height": 12
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Container",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 40,
+                      "height": 28,
+                      "widgets": [
+                        {
+                          "type": "Rectangle",
+                          "style": {
                             "inheritFrom": "default",
                             "color": "Background",
                             "borderSize": "1",
@@ -819,50 +863,6 @@
                           "top": 13,
                           "width": 40,
                           "height": 2
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Container",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "left": 0,
-                      "top": 0,
-                      "width": 40,
-                      "height": 28,
-                      "widgets": [
-                        {
-                          "type": "Rectangle",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "left": 19,
-                          "top": 0,
-                          "width": 2,
-                          "height": 28
-                        },
-                        {
-                          "type": "Rectangle",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "left": 0,
-                          "top": 13,
-                          "width": 40,
-                          "height": 2
-                        },
-                        {
-                          "type": "Rectangle",
-                          "style": {
-                            "inheritFrom": "default",
-                            "borderSize": "0",
-                            "borderRadius": 5
-                          },
-                          "left": 14,
-                          "top": 8,
-                          "width": 12,
-                          "height": 12
                         }
                       ]
                     }
@@ -1170,12 +1170,24 @@
                 "style": {
                   "inheritFrom": "status_title"
                 },
-                "data": "slot_title_max",
+                "data": "slot_title_settings",
                 "left": 40,
                 "top": 0,
-                "width": 334,
+                "width": 84,
                 "height": 32,
                 "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 124,
+                "top": 0,
+                "width": 250,
+                "height": 32,
+                "text": "Settings"
               },
               {
                 "type": "Select",
@@ -1248,7 +1260,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "dataContextOverrides": "{\n    \"slot_title_settings\": \"SMX46 #3:\"\n}"
       },
       {
         "name": "configure_routes",
@@ -1260,10 +1273,10 @@
             "style": {
               "inheritFrom": "default"
             },
-            "left": 8,
-            "top": 8,
-            "width": 464,
-            "height": 232,
+            "left": 0,
+            "top": 6,
+            "width": 480,
+            "height": 228,
             "name": "Body",
             "widgets": [
               {
@@ -1273,8 +1286,8 @@
                 },
                 "data": "routes",
                 "left": 44,
-                "top": 4,
-                "width": 420,
+                "top": 0,
+                "width": 300,
                 "height": 200,
                 "itemWidget": {
                   "type": "Container",
@@ -1284,7 +1297,7 @@
                   "action": "toggle_route",
                   "left": 0,
                   "top": 0,
-                  "width": 70,
+                  "width": 50,
                   "height": 50,
                   "widgets": [
                     {
@@ -1295,7 +1308,7 @@
                       "data": "route_open",
                       "left": 0,
                       "top": 0,
-                      "width": 70,
+                      "width": 50,
                       "height": 50,
                       "widgets": [
                         {
@@ -1305,29 +1318,15 @@
                           },
                           "left": 0,
                           "top": 0,
-                          "width": 70,
+                          "width": 50,
                           "height": 50,
                           "widgets": [
                             {
                               "type": "Rectangle",
                               "style": {
-                                "inheritFrom": "default",
-                                "color": "Background",
-                                "borderSize": "1",
-                                "borderRadius": 8,
-                                "borderColor": "Action color"
-                              },
-                              "left": 27,
-                              "top": 17,
-                              "width": 16,
-                              "height": 16
-                            },
-                            {
-                              "type": "Rectangle",
-                              "style": {
                                 "inheritFrom": "default"
                               },
-                              "left": 34,
+                              "left": 24,
                               "top": 0,
                               "width": 2,
                               "height": 50
@@ -1339,39 +1338,7 @@
                               },
                               "left": 0,
                               "top": 24,
-                              "width": 70,
-                              "height": 2
-                            }
-                          ]
-                        },
-                        {
-                          "type": "Container",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "left": 0,
-                          "top": 0,
-                          "width": 70,
-                          "height": 50,
-                          "widgets": [
-                            {
-                              "type": "Rectangle",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "left": 34,
-                              "top": 0,
-                              "width": 2,
-                              "height": 50
-                            },
-                            {
-                              "type": "Rectangle",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "left": 0,
-                              "top": 24,
-                              "width": 70,
+                              "width": 50,
                               "height": 2
                             },
                             {
@@ -1383,10 +1350,56 @@
                                 "borderSize": "0",
                                 "borderRadius": 7
                               },
-                              "left": 28,
+                              "left": 18,
                               "top": 18,
                               "width": 14,
                               "height": 14
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Container",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "left": 0,
+                          "top": 0,
+                          "width": 50,
+                          "height": 50,
+                          "widgets": [
+                            {
+                              "type": "Rectangle",
+                              "style": {
+                                "inheritFrom": "default",
+                                "color": "Background",
+                                "borderSize": "1",
+                                "borderRadius": 8,
+                                "borderColor": "Action color"
+                              },
+                              "left": 17,
+                              "top": 17,
+                              "width": 16,
+                              "height": 16
+                            },
+                            {
+                              "type": "Rectangle",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 24,
+                              "top": 0,
+                              "width": 2,
+                              "height": 50
+                            },
+                            {
+                              "type": "Rectangle",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 0,
+                              "top": 24,
+                              "width": 50,
+                              "height": 2
                             }
                           ]
                         }
@@ -1442,8 +1455,8 @@
                 },
                 "data": "x_labels",
                 "left": 44,
-                "top": 204,
-                "width": 420,
+                "top": 200,
+                "width": 300,
                 "height": 28,
                 "itemWidget": {
                   "type": "Container",
@@ -1452,7 +1465,7 @@
                   },
                   "left": 0,
                   "top": 0,
-                  "width": 70,
+                  "width": 50,
                   "height": 28,
                   "widgets": [
                     {
@@ -1467,7 +1480,7 @@
                       "action": "edit_x_label",
                       "left": 0,
                       "top": 0,
-                      "width": 70,
+                      "width": 50,
                       "height": 28,
                       "text": ""
                     }
@@ -1477,6 +1490,30 @@
                 "gap": 0
               }
             ]
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "edit_value_active_M_center"
+            },
+            "action": "clear_all_routes",
+            "left": 352,
+            "top": 146,
+            "width": 122,
+            "height": 40,
+            "text": "Clear routes"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "edit_value_active_M_center"
+            },
+            "action": "clear_all_labels",
+            "left": 352,
+            "top": 194,
+            "width": 122,
+            "height": 40,
+            "text": "Clear labels"
           },
           {
             "type": "Container",
@@ -1512,37 +1549,23 @@
                 "style": {
                   "inheritFrom": "status_title"
                 },
-                "left": 41,
+                "data": "slot_title_settings",
+                "left": 40,
                 "top": 0,
-                "width": 147,
+                "width": 84,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "left": 124,
+                "top": 0,
+                "width": 274,
                 "height": 32,
                 "text": "Configure routes"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "bottom_button_textual_S_left",
-                  "alignHorizontal": "center"
-                },
-                "action": "clear_all_routes",
-                "left": 188,
-                "top": 0,
-                "width": 105,
-                "height": 32,
-                "text": "Clear routes"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "bottom_button_textual_S_left",
-                  "alignHorizontal": "center"
-                },
-                "action": "clear_all_labels",
-                "left": 293,
-                "top": 0,
-                "width": 105,
-                "height": 32,
-                "text": "Clear labels"
               },
               {
                 "type": "Select",
@@ -1624,7 +1647,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "dataContextOverrides": "{\n    \"slot_title_settings\": \"SMX46 #3:\"\n}"
       },
       {
         "name": "slot_view_min",
@@ -1942,9 +1966,21 @@
                 "style": {
                   "inheritFrom": "status_title"
                 },
-                "left": 41,
+                "data": "slot_title_settings",
+                "left": 40,
                 "top": 0,
-                "width": 439,
+                "width": 84,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "left": 124,
+                "top": 0,
+                "width": 356,
                 "height": 32,
                 "text": "Information"
               }
@@ -1954,7 +1990,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "dataContextOverrides": "{\n    \"slot_title_settings\": \"SMX46 #3:\"\n}"
       },
       {
         "name": "relay_cycles",
@@ -2143,9 +2180,21 @@
                 "style": {
                   "inheritFrom": "status_title"
                 },
-                "left": 41,
+                "data": "slot_title_settings",
+                "left": 40,
                 "top": 0,
-                "width": 439,
+                "width": 84,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "left": 124,
+                "top": 0,
+                "width": 356,
                 "height": 32,
                 "text": "Relay Cycles"
               }
@@ -2155,7 +2204,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "dataContextOverrides": "{\n    \"slot_title_settings\": \"SMX46 #3:\"\n}"
       }
     ],
     "styles": [],

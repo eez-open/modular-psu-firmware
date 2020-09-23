@@ -415,7 +415,7 @@ Module *getModuleFromSlotIndexParam(scpi_t *context) {
     if (!SCPI_ParamInt(context, &slotIndex, TRUE)) {
         return nullptr;
     }
-    if (slotIndex < 0 && slotIndex > NUM_SLOTS) {
+    if (slotIndex < 1 || slotIndex > NUM_SLOTS) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return nullptr;
     }

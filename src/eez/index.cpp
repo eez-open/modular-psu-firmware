@@ -272,6 +272,48 @@ bool Module::routeClose(ChannelList channelList, int *err) {
     return false;
 }
 
+bool Module::getSwitchMatrixNumRows(int &numRows, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::getSwitchMatrixNumColumns(int &numColumns, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::setSwitchMatrixRowLabel(int subchannelIndex, const char *label, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::getSwitchMatrixRowLabel(int subchannelIndex, char *label, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::setSwitchMatrixColumnLabel(int subchannelIndex, const char *label, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::getSwitchMatrixColumnLabel(int subchannelIndex, char *label, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
 bool Module::getRelayCycles(int subchannelIndex, uint32_t &relayCycles, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
