@@ -511,7 +511,7 @@ static bool repositionSlotsInProfileToMatchCurrentSlotsConfiguration(Parameters 
 
     for (int i = 0; i < NUM_SLOTS; i++) {
         if (slotsMap[i] == -1) {
-            for (int j = 0; j < CH_MAX; j++) {
+            for (int j = 0; j < NUM_SLOTS; j++) {
                 if (!profileSlotAlreadyUsed[j] && !profile.slots[j].parametersAreValid) {
                     profileSlotAlreadyUsed[j] = true;
                     slotsMap[i] = j;
@@ -523,7 +523,7 @@ static bool repositionSlotsInProfileToMatchCurrentSlotsConfiguration(Parameters 
 
     for (int i = 0; i < NUM_SLOTS; i++) {
         if (slotsMap[i] == -1) {
-            for (int j = 0; j < CH_MAX; j++) {
+            for (int j = 0; j < NUM_SLOTS; j++) {
                 if (!profileSlotAlreadyUsed[j]) {
                     profileSlotAlreadyUsed[j] = true;
                     slotsMap[i] = j;
