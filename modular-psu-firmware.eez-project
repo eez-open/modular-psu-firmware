@@ -59192,9 +59192,6 @@
                   {
                     "type": "discrete",
                     "enumeration": "Channel"
-                  },
-                  {
-                    "type": "channel-list"
                   }
                 ],
                 "isOptional": false
@@ -60266,10 +60263,6 @@
                 "name": "chanlist",
                 "type": [
                   {
-                    "type": "discrete",
-                    "enumeration": "ChannelWithAll"
-                  },
-                  {
                     "type": "channel-list"
                   }
                 ],
@@ -60291,10 +60284,6 @@
               {
                 "name": "chanlist",
                 "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "ChannelWithAll"
-                  },
                   {
                     "type": "channel-list"
                   }
