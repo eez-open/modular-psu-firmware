@@ -56,7 +56,7 @@ scpi_result_t scpi_cmd_apply(scpi_t *context) {
         }
         // no CURRent parameter
     } else {
-        if (!get_current_from_param(context, param, current, channel, 0)) {
+        if (!get_current_from_param(context, param, current, channel->slotIndex, channel->subchannelIndex, 0)) {
             return SCPI_RES_ERR;
         }
         call_set_current = true;

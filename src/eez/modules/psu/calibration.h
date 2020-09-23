@@ -48,8 +48,7 @@ struct Value {
 };
 
 bool isEnabled();
-Channel *getCalibrationChannel();
-Channel *getCalibrationChannel(int &slotIndex, int &subchannelIndex);
+void getCalibrationChannel(int &slotIndex, int &subchannelIndex);
 bool hasSupportForCurrentDualRange();
 CalibrationValueType getCalibrationValueType();
 bool isCalibrationExists();
@@ -63,8 +62,6 @@ void setVoltage(float value);
 void setCurrent(float value);
 
 /// Start calibration procedure on the channel.
-/// /param channel Selected channel
-void start(Channel &channel);
 void start(int slotIndex, int subchannelIndex);
 
 /// Stop calibration procedure.

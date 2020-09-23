@@ -57,13 +57,22 @@ static scpi_result_t calibration_level(scpi_t *context, calibration::Value &cali
         return SCPI_RES_ERR;
     }
 
+    int slotIndex;
+    int subchannelIndex;
+    calibration::getCalibrationChannel(slotIndex, subchannelIndex);
+
     float dacValue;
     if (calibrationValue.type == CALIBRATION_VALUE_U) {
-        if (!get_voltage_param(context, dacValue, calibration::getCalibrationChannel(), 0)) {
+        if (!get_voltage_param(context, dacValue, slotIndex, subchannelIndex, 0)) {
             return SCPI_RES_ERR;
         }
     } else {
-        if (!get_current_param(context, dacValue, calibration::getCalibrationChannel(), 0)) {
+        if (!calibration::isCalibrationValueTypeSelectable()) {
+            SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+            return SCPI_RES_ERR;
+        }
+
+        if (!get_current_param(context, dacValue, slotIndex, subchannelIndex, 0)) {
             return SCPI_RES_ERR;
         }
     }
@@ -84,6 +93,11 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
         return SCPI_RES_ERR;
     }
 
+    if (calibrationValue.type != CALIBRATION_VALUE_U && !calibration::isCalibrationValueTypeSelectable()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+        return SCPI_RES_ERR;
+    }
+
     scpi_number_t param;
     if (!SCPI_ParamNumber(context, 0, &param, true)) {
         return SCPI_RES_ERR;
@@ -96,6 +110,7 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
     }
 
     float value = (float)param.content.value;
+
     float adc = calibrationValue.readAdcValue();
     if (!calibrationValue.checkValueAndAdc(value, adc)) {
         SCPI_ErrorPush(context, SCPI_ERROR_CAL_VALUE_OUT_OF_RANGE);
@@ -151,28 +166,34 @@ scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = getSelectedPowerChannel(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
-        return SCPI_RES_ERR;
-    }
-
-    if (channel->flags.trackingEnabled) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
-        return SCPI_RES_ERR;
-    }
-
-    if (!channel->isOutputEnabled()) {
+    SlotAndSubchannelIndex *slotAndSubchannelIndex = getSelectedChannel(context);
+    if (!slotAndSubchannelIndex) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
     }
 
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex);
+    if (channel) {
+        if (channel->channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) {
+            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED);
+            return SCPI_RES_ERR;
+        }
+
+        if (channel->flags.trackingEnabled) {
+            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTE_ERROR_IN_TRACKING_MODE);
+            return SCPI_RES_ERR;
+        }
+
+        if (enable) {
+            if (!channel->isOutputEnabled()) {
+                SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+                return SCPI_RES_ERR;
+            }
+        }
+    }
+
     if (enable) {
-        calibration::start(*channel);
+        calibration::start(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex);
     } else {
         calibration::stop();
     }
@@ -350,7 +371,6 @@ scpi_result_t scpi_cmd_calibrationVoltageData(scpi_t *context) {
 
 scpi_result_t scpi_cmd_calibrationVoltageLevel(scpi_t *context) {
     return calibration_level(context, calibration::getVoltage());
-    ;
 }
 
 scpi_result_t scpi_cmd_calibrationScreenInit(scpi_t *context) {

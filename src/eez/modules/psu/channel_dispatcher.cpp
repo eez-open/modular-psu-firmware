@@ -879,11 +879,29 @@ float getIMin(const Channel &channel) {
     return channel.i.min;
 }
 
+float getIMin(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        return getIMin(*channel);
+    }
+
+    return getCurrentMinValue(slotIndex, subchannelIndex);
+}
+
 float getIDef(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_PARALLEL) {
         return Channel::get(0).i.def + Channel::get(1).i.def;
     }
     return channel.i.def;
+}
+
+float getIDef(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        return getIDef(*channel);
+    }
+
+    return getCurrentMinValue(slotIndex, subchannelIndex);
 }
 
 float getIMax(const Channel &channel) {
@@ -904,6 +922,15 @@ float getIMax(const Channel &channel) {
         return value;
     }
     return channel.i.max;
+}
+
+float getIMax(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        return getIMax(*channel);
+    }
+
+    return getCurrentMaxValue(slotIndex, subchannelIndex);
 }
 
 static float g_setCurrentValues[CH_MAX];

@@ -546,14 +546,14 @@ public:
         ++subchannelIndex;
 
         if (subchannelIndex != 1 && subchannelIndex != 2) {
-            if (*err) {
+            if (err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
             return false;
         }
 
         if (value < DAC_MIN || value > DAC_MAX) {
-            if (*err) {
+            if (err) {
                 *err = SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
             }
             return false;

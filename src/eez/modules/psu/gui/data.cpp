@@ -2151,7 +2151,8 @@ void data_channel_calibration_value_is_voltage(DataOperationEnum operation, Curs
 void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor, Value &value) {
     int slotIndex;
     int subchannelIndex;
-    Channel *channel = calibration::getCalibrationChannel(slotIndex, subchannelIndex);
+    calibration::getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
 
     auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
     if (editPage) {
@@ -2212,7 +2213,8 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
 void data_calibration_point_measured_value(DataOperationEnum operation, Cursor cursor, Value &value) {
     int slotIndex;
     int subchannelIndex;
-    Channel *channel = calibration::getCalibrationChannel(slotIndex, subchannelIndex);
+    calibration::getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
 
     auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
     if (editPage) {

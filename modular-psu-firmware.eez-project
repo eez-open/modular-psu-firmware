@@ -57590,14 +57590,24 @@
             "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_curr_lev",
             "parameters": [
               {
+                "name": "point",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
                 "name": "level",
                 "type": [
+                  {
+                    "type": "nr2"
+                  },
                   {
                     "type": "discrete",
                     "enumeration": "Level"
                   }
-                ],
-                "isOptional": false
+                ]
               }
             ],
             "response": {
@@ -57772,14 +57782,24 @@
             "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_volt_lev",
             "parameters": [
               {
+                "name": "point",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
                 "name": "level",
                 "type": [
+                  {
+                    "type": "nr2"
+                  },
                   {
                     "type": "discrete",
                     "enumeration": "Level"
                   }
-                ],
-                "isOptional": false
+                ]
               }
             ],
             "response": {

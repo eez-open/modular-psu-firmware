@@ -378,8 +378,7 @@ bool param_temp_sensor(scpi_t *context, int32_t &sensor) {
     return true;
 }
 
-bool get_voltage_param(scpi_t *context, float &value, const Channel *channel,
-                       const Channel::Value *cv) {
+bool get_voltage_param(scpi_t *context, float &value, const Channel *channel, const Channel::Value *cv) {
     scpi_number_t param;
     if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
         return false;
@@ -388,8 +387,7 @@ bool get_voltage_param(scpi_t *context, float &value, const Channel *channel,
     return get_voltage_from_param(context, param, value, channel->slotIndex, channel->subchannelIndex, cv);
 }
 
-bool get_voltage_param(scpi_t *context, float &value, int slotIndex, int subchannelIndex,
-    const Channel::Value *cv) {
+bool get_voltage_param(scpi_t *context, float &value, int slotIndex, int subchannelIndex, const Channel::Value *cv) {
     scpi_number_t param;
     if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
         return false;
@@ -398,8 +396,7 @@ bool get_voltage_param(scpi_t *context, float &value, int slotIndex, int subchan
     return get_voltage_from_param(context, param, value, slotIndex, subchannelIndex, cv);
 }
 
-bool get_voltage_protection_level_param(scpi_t *context, float &value, float min, float max,
-                                        float def) {
+bool get_voltage_protection_level_param(scpi_t *context, float &value, float min, float max, float def) {
     scpi_number_t param;
     if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
         return false;
@@ -408,14 +405,22 @@ bool get_voltage_protection_level_param(scpi_t *context, float &value, float min
     return get_voltage_protection_level_from_param(context, param, value, min, max, def);
 }
 
-bool get_current_param(scpi_t *context, float &value, const Channel *channel,
-                       const Channel::Value *cv) {
+bool get_current_param(scpi_t *context, float &value, const Channel *channel, const Channel::Value *cv) {
     scpi_number_t param;
     if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
         return false;
     }
 
-    return get_current_from_param(context, param, value, channel, cv);
+    return get_current_from_param(context, param, value, channel->slotIndex, channel->subchannelIndex, cv);
+}
+
+bool get_current_param(scpi_t *context, float &value, int slotIndex, int subchannelIndex, const Channel::Value *cv) {
+    scpi_number_t param;
+    if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, true)) {
+        return false;
+    }
+
+    return get_current_from_param(context, param, value, slotIndex, subchannelIndex, cv);
 }
 
 bool get_power_param(scpi_t *context, float &value, float min, float max, float def) {
@@ -510,23 +515,22 @@ bool get_voltage_protection_level_from_param(scpi_t *context, const scpi_number_
     return true;
 }
 
-bool get_current_from_param(scpi_t *context, const scpi_number_t &param, float &value,
-                            const Channel *channel, const Channel::Value *cv) {
+bool get_current_from_param(scpi_t *context, const scpi_number_t &param, float &value, int slotIndex, int subchannelIndex, const Channel::Value *cv) {
     if (param.special) {
         if (param.content.tag == SCPI_NUM_MAX) {
-            value = channel_dispatcher::getIMax(*channel);
+            value = channel_dispatcher::getIMax(slotIndex, subchannelIndex);
         } else if (param.content.tag == SCPI_NUM_MIN) {
-            value = channel_dispatcher::getIMin(*channel);
+            value = channel_dispatcher::getIMin(slotIndex, subchannelIndex);
         } else if (param.content.tag == SCPI_NUM_DEF) {
-            value = channel_dispatcher::getIDef(*channel);
+            value = channel_dispatcher::getIDef(slotIndex, subchannelIndex);
         } else if (param.content.tag == SCPI_NUM_UP && cv) {
             value = cv->set + cv->step;
-            if (value > channel_dispatcher::getIMax(*channel))
-                value = channel_dispatcher::getIMax(*channel);
+            if (value > channel_dispatcher::getIMax(slotIndex, subchannelIndex))
+                value = channel_dispatcher::getIMax(slotIndex, subchannelIndex);
         } else if (param.content.tag == SCPI_NUM_DOWN && cv) {
             value = cv->set - cv->step;
-            if (value < channel_dispatcher::getIMin(*channel))
-                value = channel_dispatcher::getIMin(*channel);
+            if (value < channel_dispatcher::getIMin(slotIndex, subchannelIndex))
+                value = channel_dispatcher::getIMin(slotIndex, subchannelIndex);
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return false;
@@ -538,8 +542,8 @@ bool get_current_from_param(scpi_t *context, const scpi_number_t &param, float &
         }
 
         value = (float)param.content.value;
-        if (value < channel_dispatcher::getIMin(*channel) ||
-            value > channel_dispatcher::getIMax(*channel)) {
+        if (value < channel_dispatcher::getIMin(slotIndex, subchannelIndex) ||
+            value > channel_dispatcher::getIMax(slotIndex, subchannelIndex)) {
             SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
             return false;
         }

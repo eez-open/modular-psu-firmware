@@ -1374,7 +1374,7 @@ void ChSettingsCalibrationEditPage::onStartPasswordOk() {
     removePageFromStack(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
 
     if (g_channel) {
-        calibration::start(*g_channel);
+        calibration::start(g_channel->slotIndex, g_channel->subchannelIndex);
     } else {
         calibration::start(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
     }
@@ -1458,7 +1458,10 @@ void ChSettingsCalibrationEditPage::setCalibrationValueType(CalibrationValueType
             calibration::selectCurrentRange(0);
         }
 
-        Channel *channel = calibration::getCalibrationChannel();
+        int slotIndex;
+        int subchannelIndex;
+        calibration::getCalibrationChannel(slotIndex, subchannelIndex);
+        Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
         if (channel) {
             if (m_calibrationValueType == CALIBRATION_VALUE_U) {
                 channel_dispatcher::setCurrent(*channel, g_channel->params.U_CAL_I_SET);
@@ -1883,11 +1886,12 @@ unsigned int ChSettingsCalibrationViewPage::getNumPoints() {
 CalibrationValueConfiguration &ChSettingsCalibrationViewPage::getCalibrationValueConfiguration() {
     int slotIndex;
     int subchannelIndex;
-    Channel *channel = calibration::getCalibrationChannel(slotIndex, subchannelIndex);
+    calibration::getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
 
     CalibrationConfiguration *calConf;
     if (channel) {
-        calConf = &g_channel->cal_conf;
+        calConf = &channel->cal_conf;
     } else {
         calConf = g_slots[slotIndex]->getCalibrationConfiguration(subchannelIndex);
     }
