@@ -1454,9 +1454,9 @@
                   "inheritFrom": "default"
                 },
                 "data": "x_labels",
-                "left": 44,
+                "left": 62,
                 "top": 172,
-                "width": 420,
+                "width": 402,
                 "height": 24,
                 "itemWidget": {
                   "type": "Container",
@@ -1465,7 +1465,7 @@
                   },
                   "left": 0,
                   "top": 0,
-                  "width": 70,
+                  "width": 67,
                   "height": 24,
                   "widgets": [
                     {
@@ -1480,7 +1480,7 @@
                       "action": "edit_x_label",
                       "left": 0,
                       "top": 0,
-                      "width": 70,
+                      "width": 67,
                       "height": 24,
                       "text": ""
                     }

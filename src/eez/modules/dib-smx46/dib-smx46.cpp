@@ -405,23 +405,19 @@ public:
     }
 
     int getSubchannelIndexFromRelativeChannelIndex(int relativeChannelIndex) override {
-        relativeChannelIndex++;
         int subchannelIndex;
         if (relativeChannelIndex >= 21) {
-            subchannelIndex = 41 + (relativeChannelIndex - 21);
-        }
-        if (relativeChannelIndex >= 15) {
-            subchannelIndex = 31 + (relativeChannelIndex - 15);
-        }
-        if (relativeChannelIndex >= 9) {
-            subchannelIndex = 21 + (relativeChannelIndex - 9);
-        }
-        if (relativeChannelIndex >= 3) {
-            subchannelIndex = 11 + (relativeChannelIndex - 3);
+            subchannelIndex = 40 + (relativeChannelIndex - 21);
+        } else if (relativeChannelIndex >= 15) {
+            subchannelIndex = 30 + (relativeChannelIndex - 15);
+        } else  if (relativeChannelIndex >= 9) {
+            subchannelIndex = 20 + (relativeChannelIndex - 9);
+        } else if (relativeChannelIndex >= 3) {
+            subchannelIndex = 10 + (relativeChannelIndex - 3);
         } else {
             subchannelIndex = relativeChannelIndex;
         }
-        return subchannelIndex - 1;
+        return subchannelIndex;
     }
 
     bool isRouteOpen(int subchannelIndex, bool &isRouteOpen_, int *err) override {
@@ -923,7 +919,6 @@ void action_dib_smx46_show_configure_routes() {
 
 void action_dib_smx46_toggle_route() {
     int cursor = getFoundWidgetAtDown().cursor;
-    int slotIndex = cursor / (NUM_COLUMNS * NUM_ROWS);
     int i = cursor % (NUM_COLUMNS * NUM_ROWS);
     int x = i % NUM_COLUMNS;
     int y = i / NUM_COLUMNS;

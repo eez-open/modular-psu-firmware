@@ -84,11 +84,10 @@ void param_channels(scpi_t *context, ChannelList &channelList, scpi_bool_t manda
         }
         if (!skip_channel_check) {
             auto channel = Channel::getBySlotIndex(selectedChannel->slotIndex, selectedChannel->subchannelIndex);
-            if (!channel) {
-                return;
-            }
-            if (!checkPowerChannel(context, channel->channelIndex)) {
-                return;
+            if (channel) {
+                if (!checkPowerChannel(context, channel->channelIndex)) {
+                    return;
+                }
             }
         }
         channelList.numChannels = 1;
@@ -105,10 +104,6 @@ int getNumSlotChannels(int slotIndex) {
 
 bool isValidSlotAndSubchannelIndex(int slotIndex, int subchannelIndex) {
     return g_slots[slotIndex]->isValidSubchannelIndex(subchannelIndex);
-}
-
-int getSubchannelIndexFromRelativeChannelIndex(int slotIndex, int relativeChannelIndex) {
-    return g_slots[slotIndex]->getSubchannelIndexFromRelativeChannelIndex(relativeChannelIndex);
 }
 
 bool absoluteChannelIndexToSlotAndSubchannelIndex(int absoluteChannelIndex, SlotAndSubchannelIndex &slotAndSubchannelIndex) {
@@ -231,14 +226,11 @@ void param_channels(scpi_t *context, scpi_parameter_t *parameter, ChannelList &c
     if (!skip_channel_check) {
         for (int i = 0; i < channelList.numChannels; i++) {
             auto channel = Channel::getBySlotIndex(channelList.channels[i].slotIndex, channelList.channels[i].subchannelIndex);
-            if (!channel) {
-                // skip non-power channels
-                continue;
-            }
-
-            if (!checkPowerChannel(context, channel->channelIndex)) {
-                channelList.numChannels = 0;
-                return;
+            if (channel) {
+                if (!checkPowerChannel(context, channel->channelIndex)) {
+                    channelList.numChannels = 0;
+                    return;
+                }
             }
         }
     }

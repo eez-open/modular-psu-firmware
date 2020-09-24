@@ -387,33 +387,49 @@ scpi_result_t scpi_cmd_instrumentMemoryQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_instrumentCatalogQ(scpi_t *context) {
+void dumpCatalog(scpi_t *context, bool dumpIndex) {
+    bool catalogEmpty = true;
+
     if (CH_NUM > 0) {
-        for (int i = 0; i < CH_NUM; i++) {
-            auto &channel = Channel::get(i);
+        for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
             char channelStr[10];
-            sprintf(channelStr, "CH%d", channel.channelIndex + 1);
+            sprintf(channelStr, "CH%d", channelIndex + 1);
             SCPI_ResultText(context, channelStr);
+            if (dumpIndex) {
+                SCPI_ResultInt(context, channelIndex + 1);
+            }
+            catalogEmpty = false;
         }
-    } else {
+    }
+
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        Module *module = g_slots[slotIndex];
+        for (int relativeChannelIndex = module->numPowerChannels; relativeChannelIndex < module->numPowerChannels + module->numOtherChannels; relativeChannelIndex++) {
+            int subchannelIndex = module->getSubchannelIndexFromRelativeChannelIndex(relativeChannelIndex);
+
+            char channelStr[10];
+            sprintf(channelStr, "(@%d%02d)", slotIndex + 1, subchannelIndex + 1);
+            SCPI_ResultText(context, channelStr);
+            if (dumpIndex) {
+                SCPI_ResultInt(context, 0);
+            }
+            catalogEmpty = false;
+        }
+    }
+
+    if (catalogEmpty) {
         SCPI_ResultText(context, "");
     }
+
+}
+
+scpi_result_t scpi_cmd_instrumentCatalogQ(scpi_t *context) {
+    dumpCatalog(context, false);
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_instrumentCatalogFullQ(scpi_t *context) {
-    if (CH_NUM > 0) {
-        for (int i = 0; i < CH_NUM; i++) {
-            auto &channel = Channel::get(i);
-            char channelStr[10];
-            sprintf(channelStr, "CH%d", channel.channelIndex + 1);
-            SCPI_ResultText(context, channelStr);
-            SCPI_ResultInt(context, channel.channelIndex + 1);
-        }
-    } else {
-        SCPI_ResultText(context, "");
-        SCPI_ResultInt(context, 0);
-    }
+    dumpCatalog(context, true);
     return SCPI_RES_OK;
 }
 

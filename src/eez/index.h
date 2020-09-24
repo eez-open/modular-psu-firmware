@@ -194,7 +194,7 @@ struct Module {
 
     virtual void resetConfiguration();
 
-    virtual int getNumSubchannels();
+    int getNumSubchannels();
     virtual bool isValidSubchannelIndex(int subchannelIndex);
     virtual int getSubchannelIndexFromRelativeChannelIndex(int relativeChannelIndex);
 
