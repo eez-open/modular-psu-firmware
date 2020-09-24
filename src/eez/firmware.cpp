@@ -144,7 +144,6 @@ void boot() {
         g_slots[slotIndex]->enabled = true;
         g_slots[slotIndex]->moduleRevision = moduleRevision;
         g_slots[slotIndex]->firmwareInstalled = firmwareInstalled;
-        g_slots[slotIndex]->boot();
         
         if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
             g_slots[slotIndex]->enabled = psu::persist_conf::isSlotEnabled(slotIndex);
@@ -153,6 +152,8 @@ void boot() {
 
             numInstalledModules++;
         }
+
+        g_slots[slotIndex]->boot();
     }
 
     if (numInstalledModules == 1) {

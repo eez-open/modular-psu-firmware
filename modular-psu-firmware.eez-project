@@ -14744,14 +14744,20 @@
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "status_icon_enabled"
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14",
+                          "alignVertical": "center",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background",
+                          "activeColor": "status_line_background",
+                          "activeBackgroundColor": "status_line_text"
                         },
-                        "action": "show_main_page",
+                        "action": "show_previous_page",
                         "left": 0,
                         "top": 0,
                         "width": 41,
                         "height": 32,
-                        "text": "H"
+                        "text": "E"
                       },
                       {
                         "type": "Text",
@@ -15261,14 +15267,16 @@
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "status_icon_enabled"
+                          "inheritFrom": "status_title",
+                          "font": "Heydings14",
+                          "alignHorizontal": "center"
                         },
-                        "action": "show_main_page",
+                        "action": "show_previous_page",
                         "left": 0,
                         "top": 0,
                         "width": 41,
                         "height": 32,
-                        "text": "H"
+                        "text": "E"
                       },
                       {
                         "type": "Text",
@@ -15752,14 +15760,16 @@
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "status_icon_enabled"
+                          "inheritFrom": "status_title",
+                          "font": "Heydings14",
+                          "alignHorizontal": "center"
                         },
-                        "action": "show_main_page",
+                        "action": "show_previous_page",
                         "left": 0,
                         "top": 0,
                         "width": 41,
                         "height": 32,
-                        "text": "H"
+                        "text": "E"
                       },
                       {
                         "type": "Text",

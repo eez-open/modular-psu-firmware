@@ -216,8 +216,7 @@ bool isEnabled() {
 }
 
 void getCalibrationChannel(int &slotIndex, int &subchannelIndex) {
-    auto editPage = (eez::psu::gui::ChSettingsCalibrationEditPage *)eez::psu::gui::getPage(eez::gui::PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
-    if (editPage) {
+    if (isEnabled()) {
         slotIndex = g_slotIndex;
         subchannelIndex = g_subchannelIndex;
     } else {
@@ -227,7 +226,10 @@ void getCalibrationChannel(int &slotIndex, int &subchannelIndex) {
 }
 
 bool hasSupportForCurrentDualRange() {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         return channel->hasSupportForCurrentDualRange();
     }
@@ -235,7 +237,10 @@ bool hasSupportForCurrentDualRange() {
 }
 
 CalibrationValueType getCalibrationValueType() {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         auto editPage = (eez::psu::gui::ChSettingsCalibrationEditPage *)eez::psu::gui::getPage(eez::gui::PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
@@ -249,25 +254,31 @@ CalibrationValueType getCalibrationValueType() {
 }
 
 bool isCalibrationExists() {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         return channel->isCalibrationExists();
     } else {
-        return g_slots[g_slotIndex]->isVoltageCalibrationExists(g_subchannelIndex) || g_slots[g_slotIndex]->isCurrentCalibrationExists(g_subchannelIndex);
+        return g_slots[slotIndex]->isVoltageCalibrationExists(subchannelIndex) || g_slots[slotIndex]->isCurrentCalibrationExists(subchannelIndex);
     }
 }
 
 void getMaxValue(CalibrationValueType valueType, float &value, Unit &unit) {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     
     if (valueType == CALIBRATION_VALUE_U) {
-        value = channel ? channel->u.max : channel_dispatcher::getVoltageMaxValue(g_slotIndex, g_subchannelIndex);
+        value = channel ? channel->u.max : channel_dispatcher::getVoltageMaxValue(slotIndex, subchannelIndex);
         unit = UNIT_VOLT;
         return;
     } 
     
     if (valueType == CALIBRATION_VALUE_I_HI_RANGE) {
-        value = channel ? channel -> i.max : channel_dispatcher::getCurrentMaxValue(g_slotIndex, g_subchannelIndex);
+        value = channel ? channel -> i.max : channel_dispatcher::getCurrentMaxValue(slotIndex, subchannelIndex);
         unit = UNIT_AMPER;
         return;
     } 
@@ -277,28 +288,37 @@ void getMaxValue(CalibrationValueType valueType, float &value, Unit &unit) {
 }
 
 float roundCalibrationValue(Unit unit, float value) {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         return channel->roundChannelValue(unit, value);
     }
 
     return roundPrec(value, unit == UNIT_VOLT ?
-        channel_dispatcher::getVoltageResolution(g_slotIndex, g_subchannelIndex) : 
-        channel_dispatcher::getCurrentResolution(g_slotIndex, g_subchannelIndex));
+        channel_dispatcher::getVoltageResolution(slotIndex, subchannelIndex) : 
+        channel_dispatcher::getCurrentResolution(slotIndex, subchannelIndex));
 }
 
 bool isCalibrationValueTypeSelectable() {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     return channel != nullptr;
 }
 
 ChannelMode getChannelMode() {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         return channel->getMode();
     }
 
-    if (g_slots[g_slotIndex]->isConstantVoltageMode(g_subchannelIndex)) {
+    if (g_slots[slotIndex]->isConstantVoltageMode(subchannelIndex)) {
         return CHANNEL_MODE_CV;
     }
 
@@ -306,7 +326,10 @@ ChannelMode getChannelMode() {
 }
 
 float getDacValue(CalibrationValueType valueType) {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         if (valueType == CALIBRATION_VALUE_U) {
             return channel->u.set;
@@ -317,15 +340,18 @@ float getDacValue(CalibrationValueType valueType) {
     
     float value;
     if (valueType == CALIBRATION_VALUE_U) {
-        channel_dispatcher::getVoltage(g_slotIndex, g_subchannelIndex, value, nullptr);
+        channel_dispatcher::getVoltage(slotIndex, subchannelIndex, value, nullptr);
     } else {
-        channel_dispatcher::getCurrent(g_slotIndex, g_subchannelIndex, value, nullptr);
+        channel_dispatcher::getCurrent(slotIndex, subchannelIndex, value, nullptr);
     }
     return value;
 }
 
 float getAdcValue(CalibrationValueType valueType) {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
         if (valueType == CALIBRATION_VALUE_U) {
             return channel->u.mon_last;
