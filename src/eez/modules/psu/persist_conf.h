@@ -346,6 +346,9 @@ struct ModuleConfiguration {
 
 extern ModuleConfiguration g_moduleConf[NUM_SLOTS];
 
+bool loadSerialNo(int slotIndex);
+bool saveSerialNo(int slotIndex);
+
 void loadModuleConf(int slotIndex);
 bool saveModuleConf(int slotIndex);
 

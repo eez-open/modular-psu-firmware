@@ -498,6 +498,41 @@ scpi_result_t scpi_cmd_systemSlotStateQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_systemSlotSno(scpi_t *context) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
+        return SCPI_RES_ERR;
+    }
+
+    const char *serialStr;
+    size_t serialStrLen;
+    if (!SCPI_ParamCharacters(context, &serialStr, &serialStrLen, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!setModuleSerialInfo(module->slotIndex, serialStr, serialStrLen, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemSlotSnoQ(scpi_t *context) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
+        return SCPI_RES_ERR;
+    }
+
+    char text[50];
+    getModuleSerialInfo(module->slotIndex, text);
+    SCPI_ResultText(context, text);
+
+    return SCPI_RES_OK;
+}
+
+
 scpi_result_t scpi_cmd_systemChannelCountQ(scpi_t *context) {
     SCPI_ResultInt(context, CH_NUM);
 
@@ -630,19 +665,6 @@ scpi_result_t scpi_cmd_systemChannelVersionQ(scpi_t *context) {
     auto &slot = *g_slots[channel->slotIndex];
     char text[50];
     sprintf(text, "R%dB%d", (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
-    SCPI_ResultText(context, text);
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_systemChannelSnoQ(scpi_t *context) {
-    Channel *channel = getPowerChannelFromParam(context, false, true);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    char text[50];
-    getModuleSerialInfo(channel->slotIndex, text);
     SCPI_ResultText(context, text);
 
     return SCPI_RES_OK;

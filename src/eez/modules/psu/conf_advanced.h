@@ -22,8 +22,11 @@
 
 #pragma once
 
+#define Q(x) #x
+#define QUOTE(x) Q(x)
+
 /// MCU firmware version.
-#define MCU_FIRMWARE "1.3"
+#define MCU_FIRMWARE (QUOTE(FIRMWARE_VERSION_MAJOR) "." QUOTE(FIRMWARE_VERSION_MINOR))
 
 /// Manufacturer description text used for *IDN?
 #define IDN_MANUFACTURER "Envox"

@@ -839,6 +839,12 @@ public:
         numOtherChannels = 0;		
     }
 
+	void boot() override {
+		PsuModule::boot();
+
+		persist_conf::loadSerialNo(slotIndex);
+	}
+
 	Module *createModule() override {
 		return new DcpModule();
 	}

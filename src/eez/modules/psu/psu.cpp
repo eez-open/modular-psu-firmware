@@ -591,6 +591,8 @@ void onThreadMessage(uint8_t type, uint32_t param) {
     } else if (type == PSU_MESSAGE_SET_DPROG_STATE) {
         Channel &channel = Channel::get((param >> 8) & 0xFF);
         channel.setDprogState((DprogState)(param & 0xFF));
+    } else if (type == PSU_MESSAGE_SAVE_SERIAL_NO) {
+        persist_conf::saveSerialNo(param);
     } else if (type >= PSU_MESSAGE_MODULE_SPECIFIC) {
         int slotIndex = param & 0xff;
         g_slots[slotIndex]->onHighPriorityThreadMessage(type, param);

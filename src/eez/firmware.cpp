@@ -128,16 +128,16 @@ void boot() {
 
     int numInstalledModules = 0;
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        static const uint16_t ADDRESS = 0;
-        uint16_t value[3];
-        if (!bp3c::eeprom::read(slotIndex, (uint8_t *)&value, sizeof(value), ADDRESS)) {
-            value[0] = MODULE_TYPE_NONE;
-            value[1] = 0;
-            value[2] = 0;
+        uint16_t prolog[3];
+        assert(sizeof(prolog) <= bp3c::eeprom::EEPROM_PROLOG_SIZE);
+        if (!bp3c::eeprom::read(slotIndex, (uint8_t *)prolog, bp3c::eeprom::EEPROM_PROLOG_SIZE, bp3c::eeprom::EEPROM_PROLOG_START_ADDRESS)) {
+            prolog[0] = MODULE_TYPE_NONE;
+            prolog[1] = 0;
+            prolog[2] = 0;
         }
-        uint16_t moduleType = value[0];
-        uint16_t moduleRevision = value[1];
-        bool firmwareInstalled = value[2] == 0xA5A5;
+        uint16_t moduleType = prolog[0];
+        uint16_t moduleRevision = prolog[1];
+        bool firmwareInstalled = prolog[2] == 0xA5A5;
         
         g_slots[slotIndex] = getModule(moduleType)->createModule();
         g_slots[slotIndex]->slotIndex = slotIndex;

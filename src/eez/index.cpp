@@ -468,15 +468,75 @@ Module *getModule(uint16_t moduleType) {
     return &noneModule;
 }
 
-void getModuleSerialInfo(uint8_t slotIndex, char *text) {
+void getModuleSerialInfo(uint8_t slotIndex, char *serialStr) {
     auto &module = *g_slots[slotIndex];
     if (module.idw0 != 0 || module.idw1 != 0 || module.idw2 != 0) {
-        sprintf(text, "%08X", (unsigned int)module.idw0);
-        sprintf(text + 8, "%08X", (unsigned int)module.idw1);
-        sprintf(text + 16, "%08X", (unsigned int)module.idw2);
+        sprintf(serialStr, "%08X", (unsigned int)module.idw0);
+        sprintf(serialStr + 8, "%08X", (unsigned int)module.idw1);
+        sprintf(serialStr + 16, "%08X", (unsigned int)module.idw2);
     } else {
-        strcpy(text, "N/A");
+        strcpy(serialStr, "N/A");
     }
+}
+
+bool hexStringToNumber(const char *str, uint32_t &num, int *err) {
+    num = 0;
+    for (int i = 0; i < 8; i++) {
+        if (str[i] >= '0' && str[i] <= '9') {
+            num = num * 16 + (str[i] - '0');
+        } else if (str[i] >= 'A' && str[i] <= 'F') {
+            num = num * 16 + (10 + str[i] - 'F');
+        } else if (str[i] >= 'a' && str[i] <= 'f') {
+            num = num * 16 + (10 + str[i] - 'a');
+        } else {
+            if (err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+    }
+    return true;
+}
+
+bool setModuleSerialInfo(uint8_t slotIndex, const char *serialStr, size_t serialStrLen, int *err) {
+    Module *module = g_slots[slotIndex];
+
+    if (module->moduleType != MODULE_TYPE_DCP405) {
+        if (err) {
+            *err = SCPI_ERROR_EXECUTION_ERROR;
+        }
+        return false;
+    }
+
+    if (serialStrLen != 24) {
+        if (err) {
+            *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+        }
+        return false;
+    }
+
+    uint32_t idw0;
+    if (!hexStringToNumber(serialStr, idw0, err)) {
+        return false;
+    }
+
+    uint32_t idw1;
+    if (!hexStringToNumber(serialStr + 8, idw1, err)) {
+        return false;
+    }
+
+    uint32_t idw2;
+    if (!hexStringToNumber(serialStr + 16, idw2, err)) {
+        return false;
+    }
+
+    g_slots[slotIndex]->idw0 = idw0;
+    g_slots[slotIndex]->idw1 = idw1;
+    g_slots[slotIndex]->idw2 = idw2;
+
+    psu::persist_conf::saveSerialNo(slotIndex);
+
+    return true;
 }
 
 } // namespace eez

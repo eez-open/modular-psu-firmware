@@ -99,8 +99,24 @@ namespace eez {
 namespace bp3c {
 namespace eeprom {
 
-static const uint16_t EEPROM_ONTIME_START_ADDRESS = 40;
 static const uint16_t EEPROM_SIZE = 4096;
+
+static const uint16_t EEPROM_PROLOG_START_ADDRESS = 0;
+static const uint16_t EEPROM_PROLOG_SIZE = 6;
+
+static const uint16_t EEPROM_SERIAL_NO_BLOCK_START_ADDRESS = 6;
+static const uint16_t EEPROM_SERIAL_NO_BLOCK_SIZE = 24;
+
+static const uint16_t EEPROM_ONTIME_START_ADDRESS = 40;
+
+static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 64;
+static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
+
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = 128;
+static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 780;
+
+static const uint16_t MODULE_PERSIST_CONF_COUNTERS_ADDRESS = 2048;
+static const uint32_t COUNTER_SIZE = 64;
 
 void init();
 bool test();

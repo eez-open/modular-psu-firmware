@@ -11,6 +11,9 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     #set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --preload-file ../../images/eez.png")
 endif()
 
+add_definitions(-DFIRMWARE_VERSION_MAJOR=1)
+add_definitions(-DFIRMWARE_VERSION_MINOR=4)
+
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[png]'")
 else()

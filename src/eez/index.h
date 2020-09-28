@@ -19,6 +19,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #include <eez/firmware.h>
 #include <eez/unit.h>
@@ -256,7 +257,8 @@ extern Module *g_slots[NUM_SLOTS];
 
 Module *getModule(uint16_t moduleType);
 
-void getModuleSerialInfo(uint8_t slotIndex, char *text);
+void getModuleSerialInfo(uint8_t slotIndex, char *serialStr);
+bool setModuleSerialInfo(uint8_t slotIndex, const char *serialStr, size_t serialStrLen, int *err);
 
 extern bool g_isCol2Mode;
 extern int g_slotIndexes[NUM_SLOTS];

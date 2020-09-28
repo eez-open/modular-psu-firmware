@@ -63346,29 +63346,6 @@
             }
           },
           {
-            "name": "SYSTem:CHANnel:SNO?",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_sno",
-            "parameters": [
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "quoted-string"
-                }
-              ]
-            }
-          },
-          {
             "name": "SYSTem:CHANnel:VERSion?",
             "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_vers",
             "parameters": [
@@ -65210,6 +65187,54 @@
                     "type": "nr1"
                   }
                 ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:SLOT:SNO",
+            "parameters": [
+              {
+                "name": "slot",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "sno",
+                "type": [
+                  {
+                    "type": "quoted-string"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:SLOT:SNO?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_sno",
+            "parameters": [
+              {
+                "name": "slot",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
               }
             ],
             "response": {

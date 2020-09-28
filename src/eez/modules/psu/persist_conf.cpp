@@ -21,6 +21,7 @@
 
 #include <eez/system.h>
 #include <eez/usb.h>
+#include <eez/tasks.h>
 
 #include <eez/modules/psu/psu.h>
 
@@ -64,6 +65,7 @@ namespace persist_conf {
 ////////////////////////////////////////////////////////////////////////////////
 
 static const uint16_t MODULE_CONF_VERSION = 1;
+static const uint16_t MODULE_SERIAL_NO_VERSION = 1;
 static const uint16_t CH_CAL_CONF_VERSION = 4;
 
 static const uint16_t PERSIST_CONF_DEV_CONF_ADDRESS = 128;
@@ -1269,16 +1271,66 @@ void setSlotEnabled(int slotIndex, bool enabled) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 64;
-static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
-
-static const uint16_t MODULE_PERSIST_CONF_CH_CAL_ADDRESS = 128;
-static const uint16_t MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE = 780;
-
-static const uint16_t MODULE_PERSIST_CONF_COUNTERS_ADDRESS = 2048;
-static const uint32_t COUNTER_SIZE = 64;
-
 ModuleConfiguration g_moduleConf[NUM_SLOTS];
+
+struct ModuleSerialNo {
+    BlockHeader header;
+    uint32_t idw0;
+    uint32_t idw1;
+    uint32_t idw2;
+};
+
+bool loadSerialNo(int slotIndex) {
+    assert(sizeof(ModuleSerialNo) <= bp3c::eeprom::EEPROM_SERIAL_NO_BLOCK_SIZE);
+
+    uint8_t buffer[bp3c::eeprom::EEPROM_SERIAL_NO_BLOCK_SIZE];
+
+    if (moduleConfRead(
+        slotIndex, 
+        buffer, 
+        bp3c::eeprom::EEPROM_SERIAL_NO_BLOCK_SIZE,
+        bp3c::eeprom::EEPROM_SERIAL_NO_BLOCK_START_ADDRESS,
+        MODULE_SERIAL_NO_VERSION
+    )) {
+        ModuleSerialNo moduleSerialNo;
+        memcpy(&moduleSerialNo, buffer, sizeof(ModuleSerialNo));
+        g_slots[slotIndex]->idw0 = moduleSerialNo.idw0;
+        g_slots[slotIndex]->idw1 = moduleSerialNo.idw1;
+        g_slots[slotIndex]->idw2 = moduleSerialNo.idw2;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool saveSerialNo(int slotIndex) {
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_SAVE_SERIAL_NO, slotIndex);
+        return true;
+    }
+
+    uint8_t buffer[bp3c::eeprom::EEPROM_SERIAL_NO_BLOCK_SIZE];
+
+    ModuleSerialNo moduleSerialNo;
+    moduleSerialNo.idw0 = g_slots[slotIndex]->idw0;
+    moduleSerialNo.idw1 = g_slots[slotIndex]->idw1;
+    moduleSerialNo.idw2 = g_slots[slotIndex]->idw2;
+
+    memcpy(buffer, &moduleSerialNo, sizeof(ModuleSerialNo));
+
+    size_t len = bp3c::eeprom::EEPROM_SERIAL_NO_BLOCK_SIZE - sizeof(ModuleSerialNo);
+    if (len > 0) {
+        memset(buffer + sizeof(ModuleSerialNo), 0, len);
+    }
+
+    return moduleSave(
+        slotIndex, 
+        (BlockHeader *)buffer, 
+        bp3c::eeprom::EEPROM_SERIAL_NO_BLOCK_SIZE,
+        bp3c::eeprom::EEPROM_SERIAL_NO_BLOCK_START_ADDRESS,
+        MODULE_SERIAL_NO_VERSION
+    );
+}
 
 static void initModuleConf(int slotIndex) {
     ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
@@ -1292,15 +1344,15 @@ static void initModuleConf(int slotIndex) {
 }
 
 void loadModuleConf(int slotIndex) {
-    assert(sizeof(ModuleConfiguration) <= MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE);
+    assert(sizeof(ModuleConfiguration) <= bp3c::eeprom::MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE);
 
-    uint8_t buffer[MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE];
+    uint8_t buffer[bp3c::eeprom::MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE];
 
     if (moduleConfRead(
         slotIndex, 
         buffer, 
-        MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE, 
-        MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS,
+        bp3c::eeprom::MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE,
+        bp3c::eeprom::MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS,
         MODULE_CONF_VERSION
     )) {
         ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
@@ -1311,18 +1363,18 @@ void loadModuleConf(int slotIndex) {
 }
 
 bool saveModuleConf(int slotIndex) {
-    uint8_t buffer[MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE];
+    uint8_t buffer[bp3c::eeprom::MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE];
 
     ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
     memcpy(buffer, &moduleConf, sizeof(ModuleConfiguration));
 
-    memset(buffer + sizeof(ModuleConfiguration), 0, MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE - sizeof(ModuleConfiguration));
+    memset(buffer + sizeof(ModuleConfiguration), 0, bp3c::eeprom::MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE - sizeof(ModuleConfiguration));
 
     return moduleSave(
         slotIndex, 
         (BlockHeader *)buffer, 
-        MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE, 
-        MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS,
+        bp3c::eeprom::MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE,
+        bp3c::eeprom::MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS,
         MODULE_CONF_VERSION
     );
 }
@@ -1344,13 +1396,13 @@ void saveCalibrationEnabledFlag(int slotIndex, int subchannelIndex, bool enabled
 
 void loadChannelCalibration(Channel &channel) {
     auto x = sizeof(CalibrationConfiguration);
-	assert(MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= x);
+	assert(bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= x);
 
     if (!moduleConfRead(
         channel.slotIndex,
         (uint8_t *)&channel.cal_conf,
         sizeof(CalibrationConfiguration),
-        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
+        bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * (((bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
     )) {
         calibration::clearCalibrationConf(&channel.cal_conf);
@@ -1362,14 +1414,14 @@ bool saveChannelCalibration(Channel &channel) {
         channel.slotIndex,
         (BlockHeader *)&channel.cal_conf,
         sizeof(CalibrationConfiguration),
-        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
+        bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * (((bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
     );
 }
 
 void loadChannelCalibration(int slotIndex, int subchannelIndex) {
     auto x = sizeof(CalibrationConfiguration);
-	assert(MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= x);
+	assert(bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= x);
 
     CalibrationConfiguration *calConf = g_slots[slotIndex]->getCalibrationConfiguration(subchannelIndex);
 
@@ -1377,7 +1429,7 @@ void loadChannelCalibration(int slotIndex, int subchannelIndex) {
         slotIndex,
         (uint8_t *)calConf,
         sizeof(CalibrationConfiguration),
-        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
+        bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
     )) {
         calibration::clearCalibrationConf(calConf);
@@ -1391,7 +1443,7 @@ bool saveChannelCalibration(int slotIndex, int subchannelIndex) {
         slotIndex,
         (BlockHeader *)calConf,
         sizeof(CalibrationConfiguration),
-        MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
+        bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
     );
 }
@@ -1406,7 +1458,7 @@ uint32_t readCounter(int slotIndex, int counterIndex) {
             slotIndex,
             (uint8_t *)buffer, 
             sizeof(buffer), 
-            MODULE_PERSIST_CONF_COUNTERS_ADDRESS + counterIndex * COUNTER_SIZE,
+            bp3c::eeprom::MODULE_PERSIST_CONF_COUNTERS_ADDRESS + counterIndex * bp3c::eeprom::COUNTER_SIZE,
             -1
         );
 
@@ -1448,7 +1500,7 @@ bool writeCounter(int slotIndex, int counterIndex, uint32_t counter) {
         slotIndex,
         (uint8_t *)buffer, 
         sizeof(buffer), 
-        MODULE_PERSIST_CONF_COUNTERS_ADDRESS + counterIndex * COUNTER_SIZE
+        bp3c::eeprom::MODULE_PERSIST_CONF_COUNTERS_ADDRESS + counterIndex * bp3c::eeprom::COUNTER_SIZE
     );
 }
 

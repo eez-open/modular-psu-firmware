@@ -283,7 +283,6 @@
     SCPI_COMMAND("SYSTem:CHANnel:MODel?", scpi_cmd_systemChannelModelQ) \
     SCPI_COMMAND("SYSTem:CHANnel:OPTion?", scpi_cmd_systemChannelOptionQ) \
     SCPI_COMMAND("SYSTem:CHANnel:SLOT?", scpi_cmd_systemChannelSlotQ) \
-    SCPI_COMMAND("SYSTem:CHANnel:SNO?", scpi_cmd_systemChannelSnoQ) \
     SCPI_COMMAND("SYSTem:CHANnel:VERSion?", scpi_cmd_systemChannelVersionQ) \
     SCPI_COMMAND("SYSTem:CHANnel[:COUNt]?", scpi_cmd_systemChannelCountQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:ENABle", scpi_cmd_systemCommunicateEnable) \
@@ -381,6 +380,8 @@
     SCPI_COMMAND("SYSTem:SLOT:MODel?", scpi_cmd_systemSlotModelQ) \
     SCPI_COMMAND("SYSTem:SLOT:VERSion?", scpi_cmd_systemSlotVersionQ) \
     SCPI_COMMAND("SYSTem:SLOT:FIRMware?", scpi_cmd_systemSlotFirmwareQ) \
+    SCPI_COMMAND("SYSTem:SLOT:SNO", scpi_cmd_systemSlotSno) \
+    SCPI_COMMAND("SYSTem:SLOT:SNO?", scpi_cmd_systemSlotSnoQ) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \
     SCPI_COMMAND("TRIGger:DLOG[:IMMediate]", scpi_cmd_triggerDlogImmediate) \
