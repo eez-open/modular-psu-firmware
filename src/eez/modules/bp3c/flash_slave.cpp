@@ -72,7 +72,7 @@ static const uint8_t NACK = 0x1F;
 static const uint32_t SYNC_TIMEOUT = 5000;
 static const uint32_t CMD_TIMEOUT = 100;
 
-static UART_HandleTypeDef *phuart = &huart7;
+static UART_HandleTypeDef *phuart = &huart4;
 
 void sendDataAndCRC(uint8_t data) {
 	uint8_t sendData[1];
@@ -370,7 +370,7 @@ void enterBootloaderMode(int slotIndex) {
 
     osDelay(25);
 
-    MX_UART7_Init();
+    MX_UART4_Init();
 #endif
 }
 
