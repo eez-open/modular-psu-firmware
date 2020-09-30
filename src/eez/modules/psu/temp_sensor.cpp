@@ -122,8 +122,20 @@ void TempSensor::testTemperatureValidity(float value) {
 
 bool TempSensor::test() {
     if (isInstalled()) {
-        float temperature = doRead();
-        testTemperatureValidity(temperature);
+        uint32_t start = millis();
+    	do {
+			float temperature = doRead();
+			testTemperatureValidity(temperature);
+			if (g_testResult == TEST_OK) {
+				break;
+			}
+			HAL_Delay(1);
+    	} while (millis() - start < 1000);
+        
+        if (g_testResult != TEST_OK) {
+            g_testResult = TEST_FAILED;
+            generateError(scpi_error);
+        }
     } else {
         g_testResult = TEST_SKIPPED;
     }

@@ -224,7 +224,10 @@ struct DcpChannel : public Channel {
 		adc.test();
 		dac.test(ioexp, adc);
 
-		tempSensorTestResult = temp_sensor::sensors[temp_sensor::CH1 + channelIndex].test() ? TEST_OK : TEST_FAILED;
+		tempSensorTestResult = TEST_OK;
+		if (!temp_sensor::sensors[temp_sensor::CH1 + channelIndex].test()) {
+			tempSensorTestResult = TEST_FAILED;
+		}
 
 		return isOk();
 	}

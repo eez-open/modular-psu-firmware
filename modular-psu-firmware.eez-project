@@ -64730,19 +64730,19 @@
             "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_stat",
             "parameters": [
               {
-                "name": "bool",
+                "name": "slot",
                 "type": [
                   {
-                    "type": "boolean"
+                    "type": "nr1"
                   }
                 ],
                 "isOptional": false
               },
               {
-                "name": "slot",
+                "name": "bool",
                 "type": [
                   {
-                    "type": "nr1"
+                    "type": "boolean"
                   }
                 ],
                 "isOptional": false
