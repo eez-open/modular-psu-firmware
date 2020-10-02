@@ -264,7 +264,7 @@ void initOutputPin(int pin) {
             GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
             GPIO_InitStruct.Pull = GPIO_NOPULL;
             GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-            HAL_GPIO_Init(DOUT2_GPIO_Port, &GPIO_InitStruct);
+            HAL_GPIO_Init(UART_TX_DOUT1_GPIO_Port, &GPIO_InitStruct);
             HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, GPIO_PIN_RESET);
         }
 #endif
