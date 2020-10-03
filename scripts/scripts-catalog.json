@@ -16,8 +16,14 @@
                     "https://github.com/eez-open/modular-psu-firmware/raw/4363591203d08d7999d855f4244e088c92505c14/scripts/Curve%20Tracer/Curve%20Tracer.py",
                     "https://github.com/eez-open/modular-psu-firmware/raw/4363591203d08d7999d855f4244e088c92505c14/scripts/Curve%20Tracer/Curve%20Tracer.res"
                 ]
+            },
+            {
+                "version": "1.2",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/d98a851c06189880ceedc680f7f82fd299f65408/scripts/Curve%20Tracer/Curve%20Tracer.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/d98a851c06189880ceedc680f7f82fd299f65408/scripts/Curve%20Tracer/Curve%20Tracer.res"
+                ]
             }
-        ]
     },
     {
         "name": "Diode Tester",
