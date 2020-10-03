@@ -129,7 +129,7 @@ bool TempSensor::test() {
 			if (g_testResult == TEST_OK) {
 				break;
 			}
-			HAL_Delay(1);
+			delay(1);
     	} while (millis() - start < 1000);
         
         if (g_testResult != TEST_OK) {
