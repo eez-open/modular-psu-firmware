@@ -118,7 +118,7 @@ def start_BJT(cgnd):
     scpi("VOLT " + str(Ube))
     scpi("CURR 0")
     scpi("OUTP:DPR 1")
-    scpi("SENS:CURR:RANG 50mA")
+    scpi("SENS:CURR:RANG 0.05")
 
     scpi("INST ch2")
     scpi("OUTP 0")

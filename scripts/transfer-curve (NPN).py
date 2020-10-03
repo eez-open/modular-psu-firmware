@@ -29,7 +29,7 @@ def start(deviceName):
         scpi("CURR " + str(Ib))
         scpi("VOLT 0")
         scpi("OUTP:DPR 1")
-        scpi("SENS:CURR:RANG 50mA")
+        scpi("SENS:CURR:RANG 0.05")
 
         scpi("INST ch2")
         scpi("OUTP 0")
