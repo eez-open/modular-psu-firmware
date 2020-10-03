@@ -62,7 +62,7 @@ def start():
 
         scpi("OUTP 0")
 
-        scpi("SENS:CURR:RANG MIN")
+        scpi("SENS:CURR:RANG LOW")
         scpi("VOLT 0")
         scpi("CURR " + str(I_SET))
 
