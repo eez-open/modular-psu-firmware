@@ -124,7 +124,7 @@ def start_BJT(cgnd):
     scpi("OUTP 0")
     scpi("VOLT 0")
     scpi("CURR " + str(Ic_max))
-    scpi("SENS:CURR:RANG DEFault")
+    scpi("SENS:CURR:RANG BEST")
 
     scpi('SENS:DLOG:TRAC:REM "Device name = ' + deviceName + '; Uce,max = ' + str(Uce_max) + '; Ic,max = ' + str(Ic_max) + '"')
 
