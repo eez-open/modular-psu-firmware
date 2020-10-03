@@ -9,6 +9,13 @@
                     "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Curve%20Tracer/Curve%20Tracer.py",
                     "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Curve%20Tracer/Curve%20Tracer.res"
                 ]
+            },
+            {
+                "version": "1.1",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/4363591203d08d7999d855f4244e088c92505c14/scripts/Curve%20Tracer/Curve%20Tracer.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/4363591203d08d7999d855f4244e088c92505c14/scripts/Curve%20Tracer/Curve%20Tracer.res"
+                ]
             }
         ]
     },
