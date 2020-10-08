@@ -44,6 +44,10 @@
 
 #include <eez/modules/dib-dcp405/dib-dcp405.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include "rtc.h"
+#endif
+
 namespace eez {
 namespace psu {
 
@@ -107,6 +111,20 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
 #if defined(EEZ_PLATFORM_STM32)
             taskEXIT_CRITICAL();
             restart();
+#endif
+        } else if (cmd == 30) {
+#if defined(EEZ_PLATFORM_STM32)
+            uint32_t calr;
+            if (!SCPI_ParamUInt32(context, &calr, false)) {
+                return SCPI_RES_ERR;
+            }
+
+            RTC->WPR = 0xCA;
+            RTC->WPR = 0x53;
+            
+            RTC->CALR = calr;
+
+            RTC->WPR = 0xFF;
 #endif
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
