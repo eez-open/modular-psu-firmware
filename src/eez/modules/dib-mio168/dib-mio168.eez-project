@@ -111,24 +111,25 @@
       "defaultValue": "1.0 V"
     },
     {
-      "name": "pwms",
-      "type": "list",
-      "defaultValue": "[\n  { \"pwm_label\": \"PWM1\", \"pwm_freq\": \"100 Hz\", \"pwm_duty\": \"80 %\" },\n  { \"pwm_label\": \"PWM2\", \"pwm_freq\": \"1.2 KHz\", \"pwm_duty\": \"50 %\" }\n]"
+      "name": "adc_mode",
+      "type": "enum",
+      "enumItems": "[\"Current\", \"Voltage\"]",
+      "defaultValue": "0"
     },
     {
-      "name": "pwm_label",
+      "name": "adc_range",
       "type": "string",
-      "defaultValue": "PWM1"
+      "defaultValue": "0 V to +5 V"
     },
     {
-      "name": "pwm_freq",
-      "type": "float",
-      "defaultValue": "100 Hz"
+      "name": "adc_has_temp_sensor_bias_feature",
+      "type": "boolean",
+      "defaultValue": "1"
     },
     {
-      "name": "pwm_duty",
-      "type": "float",
-      "defaultValue": "50 %"
+      "name": "adc_temp_sensor_bias",
+      "type": "boolean",
+      "defaultValue": "1"
     },
     {
       "name": "dac_output_enabled",
@@ -149,12 +150,49 @@
     {
       "name": "current_range",
       "type": "string",
-      "defaultValue": "0 to 0.3125 x VREF"
+      "defaultValue": "0 mA to 24 mA"
+    },
+    {
+      "name": "pwms",
+      "type": "list",
+      "defaultValue": "[\n  { \"pwm_label\": \"PWM1\", \"pwm_freq\": \"100 Hz\", \"pwm_duty\": \"80 %\" },\n  { \"pwm_label\": \"PWM2\", \"pwm_freq\": \"1.2 KHz\", \"pwm_duty\": \"50 %\" }\n]"
+    },
+    {
+      "name": "pwm_label",
+      "type": "string",
+      "defaultValue": "PWM1"
+    },
+    {
+      "name": "pwm_freq",
+      "type": "float",
+      "defaultValue": "100 Hz"
+    },
+    {
+      "name": "pwm_duty",
+      "type": "float",
+      "defaultValue": "50 %"
+    },
+    {
+      "name": "dac_channel_has_settings",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
     {
+      "name": "show_din_configuration"
+    },
+    {
       "name": "toggle_output_state"
+    },
+    {
+      "name": "adc_toggle_temp_sensor_bias"
+    },
+    {
+      "name": "show_adc_configuration"
+    },
+    {
+      "name": "dac_toggle_output_enabled"
     },
     {
       "name": "select_output_mode"
@@ -169,19 +207,22 @@
       "name": "show_dac_configuration"
     },
     {
+      "name": "show_dac_calibration"
+    },
+    {
       "name": "show_info"
     },
     {
-      "name": "dac_toggle_output_enabled"
+      "name": "select_adc_mode"
     },
     {
-      "name": "show_adc_configuration"
+      "name": "select_adc_range"
     },
     {
-      "name": "show_din_configuration"
+      "name": "select_input_range"
     },
     {
-      "name": "show_dac_calibration"
+      "name": "select_input_speed"
     }
   ],
   "gui": {
@@ -1370,41 +1411,65 @@
                       "style": {
                         "inheritFrom": "default"
                       },
-                      "data": "dac_output_enabled",
+                      "data": "dac_channel_has_settings",
                       "left": 85,
                       "top": 0,
                       "width": 35,
                       "height": 25,
                       "widgets": [
                         {
-                          "type": "Text",
+                          "type": "Rectangle",
                           "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled",
-                            "font": "Oswald12",
-                            "color": "status_warning",
-                            "activeBackgroundColor": "status_warning"
+                            "inheritFrom": "default"
                           },
-                          "action": "show_dac_configuration",
                           "left": 0,
                           "top": 0,
                           "width": 35,
                           "height": 25,
-                          "text": "Off"
+                          "invertColors": true
                         },
                         {
-                          "type": "Text",
+                          "type": "Select",
                           "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled",
-                            "font": "Oswald12",
-                            "color": "Action color",
-                            "activeBackgroundColor": "Action color"
+                            "inheritFrom": "default"
                           },
-                          "action": "show_dac_configuration",
+                          "data": "dac_output_enabled",
                           "left": 0,
                           "top": 0,
                           "width": 35,
                           "height": 25,
-                          "text": "On"
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "Oswald12",
+                                "color": "status_warning",
+                                "activeBackgroundColor": "status_warning"
+                              },
+                              "action": "show_dac_configuration",
+                              "left": 0,
+                              "top": 0,
+                              "width": 35,
+                              "height": 25,
+                              "text": "Off"
+                            },
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "Oswald12",
+                                "color": "Action color",
+                                "activeBackgroundColor": "Action color"
+                              },
+                              "action": "show_dac_configuration",
+                              "left": 0,
+                              "top": 0,
+                              "width": 35,
+                              "height": 25,
+                              "text": "On"
+                            }
+                          ]
                         }
                       ]
                     }
@@ -2077,7 +2142,7 @@
                         "inheritFrom": "default"
                       },
                       "data": "input_range",
-                      "action": "select_output_mode",
+                      "action": "select_input_range",
                       "left": 44,
                       "top": 0,
                       "width": 80,
@@ -2117,7 +2182,7 @@
                         "inheritFrom": "default"
                       },
                       "data": "input_speed",
-                      "action": "select_output_mode",
+                      "action": "select_input_speed",
                       "left": 128,
                       "top": 0,
                       "width": 80,
@@ -2196,7 +2261,7 @@
                         "inheritFrom": "default"
                       },
                       "data": "input_range",
-                      "action": "select_output_mode",
+                      "action": "select_input_range",
                       "left": 44,
                       "top": 0,
                       "width": 80,
@@ -2275,7 +2340,7 @@
                         "inheritFrom": "default"
                       },
                       "data": "input_range",
-                      "action": "select_output_mode",
+                      "action": "select_input_range",
                       "left": 44,
                       "top": 0,
                       "width": 80,
@@ -2452,6 +2517,333 @@
         "dataContextOverrides": ""
       },
       {
+        "name": "adc_configuration",
+        "description": "Retrieve channel's informations such as how long channel output is active, sensor temperature, self-test result and calibration status (CAL:STAT command). \"Calib. params:\" can be ON, OFF, Uncalibrated, Corrupted. Selecting this option when it's uncalibrated or calibration data is corrupted will lead to Calibration wizard.",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 8,
+            "top": 8,
+            "width": 464,
+            "height": 224,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_M_left"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 143,
+                "height": 40,
+                "text": "Mode:"
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "adc_mode",
+                "action": "select_adc_mode",
+                "left": 178,
+                "top": 0,
+                "width": 158,
+                "height": 40,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "",
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 158,
+                    "height": 40,
+                    "text": "Current"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "",
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 158,
+                    "height": 40,
+                    "text": "Voltage"
+                  }
+                ]
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_M_left"
+                },
+                "left": 0,
+                "top": 48,
+                "width": 143,
+                "height": 40,
+                "text": "Range:"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_M_center"
+                },
+                "data": "adc_range",
+                "action": "select_adc_range",
+                "left": 178,
+                "top": 48,
+                "width": 158,
+                "height": 40,
+                "text": ""
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "adc_has_temp_sensor_bias_feature",
+                "left": 0,
+                "top": 96,
+                "width": 253,
+                "height": 40,
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 253,
+                    "height": 40,
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 253,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_M_left",
+                          "alignHorizontal": "left"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 178,
+                        "height": 40,
+                        "text": "Temp. sensor bias:"
+                      },
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "adc_temp_sensor_bias",
+                        "action": "adc_toggle_temp_sensor_bias",
+                        "left": 178,
+                        "top": 0,
+                        "width": 75,
+                        "height": 40,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_active_M_center"
+                            },
+                            "data": "",
+                            "action": "",
+                            "left": 0,
+                            "top": 0,
+                            "width": 75,
+                            "height": 40,
+                            "text": "OFF"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_active_M_center"
+                            },
+                            "action": "",
+                            "left": 0,
+                            "top": 0,
+                            "width": 75,
+                            "height": 40,
+                            "text": "ON"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_bgnd",
+                  "font": "Heydings14",
+                  "alignVertical": "center",
+                  "color": "status_line_text",
+                  "backgroundColor": "status_line_background",
+                  "activeColor": "status_line_background",
+                  "activeBackgroundColor": "status_line_text"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "slot_title_settings",
+                "left": 40,
+                "top": 0,
+                "width": 94,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "analog_input_label",
+                "left": 134,
+                "top": 0,
+                "width": 45,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 179,
+                "top": 0,
+                "width": 219,
+                "height": 32,
+                "text": "Configuration"
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "set_page_dirty",
+                "left": 398,
+                "top": 0,
+                "width": 82,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 82,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "status_bgnd"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 82,
+                        "height": 32,
+                        "invertColors": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 82,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14"
+                        },
+                        "action": "set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "_"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14"
+                        },
+                        "action": "discard",
+                        "left": 41,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "X"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272,
+        "dataContextOverrides": ""
+      },
+      {
         "name": "dac_7760_configuration",
         "description": "Retrieve channel's informations such as how long channel output is active, sensor temperature, self-test result and calibration status (CAL:STAT command). \"Calib. params:\" can be ON, OFF, Uncalibrated, Corrupted. Selecting this option when it's uncalibrated or calibration data is corrupted will lead to Calibration wizard.",
         "style": "default",
@@ -2484,7 +2876,7 @@
                   "inheritFrom": "default"
                 },
                 "data": "dac_output_enabled",
-                "action": "dac_toggle_output_enabled",
+                "action": "adc_toggle_temp_sensor_bias",
                 "left": 158,
                 "top": 0,
                 "width": 75,
@@ -2537,7 +2929,7 @@
                 "action": "select_output_mode",
                 "left": 158,
                 "top": 48,
-                "width": 150,
+                "width": 158,
                 "height": 40,
                 "widgets": [
                   {
@@ -2549,7 +2941,7 @@
                     "action": "",
                     "left": 0,
                     "top": 0,
-                    "width": 150,
+                    "width": 158,
                     "height": 40,
                     "text": "Current"
                   },
@@ -2562,7 +2954,7 @@
                     "action": "",
                     "left": 0,
                     "top": 0,
-                    "width": 150,
+                    "width": 158,
                     "height": 40,
                     "text": "Voltage"
                   }
@@ -2576,7 +2968,7 @@
                 "data": "output_mode",
                 "left": 0,
                 "top": 96,
-                "width": 308,
+                "width": 316,
                 "height": 40,
                 "widgets": [
                   {
@@ -2586,7 +2978,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 308,
+                    "width": 316,
                     "height": 40,
                     "widgets": [
                       {
@@ -2610,7 +3002,7 @@
                         "action": "select_current_range",
                         "left": 158,
                         "top": 0,
-                        "width": 150,
+                        "width": 158,
                         "height": 40,
                         "text": ""
                       }
@@ -2623,7 +3015,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 308,
+                    "width": 316,
                     "height": 40,
                     "widgets": [
                       {
@@ -2646,7 +3038,7 @@
                         "action": "select_voltage_range",
                         "left": 158,
                         "top": 0,
-                        "width": 150,
+                        "width": 158,
                         "height": 40,
                         "text": ""
                       }
@@ -2665,7 +3057,7 @@
                 "action": "show_dac_calibration",
                 "left": 0,
                 "top": 144,
-                "width": 150,
+                "width": 158,
                 "height": 40,
                 "text": "Calibration"
               }
@@ -2845,7 +3237,7 @@
                 "action": "show_dac_calibration",
                 "left": 0,
                 "top": 0,
-                "width": 150,
+                "width": 158,
                 "height": 40,
                 "text": "Calibration"
               }

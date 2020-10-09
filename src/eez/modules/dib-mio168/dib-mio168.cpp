@@ -967,6 +967,72 @@ void action_dib_mio168_show_info() {
     pushPage(PAGE_ID_DIB_MIO168_INFO);
 }
 
+void data_dib_mio168_inputs_1_2(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dib_mio168_inputs_3_5(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dib_mio168_inputs_6_8(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dib_mio168_input_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dib_mio168_input_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dib_mio168_adc_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dib_mio168_adc_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dib_mio168_adc_has_temp_sensor_bias_feature(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dib_mio168_adc_temp_sensor_bias(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dib_mio168_dac_channel_has_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dib_mio168_dac_channel_has_settings() {
+    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
+}
+
+void action_dib_mio168_show_din_configuration() {
+    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
+}
+
+void action_dib_mio168_adc_toggle_temp_sensor_bias() {
+    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
+}
+
+void action_dib_mio168_show_adc_configuration() {
+    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
+}
+
+void action_dib_mio168_show_dac_calibration() {
+    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
+}
+
+void action_dib_mio168_select_adc_mode() {
+    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
+}
+
+void action_dib_mio168_select_adc_range() {
+    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
+}
+
+void action_dib_mio168_select_input_range() {
+    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
+}
+
+void action_dib_mio168_select_input_speed() {
+    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
+}
+
 } // namespace gui
 
 } // namespace eez
