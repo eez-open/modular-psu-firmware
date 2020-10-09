@@ -512,6 +512,11 @@ float PsuModule::getProfileISet(uint8_t *buffer) {
     return parameters->i_set;
 }
 
+CalibrationConfiguration *PsuModule::getCalibrationConfiguration(int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    return &channel->cal_conf;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
@@ -566,6 +571,10 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         calibration::start(slotIndex, subchannelIndex);
     } else if (type == PSU_MESSAGE_CALIBRATION_SELECT_CURRENT_RANGE) {
         calibration::selectCurrentRange((int8_t)param);
+    } else if (type == PSU_MESSAGE_SAVE_CHANNEL_CALIBRATION) {
+        int slotIndex = param >> 8;
+        int subchannelIndex = param & 0xFF;
+        calibration::doSave(slotIndex, subchannelIndex);
     } else if (type == PSU_MESSAGE_CALIBRATION_STOP) {
         calibration::stop();
     } else if (type == PSU_MESSAGE_FLASH_SLAVE_START) {

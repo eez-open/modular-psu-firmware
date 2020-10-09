@@ -86,6 +86,8 @@ void setRemark(const char *value, size_t len);
 /// Are all calibration parameters entered?
 bool canSave(int16_t &scpiErr, int16_t *uiErr = nullptr);
 
+bool doSave(int slotIndex, int subchannelIndex);
+
 /// Save calibration parameters entered during calibration procedure.
 bool save();
 
