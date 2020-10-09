@@ -1631,6 +1631,19 @@ void pushSelectFromEnumPage(
 
 void pushSelectFromEnumPage(
     AppContext *appContext,
+    EnumItem *enumItems,
+    uint16_t currentValue,
+    bool (*disabledCallback)(uint16_t value),
+    void (*onSet)(uint16_t),
+    bool smallFont,
+    bool showRadioButtonIcon
+) {
+	g_selectFromEnumPage.init(appContext, enumItems, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+    appContext->pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &g_selectFromEnumPage);
+}
+
+void pushSelectFromEnumPage(
+    AppContext *appContext,
     void(*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),

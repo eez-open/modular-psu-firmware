@@ -29,6 +29,18 @@
 namespace eez {
 namespace gui {
 
+const char *getWidgetLabel(EnumItem *enumDefinition, uint16_t value) {
+    for (int i = 0; enumDefinition[i].menuLabel; i++) {
+        if (enumDefinition[i].value == value) {
+            if (enumDefinition[i].widgetLabel) {
+                return enumDefinition[i].widgetLabel;
+            }
+            return enumDefinition[i].menuLabel;
+        }
+    }
+    return nullptr;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 bool compare_NONE_value(const Value &a, const Value &b) {

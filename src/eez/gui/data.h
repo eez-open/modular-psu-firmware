@@ -49,6 +49,8 @@ struct EnumValue {
     uint16_t enumDefinition;
 };
 
+const char *getWidgetLabel(EnumItem *enumDefinition, uint16_t value);
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct PairOfUint8Value {
