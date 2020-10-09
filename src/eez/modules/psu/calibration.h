@@ -92,8 +92,7 @@ bool doSave(int slotIndex, int subchannelIndex);
 bool save();
 
 /// Clear calibration parameters for the currently selected channel.
-/// /param channel Selected channel
-bool clear(Channel *channel);
+bool clear(int slotIndex, int subchannelIndex, int *err);
 
 void clearCalibrationConf(CalibrationConfiguration *calConf);
 
