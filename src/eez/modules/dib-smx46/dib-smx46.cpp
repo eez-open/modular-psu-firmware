@@ -217,7 +217,7 @@ public:
 #endif
 
         if (relayCyclesWriteInterval.test(micros())) {
-            sendMessageToLowPriorityThread((LowPriorityThreadMessage)THREAD_MESSAGE_SAVE_RELAY_CYCLES);
+            sendMessageToLowPriorityThread((LowPriorityThreadMessage)THREAD_MESSAGE_SAVE_RELAY_CYCLES, slotIndex);
         }
     }
 
@@ -298,6 +298,12 @@ public:
 
     int getSlotSettingsPageId() override {
         return getTestResult() == TEST_OK ? PAGE_ID_DIB_SMX46_SETTINGS : PAGE_ID_SLOT_SETTINGS;
+    }
+
+    void onLowPriorityThreadMessage(uint8_t type, uint32_t param) override {
+        if (type == THREAD_MESSAGE_SAVE_RELAY_CYCLES) {
+            saveRelayCycles();
+        }
     }
 
     void getProfileParameters(uint8_t *buffer) override {

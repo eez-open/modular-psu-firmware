@@ -1040,6 +1040,156 @@
         "dataContextOverrides": "{\"slot_title_max\": \"SMX46\"}"
       },
       {
+        "name": "slot_view_min",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 238,
+            "height": 24,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "slot_title_min",
+                "left": 0,
+                "top": 0,
+                "width": 193,
+                "height": 24,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "alignVertical": "bottom"
+                },
+                "data": "",
+                "action": "toggle_slot_max_view",
+                "left": 193,
+                "top": 0,
+                "width": 45,
+                "height": 24,
+                "text": "e"
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dac1",
+            "action": "",
+            "left": 137,
+            "top": 24,
+            "width": 78,
+            "height": 23,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dac2",
+            "action": "",
+            "left": 137,
+            "top": 49,
+            "width": 78,
+            "height": 23,
+            "displayOption": 0
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default_S_left"
+            },
+            "left": 11,
+            "top": 31,
+            "width": 68,
+            "height": 32,
+            "text": "3 nodes"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 238,
+        "height": 72,
+        "dataContextOverrides": "{\"slot_title_min\": \"SMX46\"}"
+      },
+      {
+        "name": "slot_view_micro",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 24,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "slot_title_micro",
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 24,
+                "text": ""
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dac1",
+            "action": "",
+            "left": 0,
+            "top": 24,
+            "width": 51,
+            "height": 23,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "dac2",
+            "action": "",
+            "left": 0,
+            "top": 49,
+            "width": 51,
+            "height": 23,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 72,
+        "dataContextOverrides": "{\"slot_title_micro\": \"SMX46\"}"
+      },
+      {
         "name": "settings",
         "description": "Clear, disable and define channel's protection parameters",
         "style": "default",
@@ -1649,156 +1799,6 @@
         "width": 480,
         "height": 272,
         "dataContextOverrides": "{\n    \"slot_title_settings\": \"SMX46 #3:\"\n}"
-      },
-      {
-        "name": "slot_view_min",
-        "widgets": [
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 0,
-            "width": 238,
-            "height": 24,
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left",
-                  "padding": "0 5"
-                },
-                "data": "slot_title_min",
-                "left": 0,
-                "top": 0,
-                "width": 193,
-                "height": 24,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "alignVertical": "bottom"
-                },
-                "data": "",
-                "action": "toggle_slot_max_view",
-                "left": 193,
-                "top": 0,
-                "width": 45,
-                "height": 24,
-                "text": "e"
-              }
-            ]
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
-            },
-            "data": "dac1",
-            "action": "",
-            "left": 137,
-            "top": 24,
-            "width": 78,
-            "height": 23,
-            "displayOption": 0
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
-            },
-            "data": "dac2",
-            "action": "",
-            "left": 137,
-            "top": 49,
-            "width": 78,
-            "height": 23,
-            "displayOption": 0
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "left": 11,
-            "top": 31,
-            "width": 68,
-            "height": 32,
-            "text": "3 nodes"
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 238,
-        "height": 72,
-        "dataContextOverrides": "{\"slot_title_min\": \"SMX46\"}"
-      },
-      {
-        "name": "slot_view_micro",
-        "widgets": [
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 0,
-            "width": 158,
-            "height": 24,
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left",
-                  "padding": "0 5"
-                },
-                "data": "slot_title_micro",
-                "left": 0,
-                "top": 0,
-                "width": 158,
-                "height": 24,
-                "text": ""
-              }
-            ]
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
-            },
-            "data": "dac1",
-            "action": "",
-            "left": 0,
-            "top": 24,
-            "width": 51,
-            "height": 23,
-            "displayOption": 0
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
-            },
-            "data": "dac2",
-            "action": "",
-            "left": 0,
-            "top": 49,
-            "width": 51,
-            "height": 23,
-            "displayOption": 0
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 158,
-        "height": 72,
-        "dataContextOverrides": "{\"slot_title_micro\": \"SMX46\"}"
       },
       {
         "name": "info",

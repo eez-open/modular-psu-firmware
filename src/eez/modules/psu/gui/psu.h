@@ -106,6 +106,15 @@ void pushSelectFromEnumPage(
 );
 void pushSelectFromEnumPage(
     AppContext *appContext,
+    EnumItem *enumItems,
+    uint16_t currentValue, 
+    bool (*disabledCallback)(uint16_t value), 
+    void (*onSet)(uint16_t),
+    bool smallFont = false,
+    bool showRadioButtonIcon = true
+);
+void pushSelectFromEnumPage(
+    AppContext *appContext,
     void(*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),
@@ -357,6 +366,17 @@ inline void pushSelectFromEnumPage(
     bool showRadioButtonIcon = true
 ) {
     pushSelectFromEnumPage(&g_psuAppContext, enumDefinition, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+}
+
+inline void pushSelectFromEnumPage(
+    EnumItem *enumItems,
+    uint16_t currentValue, 
+    bool (*disabledCallback)(uint16_t value), 
+    void (*onSet)(uint16_t),
+    bool smallFont = false,
+    bool showRadioButtonIcon = true
+) {
+    pushSelectFromEnumPage(&g_psuAppContext, enumItems, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
 }
 
 inline void pushSelectFromEnumPage(
