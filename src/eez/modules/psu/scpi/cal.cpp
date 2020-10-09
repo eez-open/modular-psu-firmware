@@ -133,13 +133,14 @@ scpi_result_t scpi_cmd_calibrationClear(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    Channel *channel = getSelectedPowerChannel(context);
-    if (!channel) {
+    SlotAndSubchannelIndex *slotAndSubchannelIndex = getSelectedChannel(context);
+    if (!slotAndSubchannelIndex) {
         return SCPI_RES_ERR;
     }
 
-    if (!calibration::clear(channel)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+    int err;
+    if (!calibration::clear(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, &err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
