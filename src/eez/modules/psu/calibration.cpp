@@ -694,10 +694,39 @@ bool save() {
     return doSave(g_slotIndex, g_subchannelIndex);
 }
 
-bool clear(Channel *channel) {
-    channel->calibrationEnable(false);
-    clearCalibrationConf(&channel->cal_conf);
-    return doSave(channel->slotIndex, channel->subchannelIndex);
+bool clear(int slotIndex, int subchannelIndex, int *err) {
+	CalibrationConfiguration *calConf;
+
+	Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+
+    if (channel) {
+        channel->calibrationEnable(false);
+
+		calConf = &channel->cal_conf;
+    } else {
+        g_slots[slotIndex]->enableVoltageCalibration(subchannelIndex, false);
+        g_slots[slotIndex]->enableCurrentCalibration(subchannelIndex, false);
+
+		calConf = g_slots[slotIndex]->getCalibrationConfiguration(subchannelIndex);
+    }
+
+    if (!calConf) {
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+        return false;
+    }
+
+    clearCalibrationConf(calConf);
+
+    if (!doSave(slotIndex, subchannelIndex)) {
+        if (err) {
+            *err = SCPI_ERROR_EXECUTION_ERROR;
+        }
+        return false;
+    }
+
+    return true;
 }
 
 void clearCalibrationConf(CalibrationConfiguration *calConf) {
