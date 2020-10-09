@@ -115,17 +115,21 @@ void Value::setDacValue(float value) {
 
     if (type == CALIBRATION_VALUE_U) {
         if (channel) {
-            channel->setVoltage(value);
-            channel->setCurrent(channel->params.U_CAL_I_SET);
+            channel_dispatcher::setVoltage(*channel, value);
+            channel_dispatcher::setCurrent(*channel, channel->params.U_CAL_I_SET);
         } else {
             channel_dispatcher::setVoltage(g_slotIndex, g_subchannelIndex, value, nullptr);
         }
     } else {
-        channel->setCurrent(value);
-        if (type == CALIBRATION_VALUE_I_HI_RANGE) {
-            channel->setVoltage(channel->params.I_CAL_U_SET);
+        if (channel) {
+            channel_dispatcher::setCurrent(*channel, value);
+            if (type == CALIBRATION_VALUE_I_HI_RANGE) {
+                channel_dispatcher::setVoltage(*channel, channel->params.I_CAL_U_SET);
+            } else {
+                channel_dispatcher::setVoltage(*channel, channel->params.I_LOW_RANGE_CAL_U_SET);
+            }
         } else {
-            channel->setVoltage(channel->params.I_LOW_RANGE_CAL_U_SET);
+            // TODO
         }
     }
 }
@@ -365,18 +369,18 @@ float getAdcValue(CalibrationValueType valueType) {
 void setVoltage(float value) {
     Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
     if (channel) {
-        channel->setVoltage(value);
+        channel_dispatcher::setVoltage(*channel, value);
     } else {
-        g_slots[g_slotIndex]->setVoltage(g_subchannelIndex, value, nullptr);
+        channel_dispatcher::setVoltage(g_slotIndex, g_subchannelIndex, value, nullptr);
     }
 }
 
 void setCurrent(float value) {
     Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
     if (channel) {
-        channel->setCurrent(value);
+        channel_dispatcher::setCurrent(*channel, value);
     } else {
-        g_slots[g_slotIndex]->setCurrent(g_subchannelIndex, value, nullptr);
+        channel_dispatcher::setCurrent(g_slotIndex, g_subchannelIndex, value, nullptr);
     }
 }
 
@@ -647,17 +651,17 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
 }
 
 bool doSave(int slotIndex, int subchannelIndex) {
-    if (!isLowPriorityThread()) {
-        sendMessageToLowPriorityThread(THREAD_MESSAGE_SAVE_CHANNEL_CALIBRATION, (slotIndex << 8) | subchannelIndex);
-        return true;
+    static bool result;
+
+    result = false;
+
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_SAVE_CHANNEL_CALIBRATION, (slotIndex << 8) | subchannelIndex);
+        return result;
     }
 
-    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    if (channel) {
-        return persist_conf::saveChannelCalibration(*channel);
-    } else {
-        return persist_conf::saveChannelCalibration(slotIndex, subchannelIndex);
-    }
+    result = persist_conf::saveChannelCalibration(slotIndex, subchannelIndex);
+    return result;
 }
 
 bool save() {
