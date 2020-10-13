@@ -853,7 +853,7 @@ void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &valu
         value = MakeValue(DAC_MAX, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
+    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
         value = Value(DAC_RESOLUTION, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         StepValues *stepValues = value.getStepValues();
@@ -884,7 +884,7 @@ void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &valu
         value = "DAC 2";
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
+    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
         value = Value(DAC_RESOLUTION, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         StepValues *stepValues = value.getStepValues();

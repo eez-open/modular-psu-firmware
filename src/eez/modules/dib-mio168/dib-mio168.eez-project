@@ -29,131 +29,141 @@
   },
   "data": [
     {
-      "name": "inputs",
+      "name": "din_pins",
       "type": "list",
       "defaultValue": "[\n  { \"input_no\": 1, \"input_state\": 0 },\n  { \"input_no\": 2, \"input_state\": 1 },\n  { \"input_no\": 3, \"input_state\": 1 },\n  { \"input_no\": 4, \"input_state\": 1 },\n  { \"input_no\": 5, \"input_state\": 0 },\n  { \"input_no\": 6, \"input_state\": 1 },\n  { \"input_no\": 7, \"input_state\": 0 },\n  { \"input_no\": 8, \"input_state\": 1 }\n]"
     },
     {
-      "name": "inputs_1_2",
+      "name": "din_pins_1_2",
       "type": "list",
       "defaultValue": "[\n  { \"input_no\": 1, \"input_state\": 0, \"input_range\": 0, \"input_speed\": 0 },\n  { \"input_no\": 2, \"input_state\": 1, \"input_range\": 1, \"input_speed\": 1 }\n]"
     },
     {
-      "name": "inputs_3_5",
+      "name": "din_pins_3_5",
       "type": "list",
       "defaultValue": "[\n  { \"input_no\": 3, \"input_state\": 1, \"input_range\": 1 },\n  { \"input_no\": 4, \"input_state\": 1, \"input_range\": 0 },\n  { \"input_no\": 5, \"input_state\": 0, \"input_range\": 1 }\n]"
     },
     {
-      "name": "inputs_6_8",
+      "name": "din_pins_6_8",
       "type": "list",
       "defaultValue": "[\n  { \"input_no\": 6, \"input_state\": 1, \"input_range\": 1 },\n  { \"input_no\": 7, \"input_state\": 1, \"input_range\": 1 },\n  { \"input_no\": 8, \"input_state\": 0, \"input_range\": 0 }\n]"
     },
     {
-      "name": "input_no",
+      "name": "din_no",
       "type": "string",
       "defaultValue": "1"
     },
     {
-      "name": "input_state",
+      "name": "din_state",
       "type": "boolean",
       "defaultValue": "1"
     },
     {
-      "name": "input_range",
+      "name": "din_range",
       "type": "enum",
       "enumItems": "[\"Low\", \"High\"]",
       "defaultValue": "0"
     },
     {
-      "name": "input_speed",
+      "name": "din_speed",
       "type": "enum",
-      "enumItems": "[\"Slow\", \"Fast\"]",
+      "enumItems": "[\"Fast\", \"Slow\"]",
       "defaultValue": "0"
     },
     {
-      "name": "outputs",
+      "name": "dout_pins",
       "type": "list",
       "defaultValue": "[\n  { \"output_no\": 1, \"output_state\": 1 },\n  { \"output_no\": 2, \"output_state\": 1 },\n  { \"output_no\": 3, \"output_state\": 0 },\n  { \"output_no\": 4, \"output_state\": 0 },\n  { \"output_no\": 5, \"output_state\": 1 },\n  { \"output_no\": 6, \"output_state\": 1 },\n  { \"output_no\": 7, \"output_state\": 0 },\n  { \"output_no\": 8, \"output_state\": 1 }\n]"
     },
     {
-      "name": "output_no",
+      "name": "dout_no",
       "type": "string",
       "defaultValue": "1"
     },
     {
-      "name": "output_state",
+      "name": "dout_state",
       "type": "boolean",
       "defaultValue": "1"
     },
     {
-      "name": "analog_inputs",
+      "name": "ain_channels",
       "type": "list",
-      "defaultValue": "[\n  { \"analog_input_value\": 42 },\n  { \"analog_input_value\": 43 },\n  { \"analog_input_value\": 44 },\n  { \"analog_input_value\": 45 }\n]"
+      "defaultValue": "[\n  { \"analog_input_label\": \"AIN1\", \"analog_input_value\": \"1.0 V\" },\n  { \"analog_input_label\": \"AIN2\", \"analog_input_value\": \"2.0 V\" },\n  { \"analog_input_label\": \"AIN3\", \"analog_input_value\": \"3.0 V\" },\n  { \"analog_input_label\": \"AIN4\", \"analog_input_value\": \"4.0 V\" }\n]"
     },
     {
-      "name": "analog_input_value",
+      "name": "ain_label",
+      "type": "string",
+      "defaultValue": "AIN1"
+    },
+    {
+      "name": "ain_value",
       "type": "float",
       "defaultValue": "5.0 V"
     },
     {
-      "name": "analog_outputs",
-      "type": "list",
-      "defaultValue": "[\n  { \"analog_output_label\": \"AO1\", \"analog_output_value\": \"2.1 V\" },\n  { \"analog_output_label\": \"AO2\", \"analog_output_value\": \"2.2 V\" },\n  { \"analog_output_label\": \"AO3\", \"analog_output_value\": \"2.3 V\" },\n  { \"analog_output_label\": \"AO4\", \"analog_output_value\": \"2.4 V\" }\n]"
+      "name": "ain_mode",
+      "type": "enum",
+      "enumItems": "[\"Current\", \"Voltage\"]",
+      "defaultValue": "0"
     },
     {
-      "name": "analog_output_label",
+      "name": "ain_range",
+      "type": "string",
+      "defaultValue": "0 V to +5 V"
+    },
+    {
+      "name": "ain_has_temp_sensor_bias_feature",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "ain_temp_sensor_bias",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "aout_channels",
+      "type": "list",
+      "defaultValue": "[\n  { \"analog_output_label\": \"AO1\", \"analog_output_value\": \"2.1 V\", \"aout_channel_has_settings\": 1 },\n  { \"analog_output_label\": \"AO2\", \"analog_output_value\": \"2.2 V\", \"aout_channel_has_settings\": 1 },\n  { \"analog_output_label\": \"AO3\", \"analog_output_value\": \"2.3 V\", \"aout_channel_has_settings\": 0 },\n  { \"analog_output_label\": \"AO4\", \"analog_output_value\": \"2.4 V\", \"aout_channel_has_settings\": 0 }\n]"
+    },
+    {
+      "name": "aout_label",
       "type": "string",
       "defaultValue": "AO1"
     },
     {
-      "name": "analog_output_value",
+      "name": "aout_value",
       "type": "float",
       "defaultValue": "1.0 V"
     },
     {
-      "name": "adc_mode",
+      "name": "aout_output_enabled",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "aout_output_mode",
       "type": "enum",
       "enumItems": "[\"Current\", \"Voltage\"]",
       "defaultValue": "0"
     },
     {
-      "name": "adc_range",
+      "name": "aout_voltage_range",
       "type": "string",
       "defaultValue": "0 V to +5 V"
     },
     {
-      "name": "adc_has_temp_sensor_bias_feature",
-      "type": "boolean",
-      "defaultValue": "1"
-    },
-    {
-      "name": "adc_temp_sensor_bias",
-      "type": "boolean",
-      "defaultValue": "1"
-    },
-    {
-      "name": "dac_output_enabled",
-      "type": "boolean",
-      "defaultValue": "1"
-    },
-    {
-      "name": "output_mode",
-      "type": "enum",
-      "enumItems": "[\"Current\", \"Voltage\"]",
-      "defaultValue": "0"
-    },
-    {
-      "name": "voltage_range",
-      "type": "string",
-      "defaultValue": "0 V to +5 V"
-    },
-    {
-      "name": "current_range",
+      "name": "aout_current_range",
       "type": "string",
       "defaultValue": "0 mA to 24 mA"
     },
     {
-      "name": "pwms",
+      "name": "aout_channel_has_settings",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "pwm_channels",
       "type": "list",
       "defaultValue": "[\n  { \"pwm_label\": \"PWM1\", \"pwm_freq\": \"100 Hz\", \"pwm_duty\": \"80 %\" },\n  { \"pwm_label\": \"PWM2\", \"pwm_freq\": \"1.2 KHz\", \"pwm_duty\": \"50 %\" }\n]"
     },
@@ -171,58 +181,56 @@
       "name": "pwm_duty",
       "type": "float",
       "defaultValue": "50 %"
-    },
-    {
-      "name": "dac_channel_has_settings",
-      "type": "boolean",
-      "defaultValue": "1"
     }
   ],
   "actions": [
     {
-      "name": "show_din_configuration"
+      "name": "din_show_configuration"
     },
     {
-      "name": "toggle_output_state"
+      "name": "din_select_range"
     },
     {
-      "name": "adc_toggle_temp_sensor_bias"
+      "name": "din_select_speed"
     },
     {
-      "name": "show_adc_configuration"
+      "name": "dout_toggle_state"
     },
     {
-      "name": "dac_toggle_output_enabled"
+      "name": "ain_toggle_temp_sensor_bias"
     },
     {
-      "name": "select_output_mode"
+      "name": "ain_show_configuration"
     },
     {
-      "name": "select_voltage_range"
+      "name": "ain_show_calibration"
     },
     {
-      "name": "select_current_range"
+      "name": "ain_select_mode"
     },
     {
-      "name": "show_dac_configuration"
+      "name": "ain_select_range"
     },
     {
-      "name": "show_dac_calibration"
+      "name": "aout_toggle_output_enabled"
+    },
+    {
+      "name": "aout_select_output_mode"
+    },
+    {
+      "name": "aout_select_voltage_range"
+    },
+    {
+      "name": "aout_select_current_range"
+    },
+    {
+      "name": "aout_show_configuration"
+    },
+    {
+      "name": "aout_show_calibration"
     },
     {
       "name": "show_info"
-    },
-    {
-      "name": "select_adc_mode"
-    },
-    {
-      "name": "select_adc_range"
-    },
-    {
-      "name": "select_input_range"
-    },
-    {
-      "name": "select_input_speed"
     }
   ],
   "gui": {
@@ -322,156 +330,263 @@
             ]
           },
           {
-            "type": "List",
+            "type": "Container",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "inputs",
             "left": 0,
-            "top": 33,
-            "width": 160,
-            "height": 20,
-            "itemWidget": {
-              "type": "Select",
-              "style": {
-                "inheritFrom": "default"
+            "top": 32,
+            "width": 21,
+            "height": 208,
+            "name": "din",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "font": "RobotoCondensed-Regular",
+                  "alignHorizontal": "left"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 20,
+                "height": 16,
+                "text": "DIN"
               },
-              "data": "input_state",
-              "left": 0,
-              "top": 0,
-              "width": 20,
-              "height": 20,
-              "widgets": [
-                {
-                  "type": "Container",
+              {
+                "type": "List",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "din_pins",
+                "left": 1,
+                "top": 16,
+                "width": 20,
+                "height": 192,
+                "itemWidget": {
+                  "type": "Select",
                   "style": {
                     "inheritFrom": "default"
                   },
+                  "data": "din_state",
                   "left": 0,
                   "top": 0,
                   "width": 20,
-                  "height": 20,
+                  "height": 24,
                   "widgets": [
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
-                        "inheritFrom": "default",
-                        "font": "RobotoCondensed-Regular"
+                        "inheritFrom": "default"
                       },
-                      "data": "input_no",
                       "left": 0,
                       "top": 0,
-                      "width": 19,
-                      "height": 20,
-                      "text": ""
+                      "width": 20,
+                      "height": 24,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default",
+                            "font": "Oswald12"
+                          },
+                          "data": "din_no",
+                          "left": 0,
+                          "top": 0,
+                          "width": 20,
+                          "height": 23,
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Container",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 20,
+                      "height": 24,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_inverse",
+                            "font": "Oswald12"
+                          },
+                          "data": "din_no",
+                          "left": 0,
+                          "top": 0,
+                          "width": 20,
+                          "height": 23,
+                          "text": ""
+                        }
+                      ]
                     }
                   ]
                 },
-                {
-                  "type": "Container",
+                "listType": "vertical",
+                "gap": 0
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 22,
+            "top": 32,
+            "width": 40,
+            "height": 208,
+            "name": "dout",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "font": "RobotoCondensed-Regular",
+                  "alignHorizontal": "center"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 40,
+                "height": 16,
+                "text": "DOUT"
+              },
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "dout_pins",
+                "left": 0,
+                "top": 16,
+                "width": 40,
+                "height": 192,
+                "itemWidget": {
+                  "type": "Select",
                   "style": {
                     "inheritFrom": "default"
                   },
+                  "data": "dout_state",
+                  "action": "",
                   "left": 0,
                   "top": 0,
-                  "width": 20,
-                  "height": 20,
+                  "width": 40,
+                  "height": 24,
                   "widgets": [
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
-                        "inheritFrom": "default_inverse",
-                        "font": "RobotoCondensed-Regular"
+                        "inheritFrom": "default"
                       },
-                      "data": "input_no",
                       "left": 0,
                       "top": 0,
-                      "width": 19,
-                      "height": 20,
-                      "text": ""
+                      "width": 40,
+                      "height": 24,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default",
+                            "font": "Oswald12",
+                            "alignVertical": "center",
+                            "color": "Action color",
+                            "activeBackgroundColor": "Action color"
+                          },
+                          "data": "dout_no",
+                          "action": "dout_toggle_state",
+                          "left": 0,
+                          "top": 0,
+                          "width": 40,
+                          "height": 23,
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Container",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 40,
+                      "height": 24,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_inverse",
+                            "font": "Oswald12",
+                            "alignVertical": "center",
+                            "backgroundColor": "Action color",
+                            "activeColor": "Action color",
+                            "padding": "0"
+                          },
+                          "data": "dout_no",
+                          "action": "dout_toggle_state",
+                          "left": 0,
+                          "top": 0,
+                          "width": 40,
+                          "height": 23,
+                          "text": ""
+                        }
+                      ]
                     }
                   ]
-                }
-              ]
-            },
-            "listType": "horizontal",
-            "gap": 0
+                },
+                "gridFlow": "row"
+              }
+            ]
           },
           {
             "type": "Grid",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "outputs",
-            "left": 0,
-            "top": 54,
-            "width": 160,
+            "data": "ain_channels",
+            "left": 63,
+            "top": 32,
+            "width": 96,
             "height": 64,
             "itemWidget": {
-              "type": "Select",
+              "type": "Container",
               "style": {
                 "inheritFrom": "default"
               },
-              "data": "output_state",
-              "action": "",
               "left": 0,
               "top": 0,
-              "width": 40,
-              "height": 32,
+              "width": 96,
+              "height": 16,
               "widgets": [
                 {
-                  "type": "Container",
+                  "type": "Text",
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default_S_left",
+                    "font": "RobotoCondensed-Regular"
                   },
+                  "data": "ain_label",
                   "left": 0,
                   "top": 0,
-                  "width": 40,
-                  "height": 32,
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "default",
-                        "font": "Oswald17",
-                        "alignVertical": "center"
-                      },
-                      "data": "output_no",
-                      "action": "toggle_output_state",
-                      "left": 0,
-                      "top": 0,
-                      "width": 39,
-                      "height": 31,
-                      "text": ""
-                    }
-                  ]
+                  "width": 30,
+                  "height": 16,
+                  "text": ""
                 },
                 {
-                  "type": "Container",
+                  "type": "DisplayData",
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default",
+                    "font": "RobotoCondensed-Regular"
                   },
-                  "left": 0,
+                  "data": "ain_value",
+                  "left": 30,
                   "top": 0,
-                  "width": 40,
-                  "height": 32,
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "default_inverse",
-                        "font": "Oswald17",
-                        "alignVertical": "center"
-                      },
-                      "data": "output_no",
-                      "action": "toggle_output_state",
-                      "left": 0,
-                      "top": 0,
-                      "width": 39,
-                      "height": 31,
-                      "text": ""
-                    }
-                  ]
+                  "width": 66,
+                  "height": 16,
+                  "displayOption": 0
                 }
               ]
             }
@@ -481,11 +596,11 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "analog_inputs",
-            "left": 1,
-            "top": 119,
-            "width": 158,
-            "height": 48,
+            "data": "aout_channels",
+            "left": 63,
+            "top": 96,
+            "width": 96,
+            "height": 96,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -493,21 +608,35 @@
               },
               "left": 0,
               "top": 0,
-              "width": 79,
+              "width": 96,
               "height": 24,
               "widgets": [
                 {
+                  "type": "Text",
+                  "style": {
+                    "inheritFrom": "default_S_left",
+                    "font": "RobotoCondensed-Regular",
+                    "alignHorizontal": "right"
+                  },
+                  "data": "aout_label",
+                  "left": 0,
+                  "top": 0,
+                  "width": 24,
+                  "height": 24,
+                  "text": ""
+                },
+                {
                   "type": "DisplayData",
                   "style": {
-                    "inheritFrom": "default",
+                    "inheritFrom": "encoder_cursor_14_enabled",
                     "font": "Oswald14"
                   },
-                  "data": "analog_output_value",
+                  "data": "aout_value",
                   "action": "edit",
                   "left": 24,
                   "top": 0,
-                  "width": 79,
-                  "height": 24,
+                  "width": 72,
+                  "height": 23,
                   "displayOption": 0
                 }
               ]
@@ -516,9 +645,9 @@
           {
             "type": "List",
             "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
+              "inheritFrom": "default"
             },
-            "data": "pwms",
+            "data": "pwm_channels",
             "left": 63,
             "top": 192,
             "width": 96,
@@ -643,170 +772,228 @@
             ]
           },
           {
-            "type": "List",
+            "type": "Container",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "inputs",
             "left": 0,
-            "top": 33,
-            "width": 240,
-            "height": 20,
-            "itemWidget": {
-              "type": "Select",
-              "style": {
-                "inheritFrom": "default"
+            "top": 32,
+            "width": 21,
+            "height": 208,
+            "name": "din",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "font": "RobotoCondensed-Regular",
+                  "alignHorizontal": "left"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 20,
+                "height": 16,
+                "text": "DIN"
               },
-              "data": "input_state",
-              "left": 0,
-              "top": 0,
-              "width": 30,
-              "height": 20,
-              "widgets": [
-                {
-                  "type": "Container",
+              {
+                "type": "List",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "din_pins",
+                "left": 1,
+                "top": 16,
+                "width": 20,
+                "height": 192,
+                "itemWidget": {
+                  "type": "Select",
                   "style": {
                     "inheritFrom": "default"
                   },
+                  "data": "din_state",
                   "left": 0,
                   "top": 0,
-                  "width": 30,
-                  "height": 20,
+                  "width": 20,
+                  "height": 24,
                   "widgets": [
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
-                        "inheritFrom": "default",
-                        "font": "RobotoCondensed-Regular"
+                        "inheritFrom": "default"
                       },
-                      "data": "input_no",
                       "left": 0,
                       "top": 0,
-                      "width": 30,
-                      "height": 20,
-                      "text": ""
+                      "width": 20,
+                      "height": 24,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default",
+                            "font": "Oswald12"
+                          },
+                          "data": "din_no",
+                          "left": 0,
+                          "top": 0,
+                          "width": 20,
+                          "height": 23,
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Container",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 20,
+                      "height": 24,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_inverse",
+                            "font": "Oswald12"
+                          },
+                          "data": "din_no",
+                          "left": 0,
+                          "top": 0,
+                          "width": 20,
+                          "height": 23,
+                          "text": ""
+                        }
+                      ]
                     }
                   ]
                 },
-                {
-                  "type": "Container",
+                "listType": "vertical",
+                "gap": 0
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 26,
+            "top": 32,
+            "width": 40,
+            "height": 208,
+            "name": "dout",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "font": "RobotoCondensed-Regular",
+                  "alignHorizontal": "center"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 40,
+                "height": 16,
+                "text": "DOUT"
+              },
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "dout_pins",
+                "left": 0,
+                "top": 16,
+                "width": 40,
+                "height": 192,
+                "itemWidget": {
+                  "type": "Select",
                   "style": {
                     "inheritFrom": "default"
                   },
+                  "data": "dout_state",
+                  "action": "",
                   "left": 0,
                   "top": 0,
-                  "width": 30,
-                  "height": 20,
+                  "width": 40,
+                  "height": 24,
                   "widgets": [
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
-                        "inheritFrom": "default_inverse",
-                        "font": "RobotoCondensed-Regular"
+                        "inheritFrom": "default"
                       },
-                      "data": "input_no",
                       "left": 0,
                       "top": 0,
-                      "width": 30,
-                      "height": 20,
-                      "text": ""
+                      "width": 40,
+                      "height": 24,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default",
+                            "font": "Oswald12",
+                            "alignVertical": "center",
+                            "color": "Action color",
+                            "activeBackgroundColor": "Action color"
+                          },
+                          "data": "dout_no",
+                          "action": "dout_toggle_state",
+                          "left": 0,
+                          "top": 0,
+                          "width": 40,
+                          "height": 23,
+                          "text": ""
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Container",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 40,
+                      "height": 24,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_inverse",
+                            "font": "Oswald12",
+                            "alignVertical": "center",
+                            "backgroundColor": "Action color",
+                            "activeColor": "Action color",
+                            "padding": "0"
+                          },
+                          "data": "dout_no",
+                          "action": "dout_toggle_state",
+                          "left": 0,
+                          "top": 0,
+                          "width": 40,
+                          "height": 23,
+                          "text": ""
+                        }
+                      ]
                     }
                   ]
-                }
-              ]
-            },
-            "listType": "horizontal",
-            "gap": 0
+                },
+                "gridFlow": "row"
+              }
+            ]
           },
           {
             "type": "Grid",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "outputs",
-            "left": 0,
-            "top": 54,
-            "width": 240,
+            "data": "ain_channels",
+            "left": 71,
+            "top": 32,
+            "width": 168,
             "height": 64,
-            "itemWidget": {
-              "type": "Select",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "data": "output_state",
-              "action": "",
-              "left": 0,
-              "top": 0,
-              "width": 60,
-              "height": 32,
-              "widgets": [
-                {
-                  "type": "Container",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "left": 0,
-                  "top": 0,
-                  "width": 60,
-                  "height": 32,
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "default",
-                        "font": "Oswald17",
-                        "alignVertical": "center"
-                      },
-                      "data": "output_no",
-                      "action": "toggle_output_state",
-                      "left": 0,
-                      "top": 0,
-                      "width": 59,
-                      "height": 31,
-                      "text": ""
-                    }
-                  ]
-                },
-                {
-                  "type": "Container",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "left": 0,
-                  "top": 0,
-                  "width": 60,
-                  "height": 32,
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "default_inverse",
-                        "font": "Oswald17",
-                        "alignVertical": "center"
-                      },
-                      "data": "output_no",
-                      "action": "toggle_output_state",
-                      "left": 0,
-                      "top": 0,
-                      "width": 59,
-                      "height": 31,
-                      "text": ""
-                    }
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "type": "Grid",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "analog_inputs",
-            "left": 1,
-            "top": 119,
-            "width": 238,
-            "height": 48,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -814,31 +1001,44 @@
               },
               "left": 0,
               "top": 0,
-              "width": 119,
-              "height": 24,
+              "width": 168,
+              "height": 16,
               "widgets": [
+                {
+                  "type": "Text",
+                  "style": {
+                    "inheritFrom": "default_S_left",
+                    "font": "RobotoCondensed-Regular"
+                  },
+                  "data": "ain_label",
+                  "left": 0,
+                  "top": 0,
+                  "width": 44,
+                  "height": 16,
+                  "text": ""
+                },
                 {
                   "type": "DisplayData",
                   "style": {
                     "inheritFrom": "default",
-                    "font": "Oswald14"
+                    "font": "RobotoCondensed-Regular"
                   },
-                  "data": "analog_input_value",
-                  "left": 0,
+                  "data": "ain_value",
+                  "left": 44,
                   "top": 0,
-                  "width": 119,
-                  "height": 24,
+                  "width": 124,
+                  "height": 16,
                   "displayOption": 0
                 }
               ]
             }
           },
           {
-            "type": "DisplayData",
+            "type": "Grid",
             "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
+              "inheritFrom": "default"
             },
-            "data": "analog_outputs",
+            "data": "aout_channels",
             "left": 71,
             "top": 96,
             "width": 168,
@@ -859,7 +1059,7 @@
                     "inheritFrom": "default_S_left",
                     "font": "RobotoCondensed-Regular"
                   },
-                  "data": "analog_output_label",
+                  "data": "aout_label",
                   "left": 0,
                   "top": 0,
                   "width": 44,
@@ -872,7 +1072,7 @@
                     "inheritFrom": "encoder_cursor_14_enabled",
                     "font": "Oswald14"
                   },
-                  "data": "analog_output_value",
+                  "data": "aout_value",
                   "action": "edit",
                   "left": 43,
                   "top": 0,
@@ -886,9 +1086,9 @@
           {
             "type": "List",
             "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
+              "inheritFrom": "default"
             },
-            "data": "pwms",
+            "data": "pwm_channels",
             "left": 71,
             "top": 192,
             "width": 168,
@@ -1042,7 +1242,7 @@
                   "inheritFrom": "encoder_cursor_14_enabled",
                   "font": "Heydings14"
                 },
-                "action": "show_din_configuration",
+                "action": "din_show_configuration",
                 "left": 28,
                 "top": 1,
                 "width": 36,
@@ -1054,7 +1254,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "inputs",
+                "data": "din_pins",
                 "left": 1,
                 "top": 32,
                 "width": 64,
@@ -1064,7 +1264,7 @@
                   "style": {
                     "inheritFrom": "default"
                   },
-                  "data": "input_state",
+                  "data": "din_state",
                   "action": "",
                   "left": 0,
                   "top": 0,
@@ -1085,10 +1285,10 @@
                           "type": "Text",
                           "style": {
                             "inheritFrom": "default",
-                            "font": "RobotoCondensed-Regular",
+                            "font": "Oswald12",
                             "alignVertical": "center"
                           },
-                          "data": "input_no",
+                          "data": "din_no",
                           "action": "",
                           "left": 0,
                           "top": 0,
@@ -1115,7 +1315,7 @@
                             "font": "Oswald12",
                             "alignVertical": "center"
                           },
-                          "data": "input_no",
+                          "data": "din_no",
                           "action": "",
                           "left": 0,
                           "top": 0,
@@ -1170,7 +1370,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "outputs",
+                "data": "dout_pins",
                 "left": 1,
                 "top": 32,
                 "width": 80,
@@ -1180,7 +1380,7 @@
                   "style": {
                     "inheritFrom": "default"
                   },
-                  "data": "output_state",
+                  "data": "dout_state",
                   "action": "",
                   "left": 0,
                   "top": 0,
@@ -1201,17 +1401,17 @@
                           "type": "Text",
                           "style": {
                             "inheritFrom": "default",
-                            "font": "Oswald14",
+                            "font": "Oswald12",
                             "alignVertical": "center",
                             "color": "Action color",
                             "activeBackgroundColor": "Action color"
                           },
-                          "data": "output_no",
-                          "action": "toggle_output_state",
+                          "data": "dout_no",
+                          "action": "dout_toggle_state",
                           "left": 0,
                           "top": 0,
-                          "width": 40,
-                          "height": 26,
+                          "width": 39,
+                          "height": 25,
                           "text": ""
                         }
                       ]
@@ -1235,8 +1435,8 @@
                             "backgroundColor": "Action color",
                             "activeColor": "Action color"
                           },
-                          "data": "output_no",
-                          "action": "toggle_output_state",
+                          "data": "dout_no",
+                          "action": "dout_toggle_state",
                           "left": 0,
                           "top": 0,
                           "width": 39,
@@ -1291,7 +1491,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "analog_inputs",
+                "data": "ain_channels",
                 "left": 1,
                 "top": 32,
                 "width": 108,
@@ -1312,7 +1512,7 @@
                         "inheritFrom": "default",
                         "font": "Oswald12"
                       },
-                      "data": "analog_input_value",
+                      "data": "ain_value",
                       "left": 2,
                       "top": 0,
                       "width": 70,
@@ -1325,7 +1525,7 @@
                         "inheritFrom": "encoder_cursor_14_enabled",
                         "font": "Heydings14"
                       },
-                      "action": "show_slot_settings",
+                      "action": "ain_show_configuration",
                       "left": 73,
                       "top": 0,
                       "width": 35,
@@ -1377,7 +1577,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "analog_outputs",
+                "data": "aout_channels",
                 "left": 1,
                 "top": 32,
                 "width": 120,
@@ -1398,7 +1598,7 @@
                         "inheritFrom": "encoder_cursor_14_enabled",
                         "font": "Oswald12"
                       },
-                      "data": "analog_output_value",
+                      "data": "aout_value",
                       "action": "edit",
                       "left": 0,
                       "top": 0,
@@ -1411,7 +1611,7 @@
                       "style": {
                         "inheritFrom": "default"
                       },
-                      "data": "dac_channel_has_settings",
+                      "data": "aout_channel_has_settings",
                       "left": 85,
                       "top": 0,
                       "width": 35,
@@ -1433,7 +1633,7 @@
                           "style": {
                             "inheritFrom": "default"
                           },
-                          "data": "dac_output_enabled",
+                          "data": "aout_output_enabled",
                           "left": 0,
                           "top": 0,
                           "width": 35,
@@ -1447,7 +1647,7 @@
                                 "color": "status_warning",
                                 "activeBackgroundColor": "status_warning"
                               },
-                              "action": "show_dac_configuration",
+                              "action": "aout_show_configuration",
                               "left": 0,
                               "top": 0,
                               "width": 35,
@@ -1462,7 +1662,7 @@
                                 "color": "Action color",
                                 "activeBackgroundColor": "Action color"
                               },
-                              "action": "show_dac_configuration",
+                              "action": "aout_show_configuration",
                               "left": 0,
                               "top": 0,
                               "width": 35,
@@ -1493,7 +1693,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "pwms",
+            "data": "pwm_channels",
             "left": 384,
             "top": 64,
             "width": 96,
@@ -1666,7 +1866,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "analog_inputs",
+                "data": "ain_channels",
                 "left": 0,
                 "top": 0,
                 "width": 122,
@@ -1687,7 +1887,7 @@
                       "style": {
                         "inheritFrom": "default"
                       },
-                      "action": "show_adc_configuration",
+                      "action": "ain_show_configuration",
                       "left": 0,
                       "top": 0,
                       "width": 114,
@@ -1718,7 +1918,7 @@
                             "alignVertical": "top",
                             "padding": "13"
                           },
-                          "data": "analog_input_label",
+                          "data": "ain_label",
                           "action": "",
                           "left": 50,
                           "top": 0,
@@ -1739,7 +1939,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "analog_outputs",
+                "data": "aout_channels",
                 "left": 122,
                 "top": 0,
                 "width": 122,
@@ -1760,7 +1960,7 @@
                       "style": {
                         "inheritFrom": "default"
                       },
-                      "action": "show_dac_configuration",
+                      "action": "aout_show_configuration",
                       "left": 0,
                       "top": 0,
                       "width": 114,
@@ -1791,7 +1991,7 @@
                             "alignVertical": "top",
                             "padding": "13"
                           },
-                          "data": "analog_output_label",
+                          "data": "aout_label",
                           "action": "",
                           "left": 50,
                           "top": 0,
@@ -1815,7 +2015,7 @@
                   "alignVertical": "top",
                   "padding": "13"
                 },
-                "action": "show_din_configuration",
+                "action": "din_show_configuration",
                 "left": 244,
                 "top": 0,
                 "width": 220,
@@ -2106,7 +2306,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "inputs_1_2",
+                "data": "din_pins_1_2",
                 "left": 0,
                 "top": 40,
                 "width": 212,
@@ -2128,7 +2328,7 @@
                         "font": "Oswald14",
                         "alignVertical": "center"
                       },
-                      "data": "input_no",
+                      "data": "din_no",
                       "action": "",
                       "left": 0,
                       "top": 0,
@@ -2141,8 +2341,8 @@
                       "style": {
                         "inheritFrom": "default"
                       },
-                      "data": "input_range",
-                      "action": "select_input_range",
+                      "data": "din_range",
+                      "action": "din_select_range",
                       "left": 44,
                       "top": 0,
                       "width": 80,
@@ -2181,8 +2381,8 @@
                       "style": {
                         "inheritFrom": "default"
                       },
-                      "data": "input_speed",
-                      "action": "select_input_speed",
+                      "data": "din_speed",
+                      "action": "din_select_speed",
                       "left": 128,
                       "top": 0,
                       "width": 80,
@@ -2199,7 +2399,7 @@
                           "top": 0,
                           "width": 80,
                           "height": 40,
-                          "text": "Slow"
+                          "text": "Fast"
                         },
                         {
                           "type": "Text",
@@ -2212,7 +2412,7 @@
                           "top": 0,
                           "width": 80,
                           "height": 40,
-                          "text": "Fast"
+                          "text": "Slow"
                         }
                       ]
                     }
@@ -2225,7 +2425,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "inputs_3_5",
+                "data": "din_pins_3_5",
                 "left": 212,
                 "top": 40,
                 "width": 128,
@@ -2247,7 +2447,7 @@
                         "font": "Oswald14",
                         "alignVertical": "center"
                       },
-                      "data": "input_no",
+                      "data": "din_no",
                       "action": "",
                       "left": 0,
                       "top": 0,
@@ -2260,8 +2460,8 @@
                       "style": {
                         "inheritFrom": "default"
                       },
-                      "data": "input_range",
-                      "action": "select_input_range",
+                      "data": "din_range",
+                      "action": "din_select_range",
                       "left": 44,
                       "top": 0,
                       "width": 80,
@@ -2304,7 +2504,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "inputs_6_8",
+                "data": "din_pins_6_8",
                 "left": 340,
                 "top": 40,
                 "width": 128,
@@ -2326,7 +2526,7 @@
                         "font": "Oswald14",
                         "alignVertical": "center"
                       },
-                      "data": "input_no",
+                      "data": "din_no",
                       "action": "",
                       "left": 0,
                       "top": 0,
@@ -2339,8 +2539,8 @@
                       "style": {
                         "inheritFrom": "default"
                       },
-                      "data": "input_range",
-                      "action": "select_input_range",
+                      "data": "din_range",
+                      "action": "din_select_range",
                       "left": 44,
                       "top": 0,
                       "width": 80,
@@ -2517,7 +2717,7 @@
         "dataContextOverrides": ""
       },
       {
-        "name": "adc_configuration",
+        "name": "ain_configuration",
         "description": "Retrieve channel's informations such as how long channel output is active, sensor temperature, self-test result and calibration status (CAL:STAT command). \"Calib. params:\" can be ON, OFF, Uncalibrated, Corrupted. Selecting this option when it's uncalibrated or calibration data is corrupted will lead to Calibration wizard.",
         "style": "default",
         "widgets": [
@@ -2547,11 +2747,11 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "adc_mode",
-                "action": "select_adc_mode",
+                "data": "ain_mode",
+                "action": "ain_select_mode",
                 "left": 178,
                 "top": 0,
-                "width": 158,
+                "width": 200,
                 "height": 40,
                 "widgets": [
                   {
@@ -2563,7 +2763,7 @@
                     "action": "",
                     "left": 0,
                     "top": 0,
-                    "width": 158,
+                    "width": 200,
                     "height": 40,
                     "text": "Current"
                   },
@@ -2576,7 +2776,7 @@
                     "action": "",
                     "left": 0,
                     "top": 0,
-                    "width": 158,
+                    "width": 200,
                     "height": 40,
                     "text": "Voltage"
                   }
@@ -2598,11 +2798,11 @@
                 "style": {
                   "inheritFrom": "edit_value_active_M_center"
                 },
-                "data": "adc_range",
-                "action": "select_adc_range",
+                "data": "ain_range",
+                "action": "ain_select_range",
                 "left": 178,
                 "top": 48,
-                "width": 158,
+                "width": 200,
                 "height": 40,
                 "text": ""
               },
@@ -2611,7 +2811,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "adc_has_temp_sensor_bias_feature",
+                "data": "ain_has_temp_sensor_bias_feature",
                 "left": 0,
                 "top": 96,
                 "width": 253,
@@ -2655,8 +2855,8 @@
                         "style": {
                           "inheritFrom": "default"
                         },
-                        "data": "adc_temp_sensor_bias",
-                        "action": "adc_toggle_temp_sensor_bias",
+                        "data": "ain_temp_sensor_bias",
+                        "action": "ain_toggle_temp_sensor_bias",
                         "left": 178,
                         "top": 0,
                         "width": 75,
@@ -2692,6 +2892,21 @@
                     ]
                   }
                 ]
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "encoder_cursor_14_enabled",
+                  "font": "Oswald17",
+                  "color": "Action color",
+                  "activeBackgroundColor": "Action color"
+                },
+                "action": "aout_show_calibration",
+                "left": 0,
+                "top": 144,
+                "width": 178,
+                "height": 40,
+                "text": "Calibration"
               }
             ]
           },
@@ -2741,7 +2956,7 @@
                 "style": {
                   "inheritFrom": "status_title"
                 },
-                "data": "analog_input_label",
+                "data": "ain_label",
                 "left": 134,
                 "top": 0,
                 "width": 45,
@@ -2844,7 +3059,7 @@
         "dataContextOverrides": ""
       },
       {
-        "name": "dac_7760_configuration",
+        "name": "aout_dac7760_configuration",
         "description": "Retrieve channel's informations such as how long channel output is active, sensor temperature, self-test result and calibration status (CAL:STAT command). \"Calib. params:\" can be ON, OFF, Uncalibrated, Corrupted. Selecting this option when it's uncalibrated or calibration data is corrupted will lead to Calibration wizard.",
         "style": "default",
         "widgets": [
@@ -2875,8 +3090,8 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "dac_output_enabled",
-                "action": "adc_toggle_temp_sensor_bias",
+                "data": "aout_output_enabled",
+                "action": "aout_toggle_output_enabled",
                 "left": 158,
                 "top": 0,
                 "width": 75,
@@ -2925,8 +3140,8 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "output_mode",
-                "action": "select_output_mode",
+                "data": "aout_output_mode",
+                "action": "aout_select_output_mode",
                 "left": 158,
                 "top": 48,
                 "width": 158,
@@ -2965,7 +3180,7 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "output_mode",
+                "data": "aout_output_mode",
                 "left": 0,
                 "top": 96,
                 "width": 316,
@@ -2998,8 +3213,8 @@
                         "style": {
                           "inheritFrom": "edit_value_active_M_center"
                         },
-                        "data": "current_range",
-                        "action": "select_current_range",
+                        "data": "aout_current_range",
+                        "action": "aout_select_current_range",
                         "left": 158,
                         "top": 0,
                         "width": 158,
@@ -3034,8 +3249,8 @@
                         "style": {
                           "inheritFrom": "edit_value_active_M_center"
                         },
-                        "data": "voltage_range",
-                        "action": "select_voltage_range",
+                        "data": "aout_voltage_range",
+                        "action": "aout_select_voltage_range",
                         "left": 158,
                         "top": 0,
                         "width": 158,
@@ -3054,7 +3269,7 @@
                   "color": "Action color",
                   "activeBackgroundColor": "Action color"
                 },
-                "action": "show_dac_calibration",
+                "action": "aout_show_calibration",
                 "left": 0,
                 "top": 144,
                 "width": 158,
@@ -3109,7 +3324,7 @@
                 "style": {
                   "inheritFrom": "status_title"
                 },
-                "data": "analog_output_label",
+                "data": "aout_label",
                 "left": 134,
                 "top": 0,
                 "width": 45,
@@ -3212,7 +3427,7 @@
         "dataContextOverrides": ""
       },
       {
-        "name": "dac_7563_configuration",
+        "name": "aout_dac7563_configuration",
         "description": "Retrieve channel's informations such as how long channel output is active, sensor temperature, self-test result and calibration status (CAL:STAT command). \"Calib. params:\" can be ON, OFF, Uncalibrated, Corrupted. Selecting this option when it's uncalibrated or calibration data is corrupted will lead to Calibration wizard.",
         "style": "default",
         "widgets": [
@@ -3234,7 +3449,7 @@
                   "color": "Action color",
                   "activeBackgroundColor": "Action color"
                 },
-                "action": "show_dac_calibration",
+                "action": "aout_show_calibration",
                 "left": 0,
                 "top": 0,
                 "width": 158,
@@ -3289,7 +3504,7 @@
                 "style": {
                   "inheritFrom": "status_title"
                 },
-                "data": "analog_output_label",
+                "data": "aout_label",
                 "left": 134,
                 "top": 0,
                 "width": 45,

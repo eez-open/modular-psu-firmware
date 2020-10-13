@@ -52,50 +52,74 @@ namespace eez {
 namespace dib_mio168 {
 
 enum Mio168HighPriorityThreadMessage {
-    PSU_MESSAGE_DAC7760_CONFIGURE = PSU_MESSAGE_MODULE_SPECIFIC
+    PSU_MESSAGE_DIN_CONFIGURE = PSU_MESSAGE_MODULE_SPECIFIC,
+    PSU_MESSAGE_AIN_CONFIGURE,
+    PSU_MESSAGE_AOUT_DAC7760_CONFIGURE,
 };
 
 static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
 
 static const int DIN_SUBCHANNEL_INDEX = 0;
 static const int DOUT_SUBCHANNEL_INDEX = 1;
-static const int ADC_1_SUBCHANNEL_INDEX = 2;
-static const int ADC_2_SUBCHANNEL_INDEX = 3;
-static const int ADC_3_SUBCHANNEL_INDEX = 4;
-static const int ADC_4_SUBCHANNEL_INDEX = 5;
-static const int DAC_7760_1_SUBCHANNEL_INDEX = 6;
-static const int DAC_7760_2_SUBCHANNEL_INDEX = 7;
-static const int DAC_7563_1_SUBCHANNEL_INDEX = 8;
-static const int DAC_7563_2_SUBCHANNEL_INDEX = 9;
+static const int AIN_1_SUBCHANNEL_INDEX = 2;
+static const int AIN_2_SUBCHANNEL_INDEX = 3;
+static const int AIN_3_SUBCHANNEL_INDEX = 4;
+static const int AIN_4_SUBCHANNEL_INDEX = 5;
+static const int AOUT_1_SUBCHANNEL_INDEX = 6;
+static const int AOUT_2_SUBCHANNEL_INDEX = 7;
+static const int AOUT_3_SUBCHANNEL_INDEX = 8;
+static const int AOUT_4_2_SUBCHANNEL_INDEX = 9;
 static const int PWM_1_SUBCHANNEL_INDEX = 10;
 static const int PWM_2_SUBCHANNEL_INDEX = 11;
 
-static float U_CAL_POINTS[2] = { 1.0f, 9.0f };
-static float DAC_MIN = 0.0f;
-static float DAC_MAX = 10.0f;
-static float DAC_RESOLUTION = 0.01f;
-static float DAC_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
-static float DAC_AMPER_ENCODER_STEP_VALUES[] = { 0.05f, 0.01f, 0.005f, 0.001f };
+static float AIN_VOLTAGE_RESOLUTION = 0.005f;
+static float AIN_CURRENT_RESOLUTION = 0.00005f;
+
+static float AOUT_DAC7760_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
+static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES[] = { 0.05f, 0.01f, 0.005f, 0.001f };
+
+static float AOUT_DAC7563_MIN = -10.0f;
+static float AOUT_DAC7563_MAX = 10.0f;
+static float AOUT_DAC7563_RESOLUTION = 0.01f;
+static float AOUT_DAC7563_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
 
 static float PWM_MIN_FREQUENCY = 0.1f;
 static float PWM_MAX_FREQUENCY = 1000000.0f;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#define BUFFER_SIZE 1024
+
 struct FromMasterToSlave {
-    uint8_t reserved;
-    uint8_t outputPinStates;
+    uint8_t dinRanges;
+    uint8_t dinSpeeds;
+
+    uint8_t doutStates;
+
     struct {
-        SourceMode mode;
-        int8_t currentRange;
-        float current;
-        int8_t voltageRange;
+        uint8_t mode;
+        uint8_t range;
+        uint8_t tempSensorBias;
+    } ain[4];
+
+    struct {
+        uint8_t outputEnabled;
+        uint8_t outputRange;
+        float outputValue;
+    } aout_dac7760[2];
+
+    struct {
         float voltage;
-    } dac7760[2];
+    } aout_dac7563[2];
+
+    struct {
+        float freq;
+        float duty;
+    } pwm[2];    
 };
 
 struct FromSlaveToMaster {
-    uint8_t inputPinStates;
+    uint8_t dinStates;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,47 +127,112 @@ struct FromSlaveToMaster {
 struct MioChannel {
 };
 
-struct Mio168DinChannel : public MioChannel {
-    uint8_t pinStates = 0;
+struct DinChannel : public MioChannel {
+    uint8_t m_pinStates = 0;
+
+    // Valid for all 8 digital inputs
+    // 0 - LOW, 1 - HIGH
+    uint8_t m_pinRanges = 0;
+
+    // Valid only for first two digital inputs.
+    // 0 - FAST, 1 - SLOW
+    uint8_t m_pinSpeeds = 0;
 
     uint8_t getDigitalInputData() {
-        return pinStates;
+        return m_pinStates;
     }
 
     int getPinState(int pin) {
-        return pinStates & (1 << pin) ? 1 : 0;
+        return m_pinStates & (1 << pin) ? 1 : 0;
+    }
+
+    int getPinRange(int pin) {
+        return m_pinRanges & (1 << pin) ? 1 : 0;
+    }
+    
+    int getPinSpeed(int pin) {
+        return m_pinSpeeds & (1 << pin) ? 1 : 0;
     }
 };
 
-struct Mio168DoutChannel : public MioChannel {
-    uint8_t pinStates = 0;
+struct DoutChannel : public MioChannel {
+    uint8_t m_pinStates = 0;
 
     uint8_t getDigitalOutputData() {
-        return pinStates;
+        return m_pinStates;
     }
 
     void setDigitalOutputData(uint8_t data) {
-        pinStates = data;
+        m_pinStates = data;
     }
 
     int getPinState(int pin) {
-        return pinStates & (1 << pin) ? 1 : 0;
+        return m_pinStates & (1 << pin) ? 1 : 0;
     }
 
     void setPinState(int pin, int state) {
         if (state) {
-            pinStates |= 1 << pin;
+            m_pinStates |= 1 << pin;
         } else {
-            pinStates &= ~(1 << pin);
+            m_pinStates &= ~(1 << pin);
         }
     }
 };
 
-struct Mio168AdcChannel : public MioChannel {
-    uint16_t value = 0;
+struct AinChannel : public MioChannel {
+    float m_value = 0;
+    uint8_t m_mode = 1;
+    uint8_t m_range = 0;
+    uint8_t m_tempSensorBias = 0;
+
+    float convertU16Value(uint16_t value) {
+        float min = 0;
+        float max = 0;
+
+        if (m_range == 0) {
+            min = -10.24f;
+            max = 10.24f;
+        } else if (m_range == 1) {
+            min = -5.12f;
+            max = 5.12f;
+        } else if (m_range == 2) {
+            min = -2.56f;
+            max = 2.56f;
+        } else if (m_range == 3) {
+            min = -1.28f;
+            max = 1.28f;
+        } else if (m_range == 11) {
+            min = -0.64f;
+            max = 0.64f;
+        } else if (m_range == 5) {
+            min = 0;
+            max = 10.24f;
+        } else if (m_range == 6) {
+            min = 0;
+            max = 5.12f;
+        } else if (m_range == 7) {
+            min = 0;
+            max = 2.56f;
+        } else if (m_range == 15) {
+            min = 0;
+            max = 1.28f;
+        }
+
+        float fValue = remap(value * 1.0f, 0.0f, min, 65535.0f, max);
+
+        if (m_mode == 0) {
+            fValue /= 100.0f;
+        }
+
+        return fValue;
+    }
+
+    float getResolution() {
+        return m_mode ? AIN_VOLTAGE_RESOLUTION : AIN_CURRENT_RESOLUTION;
+    }
 };
 
-struct Mio168Dac7760Channel : public MioChannel {
+struct AoutDac7760Channel : public MioChannel {
     bool m_outputEnabled = false;
     SourceMode m_mode = SOURCE_MODE_VOLTAGE;
     int8_t m_currentRange = 5;
@@ -243,29 +332,27 @@ struct Mio168Dac7760Channel : public MioChannel {
 
     void getStepValues(StepValues *stepValues) {
         if (m_mode == SOURCE_MODE_VOLTAGE) {
-            stepValues->values = DAC_ENCODER_STEP_VALUES;
-            stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);
+            stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES;
+            stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES) / sizeof(float);
             stepValues->unit = UNIT_VOLT;
         } else {
-            stepValues->values = DAC_AMPER_ENCODER_STEP_VALUES;
-            stepValues->count = sizeof(DAC_AMPER_ENCODER_STEP_VALUES) / sizeof(float);
+            stepValues->values = AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES;
+            stepValues->count = sizeof(AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES) / sizeof(float);
             stepValues->unit = UNIT_AMPER;
         }
     }
 };
 
-struct Mio168Dac7563Channel : public MioChannel {
-    float value = 0;
+struct AoutDac7563Channel : public MioChannel {
+    float m_value = 0;
 };
 
-struct Mio168PwmChannel : public MioChannel {
-    float freq = 0;
-    float duty = 0;
+struct PwmChannel : public MioChannel {
+    float m_freq = 0;
+    float m_duty = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-
-#define BUFFER_SIZE 1024
 
 struct Mio168Module : public Module {
 public:
@@ -276,12 +363,12 @@ public:
     uint8_t output[BUFFER_SIZE];
     bool spiReady = false;
 
-    Mio168DinChannel dinChannel;
-    Mio168DoutChannel doutChannel;
-    Mio168AdcChannel adcChannels[4];
-    Mio168Dac7760Channel dac7760Channels[2];
-    Mio168Dac7563Channel dac7563Channels[2];
-    Mio168PwmChannel pwmChannels[2];
+    DinChannel dinChannel;
+    DoutChannel doutChannel;
+    AinChannel ainChannels[4];
+    AoutDac7760Channel aoutDac7760Channels[2];
+    AoutDac7563Channel aoutDac7563Channels[2];
+    PwmChannel pwmChannels[2];
 
     Mio168Module() {
         moduleType = MODULE_TYPE_DIB_MIO168;
@@ -347,20 +434,39 @@ public:
 #endif
 
     void transfer() {
-        FromMasterToSlave data = (FromMasterToSlave &)*output;
+        FromMasterToSlave &data = *((FromMasterToSlave *)output);
 
-        data.outputPinStates = doutChannel.pinStates;
+        data.dinRanges = dinChannel.m_pinRanges;
+        data.dinSpeeds = dinChannel.m_pinSpeeds;
 
-        for (int i = 0; i < 2; i++) {
-            auto channel = &dac7760Channels[i];
-            data.dac7760[0].mode = channel->m_mode;
-            data.dac7760[0].currentRange = channel->m_currentRange;
-            data.dac7760[0].current = 0; // TODO channel->i.set;
-            data.dac7760[0].voltageRange = channel->m_voltageRange;
-            data.dac7760[0].voltage = 0; // TODO channel->u.set;
+        data.doutStates = doutChannel.m_pinStates;
+
+        for (int i = 0; i < 4; i++) {
+            auto channel = &ainChannels[i];
+            data.ain[i].mode = channel->m_mode;
+            data.ain[i].range = channel->m_range;
+            data.ain[i].tempSensorBias = channel->m_tempSensorBias;
         }
 
-        auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)&data, input, BUFFER_SIZE);
+        for (int i = 0; i < 2; i++) {
+            auto channel = &aoutDac7760Channels[i];
+            data.aout_dac7760[i].outputEnabled = channel->m_outputEnabled;
+            data.aout_dac7760[i].outputRange = channel->m_mode == SOURCE_MODE_VOLTAGE ? channel->m_voltageRange : channel->m_currentRange;
+            data.aout_dac7760[i].outputValue = channel->m_mode == SOURCE_MODE_VOLTAGE ? channel->m_voltageValue : channel->m_currentValue;
+        }
+
+        for (int i = 0; i < 2; i++) {
+            auto channel = &aoutDac7563Channels[i];
+            data.aout_dac7563[i].voltage = channel->m_value;
+        }
+
+        for (int i = 0; i < 2; i++) {
+            auto channel = &pwmChannels[i];
+            data.pwm[i].freq = channel->m_freq;
+            data.pwm[i].duty = channel->m_duty;
+        }
+
+        auto status = bp3c::comm::transferDMA(slotIndex, output, input, BUFFER_SIZE);
         if (status != bp3c::comm::TRANSFER_STATUS_OK) {
         	onSpiDmaTransferCompleted(status);
         }
@@ -370,22 +476,16 @@ public:
         if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
 
-            FromSlaveToMaster data = (FromSlaveToMaster &)*input;
+            FromSlaveToMaster &data = (FromSlaveToMaster &)*input;
 
-            dinChannel.pinStates = data.inputPinStates;
-
-            static uint32_t totalSamples = 0;
+            dinChannel.m_pinStates = data.dinStates;
 
             uint16_t *inputU16 = (uint16_t *)(input + 24);
 
-            uint16_t numSamples = inputU16[-1];
-
-            adcChannels[(totalSamples + 0) % 4].value = inputU16[0];
-            adcChannels[(totalSamples + 1) % 4].value = inputU16[1];
-            adcChannels[(totalSamples + 2) % 4].value = inputU16[2];
-            adcChannels[(totalSamples + 3) % 4].value = inputU16[3];
-
-            totalSamples += numSamples;
+            for (int i = 0; i < 4; i++) {
+                auto &channel = ainChannels[i];
+                channel.m_value = channel.convertU16Value(inputU16[i]);
+            }
         } else {
             if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
                 if (++numCrcErrors >= 10) {
@@ -464,68 +564,68 @@ public:
     }
 
     bool getMode(int subchannelIndex, SourceMode &mode, int *err) override {
-        if (subchannelIndex != DAC_7760_1_SUBCHANNEL_INDEX && subchannelIndex != DAC_7760_2_SUBCHANNEL_INDEX) {
+        if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
             return false;
         }
-        mode = dac7760Channels[subchannelIndex - DAC_7760_1_SUBCHANNEL_INDEX].getMode();
+        mode = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getMode();
         return true;
     }
     
     bool setMode(int subchannelIndex, SourceMode mode, int *err) override {
-        if (subchannelIndex != DAC_7760_1_SUBCHANNEL_INDEX && subchannelIndex != DAC_7760_2_SUBCHANNEL_INDEX) {
+        if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
             return false;
         }
-        dac7760Channels[subchannelIndex - DAC_7760_1_SUBCHANNEL_INDEX].setMode(mode);
+        aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].setMode(mode);
         return true;
     }
 
     bool getCurrentRange(int subchannelIndex, int8_t &range, int *err) override {
-        if (subchannelIndex != DAC_7760_1_SUBCHANNEL_INDEX && subchannelIndex != DAC_7760_2_SUBCHANNEL_INDEX) {
+        if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
             return false;
         }
-        range = dac7760Channels[subchannelIndex - DAC_7760_1_SUBCHANNEL_INDEX].getCurrentRange();
+        range = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCurrentRange();
         return true;
     }
     
     bool setCurrentRange(int subchannelIndex, int8_t range, int *err) override {
-        if (subchannelIndex != DAC_7760_1_SUBCHANNEL_INDEX && subchannelIndex != DAC_7760_2_SUBCHANNEL_INDEX) {
+        if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
             return false;
         }
-        dac7760Channels[subchannelIndex - DAC_7760_1_SUBCHANNEL_INDEX].setCurrentRange(range);
+        aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].setCurrentRange(range);
         return true;
     }
 
     bool getVoltageRange(int subchannelIndex, int8_t &range, int *err) override {
-        if (subchannelIndex != DAC_7760_1_SUBCHANNEL_INDEX && subchannelIndex != DAC_7760_2_SUBCHANNEL_INDEX) {
+        if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
             return false;
         }
-        range = dac7760Channels[subchannelIndex - DAC_7760_1_SUBCHANNEL_INDEX].getVoltageRange();
+        range = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getVoltageRange();
         return true;
     }
     
     bool setVoltageRange(int subchannelIndex, int8_t range, int *err) override {
-        if (subchannelIndex != DAC_7760_1_SUBCHANNEL_INDEX && subchannelIndex != DAC_7760_2_SUBCHANNEL_INDEX) {
+        if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
             return false;
         }
-        dac7760Channels[subchannelIndex - DAC_7760_1_SUBCHANNEL_INDEX].setVoltageRange(range);
+        aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].setVoltageRange(range);
         return true;
     }
 };
@@ -535,13 +635,112 @@ Module *g_module = &g_mio168Module;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class Dac7760ConfigurationPage : public SetPage {
+class DinConfigurationPage : public SetPage {
 public:
     static int g_selectedChannelIndex;
 
     void pageAlloc() {
         Mio168Module *module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
-        Mio168Dac7760Channel &channel = module->dac7760Channels[g_selectedChannelIndex - DAC_7760_1_SUBCHANNEL_INDEX];
+
+        m_pinRanges = m_pinRangesOrig = module->dinChannel.m_pinRanges;
+        m_pinSpeeds = m_pinSpeedsOrig = module->dinChannel.m_pinSpeeds;
+    }
+
+    int getDirty() { 
+        return m_pinRanges != m_pinRangesOrig || m_pinSpeeds != m_pinSpeedsOrig;
+    }
+
+    void set() {
+        if (getDirty()) {
+            sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_DIN_CONFIGURE, hmi::g_selectedSlotIndex);
+        }
+
+        popPage();
+    }
+
+    int getPinRange(int pin) {
+        return m_pinRanges & (1 << pin) ? 1 : 0;
+    }
+    
+    void setPinRange(int pin, int value) {
+        if (value) {
+            m_pinRanges |= 1 << pin;
+        } else {
+            m_pinRanges &= ~(1 << pin);
+        }
+    }
+
+    int getPinSpeed(int pin) {
+        return m_pinSpeeds & (1 << pin) ? 1 : 0;
+    }
+
+    void setPinSpeed(int pin, int value) {
+        if (value) {
+            m_pinSpeeds |= 1 << pin;
+        } else {
+            m_pinSpeeds &= ~(1 << pin);
+        }
+    }
+
+    uint8_t m_pinRanges;
+    uint8_t m_pinSpeeds;
+
+private:
+    uint8_t m_pinRangesOrig;
+    uint8_t m_pinSpeedsOrig;
+};
+
+static DinConfigurationPage g_dinConfigurationPage;
+
+////////////////////////////////////////////////////////////////////////////////
+
+class AinConfigurationPage : public SetPage {
+public:
+    static int g_selectedChannelIndex;
+
+    void pageAlloc() {
+        Mio168Module *module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
+        AinChannel &channel = module->ainChannels[g_selectedChannelIndex - AIN_1_SUBCHANNEL_INDEX];
+
+        m_mode = m_modeOrig = channel.m_mode;
+        m_range = m_rangeOrig = channel.m_range;
+        m_tempSensorBias = m_tempSensorBiasOrig = channel.m_tempSensorBias;
+    }
+
+    int getDirty() { 
+        return m_mode != m_modeOrig || m_range != m_rangeOrig || m_tempSensorBias != m_tempSensorBiasOrig;
+    }
+
+    void set() {
+        if (getDirty()) {
+            sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_AIN_CONFIGURE, hmi::g_selectedSlotIndex);
+        }
+
+        popPage();
+    }
+
+    uint8_t m_mode;
+    uint8_t m_range;
+    uint8_t m_tempSensorBias;
+
+private:
+    uint8_t m_modeOrig;
+    uint8_t m_rangeOrig;
+    uint8_t m_tempSensorBiasOrig;
+};
+
+int AinConfigurationPage::g_selectedChannelIndex;
+static AinConfigurationPage g_ainConfigurationPage;
+
+////////////////////////////////////////////////////////////////////////////////
+
+class AoutDac7760ConfigurationPage : public SetPage {
+public:
+    static int g_selectedChannelIndex;
+
+    void pageAlloc() {
+        Mio168Module *module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
+        AoutDac7760Channel &channel = module->aoutDac7760Channels[g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX];
 
         m_outputEnabled = m_outputEnabledOrig = channel.m_outputEnabled;
         m_mode = m_modeOrig = channel.m_mode;
@@ -558,7 +757,7 @@ public:
 
     void set() {
         if (getDirty()) {
-            sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_DAC7760_CONFIGURE, hmi::g_selectedSlotIndex);
+            sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_AOUT_DAC7760_CONFIGURE, hmi::g_selectedSlotIndex);
         }
 
         popPage();
@@ -576,25 +775,37 @@ private:
     int8_t m_voltageRangeOrig;
 };
 
-int Dac7760ConfigurationPage::g_selectedChannelIndex;
-static Dac7760ConfigurationPage g_dac7760ConfigurationPage;
+int AoutDac7760ConfigurationPage::g_selectedChannelIndex;
+static AoutDac7760ConfigurationPage g_aoutDac7760ConfigurationPage;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 Page *Mio168Module::getPageFromId(int pageId) {
-    if (pageId == PAGE_ID_DIB_MIO168_DAC_7760_CONFIGURATION) {
-        return &g_dac7760ConfigurationPage;
+    if (pageId == PAGE_ID_DIB_MIO168_DIN_CONFIGURATION) {
+        return &g_dinConfigurationPage;
+    } else if (pageId == PAGE_ID_DIB_MIO168_AIN_CONFIGURATION) {
+        return &g_ainConfigurationPage;
+    } else if (pageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) {
+        return &g_aoutDac7760ConfigurationPage;
     }
     return nullptr;
 }
 
 void Mio168Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
-    if (type == PSU_MESSAGE_DAC7760_CONFIGURE) {
-        Mio168Dac7760Channel &channel = dac7760Channels[Dac7760ConfigurationPage::g_selectedChannelIndex - DAC_7760_1_SUBCHANNEL_INDEX];
-        channel.m_outputEnabled = g_dac7760ConfigurationPage.m_outputEnabled;
-        channel.m_mode = g_dac7760ConfigurationPage.m_mode;
-        channel.m_currentRange = g_dac7760ConfigurationPage.m_currentRange;
-        channel.m_voltageRange = g_dac7760ConfigurationPage.m_voltageRange;
+    if (type == PSU_MESSAGE_DIN_CONFIGURE) {
+        dinChannel.m_pinRanges = g_dinConfigurationPage.m_pinRanges;
+        dinChannel.m_pinSpeeds = g_dinConfigurationPage.m_pinSpeeds;
+    } else if (type == PSU_MESSAGE_AIN_CONFIGURE) {
+        AinChannel &channel = ainChannels[AinConfigurationPage::g_selectedChannelIndex - AIN_1_SUBCHANNEL_INDEX];
+        channel.m_mode = g_ainConfigurationPage.m_mode;
+        channel.m_range = g_ainConfigurationPage.m_range;
+        channel.m_tempSensorBias = g_ainConfigurationPage.m_tempSensorBias;
+    } else if (type == PSU_MESSAGE_AOUT_DAC7760_CONFIGURE) {
+        AoutDac7760Channel &channel = aoutDac7760Channels[AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+        channel.m_outputEnabled = g_aoutDac7760ConfigurationPage.m_outputEnabled;
+        channel.m_mode = g_aoutDac7760ConfigurationPage.m_mode;
+        channel.m_currentRange = g_aoutDac7760ConfigurationPage.m_currentRange;
+        channel.m_voltageRange = g_aoutDac7760ConfigurationPage.m_voltageRange;
 
         if (channel.getValue() < channel.getMinValue()) {
             channel.setValue(channel.getMinValue());
@@ -610,28 +821,7 @@ namespace gui {
 
 using namespace dib_mio168;
 
-static EnumItem g_dac7760OutputModeEnumDefinition[] = {
-    { SOURCE_MODE_CURRENT, "Current" },
-    { SOURCE_MODE_VOLTAGE, "Voltage" },
-    { 0, 0 }
-};
-
-static EnumItem g_dac7760VoltageRangeEnumDefinition[] = {
-    { 0, "0 V to +5 V" },
-    { 1, "0 V to +10 V" },
-    { 2, "-5 V to +5 V" },
-    { 3, "-10 V to +10 V" },
-    { 0, 0 }
-};
-
-static EnumItem g_dac7760CurrentRangeEnumDefinition[] = {
-    { 5, "4 mA to 20 mA" },
-    { 6, "0 mA to 20 mA" },
-    { 7, "0 mA to 24 mA" },
-    { 0, 0 }
-};
-
-void data_dib_mio168_inputs(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_pins(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 8;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -639,20 +829,99 @@ void data_dib_mio168_inputs(DataOperationEnum operation, Cursor cursor, Value &v
     }
 }
 
-void data_dib_mio168_input_no(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_pins_1_2(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 2;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * 8 + value.getInt();
+    }
+}
+
+void data_dib_mio168_din_pins_3_5(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 3;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * 8 + 2 + value.getInt();
+    }
+}
+
+void data_dib_mio168_din_pins_6_8(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 3;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * 8 + 5 + value.getInt();
+    }
+}
+
+void data_dib_mio168_din_no(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 8 + 1;
     }
 }
 
-void data_dib_mio168_input_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto mio168Module = (Mio168Module *)g_slots[cursor / 8];
-        mio168Module->dinChannel.getPinState(cursor % 8);
+        value = mio168Module->dinChannel.getPinState(cursor % 8) ? 1 : 0;
     }
 }
 
-void data_dib_mio168_outputs(DataOperationEnum operation, Cursor cursor, Value &value) {
+static int g_pin;
+
+static EnumItem g_dinRangeEnumDefinition[] = {
+    { 0, "Low" },
+    { 1, "High" },
+    { 0, 0 }
+};
+
+void data_dib_mio168_din_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_dinConfigurationPage.getPinRange(cursor % 8);
+    }
+}
+
+void onSetPinRanges(uint16_t value) {
+    popPage();
+    g_dinConfigurationPage.setPinRange(g_pin, value);
+}
+
+void action_dib_mio168_din_select_range() {
+    g_pin = getFoundWidgetAtDown().cursor % 8;
+    pushSelectFromEnumPage(g_dinRangeEnumDefinition, g_dinConfigurationPage.getPinRange(g_pin), nullptr, onSetPinRanges);
+}
+
+static EnumItem g_dinSpeedEnumDefinition[] = {
+    { 0, "Fast" },
+    { 1, "Slow" },
+    { 0, 0 }
+};
+
+void data_dib_mio168_din_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_dinConfigurationPage.getPinSpeed(cursor % 8);
+    }
+}
+
+void onSetPinSpeeds(uint16_t value) {
+    popPage();
+    g_dinConfigurationPage.setPinSpeed(g_pin, value);
+}
+
+void action_dib_mio168_din_select_speed() {
+    g_pin = getFoundWidgetAtDown().cursor % 8;
+    pushSelectFromEnumPage(g_dinSpeedEnumDefinition, g_dinConfigurationPage.getPinSpeed(g_pin), nullptr, onSetPinSpeeds);
+}
+
+void action_dib_mio168_din_show_configuration() {
+    if (getActivePageId() == PAGE_ID_MAIN) {
+        hmi::selectSlot(getFoundWidgetAtDown().cursor);
+    }
+    pushPage(PAGE_ID_DIB_MIO168_DIN_CONFIGURATION);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void data_dib_mio168_dout_pins(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 8;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -660,27 +929,29 @@ void data_dib_mio168_outputs(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
-void data_dib_mio168_output_no(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_no(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 8 + 1;
     }
 }
 
-void data_dib_mio168_output_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto mio168Module = (Mio168Module *)g_slots[cursor / 8];
         value = mio168Module->doutChannel.getPinState(cursor % 8);
     }
 }
 
-void action_dib_mio168_toggle_output_state() {
-    auto mio168Module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
+void action_dib_mio168_dout_toggle_state() {
     int cursor = getFoundWidgetAtDown().cursor;
+    auto mio168Module = (Mio168Module *)g_slots[cursor / 8];
     int pin = cursor % 8;
-    mio168Module->doutChannel.setPinState(pin, mio168Module->doutChannel.getPinState(pin));
+    mio168Module->doutChannel.setPinState(pin, !mio168Module->doutChannel.getPinState(pin));
 }
 
-void data_dib_mio168_analog_inputs(DataOperationEnum operation, Cursor cursor, Value &value) {
+////////////////////////////////////////////////////////////////////////////////
+
+void data_dib_mio168_ain_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 4;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -688,21 +959,104 @@ void data_dib_mio168_analog_inputs(DataOperationEnum operation, Cursor cursor, V
     }
 }
 
-void data_dib_mio168_analog_input_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         static const char *labels[4] = { "AIN1", "AIN2", "AIN3", "AIN4" };
         value = labels[cursor % 4];
     }
 }
 
-void data_dib_mio168_analog_input_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto mio168Module = (Mio168Module *)g_slots[cursor / 4];
-        value = mio168Module->adcChannels[cursor % 4].value;
+        auto &channel = mio168Module->ainChannels[cursor % 4];
+        value = MakeValue(roundPrec(channel.m_value, channel.getResolution()), channel.m_mode == 0 ? UNIT_AMPER : UNIT_VOLT);
     }
 }
 
-void data_dib_mio168_analog_outputs(DataOperationEnum operation, Cursor cursor, Value &value) {
+static EnumItem g_ainModeEnumDefinition[] = {
+    { 0, "Current" },
+    { 1, "Voltage" },
+    { 0, 0 }
+};
+
+void data_dib_mio168_ain_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_ainConfigurationPage.m_mode;
+    }
+}
+
+void onSetAinMode(uint16_t value) {
+    popPage();
+    g_ainConfigurationPage.m_mode = (uint8_t)value;
+}
+
+void action_dib_mio168_ain_select_mode() {
+    pushSelectFromEnumPage(g_ainModeEnumDefinition, g_ainConfigurationPage.m_mode, nullptr, onSetAinMode);
+}
+
+static EnumItem g_ainRangeEnumDefinition[] = {
+    { 0, "\xbd""10.24 V" },
+    { 1, "\xbd""5.12 V" },
+    { 2, "\xbd""2.56 V" },
+    { 3, "\xbd""1.28 V" },
+    { 11, "\xbd""0.64 V" },
+    { 5, "0 V to 10.24 V" },
+    { 6, "0 V to 5.12 V" },
+    { 7, "0 V to 2.56 V" },
+    { 15, "0 V to 1.28 V" },
+    { 0, 0 }
+};
+
+void data_dib_mio168_ain_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = getWidgetLabel(g_ainRangeEnumDefinition, g_ainConfigurationPage.m_range);
+    }
+}
+
+void onSetAinRange(uint16_t value) {
+    popPage();
+    g_ainConfigurationPage.m_range = (uint8_t)value;
+}
+
+void action_dib_mio168_ain_select_range() {
+    pushSelectFromEnumPage(g_ainRangeEnumDefinition, g_ainConfigurationPage.m_range, nullptr, onSetAinRange);
+}
+
+void data_dib_mio168_ain_has_temp_sensor_bias_feature(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = AinConfigurationPage::g_selectedChannelIndex < AIN_3_SUBCHANNEL_INDEX ? 1 : 0;
+    }
+}
+
+void data_dib_mio168_ain_temp_sensor_bias(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_ainConfigurationPage.m_tempSensorBias;
+    }
+}
+
+void action_dib_mio168_ain_toggle_temp_sensor_bias() {
+    g_ainConfigurationPage.m_tempSensorBias = !g_ainConfigurationPage.m_tempSensorBias;
+}
+
+void action_dib_mio168_ain_show_configuration() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    
+    int slotIndex = cursor / 4;
+    hmi::selectSlot(slotIndex);
+    
+    int ainChannelIndex = cursor % 4;
+    AinConfigurationPage::g_selectedChannelIndex = AIN_1_SUBCHANNEL_INDEX + ainChannelIndex;
+    pushPage(PAGE_ID_DIB_MIO168_AIN_CONFIGURATION);
+}
+
+void action_dib_mio168_ain_show_calibration() {
+    // TODO ...
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void data_dib_mio168_aout_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 4;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -710,91 +1064,205 @@ void data_dib_mio168_analog_outputs(DataOperationEnum operation, Cursor cursor, 
     }
 }
 
-void data_dib_mio168_analog_output_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         static const char *labels[4] = { "AO1", "AO2", "AO3", "AO4" };
 
-        int dacChannelIndex;
+        int aoutChannelIndex;
 
-        Dac7760ConfigurationPage *page = (Dac7760ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_DAC_7760_CONFIGURATION);
+        AoutDac7760ConfigurationPage *page = (AoutDac7760ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION);
         if (page) {
-            dacChannelIndex = Dac7760ConfigurationPage::g_selectedChannelIndex - DAC_7760_1_SUBCHANNEL_INDEX;
+            aoutChannelIndex = AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX;
         } else {
-            dacChannelIndex = cursor % 4;
+            aoutChannelIndex = cursor % 4;
         }
 
-        value = labels[dacChannelIndex];
+        value = labels[aoutChannelIndex];
     }
 }
 
-void data_dib_mio168_analog_output_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Value &value) {
     int slotIndex = cursor / 4;
-    int dacChannelIndex = cursor % 4;
+    int aoutChannelIndex = cursor % 4;
 
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_ANALOG_OUTPUT_VALUE;
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_AOUT_VALUE;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
-            if (dacChannelIndex < 2) {
-                auto &channel = ((Mio168Module *)g_slots[slotIndex])->dac7760Channels[dacChannelIndex];
+            if (aoutChannelIndex < 2) {
+                auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
                 value = MakeValue(channel.getValue(), channel.getUnit());
             } else {
-                value = MakeValue(((Mio168Module *)g_slots[slotIndex])->dac7563Channels[dacChannelIndex - 2].value, UNIT_VOLT);
+                value = MakeValue(((Mio168Module *)g_slots[slotIndex])->aoutDac7563Channels[aoutChannelIndex - 2].m_value, UNIT_VOLT);
             }
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        if (dacChannelIndex < 2) {
-            auto &channel = ((Mio168Module *)g_slots[slotIndex])->dac7760Channels[dacChannelIndex];
+        if (aoutChannelIndex < 2) {
+            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
             value = MakeValue(channel.getMinValue(), channel.getUnit());
         } else {
-            value = MakeValue(DAC_MIN, UNIT_VOLT);
+            value = MakeValue(AOUT_DAC7563_MIN, UNIT_VOLT);
         }
     } else if (operation == DATA_OPERATION_GET_MAX) {
-        if (dacChannelIndex < 2) {
-            auto &channel = ((Mio168Module *)g_slots[slotIndex])->dac7760Channels[dacChannelIndex];
+        if (aoutChannelIndex < 2) {
+            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
             value = MakeValue(channel.getMaxValue(), channel.getUnit());
         } else {
-            value = MakeValue(DAC_MAX, UNIT_VOLT);
+            value = MakeValue(AOUT_DAC7563_MAX, UNIT_VOLT);
         }
     } else if (operation == DATA_OPERATION_GET_UNIT) {
-        if (dacChannelIndex < 2) {
-            auto &channel = ((Mio168Module *)g_slots[slotIndex])->dac7760Channels[dacChannelIndex];
+        if (aoutChannelIndex < 2) {
+            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
             value = channel.getUnit();
         } else {
             value = UNIT_VOLT;
         }
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        if (dacChannelIndex < 2) {
-            auto &channel = ((Mio168Module *)g_slots[slotIndex])->dac7760Channels[dacChannelIndex];
+    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
+        if (aoutChannelIndex < 2) {
+            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
             value = Value(channel.getResolution(), channel.getUnit());
         } else {
-            value = Value(DAC_RESOLUTION, UNIT_VOLT);
+            value = Value(AOUT_DAC7563_RESOLUTION, UNIT_VOLT);
         }
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+    } 
+    else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         StepValues *stepValues = value.getStepValues();
-        if (dacChannelIndex < 2) {
-            auto &channel = ((Mio168Module *)g_slots[slotIndex])->dac7760Channels[dacChannelIndex];
+        if (aoutChannelIndex < 2) {
+            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
             channel.getStepValues(stepValues);
         } else {
-            stepValues->values = DAC_ENCODER_STEP_VALUES;
-            stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);
+            stepValues->values = AOUT_DAC7563_ENCODER_STEP_VALUES;
+            stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES) / sizeof(float);
             stepValues->unit = UNIT_VOLT;
         }
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
-        if (dacChannelIndex < 2) {
-            auto &channel = ((Mio168Module *)g_slots[slotIndex])->dac7760Channels[dacChannelIndex];
+        if (aoutChannelIndex < 2) {
+            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
             channel.setValue(roundPrec(value.getFloat(), channel.getResolution()));
         } else {
-            ((Mio168Module *)g_slots[slotIndex])->dac7563Channels[dacChannelIndex - 2].value = roundPrec(value.getFloat(), DAC_RESOLUTION);
+            ((Mio168Module *)g_slots[slotIndex])->aoutDac7563Channels[aoutChannelIndex - 2].m_value = roundPrec(value.getFloat(), AOUT_DAC7563_RESOLUTION);
         }
     }
 }
 
-void data_dib_mio168_pwms(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_output_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        AoutDac7760ConfigurationPage *page = (AoutDac7760ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION);
+        if (page) {
+            value = g_aoutDac7760ConfigurationPage.m_outputEnabled;
+        } else {
+            int slotIndex = cursor / 4;
+            int aoutChannelIndex = cursor % 4;
+            if (aoutChannelIndex < 2) {
+                auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
+                value = channel.m_outputEnabled;
+            } else {
+                value = 0;
+            }
+        }
+    }
+}
+
+static EnumItem g_aoutOutputModeEnumDefinition[] = {
+    { SOURCE_MODE_CURRENT, "Current" },
+    { SOURCE_MODE_VOLTAGE, "Voltage" },
+    { 0, 0 }
+};
+
+void data_dib_mio168_aout_output_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_aoutDac7760ConfigurationPage.m_mode;
+    }
+}
+
+void onSetOutputMode(uint16_t value) {
+    popPage();
+    g_aoutDac7760ConfigurationPage.m_mode = (SourceMode)value;
+}
+
+void action_dib_mio168_aout_select_output_mode() {
+    pushSelectFromEnumPage(g_aoutOutputModeEnumDefinition, g_aoutDac7760ConfigurationPage.m_mode, nullptr, onSetOutputMode);
+}
+
+static EnumItem g_aoutVoltageRangeEnumDefinition[] = {
+    { 0, "0 V to +5 V" },
+    { 1, "0 V to +10 V" },
+    { 2, "\xbd""5 V" },
+    { 3, "\xbd""10 V" },
+    { 0, 0 }
+};
+
+void data_dib_mio168_aout_voltage_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = getWidgetLabel(g_aoutVoltageRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_voltageRange);
+    }
+}
+
+void onSetVoltageRange(uint16_t value) {
+    popPage();
+    g_aoutDac7760ConfigurationPage.m_voltageRange = (uint8_t)value;
+}
+
+void action_dib_mio168_aout_select_voltage_range() {
+    pushSelectFromEnumPage(g_aoutVoltageRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_voltageRange, nullptr, onSetVoltageRange);
+}
+
+static EnumItem g_aoutCurrentRangeEnumDefinition[] = {
+    { 5, "4 mA to 20 mA" },
+    { 6, "0 mA to 20 mA" },
+    { 7, "0 mA to 24 mA" },
+    { 0, 0 }
+};
+
+void data_dib_mio168_aout_current_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = getWidgetLabel(g_aoutCurrentRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_currentRange);
+    }
+}
+
+void onSetCurrentRange(uint16_t value) {
+    popPage();
+    g_aoutDac7760ConfigurationPage.m_currentRange = (uint8_t)value;
+}
+
+void action_dib_mio168_aout_select_current_range() {
+    pushSelectFromEnumPage(g_aoutCurrentRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_currentRange, nullptr, onSetCurrentRange);
+}
+
+void action_dib_mio168_aout_toggle_output_enabled() {
+    g_aoutDac7760ConfigurationPage.m_outputEnabled = !g_aoutDac7760ConfigurationPage.m_outputEnabled;
+}
+
+void action_dib_mio168_aout_show_configuration() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    
+    int slotIndex = cursor / 4;
+    hmi::selectSlot(slotIndex);
+    
+    int aoutChannelIndex = cursor % 4;
+    if (aoutChannelIndex < 2) {
+        AoutDac7760ConfigurationPage::g_selectedChannelIndex = AOUT_1_SUBCHANNEL_INDEX + aoutChannelIndex;
+        pushPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION);
+    }
+}
+
+void data_dib_mio168_aout_channel_has_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = cursor % 4 < 2 ? 1 : 0;
+    }
+}
+
+void action_dib_mio168_aout_show_calibration() {
+    // TODO ...
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void data_dib_mio168_pwm_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 2;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -821,7 +1289,7 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, Cursor cursor, Value 
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
-            value = MakeValue(((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].freq, UNIT_HERTZ);
+            value = MakeValue(((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_freq, UNIT_HERTZ);
         }
     } else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
         value = 1;
@@ -834,7 +1302,7 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, Cursor cursor, Value 
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_HERTZ;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        float fvalue = ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].freq;
+        float fvalue = ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_freq;
         value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 10000.0f, 1000.0f, 100.0f, 1.0f };
@@ -844,7 +1312,7 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, Cursor cursor, Value 
         stepValues->unit = UNIT_HERTZ;
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
-        ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].freq = value.getFloat();
+        ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_freq = value.getFloat();
     }
 }
 
@@ -859,7 +1327,7 @@ void data_dib_mio168_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
-            value = MakeValue(((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].duty, UNIT_PERCENT);
+            value = MakeValue(((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_duty, UNIT_PERCENT);
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(0.0f, UNIT_PERCENT);
@@ -879,158 +1347,14 @@ void data_dib_mio168_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
         stepValues->unit = UNIT_PERCENT;
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
-        ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].duty = value.getFloat();
+        ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_duty = value.getFloat();
     } 
 }
 
-void data_dib_mio168_dac_output_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Dac7760ConfigurationPage *page = (Dac7760ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_DAC_7760_CONFIGURATION);
-        if (page) {
-            value = g_dac7760ConfigurationPage.m_outputEnabled;
-        } else {
-            int slotIndex = cursor / 4;
-            int dacChannelIndex = cursor % 4;
-            if (dacChannelIndex < 2) {
-                auto &channel = ((Mio168Module *)g_slots[slotIndex])->dac7760Channels[dacChannelIndex];
-                value = channel.m_outputEnabled;
-            } else {
-                value = 0;
-            }
-        }
-    }
-}
-
-void data_dib_mio168_output_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = g_dac7760ConfigurationPage.m_mode;
-    }
-}
-
-void data_dib_mio168_voltage_range(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = getWidgetLabel(g_dac7760VoltageRangeEnumDefinition, g_dac7760ConfigurationPage.m_voltageRange);
-    }
-}
-
-void data_dib_mio168_current_range(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = getWidgetLabel(g_dac7760CurrentRangeEnumDefinition, g_dac7760ConfigurationPage.m_currentRange);
-    }
-}
-
-void action_dib_mio168_dac_toggle_output_enabled() {
-    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
-}
-
-void onSetOutputMode(uint16_t value) {
-    popPage();
-    g_dac7760ConfigurationPage.m_mode = (SourceMode)value;
-}
-
-void action_dib_mio168_select_output_mode() {
-    pushSelectFromEnumPage(g_dac7760OutputModeEnumDefinition, g_dac7760ConfigurationPage.m_mode, nullptr, onSetOutputMode);
-}
-
-void onSetVoltageRange(uint16_t value) {
-    popPage();
-    g_dac7760ConfigurationPage.m_voltageRange = (SourceMode)value;
-}
-
-void action_dib_mio168_select_voltage_range() {
-    pushSelectFromEnumPage(g_dac7760VoltageRangeEnumDefinition, g_dac7760ConfigurationPage.m_voltageRange, nullptr, onSetVoltageRange);
-}
-
-void onSetCurrentRange(uint16_t value) {
-    popPage();
-    g_dac7760ConfigurationPage.m_currentRange = (SourceMode)value;
-}
-
-void action_dib_mio168_select_current_range() {
-    pushSelectFromEnumPage(g_dac7760CurrentRangeEnumDefinition, g_dac7760ConfigurationPage.m_currentRange, nullptr, onSetCurrentRange);
-}
-
-void action_dib_mio168_show_dac_configuration() {
-    int cursor = getFoundWidgetAtDown().cursor;
-    
-    int slotIndex = cursor / 4;
-    hmi::selectSlot(slotIndex);
-    
-    int dacChannelIndex = cursor % 4;
-    if (dacChannelIndex < 2) {
-        Dac7760ConfigurationPage::g_selectedChannelIndex = DAC_7760_1_SUBCHANNEL_INDEX + dacChannelIndex;
-        pushPage(PAGE_ID_DIB_MIO168_DAC_7760_CONFIGURATION);
-    }
-}
+////////////////////////////////////////////////////////////////////////////////
 
 void action_dib_mio168_show_info() {
     pushPage(PAGE_ID_DIB_MIO168_INFO);
-}
-
-void data_dib_mio168_inputs_1_2(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dib_mio168_inputs_3_5(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dib_mio168_inputs_6_8(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dib_mio168_input_range(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dib_mio168_input_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dib_mio168_adc_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dib_mio168_adc_range(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dib_mio168_adc_has_temp_sensor_bias_feature(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dib_mio168_adc_temp_sensor_bias(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dib_mio168_dac_channel_has_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dib_mio168_dac_channel_has_settings() {
-    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
-}
-
-void action_dib_mio168_show_din_configuration() {
-    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
-}
-
-void action_dib_mio168_adc_toggle_temp_sensor_bias() {
-    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
-}
-
-void action_dib_mio168_show_adc_configuration() {
-    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
-}
-
-void action_dib_mio168_show_dac_calibration() {
-    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
-}
-
-void action_dib_mio168_select_adc_mode() {
-    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
-}
-
-void action_dib_mio168_select_adc_range() {
-    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
-}
-
-void action_dib_mio168_select_input_range() {
-    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
-}
-
-void action_dib_mio168_select_input_speed() {
-    g_dac7760ConfigurationPage.m_outputEnabled = !g_dac7760ConfigurationPage.m_outputEnabled;
 }
 
 } // namespace gui

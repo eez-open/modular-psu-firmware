@@ -578,13 +578,10 @@ bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues) {
     return value.getType() == VALUE_TYPE_INT && value.getInt();
 }
 
-float getEncoderPrecision(Cursor cursor, int16_t id, float defaultValue) {
+Value getEncoderPrecision(Cursor cursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_PRECISION, cursor, value);
-    if (value.getType() != VALUE_TYPE_FLOAT) {
-        return defaultValue;
-    }
-    return value.getFloat();
+    return value;
 }
 
 Value get(Cursor cursor, int16_t id) {

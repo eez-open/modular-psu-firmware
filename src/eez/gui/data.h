@@ -418,7 +418,7 @@ void getLabel(Cursor cursor, int16_t id, char *text, int count);
 
 Value getEncoderStep(Cursor cursor, int16_t id);
 bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues);
-float getEncoderPrecision(Cursor cursor, int16_t id, float defaultValue);
+Value getEncoderPrecision(Cursor cursor, int16_t id);
 
 Value get(Cursor cursor, int16_t id);
 const char *isValidValue(Cursor cursor, int16_t id, Value value);
