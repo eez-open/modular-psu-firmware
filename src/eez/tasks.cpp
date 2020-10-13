@@ -374,7 +374,7 @@ void lowPriorityThreadOneIter() {
             } else if (type == THREAD_MESSAGE_SOUND_TICK) {
                 sound::tick();
             } else if (type == THREAD_MESSAGE_SELECT_USB_MODE) {
-                usb::selectUsbMode(param, usb::g_otgMode);
+                usb::selectUsbMode(param, g_otgMode);
             } else if (type == THREAD_MESSAGE_SELECT_USB_DEVICE_CLASS) {
                 usb::selectUsbDeviceClass(param);
             } 

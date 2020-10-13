@@ -40,6 +40,13 @@
 #include "task.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#define USB_MODE_DISABLED 0
+#define USB_MODE_DEVICE 1
+#define USB_MODE_HOST 2
+#define USB_MODE_OTG 3
+
+extern int g_usbMode;
+extern int g_otgMode;
 /* USER CODE END Includes */
   
 /* Private typedef -----------------------------------------------------------*/
@@ -411,8 +418,11 @@ void OTG_FS_IRQHandler(void)
 {
   /* USER CODE BEGIN OTG_FS_IRQn 0 */
   /* USER CODE END OTG_FS_IRQn 0 */
-  HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
-  HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
+  if (g_usbMode == USB_MODE_HOST || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_HOST)) {
+    HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
+  } else {
+    HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
+  }
   /* USER CODE BEGIN OTG_FS_IRQn 1 */
   /* USER CODE END OTG_FS_IRQn 1 */
 }
