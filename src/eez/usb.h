@@ -23,9 +23,6 @@
 namespace eez {
 namespace usb {
 
-extern int g_usbMode;
-extern int g_otgMode;
-
 void init();
 void tick(uint32_t tickCount);
 
@@ -50,3 +47,5 @@ bool isOtgHostModeDetected();
 #define USB_HOST_CLASS_HID 2
 
 extern "C" int g_usbDeviceClass;
+extern "C" int g_usbMode;
+extern "C" int g_otgMode;
