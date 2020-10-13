@@ -1368,16 +1368,7 @@ bool isFocusChanged() {
 static bool g_isEncoderEnabledInActivePage;
 uint32_t g_focusEditValueChangedTime;
 
-float encoderIncrement(Value value, int counter, float min, float max, int channelIndex, float precision) {
-    if (channelIndex != -1) {
-        precision = psu::channel_dispatcher::getValuePrecision(psu::Channel::get(channelIndex), value.getUnit(), value.getFloat());
-    }
-
-    // TODO 
-    if (precision == 0) {
-        precision = 0.001f;
-    }
-
+float encoderIncrement(Value value, int counter, float min, float max, float precision) {
     float step;
 
     if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
@@ -1799,8 +1790,21 @@ void onEncoder(int counter, bool clicked) {
                     newValue = clamp(newValue, min, max);
                 }
             } else {
-                float precision = getEncoderPrecision(g_focusCursor, g_focusDataId, 0);
-                newValue = encoderIncrement(value, counter, min, max, g_focusCursor, precision);
+                Value previsionValue = getEncoderPrecision(g_focusCursor, g_focusDataId);
+
+                float precision;
+                if (previsionValue.getType() != VALUE_TYPE_NONE) {
+                    precision = previsionValue.getFloat();
+                } else {
+                    if (g_focusCursor != -1) {
+                        precision = psu::channel_dispatcher::getValuePrecision(psu::Channel::get(g_focusCursor), value.getUnit(), value.getFloat());
+                    } else {
+                        // TODO
+                        precision = 0.001f;
+                    }
+                }
+
+                newValue = encoderIncrement(value, counter, min, max, precision);
             }
 
             Value limitValue = getLimit(g_focusCursor, g_focusDataId);

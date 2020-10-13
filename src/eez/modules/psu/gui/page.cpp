@@ -122,20 +122,20 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, 
 ////////////////////////////////////////
 
 void ToastMessagePage::onEncoder(int counter) {
-    if (counter < 0) {
-        if (hasAction()) {
-            if (messageValue.getType() == VALUE_TYPE_SCPI_ERROR) {
-                if (
-                   messageValue.getFirstInt16() == SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED ||
-                   messageValue.getFirstInt16() == SCPI_ERROR_CURRENT_LIMIT_EXCEEDED || 
-                   messageValue.getFirstInt16() == SCPI_ERROR_POWER_LIMIT_EXCEEDED
-                ) {
-                   popPage();
+    if (hasAction()) {
+        if (counter < 0) {
+                if (messageValue.getType() == VALUE_TYPE_SCPI_ERROR) {
+                    if (
+                    messageValue.getFirstInt16() == SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED ||
+                    messageValue.getFirstInt16() == SCPI_ERROR_CURRENT_LIMIT_EXCEEDED || 
+                    messageValue.getFirstInt16() == SCPI_ERROR_POWER_LIMIT_EXCEEDED
+                    ) {
+                    popPage();
+                    }
                 }
-            }
-        } else {
-            popPage();
         }
+    } else {
+        popPage();
     }
 }
 

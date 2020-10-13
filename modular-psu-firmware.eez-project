@@ -40544,6 +40544,24 @@
               "size": 14,
               "encoding": 63062
             }
+          },
+          {
+            "encoding": 189,
+            "x": 1,
+            "y": 0,
+            "width": 6,
+            "height": 9,
+            "dx": 8,
+            "glyphBitmap": {
+              "width": 6,
+              "height": 9,
+              "pixelArray": "0000dde500000000e0e80000d5fcfffffcd9b0d0fafcd0b30000e0e800000000e0e80000000004040000a9c8c8c8c8acd8ffffffffdc"
+            },
+            "source": {
+              "filePath": "fonts\\Oswald-Medium.ttf",
+              "size": 14,
+              "encoding": 177
+            }
           }
         ]
       },
@@ -43256,6 +43274,150 @@
               "filePath": "fonts\\OpenSans-SemiBold.ttf",
               "size": 19,
               "encoding": 937
+            }
+          },
+          {
+            "encoding": 182,
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "dx": 0,
+            "glyphBitmap": {
+              "width": 21,
+              "height": 19,
+              "pixelArray": "0000000000000000000000000005283d3f3f3f3f3f0000000000000000000000000030b7e9ebebebebeb0000000000000000000000000472f1f9e9e5e5e5e500000000000000000000000017a2fddf927f7f7f7f00000000000000000000000e54d9f8941a0d0d0d0d00000000000000000000023ba9f6dd490000000000000000000000000000032693e3f299190000000000000000000000000012439decfde350030000000000000000000000071f61b3e8fdffe248010000000000000000020e397aaadff9feffffea670800000000000000000c42b2f3fdfffffffffff290120000000000000000031a63add5f4fefffffffab61c0000000000000000000004204ebffdfffffffed12f00000000000000000000000021affef7f7fdffdc4200000000000000000000000d55daf8ac85ade1e65e00000000001a1a1a1a1a1b46acf6dd4c081d61b3690000000000b2b2b2b2b2b3c8edf1991a00000823240100000000ffffffffffffffffd3450300000000000000000000d8d8d8d8d8d8d8d8981e0000000000000000000000"
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 937
+            }
+          },
+          {
+            "encoding": 183,
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "dx": 0,
+            "glyphBitmap": {
+              "width": 0,
+              "height": 0,
+              "pixelArray": ""
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 937
+            }
+          },
+          {
+            "encoding": 184,
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "dx": 0,
+            "glyphBitmap": {
+              "width": 0,
+              "height": 0,
+              "pixelArray": ""
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 937
+            }
+          },
+          {
+            "encoding": 185,
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "dx": 0,
+            "glyphBitmap": {
+              "width": 0,
+              "height": 0,
+              "pixelArray": ""
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 937
+            }
+          },
+          {
+            "encoding": 186,
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "dx": 0,
+            "glyphBitmap": {
+              "width": 0,
+              "height": 0,
+              "pixelArray": ""
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 937
+            }
+          },
+          {
+            "encoding": 187,
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "dx": 0,
+            "glyphBitmap": {
+              "width": 0,
+              "height": 0,
+              "pixelArray": ""
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 937
+            }
+          },
+          {
+            "encoding": 188,
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "dx": 0,
+            "glyphBitmap": {
+              "width": 0,
+              "height": 0,
+              "pixelArray": ""
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 937
+            }
+          },
+          {
+            "encoding": 189,
+            "x": 1,
+            "y": 0,
+            "width": 13,
+            "height": 17,
+            "dx": 15,
+            "glyphBitmap": {
+              "width": 13,
+              "height": 17,
+              "pixelArray": "00000000001b281a00000000000000000000a8ffa400000000000000000000a8ffa400000000000000000000a8ffa400000000000000000000a8ffa400000000000000000000a8ffa40000000000c1fcfcfcfcfffffffcfcfcfcc1c4ffffffffffffffffffffffc43848484848c1ffbe48484848380000000000a8ffa400000000000000000000a8ffa400000000000000000000a8ffa400000000000000000000a8ffa4000000000000000000004a7048000000000031404040404040404040404031c4ffffffffffffffffffffffc4c4ffffffffffffffffffffffc4"
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 177
             }
           }
         ]

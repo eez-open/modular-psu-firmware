@@ -58,7 +58,7 @@ void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)() = 0
 
 Unit getCurrentEncoderUnit();
 
-float encoderIncrement(Value value, int counter, float min, float max, int channelIndex, float precision = 1.0f);
+float encoderIncrement(Value value, int counter, float min, float max, float precision);
 
 bool isEncoderEnabledInActivePage();
 
