@@ -6273,13 +6273,13 @@ void data_slot_error_message(DataOperationEnum operation, Cursor cursor, Value &
 
 void data_usb_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = usb::g_usbMode;
+        value = g_usbMode;
     }
 }
 
 void data_usb_current_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = usb::g_usbMode == USB_MODE_OTG ? usb::g_otgMode : usb::g_usbMode;
+        value = g_usbMode == USB_MODE_OTG ? g_otgMode : g_usbMode;
     }
 }
 

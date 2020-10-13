@@ -35,10 +35,23 @@
 
 #include <eez/modules/mcu/display.h>
 
+int g_usbMode = USB_MODE_DISABLED;
+int g_otgMode = USB_MODE_DISABLED;
+int g_usbDeviceClass = USB_DEVICE_CLASS_VIRTUAL_COM_PORT;
+
+#if defined(EEZ_PLATFORM_STM32)
+extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
+    auto deviceType = USBH_HID_GetDeviceType(phost);
+	if (deviceType == HID_KEYBOARD) {
+        eez::keyboard::onKeyboardEvent(phost);
+	} if (deviceType == HID_MOUSE) {
+        eez::mouse::onMouseEvent(phost);
+	}
+}
+#endif
+
 namespace eez {
 namespace usb {
-
-int g_usbMode;
 
 enum Event {
     EVENT_OTG_ID_HI,
@@ -65,8 +78,6 @@ static uint32_t g_debounceTimeout;
 static void testTimeoutEvent(uint32_t &timeout, Event timeoutEvent);
 static void stateTransition(Event event);
 static void setState(State state);
-
-int g_otgMode = USB_MODE_DISABLED;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -283,16 +294,3 @@ bool isOtgHostModeDetected() {
 
 } // usb
 } // eez
-
-int g_usbDeviceClass = USB_DEVICE_CLASS_VIRTUAL_COM_PORT;
-
-#if defined(EEZ_PLATFORM_STM32)
-extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
-    auto deviceType = USBH_HID_GetDeviceType(phost);
-	if (deviceType == HID_KEYBOARD) {
-        eez::keyboard::onKeyboardEvent(phost);
-	} if (deviceType == HID_MOUSE) {
-        eez::mouse::onMouseEvent(phost);
-	}
-}
-#endif

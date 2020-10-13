@@ -858,13 +858,13 @@ scpi_result_t scpi_cmd_systemCommunicateUsbMode(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    usb::selectUsbMode(usbMode, usb::g_otgMode);
+    usb::selectUsbMode(usbMode, g_otgMode);
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemCommunicateUsbModeQ(scpi_t *context) {
-    resultChoiceName(context, usbModeChoice, usb::g_usbMode);
+    resultChoiceName(context, usbModeChoice, g_usbMode);
     return SCPI_RES_OK;
 }
 
@@ -948,12 +948,12 @@ scpi_result_t scpi_cmd_systemCommunicateEnable(scpi_t *context) {
 
     if (commInterface == 1) {
         if (enable) {
-            if (usb::g_usbMode == USB_MODE_DISABLED) {
-                usb::selectUsbMode(USB_MODE_DEVICE, usb::g_otgMode);
+            if (g_usbMode == USB_MODE_DISABLED) {
+                usb::selectUsbMode(USB_MODE_DEVICE, g_otgMode);
             }
         } else {
-            if (usb::g_usbMode != USB_MODE_DISABLED) {
-                usb::selectUsbMode(USB_MODE_DISABLED, usb::g_otgMode);
+            if (g_usbMode != USB_MODE_DISABLED) {
+                usb::selectUsbMode(USB_MODE_DISABLED, g_otgMode);
             }
         }
     } else if (commInterface == 2) {
@@ -979,7 +979,7 @@ scpi_result_t scpi_cmd_systemCommunicateEnableQ(scpi_t *context) {
     }
 
     if (commInterface == 1) {
-        SCPI_ResultBool(context, usb::g_usbMode != USB_MODE_DISABLED);
+        SCPI_ResultBool(context, g_usbMode != USB_MODE_DISABLED);
     } else if (commInterface == 2) {
 #if OPTION_ETHERNET
         SCPI_ResultBool(context, persist_conf::isEthernetEnabled());

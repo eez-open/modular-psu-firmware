@@ -1400,7 +1400,7 @@ void onSetUsbMode(uint16_t value) {
 }
 
 void action_select_usb_mode() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, usb::g_usbMode, nullptr, onSetUsbMode);
+    pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, g_usbMode, nullptr, onSetUsbMode);
 }
 
 bool isUsbDeviceClassDisabled(uint16_t value) {
