@@ -118,7 +118,12 @@ int main(int argc, char **argv) {
     MX_I2C1_Init();
     MX_LTDC_Init();
     MX_RNG_Init();
+
+    if (HAL_IS_BIT_CLR(RTC->ISR, RTC_FLAG_INITS)) {
+        DebugTrace("RTC init\n");
+    }
     MX_RTC_Init();
+    
     MX_SPI2_Init();
     MX_SPI4_Init();
     MX_SPI5_Init();
