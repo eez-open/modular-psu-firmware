@@ -296,43 +296,50 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
   /* Set RTC state */
   hrtc->State = HAL_RTC_STATE_BUSY;
 
-  /* Disable the write protection for RTC registers */
-  __HAL_RTC_WRITEPROTECTION_DISABLE(hrtc);
+  // we do a "hard" initialization only if the INITS flag is not set;
+  // with a backup battery the RTC keeps its initialization after a reset.
+  if (HAL_IS_BIT_CLR(RTC->ISR, RTC_FLAG_INITS)) {
+    /* Disable the write protection for RTC registers */
+    __HAL_RTC_WRITEPROTECTION_DISABLE(hrtc);
 
-  /* Set Initialization mode */
-  if(RTC_EnterInitMode(hrtc) != HAL_OK)
-  {
-    /* Enable the write protection for RTC registers */
-    __HAL_RTC_WRITEPROTECTION_ENABLE(hrtc);
+    /* Set Initialization mode */
+    if(RTC_EnterInitMode(hrtc) != HAL_OK)
+    {
+      /* Enable the write protection for RTC registers */
+      __HAL_RTC_WRITEPROTECTION_ENABLE(hrtc);
 
-    /* Set RTC state */
-    hrtc->State = HAL_RTC_STATE_ERROR;
+      /* Set RTC state */
+      hrtc->State = HAL_RTC_STATE_ERROR;
 
-    return HAL_ERROR;
-  }
-  else
-  {
-    /* Clear RTC_CR FMT, OSEL and POL Bits */
-    hrtc->Instance->CR &= ((uint32_t)~(RTC_CR_FMT | RTC_CR_OSEL | RTC_CR_POL));
-    /* Set RTC_CR register */
-    hrtc->Instance->CR |= (uint32_t)(hrtc->Init.HourFormat | hrtc->Init.OutPut | hrtc->Init.OutPutPolarity);
+      return HAL_ERROR;
+    }
+    else
+    {
+      /* Clear RTC_CR FMT, OSEL and POL Bits */
+      hrtc->Instance->CR &= ((uint32_t)~(RTC_CR_FMT | RTC_CR_OSEL | RTC_CR_POL));
+      /* Set RTC_CR register */
+      hrtc->Instance->CR |= (uint32_t)(hrtc->Init.HourFormat | hrtc->Init.OutPut | hrtc->Init.OutPutPolarity);
 
-    /* Configure the RTC PRER */
-    hrtc->Instance->PRER = (uint32_t)(hrtc->Init.SynchPrediv);
-    hrtc->Instance->PRER |= (uint32_t)(hrtc->Init.AsynchPrediv << 16);
+      /* Configure the RTC PRER */
+      hrtc->Instance->PRER = (uint32_t)(hrtc->Init.SynchPrediv);
+      hrtc->Instance->PRER |= (uint32_t)(hrtc->Init.AsynchPrediv << 16);
 
-    /* Exit Initialization mode */
-    hrtc->Instance->ISR &= (uint32_t)~RTC_ISR_INIT;
+      /* Exit Initialization mode */
+      hrtc->Instance->ISR &= (uint32_t)~RTC_ISR_INIT;
 
-    hrtc->Instance->OR &= (uint32_t)~RTC_OR_ALARMTYPE;
-    hrtc->Instance->OR |= (uint32_t)(hrtc->Init.OutPutType);
+      hrtc->Instance->OR &= (uint32_t)~RTC_OR_ALARMTYPE;
+      hrtc->Instance->OR |= (uint32_t)(hrtc->Init.OutPutType);
 
-    /* Enable the write protection for RTC registers */
-    __HAL_RTC_WRITEPROTECTION_ENABLE(hrtc);
+      /* Enable the write protection for RTC registers */
+      __HAL_RTC_WRITEPROTECTION_ENABLE(hrtc);
 
-    /* Set RTC state */
+      /* Set RTC state */
+      hrtc->State = HAL_RTC_STATE_READY;
+
+      return HAL_OK;
+    }
+  } else {
     hrtc->State = HAL_RTC_STATE_READY;
-
     return HAL_OK;
   }
 }
