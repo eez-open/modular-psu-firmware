@@ -66,6 +66,12 @@ enum SourceMode {
     SOURCE_MODE_VOLTAGE
 };
 
+enum MeasureMode {
+    MEASURE_MODE_CURRENT,
+    MEASURE_MODE_VOLTAGE,
+    MEASURE_MODE_OPEN
+};
+
 static const int MAX_NUM_CH_IN_CH_LIST = 32;
 
 struct SlotAndSubchannelIndex {
@@ -201,17 +207,32 @@ struct Module {
 
     virtual bool getDigitalInputData(int subchannelIndex, uint8_t &data, int *err);
 
+    virtual bool getDigitalInputRange(int subchannelIndex, uint8_t pin, uint8_t &range, int *err);
+    virtual bool setDigitalInputRange(int subchannelIndex, uint8_t pin, uint8_t range, int *err);
+
+    virtual bool getDigitalInputSpeed(int subchannelIndex, uint8_t pin, uint8_t &speed, int *err);
+    virtual bool setDigitalInputSpeed(int subchannelIndex, uint8_t pin, uint8_t speed, int *err);
+
     virtual bool getDigitalOutputData(int subchannelIndex, uint8_t &data, int *err);
     virtual bool setDigitalOutputData(int subchannelIndex, uint8_t data, int *err);
 
     virtual bool getMode(int subchannelIndex, SourceMode &mode, int *err);
     virtual bool setMode(int subchannelIndex, SourceMode mode, int *err);
 
-    virtual bool getCurrentRange(int subchannelIndex, int8_t &range, int *err);
-    virtual bool setCurrentRange(int subchannelIndex, int8_t range, int *err);
+    virtual bool getCurrentRange(int subchannelIndex, uint8_t &range, int *err);
+    virtual bool setCurrentRange(int subchannelIndex, uint8_t range, int *err);
 
-    virtual bool getVoltageRange(int subchannelIndex, int8_t &range, int *err);
-    virtual bool setVoltageRange(int subchannelIndex, int8_t range, int *err);
+    virtual bool getVoltageRange(int subchannelIndex, uint8_t &range, int *err);
+    virtual bool setVoltageRange(int subchannelIndex, uint8_t range, int *err);
+
+    virtual bool getMeasureMode(int subchannelIndex, MeasureMode &mode, int *err);
+    virtual bool setMeasureMode(int subchannelIndex, MeasureMode mode, int *err);
+
+    virtual bool getMeasureRange(int subchannelIndex, uint8_t &range, int *err);
+    virtual bool setMeasureRange(int subchannelIndex, uint8_t range, int *err);
+
+    virtual bool getMeasureTempSensorBias(int subchannelIndex, bool &enabled, int *err);
+    virtual bool setMeasureTempSensorBias(int subchannelIndex, bool enabled, int *err);
 
     virtual bool isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err);
     virtual bool routeOpen(ChannelList channelList, int *err);
@@ -229,6 +250,7 @@ struct Module {
     
     virtual bool getVoltage(int subchannelIndex, float &value, int *err);
     virtual bool setVoltage(int subchannelIndex, float value, int *err);
+    virtual bool getMeasuredVoltage(int subchannelIndex, float &value, int *err);
     virtual void getVoltageStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode);
     virtual float getVoltageResolution(int subchannelIndex);
     virtual float getVoltageMinValue(int subchannelIndex);
@@ -240,6 +262,7 @@ struct Module {
 
     virtual bool getCurrent(int subchannelIndex, float &value, int *err);
     virtual bool setCurrent(int subchannelIndex, float value, int *err);
+    virtual bool getMeasuredCurrent(int subchannelIndex, float &value, int *err);
     virtual void getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode);
     virtual float getCurrentResolution(int subchannelIndex);
     virtual float getCurrentMinValue(int subchannelIndex);

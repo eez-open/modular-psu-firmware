@@ -2119,6 +2119,22 @@ bool getDigitalInputData(int slotIndex, int subchannelIndex, uint8_t &data, int 
     return g_slots[slotIndex]->getDigitalInputData(subchannelIndex, data, err);
 }
 
+bool getDigitalInputRange(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t &range, int *err) {
+    return g_slots[slotIndex]->getDigitalInputRange(subchannelIndex, pin, range, err);
+}
+
+bool setDigitalInputRange(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t range, int *err) {
+    return g_slots[slotIndex]->setDigitalInputRange(subchannelIndex, pin, range, err);
+}
+
+bool getDigitalInputSpeed(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t &speed, int *err) {
+    return g_slots[slotIndex]->getDigitalInputSpeed(subchannelIndex, pin, speed, err);
+}
+
+bool setDigitalInputSpeed(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t speed, int *err) {
+    return g_slots[slotIndex]->setDigitalInputSpeed(subchannelIndex, pin, speed, err);
+}
+
 bool getDigitalOutputData(int slotIndex, int subchannelIndex, uint8_t &data, int *err) {
     return g_slots[slotIndex]->getDigitalOutputData(subchannelIndex, data, err);
 }
@@ -2135,20 +2151,44 @@ bool setMode(int slotIndex, int subchannelIndex, SourceMode mode, int *err) {
     return g_slots[slotIndex]->setMode(subchannelIndex, mode, err);
 }
 
-bool getCurrentRange(int slotIndex, int subchannelIndex, int8_t &range, int *err) {
+bool getCurrentRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err) {
     return g_slots[slotIndex]->getCurrentRange(subchannelIndex, range, err);
 }
 
-bool setCurrentRange(int slotIndex, int subchannelIndex, int8_t range, int *err) {
+bool setCurrentRange(int slotIndex, int subchannelIndex, uint8_t range, int *err) {
     return g_slots[slotIndex]->setCurrentRange(subchannelIndex, range, err);
 }
 
-bool getVoltageRange(int slotIndex, int subchannelIndex, int8_t &range, int *err) {
+bool getVoltageRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err) {
     return g_slots[slotIndex]->getVoltageRange(subchannelIndex, range, err);
 }
 
-bool setVoltageRange(int slotIndex, int subchannelIndex, int8_t range, int *err) {
+bool setVoltageRange(int slotIndex, int subchannelIndex, uint8_t range, int *err) {
     return g_slots[slotIndex]->setVoltageRange(subchannelIndex, range, err);
+}
+
+bool getMeasureMode(int slotIndex, int subchannelIndex, MeasureMode &mode, int *err) {
+    return g_slots[slotIndex]->getMeasureMode(subchannelIndex, mode, err);
+}
+
+bool setMeasureMode(int slotIndex, int subchannelIndex, MeasureMode mode, int *err) {
+    return g_slots[slotIndex]->setMeasureMode(subchannelIndex, mode, err);
+}
+
+bool getMeasureRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err) {
+    return g_slots[slotIndex]->getMeasureRange(subchannelIndex, range, err);
+}
+
+bool setMeasureRange(int slotIndex, int subchannelIndex, uint8_t range, int *err) {
+    return g_slots[slotIndex]->setMeasureRange(subchannelIndex, range, err);
+}
+
+bool getMeasureTempSensorBias(int slotIndex, int subchannelIndex, bool &enabled, int *err) {
+    return g_slots[slotIndex]->getMeasureTempSensorBias(subchannelIndex, enabled, err);
+}
+
+bool setMeasureTempSensorBias(int slotIndex, int subchannelIndex, bool enabled, int *err) {
+    return g_slots[slotIndex]->setMeasureTempSensorBias(subchannelIndex, enabled, err);
 }
 
 bool routeOpen(ChannelList channelList, int *err) {
@@ -2242,11 +2282,31 @@ float getCurrentResolution(int slotIndex, int subchannelIndex) {
 }
 
 float getCurrentMinValue(int slotIndex, int subchannelIndex) {
-    return g_slots[slotIndex]->getCurrentMaxValue(subchannelIndex);
+    return g_slots[slotIndex]->getCurrentMinValue(subchannelIndex);
 }
 
 float getCurrentMaxValue(int slotIndex, int subchannelIndex) {
     return g_slots[slotIndex]->getCurrentMaxValue(subchannelIndex);
+}
+
+bool getMeasuredVoltage(int slotIndex, int subchannelIndex, float &value, int *err) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        value = getUMonLast(*channel);
+        return true;
+    } else {
+        return g_slots[slotIndex]->getMeasuredVoltage(subchannelIndex, value, err);
+    }
+}
+
+bool getMeasuredCurrent(int slotIndex, int subchannelIndex, float &value, int *err) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        value = getIMonLast(*channel);
+        return true;
+    } else {
+        return g_slots[slotIndex]->getMeasuredCurrent(subchannelIndex, value, err);
+    }
 }
 
 } // namespace channel_dispatcher

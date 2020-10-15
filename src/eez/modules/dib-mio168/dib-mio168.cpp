@@ -20,6 +20,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <memory.h>
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -33,6 +34,7 @@
 #include <eez/hmi.h>
 #include <eez/gui/gui.h>
 #include <eez/modules/psu/psu.h>
+#include "eez/modules/psu/profile.h"
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/gui/psu.h>
 #include "eez/modules/psu/gui/keypad.h"
@@ -68,7 +70,7 @@ static const int AIN_4_SUBCHANNEL_INDEX = 5;
 static const int AOUT_1_SUBCHANNEL_INDEX = 6;
 static const int AOUT_2_SUBCHANNEL_INDEX = 7;
 static const int AOUT_3_SUBCHANNEL_INDEX = 8;
-static const int AOUT_4_2_SUBCHANNEL_INDEX = 9;
+static const int AOUT_4_SUBCHANNEL_INDEX = 9;
 static const int PWM_1_SUBCHANNEL_INDEX = 10;
 static const int PWM_2_SUBCHANNEL_INDEX = 11;
 
@@ -138,6 +140,38 @@ struct DinChannel : public MioChannel {
     // 0 - FAST, 1 - SLOW
     uint8_t m_pinSpeeds = 0;
 
+    struct ProfileParameters {
+        uint8_t pinRanges;
+        uint8_t pinSpeeds;
+    };
+
+    void getProfileParameters(ProfileParameters &parameters) {
+        parameters.pinRanges = m_pinRanges;
+        parameters.pinSpeeds = m_pinSpeeds;
+    }
+
+    void setProfileParameters(ProfileParameters &parameters) {
+        m_pinRanges = parameters.pinRanges;
+        m_pinSpeeds = parameters.pinSpeeds;
+    }
+
+    bool writeProfileProperties(psu::profile::WriteContext &ctx, ProfileParameters &parameters) {
+        WRITE_PROPERTY("din_pinRanges", parameters.pinRanges);
+        WRITE_PROPERTY("din_pinSpeeds", parameters.pinSpeeds);
+        return true;
+    }
+
+    bool readProfileProperties(psu::profile::ReadContext &ctx, ProfileParameters &parameters) {
+        READ_PROPERTY("din_pinRanges", parameters.pinRanges);
+        READ_PROPERTY("din_pinSpeeds", parameters.pinSpeeds);
+        return false;
+    }
+
+    void resetConfiguration() {
+        m_pinRanges = 0;
+        m_pinSpeeds = 0;
+    }
+
     uint8_t getDigitalInputData() {
         return m_pinStates;
     }
@@ -157,6 +191,32 @@ struct DinChannel : public MioChannel {
 
 struct DoutChannel : public MioChannel {
     uint8_t m_pinStates = 0;
+
+     struct ProfileParameters {
+        uint8_t pinStates;
+    };
+
+    void getProfileParameters(ProfileParameters &parameters) {
+        parameters.pinStates = m_pinStates;
+    }
+
+    void setProfileParameters(ProfileParameters &parameters) {
+        m_pinStates = parameters.pinStates;
+    }
+
+    bool writeProfileProperties(psu::profile::WriteContext &ctx, ProfileParameters &parameters) {
+        WRITE_PROPERTY("dout_pinStates", parameters.pinStates);
+        return true;
+    }
+
+    bool readProfileProperties(psu::profile::ReadContext &ctx, ProfileParameters &parameters) {
+        READ_PROPERTY("dout_pinStates", parameters.pinStates);
+        return false;
+    }
+
+   void resetConfiguration() {
+        m_pinStates = 0;
+    }
 
     uint8_t getDigitalOutputData() {
         return m_pinStates;
@@ -184,6 +244,60 @@ struct AinChannel : public MioChannel {
     uint8_t m_mode = 1;
     uint8_t m_range = 0;
     uint8_t m_tempSensorBias = 0;
+
+    struct ProfileParameters {
+        uint8_t mode;
+        uint8_t range;
+        uint8_t tempSensorBias;
+    };
+
+    void getProfileParameters(ProfileParameters &parameters) {
+        parameters.mode = m_mode;
+        parameters.range = m_range;
+        parameters.tempSensorBias = m_tempSensorBias;
+    }
+
+    void setProfileParameters(ProfileParameters &parameters) {
+        m_mode = parameters.mode;
+        m_range = parameters.range;
+        m_tempSensorBias = parameters.tempSensorBias;
+    }
+
+    bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
+        char propName[32];
+
+        sprintf(propName, "ain_%d_mode", i+1);
+        WRITE_PROPERTY(propName, parameters.mode);
+
+        sprintf(propName, "ain_%d_range", i+1);
+        WRITE_PROPERTY(propName, parameters.range);
+
+        sprintf(propName, "ain_%d_tempSensorBias", i+1);
+        WRITE_PROPERTY(propName, parameters.tempSensorBias);
+
+        return true;
+    }
+
+    bool readProfileProperties(psu::profile::ReadContext &ctx, int i, ProfileParameters &parameters) {
+        char propName[32];
+
+        sprintf(propName, "ain_%d_mode", i+1);
+        READ_PROPERTY(propName, parameters.mode);
+
+        sprintf(propName, "ain_%d_range", i+1);
+        READ_PROPERTY(propName, parameters.range);
+
+        sprintf(propName, "ain_%d_tempSensorBias", i+1);
+        READ_PROPERTY(propName, parameters.tempSensorBias);
+
+        return false;
+    }
+
+    void resetConfiguration() {
+        m_mode = 1;
+        m_range = 0;
+        m_tempSensorBias = 0;
+    }
 
     float convertU16Value(uint16_t value) {
         float min = 0;
@@ -220,7 +334,7 @@ struct AinChannel : public MioChannel {
 
         float fValue = remap(value * 1.0f, 0.0f, min, 65535.0f, max);
 
-        if (m_mode == 0) {
+        if (m_mode == MEASURE_MODE_CURRENT) {
             fValue /= 100.0f;
         }
 
@@ -228,20 +342,104 @@ struct AinChannel : public MioChannel {
     }
 
     float getResolution() {
-        return m_mode ? AIN_VOLTAGE_RESOLUTION : AIN_CURRENT_RESOLUTION;
+        return m_mode == MEASURE_MODE_VOLTAGE ? AIN_VOLTAGE_RESOLUTION : m_mode == MEASURE_MODE_CURRENT ? AIN_CURRENT_RESOLUTION : 1.0f;
     }
 };
 
 struct AoutDac7760Channel : public MioChannel {
     bool m_outputEnabled = false;
-    SourceMode m_mode = SOURCE_MODE_VOLTAGE;
-    int8_t m_currentRange = 5;
-    int8_t m_voltageRange = 0;
+    uint8_t m_mode = SOURCE_MODE_VOLTAGE;
+    uint8_t m_currentRange = 5;
+    uint8_t m_voltageRange = 0;
     float m_currentValue = 0;
     float m_voltageValue = 0;
 
+    struct ProfileParameters {
+        bool outputEnabled;
+        uint8_t mode;
+        uint8_t currentRange;
+        uint8_t voltageRange;
+        float currentValue;
+        float voltageValue;
+    };
+
+    void getProfileParameters(ProfileParameters &parameters) {
+        parameters.outputEnabled = m_outputEnabled;
+        parameters.mode = m_mode;
+        parameters.currentRange = m_currentRange;
+        parameters.voltageRange = m_voltageRange;
+        parameters.currentValue = m_currentValue;
+        parameters.voltageValue = m_voltageValue;
+    }
+
+    void setProfileParameters(ProfileParameters &parameters) {
+        m_outputEnabled = parameters.outputEnabled;
+        m_mode = parameters.mode;
+        m_currentRange = parameters.currentRange;
+        m_voltageRange = parameters.voltageRange;
+        m_currentValue = parameters.currentValue;
+        m_voltageValue = parameters.voltageValue;
+    }
+
+    bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
+        char propName[32];
+
+        sprintf(propName, "aout_dac7760_%d_outputEnabled", i+1);
+        WRITE_PROPERTY(propName, parameters.outputEnabled);
+
+        sprintf(propName, "aout_dac7760_%d_mode", i+1);
+        WRITE_PROPERTY(propName, parameters.mode);
+
+        sprintf(propName, "aout_dac7760_%d_currentRange", i+1);
+        WRITE_PROPERTY(propName, parameters.currentRange);
+
+        sprintf(propName, "aout_dac7760_%d_voltageRange", i+1);
+        WRITE_PROPERTY(propName, parameters.voltageRange);
+
+        sprintf(propName, "aout_dac7760_%d_currentValue", i+1);
+        WRITE_PROPERTY(propName, parameters.currentValue);
+
+        sprintf(propName, "aout_dac7760_%d_voltageValue", i+1);
+        WRITE_PROPERTY(propName, parameters.voltageValue);
+
+        return true;
+    }
+
+    bool readProfileProperties(psu::profile::ReadContext &ctx, int i, ProfileParameters &parameters) {
+        char propName[32];
+
+        sprintf(propName, "aout_dac7760_%d_outputEnabled", i+1);
+        READ_PROPERTY(propName, parameters.outputEnabled);
+
+        sprintf(propName, "aout_dac7760_%d_mode", i+1);
+        READ_PROPERTY(propName, parameters.mode);
+
+        sprintf(propName, "aout_dac7760_%d_currentRange", i+1);
+        READ_PROPERTY(propName, parameters.currentRange);
+
+        sprintf(propName, "aout_dac7760_%d_voltageRange", i+1);
+        READ_PROPERTY(propName, parameters.voltageRange);
+
+        sprintf(propName, "aout_dac7760_%d_currentValue", i+1);
+        READ_PROPERTY(propName, parameters.currentValue);
+
+        sprintf(propName, "aout_dac7760_%d_voltageValue", i+1);
+        READ_PROPERTY(propName, parameters.voltageValue);
+
+        return false;
+    }
+
+    void resetConfiguration() {
+        m_outputEnabled = false;
+        m_mode = SOURCE_MODE_VOLTAGE;
+        m_currentRange = 5;
+        m_voltageRange = 0;
+        m_currentValue = 0;
+        m_voltageValue = 0;
+    }
+
     SourceMode getMode() {
-        return m_mode;
+        return (SourceMode)m_mode;
     }
 
     void setMode(SourceMode mode) {
@@ -280,54 +478,82 @@ struct AoutDac7760Channel : public MioChannel {
         }
     }
 
-    float getMinValue() {
-        if (m_mode == SOURCE_MODE_VOLTAGE) {
-            if (m_voltageRange == 0) {
-                return 0;
-            } 
-            if (m_voltageRange == 1) {
-                return 0;
-            } 
-            if (m_voltageRange == 2) {
-                return -5.0f;
-            } 
-            return -10.0f;
-        } else {
-            if (m_currentRange == 5) {
-                return 0.004f;
-            }
-            if (m_currentRange == 6) {
-                return 0;
-            }
+    float getVoltageMinValue() {
+        if (m_voltageRange == 0) {
+            return 0;
+        } 
+        if (m_voltageRange == 1) {
+            return 0;
+        } 
+        if (m_voltageRange == 2) {
+            return -5.0f;
+        } 
+        return -10.0f;
+    }
+
+    float getCurrentMinValue() {
+        if (m_currentRange == 5) {
+            return 0.004f;
+        }
+        if (m_currentRange == 6) {
             return 0;
         }
+        return 0;
+    }
+
+    float getMinValue() {
+        if (m_mode == SOURCE_MODE_VOLTAGE) {
+            return getVoltageMinValue();
+        } else {
+            return getCurrentMinValue();
+        }
+    }
+
+    float getVoltageMaxValue() {
+        if (m_voltageRange == 0) {
+            return 5.0f;
+        } 
+        if (m_voltageRange == 1) {
+            return 10.0f;
+        } 
+        if (m_voltageRange == 2) {
+            return 5.0f;
+        } 
+        return 10.0f;
+    }
+
+    float getCurrentMaxValue() {
+        if (m_currentRange == 5) {
+            return 0.02f;
+        }
+        if (m_currentRange == 6) {
+            return 0.02f;
+        }
+        return 0.024f;
     }
 
     float getMaxValue() {
         if (m_mode == SOURCE_MODE_VOLTAGE) {
-            if (m_voltageRange == 0) {
-                return 5.0f;
-            } 
-            if (m_voltageRange == 1) {
-                return 10.0f;
-            } 
-            if (m_voltageRange == 2) {
-                return 5.0f;
-            } 
-            return 10.0f;
+            return getVoltageMaxValue();
         } else {
-            if (m_currentRange == 5) {
-                return 0.02f;
-            }
-            if (m_currentRange == 6) {
-                return 0.02f;
-            }
-            return 0.024f;
+            return getCurrentMaxValue();
         }
     }
 
-    float getResolution() {
+    float getVoltageResolution() {
         return 0.001f;
+    }
+
+    float getCurrentResolution() {
+        return 0.001f;
+    }
+
+    float getResolution() {
+        if (m_mode == SOURCE_MODE_VOLTAGE) {
+            return getVoltageResolution();
+        } else {
+            return getCurrentResolution();
+        }
     }
 
     void getStepValues(StepValues *stepValues) {
@@ -345,11 +571,89 @@ struct AoutDac7760Channel : public MioChannel {
 
 struct AoutDac7563Channel : public MioChannel {
     float m_value = 0;
+
+    struct ProfileParameters {
+        float value;
+    };
+
+    void getProfileParameters(ProfileParameters &parameters) {
+        parameters.value = m_value;
+    }
+
+    void setProfileParameters(ProfileParameters &parameters) {
+        m_value = parameters.value;
+    }
+
+    bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
+        char propName[32];
+
+        sprintf(propName, "aout_dac7563_%d_value", i+1);
+        WRITE_PROPERTY(propName, parameters.value);
+
+        return true;
+    }
+
+    bool readProfileProperties(psu::profile::ReadContext &ctx, int i, ProfileParameters &parameters) {
+        char propName[32];
+
+        sprintf(propName, "aout_dac7563_%d_value", i+1);
+        READ_PROPERTY(propName, parameters.value);
+
+        return false;
+    }
+
+    void resetConfiguration() {
+        m_value = 0;
+    }
 };
 
 struct PwmChannel : public MioChannel {
     float m_freq = 0;
     float m_duty = 0;
+
+    struct ProfileParameters {
+        float freq;
+        float duty;
+    };
+    
+    void getProfileParameters(ProfileParameters &parameters) {
+        parameters.freq = m_freq;
+        parameters.duty = m_duty;
+    }
+
+    void setProfileParameters(ProfileParameters &parameters) {
+        m_freq = parameters.freq;
+        m_duty = parameters.duty;
+    }
+
+    void resetConfiguration() {
+        m_freq = 0;
+        m_duty = 0;
+    }
+
+    bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
+        char propName[32];
+
+        sprintf(propName, "pwm_%d_freq", i+1);
+        WRITE_PROPERTY(propName, parameters.freq);
+
+        sprintf(propName, "pwm_%d_duty", i+1);
+        WRITE_PROPERTY(propName, parameters.duty);
+
+        return true;
+    }
+
+    bool readProfileProperties(psu::profile::ReadContext &ctx, int i, ProfileParameters &parameters) {
+        char propName[32];
+
+        sprintf(propName, "pwm_%d_freq", i+1);
+        READ_PROPERTY(propName, parameters.freq);
+
+        sprintf(propName, "pwm_%d_duty", i+1);
+        READ_PROPERTY(propName, parameters.duty);
+
+        return false;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -386,6 +690,8 @@ public:
 #endif
         numPowerChannels = 0;
         numOtherChannels = 12;
+
+        resetConfiguration();
 
         memset(input, 0, sizeof(input));
         memset(output, 0, sizeof(output));
@@ -530,10 +836,142 @@ public:
 
     void onHighPriorityThreadMessage(uint8_t type, uint32_t param) override;
 
+    struct ProfileParameters {
+        DinChannel::ProfileParameters dinChannel;
+        DoutChannel::ProfileParameters doutChannel;
+        AinChannel::ProfileParameters ainChannels[4];
+        AoutDac7760Channel::ProfileParameters aoutDac7760Channels[2];
+        AoutDac7563Channel::ProfileParameters aoutDac7563Channels[2];
+        PwmChannel::ProfileParameters pwmChannels[2];
+    };
+
+    void getProfileParameters(uint8_t *buffer) override {
+        assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
+
+        auto parameters = (ProfileParameters *)buffer;
+
+        dinChannel.getProfileParameters(parameters->dinChannel);
+        doutChannel.getProfileParameters(parameters->doutChannel);
+        for (int i = 0; i < 4; i++) {
+            ainChannels[i].getProfileParameters(parameters->ainChannels[i]);
+        }
+        for (int i = 0; i < 2; i++) {
+            aoutDac7760Channels[i].getProfileParameters(parameters->aoutDac7760Channels[i]);
+        }
+        for (int i = 0; i < 2; i++) {
+            aoutDac7563Channels[i].getProfileParameters(parameters->aoutDac7563Channels[i]);
+        }
+        for (int i = 0; i < 2; i++) {
+            pwmChannels[i].getProfileParameters(parameters->pwmChannels[i]);
+        }
+    }
+    
+    void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) override {
+        auto parameters = (ProfileParameters *)buffer;
+
+        dinChannel.setProfileParameters(parameters->dinChannel);
+        doutChannel.setProfileParameters(parameters->doutChannel);
+        for (int i = 0; i < 4; i++) {
+            ainChannels[i].setProfileParameters(parameters->ainChannels[i]);
+        }
+        for (int i = 0; i < 2; i++) {
+            aoutDac7760Channels[i].setProfileParameters(parameters->aoutDac7760Channels[i]);
+        }
+        for (int i = 0; i < 2; i++) {
+            aoutDac7563Channels[i].setProfileParameters(parameters->aoutDac7563Channels[i]);
+        }
+        for (int i = 0; i < 2; i++) {
+            pwmChannels[i].setProfileParameters(parameters->pwmChannels[i]);
+        }
+    }
+    
+    bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) override {
+        auto parameters = (ProfileParameters *)buffer;
+
+        if (!dinChannel.writeProfileProperties(ctx, parameters->dinChannel)) {
+            return false;
+        }
+        if (!doutChannel.writeProfileProperties(ctx, parameters->doutChannel)) {
+            return false;
+        }
+        for (int i = 0; i < 4; i++) {
+            if (!ainChannels[i].writeProfileProperties(ctx, i, parameters->ainChannels[i])) {
+                return false;
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            if (!aoutDac7760Channels[i].writeProfileProperties(ctx, i, parameters->aoutDac7760Channels[i])) {
+                return false;
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            if (!aoutDac7563Channels[i].writeProfileProperties(ctx, i, parameters->aoutDac7563Channels[i])) {
+                return false;
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            if (!pwmChannels[i].writeProfileProperties(ctx, i, parameters->pwmChannels[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    bool readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) override {
+        auto parameters = (ProfileParameters *)buffer;
+
+        if (dinChannel.readProfileProperties(ctx, parameters->dinChannel)) {
+            return true;
+        }
+        if (doutChannel.readProfileProperties(ctx, parameters->doutChannel)) {
+            return true;
+        }
+        for (int i = 0; i < 4; i++) {
+            if (ainChannels[i].readProfileProperties(ctx, i, parameters->ainChannels[i])) {
+                return true;
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            if (aoutDac7760Channels[i].readProfileProperties(ctx, i, parameters->aoutDac7760Channels[i])) {
+                return true;
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            if (aoutDac7563Channels[i].readProfileProperties(ctx, i, parameters->aoutDac7563Channels[i])) {
+                return true;
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            if (pwmChannels[i].readProfileProperties(ctx, i, parameters->pwmChannels[i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void resetConfiguration() {
+        dinChannel.resetConfiguration();
+        doutChannel.resetConfiguration();
+        for (int i = 0; i < 4; i++) {
+            ainChannels[i].resetConfiguration();
+        }
+        for (int i = 0; i < 2; i++) {
+            aoutDac7760Channels[i].resetConfiguration();
+        }
+        for (int i = 0; i < 2; i++) {
+            aoutDac7563Channels[i].resetConfiguration();
+        }
+        for (int i = 0; i < 2; i++) {
+            pwmChannels[i].resetConfiguration();
+        }
+    }
+
     bool getDigitalInputData(int subchannelIndex, uint8_t &data, int *err) override {
         if (subchannelIndex != DIN_SUBCHANNEL_INDEX) {
             if (*err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }
@@ -541,10 +979,98 @@ public:
         return true;
     }
 
+    bool getDigitalInputRange(int subchannelIndex, uint8_t pin, uint8_t &range, int *err) override {
+        if (subchannelIndex != DIN_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        if (pin < 0 || pin > 7) {
+            if (*err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+
+        range = dinChannel.m_pinRanges & (1 << pin) ? 1 : 0;
+
+        return true;
+    }
+    
+    bool setDigitalInputRange(int subchannelIndex, uint8_t pin, uint8_t range, int *err) override {
+        if (subchannelIndex != DIN_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        if (pin < 0 || pin > 7) {
+            if (*err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+
+        if (range) {
+            dinChannel.m_pinRanges |= 1 << pin;
+        } else {
+            dinChannel.m_pinRanges &= ~(1 << pin);
+        }
+
+        return true;
+    }
+
+    bool getDigitalInputSpeed(int subchannelIndex, uint8_t pin, uint8_t &speed, int *err) override {
+        if (subchannelIndex != DIN_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        if (pin < 0 || pin > 1) {
+            if (*err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+
+        speed = dinChannel.m_pinSpeeds & (1 << pin) ? 1 : 0;
+
+        return true;
+    }
+    
+    bool setDigitalInputSpeed(int subchannelIndex, uint8_t pin, uint8_t speed, int *err) override {
+        if (subchannelIndex != DIN_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        if (pin < 0 || pin > 1) {
+            if (*err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+
+        if (speed) {
+            dinChannel.m_pinSpeeds |= 1 << pin;
+        } else {
+            dinChannel.m_pinSpeeds &= ~(1 << pin);
+        }
+
+        return true;
+    }
+
     bool getDigitalOutputData(int subchannelIndex, uint8_t &data, int *err) override {
         if (subchannelIndex != DOUT_SUBCHANNEL_INDEX) {
             if (*err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }
@@ -555,7 +1081,7 @@ public:
     bool setDigitalOutputData(int subchannelIndex, uint8_t data, int *err) override {
         if (subchannelIndex != DOUT_SUBCHANNEL_INDEX) {
             if (*err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }
@@ -566,7 +1092,7 @@ public:
     bool getMode(int subchannelIndex, SourceMode &mode, int *err) override {
         if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }
@@ -577,7 +1103,7 @@ public:
     bool setMode(int subchannelIndex, SourceMode mode, int *err) override {
         if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }
@@ -585,10 +1111,10 @@ public:
         return true;
     }
 
-    bool getCurrentRange(int subchannelIndex, int8_t &range, int *err) override {
+    bool getCurrentRange(int subchannelIndex, uint8_t &range, int *err) override {
         if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }
@@ -596,10 +1122,10 @@ public:
         return true;
     }
     
-    bool setCurrentRange(int subchannelIndex, int8_t range, int *err) override {
+    bool setCurrentRange(int subchannelIndex, uint8_t range, int *err) override {
         if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }
@@ -607,10 +1133,10 @@ public:
         return true;
     }
 
-    bool getVoltageRange(int subchannelIndex, int8_t &range, int *err) override {
+    bool getVoltageRange(int subchannelIndex, uint8_t &range, int *err) override {
         if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }
@@ -618,15 +1144,288 @@ public:
         return true;
     }
     
-    bool setVoltageRange(int subchannelIndex, int8_t range, int *err) override {
+    bool setVoltageRange(int subchannelIndex, uint8_t range, int *err) override {
         if (subchannelIndex != AOUT_1_SUBCHANNEL_INDEX && subchannelIndex != AOUT_2_SUBCHANNEL_INDEX) {
             if (*err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }
         aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].setVoltageRange(range);
         return true;
+    }
+
+    bool getMeasureMode(int subchannelIndex, MeasureMode &mode, int *err) override {
+        if (subchannelIndex != AIN_1_SUBCHANNEL_INDEX && subchannelIndex != AIN_4_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+        mode = (MeasureMode)ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_mode;
+        return true;
+    }
+    
+    bool setMeasureMode(int subchannelIndex, MeasureMode mode, int *err) override {
+        if (subchannelIndex != AIN_1_SUBCHANNEL_INDEX && subchannelIndex != AIN_4_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+        ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_mode = mode;
+        return true;
+    }
+
+    bool getMeasureRange(int subchannelIndex, uint8_t &range, int *err) override {
+        if (subchannelIndex != AIN_1_SUBCHANNEL_INDEX && subchannelIndex != AIN_4_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+        range = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_range;
+        return true;
+    }
+    
+    bool setMeasureRange(int subchannelIndex, uint8_t range, int *err) override {
+        if (subchannelIndex != AIN_1_SUBCHANNEL_INDEX && subchannelIndex != AIN_4_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        if (range != 0 && range != 1 && range != 2 && range != 3 && range != 11 && range != 5 && range != 6 && range != 7 && range != 15) {
+            if (*err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+
+        ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_range = range;
+
+        return true;
+    }
+
+    bool getMeasureTempSensorBias(int subchannelIndex, bool &enabled, int *err) override {
+        if (subchannelIndex != AIN_1_SUBCHANNEL_INDEX && subchannelIndex != AIN_2_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+        enabled = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_tempSensorBias;
+        return true;
+    }
+    
+    bool setMeasureTempSensorBias(int subchannelIndex, bool enabled, int *err) override {
+        if (subchannelIndex != AIN_1_SUBCHANNEL_INDEX && subchannelIndex != AIN_2_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_tempSensorBias = enabled;
+
+        return true;
+    }
+
+    bool getVoltage(int subchannelIndex, float &value, int *err) override {
+        if (subchannelIndex < AOUT_1_SUBCHANNEL_INDEX || subchannelIndex > AOUT_4_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        if (subchannelIndex < AOUT_3_SUBCHANNEL_INDEX) {
+            value = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_voltageValue;
+        } else {
+            value = aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].m_value;
+        }
+
+        return true;
+    }
+
+    bool setVoltage(int subchannelIndex, float value, int *err) override {
+        if (subchannelIndex < AOUT_1_SUBCHANNEL_INDEX || subchannelIndex > AOUT_4_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        if (subchannelIndex < AOUT_3_SUBCHANNEL_INDEX) {
+            aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_voltageValue = value;
+        } else {
+            aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].m_value = value;
+        }
+
+        return true;
+    }
+
+    bool getMeasuredVoltage(int subchannelIndex, float &value, int *err) override {
+        if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        auto &channel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+
+        if (channel.m_mode != MEASURE_MODE_VOLTAGE) {
+            if (*err) {
+                *err = SCPI_ERROR_EXECUTION_ERROR;
+            }
+            return false;
+        }
+
+        value = channel.m_value;
+        return true;
+    }
+
+    void getVoltageStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getStepValues(stepValues);
+        } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            stepValues->values = AOUT_DAC7563_ENCODER_STEP_VALUES;
+            stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES) / sizeof(float);
+            stepValues->unit = UNIT_VOLT;
+        }
+    }
+    
+    float getVoltageResolution(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getVoltageResolution();
+        } else {
+            return AOUT_DAC7563_RESOLUTION;
+        }
+    }
+
+    float getVoltageMinValue(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getVoltageMinValue();
+        } else {
+            return AOUT_DAC7563_MIN;
+        }    
+    }
+
+    float getVoltageMaxValue(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getVoltageMaxValue();
+        } else {
+            return AOUT_DAC7563_MAX;
+        }    
+    }
+
+    bool isConstantVoltageMode(int subchannelIndex) override {
+        return true;
+    }
+
+    bool isVoltageCalibrationExists(int subchannelIndex) override {
+        return false;
+    }
+
+    bool isVoltageCalibrationEnabled(int subchannelIndex) override {
+        return false;
+    }
+    
+    void enableVoltageCalibration(int subchannelIndex, bool enabled) override {
+    }
+
+    void getCalibrationPoints(CalibrationValueType type, unsigned int &numPoints, float *&points) override {
+    }
+
+    CalibrationConfiguration *getCalibrationConfiguration(int subchannelIndex) override {
+        return nullptr;
+    }
+
+    bool getCurrent(int subchannelIndex, float &value, int *err) override {
+        if (subchannelIndex < AOUT_1_SUBCHANNEL_INDEX || subchannelIndex > AOUT_2_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        value = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_currentValue;
+
+        return true;
+    }
+
+    bool setCurrent(int subchannelIndex, float value, int *err) override {
+        if (subchannelIndex < AOUT_1_SUBCHANNEL_INDEX || subchannelIndex > AOUT_2_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_currentValue = value;
+
+        return true;
+    }
+
+    bool getMeasuredCurrent(int subchannelIndex, float &value, int *err) override {
+        if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        auto &channel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+
+        if (channel.m_mode != MEASURE_MODE_CURRENT) {
+            if (*err) {
+                *err = SCPI_ERROR_EXECUTION_ERROR;
+            }
+            return false;
+        }
+
+        value = channel.m_value;
+        return true;
+    }
+
+    void getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getStepValues(stepValues);
+        }
+    }
+    
+    float getCurrentResolution(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCurrentResolution();
+        }
+        return 0.0f;
+    }
+
+    float getCurrentMinValue(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCurrentMinValue();
+        }
+        return 0.0f;
+    }
+
+    float getCurrentMaxValue(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCurrentMaxValue();
+        }
+        return 0.0f;    
+    }
+
+    bool isCurrentCalibrationExists(int subchannelIndex) override {
+        return false;
+    }
+
+    bool isCurrentCalibrationEnabled(int subchannelIndex) override {
+        return false;
+    }
+    
+    void enableCurrentCalibration(int subchannelIndex, bool enabled) override {
     }
 };
 
@@ -764,15 +1563,15 @@ public:
     }
 
     bool m_outputEnabled;
-    SourceMode m_mode;
-    int8_t m_currentRange;
-    int8_t m_voltageRange;
+    uint8_t m_mode;
+    uint8_t m_currentRange;
+    uint8_t m_voltageRange;
 
 private:
     bool m_outputEnabledOrig;
-    SourceMode m_modeOrig;
-    int8_t m_currentRangeOrig;
-    int8_t m_voltageRangeOrig;
+    uint8_t m_modeOrig;
+    uint8_t m_currentRangeOrig;
+    uint8_t m_voltageRangeOrig;
 };
 
 int AoutDac7760ConfigurationPage::g_selectedChannelIndex;
@@ -829,27 +1628,19 @@ void data_dib_mio168_din_pins(DataOperationEnum operation, Cursor cursor, Value 
     }
 }
 
-void data_dib_mio168_din_pins_1_2(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_pins_1_4(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
-        value = 2;
+        value = 4;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
         value = hmi::g_selectedSlotIndex * 8 + value.getInt();
     }
 }
 
-void data_dib_mio168_din_pins_3_5(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_pins_5_8(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
-        value = 3;
+        value = 4;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
-        value = hmi::g_selectedSlotIndex * 8 + 2 + value.getInt();
-    }
-}
-
-void data_dib_mio168_din_pins_6_8(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_COUNT) {
-        value = 3;
-    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
-        value = hmi::g_selectedSlotIndex * 8 + 5 + value.getInt();
+        value = hmi::g_selectedSlotIndex * 8 + 4 + value.getInt();
     }
 }
 
@@ -888,6 +1679,12 @@ void onSetPinRanges(uint16_t value) {
 void action_dib_mio168_din_select_range() {
     g_pin = getFoundWidgetAtDown().cursor % 8;
     pushSelectFromEnumPage(g_dinRangeEnumDefinition, g_dinConfigurationPage.getPinRange(g_pin), nullptr, onSetPinRanges);
+}
+
+void data_dib_mio168_din_has_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = cursor % 8 < 2;
+    }
 }
 
 static EnumItem g_dinSpeedEnumDefinition[] = {
@@ -970,13 +1767,18 @@ void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value
     if (operation == DATA_OPERATION_GET) {
         auto mio168Module = (Mio168Module *)g_slots[cursor / 4];
         auto &channel = mio168Module->ainChannels[cursor % 4];
-        value = MakeValue(roundPrec(channel.m_value, channel.getResolution()), channel.m_mode == 0 ? UNIT_AMPER : UNIT_VOLT);
+        if (channel.m_mode == MEASURE_MODE_OPEN) {
+            value = "-";
+        } else {
+            value = MakeValue(roundPrec(channel.m_value, channel.getResolution()), channel.m_mode == MEASURE_MODE_VOLTAGE ? UNIT_VOLT : UNIT_AMPER);
+        }
     }
 }
 
 static EnumItem g_ainModeEnumDefinition[] = {
-    { 0, "Current" },
-    { 1, "Voltage" },
+    { MEASURE_MODE_CURRENT, "Current" },
+    { MEASURE_MODE_VOLTAGE, "Voltage" },
+    { MEASURE_MODE_OPEN, "Open" },
     { 0, 0 }
 };
 
@@ -1274,7 +2076,7 @@ void data_dib_mio168_pwm_label(DataOperationEnum operation, Cursor cursor, Value
     if (operation == DATA_OPERATION_GET) {
         static const char *labels[2] = { "P1", "P2" };
         static const char *labels2Col[2] = { "PWM1", "PWM2" };
-        value = g_isCol2Mode || persist_conf::isMaxView() ? labels2Col[cursor % 4] : labels[cursor % 4];
+        value = g_isCol2Mode || persist_conf::isMaxView() ? labels2Col[cursor % 2] : labels[cursor % 2];
     }
 }
 
