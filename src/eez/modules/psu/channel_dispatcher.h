@@ -183,17 +183,32 @@ bool isEditEnabled(const eez::gui::WidgetCursor &widgetCursor);
 
 bool getDigitalInputData(int slotIndex, int subchannelIndex, uint8_t &data, int *err);
 
+bool getDigitalInputRange(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t &range, int *err);
+bool setDigitalInputRange(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t range, int *err);
+
+bool getDigitalInputSpeed(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t &speed, int *err);
+bool setDigitalInputSpeed(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t speed, int *err);
+
 bool getDigitalOutputData(int slotIndex, int subchannelIndex, uint8_t &data, int *err);
 bool setDigitalOutputData(int slotIndex, int subchannelIndex, uint8_t data, int *err);
 
 bool getMode(int slotIndex, int subchannelIndex, SourceMode &mode, int *err);
 bool setMode(int slotIndex, int subchannelIndex, SourceMode mode, int *err);
 
-bool getCurrentRange(int slotIndex, int subchannelIndex, int8_t &range, int *err);
-bool setCurrentRange(int slotIndex, int subchannelIndex, int8_t range, int *err);
+bool getCurrentRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
+bool setCurrentRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
 
-bool getVoltageRange(int slotIndex, int subchannelIndex, int8_t &range, int *err);
-bool setVoltageRange(int slotIndex, int subchannelIndex, int8_t range, int *err);
+bool getVoltageRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
+bool setVoltageRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
+
+bool getMeasureMode(int slotIndex, int subchannelIndex, MeasureMode &mode, int *err);
+bool setMeasureMode(int slotIndex, int subchannelIndex, MeasureMode mode, int *err);
+
+bool getMeasureRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
+bool setMeasureRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
+
+bool getMeasureTempSensorBias(int slotIndex, int subchannelIndex, bool &enabled, int *err);
+bool setMeasureTempSensorBias(int slotIndex, int subchannelIndex, bool enabled, int *err);
 
 bool isRouteOpen(int slotIndex, int subchannelIndex, int *err);
 bool routeOpen(ChannelList channelList, int *err);
@@ -212,6 +227,9 @@ void getCurrentStepValues(int slotIndex, int subchannelIndex, StepValues *stepVa
 float getCurrentResolution(int slotIndex, int subchannelIndex);
 float getCurrentMinValue(int slotIndex, int subchannelIndex);
 float getCurrentMaxValue(int slotIndex, int subchannelIndex);
+
+bool getMeasuredVoltage(int slotIndex, int subchannelIndex, float &value, int *err);
+bool getMeasuredCurrent(int slotIndex, int subchannelIndex, float &value, int *err);
 
 } // namespace channel_dispatcher
 } // namespace psu

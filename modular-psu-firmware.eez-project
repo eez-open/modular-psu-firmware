@@ -43284,9 +43284,9 @@
             "height": 0,
             "dx": 0,
             "glyphBitmap": {
-              "width": 21,
-              "height": 19,
-              "pixelArray": "0000000000000000000000000005283d3f3f3f3f3f0000000000000000000000000030b7e9ebebebebeb0000000000000000000000000472f1f9e9e5e5e5e500000000000000000000000017a2fddf927f7f7f7f00000000000000000000000e54d9f8941a0d0d0d0d00000000000000000000023ba9f6dd490000000000000000000000000000032693e3f299190000000000000000000000000012439decfde350030000000000000000000000071f61b3e8fdffe248010000000000000000020e397aaadff9feffffea670800000000000000000c42b2f3fdfffffffffff290120000000000000000031a63add5f4fefffffffab61c0000000000000000000004204ebffdfffffffed12f00000000000000000000000021affef7f7fdffdc4200000000000000000000000d55daf8ac85ade1e65e00000000001a1a1a1a1a1b46acf6dd4c081d61b3690000000000b2b2b2b2b2b3c8edf1991a00000823240100000000ffffffffffffffffd3450300000000000000000000d8d8d8d8d8d8d8d8981e0000000000000000000000"
+              "width": 0,
+              "height": 0,
+              "pixelArray": ""
             },
             "source": {
               "filePath": "fonts\\OpenSans-SemiBold.ttf",
@@ -59510,6 +59510,173 @@
             }
           },
           {
+            "name": "MEASure[:SCALar]:MODe",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "mode",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "MeasureMode"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "MEASure[:SCALar]:MODe?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "MeasureMode"
+                }
+              ]
+            }
+          },
+          {
+            "name": "MEASure[:SCALar]:RANGe",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "range",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "MEASure[:SCALar]:RANGe?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
+          },
+          {
+            "name": "MEASure[:SCALar]:TEMPerature:SENSor:BIAS",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "enable",
+                "type": [
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "MEASure[:SCALar]:TEMPerature:SENSor:BIAS?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "boolean"
+                }
+              ]
+            }
+          },
+          {
             "name": "MEASure:DIGital[:BYTE]?",
             "parameters": [
               {
@@ -62771,7 +62938,103 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:MODE",
+            "name": "[SOURce[<n>]]:DIGital:RANGe",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "range",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Range"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:DIGital:RANGe?",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Range"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:DIGital:SPEED",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "speed",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Speed"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:DIGital:SPEED?",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Speed"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:MODe",
             "parameters": [
               {
                 "name": "mode",
@@ -62790,7 +63053,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:MODE?",
+            "name": "[SOURce[<n>]]:MODe?",
             "parameters": [],
             "response": {
               "type": [
@@ -67285,6 +67548,36 @@
           {
             "name": "BEST",
             "value": ""
+          }
+        ]
+      },
+      {
+        "name": "Speed",
+        "members": [
+          {
+            "name": "Fast",
+            "value": "0"
+          },
+          {
+            "name": "Slow",
+            "value": "1"
+          }
+        ]
+      },
+      {
+        "name": "MeasureMode",
+        "members": [
+          {
+            "name": "CURRent",
+            "value": "0"
+          },
+          {
+            "name": "VOLTage",
+            "value": "1"
+          },
+          {
+            "name": "OPEN",
+            "value": "2"
           }
         ]
       }

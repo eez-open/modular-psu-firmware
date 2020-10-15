@@ -159,6 +159,7 @@ public:
 
     bool property(const char *name, unsigned int &value);
     bool property(const char *name, uint16_t &value);
+    bool property(const char *name, uint8_t &value);
     bool property(const char *name, bool &value);
 
     bool property(const char *name, float &value);

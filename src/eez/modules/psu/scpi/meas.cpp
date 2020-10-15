@@ -28,40 +28,193 @@ namespace scpi {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_measureScalarCurrentDcQ(scpi_t *context) {
-    Channel *channel = getPowerChannelFromParam(context);
-    if (!channel) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    float value;
+    if (!channel_dispatcher::getMeasuredCurrent(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, value, &err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, channel_dispatcher::getIMonLast(*channel));
+    strcatFloat(buffer, value);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_measureScalarPowerDcQ(scpi_t *context) {
-    Channel *channel = getPowerChannelFromParam(context);
-    if (!channel) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    float voltage;
+    if (!channel_dispatcher::getMeasuredVoltage(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, voltage, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    float current;
+    if (!channel_dispatcher::getMeasuredCurrent(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, current, &err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, channel_dispatcher::getUMonLast(*channel) * channel_dispatcher::getIMonLast(*channel));
+    strcatFloat(buffer, voltage * current);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
-    Channel *channel = getPowerChannelFromParam(context);
-    if (!channel) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    float value;
+    if (!channel_dispatcher::getMeasuredVoltage(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, value, &err)) {
+        SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, channel_dispatcher::getUMonLast(*channel));
+    strcatFloat(buffer, value);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
+
+    return SCPI_RES_OK;
+}
+
+static scpi_choice_def_t g_measureModeChoice[] = {
+    { "CURRent", MEASURE_MODE_CURRENT },
+    { "VOLTage", MEASURE_MODE_VOLTAGE },
+    { "VOLTage", MEASURE_MODE_OPEN },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_measureScalarMode(scpi_t *context) {
+    int32_t mode;
+    if (!SCPI_ParamChoice(context, g_measureModeChoice, &mode, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::setMeasureMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, (MeasureMode)mode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_measureScalarModeQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    MeasureMode mode;
+    int err;
+    if (!channel_dispatcher::getMeasureMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, mode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_measureModeChoice, mode);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_measureScalarRange(scpi_t *context) {
+    int32_t range;
+    if (!SCPI_ParamInt32(context, &range, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (range < 0 || range > 255) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::setMeasureRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_measureScalarRangeQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    uint8_t range;
+    int err;
+    if (!channel_dispatcher::getMeasureRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt8(context, range);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_measureScalarTemperatureSensorBias(scpi_t *context) {
+    bool enabled;
+    if (!SCPI_ParamBool(context, &enabled, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::setMeasureTempSensorBias(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, enabled, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_measureScalarTemperatureSensorBiasQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    bool enabled;
+    int err;
+    if (!channel_dispatcher::getMeasureTempSensorBias(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, enabled, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultBool(context, enabled);
 
     return SCPI_RES_OK;
 }

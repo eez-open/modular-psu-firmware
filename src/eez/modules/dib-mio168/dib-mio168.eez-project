@@ -34,19 +34,14 @@
       "defaultValue": "[\n  { \"input_no\": 1, \"input_state\": 0 },\n  { \"input_no\": 2, \"input_state\": 1 },\n  { \"input_no\": 3, \"input_state\": 1 },\n  { \"input_no\": 4, \"input_state\": 1 },\n  { \"input_no\": 5, \"input_state\": 0 },\n  { \"input_no\": 6, \"input_state\": 1 },\n  { \"input_no\": 7, \"input_state\": 0 },\n  { \"input_no\": 8, \"input_state\": 1 }\n]"
     },
     {
-      "name": "din_pins_1_2",
+      "name": "din_pins_1_4",
       "type": "list",
-      "defaultValue": "[\n  { \"input_no\": 1, \"input_state\": 0, \"input_range\": 0, \"input_speed\": 0 },\n  { \"input_no\": 2, \"input_state\": 1, \"input_range\": 1, \"input_speed\": 1 }\n]"
+      "defaultValue": "[\n  { \"din_no\": 1, \"din_state\": 0, \"din_range\": 0, \"din_has_speed\": 1, \"input_speed\": 0 },\n  { \"din_no\": 2, \"din_state\": 1, \"din_range\": 1, \"din_has_speed\": 1, \"input_speed\": 1 },\n  { \"din_no\": 3, \"din_state\": 1, \"din_range\": 1, \"din_has_speed\": 0 },\n  { \"din_no\": 4, \"din_state\": 0, \"din_range\": 1, \"din_has_speed\": 0 }\n]"
     },
     {
-      "name": "din_pins_3_5",
+      "name": "din_pins_5_8",
       "type": "list",
-      "defaultValue": "[\n  { \"input_no\": 3, \"input_state\": 1, \"input_range\": 1 },\n  { \"input_no\": 4, \"input_state\": 1, \"input_range\": 0 },\n  { \"input_no\": 5, \"input_state\": 0, \"input_range\": 1 }\n]"
-    },
-    {
-      "name": "din_pins_6_8",
-      "type": "list",
-      "defaultValue": "[\n  { \"input_no\": 6, \"input_state\": 1, \"input_range\": 1 },\n  { \"input_no\": 7, \"input_state\": 1, \"input_range\": 1 },\n  { \"input_no\": 8, \"input_state\": 0, \"input_range\": 0 }\n]"
+      "defaultValue": "[\n  { \"din_no\": 5, \"din_state\": 1, \"din_range\": 1 },\n  { \"din_no\": 6, \"din_state\": 1, \"din_range\": 1 },\n  { \"din_no\": 7, \"din_state\": 0, \"din_range\": 1 },\n  { \"din_no\": 8, \"din_state\": 0, \"din_range\": 0 }\n]"
     },
     {
       "name": "din_no",
@@ -103,7 +98,7 @@
     {
       "name": "ain_mode",
       "type": "enum",
-      "enumItems": "[\"Current\", \"Voltage\"]",
+      "enumItems": "[\"Current\", \"Voltage\", \"Open\"]",
       "defaultValue": "0"
     },
     {
@@ -181,6 +176,11 @@
       "name": "pwm_duty",
       "type": "float",
       "defaultValue": "50 %"
+    },
+    {
+      "name": "din_has_speed",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -2205,7 +2205,7 @@
                 },
                 "data": "",
                 "action": "",
-                "left": 0,
+                "left": 37,
                 "top": 0,
                 "width": 40,
                 "height": 40,
@@ -2220,7 +2220,7 @@
                 },
                 "data": "",
                 "action": "",
-                "left": 44,
+                "left": 81,
                 "top": 0,
                 "width": 80,
                 "height": 40,
@@ -2235,7 +2235,7 @@
                 },
                 "data": "",
                 "action": "",
-                "left": 128,
+                "left": 165,
                 "top": 0,
                 "width": 80,
                 "height": 40,
@@ -2250,7 +2250,7 @@
                 },
                 "data": "",
                 "action": "",
-                "left": 212,
+                "left": 281,
                 "top": 0,
                 "width": 40,
                 "height": 40,
@@ -2265,37 +2265,7 @@
                 },
                 "data": "",
                 "action": "",
-                "left": 256,
-                "top": 0,
-                "width": 80,
-                "height": 40,
-                "text": "Range"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14",
-                  "alignVertical": "center"
-                },
-                "data": "",
-                "action": "",
-                "left": 340,
-                "top": 0,
-                "width": 40,
-                "height": 40,
-                "text": "#"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14",
-                  "alignVertical": "center"
-                },
-                "data": "",
-                "action": "",
-                "left": 384,
+                "left": 325,
                 "top": 0,
                 "width": 80,
                 "height": 40,
@@ -2306,11 +2276,11 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "din_pins_1_2",
-                "left": 0,
+                "data": "din_pins_1_4",
+                "left": 37,
                 "top": 40,
                 "width": 212,
-                "height": 88,
+                "height": 176,
                 "itemWidget": {
                   "type": "Container",
                   "style": {
@@ -2381,38 +2351,62 @@
                       "style": {
                         "inheritFrom": "default"
                       },
-                      "data": "din_speed",
-                      "action": "din_select_speed",
+                      "data": "din_has_speed",
                       "left": 128,
                       "top": 0,
                       "width": 80,
                       "height": 40,
                       "widgets": [
                         {
-                          "type": "Text",
+                          "type": "Rectangle",
                           "style": {
-                            "inheritFrom": "edit_value_active_M_center"
+                            "inheritFrom": "default"
                           },
-                          "data": "",
-                          "action": "",
                           "left": 0,
                           "top": 0,
                           "width": 80,
                           "height": 40,
-                          "text": "Fast"
+                          "invertColors": true
                         },
                         {
-                          "type": "Text",
+                          "type": "Select",
                           "style": {
-                            "inheritFrom": "edit_value_active_M_center"
+                            "inheritFrom": "default"
                           },
-                          "data": "",
-                          "action": "",
+                          "data": "din_speed",
+                          "action": "din_select_speed",
                           "left": 0,
                           "top": 0,
                           "width": 80,
                           "height": 40,
-                          "text": "Slow"
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "edit_value_active_M_center"
+                              },
+                              "data": "",
+                              "action": "",
+                              "left": 0,
+                              "top": 0,
+                              "width": 80,
+                              "height": 40,
+                              "text": "Fast"
+                            },
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "edit_value_active_M_center"
+                              },
+                              "data": "",
+                              "action": "",
+                              "left": 0,
+                              "top": 0,
+                              "width": 80,
+                              "height": 40,
+                              "text": "Slow"
+                            }
+                          ]
                         }
                       ]
                     }
@@ -2425,90 +2419,11 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "din_pins_3_5",
-                "left": 212,
+                "data": "din_pins_5_8",
+                "left": 281,
                 "top": 40,
                 "width": 128,
-                "height": 132,
-                "itemWidget": {
-                  "type": "Container",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "left": 0,
-                  "top": 0,
-                  "width": 128,
-                  "height": 44,
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "default",
-                        "font": "Oswald14",
-                        "alignVertical": "center"
-                      },
-                      "data": "din_no",
-                      "action": "",
-                      "left": 0,
-                      "top": 0,
-                      "width": 40,
-                      "height": 40,
-                      "text": ""
-                    },
-                    {
-                      "type": "Select",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "data": "din_range",
-                      "action": "din_select_range",
-                      "left": 44,
-                      "top": 0,
-                      "width": 80,
-                      "height": 40,
-                      "widgets": [
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "edit_value_active_M_center"
-                          },
-                          "data": "",
-                          "action": "",
-                          "left": 0,
-                          "top": 0,
-                          "width": 80,
-                          "height": 40,
-                          "text": "Low"
-                        },
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "edit_value_active_M_center"
-                          },
-                          "data": "",
-                          "action": "",
-                          "left": 0,
-                          "top": 0,
-                          "width": 80,
-                          "height": 40,
-                          "text": "High"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "gridFlow": "row"
-              },
-              {
-                "type": "Grid",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "din_pins_6_8",
-                "left": 340,
-                "top": 40,
-                "width": 128,
-                "height": 132,
+                "height": 176,
                 "itemWidget": {
                   "type": "Container",
                   "style": {
@@ -2779,6 +2694,19 @@
                     "width": 200,
                     "height": 40,
                     "text": "Voltage"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "",
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 200,
+                    "height": 40,
+                    "text": "Open"
                   }
                 ]
               },

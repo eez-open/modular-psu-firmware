@@ -140,48 +140,81 @@ scpi_result_t get_tripped(scpi_t *context, ProtectionValue &cpv) {
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitude(scpi_t *context) {
-    Channel *channel = getPowerChannelFromCommandNumber(context);
-    if (!channel) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
-    if (channel_dispatcher::getVoltageTriggerMode(*channel) != TRIGGER_MODE_FIXED &&
-        !trigger::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
-        return SCPI_RES_ERR;
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (channel) {
+        if (!checkPowerChannel(context, channel->channelIndex)) {
+            return SCPI_RES_ERR;
+        }
     }
 
     float current;
-    if (!get_current_param(context, current, channel, &channel->i)) {
+    if (!get_current_param(context, current, slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, channel ? &channel->i : nullptr)) {
         return SCPI_RES_ERR;
     }
 
-    if (channel->isCurrentLimitExceeded(current)) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
-        return SCPI_RES_ERR;
-    }
 
-    int err;
-    if (channel->isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(*channel), current, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
+    if (channel) {
+        if (channel_dispatcher::getCurrentTriggerMode(*channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
+            SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+            return SCPI_RES_ERR;
+        }
 
-    channel_dispatcher::setCurrent(*channel, current);
+        if (channel->isCurrentLimitExceeded(current)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
+            return SCPI_RES_ERR;
+        }
+
+        int err;
+        if (channel->isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(*channel), current, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
+
+        channel_dispatcher::setCurrent(*channel, current);
+    } else {
+        int err;
+        if (!channel_dispatcher::setCurrent(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, current, &err)) {
+            SCPI_ErrorPush(context, err);
+        }
+    }
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitudeQ(scpi_t *context) {
-    Channel *channel = getPowerChannelFromCommandNumber(context);
-    if (!channel) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
-    return get_source_value(context, UNIT_AMPER, channel_dispatcher::getISet(*channel),
-        channel_dispatcher::getIMin(*channel),
-        channel_dispatcher::getIMax(*channel),
-        channel_dispatcher::getIDef(*channel));
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (channel) {
+        if (!checkPowerChannel(context, channel->channelIndex)) {
+            return SCPI_RES_ERR;
+        }
+    }
+
+    float value;
+
+    if (channel) {
+        value = channel_dispatcher::getISet(*channel);
+    } else {
+        int err;
+        if (!channel_dispatcher::getCurrent(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, value, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }        
+    }
+
+    return get_source_value(context, UNIT_AMPER, value,
+        channel_dispatcher::getIMin(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex),
+        channel_dispatcher::getIMax(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex),
+        channel_dispatcher::getIDef(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex));
 }
 
 scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
@@ -260,6 +293,7 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ(scpi_t *context) {
         int err;
         if (!channel_dispatcher::getVoltage(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, value, &err)) {
             SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
         }        
     }
 
@@ -1295,6 +1329,138 @@ scpi_result_t scpi_cmd_sourceDigitalDataByteQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+static scpi_choice_def_t g_sourceDigitalRangeChoice[] = {
+    { "LOW", 0 },
+    { "HIGH", 1 },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_sourceDigitalRange(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin < 1 || pin > 256) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    pin--;
+
+    int32_t range;
+    if (!SCPI_ParamChoice(context, g_sourceDigitalRangeChoice, &range, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::setDigitalInputRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, pin, range, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalRangeQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin < 1 || pin > 256) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    pin--;
+
+    uint8_t range;
+    int err;
+    if (!channel_dispatcher::getDigitalInputRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, pin, range, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_sourceDigitalRangeChoice, range);
+
+    return SCPI_RES_OK;
+}
+
+static scpi_choice_def_t g_sourceDigitalSpeedChoice[] = {
+    { "FAST", 0 },
+    { "SLOW", 1 },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_sourceDigitalSpeed(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin < 1 || pin > 256) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    pin--;
+
+    int32_t speed;
+    if (!SCPI_ParamChoice(context, g_sourceDigitalSpeedChoice, &speed, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::setDigitalInputSpeed(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, pin, speed, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalSpeedQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin < 1 || pin > 256) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    pin--;
+
+    uint8_t speed;
+    int err;
+    if (!channel_dispatcher::getDigitalInputSpeed(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, pin, speed, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_sourceDigitalSpeedChoice, speed);
+
+    return SCPI_RES_OK;
+}
+
 static scpi_choice_def_t g_sourceModeChoice[] = {
     { "CURRent", SOURCE_MODE_CURRENT },
     { "VOLTage", SOURCE_MODE_VOLTAGE },
@@ -1370,14 +1536,14 @@ scpi_result_t scpi_cmd_sourceCurrentRangeQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    int8_t range;
+    uint8_t range;
     int err;
     if (!channel_dispatcher::getCurrentRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultInt8(context, range);
+    SCPI_ResultUInt8(context, range);
 
     return SCPI_RES_OK;
 }
@@ -1413,14 +1579,14 @@ scpi_result_t scpi_cmd_sourceVoltageRangeQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    int8_t range;
+    uint8_t range;
     int err;
     if (!channel_dispatcher::getVoltageRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultInt8(context, range);
+    SCPI_ResultUInt8(context, range);
 
     return SCPI_RES_OK;
 }

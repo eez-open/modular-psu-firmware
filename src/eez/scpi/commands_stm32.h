@@ -79,6 +79,12 @@
     SCPI_COMMAND("MEASure[:SCALar]:CURRent[:DC]?", scpi_cmd_measureScalarCurrentDcQ) \
     SCPI_COMMAND("MEASure[:SCALar]:POWer[:DC]?", scpi_cmd_measureScalarPowerDcQ) \
     SCPI_COMMAND("MEASure[:SCALar][:VOLTage][:DC]?", scpi_cmd_measureScalarVoltageDcQ) \
+    SCPI_COMMAND("MEASure[:SCALar]:MODe", scpi_cmd_measureScalarMode) \
+    SCPI_COMMAND("MEASure[:SCALar]:MODe?", scpi_cmd_measureScalarModeQ) \
+    SCPI_COMMAND("MEASure[:SCALar]:RANGe", scpi_cmd_measureScalarRange) \
+    SCPI_COMMAND("MEASure[:SCALar]:RANGe?", scpi_cmd_measureScalarRangeQ) \
+    SCPI_COMMAND("MEASure[:SCALar]:TEMPerature:SENSor:BIAS", scpi_cmd_measureScalarTemperatureSensorBias) \
+    SCPI_COMMAND("MEASure[:SCALar]:TEMPerature:SENSor:BIAS?", scpi_cmd_measureScalarTemperatureSensorBiasQ) \
     SCPI_COMMAND("MEASure:DIGital[:BYTE]?", scpi_cmd_measureDigitalByteQ) \
     SCPI_COMMAND("MEMory:NSTates?", scpi_cmd_memoryNstatesQ) \
     SCPI_COMMAND("MEMory:STATe:CATalog?", scpi_cmd_memoryStateCatalogQ) \
@@ -238,8 +244,12 @@
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate][:AMPLitude]?", scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ) \
     SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]", scpi_cmd_sourceDigitalDataByte) \
     SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]?", scpi_cmd_sourceDigitalDataByteQ) \
-    SCPI_COMMAND("[SOURce#]:MODE", scpi_cmd_sourceMode) \
-    SCPI_COMMAND("[SOURce#]:MODE?", scpi_cmd_sourceModeQ) \
+    SCPI_COMMAND("[SOURce#]:DIGital:RANGe", scpi_cmd_sourceDigitalRange) \
+    SCPI_COMMAND("[SOURce#]:DIGital:RANGe?", scpi_cmd_sourceDigitalRangeQ) \
+    SCPI_COMMAND("[SOURce#]:DIGital:SPEED", scpi_cmd_sourceDigitalSpeed) \
+    SCPI_COMMAND("[SOURce#]:DIGital:SPEED?", scpi_cmd_sourceDigitalSpeedQ) \
+    SCPI_COMMAND("[SOURce#]:MODe", scpi_cmd_sourceMode) \
+    SCPI_COMMAND("[SOURce#]:MODe?", scpi_cmd_sourceModeQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:RANGe", scpi_cmd_sourceCurrentRange) \
     SCPI_COMMAND("[SOURce#]:CURRent:RANGe?", scpi_cmd_sourceCurrentRangeQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:RANGe", scpi_cmd_sourceVoltageRange) \

@@ -377,7 +377,7 @@ public:
 
         READ_PROPERTY("relayOn", parameters->relayOn);
 
-        return true;
+        return false;
     }
 
     void resetConfiguration() {
@@ -561,7 +561,7 @@ public:
 
         if (subchannelIndex != 1 && subchannelIndex != 2) {
             if (*err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }
@@ -580,7 +580,7 @@ public:
 
         if (subchannelIndex != 1 && subchannelIndex != 2) {
             if (err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
         }

@@ -1205,6 +1205,21 @@ bool ReadContext::property(const char *name, uint16_t &value) {
     return true;
 }
 
+bool ReadContext::property(const char *name, uint8_t &value) {
+    if (strcmp(propertyName, name) != 0) {
+        return false;
+    }
+
+    unsigned int temp;
+    if (sd_card::match(file, temp)) {
+        value = (uint8_t)temp;
+    } else {
+        result = false;
+    }
+
+    return true;
+}
+
 bool ReadContext::property(const char *name, bool &value) {
     if (strcmp(propertyName, name) != 0) {
         return false;
