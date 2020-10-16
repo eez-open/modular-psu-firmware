@@ -76,6 +76,12 @@ scpi_result_t scpi_cmd_outputState(scpi_t *context) {
         auto channel = Channel::getBySlotIndex(channelList.channels[i].slotIndex, channelList.channels[i].subchannelIndex);
         if (channel) {
             channels[numChannels++] = channel->channelIndex;
+        } else {
+            int err;
+            if (!g_slots[channelList.channels[i].slotIndex]->outputEnable(channelList.channels[i].subchannelIndex, enable, &err)) {
+                SCPI_ErrorPush(context, err);    
+                return SCPI_RES_ERR;
+            }
         }
     }
 
@@ -102,7 +108,13 @@ scpi_result_t scpi_cmd_outputStateQ(scpi_t *context) {
         if (channel) {
             SCPI_ResultBool(context, channel->isOutputEnabled());
         } else {
-            SCPI_ResultBool(context, false);
+            bool enabled;
+            int err;
+            if (!g_slots[channelList.channels[i].slotIndex]->isOutputEnabled(channelList.channels[i].subchannelIndex, enabled, &err)) {
+                SCPI_ErrorPush(context, err);    
+                return SCPI_RES_ERR;
+            }
+            SCPI_ResultBool(context, enabled);
         }
     }
 

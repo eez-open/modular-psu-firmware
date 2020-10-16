@@ -391,6 +391,20 @@ bool Module::getRelayCycles(int subchannelIndex, uint32_t &relayCycles, int *err
     return false;
 }
 
+bool Module::outputEnable(int subchannelIndex, bool enable, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::isOutputEnabled(int subchannelIndex, bool &enabled, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
 bool Module::getVoltage(int subchannelIndex, float &value, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
@@ -504,6 +518,12 @@ bool Module::saveChannelCalibration(int subchannelIndex, int *err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
     return false;
+}
+
+void Module::startChannelCalibration(int subchannelIndex) {
+}
+
+void Module::stopChannelCalibration(int subchannelIndex) {
 }
 
 void Module::getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points) {

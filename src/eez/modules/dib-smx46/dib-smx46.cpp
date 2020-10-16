@@ -638,7 +638,7 @@ public:
         }
     }
 
-    bool loadChannelCalibration(int subchannelIndex, int *err) {
+    bool loadChannelCalibration(int subchannelIndex, int *err) override {
         if (subchannelIndex == 0 || subchannelIndex == 1) {
             persist_conf::loadChannelCalibrationConfiguration(slotIndex, subchannelIndex, calConf[subchannelIndex]);
             return true;
@@ -647,7 +647,7 @@ public:
         return true;
     }
 
-    bool saveChannelCalibration(int subchannelIndex, int *err) {
+    bool saveChannelCalibration(int subchannelIndex, int *err) override {
         if (subchannelIndex == 0 || subchannelIndex == 1) {
             return persist_conf::saveChannelCalibrationConfiguration(slotIndex, subchannelIndex, calConf[subchannelIndex]);
         }

@@ -111,16 +111,19 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     static const int GAP_BETWEEN_LABEL_AND_EDGE = 4;
     static const int MARGIN = GAP_BETWEEN_LABEL_AND_AXIS + glyphLabel.height + GAP_BETWEEN_LABEL_AND_EDGE;
 
-    float maxLimit;
+    float minLimit;
     Unit unit;
+    calibrationBase.getMinValue(calibrationValueType, minLimit, unit);
+
+    float maxLimit;
     calibrationBase.getMaxValue(calibrationValueType, maxLimit, unit);
 
     float d = maxLimit / chartZoom;
 
     float min = dacValue - d / 2;
     float max = min + d;
-    if (min < 0) {
-        min = 0;
+    if (min < minLimit) {
+        min = minLimit;
         max = d;
     } else if (max > maxLimit) {
         min = maxLimit - d;

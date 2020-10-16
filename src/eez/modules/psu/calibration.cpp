@@ -248,6 +248,28 @@ bool CalibrationBase::isCalibrationExists() {
     }
 }
 
+void CalibrationBase::getMinValue(CalibrationValueType valueType, float &value, Unit &unit) {
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+
+    if (valueType == CALIBRATION_VALUE_U) {
+        value = channel ? channel->u.min : channel_dispatcher::getVoltageMinValue(slotIndex, subchannelIndex);
+        unit = UNIT_VOLT;
+        return;
+    }
+
+    if (valueType == CALIBRATION_VALUE_I_HI_RANGE) {
+        value = channel ? channel->i.min : channel_dispatcher::getCurrentMinValue(slotIndex, subchannelIndex);
+        unit = UNIT_AMPER;
+        return;
+    }
+
+    value = 0.05f;
+    unit = UNIT_AMPER;
+}
+
 void CalibrationBase::getMaxValue(CalibrationValueType valueType, float &value, Unit &unit) {
     int slotIndex;
     int subchannelIndex;
@@ -261,7 +283,7 @@ void CalibrationBase::getMaxValue(CalibrationValueType valueType, float &value, 
     } 
     
     if (valueType == CALIBRATION_VALUE_I_HI_RANGE) {
-        value = channel ? channel -> i.max : channel_dispatcher::getCurrentMaxValue(slotIndex, subchannelIndex);
+        value = channel ? channel->i.max : channel_dispatcher::getCurrentMaxValue(slotIndex, subchannelIndex);
         unit = UNIT_AMPER;
         return;
     } 
@@ -324,6 +346,7 @@ void CalibrationEditor::doStart() {
         channel_dispatcher::setVoltage(*channel, channel->u.min);
         channel_dispatcher::setCurrent(*channel, channel->i.min);
     } else {
+        g_slots[m_slotIndex]->outputEnable(m_subchannelIndex, false, nullptr);
         channel_dispatcher::setVoltage(m_slotIndex, m_subchannelIndex, channel_dispatcher::getVoltageMinValue(m_slotIndex, m_subchannelIndex), nullptr);
         channel_dispatcher::setCurrent(m_slotIndex, m_subchannelIndex, channel_dispatcher::getCurrentMinValue(m_slotIndex, m_subchannelIndex), nullptr);
     }
@@ -352,6 +375,8 @@ void CalibrationEditor::doStart() {
     } else {
         g_slots[m_slotIndex]->enableVoltageCalibration(m_subchannelIndex, false);
         g_slots[m_slotIndex]->enableCurrentCalibration(m_subchannelIndex, false);
+        g_slots[m_slotIndex]->outputEnable(m_subchannelIndex, true, nullptr);
+        g_slots[m_slotIndex]->startChannelCalibration(m_subchannelIndex);
     }
 }
 
@@ -401,6 +426,8 @@ void CalibrationEditor::stop() {
         if (g_slots[m_slotIndex]->isCurrentCalibrationExists(m_subchannelIndex)) {
             g_slots[m_slotIndex]->enableCurrentCalibration(m_subchannelIndex, true);
         }
+
+        g_slots[m_slotIndex]->stopChannelCalibration(m_subchannelIndex);
     }
 }
 
