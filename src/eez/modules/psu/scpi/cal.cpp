@@ -42,7 +42,7 @@ scpi_choice_def_t calibration_current_range_choice[] = {
 ////////////////////////////////////////////////////////////////////////////////
 
 static scpi_result_t calibration_level(scpi_t *context, calibration::Value &calibrationValue) {
-    if (!calibration::isEnabled()) {
+    if (!calibration::g_editor.isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CALIBRATION_STATE_IS_OFF);
         return SCPI_RES_ERR;
     }
@@ -59,7 +59,7 @@ static scpi_result_t calibration_level(scpi_t *context, calibration::Value &cali
 
     int slotIndex;
     int subchannelIndex;
-    calibration::getCalibrationChannel(slotIndex, subchannelIndex);
+    calibration::g_editor.getCalibrationChannel(slotIndex, subchannelIndex);
 
     float dacValue;
     if (calibrationValue.type == CALIBRATION_VALUE_U) {
@@ -67,7 +67,7 @@ static scpi_result_t calibration_level(scpi_t *context, calibration::Value &cali
             return SCPI_RES_ERR;
         }
     } else {
-        if (!calibration::isCalibrationValueTypeSelectable()) {
+        if (!calibration::g_editor.isCalibrationValueTypeSelectable()) {
             SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
             return SCPI_RES_ERR;
         }
@@ -83,7 +83,7 @@ static scpi_result_t calibration_level(scpi_t *context, calibration::Value &cali
     return SCPI_RES_OK;
 }
 static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calibrationValue) {
-    if (!calibration::isEnabled()) {
+    if (!calibration::g_editor.isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CALIBRATION_STATE_IS_OFF);
         return SCPI_RES_ERR;
     }
@@ -93,7 +93,7 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
         return SCPI_RES_ERR;
     }
 
-    if (calibrationValue.type != CALIBRATION_VALUE_U && !calibration::isCalibrationValueTypeSelectable()) {
+    if (calibrationValue.type != CALIBRATION_VALUE_U && !calibration::g_editor.isCalibrationValueTypeSelectable()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
     }
@@ -124,7 +124,7 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_calibrationClear(scpi_t *context) {
-    if (calibration::isEnabled()) {
+    if (calibration::g_editor.isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
     }
@@ -158,7 +158,7 @@ scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (enable == calibration::isEnabled()) {
+    if (enable == calibration::g_editor.isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
     }
@@ -194,34 +194,34 @@ scpi_result_t scpi_cmd_calibrationMode(scpi_t *context) {
     }
 
     if (enable) {
-        calibration::start(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex);
+        calibration::g_editor.start(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex);
     } else {
-        calibration::stop();
+        calibration::g_editor.stop();
     }
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_calibrationModeQ(scpi_t *context) {
-    SCPI_ResultBool(context, calibration::isEnabled());
+    SCPI_ResultBool(context, calibration::g_editor.isEnabled());
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_calibrationCurrentData(scpi_t *context) {
-    return calibration_data(context, calibration::getCurrent());
+    return calibration_data(context, calibration::g_editor.getCurrent());
 }
 
 scpi_result_t scpi_cmd_calibrationCurrentLevel(scpi_t *context) {
-    return calibration_level(context, calibration::getCurrent());
+    return calibration_level(context, calibration::g_editor.getCurrent());
 }
 
 scpi_result_t scpi_cmd_calibrationCurrentRange(scpi_t *context) {
-    if (!calibration::isEnabled()) {
+    if (!calibration::g_editor.isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CALIBRATION_STATE_IS_OFF);
         return SCPI_RES_ERR;
     }
 
-    if (!calibration::hasSupportForCurrentDualRange()) {
+    if (!calibration::g_editor.hasSupportForCurrentDualRange()) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
@@ -231,7 +231,7 @@ scpi_result_t scpi_cmd_calibrationCurrentRange(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    calibration::selectCurrentRange(range);
+    calibration::g_editor.selectCurrentRange(range);
 
     return SCPI_RES_OK;
 }
@@ -260,7 +260,7 @@ scpi_result_t scpi_cmd_calibrationPasswordNew(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationRemark(scpi_t *context) {
-    if (!calibration::isEnabled()) {
+    if (!calibration::g_editor.isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CALIBRATION_STATE_IS_OFF);
         return SCPI_RES_ERR;
     }
@@ -276,7 +276,7 @@ scpi_result_t scpi_cmd_calibrationRemark(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    calibration::setRemark(remark, len);
+    calibration::g_editor.setRemark(remark, len);
 
     return SCPI_RES_OK;
 }
@@ -284,8 +284,8 @@ scpi_result_t scpi_cmd_calibrationRemark(scpi_t *context) {
 scpi_result_t scpi_cmd_calibrationRemarkQ(scpi_t *context) {
     const char *remark;
 
-    if (calibration::isEnabled()) {
-        remark = calibration::getRemark();
+    if (calibration::g_editor.isEnabled()) {
+        remark = calibration::g_editor.getRemark();
     } else {
         Channel *channel = getSelectedPowerChannel(context);
         if (!channel) {
@@ -301,12 +301,12 @@ scpi_result_t scpi_cmd_calibrationRemarkQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_calibrationSave(scpi_t *context) {
     int16_t err;
-    if (!calibration::canSave(err)) {
+    if (!calibration::g_editor.canSave(err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
-    if (!calibration::save()) {
+    if (!calibration::g_editor.save()) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
@@ -315,7 +315,7 @@ scpi_result_t scpi_cmd_calibrationSave(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
-    if (calibration::isEnabled()) {
+    if (calibration::g_editor.isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
         return SCPI_RES_ERR;
     }
@@ -401,11 +401,11 @@ scpi_result_t scpi_cmd_calibrationStateQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_calibrationVoltageData(scpi_t *context) {
-    return calibration_data(context, calibration::getVoltage());
+    return calibration_data(context, calibration::g_editor.getVoltage());
 }
 
 scpi_result_t scpi_cmd_calibrationVoltageLevel(scpi_t *context) {
-    return calibration_level(context, calibration::getVoltage());
+    return calibration_level(context, calibration::g_editor.getVoltage());
 }
 
 scpi_result_t scpi_cmd_calibrationScreenInit(scpi_t *context) {

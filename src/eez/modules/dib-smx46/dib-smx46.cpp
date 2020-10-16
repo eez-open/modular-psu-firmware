@@ -638,18 +638,89 @@ public:
         }
     }
 
-    void getCalibrationPoints(CalibrationValueType type, unsigned int &numPoints, float *&points) override {
+    bool loadChannelCalibration(int subchannelIndex, int *err) {
+        if (subchannelIndex == 0 || subchannelIndex == 1) {
+            persist_conf::loadChannelCalibrationConfiguration(slotIndex, subchannelIndex, calConf[subchannelIndex]);
+            return true;
+        }
+        
+        return true;
+    }
+
+    bool saveChannelCalibration(int subchannelIndex, int *err) {
+        if (subchannelIndex == 0 || subchannelIndex == 1) {
+            return persist_conf::saveChannelCalibrationConfiguration(slotIndex, subchannelIndex, calConf[subchannelIndex]);
+        }
+      
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+        return false;
+    }
+
+    void getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points) override {
         points = U_CAL_POINTS;
         numPoints = sizeof(U_CAL_POINTS) / sizeof(float);
     }
 
-    CalibrationConfiguration *getCalibrationConfiguration(int subchannelIndex) override {
+    bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) override {
         if (subchannelIndex == 0) {
-            return &calConf[0];
+            memcpy(&calConf, &this->calConf[0], sizeof(CalibrationConfiguration));
+            return true;
         } else if (subchannelIndex == 1) {
-            return &calConf[1];
+            memcpy(&calConf, &this->calConf[1], sizeof(CalibrationConfiguration));
+            return true;
         }
-        return nullptr;
+
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+        return false;
+    }
+
+    bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) override {
+        if (subchannelIndex == 0) {
+            memcpy(&this->calConf[0], &calConf, sizeof(CalibrationConfiguration));
+            return true;
+        } else if (subchannelIndex == 1) {
+            memcpy(&this->calConf[1], &calConf, sizeof(CalibrationConfiguration));
+            return true;
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+        return false;
+    }
+
+    bool getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err) override {
+        if (subchannelIndex == 0) {
+            calibrationRemark = calConf[0].calibrationRemark;
+            return true;
+        } else if (subchannelIndex == 1) {
+            calibrationRemark = calConf[1].calibrationRemark;
+            return true;
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+        return false;
+    }
+
+    bool getCalibrationDate(int subchannelIndex, uint32_t &calibrationDate, int *err) override {
+        if (subchannelIndex == 0) {
+            calibrationDate = calConf[0].calibrationDate;
+            return true;
+        } else if (subchannelIndex == 1) {
+            calibrationDate = calConf[1].calibrationDate;
+            return true;
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+        return false;
     }
 
     bool isRouteOpen(int x, int y) {
@@ -986,11 +1057,13 @@ void action_dib_smx46_clear_all_labels() {
 
 void action_dib_smx46_show_dac1_calibration() {
     hmi::g_selectedSubchannelIndex = 0;
+    calibration::g_viewer.start(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
 }
 
 void action_dib_smx46_show_dac2_calibration() {
     hmi::g_selectedSubchannelIndex = 1;
+    calibration::g_viewer.start(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
 }
 

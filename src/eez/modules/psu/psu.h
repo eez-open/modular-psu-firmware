@@ -72,7 +72,10 @@ public:
     bool getProfileOutputEnable(uint8_t *buffer) override;
     float getProfileUSet(uint8_t *buffer) override;
     float getProfileISet(uint8_t *buffer) override;
-    CalibrationConfiguration *getCalibrationConfiguration(int subchannelIndex) override;
+    bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) override;
+    bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) override;
+    bool getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err) override;
+    bool getCalibrationDate(int subchannelIndex, uint32_t &calibrationDate, int *err) override;
 };
 
 /// Channel binary flags stored in profile.

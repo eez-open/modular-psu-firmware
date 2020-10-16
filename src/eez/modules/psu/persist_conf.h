@@ -355,10 +355,11 @@ bool saveModuleConf(int slotIndex);
 bool isChannelCalibrationEnabled(int slotIndex, int subchannelIndex);
 void saveCalibrationEnabledFlag(int slotIndex, int subchannelIndex, bool enabled);
 
-void loadChannelCalibration(Channel &channel);
-bool saveChannelCalibration(Channel &channel);
+bool loadChannelCalibrationConfiguration(int slotIndex, int subchannelIndex, BlockHeader *calConf, uint32_t calConfSize, int version);
+void loadChannelCalibrationConfiguration(int slotIndex, int subchannelIndex, CalibrationConfiguration &calConf);
 
-void loadChannelCalibration(int slotIndex, int subchannelIndex);
+bool saveChannelCalibrationConfiguration(int slotIndex, int subchannelIndex, const BlockHeader *calConf, uint32_t calConfSize, int version);
+bool saveChannelCalibrationConfiguration(int slotIndex, int subchannelIndex, const CalibrationConfiguration &calConf);
 bool saveChannelCalibration(int slotIndex, int subchannelIndex);
 
 uint32_t readCounter(int slotIndex, int counterIndex);

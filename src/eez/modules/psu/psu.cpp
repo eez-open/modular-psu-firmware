@@ -512,9 +512,28 @@ float PsuModule::getProfileISet(uint8_t *buffer) {
     return parameters->i_set;
 }
 
-CalibrationConfiguration *PsuModule::getCalibrationConfiguration(int subchannelIndex) {
+bool PsuModule::getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) {
     Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    return &channel->cal_conf;
+    memcpy(&calConf, &channel->cal_conf, sizeof(CalibrationConfiguration));
+    return true;
+}
+
+bool PsuModule::setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    memcpy(&channel->cal_conf, &calConf, sizeof(CalibrationConfiguration));
+    return true;
+}
+
+bool PsuModule::getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    calibrationRemark = channel->cal_conf.calibrationRemark;
+    return true;
+}
+
+bool PsuModule::getCalibrationDate(int subchannelIndex, uint32_t &calibrationDate, int *err) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    calibrationDate = channel->cal_conf.calibrationDate;
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -565,18 +584,6 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         channel_dispatcher::setVoltageInPsuThread((int)param);
     } else if (type == PSU_MESSAGE_SET_CURRENT) {
         channel_dispatcher::setCurrentInPsuThread((int)param);
-    } else if (type == PSU_MESSAGE_CALIBRATION_START) {
-        int slotIndex = param >> 8;
-        int subchannelIndex = param & 0xFF;
-        calibration::start(slotIndex, subchannelIndex);
-    } else if (type == PSU_MESSAGE_CALIBRATION_SELECT_CURRENT_RANGE) {
-        calibration::selectCurrentRange((int8_t)param);
-    } else if (type == PSU_MESSAGE_SAVE_CHANNEL_CALIBRATION) {
-        int slotIndex = param >> 8;
-        int subchannelIndex = param & 0xFF;
-        calibration::doSave(slotIndex, subchannelIndex);
-    } else if (type == PSU_MESSAGE_CALIBRATION_STOP) {
-        calibration::stop();
     } else if (type == PSU_MESSAGE_FLASH_SLAVE_START) {
         bp3c::flash_slave::doStart();
     } else if (type == PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE) {
@@ -602,6 +609,8 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         channel.setDprogState((DprogState)(param & 0xFF));
     } else if (type == PSU_MESSAGE_SAVE_SERIAL_NO) {
         persist_conf::saveSerialNo(param);
+    } else if (calibration::onHighPriorityThreadMessage(type, param)) {
+        // handled
     } else if (type >= PSU_MESSAGE_MODULE_SPECIFIC) {
         int slotIndex = param & 0xff;
         g_slots[slotIndex]->onHighPriorityThreadMessage(type, param);
@@ -754,7 +763,7 @@ bool psuReset() {
     }
 
     // CAL[:MODE] OFF
-    calibration::stop();
+    calibration::g_editor.stop();
 
     // reset channels
     int err;

@@ -373,10 +373,6 @@ void action_show_ch_settings_info() {
     pushPage(PAGE_ID_CH_SETTINGS_INFO);
 }
 
-void action_show_ch_settings_cal() {
-    pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
-}
-
 void action_edit_calibration_password() {
     editCalibrationPassword();
 }
@@ -405,10 +401,6 @@ void action_ch_settings_copy() {
     pushSelectFromEnumPage(channelsEnumDefinition, -1, nullptr, onChannelCopyDestinationSelected, false, false);
 }
 
-void action_ch_settings_calibration_start_calibration() {
-    ChSettingsCalibrationEditPage::start();
-}
-
 void action_ch_settings_calibration_toggle_enable() {
     if (g_channel) {
         g_channel->calibrationEnable(!g_channel->isCalibrationEnabled());
@@ -416,72 +408,6 @@ void action_ch_settings_calibration_toggle_enable() {
         bool enable = !g_slots[hmi::g_selectedSlotIndex]->isVoltageCalibrationEnabled(hmi::g_selectedSubchannelIndex);
         g_slots[hmi::g_selectedSlotIndex]->enableVoltageCalibration(hmi::g_selectedSubchannelIndex, enable);
         g_slots[hmi::g_selectedSlotIndex]->enableCurrentCalibration(hmi::g_selectedSubchannelIndex, enable);
-    }
-}
-
-void action_ch_settings_calibration_view_points() {
-    ChSettingsCalibrationViewPage::start();
-}
-
-void onSetChannelCalibrationValueType(uint16_t value) {
-    popPage();
-    
-    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
-    if (editPage) {
-        editPage->setCalibrationValueType((CalibrationValueType)value);
-    } else {
-        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
-        if (viewPage) {
-            viewPage->setCalibrationValueType((CalibrationValueType)value);
-        }
-    }
-}
-
-void action_select_channel_calibration_value_type() {
-    if (calibration::hasSupportForCurrentDualRange()) {
-        pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE, calibration::getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
-    } else {
-        pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE, calibration::getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
-    }
-}
-
-void action_channel_calibration_point_previous() {
-    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
-    if (editPage) {
-        editPage->moveToPreviousPoint();
-    } else {
-        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
-        viewPage->moveToPreviousPoint();
-    }        
-}
-
-void action_channel_calibration_point_next() {
-    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
-    if (editPage) {
-        editPage->moveToNextPoint();
-    } else {
-        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
-        viewPage->moveToNextPoint();
-    }        
-}
-
-void action_channel_calibration_point_save() {
-    auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
-    page->savePoint();
-}
-
-void action_channel_calibration_point_delete() {
-    auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
-    page->deletePoint();
-}
-
-void action_channel_calibration_chart_zoom() {
-    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
-    if (editPage) {
-        editPage->zoomChart();
-    } else {
-        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
-        viewPage->zoomChart();
     }
 }
 

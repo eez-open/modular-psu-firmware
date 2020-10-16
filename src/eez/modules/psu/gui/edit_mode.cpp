@@ -29,7 +29,6 @@
 #endif
 
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/dlog_record.h>
 

@@ -18,7 +18,6 @@
 
 #include <eez/modules/psu/psu.h>
 
-#include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/scpi/psu.h>

@@ -1314,7 +1314,7 @@ bool testOutputEnable(Channel &channel, bool enable, bool &callTriggerAbort, int
         bool triggerModeEnabled = getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED;
 
         if (channel.isOutputEnabled()) {
-            if (calibration::isEnabled()) {
+            if (calibration::g_editor.isEnabled()) {
                 if (err) {
                     *err = SCPI_ERROR_CAL_OUTPUT_DISABLED;
                 }

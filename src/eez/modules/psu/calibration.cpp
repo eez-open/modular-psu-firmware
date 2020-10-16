@@ -31,7 +31,7 @@
 #include <eez/modules/psu/scpi/psu.h>
 
 #include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/page_ch_settings.h>
+#include <eez/modules/psu/gui/channel_calibration.h>
 
 namespace eez {
 namespace psu {
@@ -39,26 +39,14 @@ namespace calibration {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static int g_slotIndex;
-static int g_subchannelIndex;
-
-static bool g_enabled;
-static bool g_remarkSet;
-static char g_remark[CALIBRATION_REMARK_MAX_LENGTH + 1];
-
-static int8_t g_currentRangeSelected = 0;
-
-static Value g_voltage(CALIBRATION_VALUE_U);
-
-static Value g_currents[2] = {
-    Value(CALIBRATION_VALUE_I_HI_RANGE),
-    Value(CALIBRATION_VALUE_I_LOW_RANGE)
-};
+CalibrationEditor g_editor;
+CalibrationViewer g_viewer;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Value::Value(CalibrationValueType type_)
-    : type(type_)
+Value::Value(CalibrationEditor &editor_, CalibrationValueType type_)
+    : editor(editor_)
+    , type(type_)
 {
 }
 
@@ -67,7 +55,7 @@ void Value::reset() {
 
     float *points;
 
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(editor.m_slotIndex, editor.m_subchannelIndex);
     if (channel) {
         if (type == CALIBRATION_VALUE_U) {
             configuration.numPoints = channel->params.U_CAL_NUM_POINTS;
@@ -80,7 +68,7 @@ void Value::reset() {
             points = channel->params.I_LOW_RANGE_CAL_POINTS;
         }
     } else {
-        g_slots[g_slotIndex]->getCalibrationPoints(type, configuration.numPoints, points);
+        g_slots[editor.m_slotIndex]->getDefaultCalibrationPoints(editor.m_subchannelIndex, type, configuration.numPoints, points);
     }
 
     for (unsigned int i = 0; i < configuration.numPoints; i++) {
@@ -111,14 +99,14 @@ void Value::setDacValue(float value) {
 
     configuration.points[currentPointIndex].dac = value;
 
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(editor.m_slotIndex, editor.m_subchannelIndex);
 
     if (type == CALIBRATION_VALUE_U) {
         if (channel) {
             channel_dispatcher::setVoltage(*channel, value);
             channel_dispatcher::setCurrent(*channel, channel->params.U_CAL_I_SET);
         } else {
-            channel_dispatcher::setVoltage(g_slotIndex, g_subchannelIndex, value, nullptr);
+            channel_dispatcher::setVoltage(editor.m_slotIndex, editor.m_subchannelIndex, value, nullptr);
         }
     } else {
         if (channel) {
@@ -129,7 +117,7 @@ void Value::setDacValue(float value) {
                 channel_dispatcher::setVoltage(*channel, channel->params.I_LOW_RANGE_CAL_U_SET);
             }
         } else {
-            // TODO
+            channel_dispatcher::setCurrent(editor.m_slotIndex, editor.m_subchannelIndex, value, nullptr);
         }
     }
 }
@@ -143,7 +131,7 @@ float Value::getDacValue() {
 }
 
 float Value::readAdcValue() {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(editor.m_slotIndex, editor.m_subchannelIndex);
     return channel ? (type == CALIBRATION_VALUE_U ? channel->u.mon_last : channel->i.mon_last) : NAN;
 }
 
@@ -152,7 +140,7 @@ bool Value::checkValueAndAdc(float value, float adc) {
         return false;
     }
 
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(editor.m_slotIndex, editor.m_subchannelIndex);
     if (channel) {
         float range = configuration.points[configuration.numPoints - 1].dac - configuration.points[0].dac;
         float allowedDiff = range * channel->params.CALIBRATION_DATA_TOLERANCE_PERCENT / 100;
@@ -215,21 +203,12 @@ bool Value::checkPoints() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool isEnabled() {
-    return g_enabled;
+void CalibrationBase::getCalibrationChannel(int &slotIndex, int &subchannelIndex) {
+    slotIndex = m_slotIndex;
+    subchannelIndex = m_subchannelIndex;
 }
 
-void getCalibrationChannel(int &slotIndex, int &subchannelIndex) {
-    if (isEnabled()) {
-        slotIndex = g_slotIndex;
-        subchannelIndex = g_subchannelIndex;
-    } else {
-        slotIndex = hmi::g_selectedSlotIndex;
-        subchannelIndex = hmi::g_selectedSubchannelIndex;
-    }
-}
-
-bool hasSupportForCurrentDualRange() {
+bool CalibrationBase::hasSupportForCurrentDualRange() {
     int slotIndex;
     int subchannelIndex;
     getCalibrationChannel(slotIndex, subchannelIndex);
@@ -240,7 +219,7 @@ bool hasSupportForCurrentDualRange() {
     return false;
 }
 
-CalibrationValueType getCalibrationValueType() {
+CalibrationValueType CalibrationBase::getCalibrationValueType() {
     int slotIndex;
     int subchannelIndex;
     getCalibrationChannel(slotIndex, subchannelIndex);
@@ -257,7 +236,7 @@ CalibrationValueType getCalibrationValueType() {
     return CALIBRATION_VALUE_U;
 }
 
-bool isCalibrationExists() {
+bool CalibrationBase::isCalibrationExists() {
     int slotIndex;
     int subchannelIndex;
     getCalibrationChannel(slotIndex, subchannelIndex);
@@ -269,7 +248,7 @@ bool isCalibrationExists() {
     }
 }
 
-void getMaxValue(CalibrationValueType valueType, float &value, Unit &unit) {
+void CalibrationBase::getMaxValue(CalibrationValueType valueType, float &value, Unit &unit) {
     int slotIndex;
     int subchannelIndex;
     getCalibrationChannel(slotIndex, subchannelIndex);
@@ -291,7 +270,7 @@ void getMaxValue(CalibrationValueType valueType, float &value, Unit &unit) {
     unit = UNIT_AMPER;
 }
 
-float roundCalibrationValue(Unit unit, float value) {
+float CalibrationBase::roundCalibrationValue(Unit unit, float value) {
     int slotIndex;
     int subchannelIndex;
     getCalibrationChannel(slotIndex, subchannelIndex);
@@ -305,7 +284,7 @@ float roundCalibrationValue(Unit unit, float value) {
         channel_dispatcher::getCurrentResolution(slotIndex, subchannelIndex));
 }
 
-bool isCalibrationValueTypeSelectable() {
+bool CalibrationBase::isCalibrationValueTypeSelectable() {
     int slotIndex;
     int subchannelIndex;
     getCalibrationChannel(slotIndex, subchannelIndex);
@@ -313,23 +292,7 @@ bool isCalibrationValueTypeSelectable() {
     return channel != nullptr;
 }
 
-ChannelMode getChannelMode() {
-    int slotIndex;
-    int subchannelIndex;
-    getCalibrationChannel(slotIndex, subchannelIndex);
-    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    if (channel) {
-        return channel->getMode();
-    }
-
-    if (g_slots[slotIndex]->isConstantVoltageMode(subchannelIndex)) {
-        return CHANNEL_MODE_CV;
-    }
-
-    return CHANNEL_MODE_UR;
-}
-
-float getDacValue(CalibrationValueType valueType) {
+float CalibrationBase::getDacValue(CalibrationValueType valueType) {
     int slotIndex;
     int subchannelIndex;
     getCalibrationChannel(slotIndex, subchannelIndex);
@@ -351,7 +314,113 @@ float getDacValue(CalibrationValueType valueType) {
     return value;
 }
 
-float getAdcValue(CalibrationValueType valueType) {
+////////////////////////////////////////////////////////////////////////////////
+
+void CalibrationEditor::doStart() {
+    Channel *channel = Channel::getBySlotIndex(m_slotIndex, m_subchannelIndex);
+
+    if (channel) {
+        channel_dispatcher::outputEnable(*channel, false);
+        channel_dispatcher::setVoltage(*channel, channel->u.min);
+        channel_dispatcher::setCurrent(*channel, channel->i.min);
+    } else {
+        channel_dispatcher::setVoltage(m_slotIndex, m_subchannelIndex, channel_dispatcher::getVoltageMinValue(m_slotIndex, m_subchannelIndex), nullptr);
+        channel_dispatcher::setCurrent(m_slotIndex, m_subchannelIndex, channel_dispatcher::getCurrentMinValue(m_slotIndex, m_subchannelIndex), nullptr);
+    }
+
+    profile::saveToLocation(10);
+    profile::setFreezeState(true);
+
+    reset();
+
+    selectCurrentRange(0);
+
+    m_voltageValue.reset();
+    m_currentsValue[0].reset();
+    if (hasSupportForCurrentDualRange()) {
+        m_currentsValue[1].reset();
+    }
+    
+    m_remarkSet = false;
+    m_remark[0] = 0;
+
+    m_enabled = true;
+    if (channel) {
+        channel->calibrationEnable(false);
+        channel_dispatcher::outputEnable(*channel, true);
+        channel->setOperBits(OPER_ISUM_CALI, true);
+    } else {
+        g_slots[m_slotIndex]->enableVoltageCalibration(m_subchannelIndex, false);
+        g_slots[m_slotIndex]->enableCurrentCalibration(m_subchannelIndex, false);
+    }
+}
+
+void CalibrationEditor::start(int slotIndex, int subchannelIndex) {
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_CALIBRATION_START, (slotIndex << 8) | subchannelIndex);
+        return;
+    }
+
+    if (!m_enabled) {
+        m_slotIndex = slotIndex;
+        m_subchannelIndex = subchannelIndex;
+        doStart();
+    }
+}
+
+void CalibrationEditor::stop() {
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_CALIBRATION_STOP);
+        return;
+    }
+
+    if (!m_enabled) {
+        return;
+    }
+
+    m_enabled = false;
+
+    Channel *channel = Channel::getBySlotIndex(m_slotIndex, m_subchannelIndex);
+
+    if (channel) {
+        channel->setOperBits(OPER_ISUM_CALI, false);
+    }
+
+    profile::recallFromLocation(10);
+    profile::setFreezeState(false);
+
+    if (channel) {
+        if (channel->isCalibrationExists()) {
+            channel->calibrationEnable(true);
+        }
+    } else {
+        if (g_slots[m_slotIndex]->isVoltageCalibrationExists(m_subchannelIndex)) {
+            g_slots[m_slotIndex]->enableVoltageCalibration(m_subchannelIndex, true);
+        }
+
+        if (g_slots[m_slotIndex]->isCurrentCalibrationExists(m_subchannelIndex)) {
+            g_slots[m_slotIndex]->enableCurrentCalibration(m_subchannelIndex, true);
+        }
+    }
+}
+
+ChannelMode CalibrationEditor::getChannelMode() {
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        return channel->getMode();
+    }
+
+    if (g_slots[slotIndex]->isConstantVoltageMode(subchannelIndex)) {
+        return CHANNEL_MODE_CV;
+    }
+
+    return CHANNEL_MODE_UR;
+}
+
+float CalibrationEditor::getAdcValue(CalibrationValueType valueType) {
     int slotIndex;
     int subchannelIndex;
     getCalibrationChannel(slotIndex, subchannelIndex);
@@ -366,155 +435,8 @@ float getAdcValue(CalibrationValueType valueType) {
     return NAN;
 }
 
-void setVoltage(float value) {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
-    if (channel) {
-        channel_dispatcher::setVoltage(*channel, value);
-    } else {
-        channel_dispatcher::setVoltage(g_slotIndex, g_subchannelIndex, value, nullptr);
-    }
-}
-
-void setCurrent(float value) {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
-    if (channel) {
-        channel_dispatcher::setCurrent(*channel, value);
-    } else {
-        channel_dispatcher::setCurrent(g_slotIndex, g_subchannelIndex, value, nullptr);
-    }
-}
-
-void doStart() {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
-
-    if (channel) {
-        channel_dispatcher::outputEnable(*channel, false);
-        channel_dispatcher::setVoltage(*channel, channel->u.min);
-        channel_dispatcher::setCurrent(*channel, channel->i.min);
-    } else {
-        channel_dispatcher::setVoltage(g_slotIndex, g_subchannelIndex, channel_dispatcher::getVoltageMinValue(g_slotIndex, g_subchannelIndex), nullptr);
-        channel_dispatcher::setCurrent(g_slotIndex, g_subchannelIndex, channel_dispatcher::getCurrentMinValue(g_slotIndex, g_subchannelIndex), nullptr);
-    }
-
-    profile::saveToLocation(10);
-    profile::setFreezeState(true);
-
-    reset();
-
-    selectCurrentRange(0);
-
-    g_voltage.reset();
-    g_currents[0].reset();
-    if (hasSupportForCurrentDualRange()) {
-        g_currents[1].reset();
-    }
-    
-    g_remarkSet = false;
-    g_remark[0] = 0;
-
-    g_enabled = true;
-    if (channel) {
-        channel->calibrationEnable(false);
-        channel_dispatcher::outputEnable(*channel, true);
-        channel->setOperBits(OPER_ISUM_CALI, true);
-    } else {
-        g_slots[g_slotIndex]->enableVoltageCalibration(g_subchannelIndex, false);
-        g_slots[g_slotIndex]->enableCurrentCalibration(g_subchannelIndex, false);
-    }
-}
-
-void start(int slotIndex, int subchannelIndex) {
-    if (!isPsuThread()) {
-        sendMessageToPsu(PSU_MESSAGE_CALIBRATION_START, (slotIndex << 8) | subchannelIndex);
-        return;
-    }
-
-    if (!g_enabled) {
-        g_slotIndex = slotIndex;
-        g_subchannelIndex = subchannelIndex;
-        doStart();
-    }
-}
-
-void stop() {
-    if (!isPsuThread()) {
-        sendMessageToPsu(PSU_MESSAGE_CALIBRATION_STOP);
-        return;
-    }
-
-    if (!g_enabled)
-        return;
-
-    g_enabled = false;
-
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
-
-    if (channel) {
-        channel->setOperBits(OPER_ISUM_CALI, false);
-    }
-
-    profile::recallFromLocation(10);
-
-    if (!channel) {
-        // TODO remove this when recallFromLocation for SMX46 is implemented
-        channel_dispatcher::setVoltage(g_slotIndex, g_subchannelIndex, channel_dispatcher::getVoltageMinValue(g_slotIndex, g_subchannelIndex), nullptr);
-        channel_dispatcher::setCurrent(g_slotIndex, g_subchannelIndex, channel_dispatcher::getCurrentMinValue(g_slotIndex, g_subchannelIndex), nullptr);
-    }
-
-    profile::setFreezeState(false);
-
-    if (channel) {
-        if (channel->isCalibrationExists()) {
-            channel->calibrationEnable(true);
-        }
-    } else {
-        if (g_slots[g_slotIndex]->isVoltageCalibrationExists(g_subchannelIndex)) {
-            g_slots[g_slotIndex]->enableVoltageCalibration(g_subchannelIndex, true);
-        }
-
-        if (g_slots[g_slotIndex]->isCurrentCalibrationExists(g_subchannelIndex)) {
-            g_slots[g_slotIndex]->enableCurrentCalibration(g_subchannelIndex, true);
-        }
-    }
-}
-
-void copyValueFromChannel(CalibrationValueConfiguration &channelValue, Value &value) {
-    value.configuration.numPoints = channelValue.numPoints;
-    for (unsigned int i = 0; i < channelValue.numPoints; i++) {
-        value.isPointSet[i] = true;
-        value.configuration.points[i].dac = channelValue.points[i].dac;
-        value.configuration.points[i].value = channelValue.points[i].value;
-        value.configuration.points[i].adc = channelValue.points[i].adc;
-    }
-}
-
-void copyValuesFromChannel() {
-	Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
-
-	CalibrationConfiguration *calConf;
-	if (channel) {
-		calConf = &channel->cal_conf;
-	} else {
-		calConf = g_slots[g_slotIndex]->getCalibrationConfiguration(g_subchannelIndex);
-	}
-
-	if (calConf->u.numPoints > 1) {
-		copyValueFromChannel(calConf->u, g_voltage);
-	}
-
-	if (calConf->i[0].numPoints > 1) {
-		copyValueFromChannel(calConf->i[0], g_currents[0]);
-	}
-
-    if (hasSupportForCurrentDualRange()) {
-    	if (calConf->i[1].numPoints > 1) {
-    		copyValueFromChannel(calConf->i[1], g_currents[1]);
-    	}
-    }
-}
-
-void selectCurrentRange(int8_t range) {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+void CalibrationEditor::selectCurrentRange(int8_t range) {
+    Channel *channel = Channel::getBySlotIndex(m_slotIndex, m_subchannelIndex);
     if (!channel) {
         return;
     }
@@ -524,34 +446,87 @@ void selectCurrentRange(int8_t range) {
         return;
     }
 
-    g_currentRangeSelected = range;
+    m_currentRangeSelected = range;
     channel->setCurrentRange(range);
     channel->setCurrentRangeSelectionMode(range == CURRENT_RANGE_LOW ? CURRENT_RANGE_SELECTION_ALWAYS_LOW : CURRENT_RANGE_SELECTION_ALWAYS_HIGH);
 }
 
-Value &getVoltage() {
-    return g_voltage;
+Value &CalibrationEditor::getVoltage() {
+    return m_voltageValue;
 }
 
-Value &getCurrent() {
-    return g_currents[g_currentRangeSelected];
+Value &CalibrationEditor::getCurrent() {
+    return m_currentsValue[m_currentRangeSelected];
 }
 
-bool isRemarkSet() {
-    return g_remarkSet;
+void CalibrationEditor::setVoltage(float value) {
+    Channel *channel = Channel::getBySlotIndex(m_slotIndex, m_subchannelIndex);
+    if (channel) {
+        channel_dispatcher::setVoltage(*channel, value);
+    } else {
+        channel_dispatcher::setVoltage(m_slotIndex, m_subchannelIndex, value, nullptr);
+    }
 }
 
-const char *getRemark() {
-    return g_remark;
+void CalibrationEditor::setCurrent(float value) {
+    Channel *channel = Channel::getBySlotIndex(m_slotIndex, m_subchannelIndex);
+    if (channel) {
+        channel_dispatcher::setCurrent(*channel, value);
+    } else {
+        channel_dispatcher::setCurrent(m_slotIndex, m_subchannelIndex, value, nullptr);
+    }
 }
 
-void setRemark(const char *value, size_t len) {
-    g_remarkSet = true;
-    memset(g_remark, 0, sizeof(g_remark));
-    strncpy(g_remark, value, len);
+static void copyValueFromChannel(CalibrationValueConfiguration &channelValue, Value &value) {
+    value.configuration.numPoints = channelValue.numPoints;
+    for (unsigned int i = 0; i < channelValue.numPoints; i++) {
+        value.isPointSet[i] = true;
+        value.configuration.points[i].dac = channelValue.points[i].dac;
+        value.configuration.points[i].value = channelValue.points[i].value;
+        value.configuration.points[i].adc = channelValue.points[i].adc;
+    }
 }
 
-static bool checkCalibrationValue(calibration::Value &calibrationValue, int16_t &scpiErr) {
+void CalibrationEditor::copyValuesFromChannel() {
+	Channel *channel = Channel::getBySlotIndex(m_slotIndex, m_subchannelIndex);
+
+	CalibrationConfiguration calConf;
+	if (channel) {
+        memcpy(&calConf, &channel->cal_conf, sizeof(CalibrationConfiguration));
+	} else {
+		g_slots[m_slotIndex]->getCalibrationConfiguration(m_subchannelIndex, calConf, nullptr);
+	}
+
+	if (calConf.u.numPoints > 1) {
+		copyValueFromChannel(calConf.u, m_voltageValue);
+	}
+
+	if (calConf.i[0].numPoints > 1) {
+		copyValueFromChannel(calConf.i[0], m_currentsValue[0]);
+	}
+
+    if (hasSupportForCurrentDualRange()) {
+    	if (calConf.i[1].numPoints > 1) {
+    		copyValueFromChannel(calConf.i[1], m_currentsValue[1]);
+    	}
+    }
+}
+
+bool CalibrationEditor::isRemarkSet() {
+    return m_remarkSet;
+}
+
+const char *CalibrationEditor::getRemark() {
+    return m_remark;
+}
+
+void CalibrationEditor::setRemark(const char *value, size_t len) {
+    m_remarkSet = true;
+    memset(m_remark, 0, sizeof(m_remark));
+    strncpy(m_remark, value, len);
+}
+
+static bool checkCalibrationValue(Value &calibrationValue, int16_t &scpiErr) {
     if (calibrationValue.configuration.numPoints < 2) {
         scpiErr = SCPI_ERROR_TOO_FEW_CAL_POINTS;
         return false;
@@ -565,7 +540,7 @@ static bool checkCalibrationValue(calibration::Value &calibrationValue, int16_t 
     return true;
 }
 
-bool isCalibrated(Value &value) {
+static bool isCalibrated(Value &value) {
     for (unsigned int i = 0; i < value.configuration.numPoints; i++) {
         if (!value.isPointSet[i]) {
             return false;
@@ -575,7 +550,7 @@ bool isCalibrated(Value &value) {
     return true;
 }
 
-bool canSave(int16_t &scpiErr, int16_t *uiErr) {
+bool CalibrationEditor::canSave(int16_t &scpiErr, int16_t *uiErr) {
     if (!isEnabled()) {
         scpiErr = SCPI_ERROR_CALIBRATION_STATE_IS_OFF;
         if (uiErr) {
@@ -587,8 +562,8 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
     // at least one value should be calibrated
     bool valueCalibrated = false;
 
-    if (isCalibrated(g_voltage)) {
-        if (!checkCalibrationValue(calibration::g_voltage, scpiErr)) {
+    if (isCalibrated(m_voltageValue)) {
+        if (!checkCalibrationValue(m_voltageValue, scpiErr)) {
             if (uiErr) {
                 if (scpiErr == SCPI_ERROR_TOO_FEW_CAL_POINTS) {
                     *uiErr = SCPI_ERROR_CALIBRATION_TOO_FEW_VOLTAGE_CAL_POINTS;
@@ -601,8 +576,8 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
         valueCalibrated = true;
     }
 
-    if (isCalibrated(g_currents[0])) {
-        if (!checkCalibrationValue(g_currents[0], scpiErr)) {
+    if (isCalibrated(m_currentsValue[0])) {
+        if (!checkCalibrationValue(m_currentsValue[0], scpiErr)) {
             if (uiErr) {
                 if (scpiErr == SCPI_ERROR_TOO_FEW_CAL_POINTS) {
                     *uiErr = hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_H_CAL_POINTS : SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_CAL_POINTS;
@@ -615,9 +590,9 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
         valueCalibrated = true;
     }
 
-    if (calibration::hasSupportForCurrentDualRange()) {
-        if (isCalibrated(g_currents[1])) {
-            if (!checkCalibrationValue(g_currents[1], scpiErr)) {
+    if (hasSupportForCurrentDualRange()) {
+        if (isCalibrated(m_currentsValue[1])) {
+            if (!checkCalibrationValue(m_currentsValue[1], scpiErr)) {
                 if (uiErr) {
                     if (scpiErr == SCPI_ERROR_TOO_FEW_CAL_POINTS) {
                         *uiErr = SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_L_CAL_POINTS;
@@ -650,7 +625,7 @@ bool canSave(int16_t &scpiErr, int16_t *uiErr) {
     return true;
 }
 
-bool doSave(int slotIndex, int subchannelIndex) {
+static bool doSave(int slotIndex, int subchannelIndex) {
     static bool result;
 
     result = false;
@@ -664,60 +639,66 @@ bool doSave(int slotIndex, int subchannelIndex) {
     return result;
 }
 
-bool save() {
-    Channel *channel = Channel::getBySlotIndex(g_slotIndex, g_subchannelIndex);
+bool CalibrationEditor::save() {
+    Channel *channel = Channel::getBySlotIndex(m_slotIndex, m_subchannelIndex);
 
-    CalibrationConfiguration *calConf;
+    CalibrationConfiguration calConf;
+
+    calConf.calibrationDate = datetime::now();
+
+    memset(&calConf.calibrationRemark, 0, CALIBRATION_REMARK_MAX_LENGTH + 1);
+    strcpy(calConf.calibrationRemark, m_remark);
+
+    if (isCalibrated(m_voltageValue)) {
+        memcpy(&calConf.u, &m_voltageValue.configuration, sizeof(CalibrationValueConfiguration));
+    }
+
+    if (isCalibrated(m_currentsValue[0])) {
+        memcpy(&calConf.i[0], &m_currentsValue[0].configuration, sizeof(CalibrationValueConfiguration));
+    }
+
+    if (hasSupportForCurrentDualRange() && isCalibrated(m_currentsValue[1])) {
+        memcpy(&calConf.i[1], &m_currentsValue[1].configuration, sizeof(CalibrationValueConfiguration));
+    }
+
     if (channel) {
-        calConf = &channel->cal_conf;
+        memcpy(&channel->cal_conf, &calConf, sizeof(CalibrationConfiguration));
     } else {
-        calConf = g_slots[g_slotIndex]->getCalibrationConfiguration(g_subchannelIndex);
+        if (!g_slots[m_slotIndex]->setCalibrationConfiguration(m_subchannelIndex, calConf, nullptr)) {
+            return false;
+        }
     }
 
-    calConf->calibrationDate = datetime::now();
-
-    memset(&calConf->calibrationRemark, 0, CALIBRATION_REMARK_MAX_LENGTH + 1);
-    strcpy(calConf->calibrationRemark, g_remark);
-
-    if (isCalibrated(g_voltage)) {
-        memcpy(&calConf->u, &g_voltage.configuration, sizeof(CalibrationValueConfiguration));
-    }
-
-    if (isCalibrated(g_currents[0])) {
-        memcpy(&calConf->i[0], &g_currents[0].configuration, sizeof(CalibrationValueConfiguration));
-    }
-
-    if (hasSupportForCurrentDualRange() && isCalibrated(g_currents[1])) {
-        memcpy(&calConf->i[1], &g_currents[1].configuration, sizeof(CalibrationValueConfiguration));
-    }
-
-    return doSave(g_slotIndex, g_subchannelIndex);
+    return doSave(m_slotIndex, m_subchannelIndex);
 }
 
-bool clear(int slotIndex, int subchannelIndex, int *err) {
-	CalibrationConfiguration *calConf;
+////////////////////////////////////////////////////////////////////////////////
 
+void CalibrationViewer::start(int slotIndex, int subchannelIndex) {
+    m_slotIndex = slotIndex;
+    m_subchannelIndex = subchannelIndex;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool clear(int slotIndex, int subchannelIndex, int *err) {
 	Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+
+    CalibrationConfiguration calConf;
+    clearCalibrationConf(&calConf);
 
     if (channel) {
         channel->calibrationEnable(false);
 
-		calConf = &channel->cal_conf;
+		memcpy(&channel->cal_conf, &calConf, sizeof(CalibrationConfiguration));
     } else {
         g_slots[slotIndex]->enableVoltageCalibration(subchannelIndex, false);
         g_slots[slotIndex]->enableCurrentCalibration(subchannelIndex, false);
 
-		calConf = g_slots[slotIndex]->getCalibrationConfiguration(subchannelIndex);
-    }
-
-    if (!calConf) {
-        if (err) {
-            *err = SCPI_ERROR_HARDWARE_MISSING;
+		if (!g_slots[slotIndex]->setCalibrationConfiguration(subchannelIndex, calConf, err)) {
+            return false;
         }
-        return false;
     }
-
-    clearCalibrationConf(calConf);
 
     if (!doSave(slotIndex, subchannelIndex)) {
         if (err) {
@@ -760,6 +741,28 @@ float remapValue(float value, CalibrationValueConfiguration &cal) {
         cal.points[i].dac,
         cal.points[j].value,
         cal.points[j].dac);
+}
+
+bool onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
+    if (type == PSU_MESSAGE_CALIBRATION_START) {
+        int slotIndex = param >> 8;
+        int subchannelIndex = param & 0xFF;
+        g_editor.start(slotIndex, subchannelIndex);
+    } else if (type == PSU_MESSAGE_CALIBRATION_SELECT_CURRENT_RANGE) {
+        g_editor.selectCurrentRange((int8_t)param);
+    } else if (type == PSU_MESSAGE_SAVE_CHANNEL_CALIBRATION) {
+        int slotIndex = param >> 8;
+        int subchannelIndex = param & 0xFF;
+        doSave(slotIndex, subchannelIndex);
+    } else if (type == PSU_MESSAGE_CALIBRATION_STOP) {
+        g_editor.stop();
+    } else {
+        // not handled
+        return false;
+    }
+
+    // handled
+    return true;
 }
 
 } // namespace calibration

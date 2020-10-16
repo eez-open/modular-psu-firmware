@@ -777,15 +777,15 @@ float Channel::getValuePrecision(Unit unit, float value) const {
 }
 
 float Channel::getVoltageResolution() const {
-    return calibration::isEnabled() ? params.U_RESOLUTION_DURING_CALIBRATION : params.U_RESOLUTION;
+    return calibration::g_editor.isEnabled() ? params.U_RESOLUTION_DURING_CALIBRATION : params.U_RESOLUTION;
 }
 
 float Channel::getCurrentResolution(float value) const {
-    float precision = calibration::isEnabled() ? params.I_RESOLUTION_DURING_CALIBRATION : params.I_RESOLUTION; // 0.5mA
+    float precision = calibration::g_editor.isEnabled() ? params.I_RESOLUTION_DURING_CALIBRATION : params.I_RESOLUTION; // 0.5mA
 
     if (hasSupportForCurrentDualRange()) {
         if (!isNaN(value) && value <= 0.05f && isMicroAmperAllowed()) {
-            precision = calibration::isEnabled() ? params.I_LOW_RESOLUTION_DURING_CALIBRATION : params.I_LOW_RESOLUTION; // 5uA
+            precision = calibration::g_editor.isEnabled() ? params.I_LOW_RESOLUTION_DURING_CALIBRATION : params.I_LOW_RESOLUTION; // 5uA
         }
     }
     
@@ -943,8 +943,8 @@ void Channel::executeOutputEnable(bool enable, uint16_t tasks) {
             setCvMode(false);
             setCcMode(false);
 
-            if (calibration::isEnabled()) {
-                calibration::stop();
+            if (calibration::g_editor.isEnabled()) {
+                calibration::g_editor.stop();
             }
         }
     }
@@ -1216,7 +1216,7 @@ void Channel::doSetVoltage(float value) {
 }
 
 void Channel::setVoltage(float value) {
-    if (!calibration::isEnabled()) {
+    if (!calibration::g_editor.isEnabled()) {
         value = roundPrec(value, getVoltageResolution());
     }
 
@@ -1224,7 +1224,7 @@ void Channel::setVoltage(float value) {
 }
 
 void Channel::doSetCurrent(float value) {
-    if (!calibration::isEnabled()) {
+    if (!calibration::g_editor.isEnabled()) {
         if (hasSupportForCurrentDualRange()) {
             if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH) {
                 setCurrentRange(value > 0.05f ? CURRENT_RANGE_HIGH : CURRENT_RANGE_LOW);
@@ -1249,7 +1249,7 @@ void Channel::doSetCurrent(float value) {
 }
 
 void Channel::setCurrent(float value) {
-    if (!calibration::isEnabled()) {
+    if (!calibration::g_editor.isEnabled()) {
         value = roundPrec(value, getCurrentResolution(value));
     }
 
@@ -1538,7 +1538,7 @@ void Channel::setCurrentRange(uint8_t currentCurrentRange) {
 }
 
 void Channel::doAutoSelectCurrentRange(uint32_t tickCount) {
-    if (calibration::isEnabled()) {
+    if (calibration::g_editor.isEnabled()) {
         return;
     }
 
@@ -1549,7 +1549,7 @@ void Channel::doAutoSelectCurrentRange(uint32_t tickCount) {
                     flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH &&
                     hasSupportForCurrentDualRange() && 
                     !isDacTesting() &&
-                    !calibration::isEnabled()) {
+                    !calibration::g_editor.isEnabled()) {
                     if (flags.currentCurrentRange == CURRENT_RANGE_LOW) {
                         if (i.set > 0.05f && isCcMode()) {
                             doSetCurrent(i.set);

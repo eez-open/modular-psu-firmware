@@ -152,6 +152,10 @@ void startHighPriorityThread() {
 
 void highPriorityThreadOneIter();
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+bool g_isForcedPsuThreadMessageHandling = false;
+#endif
+
 void highPriorityThreadMainLoop(const void *) {
 #ifdef __EMSCRIPTEN__
     highPriorityThreadOneIter();
@@ -172,21 +176,37 @@ void highPriorityThreadOneIter() {
         uint32_t param = QUEUE_MESSAGE_PARAM(message);
         psu::onThreadMessage(type, param);
     } else {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+        if (g_isForcedPsuThreadMessageHandling) {
+            return;
+        }
+#endif
         WATCHDOG_RESET();
         for (int i = 0; i < NUM_SLOTS; i++) {
             g_slots[i]->tick();
         }
-
         psu::tick();
     }
 }
 
 bool isPsuThread() {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    if (g_isForcedPsuThreadMessageHandling) {
+        return true;
+    }
+#endif
     return !g_isBooted || osThreadGetId() == g_highPriorityThreadHandle;
 }
 
 void sendMessageToPsu(HighPriorityThreadMessage messageType, uint32_t messageParam, uint32_t timeoutMillisec) {
     osMessagePut(g_highPriorityMessageQueueId, QUEUE_MESSAGE(messageType, messageParam), timeoutMillisec);
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    // In simulator, force handling of PSU/High priority thread messages immediately - in STM32 this will be done automatically by the FreeRTOS.
+    g_isForcedPsuThreadMessageHandling = true;
+    highPriorityThreadOneIter();
+    g_isForcedPsuThreadMessageHandling = false;
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -23,14 +23,40 @@ namespace psu {
 /// Channel calibration procedure.
 namespace calibration {
 
+////////////////////////////////////////////////////////////////////////////////////
+
+class CalibrationBase {
+    friend struct Value;
+
+public:
+    void getCalibrationChannel(int &slotIndex, int &subchannelIndex);
+    bool hasSupportForCurrentDualRange();
+    CalibrationValueType getCalibrationValueType();
+    bool isCalibrationExists();
+    void getMaxValue(CalibrationValueType valueType, float &value, Unit &unit);
+    float roundCalibrationValue(Unit unit, float value);
+    bool isCalibrationValueTypeSelectable();
+    float getDacValue(CalibrationValueType valueType);
+
+protected:
+    int m_slotIndex;
+    int m_subchannelIndex;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+class CalibrationEditor;
+
 /// Calibration parameters for the voltage or current during calibration procedure.
 struct Value {
+    CalibrationBase &editor;
+
     CalibrationValueType type;
     int currentPointIndex;
     bool isPointSet[MAX_CALIBRATION_POINTS];
     CalibrationValueConfiguration configuration;
 
-    Value(CalibrationValueType type);
+    Value(CalibrationEditor &editor_, CalibrationValueType type_);
 
     void reset();
 
@@ -47,56 +73,85 @@ struct Value {
     bool checkPoints();
 };
 
-bool isEnabled();
-void getCalibrationChannel(int &slotIndex, int &subchannelIndex);
-bool hasSupportForCurrentDualRange();
-CalibrationValueType getCalibrationValueType();
-bool isCalibrationExists();
-void getMaxValue(CalibrationValueType valueType, float &value, Unit &unit);
-float roundCalibrationValue(Unit unit, float value);
-bool isCalibrationValueTypeSelectable();
-ChannelMode getChannelMode();
-float getDacValue(CalibrationValueType valueType);
-float getAdcValue(CalibrationValueType valueType);
-void setVoltage(float value);
-void setCurrent(float value);
+////////////////////////////////////////////////////////////////////////////////
 
-/// Start calibration procedure on the channel.
-void start(int slotIndex, int subchannelIndex);
+class CalibrationEditor : public CalibrationBase {
+public:
+    bool isEnabled() { return m_enabled; }
 
-/// Stop calibration procedure.
-void stop();
+    /// Start calibration procedure on the channel.
+    void start(int slotIndex, int subchannelIndex);
 
-void copyValuesFromChannel();
+    /// Stop calibration procedure.
+    void stop();
 
-void selectCurrentRange(int8_t range);
+    ChannelMode getChannelMode();
 
-Value &getVoltage();
-Value &getCurrent();
+    float getAdcValue(CalibrationValueType valueType);
 
-/// Is calibration remark is set.
-bool isRemarkSet();
+    void selectCurrentRange(int8_t range);
 
-/// Get currently set remark.
-const char *getRemark();
+    Value &getVoltage();
+    Value &getCurrent();
 
-/// Set calibration remark.
-void setRemark(const char *value, size_t len);
+    void setVoltage(float value);
+    void setCurrent(float value);
 
-/// Are all calibration parameters entered?
-bool canSave(int16_t &scpiErr, int16_t *uiErr = nullptr);
+    void copyValuesFromChannel();
 
-bool doSave(int slotIndex, int subchannelIndex);
+    /// Is calibration remark is set.
+    bool isRemarkSet();
 
-/// Save calibration parameters entered during calibration procedure.
-bool save();
+    /// Get currently set remark.
+    const char *getRemark();
 
-/// Clear calibration parameters for the currently selected channel.
+    /// Set calibration remark.
+    void setRemark(const char *value, size_t len);
+
+    /// Are all calibration parameters entered?
+    bool canSave(int16_t &scpiErr, int16_t *uiErr = nullptr);
+
+    /// Save calibration parameters entered during calibration procedure.
+    bool save();
+
+private:
+    bool m_enabled;
+
+    Value m_voltageValue = Value(*this, CALIBRATION_VALUE_U);
+
+    int8_t m_currentRangeSelected = 0;
+    Value m_currentsValue[2] = {
+        Value(*this, CALIBRATION_VALUE_I_HI_RANGE),
+        Value(*this, CALIBRATION_VALUE_I_LOW_RANGE)
+    };
+
+    bool m_remarkSet;
+    char m_remark[CALIBRATION_REMARK_MAX_LENGTH + 1];
+
+    void doStart();
+};
+
+extern CalibrationEditor g_editor;
+
+////////////////////////////////////////////////////////////////////////////////
+
+class CalibrationViewer : public CalibrationBase {
+public:
+    void start(int slotIndex, int subchannelIndex);
+};
+
+extern CalibrationViewer g_viewer;
+
+////////////////////////////////////////////////////////////////////////////////
+
+/// Clear calibration parameters for given channel.
 bool clear(int slotIndex, int subchannelIndex, int *err);
 
 void clearCalibrationConf(CalibrationConfiguration *calConf);
 
 float remapValue(float value, CalibrationValueConfiguration &cal);
+
+bool onHighPriorityThreadMessage(uint8_t type, uint32_t param);
 
 } // namespace calibration
 } // namespace psu

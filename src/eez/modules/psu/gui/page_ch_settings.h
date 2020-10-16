@@ -21,8 +21,6 @@
 #include <eez/gui/gui.h>
 using namespace eez::gui;
 
-#include <eez/modules/psu/calibration.h>
-
 #define LIST_ITEMS_PER_PAGE 5
 #define EMPTY_VALUE "\x92"
 
@@ -304,110 +302,6 @@ private:
     static void onListCountSetToInfinity();
 
     static void onTriggerOnListStopSet(uint16_t value);
-};
-
-void drawCalibrationChart(const WidgetCursor &widgetCursor);
-float remapDacValue(CalibrationValueConfiguration &configuration, Unit unit, float value);
-
-class ChSettingsCalibrationEditPage : public SetPage {
-    friend void drawCalibrationChart(const WidgetCursor &widgetCursor);
-
-public:
-    static void start();
-
-    void pageAlloc();
-    void pageFree();
-
-    int getDirty();
-    void set();
-
-    int getChartVersion() { return m_chartVersion; }
-    int getChartZoom() { return m_chartZoom; }
-    void zoomChart();
-
-    bool isCalibrationValueTypeSelectable();
-    CalibrationValueType getCalibrationValueType();
-    void setCalibrationValueType(CalibrationValueType type);
-
-    void setDacValue(float value);
-
-    // get and set value measured with external instrument
-    float getMeasuredValue();
-    void setMeasuredValue(float value);
-    bool canEditMeasuredValue();
-
-    bool canMoveToPreviousPoint();
-    void moveToPreviousPoint();
-
-    bool canMoveToNextPoint();
-    void moveToNextPoint();
-
-    bool canSavePoint();
-    void savePoint();
-
-    bool canDeletePoint();
-    void deletePoint();
-
-    int getCurrentPointIndex();
-    unsigned int getNumPoints();
-
-private:
-    uint32_t m_version;
-    CalibrationValueType m_calibrationValueType;
-    float m_measuredValue;
-    bool m_measuredValueChanged;
-    uint32_t m_chartVersion;
-    uint16_t m_chartZoom;
-
-    static void onStartPasswordOk();
-
-    static void onSetRemarkOk(char *remark);
-
-    calibration::Value &getCalibrationValue();
-
-    float getChannelDacValue();
-    float getChannelAdcValue();
-    int compareDacValues(float dac1, float dac2);
-    void selectPointAtIndex(int8_t i);
-};
-
-class ChSettingsCalibrationViewPage : public Page {
-    friend void drawCalibrationChart(const WidgetCursor &widgetCursor);
-
-public:
-    static void start();
-
-    void pageAlloc();
-
-    int getChartVersion() { return m_chartVersion; }
-    int getChartZoom() { return m_chartZoom; }
-    void zoomChart();
-
-    bool isCalibrationValueTypeSelectable();
-    CalibrationValueType getCalibrationValueType();
-    void setCalibrationValueType(CalibrationValueType type);
-
-    float getDacValue();
-    float getMeasuredValue();
-
-    bool canMoveToPreviousPoint();
-    void moveToPreviousPoint();
-
-    bool canMoveToNextPoint();
-    void moveToNextPoint();
-
-    int getCurrentPointIndex();
-    unsigned int getNumPoints();
-
-private:
-    CalibrationValueType m_calibrationValueType;
-    int m_selectedPointIndex;
-    uint32_t m_chartVersion;
-    uint16_t m_chartZoom;
-
-    CalibrationValueConfiguration &getCalibrationValueConfiguration();
-
-    void selectPointAtIndex(int i);
 };
 
 } // namespace gui
