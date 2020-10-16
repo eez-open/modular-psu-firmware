@@ -271,8 +271,13 @@ struct Module {
     virtual bool isCurrentCalibrationEnabled(int subchannelIndex);
     virtual void enableCurrentCalibration(int subchannelIndex, bool enable);
 
-    virtual void getCalibrationPoints(CalibrationValueType type, unsigned int &numPoints, float *&points);
-    virtual CalibrationConfiguration *getCalibrationConfiguration(int subchannelIndex);
+    virtual bool loadChannelCalibration(int subchannelIndex, int *err);
+    virtual bool saveChannelCalibration(int subchannelIndex, int *err);
+    virtual void getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points);
+    virtual bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err);
+    virtual bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err);
+    virtual bool getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err);
+    virtual bool getCalibrationDate(int subchannelIndex, uint32_t &calibrationDate, int *err);
 };
 
 static const int NUM_SLOTS = 3;

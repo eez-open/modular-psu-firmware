@@ -196,6 +196,7 @@ source_group("eez\\modules\\psu" FILES ${src_eez_modules_psu} ${header_eez_modul
 
 set(src_eez_modules_psu_gui
     src/eez/modules/psu/gui/animations.cpp
+    src/eez/modules/psu/gui/channel_calibration.cpp
     src/eez/modules/psu/gui/data.cpp
     src/eez/modules/psu/gui/edit_mode.cpp
     src/eez/modules/psu/gui/file_manager.cpp
@@ -212,6 +213,7 @@ set(src_eez_modules_psu_gui
 list (APPEND src_files ${src_eez_modules_psu_gui})
 set(header_eez_modules_psu_gui
     src/eez/modules/psu/gui/animations.h
+    src/eez/modules/psu/gui/channel_calibration.h
     src/eez/modules/psu/gui/data.h
     src/eez/modules/psu/gui/edit_mode.h
     src/eez/modules/psu/gui/file_manager.h

@@ -15622,7 +15622,7 @@
               {
                 "type": "DisplayData",
                 "style": {
-                  "inheritFrom": "encoder_cursor_17_enabled"
+                  "inheritFrom": "edit_value_M_centered"
                 },
                 "data": "calibration_point_set_value",
                 "action": "",
@@ -15647,7 +15647,7 @@
               {
                 "type": "DisplayData",
                 "style": {
-                  "inheritFrom": "encoder_cursor_17_enabled"
+                  "inheritFrom": "edit_value_M_centered"
                 },
                 "data": "calibration_point_measured_value",
                 "action": "",

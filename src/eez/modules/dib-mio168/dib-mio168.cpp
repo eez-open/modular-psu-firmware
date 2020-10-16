@@ -35,6 +35,7 @@
 #include <eez/gui/gui.h>
 #include <eez/modules/psu/psu.h>
 #include "eez/modules/psu/profile.h"
+#include "eez/modules/psu/calibration.h"
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/gui/psu.h>
 #include "eez/modules/psu/gui/keypad.h"
@@ -122,6 +123,32 @@ struct FromMasterToSlave {
 
 struct FromSlaveToMaster {
     uint8_t dinStates;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+static const uint8_t MAX_CAL_CONF_POINTS = 4;
+
+struct CalConf {
+    static const int VERSION = 1;
+
+    BlockHeader header;
+
+    struct {
+        unsigned calState: 1;   // is channel calibrated?
+        unsigned calEnabled: 1; // is channel calibration enabled?
+        unsigned numPoints: 6;
+        unsigned reserved: 8;
+    } state;
+
+    struct {
+        float uncalValue;
+        float calValue;
+    } points[MAX_CAL_CONF_POINTS];
+
+    void clear() {
+        memset(this, 0, sizeof(CalConf));
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -354,6 +381,8 @@ struct AoutDac7760Channel : public MioChannel {
     float m_currentValue = 0;
     float m_voltageValue = 0;
 
+    CalConf calConf;
+
     struct ProfileParameters {
         bool outputEnabled;
         uint8_t mode;
@@ -571,6 +600,9 @@ struct AoutDac7760Channel : public MioChannel {
 
 struct AoutDac7563Channel : public MioChannel {
     float m_value = 0;
+
+    bool calEnabled;
+    CalConf calConf;
 
     struct ProfileParameters {
         float value;
@@ -1326,21 +1358,150 @@ public:
     }
 
     bool isVoltageCalibrationExists(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf.state.calState;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            return aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calState;
+        }
         return false;
     }
 
     bool isVoltageCalibrationEnabled(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf.state.calEnabled;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            return aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calEnabled;
+        }
         return false;
     }
     
     void enableVoltageCalibration(int subchannelIndex, bool enabled) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf.state.calEnabled = enabled;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calEnabled = enabled;
+        } else {
+            return;
+        }
+
+        saveChannelCalibration(subchannelIndex, nullptr);
     }
 
-    void getCalibrationPoints(CalibrationValueType type, unsigned int &numPoints, float *&points) override {
+    bool loadChannelCalibration(int subchannelIndex, int *err) {
+        assert(sizeof(CalConf) <= 64);
+
+        CalConf *calConf;
+
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            calConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            calConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
+        } else {
+            return true;
+        }
+
+        if (!persist_conf::loadChannelCalibrationConfiguration(slotIndex, subchannelIndex, &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
+            calConf->clear();
+        }
+
+        return true;
     }
 
-    CalibrationConfiguration *getCalibrationConfiguration(int subchannelIndex) override {
-        return nullptr;
+    bool saveChannelCalibration(int subchannelIndex, int *err) {
+        CalConf *calConf;
+
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            calConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            calConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
+        }
+
+        if (calConf) {
+            return persist_conf::saveChannelCalibrationConfiguration(slotIndex, subchannelIndex, &calConf->header, sizeof(CalConf), CalConf::VERSION);
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+        return false;
+    }
+
+    void getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points) override {
+        static float AOUT_POINTS[] = { -9.9f, 9.9f };
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            numPoints = 2;
+            points = AOUT_POINTS;
+        } else {
+            numPoints = 0;
+            points = nullptr;
+        }
+    }
+
+    bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) override {
+        CalConf *mioCalConf;
+
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            mioCalConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            mioCalConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
+        }
+
+        if (mioCalConf) {
+            memset(&calConf, 0, sizeof(CalibrationConfiguration));
+
+            calConf.u.numPoints = mioCalConf->state.numPoints;
+            for (unsigned i = 0; i < mioCalConf->state.numPoints; i++) {
+                calConf.u.points[i].dac = mioCalConf->points[i].uncalValue;
+                calConf.u.points[i].value = mioCalConf->points[i].calValue;
+            }
+
+            return true;
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+        return false;
+    }
+    
+    bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) override {
+        CalConf *mioCalConf;
+
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            mioCalConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            mioCalConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
+        }
+
+        if (mioCalConf) {
+            memset(mioCalConf, 0, sizeof(CalConf));
+
+            mioCalConf->state.numPoints = MIN(calConf.u.numPoints, 4);
+            for (unsigned i = 0; i < mioCalConf->state.numPoints; i++) {
+                mioCalConf->points[i].uncalValue = calConf.u.points[i].dac;
+                mioCalConf->points[i].calValue = calConf.u.points[i].value;
+            }
+
+            mioCalConf->state.calState = mioCalConf->state.numPoints >= 2;
+            mioCalConf->state.calEnabled = mioCalConf->state.calState;
+
+            return true;
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+        return false;
+    }
+
+    bool getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err) override {
+        calibrationRemark = "";
+        return true;
+    }
+
+    bool getCalibrationDate(int subchannelIndex, uint32_t &calibrationDate, int *err) override {
+        calibrationDate = 0;
+        return true;
     }
 
     bool getCurrent(int subchannelIndex, float &value, int *err) override {
@@ -1579,6 +1740,29 @@ static AoutDac7760ConfigurationPage g_aoutDac7760ConfigurationPage;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+class AoutDac7563ConfigurationPage : public SetPage {
+public:
+    static int g_selectedChannelIndex;
+
+    void pageAlloc() {
+    }
+
+    int getDirty() { 
+        return false;
+    }
+
+    void set() {
+        popPage();
+    }
+
+private:
+};
+
+int AoutDac7563ConfigurationPage::g_selectedChannelIndex;
+static AoutDac7563ConfigurationPage g_aoutDac7563ConfigurationPage;
+
+////////////////////////////////////////////////////////////////////////////////
+
 Page *Mio168Module::getPageFromId(int pageId) {
     if (pageId == PAGE_ID_DIB_MIO168_DIN_CONFIGURATION) {
         return &g_dinConfigurationPage;
@@ -1586,6 +1770,8 @@ Page *Mio168Module::getPageFromId(int pageId) {
         return &g_ainConfigurationPage;
     } else if (pageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) {
         return &g_aoutDac7760ConfigurationPage;
+    } else if (pageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION) {
+        return &g_aoutDac7563ConfigurationPage;
     }
     return nullptr;
 }
@@ -1852,11 +2038,9 @@ void action_dib_mio168_ain_show_configuration() {
     pushPage(PAGE_ID_DIB_MIO168_AIN_CONFIGURATION);
 }
 
-void action_dib_mio168_ain_show_calibration() {
-    // TODO ...
-}
-
 ////////////////////////////////////////////////////////////////////////////////
+
+static const char *aoutLabels[4] = { "AO1", "AO2", "AO3", "AO4" };
 
 void data_dib_mio168_aout_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
@@ -1868,7 +2052,6 @@ void data_dib_mio168_aout_channels(DataOperationEnum operation, Cursor cursor, V
 
 void data_dib_mio168_aout_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        static const char *labels[4] = { "AO1", "AO2", "AO3", "AO4" };
 
         int aoutChannelIndex;
 
@@ -1879,7 +2062,7 @@ void data_dib_mio168_aout_label(DataOperationEnum operation, Cursor cursor, Valu
             aoutChannelIndex = cursor % 4;
         }
 
-        value = labels[aoutChannelIndex];
+        value = aoutLabels[aoutChannelIndex];
     }
 }
 
@@ -1915,6 +2098,8 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Valu
         } else {
             value = MakeValue(AOUT_DAC7563_MAX, UNIT_VOLT);
         }
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = aoutLabels[aoutChannelIndex];
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         if (aoutChannelIndex < 2) {
             auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
@@ -2049,6 +2234,9 @@ void action_dib_mio168_aout_show_configuration() {
     if (aoutChannelIndex < 2) {
         AoutDac7760ConfigurationPage::g_selectedChannelIndex = AOUT_1_SUBCHANNEL_INDEX + aoutChannelIndex;
         pushPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION);
+    } else {
+        AoutDac7563ConfigurationPage::g_selectedChannelIndex = AOUT_1_SUBCHANNEL_INDEX + aoutChannelIndex;
+        pushPage(PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION);
     }
 }
 
@@ -2056,10 +2244,6 @@ void data_dib_mio168_aout_channel_has_settings(DataOperationEnum operation, Curs
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 4 < 2 ? 1 : 0;
     }
-}
-
-void action_dib_mio168_aout_show_calibration() {
-    // TODO ...
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2158,6 +2342,21 @@ void data_dib_mio168_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
 void action_dib_mio168_show_info() {
     pushPage(PAGE_ID_DIB_MIO168_INFO);
 }
+
+void action_dib_mio168_show_calibration() {
+    if (getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION)) {
+        hmi::g_selectedSubchannelIndex = g_aoutDac7760ConfigurationPage.g_selectedChannelIndex;
+    } else if (getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION)) {
+        hmi::g_selectedSubchannelIndex = g_aoutDac7563ConfigurationPage.g_selectedChannelIndex;
+    } else {
+        hmi::g_selectedSubchannelIndex = g_ainConfigurationPage.g_selectedChannelIndex;
+    }
+
+    calibration::g_viewer.start(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
+    
+    pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
+}
+
 
 } // namespace gui
 

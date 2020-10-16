@@ -203,9 +203,6 @@
       "name": "ain_show_configuration"
     },
     {
-      "name": "ain_show_calibration"
-    },
-    {
       "name": "ain_select_mode"
     },
     {
@@ -227,10 +224,10 @@
       "name": "aout_show_configuration"
     },
     {
-      "name": "aout_show_calibration"
+      "name": "show_info"
     },
     {
-      "name": "show_info"
+      "name": "show_calibration"
     }
   ],
   "gui": {
@@ -2829,7 +2826,7 @@
                   "color": "Action color",
                   "activeBackgroundColor": "Action color"
                 },
-                "action": "aout_show_calibration",
+                "action": "show_calibration",
                 "left": 0,
                 "top": 144,
                 "width": 178,
@@ -3197,7 +3194,7 @@
                   "color": "Action color",
                   "activeBackgroundColor": "Action color"
                 },
-                "action": "aout_show_calibration",
+                "action": "show_calibration",
                 "left": 0,
                 "top": 144,
                 "width": 158,
@@ -3377,7 +3374,7 @@
                   "color": "Action color",
                   "activeBackgroundColor": "Action color"
                 },
-                "action": "aout_show_calibration",
+                "action": "show_calibration",
                 "left": 0,
                 "top": 0,
                 "width": 158,

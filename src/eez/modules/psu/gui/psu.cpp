@@ -33,7 +33,6 @@
 #include <eez/scpi/regs.h>
 
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/devices.h>
 #include <eez/modules/psu/event_queue.h>
@@ -48,6 +47,7 @@
 #include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/keypad.h>
+#include <eez/modules/psu/gui/channel_calibration.h>
 #include <eez/modules/psu/gui/page_ch_settings.h>
 #include <eez/modules/psu/gui/page_event_queue.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>

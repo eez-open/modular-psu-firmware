@@ -408,17 +408,15 @@ void init() {
 void initChannels() {
     // load channels calibration parameters
     for (int i = 0; i < CH_NUM; ++i) {
-        persist_conf::loadChannelCalibration(Channel::get(i));
+        auto &channel = Channel::get(i);
+        loadChannelCalibrationConfiguration(channel.slotIndex, channel.subchannelIndex, channel.cal_conf);
     }
 
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         Module *module = g_slots[slotIndex];
         for (int otherChannelIndex = 0; otherChannelIndex < module->numOtherChannels; otherChannelIndex++) {
             int subchannelIndex = module->numPowerChannels + otherChannelIndex;
-            CalibrationConfiguration *calConf = module->getCalibrationConfiguration(subchannelIndex);
-            if (calConf) {
-                persist_conf::loadChannelCalibration(slotIndex, subchannelIndex);
-            }
+            g_slots[slotIndex]->loadChannelCalibration(subchannelIndex, nullptr);
         }
     }
 }
@@ -1394,58 +1392,58 @@ void saveCalibrationEnabledFlag(int slotIndex, int subchannelIndex, bool enabled
     saveModuleConf(slotIndex);
 }
 
-void loadChannelCalibration(Channel &channel) {
-    auto x = sizeof(CalibrationConfiguration);
-	assert(bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= x);
-
-    if (!moduleConfRead(
-        channel.slotIndex,
-        (uint8_t *)&channel.cal_conf,
-        sizeof(CalibrationConfiguration),
-        bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * (((bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
-        CH_CAL_CONF_VERSION
-    )) {
-        calibration::clearCalibrationConf(&channel.cal_conf);
-    }
-}
-
-bool saveChannelCalibration(Channel &channel) {
-    return moduleSave(
-        channel.slotIndex,
-        (BlockHeader *)&channel.cal_conf,
-        sizeof(CalibrationConfiguration),
-        bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_ADDRESS + channel.subchannelIndex * (((bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
-        CH_CAL_CONF_VERSION
+bool loadChannelCalibrationConfiguration(int slotIndex, int subchannelIndex, BlockHeader *calConf, uint32_t calConfSize, int version) {
+    return moduleConfRead(
+        slotIndex,
+        (uint8_t *)calConf,
+        calConfSize,
+        bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((calConfSize + 63) / 64) * 64),
+        version
     );
 }
 
-void loadChannelCalibration(int slotIndex, int subchannelIndex) {
-    auto x = sizeof(CalibrationConfiguration);
-	assert(bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= x);
-
-    CalibrationConfiguration *calConf = g_slots[slotIndex]->getCalibrationConfiguration(subchannelIndex);
+void loadChannelCalibrationConfiguration(int slotIndex, int subchannelIndex, CalibrationConfiguration &calConf) {
+    auto size = sizeof(CalibrationConfiguration);
+	assert(bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE >= size);
 
     if (!moduleConfRead(
         slotIndex,
-        (uint8_t *)calConf,
+        (uint8_t *)&calConf,
         sizeof(CalibrationConfiguration),
         bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
     )) {
-        calibration::clearCalibrationConf(calConf);
+        calibration::clearCalibrationConf(&calConf);
     }
 }
 
-bool saveChannelCalibration(int slotIndex, int subchannelIndex) {
-    CalibrationConfiguration *calConf = g_slots[slotIndex]->getCalibrationConfiguration(subchannelIndex);
-
+bool saveChannelCalibrationConfiguration(int slotIndex, int subchannelIndex, const BlockHeader *calConf, uint32_t calConfSize, int version) {
     return moduleSave(
         slotIndex,
         (BlockHeader *)calConf,
+        calConfSize,
+        bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((calConfSize + 63) / 64) * 64),
+        version
+    );
+}
+
+bool saveChannelCalibrationConfiguration(int slotIndex, int subchannelIndex, const CalibrationConfiguration &calConf) {
+    return moduleSave(
+        slotIndex,
+        (BlockHeader *)&calConf,
         sizeof(CalibrationConfiguration),
         bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_ADDRESS + subchannelIndex * (((bp3c::eeprom::MODULE_PERSIST_CONF_CH_CAL_BLOCK_SIZE + 63) / 64) * 64),
         CH_CAL_CONF_VERSION
     );
+}
+
+bool saveChannelCalibration(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        return saveChannelCalibrationConfiguration(slotIndex, subchannelIndex, channel->cal_conf);
+    }
+    
+    return g_slots[slotIndex]->saveChannelCalibration(subchannelIndex, nullptr);
 }
 
 static const uint32_t RELAY_COUNTER_SIZE = 64;

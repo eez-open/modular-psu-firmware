@@ -495,13 +495,48 @@ bool Module::isCurrentCalibrationEnabled(int subchannelIndex) {
 void Module::enableCurrentCalibration(int subchannelIndex, bool enable) {
 }
 
-void Module::getCalibrationPoints(CalibrationValueType type, unsigned int &numPoints, float *&points) {
+bool Module::loadChannelCalibration(int subchannelIndex, int *err) {
+    return true;
+}
+
+bool Module::saveChannelCalibration(int subchannelIndex, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+void Module::getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points) {
     numPoints = 0;
     points = nullptr;
 }
 
-CalibrationConfiguration *Module::getCalibrationConfiguration(int subchannelIndex) {
-    return nullptr;
+bool Module::getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::getCalibrationDate(int subchannelIndex, uint32_t &calibrationDate, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
