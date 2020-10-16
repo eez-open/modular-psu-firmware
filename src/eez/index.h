@@ -248,6 +248,9 @@ struct Module {
 
     virtual bool getRelayCycles(int subchannelIndex, uint32_t &relayCycles, int *err);
     
+    virtual bool outputEnable(int subchannelIndex, bool enable, int *err);
+    virtual bool isOutputEnabled(int subchannelIndex, bool &enabled, int *err);
+
     virtual bool getVoltage(int subchannelIndex, float &value, int *err);
     virtual bool setVoltage(int subchannelIndex, float value, int *err);
     virtual bool getMeasuredVoltage(int subchannelIndex, float &value, int *err);
@@ -273,6 +276,8 @@ struct Module {
 
     virtual bool loadChannelCalibration(int subchannelIndex, int *err);
     virtual bool saveChannelCalibration(int subchannelIndex, int *err);
+    virtual void startChannelCalibration(int subchannelIndex);
+    virtual void stopChannelCalibration(int subchannelIndex);
     virtual void getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points);
     virtual bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err);
     virtual bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err);

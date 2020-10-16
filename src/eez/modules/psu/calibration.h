@@ -33,6 +33,7 @@ public:
     bool hasSupportForCurrentDualRange();
     CalibrationValueType getCalibrationValueType();
     bool isCalibrationExists();
+    void getMinValue(CalibrationValueType valueType, float &value, Unit &unit);
     void getMaxValue(CalibrationValueType valueType, float &value, Unit &unit);
     float roundCalibrationValue(Unit unit, float value);
     bool isCalibrationValueTypeSelectable();

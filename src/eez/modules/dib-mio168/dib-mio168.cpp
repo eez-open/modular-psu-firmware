@@ -137,7 +137,8 @@ struct CalConf {
     struct {
         unsigned calState: 1;   // is channel calibrated?
         unsigned calEnabled: 1; // is channel calibration enabled?
-        unsigned numPoints: 6;
+        unsigned ongoingCal: 1; // is channel under ongoing calibration procedure?
+        unsigned numPoints: 5;
         unsigned reserved: 8;
     } state;
 
@@ -376,8 +377,18 @@ struct AinChannel : public MioChannel {
 struct AoutDac7760Channel : public MioChannel {
     bool m_outputEnabled = false;
     uint8_t m_mode = SOURCE_MODE_VOLTAGE;
+
+    // 5: 4 mA to 20 mA
+    // 6: 0 mA to 20 mA
+    // 7: 0 mA to 24 mA
     uint8_t m_currentRange = 5;
+
+    // 0: 0 V to +5 V
+    // 1: 0 V to +10 V
+    // 2: +/- 5 V
+    // 3: +/- 10 V
     uint8_t m_voltageRange = 0;
+
     float m_currentValue = 0;
     float m_voltageValue = 0;
 
@@ -468,7 +479,7 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     SourceMode getMode() {
-        return (SourceMode)m_mode;
+        return calConf.state.ongoingCal ? SOURCE_MODE_VOLTAGE : (SourceMode)m_mode;
     }
 
     void setMode(SourceMode mode) {
@@ -484,7 +495,7 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     int8_t getVoltageRange() {
-        return m_voltageRange;
+        return calConf.state.ongoingCal ? 3 : m_voltageRange;
     }
     
     void setVoltageRange(int8_t range) {
@@ -492,15 +503,15 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     float getValue() {
-        return m_mode == SOURCE_MODE_VOLTAGE ? m_voltageValue : m_currentValue;
+        return getMode() == SOURCE_MODE_VOLTAGE ? m_voltageValue : m_currentValue;
     }
 
     Unit getUnit() {
-        return m_mode == SOURCE_MODE_VOLTAGE ? UNIT_VOLT : UNIT_AMPER;
+        return getMode() == SOURCE_MODE_VOLTAGE ? UNIT_VOLT : UNIT_AMPER;
     }
 
     void setValue(float value) {
-        if (m_mode == SOURCE_MODE_VOLTAGE) {
+        if (getMode() == SOURCE_MODE_VOLTAGE) {
             m_voltageValue = value;
         } else {
             m_currentValue = value;
@@ -508,13 +519,14 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     float getVoltageMinValue() {
-        if (m_voltageRange == 0) {
+        uint8_t voltageRange = getVoltageRange();
+        if (voltageRange == 0) {
             return 0;
         } 
-        if (m_voltageRange == 1) {
+        if (voltageRange == 1) {
             return 0;
         } 
-        if (m_voltageRange == 2) {
+        if (voltageRange == 2) {
             return -5.0f;
         } 
         return -10.0f;
@@ -531,7 +543,7 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     float getMinValue() {
-        if (m_mode == SOURCE_MODE_VOLTAGE) {
+        if (getMode() == SOURCE_MODE_VOLTAGE) {
             return getVoltageMinValue();
         } else {
             return getCurrentMinValue();
@@ -539,13 +551,14 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     float getVoltageMaxValue() {
-        if (m_voltageRange == 0) {
+        uint8_t voltageRange = getVoltageRange();
+        if (voltageRange == 0) {
             return 5.0f;
         } 
-        if (m_voltageRange == 1) {
+        if (voltageRange == 1) {
             return 10.0f;
         } 
-        if (m_voltageRange == 2) {
+        if (voltageRange == 2) {
             return 5.0f;
         } 
         return 10.0f;
@@ -562,7 +575,7 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     float getMaxValue() {
-        if (m_mode == SOURCE_MODE_VOLTAGE) {
+        if (getMode() == SOURCE_MODE_VOLTAGE) {
             return getVoltageMaxValue();
         } else {
             return getCurrentMaxValue();
@@ -570,7 +583,7 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     float getVoltageResolution() {
-        return 0.001f;
+        return calConf.state.ongoingCal ? 0.0001f : 0.001f;
     }
 
     float getCurrentResolution() {
@@ -578,7 +591,7 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     float getResolution() {
-        if (m_mode == SOURCE_MODE_VOLTAGE) {
+        if (getMode() == SOURCE_MODE_VOLTAGE) {
             return getVoltageResolution();
         } else {
             return getCurrentResolution();
@@ -586,7 +599,7 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     void getStepValues(StepValues *stepValues) {
-        if (m_mode == SOURCE_MODE_VOLTAGE) {
+        if (getMode() == SOURCE_MODE_VOLTAGE) {
             stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES;
             stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES) / sizeof(float);
             stepValues->unit = UNIT_VOLT;
@@ -789,8 +802,8 @@ public:
         for (int i = 0; i < 2; i++) {
             auto channel = &aoutDac7760Channels[i];
             data.aout_dac7760[i].outputEnabled = channel->m_outputEnabled;
-            data.aout_dac7760[i].outputRange = channel->m_mode == SOURCE_MODE_VOLTAGE ? channel->m_voltageRange : channel->m_currentRange;
-            data.aout_dac7760[i].outputValue = channel->m_mode == SOURCE_MODE_VOLTAGE ? channel->m_voltageValue : channel->m_currentValue;
+            data.aout_dac7760[i].outputRange = channel->getMode() == SOURCE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->m_currentRange;
+            data.aout_dac7760[i].outputValue = channel->getMode() == SOURCE_MODE_VOLTAGE ? channel->m_voltageValue : channel->m_currentValue;
         }
 
         for (int i = 0; i < 2; i++) {
@@ -1264,6 +1277,31 @@ public:
         return true;
     }
 
+    bool outputEnable(int subchannelIndex, bool enable, int *err) override {
+        if (subchannelIndex < AOUT_1_SUBCHANNEL_INDEX || subchannelIndex > AOUT_2_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_outputEnabled = enable;
+        return true;
+    }
+
+    bool isOutputEnabled(int subchannelIndex, bool &enabled, int *err) override {
+        if (subchannelIndex < AOUT_1_SUBCHANNEL_INDEX || subchannelIndex > AOUT_2_SUBCHANNEL_INDEX) {
+            if (*err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        enabled = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_outputEnabled;
+
+        return true;
+    }
+    
     bool getVoltage(int subchannelIndex, float &value, int *err) override {
         if (subchannelIndex < AOUT_1_SUBCHANNEL_INDEX || subchannelIndex > AOUT_4_SUBCHANNEL_INDEX) {
             if (*err) {
@@ -1387,7 +1425,7 @@ public:
         saveChannelCalibration(subchannelIndex, nullptr);
     }
 
-    bool loadChannelCalibration(int subchannelIndex, int *err) {
+    bool loadChannelCalibration(int subchannelIndex, int *err) override {
         assert(sizeof(CalConf) <= 64);
 
         CalConf *calConf;
@@ -1407,8 +1445,8 @@ public:
         return true;
     }
 
-    bool saveChannelCalibration(int subchannelIndex, int *err) {
-        CalConf *calConf;
+    bool saveChannelCalibration(int subchannelIndex, int *err) override {
+        CalConf *calConf = nullptr;
 
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             calConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf;
@@ -1426,6 +1464,34 @@ public:
         return false;
     }
 
+    void startChannelCalibration(int subchannelIndex) override {
+        CalConf *calConf = nullptr;
+
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            calConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            calConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
+        }
+
+        if (calConf) {
+            calConf->state.ongoingCal = 1;
+        }
+    }
+    
+    void stopChannelCalibration(int subchannelIndex) override {
+        CalConf *calConf = nullptr;
+
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            calConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            calConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
+        }
+
+        if (calConf) {
+            calConf->state.ongoingCal = 0;
+        }
+    }
+
     void getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points) override {
         static float AOUT_POINTS[] = { -9.9f, 9.9f };
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
@@ -1438,7 +1504,7 @@ public:
     }
 
     bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) override {
-        CalConf *mioCalConf;
+        CalConf *mioCalConf = nullptr;
 
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             mioCalConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf;
@@ -1465,7 +1531,7 @@ public:
     }
     
     bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) override {
-        CalConf *mioCalConf;
+        CalConf *mioCalConf = nullptr;
 
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             mioCalConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf;
