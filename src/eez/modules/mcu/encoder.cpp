@@ -19,6 +19,7 @@
 #if OPTION_DISPLAY && OPTION_ENCODER
 
 #include <math.h>
+#include <stdio.h>
 
 #include <eez/system.h>
 #include <eez/debug.h>
@@ -39,12 +40,6 @@ namespace mcu {
 namespace encoder {
 
 #if defined(EEZ_PLATFORM_STM32)
-#define CONF_ENCODER_SPEED_FACTOR 0.25f
-#else
-#define CONF_ENCODER_SPEED_FACTOR 0.5f
-#endif
-
-#if defined(EEZ_PLATFORM_STM32)
 static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true, false);
 #endif	
 
@@ -53,77 +48,53 @@ static volatile int16_t g_diffCounter;
 #if defined(EEZ_PLATFORM_SIMULATOR)
 bool g_simulatorClicked;
 #endif	
-static float g_accumulatedCounter;
 EncoderMode g_encoderMode = ENCODER_MODE_AUTO;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct CalcAutoModeStepLevel {
-    static const int CONF_NUM_STEP_LEVELS = 4;
-    static const int CONF_NUM_ACCELERATION_STEP_COUNTERS = 10;
-    static const int CONF_ACCELERATION_STEP_COUNTER_DURATION_MS = 50;
-    static const int CONF_COUNTER_TO_STEP_DIVISOR = 5;
-
-    uint32_t m_lastTick;
-    int m_accumulatedCounter;
-    int m_counters[CONF_NUM_ACCELERATION_STEP_COUNTERS];
-    unsigned int m_counterIndex;
-    int m_stepLevel;
-
-    void reset() {
-        m_lastTick = millis();
-        m_accumulatedCounter = 0;
-        for (int i = 0; i < CONF_NUM_ACCELERATION_STEP_COUNTERS; i++) {
-            m_counters[i] = 0;
-        }
-        m_counterIndex = 0;
-        m_stepLevel = 0;
-    }
-
-    void update(int16_t diffCounter) {
-        m_accumulatedCounter += diffCounter;
-
-        uint32_t tick = millis();
-        int32_t diffTick = tick - m_lastTick;
-        if (diffTick >= CONF_ACCELERATION_STEP_COUNTER_DURATION_MS) {
-            m_counters[m_counterIndex % CONF_NUM_ACCELERATION_STEP_COUNTERS] = m_accumulatedCounter;
-
-            int stepCountersSum = 0;
-            for (int i = 0; i < CONF_NUM_ACCELERATION_STEP_COUNTERS; i++) {
-                stepCountersSum += m_counters[(m_counterIndex - i) % CONF_NUM_ACCELERATION_STEP_COUNTERS];
-            }
-
-            stepCountersSum = abs(stepCountersSum);
-
-            m_stepLevel = MIN(stepCountersSum / CONF_COUNTER_TO_STEP_DIVISOR, CONF_NUM_STEP_LEVELS - 1);
-
-            //if (stepCountersSum != 0) {
-            //    DebugTrace("%d, %d\n", stepCountersSum, m_stepLevel);
-            //}
-
-            m_lastTick = tick;
-            m_accumulatedCounter = 0;
-            m_counterIndex++;
-        }
-    }
-
-    int stepLevel() {
-        return m_stepLevel;
-    }
-};
-
-CalcAutoModeStepLevel g_calcAutoModeStepLevel;
-
-////////////////////////////////////////////////////////////////////////////////
-
-int getAutoModeStepLevel() {
-    return g_calcAutoModeStepLevel.stepLevel();
+void init() {
 }
 
-////////////////////////////////////////////////////////////////////////////////
+int getAcceleratedCounter(int increment) {
+    if (increment == 0) {
+        return 0;
+    }
 
-void init() {
-    g_calcAutoModeStepLevel.reset();
+    if (g_encoderMode != ENCODER_MODE_AUTO) {
+        return increment;
+    }
+
+    static int g_lastSign = 0;
+    int sign = increment > 0 ? 1 : -1;
+    bool diffSign = sign != g_lastSign;
+    g_lastSign = sign;
+
+    static uint32_t g_lastTime = 0;
+    uint32_t currentTime = millis();
+    float dt = 1.0f * (currentTime - g_lastTime) * sign / increment;
+    g_lastTime = currentTime;
+
+    const float X1 = 200.0f / 24;
+    const float X2 = 1000.0f / 24;
+
+    const float Y1 = 1.0f * 40 * 1000 / (24 * 5); // 40 V / (24 pulses per 1/2) / 0.5 mV
+    const float Y2 = 1.0F;
+
+    if (diffSign) {
+        dt = X2;
+    } else {
+        dt = clamp(dt, X1, X2);
+    }
+
+    float accel = remap(dt, X1, Y1, X2, Y2);
+
+    uint8_t speedOption = increment > 0 ? psu::persist_conf::devConf.encoderMovingSpeedUp : psu::persist_conf::devConf.encoderMovingSpeedDown;
+
+    accel = remap(1.0f * speedOption, 1.0f * MIN_MOVING_SPEED, 1.0f, 1.0f * MAX_MOVING_SPEED, accel);
+
+    printf("inc=%d, dt=%f, sign=%d, accel=%f\n", increment, dt, sign, accel);
+
+    return (int)(increment * accel);
 }
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -163,9 +134,9 @@ void onPinInterrupt() {
     
     uint8_t dir = g_rotationState & 0x30;
     if (dir == DIR_CCW) {
-        g_diffCounter++;
+        g_diffCounter += getAcceleratedCounter(1);
     } else if (dir == DIR_CW) {
-        g_diffCounter--;
+        g_diffCounter += getAcceleratedCounter(-1);
     }
 }
 #endif
@@ -174,8 +145,10 @@ int getCounter() {
 #if defined(EEZ_PLATFORM_STM32)
     taskENTER_CRITICAL();
 #endif
+
     int16_t diffCounter = g_diffCounter;
     g_diffCounter -= diffCounter;
+
 #if defined(EEZ_PLATFORM_STM32)
     taskEXIT_CRITICAL();
 #endif
@@ -183,20 +156,10 @@ int getCounter() {
     g_totalCounter += diffCounter;
     psu::debug::g_encoderCounter.set(g_totalCounter);
 
-    // update acceleration
-    g_calcAutoModeStepLevel.update(diffCounter);
-
-    //
-    float speedFactor = remap(g_accumulatedCounter > 0 ? psu::persist_conf::devConf.encoderMovingSpeedUp : psu::persist_conf::devConf.encoderMovingSpeedDown, MIN_MOVING_SPEED, 4.0f, MAX_MOVING_SPEED, 1.0f);
-    g_accumulatedCounter += diffCounter / speedFactor;
-    int result = (int)g_accumulatedCounter;
-    g_accumulatedCounter -= result;
-
-    return result;
+    return diffCounter;
 }
 
 void resetEncoder() {
-    g_calcAutoModeStepLevel.reset();
 }
 
 bool isButtonClicked() {
@@ -219,7 +182,7 @@ void read(int &counter, bool &clicked) {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 void write(int counter, bool clicked) {
-	g_diffCounter = counter;
+	g_diffCounter += getAcceleratedCounter(counter);
 	g_simulatorClicked = clicked;
 }
 #endif
