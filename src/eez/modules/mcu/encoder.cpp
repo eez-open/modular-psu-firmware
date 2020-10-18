@@ -49,7 +49,7 @@ static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true, false);
 #endif	
 
 static uint16_t g_totalCounter;
-static int16_t g_diffCounter;
+static volatile int16_t g_diffCounter;
 #if defined(EEZ_PLATFORM_SIMULATOR)
 bool g_simulatorClicked;
 #endif	
@@ -129,35 +129,56 @@ void init() {
 #if defined(EEZ_PLATFORM_STM32)
 
 void onPinInterrupt() {
-    static const uint8_t g_ttable[6][4] = {
-        { 0x3 , 0x2, 0x1,  0x0 },
-        { 0x23, 0x0, 0x1,  0x0 },
-        { 0x13, 0x2, 0x0,  0x0 },
-        { 0x3 , 0x5, 0x4,  0x0 },
-        { 0x3 , 0x3, 0x4, 0x10 },
-        { 0x3 , 0x5, 0x3, 0x20 }
-    };
-    static volatile uint8_t g_rotationState;
-    
-    int offset = 0;
+    // https://github.com/buxtronix/arduino/blob/master/libraries/Rotary/Rotary.cpp
+    // static const uint8_t DIR_NONE = 0x0; // No complete step yet.
+    static const uint8_t DIR_CW = 0x10; // Clockwise step.
+    static const uint8_t DIR_CCW = 0x20; // Anti-clockwise step.
 
+    static const uint8_t R_START = 0x0;
+    static const uint8_t R_CCW_BEGIN = 0x1;
+    static const uint8_t R_CW_BEGIN = 0x2;
+    static const uint8_t R_START_M = 0x3;
+    static const uint8_t R_CW_BEGIN_M = 0x4;
+    static const uint8_t R_CCW_BEGIN_M = 0x5;
+
+    static const uint8_t g_ttable[6][4] = {
+        // R_START (00)
+        {R_START_M,            R_CW_BEGIN,     R_CCW_BEGIN,  R_START},
+        // R_CCW_BEGIN
+        {R_START_M | DIR_CCW,  R_START,        R_CCW_BEGIN,  R_START},
+        // R_CW_BEGIN
+        {R_START_M | DIR_CW,   R_CW_BEGIN,     R_START,      R_START},
+        // R_START_M (11)
+        {R_START_M,            R_CCW_BEGIN_M,  R_CW_BEGIN_M, R_START},
+        // R_CW_BEGIN_M
+        {R_START_M,            R_START_M,      R_CW_BEGIN_M, R_START | DIR_CW},
+        // R_CCW_BEGIN_M
+        {R_START_M,            R_CCW_BEGIN_M,  R_START_M,    R_START | DIR_CCW},
+    };
+
+    static volatile uint8_t g_rotationState = R_START;
+    
     uint8_t pinState = (HAL_GPIO_ReadPin(ENC_B_GPIO_Port, ENC_B_Pin) << 1) | HAL_GPIO_ReadPin(ENC_A_GPIO_Port, ENC_A_Pin);
     g_rotationState = g_ttable[g_rotationState & 0xf][pinState];
-    if (g_rotationState == 0x20) {
-        offset = 1;
-    } else if (g_rotationState == 0x10) {
-        offset = -1;
-    }
-
-    if (offset) {
-        g_diffCounter += offset;
+    
+    uint8_t dir = g_rotationState & 0x30;
+    if (dir == DIR_CCW) {
+        g_diffCounter++;
+    } else if (dir == DIR_CW) {
+        g_diffCounter--;
     }
 }
 #endif
 
 int getCounter() {
+#if defined(EEZ_PLATFORM_STM32)
+    taskENTER_CRITICAL();
+#endif
     int16_t diffCounter = g_diffCounter;
     g_diffCounter -= diffCounter;
+#if defined(EEZ_PLATFORM_STM32)
+    taskEXIT_CRITICAL();
+#endif
 
     g_totalCounter += diffCounter;
     psu::debug::g_encoderCounter.set(g_totalCounter);
