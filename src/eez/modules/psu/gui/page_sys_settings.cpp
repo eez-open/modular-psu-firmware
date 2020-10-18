@@ -35,10 +35,6 @@
 #include <eez/modules/psu/ntp.h>
 #endif
 
-#if OPTION_ENCODER
-#include <eez/modules/mcu/encoder.h>
-#endif
-
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
