@@ -1392,15 +1392,7 @@ float encoderIncrement(Value value, int counter, float min, float max, float pre
 }
 
 static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
-    if (widgetCursor.widget->action != ACTION_ID_EDIT) {
-        return false;
-    }
-
-    if (!g_psuAppContext.isWidgetActionEnabled(widgetCursor)) {
-        return false;
-    }
-
-    return true;
+    return g_psuAppContext.isWidgetActionEnabled(widgetCursor) && widgetCursor.widget->action == ACTION_ID_EDIT;
 }
 
 static bool g_focusCursorIsEnabled;
@@ -1762,7 +1754,10 @@ void onEncoder(int counter, bool clicked) {
             moveToNextFocusCursor();
         }
 
-        if (isEncoderEnabledInActivePage()) {
+        bool encoderEnabled = isEncoderEnabledInActivePage();
+        mcu::encoder::enableAcceleration(encoderEnabled);
+
+        if (encoderEnabled) {
             Value value;
             if (persist_conf::devConf.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
                 value = g_focusEditValue;

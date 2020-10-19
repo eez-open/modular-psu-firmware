@@ -31,7 +31,8 @@ namespace debug {
 #define CHANNELS CHANNEL(1),  CHANNEL(2),  CHANNEL(3),  CHANNEL(4),  CHANNEL(5),  CHANNEL(6)
 
 DebugCounterVariable g_adcCounter("ADC_COUNTER");
-DebugValueVariable g_encoderCounter("ENC_COUNTER", 100);
+DebugValueVariable g_encoderCounter("ENC_COUNTER", 10);
+DebugValueVariable g_encoderDt("ENC_DT", 10);
 
 #undef CHANNEL
 #define CHANNEL(N) DebugValueVariable("CH"#N" U_DAC")
@@ -62,6 +63,7 @@ DebugValueVariable g_iMonDac[CH_MAX] = { CHANNELS };
 DebugVariable *g_variables[] = { 
     &g_adcCounter,
     &g_encoderCounter,
+    &g_encoderDt,
     CHANNELS
 };
 
