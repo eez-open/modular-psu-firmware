@@ -2333,6 +2333,11 @@
       "name": "slot_is_dcpsupply_module",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "user_switch_action",
+      "type": "string",
+      "defaultValue": "Encoder Step"
     }
   ],
   "actions": [
@@ -20776,10 +20781,10 @@
             "style": {
               "inheritFrom": "default"
             },
-            "left": 0,
-            "top": 0,
-            "width": 480,
-            "height": 168,
+            "left": 8,
+            "top": 8,
+            "width": 464,
+            "height": 224,
             "name": "Content",
             "widgets": [
               {
@@ -20787,9 +20792,9 @@
                 "style": {
                   "inheritFrom": "edit_value_M_left"
                 },
-                "left": 15,
-                "top": 10,
-                "width": 188,
+                "left": 0,
+                "top": 0,
+                "width": 193,
                 "height": 32,
                 "text": "Confirmation mode:"
               },
@@ -20799,8 +20804,8 @@
                   "inheritFrom": "default"
                 },
                 "data": "sys_encoder_confirmation_mode",
-                "left": 203,
-                "top": 10,
+                "left": 202,
+                "top": 0,
                 "width": 65,
                 "height": 32,
                 "widgets": [
@@ -20835,10 +20840,10 @@
                 "style": {
                   "inheritFrom": "edit_value_M_left"
                 },
-                "left": 15,
-                "top": 49,
+                "left": 0,
+                "top": 36,
                 "width": 298,
-                "height": 28,
+                "height": 32,
                 "text": "Acceleration sensitivity moving"
               },
               {
@@ -20846,8 +20851,8 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "left": 318,
-                "top": 48,
+                "left": 297,
+                "top": 36,
                 "width": 137,
                 "height": 32,
                 "name": "Moving up",
@@ -20888,8 +20893,8 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "left": 318,
-                "top": 91,
+                "left": 297,
+                "top": 72,
                 "width": 137,
                 "height": 32,
                 "name": "Moving down",
@@ -20924,19 +20929,49 @@
                     "upButtonText": "\\u0090"
                   }
                 ]
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_M_left"
+                },
+                "left": 0,
+                "top": 108,
+                "width": 193,
+                "height": 32,
+                "text": "User switch action:"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_M_center"
+                },
+                "data": "user_switch_action",
+                "action": "select_user_switch_action",
+                "left": 200,
+                "top": 108,
+                "width": 206,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "MultilineText",
+                "style": {
+                  "inheritFrom": "default",
+                  "font": "Oswald14",
+                  "borderSize": "2",
+                  "borderRadius": 0,
+                  "padding": "4"
+                },
+                "left": 0,
+                "top": 150,
+                "width": 405,
+                "height": 60,
+                "text": "Select user switch action at any time by pressing user switch button for more than 1 second.",
+                "firstLineIndent": 0,
+                "hangingIndent": 0
               }
             ]
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 168,
-            "width": 480,
-            "height": 72,
-            "layout": "minimized_channels"
           },
           {
             "type": "Container",

@@ -6003,6 +6003,12 @@ void data_display_test_color_index(DataOperationEnum operation, Cursor cursor, V
     }
 }
 
+void data_user_switch_action(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = MakeEnumDefinitionValue(persist_conf::devConf.userSwitchAction, ENUM_DEFINITION_USER_SWITCH_ACTION);
+    }
+}
+
 } // namespace gui
 } // namespace eez
 
