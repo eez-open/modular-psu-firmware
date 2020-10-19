@@ -35433,6 +35433,8 @@
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
         "activeBackgroundColor": "text_enabled",
+        "focusColor": "text_enable_background",
+        "focusBackgroundColor": "text_enabled",
         "borderColor": "#000000"
       },
       {
@@ -35447,9 +35449,7 @@
       },
       {
         "name": "encoder_cursor_14_enabled",
-        "inheritFrom": "encoder_cursor_enabled",
-        "focusColor": "text_enable_background",
-        "focusBackgroundColor": "text_selectable_background"
+        "inheritFrom": "encoder_cursor_enabled"
       },
       {
         "name": "encoder_cursor_14_disabled",
@@ -35459,9 +35459,7 @@
       {
         "name": "encoder_cursor_14_right_enabled",
         "inheritFrom": "encoder_cursor_enabled",
-        "alignHorizontal": "right",
-        "focusColor": "text_enable_background",
-        "focusBackgroundColor": "text_selectable_background"
+        "alignHorizontal": "right"
       },
       {
         "name": "encoder_cursor_14_right_disabled",
@@ -35472,11 +35470,7 @@
       {
         "name": "encoder_cursor_17_enabled",
         "inheritFrom": "encoder_cursor_enabled",
-        "font": "Oswald17",
-        "color": "Action color",
-        "activeBackgroundColor": "Action color",
-        "focusColor": "text_enable_background",
-        "focusBackgroundColor": "text_selectable_background"
+        "font": "Oswald17"
       },
       {
         "name": "ch_prot_off",

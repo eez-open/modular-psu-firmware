@@ -100,8 +100,8 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
 
     currentState->color = widgetCursor.currentState->flags.focused ? style->focus_color : getColor(widgetCursor.cursor, widget->data, style);
     currentState->backgroundColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : getBackgroundColor(widgetCursor.cursor, widget->data, style);
-    currentState->activeColor = getActiveColor(widgetCursor.cursor, widget->data, style);
-    currentState->activeBackgroundColor = getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
+    currentState->activeColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : getActiveColor(widgetCursor.cursor, widget->data, style);
+    currentState->activeBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
 
     bool refresh =
         !widgetCursor.previousState ||
