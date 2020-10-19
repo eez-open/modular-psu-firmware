@@ -21006,7 +21006,7 @@
                 "top": 0,
                 "width": 357,
                 "height": 32,
-                "text": "Encoder settings"
+                "text": "Encoder and User switch settings"
               },
               {
                 "type": "Select",
