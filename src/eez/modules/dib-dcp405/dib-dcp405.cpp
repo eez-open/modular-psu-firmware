@@ -457,7 +457,16 @@ struct DcpChannel : public Channel {
 		}
 	}
 
+	bool shouldDisableDP() {
+		// disable DP if low current range and current of 10 mA or less is set
+		return flags.currentCurrentRange == 1 && i.set <= 10E-3f;
+	}
+
 	void setDpEnable(bool enable) {
+		if (enable && shouldDisableDP()) {
+			return;
+		}
+
 		// DP bit is active low
 		ioexp.changeBit(IOExpander::IO_BIT_OUT_DP_ENABLE, !enable);
 
@@ -651,6 +660,18 @@ struct DcpChannel : public Channel {
 	}
 
 	void setDacCurrentFloat(float value) override {
+		if (isOk() && ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE) && flags.dprogState == DPROG_STATE_ON) {
+			if (dpOn) {
+				if (shouldDisableDP()) {
+					setDpEnable(false);
+				}
+			} else {
+				if (!shouldDisableDP()) {
+					setDpEnable(true);
+				}
+			}
+		}
+
 		dac.setCurrent(value);
 		iBeforeBalancing = NAN;
 		restoreVoltageToValueBeforeBalancing(*this);
