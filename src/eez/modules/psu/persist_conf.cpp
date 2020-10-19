@@ -1243,6 +1243,10 @@ void setEventQueueFilter(int eventQueueFilter) {
     g_devConf.eventQueueFilter = eventQueueFilter;
 }
 
+void setEncoderMode(uint8_t encoderMode) {
+    g_devConf.encoderMode = encoderMode;
+}
+
 void setIsInhibitedByUser(int isInhibitedByUser) {
     g_devConf.isInhibitedByUser = isInhibitedByUser;
 }

@@ -50,7 +50,6 @@ static uint16_t g_totalCounter;
 static volatile int16_t g_counter;
 
 bool g_accelerationEnabled = false;
-EncoderMode g_encoderMode = ENCODER_MODE_AUTO;
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 bool g_simulatorClicked;
@@ -64,9 +63,6 @@ static int getAcceleratedCounter(int increment);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void init() {
-}
-
 void read(int &counter, bool &clicked) {
     clicked = isButtonClicked();
     counter = getCounter();
@@ -76,11 +72,16 @@ void enableAcceleration(bool enable) {
     g_accelerationEnabled = enable;
 }
 
+EncoderMode getEncoderMode() {
+    return (EncoderMode)psu::persist_conf::devConf.encoderMode;
+}
+
 void switchEncoderMode() {
-    if (g_encoderMode == ENCODER_MODE_STEP4) {
-        g_encoderMode = ENCODER_MODE_AUTO;
+    EncoderMode encoderMode = getEncoderMode();
+    if (encoderMode == ENCODER_MODE_STEP4) {
+        psu::persist_conf::setEncoderMode(ENCODER_MODE_AUTO);
     } else {
-        g_encoderMode = EncoderMode(g_encoderMode + 1);
+        psu::persist_conf::setEncoderMode(encoderMode + 1);
     }
 }
 
@@ -198,7 +199,7 @@ static int getCounter() {
 }
 
 static int getAcceleratedCounter(int increment) {
-    if (increment == 0 || !g_accelerationEnabled || g_encoderMode != ENCODER_MODE_AUTO) {
+    if (increment == 0 || !g_accelerationEnabled || getEncoderMode() != ENCODER_MODE_AUTO) {
         return increment;
     }
 

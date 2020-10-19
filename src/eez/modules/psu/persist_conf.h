@@ -174,7 +174,8 @@ struct DeviceConfiguration {
     SortFilesOption sortFilesOption;
     int eventQueueFilter;
     ViewFlags viewFlags;
-    uint8_t reserved6[48];
+    uint8_t encoderMode;
+    uint8_t reserved6[47];
 
     // block 8
     char ethernetHostName[ETHERNET_HOST_NAME_SIZE + 1];
@@ -328,6 +329,8 @@ void setUserSwitchAction(UserSwitchAction userSwitchAction);
 void setSortFilesOption(SortFilesOption sortFilesOption);
 
 void setEventQueueFilter(int eventQueueFilter);
+
+void setEncoderMode(uint8_t encoderMode);
 
 void setIsInhibitedByUser(int isInhibitedByUser);
 

@@ -362,7 +362,7 @@ Value getCurrentEncoderStepValue() {
     StepValues stepValues;
     getStepValues(stepValues);
 
-    int stepValueIndex = mcu::encoder::ENCODER_MODE_STEP4 - mcu::encoder::g_encoderMode;
+    int stepValueIndex = mcu::encoder::ENCODER_MODE_STEP4 - mcu::encoder::getEncoderMode();
     if (stepValueIndex >= stepValues.count) {
         stepValueIndex = stepValues.count - 1;
     }
@@ -372,7 +372,7 @@ Value getCurrentEncoderStepValue() {
 
 void showCurrentEncoderMode() {
 #if OPTION_ENCODER
-    if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+    if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
         infoMessage("Auto");
     } else {
         infoMessage(getCurrentEncoderStepValue());
