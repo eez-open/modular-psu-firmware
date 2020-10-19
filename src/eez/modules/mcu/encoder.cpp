@@ -43,62 +43,55 @@ namespace encoder {
 static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true, false);
 #endif	
 
+#ifdef DEBUG
 static uint16_t g_totalCounter;
-static volatile int16_t g_diffCounter;
+#endif
+
+static volatile int16_t g_counter;
+
+bool g_accelerationEnabled = false;
+EncoderMode g_encoderMode = ENCODER_MODE_AUTO;
+
 #if defined(EEZ_PLATFORM_SIMULATOR)
 bool g_simulatorClicked;
 #endif	
-EncoderMode g_encoderMode = ENCODER_MODE_AUTO;
+
+////////////////////////////////////////////////////////////////////////////////
+
+static bool isButtonClicked();
+static int getCounter();
+static int getAcceleratedCounter(int increment);
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
 }
 
-int getAcceleratedCounter(int increment) {
-    if (increment == 0) {
-        return 0;
-    }
-
-    if (g_encoderMode != ENCODER_MODE_AUTO) {
-        return increment;
-    }
-
-    static int g_lastSign = 0;
-    int sign = increment > 0 ? 1 : -1;
-    bool diffSign = sign != g_lastSign;
-    g_lastSign = sign;
-
-    static uint32_t g_lastTime = 0;
-    uint32_t currentTime = millis();
-    float dt = 1.0f * (currentTime - g_lastTime) * sign / increment;
-    g_lastTime = currentTime;
-
-    const float X1 = 200.0f / 24;
-    const float X2 = 1000.0f / 24;
-
-    const float Y1 = 1.0f * 40 * 1000 / (24 * 5); // 40 V / (24 pulses per 1/2) / 0.5 mV
-    const float Y2 = 1.0F;
-
-    if (diffSign) {
-        dt = X2;
-    } else {
-        dt = clamp(dt, X1, X2);
-    }
-
-    float accel = remap(dt, X1, Y1, X2, Y2);
-
-    uint8_t speedOption = increment > 0 ? psu::persist_conf::devConf.encoderMovingSpeedUp : psu::persist_conf::devConf.encoderMovingSpeedDown;
-
-    accel = remap(1.0f * speedOption, 1.0f * MIN_MOVING_SPEED, 1.0f, 1.0f * MAX_MOVING_SPEED, accel);
-
-    printf("inc=%d, dt=%f, sign=%d, accel=%f\n", increment, dt, sign, accel);
-
-    return (int)(increment * accel);
+void read(int &counter, bool &clicked) {
+    clicked = isButtonClicked();
+    counter = getCounter();
 }
 
-#if defined(EEZ_PLATFORM_STM32)
+void enableAcceleration(bool enable) {
+    g_accelerationEnabled = enable;
+}
 
+void switchEncoderMode() {
+    if (g_encoderMode == ENCODER_MODE_STEP4) {
+        g_encoderMode = ENCODER_MODE_AUTO;
+    } else {
+        g_encoderMode = EncoderMode(g_encoderMode + 1);
+    }
+}
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+void write(int counter, bool clicked) {
+	g_counter += getAcceleratedCounter(counter);
+	g_simulatorClicked = clicked;
+}
+#endif
+
+#if defined(EEZ_PLATFORM_STM32)
 void onPinInterrupt() {
     // https://github.com/buxtronix/arduino/blob/master/libraries/Rotary/Rotary.cpp
     // static const uint8_t DIR_NONE = 0x0; // No complete step yet.
@@ -106,6 +99,11 @@ void onPinInterrupt() {
     static const uint8_t DIR_CCW = 0x20; // Anti-clockwise step.
 
     static const uint8_t R_START = 0x0;
+
+// #define HALF_STEP
+
+#ifdef HALF_STEP
+    // Use the half-step state table (emits a code at 00 and 11)
     static const uint8_t R_CCW_BEGIN = 0x1;
     static const uint8_t R_CW_BEGIN = 0x2;
     static const uint8_t R_START_M = 0x3;
@@ -126,6 +124,32 @@ void onPinInterrupt() {
         // R_CCW_BEGIN_M
         {R_START_M,            R_CCW_BEGIN_M,  R_START_M,    R_START | DIR_CCW},
     };
+#else
+    // Use the full-step state table (emits a code at 00 only)
+    static const uint8_t R_CW_FINAL = 0x1;
+    static const uint8_t R_CW_BEGIN = 0x2;
+    static const uint8_t R_CW_NEXT = 0x3;
+    static const uint8_t R_CCW_BEGIN = 0x4;
+    static const uint8_t R_CCW_FINAL = 0x5;
+    static const uint8_t R_CCW_NEXT = 0x6;
+
+    const unsigned char g_ttable[7][4] = {
+        // R_START
+        {R_START,    R_CW_BEGIN,  R_CCW_BEGIN, R_START},
+        // R_CW_FINAL
+        {R_CW_NEXT,  R_START,     R_CW_FINAL,  R_START | DIR_CW},
+        // R_CW_BEGIN
+        {R_CW_NEXT,  R_CW_BEGIN,  R_START,     R_START},
+        // R_CW_NEXT
+        {R_CW_NEXT,  R_CW_BEGIN,  R_CW_FINAL,  R_START},
+        // R_CCW_BEGIN
+        {R_CCW_NEXT, R_START,     R_CCW_BEGIN, R_START},
+        // R_CCW_FINAL
+        {R_CCW_NEXT, R_CCW_FINAL, R_START,     R_START | DIR_CCW},
+        // R_CCW_NEXT
+        {R_CCW_NEXT, R_CCW_FINAL, R_CCW_BEGIN, R_START},
+    };
+#endif
 
     static volatile uint8_t g_rotationState = R_START;
     
@@ -134,35 +158,16 @@ void onPinInterrupt() {
     
     uint8_t dir = g_rotationState & 0x30;
     if (dir == DIR_CCW) {
-        g_diffCounter += getAcceleratedCounter(1);
+        g_counter += getAcceleratedCounter(1);
     } else if (dir == DIR_CW) {
-        g_diffCounter += getAcceleratedCounter(-1);
+        g_counter += getAcceleratedCounter(-1);
     }
 }
 #endif
 
-int getCounter() {
-#if defined(EEZ_PLATFORM_STM32)
-    taskENTER_CRITICAL();
-#endif
+////////////////////////////////////////////////////////////////////////////////
 
-    int16_t diffCounter = g_diffCounter;
-    g_diffCounter -= diffCounter;
-
-#if defined(EEZ_PLATFORM_STM32)
-    taskEXIT_CRITICAL();
-#endif
-
-    g_totalCounter += diffCounter;
-    psu::debug::g_encoderCounter.set(g_totalCounter);
-
-    return diffCounter;
-}
-
-void resetEncoder() {
-}
-
-bool isButtonClicked() {
+static bool isButtonClicked() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     return g_simulatorClicked;
 #endif
@@ -172,27 +177,70 @@ bool isButtonClicked() {
 #endif
 }
 
-void read(int &counter, bool &clicked) {
-    clicked = isButtonClicked();
-    if (clicked) {
-        resetEncoder();
-    }
-    counter = getCounter();
-}
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-void write(int counter, bool clicked) {
-	g_diffCounter += getAcceleratedCounter(counter);
-	g_simulatorClicked = clicked;
-}
+static int getCounter() {
+#if defined(EEZ_PLATFORM_STM32)
+    taskENTER_CRITICAL();
 #endif
 
-void switchEncoderMode() {
-    if (g_encoderMode == ENCODER_MODE_STEP4) {
-        g_encoderMode = ENCODER_MODE_AUTO;
-    } else {
-        g_encoderMode = EncoderMode(g_encoderMode + 1);
+    int16_t counter = g_counter;
+    g_counter = 0;
+
+#if defined(EEZ_PLATFORM_STM32)
+    taskEXIT_CRITICAL();
+#endif
+
+#ifdef DEBUG
+    g_totalCounter += counter;
+    psu::debug::g_encoderCounter.set(g_totalCounter);
+#endif
+
+    return counter;
+}
+
+static int getAcceleratedCounter(int increment) {
+    if (increment == 0 || !g_accelerationEnabled || g_encoderMode != ENCODER_MODE_AUTO) {
+        return increment;
     }
+
+    static int g_lastSign = 0;
+    int sign = increment > 0 ? 1 : -1;
+    bool diffSign = sign != g_lastSign;
+    g_lastSign = sign;
+
+    static uint32_t g_lastTime = 0;
+    uint32_t currentTime = millis();
+    float dt = 1.0f * (currentTime - g_lastTime) * sign / increment;
+    g_lastTime = currentTime;
+
+#ifdef DEBUG
+    psu::debug::g_encoderDt.set((int32_t)dt);
+#endif
+
+    const float MIN_DT_MS = 8;
+    const float MAX_DT_MS = 600;
+
+    if (diffSign) {
+        dt = MAX_DT_MS;
+    } else {
+        dt = clamp(dt, MIN_DT_MS, MAX_DT_MS);
+    }
+
+    // Heuristic: when dt is MIN_DT_MS and speed options is MAX_MOVING_SPEED then 1/2 rotation (= 12 pulses)
+    // should give us full range of 40 V if one pulse is 5mV.
+    const float MIN_VELOCITY = 1.0F;
+    const float MAX_VELOCITY = 40.0f / 12.0f / 0.005f;
+
+    uint8_t speedOption = increment > 0 ? psu::persist_conf::devConf.encoderMovingSpeedUp : psu::persist_conf::devConf.encoderMovingSpeedDown;
+    float maxVelocity = remap(
+        1.0f * speedOption, 
+        1.0f * MIN_MOVING_SPEED, MAX_VELOCITY / (MAX_MOVING_SPEED - MIN_MOVING_SPEED + 1), 
+        1.0f * MAX_MOVING_SPEED, MAX_VELOCITY);
+
+    float velocity = remap(dt, MIN_DT_MS, maxVelocity, MAX_DT_MS, MIN_VELOCITY);
+
+    //printf("inc=%d, dt=%f, sign=%d, v=%f\n", increment, dt, sign, adjustedVelocity);
+
+    return (int)(increment * velocity);
 }
 
 } // namespace encoder

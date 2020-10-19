@@ -36,6 +36,7 @@ void tick(uint32_t tickCount);
 
 extern DebugCounterVariable g_adcCounter;
 extern DebugValueVariable g_encoderCounter;
+extern DebugValueVariable g_encoderDt;
 
 extern DebugValueVariable g_uDac[CH_MAX];
 extern DebugValueVariable g_uMon[CH_MAX];

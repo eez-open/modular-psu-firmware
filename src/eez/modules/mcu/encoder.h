@@ -32,6 +32,8 @@ static const uint8_t DEFAULT_MOVING_UP_SPEED = 6;
 void init();
 void read(int &counter, bool &clicked);
 
+void enableAcceleration(bool enable);
+
 enum EncoderMode {
     ENCODER_MODE_AUTO,
     ENCODER_MODE_STEP1,
@@ -39,15 +41,12 @@ enum EncoderMode {
     ENCODER_MODE_STEP3,
     ENCODER_MODE_STEP4
 };
-
 extern EncoderMode g_encoderMode;
-int getAutoModeStepLevel();
+void switchEncoderMode();
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 void write(int counter, bool clicked);
 #endif
-
-void switchEncoderMode();
 
 #if defined(EEZ_PLATFORM_STM32)
 void onPinInterrupt();
