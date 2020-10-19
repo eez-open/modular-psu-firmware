@@ -208,8 +208,8 @@ static int getAcceleratedCounter(int increment) {
     g_lastSign = sign;
 
     static uint32_t g_lastTime = 0;
-    uint32_t currentTime = millis();
-    float dt = 1.0f * (currentTime - g_lastTime) * sign / increment;
+    uint32_t currentTime = micros();
+    float dt = 1.0f * (currentTime - g_lastTime) / 1000.0f * sign / increment;
     g_lastTime = currentTime;
 
 #ifdef DEBUG
@@ -217,7 +217,7 @@ static int getAcceleratedCounter(int increment) {
 #endif
 
     const float MIN_DT_MS = 8;
-    const float MAX_DT_MS = 600;
+    const float MAX_DT_MS = 150;
 
     if (diffSign) {
         dt = MAX_DT_MS;
