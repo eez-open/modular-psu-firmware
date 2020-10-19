@@ -29,7 +29,6 @@ static const uint8_t MIN_MOVING_SPEED = 1;
 static const uint8_t DEFAULT_MOVING_DOWN_SPEED = 8;
 static const uint8_t DEFAULT_MOVING_UP_SPEED = 6;
 
-void init();
 void read(int &counter, bool &clicked);
 
 void enableAcceleration(bool enable);
@@ -41,7 +40,7 @@ enum EncoderMode {
     ENCODER_MODE_STEP3,
     ENCODER_MODE_STEP4
 };
-extern EncoderMode g_encoderMode;
+extern EncoderMode getEncoderMode();
 void switchEncoderMode();
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

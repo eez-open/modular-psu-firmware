@@ -222,10 +222,6 @@ void boot() {
 
     psu::trigger::init();
 
-#if OPTION_ENCODER
-    mcu::encoder::init();
-#endif
-
     // TEST
 
     g_bootTestSuccess = true;

@@ -1371,7 +1371,7 @@ uint32_t g_focusEditValueChangedTime;
 float encoderIncrement(Value value, int counter, float min, float max, float precision) {
     float step;
 
-    if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+    if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
         StepValues stepValues;
         edit_mode_step::getStepValues(stepValues);
         step = stepValues.values[stepValues.count - 1];
@@ -1773,7 +1773,7 @@ void onEncoder(int counter, bool clicked) {
             Value stepValue = getEncoderStep(g_focusCursor, g_focusDataId);
             if (stepValue.getType() != VALUE_TYPE_NONE) {
                 float step;
-                if (mcu::encoder::g_encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+                if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
                     step = stepValue.getFloat();
                 } else {
                     step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
