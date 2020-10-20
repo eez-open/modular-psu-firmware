@@ -688,6 +688,8 @@ void SysSettingsTemperaturePage::editFanSpeed() {
     options.flags.signButtonEnabled = false;
     options.flags.dotButtonEnabled = false;
 
+    options.encoderPrecision = 1.0f;
+
     NumericKeypad::start(0, fanSpeedPercentage, options, onFanSpeedSet, 0, 0);
 }
 

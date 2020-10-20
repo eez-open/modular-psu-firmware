@@ -1368,7 +1368,7 @@ bool isFocusChanged() {
 static bool g_isEncoderEnabledInActivePage;
 uint32_t g_focusEditValueChangedTime;
 
-float encoderIncrement(Value value, int counter, float min, float max, float precision) {
+float encoderIncrement(Value value, int counter, float min, float max) {
     float step;
 
     if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
@@ -1799,7 +1799,7 @@ void onEncoder(int counter, bool clicked) {
                     }
                 }
 
-                newValue = encoderIncrement(value, counter, min, max, precision);
+                newValue = encoderIncrement(value, counter, min, max);
             }
 
             Value limitValue = getLimit(g_focusCursor, g_focusDataId);

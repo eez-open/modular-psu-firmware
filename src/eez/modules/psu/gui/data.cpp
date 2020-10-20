@@ -3039,6 +3039,8 @@ void data_sys_fan_speed(DataOperationEnum operation, Cursor cursor, Value &value
         if (page) {
             value = page->fanSpeedPercentage;
         }
+    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
+        value = Value(1.0f, UNIT_PERCENT);
     }
 }
 
