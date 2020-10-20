@@ -481,7 +481,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         if (activePageId == PAGE_ID_MAIN) {
             animateHideSysSettings();
         } else if (activePageId == PAGE_ID_SYS_SETTINGS) {
-            animateSettingsSlideRight(previousPageId == PAGE_ID_SYS_INFO);
+            animateSettingsSlideRight(previousPageId == PAGE_ID_SYS_INFO || previousPageId == PAGE_ID_SYS_SETTINGS_ENCODER || previousPageId == PAGE_ID_SYS_SETTINGS_DATE_TIME);
         } else if (activePageId == PAGE_ID_SYS_SETTINGS_MQTT) {
             animateSettingsSlideLeft(false);
         }
