@@ -308,6 +308,8 @@ NumericKeypadOptions::NumericKeypadOptions() {
     flags.dotButtonEnabled = false;
 
     editValueUnit = UNIT_UNKNOWN;
+
+    encoderPrecision = 0.01f;
 }
 
 void NumericKeypadOptions::enableMaxButton() {
@@ -1006,10 +1008,11 @@ void NumericKeypad::onEncoder(int counter) {
             if (m_options.channelIndex != -1) {
                 precision = psu::channel_dispatcher::getValuePrecision(psu::Channel::get(m_options.channelIndex), m_startValue.getUnit(), m_startValue.getFloat());
             } else {
-                // TODO
-                precision = 0.01f;
+                precision = m_options.encoderPrecision;
             }
-            float newValue = encoderIncrement(m_startValue, counter, m_options.min, m_options.max, precision);
+            float newValue = m_startValue.getFloat() + counter * precision;
+            newValue = roundPrec(newValue, precision);
+            newValue = clamp(newValue, m_options.min, m_options.max);
             m_startValue = MakeValue(newValue, m_startValue.getUnit());
             return;
         } else if (m_startValue.getType() == VALUE_TYPE_INT) {

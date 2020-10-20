@@ -832,15 +832,7 @@ void ChSettingsListsPage::onEncoder(int counter) {
     Value min = getMin(cursor, dataId);
     Value max = getMax(cursor, dataId);
 
-    float precision;
-    if (g_channel->channelIndex != -1) {
-        precision = psu::channel_dispatcher::getValuePrecision(psu::Channel::get(g_channel->channelIndex), value.getUnit(), value.getFloat());
-    } else {
-        // TODO
-        precision = 0.001f;
-    }
-
-    float newValue = encoderIncrement(value, counter, min.getFloat(), max.getFloat(), precision);
+    float newValue = encoderIncrement(value, counter, min.getFloat(), max.getFloat());
 
     setFocusedValue(newValue);
 #endif

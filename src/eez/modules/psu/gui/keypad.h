@@ -134,6 +134,8 @@ struct NumericKeypadOptions {
     void enableMaxButton();
     void enableDefButton();
 
+    float encoderPrecision;
+
   private:
     static void maxOption();
     static void minOption();
