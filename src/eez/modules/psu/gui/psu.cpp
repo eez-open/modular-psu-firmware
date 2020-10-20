@@ -1785,20 +1785,6 @@ void onEncoder(int counter, bool clicked) {
                     newValue = clamp(newValue, min, max);
                 }
             } else {
-                Value previsionValue = getEncoderPrecision(g_focusCursor, g_focusDataId);
-
-                float precision;
-                if (previsionValue.getType() != VALUE_TYPE_NONE) {
-                    precision = previsionValue.getFloat();
-                } else {
-                    if (g_focusCursor != -1) {
-                        precision = psu::channel_dispatcher::getValuePrecision(psu::Channel::get(g_focusCursor), value.getUnit(), value.getFloat());
-                    } else {
-                        // TODO
-                        precision = 0.001f;
-                    }
-                }
-
                 newValue = encoderIncrement(value, counter, min, max);
             }
 
