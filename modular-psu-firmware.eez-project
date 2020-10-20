@@ -272,17 +272,17 @@
     {
       "name": "slot1_micro_view",
       "type": "string",
-      "defaultValue": "dib_dcp405_slot_micro_1ch_on"
+      "defaultValue": "dib_dcp405::slot_micro_1ch_on"
     },
     {
       "name": "slot2_micro_view",
       "type": "string",
-      "defaultValue": "dib_dcp405_slot_micro_1ch_off"
+      "defaultValue": "dib_dcp405::slot_micro_1ch_off"
     },
     {
       "name": "slot3_micro_view",
       "type": "string",
-      "defaultValue": "dib_dcp405_slot_micro_2ch"
+      "defaultValue": "dib_dcm224::slot_micro_2ch"
     },
     {
       "name": "channel_display_value1",
