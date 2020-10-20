@@ -166,8 +166,6 @@ void stateTransition(int event) {
 			datetime::breakTime(local, year, month, day, hour, minute, second);
 			datetime::setDateTime(year - 2000, month, day, hour, minute, second, false, 2);
 
-			event_queue::pushEvent(event_queue::EVENT_INFO_NTP_REFRESH_SUCCEEDED);
-
 			setTimeout(g_timeout1, persist_conf::devConf.ntpRefreshFrequency * 60 * 1000);
 			setState(STATE_SUCCESS);
 		} else if (event == EVENT_TEST_NTP_SERVER) {
