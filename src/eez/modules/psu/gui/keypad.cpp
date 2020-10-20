@@ -246,6 +246,9 @@ void Keypad::option1() {
 void Keypad::option2() {
 }
 
+void Keypad::option3() {
+}
+
 void Keypad::setMaxValue() {
 }
 
@@ -300,6 +303,7 @@ NumericKeypadOptions::NumericKeypadOptions() {
     flags.checkWhileTyping = false;
     flags.option1ButtonEnabled = false;
     flags.option2ButtonEnabled = false;
+    flags.option3ButtonEnabled = false;
     flags.signButtonEnabled = false;
     flags.dotButtonEnabled = false;
 
@@ -313,14 +317,27 @@ void NumericKeypadOptions::enableMaxButton() {
 }
 
 void NumericKeypadOptions::enableMinButton() {
-    flags.option2ButtonEnabled = true;
-    option2ButtonText = "min";
-    option2 = minOption;
+    if (flags.option2ButtonEnabled) {
+        flags.option3ButtonEnabled = true;
+        option3ButtonText = "min";
+        option3 = minOption;
+    } else {
+        flags.option2ButtonEnabled = true;
+        option2ButtonText = "min";
+        option2 = minOption;
+    }
 }
+
 void NumericKeypadOptions::enableDefButton() {
-    flags.option2ButtonEnabled = true;
-    option2ButtonText = "def";
-    option2 = defOption;
+    if (flags.option2ButtonEnabled) {
+        flags.option3ButtonEnabled = true;
+        option3ButtonText = "def";
+        option3 = defOption;
+    } else {
+        flags.option2ButtonEnabled = true;
+        option2ButtonText = "def";
+        option2 = defOption;
+    }
 }
 
 void NumericKeypadOptions::maxOption() {
@@ -890,6 +907,12 @@ void NumericKeypad::option1() {
 void NumericKeypad::option2() {
     if (m_options.flags.option2ButtonEnabled && m_options.option2) {
         m_options.option2();
+    }
+}
+
+void NumericKeypad::option3() {
+    if (m_options.flags.option3ButtonEnabled && m_options.option3) {
+        m_options.option3();
     }
 }
 

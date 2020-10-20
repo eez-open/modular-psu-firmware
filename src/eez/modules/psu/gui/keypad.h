@@ -53,6 +53,7 @@ class Keypad : public Page {
     virtual void unit();
     virtual void option1();
     virtual void option2();
+    virtual void option3();
     virtual void setMaxValue();
     virtual void setMinValue();
     virtual void setDefValue();
@@ -115,6 +116,7 @@ struct NumericKeypadOptions {
         unsigned checkWhileTyping : 1;
         unsigned option1ButtonEnabled : 1;
         unsigned option2ButtonEnabled : 1;
+        unsigned option3ButtonEnabled : 1;
         unsigned signButtonEnabled : 1;
         unsigned dotButtonEnabled : 1;
     } flags;
@@ -125,8 +127,11 @@ struct NumericKeypadOptions {
     const char *option2ButtonText;
     void (*option2)();
 
-    void enableMaxButton();
+    const char *option3ButtonText;
+    void (*option3)();
+
     void enableMinButton();
+    void enableMaxButton();
     void enableDefButton();
 
   private:
@@ -202,6 +207,7 @@ public:
     void unit();
     void option1();
     void option2();
+    void option3();
     void setMaxValue();
     void setMinValue();
     void setDefValue();

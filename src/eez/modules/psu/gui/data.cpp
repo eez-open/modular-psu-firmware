@@ -62,6 +62,7 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ontime.h>
 #include <eez/modules/psu/sd_card.h>
+#include <eez/modules/psu/ntp.h>
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/edit_mode.h>
@@ -1935,6 +1936,24 @@ void data_keypad_option2_enabled(DataOperationEnum operation, Cursor cursor, Val
         NumericKeypad *keypad = getActiveNumericKeypad();
         if (keypad) {
             value = (int)keypad->m_options.flags.option2ButtonEnabled;
+        }
+    }
+}
+
+void data_keypad_option3_text(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        NumericKeypad *keypad = getActiveNumericKeypad();
+        if (keypad) {
+            value = Value(keypad->m_options.flags.option3ButtonEnabled ? keypad->m_options.option3ButtonText : "");
+        }
+    }
+}
+
+void data_keypad_option3_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        NumericKeypad *keypad = getActiveNumericKeypad();
+        if (keypad) {
+            value = (int)keypad->m_options.flags.option3ButtonEnabled;
         }
     }
 }
@@ -6007,6 +6026,13 @@ void data_user_switch_action(DataOperationEnum operation, Cursor cursor, Value &
     if (operation == DATA_OPERATION_GET) {
         value = MakeEnumDefinitionValue(persist_conf::devConf.userSwitchAction, ENUM_DEFINITION_USER_SWITCH_ACTION);
     }
+}
+
+void data_ntp_refresh_frequency(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
+        value = MakeValue((float)page->ntpRefreshFrequency, UNIT_MINUTE);
+    } 
 }
 
 } // namespace gui

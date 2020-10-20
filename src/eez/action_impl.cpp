@@ -36,6 +36,7 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/dlog_view.h>
+#include <eez/modules/psu/ntp.h>
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/animations.h>
@@ -168,6 +169,10 @@ void action_keypad_option1() {
 
 void action_keypad_option2() {
     getActiveKeypad()->option2();
+}
+
+void action_keypad_option3() {
+    getActiveKeypad()->option3();
 }
 
 void action_enter_touch_calibration() {
@@ -1349,6 +1354,27 @@ void action_show_display_test_page() {
 
 void action_toggle_display_test_color_index() {
     psu::gui::g_displayTestColorIndex = (psu::gui::g_displayTestColorIndex + 1) % 4;
+}
+
+void onSetNtpRefreshFrequency(float value) {
+    popPage();
+    SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
+    page->ntpRefreshFrequency = (uint32_t)value;
+}
+
+void action_edit_ntp_refresh_frequency() {
+    NumericKeypadOptions options;
+
+    options.min = NTP_REFRESH_FREQUENCY_MIN;
+    options.max = NTP_REFRESH_FREQUENCY_MAX;
+    options.def = NTP_REFRESH_FREQUENCY_DEF;
+
+    options.enableMaxButton();
+    options.enableDefButton();
+    options.enableMinButton();
+
+    SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
+    NumericKeypad::start(0, Value(page->ntpRefreshFrequency, VALUE_TYPE_UINT32), options, onSetNtpRefreshFrequency, 0, 0);
 }
 
 } // namespace gui

@@ -26,12 +26,14 @@
 #include <eez/modules/psu/psu.h>
 
 #include <eez/modules/mcu/eeprom.h>
+#include <eez/modules/mcu/encoder.h>
 #include <eez/modules/bp3c/eeprom.h>
 
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/calibration.h>
+#include <eez/modules/psu/ntp.h>
 
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
@@ -183,6 +185,8 @@ void initDefaultDevConf() {
     g_defaultDevConf.eventQueueFilter = event_queue::EVENT_TYPE_INFO;
     g_defaultDevConf.viewFlags.dlogViewLegendViewOption = DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK;
     g_defaultDevConf.viewFlags.dlogViewShowLabels = 1;
+    g_defaultDevConf.encoderMode = mcu::encoder::ENCODER_MODE_AUTO;
+    g_defaultDevConf.ntpRefreshFrequency = NTP_REFRESH_FREQUENCY_DEF;
 
     // block 8
     strcpy(g_defaultDevConf.ethernetHostName, DEFAULT_ETHERNET_HOST_NAME);
@@ -394,6 +398,10 @@ void init() {
 
         blockAddress += 2 * blockStorageSize;
         blockStart = blockEnd;
+    }
+
+    if (g_devConf.ntpRefreshFrequency < NTP_REFRESH_FREQUENCY_MIN || g_devConf.ntpRefreshFrequency > NTP_REFRESH_FREQUENCY_MAX) {
+        g_devConf.ntpRefreshFrequency = NTP_REFRESH_FREQUENCY_DEF;
     }
 
     // remember this g_devConf to be used to detect when it changes
@@ -1134,9 +1142,10 @@ void setNtpServer(const char *ntpServer, size_t ntpServerLength) {
     g_devConf.ntpServer[ntpServerLength] = 0;
 }
 
-void setNtpSettings(bool enable, const char *ntpServer) {
+void setNtpSettings(bool enable, const char *ntpServer, uint32_t ntpRefreshFrequency) {
     g_devConf.ntpEnabled = enable ? 1 : 0;
     strcpy(g_devConf.ntpServer, ntpServer);
+    g_devConf.ntpRefreshFrequency = ntpRefreshFrequency;
 }
 
 bool setMqttSettings(bool enable, const char *host, uint16_t port, const char *username, const char *password, float period) {

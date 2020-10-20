@@ -47,7 +47,6 @@ namespace ntp {
 #ifdef EEZ_PLATFORM_STM32
 
 #define CONF_NTP_LOCAL_PORT 8888
-#define CONF_TIMEOUT_AFTER_SUCCESS_MS CONF_NTP_PERIOD_SEC * 1000L
 #define CONF_TIMEOUT_AFTER_ERROR_MS CONF_NTP_PERIOD_AFTER_ERROR_SEC * 1000L
 #define CONF_TEST_NTP_SERVER_TIMEOUT 5 * 1000 // 5 second
 #define NUM_RETRIES 3
@@ -167,7 +166,9 @@ void stateTransition(int event) {
 			datetime::breakTime(local, year, month, day, hour, minute, second);
 			datetime::setDateTime(year - 2000, month, day, hour, minute, second, false, 2);
 
-			setTimeout(g_timeout1, CONF_TIMEOUT_AFTER_SUCCESS_MS);
+			event_queue::pushEvent(event_queue::EVENT_INFO_NTP_REFRESH_SUCCEEDED);
+
+			setTimeout(g_timeout1, persist_conf::devConf.ntpRefreshFrequency * 60 * 1000);
 			setState(STATE_SUCCESS);
 		} else if (event == EVENT_TEST_NTP_SERVER) {
 			stop();

@@ -36,6 +36,7 @@ enum Unit {
     UNIT_MILLI_WATT,
     UNIT_SECOND,
     UNIT_MILLI_SECOND,
+    UNIT_MINUTE,
     UNIT_CELSIUS,
     UNIT_RPM,
     UNIT_OHM,
