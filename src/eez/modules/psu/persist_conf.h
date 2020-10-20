@@ -299,6 +299,7 @@ bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint3
 void enableNtp(bool enable);
 bool isNtpEnabled();
 void setNtpServer(const char *ntpServer, size_t ntpServerLength);
+void setNtpRefreshFrequency(uint32_t ntpRefreshFrequency);
 void setNtpSettings(bool enable, const char *ntpServer, uint32_t ntpRefreshFrequency);
 
 bool setMqttSettings(bool enable, const char *host, uint16_t port, const char *username, const char *password, float period);

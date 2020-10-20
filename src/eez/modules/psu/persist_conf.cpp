@@ -1142,6 +1142,10 @@ void setNtpServer(const char *ntpServer, size_t ntpServerLength) {
     g_devConf.ntpServer[ntpServerLength] = 0;
 }
 
+void setNtpRefreshFrequency(uint32_t ntpRefreshFrequency) {
+    g_devConf.ntpRefreshFrequency = ntpRefreshFrequency;
+}
+
 void setNtpSettings(bool enable, const char *ntpServer, uint32_t ntpRefreshFrequency) {
     g_devConf.ntpEnabled = enable ? 1 : 0;
     strcpy(g_devConf.ntpServer, ntpServer);
