@@ -177,8 +177,7 @@ static const int EVENT_TYPE_ERROR = 4;
     EVENT_INFO(SYSTEM_SHUTDOWN, 129, "System shutdown")                                            \
     EVENT_INFO(DLOG_START, 130, "DLOG recording started")                                          \
     EVENT_INFO(DLOG_FINISH, 131, "DLOG recording finished")                                        \
-    EVENT_INFO(ETHERNET_CONNECTED, 132, "Ethernet connected")                                      \
-    EVENT_INFO(NTP_REFRESH_SUCCEEDED, 133, "NTP refresh succeeded")                                \
+    EVENT_INFO(ETHERNET_CONNECTED, 132, "Ethernet connected")
 
 #define EVENT_ERROR_START_ID 10000
 #define EVENT_WARNING_START_ID 12000
