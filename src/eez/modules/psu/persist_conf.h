@@ -175,7 +175,8 @@ struct DeviceConfiguration {
     int eventQueueFilter;
     ViewFlags viewFlags;
     uint8_t encoderMode;
-    uint8_t reserved6[47];
+    uint8_t reserved6[43];
+    uint32_t ntpRefreshFrequency;
 
     // block 8
     char ethernetHostName[ETHERNET_HOST_NAME_SIZE + 1];
@@ -298,7 +299,7 @@ bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint3
 void enableNtp(bool enable);
 bool isNtpEnabled();
 void setNtpServer(const char *ntpServer, size_t ntpServerLength);
-void setNtpSettings(bool enable, const char *ntpServer);
+void setNtpSettings(bool enable, const char *ntpServer, uint32_t ntpRefreshFrequency);
 
 bool setMqttSettings(bool enable, const char *host, uint16_t port, const char *username, const char *password, float period);
 void enableMqtt(bool enable);

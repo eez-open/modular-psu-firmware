@@ -18,6 +18,10 @@
  
 #pragma once
 
+#define NTP_REFRESH_FREQUENCY_MIN 15           // 15 minutes
+#define NTP_REFRESH_FREQUENCY_MAX 10 * 24 * 60 // 10 days
+#define NTP_REFRESH_FREQUENCY_DEF 12 * 60      // 12 hours
+
 namespace eez {
 namespace ntp {
 

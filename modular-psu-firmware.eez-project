@@ -424,10 +424,21 @@
     {
       "name": "keypad_option2_text",
       "type": "string",
-      "defaultValue": "min"
+      "defaultValue": "def"
     },
     {
       "name": "keypad_option2_enabled",
+      "description": "Is \"def\" key on numeric keypad enabled?",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "keypad_option3_text",
+      "type": "string",
+      "defaultValue": "min"
+    },
+    {
+      "name": "keypad_option3_enabled",
       "description": "Is \"def\" key on numeric keypad enabled?",
       "type": "boolean",
       "defaultValue": "1"
@@ -2338,6 +2349,11 @@
       "name": "user_switch_action",
       "type": "string",
       "defaultValue": "Encoder Step"
+    },
+    {
+      "name": "ntp_refresh_frequency",
+      "type": "string",
+      "defaultValue": "720 minutes"
     }
   ],
   "actions": [
@@ -3029,6 +3045,12 @@
     },
     {
       "name": "show_display_test_page"
+    },
+    {
+      "name": "edit_ntp_refresh_frequency"
+    },
+    {
+      "name": "keypad_option3"
     }
   ],
   "gui": {
@@ -8994,20 +9016,50 @@
                 "text": "6"
               },
               {
-                "type": "Button",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "key"
+                  "inheritFrom": "default"
                 },
-                "data": "edit_unit",
-                "action": "keypad_unit",
+                "data": "keypad_option3_enabled",
                 "left": 180,
                 "top": 45,
                 "width": 59,
                 "height": 42,
-                "enabled": "keypad_unit_enabled",
-                "disabledStyle": {
-                  "inheritFrom": "key_disabled"
-                }
+                "widgets": [
+                  {
+                    "type": "Button",
+                    "style": {
+                      "inheritFrom": "key"
+                    },
+                    "data": "edit_unit",
+                    "action": "keypad_unit",
+                    "left": 0,
+                    "top": 0,
+                    "width": 59,
+                    "height": 42,
+                    "enabled": "keypad_unit_enabled",
+                    "disabledStyle": {
+                      "inheritFrom": "key_disabled"
+                    }
+                  },
+                  {
+                    "type": "Button",
+                    "style": {
+                      "inheritFrom": "key"
+                    },
+                    "data": "keypad_option3_text",
+                    "action": "keypad_option3",
+                    "left": 0,
+                    "top": 0,
+                    "width": 59,
+                    "height": 42,
+                    "text": "",
+                    "enabled": "keypad_option3_enabled",
+                    "disabledStyle": {
+                      "inheritFrom": "key_disabled"
+                    }
+                  }
+                ]
               },
               {
                 "type": "Text",
@@ -20166,7 +20218,7 @@
             },
             "data": "ntp_enabled",
             "left": 10,
-            "top": 47,
+            "top": 43,
             "width": 214,
             "height": 32,
             "widgets": [
@@ -20450,7 +20502,7 @@
               "inheritFrom": "default"
             },
             "left": 248,
-            "top": 47,
+            "top": 43,
             "width": 192,
             "height": 32,
             "name": "set DST",
@@ -20487,7 +20539,7 @@
               "inheritFrom": "default"
             },
             "left": 10,
-            "top": 89,
+            "top": 81,
             "width": 234,
             "height": 32,
             "name": "time zone",
@@ -20525,9 +20577,9 @@
             },
             "data": "ethernet_enabled",
             "left": 10,
-            "top": 131,
-            "width": 460,
-            "height": 37,
+            "top": 120,
+            "width": 462,
+            "height": 114,
             "widgets": [
               {
                 "type": "Rectangle",
@@ -20536,8 +20588,8 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 460,
-                "height": 37,
+                "width": 462,
+                "height": 114,
                 "invertColors": true
               },
               {
@@ -20548,8 +20600,8 @@
                 "data": "ntp_enabled",
                 "left": 0,
                 "top": 0,
-                "width": 460,
-                "height": 37,
+                "width": 462,
+                "height": 114,
                 "widgets": [
                   {
                     "type": "Container",
@@ -20558,8 +20610,8 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 460,
-                    "height": 37,
+                    "width": 462,
+                    "height": 114,
                     "name": "NTP disabled",
                     "widgets": [
                       {
@@ -20568,9 +20620,9 @@
                           "inheritFrom": "edit_value_active_M_center"
                         },
                         "action": "ntp_toggle",
-                        "left": 340,
-                        "top": 0,
-                        "width": 120,
+                        "left": 6,
+                        "top": 6,
+                        "width": 140,
                         "height": 32,
                         "text": "Enable NTP"
                       }
@@ -20583,18 +20635,74 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 460,
-                    "height": 37,
+                    "width": 462,
+                    "height": 114,
                     "name": "NTP enabled",
                     "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 462,
+                        "height": 2,
+                        "invertColors": false
+                      },
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 2,
+                        "width": 2,
+                        "height": 110,
+                        "invertColors": false
+                      },
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 460,
+                        "top": 2,
+                        "width": 2,
+                        "height": 110,
+                        "invertColors": false
+                      },
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 112,
+                        "width": 462,
+                        "height": 2,
+                        "invertColors": false
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_M_center"
+                        },
+                        "action": "ntp_toggle",
+                        "left": 6,
+                        "top": 6,
+                        "width": 140,
+                        "height": 32,
+                        "text": "Disable NTP"
+                      },
                       {
                         "type": "Text",
                         "style": {
                           "inheritFrom": "edit_value_M_left"
                         },
-                        "left": 0,
-                        "top": 0,
-                        "width": 109,
+                        "left": 6,
+                        "top": 41,
+                        "width": 113,
                         "height": 32,
                         "text": "NTP server:"
                       },
@@ -20605,40 +20713,41 @@
                         },
                         "data": "ntp_server",
                         "action": "ntp_edit_server",
-                        "left": 109,
-                        "top": 0,
-                        "width": 225,
+                        "left": 119,
+                        "top": 41,
+                        "width": 337,
                         "height": 32,
                         "displayOption": 0
                       },
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "edit_value_active_M_center"
+                          "inheritFrom": "edit_value_M_left"
                         },
-                        "action": "ntp_toggle",
-                        "left": 340,
-                        "top": 0,
-                        "width": 120,
+                        "left": 6,
+                        "top": 76,
+                        "width": 180,
                         "height": 32,
-                        "text": "Disable NTP"
+                        "text": "Refresh frequency:"
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_17_enabled"
+                        },
+                        "data": "ntp_refresh_frequency",
+                        "action": "edit_ntp_refresh_frequency",
+                        "left": 186,
+                        "top": 76,
+                        "width": 160,
+                        "height": 32,
+                        "displayOption": 0
                       }
                     ]
                   }
                 ]
               }
             ]
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 168,
-            "width": 480,
-            "height": 72,
-            "layout": "minimized_channels"
           },
           {
             "type": "Container",

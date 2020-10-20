@@ -48,6 +48,7 @@ class SysSettingsDateTimePage : public SetPage {
 
     bool ntpEnabled;
     char ntpServer[32 + 1];
+    uint32_t ntpRefreshFrequency;
     datetime::DateTime dateTime;
     int16_t timeZone;
     datetime::DstRule dstRule;
@@ -57,6 +58,7 @@ class SysSettingsDateTimePage : public SetPage {
   private:
     bool origNtpEnabled;
     char origNtpServer[32 + 1];
+    uint32_t origNtpRefreshFrequency;
     int16_t origTimeZone;
     datetime::DstRule origDstRule;
     datetime::Format origDateTimeFormat;

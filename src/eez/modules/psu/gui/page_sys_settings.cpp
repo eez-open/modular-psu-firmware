@@ -54,6 +54,7 @@ void SysSettingsDateTimePage::pageAlloc() {
     ntpEnabled = origNtpEnabled = persist_conf::isEthernetEnabled() && persist_conf::isNtpEnabled();
     strcpy(ntpServer, persist_conf::devConf.ntpServer);
     strcpy(origNtpServer, persist_conf::devConf.ntpServer);
+    ntpRefreshFrequency = origNtpRefreshFrequency = persist_conf::devConf.ntpRefreshFrequency;
 #else
     ntpEnabled = origNtpEnabled = false;
     strcpy(ntpServer, "");
@@ -237,6 +238,9 @@ int SysSettingsDateTimePage::getDirty() {
         if (ntpServer[0] && strcmp(ntpServer, origNtpServer)) {
             return 1;
         }
+        if (ntpRefreshFrequency != origNtpRefreshFrequency) {
+            return 1;
+        }
     } else {
         if (dateTimeModified) {
             return 1;
@@ -295,8 +299,8 @@ void SysSettingsDateTimePage::doSet() {
     }
 
 #if OPTION_ETHERNET
-    if (ntpEnabled != origNtpEnabled || strcmp(ntpServer, origNtpServer)) {
-        persist_conf::setNtpSettings(ntpEnabled, ntpServer);
+    if (ntpEnabled != origNtpEnabled || strcmp(ntpServer, origNtpServer) || ntpRefreshFrequency != origNtpRefreshFrequency) {
+        persist_conf::setNtpSettings(ntpEnabled, ntpServer, ntpRefreshFrequency);
     }
 #endif
 

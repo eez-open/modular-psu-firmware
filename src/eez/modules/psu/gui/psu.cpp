@@ -467,7 +467,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         if (activePageId == PAGE_ID_MAIN) {
             animateHideSysSettings();
         } else if (isSysSettingsSubPage(activePageId)) {
-            animateSettingsSlideLeft(activePageId == PAGE_ID_SYS_INFO || activePageId == PAGE_ID_SYS_SETTINGS_ENCODER);
+            animateSettingsSlideLeft(activePageId == PAGE_ID_SYS_INFO || activePageId == PAGE_ID_SYS_SETTINGS_ENCODER || activePageId == PAGE_ID_SYS_SETTINGS_DATE_TIME);
         }
     } else if (previousPageId == PAGE_ID_SYS_SETTINGS_TRIGGER || previousPageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY) {
         if (activePageId == PAGE_ID_MAIN) {
