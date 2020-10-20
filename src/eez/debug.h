@@ -18,19 +18,26 @@
 
 #pragma once
 
-#ifdef DEBUG
-
 #include <stdint.h>
 
 namespace eez {
 namespace debug {
 
-void Trace(const char *format, ...);
+enum TraceType {
+    TRACE_TYPE_INFO,
+    TRACE_TYPE_DEBUG
+};
+
+void Trace(TraceType traceType, const char *format, ...);
 
 } // namespace debug
 } // namespace eez
 
-#define DebugTrace(...) ::eez::debug::Trace(__VA_ARGS__)
+#define InfoTrace(...) ::eez::debug::Trace(::eez::debug::TRACE_TYPE_INFO, __VA_ARGS__)
+
+#ifdef DEBUG
+
+#define DebugTrace(...) ::eez::debug::Trace(::eez::debug::TRACE_TYPE_DEBUG, __VA_ARGS__)
 
 #else // NO DEBUG
 

@@ -37,7 +37,7 @@ using namespace eez::psu;
 namespace eez {
 namespace debug {
 
-void Trace(const char *format, ...) {
+void Trace(TraceType traceType, const char *format, ...) {
     va_list args;
     va_start(args, format);
 
@@ -49,7 +49,11 @@ void Trace(const char *format, ...) {
 
     va_end(args);
 
-    event_queue::pushDebugTrace(buffer, strlen(buffer));
+    if (traceType == TRACE_TYPE_INFO) {
+        event_queue::pushInfoTrace(buffer, strlen(buffer));
+    } else {
+        event_queue::pushDebugTrace(buffer, strlen(buffer));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

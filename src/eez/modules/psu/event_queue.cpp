@@ -291,7 +291,7 @@ void pushChannelEvent(int16_t eventId, int channelIndex) {
     pushEvent(eventId, channelIndex);
 }
 
-void pushDebugTrace(const char *message, size_t messageLength) {
+void pushTraceMessage(int16_t traceMessageType, const char *message, size_t messageLength) {
     static char buffer[EVENT_MESSAGE_MAX_SIZE];
     static int bufferIndex = 0;
     
@@ -307,10 +307,18 @@ void pushDebugTrace(const char *message, size_t messageLength) {
                 buffer[bufferIndex] = 0;
                 bufferIndex = 0;
 
-                addEventToWriteQueue(EVENT_DEBUG_TRACE, buffer, -1);
+                addEventToWriteQueue(traceMessageType, buffer, -1);
             }
         }
     }
+}
+
+void pushDebugTrace(const char *message, size_t messageLength) {
+    pushTraceMessage(EVENT_DEBUG_TRACE, message, messageLength);
+}
+
+void pushInfoTrace(const char *message, size_t messageLength) {
+    pushTraceMessage(EVENT_INFO_TRACE, message, messageLength);
 }
 
 void markAsRead() {
@@ -424,7 +432,7 @@ static uint32_t getEventDateTime(Event *e) {
 static int getEventType(int16_t eventId) {
     if (eventId == EVENT_DEBUG_TRACE) {
         return EVENT_TYPE_DEBUG;
-    } else if (eventId >= EVENT_INFO_START_ID) {
+    } else if (eventId >= EVENT_INFO_START_ID || eventId == EVENT_INFO_TRACE) {
         return EVENT_TYPE_INFO;
     } else if (eventId >= EVENT_WARNING_START_ID) {
         return EVENT_TYPE_WARNING;
@@ -542,7 +550,7 @@ static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
     bool result = bufferedFile.write((const uint8_t *)dateTimeAndEventTypeStr, strlen(dateTimeAndEventTypeStr));
 
     if (result) {
-        if (event->eventId == EVENT_DEBUG_TRACE) {
+        if (event->eventId == EVENT_DEBUG_TRACE || event->eventId == EVENT_INFO_TRACE) {
             result = bufferedFile.write((const uint8_t *)event->message, strlen(event->message));
         } else {
             const char *message = getEventMessage(event->eventId);
@@ -769,7 +777,7 @@ static void readEvents(uint32_t fromPosition) {
                             event.dateTime = g_writeQueue[i].dateTime;
                             event.eventType = eventType;
                             if (g_writeQueue[i].channelIndex == -1 || g_writeQueue[i].message) {
-                                strcpy(event.message, eventType == EVENT_DEBUG_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
+                                strcpy(event.message, eventType == EVENT_DEBUG_TRACE || eventType == EVENT_INFO_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
                             } else {
                                 sprintf(event.message, getEventMessage(g_writeQueue[i].eventId), g_writeQueue[i].channelIndex + 1);
                             }

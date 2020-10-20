@@ -183,6 +183,7 @@ static const int EVENT_TYPE_ERROR = 4;
 #define EVENT_WARNING_START_ID 12000
 #define EVENT_INFO_START_ID 14000
 #define EVENT_DEBUG_TRACE 32000
+#define EVENT_INFO_TRACE 32001
 
 #define EVENT_SCPI_ERROR(ID, TEXT)
 #define EVENT_ERROR(NAME, ID, TEXT) EVENT_ERROR_##NAME = EVENT_ERROR_START_ID + ID,
@@ -213,6 +214,7 @@ void setFilter(int filter);
 void pushEvent(int16_t eventId, int channelIndex = -1);
 void pushChannelEvent(int16_t eventId, int channelIndex);
 void pushDebugTrace(const char *message, size_t messageLength);
+void pushInfoTrace(const char *message, size_t messageLength);
 
 void markAsRead();
 void moveToTop();
