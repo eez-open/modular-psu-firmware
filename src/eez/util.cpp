@@ -622,4 +622,25 @@ void formatBytes(uint64_t bytes, char *text, int count) {
     text[count - 1] = 0;
 }
 
+void getBaseFileName(const char *path, char *baseName, unsigned basenameSize) {
+    const char *a = strrchr(path, '/');
+    if (a) {
+         a++;
+    } else {
+        a = path;
+    }
+    
+    const char *b = strrchr(path, '.');
+    if (!b || !(b >= a)) {
+        b = path + strlen(path);
+    }
+
+    unsigned n = b - a;
+    n = MIN(basenameSize - 1, n);
+    if (n > 0) {
+        strncpy(baseName, a, n);
+    }
+    baseName[n] = 0;
+}
+
 } // namespace eez

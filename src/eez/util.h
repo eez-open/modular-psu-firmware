@@ -128,4 +128,6 @@ bool endsWithNoCase(const char *str, const char *suffix);
 
 void formatBytes(uint64_t bytes, char *text, int count);
 
+void getBaseFileName(const char *path, char *baseName, unsigned basenameSize);
+
 } // namespace eez

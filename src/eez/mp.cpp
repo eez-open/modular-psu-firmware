@@ -166,8 +166,11 @@ enum {
 void oneIter() {
     osEvent event = osMessageGet(g_mpMessageQueueId, osWaitForever);
     if (event.status == osEventMessage) {
-        switch (event.value.v) {
-        case QUEUE_MESSAGE_START_SCRIPT:
+        if (event.value.v == QUEUE_MESSAGE_START_SCRIPT) {
+            char scriptName[64];
+            getBaseFileName(g_scriptPath, scriptName, sizeof(scriptName));
+            InfoTrace("Script started: %s\n", scriptName);
+
 #if 0
         	// this version reinitialise MP every time
 			volatile char dummy;
@@ -218,13 +221,14 @@ void oneIter() {
 				mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
                 onUncaughtScriptExceptionHook();
 			}
+
 #endif
 
             psu::gui::hideAsyncOperationInProgress();
 
             g_state = STATE_IDLE;
 
-            break;
+            InfoTrace("Script ended: %s\n", scriptName);
         }
     }
 }
@@ -279,7 +283,7 @@ ErrorNoClose:
     psu::gui::hideAsyncOperationInProgress();
 
     g_state = STATE_IDLE;
-    
+
     return;
 }
 
