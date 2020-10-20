@@ -64374,6 +64374,28 @@
             }
           },
           {
+            "name": "SYSTem:COMMunicate:NTP:FREQuency",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_ntp",
+            "parameters": [
+              {
+                "name": "freq",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
             "name": "SYSTem:COMMunicate:RLSTate",
             "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_rlst",
             "parameters": [
@@ -65804,6 +65826,18 @@
               "type": [
                 {
                   "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:NTP:FREQuency?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_ntp",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
                 }
               ]
             }

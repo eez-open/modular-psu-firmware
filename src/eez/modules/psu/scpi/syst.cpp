@@ -1400,6 +1400,7 @@ scpi_result_t scpi_cmd_systemCommunicateNtp(scpi_t *context) {
     }
 
     persist_conf::setNtpServer(ntpServer, ntpServerLength);
+    ntp::reset();
 
     return SCPI_RES_OK;
 #else
@@ -1411,6 +1412,38 @@ scpi_result_t scpi_cmd_systemCommunicateNtp(scpi_t *context) {
 scpi_result_t scpi_cmd_systemCommunicateNtpQ(scpi_t *context) {
 #if OPTION_ETHERNET
     SCPI_ResultText(context, persist_conf::devConf.ntpServer);
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_result_t scpi_cmd_systemCommunicateNtpFrequency(scpi_t *context) {
+#if OPTION_ETHERNET
+    uint32_t freq;
+    if (!SCPI_ParamUInt32(context, &freq, false)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (freq < NTP_REFRESH_FREQUENCY_MIN || freq > NTP_REFRESH_FREQUENCY_MAX) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+        return SCPI_RES_ERR;
+    }
+
+    persist_conf::setNtpRefreshFrequency(freq);
+    ntp::reset();
+
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
+scpi_result_t scpi_cmd_systemCommunicateNtpFrequencyQ(scpi_t *context) {
+#if OPTION_ETHERNET
+	SCPI_ResultUInt32(context, persist_conf::devConf.ntpRefreshFrequency);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

@@ -317,6 +317,7 @@
     SCPI_COMMAND("SYSTem:COMMunicate:MQTT:STATe?", scpi_cmd_systemCommunicateMqttStateQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:NTP", scpi_cmd_systemCommunicateNtp) \
     SCPI_COMMAND("SYSTem:COMMunicate:NTP?", scpi_cmd_systemCommunicateNtpQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:NTP:FREQuency", scpi_cmd_systemCommunicateNtpFrequency) \
     SCPI_COMMAND("SYSTem:COMMunicate:RLSTate", scpi_cmd_systemCommunicateRlstate) \
     SCPI_COMMAND("SYSTem:COMMunicate:RLSTate?", scpi_cmd_systemCommunicateRlstateQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:USB:CLAss", scpi_cmd_systemCommunicateUsbClass) \
@@ -392,6 +393,7 @@
     SCPI_COMMAND("SYSTem:SLOT:FIRMware?", scpi_cmd_systemSlotFirmwareQ) \
     SCPI_COMMAND("SYSTem:SLOT:SNO", scpi_cmd_systemSlotSno) \
     SCPI_COMMAND("SYSTem:SLOT:SNO?", scpi_cmd_systemSlotSnoQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:NTP:FREQuency?", scpi_cmd_systemCommunicateNtpFrequencyQ) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \
     SCPI_COMMAND("TRIGger:DLOG[:IMMediate]", scpi_cmd_triggerDlogImmediate) \
