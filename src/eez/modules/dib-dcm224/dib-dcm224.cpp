@@ -660,9 +660,11 @@ void DcmChannel::tickSpecific(uint32_t tickCount) {
 #if !CONF_SKIP_PWRGOOD_TEST
     bool pwrGood = simulator::getPwrgood(channelIndex);
     if (!pwrGood) {
+        channel_dispatcher::setVoltage(*this, 0);
+        channel_dispatcher::outputEnable(*this, false);
         flags.powerOk = 0;
+        ((DcmModule *)g_slots[slotIndex])->testResult = TEST_FAILED;
         generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channelIndex);
-        powerDownBySensor();
         return;
     }
 #endif
@@ -884,9 +886,12 @@ void DcmModule::tick(uint8_t slotIndex) {
 #if !CONF_SKIP_PWRGOOD_TEST
             bool pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
             if (!pwrGood) {
+                channel_dispatcher::setVoltage(channel, 0);
+                channel_dispatcher::outputEnable(channel, false);
+                transfer();
                 channel.flags.powerOk = 0;
+                testResult = TEST_FAILED;
                 generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channel.channelIndex);
-                powerDownBySensor();
             }
 #endif
 

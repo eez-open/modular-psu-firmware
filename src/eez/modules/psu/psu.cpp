@@ -868,7 +868,7 @@ bool powerUp() {
     // turn on Power On (PON) bit of ESE register
     reg_set_esr_bits(ESR_PON);
 
-    event_queue::pushEvent(event_queue::EVENT_INFO_POWER_UP);
+    InfoTrace("Power up (v%s)\n", MCU_FIRMWARE);
 
     // play power up tune on success
     if (testSuccess) {

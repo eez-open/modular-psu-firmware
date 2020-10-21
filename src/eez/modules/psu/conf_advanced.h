@@ -28,6 +28,9 @@
 /// MCU firmware version.
 #define MCU_FIRMWARE (QUOTE(FIRMWARE_VERSION_MAJOR) "." QUOTE(FIRMWARE_VERSION_MINOR))
 
+#define MCU_FIRMWARE_BUILD_DATE __DATE__
+#define MCU_FIRMWARE_BUILD_TIME __TIME__
+
 /// Manufacturer description text used for *IDN?
 #define IDN_MANUFACTURER "Envox"
 
