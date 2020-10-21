@@ -24,6 +24,8 @@
 #include <eez/modules/dib-dcp405/dac.h>
 #include <eez/modules/dib-dcp405/ioexp.h>
 
+#include <eez/unit.h>
+
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/debug.h>
 #include <eez/modules/psu/profile.h>
@@ -772,7 +774,20 @@ struct DcpChannel : public Channel {
         if (isNaN(uBeforeBalancing)) {
             uBeforeBalancing = channel.u.set;
         }
+<<<<<<< HEAD
         channel.doSetVoltage((psu::Channel::get(0).u.mon_last + psu::Channel::get(1).u.mon_last) / 2);
+=======
+        dcpChannel.valueBalancing = true;
+
+        channel.doSetVoltage(
+        	channel.roundChannelValue(
+        		UNIT_VOLT,
+        		(psu::Channel::get(0).u.mon_last + psu::Channel::get(1).u.mon_last) / 2
+			)
+		);
+
+        dcpChannel.valueBalancing = false;
+>>>>>>> 5594861... #84
     }
 
     void currentBalancing(psu::Channel &channel) {
@@ -781,7 +796,20 @@ struct DcpChannel : public Channel {
         if (isNaN(iBeforeBalancing)) {
             iBeforeBalancing = channel.i.set;
         }
+<<<<<<< HEAD
         channel.doSetCurrent((psu::Channel::get(0).i.mon_last + psu::Channel::get(1).i.mon_last) / 2);
+=======
+        dcpChannel.valueBalancing = true;
+
+        channel.doSetCurrent(
+        	channel.roundChannelValue(
+        		UNIT_AMPER,
+        		(psu::Channel::get(0).i.mon_last + psu::Channel::get(1).i.mon_last) / 2
+			)
+		);
+
+        dcpChannel.valueBalancing = false;
+>>>>>>> 5594861... #84
     }
 
     void restoreVoltageToValueBeforeBalancing(psu::Channel &channel) {
