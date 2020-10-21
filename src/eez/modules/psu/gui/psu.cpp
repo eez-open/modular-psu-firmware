@@ -2185,11 +2185,23 @@ void executeInternalActionHook(int actionId) {
     g_internalActionExecFunctions[actionId - FIRST_INTERNAL_ACTION_ID]();
 }
 
+static uint16_t getBalancedStyle(uint16_t styleId) {
+    if (styleId == STYLE_ID_ENCODER_CURSOR_14_ENABLED) {
+        return STYLE_ID_ENCODER_CURSOR_14_ENABLED_BALANCED;
+    } else if (styleId == STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED) {
+        return STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED_BALANCED;
+    }  else if (styleId == STYLE_ID_ENCODER_CURSOR_17_ENABLED) {
+        return STYLE_ID_ENCODER_CURSOR_17_ENABLED_BALANCED;
+    }
+    return styleId;
+}
+
 uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
+    using namespace psu;
+    using namespace psu::gui;
+
     if (widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE1 || widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE2) {
         if (styleId == STYLE_ID_YT_GRAPH_U_DEFAULT || styleId == STYLE_ID_YT_GRAPH_I_DEFAULT) {
-            using namespace psu;
-            using namespace psu::gui;
             int iChannel = widgetCursor.cursor >= 0 ? widgetCursor.cursor : (g_channel ? g_channel->channelIndex : 0);
             Channel &channel = Channel::get(iChannel);
             if (widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE1) {
@@ -2231,6 +2243,24 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
             return STYLE_ID_ENCODER_CURSOR_14_DISABLED;
         } else if (styleId == STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED) {
             return STYLE_ID_ENCODER_CURSOR_14_RIGHT_DISABLED;
+        }
+    } else if (widgetCursor.widget->data == DATA_ID_CHANNEL_U_EDIT) {
+        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+            int iChannel = widgetCursor.cursor >= 0 ? widgetCursor.cursor : (g_channel ? g_channel->channelIndex : 0);
+            if (iChannel == 0 || iChannel == 1) {
+                if (Channel::get(0).isVoltageBalanced() || Channel::get(1).isVoltageBalanced()) {
+                    return getBalancedStyle(styleId);
+                }
+            }
+        }
+    } else if (widgetCursor.widget->data == DATA_ID_CHANNEL_I_EDIT) {
+        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+            int iChannel = widgetCursor.cursor >= 0 ? widgetCursor.cursor : (g_channel ? g_channel->channelIndex : 0);
+            if (iChannel == 0 || iChannel == 1) {
+                if (Channel::get(0).isCurrentBalanced() || Channel::get(1).isCurrentBalanced()) {
+                    return getBalancedStyle(styleId);
+                }
+            }
         }
     }
     return styleId;

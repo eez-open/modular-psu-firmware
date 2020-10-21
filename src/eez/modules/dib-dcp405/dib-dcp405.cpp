@@ -89,6 +89,8 @@ struct DcpChannel : public Channel {
 	float I_CAL_POINTS[2];
 	float I_LOW_RANGE_CAL_POINTS[2];
 
+    bool valueBalancing = false;
+
     DcpChannel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex)
         : Channel(slotIndex, channelIndex, subchannelIndex)
     {
@@ -320,13 +322,11 @@ struct DcpChannel : public Channel {
 				} else if (tickCount - dpNegMonitoringTime > 500 * 1000UL) {
 					if (dpOn && channelIndex < 2) {
 						if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
-							psu::Channel &channel2 = psu::Channel::get(channelIndex == 0 ? 1 : 0);
-							voltageBalancing(channel2);
-							dpNegMonitoringTime = tickCount;
+							psu::Channel &otherChannel = psu::Channel::get(channelIndex == 0 ? 1 : 0);
+							voltageBalancing(otherChannel);
 						} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
-							psu::Channel &channel2 = psu::Channel::get(channelIndex == 0 ? 1 : 0);
-							currentBalancing(channel2);
-							dpNegMonitoringTime = tickCount;
+							psu::Channel &otherChannel = psu::Channel::get(channelIndex == 0 ? 1 : 0);
+							currentBalancing(otherChannel);
 						}
 					}
 				}
@@ -614,9 +614,6 @@ struct DcpChannel : public Channel {
 
 	void setDacVoltage(uint16_t value) override {
 		dac.setDacVoltage(value);
-
-        uBeforeBalancing = NAN;
-        restoreCurrentToValueBeforeBalancing(*this);
     }
 
 	void setDacVoltageFloat(float value) override {
@@ -651,15 +648,14 @@ struct DcpChannel : public Channel {
 			dac.setDacVoltage(0);
 		}
 
-		uBeforeBalancing = NAN;
-		restoreCurrentToValueBeforeBalancing(*this);
+        if (!valueBalancing) {
+            uBeforeBalancing = NAN;
+            restoreCurrentToValueBeforeBalancing(*this);
+        }
 	}
 
 	void setDacCurrent(uint16_t value) override {
 		dac.setDacCurrent(value);
-
-		iBeforeBalancing = NAN;
-		restoreVoltageToValueBeforeBalancing(*this);
 	}
 
 	void setDacCurrentFloat(float value) override {
@@ -676,8 +672,11 @@ struct DcpChannel : public Channel {
 		}
 
 		dac.setCurrent(value);
-		iBeforeBalancing = NAN;
-		restoreVoltageToValueBeforeBalancing(*this);
+
+        if (!valueBalancing) {
+            iBeforeBalancing = NAN;
+            restoreVoltageToValueBeforeBalancing(*this);
+        }
 	}
 
 	bool isDacTesting() override {
@@ -756,37 +755,41 @@ struct DcpChannel : public Channel {
 	}
 #endif
 
-    void voltageBalancing(psu::Channel &channel) {
-        // DebugTrace("Channel voltage balancing: CH1_Umon=%f, CH2_Umon=%f",
-        // Channel::get(0).u.mon_last, Channel::get(1).u.mon_last);
-        if (isNaN(uBeforeBalancing)) {
-            uBeforeBalancing = channel.u.set;
+    static void voltageBalancing(psu::Channel &channel) {
+        DcpChannel &dcpChannel = (DcpChannel &)channel;
+        if (isNaN(dcpChannel.uBeforeBalancing)) {
+            dcpChannel.uBeforeBalancing = channel.u.set;
         }
+        dcpChannel.valueBalancing = true;
         channel.doSetVoltage((psu::Channel::get(0).u.mon_last + psu::Channel::get(1).u.mon_last) / 2);
+        dcpChannel.valueBalancing = false;
     }
 
-    void currentBalancing(psu::Channel &channel) {
-        // DebugTrace("CH%d channel current balancing: CH1_Imon=%f, CH2_Imon=%f", index,
-        // Channel::get(0).i.mon_last, Channel::get(1).i.mon_last);
-        if (isNaN(iBeforeBalancing)) {
-            iBeforeBalancing = channel.i.set;
+    static void currentBalancing(psu::Channel &channel) {
+        DcpChannel &dcpChannel = (DcpChannel &)channel;
+        if (isNaN(dcpChannel.iBeforeBalancing)) {
+            dcpChannel.iBeforeBalancing = channel.i.set;
         }
+        dcpChannel.valueBalancing = true;
         channel.doSetCurrent((psu::Channel::get(0).i.mon_last + psu::Channel::get(1).i.mon_last) / 2);
+        dcpChannel.valueBalancing = false;
     }
 
-    void restoreVoltageToValueBeforeBalancing(psu::Channel &channel) {
-        if (!isNaN(uBeforeBalancing)) {
+    static void restoreVoltageToValueBeforeBalancing(psu::Channel &channel) {
+        DcpChannel &dcpChannel = (DcpChannel &)channel;
+        if (!isNaN(dcpChannel.uBeforeBalancing)) {
             // DebugTrace("Restore voltage to value before balancing: %f", uBeforeBalancing);
-            channel.setVoltage(uBeforeBalancing);
-            uBeforeBalancing = NAN;
+            channel.setVoltage(dcpChannel.uBeforeBalancing);
+            dcpChannel.uBeforeBalancing = NAN;
         }
     }
 
-    void restoreCurrentToValueBeforeBalancing(psu::Channel &channel) {
-        if (!isNaN(iBeforeBalancing)) {
+    static void restoreCurrentToValueBeforeBalancing(psu::Channel &channel) {
+        DcpChannel &dcpChannel = (DcpChannel &)channel;
+        if (!isNaN(dcpChannel.iBeforeBalancing)) {
             // DebugTrace("Restore current to value before balancing: %f", index, iBeforeBalancing);
-            channel.setCurrent(iBeforeBalancing);
-            iBeforeBalancing = NAN;
+            channel.setCurrent(dcpChannel.iBeforeBalancing);
+            dcpChannel.iBeforeBalancing = NAN;
         }
     }
 
