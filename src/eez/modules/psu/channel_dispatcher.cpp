@@ -140,28 +140,31 @@ bool setCouplingType(CouplingType couplingType, int *err) {
 }
 
 bool additionalCheckForCouplingType(CouplingType couplingType, int *err) {
-    if (!Channel::get(0).isCalibrationExists()) {
+    Channel &ch1 = Channel::get(0);
+    Channel &ch2 = Channel::get(1);
+
+    if (!ch1.isVoltageCalibrationExists() || !ch1.isCurrentCalibrationExists(0) || !ch1.isCurrentCalibrationExists(1)) {
         if (err) {
             *err = SCPI_ERROR_CH1_NOT_CALIBRATED;
         }
         return false;
     }
 
-    if (!Channel::get(1).isCalibrationExists()) {
+    if (!ch2.isVoltageCalibrationExists() || !ch2.isCurrentCalibrationExists() || !ch1.isCurrentCalibrationExists(1)) {
         if (err) {
             *err = SCPI_ERROR_CH2_NOT_CALIBRATED;
         }
         return false;
     }
 
-    if (!Channel::get(0).isCalibrationEnabled()) {
+    if (!ch1.isCalibrationEnabled()) {
         if (err) {
             *err = SCPI_ERROR_CH1_CALIBRATION_NOT_ENABLED;
         }
         return false;
     }
 
-    if (!Channel::get(1).isCalibrationEnabled()) {
+    if (!ch2.isCalibrationEnabled()) {
         if (err) {
             *err = SCPI_ERROR_CH2_CALIBRATION_NOT_ENABLED;
         }
