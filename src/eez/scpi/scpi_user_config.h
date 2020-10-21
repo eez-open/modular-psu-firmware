@@ -156,6 +156,11 @@ extern "C" {
     X(SCPI_ERROR_CH4_TEMP_SENSOR_TEST_FAILED,                725, "CH4 temperature sensor test failed")           \
     X(SCPI_ERROR_CH5_TEMP_SENSOR_TEST_FAILED,                726, "CH5 temperature sensor test failed")           \
     X(SCPI_ERROR_CH6_TEMP_SENSOR_TEST_FAILED,                727, "CH6 temperature sensor test failed")           \
+    X(SCPI_ERROR_CH1_NOT_CALIBRATED,                         730, "CH1 is not calibrated")                        \
+    X(SCPI_ERROR_CH2_NOT_CALIBRATED,                         731, "CH2 is not calibrated")                        \
+    X(SCPI_ERROR_CH1_CALIBRATION_NOT_ENABLED,                741, "CH1 calibration is not enabled")               \
+    X(SCPI_ERROR_CH2_CALIBRATION_NOT_ENABLED,                742, "CH2 calibration is not enabled")
+
 // clang-format on
 
 #ifdef	__cplusplus
