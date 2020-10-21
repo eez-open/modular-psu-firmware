@@ -193,7 +193,7 @@
 /// that is negative value in Watts (default -5 W),
 /// and that condition lasts more then DP_NEG_DELAY seconds (default 5 s),
 /// down-programmer circuit has to be switched off.
-#define DP_NEG_LEV -5 // -5 W
+#define DP_NEG_LEV -2.0f // -5 W
 
 /// See DP_NEG_LEV in seconds.
 #define DP_NEG_DELAY 1

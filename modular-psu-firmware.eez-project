@@ -16313,7 +16313,7 @@
                         "top": 0,
                         "width": 344,
                         "height": 50,
-                        "text": "Down-programmer (max. sinking power: 5 W)"
+                        "text": "Down-programmer (max. sinking power: 2 W)"
                       },
                       {
                         "type": "Select",
@@ -35561,6 +35561,14 @@
         "inheritFrom": "encoder_cursor_enabled"
       },
       {
+        "name": "encoder_cursor_14_enabled_balanced",
+        "inheritFrom": "encoder_cursor_enabled",
+        "alwaysBuild": true,
+        "color": "text_enabled_balanced",
+        "activeBackgroundColor": "text_enabled_balanced",
+        "focusBackgroundColor": "text_enabled_balanced"
+      },
+      {
         "name": "encoder_cursor_14_disabled",
         "inheritFrom": "encoder_cursor_disabled",
         "alwaysBuild": true
@@ -35569,6 +35577,15 @@
         "name": "encoder_cursor_14_right_enabled",
         "inheritFrom": "encoder_cursor_enabled",
         "alignHorizontal": "right"
+      },
+      {
+        "name": "encoder_cursor_14_right_enabled_balanced",
+        "inheritFrom": "encoder_cursor_enabled",
+        "alwaysBuild": true,
+        "alignHorizontal": "right",
+        "color": "text_enabled_balanced",
+        "activeBackgroundColor": "text_enabled_balanced",
+        "focusBackgroundColor": "text_enabled_balanced"
       },
       {
         "name": "encoder_cursor_14_right_disabled",
@@ -35580,6 +35597,15 @@
         "name": "encoder_cursor_17_enabled",
         "inheritFrom": "encoder_cursor_enabled",
         "font": "Oswald17"
+      },
+      {
+        "name": "encoder_cursor_17_enabled_balanced",
+        "inheritFrom": "encoder_cursor_enabled",
+        "alwaysBuild": true,
+        "font": "Oswald17",
+        "color": "text_enabled_balanced",
+        "activeBackgroundColor": "text_enabled_balanced",
+        "focusBackgroundColor": "text_enabled_balanced"
       },
       {
         "name": "ch_prot_off",
@@ -57690,6 +57716,9 @@
         "name": "text_enabled"
       },
       {
+        "name": "text_enabled_balanced"
+      },
+      {
         "name": "text_selected"
       },
       {
@@ -57859,6 +57888,7 @@
           "#1b4fd9",
           "#ffffff",
           "#ffffff",
+          "#aaaaaa",
           "#5080ff",
           "#4c72da",
           "#404040",
@@ -57921,6 +57951,7 @@
           "#f0f0f0",
           "#202020",
           "#434cf6",
+          "#050c7a",
           "#d0d0d0",
           "#d0d0d0",
           "#404040",
@@ -57983,6 +58014,7 @@
           "#000000",
           "#d0d0d0",
           "#ffff7f",
+          "#aaaa00",
           "#ff8000",
           "#303030",
           "#f9fff0",
