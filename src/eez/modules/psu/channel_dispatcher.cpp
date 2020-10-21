@@ -150,7 +150,7 @@ bool additionalCheckForCouplingType(CouplingType couplingType, int *err) {
         return false;
     }
 
-    if (!ch2.isVoltageCalibrationExists() || !ch2.isCurrentCalibrationExists() || !ch1.isCurrentCalibrationExists(1)) {
+    if (!ch2.isVoltageCalibrationExists() || !ch2.isCurrentCalibrationExists(0) || !ch2.isCurrentCalibrationExists(1)) {
         if (err) {
             *err = SCPI_ERROR_CH2_NOT_CALIBRATED;
         }
