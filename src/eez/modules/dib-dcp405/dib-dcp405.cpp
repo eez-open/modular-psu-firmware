@@ -201,6 +201,11 @@ struct DcpChannel : public Channel {
 		dac.init();
 	}
 
+	void onPowerDown() {
+		Channel::onPowerDown();
+		ioexp.testResult = TEST_FAILED;
+	}
+
 	void reset() override {
 		Channel::reset();
 
@@ -271,13 +276,9 @@ struct DcpChannel : public Channel {
 
 #if !CONF_SKIP_PWRGOOD_TEST
 		if (!ioexp.testBit(IOExpander::IO_BIT_IN_PWRGOOD)) {
-			channel_dispatcher::setVoltage(*this, 0);
-			channel_dispatcher::outputEnable(*this, false);
-
 			DebugTrace("Ch%d PWRGOOD bit changed to 0, gpio=%d\n", channelIndex + 1, (int)ioexp.gpio);
-			flags.powerOk = 0;
-			ioexp.testResult = TEST_FAILED;
 			generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channelIndex);
+			powerDownOnlyPowerChannels();
 			return;
 		}
 #endif

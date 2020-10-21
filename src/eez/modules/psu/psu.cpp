@@ -882,6 +882,23 @@ bool powerUp() {
     return true;
 }
 
+void powerDownOnlyPowerChannels() {
+    trigger::abort();
+    dlog_record::abort();
+
+    channel_dispatcher::setCouplingType(channel_dispatcher::COUPLING_TYPE_NONE, nullptr);
+
+    powerDownChannels(true);
+
+    board::powerDown();
+
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE && g_slots[slotIndex]->numPowerChannels > 0) {
+            ontime::g_moduleCounters[slotIndex].stop();
+        }
+    }
+}
+
 void powerDown() {
 #if OPTION_DISPLAY
     if (!g_shutdownInProgress) {
@@ -925,7 +942,7 @@ void powerDown() {
     sound::playPowerDown();
 }
 
-void powerDownChannels() {
+void powerDownChannels(bool onlyPowerChannels) {
     channel_dispatcher::disableOutputForAllChannels();
 
     for (int i = 0; i < CH_NUM; ++i) {
@@ -933,7 +950,9 @@ void powerDownChannels() {
     }
 
     for (int i = 0; i < NUM_SLOTS; ++i) {
-        g_slots[i]->onPowerDown();
+        if (!onlyPowerChannels || g_slots[i]->numPowerChannels > 0) {
+            g_slots[i]->onPowerDown();
+        }
     }
 }
 
@@ -981,12 +1000,7 @@ void changePowerState(bool up) {
 
 void powerDownBySensor() {
     if (g_powerIsUp) {
-#if OPTION_DISPLAY
-        gui::showEnteringStandbyPage();
-#endif
-
         channel_dispatcher::disableOutputForAllChannels();
-
         powerDown();
     }
 }

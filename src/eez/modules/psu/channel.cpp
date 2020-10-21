@@ -585,8 +585,8 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
 void Channel::onPowerDown() {
     doRemoteSensingEnable(false);
     doRemoteProgrammingEnable(false);
-
     clearProtection(false);
+    flags.powerOk = 0;
 }
 
 void Channel::reset() {
