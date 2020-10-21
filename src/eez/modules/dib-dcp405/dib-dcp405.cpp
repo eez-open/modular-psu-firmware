@@ -462,7 +462,16 @@ struct DcpChannel : public Channel {
 
 	bool shouldDisableDP() {
 		// disable DP if low current range and current of 10 mA or less is set
-		return flags.currentCurrentRange == 1 && i.set <= 10E-3f;
+		if (flags.currentCurrentRange == 1 && i.set <= 10E-3f) {
+			return true;
+		}
+
+		// in parallel coupling, only DP on channel 1 could be enabled
+		if (channelIndex == 1 && channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+			return true;
+		}
+
+		return false;
 	}
 
 	void setDpEnable(bool enable) {

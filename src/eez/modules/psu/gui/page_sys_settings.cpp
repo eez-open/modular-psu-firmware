@@ -1009,7 +1009,6 @@ void SysSettingsCouplingPage::set() {
             }
         } else {
             event_queue::pushEvent(err);
-            infoMessage("Coupling failed!");
         }
     }
 }

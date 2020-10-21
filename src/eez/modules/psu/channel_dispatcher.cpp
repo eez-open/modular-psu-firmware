@@ -112,6 +112,8 @@ bool isCouplingTypeAllowed(CouplingType couplingType, int *err) {
     return true;
 }
 
+static int g_setCouplingTypeErr;
+
 bool setCouplingType(CouplingType couplingType, int *err) {
     if (g_couplingType != couplingType) {
         if (!isCouplingTypeAllowed(couplingType, err)) {
@@ -123,6 +125,47 @@ bool setCouplingType(CouplingType couplingType, int *err) {
         } else {
             setCouplingTypeInPsuThread(couplingType);
         }
+
+        if (g_setCouplingTypeErr != SCPI_RES_OK) {
+            if (err) {
+                *err = g_setCouplingTypeErr;
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    return true;
+}
+
+bool additionalCheckForCouplingType(CouplingType couplingType, int *err) {
+    if (!Channel::get(0).isCalibrationExists()) {
+        if (err) {
+            *err = SCPI_ERROR_CH1_NOT_CALIBRATED;
+        }
+        return false;
+    }
+
+    if (!Channel::get(1).isCalibrationExists()) {
+        if (err) {
+            *err = SCPI_ERROR_CH2_NOT_CALIBRATED;
+        }
+        return false;
+    }
+
+    if (!Channel::get(0).isCalibrationEnabled()) {
+        if (err) {
+            *err = SCPI_ERROR_CH1_CALIBRATION_NOT_ENABLED;
+        }
+        return false;
+    }
+
+    if (!Channel::get(1).isCalibrationEnabled()) {
+        if (err) {
+            *err = SCPI_ERROR_CH2_CALIBRATION_NOT_ENABLED;
+        }
+        return false;
     }
 
     return true;
@@ -212,6 +255,10 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
                 }
             }
         }
+
+        if (!additionalCheckForCouplingType(couplingType, &g_setCouplingTypeErr)) {
+            return;
+        }
     } else {
         if (g_couplingType == COUPLING_TYPE_PARALLEL || g_couplingType == COUPLING_TYPE_SERIES) {
             for (int i = 0; i < 2; ++i) {
@@ -242,6 +289,8 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
     setOperBits(OPER_GROUP_SPLIT_RAILS, g_couplingType == COUPLING_TYPE_SPLIT_RAILS);
 
     delay(100); // Huge pause that allows relay contacts to debounce
+
+    g_setCouplingTypeErr = SCPI_RES_OK;
 }
 
 void setTrackingChannels(uint16_t trackingEnabled) {
