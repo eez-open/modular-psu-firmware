@@ -24,6 +24,8 @@
 #include <eez/modules/dib-dcp405/dac.h>
 #include <eez/modules/dib-dcp405/ioexp.h>
 
+#include <eez/unit.h>
+
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/debug.h>
 #include <eez/modules/psu/profile.h>
@@ -771,7 +773,14 @@ struct DcpChannel : public Channel {
             dcpChannel.uBeforeBalancing = channel.u.set;
         }
         dcpChannel.valueBalancing = true;
-        channel.doSetVoltage((psu::Channel::get(0).u.mon_last + psu::Channel::get(1).u.mon_last) / 2);
+
+        channel.doSetVoltage(
+        	channel.roundChannelValue(
+        		UNIT_VOLT,
+        		(psu::Channel::get(0).u.mon_last + psu::Channel::get(1).u.mon_last) / 2
+			)
+		);
+
         dcpChannel.valueBalancing = false;
     }
 
@@ -781,7 +790,14 @@ struct DcpChannel : public Channel {
             dcpChannel.iBeforeBalancing = channel.i.set;
         }
         dcpChannel.valueBalancing = true;
-        channel.doSetCurrent((psu::Channel::get(0).i.mon_last + psu::Channel::get(1).i.mon_last) / 2);
+
+        channel.doSetCurrent(
+        	channel.roundChannelValue(
+        		UNIT_AMPER,
+        		(psu::Channel::get(0).i.mon_last + psu::Channel::get(1).i.mon_last) / 2
+			)
+		);
+
         dcpChannel.valueBalancing = false;
     }
 
