@@ -424,7 +424,9 @@ public:
 	}
 
     void onPowerDown() {
+        transfer();
         synchronized = false;
+        testResult = TEST_FAILED;
     }
 
     void test() {
@@ -599,6 +601,7 @@ void DcmChannel::init() {
 
 void DcmChannel::onPowerDown() {
     Channel::onPowerDown();
+
     if (subchannelIndex == 0) {
         ((DcmModule *)g_slots[slotIndex])->onPowerDown();
     }
@@ -660,11 +663,8 @@ void DcmChannel::tickSpecific(uint32_t tickCount) {
 #if !CONF_SKIP_PWRGOOD_TEST
     bool pwrGood = simulator::getPwrgood(channelIndex);
     if (!pwrGood) {
-        channel_dispatcher::setVoltage(*this, 0);
-        channel_dispatcher::outputEnable(*this, false);
-        flags.powerOk = 0;
-        ((DcmModule *)g_slots[slotIndex])->testResult = TEST_FAILED;
         generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channelIndex);
+        powerDownOnlyPowerChannels();        
         return;
     }
 #endif
@@ -886,12 +886,8 @@ void DcmModule::tick(uint8_t slotIndex) {
 #if !CONF_SKIP_PWRGOOD_TEST
             bool pwrGood = input[0] & REG0_PWRGOOD_MASK ? true : false;
             if (!pwrGood) {
-                channel_dispatcher::setVoltage(channel, 0);
-                channel_dispatcher::outputEnable(channel, false);
-                transfer();
-                channel.flags.powerOk = 0;
-                testResult = TEST_FAILED;
                 generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channel.channelIndex);
+                powerDownOnlyPowerChannels();
             }
 #endif
 

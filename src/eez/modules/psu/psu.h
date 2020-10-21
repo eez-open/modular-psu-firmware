@@ -138,7 +138,8 @@ bool testChannels();
 
 bool powerUp();
 void powerDown();
-void powerDownChannels();
+void powerDownOnlyPowerChannels();
+void powerDownChannels(bool onlyPowerChannels = false);
 bool isPowerUp();
 void changePowerState(bool up);
 void powerDownBySensor();
