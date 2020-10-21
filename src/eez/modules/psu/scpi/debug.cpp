@@ -132,6 +132,9 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
             bp3c::io_exp::test();
             SCPI_ResultBool(context, bp3c::io_exp::g_testResult == TEST_OK);
             return SCPI_RES_OK;
+        } else if (cmd == 24) {
+            SCPI_ResultText(context, MCU_FIRMWARE_BUILD_DATE " " MCU_FIRMWARE_BUILD_TIME);
+            return SCPI_RES_OK;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;
