@@ -78,13 +78,13 @@ static const int PWM_2_SUBCHANNEL_INDEX = 11;
 static float AIN_VOLTAGE_RESOLUTION = 0.005f;
 static float AIN_CURRENT_RESOLUTION = 0.00005f;
 
-static float AOUT_DAC7760_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
-static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES[] = { 0.05f, 0.01f, 0.005f, 0.001f };
+static float AOUT_DAC7760_ENCODER_STEP_VALUES[] = { 0.01f, 0.1f, 0.2f, 0.5f };
+static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES[] = { 0.001f, 0.005f, 0.01f, 0.05f };
 
 static float AOUT_DAC7563_MIN = -10.0f;
 static float AOUT_DAC7563_MAX = 10.0f;
 static float AOUT_DAC7563_RESOLUTION = 0.01f;
-static float AOUT_DAC7563_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
+static float AOUT_DAC7563_ENCODER_STEP_VALUES[] = { 0.01f, 0.1f, 0.2f, 0.5f };
 
 static float PWM_MIN_FREQUENCY = 0.1f;
 static float PWM_MAX_FREQUENCY = 1000000.0f;
@@ -2357,7 +2357,7 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, Cursor cursor, Value 
         float fvalue = ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_freq;
         value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static float values[] = { 10000.0f, 1000.0f, 100.0f, 1.0f };
+        static float values[] = { 1.0f, 100.0f, 1000.0f, 10000.0f };
         StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -2392,7 +2392,7 @@ void data_dib_mio168_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
         value = Value(1.0f, UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static float values[] = { 5.0f, 1.0f, 0.5f, 0.1f };
+        static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
         StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);

@@ -46,7 +46,6 @@ int getFocusCursor() {
     return g_focusCursor != -1 ? g_focusCursor : g_channel ? g_channel->channelIndex : -1;
 }
 
-
 namespace edit_mode {
 
 static int g_tabIndex = PAGE_ID_EDIT_MODE_KEYPAD;
@@ -358,11 +357,24 @@ void onTouchMove() {
 void onTouchUp() {
 }
 
+bool hasEncoderStepValue() {
+    auto encoderMode = mcu::encoder::getEncoderMode();
+    if (encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
+        return true;
+    }
+
+    StepValues stepValues;
+    getStepValues(stepValues);
+
+    int index = encoderMode - mcu::encoder::ENCODER_MODE_STEP1;
+    return index < stepValues.count;
+}
+
 Value getCurrentEncoderStepValue() {
     StepValues stepValues;
     getStepValues(stepValues);
 
-    int stepValueIndex = mcu::encoder::ENCODER_MODE_STEP4 - mcu::encoder::getEncoderMode();
+    int stepValueIndex = mcu::encoder::getEncoderMode() - mcu::encoder::ENCODER_MODE_STEP1;
     if (stepValueIndex >= stepValues.count) {
         stepValueIndex = stepValues.count - 1;
     }
@@ -407,8 +419,8 @@ void onTouchDown() {
     }
     y -= TOP_BORDER;
 
-    int stepIndex = NUM_STEPS_PER_UNIT * y / (BOTTOM_BORDER - TOP_BORDER);
-    stepIndex = MAX(MIN(stepIndex, NUM_STEPS_PER_UNIT - 1), 0);
+    int stepIndex = edit_mode_step::NUM_STEPS * y / (BOTTOM_BORDER - TOP_BORDER);
+    stepIndex = edit_mode_step::NUM_STEPS - 1 - MAX(MIN(stepIndex, edit_mode_step::NUM_STEPS - 1), 0);
     StepValues stepValues;
     edit_mode_step::getStepValues(stepValues);
     stepValue = stepValues.values[MIN(stepIndex, stepValues.count - 1)];

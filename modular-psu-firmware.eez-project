@@ -5468,7 +5468,8 @@
           {
             "type": "ButtonGroup",
             "style": {
-              "inheritFrom": "edit_value_active_S_center"
+              "inheritFrom": "edit_value_active_S_center",
+              "font": "Oswald12"
             },
             "data": "edit_steps",
             "left": 0,

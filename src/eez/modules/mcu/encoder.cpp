@@ -78,7 +78,7 @@ EncoderMode getEncoderMode() {
 
 void switchEncoderMode() {
     EncoderMode encoderMode = getEncoderMode();
-    if (encoderMode == ENCODER_MODE_STEP4) {
+    if (encoderMode == ENCODER_MODE_STEP5) {
         psu::persist_conf::setEncoderMode(ENCODER_MODE_AUTO);
     } else {
         psu::persist_conf::setEncoderMode(encoderMode + 1);
