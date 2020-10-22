@@ -100,6 +100,8 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
 
     Unit unit = value.getUnit();
 
+    bool appendDotZero = unit == UNIT_VOLT || unit == UNIT_AMPER || unit == UNIT_WATT;
+
     if (floatValue != 0) {
         if (unit == UNIT_VOLT) {
             if (fabs(floatValue) < 1) {
@@ -181,15 +183,27 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
         }
 
         if (decimalPointIndex == n) {
-            // 1 => 1.0
-            strcat(text, ".0");
+            if (appendDotZero) {
+                // 1 => 1.0
+                strcat(text, ".0");
+            }
         } else if (decimalPointIndex == n - 1) {
-            // 1. => 1.0
-            strcat(text, "0");
+            if (appendDotZero) {
+                // 1. => 1.0
+                strcat(text, "0");
+            } else {
+                text[decimalPointIndex] = 0;
+            }
         } else {
             // remove trailing zeros
-            for (int j = n - 1; j > decimalPointIndex + 1 && text[j] == '0'; j--) {
-                text[j] = 0;
+            if (appendDotZero) {
+                for (int j = n - 1; j > decimalPointIndex + 1 && text[j] == '0'; j--) {
+                    text[j] = 0;
+                }
+            } else {
+                for (int j = n - 1; j >= decimalPointIndex && (text[j] == '0' || text[j] == '.'); j--) {
+                    text[j] = 0;
+                }
             }
         }
 
