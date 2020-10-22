@@ -1374,7 +1374,7 @@ float encoderIncrement(Value value, int counter, float min, float max) {
     if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
         StepValues stepValues;
         edit_mode_step::getStepValues(stepValues);
-        step = stepValues.values[stepValues.count - 1];
+        step = stepValues.values[0];
     } else {
         step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
     }

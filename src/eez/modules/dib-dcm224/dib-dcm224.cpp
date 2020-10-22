@@ -302,23 +302,23 @@ struct DcmChannel : public Channel {
 	}
 
     void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {
-        static float values[] = { 1.0f, 0.5f, 0.1f, 0.01f };
-		static float calibrationModeValues[] = { 1.0f, 0.1f, 0.01f, 0.001f };
+        static float values[] = { 0.01f, 0.1f, 0.5f, 1.0f };
+		static float calibrationModeValues[] = { 0.001f, 0.01f, 0.1f, 1.0f };
         stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_VOLT;
 	}
     
 	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
-        static float values[] = { 0.5f, 0.25f, 0.1f,  0.01f };
-		static float calibrationModeValues[] = { 0.05f, 0.01f, 0.005f,  0.001f };
+        static float values[] = { 0.01f, 0.1f, 0.25f, 0.5f };
+		static float calibrationModeValues[] = { 0.001f, 0.005f, 0.01f, 0.05f };
         stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_AMPER;
 	}
 
     void getPowerStepValues(StepValues *stepValues) override {
-        static float values[] = { 10.0f, 1.0f, 0.1f, 0.01f };
+        static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_WATT;
@@ -1029,7 +1029,7 @@ void data_dib_dcm224_pwm_frequency(DataOperationEnum operation, Cursor cursor, V
 
         value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static float values[] = { 1000.0f, 500.0f, 100.0f, 1.0f };
+        static float values[] = { 1.0f, 100.0f, 500.0f, 1000.0f };
         StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -1075,7 +1075,7 @@ void data_dib_dcm224_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
         value = Value(1.0f, UNIT_PERCENT);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static float values[] = { 5.0f, 1.0f, 0.5f, 0.1f };
+        static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
         StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -1133,7 +1133,7 @@ void data_dib_dcm224_counterphase_frequency(DataOperationEnum operation, Cursor 
 
         value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static float values[] = { 10000.0f, 1000.0f, 100.0f, 1.0f };
+        static float values[] = { 1.0f, 100.0f, 1000.0f, 10000.0f };
         StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);

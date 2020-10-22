@@ -1021,7 +1021,7 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
         } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
             value = channel ? 1 : 0;
         } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-            static float values[] = { 1.0f, 0.1f, 0.01f, 0.001f };
+            static float values[] = { 0.001f, 0.01f, 0.1f, 1.0f };
             auto stepValues = value.getStepValues();
             stepValues->values = values;
             stepValues->count = sizeof(values) / sizeof(float);

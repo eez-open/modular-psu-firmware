@@ -68,7 +68,7 @@ static float U_CAL_POINTS[2] = { 1.0f, 9.0f };
 static float DAC_MIN = 0.0f;
 static float DAC_MAX = 10.0f;
 static float DAC_RESOLUTION = 0.01f;
-static float DAC_ENCODER_STEP_VALUES[] = { 0.5f, 0.2f, 0.1f, 0.01f };
+static float DAC_ENCODER_STEP_VALUES[] = { 0.01f, 0.1f, 0.2f, 0.5f  };
 
 static const int NUM_COLUMNS = 6;
 static const int NUM_ROWS = 4;

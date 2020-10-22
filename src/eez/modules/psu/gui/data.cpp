@@ -1861,14 +1861,14 @@ void data_edit_steps(DataOperationEnum operation, Cursor cursor, Value &value) {
     edit_mode_step::getStepValues(stepValues);
 
     if (operation == DATA_OPERATION_GET) {
-        value = edit_mode_step::getStepIndex() % stepValues.count;
+        value = edit_mode_step::NUM_STEPS - 1 - (edit_mode_step::getStepIndex() % stepValues.count);
     } else if (operation == DATA_OPERATION_COUNT) {
-        value = stepValues.count;
+        value = edit_mode_step::NUM_STEPS;
     } else if (operation == DATA_OPERATION_GET_LABEL) {
         edit_mode_step::getStepValues(stepValues);
-        value = Value(stepValues.values[cursor], stepValues.unit);
+        value = Value(stepValues.values[edit_mode_step::NUM_STEPS - 1 - cursor], stepValues.unit);
     } else if (operation == DATA_OPERATION_SET) {
-        edit_mode_step::setStepIndex(value.getInt());
+        edit_mode_step::setStepIndex(edit_mode_step::NUM_STEPS - 1 - value.getInt());
     }
 }
 
@@ -2216,7 +2216,7 @@ void data_channel_protection_ovp_level(DataOperationEnum operation, Cursor curso
 }
 
 void getProtectionDelayStepValues(StepValues *stepValues) {
-    static float values[] = { 20.0f, 10.0f, 5.0f, 1.0f };
+    static float values[] = { 1.0f, 5.0f, 10.0f, 20.0f };
     stepValues->values = values;
     stepValues->count = sizeof(values) / sizeof(float);
     stepValues->unit = UNIT_SECOND;
@@ -2523,7 +2523,7 @@ void data_channel_protection_otp_level(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         auto stepValues = value.getStepValues();
 
-        static float values[] = { 10.0f, 5.0f, 2.0f, 1.0f };
+        static float values[] = { 1.0f, 2.0f, 5.0f, 10.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_CELSIUS;
@@ -4299,7 +4299,7 @@ void data_io_pin_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value
 
         value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static float values[] = { 10000.0f, 1000.0f, 100.0f, 1.0f };
+        static float values[] = { 1.0f, 100.0f, 1000.0f, 10000.0f };
         StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -4341,7 +4341,7 @@ void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &val
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
         value = Value(1.0f, UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static float values[] = { 5.0f, 1.0f, 0.5f, 0.1f };
+        static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
         StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -4994,10 +4994,10 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static const int COUNT = 4;
         static float values[COUNT];
-        values[0] = recording.parameters.xAxis.step * 1000;
-        values[1] = recording.parameters.xAxis.step * 100;
-        values[2] = recording.parameters.xAxis.step * 10;
-        values[3] = recording.parameters.xAxis.step;
+        values[0] = recording.parameters.xAxis.step;
+        values[1] = recording.parameters.xAxis.step * 10;
+        values[2] = recording.parameters.xAxis.step * 100;
+        values[3] = recording.parameters.xAxis.step * 1000;
         StepValues *stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = COUNT;
@@ -5103,23 +5103,23 @@ void data_dlog_visible_value_label(DataOperationEnum operation, Cursor cursor, V
 
 void guessStepValues(StepValues *stepValues, Unit unit) {
     if (unit == UNIT_VOLT) {
-        static float values[] = { 2.0f, 1.0f, 0.5f, 0.1f };
+        static float values[] = { 0.1f, 0.5f, 1.0f, 2.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     } else if (unit == UNIT_AMPER) {
-        static float values[] = { 0.25f, 0.1f, 0.05f, 0.01f };
+        static float values[] = { 0.01f, 0.05f, 0.1f, 0.25f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     } else if (unit == UNIT_WATT) {
-        static float values[] = { 5.0f, 2.0f, 1.0f, 0.5f };
+        static float values[] = { 0.5f, 1.0f, 2.0f, 5.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     } else if (unit == UNIT_SECOND) {
-        static float values[] = { 20.0f, 10.0f, 5.0f, 1.0f };
+        static float values[] = { 1.0f, 5.0f, 10.0f, 20.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     } else {
-        static float values[] = { 10.0f, 1.0f, 0.1f, 0.01f };
+        static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     }
@@ -5693,7 +5693,7 @@ void data_channel_ramp_state(DataOperationEnum operation, Cursor cursor, Value &
 void getRampAndDelayDurationStepValues(Value &value) {
     auto stepValues = value.getStepValues();
 
-    static float values[] = { 1.0f, 0.1f, 0.01f, 0.001f };
+    static float values[] = { 0.001f, 0.01f, 0.1f, 1.0f };
     stepValues->values = values;
     stepValues->count = sizeof(values) / sizeof(float);
     stepValues->unit = UNIT_SECOND;
@@ -5892,7 +5892,7 @@ void data_debug_u_dac(DataOperationEnum operation, Cursor cursor, Value &value) 
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static float values[] = { 1000.0f, 100.0f, 10.0f, 1.0f };
+        static float values[] = { 1.0f, 10.0f, 100.0f, 1000.0f };
         auto stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -5944,7 +5944,7 @@ void data_debug_i_dac(DataOperationEnum operation, Cursor cursor, Value &value) 
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        static float values[] = { 1000.0f, 100.0f, 10.0f, 1.0f };
+        static float values[] = { 1.0f, 10.0f, 100.0f, 1000.0f };
         auto stepValues = value.getStepValues();
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);

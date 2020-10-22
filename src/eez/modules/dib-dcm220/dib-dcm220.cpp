@@ -270,23 +270,23 @@ struct DcmChannel : public Channel {
 	}
 
     void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {
-        static float values[] = { 1.0f, 0.5f, 0.1f, 0.01f };
-		static float calibrationModeValues[] = { 1.0f, 0.1f, 0.01f, 0.001f };
+        static float values[] = { 0.01f, 0.1f, 0.5f, 1.0f};
+		static float calibrationModeValues[] = { 0.001f, 0.01f, 0.1f, 1.0f };
         stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_VOLT;
 	}
     
 	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
-        static float values[] = { 0.5f, 0.25f, 0.1f,  0.01f };
-		static float calibrationModeValues[] = { 0.05f, 0.01f, 0.005f,  0.001f };
+        static float values[] = { 0.01f, 0.1f, 0.25f, 0.5f   };
+		static float calibrationModeValues[] = { 0.001f, 0.005f, 0.01f, 0.05f };
         stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_AMPER;
 	}
 
     void getPowerStepValues(StepValues *stepValues) override {
-        static float values[] = { 10.0f, 1.0f, 0.1f, 0.01f };
+        static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_WATT;

@@ -59,11 +59,11 @@ extern NumericKeypad *g_keypad;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define NUM_STEPS_PER_UNIT 4
-
 namespace edit_mode_step {
 
 void getStepValues(StepValues &stepValues);
+
+static const int NUM_STEPS = 4;
 
 int getStepIndex();
 void setStepIndex(int value);
@@ -78,6 +78,7 @@ void onTouchUp();
 
 void switchToNextStepIndex();
 
+bool hasEncoderStepValue();
 Value getCurrentEncoderStepValue();
 void showCurrentEncoderMode();
 

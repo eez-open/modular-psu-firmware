@@ -841,18 +841,18 @@ struct DcpChannel : public Channel {
 #endif
 
     void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) override {
-        static float values[] = { 1.0f, 0.1f, 0.01f, 0.005f };
-		static float calibrationModeValues[] = { 1.0f, 0.1f, 0.01f, 0.001f };
+        static float values[] = { 0.005f, 0.025f, 0.1f, 0.5f, 1.0f  };
+		static float calibrationModeValues[] = { 0.001f, 0.01f, 0.1f, 0.5f, 1.0f };
         stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_VOLT;
 	}
     
 	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
-        static float lowRangeValues[] = { 0.001f, 0.0001f, 0.00001f, 0.000005f };
-		static float calibrationModeLowRangeValues[] = { 0.001f, 0.0001f, 0.00001f, 0.000001f };
-        static float highRangeValues[] = { 0.1f, 0.01f, 0.001f, 0.0005f }; 
-		static float calibrationModeHighRangeValues[] = { 0.1f, 0.01f, 0.001f, 0.0001f }; 
+        static float lowRangeValues[] = { 0.000005f, 0.00001f, 0.0001f, 0.0005f, 0.001f };
+		static float calibrationModeLowRangeValues[] = { 0.000001f, 0.00001f, 0.0001f, 0.0005f, 0.001f};
+        static float highRangeValues[] = { 0.0005f, 0.0025f, 0.01f, 0.05f, 0.1f };
+		static float calibrationModeHighRangeValues[] = { 0.0001f, 0.001f, 0.01f, 0.05f, 0.1f };
 		if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
         	stepValues->values = calibrationMode ? calibrationModeLowRangeValues : lowRangeValues;
         	stepValues->count = sizeof(lowRangeValues) / sizeof(float);
@@ -864,7 +864,7 @@ struct DcpChannel : public Channel {
 	}
 
     void getPowerStepValues(StepValues *stepValues) override {
-        static float values[] = { 10.0f, 1.0f, 0.1f, 0.01f };
+        static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_WATT;
