@@ -234,7 +234,7 @@ private:
     void (*m_cancelCallback)();
 
     void appendEditUnit(char *text);
-    float getValue();
+    double getValue();
     char getDotSign();
 
     bool isPico();
@@ -252,8 +252,6 @@ private:
     Unit getMegaUnit();
 
     void toggleEditUnit();
-    int getNumDecimalDigits();
-    bool isValueValid();
     bool checkNumSignificantDecimalDigits();
     void digit(int d);
     void dot();
