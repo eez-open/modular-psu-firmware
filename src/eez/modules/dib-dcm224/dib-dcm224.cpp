@@ -424,7 +424,9 @@ public:
 	}
 
     void onPowerDown() {
+#if defined(EEZ_PLATFORM_STM32)
         transfer();
+#endif
         synchronized = false;
         testResult = TEST_FAILED;
     }
