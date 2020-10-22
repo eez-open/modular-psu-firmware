@@ -36,6 +36,9 @@
 #include <eez/modules/psu/gui/keypad.h>
 #include <eez/modules/psu/gui/page_ch_settings.h>
 #include <eez/modules/psu/gui/password.h>
+#include <eez/modules/psu/gui/edit_mode.h>
+
+#include <eez/modules/mcu/encoder.h>
 
 #include <scpi/scpi.h>
 
@@ -829,10 +832,25 @@ void ChSettingsListsPage::onEncoder(int counter) {
         value = getDef(cursor, dataId);
     }
 
-    Value min = getMin(cursor, dataId);
-    Value max = getMax(cursor, dataId);
+    float min = getMin(cursor, dataId).getFloat();
+    float max = getMax(cursor, dataId).getFloat();
 
-    float newValue = encoderIncrement(value, counter, min.getFloat(), max.getFloat());
+    float newValue;
+
+    Value stepValue = getEncoderStep(g_focusCursor, g_focusDataId);
+    if (stepValue.getType() != VALUE_TYPE_NONE) {
+        float step;
+        if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
+            step = stepValue.getFloat();
+        } else {
+            step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
+        }
+        newValue = roundPrec(value.getFloat() + counter * step, step);
+        newValue = clamp(newValue, min, max);
+    } else {
+        newValue = encoderIncrement(value, counter, min, max);
+    }
+
 
     setFocusedValue(newValue);
 #endif

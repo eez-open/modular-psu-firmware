@@ -59,34 +59,25 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(ListGraphWidgetState);
     widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
-    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData =
-        get(widgetCursor.cursor, listGraphWidget->cursorData);
-
-    bool refreshAll = !widgetCursor.previousState ||
-                      widgetCursor.previousState->data != widgetCursor.currentState->data;
-    bool refresh = refreshAll;
+    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData = get(widgetCursor.cursor, listGraphWidget->cursorData);
 
     int iPrevCursor = -1;
-    int iPrevRow = -1;
     if (widgetCursor.previousState) {
         iPrevCursor = ((ListGraphWidgetState *)widgetCursor.previousState)->cursorData.getInt();
-        iPrevRow = iPrevCursor / 3;
     }
 
     int iCursor = ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.getInt();
     int iRow = iCursor / 3;
 
-    if (!refreshAll) {
-        refresh = iPrevCursor != iCursor;
-    }
+    bool refresh = !widgetCursor.previousState ||
+        widgetCursor.previousState->data != widgetCursor.currentState->data ||
+        iCursor != iPrevCursor;
 
     if (refresh) {
         // draw background
-        if (refreshAll) {
-            display::setColor(style->background_color);
-            display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1,
-                              widgetCursor.y + (int)widget->h - 1);
-        }
+        display::setColor(style->background_color);
+        display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1,
+                            widgetCursor.y + (int)widget->h - 1);
 
         int dwellListLength = getFloatListLength(listGraphWidget->dwellData);
         if (dwellListLength > 0) {
@@ -139,35 +130,18 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                 if (x2 >= widgetCursor.x + (int)widget->w)
                     x2 = widgetCursor.x + (int)widget->w - 1;
 
-                bool skipDraw = false;
-
-                if (!refreshAll) {
-                    if (i < iPrevRow - 1 && i > iPrevRow + 1 && i < iRow - 1 && i > iRow + 1) {
-                        skipDraw = true;
-                    }
+                if (i == iRow) {
+                    display::setColor(cursorStyle->background_color);
+                    display::fillRect(x1, widgetCursor.y, x2 - 1,
+                        widgetCursor.y + (int)widget->h - 1);
                 }
 
-                if (!skipDraw) {
-                    if (!refreshAll && i == iPrevRow) {
-                        display::setColor(style->background_color);
-                        display::fillRect(x1, widgetCursor.y, x2 - 1,
-                                          widgetCursor.y + (int)widget->h - 1);
-                    }
-
-                    if (i == iRow) {
-                        display::setColor(cursorStyle->background_color);
-                        display::fillRect(x1, widgetCursor.y, x2 - 1,
-                                          widgetCursor.y + (int)widget->h - 1);
-                    }
-                }
 
                 for (int k = 0; k < 2; ++k) {
                     int j = iCursor % 3 == 2 ? k : 1 - k;
 
                     if (listLength[j] > 0) {
-                        if (!skipDraw) {
-                            display::setColor(styles[j]->color);
-                        }
+                        display::setColor(styles[j]->color);
 
                         float value = i < listLength[j] ? list[j][i] : list[j][listLength[j] - 1];
                         int y = int((value - min[j]) * widget->h / (max[j] - min[j]));
@@ -178,21 +152,17 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 
                         y = widgetCursor.y + ((int)widget->h - 1) - y;
 
-                        if (!skipDraw) {
-                            if (i > 0 && abs(yPrev[j] - y) > 1) {
-                                if (yPrev[j] < y) {
-                                    display::drawVLine(x1, yPrev[j] + 1, y - yPrev[j] - 1);
-                                } else {
-                                    display::drawVLine(x1, y, yPrev[j] - y - 1);
-                                }
+                        if (i > 0 && abs(yPrev[j] - y) > 1) {
+                            if (yPrev[j] < y) {
+                                display::drawVLine(x1, yPrev[j] + 1, y - yPrev[j] - 1);
+                            } else {
+                                display::drawVLine(x1, y, yPrev[j] - y - 1);
                             }
                         }
 
                         yPrev[j] = y;
 
-                        if (!skipDraw) {
-                            display::drawHLine(x1, y, x2 - x1);
-                        }
+                        display::drawHLine(x1, y, x2 - x1);
                     }
                 }
 

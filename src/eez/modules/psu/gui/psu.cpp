@@ -1755,7 +1755,7 @@ void onEncoder(int counter, bool clicked) {
         }
 
         bool encoderEnabled = isEncoderEnabledInActivePage();
-        mcu::encoder::enableAcceleration(encoderEnabled || getActivePageId() == PAGE_ID_DEBUG_VARIABLES);
+        mcu::encoder::enableAcceleration(encoderEnabled || getActivePageId() == PAGE_ID_DEBUG_VARIABLES || getActivePageId() == PAGE_ID_CH_SETTINGS_LISTS);
 
         if (encoderEnabled) {
             Value value;
