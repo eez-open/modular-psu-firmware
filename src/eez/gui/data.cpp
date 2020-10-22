@@ -170,7 +170,29 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
         } else {
             strcatFloat(text, floatValue);
         }
-        removeTrailingZerosFromFloat(text);
+
+        int n = strlen(text);
+
+        int decimalPointIndex;
+        for (decimalPointIndex = 0; decimalPointIndex < n; ++decimalPointIndex) {
+            if (text[decimalPointIndex] == '.') {
+                break;
+            }
+        }
+
+        if (decimalPointIndex == n) {
+            // 1 => 1.0
+            strcat(text, ".0");
+        } else if (decimalPointIndex == n - 1) {
+            // 1. => 1.0
+            strcat(text, "0");
+        } else {
+            // remove trailing zeros
+            for (int j = n - 1; j > decimalPointIndex + 1 && text[j] == '0'; j--) {
+                text[j] = 0;
+            }
+        }
+
         strcat(text, " ");
         strcat(text, getUnitName(unit));
     } else {

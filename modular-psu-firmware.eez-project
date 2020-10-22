@@ -143,7 +143,7 @@
       "name": "channel_u_edit",
       "description": "scpi: volt? and volt",
       "type": "float",
-      "defaultValue": "30.00V",
+      "defaultValue": "30.005 V",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
     },

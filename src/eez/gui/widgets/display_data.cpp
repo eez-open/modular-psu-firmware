@@ -133,7 +133,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
                 start = text + i;
                 text[k] = 0;
             } else {
-                strcpy(text, ".00");
+                strcpy(text, ".0");
             }
         } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
             int i = findStartOfUnit(text, 0);
