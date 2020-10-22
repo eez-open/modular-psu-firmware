@@ -2218,4 +2218,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH_OFF = 252
 };
 
-extern const uint8_t assets[537626];
+extern const uint8_t assets[537618];
