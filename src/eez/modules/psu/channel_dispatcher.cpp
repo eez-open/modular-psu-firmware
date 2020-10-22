@@ -467,9 +467,9 @@ float roundChannelValue(const Channel &channel, Unit unit, float value) {
 
 float getUSet(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
-        return Channel::get(0).u.set + Channel::get(1).u.set;
+        return Channel::get(0).getUSet() + Channel::get(1).getUSet();
     }
-    return channel.u.set;
+    return channel.getUSet();
 }
 
 float getUSet(int slotIndex, int subchannelIndex) {
@@ -481,13 +481,6 @@ float getUSet(int slotIndex, int subchannelIndex) {
     float value;
     getVoltage(slotIndex, subchannelIndex, value, nullptr);
     return value;
-}
-
-float getUSetUnbalanced(const Channel &channel) {
-    if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
-        return Channel::get(0).getUSetUnbalanced() + Channel::get(1).getUSetUnbalanced();
-    }
-    return channel.u.set;
 }
 
 float getUMon(const Channel &channel) {
@@ -831,9 +824,9 @@ void setOvpDelay(Channel &channel, float delay) {
 
 float getISet(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_PARALLEL) {
-        return Channel::get(0).i.set + Channel::get(1).i.set;
+        return Channel::get(0).getISet() + Channel::get(1).getISet();
     }
-    return channel.i.set;
+    return channel.getISet();
 }
 
 float getISet(int slotIndex, int subchannelIndex) {
@@ -845,13 +838,6 @@ float getISet(int slotIndex, int subchannelIndex) {
     float value;
     getCurrent(slotIndex, subchannelIndex, value, nullptr);
     return value;
-}
-
-float getISetUnbalanced(const Channel &channel) {
-    if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_PARALLEL) {
-        return Channel::get(0).getISetUnbalanced() + Channel::get(1).getISetUnbalanced();
-    }
-    return channel.i.set;
 }
 
 float getIMon(const Channel &channel) {
@@ -2046,15 +2032,15 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
         powerLimit = channel_dispatcher::getPowerMaxLimit(dstChannel);
     }
 
-    if (srcChannel.u.set > voltageLimit) {
+    if (srcChannel.getUSet() > voltageLimit) {
         return "Voltage overflow.";
     }
 
-    if (srcChannel.i.set > currentLimit) {
+    if (srcChannel.getISet() > currentLimit) {
         return "Current overflow.";
     }
 
-    if (srcChannel.u.set * srcChannel.i.set > powerLimit) {
+    if (srcChannel.getUSet() * srcChannel.getISet() > powerLimit) {
         return "Power overflow.";
     }
 
@@ -2092,11 +2078,11 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
 
     channel_dispatcher::outputEnable(dstChannel, false);
 
-    channel_dispatcher::setVoltage(dstChannel, srcChannel.u.set);
+    channel_dispatcher::setVoltage(dstChannel, srcChannel.getUSet());
     channel_dispatcher::setVoltageStep(dstChannel, srcChannel.u.step);
     channel_dispatcher::setVoltageLimit(dstChannel, voltageLimit);
 
-    channel_dispatcher::setCurrent(dstChannel, srcChannel.i.set);
+    channel_dispatcher::setCurrent(dstChannel, srcChannel.getISet());
     channel_dispatcher::setCurrentStep(dstChannel, srcChannel.i.step);
     channel_dispatcher::setCurrentLimit(dstChannel, currentLimit);
 

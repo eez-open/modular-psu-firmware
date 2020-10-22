@@ -49,7 +49,6 @@ float roundChannelValue(const Channel &channel, Unit unit, float value);
 
 float getUSet(const Channel &channel);
 float getUSet(int slotIndex, int subchannelIndex);
-float getUSetUnbalanced(const Channel &channel);
 float getUMon(const Channel &channel);
 float getUMonLast(const Channel &channel);
 float getUMonDac(const Channel &channel);
@@ -76,7 +75,6 @@ void setOvpDelay(Channel &channel, float delay);
 
 float getISet(const Channel &channel);
 float getISet(int slotIndex, int subchannelIndex);
-float getISetUnbalanced(const Channel &channel);
 float getIMon(const Channel &channel);
 float getIMonLast(const Channel &channel);
 float getIMonDac(const Channel &channel);

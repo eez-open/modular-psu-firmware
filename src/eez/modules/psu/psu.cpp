@@ -268,11 +268,11 @@ void PsuModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buff
     parameters->flags.i_state = channel.prot_conf.flags.i_state;
     parameters->flags.p_state = channel.prot_conf.flags.p_state;
 
-    parameters->u_set = channel.getUSetUnbalanced();
+    parameters->u_set = channel.getUSet();
     parameters->u_step = channel.u.step;
     parameters->u_limit = channel.u.limit;
 
-    parameters->i_set = channel.getISetUnbalanced();
+    parameters->i_set = channel.getISet();
     parameters->i_step = channel.i.step;
     parameters->i_limit = channel.i.limit;
 

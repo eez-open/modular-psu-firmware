@@ -1588,19 +1588,11 @@ void Channel::setRemoteProgramming(bool enable) {
 void Channel::doSetCurrentRange() {
 }
 
-bool Channel::isVoltageBalanced() {
-	return false;
-}
-
-bool Channel::isCurrentBalanced() {
-	return false;
-}
-
-float Channel::getUSetUnbalanced() {
+float Channel::getUSet() const {
     return u.set;
 }
 
-float Channel::getISetUnbalanced() {
+float Channel::getISet() const {
     return i.set;
 }
 

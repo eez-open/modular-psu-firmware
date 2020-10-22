@@ -102,7 +102,7 @@ mp_obj_t modeez_setU(mp_obj_t channelIndexObj, mp_obj_t value) {
     }
 
     int err;
-    if (channel.isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(channel), &err)) {
+    if (channel.isPowerLimitExceeded(voltage, channel_dispatcher::getISet(channel), &err)) {
         mp_raise_ValueError(SCPI_ErrorTranslate(err));
     }
 
@@ -139,7 +139,7 @@ mp_obj_t modeez_setI(mp_obj_t channelIndexObj, mp_obj_t value) {
     }
 
     int err;
-    if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), current, &err)) {
+    if (channel.isPowerLimitExceeded(channel_dispatcher::getUSet(channel), current, &err)) {
         mp_raise_ValueError(SCPI_ErrorTranslate(err));
     }
 

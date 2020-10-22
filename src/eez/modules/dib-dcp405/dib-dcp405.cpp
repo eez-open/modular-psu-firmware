@@ -732,19 +732,19 @@ struct DcpChannel : public Channel {
 		}
 	}
 
-    bool isVoltageBalanced() override {
+    bool isVoltageBalanced() const {
         return !isNaN(uBeforeBalancing);
     }
 
-    bool isCurrentBalanced() override {
+    bool isCurrentBalanced() const {
         return !isNaN(iBeforeBalancing);
     }
 
-    float getUSetUnbalanced() override {
+    float getUSet() const override {
         return isVoltageBalanced() ? uBeforeBalancing : u.set;
     }
 
-    float getISetUnbalanced() override {
+    float getISet() const override {
         return isCurrentBalanced() ? iBeforeBalancing : i.set;
     }
 
