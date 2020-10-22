@@ -849,8 +849,8 @@ struct DcpChannel : public Channel {
 	}
     
 	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
-        static float lowRangeValues[] = { 0.000005f, 0.00001f, 0.0001f, 0.0005f, 0.001f };
-		static float calibrationModeLowRangeValues[] = { 0.000001f, 0.00001f, 0.0001f, 0.0005f, 0.001f};
+        static float lowRangeValues[] = { 0.000005f, 0.000025f, 0.0001f, 0.0005f, 0.001f };
+		static float calibrationModeLowRangeValues[] = { 0.000001f, 0.00001f, 0.0001f, 0.0005f, 0.001f };
         static float highRangeValues[] = { 0.0005f, 0.0025f, 0.01f, 0.05f, 0.1f };
 		static float calibrationModeHighRangeValues[] = { 0.0001f, 0.001f, 0.01f, 0.05f, 0.1f };
 		if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
