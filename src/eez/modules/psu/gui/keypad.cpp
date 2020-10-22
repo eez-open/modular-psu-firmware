@@ -681,11 +681,11 @@ void NumericKeypad::toggleEditUnit() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-float NumericKeypad::getValue() {
+double NumericKeypad::getValue() {
     const char *p = m_keypadText;
 
     int a = 0;
-    float b = 0;
+    double b = 0;
     int sign = 1;
 
     if (*p == '-') {
@@ -708,7 +708,7 @@ float NumericKeypad::getValue() {
         }
     }
 
-    float value = sign * (a + b);
+    double value = sign * (a + b);
 
     if (isPico()) {
         value *= 1E-12f;
@@ -725,33 +725,6 @@ float NumericKeypad::getValue() {
     }
 
     return value;
-}
-
-int NumericKeypad::getNumDecimalDigits() {
-    int n = 0;
-    bool afterDot = false;
-    for (int i = 0; m_keypadText[i]; ++i) {
-        if (afterDot) {
-            ++n;
-        } else if (m_keypadText[i] == '.') {
-            afterDot = true;
-        }
-    }
-    return n;
-}
-
-bool NumericKeypad::isValueValid() {
-    if (m_appContext->getActivePageId() != PAGE_ID_EDIT_MODE_KEYPAD) {
-        return true;
-    }
-
-    float value = getValue();
-
-    if ((value < m_options.min || value > m_options.max) && !(value == 0 && m_options.allowZero)) {
-        return false;
-    }
-
-    return true;
 }
 
 bool NumericKeypad::checkNumSignificantDecimalDigits() {
@@ -961,13 +934,14 @@ void NumericKeypad::ok() {
 
             return;
         } else {
-            float value = getValue();
+            double value = getValue();
+
             if (!isNaN(m_options.min) && value < m_options.min && !(value == 0 && m_options.allowZero)) {
                 psuErrorMessage(0, MakeLessThenMinMessageValue(m_options.min, m_startValue));
             } else if (!isNaN(m_options.max) && value > m_options.max) {
                 psuErrorMessage(0, MakeGreaterThenMaxMessageValue(m_options.max, m_startValue));
             } else {
-                m_okFloatCallback(value);
+                m_okFloatCallback((float)value);
                 return;
             }
 
