@@ -298,7 +298,7 @@ public:
     /// Voltage and current data set and measured during runtime.
     struct Value {
         float set;
-
+    
         bool mon_measured;
 
         float mon_adc; // uncalibrated
@@ -652,10 +652,8 @@ public:
 
     virtual void doSetCurrentRange();
 
-    virtual bool isVoltageBalanced();
-    virtual bool isCurrentBalanced();
-    virtual float getUSetUnbalanced();
-    virtual float getISetUnbalanced();
+    virtual float getUSet() const;
+    virtual float getISet() const;
 
     virtual void readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]);
 

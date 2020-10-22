@@ -451,11 +451,11 @@ bool get_voltage_from_param(scpi_t *context, const scpi_number_t &param, float &
         } else if (param.content.tag == SCPI_NUM_DEF) {
             value = channel_dispatcher::getUDef(slotIndex, subchannelIndex);
         } else if (param.content.tag == SCPI_NUM_UP && cv) {
-            value = cv->set + cv->step;
+            value = channel_dispatcher::getUSet(slotIndex, subchannelIndex) + cv->step;
             if (value > channel_dispatcher::getUMax(slotIndex, subchannelIndex))
                 value = channel_dispatcher::getUMax(slotIndex, subchannelIndex);
         } else if (param.content.tag == SCPI_NUM_DOWN && cv) {
-            value = cv->set - cv->step;
+            value = channel_dispatcher::getUSet(slotIndex, subchannelIndex) - cv->step;
             if (value < channel_dispatcher::getUMin(slotIndex, subchannelIndex))
                 value = channel_dispatcher::getUMin(slotIndex, subchannelIndex);
         } else {
@@ -516,11 +516,11 @@ bool get_current_from_param(scpi_t *context, const scpi_number_t &param, float &
         } else if (param.content.tag == SCPI_NUM_DEF) {
             value = channel_dispatcher::getIDef(slotIndex, subchannelIndex);
         } else if (param.content.tag == SCPI_NUM_UP && cv) {
-            value = cv->set + cv->step;
+            value = channel_dispatcher::getISet(slotIndex, subchannelIndex) + cv->step;
             if (value > channel_dispatcher::getIMax(slotIndex, subchannelIndex))
                 value = channel_dispatcher::getIMax(slotIndex, subchannelIndex);
         } else if (param.content.tag == SCPI_NUM_DOWN && cv) {
-            value = cv->set - cv->step;
+            value = channel_dispatcher::getISet(slotIndex, subchannelIndex) - cv->step;
             if (value < channel_dispatcher::getIMin(slotIndex, subchannelIndex))
                 value = channel_dispatcher::getIMin(slotIndex, subchannelIndex);
         } else {

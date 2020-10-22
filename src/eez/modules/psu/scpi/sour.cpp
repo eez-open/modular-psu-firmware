@@ -170,7 +170,7 @@ scpi_result_t scpi_cmd_sourceCurrentLevelImmediateAmplitude(scpi_t *context) {
         }
 
         int err;
-        if (channel->isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(*channel), current, &err)) {
+        if (channel->isPowerLimitExceeded(channel_dispatcher::getUSet(*channel), current, &err)) {
             SCPI_ErrorPush(context, err);
             return SCPI_RES_ERR;
         }
@@ -252,7 +252,7 @@ scpi_result_t scpi_cmd_sourceVoltageLevelImmediateAmplitude(scpi_t *context) {
         }
 
         int err;
-        if (channel->isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(*channel), &err)) {
+        if (channel->isPowerLimitExceeded(voltage, channel_dispatcher::getISet(*channel), &err)) {
             SCPI_ErrorPush(context, err);
             return SCPI_RES_ERR;
         }

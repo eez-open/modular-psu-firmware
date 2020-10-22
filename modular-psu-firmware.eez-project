@@ -993,16 +993,6 @@
       "defaultValue": "00-00-00-00-00-00"
     },
     {
-      "name": "channel_is_voltage_balanced",
-      "type": "boolean",
-      "defaultValue": "0"
-    },
-    {
-      "name": "channel_is_current_balanced",
-      "type": "boolean",
-      "defaultValue": "0"
-    },
-    {
       "name": "sys_output_protection_coupled",
       "type": "boolean",
       "defaultValue": "0"

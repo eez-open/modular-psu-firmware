@@ -271,7 +271,7 @@ void onIncomingPublish(const char *topic, const char *payload) {
                     return;
                 }
 
-                if (channel.isPowerLimitExceeded(voltage, channel_dispatcher::getISetUnbalanced(channel), nullptr)) {
+                if (channel.isPowerLimitExceeded(voltage, channel_dispatcher::getISet(channel), nullptr)) {
                     return;
                 }
 
@@ -299,7 +299,7 @@ void onIncomingPublish(const char *topic, const char *payload) {
                     return;
                 }
 
-                if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), current, nullptr)) {
+                if (channel.isPowerLimitExceeded(channel_dispatcher::getUSet(channel), current, nullptr)) {
                     return;
                 }
 

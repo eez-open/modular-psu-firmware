@@ -1280,7 +1280,7 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
             value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
         }
     } else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
-        value = MakeValue(channel_dispatcher::getUSetUnbalanced(channel), UNIT_VOLT);
+        value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getUMin(channel), UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_MAX) {
@@ -1303,7 +1303,7 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         } else if (channel.isVoltageLimitExceeded(value.getFloat())) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
-        } else if (channel.isPowerLimitExceeded(value.getFloat(), channel_dispatcher::getISetUnbalanced(channel), &err)) {
+        } else if (channel.isPowerLimitExceeded(value.getFloat(), channel_dispatcher::getISet(channel), &err)) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(err);
         } else {
@@ -1394,7 +1394,7 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
             value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER);
         }
     } else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
-        value = MakeValue(channel_dispatcher::getISetUnbalanced(channel), UNIT_AMPER);
+        value = MakeValue(channel_dispatcher::getISet(channel), UNIT_AMPER);
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(channel_dispatcher::getIMin(channel), UNIT_AMPER);
     } else if (operation == DATA_OPERATION_GET_MAX) {
@@ -1417,7 +1417,7 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         } else if (channel.isCurrentLimitExceeded(value.getFloat())) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
-        } else if (channel.isPowerLimitExceeded(channel_dispatcher::getUSetUnbalanced(channel), value.getFloat(), &err)) {
+        } else if (channel.isPowerLimitExceeded(channel_dispatcher::getUSet(channel), value.getFloat(), &err)) {
             g_errorChannelIndex = channel.channelIndex;
             value = MakeScpiErrorValue(err);
         } else {
@@ -3520,26 +3520,6 @@ void data_ethernet_mac(DataOperationEnum operation, Cursor cursor, Value &value)
         }
     }
 #endif
-}
-
-void data_channel_is_voltage_balanced(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
-            value = Channel::get(0).isVoltageBalanced() || Channel::get(1).isVoltageBalanced();
-        } else {
-            value = 0;
-        }
-    }
-}
-
-void data_channel_is_current_balanced(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
-            value = Channel::get(0).isCurrentBalanced() || Channel::get(1).isCurrentBalanced();
-        } else {
-            value = 0;
-        }
-    }
 }
 
 void data_sys_output_protection_coupled(DataOperationEnum operation, Cursor cursor, Value &value) {
