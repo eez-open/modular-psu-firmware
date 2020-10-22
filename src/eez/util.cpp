@@ -246,35 +246,6 @@ int fromHexDigit(char ch) {
     return 10 + (ch - 'A');
 }
 
-// remove trailing zeros in fractional part,
-// i.e: 1.200 => 1.2
-void removeTrailingZerosFromFloat(char *str) {
-    int n = strlen(str);
-
-    int i;
-    for (i = 0; i < n; ++i) {
-        if (str[i] == '.') {
-            break;
-        }
-    }
-
-    if (i == n) {
-        // no decimal point found
-        return;
-    }
-
-    for (int i = n - 1; i >= 0; --i) {
-        if (str[i] == '0') {
-            str[i] = 0;
-        } else {
-            if (str[i] == '.') {
-                str[i] = 0;
-            }
-            break;
-        }
-    }
-}
-
 bool pointInsideRect(int xPoint, int yPoint, int xRect, int yRect, int wRect, int hRect) {
     return xPoint >= xRect && xPoint < xRect + wRect && yPoint >= yRect && yPoint < yRect + hRect;
 }
