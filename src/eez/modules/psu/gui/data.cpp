@@ -3834,7 +3834,10 @@ void data_channel_trigger_on_list_stop(DataOperationEnum operation, Cursor curso
 }
 
 void data_channel_lists(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_COUNT) {
+    if (operation == DATA_OPERATION_GET) {
+        ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
+        value = page->m_listVersion;
+    } else if (operation == DATA_OPERATION_COUNT) {
         value = LIST_ITEMS_PER_PAGE;
     } else if (operation == DATA_OPERATION_GET_FLOAT_LIST_LENGTH) {
         ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
@@ -3883,6 +3886,13 @@ void data_channel_list_dwell(DataOperationEnum operation, Cursor cursor, Value &
         if (page) {
             value = MakeFloatListValue(page->m_dwellList);
         }
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        static float values[] = { 0.001f, 0.01f, 0.1f, 1.0f };
+        StepValues *stepValues = value.getStepValues();
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+        stepValues->unit = UNIT_SECOND;
+        value = 1;
     }
 }
 
@@ -3925,6 +3935,8 @@ void data_channel_list_voltage(DataOperationEnum operation, Cursor cursor, Value
         if (page) {
             value = MakeFloatListValue(page->m_voltageList);
         }
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        data_channel_u_edit(operation, cursor, value);
     }
 }
 
@@ -3970,6 +3982,8 @@ void data_channel_list_current(DataOperationEnum operation, Cursor cursor, Value
             ChSettingsListsPage *page = (ChSettingsListsPage *)getActivePage();
             value = MakeFloatListValue(page->m_currentList);
         }
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        data_channel_i_edit(operation, cursor, value);
     }
 }
 

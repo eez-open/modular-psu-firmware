@@ -35,6 +35,7 @@
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #include <eez/modules/psu/gui/keypad.h>
+#include <eez/modules/psu/gui/page_ch_settings.h>
 
 #define CONF_GUI_EDIT_MODE_STEP_THRESHOLD_PX 5
 
@@ -289,7 +290,12 @@ void setStepIndex(int value) {
 }
 
 void getStepValues(StepValues &stepValues) {
-    getEncoderStepValues(getFocusCursor(), g_focusDataId, stepValues);
+    ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
+    if (page) {
+        getEncoderStepValues(g_channel->channelIndex, page->getDataIdAtCursor(), stepValues);
+    } else {
+        getEncoderStepValues(getFocusCursor(), g_focusDataId, stepValues);
+    }
 }
 
 void switchToNextStepIndex() {

@@ -261,6 +261,8 @@ public:
     uint16_t m_listCount;
     TriggerOnListStop m_triggerOnListStop;
 
+    int16_t getDataIdAtCursor();
+
 private:
     char m_listFilePath[MAX_PATH_LENGTH + 1];
     float m_voltageListLoad[MAX_LIST_LENGTH];
@@ -275,7 +277,6 @@ private:
 
     int getColumnIndex();
     int getCursorIndexWithinPage();
-    int16_t getDataIdAtCursor();
     int getCursorIndex(const eez::gui::Cursor cursor, int16_t id);
 
     bool isFocusedValueEmpty();

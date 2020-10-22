@@ -1037,7 +1037,7 @@ void action_user_switch_clicked() {
                 popPage();
             }
 
-            if (psu::gui::isEncoderEnabledInActivePage()) {
+            if (psu::gui::isEncoderEnabledInActivePage() || getActivePageId() == PAGE_ID_CH_SETTINGS_LISTS) {
                 for (int i = mcu::encoder::ENCODER_MODE_MIN; i < mcu::encoder::ENCODER_MODE_MAX; i++) {
                     mcu::encoder::switchEncoderMode();
                     if (psu::gui::edit_mode_step::hasEncoderStepValue()) {
