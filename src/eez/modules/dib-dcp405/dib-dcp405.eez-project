@@ -606,7 +606,7 @@
             },
             "action": "channel_toggle_output",
             "left": 0,
-            "top": 32,
+            "top": 34,
             "width": 240,
             "height": 136,
             "name": "mon section",
@@ -645,7 +645,7 @@
                     "action": "",
                     "left": 142,
                     "top": 0,
-                    "width": 98,
+                    "width": 97,
                     "height": 34,
                     "displayOption": 4
                   },
@@ -658,7 +658,7 @@
                     "action": "",
                     "left": 142,
                     "top": 34,
-                    "width": 98,
+                    "width": 97,
                     "height": 33,
                     "displayOption": 3
                   }
@@ -682,9 +682,9 @@
                     },
                     "data": "channel_i_mon",
                     "action": "",
-                    "left": 17,
+                    "left": 1,
                     "top": 0,
-                    "width": 125,
+                    "width": 141,
                     "height": 67,
                     "displayOption": 1
                   },
@@ -698,7 +698,7 @@
                     "action": "",
                     "left": 142,
                     "top": 0,
-                    "width": 98,
+                    "width": 97,
                     "height": 34,
                     "displayOption": 4
                   },
@@ -711,7 +711,7 @@
                     "action": "",
                     "left": 142,
                     "top": 34,
-                    "width": 98,
+                    "width": 97,
                     "height": 33,
                     "displayOption": 3
                   }
