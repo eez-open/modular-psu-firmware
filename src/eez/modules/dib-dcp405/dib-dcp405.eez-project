@@ -5623,7 +5623,7 @@
                 "type": "Container",
                 "style": {
                   "inheritFrom": "yt_graph",
-                  "opacity": 192
+                  "opacity": 240
                 },
                 "action": "channel_toggle_output",
                 "left": 70,

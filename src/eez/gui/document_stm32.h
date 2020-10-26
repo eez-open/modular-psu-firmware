@@ -1836,7 +1836,8 @@ enum StylesEnum {
     STYLE_ID_CHANNEL_OFF_BUTTON_20 = 316,
     STYLE_ID_MON_VALUE_14_RIGHT = 317,
     STYLE_ID_CHANNEL_OFF_BUTTON_14 = 318,
-    STYLE_ID_MON_VALUE_24_RIGHT = 319
+    STYLE_ID_MON_VALUE_24_RIGHT = 319,
+    STYLE_ID_INLINE320 = 320
 };
 
 enum ThemesEnum {
@@ -2150,4 +2151,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH_OFF = 241
 };
 
-extern const uint8_t assets[329290];
+extern const uint8_t assets[329299];
