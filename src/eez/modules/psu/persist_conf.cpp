@@ -402,6 +402,10 @@ void init() {
 
     if (g_devConf.ntpRefreshFrequency < NTP_REFRESH_FREQUENCY_MIN || g_devConf.ntpRefreshFrequency > NTP_REFRESH_FREQUENCY_MAX) {
         g_devConf.ntpRefreshFrequency = NTP_REFRESH_FREQUENCY_DEF;
+
+        if (g_devConf.usbMode == USB_MODE_DISABLED) {
+        	g_devConf.usbMode = USB_MODE_DEVICE;
+        }
     }
 
     // remember this g_devConf to be used to detect when it changes
