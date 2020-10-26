@@ -1089,7 +1089,16 @@ void onSetUserSwitchAction(uint16_t value) {
 }
 
 void action_select_user_switch_action() {
-    if (getActivePageId() == PAGE_ID_STAND_BY_MENU) {
+    if (
+        getActivePageId() == PAGE_ID_STAND_BY_MENU ||
+        getActivePageId() == PAGE_ID_SHUTDOWN ||
+        getActivePageId() == PAGE_ID_ENTERING_STANDBY ||
+        getActivePageId() == PAGE_ID_STANDBY ||
+        getActivePageId() == PAGE_ID_SAVING ||
+        getActivePageId() == PAGE_ID_DISPLAY_OFF ||
+        getActivePageId() == PAGE_ID_WELCOME
+
+    ) {
         return;
     }
 
