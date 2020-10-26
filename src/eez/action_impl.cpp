@@ -1089,6 +1089,10 @@ void onSetUserSwitchAction(uint16_t value) {
 }
 
 void action_select_user_switch_action() {
+    if (getActivePageId() == PAGE_ID_STAND_BY_MENU) {
+        return;
+    }
+
     if (getActiveSelectEnumDefinition() == g_enumDefinitions[ENUM_DEFINITION_USER_SWITCH_ACTION]) {
     	popSelectFromEnumPage();
     } else {
