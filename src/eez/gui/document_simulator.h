@@ -1885,7 +1885,8 @@ enum StylesEnum {
     STYLE_ID_INLINE334 = 334,
     STYLE_ID_INLINE335 = 335,
     STYLE_ID_INLINE336 = 336,
-    STYLE_ID_INLINE337 = 337
+    STYLE_ID_INLINE337 = 337,
+    STYLE_ID_INLINE338 = 338
 };
 
 enum ThemesEnum {
@@ -2210,4 +2211,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH_OFF = 252
 };
 
-extern const uint8_t assets[537598];
+extern const uint8_t assets[537609];
