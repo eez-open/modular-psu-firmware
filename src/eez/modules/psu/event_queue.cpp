@@ -777,7 +777,7 @@ static void readEvents(uint32_t fromPosition) {
                             event.dateTime = g_writeQueue[i].dateTime;
                             event.eventType = eventType;
                             if (g_writeQueue[i].channelIndex == -1 || g_writeQueue[i].message) {
-                                strcpy(event.message, eventType == EVENT_DEBUG_TRACE || eventType == EVENT_INFO_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
+                                strcpy(event.message, g_writeQueue[i].eventId == EVENT_DEBUG_TRACE || g_writeQueue[i].eventId == EVENT_INFO_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
                             } else {
                                 sprintf(event.message, getEventMessage(g_writeQueue[i].eventId), g_writeQueue[i].channelIndex + 1);
                             }
