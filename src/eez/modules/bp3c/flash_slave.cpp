@@ -55,7 +55,6 @@ namespace flash_slave {
 bool g_bootloaderMode = false;
 static int g_slotIndex;
 static char g_hexFilePath[MAX_PATH_LENGTH + 1];
-static uint32_t g_flashStartTime;
 
 #ifdef EEZ_PLATFORM_STM32
 
@@ -69,7 +68,7 @@ static const uint8_t BL_SPI_SOF = 0x5A;
 static const uint8_t ACK = 0x79;
 static const uint8_t NACK = 0x1F;
 
-static const uint32_t SYNC_TIMEOUT = 5000;
+static const uint32_t SYNC_TIMEOUT = 30000;
 static const uint32_t CMD_TIMEOUT = 100;
 
 static UART_HandleTypeDef *phuart = &huart7;
@@ -90,30 +89,10 @@ void sendDataNoCRC(uint8_t data) {
 
 #endif
 
-#if OPTION_DISPLAY
-
-void updateProgress(int slotIndex, size_t currentPosition, size_t totalSize) {
-	auto flashDuration = g_slots[slotIndex]->flashDuration;
-	if (flashDuration != 0) {
-		uint32_t currentPosition = millis() - g_flashStartTime;
-		if (currentPosition > flashDuration) {
-			currentPosition = flashDuration;
-		}
-		psu::gui::updateProgressPage(currentPosition, flashDuration);
-	} else {
-		psu::gui::updateProgressPage(currentPosition, totalSize);
-	}
-}
-
-#endif
-
 bool waitForAck(int slotIndex) {
 #if defined(EEZ_PLATFORM_STM32)
-  	while (true) {
-#if OPTION_DISPLAY
-		updateProgress(slotIndex, 0, 0);
-#endif
-
+	uint32_t startTime = HAL_GetTick();
+  	do {
 		uint8_t txData = 0;
 		uint8_t rxData;
 
@@ -140,11 +119,9 @@ bool waitForAck(int slotIndex) {
       		// Received NACK
       		return false;
     	} 
-		
-		// Received junk
-	}
+	} while (HAL_GetTick() - startTime < SYNC_TIMEOUT);
 #endif
-    return true;
+    return false;
 }
 
 bool syncWithSlave(int slotIndex) {
@@ -393,6 +370,10 @@ void leaveBootloaderMode() {
     HAL_UART_DeInit(phuart);
     psu::io_pins::refresh();
 #endif
+
+	if (g_slots[g_slotIndex]->moduleType != MODULE_TYPE_NONE) {
+		psu::gui::showPage(g_slots[g_slotIndex]->getSlotSettingsPageId());
+	}
 }
 
 struct HexRecord {
@@ -439,7 +420,7 @@ bool readHexRecord(psu::sd_card::BufferedFileRead &file, HexRecord &hexRecord) {
 			hexRecord.data[i] = (hex(buffer[2 * i]) << 4) + hex(buffer[2 * i + 1]);
 		}
 	} else {
-		delay(1);
+		osDelay(1);
 	}
 
 	bytes = file.read(buffer, 2);
@@ -457,9 +438,8 @@ bool readHexRecord(psu::sd_card::BufferedFileRead &file, HexRecord &hexRecord) {
 
 void doStart() {
 #if OPTION_DISPLAY
-    psu::gui::showProgressPageWithoutAbort("Downloading firmware...");
+	psu::gui::showAsyncOperationInProgress("Preparing...");
 #endif
-	g_flashStartTime = millis();
 
 	psu::channel_dispatcher::disableOutputForAllChannels();
 
@@ -480,6 +460,7 @@ void start(int slotIndex, const char *hexFilePath) {
 }
 
 void uploadHexFile() {
+	bool dowloadStarted = false;
 	if (syncWithSlave(g_slotIndex)) {
 		bool eofReached = false;
 	    File file;
@@ -498,13 +479,23 @@ void uploadHexFile() {
 			goto Exit;
 	    }
 
+		dowloadStarted = true;
+
+#if OPTION_DISPLAY
+		psu::gui::hideAsyncOperationInProgress();
+    	psu::gui::showProgressPageWithoutAbort("Downloading firmware...");
+		psu::gui::updateProgressPage(0, 0);
+#endif
+
 	#if OPTION_DISPLAY
 	    totalSize = file.size();
 	#endif
 
 		while (!eofReached && readHexRecord(bufferedFile, hexRecord)) {
+			size_t currentPosition = file.tell();
+
 	#if OPTION_DISPLAY
-			updateProgress(g_slotIndex, file.tell(), totalSize);
+			psu::gui::updateProgressPage(currentPosition, totalSize);
 	#endif
 
 			if (hexRecord.recordType == 0x04) {
@@ -520,16 +511,15 @@ void uploadHexFile() {
 			}
 		}
 
-		// uint8_t hour, minute, second;
-		// psu::datetime::getTime(hour, minute, second);
-		// DebugTrace("[%02d:%02d:%02d] Flash finished\n", hour, minute, second);
-
 		file.close();
 
 Exit:
-
 	#if OPTION_DISPLAY
-		psu::gui::hideProgressPage();
+		if (dowloadStarted) {
+			psu::gui::hideProgressPage();
+		} else {
+			psu::gui::hideAsyncOperationInProgress();			
+		}
 	#endif
 
 		if (eofReached) {
@@ -541,7 +531,7 @@ Exit:
 		}
 	} else {
 #if OPTION_DISPLAY
-    	psu::gui::hideProgressPage();
+		psu::gui::hideAsyncOperationInProgress();			
 #endif
 
 		DebugTrace("Failed to sync with slave\n");

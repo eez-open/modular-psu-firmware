@@ -888,7 +888,6 @@ public:
         moduleBrand = "Envox";
         latestModuleRevision = MODULE_REVISION_DCP405_R2B11;
         flashMethod = FLASH_METHOD_NONE;
-        flashDuration = 0;
         spiBaudRatePrescaler = 0;
         spiCrcCalculationEnable = false;
         numPowerChannels = 1;
