@@ -725,7 +725,6 @@ public:
         moduleBrand = "Envox";
         latestModuleRevision = MODULE_REVISION_R1B2;
         flashMethod = FLASH_METHOD_STM32_BOOTLOADER_SPI;
-        flashDuration = 10000;
 #if defined(EEZ_PLATFORM_STM32)        
         spiBaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
         spiCrcCalculationEnable = true;

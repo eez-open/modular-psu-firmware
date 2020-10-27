@@ -341,7 +341,6 @@ public:
         moduleBrand = "Envox";
         latestModuleRevision = MODULE_REVISION_DCM220_R2B4;
         flashMethod = FLASH_METHOD_STM32_BOOTLOADER_UART;
-        flashDuration = 0;
 #if defined(EEZ_PLATFORM_STM32)        
         spiBaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
         spiCrcCalculationEnable = false;

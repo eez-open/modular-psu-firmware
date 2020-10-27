@@ -569,7 +569,6 @@ public:
         moduleBrand = "None";
         latestModuleRevision = 0;
         flashMethod = FLASH_METHOD_NONE;
-        flashDuration = 0;
         spiBaudRatePrescaler = 0;
         spiCrcCalculationEnable = false;
         numPowerChannels = 0;

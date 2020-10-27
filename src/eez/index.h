@@ -147,7 +147,6 @@ struct Module {
     const char *moduleBrand;
     uint16_t latestModuleRevision;
     FlashMethod flashMethod;
-    uint32_t flashDuration;
     uint32_t spiBaudRatePrescaler;
     bool spiCrcCalculationEnable;
     uint8_t numPowerChannels;
