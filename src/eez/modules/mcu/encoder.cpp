@@ -50,6 +50,8 @@ static uint16_t g_totalCounter;
 static volatile int16_t g_counter;
 
 bool g_accelerationEnabled = false;
+float g_range;
+float g_step;
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 bool g_simulatorClicked;
@@ -68,8 +70,10 @@ void read(int &counter, bool &clicked) {
     counter = getCounter();
 }
 
-void enableAcceleration(bool enable) {
+void enableAcceleration(bool enable, float range, float step) {
     g_accelerationEnabled = enable;
+    g_range = range;
+    g_step = step;
 }
 
 EncoderMode getEncoderMode() {
@@ -226,10 +230,9 @@ static int getAcceleratedCounter(int increment) {
         dt = clamp(dt, MIN_DT_MS, MAX_DT_MS);
     }
 
-    // Heuristic: when dt is MIN_DT_MS and speed options is MAX_MOVING_SPEED then 1/2 rotation (= 12 pulses)
-    // should give us full range of 40 V if one pulse is 5mV.
-    const float MIN_VELOCITY = 1.0F;
-    const float MAX_VELOCITY = 40.0f / 12.0f / 0.005f;
+    // Heuristic: when dt is MIN_DT_MS and speed options is MAX_MOVING_SPEED then 1/2 rotation (= 12 pulses) should give us full range.
+    const float MIN_VELOCITY = 1.0f;
+    const float MAX_VELOCITY = g_range / 12.0f / g_step;
 
     uint8_t speedOption = increment > 0 ? psu::persist_conf::devConf.encoderMovingSpeedUp : psu::persist_conf::devConf.encoderMovingSpeedDown;
     float maxVelocity = remap(
@@ -238,6 +241,9 @@ static int getAcceleratedCounter(int increment) {
         1.0f * MAX_MOVING_SPEED, MAX_VELOCITY);
 
     float velocity = remap(dt, MIN_DT_MS, maxVelocity, MAX_DT_MS, MIN_VELOCITY);
+    if (velocity < 1.0f) {
+        velocity = 1.0f;
+    }
 
     //printf("inc=%d, dt=%f, sign=%d, v=%f\n", increment, dt, sign, adjustedVelocity);
 

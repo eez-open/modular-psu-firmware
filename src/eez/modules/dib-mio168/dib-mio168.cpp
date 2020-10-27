@@ -1908,28 +1908,15 @@ void data_dib_mio168_din_state(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
-static int g_pin;
-
-static EnumItem g_dinRangeEnumDefinition[] = {
-    { 0, "Low" },
-    { 1, "High" },
-    { 0, 0 }
-};
-
 void data_dib_mio168_din_range(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_dinConfigurationPage.getPinRange(cursor % 8);
     }
 }
 
-void onSetPinRanges(uint16_t value) {
-    popPage();
-    g_dinConfigurationPage.setPinRange(g_pin, value);
-}
-
 void action_dib_mio168_din_select_range() {
-    g_pin = getFoundWidgetAtDown().cursor % 8;
-    pushSelectFromEnumPage(g_dinRangeEnumDefinition, g_dinConfigurationPage.getPinRange(g_pin), nullptr, onSetPinRanges);
+    uint8_t pin = getFoundWidgetAtDown().cursor % 8;
+    g_dinConfigurationPage.setPinRange(pin, g_dinConfigurationPage.getPinRange(pin) ? 0 : 1);
 }
 
 void data_dib_mio168_din_has_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -1938,26 +1925,15 @@ void data_dib_mio168_din_has_speed(DataOperationEnum operation, Cursor cursor, V
     }
 }
 
-static EnumItem g_dinSpeedEnumDefinition[] = {
-    { 0, "Fast" },
-    { 1, "Slow" },
-    { 0, 0 }
-};
-
 void data_dib_mio168_din_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_dinConfigurationPage.getPinSpeed(cursor % 8);
     }
 }
 
-void onSetPinSpeeds(uint16_t value) {
-    popPage();
-    g_dinConfigurationPage.setPinSpeed(g_pin, value);
-}
-
 void action_dib_mio168_din_select_speed() {
-    g_pin = getFoundWidgetAtDown().cursor % 8;
-    pushSelectFromEnumPage(g_dinSpeedEnumDefinition, g_dinConfigurationPage.getPinSpeed(g_pin), nullptr, onSetPinSpeeds);
+    uint8_t pin = getFoundWidgetAtDown().cursor % 8;
+    g_dinConfigurationPage.setPinSpeed(pin, g_dinConfigurationPage.getPinSpeed(pin) ? 0 : 1);
 }
 
 void action_dib_mio168_din_show_configuration() {
@@ -2219,12 +2195,6 @@ void data_dib_mio168_aout_output_enabled(DataOperationEnum operation, Cursor cur
     }
 }
 
-static EnumItem g_aoutOutputModeEnumDefinition[] = {
-    { SOURCE_MODE_CURRENT, "Current" },
-    { SOURCE_MODE_VOLTAGE, "Voltage" },
-    { 0, 0 }
-};
-
 void data_dib_mio168_aout_output_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_aoutDac7760ConfigurationPage.m_mode;
@@ -2237,7 +2207,7 @@ void onSetOutputMode(uint16_t value) {
 }
 
 void action_dib_mio168_aout_select_output_mode() {
-    pushSelectFromEnumPage(g_aoutOutputModeEnumDefinition, g_aoutDac7760ConfigurationPage.m_mode, nullptr, onSetOutputMode);
+    g_aoutDac7760ConfigurationPage.m_mode = g_aoutDac7760ConfigurationPage.m_mode == SOURCE_MODE_VOLTAGE ? SOURCE_MODE_CURRENT : SOURCE_MODE_VOLTAGE;
 }
 
 static EnumItem g_aoutVoltageRangeEnumDefinition[] = {

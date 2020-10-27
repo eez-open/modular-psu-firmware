@@ -29,9 +29,12 @@ static const uint8_t MIN_MOVING_SPEED = 1;
 static const uint8_t DEFAULT_MOVING_DOWN_SPEED = 8;
 static const uint8_t DEFAULT_MOVING_UP_SPEED = 6;
 
+static const float DEFAULT_ENCODER_RANGE = 40.0f;
+static const float DEFAULT_ENCODER_STEP = 5E-3f;
+
 void read(int &counter, bool &clicked);
 
-void enableAcceleration(bool enable);
+void enableAcceleration(bool enable, float range = DEFAULT_ENCODER_RANGE, float step = DEFAULT_ENCODER_STEP);
 
 enum EncoderMode {
     ENCODER_MODE_MIN,
