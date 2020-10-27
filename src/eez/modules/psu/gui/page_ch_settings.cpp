@@ -835,6 +835,14 @@ void ChSettingsListsPage::onEncoder(int counter) {
     float min = getMin(cursor, dataId).getFloat();
     float max = getMax(cursor, dataId).getFloat();
 
+    if (dataId == DATA_ID_CHANNEL_LIST_DWELL) {
+        mcu::encoder::enableAcceleration(true);
+    } else {
+        StepValues stepValues;
+        edit_mode_step::getStepValues(stepValues);
+        mcu::encoder::enableAcceleration(true, max - min, stepValues.values[0]);
+    }
+
     float newValue;
 
     Value stepValue = getEncoderStep(g_focusCursor, g_focusDataId);

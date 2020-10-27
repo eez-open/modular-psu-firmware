@@ -1755,8 +1755,6 @@ void onEncoder(int counter, bool clicked) {
         }
 
         bool encoderEnabled = isEncoderEnabledInActivePage();
-        mcu::encoder::enableAcceleration(encoderEnabled || getActivePageId() == PAGE_ID_DEBUG_VARIABLES || getActivePageId() == PAGE_ID_CH_SETTINGS_LISTS);
-
         if (encoderEnabled) {
             Value value;
             if (persist_conf::devConf.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
@@ -1767,6 +1765,10 @@ void onEncoder(int counter, bool clicked) {
 
             float min = getMin(g_focusCursor, g_focusDataId).getFloat();
             float max = getMax(g_focusCursor, g_focusDataId).getFloat();
+
+            StepValues stepValues;
+            edit_mode_step::getStepValues(stepValues);
+            mcu::encoder::enableAcceleration(true, max - min, stepValues.values[0]);
 
             float newValue;
 
@@ -1805,6 +1807,8 @@ void onEncoder(int counter, bool clicked) {
                     psuErrorMessage(g_focusCursor, result);
                 }
             }
+        } else {
+            mcu::encoder::enableAcceleration(false);
         }
 
         if (activePageId == PAGE_ID_EDIT_MODE_KEYPAD || activePageId == PAGE_ID_NUMERIC_KEYPAD) {
