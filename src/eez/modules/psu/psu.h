@@ -65,6 +65,7 @@ public:
 
 	int getChannelSettingsPageId() override;
 
+    void resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer) override;
     void getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) override;
     void setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
     bool writePowerChannelProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;

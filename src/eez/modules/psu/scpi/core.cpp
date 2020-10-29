@@ -116,7 +116,13 @@ scpi_result_t scpi_cmd_coreSreQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_coreStbQ(scpi_t *context) {
-    return SCPI_CoreStbQ(context);
+    scpi_result_t result = SCPI_CoreStbQ(context);
+
+    // clear MAV (Message AVailable) bit
+    SCPI_RegSet(context, SCPI_REG_STB, SCPI_RegGet(context, SCPI_REG_STB) & ~STB_MAV);
+    g_stbQueryExecuted = true;
+
+    return result;
 }
 
 /**

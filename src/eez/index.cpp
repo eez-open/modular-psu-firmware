@@ -133,6 +133,9 @@ void Module::onLowPriorityThreadMessage(uint8_t type, uint32_t param) {
 void Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
 }
 
+void Module::resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer) {
+}
+
 void Module::getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) {
 }
 
@@ -157,6 +160,9 @@ float Module::getProfileUSet(uint8_t *buffer) {
 
 float Module::getProfileISet(uint8_t *buffer) {
     return NAN;
+}
+
+void Module::resetProfileToDefaults(uint8_t *buffer) {
 }
 
 void Module::getProfileParameters(uint8_t *buffer) {

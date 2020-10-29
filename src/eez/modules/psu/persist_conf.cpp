@@ -286,7 +286,9 @@ static bool moduleConfRead(int slotIndex, uint8_t *buffer, uint16_t bufferSize, 
         if (!checkBlock((const BlockHeader *)buffer, bufferSize, version)) {
             if (((const BlockHeader *)buffer)->checksum != 0xFFFFFFFF) {
 #if defined(EEZ_PLATFORM_STM32)
+            	osDelay(1);
         	    event_queue::pushEvent(event_queue::EVENT_ERROR_EEPROM_SLOT1_CRC_CHECK_ERROR + slotIndex);
+        	    osDelay(1);
 #endif
             }
 			continue;

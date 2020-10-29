@@ -28,6 +28,9 @@ namespace psu {
 /// SCPI commands.
 namespace scpi {
 
+extern bool g_messageAvailable;
+extern bool g_stbQueryExecuted;
+
 /// EEZ PSU specific SCPI parser context data.
 struct scpi_psu_t {
     scpi_reg_val_t *registers;
@@ -46,13 +49,26 @@ void input(scpi_t &scpi_context, const char *str, size_t size);
 void emptyBuffer(scpi_t &context);
 void onBufferOverrun(scpi_t &context);
 
-void printError(int_fast16_t err);
-
 void resultChoiceName(scpi_t *context, scpi_choice_def_t *choice, int tag);
 
 void abortDownloading();
 
 bool mmemUpload(const char *filePath, scpi_t *context, int *err);
+
+struct OutputBufferWriter {
+public:
+    OutputBufferWriter(char *buffer, size_t maxBufferSize, size_t (*writeFunc)(const char *data, size_t len));
+
+    size_t write(const char *data, size_t len);
+
+private:
+    char *m_buffer;
+    size_t m_maxBufferSize;
+    size_t (*m_writeFunc)(const char *data, size_t len);
+    size_t m_bufferSize;
+};
+
+int printError(scpi_t *context, int_fast16_t err, OutputBufferWriter &outputBufferWriter);
 
 } // namespace scpi
 } // namespace psu
