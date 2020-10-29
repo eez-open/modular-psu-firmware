@@ -22,10 +22,12 @@
 #include <eez/firmware.h>
 #include <eez/mp.h>
 #include <eez/system.h>
+#include <eez/sound.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/gui/psu.h>
@@ -105,11 +107,20 @@ int SCPI_Error(scpi_t *context, int_fast16_t err) {
     g_lastError = err;
 
     if (err != 0) {
-       psu::scpi::printError(err);
+        sound::playBeep();
+        
+        DebugTrace("**ERROR");
 
-       if (err == SCPI_ERROR_INPUT_BUFFER_OVERRUN) {
-           psu::scpi::onBufferOverrun(*context);
-       }
+        char datetime_buffer[32] = { 0 };
+        if (psu::datetime::getDateTimeAsString(datetime_buffer)) {
+            DebugTrace(" [%s]", datetime_buffer);
+        }
+
+        DebugTrace(": %d,\"%s\"\r\n", (int16_t)err, SCPI_ErrorTranslate(err));
+
+        if (err == SCPI_ERROR_INPUT_BUFFER_OVERRUN) {
+            psu::scpi::onBufferOverrun(*context);
+        }
     }
 
     return 0;

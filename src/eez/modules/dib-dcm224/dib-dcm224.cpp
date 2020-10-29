@@ -139,7 +139,6 @@ struct DcmChannel : public Channel {
     }
 
 	void getParams(uint16_t moduleRevision) override {
-
 		params.U_MIN = 1.0f;
 		params.U_DEF = 1.0f;
 		params.U_MAX = 24.0f;
@@ -366,6 +365,8 @@ struct DcmChannel : public Channel {
 	}
 };
 
+static const float DEFAULT_COUNTERPHASE_FREQUENCY = 500000.0f;
+
 struct DcmModule : public PsuModule {
 public:
     TestResult testResult = TEST_NONE;
@@ -374,7 +375,7 @@ public:
     uint32_t lastTransferTickCount;
     uint8_t input[BUFFER_SIZE];
     uint8_t output[BUFFER_SIZE];
-    float counterphaseFrequency = 500000.0f;
+    float counterphaseFrequency = DEFAULT_COUNTERPHASE_FREQUENCY;
     bool counterphaseDithering = false;
 
     DcmModule() {
@@ -588,6 +589,7 @@ public:
         bool counterphaseDithering;
     };
 
+    void resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer) override;
     void getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) override;
     void setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
     bool writePowerChannelProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
@@ -671,6 +673,19 @@ void DcmChannel::tickSpecific(uint32_t tickCount) {
 #endif
 
 #endif
+}
+
+void DcmModule::resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer) {
+    PsuModule::resetPowerChannelProfileToDefaults(channelIndex, buffer);
+
+    auto parameters = (DcmProfileParameters *)buffer;
+
+    parameters->pwmEnabled = false;
+    parameters->pwmFrequency = PWM_DEF_FREQUENCY;
+    parameters->pwmDuty = PWM_DEF_DUTY;
+
+    parameters->counterphaseFrequency = DEFAULT_COUNTERPHASE_FREQUENCY;
+    parameters->counterphaseDithering = false;
 }
 
 void DcmModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) {

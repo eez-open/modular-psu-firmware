@@ -185,6 +185,7 @@ struct Module {
     virtual void onLowPriorityThreadMessage(uint8_t type, uint32_t param);
     virtual void onHighPriorityThreadMessage(uint8_t type, uint32_t param);
 
+    virtual void resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer);
     virtual void getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer);
     virtual void setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels);
     virtual bool writePowerChannelProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer);
@@ -193,6 +194,7 @@ struct Module {
     virtual float getProfileUSet(uint8_t *buffer);
     virtual float getProfileISet(uint8_t *buffer);
 
+    virtual void resetProfileToDefaults(uint8_t *buffer);
     virtual void getProfileParameters(uint8_t *buffer);
     virtual void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions);
     virtual bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer);

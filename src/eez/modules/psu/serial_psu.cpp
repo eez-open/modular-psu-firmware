@@ -36,8 +36,19 @@ namespace serial {
 
 TestResult g_testResult = TEST_FAILED;
 
-size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
+static const size_t OUTPUT_BUFFER_MAX_SIZE = 1024;
+static char g_outputBuffer[OUTPUT_BUFFER_MAX_SIZE];
+
+size_t serialWrite(const char *data, size_t len) {
+    g_messageAvailable = true;
     Serial.write(data, len);
+    return len;
+}
+
+static OutputBufferWriter g_outputBufferWriter(&g_outputBuffer[0], OUTPUT_BUFFER_MAX_SIZE, serialWrite);
+
+size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
+    g_outputBufferWriter.write(data, len);
     return len;
 }
 
@@ -46,15 +57,7 @@ scpi_result_t SCPI_Flush(scpi_t *context) {
 }
 
 int SCPI_Error(scpi_t *context, int_fast16_t err) {
-    if (err != 0) {
-        scpi::printError(err);
-
-        if (err == SCPI_ERROR_INPUT_BUFFER_OVERRUN) {
-            scpi::onBufferOverrun(*context);
-        }
-    }
-
-    return 0;
+    return printError(context, err, g_outputBufferWriter);
 }
 
 scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_t val) {
@@ -65,7 +68,7 @@ scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_
         } else {
             sprintf(errorOutputBuffer, "**CTRL %02x: 0x%X (%d)\r\n", ctrl, val, val);
         }
-        Serial.println(errorOutputBuffer);
+        g_outputBufferWriter.write(errorOutputBuffer, strlen(errorOutputBuffer));
     }
 
     return SCPI_RES_OK;
@@ -75,7 +78,7 @@ scpi_result_t SCPI_Reset(scpi_t *context) {
     if (serial::g_testResult == TEST_OK) {
         char errorOutputBuffer[256];
         strcpy(errorOutputBuffer, "**Reset\r\n");
-        Serial.println(errorOutputBuffer);
+        g_outputBufferWriter.write(errorOutputBuffer, strlen(errorOutputBuffer));
     }
 
     return reset() ? SCPI_RES_OK : SCPI_RES_ERR;

@@ -435,7 +435,7 @@ public:
             int y = subchannelIndex / 10 - 1;
 
             if (x < 0 || x >= NUM_COLUMNS || y < 0 || y >= NUM_ROWS) {
-                if (*err) {
+                if (err) {
                     *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
                 }
                 return false;
@@ -461,7 +461,7 @@ public:
             int y = subchannelIndex / 10 - 1;
 
             if (x < 0 || x >= NUM_COLUMNS || y < 0 || y >= NUM_ROWS) {
-                if (*err) {
+                if (err) {
                     *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
                 }
                 return false;
@@ -488,7 +488,7 @@ public:
             int y = subchannelIndex / 10 - 1;
 
             if (x < 0 || x >= NUM_COLUMNS || y < 0 || y >= NUM_ROWS) {
-                if (*err) {
+                if (err) {
                     *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
                 }
                 return false;
@@ -543,7 +543,7 @@ public:
             int y = subchannelIndex / 10 - 1;
 
             if (x < 0 || x >= NUM_COLUMNS || y < 0 || y >= NUM_ROWS) {
-                if (*err) {
+                if (err) {
                     *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
                 }
                 return false;
@@ -559,7 +559,7 @@ public:
         ++subchannelIndex;
 
         if (subchannelIndex != 1 && subchannelIndex != 2) {
-            if (*err) {
+            if (err) {
                 *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;

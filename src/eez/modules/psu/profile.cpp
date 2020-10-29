@@ -459,6 +459,15 @@ static void getProfileFilePath(int location, char *filePath) {
 static void resetProfileToDefaults(Parameters &profile) {
     memset(&profile, 0, sizeof(Parameters));
 
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel &channel = Channel::get(i);
+        g_slots[channel.slotIndex]->resetPowerChannelProfileToDefaults(channel.subchannelIndex, (uint8_t *)profile.channels[i].parameters);
+    }
+
+    for (int i = 0; i < NUM_SLOTS; i++) {
+        g_slots[i]->resetProfileToDefaults((uint8_t *)profile.slots[i].parameters);
+    }
+
     for (int i = 0; i < temp_sensor::MAX_NUM_TEMP_SENSORS; ++i) {
         if (i == temp_sensor::AUX) {
             profile.tempProt[i].delay = OTP_AUX_DEFAULT_DELAY;
@@ -673,22 +682,20 @@ static void saveState(Parameters &profile, List *lists) {
     }
 
     for (int i = 0; i < CH_NUM; ++i) {
-        if (i < CH_NUM) {
-            Channel &channel = Channel::get(i);
+        Channel &channel = Channel::get(i);
 
-            profile.channels[i].moduleType = g_slots[channel.slotIndex]->moduleType;
-            profile.channels[i].moduleRevision = g_slots[channel.slotIndex]->moduleRevision;
-            
-            profile.channels[i].parametersAreValid = 1;
-            
-            g_slots[channel.slotIndex]->getPowerChannelProfileParameters(i, (uint8_t *)profile.channels[i].parameters);
+        profile.channels[i].moduleType = g_slots[channel.slotIndex]->moduleType;
+        profile.channels[i].moduleRevision = g_slots[channel.slotIndex]->moduleRevision;
+        
+        profile.channels[i].parametersAreValid = 1;
+        
+        g_slots[channel.slotIndex]->getPowerChannelProfileParameters(i, (uint8_t *)profile.channels[i].parameters);
 
-            if (lists) {
-                auto &list = lists[i];
-                memcpy(list.dwellList, list::getDwellList(channel, &list.dwellListLength), sizeof(list.dwellList));
-                memcpy(list.voltageList, list::getVoltageList(channel, &list.voltageListLength), sizeof(list.voltageList));
-                memcpy(list.currentList, list::getCurrentList(channel, &list.currentListLength), sizeof(list.currentList));
-            }
+        if (lists) {
+            auto &list = lists[i];
+            memcpy(list.dwellList, list::getDwellList(channel, &list.dwellListLength), sizeof(list.dwellList));
+            memcpy(list.voltageList, list::getVoltageList(channel, &list.voltageListLength), sizeof(list.voltageList));
+            memcpy(list.currentList, list::getCurrentList(channel, &list.currentListLength), sizeof(list.currentList));
         }
     }
 

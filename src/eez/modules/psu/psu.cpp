@@ -248,6 +248,70 @@ int PsuModule::getChannelSettingsPageId() {
     return eez::gui::PAGE_ID_CH_SETTINGS;
 }
 
+void PsuModule::resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer) {
+    auto &channel = Channel::get(channelIndex);
+    auto parameters = (ProfileParameters *)buffer;
+
+    parameters->flags.output_enabled = 0;
+    parameters->flags.sense_enabled = 0;
+
+    parameters->flags.rprog_enabled = 0;
+
+    parameters->flags.u_state = channel.params.OVP_DEFAULT_STATE;
+    if (channel.params.features & CH_FEATURE_HW_OVP) {
+        parameters->flags.u_type = 1; // HW
+    } else {
+        parameters->flags.u_type = 0; // SW
+    }    
+    parameters->flags.i_state = channel.params.OCP_DEFAULT_STATE;
+    parameters->flags.p_state = channel.params.OPP_DEFAULT_STATE;
+
+    parameters->u_set = channel.params.U_MIN;
+    parameters->u_step = channel.params.U_DEF_STEP;
+    parameters->u_limit = channel.u.max;
+
+    parameters->i_set = channel.params.I_MIN;
+    parameters->i_step = channel.params.I_DEF_STEP;
+    parameters->i_limit = channel.i.max;
+
+    parameters->p_limit = channel.roundChannelValue(UNIT_WATT, channel.params.PTOT);
+
+    parameters->u_delay = channel.params.OVP_DEFAULT_DELAY;
+    parameters->u_level = channel.u.max;
+    parameters->i_delay = channel.params.OCP_DEFAULT_DELAY;
+    parameters->p_delay = channel.params.OPP_DEFAULT_DELAY;
+    parameters->p_level = channel.params.OPP_DEFAULT_LEVEL;
+
+    parameters->flags.displayValue1 = DISPLAY_VALUE_VOLTAGE;
+    parameters->flags.displayValue2 = DISPLAY_VALUE_CURRENT;
+    parameters->ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+    parameters->load_enabled = 0;
+    parameters->load = 0;
+    parameters->voltProgExt = 0;
+#endif
+
+    parameters->flags.u_triggerMode = TRIGGER_MODE_FIXED;
+    parameters->flags.i_triggerMode = TRIGGER_MODE_FIXED;
+    parameters->flags.triggerOutputState = 1;
+    parameters->flags.triggerOnListStop = TRIGGER_ON_LIST_STOP_OUTPUT_OFF;
+    parameters->u_triggerValue = channel.params.U_MIN;
+    parameters->i_triggerValue = channel.params.I_MIN;
+    parameters->listCount = 0;
+
+    parameters->flags.currentRangeSelectionMode = CURRENT_RANGE_SELECTION_USE_BOTH;
+    parameters->flags.autoSelectCurrentRange = 0;
+
+    parameters->flags.dprogState = 1;
+    parameters->flags.trackingEnabled = 0;
+
+    parameters->u_rampDuration = RAMP_DURATION_DEF_VALUE_U;
+    parameters->i_rampDuration = RAMP_DURATION_DEF_VALUE_I;
+
+    parameters->outputDelayDuration = 0;
+}
+
 void PsuModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) {
     assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
 

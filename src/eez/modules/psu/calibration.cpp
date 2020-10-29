@@ -93,11 +93,9 @@ void Value::setCurrentPointIndex(int currentPointIndex_) {
 }
 
 void Value::setDacValue(float value) {
-    if (currentPointIndex == -1) {
-        return;
+    if (currentPointIndex != -1) {
+        configuration.points[currentPointIndex].dac = value;
     }
-
-    configuration.points[currentPointIndex].dac = value;
 
     Channel *channel = Channel::getBySlotIndex(editor.m_slotIndex, editor.m_subchannelIndex);
 

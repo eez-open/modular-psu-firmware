@@ -43,6 +43,11 @@ static const scpi_command_t scpi_commands[] = { SCPI_COMMANDS SCPI_CMD_LIST_END 
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool g_messageAvailable = false;
+bool g_stbQueryExecuted = false;
+
+////////////////////////////////////////////////////////////////////////////////
+
 void init(scpi_t &scpi_context, scpi_psu_t &scpi_psu_context, scpi_interface_t *interface,
           char *input_buffer, size_t input_buffer_length, scpi_error_t *error_queue_data,
           int16_t error_queue_size) {
@@ -94,29 +99,43 @@ void input(scpi_t &context, const char *str, size_t size) {
         }
     }
 
+    g_messageAvailable = false;
+    g_stbQueryExecuted = false;
+
     int result = SCPI_Input(&context, str, size);
     if (result == -1) {
         onBufferOverrun(context);
+    } else {
+        if (g_messageAvailable && !g_stbQueryExecuted) {
+            // set MAV (Message AVailable) bit
+            SCPI_RegSet(&context, SCPI_REG_STB, SCPI_RegGet(&context, SCPI_REG_STB) | STB_MAV);
+        }
     }
 }
 
-void printError(int_fast16_t err) {
-    sound::playBeep();
+int printError(scpi_t *context, int_fast16_t err, OutputBufferWriter &outputBufferWriter) {
+    if (err != 0) {
+        sound::playBeep();
 
-    if (serial::g_testResult == TEST_OK) {
-        char errorOutputBuffer[256];
+        char errorOutputBuffer[512];
 
-        Serial.print("**ERROR");
+        outputBufferWriter.write("**ERROR", sizeof("**ERROR"));
 
         char datetime_buffer[32] = { 0 };
         if (datetime::getDateTimeAsString(datetime_buffer)) {
             sprintf(errorOutputBuffer, " [%s]", datetime_buffer);
-            Serial.print(errorOutputBuffer);
+            outputBufferWriter.write(errorOutputBuffer, strlen(errorOutputBuffer));
         }
 
-        sprintf(errorOutputBuffer, ": %d,\"%s\"", (int16_t)err, SCPI_ErrorTranslate(err));
-        Serial.println(errorOutputBuffer);
+        sprintf(errorOutputBuffer, ": %d,\"%s\"\r\n", (int16_t)err, SCPI_ErrorTranslate(err));
+        outputBufferWriter.write(errorOutputBuffer, strlen(errorOutputBuffer));
+
+        if (err == SCPI_ERROR_INPUT_BUFFER_OVERRUN) {
+            scpi::onBufferOverrun(*context);
+        }
     }
+
+    return 0;
 }
 
 void resultChoiceName(scpi_t *context, scpi_choice_def_t *choice, int tag) {
@@ -137,6 +156,57 @@ void resultChoiceName(scpi_t *context, scpi_choice_def_t *choice, int tag) {
             break;
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+OutputBufferWriter::OutputBufferWriter(char *buffer, size_t maxBufferSize, size_t(*writeFunc)(const char *data, size_t len))
+    : m_buffer(buffer)
+    , m_maxBufferSize(maxBufferSize)
+    , m_writeFunc(writeFunc)
+{
+}
+
+size_t OutputBufferWriter::write(const char *data, size_t len) {
+    g_messageAvailable = true;
+
+    const char *restData = nullptr;
+    size_t restLen = 0;
+
+    const char *endOfLine = strstr(data, "\r\n");
+    if (endOfLine) {
+        restData = endOfLine + 2;
+        size_t n = restData - data;
+        restLen = len - n;
+        len = n;
+    }
+
+    if (m_bufferSize + len < m_maxBufferSize) {
+        memcpy(m_buffer + m_bufferSize, data, len);
+        m_bufferSize += len;
+        len = 0;
+    } else {
+        int n = m_maxBufferSize - m_bufferSize;
+        memcpy(m_buffer + m_bufferSize, data, n);
+        m_bufferSize += n;
+        data += n;
+        len -= n;
+    }
+
+    if ((m_bufferSize >= 2 && m_buffer[m_bufferSize - 2] == '\r' && m_buffer[m_bufferSize - 1] == '\n') || m_bufferSize == m_maxBufferSize) {
+        m_writeFunc(m_buffer, m_bufferSize);
+        m_bufferSize = 0;
+    }
+
+    if (len > 0) {
+        write(data, len);
+    }
+
+    if (restLen > 0) {
+        write(restData, restLen);
+    }
+
+    return len;
 }
 
 } // namespace scpi

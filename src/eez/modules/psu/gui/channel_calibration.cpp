@@ -118,17 +118,20 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     float maxLimit;
     calibrationBase.getMaxValue(calibrationValueType, maxLimit, unit);
 
-    float d = maxLimit / chartZoom;
+    float d = (maxLimit - minLimit) / chartZoom;
 
     float min = dacValue - d / 2;
-    float max = min + d;
+    float max;
     if (min < minLimit) {
         min = minLimit;
-        max = d;
-    } else if (max > maxLimit) {
-        min = maxLimit - d;
-        max = maxLimit;
-    }
+        max = minLimit + d;
+    } else {
+        max = dacValue + d / 2;
+        if (max > maxLimit) {
+            max = maxLimit;
+        }
+        min = max - d;
+   }
 
     auto scale = [&](float value) {
         return (value - min) / d;
@@ -192,7 +195,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
 
         RectangleF clipRectangle = { 0.0f, 0.0f, 1.0f * (w - 2 * MARGIN - 1), 1.0f * (h - 2 * MARGIN - 1) };
 
-        for (unsigned int i = 0; i < configuration.numPoints + 1; i++) {
+        for (unsigned int i = 0; i < configuration.numPoints; i++) {
             PointF p1 = { xPoints[i], yPoints[i] };
             PointF p2 = { xPoints[i + 1], yPoints[i + 1] };
             if (clipSegment(clipRectangle, p1, p2)) {
@@ -400,9 +403,9 @@ void ChSettingsCalibrationEditPage::setCalibrationValueType(CalibrationValueType
 
 void ChSettingsCalibrationEditPage::setDacValue(float value) {
     if (m_calibrationValueType == CALIBRATION_VALUE_U) {
-        g_channel->setVoltage(value);
+        calibration::g_editor.getVoltage().setDacValue(value);
     } else {
-        g_channel->setCurrent(value);
+        calibration::g_editor.getCurrent().setDacValue(value);
     }
 
     m_measuredValue = remapDacValue(
@@ -945,17 +948,15 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
                 }
             }
         } else if (operation == DATA_OPERATION_GET_MIN) {
-            if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                value = MakeValue(0, UNIT_VOLT);
-            } else {
-                value = MakeValue(0, UNIT_AMPER);
-            }
+            float fvalue;
+            Unit unit;
+            calibration::g_editor.getMinValue(editPage->getCalibrationValueType(), fvalue, unit);
+            value = MakeValue(fvalue, unit);
         } else if (operation == DATA_OPERATION_GET_MAX) {
-            if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                value = MakeValue(channel_dispatcher::getUMax(slotIndex, subchannelIndex), UNIT_VOLT);
-            } else {
-                value = MakeValue(channel_dispatcher::getIMaxLimit(slotIndex, subchannelIndex), UNIT_AMPER);
-            }
+            float fvalue;
+            Unit unit;
+            calibration::g_editor.getMaxValue(editPage->getCalibrationValueType(), fvalue, unit);
+            value = MakeValue(fvalue, unit);
         } else if (operation == DATA_OPERATION_GET_NAME) {
             value = editPage->getCalibrationValueType() == CALIBRATION_VALUE_U ? "Voltage" : "Current";
         } else if (operation == DATA_OPERATION_GET_UNIT) {
@@ -1003,18 +1004,20 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
                 value = MakeValue(editPage->getMeasuredValue(), editPage->getCalibrationValueType() == CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
             }
         } else if (operation == DATA_OPERATION_GET_MIN) {
-            if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                value = MakeValue(-1.0f, UNIT_VOLT);
-            } else {
-                value = MakeValue(-0.5f, UNIT_AMPER);
-            }
+            float fvalueMin;
+            float fvalueMax;
+            Unit unit;
+            calibration::g_editor.getMinValue(editPage->getCalibrationValueType(), fvalueMin, unit);
+            calibration::g_editor.getMaxValue(editPage->getCalibrationValueType(), fvalueMax, unit);
+            value = MakeValue(roundPrec(fvalueMin - fabsf(fvalueMax - fvalueMin) * 0.1f, 1E-4f), unit);
         } else if (operation == DATA_OPERATION_GET_MAX) {
-            if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                value = MakeValue(channel_dispatcher::getUMax(slotIndex, subchannelIndex) + 1.0f, UNIT_VOLT);
-            } else {
-                value = MakeValue(channel_dispatcher::getIMaxLimit(slotIndex, subchannelIndex) + 0.5f, UNIT_AMPER);
-            }
-        } else if (operation == DATA_OPERATION_GET_NAME) {
+            float fvalueMin;
+            float fvalueMax;
+            Unit unit;
+            calibration::g_editor.getMinValue(editPage->getCalibrationValueType(), fvalueMin, unit);
+            calibration::g_editor.getMaxValue(editPage->getCalibrationValueType(), fvalueMax, unit);
+            value = MakeValue(roundPrec(fvalueMax + fabsf(fvalueMax - fvalueMin) * 0.1f, 1E-4f), unit);
+        }  else if (operation == DATA_OPERATION_GET_NAME) {
             value = editPage->getCalibrationValueType() == CALIBRATION_VALUE_U ? "Voltage" : "Current";
         } else if (operation == DATA_OPERATION_GET_UNIT) {
             value = editPage->getCalibrationValueType() == CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER;

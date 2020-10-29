@@ -48,19 +48,20 @@ static bool g_isConnected = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-size_t ethernet_client_write(const char *data, size_t len) {
-    size_t size = eez::mcu::ethernet::writeBuffer(data, len);
-    return size;
+static const size_t OUTPUT_BUFFER_MAX_SIZE = 1024;
+static char g_outputBuffer[OUTPUT_BUFFER_MAX_SIZE];
+
+size_t ethernetClientWrite(const char *data, size_t len) {
+    g_messageAvailable = true;
+    return eez::mcu::ethernet::writeBuffer(data, len);
 }
 
-size_t ethernet_client_write_str(const char *str) {
-    return ethernet_client_write(str, strlen(str));
-}
+static OutputBufferWriter g_outputBufferWriter(&g_outputBuffer[0], OUTPUT_BUFFER_MAX_SIZE, ethernetClientWrite);
 
 ////////////////////////////////////////////////////////////////////////////////
 
 size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
-    return ethernet_client_write(data, len);
+    return g_outputBufferWriter.write(data, len);
 }
 
 scpi_result_t SCPI_Flush(scpi_t *context) {
@@ -68,18 +69,7 @@ scpi_result_t SCPI_Flush(scpi_t *context) {
 }
 
 int SCPI_Error(scpi_t *context, int_fast16_t err) {
-    if (err != 0) {
-        char errorOutputBuffer[256];
-        sprintf(errorOutputBuffer, "**ERROR: %d,\"%s\"\r\n", (int16_t)err,
-                SCPI_ErrorTranslate(err));
-        ethernet_client_write(errorOutputBuffer, strlen(errorOutputBuffer));
-
-        if (err == SCPI_ERROR_INPUT_BUFFER_OVERRUN) {
-            scpi::onBufferOverrun(*context);
-        }
-    }
-
-    return 0;
+    return printError(context, err, g_outputBufferWriter);
 }
 
 scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_t val) {
@@ -90,7 +80,7 @@ scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_
         sprintf(outputBuffer, "**CTRL %02x: 0x%X (%d)\r\n", ctrl, val, val);
     }
 
-    ethernet_client_write(outputBuffer, strlen(outputBuffer));
+    g_outputBufferWriter.write(outputBuffer, strlen(outputBuffer));
 
     return SCPI_RES_OK;
 }
@@ -98,7 +88,7 @@ scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_
 scpi_result_t SCPI_Reset(scpi_t *context) {
     char errorOutputBuffer[256];
     strcpy(errorOutputBuffer, "**Reset\r\n");
-    ethernet_client_write(errorOutputBuffer, strlen(errorOutputBuffer));
+    g_outputBufferWriter.write(errorOutputBuffer, strlen(errorOutputBuffer));
 
     return reset() ? SCPI_RES_OK : SCPI_RES_ERR;
 }
