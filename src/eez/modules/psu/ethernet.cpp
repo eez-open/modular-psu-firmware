@@ -65,6 +65,7 @@ size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
 }
 
 scpi_result_t SCPI_Flush(scpi_t *context) {
+    g_outputBufferWriter.flush();
     return SCPI_RES_OK;
 }
 

@@ -194,8 +194,7 @@ size_t OutputBufferWriter::write(const char *data, size_t len) {
     }
 
     if ((m_bufferSize >= 2 && m_buffer[m_bufferSize - 2] == '\r' && m_buffer[m_bufferSize - 1] == '\n') || m_bufferSize == m_maxBufferSize) {
-        m_writeFunc(m_buffer, m_bufferSize);
-        m_bufferSize = 0;
+        flush();
     }
 
     if (len > 0) {
@@ -207,6 +206,13 @@ size_t OutputBufferWriter::write(const char *data, size_t len) {
     }
 
     return len;
+}
+
+void OutputBufferWriter::flush() {
+    if (m_bufferSize > 0) {
+        m_writeFunc(m_buffer, m_bufferSize);
+        m_bufferSize = 0;
+    }
 }
 
 } // namespace scpi

@@ -172,11 +172,12 @@ scpi_result_t scpi_cmd_mmemoryInformationQ(scpi_t *context) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void uploadCallback(void *param, const void *buffer, int size) {
+    scpi_t *context = (scpi_t *)param;
+
     if (buffer == NULL && size == -1) {
+        context->interface->flush(context);
         return;
     }
-
-    scpi_t *context = (scpi_t *)param;
 
     if (buffer == NULL) {
         SCPI_ResultArbitraryBlockHeader(context, size);
