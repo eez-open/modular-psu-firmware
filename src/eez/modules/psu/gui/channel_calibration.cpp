@@ -199,12 +199,14 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
             PointF p1 = { xPoints[i], yPoints[i] };
             PointF p2 = { xPoints[i + 1], yPoints[i + 1] };
             if (clipSegment(clipRectangle, p1, p2)) {
-                drawAntialiasedLine(
-                    x + MARGIN + (int)roundf(p1.x),
-                    y + h - MARGIN - 1 - (int)roundf(p1.y),
-                    x + MARGIN + (int)roundf(p2.x),
-                    y + h - MARGIN - 1 - (int)roundf(p2.y)
-                );
+                if (!isNaN(p1.x) && !isNaN(p1.y) && !isNaN(p2.x) && !isNaN(p2.y)) {
+                    drawAntialiasedLine(
+                        x + MARGIN + (int)roundf(p1.x),
+                        y + h - MARGIN - 1 - (int)roundf(p1.y),
+                        x + MARGIN + (int)roundf(p2.x),
+                        y + h - MARGIN - 1 - (int)roundf(p2.y)
+                    );
+                }
             }
         }
     }

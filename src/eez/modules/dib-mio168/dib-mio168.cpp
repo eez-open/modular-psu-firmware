@@ -122,9 +122,12 @@ struct FromMasterToSlave {
 
 struct FromSlaveToMaster {
     uint8_t dinStates;
+    uint16_t ainValues[4];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+
+static const size_t MIO_CALIBRATION_REMARK_MAX_LENGTH = 28;
 
 struct CalConf {
     static const int VERSION = 1;
@@ -146,7 +149,7 @@ struct CalConf {
     uint32_t calibrationDate;
 
     /// Remark about calibration set by user.
-    char calibrationRemark[CALIBRATION_REMARK_MAX_LENGTH + 1];
+    char calibrationRemark[MIO_CALIBRATION_REMARK_MAX_LENGTH + 1];
 
     void clear() {
         memset(this, 0, sizeof(CalConf));
@@ -810,6 +813,10 @@ public:
     AoutDac7563Channel aoutDac7563Channels[2];
     PwmChannel pwmChannels[2];
 
+    uint8_t dac7760CalibrationChannelMode;
+    uint8_t dac7760CalibrationChannelCurrentRange;
+    uint8_t dac7760CalibrationChannelVoltageRange;
+
     Mio168Module() {
         moduleType = MODULE_TYPE_DIB_MIO168;
         moduleName = "MIO168";
@@ -817,7 +824,7 @@ public:
         latestModuleRevision = MODULE_REVISION_R1B2;
         flashMethod = FLASH_METHOD_STM32_BOOTLOADER_SPI;
 #if defined(EEZ_PLATFORM_STM32)        
-        spiBaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+        spiBaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
         spiCrcCalculationEnable = true;
 #else
         spiBaudRatePrescaler = 0;
@@ -911,7 +918,7 @@ public:
             data.pwm[i].duty = channel->m_duty;
         }
 
-        auto status = bp3c::comm::transferDMA(slotIndex, output, input, BUFFER_SIZE);
+        auto status = bp3c::comm::transferDMA(slotIndex, output, input, sizeof(FromMasterToSlave));
         if (status != bp3c::comm::TRANSFER_STATUS_OK) {
         	onSpiDmaTransferCompleted(status);
         }
@@ -925,11 +932,9 @@ public:
 
             dinChannel.m_pinStates = data.dinStates;
 
-            uint16_t *inputU16 = (uint16_t *)(input + 24);
-
             for (int i = 0; i < 4; i++) {
                 auto &channel = ainChannels[i];
-                channel.m_value = channel.convertU16Value(inputU16[i]);
+                channel.m_value = channel.convertU16Value(data.ainValues[i]);
             }
         } else {
             if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
@@ -1539,9 +1544,11 @@ public:
     }
 
     bool loadChannelCalibration(int subchannelIndex, int *err) override {
+        assert(sizeof(CalConf) <= 64);
+
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             for (int i = 0; i < 7; i++) {
-                CalConf *calConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf[0];
+                CalConf *calConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf[i];
                 if (!persist_conf::loadChannelCalibrationConfiguration(slotIndex, (subchannelIndex - AOUT_1_SUBCHANNEL_INDEX) * 7 + i, &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
                     calConf->clear();
                 }
@@ -1582,7 +1589,11 @@ public:
 
     void startChannelCalibration(int subchannelIndex) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].ongoingCal = 1;
+            auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+            channel.ongoingCal = 1;
+            channel.m_mode = dac7760CalibrationChannelMode;
+            channel.m_voltageRange = dac7760CalibrationChannelVoltageRange;
+            channel.m_currentRange = dac7760CalibrationChannelCurrentRange;
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].ongoingCal = 1;
         }
@@ -1630,7 +1641,8 @@ public:
             }
 
             calConf.calibrationDate = mioCalConf->calibrationDate;
-            strcpy(calConf.calibrationRemark, mioCalConf->calibrationRemark);
+            strncpy(calConf.calibrationRemark, mioCalConf->calibrationRemark, MIO_CALIBRATION_REMARK_MAX_LENGTH);
+            calConf.calibrationRemark[MIO_CALIBRATION_REMARK_MAX_LENGTH] = 0;
 
             return true;
         }
@@ -1662,7 +1674,8 @@ public:
             mioCalConf->state.calEnabled = mioCalConf->state.calState;
 
             mioCalConf->calibrationDate = calConf.calibrationDate;
-            strcpy(mioCalConf->calibrationRemark, calConf.calibrationRemark);
+            strncpy(mioCalConf->calibrationRemark, calConf.calibrationRemark, MIO_CALIBRATION_REMARK_MAX_LENGTH);
+            mioCalConf->calibrationRemark[MIO_CALIBRATION_REMARK_MAX_LENGTH] = 0;
 
             return true;
         }
@@ -1683,7 +1696,7 @@ public:
         }
 
         if (mioCalConf) {
-            return mioCalConf->calibrationRemark;
+            calibrationRemark = mioCalConf->calibrationRemark;
         } else {
             calibrationRemark = "";
         }
@@ -1701,10 +1714,12 @@ public:
         }
 
         if (mioCalConf) {
-            return mioCalConf->calibrationDate;
+            calibrationDate = mioCalConf->calibrationDate;
+        } else {
+            calibrationDate = 0;
         }
         
-        return 0;
+        return true;
     }
 
     bool getCurrent(int subchannelIndex, float &value, int *err) override {
@@ -2526,8 +2541,14 @@ void action_dib_mio168_show_calibration() {
         pushPage(pageId);
     }
 
+    auto module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
+
     if (getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION)) {
         hmi::g_selectedSubchannelIndex = g_aoutDac7760ConfigurationPage.g_selectedChannelIndex;
+        auto &channel = module->aoutDac7760Channels[hmi::g_selectedSubchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+        module->dac7760CalibrationChannelMode = channel.getMode();
+        module->dac7760CalibrationChannelCurrentRange = channel.getCurrentRange();
+        module->dac7760CalibrationChannelVoltageRange = channel.getVoltageRange();
     } else if (getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION)) {
         hmi::g_selectedSubchannelIndex = g_aoutDac7563ConfigurationPage.g_selectedChannelIndex;
     } else {
