@@ -2139,7 +2139,14 @@ void data_dib_mio168_ain_channels(DataOperationEnum operation, Cursor cursor, Va
 void data_dib_mio168_ain_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         static const char *labels[4] = { "AIN1", "AIN2", "AIN3", "AIN4" };
-        value = labels[cursor % 4];
+        int ainChannelIndex;
+        AinConfigurationPage *page = (AinConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AIN_CONFIGURATION);
+        if (page) {
+            ainChannelIndex = page->g_selectedChannelIndex - AIN_1_SUBCHANNEL_INDEX;
+        } else {
+            ainChannelIndex = cursor % 4;
+        }
+        value = labels[ainChannelIndex];
     }
 }
 
@@ -2253,7 +2260,12 @@ void data_dib_mio168_aout_label(DataOperationEnum operation, Cursor cursor, Valu
         if (page) {
             aoutChannelIndex = AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX;
         } else {
-            aoutChannelIndex = cursor % 4;
+            AoutDac7563ConfigurationPage *page = (AoutDac7563ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION);
+            if (page) {
+                aoutChannelIndex = AoutDac7563ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX;
+            } else {
+                aoutChannelIndex = cursor % 4;
+            }
         }
 
         value = aoutLabels[aoutChannelIndex];
