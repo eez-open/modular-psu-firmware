@@ -80,7 +80,7 @@ void Value::reset() {
 }
 
 void Value::setCurrentPointIndex(int currentPointIndex_) {
-    if (currentPointIndex_ < MAX_CALIBRATION_POINTS) {
+    if (currentPointIndex_ < (int)g_editor.getMaxCalibrationPoints()) {
         currentPointIndex = currentPointIndex_;
         while (currentPointIndex >= (int)configuration.numPoints) {
             isPointSet[configuration.numPoints] = false;
@@ -215,6 +215,18 @@ bool CalibrationBase::hasSupportForCurrentDualRange() {
         return channel->hasSupportForCurrentDualRange();
     }
     return false;
+}
+
+CalibrationValueType CalibrationBase::getInitialCalibrationValueType() {
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        return CALIBRATION_VALUE_U;
+    } else {
+        return g_slots[slotIndex]->getCalibrationValueType(subchannelIndex);
+    }
 }
 
 CalibrationValueType CalibrationBase::getCalibrationValueType() {
@@ -356,26 +368,31 @@ void CalibrationEditor::doStart() {
 
     selectCurrentRange(0);
 
-    m_voltageValue.reset();
-    m_currentsValue[0].reset();
-    if (hasSupportForCurrentDualRange()) {
-        m_currentsValue[1].reset();
-    }
-    
-    m_remarkSet = false;
-    m_remark[0] = 0;
-
     m_enabled = true;
+
     if (channel) {
         channel->calibrationEnable(false);
         channel_dispatcher::outputEnable(*channel, true);
         channel->setOperBits(OPER_ISUM_CALI, true);
+
+        m_maxCalibrationPoints = MAX_CALIBRATION_POINTS;
     } else {
         g_slots[m_slotIndex]->enableVoltageCalibration(m_subchannelIndex, false);
         g_slots[m_slotIndex]->enableCurrentCalibration(m_subchannelIndex, false);
         g_slots[m_slotIndex]->outputEnable(m_subchannelIndex, true, nullptr);
         g_slots[m_slotIndex]->startChannelCalibration(m_subchannelIndex);
+
+        m_maxCalibrationPoints = g_slots[m_slotIndex]->getMaxCalibrationPoints(m_subchannelIndex);;
     }
+
+    m_voltageValue.reset();
+    m_currentsValue[0].reset();
+    if (hasSupportForCurrentDualRange()) {
+        m_currentsValue[1].reset();
+    }
+
+    m_remarkSet = false;
+    m_remark[0] = 0;
 }
 
 void CalibrationEditor::start(int slotIndex, int subchannelIndex) {
@@ -427,6 +444,18 @@ void CalibrationEditor::stop() {
 
         g_slots[m_slotIndex]->stopChannelCalibration(m_subchannelIndex);
     }
+}
+
+unsigned int CalibrationEditor::getMaxCalibrationPoints() {
+    return m_maxCalibrationPoints;
+}
+
+bool CalibrationEditor::isPowerChannel() {
+    int slotIndex;
+    int subchannelIndex;
+    calibration::g_editor.getCalibrationChannel(slotIndex, subchannelIndex);
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    return channel != nullptr;
 }
 
 ChannelMode CalibrationEditor::getChannelMode() {

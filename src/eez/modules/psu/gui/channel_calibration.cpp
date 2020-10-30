@@ -314,7 +314,7 @@ void ChSettingsCalibrationEditPage::pageAlloc() {
     m_version = 0;
     m_chartVersion = 0;
     m_chartZoom = 1;
-    setCalibrationValueType(CALIBRATION_VALUE_U);
+    setCalibrationValueType(calibration::g_editor.getInitialCalibrationValueType());
 }
 
 void ChSettingsCalibrationEditPage::pageFree() {
@@ -435,7 +435,7 @@ void ChSettingsCalibrationEditPage::setMeasuredValue(float value) {
 bool ChSettingsCalibrationEditPage::canEditMeasuredValue() {
     auto &configuration = getCalibrationValue().configuration;
 
-    if (configuration.numPoints < MAX_CALIBRATION_POINTS) {
+    if (configuration.numPoints < calibration::g_editor.getMaxCalibrationPoints()) {
         return true;
     }
 
@@ -513,12 +513,14 @@ bool ChSettingsCalibrationEditPage::canSavePoint() {
         return false;
     }
 
-    if (m_calibrationValueType == CALIBRATION_VALUE_U && calibration::g_editor.getChannelMode() != CHANNEL_MODE_CV) {
-        return false;
-    }
+    if (calibration::g_editor.isPowerChannel()) {
+        if (m_calibrationValueType == CALIBRATION_VALUE_U && calibration::g_editor.getChannelMode() != CHANNEL_MODE_CV) {
+            return false;
+        }
 
-    if (m_calibrationValueType != CALIBRATION_VALUE_U && calibration::g_editor.getChannelMode() != CHANNEL_MODE_CC) {
-        return false;
+        if (m_calibrationValueType != CALIBRATION_VALUE_U && calibration::g_editor.getChannelMode() != CHANNEL_MODE_CC) {
+            return false;
+        }
     }
 
     auto &configuration = getCalibrationValue().configuration;
@@ -539,7 +541,7 @@ bool ChSettingsCalibrationEditPage::canSavePoint() {
     if (compareDacValues(configuration.points[i].dac, dac) == 0) {
         return configuration.points[i].value != m_measuredValue;
     } else {
-        if (configuration.numPoints < MAX_CALIBRATION_POINTS) {
+        if (configuration.numPoints < calibration::g_editor.getMaxCalibrationPoints()) {
             return true;
         }
     }
@@ -556,14 +558,16 @@ void ChSettingsCalibrationEditPage::savePoint() {
         return;
     }
 
-    if (m_calibrationValueType == CALIBRATION_VALUE_U && calibration::g_editor.getChannelMode() != CHANNEL_MODE_CV) {
-        return;
-    }
+    if (calibration::g_editor.isPowerChannel()) {
+        if (m_calibrationValueType == CALIBRATION_VALUE_U && calibration::g_editor.getChannelMode() != CHANNEL_MODE_CV) {
+            return;
+        }
 
-    if (m_calibrationValueType != CALIBRATION_VALUE_U && calibration::g_editor.getChannelMode() != CHANNEL_MODE_CC) {
-        return;
+        if (m_calibrationValueType != CALIBRATION_VALUE_U && calibration::g_editor.getChannelMode() != CHANNEL_MODE_CC) {
+            return;
+        }
     }
-
+    
     auto &calibrationValue = getCalibrationValue();
     auto &configuration = calibrationValue.configuration;
 
@@ -585,7 +589,7 @@ void ChSettingsCalibrationEditPage::savePoint() {
         m_version++;
         m_chartVersion++;
     } else {
-        if (configuration.numPoints < MAX_CALIBRATION_POINTS) {
+        if (configuration.numPoints < calibration::g_editor.getMaxCalibrationPoints()) {
             for (unsigned int j = configuration.numPoints; j > i; j--) {
                 calibrationValue.isPointSet[j] = calibrationValue.isPointSet[j - 1];
                 configuration.points[j].dac = configuration.points[j - 1].dac;
@@ -726,7 +730,7 @@ void ChSettingsCalibrationViewPage::start() {
 void ChSettingsCalibrationViewPage::pageAlloc() {
     m_chartVersion = 0;
     m_chartZoom = 1;
-    setCalibrationValueType(CALIBRATION_VALUE_U);
+    setCalibrationValueType(calibration::g_viewer.getInitialCalibrationValueType());
 }
 
 void ChSettingsCalibrationViewPage::zoomChart() {
@@ -913,11 +917,25 @@ void data_channel_calibration_value_type(DataOperationEnum operation, Cursor cur
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
-            value = MakeEnumDefinitionValue(editPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
+            if (calibration::g_editor.hasSupportForCurrentDualRange()) {
+                value = MakeEnumDefinitionValue(editPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
+            } else {
+                value = MakeEnumDefinitionValue(editPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE);
+            }
         } else {
             auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
-            value = MakeEnumDefinitionValue(viewPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
+            if (calibration::g_editor.hasSupportForCurrentDualRange()) {
+                value = MakeEnumDefinitionValue(viewPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
+            } else {
+                value = MakeEnumDefinitionValue(viewPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE);
+            }
         }
+    }
+}
+
+void data_channel_calibration_is_power_channel(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = calibration::g_editor.isPowerChannel();
     }
 }
 

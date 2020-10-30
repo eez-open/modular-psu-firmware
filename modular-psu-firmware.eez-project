@@ -2344,6 +2344,11 @@
       "name": "ntp_refresh_frequency",
       "type": "string",
       "defaultValue": "720 minutes"
+    },
+    {
+      "name": "channel_calibration_is_power_channel",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -15099,81 +15104,105 @@
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "channel_calibration_value_is_voltage",
+                "data": "channel_calibration_is_power_channel",
                 "left": 0,
                 "top": 137,
                 "width": 54,
                 "height": 38,
                 "widgets": [
                   {
-                    "type": "Select",
+                    "type": "Rectangle",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "channel_is_cc",
                     "left": 0,
                     "top": 0,
                     "width": 54,
                     "height": 38,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_M_warning",
-                          "blink": true
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 54,
-                        "height": 38,
-                        "text": "\\u0081CV"
-                      },
-                      {
-                        "type": "Rectangle",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 54,
-                        "height": 38,
-                        "invertColors": true
-                      }
-                    ]
+                    "invertColors": true
                   },
                   {
                     "type": "Select",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "channel_is_cv",
+                    "data": "channel_calibration_value_is_voltage",
                     "left": 0,
                     "top": 0,
                     "width": 54,
                     "height": 38,
                     "widgets": [
                       {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_M_warning",
-                          "blink": true
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 54,
-                        "height": 38,
-                        "text": "\\u0081CC"
-                      },
-                      {
-                        "type": "Rectangle",
+                        "type": "Select",
                         "style": {
                           "inheritFrom": "default"
                         },
+                        "data": "channel_is_cc",
                         "left": 0,
                         "top": 0,
                         "width": 54,
                         "height": 38,
-                        "invertColors": true
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "default_M_warning",
+                              "blink": true
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 54,
+                            "height": 38,
+                            "text": "\\u0081CV"
+                          },
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 54,
+                            "height": 38,
+                            "invertColors": true
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "channel_is_cv",
+                        "left": 0,
+                        "top": 0,
+                        "width": 54,
+                        "height": 38,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "default_M_warning",
+                              "blink": true
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 54,
+                            "height": 38,
+                            "text": "\\u0081CC"
+                          },
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 54,
+                            "height": 38,
+                            "invertColors": true
+                          }
+                        ]
                       }
                     ]
                   }

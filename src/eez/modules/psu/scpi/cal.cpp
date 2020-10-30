@@ -52,7 +52,7 @@ static scpi_result_t calibration_level(scpi_t *context, calibration::Value &cali
         return SCPI_RES_ERR;
     }
 
-    if (currentPointIndex < 1 || currentPointIndex > MAX_CALIBRATION_POINTS) {
+    if (currentPointIndex < 1 || currentPointIndex > (int)calibration::g_editor.getMaxCalibrationPoints()) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }
@@ -63,11 +63,16 @@ static scpi_result_t calibration_level(scpi_t *context, calibration::Value &cali
 
     float dacValue;
     if (calibrationValue.type == CALIBRATION_VALUE_U) {
+        if (!calibration::g_editor.isCalibrationValueTypeSelectable() && calibration::g_editor.getCalibrationValueType() != CALIBRATION_VALUE_U) {
+            SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+            return SCPI_RES_ERR;
+        }
+
         if (!get_voltage_param(context, dacValue, slotIndex, subchannelIndex, 0)) {
             return SCPI_RES_ERR;
         }
     } else {
-        if (!calibration::g_editor.isCalibrationValueTypeSelectable()) {
+        if (!calibration::g_editor.isCalibrationValueTypeSelectable() && calibration::g_editor.getCalibrationValueType() != CALIBRATION_VALUE_I_HI_RANGE && calibration::g_editor.getCalibrationValueType() != CALIBRATION_VALUE_I_HI_RANGE) {
             SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
             return SCPI_RES_ERR;
         }
@@ -93,9 +98,16 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
         return SCPI_RES_ERR;
     }
 
-    if (calibrationValue.type != CALIBRATION_VALUE_U && !calibration::g_editor.isCalibrationValueTypeSelectable()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
-        return SCPI_RES_ERR;
+    if (calibrationValue.type == CALIBRATION_VALUE_U) {
+        if (!calibration::g_editor.isCalibrationValueTypeSelectable() && calibration::g_editor.getCalibrationValueType() != CALIBRATION_VALUE_U) {
+            SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+            return SCPI_RES_ERR;
+        }
+    } else {
+        if (!calibration::g_editor.isCalibrationValueTypeSelectable() && calibration::g_editor.getCalibrationValueType() != CALIBRATION_VALUE_I_HI_RANGE && calibration::g_editor.getCalibrationValueType() != CALIBRATION_VALUE_I_HI_RANGE) {
+            SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+            return SCPI_RES_ERR;
+        }
     }
 
     scpi_number_t param;

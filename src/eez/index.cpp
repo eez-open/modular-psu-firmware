@@ -532,6 +532,14 @@ void Module::startChannelCalibration(int subchannelIndex) {
 void Module::stopChannelCalibration(int subchannelIndex) {
 }
 
+unsigned int Module::getMaxCalibrationPoints(int m_subchannelIndex) {
+    return MAX_CALIBRATION_POINTS;
+}
+
+CalibrationValueType Module::getCalibrationValueType(int subchannelIndex) {
+    return CALIBRATION_VALUE_U;
+}
+
 void Module::getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points) {
     numPoints = 0;
     points = nullptr;

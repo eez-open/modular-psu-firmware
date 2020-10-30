@@ -279,6 +279,8 @@ struct Module {
     virtual bool saveChannelCalibration(int subchannelIndex, int *err);
     virtual void startChannelCalibration(int subchannelIndex);
     virtual void stopChannelCalibration(int subchannelIndex);
+    virtual unsigned int getMaxCalibrationPoints(int m_subchannelIndex);
+    virtual CalibrationValueType getCalibrationValueType(int subchannelIndex);
     virtual void getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points);
     virtual bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err);
     virtual bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err);

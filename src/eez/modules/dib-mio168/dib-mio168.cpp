@@ -81,9 +81,13 @@ static float AIN_CURRENT_RESOLUTION = 0.00005f;
 static float AOUT_DAC7760_ENCODER_STEP_VALUES[] = { 0.01f, 0.1f, 0.2f, 0.5f };
 static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES[] = { 0.001f, 0.005f, 0.01f, 0.05f };
 
+static float AOUT_DAC7760_ENCODER_STEP_VALUES_CAL[] = { 0.001f, 0.01f, 0.02f, 0.05f };
+static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES_CAL[] = { 0.0001f, 0.0005f, 0.001f, 0.005f };
+
 static float AOUT_DAC7563_MIN = -10.0f;
 static float AOUT_DAC7563_MAX = 10.0f;
 static float AOUT_DAC7563_ENCODER_STEP_VALUES[] = { 0.01f, 0.1f, 0.2f, 0.5f };
+static float AOUT_DAC7563_ENCODER_STEP_VALUES_CAL[] = { 0.001f, 0.01f, 0.02f, 0.05f };
 
 static float PWM_MIN_FREQUENCY = 0.1f;
 static float PWM_MAX_FREQUENCY = 1000000.0f;
@@ -652,14 +656,26 @@ struct AoutDac7760Channel : public MioChannel {
     }
 
     void getStepValues(StepValues *stepValues) {
-        if (getMode() == SOURCE_MODE_VOLTAGE) {
-            stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES;
-            stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES) / sizeof(float);
-            stepValues->unit = UNIT_VOLT;
+        if (ongoingCal) {
+            if (getMode() == SOURCE_MODE_VOLTAGE) {
+                stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES_CAL;
+                stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES_CAL) / sizeof(float);
+                stepValues->unit = UNIT_VOLT;
+            } else {
+                stepValues->values = AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES_CAL;
+                stepValues->count = sizeof(AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES_CAL) / sizeof(float);
+                stepValues->unit = UNIT_AMPER;
+            }
         } else {
-            stepValues->values = AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES;
-            stepValues->count = sizeof(AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES) / sizeof(float);
-            stepValues->unit = UNIT_AMPER;
+            if (getMode() == SOURCE_MODE_VOLTAGE) {
+                stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES;
+                stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES) / sizeof(float);
+                stepValues->unit = UNIT_VOLT;
+            } else {
+                stepValues->values = AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES;
+                stepValues->count = sizeof(AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES) / sizeof(float);
+                stepValues->unit = UNIT_AMPER;
+            }
         }
     }
 
@@ -1478,10 +1494,16 @@ public:
     void getVoltageStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getStepValues(stepValues);
-        } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            stepValues->values = AOUT_DAC7563_ENCODER_STEP_VALUES;
-            stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES) / sizeof(float);
-            stepValues->unit = UNIT_VOLT;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            if (aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].ongoingCal) {
+                stepValues->values = AOUT_DAC7563_ENCODER_STEP_VALUES;
+                stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES) / sizeof(float);
+                stepValues->unit = UNIT_VOLT;
+            } else {
+                stepValues->values = AOUT_DAC7563_ENCODER_STEP_VALUES;
+                stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES) / sizeof(float);
+                stepValues->unit = UNIT_VOLT;
+            }
         }
     }
     
@@ -1607,6 +1629,19 @@ public:
         }
     }
 
+    unsigned int getMaxCalibrationPoints(int subchannelIndex) override {
+        return 2;
+    }
+
+    CalibrationValueType getCalibrationValueType(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            if (aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getMode() == SOURCE_MODE_CURRENT) {
+                return CALIBRATION_VALUE_I_HI_RANGE;
+            }
+        }
+        return CALIBRATION_VALUE_U;
+    }
+
     void getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getDefaultCalibrationPoints(numPoints, points);
@@ -1631,13 +1666,23 @@ public:
             memset(&calConf, 0, sizeof(CalibrationConfiguration));
 
             if (mioCalConf->state.calState) {
-                calConf.u.numPoints = 2;
-                for (unsigned i = 0; i < 2; i++) {
-                    calConf.u.points[i].dac = mioCalConf->points[i].uncalValue;
-                    calConf.u.points[i].value = mioCalConf->points[i].calValue;
+                bool isVoltage = getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_U;
+
+                if (isVoltage) {
+                    calConf.u.numPoints = 2;
+                } else {
+                    calConf.i[0].numPoints = 2;
                 }
-            } else {
-                calConf.u.numPoints = 0;
+
+                for (unsigned i = 0; i < 2; i++) {
+                    if (isVoltage) {
+                        calConf.u.points[i].dac = mioCalConf->points[i].uncalValue;
+                        calConf.u.points[i].value = mioCalConf->points[i].calValue;
+                    } else {
+                        calConf.i[0].points[i].dac = mioCalConf->points[i].uncalValue;
+                        calConf.i[0].points[i].value = mioCalConf->points[i].calValue;
+                    }
+                }
             }
 
             calConf.calibrationDate = mioCalConf->calibrationDate;
@@ -1665,9 +1710,16 @@ public:
         if (mioCalConf) {
             memset(mioCalConf, 0, sizeof(CalConf));
 
+            bool isVoltage = getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_U;
+
             for (unsigned i = 0; i < 2; i++) {
-                mioCalConf->points[i].uncalValue = calConf.u.points[i].dac;
-                mioCalConf->points[i].calValue = calConf.u.points[i].value;
+                if (isVoltage) {
+                    mioCalConf->points[i].uncalValue = calConf.u.points[i].dac;
+                    mioCalConf->points[i].calValue = calConf.u.points[i].value;
+                } else {
+                    mioCalConf->points[i].uncalValue = calConf.i[0].points[i].dac;
+                    mioCalConf->points[i].calValue = calConf.i[0].points[i].value;
+                }
             }
 
             mioCalConf->state.calState = calConf.u.numPoints == 2;

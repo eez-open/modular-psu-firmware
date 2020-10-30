@@ -31,6 +31,7 @@ class CalibrationBase {
 public:
     void getCalibrationChannel(int &slotIndex, int &subchannelIndex);
     bool hasSupportForCurrentDualRange();
+    CalibrationValueType getInitialCalibrationValueType();
     CalibrationValueType getCalibrationValueType();
     bool isCalibrationExists();
     void getMinValue(CalibrationValueType valueType, float &value, Unit &unit);
@@ -86,6 +87,10 @@ public:
     /// Stop calibration procedure.
     void stop();
 
+    unsigned int getMaxCalibrationPoints();
+
+    bool isPowerChannel();
+
     ChannelMode getChannelMode();
 
     float getAdcValue(CalibrationValueType valueType);
@@ -117,6 +122,8 @@ public:
 
 private:
     bool m_enabled;
+
+    unsigned int m_maxCalibrationPoints;
 
     Value m_voltageValue = Value(*this, CALIBRATION_VALUE_U);
 
