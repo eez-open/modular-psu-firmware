@@ -60,6 +60,7 @@ public:
     OutputBufferWriter(char *buffer, size_t maxBufferSize, size_t (*writeFunc)(const char *data, size_t len));
 
     size_t write(const char *data, size_t len);
+    void flush();
 
 private:
     char *m_buffer;

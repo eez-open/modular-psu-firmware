@@ -47,12 +47,15 @@ size_t serialWrite(const char *data, size_t len) {
 
 static OutputBufferWriter g_outputBufferWriter(&g_outputBuffer[0], OUTPUT_BUFFER_MAX_SIZE, serialWrite);
 
+////////////////////////////////////////////////////////////////////////////////
+
 size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
     g_outputBufferWriter.write(data, len);
     return len;
 }
 
 scpi_result_t SCPI_Flush(scpi_t *context) {
+    g_outputBufferWriter.flush();
     return SCPI_RES_OK;
 }
 
