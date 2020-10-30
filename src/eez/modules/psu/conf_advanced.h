@@ -42,7 +42,12 @@
 #endif
 
 #define MCU_NAME "STM32"
+
+#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
+#define MCU_REVISION "R3B3"
+#else
 #define MCU_REVISION "R2B4"
+#endif
 
 /// SCPI TCP server port.
 #define TCP_PORT 5025

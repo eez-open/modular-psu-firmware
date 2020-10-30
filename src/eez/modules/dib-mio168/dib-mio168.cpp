@@ -824,7 +824,7 @@ public:
         latestModuleRevision = MODULE_REVISION_R1B2;
         flashMethod = FLASH_METHOD_STM32_BOOTLOADER_SPI;
 #if defined(EEZ_PLATFORM_STM32)        
-        spiBaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+        spiBaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
         spiCrcCalculationEnable = true;
 #else
         spiBaudRatePrescaler = 0;

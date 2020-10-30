@@ -202,9 +202,16 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 1, 0);
     } else if (GPIO_Pin == SPI5_IRQ_Pin) {
         sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 2, 0);
-    } else if (GPIO_Pin == SD_DETECT_Pin) {
+    } 
+
+#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
+#else
+    else if (GPIO_Pin == SD_DETECT_Pin) {
         eez::psu::sd_card::onSdDetectInterrupt();
-    } else if (GPIO_Pin == ENC_A_Pin || GPIO_Pin == ENC_B_Pin) {
+    } 
+#endif
+    
+    else if (GPIO_Pin == ENC_A_Pin || GPIO_Pin == ENC_B_Pin) {
         eez::mcu::encoder::onPinInterrupt();
     }
 }
