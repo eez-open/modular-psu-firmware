@@ -843,8 +843,7 @@ void Channel::addIMonAdcValue(float value) {
     if (isCurrentCalibrationEnabled()) {
         value = remapAdcValue(value, cal_conf.i[flags.currentCurrentRange]);
     }
-
-    i.addMonValue(value, getCurrentResolution());
+    i.addMonValue(value, getCurrentResolution(value));
 }
 
 void Channel::addUMonDacAdcValue(float value) {
@@ -852,7 +851,7 @@ void Channel::addUMonDacAdcValue(float value) {
 }
 
 void Channel::addIMonDacAdcValue(float value) {
-    i.addMonDacValue(value, getCurrentResolution());
+    i.addMonDacValue(value, getCurrentResolution(value));
 }
 
 void Channel::onAdcData(AdcDataType adcDataType, float value) {
