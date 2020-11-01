@@ -1,5 +1,4 @@
-[![GitHub release](https://img.shields.io/github/release/eez-open/modular-psu-firmware.svg)](https://github.com/eez-open/modular-psu-firmware/releases)
-[![license](https://img.shields.io/github/license/eez-open/modular-psu-firmware.svg)](https://github.com/eez-open/modular-psu-firmware/blob/master/LICENSE.TXT)
+[![GitHub release](https://img.shields.io/github/release/eez-open/modular-psu-firmware.svg)](https://github.com/eez-open/modular-psu-firmware/releases)  [![license](https://img.shields.io/github/license/eez-open/modular-psu-firmware.svg)](https://github.com/eez-open/modular-psu-firmware/blob/master/LICENSE.TXT) [![liberapay](https://img.shields.io/liberapay/receives/eez-open.svg?logo=liberapay)](https://liberapay.com/eez-open/donate)
 
 ### Ownership and License
 
