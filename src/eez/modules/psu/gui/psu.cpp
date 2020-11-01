@@ -818,6 +818,8 @@ void NumberInputParams::onCancel() {
 float PsuAppContext::numberInput(const char *label, Unit unit, float min, float max, float value) {
     m_inputLabel = label[0] ? label : nullptr;
 
+    m_numberInputParams.m_options = NumericKeypadOptions();
+
     m_numberInputParams.m_options.editValueUnit = unit;
     m_numberInputParams.m_options.min = min;
     m_numberInputParams.m_options.enableMinButton();
@@ -859,6 +861,8 @@ void IntegerInputParams::onCancel() {
 
 bool PsuAppContext::integerInput(const char *label, int32_t min, int32_t max, int32_t &value) {
     m_inputLabel = label[0] ? label : nullptr;
+
+    m_numberInputParams.m_options = NumericKeypadOptions();
 
     m_integerInputParams.m_options.editValueUnit = UNIT_UNKNOWN;
     m_integerInputParams.m_options.min = (float)min;

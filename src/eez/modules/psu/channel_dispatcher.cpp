@@ -2313,7 +2313,7 @@ void getCurrentStepValues(int slotIndex, int subchannelIndex, StepValues *stepVa
 float getCurrentResolution(int slotIndex, int subchannelIndex) {
     Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
-        return channel->getCurrentResolution();
+        return channel->getCurrentResolution(NAN);
     } else {
         return g_slots[slotIndex]->getCurrentResolution(subchannelIndex);
     }

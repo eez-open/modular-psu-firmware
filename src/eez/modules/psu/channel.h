@@ -583,7 +583,7 @@ public:
     void setCurrentRange(uint8_t currentRange);
 
     float getVoltageResolution() const;
-    float getCurrentResolution(float value = NAN) const;
+    float getCurrentResolution(float value) const;
     float getPowerResolution() const;
 
     bool isMicroAmperAllowed() const;
