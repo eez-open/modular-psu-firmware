@@ -93,7 +93,7 @@ static const char *PUB_TOPIC_DCPSUPPLY_TEMP = "%s/dcpsupply/ch/%d/temp";
 static const char *PUB_TOPIC_DCPSUPPLY_TOTAL_ONTIME = "%s/dcpsupply/ch/%d/total_ontime";
 static const char *PUB_TOPIC_DCPSUPPLY_LAST_ONTIME = "%s/dcpsupply/ch/%d/last_ontime";
 
-static const size_t MAX_SUB_TOPIC_LENGTH = 50;
+static const size_t MAX_SUB_TOPIC_LENGTH = 85;
 
 static const char *SUB_TOPIC_SYSTEM_PATTERN = "%s/system/exec/#";
 static const char *SUB_TOPIC_DCPSUPPLY_PATTERN = "%s/dcpsupply/ch/+/set/+";
@@ -551,10 +551,10 @@ void setState(ConnectionState connectionState) {
         g_lastError = EEZ_MQTT_ERROR_NONE;
 
         char subTopicSystem[MAX_SUB_TOPIC_LENGTH + 1];
-        sprintf(subTopicSystem, SUB_TOPIC_SYSTEM_PATTERN, persist_conf::devConf.ethernetHostName);
+        snprintf(subTopicSystem, MAX_SUB_TOPIC_LENGTH, SUB_TOPIC_SYSTEM_PATTERN, persist_conf::devConf.ethernetHostName);
 
         char subTopicDcpsupply[MAX_SUB_TOPIC_LENGTH + 1];
-        sprintf(subTopicDcpsupply, SUB_TOPIC_DCPSUPPLY_PATTERN, persist_conf::devConf.ethernetHostName);
+        snprintf(subTopicDcpsupply, MAX_SUB_TOPIC_LENGTH, SUB_TOPIC_DCPSUPPLY_PATTERN, persist_conf::devConf.ethernetHostName);
 
 #if defined(EEZ_PLATFORM_STM32)
         mqtt_set_inpub_callback(&g_client, incomingPublishCallback, incomingDataCallback, nullptr);

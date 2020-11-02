@@ -1189,20 +1189,20 @@ void action_show_dlog_view() {
 void action_dlog_start_recording() {
     popPage();
 
-    char filePath[MAX_PATH_LENGTH + 1];
+    char filePath[MAX_PATH_LENGTH + 50];
 
     if (isStringEmpty(dlog_record::g_guiParameters.filePath)) {
         uint8_t year, month, day, hour, minute, second;
         datetime::getDateTime(year, month, day, hour, minute, second);
 
         if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24) {
-            sprintf(filePath, "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+            snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
                 RECORDINGS_DIR,
                 dlog_record::g_guiParameters.filePath,
                 (int)day, (int)month, (int)year,
                 (int)hour, (int)minute, (int)second);
         } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
-            sprintf(filePath, "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+        	snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
                 RECORDINGS_DIR,
                 dlog_record::g_guiParameters.filePath,
                 (int)month, (int)day, (int)year,
@@ -1210,7 +1210,7 @@ void action_dlog_start_recording() {
         } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
             bool am;
             datetime::convertTime24to12(hour, am);
-            sprintf(filePath, "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+            snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
                 RECORDINGS_DIR,
                 dlog_record::g_guiParameters.filePath,
                 (int)day, (int)month, (int)year,
@@ -1218,14 +1218,14 @@ void action_dlog_start_recording() {
         } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_12) {
             bool am;
             datetime::convertTime24to12(hour, am);
-            sprintf(filePath, "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+            snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
                 RECORDINGS_DIR,
                 dlog_record::g_guiParameters.filePath,
                 (int)month, (int)day, (int)year,
                 (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
         }
     } else {
-        sprintf(filePath, "%s/%s.dlog", RECORDINGS_DIR, dlog_record::g_guiParameters.filePath);
+    	snprintf(filePath, sizeof(filePath), "%s/%s.dlog", RECORDINGS_DIR, dlog_record::g_guiParameters.filePath);
     }
 
     memcpy(&dlog_record::g_parameters, &dlog_record::g_guiParameters, sizeof(dlog_record::g_guiParameters));

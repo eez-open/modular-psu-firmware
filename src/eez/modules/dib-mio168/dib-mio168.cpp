@@ -750,6 +750,18 @@ struct AoutDac7563Channel : public MioChannel {
         return ongoingCal ? 0.001f : 0.01f;
     }
 
+    void getStepValues(StepValues *stepValues) {
+        if (ongoingCal) {
+            stepValues->values = AOUT_DAC7563_ENCODER_STEP_VALUES_CAL;
+            stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES_CAL) / sizeof(float);
+            stepValues->unit = UNIT_VOLT;
+        } else {
+            stepValues->values = AOUT_DAC7563_ENCODER_STEP_VALUES;
+            stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES) / sizeof(float);
+            stepValues->unit = UNIT_VOLT;
+        }
+    }
+
     void getDefaultCalibrationPoints(unsigned int &numPoints, float *&points) {
         static float AOUT_POINTS[] = { -9.9f, 9.9f };
         numPoints = 2;
@@ -1495,15 +1507,7 @@ public:
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getStepValues(stepValues);
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            if (aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].ongoingCal) {
-                stepValues->values = AOUT_DAC7563_ENCODER_STEP_VALUES;
-                stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES) / sizeof(float);
-                stepValues->unit = UNIT_VOLT;
-            } else {
-                stepValues->values = AOUT_DAC7563_ENCODER_STEP_VALUES;
-                stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES) / sizeof(float);
-                stepValues->unit = UNIT_VOLT;
-            }
+        	aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].getStepValues(stepValues);
         }
     }
     
@@ -2380,9 +2384,8 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Valu
             auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
             channel.getStepValues(stepValues);
         } else {
-            stepValues->values = AOUT_DAC7563_ENCODER_STEP_VALUES;
-            stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES) / sizeof(float);
-            stepValues->unit = UNIT_VOLT;
+            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7563Channels[aoutChannelIndex - 2];
+            channel.getStepValues(stepValues);
         }
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {

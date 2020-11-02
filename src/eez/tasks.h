@@ -76,7 +76,7 @@ enum LowPriorityThreadMessage {
     ETHERNET_LAST_MESSAGE_TYPE,
 
     MP_LOAD_SCRIPT,
-    MP_EXECUTE_SCPI,
+//    MP_EXECUTE_SCPI,
 
     MP_LAST_MESSAGE_TYPE,
 

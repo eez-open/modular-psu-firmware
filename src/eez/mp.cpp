@@ -298,17 +298,18 @@ ErrorNoClose:
     return;
 }
 
-static const char *g_commandOrQueryText;
+// static const char *g_commandOrQueryText;
 
 void onQueueMessage(uint32_t type, uint32_t param) {
     if (type == MP_LOAD_SCRIPT) {
         loadScript();
-    } else if (type == MP_EXECUTE_SCPI) {
-        input(g_scpiContext, (const char *)g_commandOrQueryText, strlen(g_commandOrQueryText));
-        input(g_scpiContext, "\r\n", 2);
-
-        osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_SCPI_RESULT, osWaitForever);
     }
+//    else if (type == MP_EXECUTE_SCPI) {
+//        input(g_scpiContext, (const char *)g_commandOrQueryText, strlen(g_commandOrQueryText));
+//        input(g_scpiContext, "\r\n", 2);
+//
+//        osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_SCPI_RESULT, osWaitForever);
+//    }
 }
 
 bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen) {
