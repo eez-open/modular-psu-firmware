@@ -64,7 +64,8 @@
  * -- Insert your variables declaration here --
  */
 /* USER CODE BEGIN VARIABLES */
-
+extern int g_mxUsbDeviceOperationUsbResult;
+extern int g_mxUsbDeviceOperationResult;
 /* USER CODE END VARIABLES */
 /**
   * @}
@@ -82,7 +83,7 @@ void MX_USB_DEVICE_Init(void);
  * -- Insert functions declaration here --
  */
 /* USER CODE BEGIN FD */
-
+void MX_USB_DEVICE_DeInit(void);
 /* USER CODE END FD */
 /**
   * @}

@@ -29,6 +29,9 @@
 
 /* USER CODE BEGIN Includes */
 
+#include "usbd_msc.h"
+#include "usbd_storage_if.h"
+
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN PV */
@@ -55,7 +58,26 @@ USBD_HandleTypeDef hUsbDeviceFS;
  * -- Insert your external function declaration here --
  */
 /* USER CODE BEGIN 1 */
+int g_mxUsbDeviceOperationUsbResult;
+int g_mxUsbDeviceOperationResult;
 
+extern USBD_DescriptorsTypeDef FS_Desc_MSC;
+extern int g_usbDeviceClass;
+
+void MX_USB_DEVICE_DeInit(void) {
+  g_mxUsbDeviceOperationUsbResult = USBD_Stop(&hUsbDeviceFS);
+  if (g_mxUsbDeviceOperationUsbResult != USBD_OK){
+    g_mxUsbDeviceOperationResult = -1;
+  }
+
+  g_mxUsbDeviceOperationUsbResult = USBD_DeInit(&hUsbDeviceFS);
+  if (g_mxUsbDeviceOperationUsbResult != USBD_OK){
+    g_mxUsbDeviceOperationResult = -2;
+  }
+
+  g_mxUsbDeviceOperationUsbResult = USBD_OK;
+  g_mxUsbDeviceOperationResult = 0;
+}
 /* USER CODE END 1 */
 
 /**
@@ -65,9 +87,59 @@ USBD_HandleTypeDef hUsbDeviceFS;
 void MX_USB_DEVICE_Init(void)
 {
   /* USER CODE BEGIN USB_DEVICE_Init_PreTreatment */
-  
+  if (g_usbDeviceClass == 0) {
+    /* Init Device Library, add supported class and start the library. */
+    g_mxUsbDeviceOperationUsbResult = USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -1;
+      return;
+    }
+
+    g_mxUsbDeviceOperationUsbResult = USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -2;
+      return;
+    }
+
+    g_mxUsbDeviceOperationUsbResult = USBD_CDC_RegisterInterface(&hUsbDeviceFS, &USBD_Interface_fops_FS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -3;
+      return;
+    }
+
+    g_mxUsbDeviceOperationUsbResult = USBD_Start(&hUsbDeviceFS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -4;
+      return;
+    }
+  } else {
+    /* Init Device Library, add supported class and start the library. */
+    g_mxUsbDeviceOperationUsbResult = USBD_Init(&hUsbDeviceFS, &FS_Desc_MSC, DEVICE_FS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -1;
+      return;
+    }
+    g_mxUsbDeviceOperationUsbResult = USBD_RegisterClass(&hUsbDeviceFS, &USBD_MSC);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -2;
+      return;
+    }
+
+    g_mxUsbDeviceOperationUsbResult = USBD_MSC_RegisterStorage(&hUsbDeviceFS, &USBD_Storage_Interface_fops_FS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -3;
+      return;
+    }
+
+    g_mxUsbDeviceOperationUsbResult = USBD_Start(&hUsbDeviceFS);
+    if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
+      g_mxUsbDeviceOperationResult = -4;
+      return;
+    }
+  }
+#if 0    
   /* USER CODE END USB_DEVICE_Init_PreTreatment */
-  
+
   /* Init Device Library, add supported class and start the library. */
   if (USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS) != USBD_OK)
   {
@@ -87,7 +159,10 @@ void MX_USB_DEVICE_Init(void)
   }
 
   /* USER CODE BEGIN USB_DEVICE_Init_PostTreatment */
-  
+#endif
+
+  g_mxUsbDeviceOperationUsbResult = USBD_OK;
+  g_mxUsbDeviceOperationResult = 0;
   /* USER CODE END USB_DEVICE_Init_PostTreatment */
 }
 

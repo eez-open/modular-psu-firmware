@@ -38,7 +38,7 @@
  * or "long" not 32 bits.  We don't care whether "int" is 16 or 32 bits,
  * but it had better be at least 16.
  */
- 
+
 /* Representation of a single sample (pixel element value).
  * We frequently allocate large arrays of these, so it's important to keep
  * them small.  But if you have memory to burn and access to char or short

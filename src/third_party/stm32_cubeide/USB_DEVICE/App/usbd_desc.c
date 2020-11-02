@@ -91,25 +91,88 @@
   */
 
 /* USER CODE BEGIN PRIVATE_MACRO */
+#if defined ( __ICCARM__ ) /* IAR Compiler */
+  #pragma data_alignment=4
+#endif /* defined ( __ICCARM__ ) */
+/** USB standard device descriptor. */
+__ALIGN_BEGIN uint8_t USBD_FS_DeviceDesc_MSC[USB_LEN_DEV_DESC] __ALIGN_END =
+{
+  0x12,                       /*bLength */
+  USB_DESC_TYPE_DEVICE,       /*bDescriptorType*/
+#if (USBD_LPM_ENABLED == 1)
+  0x01,                       /*bcdUSB */ /* changed to USB version 2.01
+                                             in order to support LPM L1 suspend
+                                             resume test of USBCV3.0*/
+#else
+  0x00,                       /*bcdUSB */
+#endif /* (USBD_LPM_ENABLED == 1) */
+  0x02,
+  0x00,                       /*bDeviceClass*/
+  0x00,                       /*bDeviceSubClass*/
+  0x00,                       /*bDeviceProtocol*/
+  USB_MAX_EP0_SIZE,           /*bMaxPacketSize*/
+  LOBYTE(USBD_VID),           /*idVendor*/
+  HIBYTE(USBD_VID),           /*idVendor*/
+  LOBYTE(USBD_PID_FS),        /*idProduct*/
+  HIBYTE(USBD_PID_FS),        /*idProduct*/
+  0x00,                       /*bcdDevice rel. 2.00*/
+  0x02,
+  USBD_IDX_MFC_STR,           /*Index of manufacturer  string*/
+  USBD_IDX_PRODUCT_STR,       /*Index of product string*/
+  USBD_IDX_SERIAL_STR,        /*Index of serial number string*/
+  USBD_MAX_NUM_CONFIGURATION  /*bNumConfigurations*/
+};
+
+uint8_t * USBD_FS_DeviceDescriptor_MSC(USBD_SpeedTypeDef speed, uint16_t *length);
+uint8_t * USBD_FS_LangIDStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+uint8_t * USBD_FS_ManufacturerStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+uint8_t * USBD_FS_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+uint8_t * USBD_FS_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+uint8_t * USBD_FS_ConfigStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+uint8_t * USBD_FS_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+#if (USBD_LPM_ENABLED == 1)
+uint8_t * USBD_FS_USR_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+#endif /* (USBD_LPM_ENABLED == 1) */
+
+USBD_DescriptorsTypeDef FS_Desc_MSC =
+{
+  USBD_FS_DeviceDescriptor_MSC
+, USBD_FS_LangIDStrDescriptor
+, USBD_FS_ManufacturerStrDescriptor
+, USBD_FS_ProductStrDescriptor
+, USBD_FS_SerialStrDescriptor
+, USBD_FS_ConfigStrDescriptor
+, USBD_FS_InterfaceStrDescriptor
+#if (USBD_LPM_ENABLED == 1)
+, USBD_FS_USR_BOSDescriptor
+#endif /* (USBD_LPM_ENABLED == 1) */
+};
+
+uint8_t * USBD_FS_DeviceDescriptor_MSC(USBD_SpeedTypeDef speed, uint16_t *length)
+{
+  UNUSED(speed);
+  *length = sizeof(USBD_FS_DeviceDesc_MSC);
+  return USBD_FS_DeviceDesc_MSC;
+}
+
 
 /* USER CODE END PRIVATE_MACRO */
 
 /**
   * @}
   */
-  
+
 /** @defgroup USBD_DESC_Private_FunctionPrototypes USBD_DESC_Private_FunctionPrototypes
   * @brief Private functions declaration.
   * @{
   */
-  
+
 static void Get_SerialNum(void);
 static void IntToUnicode(uint32_t value, uint8_t * pbuf, uint8_t len);
-  
+
 /**
   * @}
-  */  
-  
+  */
 
 /** @defgroup USBD_DESC_Private_FunctionPrototypes USBD_DESC_Private_FunctionPrototypes
   * @brief Private functions declaration for FS.
@@ -235,7 +298,7 @@ __ALIGN_BEGIN uint8_t USBD_LangIDDesc[USB_LEN_LANGID_STR_DESC] __ALIGN_END =
 __ALIGN_BEGIN uint8_t USBD_StrDesc[USBD_MAX_STR_DESC_SIZ] __ALIGN_END;
 
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
-  #pragma data_alignment=4   
+  #pragma data_alignment=4
 #endif
 __ALIGN_BEGIN uint8_t USBD_StringSerial[USB_SIZ_STRING_SERIAL] __ALIGN_END = {
   USB_SIZ_STRING_SERIAL,
@@ -383,8 +446,8 @@ uint8_t * USBD_FS_USR_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 #endif /* (USBD_LPM_ENABLED == 1) */
 
 /**
-  * @brief  Create the serial number string descriptor 
-  * @param  None 
+  * @brief  Create the serial number string descriptor
+  * @param  None
   * @retval None
   */
 static void Get_SerialNum(void)
@@ -405,9 +468,9 @@ static void Get_SerialNum(void)
 }
 
 /**
-  * @brief  Convert Hex 32Bits value into char 
+  * @brief  Convert Hex 32Bits value into char
   * @param  value: value to convert
-  * @param  pbuf: pointer to the buffer 
+  * @param  pbuf: pointer to the buffer
   * @param  len: buffer length
   * @retval None
   */

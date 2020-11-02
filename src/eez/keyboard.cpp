@@ -363,11 +363,11 @@ void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &
             }
 
             if (g_mouseInfo.x != 0) {
-                sprintf(str + strlen(str), " / X=%d", g_mouseInfo.x);
+                sprintf(str + strlen(str), " / X=%d", (int8_t)g_mouseInfo.x);
             }
 
             if (g_mouseInfo.y != 0) {
-                sprintf(str + strlen(str), " Y=%d", g_mouseInfo.y);
+                sprintf(str + strlen(str), " Y=%d", (int8_t)g_mouseInfo.y);
             }
 
             if (g_mouseInfo.button1) {

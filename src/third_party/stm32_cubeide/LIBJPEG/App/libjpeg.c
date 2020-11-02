@@ -37,7 +37,7 @@
 void MX_LIBJPEG_Init(void)
 {
 /***************************************/
-   /** 
+   /**
   */
 
   /* USER CODE BEGIN 3 */
@@ -51,7 +51,7 @@ void MX_LIBJPEG_Init(void)
 /**
   * @}
   */
- 
+
 /**
   * @}
   */

@@ -208,8 +208,8 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
 
   /* USER CODE END TIM3_MspPostInit 0 */
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**TIM3 GPIO Configuration    
-    PB5     ------> TIM3_CH2 
+    /**TIM3 GPIO Configuration
+    PB5     ------> TIM3_CH2
     */
     GPIO_InitStruct.Pin = DOUT2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -227,10 +227,10 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
   /* USER CODE BEGIN TIM12_MspPostInit 0 */
 
   /* USER CODE END TIM12_MspPostInit 0 */
-  
+
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**TIM12 GPIO Configuration    
-    PB15     ------> TIM12_CH2 
+    /**TIM12 GPIO Configuration
+    PB15     ------> TIM12_CH2
     */
     GPIO_InitStruct.Pin = TFT_BRIGHTNESS_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -301,7 +301,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 
   /* USER CODE END TIM7_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 

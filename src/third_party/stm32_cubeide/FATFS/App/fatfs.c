@@ -28,9 +28,9 @@ FIL SDFile;       /* File object for SD */
 #include <stm32f7xx_hal_rtc.h>
 #include <rtc.h>
 
-/* USER CODE END Variables */    
+/* USER CODE END Variables */
 
-void MX_FATFS_Init(void) 
+void MX_FATFS_Init(void)
 {
   /*## FatFS: Link the SD driver ###########################*/
   retSD = FATFS_LinkDriver(&SD_Driver, SDPath);
@@ -41,7 +41,7 @@ void MX_FATFS_Init(void)
 }
 
 /**
-  * @brief  Gets Time from RTC 
+  * @brief  Gets Time from RTC
   * @param  None
   * @retval Time in DWORD
   */
@@ -62,7 +62,7 @@ DWORD get_fattime(void)
         | (WORD)(time.Seconds >> 1);
 
     return res;
-  /* USER CODE END get_fattime */  
+  /* USER CODE END get_fattime */
 }
 
 /* USER CODE BEGIN Application */

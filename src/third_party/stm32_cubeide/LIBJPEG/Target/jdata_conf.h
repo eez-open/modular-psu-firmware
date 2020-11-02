@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-/*FreeRtos Api*/				
+/*FreeRtos Api*/
 #include "cmsis_os.h"
 
 /* Private typedef -----------------------------------------------------------*/

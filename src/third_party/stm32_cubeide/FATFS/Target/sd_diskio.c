@@ -18,7 +18,7 @@
   */
 /* USER CODE END Header */
 
-/* Note: code generation based on sd_diskio_dma_rtos_template_bspv1.c v2.1.4 
+/* Note: code generation based on sd_diskio_dma_rtos_template_bspv1.c v2.1.4
    as FreeRTOS is enabled. */
 
 /* USER CODE BEGIN firstSection */
@@ -55,21 +55,21 @@ See BSP_SD_ErrorCallback() and BSP_SD_AbortCallback() below
  * in case of errors in either BSP_SD_ReadCpltCallback() or BSP_SD_WriteCpltCallback()
  * the value by default is as defined in the BSP platform driver otherwise 30 secs
  */
-#define SD_TIMEOUT 250
+#define SD_TIMEOUT 30 * 1000
 
 #define SD_DEFAULT_BLOCK_SIZE 512
 
 /*
  * Depending on the use case, the SD card initialization could be done at the
  * application level: if it is the case define the flag below to disable
- * the BSP_SD_Init() call in the SD_Initialize() and add a call to 
+ * the BSP_SD_Init() call in the SD_Initialize() and add a call to
  * BSP_SD_Init() elsewhere in the application.
  */
 /* USER CODE BEGIN disableSDInit */
 /* #define DISABLE_SD_INIT */
 /* USER CODE END disableSDInit */
 
-/* 
+/*
  * when using cachable memory region, it may be needed to maintain the cache
  * validity. Enable the define below to activate a cache maintenance at each
  * read and write operation.
@@ -168,7 +168,7 @@ static DSTATUS SD_CheckStatus(BYTE lun)
 
   return Stat;
 }
- 
+
 /**
   * @brief  Initializes a Drive
   * @param  lun : not used
@@ -176,7 +176,7 @@ static DSTATUS SD_CheckStatus(BYTE lun)
   */
 DSTATUS SD_initialize(BYTE lun)
 {
-Stat = STA_NOINIT; 
+Stat = STA_NOINIT;
 
   /*
    * check that the kernel has been started before continuing
@@ -247,7 +247,7 @@ DSTATUS SD_status(BYTE lun)
   * @param  count: Number of sectors to read (1..128)
   * @retval DRESULT: Operation result
   */
-   
+
 DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 {
   DRESULT res = RES_ERROR;
@@ -394,7 +394,6 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 #endif
   return res;
 }
- 
 
 /* USER CODE BEGIN beforeWriteSection */
 /* can be used to modify previous code / undefine following code / add new code */
@@ -408,7 +407,7 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
   * @retval DRESULT: Operation result
   */
 #if _USE_WRITE == 1
-   
+
 DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
 {
   DRESULT res = RES_ERROR;
@@ -623,7 +622,7 @@ DRESULT SD_ioctl(BYTE lun, BYTE cmd, void *buff)
 /* can be used to modify previous code / undefine following code / add new code */
 /* USER CODE END afterIoctlSection */
 
-/* USER CODE BEGIN callbackSection */ 
+/* USER CODE BEGIN callbackSection */
 /* can be used to modify / following code or add new code */
 /* USER CODE END callbackSection */
 /**
@@ -633,7 +632,7 @@ DRESULT SD_ioctl(BYTE lun, BYTE cmd, void *buff)
   */
 void BSP_SD_WriteCpltCallback(void)
 {
-  
+
   /*
    * No need to add an "osKernelRunning()" check here, as the SD_initialize()
    * is always called before any SD_Read()/SD_Write() call
@@ -665,7 +664,7 @@ void BSP_SD_ReadCpltCallback(void)
 #endif
 }
 
-/* USER CODE BEGIN ErrorAbortCallbacks */ 
+/* USER CODE BEGIN ErrorAbortCallbacks */
 /*
 void BSP_SD_AbortCallback(void)
 {
@@ -677,9 +676,9 @@ void BSP_SD_AbortCallback(void)
 #endif
 }
 */ 
-/* USER CODE END ErrorAbortCallbacks */ 
+/* USER CODE END ErrorAbortCallbacks */
 
-/* USER CODE BEGIN lastSection */ 
+/* USER CODE BEGIN lastSection */
 /* can be used to modify / undefine previous code or add new code */
 /* USER CODE END lastSection */
 

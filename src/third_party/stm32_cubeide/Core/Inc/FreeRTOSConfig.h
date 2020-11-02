@@ -43,9 +43,9 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
-/* USER CODE BEGIN Includes */   	      
+/* USER CODE BEGIN Includes */
 /* Section where include file can be added */
-/* USER CODE END Includes */ 
+/* USER CODE END Includes */
 
 /* Ensure definitions are only used by the compiler, and not by the assembler. */
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
@@ -74,7 +74,7 @@
 /* Defaults to size_t for backward compatibility, but can be changed
    if lengths will always be less than the number of bytes in a size_t. */
 #define configMESSAGE_BUFFER_LENGTH_TYPE         size_t
-/* USER CODE END MESSAGE_BUFFER_LENGTH_TYPE */ 
+/* USER CODE END MESSAGE_BUFFER_LENGTH_TYPE */
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES                    0
@@ -129,11 +129,11 @@ standard names. */
 
 /* IMPORTANT: This define is commented when used with STM32Cube firmware, when the timebase source is SysTick,
               to prevent overwriting SysTick_Handler defined within STM32Cube HAL */
- 
+
 #define xPortSysTickHandler SysTick_Handler
 
-/* USER CODE BEGIN Defines */   	      
+/* USER CODE BEGIN Defines */
 #define configUSE_NEWLIB_REENTRANT 1
-/* USER CODE END Defines */ 
+/* USER CODE END Defines */
 
 #endif /* FREERTOS_CONFIG_H */
