@@ -145,7 +145,11 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_RTC
+#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
+                              |RCC_PERIPHCLK_UART4|RCC_PERIPHCLK_I2C1
+#else
                               |RCC_PERIPHCLK_UART7|RCC_PERIPHCLK_I2C1
+#endif                              
                               |RCC_PERIPHCLK_SDMMC1|RCC_PERIPHCLK_CLK48;
   PeriphClkInitStruct.PLLSAI.PLLSAIN = 200;
   PeriphClkInitStruct.PLLSAI.PLLSAIR = 5;
@@ -154,7 +158,11 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PLLSAIDivQ = 1;
   PeriphClkInitStruct.PLLSAIDivR = RCC_PLLSAIDIVR_4;
   PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER  
+  PeriphClkInitStruct.Uart4ClockSelection = RCC_UART4CLKSOURCE_PCLK1;
+#else
   PeriphClkInitStruct.Uart7ClockSelection = RCC_UART7CLKSOURCE_PCLK1;
+#endif
   PeriphClkInitStruct.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLL;
   PeriphClkInitStruct.Sdmmc1ClockSelection = RCC_SDMMC1CLKSOURCE_CLK48;

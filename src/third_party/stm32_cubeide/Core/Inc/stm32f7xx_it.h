@@ -43,10 +43,37 @@
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
+void NMI_Handler(void);
+void HardFault_Handler(void);
+void MemManage_Handler(void);
+void BusFault_Handler(void);
+void UsageFault_Handler(void);
+void DebugMon_Handler(void);
+void DMA1_Stream1_IRQHandler(void);
+void DMA1_Stream4_IRQHandler(void);
+void DMA1_Stream5_IRQHandler(void);
+void ADC_IRQHandler(void);
+void EXTI9_5_IRQHandler(void);
+void TIM1_UP_TIM10_IRQHandler(void);
+void EXTI15_10_IRQHandler(void);
+void SDMMC1_IRQHandler(void);
+void UART4_IRQHandler(void);
+void TIM7_IRQHandler(void);
+void DMA2_Stream0_IRQHandler(void);
+void DMA2_Stream1_IRQHandler(void);
+void DMA2_Stream3_IRQHandler(void);
+void DMA2_Stream4_IRQHandler(void);
+void ETH_IRQHandler(void);
+void OTG_FS_IRQHandler(void);
+void DMA2_Stream5_IRQHandler(void);
+void DMA2_Stream6_IRQHandler(void);
+/* USER CODE BEGIN EFP */
+#else
+
 void NMI_Handler(void);
 void HardFault_Handler(void);
 void MemManage_Handler(void);
@@ -71,8 +98,8 @@ void OTG_FS_IRQHandler(void);
 void DMA2_Stream5_IRQHandler(void);
 void DMA2_Stream6_IRQHandler(void);
 void UART7_IRQHandler(void);
-/* USER CODE BEGIN EFP */
 
+#endif
 /* USER CODE END EFP */
 
 #ifdef __cplusplus
