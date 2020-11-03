@@ -193,7 +193,7 @@ bool exists(const char *dirPath, int *err) {
 }
 
 bool catalog(const char *dirPath, void *param,
-             void (*callback)(void *param, const char *name, FileType type, size_t size),
+             void (*callback)(void *param, const char *name, FileType type, size_t size, bool isHiddenOrSystemFile),
              int *numFiles, int *err) {
     *numFiles = 0;
 
@@ -224,7 +224,7 @@ bool catalog(const char *dirPath, void *param,
                 type = getFileTypeFromExtension(name);
             }
 
-            callback(param != nullptr ? param : &fileInfo, name, type, fileInfo.getSize());
+            callback(param != nullptr ? param : &fileInfo, name, type, fileInfo.getSize(), fileInfo.isHiddenOrSystemFile());
         }
 
         if (dir.findNext(fileInfo) != SD_FAT_RESULT_OK) {

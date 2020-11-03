@@ -135,6 +135,10 @@ size_t FileInfo::getSize() {
 #endif
 }
 
+bool FileInfo::isHiddenOrSystemFile() {
+    return false;
+}
+
 struct tm *getGmTime(FileInfo &fileInfo) {
     time_t mtime;
 

@@ -71,6 +71,10 @@ size_t FileInfo::getSize() {
     return m_fno.fsize;
 }
 
+bool FileInfo::isHiddenOrSystemFile() {
+    return (m_fno.fattrib & (AM_HID | AM_SYS)) != 0;
+}
+
 #define FAT_YEAR(date) (1980 + ((date) >> 9))
 #define FAT_MONTH(date) (((date) >> 5) & 0XF)
 #define FAT_DAY(date) ((date)&0X1F)

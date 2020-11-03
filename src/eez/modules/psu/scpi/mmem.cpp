@@ -84,7 +84,7 @@ scpi_result_t scpi_cmd_mmemoryCdirectoryQ(scpi_t *context) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void catalogCallback(void *param, const char *name, FileType type, size_t size) {
+void catalogCallback(void *param, const char *name, FileType type, size_t size, bool isHiddenOrSystemFile) {
     scpi_t *context = (scpi_t *)param;
 
     char buffer[MAX_PATH_LENGTH + 10 + 10 + 1];

@@ -80,6 +80,7 @@ struct FileInfo {
     bool isDirectory();
     void getName(char *name, size_t size);
     size_t getSize();
+    bool isHiddenOrSystemFile();
 
     int getModifiedYear();
     int getModifiedMonth();

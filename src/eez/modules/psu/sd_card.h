@@ -52,7 +52,7 @@ bool isBusy();
 bool makeParentDir(const char *filePath, int *err);
 
 bool exists(const char *dirPath, int *err);
-bool catalog(const char *dirPath, void *param, void (*callback)(void *param, const char *name, FileType type, size_t size), int *numFiles, int *err);
+bool catalog(const char *dirPath, void *param, void (*callback)(void *param, const char *name, FileType type, size_t size, bool isHiddenOrSystemFile), int *numFiles, int *err);
 bool catalogLength(const char *dirPath, size_t *length, int *err);
 bool upload(const char *filePath, void *param, void (*callback)(void *param, const void *buffer, int size), int *err);
 bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *err);
