@@ -6043,6 +6043,20 @@ void data_ntp_refresh_frequency(DataOperationEnum operation, Cursor cursor, Valu
     } 
 }
 
+void data_has_custom_bitmap(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = !!g_customLogo.pixels;
+    }
+}
+
+void data_custom_bitmap(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET_BITMAP_IMAGE) {
+        if (g_customLogo.pixels) {
+            value = Value(&g_customLogo, VALUE_TYPE_POINTER);
+        }
+    }
+}
+
 } // namespace gui
 } // namespace eez
 

@@ -55,11 +55,10 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
 
         if (widget->data) {
             if (widgetCursor.currentState->data.getType() != VALUE_TYPE_NONE) {
+                drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, true, true);
                 auto image = (Image *)widgetCursor.currentState->data.getVoidPointer();
                 if (image) {
                     drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active);
-                } else {
-                    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, true, true);
                 }
                 return;
             } else {

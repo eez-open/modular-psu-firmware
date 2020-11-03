@@ -711,17 +711,17 @@ double NumericKeypad::getValue() {
     double value = sign * (a + b);
 
     if (isPico()) {
-        value *= 1E-12f;
+        value /= 1E12f;
     } else if (isNano()) {
-        value *= 1E-9f;
+        value /= 1E9f;
     } else if (isMicro()) {
-        value *= 1E-6f;
+        value /= 1000000;
     } else if (isMilli()) {
-        value *= 1E-3f;
+        value /= 1000;
     } else if (isKilo()) {
-        value *= 1E3f;
+        value *= 1000;
     } else if (isMega()) {
-        value *= 1E6f;
+        value *= 1000000;
     }
 
     return value;

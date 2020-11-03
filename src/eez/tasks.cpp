@@ -407,6 +407,8 @@ void lowPriorityThreadOneIter() {
 #endif 
             else if (type == THREAD_MESSAGE_GENERATE_ERROR) {
                 generateError(param);
+            } else if (type == THREAD_MESSAGE_LOAD_CUSTOM_LOGO) {
+                psu::gui::loadCustomLogo();
             } else if (type >= THREAD_MESSAGE_MODULE_SPECIFIC) {
                 int slotIndex = param & 0xff;
                 g_slots[slotIndex]->onLowPriorityThreadMessage(type, param);

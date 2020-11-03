@@ -140,7 +140,6 @@ scpi_reg_val_t reg_get(scpi_t *context, scpi_psu_reg_name_t name) {
  */
 void reg_set(scpi_t *context, scpi_psu_reg_name_t name, scpi_reg_val_t val) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
-
     if ((name >= SCPI_PSU_REG_COUNT) || (psu_context->registers == NULL)) {
         return;
     }

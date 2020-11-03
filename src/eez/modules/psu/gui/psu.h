@@ -130,6 +130,9 @@ void showMainPage();
 void goBack();
 void takeScreenshot();
 
+extern Image g_customLogo;
+void loadCustomLogo();
+
 extern Value g_progress;
 
 struct AsyncOperationInProgressParams {

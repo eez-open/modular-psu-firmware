@@ -1461,7 +1461,37 @@ bool isFrontPanelLocked() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+Image g_customLogo;
+
+void loadCustomLogo() {
+    static const uint32_t CONF_MAX_LOGO_WIDTH = 480;
+    static const uint32_t CONF_MAX_LOGO_HEIGHT = 120;
+
+#ifdef EEZ_PLATFORM_STM32
+    static bool loaded;
+    loaded = false;
+    if (g_isBooted && !isLowPriorityThread()) {
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_LOAD_CUSTOM_LOGO);
+        while (!loaded) {
+        	osDelay(1);
+        }
+        return;
+    }
+#endif
+
+    if (!imageDecode("/logo.jpg", &g_customLogo) || g_customLogo.width > CONF_MAX_LOGO_WIDTH || g_customLogo.height > CONF_MAX_LOGO_HEIGHT) {
+        g_customLogo.pixels = nullptr;
+    }
+
+#ifdef EEZ_PLATFORM_STM32
+    loaded = true;
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void showWelcomePage() {
+    loadCustomLogo();
     showPage(PAGE_ID_WELCOME);
 }
 

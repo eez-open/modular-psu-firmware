@@ -85,6 +85,8 @@ bool g_shutdown;
 void boot() {
     assert((uint32_t)(MEMORY_END - MEMORY_BEGIN) <= MEMORY_SIZE);
 
+    psu::serial::initScpi();
+
     psu::event_queue::init();
 
 #if defined(EEZ_PLATFORM_STM32)

@@ -2356,6 +2356,14 @@
       "name": "channel_calibration_is_power_channel",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "has_custom_bitmap",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
+      "name": "custom_bitmap"
     }
   ],
   "actions": [
@@ -3067,46 +3075,83 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "is_reset_by_iwdg",
+            "data": "has_custom_bitmap",
             "left": 0,
-            "top": 26,
+            "top": 0,
             "width": 480,
-            "height": 40,
+            "height": 120,
             "widgets": [
               {
-                "type": "Text",
+                "type": "Container",
                 "style": {
-                  "inheritFrom": "default_M"
+                  "inheritFrom": "default"
                 },
                 "left": 0,
                 "top": 0,
                 "width": 480,
-                "height": 40,
-                "text": "Welcome to EEZ BB3"
+                "height": 120,
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "is_reset_by_iwdg",
+                    "left": 0,
+                    "top": 14,
+                    "width": 480,
+                    "height": 40,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_M"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 40,
+                        "text": "Welcome to EEZ BB3"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_M_warning"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 480,
+                        "height": 40,
+                        "text": "Welcome to EEZ BB3"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Bitmap",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 54,
+                    "width": 480,
+                    "height": 64,
+                    "bitmap": "logo"
+                  }
+                ]
               },
               {
-                "type": "Text",
+                "type": "Bitmap",
                 "style": {
-                  "inheritFrom": "default_M_warning"
+                  "inheritFrom": "default"
                 },
+                "data": "custom_bitmap",
                 "left": 0,
                 "top": 0,
                 "width": 480,
-                "height": 40,
-                "text": "Welcome to EEZ BB3"
+                "height": 120,
+                "bitmap": ""
               }
             ]
-          },
-          {
-            "type": "Bitmap",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 66,
-            "width": 480,
-            "height": 48,
-            "bitmap": "logo"
           },
           {
             "type": "Text",
@@ -3114,7 +3159,7 @@
               "inheritFrom": "default_S_left"
             },
             "left": 135,
-            "top": 121,
+            "top": 125,
             "width": 64,
             "height": 25,
             "text": "Master:"
@@ -3126,7 +3171,7 @@
             },
             "data": "master_info",
             "left": 203,
-            "top": 121,
+            "top": 125,
             "width": 123,
             "height": 25,
             "displayOption": 0
@@ -3138,7 +3183,7 @@
             },
             "data": "master_test_result",
             "left": 326,
-            "top": 121,
+            "top": 125,
             "width": 78,
             "height": 25,
             "widgets": [
@@ -3217,7 +3262,7 @@
             },
             "data": "slots",
             "left": 135,
-            "top": 146,
+            "top": 150,
             "width": 269,
             "height": 75,
             "itemWidget": {
@@ -3345,10 +3390,69 @@
             },
             "data": "firmware_info",
             "left": 0,
-            "top": 232,
+            "top": 236,
             "width": 480,
             "height": 30,
             "displayOption": 0
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "has_custom_bitmap",
+            "left": 0,
+            "top": 268,
+            "width": 480,
+            "height": 4,
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 4,
+                "invertColors": true
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "is_reset_by_iwdg",
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 4,
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 4,
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "status_warning"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 4
+                  }
+                ]
+              }
+            ]
           }
         ],
         "left": 0,
