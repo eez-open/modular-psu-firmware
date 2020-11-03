@@ -110,8 +110,12 @@ scpi_t g_scpiContext;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void init() {
+void initScpi() {
     scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer, SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
+}
+
+void init() {
+    initScpi();
 
     if (!persist_conf::isEthernetEnabled()) {
         g_testResult = TEST_SKIPPED;
@@ -150,7 +154,7 @@ void onQueueMessage(uint32_t type, uint32_t param) {
         //DebugTrace("Listening on port %d", (int)persist_conf::devConf.ethernetScpiPort);
     } else if (type == ETHERNET_CLIENT_CONNECTED) {
         g_isConnected = true;
-        scpi::emptyBuffer(g_scpiContext);
+        initScpi();
     } else if (type == ETHERNET_CLIENT_DISCONNECTED) {
         g_isConnected = false;
     } else if (type == ETHERNET_INPUT_AVAILABLE) {

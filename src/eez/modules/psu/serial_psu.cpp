@@ -106,8 +106,8 @@ static bool g_isConnected;
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
-	initScpi();
-
+    initScpi();
+    
 #ifdef EEZ_PLATFORM_SIMULATOR
     if (usb::isVirtualComPortActive()) {
         Serial.print("EEZ BB3 software simulator ver. ");
@@ -118,9 +118,10 @@ void init() {
 
 void onQueueMessage(uint32_t type, uint32_t param) {
     if (type == SERIAL_LINE_STATE_CHANGED) {
+        bool wasConnected = isConnected();
         g_isConnected = param ? true : false;
-        if (isConnected()) {
-            scpi::emptyBuffer(g_scpiContext);
+        if (isConnected() && !wasConnected) {
+            initScpi();
         }
     } else if (type == SERIAL_INPUT_AVAILABLE) {
         uint8_t *buffer;

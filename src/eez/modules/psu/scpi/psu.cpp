@@ -55,7 +55,6 @@ void init(scpi_t &scpi_context, scpi_psu_t &scpi_psu_context, scpi_interface_t *
               getSerialNumber(), MCU_FIRMWARE, input_buffer, input_buffer_length,
               error_queue_data, error_queue_size);
 
-
     if (CH_NUM > 0) {
         auto &channel = Channel::get(0);
         scpi_psu_context.selectedChannels.numChannels = 1;
