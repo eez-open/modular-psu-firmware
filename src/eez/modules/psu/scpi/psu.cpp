@@ -119,15 +119,15 @@ int printError(scpi_t *context, int_fast16_t err, OutputBufferWriter &outputBuff
 
         char errorOutputBuffer[512];
 
-        outputBufferWriter.write("**ERROR", sizeof("**ERROR"));
+        outputBufferWriter.write("**ERROR", strlen("**ERROR"));
 
         char datetime_buffer[32] = { 0 };
         if (datetime::getDateTimeAsString(datetime_buffer)) {
-            sprintf(errorOutputBuffer, " [%s]", datetime_buffer);
+            snprintf(errorOutputBuffer, sizeof(errorOutputBuffer),  " [%s]", datetime_buffer);
             outputBufferWriter.write(errorOutputBuffer, strlen(errorOutputBuffer));
         }
 
-        sprintf(errorOutputBuffer, ": %d,\"%s\"\r\n", (int16_t)err, SCPI_ErrorTranslate(err));
+        snprintf(errorOutputBuffer, sizeof(errorOutputBuffer), ": %d,\"%s\"\r\n", (int16_t)err, SCPI_ErrorTranslate(err));
         outputBufferWriter.write(errorOutputBuffer, strlen(errorOutputBuffer));
 
         if (err == SCPI_ERROR_INPUT_BUFFER_OVERRUN) {
