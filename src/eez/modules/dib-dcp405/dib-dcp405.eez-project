@@ -434,7 +434,7 @@
                     "style": {
                       "inheritFrom": "mon_value_48_right"
                     },
-                    "data": "channel_u_mon",
+                    "data": "channel_display_value1",
                     "action": "",
                     "left": 1,
                     "top": 0,
@@ -448,7 +448,7 @@
                       "inheritFrom": "mon_value_20_left",
                       "padding": "0 4"
                     },
-                    "data": "channel_u_mon",
+                    "data": "channel_display_value1",
                     "action": "",
                     "left": 101,
                     "top": 0,
@@ -461,7 +461,7 @@
                     "style": {
                       "inheritFrom": "mon_value_20_left"
                     },
-                    "data": "channel_u_mon",
+                    "data": "channel_display_value1",
                     "action": "",
                     "left": 101,
                     "top": 34,
@@ -487,7 +487,7 @@
                     "style": {
                       "inheritFrom": "mon_value_48_right"
                     },
-                    "data": "channel_i_mon",
+                    "data": "channel_display_value2",
                     "action": "",
                     "left": 1,
                     "top": 0,
@@ -501,7 +501,7 @@
                       "inheritFrom": "mon_value_20_left",
                       "padding": "0 4"
                     },
-                    "data": "channel_i_mon",
+                    "data": "channel_display_value2",
                     "action": "",
                     "left": 101,
                     "top": 0,
@@ -514,7 +514,7 @@
                     "style": {
                       "inheritFrom": "mon_value_20_left"
                     },
-                    "data": "channel_i_mon",
+                    "data": "channel_display_value2",
                     "action": "",
                     "left": 101,
                     "top": 34,
@@ -532,7 +532,7 @@
               "inheritFrom": "default",
               "font": "Oswald14"
             },
-            "data": "channel_p_mon",
+            "data": "channel_display_value3",
             "left": 1,
             "top": 206,
             "width": 78,
@@ -627,7 +627,7 @@
                     "style": {
                       "inheritFrom": "mon_value_48_right"
                     },
-                    "data": "channel_u_mon",
+                    "data": "channel_display_value1",
                     "action": "",
                     "left": 1,
                     "top": 0,
@@ -641,7 +641,7 @@
                       "inheritFrom": "mon_value_20_left",
                       "padding": "0 4"
                     },
-                    "data": "channel_u_mon",
+                    "data": "channel_display_value1",
                     "action": "",
                     "left": 142,
                     "top": 0,
@@ -654,7 +654,7 @@
                     "style": {
                       "inheritFrom": "mon_value_20_left"
                     },
-                    "data": "channel_u_mon",
+                    "data": "channel_display_value1",
                     "action": "",
                     "left": 142,
                     "top": 34,
@@ -680,7 +680,7 @@
                     "style": {
                       "inheritFrom": "mon_value_48_right"
                     },
-                    "data": "channel_i_mon",
+                    "data": "channel_display_value2",
                     "action": "",
                     "left": 1,
                     "top": 0,
@@ -694,7 +694,7 @@
                       "inheritFrom": "mon_value_20_left",
                       "padding": "0 4"
                     },
-                    "data": "channel_i_mon",
+                    "data": "channel_display_value2",
                     "action": "",
                     "left": 142,
                     "top": 0,
@@ -707,7 +707,7 @@
                     "style": {
                       "inheritFrom": "mon_value_20_left"
                     },
-                    "data": "channel_i_mon",
+                    "data": "channel_display_value2",
                     "action": "",
                     "left": 142,
                     "top": 34,
@@ -725,7 +725,7 @@
               "inheritFrom": "default",
               "font": "Oswald14"
             },
-            "data": "channel_p_mon",
+            "data": "channel_display_value3",
             "left": 1,
             "top": 206,
             "width": 118,
@@ -860,7 +860,7 @@
               "inheritFrom": "default",
               "font": "Oswald14"
             },
-            "data": "channel_p_mon",
+            "data": "channel_display_value3",
             "left": 1,
             "top": 206,
             "width": 78,
@@ -995,7 +995,7 @@
               "inheritFrom": "default",
               "font": "Oswald14"
             },
-            "data": "channel_p_mon",
+            "data": "channel_display_value3",
             "left": 1,
             "top": 206,
             "width": 118,
@@ -3759,7 +3759,7 @@
                                 "style": {
                                   "inheritFrom": "default_S"
                                 },
-                                "data": "channel_p_mon",
+                                "data": "channel_display_value3",
                                 "left": 0,
                                 "top": 0,
                                 "width": 48,
@@ -3771,7 +3771,7 @@
                                 "style": {
                                   "inheritFrom": "default_S"
                                 },
-                                "data": "channel_p_mon",
+                                "data": "channel_display_value3",
                                 "left": 0,
                                 "top": 25,
                                 "width": 48,
@@ -5269,7 +5269,7 @@
                     "style": {
                       "inheritFrom": "default_S"
                     },
-                    "data": "channel_p_mon",
+                    "data": "channel_display_value3",
                     "left": 0,
                     "top": 0,
                     "width": 48,
@@ -5281,7 +5281,7 @@
                     "style": {
                       "inheritFrom": "default_S"
                     },
-                    "data": "channel_p_mon",
+                    "data": "channel_display_value3",
                     "left": 0,
                     "top": 25,
                     "width": 48,
@@ -6007,7 +6007,7 @@
                         "style": {
                           "inheritFrom": "mon_value_20_right"
                         },
-                        "data": "channel_u_mon",
+                        "data": "channel_display_value1",
                         "left": 0,
                         "top": 0,
                         "width": 50,
@@ -6019,7 +6019,7 @@
                         "style": {
                           "inheritFrom": "mon_value_14_left"
                         },
-                        "data": "channel_u_mon",
+                        "data": "channel_display_value1",
                         "left": 50,
                         "top": 22,
                         "width": 28,
@@ -6031,7 +6031,7 @@
                         "style": {
                           "inheritFrom": "mon_value_14_center"
                         },
-                        "data": "channel_u_mon",
+                        "data": "channel_display_value1",
                         "left": 50,
                         "top": 0,
                         "width": 28,
@@ -6056,7 +6056,7 @@
                         "style": {
                           "inheritFrom": "mon_value_20_right"
                         },
-                        "data": "channel_i_mon",
+                        "data": "channel_display_value2",
                         "left": 0,
                         "top": 0,
                         "width": 50,
@@ -6068,7 +6068,7 @@
                         "style": {
                           "inheritFrom": "mon_value_14_left"
                         },
-                        "data": "channel_i_mon",
+                        "data": "channel_display_value2",
                         "left": 50,
                         "top": 22,
                         "width": 28,
@@ -6080,7 +6080,7 @@
                         "style": {
                           "inheritFrom": "mon_value_14_center"
                         },
-                        "data": "channel_i_mon",
+                        "data": "channel_display_value2",
                         "left": 50,
                         "top": 0,
                         "width": 28,
@@ -6420,7 +6420,7 @@
                 "style": {
                   "inheritFrom": "mon_value_14_right"
                 },
-                "data": "channel_u_mon",
+                "data": "channel_display_value1",
                 "left": 0,
                 "top": 0,
                 "width": 78,
@@ -6432,7 +6432,7 @@
                 "style": {
                   "inheritFrom": "mon_value_14_right"
                 },
-                "data": "channel_i_mon",
+                "data": "channel_display_value2",
                 "left": 0,
                 "top": 23,
                 "width": 78,

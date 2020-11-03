@@ -4838,7 +4838,7 @@
                     "style": {
                       "inheritFrom": "default_S"
                     },
-                    "data": "channel_p_mon",
+                    "data": "channel_display_value3",
                     "left": 0,
                     "top": 0,
                     "width": 48,
@@ -4850,7 +4850,7 @@
                     "style": {
                       "inheritFrom": "default_S"
                     },
-                    "data": "channel_p_mon",
+                    "data": "channel_display_value3",
                     "left": 0,
                     "top": 25,
                     "width": 48,
@@ -5401,7 +5401,7 @@
                             "style": {
                               "inheritFrom": "default_S"
                             },
-                            "data": "channel_p_mon",
+                            "data": "channel_display_value3",
                             "left": 0,
                             "top": 0,
                             "width": 48,
@@ -5413,7 +5413,7 @@
                             "style": {
                               "inheritFrom": "default_S"
                             },
-                            "data": "channel_p_mon",
+                            "data": "channel_display_value3",
                             "left": 0,
                             "top": 25,
                             "width": 48,
@@ -5585,7 +5585,7 @@
                 "style": {
                   "inheritFrom": "mon_value_14_center"
                 },
-                "data": "channel_u_mon",
+                "data": "channel_display_value1",
                 "left": 0,
                 "top": 0,
                 "width": 79,
@@ -5597,7 +5597,7 @@
                 "style": {
                   "inheritFrom": "mon_value_14_center"
                 },
-                "data": "channel_i_mon",
+                "data": "channel_display_value2",
                 "left": 0,
                 "top": 33,
                 "width": 79,
@@ -6357,7 +6357,7 @@
                 "style": {
                   "inheritFrom": "mon_value_14_right"
                 },
-                "data": "channel_u_mon",
+                "data": "channel_display_value1",
                 "left": 0,
                 "top": 0,
                 "width": 58,
@@ -6369,7 +6369,7 @@
                 "style": {
                   "inheritFrom": "mon_value_14_right"
                 },
-                "data": "channel_i_mon",
+                "data": "channel_display_value2",
                 "left": 0,
                 "top": 24,
                 "width": 58,
@@ -6768,7 +6768,7 @@
                 "style": {
                   "inheritFrom": "mon_value_14_right"
                 },
-                "data": "channel_u_mon",
+                "data": "channel_display_value1",
                 "left": 0,
                 "top": 0,
                 "width": 54,
@@ -6780,7 +6780,7 @@
                 "style": {
                   "inheritFrom": "mon_value_14_left"
                 },
-                "data": "channel_u_mon",
+                "data": "channel_display_value1",
                 "left": 54,
                 "top": 0,
                 "width": 24,
@@ -6792,7 +6792,7 @@
                 "style": {
                   "inheritFrom": "mon_value_14_right"
                 },
-                "data": "channel_i_mon",
+                "data": "channel_display_value2",
                 "left": 0,
                 "top": 23,
                 "width": 54,
@@ -6804,7 +6804,7 @@
                 "style": {
                   "inheritFrom": "mon_value_14_left"
                 },
-                "data": "channel_i_mon",
+                "data": "channel_display_value2",
                 "left": 54,
                 "top": 23,
                 "width": 24,

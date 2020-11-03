@@ -1753,6 +1753,18 @@ void data_channel_display_value2_limit(DataOperationEnum operation, Cursor curso
     }
 }
 
+void data_channel_display_value3(DataOperationEnum operation, Cursor cursor, Value &value) {
+    int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (channel.flags.displayValue1 != DISPLAY_VALUE_VOLTAGE && channel.flags.displayValue2 != DISPLAY_VALUE_VOLTAGE) {
+        data_channel_u_mon(operation, cursor, value);
+    } else if (channel.flags.displayValue1 != DISPLAY_VALUE_CURRENT && channel.flags.displayValue2 != DISPLAY_VALUE_CURRENT) {
+        data_channel_i_mon(operation, cursor, value);
+    } else {
+        data_channel_p_mon(operation, cursor, value);
+    }
+}
+
 void data_ovp(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);

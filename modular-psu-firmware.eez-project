@@ -299,6 +299,13 @@
       "defaultMaxValue": 5
     },
     {
+      "name": "channel_display_value3",
+      "type": "float",
+      "defaultValue": "71.23 W",
+      "defaultMinValue": 0,
+      "defaultMaxValue": 5
+    },
+    {
       "name": "ovp",
       "description": "scpi: volt:prot:stat? volt:prot:trip?",
       "type": "enum",
