@@ -133,8 +133,12 @@ bool TempSensor::test() {
     	} while (millis() - start < 1000);
         
         if (g_testResult != TEST_OK) {
+#if !CONF_SURVIVE_MODE
             g_testResult = TEST_FAILED;
             generateError(scpi_error);
+#else
+            g_testResult = TEST_OK;
+#endif
         }
     } else {
         g_testResult = TEST_SKIPPED;

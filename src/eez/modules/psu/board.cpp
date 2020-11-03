@@ -30,21 +30,30 @@ namespace board {
 
 void powerUp() {
 #if defined(EEZ_PLATFORM_STM32)    
+
     HAL_GPIO_WritePin(PWR_SSTART_GPIO_Port, PWR_SSTART_Pin, GPIO_PIN_SET);
     delay(700);
     HAL_GPIO_WritePin(PWR_DIRECT_GPIO_Port, PWR_DIRECT_Pin, GPIO_PIN_SET);
+    
+#if !CONF_SURVIVE_MODE
     delay(100);
     HAL_GPIO_WritePin(PWR_SSTART_GPIO_Port, PWR_SSTART_Pin, GPIO_PIN_RESET);
+#endif
+
 #endif
 }
 
 void powerDown() {
 #if defined(EEZ_PLATFORM_STM32)    
+
+#if !CONF_SURVIVE_MODE    
     HAL_GPIO_WritePin(PWR_SSTART_GPIO_Port, PWR_SSTART_Pin, GPIO_PIN_SET);
     delay(50);
     HAL_GPIO_WritePin(PWR_DIRECT_GPIO_Port, PWR_DIRECT_Pin, GPIO_PIN_RESET);
     delay(50);
     HAL_GPIO_WritePin(PWR_SSTART_GPIO_Port, PWR_SSTART_Pin, GPIO_PIN_RESET);
+#endif
+
 #endif
 }
 

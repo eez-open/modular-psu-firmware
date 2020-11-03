@@ -512,6 +512,7 @@ public:
             result = TRANSFER_NOT_READY;
         }
 
+#if !CONF_SURVIVE_MODE
         if (result != TRANSFER_OK) {
             int32_t diff = millis() - lastTransferTickCount;
             if (diff > CONF_TRANSFER_TIMEOUT_MS || numConsecutiveTransferErrors > CONF_MAX_ALLOWED_CONSECUTIVE_TRANSFER_ERRORS) {
@@ -521,6 +522,7 @@ public:
                 result = TRANSFER_TIMEOUT;
             }
         }
+#endif
 
         return result;
     }
