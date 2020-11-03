@@ -1769,21 +1769,28 @@ void onEncoder(int counter, bool clicked) {
 
             float min = getMin(g_focusCursor, g_focusDataId).getFloat();
             float max = getMax(g_focusCursor, g_focusDataId).getFloat();
-
-            StepValues stepValues;
-            edit_mode_step::getStepValues(stepValues);
-            mcu::encoder::enableAcceleration(true, max - min, stepValues.values[0]);
+            
+            float limit;
+            Value limitValue = getLimit(g_focusCursor, g_focusDataId);
+            if (limitValue.getType() == VALUE_TYPE_FLOAT) {
+                limit = limitValue.getFloat();
+            } else {
+                limit = max;
+            }
 
             float newValue;
 
             Value stepValue = getEncoderStep(g_focusCursor, g_focusDataId);
             if (stepValue.getType() != VALUE_TYPE_NONE) {
+                mcu::encoder::enableAcceleration(false);
+
                 float step;
                 if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
                     step = stepValue.getFloat();
                 } else {
                     step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
                 }
+
                 newValue = roundPrec(value.getFloat() + counter * step, step);
                 if (getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
                     newValue = 0;
@@ -1791,12 +1798,14 @@ void onEncoder(int counter, bool clicked) {
                     newValue = clamp(newValue, min, max);
                 }
             } else {
+                StepValues stepValues;
+                edit_mode_step::getStepValues(stepValues);
+                mcu::encoder::enableAcceleration(true, limit - min, stepValues.values[0]);
+
                 newValue = encoderIncrement(value, counter, min, max);
             }
 
-            Value limitValue = getLimit(g_focusCursor, g_focusDataId);
-            if (limitValue.getType() != VALUE_TYPE_NONE) {
-                float limit = limitValue.getFloat();
+            if (limitValue.getType() == VALUE_TYPE_FLOAT) {
                 if (newValue > limit && value.getFloat() < limit) {
                     newValue = limit;
                 }
