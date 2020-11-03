@@ -160,6 +160,8 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
                 floatValue *= 1E3f;
             }
         } 
+    } else {
+        floatValue = 0; // set to zero just in case we have negative zero
     }
 
     if (!isNaN(floatValue)) {
