@@ -168,7 +168,7 @@ void PsuAppContext::stateManagment() {
         }
         return;
     } else if (activePageId == PAGE_ID_WELCOME) {
-        if (int32_t(tickCount - m_showPageTime) < CONF_GUI_WELCOME_PAGE_TIMEOUT_MS) {
+        if (!g_isBooted || int32_t(tickCount - m_showPageTime) < CONF_GUI_WELCOME_PAGE_TIMEOUT_MS) {
             return;
         }
     }
@@ -393,13 +393,8 @@ bool isChSettingsSubPage(int pageId) {
         pageId == PAGE_ID_CH_SETTINGS_INFO;
 }
 
-
 void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
     AppContext::onPageChanged(previousPageId, activePageId);
-
-    if (previousPageId == PAGE_ID_WELCOME) {
-        animateFadeOutFadeIn();
-    }
 
     g_focusEditValue = Value();
 
@@ -407,7 +402,14 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         g_slots[i]->animatePageAppearance(previousPageId, activePageId);
     }
 
-    if (previousPageId == PAGE_ID_EVENT_QUEUE) {
+    if (previousPageId == activePageId) {
+    } else if (previousPageId == PAGE_ID_NONE) {
+        if (activePageId == PAGE_ID_WELCOME) {
+            animateFadeOutFadeIn();
+        }
+    } else if (previousPageId == PAGE_ID_WELCOME) {
+        animateFadeOutFadeIn();
+    } else if (previousPageId == PAGE_ID_EVENT_QUEUE) {
         if (getActivePageId() == PAGE_ID_MAIN) {
             animateSlideUp();
         }

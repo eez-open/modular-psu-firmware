@@ -388,7 +388,8 @@ void turnOn() {
 		g_buffers[6].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER7_START_ADDRESS);
 		g_buffers[7].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER8_START_ADDRESS);
 
-        fillRect(g_buffer, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
+        fillRect(g_bufferOld, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
+        fillRect(g_bufferNew, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
 
         // set video RAM address
         HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
