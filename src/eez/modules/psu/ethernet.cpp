@@ -110,10 +110,6 @@ scpi_t g_scpiContext;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void initScpi() {
-    scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer, SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
-}
-
 void init() {
     initScpi();
 
@@ -125,6 +121,10 @@ void init() {
     eez::mcu::ethernet::begin();
 
     g_testResult = TEST_CONNECTING;
+}
+
+void initScpi() {
+    scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer, SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
 }
 
 bool test() {

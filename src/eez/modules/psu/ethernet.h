@@ -28,6 +28,8 @@ extern TestResult g_testResult;
 extern scpi_t g_scpiContext;
 
 void init();
+void initScpi();
+
 bool test();
 
 void onQueueMessage(uint32_t type, uint32_t param);
