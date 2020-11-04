@@ -888,6 +888,29 @@ void SLOT_INFO_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
+bool compare_SLOT_INFO_WITH_FW_VER_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void SLOT_INFO_WITH_FW_VER_value_to_text(const Value &value, char *text, int count) {
+    int slotIndex = value.getInt();
+    auto &slot = *g_slots[slotIndex];
+    if (slot.moduleType != MODULE_TYPE_NONE) {
+        if (slot.firmwareInstalled) {
+            if (slot.firmwareMajorVersion == 0 && slot.firmwareMinorVersion == 0) {
+                snprintf(text, count - 1, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+            } else {
+                snprintf(text, count - 1, "%s R%dB%d v%d.%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF), slot.firmwareMajorVersion, slot.firmwareMinorVersion);
+            }
+        } else {
+            snprintf(text, count - 1, "%s R%dB%d ---", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+        }
+    } else {
+        strncpy(text, "Not installed", count - 1);
+    }
+    text[count - 1] = 0;
+}
+
 bool compare_SLOT_TITLE_DEF_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -949,6 +972,15 @@ bool compare_MASTER_INFO_value(const Value &a, const Value &b) {
 
 void MASTER_INFO_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count - 1, "%s %s", MCU_NAME, MCU_REVISION);
+    text[count - 1] = 0;
+}
+
+bool compare_MASTER_INFO_WITH_FW_VER_value(const Value &a, const Value &b) {
+    return true;
+}
+
+void MASTER_INFO_WITH_FW_VER_value_to_text(const Value &value, char *text, int count) {
+    snprintf(text, count - 1, "%s %s v%s", MCU_NAME, MCU_REVISION, MCU_FIRMWARE);
     text[count - 1] = 0;
 }
 
@@ -5567,6 +5599,12 @@ void data_master_info(DataOperationEnum operation, Cursor cursor, Value &value) 
     }
 }
 
+void data_master_info_with_fw_ver(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(0, VALUE_TYPE_MASTER_INFO_WITH_FW_VER);
+    }
+}
+
 void data_master_test_result(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value((int)g_masterTestResult, VALUE_TYPE_TEST_RESULT);
@@ -5588,6 +5626,12 @@ void data_slot_index(DataOperationEnum operation, Cursor cursor, Value &value) {
 void data_slot_info(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(cursor != -1 ? cursor : hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_INFO);
+    }
+}
+
+void data_slot_info_with_fw_ver(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(cursor != -1 ? cursor : hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_INFO_WITH_FW_VER);
     }
 }
 

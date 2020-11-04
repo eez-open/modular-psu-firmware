@@ -391,7 +391,7 @@
     {
       "name": "master_info",
       "type": "string",
-      "defaultValue": "STM32F7 r1B5"
+      "defaultValue": "STM32F7 R1B5"
     },
     {
       "name": "master_test_result",
@@ -755,7 +755,7 @@
     {
       "name": "sys_info_firmware_ver",
       "type": "string",
-      "defaultValue": "M2"
+      "defaultValue": "v1.5"
     },
     {
       "name": "sys_info_serial_no",
@@ -1859,7 +1859,7 @@
     {
       "name": "channel_firmware_version",
       "type": "string",
-      "defaultValue": "1.23"
+      "defaultValue": "v0.5"
     },
     {
       "name": "file_manager_browser_title",
@@ -2364,6 +2364,16 @@
     },
     {
       "name": "custom_bitmap"
+    },
+    {
+      "name": "slot_info_with_fw_ver",
+      "type": "string",
+      "defaultValue": "DCP405 R3B3 v1.5"
+    },
+    {
+      "name": "master_info_with_fw_ver",
+      "type": "string",
+      "defaultValue": "STM32F7 R1B5 v1.5"
     }
   ],
   "actions": [
@@ -3071,58 +3081,83 @@
         "style": "default",
         "widgets": [
           {
-            "type": "Select",
+            "type": "Container",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "has_custom_bitmap",
             "left": 0,
             "top": 0,
             "width": 480,
-            "height": 120,
+            "height": 136,
             "widgets": [
               {
-                "type": "Container",
+                "type": "Select",
                 "style": {
                   "inheritFrom": "default"
                 },
+                "data": "has_custom_bitmap",
                 "left": 0,
                 "top": 0,
                 "width": 480,
-                "height": 120,
+                "height": 136,
                 "widgets": [
                   {
-                    "type": "Select",
+                    "type": "Container",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "is_reset_by_iwdg",
                     "left": 0,
-                    "top": 14,
+                    "top": 0,
                     "width": 480,
-                    "height": 40,
+                    "height": 136,
                     "widgets": [
                       {
-                        "type": "Text",
+                        "type": "Select",
                         "style": {
-                          "inheritFrom": "default_M"
+                          "inheritFrom": "default"
                         },
+                        "data": "is_reset_by_iwdg",
                         "left": 0,
-                        "top": 0,
+                        "top": 4,
                         "width": 480,
-                        "height": 40,
-                        "text": "Welcome to EEZ BB3"
+                        "height": 48,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "default_M",
+                              "font": "Oswald20"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 480,
+                            "height": 48,
+                            "text": "Welcome to EEZ BB3"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "default_M_warning",
+                              "font": "Oswald20"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 480,
+                            "height": 48,
+                            "text": "Welcome to EEZ BB3"
+                          }
+                        ]
                       },
                       {
-                        "type": "Text",
+                        "type": "Bitmap",
                         "style": {
-                          "inheritFrom": "default_M_warning"
+                          "inheritFrom": "default"
                         },
                         "left": 0,
-                        "top": 0,
+                        "top": 52,
                         "width": 480,
-                        "height": 40,
-                        "text": "Welcome to EEZ BB3"
+                        "height": 84,
+                        "bitmap": "logo"
                       }
                     ]
                   },
@@ -3131,249 +3166,273 @@
                     "style": {
                       "inheritFrom": "default"
                     },
+                    "data": "custom_bitmap",
                     "left": 0,
-                    "top": 54,
+                    "top": 0,
                     "width": 480,
-                    "height": 64,
-                    "bitmap": "logo"
+                    "height": 136,
+                    "bitmap": ""
                   }
                 ]
-              },
-              {
-                "type": "Bitmap",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "custom_bitmap",
-                "left": 0,
-                "top": 0,
-                "width": 480,
-                "height": 120,
-                "bitmap": ""
               }
             ]
           },
           {
-            "type": "Text",
+            "type": "Container",
             "style": {
-              "inheritFrom": "default_S_left"
+              "inheritFrom": "default",
+              "font": "Oswald14"
             },
-            "left": 135,
-            "top": 125,
-            "width": 64,
-            "height": 25,
-            "text": "Master:"
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "default_S_left"
-            },
-            "data": "master_info",
-            "left": 203,
-            "top": 125,
-            "width": 123,
-            "height": 25,
-            "displayOption": 0
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "master_test_result",
-            "left": 326,
-            "top": 125,
-            "width": 78,
-            "height": 25,
+            "left": 104,
+            "top": 144,
+            "width": 336,
+            "height": 30,
             "widgets": [
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "default_S_left"
+                  "inheritFrom": "default_S_left",
+                  "font": "Oswald14",
+                  "alignHorizontal": "left"
                 },
                 "left": 0,
                 "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
+                "width": 76,
+                "height": 30,
+                "text": "Master:"
               },
               {
-                "type": "Text",
+                "type": "DisplayData",
                 "style": {
-                  "inheritFrom": "default_S_left_warning"
+                  "inheritFrom": "default_S_left",
+                  "font": "Oswald14"
                 },
-                "left": 0,
+                "data": "master_info_with_fw_ver",
+                "left": 76,
                 "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "Failed"
+                "width": 170,
+                "height": 30,
+                "displayOption": 0
               },
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "default_S_left_ok"
+                  "inheritFrom": "default",
+                  "font": "Oswald14"
                 },
-                "left": 0,
+                "data": "master_test_result",
+                "left": 246,
                 "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "OK"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": " "
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left_warning"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 25,
-                "text": "Warning"
+                "width": 90,
+                "height": 30,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": " "
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left_warning",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": "Failed"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left_ok",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": "OK"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": " "
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": " "
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left_warning",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": "Warning"
+                  }
+                ]
               }
             ]
           },
           {
             "type": "List",
             "style": {
-              "inheritFrom": "default"
+              "inheritFrom": "default",
+              "font": "Oswald14"
             },
             "data": "slots",
-            "left": 135,
-            "top": 156,
-            "width": 269,
-            "height": 75,
+            "left": 104,
+            "top": 174,
+            "width": 336,
+            "height": 90,
             "itemWidget": {
               "type": "Container",
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default",
+                "font": "Oswald14"
               },
               "left": 0,
               "top": 0,
-              "width": 269,
-              "height": 25,
+              "width": 336,
+              "height": 30,
               "widgets": [
                 {
                   "type": "Text",
                   "style": {
-                    "inheritFrom": "default_S_left"
+                    "inheritFrom": "default_S_left",
+                    "font": "Oswald14",
+                    "alignHorizontal": "left"
                   },
                   "data": "slot_index",
                   "left": 0,
                   "top": 0,
-                  "width": 64,
-                  "height": 25,
+                  "width": 76,
+                  "height": 30,
                   "text": ""
                 },
                 {
                   "type": "DisplayData",
                   "style": {
-                    "inheritFrom": "default_S_left"
+                    "inheritFrom": "default_S_left",
+                    "font": "Oswald14"
                   },
-                  "data": "slot_info",
-                  "left": 68,
+                  "data": "slot_info_with_fw_ver",
+                  "left": 76,
                   "top": 0,
-                  "width": 123,
-                  "height": 25,
+                  "width": 170,
+                  "height": 30,
                   "displayOption": 0
                 },
                 {
                   "type": "Select",
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default",
+                    "font": "Oswald14"
                   },
                   "data": "slot_test_result",
-                  "left": 191,
+                  "left": 246,
                   "top": 0,
-                  "width": 78,
-                  "height": 25,
+                  "width": 90,
+                  "height": 30,
                   "widgets": [
                     {
                       "type": "Text",
                       "style": {
-                        "inheritFrom": "default_S_left"
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 78,
-                      "height": 25,
+                      "width": 90,
+                      "height": 30,
                       "text": " "
                     },
                     {
                       "type": "Text",
                       "style": {
-                        "inheritFrom": "default_S_left_warning"
+                        "inheritFrom": "default_S_left_warning",
+                        "font": "Oswald14"
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 78,
-                      "height": 25,
+                      "width": 90,
+                      "height": 30,
                       "text": "Failed"
                     },
                     {
                       "type": "Text",
                       "style": {
-                        "inheritFrom": "default_S_left_ok"
+                        "inheritFrom": "default_S_left_ok",
+                        "font": "Oswald14"
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 78,
-                      "height": 25,
+                      "width": 90,
+                      "height": 30,
                       "text": "OK"
                     },
                     {
                       "type": "Text",
                       "style": {
-                        "inheritFrom": "default_S_left"
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 78,
-                      "height": 25,
+                      "width": 90,
+                      "height": 30,
                       "text": " "
                     },
                     {
                       "type": "Text",
                       "style": {
-                        "inheritFrom": "default_S_left"
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 78,
-                      "height": 25,
+                      "width": 90,
+                      "height": 30,
                       "text": " "
                     },
                     {
                       "type": "Text",
                       "style": {
-                        "inheritFrom": "default_S_left_warning"
+                        "inheritFrom": "default_S_left_warning",
+                        "font": "Oswald14"
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 78,
-                      "height": 25,
+                      "width": 90,
+                      "height": 30,
                       "text": "Warning"
                     }
                   ]
@@ -3382,18 +3441,6 @@
             },
             "listType": "vertical",
             "gap": 0
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "default_S"
-            },
-            "data": "firmware_info",
-            "left": 0,
-            "top": 236,
-            "width": 480,
-            "height": 30,
-            "displayOption": 0
           },
           {
             "type": "Select",
@@ -3458,7 +3505,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "dataContextOverrides": "{\n    \"slots\": [\n        {\n            \"slot_index\": \"Slot #1:\",\n            \"slot_info_with_fw_ver\": \"DCP405 R3B3\"\n        },\n        {\n            \"slot_index\": \"Slot #2:\",\n            \"slot_info_with_fw_ver\": \"SMX46 R1B2 v0.7\"\n        },\n        {\n            \"slot_index\": \"Slot #3:\",\n            \"slot_info_with_fw_ver\": \"MIO168 R1B2 ---\"\n        }\n    ]\n}"
       },
       {
         "name": "touch_calibration_intro",
@@ -57740,7 +57788,7 @@
     "bitmaps": [
       {
         "name": "logo",
-        "image": "data:image/png;base64,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",
+        "image": "data:image/png;base64,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",
         "bpp": 32
       },
       {
