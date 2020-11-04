@@ -132,12 +132,17 @@ struct netconn *g_tcpListenConnection;
 struct netconn *g_tcpClientConnection;
 static netbuf *g_inbuf;
 static bool g_checkLinkWhileIdle = false;
+static bool g_acceptClientIsDone;
 
 static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t len) {
 	switch (evt) {
 	case NETCONN_EVT_RCVPLUS:
 		if (conn == g_tcpListenConnection) {
+            g_acceptClientIsDone = false;
 			osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_ACCEPT_CLIENT, osWaitForever);
+            while (!g_acceptClientIsDone) {
+                osDelay(1);
+            }
 		} else if (conn == g_tcpClientConnection) {
 			sendMessageToLowPriorityThread(ETHERNET_INPUT_AVAILABLE);
 		}
@@ -244,7 +249,6 @@ static void onEvent(uint8_t eventType) {
 		break;
 
     case QUEUE_MESSAGE_DESTROY_TCP_SERVER:
-        netconn_close(g_tcpListenConnection);
         netconn_delete(g_tcpListenConnection);
         g_tcpListenConnection = nullptr;
         break;
@@ -255,14 +259,18 @@ static void onEvent(uint8_t eventType) {
 			if (netconn_accept(g_tcpListenConnection, &newConnection) == ERR_OK) {
 				if (g_tcpClientConnection) {
 					// there is a client already connected, close this connection
-					netconn_close(newConnection);
+                    g_acceptClientIsDone = true;
+                    osDelay(10);
 					netconn_delete(newConnection);
 				} else {
 					// connection with the client established
 					g_tcpClientConnection = newConnection;
 					sendMessageToLowPriorityThread(ETHERNET_CLIENT_CONNECTED);
+                    g_acceptClientIsDone = true;
 				}
-			}
+			}  else {
+                g_acceptClientIsDone = true;
+            }
 		}
 		break;
 	}
@@ -289,6 +297,10 @@ void onIdle() {
             g_connectionState = CONNECTION_STATE_CONNECT_ERROR;
             sendMessageToLowPriorityThread(ETHERNET_CONNECTED);
 		}
+	}
+
+	if (g_tcpClientConnection) {
+
 	}
 }
 #endif
@@ -783,7 +795,6 @@ fail2:
 	g_inbuf = nullptr;
 
 fail1:
-	netconn_close(g_tcpClientConnection);
 	netconn_delete(g_tcpClientConnection);
 	g_tcpClientConnection = nullptr;
 	sendMessageToLowPriorityThread(ETHERNET_CLIENT_DISCONNECTED);
@@ -824,7 +835,6 @@ int writeBuffer(const char *buffer, uint32_t length) {
 
 void disconnectClient() {
 #if defined(EEZ_PLATFORM_STM32)
-	netconn_close(g_tcpClientConnection);
 	netconn_delete(g_tcpClientConnection);
 	g_tcpClientConnection = nullptr;
 #endif
