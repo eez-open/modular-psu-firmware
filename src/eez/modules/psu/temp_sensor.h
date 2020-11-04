@@ -69,7 +69,7 @@ public:
 private:
     float doRead();
 
-	void testTemperatureValidity(float value);
+	void testTemperatureValidity(float &value);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

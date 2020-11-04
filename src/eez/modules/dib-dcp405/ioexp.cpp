@@ -223,6 +223,10 @@ bool IOExpander::test() {
             DebugTrace("Ch%d power fault\n", channel.channelIndex + 1);
             generateChannelError(SCPI_ERROR_CH1_FAULT_DETECTED, channel.channelIndex);
         }
+#else
+        testBit(IO_BIT_IN_PWRGOOD);
+        channel.flags.powerOk = 1;
+        testResult = TEST_OK;
 #endif
 	}
 #endif

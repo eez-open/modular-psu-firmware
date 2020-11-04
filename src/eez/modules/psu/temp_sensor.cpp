@@ -95,12 +95,13 @@ float TempSensor::doRead() {
     return NAN;
 }
 
-void TempSensor::testTemperatureValidity(float value) {
+void TempSensor::testTemperatureValidity(float& value) {
     Channel *channel = getChannel();
     if (!channel || channel->isOk()) {
         bool isTemperatureValueInvalid = isNaN(value) || value < TEMP_SENSOR_MIN_VALID_TEMPERATURE || value > TEMP_SENSOR_MAX_VALID_TEMPERATURE;
         if (isTemperatureValueInvalid) {
             if (g_testResult == TEST_OK) {
+#if !CONF_SURVIVE_MODE
                 g_testResult = TEST_FAILED;
 
                 if (channel) {
@@ -109,6 +110,9 @@ void TempSensor::testTemperatureValidity(float value) {
                 }
 
                 generateError(scpi_error);
+#else
+                value = 60.0f;
+#endif
             }
         } else {
             g_testResult = TEST_OK;
