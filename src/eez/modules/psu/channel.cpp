@@ -846,6 +846,10 @@ void Channel::addIMonAdcValue(float value) {
         value = remapAdcValue(value, cal_conf.i[flags.currentCurrentRange]);
     }
 
+    if (g_slots[slotIndex]->moduleType == MODULE_TYPE_DCP405 && value < 0 && isCvMode() &&  u.set >= 0.1f) {
+        value = 0;
+    }
+
     i.addMonValue(value, getCurrentResolution(value));
 }
 
@@ -1596,6 +1600,10 @@ float Channel::getUSet() const {
 
 float Channel::getISet() const {
     return i.set;
+}
+
+bool Channel::getCurrentEncoderRangeAndStep(EncoderRangeAndStep *encoderRangeAndStep) {
+    return false;
 }
 
 void Channel::readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
