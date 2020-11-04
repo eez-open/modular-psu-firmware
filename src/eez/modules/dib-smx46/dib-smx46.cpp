@@ -604,7 +604,11 @@ public:
         stepValues->values = DAC_ENCODER_STEP_VALUES;
         stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);
         stepValues->unit = UNIT_VOLT;
-    }
+
+		stepValues->encoderSettings.accelerationEnabled = true;
+		stepValues->encoderSettings.range = DAC_MAX - DAC_MIN;
+		stepValues->encoderSettings.step = stepValues->values[0];
+}
     
     float getVoltageResolution(int subchannelIndex) override {
         return DAC_RESOLUTION;
@@ -921,15 +925,21 @@ void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &valu
         value = MakeValue(DAC_MIN, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(DAC_MAX, UNIT_VOLT);
-    } else if (operation == DATA_OPERATION_GET_UNIT) {
+    }else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "AO1";
+    }  else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
-        value = Value(DAC_RESOLUTION, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = DAC_ENCODER_STEP_VALUES;
         stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);
         stepValues->unit = UNIT_VOLT;
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+        stepValues->encoderSettings.range = DAC_MAX - DAC_MIN;
+        stepValues->encoderSettings.step = stepValues->values[0];
+
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
         ((Smx46Module *)g_slots[cursor])->dac1 = roundPrec(value.getFloat(), DAC_RESOLUTION);
@@ -951,16 +961,20 @@ void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &valu
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(DAC_MAX, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_NAME) {
-        value = "DAC 2";
+        value = "AO2";
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
-        value = Value(DAC_RESOLUTION, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = DAC_ENCODER_STEP_VALUES;
         stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);
         stepValues->unit = UNIT_VOLT;
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+        stepValues->encoderSettings.range = DAC_MAX - DAC_MIN;
+        stepValues->encoderSettings.step = stepValues->values[0];
+
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
         ((Smx46Module *)g_slots[cursor])->dac2 = roundPrec(value.getFloat(), DAC_RESOLUTION);

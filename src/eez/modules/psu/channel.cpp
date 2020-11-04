@@ -1602,10 +1602,6 @@ float Channel::getISet() const {
     return i.set;
 }
 
-bool Channel::getCurrentEncoderRangeAndStep(EncoderRangeAndStep *encoderRangeAndStep) {
-    return false;
-}
-
 void Channel::readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]) {
 }
 

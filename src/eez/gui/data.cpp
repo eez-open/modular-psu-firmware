@@ -604,22 +604,10 @@ void getLabel(Cursor cursor, int16_t id, char *text, int count) {
     value.toText(text, count);
 }
 
-Value getEncoderStep(Cursor cursor, int16_t id) {
-    Value value;
-    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_STEP, cursor, value);
-    return value;
-}
-
 bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues) {
     Value value(&stepValues, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_STEP_VALUES, cursor, value);
     return value.getType() == VALUE_TYPE_INT && value.getInt();
-}
-
-Value getEncoderPrecision(Cursor cursor, int16_t id) {
-    Value value;
-    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_PRECISION, cursor, value);
-    return value;
 }
 
 Value get(Cursor cursor, int16_t id) {

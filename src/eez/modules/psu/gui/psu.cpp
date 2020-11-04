@@ -1374,29 +1374,6 @@ bool isFocusChanged() {
 static bool g_isEncoderEnabledInActivePage;
 uint32_t g_focusEditValueChangedTime;
 
-float encoderIncrement(Value value, int counter, float min, float max) {
-    float step;
-
-    if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
-        StepValues stepValues;
-        edit_mode_step::getStepValues(stepValues);
-        step = stepValues.values[0];
-    } else {
-        step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
-    }
-
-    float newValue = value.getFloat() + step * counter;
-    newValue = roundPrec(newValue, step);
-
-    if (getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
-        newValue = 0;
-    } else {
-        newValue = clamp(newValue, min, max);
-    }
-
-    return newValue;
-}
-
 static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
     return g_psuAppContext.isWidgetActionEnabled(widgetCursor) && widgetCursor.widget->action == ACTION_ID_EDIT;
 }
@@ -1482,7 +1459,9 @@ void loadCustomLogo() {
 #endif
 
     if (!imageDecode("/logo.jpg", &g_customLogo) || g_customLogo.width > CONF_MAX_LOGO_WIDTH || g_customLogo.height > CONF_MAX_LOGO_HEIGHT) {
-        g_customLogo.pixels = nullptr;
+        if (!imageDecode("/logo.bmp", &g_customLogo) || g_customLogo.width > CONF_MAX_LOGO_WIDTH || g_customLogo.height > CONF_MAX_LOGO_HEIGHT) {
+            g_customLogo.pixels = nullptr;
+        }
     }
 
 #ifdef EEZ_PLATFORM_STM32
@@ -1802,42 +1781,29 @@ void onEncoder(int counter, bool clicked) {
             float min = getMin(g_focusCursor, g_focusDataId).getFloat();
             float max = getMax(g_focusCursor, g_focusDataId).getFloat();
             
-            float limit;
-            Value limitValue = getLimit(g_focusCursor, g_focusDataId);
-            if (limitValue.getType() == VALUE_TYPE_FLOAT) {
-                limit = limitValue.getFloat();
-            } else {
-                limit = max;
-            }
-
             float newValue;
 
-            Value stepValue = getEncoderStep(g_focusCursor, g_focusDataId);
-            if (stepValue.getType() != VALUE_TYPE_NONE) {
-                mcu::encoder::enableAcceleration(false);
+            StepValues stepValues;
+            edit_mode_step::getStepValues(stepValues);
+            mcu::encoder::enableAcceleration(stepValues.encoderSettings.accelerationEnabled, stepValues.encoderSettings.range, stepValues.encoderSettings.step);
 
-                float step;
-                if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
-                    step = stepValue.getFloat();
-                } else {
-                    step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
-                }
-
-                newValue = roundPrec(value.getFloat() + counter * step, step);
-                if (getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
-                    newValue = 0;
-                } else {
-                    newValue = clamp(newValue, min, max);
-                }
+            float step;
+            if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
+                step = stepValues.encoderSettings.step;
             } else {
-                StepValues stepValues;
-                edit_mode_step::getStepValues(stepValues);
-                mcu::encoder::enableAcceleration(true, limit - min, stepValues.values[0]);
-
-                newValue = encoderIncrement(value, counter, min, max);
+                step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
             }
 
+            newValue = roundPrec(value.getFloat() + counter * step, step);
+            if (getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
+                newValue = 0;
+            } else {
+                newValue = clamp(newValue, min, max);
+            }            
+
+            Value limitValue = getLimit(g_focusCursor, g_focusDataId);
             if (limitValue.getType() == VALUE_TYPE_FLOAT) {
+                float limit = limitValue.getFloat();
                 if (newValue > limit && value.getFloat() < limit) {
                     newValue = limit;
                 }

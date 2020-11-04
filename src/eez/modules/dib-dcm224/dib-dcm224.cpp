@@ -306,6 +306,10 @@ struct DcmChannel : public Channel {
         stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_VOLT;
+
+		stepValues->encoderSettings.accelerationEnabled = true;
+		stepValues->encoderSettings.range = params.U_MAX;
+		stepValues->encoderSettings.step = params.U_RESOLUTION;
 	}
     
 	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
@@ -314,6 +318,10 @@ struct DcmChannel : public Channel {
         stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_AMPER;
+
+		stepValues->encoderSettings.accelerationEnabled = true;
+		stepValues->encoderSettings.range = params.I_MAX;
+		stepValues->encoderSettings.step = params.I_RESOLUTION;
 	}
 
     void getPowerStepValues(StepValues *stepValues) override {
@@ -321,6 +329,10 @@ struct DcmChannel : public Channel {
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_WATT;
+
+		stepValues->encoderSettings.accelerationEnabled = true;
+		stepValues->encoderSettings.range = params.PTOT;
+		stepValues->encoderSettings.step = params.P_RESOLUTION;
 	}
 	
 	bool isPowerLimitExceeded(float u, float i, int *err) override {
@@ -1032,24 +1044,24 @@ void data_dib_dcm224_pwm_frequency(DataOperationEnum operation, Cursor cursor, V
             DcmChannel *channel = (DcmChannel *)g_channel;
             channel->pwmFrequency = value.getFloat();
         }
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        float fvalue;
-
-        ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
-        if (page && page->getDirty()) {
-            fvalue = page->m_pwmFrequency;
-        } else {
-            DcmChannel *channel = (DcmChannel *)g_channel;
-            fvalue = channel->pwmFrequency;
-        }
-
-        value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 1.0f, 100.0f, 500.0f, 1000.0f };
+
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_HERTZ;
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+
+        ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
+        float fvalue = page && page->getDirty() ? page->m_pwmFrequency : ((DcmChannel *)g_channel)->pwmFrequency;
+        float step = MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f);
+
+        stepValues->encoderSettings.range = step * 5.0f;
+        stepValues->encoderSettings.step = step;
+
         value = 1;
     }
 }
@@ -1088,14 +1100,19 @@ void data_dib_dcm224_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
             auto channel = (DcmChannel *)g_channel;
             channel->pwmDuty = value.getFloat();
         }
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        value = Value(1.0f, UNIT_PERCENT);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
+
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_PERCENT;
+
+        stepValues->encoderSettings.accelerationEnabled = false;
+        stepValues->encoderSettings.range = 100.0f;
+        stepValues->encoderSettings.step = 1.0f;
+
         value = 1;
     }
 }
@@ -1136,24 +1153,24 @@ void data_dib_dcm224_counterphase_frequency(DataOperationEnum operation, Cursor 
             auto module = (DcmModule *)g_slots[g_selectedSlotIndex];
             module->counterphaseFrequency = value.getFloat();
         }
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        float fvalue;
-
-        ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
-        if (page) {
-            fvalue = page->m_counterphaseFrequency;
-        } else {
-            auto module = (DcmModule *)g_slots[g_selectedSlotIndex];
-            fvalue = module->counterphaseFrequency;
-        }
-
-        value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 1.0f, 100.0f, 1000.0f, 10000.0f };
+
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_HERTZ;
+ 
+        stepValues->encoderSettings.accelerationEnabled = true;
+
+        ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
+        float fvalue = page ? page->m_counterphaseFrequency : ((DcmModule *)g_slots[g_selectedSlotIndex])->counterphaseFrequency;
+        float step = MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f);
+
+        stepValues->encoderSettings.range = step * 5.0f;
+        stepValues->encoderSettings.step = step;
+
         value = 1;
     }
 }

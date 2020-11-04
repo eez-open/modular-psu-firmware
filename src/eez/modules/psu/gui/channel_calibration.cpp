@@ -989,12 +989,7 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
             } else {
                 channel_dispatcher::getCurrentStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
             }
-        } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
-            if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                value = MakeValue(channel_dispatcher::getVoltageResolution(slotIndex, subchannelIndex) / 10, UNIT_VOLT);
-            } else {
-                value = MakeValue(channel_dispatcher::getCurrentResolution(slotIndex, subchannelIndex) / 10, UNIT_AMPER);
-            }
+            value = 1;
         } else if (operation == DATA_OPERATION_SET) {
             editPage->setDacValue(value.getFloat());
         }
@@ -1044,13 +1039,12 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
         } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
             value = channel ? 1 : 0;
         } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-            static float values[] = { 0.001f, 0.01f, 0.1f, 1.0f };
-            auto stepValues = value.getStepValues();
-            stepValues->values = values;
-            stepValues->count = sizeof(values) / sizeof(float);
-            stepValues->unit = UNIT_UNKNOWN;
-        } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
-            value = MakeValue(1E-4f, UNIT_UNKNOWN);
+            if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
+                channel_dispatcher::getVoltageStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
+            } else {
+                channel_dispatcher::getCurrentStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
+            }
+            value = 1;
         } else if (operation == DATA_OPERATION_SET) {
             editPage->setMeasuredValue(value.getFloat());
         }

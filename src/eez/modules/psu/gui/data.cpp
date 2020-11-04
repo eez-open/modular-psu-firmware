@@ -2229,9 +2229,14 @@ void data_channel_protection_ovp_level(DataOperationEnum operation, Cursor curso
 
 void getProtectionDelayStepValues(StepValues *stepValues) {
     static float values[] = { 1.0f, 5.0f, 10.0f, 20.0f };
+ 
     stepValues->values = values;
     stepValues->count = sizeof(values) / sizeof(float);
     stepValues->unit = UNIT_SECOND;
+
+    stepValues->encoderSettings.accelerationEnabled = true;
+    stepValues->encoderSettings.range = 10.0f * stepValues->values[0];
+    stepValues->encoderSettings.step = stepValues->values[0];
 }
 
 void data_channel_protection_ovp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2539,6 +2544,10 @@ void data_channel_protection_otp_level(DataOperationEnum operation, Cursor curso
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_CELSIUS;
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+        stepValues->encoderSettings.range = 10.0f * stepValues->values[0];
+        stepValues->encoderSettings.step = stepValues->values[0];
 
         value = 1;
     }
@@ -3051,8 +3060,6 @@ void data_sys_fan_speed(DataOperationEnum operation, Cursor cursor, Value &value
         if (page) {
             value = page->fanSpeedPercentage;
         }
-    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
-        value = Value(1.0f, UNIT_PERCENT);
     }
 }
 
@@ -3880,10 +3887,17 @@ void data_channel_list_dwell(DataOperationEnum operation, Cursor cursor, Value &
         }
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 0.001f, 0.01f, 0.1f, 1.0f };
+
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_SECOND;
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+        stepValues->encoderSettings.range = 10.0f * stepValues->values[0];
+        stepValues->encoderSettings.step = stepValues->values[0];
+
         value = 1;
     }
 }
@@ -3928,7 +3942,12 @@ void data_channel_list_voltage(DataOperationEnum operation, Cursor cursor, Value
             value = MakeFloatListValue(page->m_voltageList);
         }
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        data_channel_u_edit(operation, cursor, value);
+        StepValues *stepValues = value.getStepValues();
+
+        data_channel_u_edit(operation, g_channel->channelIndex, value);
+
+        stepValues->encoderSettings.range = g_channel->params.U_MAX;
+        stepValues->encoderSettings.step = g_channel->params.U_RESOLUTION;
     }
 }
 
@@ -3975,7 +3994,12 @@ void data_channel_list_current(DataOperationEnum operation, Cursor cursor, Value
             value = MakeFloatListValue(page->m_currentList);
         }
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        StepValues *stepValues = value.getStepValues();
+
         data_channel_i_edit(operation, cursor, value);
+
+        stepValues->encoderSettings.range = g_channel->params.I_MAX;
+        stepValues->encoderSettings.step = g_channel->params.I_RESOLUTION;
     }
 }
 
@@ -4293,23 +4317,24 @@ void data_io_pin_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value
         } else {
             io_pins::setPwmFrequency(cursor, value.getFloat());
         }
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        float fvalue;
-
-        SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
-        if (page && page->getDirty()) {
-            fvalue = page->getPwmFrequency(cursor);
-        } else {
-            fvalue = io_pins::getPwmFrequency(cursor);
-        }
-
-        value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 1.0f, 100.0f, 1000.0f, 10000.0f };
+
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_HERTZ;
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+
+        SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+        float fvalue = page && page->getDirty() ? page->getPwmFrequency(cursor) : io_pins::getPwmFrequency(cursor);
+        float step = MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f);
+
+        stepValues->encoderSettings.range = step * 5.0f;
+        stepValues->encoderSettings.step = step;
+
         value = 1;
     }
 }
@@ -4344,14 +4369,19 @@ void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &val
         } else {
             io_pins::setPwmDuty(cursor, value.getFloat());
         }
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        value = Value(1.0f, UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
+
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_PERCENT;
+
+        stepValues->encoderSettings.accelerationEnabled = false;
+        stepValues->encoderSettings.range = 100.0f;
+        stepValues->encoderSettings.step = 1.0f;
+
         value = 1;
     }
 }
@@ -4995,19 +5025,26 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
         } else {
             recording.cursorOffset = (uint32_t)roundf(cursorOffset);
         }
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        value = Value(recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static const int COUNT = 4;
+
         static float values[COUNT];
+
         values[0] = recording.parameters.xAxis.step;
         values[1] = recording.parameters.xAxis.step * 10;
         values[2] = recording.parameters.xAxis.step * 100;
         values[3] = recording.parameters.xAxis.step * 1000;
+
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = COUNT;
         stepValues->unit = dlog_view::getXAxisUnit(recording);
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+        stepValues->encoderSettings.range = 100.0f * values[0];
+        stepValues->encoderSettings.step = values[0];
+
         value = 1;
     }
 }
@@ -5129,6 +5166,11 @@ void guessStepValues(StepValues *stepValues, Unit unit) {
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     }
+
+    stepValues->encoderSettings.accelerationEnabled = true;
+    stepValues->encoderSettings.range = stepValues->values[0] * 10.0f;
+    stepValues->encoderSettings.step = stepValues->values[0];
+
     stepValues->unit = unit;
 }
 
@@ -5704,6 +5746,10 @@ void getRampAndDelayDurationStepValues(Value &value) {
     stepValues->count = sizeof(values) / sizeof(float);
     stepValues->unit = UNIT_SECOND;
 
+    stepValues->encoderSettings.accelerationEnabled = true;
+    stepValues->encoderSettings.range = stepValues->values[0] * 10.0f;
+    stepValues->encoderSettings.step = stepValues->values[0];
+
     value = 1;
 }
 
@@ -5899,12 +5945,18 @@ void data_debug_u_dac(DataOperationEnum operation, Cursor cursor, Value &value) 
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 1.0f, 10.0f, 100.0f, 1000.0f };
+
         auto stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_UNKNOWN;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
-        value = MakeValue(1.0f, UNIT_UNKNOWN);
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+        stepValues->encoderSettings.range = stepValues->values[0] * 10.0f;
+        stepValues->encoderSettings.step = stepValues->values[0];
+
+        value = 1;
     }
 }
 
@@ -5951,12 +6003,18 @@ void data_debug_i_dac(DataOperationEnum operation, Cursor cursor, Value &value) 
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 1.0f, 10.0f, 100.0f, 1000.0f };
+
         auto stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_UNKNOWN;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
-        value = MakeValue(1.0f, UNIT_UNKNOWN);
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+        stepValues->encoderSettings.range = stepValues->values[0] * 10.0f;
+        stepValues->encoderSettings.step = stepValues->values[0];
+
+        value = 1;
     }
 }
 

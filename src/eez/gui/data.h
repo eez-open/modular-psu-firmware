@@ -19,10 +19,9 @@
 #pragma once
 
 #include <stdint.h>
-
 #include <eez/unit.h>
+#include <eez/index.h>
 #include <eez/gui/event.h>
-
 #include <eez/value_types.h>
 
 namespace eez {
@@ -342,9 +341,8 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_NAME,
     DATA_OPERATION_GET_UNIT,
     DATA_OPERATION_GET_IS_CHANNEL_DATA,
-    DATA_OPERATION_GET_ENCODER_STEP,
     DATA_OPERATION_GET_ENCODER_STEP_VALUES,
-    DATA_OPERATION_GET_ENCODER_PRECISION,
+    DATA_OPERATION_GET_ENCODER_RANGE_AND_STEP,
     DATA_OPERATION_GET_FLOAT_LIST_LENGTH,
     DATA_OPERATION_GET_FLOAT_LIST,
     DATA_OPERATION_GET_BITMAP_IMAGE,
@@ -416,9 +414,7 @@ bool isChannelData(Cursor cursor, int16_t id);
 
 void getLabel(Cursor cursor, int16_t id, char *text, int count);
 
-Value getEncoderStep(Cursor cursor, int16_t id);
 bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues);
-Value getEncoderPrecision(Cursor cursor, int16_t id);
 
 Value get(Cursor cursor, int16_t id);
 const char *isValidValue(Cursor cursor, int16_t id, Value value);

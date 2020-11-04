@@ -141,6 +141,17 @@ struct CalibrationConfiguration {
     char calibrationRemark[CALIBRATION_REMARK_MAX_LENGTH + 1];
 };
 
+struct StepValues {
+    int count;
+    const float *values;
+    Unit unit;
+    struct {
+        bool accelerationEnabled;
+        float range;
+        float step;
+    } encoderSettings;
+};
+
 struct Module {
     uint16_t moduleType;
     const char *moduleName;

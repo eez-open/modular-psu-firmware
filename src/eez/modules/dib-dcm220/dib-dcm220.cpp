@@ -275,6 +275,10 @@ struct DcmChannel : public Channel {
         stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_VOLT;
+
+		stepValues->encoderSettings.accelerationEnabled = true;
+		stepValues->encoderSettings.range = params.U_MAX;
+		stepValues->encoderSettings.step = params.U_RESOLUTION;
 	}
     
 	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
@@ -283,6 +287,10 @@ struct DcmChannel : public Channel {
         stepValues->values = calibrationMode ? calibrationModeValues : values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_AMPER;
+
+		stepValues->encoderSettings.accelerationEnabled = true;
+		stepValues->encoderSettings.range = params.I_MAX;
+		stepValues->encoderSettings.step = params.I_RESOLUTION;
 	}
 
     void getPowerStepValues(StepValues *stepValues) override {
@@ -290,6 +298,10 @@ struct DcmChannel : public Channel {
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_WATT;
+
+		stepValues->encoderSettings.accelerationEnabled = true;
+		stepValues->encoderSettings.range = params.PTOT;
+		stepValues->encoderSettings.step = params.P_RESOLUTION;
 	}
 	
 	bool isPowerLimitExceeded(float u, float i, int *err) override {

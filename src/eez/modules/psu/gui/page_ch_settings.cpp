@@ -835,30 +835,29 @@ void ChSettingsListsPage::onEncoder(int counter) {
     float min = getMin(cursor, dataId).getFloat();
     float max = getMax(cursor, dataId).getFloat();
 
-    if (dataId == DATA_ID_CHANNEL_LIST_DWELL) {
-        mcu::encoder::enableAcceleration(true);
-    } else {
-        StepValues stepValues;
-        edit_mode_step::getStepValues(stepValues);
-        mcu::encoder::enableAcceleration(true, max - min, stepValues.values[0]);
-    }
+    StepValues stepValues;
+    getEncoderStepValues(cursor, dataId, stepValues);
+
+    mcu::encoder::enableAcceleration(stepValues.encoderSettings.accelerationEnabled, stepValues.encoderSettings.range, stepValues.encoderSettings.step);
 
     float newValue;
 
-    Value stepValue = getEncoderStep(g_focusCursor, g_focusDataId);
-    if (stepValue.getType() != VALUE_TYPE_NONE) {
-        float step;
-        if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
-            step = stepValue.getFloat();
-        } else {
-            step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
-        }
-        newValue = roundPrec(value.getFloat() + counter * step, step);
-        newValue = clamp(newValue, min, max);
+    float step;
+
+    if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
+        step = stepValues.encoderSettings.step;
     } else {
-        newValue = encoderIncrement(value, counter, min, max);
+        step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
     }
 
+    newValue = value.getFloat() + step * counter;
+    newValue = roundPrec(newValue, step);
+
+    if (getAllowZero(cursor, dataId) && newValue < value.getFloat() && newValue < min) {
+        newValue = 0;
+    } else {
+        newValue = clamp(newValue, min, max);
+    }
 
     setFocusedValue(newValue);
 #endif

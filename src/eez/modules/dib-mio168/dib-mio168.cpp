@@ -677,6 +677,10 @@ struct AoutDac7760Channel : public MioChannel {
                 stepValues->unit = UNIT_AMPER;
             }
         }
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+        stepValues->encoderSettings.range = getMaxValue() - getMinValue();
+        stepValues->encoderSettings.step = getResolution();
     }
 
     void getDefaultCalibrationPoints(unsigned int &numPoints, float *&points) {
@@ -760,6 +764,10 @@ struct AoutDac7563Channel : public MioChannel {
             stepValues->count = sizeof(AOUT_DAC7563_ENCODER_STEP_VALUES) / sizeof(float);
             stepValues->unit = UNIT_VOLT;
         }
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+        stepValues->encoderSettings.range = AOUT_DAC7563_MAX - AOUT_DAC7563_MIN;
+        stepValues->encoderSettings.step = getResolution();
     }
 
     void getDefaultCalibrationPoints(unsigned int &numPoints, float *&points) {
@@ -2369,17 +2377,9 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Valu
         } else {
             value = UNIT_VOLT;
         }
-    } else if (operation == DATA_OPERATION_GET_ENCODER_PRECISION) {
-        if (aoutChannelIndex < 2) {
-            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
-            value = Value(channel.getResolution(), channel.getUnit());
-        } else {
-            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7563Channels[aoutChannelIndex - 2];
-            value = Value(channel.getResolution(), UNIT_VOLT);
-        }
-    } 
-    else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         StepValues *stepValues = value.getStepValues();
+
         if (aoutChannelIndex < 2) {
             auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
             channel.getStepValues(stepValues);
@@ -2387,6 +2387,7 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Valu
             auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7563Channels[aoutChannelIndex - 2];
             channel.getStepValues(stepValues);
         }
+
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
         if (aoutChannelIndex < 2) {
@@ -2544,15 +2545,23 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, Cursor cursor, Value 
         value = "PWM frequency";
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_HERTZ;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        float fvalue = ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_freq;
-        value = Value(MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f), UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 1.0f, 100.0f, 1000.0f, 10000.0f };
+
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_HERTZ;
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+
+        float fvalue = ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_freq;
+        float step = MAX(powf(10.0f, floorf(log10f(fabsf(fvalue))) - 1), 0.001f);
+
+        stepValues->encoderSettings.range = step * 5.0f;
+        stepValues->encoderSettings.step = step;
+
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
         ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_freq = value.getFloat();
@@ -2580,14 +2589,19 @@ void data_dib_mio168_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
         value = "PWM duty cycle";
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_PERCENT;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP) {
-        value = Value(1.0f, UNIT_HERTZ);
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
+
         StepValues *stepValues = value.getStepValues();
+
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_PERCENT;
+
+        stepValues->encoderSettings.accelerationEnabled = false;
+        stepValues->encoderSettings.range = 100.0f;
+        stepValues->encoderSettings.step = 1.0f;
+
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
         ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_duty = value.getFloat();

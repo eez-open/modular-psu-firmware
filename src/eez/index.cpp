@@ -436,6 +436,10 @@ void Module::getVoltageStepValues(int subchannelIndex, StepValues *stepValues, b
     stepValues->values = nullptr;
     stepValues->count = 0;
     stepValues->unit = UNIT_VOLT;
+
+    stepValues->encoderSettings.accelerationEnabled = false;
+    stepValues->encoderSettings.range = 40.0f;
+    stepValues->encoderSettings.step = 0.005f;
 }
 
 float Module::getVoltageResolution(int subchannelIndex) {
@@ -490,6 +494,10 @@ void Module::getCurrentStepValues(int subchannelIndex, StepValues *stepValues, b
     stepValues->values = nullptr;
     stepValues->count = 0;
     stepValues->unit = UNIT_AMPER;
+
+    stepValues->encoderSettings.accelerationEnabled = false;
+    stepValues->encoderSettings.range = 5.0f;
+    stepValues->encoderSettings.step = 0.0005f;
 }
 
 float Module::getCurrentResolution(int subchannelIndex) {

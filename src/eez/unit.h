@@ -63,10 +63,4 @@ inline const char *getUnitName(Unit unit) {
 
 int getScpiUnit(Unit unit);
 
-struct StepValues {
-    int count;
-    const float *values;
-    Unit unit;
-};
-
 } // namespace eez
