@@ -340,6 +340,7 @@ void lowPriorityThreadOneIter() {
                         if (written == imageDataSize) {
                             if (file.close()) {
                                 // success!
+                                psu::gui::infoMessage("Screenshot Taken");
                                 event_queue::pushEvent(event_queue::EVENT_INFO_SCREENSHOT_SAVED);
                                 onSdCardFileChangeHook(filePath);
                                 g_screenshotGenerating = false;
