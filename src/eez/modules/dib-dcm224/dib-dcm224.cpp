@@ -310,6 +310,10 @@ struct DcmChannel : public Channel {
 		stepValues->encoderSettings.accelerationEnabled = true;
 		stepValues->encoderSettings.range = params.U_MAX;
 		stepValues->encoderSettings.step = params.U_RESOLUTION;
+        if (calibrationMode) {
+            stepValues->encoderSettings.step /= 10.0f;
+            stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
+        }
 	}
     
 	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
@@ -322,6 +326,10 @@ struct DcmChannel : public Channel {
 		stepValues->encoderSettings.accelerationEnabled = true;
 		stepValues->encoderSettings.range = params.I_MAX;
 		stepValues->encoderSettings.step = params.I_RESOLUTION;
+        if (calibrationMode) {
+            stepValues->encoderSettings.step /= 10.0f;
+            stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
+        }
 	}
 
     void getPowerStepValues(StepValues *stepValues) override {

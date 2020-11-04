@@ -1517,6 +1517,11 @@ public:
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
         	aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].getStepValues(stepValues);
         }
+
+        if (calibrationMode) {
+            stepValues->encoderSettings.step /= 10.0f;
+            stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
+        }
     }
     
     float getVoltageResolution(int subchannelIndex) override {
@@ -1836,6 +1841,10 @@ public:
     void getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getStepValues(stepValues);
+            if (calibrationMode) {
+                stepValues->encoderSettings.step /= 10.0f;
+                stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
+            }
         }
     }
     

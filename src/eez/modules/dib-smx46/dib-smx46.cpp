@@ -608,7 +608,11 @@ public:
 		stepValues->encoderSettings.accelerationEnabled = true;
 		stepValues->encoderSettings.range = DAC_MAX - DAC_MIN;
 		stepValues->encoderSettings.step = stepValues->values[0];
-}
+        if (calibrationMode) {
+            stepValues->encoderSettings.step /= 10.0f;
+            stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
+        }
+    }
     
     float getVoltageResolution(int subchannelIndex) override {
         return DAC_RESOLUTION;
