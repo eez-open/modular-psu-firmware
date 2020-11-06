@@ -108,7 +108,12 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             taskEXIT_CRITICAL();
             restart();
 #endif
-        } else {
+        } else if (cmd == 30) {
+#if defined(EEZ_PLATFORM_STM32)
+            taskENTER_CRITICAL();
+#endif
+            while(1);
+        } {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;
         }
