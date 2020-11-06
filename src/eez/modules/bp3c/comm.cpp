@@ -60,6 +60,7 @@ bool masterSynchro(int slotIndex) {
             uint32_t startIrq = millis();
             while (true) {
                 if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
+                    slot.firmwareVersionAcquired = true;
                     slot.firmwareMajorVersion = rxBuffer[1];
                     slot.firmwareMinorVersion = rxBuffer[2];
                     slot.idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
@@ -81,6 +82,7 @@ bool masterSynchro(int slotIndex) {
 
         int32_t diff = millis() - start;
         if (diff > CONF_MASTER_SYNC_TIMEOUT_MS) {
+            slot.firmwareVersionAcquired = true;
             slot.firmwareMajorVersion = 0;
             slot.firmwareMinorVersion = 0;
             slot.idw0 = 0;
@@ -94,6 +96,7 @@ bool masterSynchro(int slotIndex) {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
+    slot.firmwareVersionAcquired = true;
     slot.firmwareMajorVersion = 1;
     slot.firmwareMinorVersion = 0;
     slot.idw0 = 0;
@@ -124,6 +127,7 @@ bool masterSynchroV2(int slotIndex) {
                 break;
             }
 
+            slot.firmwareVersionAcquired = true;
             slot.firmwareMajorVersion = rxBuffer[1];
             slot.firmwareMinorVersion = rxBuffer[2];
             slot.idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
@@ -140,6 +144,7 @@ bool masterSynchroV2(int slotIndex) {
         osDelay(1);
     }
 
+    slot.firmwareVersionAcquired = true;
     slot.firmwareMajorVersion = 0;
     slot.firmwareMinorVersion = 0;
     slot.idw0 = 0;
@@ -149,6 +154,7 @@ bool masterSynchroV2(int slotIndex) {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
+    slot.firmwareVersionAcquired = true;
     slot.firmwareMajorVersion = 1;
     slot.firmwareMinorVersion = 0;
     slot.idw0 = 0;

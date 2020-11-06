@@ -917,6 +917,8 @@ public:
         spiCrcCalculationEnable = false;
         numPowerChannels = 1;
         numOtherChannels = 0;		
+
+		firmareBasedModule = false;
     }
 
 	void boot() override {

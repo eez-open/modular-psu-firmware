@@ -1444,7 +1444,7 @@ Image g_customLogo;
 
 void loadCustomLogo() {
     static const uint32_t CONF_MAX_LOGO_WIDTH = 480;
-    static const uint32_t CONF_MAX_LOGO_HEIGHT = 120;
+    static const uint32_t CONF_MAX_LOGO_HEIGHT = 136;
 
 #ifdef EEZ_PLATFORM_STM32
     static bool loaded;
