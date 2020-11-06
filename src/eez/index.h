@@ -166,7 +166,9 @@ struct Module {
     uint8_t slotIndex = -1;
     bool enabled;
     uint16_t moduleRevision = 0;
+    bool firmareBasedModule = true;
     bool firmwareInstalled = false;
+    bool firmwareVersionAcquired = false;
 	uint8_t firmwareMajorVersion = 0;
 	uint8_t firmwareMinorVersion = 0;
 	uint32_t idw0 = 0;
