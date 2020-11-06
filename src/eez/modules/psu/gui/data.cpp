@@ -76,7 +76,7 @@ using namespace eez::psu;
 using namespace eez::psu::gui;
 
 #if defined(EEZ_PLATFORM_STM32)
-extern bool g_isResetByIWDG;
+extern uint32_t g_RCC_CSR;
 #endif
 
 namespace eez {
@@ -893,17 +893,15 @@ bool compare_SLOT_INFO_WITH_FW_VER_value(const Value &a, const Value &b) {
 }
 
 void SLOT_INFO_WITH_FW_VER_value_to_text(const Value &value, char *text, int count) {
-    int slotIndex = value.getInt();
+    int slotIndex = value.getInt() & 0xFF;
     auto &slot = *g_slots[slotIndex];
     if (slot.moduleType != MODULE_TYPE_NONE) {
-        if (slot.firmwareInstalled) {
-            if (slot.firmwareMajorVersion == 0 && slot.firmwareMinorVersion == 0) {
-                snprintf(text, count - 1, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
-            } else {
-                snprintf(text, count - 1, "%s R%dB%d v%d.%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF), slot.firmwareMajorVersion, slot.firmwareMinorVersion);
-            }
-        } else {
+        if (slot.firmwareVersionAcquired && (slot.firmwareMajorVersion != 0 || slot.firmwareMinorVersion != 0)) {
+            snprintf(text, count - 1, "%s R%dB%d v%d.%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF), slot.firmwareMajorVersion, slot.firmwareMinorVersion);
+        } else if (slot.firmareBasedModule && slot.firmwareVersionAcquired) {
             snprintf(text, count - 1, "%s R%dB%d ---", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+        } else {
+            snprintf(text, count - 1, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
         }
     } else {
         strncpy(text, "Not installed", count - 1);
@@ -5631,7 +5629,7 @@ void data_slot_info(DataOperationEnum operation, Cursor cursor, Value &value) {
 
 void data_slot_info_with_fw_ver(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(cursor != -1 ? cursor : hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_INFO_WITH_FW_VER);
+        value = Value(cursor | (g_slots[cursor]->firmwareMajorVersion) << 8 | (g_slots[cursor]->firmwareMinorVersion) << 16, VALUE_TYPE_SLOT_INFO_WITH_FW_VER);
     }
 }
 
@@ -5674,7 +5672,7 @@ void data_slot_title_settings(DataOperationEnum operation, Cursor cursor, Value 
 void data_is_reset_by_iwdg(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         #if defined(EEZ_PLATFORM_STM32)
-            value = g_isResetByIWDG ? 1 : 0;
+            value = g_RCC_CSR & RCC_CSR_IWDGRSTF ? 1 : 0;
         #endif
     }
 }

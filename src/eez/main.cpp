@@ -85,7 +85,7 @@ void startEmscripten();
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(EEZ_PLATFORM_STM32)
-bool g_isResetByIWDG;
+uint32_t g_RCC_CSR;
 #endif
 
 int main(int argc, char **argv) {
@@ -94,18 +94,16 @@ int main(int argc, char **argv) {
 #else
 
 #if defined(EEZ_PLATFORM_STM32)
-	if (RCC->CSR & RCC_CSR_IWDGRSTF) {	
-		/* Reset by IWDG */
-		g_isResetByIWDG = true;
-		/* Clear reset flags */
-		RCC->CSR |= RCC_CSR_RMVF;
-	}
+    // Save reset flags
+    g_RCC_CSR = RCC->CSR;
+    // Clear reset flags
+    RCC->CSR |= RCC_CSR_RMVF;
 
-	volatile unsigned int* const SCB_DHCSR = (volatile unsigned int *)0xE000EDF0;
-	bool debugger = *SCB_DHCSR & 1;
-	if (!debugger) {
-		MX_IWDG_Init();
-	}
+    // __HAL_RCC_DBGMCU_CLK_ENABLE();
+    // __HAL_DBGMCU_FREEZE_IWDG();
+    DBGMCU->APB1FZ |= DBGMCU_APB1_FZ_DBG_IWDG_STOP;
+
+    MX_IWDG_Init();
 
     HAL_Init();
     SystemClock_Config();

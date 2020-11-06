@@ -72,7 +72,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(EEZ_PLATFORM_STM32)
-extern bool g_isResetByIWDG;
+extern uint32_t g_RCC_CSR;
 #endif
 
 namespace eez {
@@ -231,12 +231,6 @@ void boot() {
 
     g_bootTestSuccess &= testMaster();
 
-#if defined(EEZ_PLATFORM_STM32)
-    if (g_isResetByIWDG) {
-        psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_WATCHDOG_RESET);
-    }
-#endif
-
     if (!psu::autoRecall()) {
         psu::psuReset();
     }
@@ -257,6 +251,34 @@ void boot() {
 
     mp::initMessageQueue();
     mp::startThread();
+
+#if defined(EEZ_PLATFORM_STM32)
+    if (g_RCC_CSR & RCC_CSR_LPWRRSTF) {
+        DebugTrace("Low-power reset flag\n");
+    }
+    if (g_RCC_CSR & RCC_CSR_WWDGRSTF) {
+        DebugTrace("Window watchdog reset flag\n");
+    }
+    if (g_RCC_CSR & RCC_CSR_IWDGRSTF) {
+        DebugTrace("Independent watchdog reset flag\n");
+    }
+    if (g_RCC_CSR & RCC_CSR_SFTRSTF) {
+        DebugTrace("Software reset flag\n");
+    }
+    if (g_RCC_CSR & RCC_CSR_PORRSTF) {
+        DebugTrace("POR/PDR reset flag\n");
+    }
+    if (g_RCC_CSR & RCC_CSR_PINRSTF) {
+        DebugTrace("PIN reset flag\n");
+    }
+    if (g_RCC_CSR & RCC_CSR_BORRSTF) {
+        DebugTrace("BOR reset flag\n");
+    }
+
+    if (g_RCC_CSR & RCC_CSR_IWDGRSTF) {	
+        psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_WATCHDOG_RESET);
+    }
+#endif
 }
 
 bool testMaster() {
