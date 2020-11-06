@@ -1281,11 +1281,6 @@ void onSdCardFileChangeHook(const char *filePath1, const char *filePath2) {
     if (filePath2) {
         onSdCardFileChangeHook(filePath2);
     }
-
-    // invalidate storage info cache
-    uint64_t usedSpace;
-    uint64_t freeSpace;
-    psu::sd_card::getInfo(usedSpace, freeSpace, false); // "false" means **do not** get storage info from cache
 }
 
 } // namespace eez
