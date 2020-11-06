@@ -400,8 +400,6 @@ struct DcpChannel : public Channel {
 			}
 			delay(1);
 		}
-
-        WATCHDOG_RESET();
 #endif
     }
 

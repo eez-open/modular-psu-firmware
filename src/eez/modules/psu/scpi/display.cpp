@@ -183,6 +183,8 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
     static const size_t CHUNK_SIZE = 1024;
 
     while (imageDataSize > 0) {
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
         size_t n = MIN(imageDataSize, CHUNK_SIZE);
         SCPI_ResultArbitraryBlockData(context, imageData, n);
         imageData += n;

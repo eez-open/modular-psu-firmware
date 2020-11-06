@@ -50,7 +50,7 @@ bool masterSynchro(int slotIndex) {
     uint8_t rxBuffer[15];
 
     while (true) {
-        WATCHDOG_RESET();
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
 
         spi::select(slotIndex, spi::CHIP_SLAVE_MCU);
         spi::transfer(slotIndex, txBuffer, rxBuffer, sizeof(rxBuffer));
@@ -116,7 +116,7 @@ bool masterSynchroV2(int slotIndex) {
     uint8_t rxBuffer[15];
 
     while (true) {
-        WATCHDOG_RESET();
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
 
         if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
             spi::select(slotIndex, spi::CHIP_SLAVE_MCU);

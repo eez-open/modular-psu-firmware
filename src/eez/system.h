@@ -21,13 +21,21 @@
 #include "cmsis_os.h"
 #include <stdint.h>
 
+#define WATCHDOG_LONG_OPERATION 1
+#define WATCHDOG_HIGH_PRIORITY_THREAD 2
+#define WATCHDOG_GUI_THREAD 3
+
 #if defined(EEZ_PLATFORM_STM32)
-#include <main.h>
-#include <iwdg.h>
-#define WATCHDOG_RESET(...) HAL_IWDG_Refresh(&hiwdg)
+
+void doWatchdogReset(int fromTask);
+#define WATCHDOG_RESET(fromTask) doWatchdogReset(fromTask)
+
 extern volatile uint32_t g_tickCount;
+
 #else
+
 #define WATCHDOG_RESET(...) 0
+
 #endif
 
 namespace eez {

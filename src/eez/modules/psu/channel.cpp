@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <main.h>
+#endif
+
 #include <eez/modules/psu/psu.h>
 
 #include <math.h>

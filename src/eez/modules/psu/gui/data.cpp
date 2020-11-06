@@ -22,6 +22,11 @@
 #include <math.h>
 #include <stdio.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <main.h>
+#include <iwdg.h>
+#endif
+
 #include <eez/system.h>
 #include <eez/util.h>
 #include <eez/index.h>
@@ -5671,9 +5676,11 @@ void data_slot_title_settings(DataOperationEnum operation, Cursor cursor, Value 
 
 void data_is_reset_by_iwdg(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        #if defined(EEZ_PLATFORM_STM32)
+#if defined(EEZ_PLATFORM_STM32)
             value = g_RCC_CSR & RCC_CSR_IWDGRSTF ? 1 : 0;
-        #endif
+#else
+            value = 0;
+#endif
     }
 }
 

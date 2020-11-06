@@ -141,7 +141,7 @@ void oneIter() {
         onGuiQueueMessage(type, param);
     }
 
-    WATCHDOG_RESET();
+    WATCHDOG_RESET(WATCHDOG_GUI_THREAD);
 
     mcu::display::sync();
 

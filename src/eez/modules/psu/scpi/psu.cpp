@@ -167,17 +167,27 @@ OutputBufferWriter::OutputBufferWriter(char *buffer, size_t maxBufferSize, size_
 }
 
 size_t OutputBufferWriter::write(const char *data, size_t len) {
+	if (len == 0) {
+		return len;
+	}
+
     g_messageAvailable = true;
 
     const char *restData = nullptr;
     size_t restLen = 0;
 
-    const char *endOfLine = strstr(data, "\r\n");
-    if (endOfLine) {
-        restData = endOfLine + 2;
-        size_t n = restData - data;
-        restLen = len - n;
-        len = n;
+    if (m_bufferSize > 0 && m_buffer[m_bufferSize - 1] == '\r' && data[0] == '\n') {
+    	restData = data + 1;
+        restLen = len - 1;
+        len = 1;
+    } else {
+        const char *endOfLine = strnstr(data, "\r\n", len);
+        if (endOfLine) {
+            restData = endOfLine + 2;
+            size_t n = restData - data;
+            restLen = len - n;
+            len = n;
+        }
     }
 
     if (m_bufferSize + len < m_maxBufferSize) {

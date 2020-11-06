@@ -18,11 +18,32 @@
 
 #include <stdio.h>
 
+#include <main.h>
+#include <iwdg.h>
+
 #include <eez/system.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 volatile uint32_t g_tickCount;
 #endif
+
+int g_watchdogExpectingTask = WATCHDOG_HIGH_PRIORITY_THREAD;
+
+void doWatchdogReset(int fromTask) {
+	if (fromTask == WATCHDOG_LONG_OPERATION) {
+		HAL_IWDG_Refresh(&hiwdg);
+	} else if (fromTask == WATCHDOG_HIGH_PRIORITY_THREAD) {
+		if (g_watchdogExpectingTask == WATCHDOG_HIGH_PRIORITY_THREAD) {
+			HAL_IWDG_Refresh(&hiwdg);
+			g_watchdogExpectingTask = WATCHDOG_GUI_THREAD;
+		}
+	} else if (fromTask == WATCHDOG_GUI_THREAD) {
+		if (g_watchdogExpectingTask == WATCHDOG_GUI_THREAD) {
+			HAL_IWDG_Refresh(&hiwdg);
+			g_watchdogExpectingTask = WATCHDOG_HIGH_PRIORITY_THREAD;
+		}
+	}
+}
 
 namespace eez {
 

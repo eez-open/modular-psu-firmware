@@ -181,7 +181,7 @@ void highPriorityThreadOneIter() {
             return;
         }
 #endif
-        WATCHDOG_RESET();
+        WATCHDOG_RESET(WATCHDOG_HIGH_PRIORITY_THREAD);
         for (int i = 0; i < NUM_SLOTS; i++) {
             g_slots[i]->tick();
         }

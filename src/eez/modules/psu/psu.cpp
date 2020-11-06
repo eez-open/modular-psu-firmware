@@ -720,7 +720,7 @@ bool testChannels() {
     channel_dispatcher::disableOutputForAllChannels();
 
     for (int i = 0; i < CH_NUM; ++i) {
-        WATCHDOG_RESET();
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
         result &= Channel::get(i).test();
     }
 
