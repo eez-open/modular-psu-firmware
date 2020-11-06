@@ -4,7 +4,9 @@ build/linux
 build/win32
 src/third_party/micropython/ports/bare-arm/build
 src/third_party/stm32_cubeide/Debug
+src/third_party/stm32_cubeide/Debug (R3B3)
 src/third_party/stm32_truestudio/Debug
+src/third_party/stm32_truestudio/Debug (R3B3)
 *.eez-project-ui-state
 src/third_party/stm32_truestudio/.settings/language.settings.xml
 src/third_party/stm32_cubeide/.settings/language.settings.xml
