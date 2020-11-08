@@ -615,3 +615,27 @@ void getBaseFileName(const char *path, char *baseName, unsigned basenameSize) {
 }
 
 } // namespace eez
+
+#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
+char *strnstr(const char *s1, const char *s2, size_t n) {
+    char c = *s2;
+
+    if (c == '\0')
+        return (char *)s1;
+
+    for (size_t len = strlen(s2); len <= n; n--, s1++) {
+        if (*s1 == c) {
+            for (size_t i = 1;; i++) {
+                if (i == len) {
+                    return (char *)s1;
+                }
+                if (s1[i] != s2[i]) {
+                    break;
+                }
+            }
+        }
+    }
+
+    return NULL;
+}
+#endif

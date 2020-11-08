@@ -129,3 +129,7 @@ void formatBytes(uint64_t bytes, char *text, int count);
 void getBaseFileName(const char *path, char *baseName, unsigned basenameSize);
 
 } // namespace eez
+
+#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
+char *strnstr(const char *s1, const char *s2, size_t n);
+#endif
