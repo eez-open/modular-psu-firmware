@@ -798,6 +798,14 @@ float Channel::getCurrentResolution(float value) const {
     return precision;
 }
 
+float Channel::getCurrentResolution() const {
+    if (flags.currentCurrentRange == CURRENT_RANGE_LOW) {
+        return calibration::g_editor.isEnabled() ? params.I_LOW_RESOLUTION_DURING_CALIBRATION : params.I_LOW_RESOLUTION; // 5uA
+    }
+    
+    return  calibration::g_editor.isEnabled() ? params.I_RESOLUTION_DURING_CALIBRATION : params.I_RESOLUTION; // 0.5mA
+}
+
 float Channel::getPowerResolution() const {
     return params.P_RESOLUTION; // 1 mW;
 }
@@ -854,7 +862,7 @@ void Channel::addIMonAdcValue(float value) {
         value = 0;
     }
 
-    i.addMonValue(value, getCurrentResolution(value));
+    i.addMonValue(value, getCurrentResolution());
 }
 
 void Channel::addUMonDacAdcValue(float value) {
@@ -862,7 +870,7 @@ void Channel::addUMonDacAdcValue(float value) {
 }
 
 void Channel::addIMonDacAdcValue(float value) {
-    i.addMonDacValue(value, getCurrentResolution(value));
+    i.addMonDacValue(value, getCurrentResolution());
 }
 
 void Channel::onAdcData(AdcDataType adcDataType, float value) {

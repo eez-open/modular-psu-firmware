@@ -584,6 +584,7 @@ public:
 
     float getVoltageResolution() const;
     float getCurrentResolution(float value) const;
+    float getCurrentResolution() const;
     float getPowerResolution() const;
 
     bool isMicroAmperAllowed() const;
