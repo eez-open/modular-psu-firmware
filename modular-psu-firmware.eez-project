@@ -31328,7 +31328,9 @@
               {
                 "type": "Bitmap",
                 "style": {
-                  "inheritFrom": "default"
+                  "inheritFrom": "default",
+                  "activeColor": "text_regular",
+                  "activeBackgroundColor": "Background"
                 },
                 "data": "file_manager_opened_image",
                 "action": "show_previous_page",
