@@ -96,7 +96,7 @@ static ListViewOption g_rootDirectoryListViewOption = LIST_VIEW_LARGE_ICONS;
 static ListViewOption g_scriptsDirectoryListViewOption = LIST_VIEW_SCRIPTS;
 
 void catalogCallback(void *param, const char *name, FileType type, size_t size, bool isHiddenOrSystemFile) {
-    if (isHiddenOrSystemFile || (g_fileBrowserMode && type != FILE_TYPE_DIRECTORY && type != g_fileBrowserFileType)) {
+    if (isHiddenOrSystemFile || name[0] = '.' || (g_fileBrowserMode && type != FILE_TYPE_DIRECTORY && type != g_fileBrowserFileType)) {
         return;
     }
 
