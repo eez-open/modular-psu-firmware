@@ -26,14 +26,14 @@ namespace eez {
 namespace gui {
 
 struct ToggleButtonWidget {
-    const char *text1;
-    const char *text2;
+    AssetsPtr<const char> text1;
+    AssetsPtr<const char> text2;
 };
 
 FixPointersFunctionType TOGGLE_BUTTON_fixPointers = [](Widget *widget, Assets *assets) {
     ToggleButtonWidget *toggleButtonWidget = (ToggleButtonWidget *)widget->specific;
-    toggleButtonWidget->text1 = (const char *)((uint8_t *)assets->document + (uint32_t)toggleButtonWidget->text1);
-    toggleButtonWidget->text2 = (const char *)((uint8_t *)assets->document + (uint32_t)toggleButtonWidget->text2);
+    toggleButtonWidget->text1 = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)toggleButtonWidget->text1);
+    toggleButtonWidget->text2 = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)toggleButtonWidget->text2);
 };
 
 EnumFunctionType TOGGLE_BUTTON_enum = nullptr;

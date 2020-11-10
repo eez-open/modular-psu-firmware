@@ -29,14 +29,14 @@ namespace gui {
 
 struct UpDownWidget {
     uint16_t buttonsStyle;
-    const char *downButtonText;
-	const char *upButtonText;
+    AssetsPtr<const char> downButtonText;
+    AssetsPtr<const char> upButtonText;
 };
 
 FixPointersFunctionType UP_DOWN_fixPointers = [](Widget *widget, Assets *assets) {
     UpDownWidget *upDownWidget = (UpDownWidget *)widget->specific;
-    upDownWidget->downButtonText = (const char *)((uint8_t *)assets->document + (uint32_t)upDownWidget->downButtonText);
-    upDownWidget->upButtonText = (const char *)((uint8_t *)assets->document + (uint32_t)upDownWidget->upButtonText);
+    upDownWidget->downButtonText = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)upDownWidget->downButtonText);
+    upDownWidget->upButtonText = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)upDownWidget->upButtonText);
 };
 
 EnumFunctionType UP_DOWN_enum = nullptr;

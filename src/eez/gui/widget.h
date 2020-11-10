@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <type_traits>
 #include <eez/gui/geometry.h>
+#include <eez/memory.h>
 
 namespace eez {
 namespace gui {
@@ -55,6 +57,101 @@ enum ValueTypes {
 #undef WIDGET_TYPE
 
 typedef void (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
+
+template<typename T, bool is_void>
+struct AssetsPtrImpl;
+
+/* This template is used (on 64-bit systems) to pack asset pointers into 32-bit values.
+ * All pointers are relative to MEMORY_BEGIN.
+ * This way, the assets created by Studio can be used without having to fix all
+ * the sizes - Studio creates 32-bit pointers that are relative to the
+ * beginning of the assets, which the firmware rewrites to global pointers
+ * during initialization. On a 32-bit system this works just fine, but for a
+ * 64-bit system the pointers have different sizes and this breaks. By
+ * inserting a 'middleman' structure that stores the pointers as a 32-bit
+ * offset to MEMORY_BEGIN, we can keep the pointer sizes and initialization
+ * code the same.
+ */
+template<typename T>
+struct AssetsPtrImpl<T, false>
+{
+    /* Default constructors initialize to an invalid pointer */
+    AssetsPtrImpl() = default;
+    AssetsPtrImpl(std::nullptr_t v) {};
+    /* Can accept void or T pointers. Store the offset to MEMORY_BEGIN. */
+    AssetsPtrImpl(T * p) : val(reinterpret_cast<const uint8_t*>(p) - MEMORY_BEGIN) {}
+    AssetsPtrImpl(void * p) : val(reinterpret_cast<const uint8_t*>(p) - MEMORY_BEGIN) {}
+
+    /* Conversion to an int return the raw value */
+    operator uint32_t() const { return val; }
+    
+    /* Implicit conversion to a T pointer */
+    operator T*() const { return ptr(); }
+    
+    /* Implicit conversions to void pointers */
+    operator       void*() const { return ptr(); }
+    operator const void*() const { return ptr(); }
+
+    /* Special cases for converting to (unsigned) char for pointer arithmetic */
+    template<typename U, typename = typename std::enable_if<!std::is_same<typename std::remove_pointer<U>::type, T>::value>>
+    operator U() const { return (U)ptr(); }
+    
+    /* Dereferencing operators */
+          T* operator->()       { return ptr(); }
+    const T* operator->() const { return ptr(); }
+    
+    /* Array access */
+    T&       operator[](uint32_t i)       { return ptr()[i]; }
+    const T& operator[](uint32_t i) const { return ptr()[i]; }
+    
+    /* Implement addition of ints just like 'normal' pointers */
+    T* operator+(int i)      { return &ptr()[i]; }
+    T* operator+(unsigned i) { return &ptr()[i]; }
+
+    /* Calculate the pointer, return a null pointer if the value is invalid */
+    T* ptr() const {
+        if (val == 0xFFFFFFFF) {
+            return 0;
+        } else {
+            return (T*)(MEMORY_BEGIN + val);
+        }
+    }
+
+    uint32_t val{0xFFFFFFFF};
+};
+
+/* Template specialization for void pointers that does not allow dereferencing */
+template<typename T>
+struct AssetsPtrImpl<T, true>
+{
+    AssetsPtrImpl() = default;
+    AssetsPtrImpl(std::nullptr_t) {};
+    AssetsPtrImpl(T* p) : val(reinterpret_cast<const uint8_t*>(p) - MEMORY_BEGIN) {}
+    operator uint32_t() const { return val; }
+    operator T*() const { return reinterpret_cast<T*>(MEMORY_BEGIN + val); }
+
+    /* Implicit conversions to convert to any pointer type */
+    template<typename U> operator U() const { return (U)(T*)(*this); }
+    uint32_t val{0xFFFFFFFF};
+};
+
+/* This struct chooses the type used for AssetsPtr<T> - by default it uses an AssetsPtrImpl<> */
+template<typename T, uint32_t ptrSize>
+struct AssetsPtrChooser
+{
+    using type = AssetsPtrImpl<T, std::is_void<T>::value>;
+};
+
+/* On 32-bit systems, we can just use raw pointers */
+template<typename T>
+struct AssetsPtrChooser<T, 4>
+{
+    using type = T*;
+};
+
+/* Utility typedef that delegates to AssetsPtrChooser */
+template<typename T>
+using AssetsPtr = typename AssetsPtrChooser<T, sizeof(void*)>::type;
 
 struct Widget;
 struct Assets;
@@ -110,15 +207,15 @@ struct Style {
     uint8_t padding_right;
     uint8_t padding_bottom;
     uint8_t padding_left;
-	uint8_t margin_top;
-	uint8_t margin_right;
-	uint8_t margin_bottom;
-	uint8_t margin_left;
+    uint8_t margin_top;
+    uint8_t margin_right;
+    uint8_t margin_bottom;
+    uint8_t margin_left;
 };
 
 struct StyleList {
     uint32_t count;
-    const Style *first;
+    AssetsPtr<const Style> first;
 };
 
 void StyleList_fixPointers(StyleList &styleList);
@@ -134,14 +231,14 @@ struct Widget {
     int16_t w;
     int16_t h;
     uint16_t style;
-    const void *specific;
+    AssetsPtr<const void> specific;
 };
 
-void Widget_fixPointers(Widget *widget);
+void Widget_fixPointers(Widget* widget);
 
 struct WidgetList {
     uint32_t count;
-    const Widget *first;
+    AssetsPtr<const Widget> first;
 };
 
 void WidgetList_fixPointers(WidgetList &widgetList);
@@ -165,13 +262,13 @@ struct Document {
 
 struct ColorList {
     uint32_t count;
-    const uint16_t *first;
+    AssetsPtr<const uint16_t> first;
 };
 
 void ColorList_fixPointers(ColorList &colorList);
 
 struct Theme {
-    const char *name;
+    AssetsPtr<const char> name;
     ColorList colors;
 };
 
@@ -179,7 +276,7 @@ void Theme_fixPointers(Theme *theme);
 
 struct ThemeList {
     uint32_t count;
-    const Theme *first;
+    AssetsPtr<const Theme> first;
 };
 
 void ThemeList_fixPointers(ThemeList &themeList);
@@ -193,17 +290,17 @@ struct Colors {
 
 struct NameList {
     uint32_t count;
-    const char **first;
+    AssetsPtr<AssetsPtr<const char>> first;
 };
 
 struct Assets {
-    Document *document;
-    StyleList *styles;
-    uint8_t *fontsData;
-    uint8_t *bitmapsData;
-    Colors *colorsData;
-    NameList *actionNames;
-    NameList *dataItemNames;
+    AssetsPtr<Document> document;
+    AssetsPtr<StyleList> styles;
+    AssetsPtr<uint8_t> fontsData;
+    AssetsPtr<uint8_t> bitmapsData;
+    AssetsPtr<Colors> colorsData;
+    AssetsPtr<NameList> actionNames;
+    AssetsPtr<NameList> dataItemNames;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

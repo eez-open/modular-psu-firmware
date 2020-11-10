@@ -45,13 +45,13 @@ static Assets g_externalAssets;
 static Assets *g_fixPointersAssets;
 
 void StyleList_fixPointers() {
-    g_fixPointersAssets->styles->first = (Style *)((uint8_t *)g_fixPointersAssets->styles + (uint32_t)g_fixPointersAssets->styles->first);
+    g_fixPointersAssets->styles->first = (const Style *)((uint8_t *)g_fixPointersAssets->styles + (uint32_t)g_fixPointersAssets->styles->first);
 }
 
 void WidgetList_fixPointers(WidgetList &widgetList) {
     widgetList.first = (Widget *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)widgetList.first);
     for (uint32_t i = 0; i < widgetList.count; ++i) {
-        Widget_fixPointers((Widget *)widgetList.first + i);
+        Widget_fixPointers((Widget *)&widgetList.first[i]);
     }
 }
 
@@ -67,7 +67,7 @@ void Theme_fixPointers(Theme *theme) {
 void ThemeList_fixPointers(ThemeList &themeList) {
     themeList.first = (Theme *)((uint8_t *)g_fixPointersAssets->colorsData + (uint32_t)themeList.first);
     for (uint32_t i = 0; i < themeList.count; ++i) {
-        Theme_fixPointers((Theme *)themeList.first + i);
+        Theme_fixPointers(const_cast<Theme*>(&themeList.first[i]));
     }
 }
 
@@ -78,7 +78,7 @@ void ColorsData_fixPointers() {
 
 void NameList_fixPointers(NameList *nameList) {
     if (nameList) {
-        nameList->first = (const char **)((uint8_t *)nameList + (uint32_t)nameList->first);
+        nameList->first = (void *){(uint8_t *)nameList + (uint32_t)nameList->first};
         for (uint32_t i = 0; i < nameList->count; i++) {
             nameList->first[i] = (const char *)((uint8_t *)nameList + (uint32_t)nameList->first[i]);
         }
