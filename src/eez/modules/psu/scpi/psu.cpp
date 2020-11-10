@@ -17,6 +17,9 @@
  */
 
 #include <stdio.h>
+#ifdef EEZ_PLATFORM_SIMULATOR_UNIX
+#include <bsd/string.h>
+#endif
 
 #include <eez/sound.h>
 #include <eez/system.h>

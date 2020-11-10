@@ -823,7 +823,7 @@ endif()
 if (UNIX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-    target_link_libraries(modular-psu-firmware Threads::Threads)    
+    target_link_libraries(modular-psu-firmware Threads::Threads bsd)
 endif (UNIX)
 
 target_link_libraries(modular-psu-firmware ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
