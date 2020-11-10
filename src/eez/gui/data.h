@@ -80,7 +80,7 @@ struct Value {
     Value() 
         : type_(VALUE_TYPE_NONE), options_(0), unit_(UNIT_UNKNOWN) 
     {
-        uint32_ = 0;
+        pVoid_ = 0;
     }
 
     Value(int value) 
