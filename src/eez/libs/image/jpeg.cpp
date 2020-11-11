@@ -152,20 +152,22 @@ bool jpegDecode(const char *filePath, Image *image) {
     if (jpegInfo.ChromaSubsampling == JPEG_420_SUBSAMPLING) {
         blockSize = YCBCR_420_BLOCK_SIZE;
         if ((width % 16) != 0) {
-            //lineOffset = 16 - (width % 16);
+            lineOffset = 16 - (width % 16);
         }
     } else if (jpegInfo.ChromaSubsampling == JPEG_422_SUBSAMPLING) {
         blockSize = YCBCR_422_BLOCK_SIZE;
         if ((width % 16) != 0) {
-            //lineOffset = 16 - (width % 16);
+            lineOffset = 16 - (width % 16);
         }
     } else {
     	// JPEG_444_SUBSAMPLING
     	blockSize = YCBCR_444_BLOCK_SIZE;
         if ((width % 8) != 0) {
-            //lineOffset = 8 - (width % 8);
+            lineOffset = 8 - (width % 8);
         }
     }
+
+    jpegInfo.ImageWidth += lineOffset;
 
     JPEG_YCbCrToRGB_Convert_Function convertFunction;
     uint32_t numMCUs;
