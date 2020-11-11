@@ -25,7 +25,6 @@ namespace bp3c {
 namespace comm {
 
 bool masterSynchro(int slotIndex);
-bool masterSynchroV2(int slotIndex);
 
 enum TransferResult {
     TRANSFER_STATUS_OK,

@@ -885,7 +885,7 @@ public:
 
     void initChannels() override {
         if (!synchronized) {
-            if (bp3c::comm::masterSynchroV2(slotIndex)) {
+            if (bp3c::comm::masterSynchro(slotIndex)) {
                 synchronized = true;
                 numCrcErrors = 0;
                 testResult = TEST_OK;

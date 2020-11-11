@@ -425,7 +425,7 @@ public:
 
     void init() {
         if (/*enabled && */!synchronized) {
-            if (bp3c::comm::masterSynchroV2(slotIndex)) {
+            if (bp3c::comm::masterSynchro(slotIndex)) {
                 synchronized = true;
                 lastTransferTickCount = millis();
                 numConsecutiveTransferErrors = 0;
@@ -517,7 +517,7 @@ public:
     TransferResult transfer() {
         TransferResult result;
         
-        if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
+        if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
             auto status = bp3c::comm::transfer(slotIndex, output, input, BUFFER_SIZE);
             if (status == bp3c::comm::TRANSFER_STATUS_OK) {
                 lastTransferTickCount = millis();

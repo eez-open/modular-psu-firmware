@@ -33,8 +33,7 @@
 #define SPI_SLAVE_SYNBYTE         0x53
 #define SPI_MASTER_SYNBYTE        0xAC
 
-#define CONF_MASTER_SYNC_TIMEOUT_MS 500
-#define CONF_MASTER_SYNC_IRQ_TIMEOUT_MS 50
+#define CONF_MASTER_SYNC_TIMEOUT_MS 1000
 
 namespace eez {
 namespace bp3c {
@@ -52,88 +51,20 @@ bool masterSynchro(int slotIndex) {
     while (true) {
         WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
 
-        spi::select(slotIndex, spi::CHIP_SLAVE_MCU);
-        spi::transfer(slotIndex, txBuffer, rxBuffer, sizeof(rxBuffer));
-        spi::deselect(slotIndex);
-
-        if (rxBuffer[0] == SPI_SLAVE_SYNBYTE) {
-            uint32_t startIrq = millis();
-            while (true) {
-                if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
-                    slot.firmwareVersionAcquired = true;
-                    slot.firmwareMajorVersion = rxBuffer[1];
-                    slot.firmwareMinorVersion = rxBuffer[2];
-                    slot.idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
-                    slot.idw1 = (rxBuffer[7] << 24) | (rxBuffer[8] << 16) | (rxBuffer[9] << 8) | rxBuffer[10];
-                    slot.idw2 = (rxBuffer[11] << 24) | (rxBuffer[12] << 16) | (rxBuffer[13] << 8) | rxBuffer[14];
-                    return true;
-                }
-
-                int32_t diff = millis() - startIrq;
-                if (diff > CONF_MASTER_SYNC_IRQ_TIMEOUT_MS) {
-                    break;
-                }
-
-                osDelay(1);
-            }
-        } else {
-            // DebugTrace("Slot %d: %02X\n", slotIndex + 1, rxBuffer[0]);
-        }
-
-        int32_t diff = millis() - start;
-        if (diff > CONF_MASTER_SYNC_TIMEOUT_MS) {
-            slot.firmwareVersionAcquired = true;
-            slot.firmwareMajorVersion = 0;
-            slot.firmwareMinorVersion = 0;
-            slot.idw0 = 0;
-            slot.idw1 = 0;
-            slot.idw2 = 0;
-            return false;
-        }
-
-        osDelay(1);
-    }
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    slot.firmwareVersionAcquired = true;
-    slot.firmwareMajorVersion = 1;
-    slot.firmwareMinorVersion = 0;
-    slot.idw0 = 0;
-    slot.idw1 = 0;
-    slot.idw2 = 0;
-    return true;
-#endif
-}
-
-bool masterSynchroV2(int slotIndex) {
-    auto &slot = *g_slots[slotIndex];
-
-#if defined(EEZ_PLATFORM_STM32)
-    uint32_t start = millis();
-
-    uint8_t txBuffer[15] = { SPI_MASTER_SYNBYTE, (uint8_t)(slot.moduleRevision >> 8), (uint8_t)(slot.moduleRevision & 0xFF) };
-    uint8_t rxBuffer[15];
-
-    while (true) {
-        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
-
-        if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_SET) {
+        if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
             spi::select(slotIndex, spi::CHIP_SLAVE_MCU);
-            spi::transfer(slotIndex, txBuffer, rxBuffer, sizeof(rxBuffer));
+            auto result = spi::transfer(slotIndex, txBuffer, rxBuffer, sizeof(rxBuffer));
             spi::deselect(slotIndex);
 
-            if (rxBuffer[0] != SPI_SLAVE_SYNBYTE) {
-                break;
+            if (result == HAL_OK && rxBuffer[0] == SPI_SLAVE_SYNBYTE) {
+				slot.firmwareVersionAcquired = true;
+				slot.firmwareMajorVersion = rxBuffer[1];
+				slot.firmwareMinorVersion = rxBuffer[2];
+				slot.idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
+				slot.idw1 = (rxBuffer[7] << 24) | (rxBuffer[8] << 16) | (rxBuffer[9] << 8) | rxBuffer[10];
+				slot.idw2 = (rxBuffer[11] << 24) | (rxBuffer[12] << 16) | (rxBuffer[13] << 8) | rxBuffer[14];
+				return true;
             }
-
-            slot.firmwareVersionAcquired = true;
-            slot.firmwareMajorVersion = rxBuffer[1];
-            slot.firmwareMinorVersion = rxBuffer[2];
-            slot.idw0 = (rxBuffer[3] << 24) | (rxBuffer[4] << 16) | (rxBuffer[5] << 8) | rxBuffer[6];
-            slot.idw1 = (rxBuffer[7] << 24) | (rxBuffer[8] << 16) | (rxBuffer[9] << 8) | rxBuffer[10];
-            slot.idw2 = (rxBuffer[11] << 24) | (rxBuffer[12] << 16) | (rxBuffer[13] << 8) | rxBuffer[14];
-            return true;
         }
 
         int32_t diff = millis() - start;
