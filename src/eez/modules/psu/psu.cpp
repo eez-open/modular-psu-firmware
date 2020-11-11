@@ -936,8 +936,10 @@ bool powerUp() {
     // turn on Power On (PON) bit of ESE register
     reg_set_esr_bits(ESR_PON);
 
+#if defined(EEZ_PLATFORM_STM32)
     HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
     HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+#endif
 
     InfoTrace("Power up (v%s)\n", MCU_FIRMWARE);
 
@@ -994,8 +996,10 @@ void powerDown() {
 
     powerDownChannels();
 
+#if defined(EEZ_PLATFORM_STM32)
     HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
     HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
+#endif
 
     board::powerDown();
 
