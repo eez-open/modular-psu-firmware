@@ -199,6 +199,10 @@ bool isPsuThread() {
 }
 
 void sendMessageToPsu(HighPriorityThreadMessage messageType, uint32_t messageParam, uint32_t timeoutMillisec) {
+    if (!g_highPriorityMessageQueueId) {
+        return;
+    }
+
     osMessagePut(g_highPriorityMessageQueueId, QUEUE_MESSAGE(messageType, messageParam), timeoutMillisec);
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -469,6 +473,9 @@ bool isLowPriorityThread() {
 }
 
 void sendMessageToLowPriorityThread(LowPriorityThreadMessage messageType, uint32_t messageParam, uint32_t timeoutMillisec) {
+    if (!g_lowPriorityMessageQueueId) {
+        return;
+    }
     osMessagePut(g_lowPriorityMessageQueueId, QUEUE_MESSAGE(messageType, messageParam), timeoutMillisec);
 }
 

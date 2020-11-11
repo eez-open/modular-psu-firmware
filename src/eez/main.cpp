@@ -186,6 +186,11 @@ void mainTask(const void *) {
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(EEZ_PLATFORM_STM32)
+
+namespace eez {
+void readIntcapRegisterShortcut(int slotIndex);
+}
+
 extern "C" void SystemClock_Config(void);
 
 extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName) {
@@ -195,10 +200,19 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *p
 extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     using namespace eez;
 	if (GPIO_Pin == SPI2_IRQ_Pin) {
+        if (g_slots[0]->moduleType == MODULE_TYPE_DCP405) {
+            readIntcapRegisterShortcut(0);
+        }
         sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 0, 0);
     } else if (GPIO_Pin == SPI4_IRQ_Pin) {
+        if (g_slots[1]->moduleType == MODULE_TYPE_DCP405) {
+            readIntcapRegisterShortcut(1);
+        }
         sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 1, 0);
     } else if (GPIO_Pin == SPI5_IRQ_Pin) {
+        if (g_slots[2]->moduleType == MODULE_TYPE_DCP405) {
+            readIntcapRegisterShortcut(2);
+        }
         sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 2, 0);
     } 
 

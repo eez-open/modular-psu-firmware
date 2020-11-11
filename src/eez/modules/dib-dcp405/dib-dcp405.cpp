@@ -39,6 +39,8 @@
 #include <eez/gui/gui.h>
 
 #if defined(EEZ_PLATFORM_STM32)
+#include <main.h>
+
 #include <eez/drivers/tmp1075.h>
 #include <eez/drivers/tc77.h>
 #endif
@@ -827,6 +829,8 @@ struct DcpChannel : public Channel {
 			if (isOutputEnabled() && isHwOvpEnabled(*this)) {
 				protectionEnter(ovp, true);
 			}
+		} else if (!(intcap & (1 << IOExpander::IO_BIT_IN_PWRGOOD))) {
+			NVIC_SystemReset();
 		}
 	}
 #endif
@@ -1079,4 +1083,12 @@ void tickDacRamp(uint32_t tickCount) {
 }
 
 } // namespace dcp405
+
+void readIntcapRegisterShortcut(int slotIndex) {
+	dcp405::DcpChannel *channel = (dcp405::DcpChannel *)Channel::getBySlotIndex(slotIndex, 0);
+	if (channel) {
+		channel->ioexp.readIntcapRegister();
+	}
+}
+
 } // namespace eez

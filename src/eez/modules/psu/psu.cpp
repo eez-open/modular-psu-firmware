@@ -248,6 +248,10 @@ int PsuModule::getChannelSettingsPageId() {
     return eez::gui::PAGE_ID_CH_SETTINGS;
 }
 
+int PsuModule::getSlotSettingsPageId() {
+    return eez::gui::PAGE_ID_CH_SETTINGS;
+}
+
 void PsuModule::resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer) {
     auto &channel = Channel::get(channelIndex);
     auto parameters = (ProfileParameters *)buffer;
@@ -932,6 +936,9 @@ bool powerUp() {
     // turn on Power On (PON) bit of ESE register
     reg_set_esr_bits(ESR_PON);
 
+    HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
     InfoTrace("Power up (v%s)\n", MCU_FIRMWARE);
 
     // play power up tune on success
@@ -986,6 +993,9 @@ void powerDown() {
     }
 
     powerDownChannels();
+
+    HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+    HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
 
     board::powerDown();
 

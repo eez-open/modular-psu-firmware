@@ -182,6 +182,8 @@ void IOExpander::init() {
     HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
 #endif
 
+    readIntcapRegister();
+
 #endif
 }
 
@@ -255,6 +257,8 @@ void IOExpander::reinit() {
 
     	write(reg, value);
     }
+
+    readIntcapRegister();
 }
 #endif
 
