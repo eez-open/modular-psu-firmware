@@ -154,16 +154,25 @@ bool jpegDecode(const char *filePath, Image *image) {
         if ((width % 16) != 0) {
             lineOffset = 16 - (width % 16);
         }
+        if ((height % 16) != 0) {
+            jpegInfo.ImageHeight += 16 - (height % 16);
+        }
     } else if (jpegInfo.ChromaSubsampling == JPEG_422_SUBSAMPLING) {
         blockSize = YCBCR_422_BLOCK_SIZE;
         if ((width % 16) != 0) {
             lineOffset = 16 - (width % 16);
+        }
+        if ((height % 8) != 0) {
+            jpegInfo.ImageHeight += 8 - (height % 8);
         }
     } else {
     	// JPEG_444_SUBSAMPLING
     	blockSize = YCBCR_444_BLOCK_SIZE;
         if ((width % 8) != 0) {
             lineOffset = 8 - (width % 8);
+        }
+        if ((height % 8) != 0) {
+            jpegInfo.ImageHeight += 8 - (height % 8);
         }
     }
 
