@@ -19,6 +19,10 @@
 #include <math.h>
 #include <stdio.h>
 
+#if EEZ_PLATFORM_STM32
+#include <main.h>
+#endif
+
 #include <eez/firmware.h>
 #include <eez/system.h>
 
@@ -139,6 +143,13 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
             return SCPI_RES_OK;
         } else if (cmd == 24) {
             SCPI_ResultText(context, MCU_FIRMWARE_BUILD_DATE " " MCU_FIRMWARE_BUILD_TIME);
+            return SCPI_RES_OK;
+        } else if (cmd == 25) {
+#if EEZ_PLATFORM_STM32
+        	char idCode[20];
+        	snprintf(idCode, sizeof(idCode), "0x%08X", (unsigned int)DBGMCU->IDCODE);
+            SCPI_ResultText(context, idCode);
+#endif
             return SCPI_RES_OK;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
