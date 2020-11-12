@@ -97,7 +97,7 @@ void onKeypadTextTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     }
 
     Keypad *keypad = getActiveKeypad();
-    if (keypad) {
+    if (keypad && keypad != getActiveNumericKeypad()) {
         keypad->setCursorPosition(DISPLAY_DATA_getCharIndexAtPosition(touchEvent.x, widgetCursor));
     }
 }
@@ -305,9 +305,7 @@ int Keypad::getXScroll(const WidgetCursor &widgetCursor) {
     
     x -= widgetCursor.x;
 
-    static const int CURSOR_WIDTH = 2;
-
-    if (x < m_xScroll) {
+    if (x < m_xScroll + widgetCursor.widget->w / 4) {
         m_xScroll = MAX(x - widgetCursor.widget->w / 2, 0);
     } else if (m_xScroll + widgetCursor.widget->w < x + CURSOR_WIDTH) {
         m_xScroll = x + CURSOR_WIDTH - widgetCursor.widget->w;
@@ -468,6 +466,7 @@ char NumericKeypad::getDotSign() {
 }
 
 void NumericKeypad::appendEditUnit(char *text) {
+    strcat(text, " ");
     strcat(text, getUnitName(m_options.editValueUnit));
 }
 
@@ -702,6 +701,14 @@ Unit NumericKeypad::getSwitchToUnit() {
 
 void NumericKeypad::toggleEditUnit() {
     m_options.editValueUnit = getSwitchToUnit();
+}
+
+int NumericKeypad::getCursorPostion() {
+    if (m_state == START) {
+        return -1;
+    }
+
+    return Keypad::getCursorPostion();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

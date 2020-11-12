@@ -51,8 +51,6 @@ struct DisplayDataState {
     uint16_t activeBackgroundColor;
     uint32_t dataRefreshLastTime;
     int16_t cursorPosition;
-    uint32_t cursorBlinkStartTime;
-    uint8_t cursorVisible;
     uint8_t xScroll;
 };
 
@@ -87,7 +85,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     
     uint32_t currentTime = millis();
     widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
-    bool refreshData;
+    bool refreshData = false;
     if (widgetCursor.previousState) {
         refreshData = widgetCursor.currentState->data != widgetCursor.previousState->data;
         if (refreshData) {
@@ -109,7 +107,8 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     currentState->activeColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : getActiveColor(widgetCursor.cursor, widget->data, style);
     currentState->activeBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
 
-    currentState->cursorPosition = getTextCursorPosition(widgetCursor.cursor, widget->data);
+    bool cursorVisible = millis() % (2 * CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS) < CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS;
+    currentState->cursorPosition = cursorVisible ? getTextCursorPosition(widgetCursor.cursor, widget->data) : -1;
     
     currentState->xScroll = getXScroll(widgetCursor);
 
@@ -125,17 +124,6 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
         currentState->activeBackgroundColor != previousState->activeBackgroundColor ||
         currentState->cursorPosition != previousState->cursorPosition ||
         currentState->xScroll != previousState->xScroll;
-
-    if (currentState->cursorPosition != -1) {
-        if (refresh) {
-            currentState->cursorBlinkStartTime =  millis();
-            currentState->cursorVisible = 1;
-        } else {
-            currentState->cursorBlinkStartTime = previousState->cursorBlinkStartTime;
-            currentState->cursorVisible = (millis() - currentState->cursorBlinkStartTime) % (2 * CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS) < CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS;
-            refresh = currentState->cursorVisible != previousState->cursorVisible;
-        }
-    }
 
     if (refresh) {
         char text[64];
@@ -182,7 +170,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
             widgetCursor.currentState->flags.blinking, false,
             &currentState->color, &currentState->backgroundColor, &currentState->activeColor, &currentState->activeBackgroundColor,
             widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT,
-            currentState->cursorVisible ? currentState->cursorPosition : -1, currentState->xScroll);
+            currentState->cursorPosition, currentState->xScroll);
     }
 };
 

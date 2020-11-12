@@ -25,6 +25,8 @@
 
 #include <eez/libs/image/image.h>
 
+static const int CURSOR_WIDTH = 2;
+
 namespace eez {
 namespace mcu {
 namespace display {

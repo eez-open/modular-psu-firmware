@@ -1,4 +1,4 @@
-/*
+    /*
  * EEZ Modular Firmware
  * Copyright (C) 2015-present, Envox d.o.o.
  *
@@ -658,8 +658,8 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
     }
 
     if (cursorPosition != -1) {
-        drawVLine(xCursor, clip_y1 + 1, clip_y2 - clip_y1 - 2);
-        drawVLine(xCursor + 1, clip_y1 + 1, clip_y2 - clip_y1 - 2);
+        auto d = MAX(((clip_y2 - clip_y1) - font.getHeight()) / 2, 0);
+        fillRect(xCursor - CURSOR_WIDTH / 2, clip_y1 + d, xCursor + CURSOR_WIDTH / 2 - 1, clip_y2 - d);
     }
 
     markDirty(clip_x1, clip_y1, clip_x2, clip_y2);
