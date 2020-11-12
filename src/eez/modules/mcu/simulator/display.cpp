@@ -634,19 +634,28 @@ void drawBitmap(Image *image, int x, int y) {
     markDirty(x, y, x + image->width - 1, y + image->height - 1);
 }
 
-void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font) {
+void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font, int cursorPosition) {
     g_font = font;
 
     if (textLength == -1) {
-        char encoding;
-        while ((encoding = *text++) != 0) {
-            x += drawGlyph(x, y, clip_x1, clip_y1, clip_x2, clip_y2, encoding);
+        textLength = strlen(text);
+    }
+
+    int i;
+
+    for (i = 0; i < textLength && text[i]; ++i) {
+        char encoding = text[i];
+        auto dx = drawGlyph(x, y, clip_x1, clip_y1, clip_x2, clip_y2, encoding);
+        if (i == cursorPosition) {
+            drawVLine(x, clip_y1 + 1, clip_y2 - clip_y1 - 2);
+            drawVLine(x + 1, clip_y1 + 1, clip_y2 - clip_y1 - 2);
         }
-    } else {
-        for (int i = 0; i < textLength && text[i]; ++i) {
-            char encoding = text[i];
-            x += drawGlyph(x, y, clip_x1, clip_y1, clip_x2, clip_y2, encoding);
-        }
+        x += dx;
+    }
+
+    if (i == cursorPosition) {
+        drawVLine(x, clip_y1 + 1, clip_y2 - clip_y1 - 2);
+        drawVLine(x + 1, clip_y1 + 1, clip_y2 - clip_y1 - 2);
     }
 
     markDirty(clip_x1, clip_y1, clip_x2, clip_y2);

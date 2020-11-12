@@ -70,7 +70,7 @@ void drawGlyph(font::Font &font, font::Glyph &glyph, uint8_t encoding, int x, in
 
     char str[2] = { (char)encoding, 0 };
 
-    mcu::display::drawStr(str, 1, x, y, clip_x1, clip_y1, clip_x2, clip_y2, font);
+    mcu::display::drawStr(str, 1, x, y, clip_x1, clip_y1, clip_x2, clip_y2, font, -1);
 }
 
 void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const WidgetCursor &widgetCursor) {
@@ -156,7 +156,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
         xLabelText,
         y + h - MARGIN + GAP_BETWEEN_LABEL_AND_AXIS - (font.getAscent() - glyphLabel.height),
         x, y, x + w - 1, y + w - 1,
-        font);
+        font, -1);
 
     // max
     Value maxValue = Value(max, unit);
@@ -170,7 +170,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
         xLabelText,
         y + h - MARGIN + GAP_BETWEEN_LABEL_AND_AXIS - (font.getAscent() - glyphLabel.height),
         x, y, x + w - 1, y + w - 1,
-        font);
+        font, -1);
 
     // draw diagonal line from (min, min) to (max, max)
     drawAntialiasedLine(x + MARGIN, y + h - MARGIN - 1, x + w - MARGIN - 1, y + MARGIN);

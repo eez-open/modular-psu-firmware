@@ -142,6 +142,8 @@ OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
         if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
             return onWidgetDefaultTouch;
         }
+
+        return getWidgetTouchFunctionHook(widgetCursor);
     }
 
     return nullptr;

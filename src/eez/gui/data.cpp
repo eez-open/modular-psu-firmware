@@ -850,6 +850,12 @@ void ytDataTouchDrag(Cursor cursor, int16_t id, TouchDrag *touchDrag) {
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_TOUCH_DRAG, cursor, value);
 }
 
+int getTextCursorPosition(Cursor cursor, int16_t id) {
+    Value value;
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_TEXT_CURSOR_POSITION, cursor, value);
+    return value.getType() == VALUE_TYPE_INT ? value.getInt() : -1;
+}
+
 } // namespace gui
 } // namespace eez
 

@@ -25,6 +25,8 @@
 
 #include <eez/gui/gui.h>
 
+#define CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS 500
+
 namespace eez {
 namespace gui {
 
@@ -48,6 +50,9 @@ struct DisplayDataState {
     uint16_t activeColor;
     uint16_t activeBackgroundColor;
     uint32_t dataRefreshLastTime;
+    int16_t cursorPosition;
+    uint32_t cursorBlinkStartTime;
+    uint8_t cursorVisible;
 };
 
 FixPointersFunctionType DISPLAY_DATA_fixPointers = nullptr;
@@ -103,6 +108,8 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     currentState->activeColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : getActiveColor(widgetCursor.cursor, widget->data, style);
     currentState->activeBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
 
+    currentState->cursorPosition = getTextCursorPosition(widgetCursor.cursor, widget->data);
+
     bool refresh =
         !widgetCursor.previousState ||
         widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
@@ -112,7 +119,19 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
         currentState->color != previousState->color ||
         currentState->backgroundColor != previousState->backgroundColor ||
         currentState->activeColor != previousState->activeColor ||
-        currentState->activeBackgroundColor != previousState->activeBackgroundColor;
+        currentState->activeBackgroundColor != previousState->activeBackgroundColor ||
+        currentState->cursorPosition != previousState->cursorPosition;
+
+    if (currentState->cursorPosition != -1) {
+        if (refresh) {
+            currentState->cursorBlinkStartTime =  millis();
+            currentState->cursorVisible = 1;
+        } else {
+            currentState->cursorBlinkStartTime = previousState->cursorBlinkStartTime;
+            currentState->cursorVisible = (millis() - currentState->cursorBlinkStartTime) % (2 * CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS) < CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS;
+            refresh = currentState->cursorVisible != previousState->cursorVisible;
+        }
+    }
 
     if (refresh) {
         char text[64];
@@ -150,7 +169,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
 
         // trim right
         int length = strlen(start);
-        if (length > 0 && start[length - 1] == ' ') {
+        while (length > 0 && start[length - 1] == ' ') {
             length--;
         }
 
@@ -158,9 +177,58 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
                  style, widgetCursor.currentState->flags.active,
                  widgetCursor.currentState->flags.blinking, false,
                  &currentState->color, &currentState->backgroundColor, &currentState->activeColor, &currentState->activeBackgroundColor,
-                 widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT);
+                 widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT, currentState->cursorVisible ? currentState->cursorPosition : -1);
     }
 };
+
+int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCursor) {
+    const Widget *widget = widgetCursor.widget;
+    const DisplayDataWidget *display_data_widget = GET_WIDGET_PROPERTY(widget, specific, const DisplayDataWidget *);
+
+	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+
+    char text[64];
+    Value data = get(widgetCursor.cursor, widget->data);
+    data.toText(text, sizeof(text));
+
+    char *start = text;
+
+    if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER) {
+        int i = findStartOfFraction(text);
+        text[i] = 0;
+    } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION) {
+        int i = findStartOfFraction(text);
+        start = text + i;
+    } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
+        int i = findStartOfFraction(text);
+        int k = findStartOfUnit(text, i);
+        if (i < k) {
+            start = text + i;
+            text[k] = 0;
+        } else {
+            strcpy(text, ".0");
+        }
+    } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
+        int i = findStartOfUnit(text, 0);
+        start = text + i;
+    } else if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
+        int i = findStartOfUnit(text, 0);
+        text[i] = 0;
+    }
+
+    // trim left
+    while (*start && *start == ' ') {
+        start++;
+    }
+
+    // trim right
+    int length = strlen(start);
+    while (length > 0 && start[length - 1] == ' ') {
+        length--;
+    }
+
+    return getCharIndexAtPosition(xPos, start, length, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style);
+}
 
 OnTouchFunctionType DISPLAY_DATA_onTouch = nullptr;
 

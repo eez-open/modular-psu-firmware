@@ -26,6 +26,9 @@
 #include <eez/sound.h>
 #include <eez/system.h>
 
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/display_data.h>
+
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 
@@ -40,10 +43,6 @@
 #ifdef _MSC_VER
 #pragma warning(disable : 4996)
 #endif
-
-#define CONF_GUI_KEYPAD_CURSOR_BLINK_TIME 750000UL
-#define CONF_GUI_KEYPAD_CURSOR_ON "|"
-#define CONF_GUI_KEYPAD_CURSOR_OFF " "
 
 #define CONF_GUI_KEYPAD_PASSWORD_LAST_CHAR_VISIBLE_DURATION 500000UL
 
@@ -92,6 +91,16 @@ NumericKeypad *getActiveNumericKeypad() {
     return 0;
 }
 
+void onKeypadTextTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+    if (touchEvent.type != EVENT_TYPE_TOUCH_DOWN && touchEvent.type != EVENT_TYPE_TOUCH_MOVE) {
+        return;
+    }
+
+    Keypad *keypad = getActiveKeypad();
+    if (keypad) {
+        keypad->setCursorPostion(DISPLAY_DATA_getCharIndexAtPosition(touchEvent.x, widgetCursor));
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -112,6 +121,7 @@ void Keypad::init(AppContext *appContext, const char *label_) {
 
     m_label[0] = 0;
     m_keypadText[0] = 0;
+    m_cursorPosition = 0;
     m_okCallback = 0;
     m_cancelCallback = 0;
     m_keypadMode = KEYPAD_MODE_LOWERCASE;
@@ -122,8 +132,6 @@ void Keypad::init(AppContext *appContext, const char *label_) {
     } else {
         m_label[0] = 0;
     }
-
-    m_lastCursorChangeTime = micros();
 }
 
 Value Keypad::getKeypadTextValue() {
@@ -165,8 +173,6 @@ void Keypad::getKeypadText(char *text) {
     } else {
         strcpy(textPtr, m_keypadText);
     }
-
-    appendCursor(text);
 }
 
 void Keypad::start(AppContext *appContext, const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
@@ -181,8 +187,10 @@ void Keypad::start(AppContext *appContext, const char *label, const char *text, 
 
     if (text) {
         strcpy(m_keypadText, text);
+        m_cursorPosition = strlen(m_keypadText);
     } else {
         m_keypadText[0] = 0;
+        m_cursorPosition = 0;
     }
     m_keypadMode = KEYPAD_MODE_LOWERCASE;
 }
@@ -197,11 +205,13 @@ void Keypad::startReplace(const char *label, const char *text, int minChars_, in
     replacePage(PAGE_ID_KEYPAD, &g_keypad);
 }
 
-void Keypad::appendChar(char c) {
+void Keypad::insertChar(char c) {
     int n = strlen(m_keypadText);
     if (n < m_maxChars && (n + (*m_label ? strlen(m_label) : 0)) < MAX_KEYPAD_TEXT_LENGTH) {
-        m_keypadText[n] = c;
-        m_keypadText[n + 1] = 0;
+        for (int i = n; i >= m_cursorPosition; i--) {
+            m_keypadText[i + 1] = m_keypadText[i];
+        }
+        m_keypadText[m_cursorPosition++] = c;
         m_lastKeyAppendTime = micros();
     } else {
         sound::playBeep();
@@ -214,16 +224,20 @@ void Keypad::key() {
 }
 
 void Keypad::key(char ch) {
-    appendChar(ch);
+    insertChar(ch);
 }
 
 void Keypad::space() {
-    appendChar(' ');
+    insertChar(' ');
 }
 
 void Keypad::back() {
-    int n = strlen(m_keypadText);
-    if (n > 0) {
+    if (m_cursorPosition > 0) {
+        int n = strlen(m_keypadText);
+        for (int i = m_cursorPosition; i < n; i++) {
+            m_keypadText[i - 1] = m_keypadText[i];
+        }
+        m_cursorPosition--;
         m_keypadText[n - 1] = 0;
     } else {
         sound::playBeep();
@@ -232,6 +246,7 @@ void Keypad::back() {
 
 void Keypad::clear() {
     m_keypadText[0] = 0;
+    m_cursorPosition = 0;
 }
 
 void Keypad::sign() {
@@ -275,18 +290,12 @@ void Keypad::cancel() {
     }
 }
 
-void Keypad::appendCursor(char *text) {
-    uint32_t current_time = micros();
-    if (current_time - m_lastCursorChangeTime > CONF_GUI_KEYPAD_CURSOR_BLINK_TIME) {
-        m_cursor = !m_cursor;
-        m_lastCursorChangeTime = current_time;
-    }
+int Keypad::getCursorPostion() {
+    return m_cursorPosition;
+}
 
-    if (m_cursor) {
-        strcat(text, CONF_GUI_KEYPAD_CURSOR_ON);
-    } else {
-        strcat(text, CONF_GUI_KEYPAD_CURSOR_OFF);
-    }
+void Keypad::setCursorPostion(int cursorPosition) {
+    m_cursorPosition = cursorPosition;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -464,8 +473,6 @@ bool NumericKeypad::getText(char *text, int count) {
     }
 
     strcpy(text, m_keypadText);
-
-    appendCursor(text);
 
     appendEditUnit(text);
 
@@ -736,11 +743,11 @@ void NumericKeypad::digit(int d) {
         m_state = BEFORE_DOT;
         if (m_startValue.getType() == VALUE_TYPE_TIME_ZONE) {
             if (strlen(m_keypadText) == 0) {
-                appendChar('+');
+                insertChar('+');
             }
         }
     }
-    appendChar(d + '0');
+    insertChar(d + '0');
 
     if (!checkNumSignificantDecimalDigits()) {
         back();
@@ -757,7 +764,7 @@ void NumericKeypad::dot() {
         if (m_state == EMPTY || m_state == START) {
             sound::playBeep();
         } else {
-            appendChar(getDotSign());
+            insertChar(getDotSign());
         }
         return;
     }
@@ -765,20 +772,20 @@ void NumericKeypad::dot() {
     if (m_state == EMPTY) {
         if (m_startValue.getType() == VALUE_TYPE_TIME_ZONE) {
             if (strlen(m_keypadText) == 0) {
-                appendChar('+');
+                insertChar('+');
             }
         }
-        appendChar('0');
+        insertChar('0');
         m_state = BEFORE_DOT;
     }
 
     if (m_state == START || m_state == EMPTY) {
-        appendChar('0');
+        insertChar('0');
         m_state = BEFORE_DOT;
     }
 
     if (m_state == BEFORE_DOT) {
-        appendChar(getDotSign());
+        insertChar(getDotSign());
         m_state = AFTER_DOT;
     } else {
         sound::playBeep();
@@ -788,6 +795,7 @@ void NumericKeypad::dot() {
 void NumericKeypad::reset() {
     m_state = m_startValue.getType() != VALUE_TYPE_NONE ? START : EMPTY;
     m_keypadText[0] = 0;
+    m_cursorPosition = 0;
 }
 
 void NumericKeypad::key(char ch) {
@@ -807,17 +815,20 @@ void NumericKeypad::caps() {
 }
 
 void NumericKeypad::back() {
-    int n = strlen(m_keypadText);
-    if (n > 0) {
-        if (m_keypadText[n - 1] == getDotSign()) {
+    if (m_cursorPosition > 0) {
+        if (m_keypadText[m_cursorPosition - 1] == getDotSign()) {
             m_state = BEFORE_DOT;
         }
-        m_keypadText[n - 1] = 0;
-        if (n - 1 == 1) {
+
+        Keypad::back();
+
+        int n = strlen(m_keypadText);
+
+        if (n == 1) {
             if (m_keypadText[0] == '+' || m_keypadText[0] == '-') {
                 m_state = EMPTY;
             }
-        } else if (n - 1 == 0) {
+        } else if (n == 0) {
             m_state = EMPTY;
         }
     } else if (m_state == START) {
@@ -928,6 +939,7 @@ void NumericKeypad::ok() {
                 m_okUint32Callback(ipAddress);
                 m_state = START;
                 m_keypadText[0] = 0;
+                m_cursorPosition = 0;
             } else {
                 errorMessage("Invalid IP address format!");
             }

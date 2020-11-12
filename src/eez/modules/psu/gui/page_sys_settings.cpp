@@ -1276,7 +1276,7 @@ void SysSettingsRampAndDelayPage::drawRamp(const WidgetCursor &widgetCursor, int
         mcu::display::drawStr(label, -1,
             x4 - textWidth, y2 - textHeight > widgetCursor.y ? y2 - textHeight : y2,
             widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1,
-            font
+            font, -1
         );
     }
 }

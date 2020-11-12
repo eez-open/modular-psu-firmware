@@ -238,7 +238,7 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
     display::drawStr(message1, message1Len, 
         x1 + style->padding_left + (textWidth - textWidth1) / 2, 
         yText, 
-        x1, y1, x2, y2, font);
+        x1, y1, x2, y2, font, -1);
 
     yText += textHeight;
 
@@ -246,7 +246,7 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
         display::drawStr(message2, message2Len,
             x1 + style->padding_left + (textWidth - textWidth2) / 2,
             yText,
-            x1, y1, x2, y2, font);
+            x1, y1, x2, y2, font, -1);
 
         yText += textHeight;
     }
@@ -255,7 +255,7 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
         display::drawStr(message3, message3Len, 
             x1 + style->padding_left + (textWidth - textWidth2) / 2, 
             yText, 
-            x1, y1, x2, y2, font);
+            x1, y1, x2, y2, font, -1);
 
         yText += textHeight;
     }
@@ -285,7 +285,7 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
 
         display::drawStr(actionLabel, -1,
             actionWidget.x + actionStyle->padding_left, actionWidget.y,
-            x1, y1, x2, y2, font);
+            x1, y1, x2, y2, font, -1);
     }
 }
 

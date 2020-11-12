@@ -390,7 +390,8 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET,
     DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE,
     DATA_OPERATION_YT_DATA_TOUCH_DRAG,
-    DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION
+    DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION,
+    DATA_OPERATION_GET_TEXT_CURSOR_POSITION
 };
 
 int count(int16_t id);
@@ -467,6 +468,8 @@ struct TouchDrag {
     int y;
 };
 void ytDataTouchDrag(Cursor cursor, int16_t id, TouchDrag *touchDrag);
+
+int getTextCursorPosition(Cursor cursor, int16_t id);
 
 } // namespace gui
 } // namespace eez

@@ -328,6 +328,7 @@ list (APPEND src_files ${src_eez_gui_widgets})
 set(header_eez_gui_widgets
     src/eez/gui/widgets/button.h
     src/eez/gui/widgets/container.h
+    src/eez/gui/widgets/display_data.h
     src/eez/gui/widgets/layout_view.h
     src/eez/gui/widgets/rectangle.h
     src/eez/gui/widgets/text.h

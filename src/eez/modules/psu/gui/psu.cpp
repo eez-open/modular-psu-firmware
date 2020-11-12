@@ -2349,6 +2349,14 @@ bool activePageHasBackdropHook() {
     return true;
 }
 
+OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.widget->data == DATA_ID_KEYPAD_TEXT) {
+        return eez::psu::gui::onKeypadTextTouch;
+    }
+    return nullptr;
+}
+
+
 } // namespace gui
 } // namespace eez
 

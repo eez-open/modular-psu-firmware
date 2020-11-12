@@ -1939,6 +1939,11 @@ void data_keypad_text(DataOperationEnum operation, Cursor cursor, Value &value) 
         if (keypad) {
             value = keypad->getKeypadTextValue();
         }
+    } else if (operation == DATA_OPERATION_GET_TEXT_CURSOR_POSITION) {
+        Keypad *keypad = getActiveKeypad();
+        if (keypad) {
+            value = keypad->getCursorPostion();
+        }
     }
 }
 

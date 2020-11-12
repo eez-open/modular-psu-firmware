@@ -16,10 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <memory.h>
-
 #if OPTION_DISPLAY
+
+#include <stdio.h>
+#include <string.h>
+#include <memory.h>
 
 #include <eez/util.h>
 #include <eez/keyboard.h>
@@ -596,6 +597,32 @@ void endBuffersDrawing() {
     g_numBuffersToDraw = 0;
 
     freeUnusedBuffers();
+}
+
+int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
+    g_font = font;
+
+    if (textLength == -1) {
+        textLength = strlen(text);
+    }
+
+    int i;
+
+    for (i = 0; i < textLength && text[i]; ++i) {
+        char encoding = text[i];
+        gui::font::Glyph glyph;
+        g_font.getGlyph(encoding, glyph);
+        auto dx = 0;
+        if (glyph) {
+            dx = glyph.dx;
+        }
+        if (xPos < x + dx / 2) {
+            return i;
+        }
+        x += dx;
+    }
+
+    return i;
 }
 
 } // namespace display

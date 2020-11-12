@@ -383,7 +383,7 @@ struct YTGraphStaticDrawHelper {
             }
 
             display::setColor(labelStyle->color, false);
-            display::drawStr(labelText, -1, xLabel, yLabels[m_valueIndex], widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.widget->w - 1, widgetCursor.y + widgetCursor.widget->h - 1, font);
+            display::drawStr(labelText, -1, xLabel, yLabels[m_valueIndex], widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.widget->w - 1, widgetCursor.y + widgetCursor.widget->h - 1, font, -1);
         }
     }
 

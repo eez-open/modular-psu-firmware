@@ -64,8 +64,7 @@ class Keypad : public Page {
     virtual void getKeypadText(char *text);
     Value getKeypadTextValue();
 
-    void appendChar(char c);
-    void appendCursor(char *text);
+    void insertChar(char c);
 
     virtual Unit getSwitchToUnit() {
         return UNIT_UNKNOWN;
@@ -73,12 +72,16 @@ class Keypad : public Page {
 
     KeypadMode m_keypadMode;
 
+    int getCursorPostion();
+    void setCursorPostion(int cursorPosition);
+
 protected:
     AppContext *m_appContext;
 
     char m_stateText[2][MAX_KEYPAD_TEXT_LENGTH + 2];
     char m_label[MAX_KEYPAD_LABEL_LENGTH + 1];
     char m_keypadText[MAX_KEYPAD_TEXT_LENGTH + 2];
+    int m_cursorPosition;
     int m_minChars;
     int m_maxChars;
 
@@ -87,8 +90,6 @@ protected:
 private:
     bool m_isPassword;
     uint32_t m_lastKeyAppendTime;
-    bool m_cursor;
-    uint32_t m_lastCursorChangeTime;
 
     void (*m_okCallback)(char *); // +2 for cursor and zero at the end
     void (*m_cancelCallback)();
@@ -262,6 +263,7 @@ private:
 
 Keypad *getActiveKeypad();
 NumericKeypad *getActiveNumericKeypad();
+void onKeypadTextTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 
 } // namespace gui
 } // namespace psu
