@@ -600,8 +600,6 @@ void endBuffersDrawing() {
 }
 
 int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
-    g_font = font;
-
     if (textLength == -1) {
         textLength = strlen(text);
     }
@@ -611,7 +609,7 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
     for (i = 0; i < textLength && text[i]; ++i) {
         char encoding = text[i];
         gui::font::Glyph glyph;
-        g_font.getGlyph(encoding, glyph);
+        font.getGlyph(encoding, glyph);
         auto dx = 0;
         if (glyph) {
             dx = glyph.dx;
@@ -624,6 +622,27 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
 
     return i;
 }
+
+int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
+    if (textLength == -1) {
+        textLength = strlen(text);
+    }
+
+    for (int i = 0; i < textLength && text[i]; ++i) {
+        if (i == cursorPosition) {
+            return x;
+        }
+        char encoding = text[i];
+        gui::font::Glyph glyph;
+        font.getGlyph(encoding, glyph);
+        if (glyph) {
+            x += glyph.dx;
+        }
+    }
+
+    return x;
+}
+
 
 } // namespace display
 } // namespace mcu

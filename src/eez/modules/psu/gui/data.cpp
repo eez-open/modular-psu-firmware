@@ -1944,6 +1944,11 @@ void data_keypad_text(DataOperationEnum operation, Cursor cursor, Value &value) 
         if (keypad) {
             value = keypad->getCursorPostion();
         }
+    } else if (operation == DATA_OPERATION_GET_X_SCROLL) {
+        Keypad *keypad = getActiveKeypad();
+        if (keypad) {
+            value = keypad->getXScroll(*(WidgetCursor *)value.getVoidPointer());
+        }
     }
 }
 

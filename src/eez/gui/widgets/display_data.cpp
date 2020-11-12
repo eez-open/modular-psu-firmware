@@ -53,6 +53,7 @@ struct DisplayDataState {
     int16_t cursorPosition;
     uint32_t cursorBlinkStartTime;
     uint8_t cursorVisible;
+    uint8_t xScroll;
 };
 
 FixPointersFunctionType DISPLAY_DATA_fixPointers = nullptr;
@@ -109,6 +110,8 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     currentState->activeBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
 
     currentState->cursorPosition = getTextCursorPosition(widgetCursor.cursor, widget->data);
+    
+    currentState->xScroll = getXScroll(widgetCursor);
 
     bool refresh =
         !widgetCursor.previousState ||
@@ -120,7 +123,8 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
         currentState->backgroundColor != previousState->backgroundColor ||
         currentState->activeColor != previousState->activeColor ||
         currentState->activeBackgroundColor != previousState->activeBackgroundColor ||
-        currentState->cursorPosition != previousState->cursorPosition;
+        currentState->cursorPosition != previousState->cursorPosition ||
+        currentState->xScroll != previousState->xScroll;
 
     if (currentState->cursorPosition != -1) {
         if (refresh) {
@@ -174,10 +178,11 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
         }
 
         drawText(start, length, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                 style, widgetCursor.currentState->flags.active,
-                 widgetCursor.currentState->flags.blinking, false,
-                 &currentState->color, &currentState->backgroundColor, &currentState->activeColor, &currentState->activeBackgroundColor,
-                 widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT, currentState->cursorVisible ? currentState->cursorPosition : -1);
+            style, widgetCursor.currentState->flags.active,
+            widgetCursor.currentState->flags.blinking, false,
+            &currentState->color, &currentState->backgroundColor, &currentState->activeColor, &currentState->activeBackgroundColor,
+            widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT,
+            currentState->cursorVisible ? currentState->cursorPosition : -1, currentState->xScroll);
     }
 };
 
@@ -227,7 +232,58 @@ int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCurs
         length--;
     }
 
-    return getCharIndexAtPosition(xPos, start, length, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style);
+    int xScroll = getXScroll(widgetCursor);
+
+    return getCharIndexAtPosition(xPos, start, length, widgetCursor.x - xScroll, widgetCursor.y, (int)widget->w, (int)widget->h, style);
+}
+
+int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widgetCursor) {
+    const Widget *widget = widgetCursor.widget;
+    const DisplayDataWidget *display_data_widget = GET_WIDGET_PROPERTY(widget, specific, const DisplayDataWidget *);
+
+	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+
+    char text[64];
+    Value data = get(widgetCursor.cursor, widget->data);
+    data.toText(text, sizeof(text));
+
+    char *start = text;
+
+    if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER) {
+        int i = findStartOfFraction(text);
+        text[i] = 0;
+    } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION) {
+        int i = findStartOfFraction(text);
+        start = text + i;
+    } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
+        int i = findStartOfFraction(text);
+        int k = findStartOfUnit(text, i);
+        if (i < k) {
+            start = text + i;
+            text[k] = 0;
+        } else {
+            strcpy(text, ".0");
+        }
+    } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
+        int i = findStartOfUnit(text, 0);
+        start = text + i;
+    } else if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
+        int i = findStartOfUnit(text, 0);
+        text[i] = 0;
+    }
+
+    // trim left
+    while (*start && *start == ' ') {
+        start++;
+    }
+
+    // trim right
+    int length = strlen(start);
+    while (length > 0 && start[length - 1] == ' ') {
+        length--;
+    }
+
+    return getCursorXPosition(cursorPosition, start, length, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style);
 }
 
 OnTouchFunctionType DISPLAY_DATA_onTouch = nullptr;

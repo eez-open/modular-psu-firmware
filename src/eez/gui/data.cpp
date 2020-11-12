@@ -856,6 +856,13 @@ int getTextCursorPosition(Cursor cursor, int16_t id) {
     return value.getType() == VALUE_TYPE_INT ? value.getInt() : -1;
 }
 
+int getXScroll(const WidgetCursor &widgetCursor) {
+    const Widget *widget = widgetCursor.widget;
+    Value value((void *)&widgetCursor, VALUE_TYPE_POINTER);
+    DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET_X_SCROLL, widgetCursor.cursor, value);
+    return value.getType() == VALUE_TYPE_INT ? value.getInt() : 0;
+}
+
 } // namespace gui
 } // namespace eez
 

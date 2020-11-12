@@ -73,7 +73,9 @@ class Keypad : public Page {
     KeypadMode m_keypadMode;
 
     int getCursorPostion();
-    void setCursorPostion(int cursorPosition);
+    void setCursorPosition(int cursorPosition);
+
+    int getXScroll(const WidgetCursor &widgetCursor);
 
 protected:
     AppContext *m_appContext;
@@ -82,6 +84,7 @@ protected:
     char m_label[MAX_KEYPAD_LABEL_LENGTH + 1];
     char m_keypadText[MAX_KEYPAD_TEXT_LENGTH + 2];
     int m_cursorPosition;
+    int m_xScroll;
     int m_minChars;
     int m_maxChars;
 

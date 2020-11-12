@@ -22,6 +22,7 @@ namespace eez {
 namespace gui {
 
 int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCursor);
+int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widgetCursor);
 
 } // namespace gui
 } // namespace eez

@@ -83,7 +83,7 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
               bool active, bool blink, bool ignoreLuminocity,
               uint16_t *overrideColor, uint16_t *overrideBackgroundColor,
               uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor,
-              bool useSmallerFontIfDoesNotFit, int cursorPosition) {
+              bool useSmallerFontIfDoesNotFit, int cursorPosition, int xScroll) {
     int x1 = x;
     int y1 = y;
     int x2 = x + w - 1;
@@ -166,7 +166,7 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
             display::setColor(style->color, ignoreLuminocity);
         }
     }
-    display::drawStr(text, textLength, x_offset, y_offset, x1, y1, x2, y2, font, cursorPosition);
+    display::drawStr(text, textLength, x_offset - xScroll, y_offset, x1, y1, x2, y2, font, cursorPosition);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -214,6 +214,51 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
     }
 
     return display::getCharIndexAtPosition(xPos, text, textLength, x_offset, y_offset, x1, y1, x2, y2, font);
+}
+
+int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int w, int h, const Style *style) {
+    int x1 = x;
+    int y1 = y;
+    int x2 = x + w - 1;
+    int y2 = y + h - 1;
+
+    if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
+        x1 += style->border_size_left;
+        y1 += style->border_size_top;
+        x2 -= style->border_size_right;
+        y2 -= style->border_size_bottom;
+    }
+
+    font::Font font = styleGetFont(style);
+
+    int width = display::measureStr(text, textLength, font, 0);
+    int height = font.getHeight();
+
+    int x_offset;
+    if (styleIsHorzAlignLeft(style)) {
+        x_offset = x1 + style->padding_left;
+    } else if (styleIsHorzAlignRight(style)) {
+        x_offset = x2 - style->padding_right - width;
+    } else {
+        x_offset = x1 + ((x2 - x1 + 1) - width) / 2;
+        if (x_offset < x1) {
+            x_offset = x1;
+        }
+    }
+
+    int y_offset;
+    if (styleIsVertAlignTop(style)) {
+        y_offset = y1 + style->padding_top;
+    } else if (styleIsVertAlignBottom(style)) {
+        y_offset = y2 - style->padding_bottom - height;
+    } else {
+        y_offset = y1 + ((y2 - y1 + 1) - height) / 2;
+    }
+    if (y_offset < 0) {
+        y_offset = y1;
+    }
+
+    return display::getCursorXPosition(cursorPosition, text, textLength, x_offset, y_offset, x1, y1, x2, y2, font);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
