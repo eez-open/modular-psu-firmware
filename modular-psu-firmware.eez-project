@@ -7675,8 +7675,7 @@
           {
             "type": "DisplayData",
             "style": {
-              "inheritFrom": "edit_value_M_left",
-              "alignHorizontal": "left-right"
+              "inheritFrom": "edit_value_M_left"
             },
             "data": "keypad_text",
             "left": 0,

@@ -81,7 +81,6 @@ struct Bitmap {
 #define STYLE_FLAGS_HORZ_ALIGN_LEFT 0
 #define STYLE_FLAGS_HORZ_ALIGN_RIGHT 1
 #define STYLE_FLAGS_HORZ_ALIGN_CENTER 2
-#define STYLE_FLAGS_HORZ_ALIGN_LEFT_RIGHT 3 // align left, but if it doesn't fit then align right
 
 #define STYLE_FLAGS_VERT_ALIGN_MASK (0x7 << 3)
 #define STYLE_FLAGS_VERT_ALIGN_TOP (0 << 3)

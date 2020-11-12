@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
     // __HAL_DBGMCU_FREEZE_IWDG();
     DBGMCU->APB1FZ |= DBGMCU_APB1_FZ_DBG_IWDG_STOP;
 
-    // MX_IWDG_Init();
+    MX_IWDG_Init();
 
     HAL_Init();
     SystemClock_Config();

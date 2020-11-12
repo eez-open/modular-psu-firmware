@@ -40,10 +40,6 @@ bool styleIsHorzAlignRight(const Style *style) {
     return (style->flags & STYLE_FLAGS_HORZ_ALIGN_MASK) == STYLE_FLAGS_HORZ_ALIGN_RIGHT;
 }
 
-bool styleIsHorzAlignLeftRight(const Style *style) {
-    return (style->flags & STYLE_FLAGS_HORZ_ALIGN_MASK) == STYLE_FLAGS_HORZ_ALIGN_LEFT_RIGHT;
-}
-
 bool styleIsVertAlignTop(const Style *style) {
     return (style->flags & STYLE_FLAGS_VERT_ALIGN_MASK) == STYLE_FLAGS_VERT_ALIGN_TOP;
 }
@@ -116,12 +112,10 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
     }
     int height = font.getHeight();
 
-    bool horizontallyFits = width <= (x2 - x1 + 1);
-
     int x_offset;
-    if (styleIsHorzAlignLeft(style) || (styleIsHorzAlignLeftRight(style) && horizontallyFits)) {
+    if (styleIsHorzAlignLeft(style)) {
         x_offset = x1 + style->padding_left;
-    } else if (styleIsHorzAlignRight(style) || (styleIsHorzAlignLeftRight(style) && !horizontallyFits)) {
+    } else if (styleIsHorzAlignRight(style)) {
         x_offset = x2 - style->padding_right - width;
     } else {
         x_offset = x1 + ((x2 - x1 + 1) - width) / 2;
@@ -195,12 +189,10 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
     int width = display::measureStr(text, textLength, font, 0);
     int height = font.getHeight();
 
-    bool horizontallyFits = width <= (x2 - x1 + 1);
-
     int x_offset;
-    if (styleIsHorzAlignLeft(style) || (styleIsHorzAlignLeftRight(style) && horizontallyFits)) {
+    if (styleIsHorzAlignLeft(style)) {
         x_offset = x1 + style->padding_left;
-    } else if (styleIsHorzAlignRight(style) || (styleIsHorzAlignLeftRight(style) && !horizontallyFits)) {
+    } else if (styleIsHorzAlignRight(style)) {
         x_offset = x2 - style->padding_right - width;
     } else {
         x_offset = x1 + ((x2 - x1 + 1) - width) / 2;

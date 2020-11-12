@@ -641,21 +641,25 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
         textLength = strlen(text);
     }
 
+    int xCursor = x;
+
     int i;
 
     for (i = 0; i < textLength && text[i]; ++i) {
         char encoding = text[i];
-        auto dx = drawGlyph(x, y, clip_x1, clip_y1, clip_x2, clip_y2, encoding);
         if (i == cursorPosition) {
-            drawVLine(x, clip_y1 + 1, clip_y2 - clip_y1 - 2);
-            drawVLine(x + 1, clip_y1 + 1, clip_y2 - clip_y1 - 2);
+            xCursor = x;
         }
-        x += dx;
+        x += drawGlyph(x, y, clip_x1, clip_y1, clip_x2, clip_y2, encoding);
     }
 
     if (i == cursorPosition) {
-        drawVLine(x, clip_y1 + 1, clip_y2 - clip_y1 - 2);
-        drawVLine(x + 1, clip_y1 + 1, clip_y2 - clip_y1 - 2);
+        xCursor = x;
+    }
+
+    if (cursorPosition != -1) {
+        drawVLine(xCursor, clip_y1 + 1, clip_y2 - clip_y1 - 2);
+        drawVLine(xCursor + 1, clip_y1 + 1, clip_y2 - clip_y1 - 2);
     }
 
     markDirty(clip_x1, clip_y1, clip_x2, clip_y2);
