@@ -5,7 +5,7 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<macros>
 					<stringMacro name="FW_VER_MAJOR" type="VALUE_TEXT" value="1"/>
-					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="5"/>
+					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="6"/>
 				</macros>
 				<externalSettings/>
 				<extensions>
@@ -433,7 +433,7 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1343602219" moduleId="org.eclipse.cdt.core.settings" name="Debug (R3B3)">
 				<macros>
 					<stringMacro name="FW_VER_MAJOR" type="VALUE_TEXT" value="1"/>
-					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="5"/>
+					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="6"/>
 				</macros>
 				<externalSettings/>
 				<extensions>

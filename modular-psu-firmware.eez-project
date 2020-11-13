@@ -3071,6 +3071,9 @@
     },
     {
       "name": "keypad_option3"
+    },
+    {
+      "name": "show_labels_and_colors"
     }
   ],
   "gui": {
@@ -26347,6 +26350,1254 @@
         "dataContextOverrides": "{\n    \"ramp_and_delay_list\": [\n        {\n            \"channel_short_title_without_tracking_icon\": \"#1\",\n            \"channel_u_trigger_value\": \"10 V\",\n            \"channel_voltage_ramp\": \"100 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"0 s\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#2\",\n            \"channel_u_trigger_value\": \"12 V\",\n            \"channel_voltage_ramp\": \"200 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"50 ms\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#3\",\n            \"channel_u_trigger_value\": \"15 V\",\n            \"channel_voltage_ramp\": \"300 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"100 ms\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#4\",\n            \"channel_u_trigger_value\": \"18 V\",\n            \"channel_voltage_ramp\": \"2 s\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"1 s\"\n        }\n    ]\n}"
       },
       {
+        "name": "sys_info",
+        "description": "System information",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 8,
+            "top": 8,
+            "width": 472,
+            "height": 232,
+            "name": "",
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 236,
+                "height": 28,
+                "name": "Total on time",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "Total On time:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "value_S_left"
+                    },
+                    "data": "sys_on_time_total",
+                    "left": 114,
+                    "top": 0,
+                    "width": 122,
+                    "height": 28,
+                    "displayOption": 0
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 28,
+                "width": 236,
+                "height": 28,
+                "name": "Last on time",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "Last On time:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "value_S_left"
+                    },
+                    "data": "sys_on_time_last",
+                    "left": 114,
+                    "top": 0,
+                    "width": 122,
+                    "height": 28,
+                    "displayOption": 0
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 56,
+                "width": 236,
+                "height": 28,
+                "name": "Temp. AUX",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "Temp. AUX:"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "sys_temp_aux_status",
+                    "left": 114,
+                    "top": 0,
+                    "width": 122,
+                    "height": 28,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "event_error"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Invalid"
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "value_S_left"
+                        },
+                        "data": "sys_temp_aux",
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_disabled_S_left"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Not installed"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 84,
+                "width": 236,
+                "height": 28,
+                "name": "Fan speed",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "Fan speed:"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "sys_info_fan_status",
+                    "left": 114,
+                    "top": 0,
+                    "width": 122,
+                    "height": 28,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "event_error"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Fault"
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "value_S_left"
+                        },
+                        "data": "sys_info_fan_speed",
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_disabled_S_left"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Testing..."
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_disabled_S_left"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Not installed"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 112,
+                "width": 236,
+                "height": 28,
+                "name": "Battery",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "Battery:"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "sys_info_battery_status",
+                    "left": 114,
+                    "top": 0,
+                    "width": 122,
+                    "height": 28,
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "event_error"
+                        },
+                        "data": "battery",
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "value_S_left"
+                        },
+                        "data": "battery",
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value_S_left"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Not installed"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 140,
+                "width": 236,
+                "height": 28,
+                "name": "SD card",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "SD card:"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "sys_info_sdcard_status",
+                    "left": 114,
+                    "top": 0,
+                    "width": 122,
+                    "height": 28,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value_S_left"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Unsupported"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "value_S_left"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Present"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "event_error"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Not present"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "event_error"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "No FAT"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "event_error"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Failed"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "event_warning"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Busy"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 236,
+                "top": 0,
+                "width": 236,
+                "height": 28,
+                "name": "Firmware",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "Firmware:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "value_S_left"
+                    },
+                    "data": "sys_info_firmware_ver",
+                    "left": 114,
+                    "top": 0,
+                    "width": 122,
+                    "height": 28,
+                    "displayOption": 0
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 236,
+                "top": 28,
+                "width": 236,
+                "height": 28,
+                "name": "CPU module",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "CPU module:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "value_S_left"
+                    },
+                    "data": "sys_info_cpu",
+                    "left": 114,
+                    "top": 0,
+                    "width": 122,
+                    "height": 28,
+                    "displayOption": 0
+                  }
+                ]
+              },
+              {
+                "type": "List",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "slots",
+                "left": 236,
+                "top": 56,
+                "width": 236,
+                "height": 84,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 236,
+                  "height": 28,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "edit_value_S_left"
+                      },
+                      "data": "slot_index",
+                      "left": 0,
+                      "top": 0,
+                      "width": 114,
+                      "height": 28,
+                      "text": ""
+                    },
+                    {
+                      "type": "Select",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "data": "slot_test_result",
+                      "left": 114,
+                      "top": 0,
+                      "width": 122,
+                      "height": 28,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left",
+                            "color": "status_warning",
+                            "activeBackgroundColor": "status_warning"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "value_S_left"
+                          },
+                          "data": "slot_info",
+                          "left": 0,
+                          "top": 0,
+                          "width": 122,
+                          "height": 28,
+                          "text": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "listType": "vertical"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "show_labels_and_colors",
+                "left": 236,
+                "top": 140,
+                "width": 236,
+                "height": 28,
+                "text": "Labels & Colors"
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 168,
+                "width": 472,
+                "height": 28,
+                "name": "Serial No",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "Host name:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "value_S_left"
+                    },
+                    "data": "ethernet_host_name",
+                    "left": 114,
+                    "top": 0,
+                    "width": 358,
+                    "height": 28,
+                    "displayOption": 0
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 196,
+                "width": 472,
+                "height": 28,
+                "name": "Serial No",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 28,
+                    "text": "Serial No.:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "value_S_left"
+                    },
+                    "data": "sys_info_serial_no",
+                    "left": 114,
+                    "top": 0,
+                    "width": 358,
+                    "height": 28,
+                    "displayOption": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "left": 41,
+                "top": 0,
+                "width": 438,
+                "height": 32,
+                "text": "System information"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
+      },
+      {
+        "name": "sys_settings_labels_and_colors",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 238,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "",
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 32,
+                "text": "DCP405 #1"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "",
+                "left": 7,
+                "top": 37,
+                "width": 144,
+                "height": 32,
+                "text": "Change label"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "",
+                "left": 7,
+                "top": 74,
+                "width": 144,
+                "height": 32,
+                "text": "Pick color"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "channel1"
+                },
+                "left": 0,
+                "top": 32,
+                "width": 2,
+                "height": 206
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "channel1"
+                },
+                "left": 156,
+                "top": 32,
+                "width": 2,
+                "height": 206
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "channel1"
+                },
+                "left": 2,
+                "top": 236,
+                "width": 154,
+                "height": 2
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 161,
+            "top": 0,
+            "width": 158,
+            "height": 238,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "backgroundColor": "channel2",
+                  "padding": "0 5"
+                },
+                "data": "channel_title",
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 32,
+                "text": "MIO168"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "",
+                "left": 7,
+                "top": 37,
+                "width": 144,
+                "height": 32,
+                "text": "Change label"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "",
+                "left": 7,
+                "top": 74,
+                "width": 144,
+                "height": 32,
+                "text": "Pick color"
+              },
+              {
+                "type": "MultilineText",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "left": 7,
+                "top": 116,
+                "width": 144,
+                "height": 56,
+                "text": "Channel labels\\nand colors",
+                "firstLineIndent": 4,
+                "hangingIndent": 0
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "channel2"
+                },
+                "left": 0,
+                "top": 32,
+                "width": 2,
+                "height": 206
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "channel2"
+                },
+                "left": 156,
+                "top": 32,
+                "width": 2,
+                "height": 206
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "channel2"
+                },
+                "left": 2,
+                "top": 236,
+                "width": 154,
+                "height": 2
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 322,
+            "top": 0,
+            "width": 158,
+            "height": 238,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 118,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "channel1",
+                      "alignHorizontal": "left",
+                      "backgroundColor": "channel3",
+                      "padding": "0 5"
+                    },
+                    "data": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 158,
+                    "height": 32,
+                    "text": "DCM220 #2"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 7,
+                    "top": 37,
+                    "width": 144,
+                    "height": 32,
+                    "text": "Change label"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald14"
+                    },
+                    "action": "ch_settings_adv_remote_toggle_sense",
+                    "left": 7,
+                    "top": 74,
+                    "width": 144,
+                    "height": 32,
+                    "text": "Pick color"
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel3"
+                    },
+                    "left": 0,
+                    "top": 32,
+                    "width": 2,
+                    "height": 86
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel3"
+                    },
+                    "left": 156,
+                    "top": 32,
+                    "width": 2,
+                    "height": 86
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel3"
+                    },
+                    "left": 2,
+                    "top": 116,
+                    "width": 154,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 120,
+                "width": 158,
+                "height": 118,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "channel1",
+                      "alignHorizontal": "left",
+                      "backgroundColor": "channel4",
+                      "padding": "0 5"
+                    },
+                    "data": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 158,
+                    "height": 32,
+                    "text": "DCM220 #3"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald14"
+                    },
+                    "action": "ch_settings_adv_remote_toggle_sense",
+                    "left": 7,
+                    "top": 37,
+                    "width": 144,
+                    "height": 32,
+                    "text": "Change label"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald14"
+                    },
+                    "action": "ch_settings_adv_remote_toggle_sense",
+                    "left": 7,
+                    "top": 74,
+                    "width": 144,
+                    "height": 32,
+                    "text": "Pick color"
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel4"
+                    },
+                    "left": 0,
+                    "top": 32,
+                    "width": 2,
+                    "height": 86
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel4"
+                    },
+                    "left": 156,
+                    "top": 32,
+                    "width": 2,
+                    "height": 86
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel4"
+                    },
+                    "left": 2,
+                    "top": 116,
+                    "width": 154,
+                    "height": 2
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 41,
+                "top": 0,
+                "width": 357,
+                "height": 32,
+                "text": "Labels and colors"
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "set_page_dirty",
+                "left": 398,
+                "top": 0,
+                "width": 82,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 82,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background",
+                          "activeColor": "status_line_background",
+                          "activeBackgroundColor": "status_line_text"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 82,
+                        "height": 32,
+                        "invertColors": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 82,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14",
+                          "alignVertical": "center",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background",
+                          "activeColor": "status_line_background",
+                          "activeBackgroundColor": "status_line_text"
+                        },
+                        "action": "set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "_"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14",
+                          "alignVertical": "center",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background",
+                          "activeColor": "status_line_background",
+                          "activeBackgroundColor": "status_line_text"
+                        },
+                        "action": "discard",
+                        "left": 41,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "X"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
+      },
+      {
         "name": "user_profiles",
         "description": "User profiles information and settings",
         "style": "default",
@@ -27174,738 +28425,6 @@
         "width": 376,
         "height": 132,
         "dataContextOverrides": "{\n    \"channels\": [\n        {\n            \"channel_short_label\": \"Ch1:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"INH\",\n            \"profile_channel_u_set\": \"33.33V\",\n            \"profile_channel_i_set\": \"3.1234A\"\n        },\n        {\n            \"channel_short_label\": \"Ch2:\",\n            \"profile_channel_output_state\": 1\n        },\n        {\n            \"channel_short_label\": \"Ch3:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        },\n        {\n            \"channel_short_label\": \"Ch4:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        },\n        {\n            \"channel_short_label\": \"Ch5:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        },\n        {\n            \"channel_short_label\": \"Ch6:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        }\n    ]\n}"
-      },
-      {
-        "name": "sys_info",
-        "description": "System information",
-        "style": "default",
-        "widgets": [
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 8,
-            "top": 8,
-            "width": 472,
-            "height": 232,
-            "name": "",
-            "widgets": [
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 236,
-                "height": 28,
-                "name": "Total on time",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 28,
-                    "text": "Total On time:"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "value_S_left"
-                    },
-                    "data": "sys_on_time_total",
-                    "left": 114,
-                    "top": 0,
-                    "width": 122,
-                    "height": 28,
-                    "displayOption": 0
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 28,
-                "width": 236,
-                "height": 28,
-                "name": "Last on time",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 28,
-                    "text": "Last On time:"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "value_S_left"
-                    },
-                    "data": "sys_on_time_last",
-                    "left": 114,
-                    "top": 0,
-                    "width": 122,
-                    "height": 28,
-                    "displayOption": 0
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 56,
-                "width": 236,
-                "height": 28,
-                "name": "Temp. AUX",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 28,
-                    "text": "Temp. AUX:"
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "sys_temp_aux_status",
-                    "left": 114,
-                    "top": 0,
-                    "width": 122,
-                    "height": 28,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "event_error"
-                        },
-                        "data": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Invalid"
-                      },
-                      {
-                        "type": "DisplayData",
-                        "style": {
-                          "inheritFrom": "value_S_left"
-                        },
-                        "data": "sys_temp_aux",
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "displayOption": 0
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_disabled_S_left"
-                        },
-                        "data": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Not installed"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 84,
-                "width": 236,
-                "height": 28,
-                "name": "Fan speed",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 28,
-                    "text": "Fan speed:"
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "sys_info_fan_status",
-                    "left": 114,
-                    "top": 0,
-                    "width": 122,
-                    "height": 28,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "event_error"
-                        },
-                        "data": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Fault"
-                      },
-                      {
-                        "type": "DisplayData",
-                        "style": {
-                          "inheritFrom": "value_S_left"
-                        },
-                        "data": "sys_info_fan_speed",
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "displayOption": 0
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_disabled_S_left"
-                        },
-                        "data": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Testing..."
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_disabled_S_left"
-                        },
-                        "data": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Not installed"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 112,
-                "width": 236,
-                "height": 28,
-                "name": "Battery",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 28,
-                    "text": "Battery:"
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "sys_info_battery_status",
-                    "left": 114,
-                    "top": 0,
-                    "width": 122,
-                    "height": 28,
-                    "widgets": [
-                      {
-                        "type": "DisplayData",
-                        "style": {
-                          "inheritFrom": "event_error"
-                        },
-                        "data": "battery",
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "displayOption": 0
-                      },
-                      {
-                        "type": "DisplayData",
-                        "style": {
-                          "inheritFrom": "value_S_left"
-                        },
-                        "data": "battery",
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "displayOption": 0
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "value_S_left"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Not installed"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 140,
-                "width": 236,
-                "height": 28,
-                "name": "SD card",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 28,
-                    "text": "SD card:"
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "sys_info_sdcard_status",
-                    "left": 114,
-                    "top": 0,
-                    "width": 122,
-                    "height": 28,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "value_S_left"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Unsupported"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "value_S_left"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Present"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "event_error"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Not present"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "event_error"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "No FAT"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "event_error"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Failed"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "event_warning"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 122,
-                        "height": 28,
-                        "text": "Busy"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 236,
-                "top": 0,
-                "width": 236,
-                "height": 28,
-                "name": "Firmware",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 28,
-                    "text": "Firmware:"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "value_S_left"
-                    },
-                    "data": "sys_info_firmware_ver",
-                    "left": 114,
-                    "top": 0,
-                    "width": 122,
-                    "height": 28,
-                    "displayOption": 0
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 236,
-                "top": 28,
-                "width": 236,
-                "height": 28,
-                "name": "CPU module",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 28,
-                    "text": "CPU module:"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "value_S_left"
-                    },
-                    "data": "sys_info_cpu",
-                    "left": 114,
-                    "top": 0,
-                    "width": 122,
-                    "height": 28,
-                    "displayOption": 0
-                  }
-                ]
-              },
-              {
-                "type": "List",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "slots",
-                "left": 236,
-                "top": 56,
-                "width": 236,
-                "height": 84,
-                "itemWidget": {
-                  "type": "Container",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "left": 0,
-                  "top": 0,
-                  "width": 236,
-                  "height": 28,
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "edit_value_S_left"
-                      },
-                      "data": "slot_index",
-                      "left": 0,
-                      "top": 0,
-                      "width": 114,
-                      "height": 28,
-                      "text": ""
-                    },
-                    {
-                      "type": "Select",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "data": "slot_test_result",
-                      "left": 114,
-                      "top": 0,
-                      "width": 122,
-                      "height": 28,
-                      "widgets": [
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "value_S_left"
-                          },
-                          "data": "slot_info",
-                          "left": 0,
-                          "top": 0,
-                          "width": 122,
-                          "height": 28,
-                          "text": ""
-                        },
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "value_S_left",
-                            "color": "status_warning",
-                            "activeBackgroundColor": "status_warning"
-                          },
-                          "data": "slot_info",
-                          "left": 0,
-                          "top": 0,
-                          "width": 122,
-                          "height": 28,
-                          "text": ""
-                        },
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "value_S_left"
-                          },
-                          "data": "slot_info",
-                          "left": 0,
-                          "top": 0,
-                          "width": 122,
-                          "height": 28,
-                          "text": ""
-                        },
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "value_S_left"
-                          },
-                          "data": "slot_info",
-                          "left": 0,
-                          "top": 0,
-                          "width": 122,
-                          "height": 28,
-                          "text": ""
-                        },
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "value_S_left"
-                          },
-                          "data": "slot_info",
-                          "left": 0,
-                          "top": 0,
-                          "width": 122,
-                          "height": 28,
-                          "text": ""
-                        },
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "value_S_left"
-                          },
-                          "data": "slot_info",
-                          "left": 0,
-                          "top": 0,
-                          "width": 122,
-                          "height": 28,
-                          "text": ""
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "listType": "vertical"
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 168,
-                "width": 472,
-                "height": 28,
-                "name": "Serial No",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 28,
-                    "text": "Host name:"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "value_S_left"
-                    },
-                    "data": "ethernet_host_name",
-                    "left": 114,
-                    "top": 0,
-                    "width": 358,
-                    "height": 28,
-                    "displayOption": 0
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 196,
-                "width": 472,
-                "height": 28,
-                "name": "Serial No",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_S_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 114,
-                    "height": 28,
-                    "text": "Serial No.:"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "value_S_left"
-                    },
-                    "data": "sys_info_serial_no",
-                    "left": 114,
-                    "top": 0,
-                    "width": 358,
-                    "height": 28,
-                    "displayOption": 0
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 240,
-            "width": 480,
-            "height": 32,
-            "name": "Status line",
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "status_icon_enabled"
-                },
-                "action": "show_previous_page",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 32,
-                "text": "E"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "status_title"
-                },
-                "left": 41,
-                "top": 0,
-                "width": 438,
-                "height": 32,
-                "text": "System information"
-              }
-            ]
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 480,
-        "height": 272
       },
       {
         "name": "stand_by_menu",
@@ -57894,6 +58413,9 @@
         "name": "status_warning"
       },
       {
+        "name": "status_warning (1)"
+      },
+      {
         "name": "inst_max_header_bgnd"
       },
       {
@@ -58047,6 +58569,7 @@
           "#b3b7b7",
           "#55f2e6",
           "#ff0000",
+          "#000000",
           "#f5c7c1",
           "#272eb0",
           "#404040",
@@ -58109,6 +58632,7 @@
           "#b3b7b7",
           "#0c857b",
           "#ff0000",
+          "#000000",
           "#3d15a3",
           "#2f73bf",
           "#ffffff",
@@ -58171,6 +58695,7 @@
           "#187397",
           "#50cec5",
           "#ff0000",
+          "#000000",
           "#f8fac0",
           "#66999b",
           "#454545",

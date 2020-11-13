@@ -3716,6 +3716,20 @@
                 "text": "Information"
               }
             ]
+          },
+          {
+            "type": "MultilineText",
+            "style": {
+              "inheritFrom": "option_toggle_L_center",
+              "font": "Oswald14"
+            },
+            "left": 0,
+            "top": 180,
+            "width": 144,
+            "height": 56,
+            "text": "Channel labels\\nand colors",
+            "firstLineIndent": 4,
+            "hangingIndent": 0
           }
         ],
         "left": 0,

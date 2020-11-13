@@ -1395,6 +1395,10 @@ void action_edit_ntp_refresh_frequency() {
     NumericKeypad::start(0, Value(page->ntpRefreshFrequency, VALUE_TYPE_UINT32), options, onSetNtpRefreshFrequency, 0, 0);
 }
 
+void action_show_labels_and_colors() {
+    pushPage(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS);
+}
+
 } // namespace gui
 } // namespace eez
 
