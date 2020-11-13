@@ -266,14 +266,14 @@ bool loadExternalAssets(const char *filePath, int *err) {
         return false;
     }
 
-    if (fileSize > FILE_VIEW_BUFFER_SIZE) {
+    if (fileSize > EXTERNAL_ASSETS_BUFFER_SIZE) {
         if (err) {
             *err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
         }
         return false;
     }
 
-    uint8_t *fileData = FILE_VIEW_BUFFER + FILE_VIEW_BUFFER_SIZE - ((fileSize + 3) / 4) * 4;
+    uint8_t *fileData = EXTERNAL_ASSETS_BUFFER + EXTERNAL_ASSETS_BUFFER_SIZE - ((fileSize + 3) / 4) * 4;
     uint32_t bytesRead = file.read(fileData, fileSize);
     file.close();
 
@@ -289,14 +289,14 @@ bool loadExternalAssets(const char *filePath, int *err) {
     // first 4 bytes (uint32_t) are decompressed size
     uint32_t decompressedSize = ((uint32_t *)fileData)[0];
 
-    if (decompressedSize > (uint32_t)(fileData - FILE_VIEW_BUFFER)) {
+    if (decompressedSize > (uint32_t)(fileData - EXTERNAL_ASSETS_BUFFER)) {
         if (err) {
             *err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
         }
         return false;
     }
 
-    uint8_t *decompressedAssets = FILE_VIEW_BUFFER;
+    uint8_t *decompressedAssets = EXTERNAL_ASSETS_BUFFER;
 
     int result = LZ4_decompress_safe((const char *)fileData + 4, (char *)decompressedAssets, compressedSize, (int)decompressedSize);
     if (result != (int)decompressedSize) {
