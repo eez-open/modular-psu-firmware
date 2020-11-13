@@ -653,7 +653,7 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
         x += drawGlyph(x, y, clip_x1, clip_y1, clip_x2, clip_y2, encoding);
     }
 
-    if (i == cursorPosition) {
+    if (i <= cursorPosition) {
         xCursor = x;
     }
 

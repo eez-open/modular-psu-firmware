@@ -131,38 +131,42 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
 
         char *start = text;
 
-        if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER) {
-            int i = findStartOfFraction(text);
-            text[i] = 0;
-        } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION) {
-            int i = findStartOfFraction(text);
-            start = text + i;
-        } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
-            int i = findStartOfFraction(text);
-            int k = findStartOfUnit(text, i);
-            if (i < k) {
+        int length = -1;
+
+        if (display_data_widget->displayOption != DISPLAY_OPTION_ALL) {
+            if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER) {
+                int i = findStartOfFraction(text);
+                text[i] = 0;
+            } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION) {
+                int i = findStartOfFraction(text);
                 start = text + i;
-                text[k] = 0;
-            } else {
-                strcpy(text, ".0");
+            } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
+                int i = findStartOfFraction(text);
+                int k = findStartOfUnit(text, i);
+                if (i < k) {
+                    start = text + i;
+                    text[k] = 0;
+                } else {
+                    strcpy(text, ".0");
+                }
+            } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
+                int i = findStartOfUnit(text, 0);
+                start = text + i;
+            } else if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
+                int i = findStartOfUnit(text, 0);
+                text[i] = 0;
             }
-        } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
-            int i = findStartOfUnit(text, 0);
-            start = text + i;
-        } else if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
-            int i = findStartOfUnit(text, 0);
-            text[i] = 0;
-        }
 
-        // trim left
-        while (*start && *start == ' ') {
-            start++;
-        }
+            // trim left
+            while (*start && *start == ' ') {
+                start++;
+            }
 
-        // trim right
-        int length = strlen(start);
-        while (length > 0 && start[length - 1] == ' ') {
-            length--;
+            // trim right
+            length = strlen(start);
+            if (length > 0 && start[length - 1] == ' ') {
+                length--;
+            }
         }
 
         drawText(start, length, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,

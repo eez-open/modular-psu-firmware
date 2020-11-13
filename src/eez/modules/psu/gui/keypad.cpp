@@ -188,10 +188,10 @@ void Keypad::start(AppContext *appContext, const char *label, const char *text, 
 
     if (text) {
         strcpy(m_keypadText, text);
-        setCursorPosition(strlen(m_keypadText));
+        m_cursorPosition = strlen(m_keypadText);
     } else {
         m_keypadText[0] = 0;
-        setCursorPosition(0);
+        m_cursorPosition = 0;
     }
     m_keypadMode = KEYPAD_MODE_LOWERCASE;
 }
@@ -213,7 +213,7 @@ void Keypad::insertChar(char c) {
             m_keypadText[i + 1] = m_keypadText[i];
         }
         m_keypadText[m_cursorPosition] = c;
-        setCursorPosition(m_cursorPosition + 1);
+        m_cursorPosition++;
         m_lastKeyAppendTime = micros();
     } else {
         sound::playBeep();
@@ -239,7 +239,7 @@ void Keypad::back() {
         for (int i = m_cursorPosition; i < n; i++) {
             m_keypadText[i - 1] = m_keypadText[i];
         }
-        setCursorPosition(m_cursorPosition - 1);
+        m_cursorPosition--;
         m_keypadText[n - 1] = 0;
     } else {
         sound::playBeep();
@@ -248,7 +248,7 @@ void Keypad::back() {
 
 void Keypad::clear() {
     m_keypadText[0] = 0;
-    setCursorPosition(0);
+    m_cursorPosition = 0;
 }
 
 void Keypad::sign() {
@@ -293,15 +293,24 @@ void Keypad::cancel() {
 }
 
 int Keypad::getCursorPostion() {
-    return m_cursorPosition;
+    return m_cursorPosition + strlen(m_label);
 }
 
 void Keypad::setCursorPosition(int cursorPosition) {
-    m_cursorPosition = cursorPosition;
+    m_cursorPosition = cursorPosition - strlen(m_label);
+
+    if (m_cursorPosition < 0) {
+        m_cursorPosition = 0;
+    } else {
+        int n = strlen(m_keypadText);
+        if (m_cursorPosition > n) {
+            m_cursorPosition = n;
+        }
+    }
 }
 
 int Keypad::getXScroll(const WidgetCursor &widgetCursor) {
-    int x = DISPLAY_DATA_getCursorXPosition(m_cursorPosition, widgetCursor);
+    int x = DISPLAY_DATA_getCursorXPosition(getCursorPostion(), widgetCursor);
     
     x -= widgetCursor.x;
 
@@ -820,7 +829,7 @@ void NumericKeypad::dot() {
 void NumericKeypad::reset() {
     m_state = m_startValue.getType() != VALUE_TYPE_NONE ? START : EMPTY;
     m_keypadText[0] = 0;
-    setCursorPosition(0);
+    m_cursorPosition = 0;
 }
 
 void NumericKeypad::key(char ch) {
@@ -964,7 +973,7 @@ void NumericKeypad::ok() {
                 m_okUint32Callback(ipAddress);
                 m_state = START;
                 m_keypadText[0] = 0;
-                setCursorPosition(0);
+                m_cursorPosition = 0;
             } else {
                 errorMessage("Invalid IP address format!");
             }
