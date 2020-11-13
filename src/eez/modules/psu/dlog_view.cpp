@@ -226,7 +226,12 @@ void loadBlock() {
 void stateManagment() {
     auto isExecuting = dlog_record::isExecuting();
     if (!isExecuting && g_wasExecuting && g_showLatest && psu::gui::isPageOnStack(PAGE_ID_DLOG_VIEW)) {
-        openFile(dlog_record::getLatestFilePath());
+        if (psu::gui::isPageOnStack(getExternalAssetsFirstPageId())) {
+            psu::gui::removePageFromStack(PAGE_ID_DLOG_VIEW);
+            return;
+        } else {
+            openFile(dlog_record::getLatestFilePath());
+        }
     }
     g_wasExecuting = isExecuting;
 
