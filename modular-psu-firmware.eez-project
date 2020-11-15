@@ -3512,6 +3512,439 @@
         "dataContextOverrides": "{\n    \"slots\": [\n        {\n            \"slot_index\": \"Slot #1:\",\n            \"slot_info_with_fw_ver\": \"DCP405 R3B3\"\n        },\n        {\n            \"slot_index\": \"Slot #2:\",\n            \"slot_info_with_fw_ver\": \"SMX46 R1B2 v0.7\"\n        },\n        {\n            \"slot_index\": \"Slot #3:\",\n            \"slot_info_with_fw_ver\": \"MIO168 R1B2 ---\"\n        }\n    ]\n}"
       },
       {
+        "name": "welcome_800x480",
+        "description": "Welcome screen, display channels capacity and firmware revision",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 800,
+            "height": 240,
+            "widgets": [
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "has_custom_bitmap",
+                "left": 0,
+                "top": 0,
+                "width": 800,
+                "height": 240,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 800,
+                    "height": 240,
+                    "widgets": [
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "is_reset_by_iwdg",
+                        "left": 0,
+                        "top": 4,
+                        "width": 800,
+                        "height": 120,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "default_M",
+                              "font": "Oswald48"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 800,
+                            "height": 120,
+                            "text": "Welcome to EEZ BB3"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "default_M_warning",
+                              "font": "Oswald48"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 800,
+                            "height": 120,
+                            "text": "Welcome to EEZ BB3"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Bitmap",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 120,
+                        "width": 800,
+                        "height": 120,
+                        "bitmap": "logo"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Bitmap",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "custom_bitmap",
+                    "left": 0,
+                    "top": 0,
+                    "width": 800,
+                    "height": 240,
+                    "bitmap": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald14"
+            },
+            "left": 264,
+            "top": 260,
+            "width": 336,
+            "height": 30,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "font": "Oswald14",
+                  "alignHorizontal": "left"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 76,
+                "height": 30,
+                "text": "Master:"
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "font": "Oswald14"
+                },
+                "data": "master_info_with_fw_ver",
+                "left": 76,
+                "top": 0,
+                "width": 170,
+                "height": 30,
+                "displayOption": 0
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default",
+                  "font": "Oswald14"
+                },
+                "data": "master_test_result",
+                "left": 246,
+                "top": 0,
+                "width": 90,
+                "height": 30,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": " "
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left_warning",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": "Failed"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left_ok",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": "OK"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": " "
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": " "
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left_warning",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 90,
+                    "height": 30,
+                    "text": "Warning"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "List",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald14"
+            },
+            "data": "slots",
+            "left": 264,
+            "top": 290,
+            "width": 336,
+            "height": 90,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default",
+                "font": "Oswald14"
+              },
+              "left": 0,
+              "top": 0,
+              "width": 336,
+              "height": 30,
+              "widgets": [
+                {
+                  "type": "Text",
+                  "style": {
+                    "inheritFrom": "default_S_left",
+                    "font": "Oswald14",
+                    "alignHorizontal": "left"
+                  },
+                  "data": "slot_index",
+                  "left": 0,
+                  "top": 0,
+                  "width": 76,
+                  "height": 30,
+                  "text": ""
+                },
+                {
+                  "type": "DisplayData",
+                  "style": {
+                    "inheritFrom": "default_S_left",
+                    "font": "Oswald14"
+                  },
+                  "data": "slot_info_with_fw_ver",
+                  "left": 76,
+                  "top": 0,
+                  "width": 170,
+                  "height": 30,
+                  "displayOption": 0
+                },
+                {
+                  "type": "Select",
+                  "style": {
+                    "inheritFrom": "default",
+                    "font": "Oswald14"
+                  },
+                  "data": "slot_test_result",
+                  "left": 246,
+                  "top": 0,
+                  "width": 90,
+                  "height": 30,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 90,
+                      "height": 30,
+                      "text": " "
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left_warning",
+                        "font": "Oswald14"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 90,
+                      "height": 30,
+                      "text": "Failed"
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left_ok",
+                        "font": "Oswald14"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 90,
+                      "height": 30,
+                      "text": "OK"
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 90,
+                      "height": 30,
+                      "text": " "
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 90,
+                      "height": 30,
+                      "text": " "
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left_warning",
+                        "font": "Oswald14"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 90,
+                      "height": 30,
+                      "text": "Warning"
+                    }
+                  ]
+                }
+              ]
+            },
+            "listType": "vertical",
+            "gap": 0
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "has_custom_bitmap",
+            "left": 0,
+            "top": 476,
+            "width": 800,
+            "height": 4,
+            "widgets": [
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 800,
+                "height": 4,
+                "invertColors": true
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "is_reset_by_iwdg",
+                "left": 0,
+                "top": 0,
+                "width": 800,
+                "height": 4,
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 800,
+                    "height": 4,
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "status_warning"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 800,
+                    "height": 4
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 800,
+        "height": 480,
+        "dataContextOverrides": "{\n    \"slots\": [\n        {\n            \"slot_index\": \"Slot #1:\",\n            \"slot_info_with_fw_ver\": \"DCP405 R3B3\"\n        },\n        {\n            \"slot_index\": \"Slot #2:\",\n            \"slot_info_with_fw_ver\": \"SMX46 R1B2 v0.7\"\n        },\n        {\n            \"slot_index\": \"Slot #3:\",\n            \"slot_info_with_fw_ver\": \"MIO168 R1B2 ---\"\n        }\n    ]\n}"
+      },
+      {
         "name": "touch_calibration_intro",
         "description": "Touchscreen calibration introduction",
         "style": "default",

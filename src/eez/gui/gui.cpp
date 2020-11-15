@@ -343,7 +343,6 @@ void animate(Buffer startBuffer, void(*callback)(float t, void *bufferOld, void 
     g_animationState.callback = callback;
     g_animationState.easingRects = remapOutQuad;
     g_animationState.easingOpacity = remapOutCubic;
-
 }
 
 void animateOpenClose(const Rect &srcRect, const Rect &dstRect, bool direction) {

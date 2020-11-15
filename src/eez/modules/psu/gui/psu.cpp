@@ -1443,8 +1443,13 @@ bool isFrontPanelLocked() {
 Image g_customLogo;
 
 void loadCustomLogo() {
+#if CONF_OPTION_FPGA
+    static const uint32_t CONF_MAX_LOGO_WIDTH = 800;
+    static const uint32_t CONF_MAX_LOGO_HEIGHT = 240;
+#else
     static const uint32_t CONF_MAX_LOGO_WIDTH = 480;
     static const uint32_t CONF_MAX_LOGO_HEIGHT = 136;
+#endif
 
 #ifdef EEZ_PLATFORM_STM32
     static bool loaded;

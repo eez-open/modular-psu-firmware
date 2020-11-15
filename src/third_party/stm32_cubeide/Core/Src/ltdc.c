@@ -40,10 +40,17 @@ void MX_LTDC_Init(void)
   hltdc.Init.VerticalSync = 19;
   hltdc.Init.AccumulatedHBP = 93;
   hltdc.Init.AccumulatedVBP = 31;
+#if CONF_OPTION_FPGA
+  hltdc.Init.AccumulatedActiveW = 893;
+  hltdc.Init.AccumulatedActiveH = 511;
+  hltdc.Init.TotalWidth = 901;
+  hltdc.Init.TotalHeigh = 519;
+#else
   hltdc.Init.AccumulatedActiveW = 573;
   hltdc.Init.AccumulatedActiveH = 303;
   hltdc.Init.TotalWidth = 581;
   hltdc.Init.TotalHeigh = 311;
+#endif
   hltdc.Init.Backcolor.Blue = 0;
   hltdc.Init.Backcolor.Green = 0;
   hltdc.Init.Backcolor.Red = 0;
@@ -52,17 +59,30 @@ void MX_LTDC_Init(void)
     Error_Handler();
   }
   pLayerCfg.WindowX0 = 0;
+#if CONF_OPTION_FPGA
+  pLayerCfg.WindowX1 = 800;
+#else
   pLayerCfg.WindowX1 = 480;
+#endif
   pLayerCfg.WindowY0 = 0;
+#if CONF_OPTION_FPGA  
+  pLayerCfg.WindowY1 = 480;
+#else
   pLayerCfg.WindowY1 = 272;
+#endif
   pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_RGB565;
   pLayerCfg.Alpha = 255;
   pLayerCfg.Alpha0 = 255;
   pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA;
   pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA;
   pLayerCfg.FBStartAdress = 0;
+#if CONF_OPTION_FPGA  
+  pLayerCfg.ImageWidth = 800;
+  pLayerCfg.ImageHeight = 480;
+#else
   pLayerCfg.ImageWidth = 480;
   pLayerCfg.ImageHeight = 272;
+#endif  
   pLayerCfg.Backcolor.Blue = 0;
   pLayerCfg.Backcolor.Green = 0;
   pLayerCfg.Backcolor.Red = 0;

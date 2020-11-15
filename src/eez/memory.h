@@ -22,7 +22,11 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 static uint8_t * const MEMORY_BEGIN = (uint8_t *)0xc0000000u;
+#if CONF_OPTION_FPGA
+static const uint32_t MEMORY_SIZE = 32 * 1024 * 1024;
+#else
 static const uint32_t MEMORY_SIZE = 8 * 1024 * 1024;
+#endif
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -69,8 +73,13 @@ static uint8_t * const SCREENSHOOT_BUFFER_START_ADDRESS = VRAM_SCREENSHOOT_JPEG_
 static const uint32_t SCREENSHOOT_BUFFER_SIZE = 480 * 272 * 3;
 
 #if defined(EEZ_PLATFORM_STM32)
+#if CONF_OPTION_FPGA
+static const uint32_t DISPLAY_WIDTH = 800;
+static const uint32_t DISPLAY_HEIGHT = 480;
+#else
 static const uint32_t DISPLAY_WIDTH = 480;
 static const uint32_t DISPLAY_HEIGHT = 272;
+#endif
 static const uint32_t VRAM_BUFFER_SIZE = DISPLAY_WIDTH * DISPLAY_HEIGHT * 2; // RGB565
 #endif
 
