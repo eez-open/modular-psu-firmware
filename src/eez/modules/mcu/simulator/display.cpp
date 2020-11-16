@@ -173,8 +173,6 @@ void turnOn() {
         g_buffers[3].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER4_START_ADDRESS;
         g_buffers[4].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER5_START_ADDRESS;
         g_buffers[5].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER6_START_ADDRESS;
-        g_buffers[6].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER7_START_ADDRESS;
-        g_buffers[7].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER8_START_ADDRESS;
 
         refreshScreen();
     }

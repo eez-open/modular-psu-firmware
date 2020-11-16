@@ -101,7 +101,7 @@ void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color
 		HAL_DMA2D_Start(&hdma2d, colorBGRA, vramOffset(dst, x, y), width, height);
 	} else {
 		// fill aux. buffer with BGRA color
-		auto auxBuffer = (uint32_t *)VRAM_AUX_BUFFER9_START_ADDRESS;
+		auto auxBuffer = (uint32_t *)VRAM_AUX_BUFFER7_START_ADDRESS;
 
 		hdma2d.Init.Mode = DMA2D_R2M;
 		hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
@@ -385,8 +385,6 @@ void turnOn() {
 		g_buffers[3].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER4_START_ADDRESS);
 		g_buffers[4].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER5_START_ADDRESS);
 		g_buffers[5].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER6_START_ADDRESS);
-		g_buffers[6].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER7_START_ADDRESS);
-		g_buffers[7].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER8_START_ADDRESS);
 
         fillRect(g_bufferOld, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
         fillRect(g_bufferNew, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);

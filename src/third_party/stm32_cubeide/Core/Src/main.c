@@ -152,7 +152,11 @@ void SystemClock_Config(void)
 #endif                              
                               |RCC_PERIPHCLK_SDMMC1|RCC_PERIPHCLK_CLK48;
   PeriphClkInitStruct.PLLSAI.PLLSAIN = 200;
+#if CONF_OPTION_FPGA  
   PeriphClkInitStruct.PLLSAI.PLLSAIR = 2;
+#else
+  PeriphClkInitStruct.PLLSAI.PLLSAIR = 5;
+#endif
   PeriphClkInitStruct.PLLSAI.PLLSAIQ = 2;
   PeriphClkInitStruct.PLLSAI.PLLSAIP = RCC_PLLSAIP_DIV2;
   PeriphClkInitStruct.PLLSAIDivQ = 1;
