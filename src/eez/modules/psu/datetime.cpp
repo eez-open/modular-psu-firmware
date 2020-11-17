@@ -532,4 +532,4 @@ bool DateTime::operator!=(const DateTime &rhs) {
 
 } // namespace datetime
 } // namespace psu
-}; // namespace eez
+} // namespace eez
