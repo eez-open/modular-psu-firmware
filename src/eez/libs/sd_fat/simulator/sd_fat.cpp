@@ -282,8 +282,7 @@ SdFatResult Directory::findNext(FileInfo &fileInfo) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-File::File() : m_fp(NULL), m_isOpen(false) {
-}
+File::File() {}
 
 bool File::open(const char *path, uint8_t mode) {
     const char *fmode;

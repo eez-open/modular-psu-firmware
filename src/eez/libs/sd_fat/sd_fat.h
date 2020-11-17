@@ -147,9 +147,9 @@ class File {
     void print(char value);
 
   private:
-    bool m_isOpen;
+    bool m_isOpen{false};
 #ifdef EEZ_PLATFORM_SIMULATOR
-    FILE *m_fp;
+    FILE *m_fp{NULL};
 #else
     FIL m_file;
 #endif
