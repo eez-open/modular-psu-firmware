@@ -78,7 +78,7 @@ void ColorsData_fixPointers() {
 
 void NameList_fixPointers(NameList *nameList) {
     if (nameList) {
-        nameList->first = (void *){(uint8_t *)nameList + (uint32_t)nameList->first};
+        nameList->first = (void *)((uint8_t *)nameList + (uint32_t)nameList->first);
         for (uint32_t i = 0; i < nameList->count; i++) {
             nameList->first[i] = (const char *)((uint8_t *)nameList + (uint32_t)nameList->first[i]);
         }
