@@ -143,7 +143,7 @@ static uint32_t g_timer1LastTickCount;
 ////////////////////////////////////////////////////////////////////////////////
 
 void initHighPriorityMessageQueue() {
-    g_highPriorityMessageQueueId = osMessageCreate(osMessageQ(g_highPriorityMessageQueue), NULL);
+    g_highPriorityMessageQueueId = osMessageCreate(osMessageQ(g_highPriorityMessageQueue), 0);
 }
 
 void startHighPriorityThread() {
@@ -212,7 +212,7 @@ void sendMessageToPsu(HighPriorityThreadMessage messageType, uint32_t messagePar
 ////////////////////////////////////////////////////////////////////////////////
 
 void initLowPriorityMessageQueue() {
-    g_lowPriorityMessageQueueId = osMessageCreate(osMessageQ(g_lowPriorityMessageQueue), NULL);
+    g_lowPriorityMessageQueueId = osMessageCreate(osMessageQ(g_lowPriorityMessageQueue), 0);
 }
 
 void startLowPriorityThread() {

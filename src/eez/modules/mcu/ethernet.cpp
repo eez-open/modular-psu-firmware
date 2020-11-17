@@ -98,7 +98,7 @@ osMessageQId(g_ethernetMessageQueueId);
 static osThreadId g_ethernetTaskHandle;
 
 void initMessageQueue() {
-    g_ethernetMessageQueueId = osMessageCreate(osMessageQ(g_ethernetMessageQueue), NULL);
+    g_ethernetMessageQueueId = osMessageCreate(osMessageQ(g_ethernetMessageQueue), 0);
 }
 
 void startThread() {
