@@ -166,12 +166,14 @@ uint32_t calcPwmDutyInt(float duty, uint32_t periodInt) {
 }
 
 void updatePwmDuty(int pin) {
+#if defined EEZ_PLATFORM_STM32
     float duty = g_pwmDuty[pin - DOUT1];
     uint32_t periodInt = g_pwmPeriodInt[pin - DOUT1];
     uint32_t dutyInt = calcPwmDutyInt(duty, periodInt);
-#if defined EEZ_PLATFORM_STM32
     /* Set the Capture Compare Register value */
     TIM3->CCR2 = dutyInt;
+#else
+    (void)pin;
 #endif
 }
 
