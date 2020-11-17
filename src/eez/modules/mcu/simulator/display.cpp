@@ -62,7 +62,6 @@ static uint32_t *g_buffer;
 static uint32_t *g_lastBuffer;
 
 static bool g_takeScreenshot;
-static int g_screenshotY;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -533,7 +532,6 @@ void drawVLine(int x, int y, int l) {
 
 void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     int width = x2 - x1 + 1;
-    int height = y2 - y1 + 1;
 
     uint32_t *src = g_buffer + y1 * DISPLAY_WIDTH + x1;
     uint32_t *dst = g_buffer + dsty * DISPLAY_WIDTH + dstx;

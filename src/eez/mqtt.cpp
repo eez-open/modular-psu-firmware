@@ -532,7 +532,6 @@ const char *getClientId() {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        static const char *CLIENT_ID = "BB3_Simulator";
         sprintf(g_clientId, "BB3_Simulator_%s", getSerialNumber());
 #endif
     }
