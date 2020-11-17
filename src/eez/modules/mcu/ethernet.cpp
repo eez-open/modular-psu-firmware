@@ -93,7 +93,7 @@ osThreadDef(g_ethernetTask, mainLoop, osPriorityNormal, 0, 1024);
 #endif
 
 osMessageQDef(g_ethernetMessageQueue, 20, uint32_t);
-osMessageQId(g_ethernetMessageQueueId);
+osMessageQId g_ethernetMessageQueueId;
 
 static osThreadId g_ethernetTaskHandle;
 
