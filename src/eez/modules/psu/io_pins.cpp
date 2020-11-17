@@ -63,7 +63,10 @@ static float g_pwmFrequency[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_FREQUENCY, PWM_
 static float g_pwmDuty[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_DUTY, PWM_DEFAULT_DUTY };
 static uint32_t g_pwmPeriodInt[NUM_IO_PINS - DOUT1];
 static bool m_gPwmStarted;
+
+#if defined EEZ_PLATFORM_STM32
 static float g_pwmStartedFrequency;
+#endif
 
 #if defined EEZ_PLATFORM_STM32
 
