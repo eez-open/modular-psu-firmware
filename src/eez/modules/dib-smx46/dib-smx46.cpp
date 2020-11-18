@@ -1031,7 +1031,7 @@ static char *g_labelPointer;
 void onSetLabel(char *value) {
     strcpy(g_labelPointer, value);
     popPage();
-};
+}
 
 void action_dib_smx46_edit_x_label() {
     int cursor = getFoundWidgetAtDown().cursor;

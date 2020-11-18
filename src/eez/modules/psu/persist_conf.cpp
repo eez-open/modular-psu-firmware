@@ -202,7 +202,7 @@ void initDefaultDevConf() {
 
     // block 10
     g_defaultDevConf.slotEnabledBits = 0xFF;
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

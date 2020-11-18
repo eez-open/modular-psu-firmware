@@ -91,8 +91,9 @@ static uint32_t g_debounceTimeout;
 ////////////////////////////////////////////////////////////////////////////////
 
 static void stateTransition(Event event);
+#if defined(EEZ_PLATFORM_STM32)
 static void testTimeoutEvent(uint32_t &timeout, Event timeoutEvent);
-
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
@@ -1074,12 +1075,14 @@ static void clearTimeout(uint32_t &timeout) {
     timeout = 0;
 }
 
+#if defined(EEZ_PLATFORM_STM32)
 static void testTimeoutEvent(uint32_t &timeout, Event timeoutEvent) {
     if (timeout && (int32_t)(millis() - timeout) >= 0) {
         clearTimeout(timeout);
         stateTransition(timeoutEvent);
     }
 }
+#endif
 
 static void stateTransition(Event event) {
     if (g_state == STATE_START) {

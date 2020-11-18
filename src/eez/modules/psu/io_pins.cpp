@@ -63,7 +63,10 @@ static float g_pwmFrequency[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_FREQUENCY, PWM_
 static float g_pwmDuty[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_DUTY, PWM_DEFAULT_DUTY };
 static uint32_t g_pwmPeriodInt[NUM_IO_PINS - DOUT1];
 static bool m_gPwmStarted;
+
+#if defined EEZ_PLATFORM_STM32
 static float g_pwmStartedFrequency;
+#endif
 
 #if defined EEZ_PLATFORM_STM32
 
@@ -163,12 +166,14 @@ uint32_t calcPwmDutyInt(float duty, uint32_t periodInt) {
 }
 
 void updatePwmDuty(int pin) {
+#if defined EEZ_PLATFORM_STM32
     float duty = g_pwmDuty[pin - DOUT1];
     uint32_t periodInt = g_pwmPeriodInt[pin - DOUT1];
     uint32_t dutyInt = calcPwmDutyInt(duty, periodInt);
-#if defined EEZ_PLATFORM_STM32
     /* Set the Capture Compare Register value */
     TIM3->CCR2 = dutyInt;
+#else
+    (void)pin;
 #endif
 }
 

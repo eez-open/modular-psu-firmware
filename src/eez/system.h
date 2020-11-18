@@ -34,7 +34,7 @@ extern volatile uint32_t g_tickCount;
 
 #else
 
-#define WATCHDOG_RESET(...) 0
+#define WATCHDOG_RESET(...) (void)0
 
 #endif
 
