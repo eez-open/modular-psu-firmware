@@ -22,7 +22,7 @@ namespace eez {
 namespace gui {
 
 struct TextWidgetSpecific {
-    const char *text;
+    AssetsPtr<const char> text;
     uint8_t flags;
 };
 

@@ -43,7 +43,7 @@ int16_t getDataIdFromName(const char *name);
 int getExternalAssetsFirstPageId();
 
 #define GET_WIDGET_PROPERTY(widget, propertyName, type) ((type)widget->propertyName)
-#define GET_WIDGET_LIST_ELEMENT(list, index) ((list).first + (index))
+#define GET_WIDGET_LIST_ELEMENT(list, index) &((list).first[index])
 
 bool loadExternalAssets(const char *filePath, int *err);
 

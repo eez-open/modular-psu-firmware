@@ -28,14 +28,14 @@ namespace gui {
 
 struct ListWidget {
     uint8_t listType; // LIST_TYPE_VERTICAL or LIST_TYPE_HORIZONTAL
-    const Widget *itemWidget;
+    AssetsPtr<const Widget> itemWidget;
     uint8_t gap;
 };
 
 FixPointersFunctionType LIST_fixPointers = [](Widget *widget, Assets *assets) {
     ListWidget *listWidget = (ListWidget *)widget->specific;
-    listWidget->itemWidget = (Widget *)((uint8_t *)assets->document + (uint32_t)listWidget->itemWidget);
-    Widget_fixPointers((Widget *)listWidget->itemWidget);
+    listWidget->itemWidget = (Widget *)((uint8_t *)(void *)assets->document + (uint32_t)listWidget->itemWidget);
+    Widget_fixPointers((Widget *)&*listWidget->itemWidget);
 };
 
 EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {

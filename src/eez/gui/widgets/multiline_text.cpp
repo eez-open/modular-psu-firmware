@@ -26,14 +26,14 @@ namespace eez {
 namespace gui {
 
 struct MultilineTextWidget {
-    const char *text;
+    AssetsPtr<const char> text;
     int16_t firstLineIndent;
     int16_t hangingIndent;
 };
 
 FixPointersFunctionType MULTILINE_TEXT_fixPointers = [](Widget *widget, Assets *assets) {
     MultilineTextWidget *multilineTextWidget = (MultilineTextWidget *)widget->specific;
-    multilineTextWidget->text = (const char *)((uint8_t *)assets->document + (uint32_t)multilineTextWidget->text);
+    multilineTextWidget->text = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)multilineTextWidget->text);
 };
 
 EnumFunctionType MULTILINE_TEXT_enum = nullptr;

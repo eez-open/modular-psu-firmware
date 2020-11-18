@@ -32,7 +32,7 @@ namespace gui {
 
 FixPointersFunctionType TEXT_fixPointers = [](Widget *widget, Assets *assets) {
     TextWidgetSpecific *textWidget = (TextWidgetSpecific *)widget->specific;
-    textWidget->text = (const char *)((uint8_t *)assets->document + (uint32_t)textWidget->text);
+    textWidget->text = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)textWidget->text);
 };
 
 EnumFunctionType TEXT_enum = nullptr;
