@@ -150,7 +150,7 @@ scpi_t g_scpiContext;
 
 void initMessageQueue() {
     eez::psu::scpi::init(g_scpiContext, g_scpiPsuContext, &g_scpiInterface, g_scpiInputBuffer, SCPI_PARSER_INPUT_BUFFER_LENGTH, g_errorQueueData, SCPI_PARSER_ERROR_QUEUE_SIZE + 1);
-    g_mpMessageQueueId = osMessageCreate(osMessageQ(g_mpMessageQueue), NULL);
+    g_mpMessageQueueId = osMessageCreate(osMessageQ(g_mpMessageQueue), 0);
 }
 
 void startThread() {
@@ -339,7 +339,7 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
 
     if (g_lastError != 0) {
         static char g_scpiError[48];
-        snprintf(g_scpiError, 48, "SCPI error %d, \"%s\"", g_lastError, SCPI_ErrorTranslate(g_lastError));
+        snprintf(g_scpiError, 48, "SCPI error %d, \"%s\"", (int)g_lastError, SCPI_ErrorTranslate(g_lastError));
         mp_raise_ValueError(g_scpiError);
     }
 

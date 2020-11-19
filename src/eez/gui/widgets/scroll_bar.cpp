@@ -35,8 +35,8 @@ namespace gui {
 struct ScrollBarWidget {
     uint16_t thumbStyle;
     uint16_t buttonsStyle;
-    const char *leftButtonText;
-	const char *rightButtonText;
+    AssetsPtr<const char> leftButtonText;
+    AssetsPtr<const char> rightButtonText;
 };
 
 enum ScrollBarWidgetSegment {
@@ -58,8 +58,8 @@ struct ScrollBarWidgetState {
 
 FixPointersFunctionType SCROLL_BAR_fixPointers = [](Widget *widget, Assets *assets) {
     ScrollBarWidget *scrollBarWidget = (ScrollBarWidget *)widget->specific;
-    scrollBarWidget->leftButtonText = (const char *)((uint8_t *)assets->document + (uint32_t)scrollBarWidget->leftButtonText);
-    scrollBarWidget->rightButtonText = (const char *)((uint8_t *)assets->document + (uint32_t)scrollBarWidget->rightButtonText);
+    scrollBarWidget->leftButtonText = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)scrollBarWidget->leftButtonText);
+    scrollBarWidget->rightButtonText = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)scrollBarWidget->rightButtonText);
 };
 
 EnumFunctionType SCROLL_BAR_enum = nullptr;

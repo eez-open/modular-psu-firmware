@@ -84,4 +84,4 @@ struct DateTime {
 
 } // namespace datetime
 } // namespace psu
-}; // namespace eez
+} // namespace eez

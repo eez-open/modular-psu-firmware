@@ -28,13 +28,13 @@ namespace gui {
 
 struct GridWidget {
     uint8_t gridFlow; // GRID_FLOW_ROW or GRID_FLOW_COLUMN
-    const Widget *itemWidget;
+    AssetsPtr<const Widget> itemWidget;
 };
 
 FixPointersFunctionType GRID_fixPointers = [](Widget *widget, Assets *assets) {
     GridWidget *gridWidget = (GridWidget *)widget->specific;
-	gridWidget->itemWidget = (Widget *)((uint8_t *)assets->document + (uint32_t)gridWidget->itemWidget);
-    Widget_fixPointers((Widget *)gridWidget->itemWidget);
+    gridWidget->itemWidget = (Widget *)((uint8_t *)(void *)assets->document + (uint32_t)gridWidget->itemWidget);
+    Widget_fixPointers((Widget *)&*gridWidget->itemWidget);
 };
 
 EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {

@@ -2004,10 +2004,12 @@ scpi_result_t scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ(scpi_t *conte
     return SCPI_RES_OK;
 }
 
+#if defined(EEZ_PLATFORM_STM32)
 static scpi_choice_def_t systemMeasureVoltageChoice[] = { 
     { "RTC", 1 },
     SCPI_CHOICE_LIST_END 
 };
+#endif
 
 
 scpi_result_t scpi_cmd_systemMeasureScalarVoltageDcQ(scpi_t *context) {

@@ -28,7 +28,7 @@ namespace gui {
 
 FixPointersFunctionType BUTTON_fixPointers = [](Widget *widget, Assets *assets) {
     ButtonWidget *buttonWidget = (ButtonWidget *)widget->specific;
-    buttonWidget->text = (const char *)((uint8_t *)assets->document + (uint32_t)buttonWidget->text);
+    buttonWidget->text = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)buttonWidget->text);
 };
 
 EnumFunctionType BUTTON_enum = nullptr;

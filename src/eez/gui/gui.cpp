@@ -72,7 +72,7 @@ void startThread() {
     mcu::display::onThemeChanged();
     touch::init();
     mouse::init();
-    g_guiMessageQueueId = osMessageCreate(osMessageQ(g_guiMessageQueue), NULL);
+    g_guiMessageQueueId = osMessageCreate(osMessageQ(g_guiMessageQueue), 0);
     g_guiTaskHandle = osThreadCreate(osThread(g_guiTask), nullptr);
 }
 

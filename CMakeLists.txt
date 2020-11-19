@@ -20,13 +20,13 @@ else()
     set(SDL2_BUILDING_LIBRARY 1)
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
-    include_directories(${SDL2_INCLUDE_DIRS})
-    include_directories(${SDL2IMAGE_INCLUDE_DIR})
+    include_directories(SYSTEM ${SDL2_INCLUDE_DIRS})
+    include_directories(SYSTEM ${SDL2IMAGE_INCLUDE_DIR})
     add_definitions(-DOPTION_ETHERNET=1)
 endif()
 
 if (UNIX)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fpermissive")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fpermissive -pedantic -Wall")
 endif (UNIX)
 
 add_definitions(-DDEBUG)
@@ -74,12 +74,13 @@ include_directories(
     src/eez/libs/mqtt
     src/eez/platform/simulator
     src/eez/scpi
+)
 
+include_directories(SYSTEM
     src/third_party/libscpi/inc
     src/third_party/micropython
     src/third_party/micropython/ports/bb3
 )
-
 if(WIN32)
     include_directories(src/third_party/micropython/ports/bb3/win32)
 endif()
@@ -834,7 +835,7 @@ endif()
 if (UNIX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-    target_link_libraries(modular-psu-firmware Threads::Threads)    
+    target_link_libraries(modular-psu-firmware Threads::Threads bsd)
 endif (UNIX)
 
 target_link_libraries(modular-psu-firmware ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
