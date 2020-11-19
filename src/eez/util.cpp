@@ -214,6 +214,10 @@ bool isNaN(float x) {
     return x != x;
 }
 
+bool isNaN(double x) {
+    return x != x;
+}
+
 bool isDigit(char ch) {
     return ch >= '0' && ch <= '9';
 }

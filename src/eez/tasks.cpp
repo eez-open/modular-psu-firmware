@@ -365,6 +365,8 @@ void lowPriorityThreadOneIter() {
                 file_manager::uploadFile();
             } else if (type == THREAD_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE) {
                 file_manager::openImageFile();
+            } else if (type == THREAD_MESSAGE_FILE_MANAGER_OPEN_BIT_FILE) {
+                file_manager::openBitFile();
             } else if (type == THREAD_MESSAGE_FILE_MANAGER_DELETE_FILE) {
                 file_manager::deleteFile();
             } else if (type == THREAD_MESSAGE_FILE_MANAGER_RENAME_FILE) {

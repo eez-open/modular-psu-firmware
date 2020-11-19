@@ -72,6 +72,7 @@ bool isDeleteFileEnabled();
 void deleteFile();
 
 void openImageFile();
+void openBitFile();
 
 void onEncoder(int couter);
 

@@ -57,6 +57,9 @@ void select(uint8_t slotIndex, int chip) {
         } else if (chip == CHIP_IOEXP || chip == CHIP_TEMP_SENSOR) {
             WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
             handle[slotIndex]->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+        } else if (chip == CHIP_FPGA) {
+            WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_1LINE | SPI_POLARITY_HIGH | SPI_PHASE_1EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
+            handle[slotIndex]->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
         } else {
             WRITE_REG(handle[slotIndex]->Instance->CR1, SPI_MODE_MASTER | SPI_DIRECTION_2LINES | SPI_POLARITY_LOW | SPI_PHASE_2EDGE | (SPI_NSS_SOFT & SPI_CR1_SSM) | SPI_BAUDRATEPRESCALER_16 | SPI_FIRSTBIT_MSB | SPI_CRCCALCULATION_DISABLE);
             handle[slotIndex]->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

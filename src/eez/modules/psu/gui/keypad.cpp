@@ -97,7 +97,7 @@ void onKeypadTextTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     }
 
     Keypad *keypad = getActiveKeypad();
-    if (keypad && keypad != getActiveNumericKeypad()) {
+    if (keypad) {
         keypad->setCursorPosition(DISPLAY_DATA_getCharIndexAtPosition(touchEvent.x, widgetCursor));
     }
 }
@@ -434,6 +434,7 @@ void NumericKeypad::init(
 
     if (value.getType() == VALUE_TYPE_IP_ADDRESS) {
         ipAddressToString(value.getUInt32(), m_keypadText);
+        m_cursorPosition = strlen(m_keypadText);
         m_state = BEFORE_DOT;
     }
 }
@@ -725,6 +726,8 @@ int NumericKeypad::getCursorPostion() {
 double NumericKeypad::getValue() {
     const char *p = m_keypadText;
 
+    bool empty = true;
+
     int a = 0;
     double b = 0;
     int sign = 1;
@@ -739,6 +742,7 @@ double NumericKeypad::getValue() {
     while (*p && *p != getDotSign()) {
         a = a * 10 + (*p - '0');
         ++p;
+        empty = false;
     }
 
     if (*p) {
@@ -746,7 +750,12 @@ double NumericKeypad::getValue() {
         while (q != p) {
             b = (b + (*q - '0')) / 10;
             --q;
+            empty = false;
         }
+    }
+
+    if (empty) {
+        return NAN;
     }
 
     double value = sign * (a + b);
@@ -780,7 +789,13 @@ void NumericKeypad::digit(int d) {
                 insertChar('+');
             }
         }
+    } else {
+        if (m_keypadText[m_cursorPosition] == '-' || m_keypadText[m_cursorPosition] == '+') {
+            sound::playBeep();
+            return;
+        }
     }
+
     insertChar(d + '0');
 
     if (!checkNumSignificantDecimalDigits()) {
@@ -803,7 +818,7 @@ void NumericKeypad::dot() {
         return;
     }
 
-    if (m_state == EMPTY) {
+    if (m_state == START || m_state == EMPTY) {
         if (m_startValue.getType() == VALUE_TYPE_TIME_ZONE) {
             if (strlen(m_keypadText) == 0) {
                 insertChar('+');
@@ -813,12 +828,7 @@ void NumericKeypad::dot() {
         m_state = BEFORE_DOT;
     }
 
-    if (m_state == START || m_state == EMPTY) {
-        insertChar('0');
-        m_state = BEFORE_DOT;
-    }
-
-    if (m_state == BEFORE_DOT) {
+    if (m_state == BEFORE_DOT && m_keypadText[m_cursorPosition] != '-' && m_keypadText[m_cursorPosition] != '+') {
         insertChar(getDotSign());
         m_state = AFTER_DOT;
     } else {
@@ -886,6 +896,8 @@ void NumericKeypad::sign() {
             if (m_keypadText[0] == 0) {
                 m_keypadText[0] = '-';
                 m_keypadText[1] = 0;
+                m_cursorPosition = 1;
+                m_state = BEFORE_DOT;
             } else if (m_keypadText[0] == '-') {
                 m_keypadText[0] = '+';
             } else {
@@ -894,11 +906,17 @@ void NumericKeypad::sign() {
         } else {
             if (m_keypadText[0] == '-') {
                 strcpy(m_keypadText, m_keypadText + 1);
+                if (m_cursorPosition > 0) {
+                    m_cursorPosition--;
+                }
             } else if (m_keypadText[0] == '+') {
                 m_keypadText[0] = '-';
             } else {
-                memmove(m_keypadText + 1, m_keypadText, strlen(m_keypadText));
+                auto n = strlen(m_keypadText);
+                memmove(m_keypadText + 1, m_keypadText, n);
+                m_keypadText[n + 1] = 0;
                 m_keypadText[0] = '-';
+                m_cursorPosition++;
             }
 
             if (m_state == START || m_state == EMPTY) {
@@ -981,6 +999,10 @@ void NumericKeypad::ok() {
             return;
         } else {
             double value = getValue();
+            if (isNaN(value)) {
+                sound::playBeep();
+                return;
+            }
 
             if (!isNaN(m_options.min) && value < m_options.min && !(value == 0 && m_options.allowZero)) {
                 psuErrorMessage(0, MakeLessThenMinMessageValue(m_options.min, m_startValue));

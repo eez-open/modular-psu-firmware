@@ -48,6 +48,8 @@
 
 #include <eez/modules/dib-dcp405/dib-dcp405.h>
 
+#include <eez/modules/fpga/prog.h>
+
 namespace eez {
 namespace psu {
 
@@ -117,7 +119,13 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             taskENTER_CRITICAL();
 #endif
             while(1);
-        } {
+        } else if (cmd == 31) {
+            char filePath[MAX_PATH_LENGTH + 1];
+            if (!getFilePath(context, filePath, true)) {
+                return SCPI_RES_ERR;
+            }
+            return fpga::prog(filePath);
+        } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;
         }

@@ -76,6 +76,7 @@ float floorPrec(float a, float prec);
 float ceilPrec(float a, float prec);
 
 bool isNaN(float x);
+bool isNaN(double x);
 
 bool isDigit(char ch);
 bool isHexDigit(char ch);

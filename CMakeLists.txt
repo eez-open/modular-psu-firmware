@@ -417,6 +417,16 @@ set(header_eez_modules_bp3c
 list (APPEND header_files ${header_eez_modules_bp3c})
 source_group("eez\\modules\\bp3c" FILES ${src_eez_modules_bp3c} ${header_eez_modules_bp3c})
 
+set(src_eez_modules_fpga
+    src/eez/modules/fpga/prog.cpp
+) 
+list (APPEND src_files ${src_eez_modules_fpga})
+set(header_eez_modules_fpga
+    src/eez/modules/fpga/prog.h
+) 
+list (APPEND header_files ${header_eez_modules_fpga})
+source_group("eez\\modules\\fpga" FILES ${src_eez_modules_fpga} ${header_eez_modules_fpga})
+
 set(src_eez_modules_mcu
     src/eez/modules/mcu/battery.cpp
     src/eez/modules/mcu/display.cpp

@@ -51,6 +51,7 @@
 #include <eez/libs/sd_fat/sd_fat.h>
 
 #include <eez/libs/image/image.h>
+#include <eez/modules/fpga/prog.h>
 
 using namespace eez::psu::gui;
 
@@ -654,6 +655,12 @@ bool isOpenFileEnabled() {
         return mp::isIdle();
     }
 
+    if (fileItem->type == FILE_TYPE_OTHER) {
+        if (endsWithNoCase(fileItem->name, ".bit")) {
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -690,6 +697,10 @@ void openFile() {
         sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE);
     } else if (fileItem->type == FILE_TYPE_MICROPYTHON) {
         mp::startScript(filePath);
+    } else if (fileItem->type == FILE_TYPE_OTHER) {
+        if (endsWithNoCase(filePath, ".bit")) {
+            sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_OPEN_BIT_FILE);
+        }
     }
 }
 
@@ -709,6 +720,22 @@ void openImageFile() {
         if (!imageDecode(filePath, &g_openedImage)) {
             g_imageLoadFailed = true;
         }            
+    }
+}
+
+void openBitFile() {
+    auto fileItem = getFileItem(g_selectedFileIndex);
+    if (fileItem) {
+        if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+            return;
+        }
+
+        char filePath[MAX_PATH_LENGTH + 1];
+        strcpy(filePath, g_currentDirectory);
+        strcat(filePath, "/");
+        strcat(filePath, fileItem->name);
+
+        fpga::prog(filePath);
     }
 }
 
