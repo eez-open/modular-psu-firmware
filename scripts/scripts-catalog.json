@@ -1,4 +1,17 @@
 [
+     {
+        "name": "CapReform",
+        "description": "Reform Electrolytic Capacitors with a specific profile for it",
+        "versions": [
+            {
+                "version": "1.0",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/7bcf4818e3fd12d3e7dc0bee35e4d0a29be08f5a/scripts/CapReform/CapReform.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/7bcf4818e3fd12d3e7dc0bee35e4d0a29be08f5a/scripts/CapReform/CapReform.res"
+                ]
+            }
+        ]
+    },
     {
         "name": "Curve Tracer",
         "description": "Plot output characteristic for BJTs and MOSFETs",
