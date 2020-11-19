@@ -200,15 +200,16 @@ def main():
     scpi('SYST:DIGITAL:PIN4:POLARITY POS')
     scpi('SYST:DIG:OUTP:DATA 4,0')
   
-    # TODO: check & setup stuff
-    # set maximum values, check channel/module types/configure serial if possible....
-    ch1Model = scpi("SYSTem:CHANnel:MODel? ch1")
-    ch2Model = scpi("SYSTem:CHANnel:MODel? ch2")
-    if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
+    if scpi("SYSTem:CHANnel:COUNt?") >= 2:
+      ch1Model = scpi("SYSTem:CHANnel:MODel? ch1")
+      ch2Model = scpi("SYSTem:CHANnel:MODel? ch2")
+      if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
         scpi("INST:COUP:TRAC SER")
-    else:
+      else:
         scpi("INST:COUP:TRAC NONE")
-  
+    else:
+      scpi("INST:COUP:TRAC NONE")
+      
     scpi("INST ch1")
     module_max_volt = float(scpi("VOLT? MAX"))
     scpi("OUTP 0")
