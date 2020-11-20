@@ -1020,7 +1020,7 @@ public:
 
     void onHighPriorityThreadMessage(uint8_t type, uint32_t param) override;
 
-    struct ProfileParameters {
+    struct ProfileParameters : public Module::ProfileParameters  {
         DinChannel::ProfileParameters dinChannel;
         DoutChannel::ProfileParameters doutChannel;
         AinChannel::ProfileParameters ainChannels[4];
@@ -1030,6 +1030,8 @@ public:
     };
 
     void resetProfileToDefaults(uint8_t *buffer) override {
+        Module::resetProfileToDefaults(buffer);
+
         auto parameters = (ProfileParameters *)buffer;
 
         dinChannel.resetProfileToDefaults(parameters->dinChannel);
@@ -1049,6 +1051,8 @@ public:
     }
 
     void getProfileParameters(uint8_t *buffer) override {
+        Module::getProfileParameters(buffer);
+
         assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
 
         auto parameters = (ProfileParameters *)buffer;
@@ -1070,6 +1074,8 @@ public:
     }
     
     void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) override {
+        Module::setProfileParameters(buffer, mismatch, recallOptions);
+
         auto parameters = (ProfileParameters *)buffer;
 
         dinChannel.setProfileParameters(parameters->dinChannel);
@@ -1089,6 +1095,10 @@ public:
     }
     
     bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) override {
+        if (!Module::writeProfileProperties(ctx, buffer)) {
+            return false;
+        }
+
         auto parameters = (ProfileParameters *)buffer;
 
         if (!dinChannel.writeProfileProperties(ctx, parameters->dinChannel)) {
@@ -1122,6 +1132,10 @@ public:
     }
     
     bool readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) override {
+        if (Module::readProfileProperties(ctx, buffer)) {
+            return true;
+        }
+
         auto parameters = (ProfileParameters *)buffer;
 
         if (dinChannel.readProfileProperties(ctx, parameters->dinChannel)) {
@@ -1155,6 +1169,8 @@ public:
     }
 
     void resetConfiguration() {
+        Module::resetConfiguration();
+
         dinChannel.resetConfiguration();
         doutChannel.resetConfiguration();
         for (int i = 0; i < 4; i++) {

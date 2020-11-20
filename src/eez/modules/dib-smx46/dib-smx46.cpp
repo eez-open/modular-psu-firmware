@@ -380,6 +380,8 @@ public:
     }
 
     void resetConfiguration() {
+        Module::resetConfiguration();
+
         routes = 0;
 
         for (int i = 0; i < NUM_COLUMNS; i++) {

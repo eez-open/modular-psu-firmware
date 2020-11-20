@@ -31,6 +31,7 @@
 
 #include <eez/gui/gui.h>
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/persist_conf.h>
 
 #include <scpi/scpi.h>
@@ -167,23 +168,47 @@ float Module::getProfileISet(uint8_t *buffer) {
 }
 
 void Module::resetProfileToDefaults(uint8_t *buffer) {
+    auto parameters = (ProfileParameters *)buffer;
+
+    *parameters->label = 0;
+    parameters->color = 0;
 }
 
 void Module::getProfileParameters(uint8_t *buffer) {
+    auto parameters = (ProfileParameters *)buffer;
+
+    strcpy(parameters->label, label);
+    parameters->color = color;
 }
 
 void Module::setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) {
+    auto parameters = (ProfileParameters *)buffer;
+
+    strcpy(label, parameters->label);
+    color = parameters->color;
 }
 
 bool Module::writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) {
+    auto parameters = (ProfileParameters *)buffer;
+
+    WRITE_PROPERTY("label", parameters->label);
+    WRITE_PROPERTY("color", parameters->color);
+
     return true;
 }
 
 bool Module::readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) {
+    auto parameters = (ProfileParameters *)buffer;
+
+    READ_STRING_PROPERTY("label", parameters->label, CHANNEL_LABEL_MAX_CHARS);
+    READ_PROPERTY("color", parameters->color);
+
     return false;
 }
 
 void Module::resetConfiguration() {
+    *label = 0;
+    color = 0;
 }
 
 int Module::getNumSubchannels() {
@@ -197,6 +222,45 @@ bool Module::isValidSubchannelIndex(int subchannelIndex) {
 int Module::getSubchannelIndexFromRelativeChannelIndex(int relativeChannelIndex) {
     return relativeChannelIndex;
 }
+
+const char *Module::getLabel() {
+    return label;
+}
+
+const char *Module::getDefaultLabel() {
+    return moduleName;
+}
+
+void Module::setLabel(const char *value) {
+    strcpy(label, value);
+}
+
+uint8_t Module::getColor() {
+    return color;
+}
+
+void Module::setColor(uint8_t value) {
+    color = value;
+}
+
+const char *Module::getChannelLabel(int subchannelIndex) {
+    return "";
+}
+
+const char *Module::getDefaultChannelLabel(int subchannelIndex) {
+    return "";
+}
+
+void Module::setChannelLabel(int subchannelIndex, const char *label) {
+}
+
+uint8_t Module::getChannelColor(int subchannelIndex) {
+    return 0;
+}
+
+void Module::setChannelColor(int subchannelIndex, uint8_t color) {
+}
+
 
 bool Module::getDigitalInputData(int subchannelIndex, uint8_t &data, int *err) {
     if (err) {

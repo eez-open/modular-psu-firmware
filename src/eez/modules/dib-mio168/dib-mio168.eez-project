@@ -1848,12 +1848,9 @@
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "channel1",
-              "alignHorizontal": "left",
-              "backgroundColor": "channel2",
-              "padding": "0 5"
+              "inheritFrom": "labels_and_colors_slot"
             },
-            "data": "slot_title_def",
+            "data": "labels_and_colors_page_slot_title",
             "left": 0,
             "top": 0,
             "width": 158,
@@ -1887,24 +1884,10 @@
             "text": "Pick color"
           },
           {
-            "type": "MultilineText",
-            "style": {
-              "inheritFrom": "option_toggle_L_center",
-              "font": "Oswald14"
-            },
-            "left": 7,
-            "top": 116,
-            "width": 144,
-            "height": 56,
-            "text": "Channel labels\\nand colors",
-            "firstLineIndent": 4,
-            "hangingIndent": 0
-          },
-          {
             "type": "Rectangle",
             "style": {
               "inheritFrom": "default",
-              "color": "channel2"
+              "color": "labels_and_colors_page_slot_color"
             },
             "left": 0,
             "top": 32,
@@ -1915,7 +1898,7 @@
             "type": "Rectangle",
             "style": {
               "inheritFrom": "default",
-              "color": "channel2"
+              "color": "labels_and_colors_page_slot_color"
             },
             "left": 156,
             "top": 32,
@@ -1926,7 +1909,7 @@
             "type": "Rectangle",
             "style": {
               "inheritFrom": "default",
-              "color": "channel2"
+              "color": "labels_and_colors_page_slot_color"
             },
             "left": 2,
             "top": 236,

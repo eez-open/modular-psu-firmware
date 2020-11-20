@@ -74,6 +74,13 @@ public:
     bool getProfileOutputEnable(uint8_t *buffer) override;
     float getProfileUSet(uint8_t *buffer) override;
     float getProfileISet(uint8_t *buffer) override;
+
+    const char *getChannelLabel(int subchannelIndex) override;
+    const char *getDefaultChannelLabel(int subchannelIndex) override;
+    void setChannelLabel(int subchannelIndex, const char *label) override;
+    uint8_t getChannelColor(int subchannelIndex) override;
+    void setChannelColor(int subchannelIndex, uint8_t color) override;
+
     bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) override;
     bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) override;
     bool getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err) override;
@@ -81,7 +88,7 @@ public:
 };
 
 /// Channel binary flags stored in profile.
-struct ProfileChannelFlags {
+struct PowerChannelProfileChannelFlags {
     unsigned output_enabled : 1;
     unsigned sense_enabled : 1;
     unsigned u_state : 1;
@@ -101,8 +108,8 @@ struct ProfileChannelFlags {
     unsigned trackingEnabled : 1;
 };
 
-struct ProfileParameters {
-    ProfileChannelFlags flags;
+struct PowerChannelProfileParameters {
+    PowerChannelProfileChannelFlags flags;
     float u_set;
     float u_step;
     float u_limit;
@@ -122,8 +129,8 @@ struct ProfileParameters {
     float u_rampDuration;
     float i_rampDuration;
     float outputDelayDuration;
-    char customLabel[CHANNEL_LABEL_MAX_CHARS + 1];
-    uint8_t customColor;
+    char label[CHANNEL_LABEL_MAX_CHARS + 1];
+    uint8_t color;
 #ifdef EEZ_PLATFORM_SIMULATOR
     bool load_enabled;
     float load;

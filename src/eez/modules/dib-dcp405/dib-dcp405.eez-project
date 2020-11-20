@@ -1053,11 +1053,9 @@
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "channel1",
-              "alignHorizontal": "left",
-              "padding": "0 5"
+              "inheritFrom": "labels_and_colors_channel"
             },
-            "data": "channel_title",
+            "data": "labels_and_colors_page_channel_title",
             "left": 0,
             "top": 0,
             "width": 158,
@@ -1094,7 +1092,7 @@
             "type": "Rectangle",
             "style": {
               "inheritFrom": "default",
-              "color": "channel1"
+              "color": "labels_and_colors_page_channel_color"
             },
             "left": 0,
             "top": 32,
@@ -1105,7 +1103,7 @@
             "type": "Rectangle",
             "style": {
               "inheritFrom": "default",
-              "color": "channel1"
+              "color": "labels_and_colors_page_channel_color"
             },
             "left": 156,
             "top": 32,
@@ -1116,7 +1114,7 @@
             "type": "Rectangle",
             "style": {
               "inheritFrom": "default",
-              "color": "channel1"
+              "color": "labels_and_colors_page_channel_color"
             },
             "left": 2,
             "top": 236,

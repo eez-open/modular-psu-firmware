@@ -55,6 +55,7 @@
 #include <eez/modules/psu/gui/password.h>
 #include <eez/modules/psu/gui/file_manager.h>
 #include <eez/modules/psu/gui/touch_calibration.h>
+#include <eez/modules/psu/gui/labels_and_colors.h>
 
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
@@ -2001,15 +2002,54 @@ namespace mcu {
 namespace display {
 
 uint16_t transformColorHook(uint16_t color) {
-    if (color == COLOR_ID_CHANNEL1 && g_channelIndex >= 0 && g_channelIndex < psu::CH_NUM) {
+    if (color == COLOR_ID_CHANNEL1 || color == COLOR_ID_CHANNEL1_TEXT) {
+        if (g_channelIndex >= 0 && g_channelIndex < psu::CH_NUM) {
+            auto &channel = psu::Channel::get(g_channelIndex);
+            if (channel.color) {
+                return color + channel.color - 1;
+            } else {
+                return color + g_channelIndex;
+            }
+        } else if (hmi::g_selectedSlotIndex >= 0 && hmi::g_selectedSlotIndex < NUM_SLOTS) {
+            auto slotColor = g_slots[hmi::g_selectedSlotIndex]->getColor();
+            if (slotColor) {
+                return color + slotColor - 1;
+            } else {
+                return color;
+            }
+        }
+    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_SLOT_COLOR) {
+        uint8_t color = LabelsAndColorsPage::getSlotColor(hmi::g_selectedSlotIndex);
+        if (color) {
+            return COLOR_ID_CHANNEL1 + color - 1;
+        } else {
+            return COLOR_ID_CHANNEL1;
+        }
+    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_SLOT_COLOR_TEXT) {
+        uint8_t color = LabelsAndColorsPage::getSlotColor(hmi::g_selectedSlotIndex);
+        if (color) {
+            return COLOR_ID_CHANNEL1_TEXT + color - 1;
+        } else {
+            return COLOR_ID_CHANNEL1_TEXT;
+        }
+    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_CHANNEL_COLOR) {
         auto &channel = psu::Channel::get(g_channelIndex);
-        if (channel.customColor) {
-            return COLOR_ID_CHANNEL1 + channel.customColor - 1;
+        uint8_t color = LabelsAndColorsPage::getChannelColor(channel.slotIndex, channel.subchannelIndex);
+        if (color) {
+            return COLOR_ID_CHANNEL1 + color - 1;
         } else {
             return COLOR_ID_CHANNEL1 + g_channelIndex;
         }
+    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_CHANNEL_COLOR_TEXT) {
+        auto &channel = psu::Channel::get(g_channelIndex);
+        uint8_t color = LabelsAndColorsPage::getChannelColor(channel.slotIndex, channel.subchannelIndex);
+        if (color) {
+            return COLOR_ID_CHANNEL1_TEXT + color - 1;
+        } else {
+            return COLOR_ID_CHANNEL1_TEXT + g_channelIndex;
+        }
     } else if (color == COLOR_ID_PICK_COLOR) {
-        return COLOR_ID_CHANNEL1 + hmi::g_colorIndex;
+        return COLOR_ID_CHANNEL1 + LabelsAndColorsPage::g_colorIndex;
     }
     return color;
 }
@@ -2074,6 +2114,7 @@ static SysSettingsCouplingPage g_sysSettingsCouplingPage;
 static UserProfilesPage g_UserProfilesPage;
 static file_manager::FileBrowserPage g_FileBrowserPage;
 static SysSettingsRampAndDelayPage g_sysSettingsRampAndDelayPage;
+static LabelsAndColorsPage g_LabelsAndColorsPage;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2167,6 +2208,9 @@ Page *getPageFromIdHook(int pageId) {
         break;
     case PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY:
         page = &g_sysSettingsRampAndDelayPage;
+        break;
+    case PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS:
+        page = &g_LabelsAndColorsPage;
         break;
     default :
         for (int i = 0; i < NUM_SLOTS; i++) {

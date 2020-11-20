@@ -606,7 +606,7 @@ public:
     }
 
     struct DcmProfileParameters {
-        ProfileParameters baseParameters;
+        PowerChannelProfileParameters baseParameters;
         unsigned int dcmVersion;
         bool pwmEnabled;
         float pwmFrequency;

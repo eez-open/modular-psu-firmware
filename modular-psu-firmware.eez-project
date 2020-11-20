@@ -2394,6 +2394,16 @@
       "name": "keypad_can_set_default",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "labels_and_colors_page_slot_title",
+      "type": "string",
+      "defaultValue": "MIO168"
+    },
+    {
+      "name": "labels_and_colors_page_channel_title",
+      "type": "string",
+      "defaultValue": "DCP405 #1"
     }
   ],
   "actions": [
@@ -35585,11 +35595,9 @@
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left",
-                  "padding": "0 5"
+                  "inheritFrom": "labels_and_colors_slot"
                 },
-                "data": "slot_title_def",
+                "data": "labels_and_colors_page_slot_title",
                 "left": 0,
                 "top": 0,
                 "width": 158,
@@ -35626,7 +35634,7 @@
                 "type": "Rectangle",
                 "style": {
                   "inheritFrom": "default",
-                  "color": "channel1"
+                  "color": "labels_and_colors_page_slot_color"
                 },
                 "left": 0,
                 "top": 32,
@@ -35637,7 +35645,7 @@
                 "type": "Rectangle",
                 "style": {
                   "inheritFrom": "default",
-                  "color": "channel1"
+                  "color": "labels_and_colors_page_slot_color"
                 },
                 "left": 156,
                 "top": 32,
@@ -35648,7 +35656,7 @@
                 "type": "Rectangle",
                 "style": {
                   "inheritFrom": "default",
-                  "color": "channel1"
+                  "color": "labels_and_colors_page_slot_color"
                 },
                 "left": 2,
                 "top": 236,
@@ -36975,110 +36983,10 @@
         "inheritFrom": "default",
         "alwaysBuild": true,
         "font": "Oswald14",
-        "color": "#404040",
+        "color": "channel1_text",
         "backgroundColor": "channel1",
         "activeColor": "channel1",
-        "activeBackgroundColor": "#404040"
-      },
-      {
-        "name": "channel2",
-        "inheritFrom": "channel1",
-        "alwaysBuild": true,
-        "color": "#404040",
-        "backgroundColor": "channel2",
-        "activeColor": "channel2",
-        "activeBackgroundColor": "#404040"
-      },
-      {
-        "name": "channel3",
-        "inheritFrom": "channel1",
-        "alwaysBuild": true,
-        "color": "#404040",
-        "backgroundColor": "channel3",
-        "activeColor": "channel3",
-        "activeBackgroundColor": "#404040"
-      },
-      {
-        "name": "channel4",
-        "inheritFrom": "channel1",
-        "alwaysBuild": true,
-        "color": "#404040",
-        "backgroundColor": "channel4",
-        "activeColor": "channel4",
-        "activeBackgroundColor": "#404040"
-      },
-      {
-        "name": "channel5",
-        "inheritFrom": "channel1",
-        "alwaysBuild": true,
-        "color": "#404040",
-        "backgroundColor": "channel5",
-        "activeColor": "channel5",
-        "activeBackgroundColor": "#404040"
-      },
-      {
-        "name": "channel6",
-        "inheritFrom": "channel1",
-        "alwaysBuild": true,
-        "color": "#404040",
-        "backgroundColor": "channel6",
-        "activeColor": "channel6",
-        "activeBackgroundColor": "#404040"
-      },
-      {
-        "name": "channel1_inverse",
-        "inheritFrom": "default",
-        "alwaysBuild": true,
-        "font": "Oswald14",
-        "color": "channel1",
-        "backgroundColor": "#404040",
-        "activeColor": "#404040",
-        "activeBackgroundColor": "channel1"
-      },
-      {
-        "name": "channel2_inverse",
-        "inheritFrom": "channel1_inverse",
-        "alwaysBuild": true,
-        "color": "channel2",
-        "backgroundColor": "#404040",
-        "activeColor": "#404040",
-        "activeBackgroundColor": "channel2"
-      },
-      {
-        "name": "channel3_inverse",
-        "inheritFrom": "channel1_inverse",
-        "alwaysBuild": true,
-        "color": "channel3",
-        "backgroundColor": "#404040",
-        "activeColor": "#404040",
-        "activeBackgroundColor": "channel3"
-      },
-      {
-        "name": "channel4_inverse",
-        "inheritFrom": "channel1_inverse",
-        "alwaysBuild": true,
-        "color": "channel4",
-        "backgroundColor": "#404040",
-        "activeColor": "#404040",
-        "activeBackgroundColor": "channel4"
-      },
-      {
-        "name": "channel5_inverse",
-        "inheritFrom": "channel1_inverse",
-        "alwaysBuild": true,
-        "color": "channel5",
-        "backgroundColor": "#404040",
-        "activeColor": "#404040",
-        "activeBackgroundColor": "channel5"
-      },
-      {
-        "name": "channel6_inverse",
-        "inheritFrom": "channel1_inverse",
-        "alwaysBuild": true,
-        "color": "channel6",
-        "backgroundColor": "#404040",
-        "activeColor": "#404040",
-        "activeBackgroundColor": "channel6"
+        "activeBackgroundColor": "channel1_text"
       },
       {
         "name": "scrollbar_track",
@@ -37184,6 +37092,26 @@
         "backgroundColor": "inst_max_header_bgnd",
         "activeColor": "inst_max_header_bgnd",
         "activeBackgroundColor": "inst_max_header_text"
+      },
+      {
+        "name": "labels_and_colors_slot",
+        "inheritFrom": "channel1",
+        "alignHorizontal": "left",
+        "color": "labels_and_colors_page_slot_color_text",
+        "backgroundColor": "labels_and_colors_page_slot_color",
+        "activeColor": "labels_and_colors_page_slot_color",
+        "activeBackgroundColor": "labels_and_colors_page_slot_color_text",
+        "padding": "0 5"
+      },
+      {
+        "name": "labels_and_colors_channel",
+        "inheritFrom": "channel1",
+        "alignHorizontal": "left",
+        "color": "labels_and_colors_page_channel_color_text",
+        "backgroundColor": "labels_and_colors_page_channel_color",
+        "activeColor": "labels_and_colors_page_channel_color",
+        "activeBackgroundColor": "labels_and_colors_page_channel_color_text",
+        "padding": "0 5"
       }
     ],
     "fonts": [
@@ -58797,9 +58725,6 @@
         "name": "status_warning"
       },
       {
-        "name": "status_warning (1)"
-      },
-      {
         "name": "inst_max_header_bgnd"
       },
       {
@@ -58947,6 +58872,78 @@
         "name": "channel24"
       },
       {
+        "name": "channel1_text"
+      },
+      {
+        "name": "channel2_text"
+      },
+      {
+        "name": "channel3_text"
+      },
+      {
+        "name": "channel4_text"
+      },
+      {
+        "name": "channel5_text"
+      },
+      {
+        "name": "channel6_text"
+      },
+      {
+        "name": "channel7_text"
+      },
+      {
+        "name": "channel8_text"
+      },
+      {
+        "name": "channel9_text"
+      },
+      {
+        "name": "channel10_text"
+      },
+      {
+        "name": "channel11_text"
+      },
+      {
+        "name": "channel12_text"
+      },
+      {
+        "name": "channel13_text"
+      },
+      {
+        "name": "channel14_text"
+      },
+      {
+        "name": "channel15_text"
+      },
+      {
+        "name": "channel16_text"
+      },
+      {
+        "name": "channel17_text"
+      },
+      {
+        "name": "channel18_text"
+      },
+      {
+        "name": "channel19_text"
+      },
+      {
+        "name": "channel20_text"
+      },
+      {
+        "name": "channel21_text"
+      },
+      {
+        "name": "channel22_text"
+      },
+      {
+        "name": "channel23_text"
+      },
+      {
+        "name": "channel24_text"
+      },
+      {
         "name": "scrollbar_track"
       },
       {
@@ -58993,6 +58990,18 @@
       },
       {
         "name": "pick_color"
+      },
+      {
+        "name": "labels_and_colors_page_slot_color"
+      },
+      {
+        "name": "labels_and_colors_page_slot_color_text"
+      },
+      {
+        "name": "labels_and_colors_page_channel_color"
+      },
+      {
+        "name": "labels_and_colors_page_channel_color_text"
       }
     ],
     "themes": [
@@ -59010,7 +59019,6 @@
           "#b3b7b7",
           "#55f2e6",
           "#ff0000",
-          "#000000",
           "#f5c7c1",
           "#272eb0",
           "#404040",
@@ -59060,6 +59068,32 @@
           "#ff5722",
           "#795548",
           "#607d8b",
+
+          "#404040",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+
           "#b3b7b7",
           "#404040",
           "#404040",
@@ -59075,7 +59109,11 @@
           "#202020",
           "#c0c0c0",
           "#808080",
-          "#000000"
+          "#000000",
+          "#d4c36b",
+          "#404040",
+          "#9fdd9a",
+          "#404040"
         ]
       },
       {
@@ -59092,7 +59130,6 @@
           "#b3b7b7",
           "#0c857b",
           "#ff0000",
-          "#000000",
           "#3d15a3",
           "#2f73bf",
           "#ffffff",
@@ -59142,6 +59179,32 @@
           "#ff5722",
           "#795548",
           "#607d8b",
+
+          "#404040",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+
           "#b3b7b7",
           "#404040",
           "#404040",
@@ -59157,6 +59220,10 @@
           "#202020",
           "#c0c0c0",
           "#202020",
+          "#000000",
+          "#d4c36b",
+          "#000000",
+          "#9fdd9a",
           "#000000"
         ]
       },
@@ -59174,7 +59241,6 @@
           "#187397",
           "#50cec5",
           "#ff0000",
-          "#000000",
           "#f8fac0",
           "#66999b",
           "#454545",
@@ -59224,6 +59290,32 @@
           "#ff5722",
           "#795548",
           "#607d8b",
+
+          "#404040",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#404040",
+          "#404040",
+          "#404040",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          
           "#187397",
           "#d0d0d0",
           "#d0d0d0",
@@ -59239,7 +59331,11 @@
           "#d0d0d0",
           "#606060",
           "#e0e0e0",
-          "#ffffff"
+          "#ffffff",
+          "#d4c36b",
+          "#000000",
+          "#9fdd9a",
+          "#000000"
         ]
       }
     ]

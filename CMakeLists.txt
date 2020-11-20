@@ -202,6 +202,7 @@ set(src_eez_modules_psu_gui
     src/eez/modules/psu/gui/edit_mode.cpp
     src/eez/modules/psu/gui/file_manager.cpp
     src/eez/modules/psu/gui/keypad.cpp
+    src/eez/modules/psu/gui/labels_and_colors.cpp
     src/eez/modules/psu/gui/page.cpp
     src/eez/modules/psu/gui/page_ch_settings.cpp
     src/eez/modules/psu/gui/page_event_queue.cpp
@@ -219,6 +220,7 @@ set(header_eez_modules_psu_gui
     src/eez/modules/psu/gui/edit_mode.h
     src/eez/modules/psu/gui/file_manager.h
     src/eez/modules/psu/gui/keypad.h
+    src/eez/modules/psu/gui/labels_and_colors.h
     src/eez/modules/psu/gui/page.h
     src/eez/modules/psu/gui/page_ch_settings.h
     src/eez/modules/psu/gui/page_event_queue.h

@@ -582,6 +582,10 @@ public:
         assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
         return PAGE_ID_DIB_DCM220_SLOT_MICRO_2CH;
     }
+
+    int getLabelsAndColorsPageId() override {
+        return PAGE_ID_DIB_DCM220_LABELS_AND_COLORS;
+    }
 };
 
 void DcmChannel::init() {

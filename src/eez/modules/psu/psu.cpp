@@ -254,7 +254,7 @@ int PsuModule::getSlotSettingsPageId() {
 
 void PsuModule::resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer) {
     auto &channel = Channel::get(channelIndex);
-    auto parameters = (ProfileParameters *)buffer;
+    auto parameters = (PowerChannelProfileParameters *)buffer;
 
     parameters->flags.output_enabled = 0;
     parameters->flags.sense_enabled = 0;
@@ -315,15 +315,15 @@ void PsuModule::resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *bu
 
     parameters->outputDelayDuration = 0;
     
-    *parameters->customLabel = 0;
-    parameters->customColor = 0;
+    *parameters->label = 0;
+    parameters->color = 0;
 }
 
 void PsuModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) {
-    assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
+    assert(sizeof(PowerChannelProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
 
     auto &channel = Channel::get(channelIndex);
-    auto parameters = (ProfileParameters *)buffer;
+    auto parameters = (PowerChannelProfileParameters *)buffer;
 
     parameters->flags.output_enabled = channel.flags.outputEnabled;
     parameters->flags.sense_enabled = channel.flags.senseEnabled;
@@ -384,13 +384,13 @@ void PsuModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buff
 
     parameters->outputDelayDuration = channel.outputDelayDuration;
 
-    strcpy(parameters->customLabel, channel.customLabel);
-    parameters->customColor = channel.customColor;
+    strcpy(parameters->label, channel.label);
+    parameters->color = channel.color;
 }
 
 void PsuModule::setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
     auto &channel = Channel::get(channelIndex);
-    auto parameters = (ProfileParameters *)buffer;
+    auto parameters = (PowerChannelProfileParameters *)buffer;
 
     channel.flags.currentRangeSelectionMode = parameters->flags.currentRangeSelectionMode;
     channel.flags.autoSelectCurrentRange = parameters->flags.autoSelectCurrentRange;
@@ -466,12 +466,12 @@ void PsuModule::setPowerChannelProfileParameters(int channelIndex, uint8_t *buff
 
     channel.outputDelayDuration = parameters->outputDelayDuration;
 
-    strcpy(channel.customLabel, parameters->customLabel);
-    channel.customColor = parameters->customColor;
+    strcpy(channel.label, parameters->label);
+    channel.color = parameters->color;
 }
 
 bool PsuModule::writePowerChannelProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
-    auto parameters = (const ProfileParameters *)buffer;
+    auto parameters = (const PowerChannelProfileParameters *)buffer;
 
     WRITE_PROPERTY("output_enabled", parameters->flags.output_enabled);
     WRITE_PROPERTY("sense_enabled", parameters->flags.sense_enabled);
@@ -513,8 +513,8 @@ bool PsuModule::writePowerChannelProfileProperties(profile::WriteContext &ctx, c
 
     WRITE_PROPERTY("outputDelayDuration", parameters->outputDelayDuration);
 
-    WRITE_PROPERTY("label", parameters->customLabel);
-    WRITE_PROPERTY("color", parameters->customColor);
+    WRITE_PROPERTY("label", parameters->label);
+    WRITE_PROPERTY("color", parameters->color);
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     WRITE_PROPERTY("load_enabled", parameters->load_enabled);
@@ -526,7 +526,7 @@ bool PsuModule::writePowerChannelProfileProperties(profile::WriteContext &ctx, c
 }
 
 bool PsuModule::readPowerChannelProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) {
-    auto parameters = (ProfileParameters *)buffer;
+    auto parameters = (PowerChannelProfileParameters *)buffer;
 
     READ_FLAG("output_enabled", parameters->flags.output_enabled);
     READ_FLAG("sense_enabled", parameters->flags.sense_enabled);
@@ -568,8 +568,8 @@ bool PsuModule::readPowerChannelProfileProperties(profile::ReadContext &ctx, uin
 
     READ_PROPERTY("outputDelayDuration", parameters->outputDelayDuration);
 
-    READ_STRING_PROPERTY("label", parameters->customLabel, CHANNEL_LABEL_MAX_CHARS);
-    READ_PROPERTY("customColor", parameters->customColor);
+    READ_STRING_PROPERTY("label", parameters->label, CHANNEL_LABEL_MAX_CHARS);
+    READ_PROPERTY("color", parameters->color);
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     READ_PROPERTY("load_enabled", parameters->load_enabled);
@@ -581,18 +581,43 @@ bool PsuModule::readPowerChannelProfileProperties(profile::ReadContext &ctx, uin
 }
 
 bool PsuModule::getProfileOutputEnable(uint8_t *buffer) {
-    auto parameters = (ProfileParameters *)buffer;
+    auto parameters = (PowerChannelProfileParameters *)buffer;
     return parameters->flags.output_enabled;
 }
 
 float PsuModule::getProfileUSet(uint8_t *buffer) {
-    auto parameters = (ProfileParameters *)buffer;
+    auto parameters = (PowerChannelProfileParameters *)buffer;
     return parameters->u_set;
 }
 
 float PsuModule::getProfileISet(uint8_t *buffer) {
-    auto parameters = (ProfileParameters *)buffer;
+    auto parameters = (PowerChannelProfileParameters *)buffer;
     return parameters->i_set;
+}
+
+const char *PsuModule::getChannelLabel(int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    return channel->getLabel();
+}
+
+const char *PsuModule::getDefaultChannelLabel(int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    return channel->getDefaultLabel();
+}
+
+void PsuModule::setChannelLabel(int subchannelIndex, const char *label) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    strcpy(channel->label, label);
+}
+
+uint8_t PsuModule::getChannelColor(int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    return channel->color;
+}
+
+void PsuModule::setChannelColor(int subchannelIndex, uint8_t color) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    channel->color = color;
 }
 
 bool PsuModule::getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) {

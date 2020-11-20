@@ -741,9 +741,9 @@ bool compare_CHANNEL_TITLE_value(const Value &a, const Value &b) {
 void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
     if (channel.flags.trackingEnabled) {
-        snprintf(text, count - 1, "\xA2 %s", channel.getLabel());
+        snprintf(text, count - 1, "\xA2 %s", channel.getLabelOrDefault());
     } else {
-        snprintf(text, count - 1, channel.getLabel());
+        snprintf(text, count - 1, channel.getLabelOrDefault());
     }
 }
 
@@ -781,11 +781,11 @@ void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count)
     auto &channel = Channel::get(value.getInt());
     auto &slot = *g_slots[channel.slotIndex];
     if (channel.flags.trackingEnabled) {
-        snprintf(text, count - 1, "\xA2 %s: %dV/%dA, R%dB%d", channel.getLabel(), 
+        snprintf(text, count - 1, "\xA2 %s: %dV/%dA, R%dB%d", channel.getLabelOrDefault(), 
             (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
             (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     } else {
-        snprintf(text, count - 1, "%s: %dV/%dA, R%dB%d", channel.getLabel(), 
+        snprintf(text, count - 1, "%s: %dV/%dA, R%dB%d", channel.getLabelOrDefault(), 
             (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
             (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     }
@@ -912,7 +912,7 @@ bool compare_SLOT_TITLE_DEF_value(const Value &a, const Value &b) {
 void SLOT_TITLE_DEF_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s", slot.moduleName);
+    snprintf(text, count - 1, "%s", slot.getLabelOrDefault());
     text[count - 1] = 0;
 }
 
@@ -923,7 +923,7 @@ bool compare_SLOT_TITLE_MAX_value(const Value &a, const Value &b) {
 void SLOT_TITLE_MAX_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+    snprintf(text, count - 1, "%s R%dB%d", slot.getLabelOrDefault(), (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     text[count - 1] = 0;
 }
 
@@ -934,7 +934,7 @@ bool compare_SLOT_TITLE_MIN_value(const Value &a, const Value &b) {
 void SLOT_TITLE_MIN_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s", slot.moduleName);
+    snprintf(text, count - 1, "%s", slot.getLabelOrDefault());
     text[count - 1] = 0;
 }
 
@@ -945,7 +945,7 @@ bool compare_SLOT_TITLE_MICRO_value(const Value &a, const Value &b) {
 void SLOT_TITLE_MICRO_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s", slot.moduleName);
+    snprintf(text, count - 1, "%s", slot.getLabelOrDefault());
     text[count - 1] = 0;
 }
 
@@ -956,7 +956,7 @@ bool compare_SLOT_TITLE_SETTINGS_value(const Value &a, const Value &b) {
 void SLOT_TITLE_SETTINGS_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s #%d:", slot.moduleName, slotIndex + 1);
+    snprintf(text, count - 1, "%s #%d:", slot.getLabelOrDefault(), slotIndex + 1);
     text[count - 1] = 0;
 }
 
@@ -6165,35 +6165,6 @@ void data_custom_bitmap(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(&g_customLogo, VALUE_TYPE_POINTER);
         }
     }
-}
-
-void data_slot_labels_and_colors_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = g_slots[slotIndex]->getLabelsAndColorsPageId();
-    }
-}
-
-void data_slot1_labels_and_colors_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_labels_and_colors_view(0, operation, cursor, value);
-}
-
-void data_slot2_labels_and_colors_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_labels_and_colors_view(1, operation, cursor, value);
-}
-
-void data_slot3_labels_and_colors_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_labels_and_colors_view(2, operation, cursor, value);
-}
-
-void data_colors(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_COUNT) {
-        value = 24;
-    } else if (operation == DATA_OPERATION_SELECT) {
-        value = hmi::g_colorIndex;
-        hmi::g_colorIndex = cursor;
-    } else if (operation == DATA_OPERATION_DESELECT) {
-        hmi::g_colorIndex = value.getInt();
-    } 
 }
 
 } // namespace gui

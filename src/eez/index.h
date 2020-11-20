@@ -152,6 +152,9 @@ struct StepValues {
     } encoderSettings;
 };
 
+static const size_t SLOT_LABEL_MAX_CHARS = 10;
+static const size_t CHANNEL_LABEL_MAX_CHARS = 10;
+
 struct Module {
     uint16_t moduleType;
     const char *moduleName;
@@ -174,6 +177,8 @@ struct Module {
 	uint32_t idw0 = 0;
 	uint32_t idw1 = 0;
 	uint32_t idw2 = 0;
+    char label[SLOT_LABEL_MAX_CHARS + 1] = { 0 };
+    uint8_t color = 0;
 
     virtual void setEnabled(bool value);
 
@@ -208,6 +213,11 @@ struct Module {
     virtual float getProfileUSet(uint8_t *buffer);
     virtual float getProfileISet(uint8_t *buffer);
 
+    struct ProfileParameters {
+        char label[SLOT_LABEL_MAX_CHARS + 1];
+        uint8_t color;
+    };
+
     virtual void resetProfileToDefaults(uint8_t *buffer);
     virtual void getProfileParameters(uint8_t *buffer);
     virtual void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions);
@@ -219,6 +229,19 @@ struct Module {
     int getNumSubchannels();
     virtual bool isValidSubchannelIndex(int subchannelIndex);
     virtual int getSubchannelIndexFromRelativeChannelIndex(int relativeChannelIndex);
+
+    const char *getLabel();
+    const char *getDefaultLabel();
+    const char *getLabelOrDefault() {return *label ? label : getDefaultLabel(); }
+    void setLabel(const char *label);
+    uint8_t getColor();
+    void setColor(uint8_t color);
+
+    virtual const char *getChannelLabel(int subchannelIndex);
+    virtual const char *getDefaultChannelLabel(int subchannelIndex);
+    virtual void setChannelLabel(int subchannelIndex, const char *label);
+    virtual uint8_t getChannelColor(int subchannelIndex);
+    virtual void setChannelColor(int subchannelIndex, uint8_t color);
 
     virtual bool getDigitalInputData(int subchannelIndex, uint8_t &data, int *err);
 

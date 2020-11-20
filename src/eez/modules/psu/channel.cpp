@@ -443,8 +443,8 @@ Channel::Channel(uint8_t slotIndex_, uint8_t channelIndex_, uint8_t subchannelIn
 	slotIndex = slotIndex_;
     channelIndex = channelIndex_;
     subchannelIndex = subchannelIndex_;
-    *customLabel = 0;
-    customColor = channelIndex;
+    *label = 0;
+    color = channelIndex;
 }
 
 void Channel::initParams(uint16_t moduleRevision) {
@@ -671,6 +671,9 @@ void Channel::reset() {
     list::resetChannelList(*this);
 
     outputDelayDuration = 0;
+
+    *label = 0;
+    color = 0;
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     simulator.setLoadEnabled(false);
@@ -1637,14 +1640,14 @@ int Channel::getAdvancedOptionsPageId() {
 }
 
 const char *Channel::getLabel() {
-    static char label[CHANNEL_LABEL_MAX_CHARS + 1];
-    if (*customLabel) {
-        strncpy(label, customLabel, CHANNEL_LABEL_MAX_CHARS);
-    } else {
-        snprintf(label, CHANNEL_LABEL_MAX_CHARS, "%s #%d", g_slots[slotIndex]->moduleName, (int)(channelIndex + 1));
-    }
-    label[CHANNEL_LABEL_MAX_CHARS] = 0;
     return label;
+}
+
+const char *Channel::getDefaultLabel() {
+    static char g_defaultLabel[CHANNEL_LABEL_MAX_CHARS + 1];
+    snprintf(g_defaultLabel, CHANNEL_LABEL_MAX_CHARS, "%s #%d", g_slots[slotIndex]->moduleName, (int)(channelIndex + 1));
+    g_defaultLabel[CHANNEL_LABEL_MAX_CHARS] = 0;
+    return g_defaultLabel;
 }
 
 } // namespace psu

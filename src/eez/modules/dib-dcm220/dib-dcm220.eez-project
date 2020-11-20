@@ -5507,6 +5507,119 @@
         "top": 0,
         "width": 78,
         "height": 72
+      },
+      {
+        "name": "labels_and_colors",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 118,
+            "layout": "labels_and_colors_ch",
+            "context": "slot_2ch_ch1_index"
+          },
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 120,
+            "width": 158,
+            "height": 118,
+            "layout": "labels_and_colors_ch",
+            "context": "slot_2ch_ch2_index"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 238
+      },
+      {
+        "name": "labels_and_colors_ch",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "labels_and_colors_channel"
+            },
+            "data": "labels_and_colors_page_channel_title",
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 32,
+            "text": ""
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "option_toggle_L_center",
+              "font": "Oswald14"
+            },
+            "action": "change_channel_label",
+            "left": 7,
+            "top": 37,
+            "width": 144,
+            "height": 32,
+            "text": "Change label"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "option_toggle_L_center",
+              "font": "Oswald14"
+            },
+            "action": "show_channel_color_picker",
+            "left": 7,
+            "top": 74,
+            "width": 144,
+            "height": 32,
+            "text": "Pick color"
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "labels_and_colors_page_channel_color"
+            },
+            "left": 0,
+            "top": 32,
+            "width": 2,
+            "height": 86
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "labels_and_colors_page_channel_color"
+            },
+            "left": 156,
+            "top": 32,
+            "width": 2,
+            "height": 86
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "labels_and_colors_page_channel_color"
+            },
+            "left": 2,
+            "top": 116,
+            "width": 154,
+            "height": 2
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 118
       }
     ],
     "styles": [],
