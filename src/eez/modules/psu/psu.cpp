@@ -314,6 +314,9 @@ void PsuModule::resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *bu
     parameters->i_rampDuration = RAMP_DURATION_DEF_VALUE_I;
 
     parameters->outputDelayDuration = 0;
+    
+    *parameters->customLabel = 0;
+    parameters->customColor = 0;
 }
 
 void PsuModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buffer) {
@@ -380,6 +383,9 @@ void PsuModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buff
     parameters->i_rampDuration = channel.i.rampDuration;
 
     parameters->outputDelayDuration = channel.outputDelayDuration;
+
+    strcpy(parameters->customLabel, channel.customLabel);
+    parameters->customColor = channel.customColor;
 }
 
 void PsuModule::setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) {
@@ -459,6 +465,9 @@ void PsuModule::setPowerChannelProfileParameters(int channelIndex, uint8_t *buff
     channel.i.rampDuration = parameters->i_rampDuration;
 
     channel.outputDelayDuration = parameters->outputDelayDuration;
+
+    strcpy(channel.customLabel, parameters->customLabel);
+    channel.customColor = parameters->customColor;
 }
 
 bool PsuModule::writePowerChannelProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) {
@@ -503,6 +512,9 @@ bool PsuModule::writePowerChannelProfileProperties(profile::WriteContext &ctx, c
     WRITE_PROPERTY("i_rampDuration", parameters->i_rampDuration);
 
     WRITE_PROPERTY("outputDelayDuration", parameters->outputDelayDuration);
+
+    WRITE_PROPERTY("label", parameters->customLabel);
+    WRITE_PROPERTY("color", parameters->customColor);
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     WRITE_PROPERTY("load_enabled", parameters->load_enabled);
@@ -555,6 +567,9 @@ bool PsuModule::readPowerChannelProfileProperties(profile::ReadContext &ctx, uin
     READ_PROPERTY("i_rampDuration", parameters->i_rampDuration);
 
     READ_PROPERTY("outputDelayDuration", parameters->outputDelayDuration);
+
+    READ_STRING_PROPERTY("label", parameters->customLabel, CHANNEL_LABEL_MAX_CHARS);
+    READ_PROPERTY("customColor", parameters->customColor);
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     READ_PROPERTY("load_enabled", parameters->load_enabled);

@@ -122,6 +122,8 @@ struct ProfileParameters {
     float u_rampDuration;
     float i_rampDuration;
     float outputDelayDuration;
+    char customLabel[CHANNEL_LABEL_MAX_CHARS + 1];
+    uint8_t customColor;
 #ifdef EEZ_PLATFORM_SIMULATOR
     bool load_enabled;
     float load;

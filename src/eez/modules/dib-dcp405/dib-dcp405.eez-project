@@ -1048,6 +1048,88 @@
         "height": 240
       },
       {
+        "name": "labels_and_colors",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "padding": "0 5"
+            },
+            "data": "channel_title",
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 32,
+            "text": ""
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "option_toggle_L_center",
+              "font": "Oswald14"
+            },
+            "action": "change_channel_label",
+            "left": 7,
+            "top": 37,
+            "width": 144,
+            "height": 32,
+            "text": "Change label"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "option_toggle_L_center",
+              "font": "Oswald14"
+            },
+            "action": "show_channel_color_picker",
+            "left": 7,
+            "top": 74,
+            "width": 144,
+            "height": 32,
+            "text": "Pick color"
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 0,
+            "top": 32,
+            "width": 2,
+            "height": 206
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 156,
+            "top": 32,
+            "width": 2,
+            "height": 206
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 2,
+            "top": 236,
+            "width": 154,
+            "height": 2
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 238
+      },
+      {
         "name": "slot_def_1ch_vert_off",
         "description": "",
         "widgets": [

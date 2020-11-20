@@ -41,7 +41,7 @@ class Keypad : public Page {
     void pageAlloc();
     void pageFree();
 
-    static void startPush(const char *label, const char *text, int minChars, int maxChars, bool isPassword, void (*ok)(char *), void (*cancel)());
+    static void startPush(const char *label, const char *text, int minChars, int maxChars, bool isPassword, void (*ok)(char *), void (*cancel)(), void (*setDefault)() = nullptr);
     static void startReplace(const char *label, const char *text, int minChars, int maxChars, bool isPassword, void (*ok)(char *), void (*cancel)());
 
     void key();
@@ -60,6 +60,8 @@ class Keypad : public Page {
     virtual bool isOkEnabled();
     virtual void ok();
     virtual void cancel();
+    virtual bool canSetDefault();
+    virtual void setDefault();
 
     virtual void getKeypadText(char *text);
     Value getKeypadTextValue();
@@ -94,10 +96,11 @@ private:
     bool m_isPassword;
     uint32_t m_lastKeyAppendTime;
 
-    void (*m_okCallback)(char *); // +2 for cursor and zero at the end
+    void (*m_okCallback)(char *);
     void (*m_cancelCallback)();
+    void (*m_setDefaultCallback)();
 
-    void start(AppContext *appContext, const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)());
+    void start(AppContext *appContext, const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)(), void (*setDefault)());
 };
 
 ////////////////////////////////////////////////////////////////////////////////

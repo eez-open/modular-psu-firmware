@@ -33,5 +33,7 @@ void selectSlot(int slotIndex);
 
 extern int g_selectedSubchannelIndex;
 
+extern int g_colorIndex;
+
 }
 } // namespace eez::hmi

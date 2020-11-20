@@ -33,6 +33,8 @@ struct StepValues;
    
 namespace psu {
 
+static const size_t CHANNEL_LABEL_MAX_CHARS = 10;
+
 enum MaxCurrentLimitCause {
     MAX_CURRENT_LIMIT_CAUSE_NONE,
     MAX_CURRENT_LIMIT_CAUSE_FAN,
@@ -410,6 +412,9 @@ public:
 
     float outputDelayDuration;
 
+    char customLabel[CHANNEL_LABEL_MAX_CHARS + 1];
+    uint8_t customColor;
+
 #ifdef EEZ_PLATFORM_SIMULATOR
     Simulator simulator;
 #endif // EEZ_PLATFORM_SIMULATOR
@@ -673,6 +678,8 @@ public:
     virtual float readTemperature() = 0;
 
     virtual int getAdvancedOptionsPageId();
+
+    const char *getLabel();
 
     //
     //

@@ -741,9 +741,9 @@ bool compare_CHANNEL_TITLE_value(const Value &a, const Value &b) {
 void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
     if (channel.flags.trackingEnabled) {
-        snprintf(text, count - 1, "\xA2 #%d", channel.channelIndex + 1);
+        snprintf(text, count - 1, "\xA2 %s", channel.getLabel());
     } else {
-        snprintf(text, count - 1, "%s #%d", g_slots[channel.slotIndex]->moduleName, channel.channelIndex + 1);
+        snprintf(text, count - 1, channel.getLabel());
     }
 }
 
@@ -771,15 +771,6 @@ void CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text(const Value &value,
     snprintf(text, count - 1, "#%d", channel.channelIndex + 1);
 }
 
-bool compare_CHANNEL_SHORT_TITLE_WITH_COLON_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
-}
-
-void CHANNEL_SHORT_TITLE_WITH_COLON_value_to_text(const Value &value, char *text, int count) {
-    Channel &channel = Channel::get(value.getInt());
-    snprintf(text, count - 1, "#%d:", channel.channelIndex + 1);
-}
-
 bool compare_CHANNEL_LONG_TITLE_value(const Value &a, const Value &b) {
     Channel &aChannel = Channel::get(a.getInt());
     Channel &bChannel = Channel::get(b.getInt());
@@ -790,11 +781,11 @@ void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count)
     auto &channel = Channel::get(value.getInt());
     auto &slot = *g_slots[channel.slotIndex];
     if (channel.flags.trackingEnabled) {
-        snprintf(text, count - 1, "\xA2 %s #%d: %dV/%dA, R%dB%d", slot.moduleName, channel.channelIndex + 1, 
+        snprintf(text, count - 1, "\xA2 %s: %dV/%dA, R%dB%d", channel.getLabel(), 
             (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
             (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     } else {
-        snprintf(text, count - 1, "%s #%d: %dV/%dA, R%dB%d", slot.moduleName, channel.channelIndex + 1, 
+        snprintf(text, count - 1, "%s: %dV/%dA, R%dB%d", channel.getLabel(), 
             (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
             (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     }
@@ -2071,6 +2062,15 @@ void data_keypad_ok_enabled(DataOperationEnum operation, Cursor cursor, Value &v
     }
 }
 
+void data_keypad_can_set_default(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        Keypad *keypad = getActiveKeypad();
+        if (keypad) {
+            value = keypad->canSetDefault();
+        }
+    }
+}
+
 void data_channel_off_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = io_pins::isInhibited() ? "INH" : "OFF";
@@ -2109,13 +2109,6 @@ void data_channel_short_title_without_tracking_icon(DataOperationEnum operation,
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         value = Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON);
-    }
-}
-
-void data_channel_short_title_with_colon(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        value = Value(iChannel, VALUE_TYPE_CHANNEL_SHORT_TITLE_WITH_COLON);
     }
 }
 
@@ -6172,6 +6165,35 @@ void data_custom_bitmap(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(&g_customLogo, VALUE_TYPE_POINTER);
         }
     }
+}
+
+void data_slot_labels_and_colors_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_slots[slotIndex]->getLabelsAndColorsPageId();
+    }
+}
+
+void data_slot1_labels_and_colors_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    data_slot_labels_and_colors_view(0, operation, cursor, value);
+}
+
+void data_slot2_labels_and_colors_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    data_slot_labels_and_colors_view(1, operation, cursor, value);
+}
+
+void data_slot3_labels_and_colors_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    data_slot_labels_and_colors_view(2, operation, cursor, value);
+}
+
+void data_colors(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 24;
+    } else if (operation == DATA_OPERATION_SELECT) {
+        value = hmi::g_colorIndex;
+        hmi::g_colorIndex = cursor;
+    } else if (operation == DATA_OPERATION_DESELECT) {
+        hmi::g_colorIndex = value.getInt();
+    } 
 }
 
 } // namespace gui

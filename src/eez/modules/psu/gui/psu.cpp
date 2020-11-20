@@ -2002,7 +2002,14 @@ namespace display {
 
 uint16_t transformColorHook(uint16_t color) {
     if (color == COLOR_ID_CHANNEL1 && g_channelIndex >= 0 && g_channelIndex < psu::CH_NUM) {
-        return COLOR_ID_CHANNEL1 + g_channelIndex;
+        auto &channel = psu::Channel::get(g_channelIndex);
+        if (channel.customColor) {
+            return COLOR_ID_CHANNEL1 + channel.customColor - 1;
+        } else {
+            return COLOR_ID_CHANNEL1 + g_channelIndex;
+        }
+    } else if (color == COLOR_ID_PICK_COLOR) {
+        return COLOR_ID_CHANNEL1 + hmi::g_colorIndex;
     }
     return color;
 }

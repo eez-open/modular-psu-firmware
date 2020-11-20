@@ -1014,6 +1014,10 @@ public:
         return getTestResult() == TEST_OK ? PAGE_ID_DIB_MIO168_SETTINGS : PAGE_ID_SLOT_SETTINGS;
     }
 
+    int getLabelsAndColorsPageId() override {
+        return PAGE_ID_DIB_MIO168_LABELS_AND_COLORS;
+    }
+
     void onHighPriorityThreadMessage(uint8_t type, uint32_t param) override;
 
     struct ProfileParameters {

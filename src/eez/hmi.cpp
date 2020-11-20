@@ -39,6 +39,8 @@ static bool g_inactivityTimeMaxed = true;
 int g_selectedSlotIndex;
 int g_selectedSubchannelIndex;
 
+int g_colorIndex;
+
 void tick(uint32_t tickCount) {
     if (!g_inactivityTimeMaxed) {
         uint32_t inactivityPeriod = getInactivityPeriod();

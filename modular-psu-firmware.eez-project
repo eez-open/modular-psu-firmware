@@ -247,7 +247,7 @@
     {
       "name": "slot_max_view",
       "type": "string",
-      "defaultValue": "slot_max_1ch_num_on"
+      "defaultValue": "dib_dcp405::slot_max_1ch_num_on"
     },
     {
       "name": "slot_min1_channel_index",
@@ -257,7 +257,7 @@
     {
       "name": "slot_min1_view",
       "type": "string",
-      "defaultValue": "slot_min_1ch_on"
+      "defaultValue": "dib_dcp405::slot_min_1ch_on"
     },
     {
       "name": "slot_min2_channel_index",
@@ -267,7 +267,7 @@
     {
       "name": "slot_min2_view",
       "type": "string",
-      "defaultValue": "slot_min_1ch_off"
+      "defaultValue": "dib_dcp405::slot_min_1ch_off"
     },
     {
       "name": "slot1_micro_view",
@@ -1370,11 +1370,6 @@
       "defaultValue": "#1"
     },
     {
-      "name": "channel_short_title_with_colon",
-      "type": "string",
-      "defaultValue": "#1:"
-    },
-    {
       "name": "channel_short_title_without_tracking_icon",
       "type": "string",
       "defaultValue": "#5"
@@ -1402,17 +1397,17 @@
     {
       "name": "slot1_default_view",
       "type": "string",
-      "defaultValue": "slot_def_1ch_num_on"
+      "defaultValue": "dib_dcp405::slot_def_1ch_num_on_2col"
     },
     {
       "name": "slot2_default_view",
       "type": "string",
-      "defaultValue": "slot_def_1ch_vbar_on"
+      "defaultValue": "dib_dcp405::slot_def_1ch_vbar_on_2col"
     },
     {
       "name": "slot3_default_view",
       "type": "string",
-      "defaultValue": "slot_def_1ch_vert_off"
+      "defaultValue": "dib_dcp405::slot_def_1ch_vert_off"
     },
     {
       "name": "slot1_channel_index",
@@ -2374,6 +2369,31 @@
       "name": "master_info_with_fw_ver",
       "type": "string",
       "defaultValue": "STM32F7 R1B5 v1.5"
+    },
+    {
+      "name": "slot1_labels_and_colors_view",
+      "type": "string",
+      "defaultValue": "dib_dcp405::labels_and_colors"
+    },
+    {
+      "name": "slot2_labels_and_colors_view",
+      "type": "string",
+      "defaultValue": "dib_mio168::labels_and_colors"
+    },
+    {
+      "name": "slot3_labels_and_colors_view",
+      "type": "string",
+      "defaultValue": "dib_dcm224::labels_and_colors"
+    },
+    {
+      "name": "colors",
+      "type": "list",
+      "defaultValue": "[\n  {}, {}, {}, {}, {}, {},\n  {}, {}, {}, {}, {}, {},\n  {}, {}, {}, {}, {}, {},\n  {}, {}, {}, {}, {}, {}\n]"
+    },
+    {
+      "name": "keypad_can_set_default",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -3074,6 +3094,27 @@
     },
     {
       "name": "show_labels_and_colors"
+    },
+    {
+      "name": "change_slot_label"
+    },
+    {
+      "name": "change_channel_label"
+    },
+    {
+      "name": "show_channel_color_picker"
+    },
+    {
+      "name": "pick_color"
+    },
+    {
+      "name": "keypad_set_default"
+    },
+    {
+      "name": "show_slot_color_picker"
+    },
+    {
+      "name": "pick_default_color"
     }
   ],
   "gui": {
@@ -8109,16 +8150,66 @@
         "style": "default",
         "widgets": [
           {
-            "type": "DisplayData",
+            "type": "Select",
             "style": {
-              "inheritFrom": "edit_value_M_left"
+              "inheritFrom": "default"
             },
-            "data": "keypad_text",
+            "data": "keypad_can_set_default",
             "left": 0,
             "top": 0,
             "width": 420,
-            "height": 32,
-            "displayOption": 0
+            "height": 42,
+            "widgets": [
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "edit_value_M_left"
+                },
+                "data": "keypad_text",
+                "left": 0,
+                "top": 0,
+                "width": 420,
+                "height": 42,
+                "displayOption": 0
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 420,
+                "height": 42,
+                "widgets": [
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "edit_value_M_left"
+                    },
+                    "data": "keypad_text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 350,
+                    "height": 42,
+                    "displayOption": 0
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "key",
+                      "font": "Oswald14"
+                    },
+                    "action": "keypad_set_default",
+                    "left": 351,
+                    "top": 0,
+                    "width": 69,
+                    "height": 41,
+                    "text": "Default"
+                  }
+                ]
+              }
+            ]
           },
           {
             "type": "Container",
@@ -8126,7 +8217,7 @@
               "inheritFrom": "default"
             },
             "left": 0,
-            "top": 32,
+            "top": 42,
             "width": 420,
             "height": 208,
             "widgets": [
@@ -9490,9 +9581,9 @@
           }
         ],
         "left": 30,
-        "top": 16,
+        "top": 11,
         "width": 420,
-        "height": 240
+        "height": 250
       },
       {
         "name": "numeric_keypad",
@@ -27531,373 +27622,43 @@
         "name": "sys_settings_labels_and_colors",
         "widgets": [
           {
-            "type": "Container",
+            "type": "LayoutView",
             "style": {
               "inheritFrom": "default"
             },
+            "data": "slot1_labels_and_colors_view",
             "left": 0,
             "top": 0,
             "width": 158,
             "height": 238,
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left",
-                  "padding": "0 5"
-                },
-                "data": "",
-                "left": 0,
-                "top": 0,
-                "width": 158,
-                "height": 32,
-                "text": "DCP405 #1"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 7,
-                "top": 37,
-                "width": 144,
-                "height": 32,
-                "text": "Change label"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 7,
-                "top": 74,
-                "width": 144,
-                "height": 32,
-                "text": "Pick color"
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default",
-                  "color": "channel1"
-                },
-                "left": 0,
-                "top": 32,
-                "width": 2,
-                "height": 206
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default",
-                  "color": "channel1"
-                },
-                "left": 156,
-                "top": 32,
-                "width": 2,
-                "height": 206
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default",
-                  "color": "channel1"
-                },
-                "left": 2,
-                "top": 236,
-                "width": 154,
-                "height": 2
-              }
-            ]
+            "layout": "",
+            "context": "slot1_channel_index"
           },
           {
-            "type": "Container",
+            "type": "LayoutView",
             "style": {
               "inheritFrom": "default"
             },
+            "data": "slot2_labels_and_colors_view",
             "left": 161,
             "top": 0,
             "width": 158,
             "height": 238,
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left",
-                  "backgroundColor": "channel2",
-                  "padding": "0 5"
-                },
-                "data": "channel_title",
-                "left": 0,
-                "top": 0,
-                "width": 158,
-                "height": 32,
-                "text": "MIO168"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 7,
-                "top": 37,
-                "width": 144,
-                "height": 32,
-                "text": "Change label"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 7,
-                "top": 74,
-                "width": 144,
-                "height": 32,
-                "text": "Pick color"
-              },
-              {
-                "type": "MultilineText",
-                "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
-                },
-                "left": 7,
-                "top": 116,
-                "width": 144,
-                "height": 56,
-                "text": "Channel labels\\nand colors",
-                "firstLineIndent": 4,
-                "hangingIndent": 0
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default",
-                  "color": "channel2"
-                },
-                "left": 0,
-                "top": 32,
-                "width": 2,
-                "height": 206
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default",
-                  "color": "channel2"
-                },
-                "left": 156,
-                "top": 32,
-                "width": 2,
-                "height": 206
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default",
-                  "color": "channel2"
-                },
-                "left": 2,
-                "top": 236,
-                "width": 154,
-                "height": 2
-              }
-            ]
+            "layout": "",
+            "context": "slot2_channel_index"
           },
           {
-            "type": "Container",
+            "type": "LayoutView",
             "style": {
               "inheritFrom": "default"
             },
+            "data": "slot3_labels_and_colors_view",
             "left": 322,
             "top": 0,
             "width": 158,
             "height": 238,
-            "widgets": [
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 158,
-                "height": 118,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "channel1",
-                      "alignHorizontal": "left",
-                      "backgroundColor": "channel3",
-                      "padding": "0 5"
-                    },
-                    "data": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 158,
-                    "height": 32,
-                    "text": "DCM220 #2"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "option_toggle_L_center",
-                      "font": "Oswald14"
-                    },
-                    "action": "",
-                    "left": 7,
-                    "top": 37,
-                    "width": 144,
-                    "height": 32,
-                    "text": "Change label"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "option_toggle_L_center",
-                      "font": "Oswald14"
-                    },
-                    "action": "ch_settings_adv_remote_toggle_sense",
-                    "left": 7,
-                    "top": 74,
-                    "width": 144,
-                    "height": 32,
-                    "text": "Pick color"
-                  },
-                  {
-                    "type": "Rectangle",
-                    "style": {
-                      "inheritFrom": "default",
-                      "color": "channel3"
-                    },
-                    "left": 0,
-                    "top": 32,
-                    "width": 2,
-                    "height": 86
-                  },
-                  {
-                    "type": "Rectangle",
-                    "style": {
-                      "inheritFrom": "default",
-                      "color": "channel3"
-                    },
-                    "left": 156,
-                    "top": 32,
-                    "width": 2,
-                    "height": 86
-                  },
-                  {
-                    "type": "Rectangle",
-                    "style": {
-                      "inheritFrom": "default",
-                      "color": "channel3"
-                    },
-                    "left": 2,
-                    "top": 116,
-                    "width": 154,
-                    "height": 2
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 120,
-                "width": 158,
-                "height": 118,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "channel1",
-                      "alignHorizontal": "left",
-                      "backgroundColor": "channel4",
-                      "padding": "0 5"
-                    },
-                    "data": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 158,
-                    "height": 32,
-                    "text": "DCM220 #3"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "option_toggle_L_center",
-                      "font": "Oswald14"
-                    },
-                    "action": "ch_settings_adv_remote_toggle_sense",
-                    "left": 7,
-                    "top": 37,
-                    "width": 144,
-                    "height": 32,
-                    "text": "Change label"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "option_toggle_L_center",
-                      "font": "Oswald14"
-                    },
-                    "action": "ch_settings_adv_remote_toggle_sense",
-                    "left": 7,
-                    "top": 74,
-                    "width": 144,
-                    "height": 32,
-                    "text": "Pick color"
-                  },
-                  {
-                    "type": "Rectangle",
-                    "style": {
-                      "inheritFrom": "default",
-                      "color": "channel4"
-                    },
-                    "left": 0,
-                    "top": 32,
-                    "width": 2,
-                    "height": 86
-                  },
-                  {
-                    "type": "Rectangle",
-                    "style": {
-                      "inheritFrom": "default",
-                      "color": "channel4"
-                    },
-                    "left": 156,
-                    "top": 32,
-                    "width": 2,
-                    "height": 86
-                  },
-                  {
-                    "type": "Rectangle",
-                    "style": {
-                      "inheritFrom": "default",
-                      "color": "channel4"
-                    },
-                    "left": 2,
-                    "top": 116,
-                    "width": 154,
-                    "height": 2
-                  }
-                ]
-              }
-            ]
+            "layout": "",
+            "context": "slot3_channel_index"
           },
           {
             "type": "Container",
@@ -35807,6 +35568,196 @@
         "width": 480,
         "height": 272,
         "dataContextOverrides": "{\n    \"channels\": [\n        {\n            \"channel_short_title_without_tracking_icon\": \"#1\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#2\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#3\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#4\"\n        }\n    ]\n}"
+      },
+      {
+        "name": "slot_labels_and_colors",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 238,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "alignHorizontal": "left",
+                  "padding": "0 5"
+                },
+                "data": "slot_title_def",
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "change_slot_label",
+                "left": 7,
+                "top": 37,
+                "width": 144,
+                "height": 32,
+                "text": "Change label"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "show_slot_color_picker",
+                "left": 7,
+                "top": 74,
+                "width": 144,
+                "height": 32,
+                "text": "Pick color"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "channel1"
+                },
+                "left": 0,
+                "top": 32,
+                "width": 2,
+                "height": 206
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "channel1"
+                },
+                "left": 156,
+                "top": 32,
+                "width": 2,
+                "height": 206
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default",
+                  "color": "channel1"
+                },
+                "left": 2,
+                "top": 236,
+                "width": 154,
+                "height": 2
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 238
+      },
+      {
+        "name": "color_picker",
+        "widgets": [
+          {
+            "type": "Grid",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "colors",
+            "left": 0,
+            "top": 0,
+            "width": 420,
+            "height": 200,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default",
+                "activeBackgroundColor": "Background"
+              },
+              "action": "pick_color",
+              "left": 0,
+              "top": 0,
+              "width": 70,
+              "height": 50,
+              "widgets": [
+                {
+                  "type": "Rectangle",
+                  "style": {
+                    "inheritFrom": "default",
+                    "color": "pick_color",
+                    "activeBackgroundColor": "Background"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 69,
+                  "height": 49
+                }
+              ]
+            }
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 200,
+            "width": 420,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 41,
+                "top": 0,
+                "width": 283,
+                "height": 32,
+                "text": "Pick a color"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled",
+                  "font": "Oswald14"
+                },
+                "action": "pick_default_color",
+                "left": 324,
+                "top": 0,
+                "width": 96,
+                "height": 32,
+                "text": "Default"
+              }
+            ]
+          }
+        ],
+        "left": 30,
+        "top": 20,
+        "width": 420,
+        "height": 232
       }
     ],
     "styles": [
@@ -58942,6 +58893,60 @@
         "name": "channel6"
       },
       {
+        "name": "channel7"
+      },
+      {
+        "name": "channel8"
+      },
+      {
+        "name": "channel9"
+      },
+      {
+        "name": "channel10"
+      },
+      {
+        "name": "channel11"
+      },
+      {
+        "name": "channel12"
+      },
+      {
+        "name": "channel13"
+      },
+      {
+        "name": "channel14"
+      },
+      {
+        "name": "channel15"
+      },
+      {
+        "name": "channel16"
+      },
+      {
+        "name": "channel17"
+      },
+      {
+        "name": "channel18"
+      },
+      {
+        "name": "channel19"
+      },
+      {
+        "name": "channel20"
+      },
+      {
+        "name": "channel21"
+      },
+      {
+        "name": "channel22"
+      },
+      {
+        "name": "channel23"
+      },
+      {
+        "name": "channel24"
+      },
+      {
         "name": "scrollbar_track"
       },
       {
@@ -58985,6 +58990,9 @@
       },
       {
         "name": "backdrop"
+      },
+      {
+        "name": "pick_color"
       }
     ],
     "themes": [
@@ -59034,6 +59042,24 @@
           "#d971ca",
           "#dbafea",
           "#adaaf9",
+          "#f44336",
+          "#e91e63",
+          "#9c27b0",
+          "#673ab7",
+          "#3f51b5",
+          "#2196f3",
+          "#03a9f4",
+          "#00bcd4",
+          "#009688",
+          "#4caf50",
+          "#8bc34a",
+          "#cddc39",
+          "#ffeb3b",
+          "#ffc107",
+          "#ff9800",
+          "#ff5722",
+          "#795548",
+          "#607d8b",
           "#b3b7b7",
           "#404040",
           "#404040",
@@ -59048,7 +59074,8 @@
           "#093dc9",
           "#202020",
           "#c0c0c0",
-          "#808080"
+          "#808080",
+          "#000000"
         ]
       },
       {
@@ -59097,6 +59124,24 @@
           "#d971ca",
           "#dbafea",
           "#adaaf9",
+          "#f44336",
+          "#e91e63",
+          "#9c27b0",
+          "#673ab7",
+          "#3f51b5",
+          "#2196f3",
+          "#03a9f4",
+          "#00bcd4",
+          "#009688",
+          "#4caf50",
+          "#8bc34a",
+          "#cddc39",
+          "#ffeb3b",
+          "#ffc107",
+          "#ff9800",
+          "#ff5722",
+          "#795548",
+          "#607d8b",
           "#b3b7b7",
           "#404040",
           "#404040",
@@ -59111,7 +59156,8 @@
           "#e0e0e0",
           "#202020",
           "#c0c0c0",
-          "#202020"
+          "#202020",
+          "#000000"
         ]
       },
       {
@@ -59160,6 +59206,24 @@
           "#d971ca",
           "#dbafea",
           "#adaaf9",
+          "#f44336",
+          "#e91e63",
+          "#9c27b0",
+          "#673ab7",
+          "#3f51b5",
+          "#2196f3",
+          "#03a9f4",
+          "#00bcd4",
+          "#009688",
+          "#4caf50",
+          "#8bc34a",
+          "#cddc39",
+          "#ffeb3b",
+          "#ffc107",
+          "#ff9800",
+          "#ff5722",
+          "#795548",
+          "#607d8b",
           "#187397",
           "#d0d0d0",
           "#d0d0d0",
@@ -59174,7 +59238,8 @@
           "#202020",
           "#d0d0d0",
           "#606060",
-          "#e0e0e0"
+          "#e0e0e0",
+          "#ffffff"
         ]
       }
     ]

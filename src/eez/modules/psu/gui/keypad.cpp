@@ -125,6 +125,7 @@ void Keypad::init(AppContext *appContext, const char *label_) {
     m_xScroll = 0;
     m_okCallback = 0;
     m_cancelCallback = 0;
+    m_setDefaultCallback = 0;
     m_keypadMode = KEYPAD_MODE_LOWERCASE;
     m_isPassword = false;
 
@@ -176,11 +177,12 @@ void Keypad::getKeypadText(char *text) {
     }
 }
 
-void Keypad::start(AppContext *appContext, const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
+void Keypad::start(AppContext *appContext, const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)(), void (*setDefault)()) {
     init(appContext, label);
 
     m_okCallback = ok;
     m_cancelCallback = cancel;
+    m_setDefaultCallback = setDefault;
 
     m_minChars = minChars_;
     m_maxChars = maxChars_;
@@ -196,13 +198,13 @@ void Keypad::start(AppContext *appContext, const char *label, const char *text, 
     m_keypadMode = KEYPAD_MODE_LOWERCASE;
 }
 
-void Keypad::startPush(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
-    g_keypad.start(&g_psuAppContext, label, text, minChars_, maxChars_, isPassword_, ok, cancel);
+void Keypad::startPush(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)(), void (*setDefault)()) {
+    g_keypad.start(&g_psuAppContext, label, text, minChars_, maxChars_, isPassword_, ok, cancel, setDefault);
     pushPage(PAGE_ID_KEYPAD, &g_keypad);
 }
 
 void Keypad::startReplace(const char *label, const char *text, int minChars_, int maxChars_, bool isPassword_, void (*ok)(char *), void (*cancel)()) {
-    g_keypad.start(&g_psuAppContext, label, text, minChars_, maxChars_, isPassword_, ok, cancel);
+    g_keypad.start(&g_psuAppContext, label, text, minChars_, maxChars_, isPassword_, ok, cancel, nullptr);
     replacePage(PAGE_ID_KEYPAD, &g_keypad);
 }
 
@@ -289,6 +291,16 @@ void Keypad::cancel() {
         m_cancelCallback();
     } else {
         m_appContext->popPage();
+    }
+}
+
+bool Keypad::canSetDefault() {
+    return m_setDefaultCallback != nullptr;
+}
+
+void Keypad::setDefault() {
+    if (m_setDefaultCallback) {
+        m_setDefaultCallback();
     }
 }
 

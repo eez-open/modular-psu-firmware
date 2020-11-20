@@ -155,6 +155,10 @@ void action_keypad_cancel() {
     getActiveKeypad()->cancel();
 }
 
+void action_keypad_set_default() {
+    getActiveKeypad()->setDefault();
+}
+
 void action_keypad_sign() {
     getActiveKeypad()->sign();
 }
@@ -1397,6 +1401,47 @@ void action_edit_ntp_refresh_frequency() {
 
 void action_show_labels_and_colors() {
     pushPage(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS);
+}
+
+void action_change_slot_label() {
+}
+
+void onSetChannelLabel(char *value) {
+    strcpy(g_channel->customLabel, value);
+    popPage();
+}
+
+void onSetChannelDefaultLabel(char *value) {
+    strcpy(g_channel->customLabel, value);
+    popPage();
+}
+
+void onSetChannelDefaultLabel() {
+    *g_channel->customLabel = 0;
+    popPage();
+}
+
+void action_change_channel_label() {
+    selectChannelByCursor();
+    Keypad::startPush(0, g_channel->getLabel(), 1, psu::CHANNEL_LABEL_MAX_CHARS, false, onSetChannelLabel, popPage, onSetChannelDefaultLabel);
+}
+
+void action_show_channel_color_picker() {
+    selectChannelByCursor();
+    pushPage(PAGE_ID_COLOR_PICKER);
+}
+
+void action_show_slot_color_picker() {
+}
+
+void action_pick_color() {
+    g_channel->customColor = 1 + getFoundWidgetAtDown().cursor;
+    popPage();
+}
+
+void action_pick_default_color() {
+    g_channel->customColor = 0;
+    popPage();
 }
 
 } // namespace gui

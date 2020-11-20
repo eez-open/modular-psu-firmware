@@ -194,6 +194,7 @@ struct Module {
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);
     virtual int getChannelSettingsPageId();
     virtual int getSlotSettingsPageId();
+    virtual int getLabelsAndColorsPageId();
 
     virtual void onLowPriorityThreadMessage(uint8_t type, uint32_t param);
     virtual void onHighPriorityThreadMessage(uint8_t type, uint32_t param);

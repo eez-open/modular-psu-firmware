@@ -127,6 +127,10 @@ int Module::getSlotSettingsPageId() {
     return PAGE_ID_SLOT_SETTINGS;
 }
 
+int Module::getLabelsAndColorsPageId() {
+    return moduleType == MODULE_TYPE_NONE ? PAGE_ID_NONE : PAGE_ID_SLOT_LABELS_AND_COLORS;
+}
+
 void Module::onLowPriorityThreadMessage(uint8_t type, uint32_t param) {
 }
 

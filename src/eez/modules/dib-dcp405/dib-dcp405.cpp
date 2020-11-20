@@ -1035,6 +1035,10 @@ public:
 			return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_MICRO_1CH_ON : PAGE_ID_DIB_DCP405_SLOT_MICRO_1CH_OFF;
 		}
 	}
+
+    int getLabelsAndColorsPageId() override {
+        return PAGE_ID_DIB_DCP405_LABELS_AND_COLORS;
+    }
 };
 
 static DcpModule g_dcpModule;

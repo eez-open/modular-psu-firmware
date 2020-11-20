@@ -443,6 +443,8 @@ Channel::Channel(uint8_t slotIndex_, uint8_t channelIndex_, uint8_t subchannelIn
 	slotIndex = slotIndex_;
     channelIndex = channelIndex_;
     subchannelIndex = subchannelIndex_;
+    *customLabel = 0;
+    customColor = channelIndex;
 }
 
 void Channel::initParams(uint16_t moduleRevision) {
@@ -1632,6 +1634,17 @@ void Channel::changeIoExpBit(int io_bit, bool set) {
 
 int Channel::getAdvancedOptionsPageId() {
     return gui::PAGE_ID_NONE;
+}
+
+const char *Channel::getLabel() {
+    static char label[CHANNEL_LABEL_MAX_CHARS + 1];
+    if (*customLabel) {
+        strncpy(label, customLabel, CHANNEL_LABEL_MAX_CHARS);
+    } else {
+        snprintf(label, CHANNEL_LABEL_MAX_CHARS, "%s #%d", g_slots[slotIndex]->moduleName, (int)(channelIndex + 1));
+    }
+    label[CHANNEL_LABEL_MAX_CHARS] = 0;
+    return label;
 }
 
 } // namespace psu

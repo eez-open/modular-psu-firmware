@@ -601,6 +601,10 @@ public:
         return PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH;
     }
 
+    int getLabelsAndColorsPageId() override {
+        return PAGE_ID_DIB_DCM224_LABELS_AND_COLORS;
+    }
+
     struct DcmProfileParameters {
         ProfileParameters baseParameters;
         unsigned int dcmVersion;
