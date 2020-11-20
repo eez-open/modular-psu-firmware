@@ -88,6 +88,10 @@ void LabelsAndColorsPage::setSlotColor(int slotIndex, uint8_t color) {
     getSlotLabelAndColor(slotIndex)->color = color;
 }
 
+bool LabelsAndColorsPage::isSlotColorModified(int slotIndex) {
+    return getSlotLabelAndColor(slotIndex)->color != 0;
+}
+
 Value LabelsAndColorsPage::getChannelLabel(int slotIndex, int subchannelIndex) {
     return getChannelLabelAndColor(slotIndex, subchannelIndex)->label;
 }
@@ -111,6 +115,10 @@ uint8_t LabelsAndColorsPage::getChannelColor(int slotIndex, int subchannelIndex)
 
 void LabelsAndColorsPage::setChannelColor(int slotIndex, int subchannelIndex, uint8_t color) {
     getChannelLabelAndColor(slotIndex, subchannelIndex)->color = color;
+}
+
+bool LabelsAndColorsPage::isChannelColorModified(int slotIndex, int subchannelIndex) {
+    return getChannelLabelAndColor(slotIndex, subchannelIndex)->color != 0;
 }
 
 void LabelsAndColorsPage::pageAlloc() {
@@ -231,6 +239,16 @@ void data_labels_and_colors_page_channel_title(DataOperationEnum operation, Curs
     if (operation == DATA_OPERATION_GET) {
         auto &channel = psu::Channel::get(cursor);
         value = LabelsAndColorsPage::getChannelLabelOrDefault(channel.slotIndex, channel.subchannelIndex);
+    }
+}
+
+void data_labels_and_colors_is_color_modified(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        if (g_channel) {
+            value = LabelsAndColorsPage::isChannelColorModified(g_channel->slotIndex, g_channel->subchannelIndex);
+        } else {
+            value = LabelsAndColorsPage::isSlotColorModified(hmi::g_selectedSlotIndex);
+        }
     }
 }
 

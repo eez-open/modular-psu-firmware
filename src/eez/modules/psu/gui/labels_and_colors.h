@@ -37,6 +37,7 @@ public:
     
     static uint8_t getSlotColor(int slotIndex);
     static void setSlotColor(int slotIndex, uint8_t color);
+    static bool isSlotColorModified(int slotIndex);
 
     static Value getChannelLabel(int slotIndex, int subchannelIndex);
     static Value getChannelLabelOrDefault(int slotIndex, int subchannelIndex);
@@ -45,6 +46,7 @@ public:
     
     static uint8_t getChannelColor(int slotIndex, int subchannelIndex);
     static void setChannelColor(int slotIndex, int subchannelIndex, uint8_t color);
+    static bool isChannelColorModified(int slotIndex, int subchannelIndex);
 
     void pageAlloc();
 

@@ -2404,6 +2404,11 @@
       "name": "labels_and_colors_page_channel_title",
       "type": "string",
       "defaultValue": "DCP405 #1"
+    },
+    {
+      "name": "labels_and_colors_is_color_modified",
+      "type": "boolean",
+      "defaultValue": "0"
     }
   ],
   "actions": [
@@ -35747,17 +35752,41 @@
                 "text": "Pick a color"
               },
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "status_icon_enabled",
-                  "font": "Oswald14"
+                  "inheritFrom": "default"
                 },
-                "action": "pick_default_color",
+                "data": "labels_and_colors_is_color_modified",
                 "left": 324,
                 "top": 0,
                 "width": 96,
                 "height": 32,
-                "text": "Default"
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "status_title"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 96,
+                    "height": 32,
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "status_icon_enabled",
+                      "font": "Oswald14"
+                    },
+                    "action": "pick_default_color",
+                    "left": 0,
+                    "top": 0,
+                    "width": 96,
+                    "height": 32,
+                    "text": "Default"
+                  }
+                ]
               }
             ]
           }
@@ -59068,7 +59097,6 @@
           "#ff5722",
           "#795548",
           "#607d8b",
-
           "#404040",
           "#404040",
           "#404040",
@@ -59093,7 +59121,6 @@
           "#FFFFFF",
           "#FFFFFF",
           "#FFFFFF",
-
           "#b3b7b7",
           "#404040",
           "#404040",
@@ -59179,7 +59206,6 @@
           "#ff5722",
           "#795548",
           "#607d8b",
-
           "#404040",
           "#404040",
           "#404040",
@@ -59204,7 +59230,6 @@
           "#FFFFFF",
           "#FFFFFF",
           "#FFFFFF",
-
           "#b3b7b7",
           "#404040",
           "#404040",
@@ -59290,7 +59315,6 @@
           "#ff5722",
           "#795548",
           "#607d8b",
-
           "#404040",
           "#404040",
           "#404040",
@@ -59315,7 +59339,6 @@
           "#FFFFFF",
           "#FFFFFF",
           "#FFFFFF",
-          
           "#187397",
           "#d0d0d0",
           "#d0d0d0",
