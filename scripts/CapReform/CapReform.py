@@ -182,57 +182,65 @@ def show_main_dialog():
   
 # Start of main (loop) script
 #############################
-# Save state  
-scpi("*SAV 10")
-scpi("MEM:STATE:FREEZE ON")
+def main():
+  # Save state  
+  scpi("*SAV 10")
+  scpi("MEM:STATE:FREEZE ON")
 
-# From now on we always restore the state in case of an error.  
-try:
-  # Digital output for timing/jitter measurements
-  scpi('SYSTEM:DIGITAL:PIN4:FUNCTION DOUTPUT')
-  scpi('SYST:DIGITAL:PIN4:POLARITY POS')
-  scpi('SYST:DIG:OUTP:DATA 4,0')
+  # From now on we always restore the state in case of an error.  
+  try:
+    # Script requires firmware > 1.6, check for it.
+    firmwareversion = scpi("SYSTem:CPU:FIRMware?")
+    if float(firmwareversion) < 1.6:
+      scpi('DISP:ERR "Script requires firmware >= 1.6"')
+      return
   
-  # TODO: check & setup stuff
-  # set maximum values, check channel/module types/configure serial if possible....
-  ch1Model = scpi("SYSTem:CHANnel:MODel? ch1")
-  ch2Model = scpi("SYSTem:CHANnel:MODel? ch2")
-  if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
-      scpi("INST:COUP:TRAC SER")
-  else:
+    # Digital output for timing/jitter measurements
+    scpi('SYSTEM:DIGITAL:PIN4:FUNCTION DOUTPUT')
+    scpi('SYST:DIGITAL:PIN4:POLARITY POS')
+    scpi('SYST:DIG:OUTP:DATA 4,0')
+  
+    if scpi("SYSTem:CHANnel:COUNt?") >= 2:
+      ch1Model = scpi("SYSTem:CHANnel:MODel? ch1")
+      ch2Model = scpi("SYSTem:CHANnel:MODel? ch2")
+      if ch1Model.startswith("DCP405") and ch2Model.startswith("DCP405"):
+        scpi("INST:COUP:TRAC SER")
+      else:
+        scpi("INST:COUP:TRAC NONE")
+    else:
       scpi("INST:COUP:TRAC NONE")
-  
-  scpi("INST ch1")
-  module_max_volt = float(scpi("VOLT? MAX"))
-  scpi("OUTP 0")
-  show_main_dialog()
+      
+    scpi("INST ch1")
+    module_max_volt = float(scpi("VOLT? MAX"))
+    scpi("OUTP 0")
+    show_main_dialog()
 
-  while True:
-      action = scpi("DISP:DIALOG:ACTION?")
-      if action == "input_cap_max_volt":
-        input_cap_max_volt()
-      elif action == "input_charge_current":
-        input_charge_current()
-      elif action == "input_reform_time":
-        input_reform_time()
-      elif action == "input_reform_time":
-        input_reform_time()
-      elif action == "view_dlog":
-        scpi("DISP:WINDOW:DLOG \"/Recordings/ReformCap.dlog\"")
-      elif action == "start_reform":
-        discharge_cap()
-        scpi('DISP:DIALog:DATA "run_state", INT, 1')
-        scpi('DISP:DIALog:DATA "data_viewable", INT, 1')  
-        start_reform()
-        scpi("DISP:DIAL:DATA \"reform_progress\", INT, 0")
-        scpi('DISP:DIALog:DATA "run_state", INT, 0')
-      elif action == "close_script" or action == 0:
-          break
-finally:
-  close_script()
+    while True:
+        action = scpi("DISP:DIALOG:ACTION?")
+        if action == "input_cap_max_volt":
+          input_cap_max_volt()
+        elif action == "input_charge_current":
+          input_charge_current()
+        elif action == "input_reform_time":
+          input_reform_time()
+        elif action == "input_reform_time":
+          input_reform_time()
+        elif action == "view_dlog":
+          scpi("DISP:WINDOW:DLOG \"/Recordings/ReformCap.dlog\"")
+        elif action == "start_reform":
+          discharge_cap()
+          scpi('DISP:DIALog:DATA "run_state", INT, 1')
+          scpi('DISP:DIALog:DATA "data_viewable", INT, 1')  
+          start_reform()
+          scpi("DISP:DIAL:DATA \"reform_progress\", INT, 0")
+          scpi('DISP:DIALog:DATA "run_state", INT, 0')
+        elif action == "close_script" or action == 0:
+            break
+  finally:
+    close_script()
 
 
-
+main()
     
          
           
