@@ -16,6 +16,13 @@
                     "https://github.com/eez-open/modular-psu-firmware/raw/c163897d07b228d5bd28329e2bfab9609f28f7fc/scripts/CapReform/CapReform.py",
                     "https://github.com/eez-open/modular-psu-firmware/raw/c163897d07b228d5bd28329e2bfab9609f28f7fc/scripts/CapReform/CapReform.res"
                 ]
+            },
+            {
+                "version": "1.2",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/b1ad16effbabd0109529b8fe58eb438f2e97b726/scripts/CapReform/CapReform.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/b1ad16effbabd0109529b8fe58eb438f2e97b726/scripts/CapReform/CapReform.res"
+                ]
             }
         ]
     },
