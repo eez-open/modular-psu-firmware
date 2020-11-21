@@ -21,7 +21,7 @@ STEP3 = 1.00
 
 def input_cap_max_volt():
   global cap_max_volt
-  value = scpi('DISP:INPUT? "",NUMBER,VOLT,1.0,' +
+  value = scpi('DISP:INPUT? "Max Cap Voltage",NUMBER,VOLT,1.0,' +
             str(module_max_volt) + ',' +
             str(cap_max_volt))
   if value != None:
@@ -183,6 +183,7 @@ def show_main_dialog():
 # Start of main (loop) script
 #############################
 def main():
+  global module_max_volt
   # Save state  
   scpi("*SAV 10")
   scpi("MEM:STATE:FREEZE ON")
