@@ -104,10 +104,10 @@ void AppContext::onPageChanged(int previousPageId, int activePageId) {
 }
 
 void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
-//#if CONF_OPTION_FPGA
-//    pageId = PAGE_ID_WELCOME_800X480;
-//    page = nullptr;
-//#endif
+#if CONF_OPTION_FPGA
+    pageId = PAGE_ID_WELCOME_800X480;
+    page = nullptr;
+#endif
 
     page = page ? page : getPageFromIdHook(pageId);
 

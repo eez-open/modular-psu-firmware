@@ -33,19 +33,28 @@ void MX_LTDC_Init(void)
 
   hltdc.Instance = LTDC;
   hltdc.Init.HSPolarity = LTDC_HSPOLARITY_AH;
+#if CONF_OPTION_FPGA
+  hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AH;
+#else
   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AL;
+#endif
   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AL;
   hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IPC;
+#if CONF_OPTION_FPGA  
+  hltdc.Init.HorizontalSync = 19;
+  hltdc.Init.AccumulatedHBP = 39;
+  hltdc.Init.AccumulatedActiveW = 839;
+  hltdc.Init.TotalWidth = 849;
+  
+  hltdc.Init.VerticalSync = 19;
+  hltdc.Init.AccumulatedVBP = 31;
+  hltdc.Init.AccumulatedActiveH = 511;
+  hltdc.Init.TotalHeigh = 514;
+#else
   hltdc.Init.HorizontalSync = 50;
   hltdc.Init.VerticalSync = 19;
   hltdc.Init.AccumulatedHBP = 93;
   hltdc.Init.AccumulatedVBP = 31;
-#if CONF_OPTION_FPGA
-  hltdc.Init.AccumulatedActiveW = 893;
-  hltdc.Init.AccumulatedActiveH = 511;
-  hltdc.Init.TotalWidth = 901;
-  hltdc.Init.TotalHeigh = 519;
-#else
   hltdc.Init.AccumulatedActiveW = 573;
   hltdc.Init.AccumulatedActiveH = 303;
   hltdc.Init.TotalWidth = 581;
