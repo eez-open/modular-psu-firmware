@@ -37,7 +37,7 @@ static const uint32_t MEMORY_SIZE = 64 * 1024 * 1024;
 
 static uint8_t * const DECOMPRESSED_ASSETS_START_ADDRESS = MEMORY_BEGIN;
 #if defined(EEZ_PLATFORM_STM32)
-static const uint32_t DECOMPRESSED_ASSETS_SIZE = (3 * 512 - 32) * 1024;
+static const uint32_t DECOMPRESSED_ASSETS_SIZE = 3 * 512 * 1024;
 #endif
 #if defined(EEZ_PLATFORM_SIMULATOR)
 static const uint32_t DECOMPRESSED_ASSETS_SIZE = 8 * 1024 * 1024;
@@ -54,8 +54,8 @@ static const uint32_t FILE_VIEW_BUFFER_SIZE = 1024 * 1024;
 static const uint32_t FILE_VIEW_BUFFER_SIZE = 3 * 512 * 1024;
 #endif
 
-static uint8_t * const EXTERNAL_ASSETS_BUFFER = FILE_VIEW_BUFFER + FILE_VIEW_BUFFER_SIZE;
-static const uint32_t EXTERNAL_ASSETS_BUFFER_SIZE = 768 * 1024;
+static uint8_t * const EXTERNAL_ASSETS_BUFFER = FILE_VIEW_BUFFER;
+static const uint32_t EXTERNAL_ASSETS_BUFFER_SIZE = FILE_VIEW_BUFFER_SIZE;
 
 static uint8_t * const MP_BUFFER = EXTERNAL_ASSETS_BUFFER + EXTERNAL_ASSETS_BUFFER_SIZE;
 static const uint32_t MP_BUFFER_SIZE = 512 * 1024;
