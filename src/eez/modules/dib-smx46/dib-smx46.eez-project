@@ -86,6 +86,26 @@
       "name": "power_relay_cycles",
       "type": "integer",
       "defaultValue": "3245"
+    },
+    {
+      "name": "analog_outputs",
+      "type": "list",
+      "defaultValue": "[{\"ao_label\": \"AO1\"}, {\"ao_label\": \"AO2\"}]"
+    },
+    {
+      "name": "ao_label",
+      "type": "string",
+      "defaultValue": "AO1"
+    },
+    {
+      "name": "ao1_label",
+      "type": "string",
+      "defaultValue": "AO1"
+    },
+    {
+      "name": "ao2_label",
+      "type": "string",
+      "defaultValue": "AO2"
     }
   ],
   "actions": [
@@ -121,6 +141,9 @@
     },
     {
       "name": "edit_x_label"
+    },
+    {
+      "name": "change_subchannel_label"
     }
   ],
   "gui": {
@@ -335,13 +358,15 @@
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "default_S_left"
+              "inheritFrom": "default_S_left",
+              "alignHorizontal": "center"
             },
-            "left": 13,
+            "data": "ao1_label",
+            "left": 0,
             "top": 140,
-            "width": 38,
+            "width": 51,
             "height": 32,
-            "text": "AO1"
+            "text": ""
           },
           {
             "type": "DisplayData",
@@ -359,13 +384,15 @@
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "default_S_left"
+              "inheritFrom": "default_S_left",
+              "alignHorizontal": "center"
             },
-            "left": 13,
+            "data": "ao2_label",
+            "left": 0,
             "top": 174,
-            "width": 39,
+            "width": 52,
             "height": 32,
-            "text": "AO2"
+            "text": ""
           },
           {
             "type": "DisplayData",
@@ -597,13 +624,15 @@
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "default_S_left"
+              "inheritFrom": "default_S_left",
+              "alignHorizontal": "center"
             },
-            "left": 30,
+            "data": "ao1_label",
+            "left": 0,
             "top": 140,
-            "width": 46,
+            "width": 76,
             "height": 32,
-            "text": "AO1"
+            "text": ""
           },
           {
             "type": "DisplayData",
@@ -621,13 +650,15 @@
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "default_S_left"
+              "inheritFrom": "default_S_left",
+              "alignHorizontal": "center"
             },
-            "left": 30,
+            "data": "ao2_label",
+            "left": 0,
             "top": 174,
-            "width": 46,
+            "width": 76,
             "height": 32,
-            "text": "AO2"
+            "text": ""
           },
           {
             "type": "DisplayData",
@@ -949,13 +980,15 @@
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "default_S_left"
+              "inheritFrom": "default_S_left",
+              "alignHorizontal": "center"
             },
-            "left": 305,
+            "data": "ao1_label",
+            "left": 290,
             "top": 36,
-            "width": 37,
+            "width": 54,
             "height": 38,
-            "text": "AO1"
+            "text": ""
           },
           {
             "type": "DisplayData",
@@ -973,13 +1006,15 @@
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "default_S_left"
+              "inheritFrom": "default_S_left",
+              "alignHorizontal": "center"
             },
-            "left": 305,
+            "data": "ao2_label",
+            "left": 290,
             "top": 81,
-            "width": 39,
+            "width": 54,
             "height": 38,
-            "text": "AO2"
+            "text": ""
           },
           {
             "type": "DisplayData",
@@ -2206,6 +2241,148 @@
         "width": 480,
         "height": 272,
         "dataContextOverrides": "{\n    \"slot_title_settings\": \"SMX46 #3:\"\n}"
+      },
+      {
+        "name": "labels_and_colors",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "labels_and_colors_slot"
+            },
+            "data": "labels_and_colors_page_slot_title",
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 32,
+            "text": ""
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "option_toggle_L_center",
+              "font": "Oswald14"
+            },
+            "action": "change_slot_label",
+            "left": 8,
+            "top": 39,
+            "width": 142,
+            "height": 32,
+            "text": "Change label"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "option_toggle_L_center",
+              "font": "Oswald14"
+            },
+            "action": "show_slot_color_picker",
+            "left": 8,
+            "top": 77,
+            "width": 142,
+            "height": 32,
+            "text": "Pick color"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default_S"
+            },
+            "left": 7,
+            "top": 115,
+            "width": 77,
+            "height": 32,
+            "text": "AO1 label:"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default_S"
+            },
+            "left": 7,
+            "top": 153,
+            "width": 77,
+            "height": 32,
+            "text": "AO2 label:"
+          },
+          {
+            "type": "List",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "analog_outputs",
+            "left": 88,
+            "top": 115,
+            "width": 62,
+            "height": 76,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "left": 0,
+              "top": 0,
+              "width": 62,
+              "height": 38,
+              "widgets": [
+                {
+                  "type": "Text",
+                  "style": {
+                    "inheritFrom": "option_toggle_L_center",
+                    "font": "Oswald14"
+                  },
+                  "data": "ao_label",
+                  "action": "change_subchannel_label",
+                  "left": 0,
+                  "top": 0,
+                  "width": 62,
+                  "height": 32,
+                  "text": ""
+                }
+              ]
+            },
+            "listType": "vertical",
+            "gap": 0
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "labels_and_colors_page_slot_color"
+            },
+            "left": 0,
+            "top": 32,
+            "width": 2,
+            "height": 206
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "labels_and_colors_page_slot_color"
+            },
+            "left": 156,
+            "top": 32,
+            "width": 2,
+            "height": 206
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "labels_and_colors_page_slot_color"
+            },
+            "left": 2,
+            "top": 236,
+            "width": 154,
+            "height": 2
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 238,
+        "dataContextOverrides": "{\n    \"labels_and_colors_page_slot_title\": \"SMX46\"\n}"
       }
     ],
     "styles": [],

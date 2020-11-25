@@ -90,9 +90,9 @@ float TempSensor::doRead() {
 	if (type >= CH1 && type <= CH6) {
         return Channel::get(type - CH1).readTemperature();
 	}
-#endif
 
     return NAN;
+#endif
 }
 
 void TempSensor::testTemperatureValidity(float& value) {

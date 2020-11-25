@@ -200,7 +200,7 @@ bool Module::writeProfileProperties(psu::profile::WriteContext &ctx, const uint8
 bool Module::readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) {
     auto parameters = (ProfileParameters *)buffer;
 
-    READ_STRING_PROPERTY("label", parameters->label, CHANNEL_LABEL_MAX_CHARS);
+    READ_STRING_PROPERTY("label", parameters->label, SLOT_LABEL_MAX_LENGTH);
     READ_PROPERTY("color", parameters->color);
 
     return false;
@@ -231,8 +231,15 @@ const char *Module::getDefaultLabel() {
     return moduleName;
 }
 
-void Module::setLabel(const char *value) {
-    strcpy(label, value);
+void Module::setLabel(const char *value, int length) {
+    if (length == -1) {
+        length = strlen(label);
+    }
+    if (length > (int)SLOT_LABEL_MAX_LENGTH) {
+        length = SLOT_LABEL_MAX_LENGTH;
+    }
+    strncpy(label, value, length);
+    label[length] = 0;
 }
 
 uint8_t Module::getColor() {
@@ -243,6 +250,10 @@ void Module::setColor(uint8_t value) {
     color = value;
 }
 
+size_t Module::getChannelLabelMaxLength(int subchannelIndex) {
+    return 0;
+}
+
 const char *Module::getChannelLabel(int subchannelIndex) {
     return "";
 }
@@ -251,16 +262,41 @@ const char *Module::getDefaultChannelLabel(int subchannelIndex) {
     return "";
 }
 
-void Module::setChannelLabel(int subchannelIndex, const char *label) {
+eez_err_t Module::getChannelLabel(int subchannelIndex, const char *&label) {
+    return SCPI_ERROR_HARDWARE_MISSING;
+}
+
+eez_err_t Module::setChannelLabel(int subchannelIndex, const char *label, int length) {
+    return SCPI_ERROR_HARDWARE_MISSING;
+}
+
+size_t Module::getChannelPinLabelMaxLength(int subchannelIndex, int pin) {
+    return 0;
+}
+
+const char *Module::getDefaultChannelPinLabel(int subchannelIndex, int pin) {
+    return "";
+}
+
+eez_err_t Module::getChannelPinLabel(int subchannelIndex, int pin, const char *&label) {
+    return SCPI_ERROR_HARDWARE_MISSING;
+}
+
+eez_err_t Module::setChannelPinLabel(int subchannelIndex, int pin, const char *label, int length) {
+    return SCPI_ERROR_HARDWARE_MISSING;
 }
 
 uint8_t Module::getChannelColor(int subchannelIndex) {
     return 0;
 }
 
-void Module::setChannelColor(int subchannelIndex, uint8_t color) {
+eez_err_t Module::getChannelColor(int subchannelIndex, uint8_t &color) {
+    return SCPI_ERROR_HARDWARE_MISSING;
 }
 
+eez_err_t Module::setChannelColor(int subchannelIndex, uint8_t color) {
+    return SCPI_ERROR_HARDWARE_MISSING;
+}
 
 bool Module::getDigitalInputData(int subchannelIndex, uint8_t &data, int *err) {
     if (err) {

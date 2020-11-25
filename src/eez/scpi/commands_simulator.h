@@ -285,13 +285,19 @@
     SCPI_COMMAND("SYSTem:BEEPer:STATe?", scpi_cmd_systemBeeperStateQ) \
     SCPI_COMMAND("SYSTem:BEEPer[:IMMediate]", scpi_cmd_systemBeeperImmediate) \
     SCPI_COMMAND("SYSTem:CAPability?", scpi_cmd_systemCapabilityQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:COLor", scpi_cmd_systemChannelColor) \
+    SCPI_COMMAND("SYSTem:CHANnel:COLor?", scpi_cmd_systemChannelColorQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:CURRent?", scpi_cmd_systemChannelInformationCurrentQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:ONTime:LAST?", scpi_cmd_systemChannelInformationOntimeLastQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:ONTime:TOTal?", scpi_cmd_systemChannelInformationOntimeTotalQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:POWer?", scpi_cmd_systemChannelInformationPowerQ) \
     SCPI_COMMAND("SYSTem:CHANnel:INFOrmation:VOLTage?", scpi_cmd_systemChannelInformationVoltageQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:LABel", scpi_cmd_systemChannelLabel) \
+    SCPI_COMMAND("SYSTem:CHANnel:LABel?", scpi_cmd_systemChannelLabelQ) \
     SCPI_COMMAND("SYSTem:CHANnel:MODel?", scpi_cmd_systemChannelModelQ) \
     SCPI_COMMAND("SYSTem:CHANnel:OPTion?", scpi_cmd_systemChannelOptionQ) \
+    SCPI_COMMAND("SYSTem:CHANnel:PIN:LABel", scpi_cmd_systemChannelPinLabel) \
+    SCPI_COMMAND("SYSTem:CHANnel:PIN:LABel?", scpi_cmd_systemChannelPinLabelQ) \
     SCPI_COMMAND("SYSTem:CHANnel:SLOT?", scpi_cmd_systemChannelSlotQ) \
     SCPI_COMMAND("SYSTem:CHANnel:VERSion?", scpi_cmd_systemChannelVersionQ) \
     SCPI_COMMAND("SYSTem:CHANnel[:COUNt]?", scpi_cmd_systemChannelCountQ) \
@@ -371,9 +377,18 @@
     SCPI_COMMAND("SYSTem:REMote", scpi_cmd_systemRemote) \
     SCPI_COMMAND("SYSTem:REStart", scpi_cmd_systemRestart) \
     SCPI_COMMAND("SYSTem:RWLock", scpi_cmd_systemRwlock) \
+    SCPI_COMMAND("SYSTem:SLOT[:COUNt]?", scpi_cmd_systemSlotCountQ) \
+    SCPI_COMMAND("SYSTem:SLOT:COLor", scpi_cmd_systemSlotColor) \
+    SCPI_COMMAND("SYSTem:SLOT:COLor?", scpi_cmd_systemSlotColorQ) \
+    SCPI_COMMAND("SYSTem:SLOT:FIRMware?", scpi_cmd_systemSlotFirmwareQ) \
+    SCPI_COMMAND("SYSTem:SLOT:LABel", scpi_cmd_systemSlotLabel) \
+    SCPI_COMMAND("SYSTem:SLOT:LABel?", scpi_cmd_systemSlotLabelQ) \
+    SCPI_COMMAND("SYSTem:SLOT:MODel?", scpi_cmd_systemSlotModelQ) \
+    SCPI_COMMAND("SYSTem:SLOT:SNO", scpi_cmd_systemSlotSno) \
+    SCPI_COMMAND("SYSTem:SLOT:SNO?", scpi_cmd_systemSlotSnoQ) \
     SCPI_COMMAND("SYSTem:SLOT:STATe", scpi_cmd_systemSlotState) \
     SCPI_COMMAND("SYSTem:SLOT:STATe?", scpi_cmd_systemSlotStateQ) \
-    SCPI_COMMAND("SYSTem:SLOT[:COUNt]?", scpi_cmd_systemSlotCountQ) \
+    SCPI_COMMAND("SYSTem:SLOT:VERSion?", scpi_cmd_systemSlotVersionQ) \
     SCPI_COMMAND("SYSTem:TEMPerature:PROTection[:HIGH]:CLEar", scpi_cmd_systemTemperatureProtectionHighClear) \
     SCPI_COMMAND("SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]", scpi_cmd_systemTemperatureProtectionHighDelayTime) \
     SCPI_COMMAND("SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]?", scpi_cmd_systemTemperatureProtectionHighDelayTimeQ) \
@@ -389,11 +404,6 @@
     SCPI_COMMAND("SYSTem:TIME:ZONE?", scpi_cmd_systemTimeZoneQ) \
     SCPI_COMMAND("SYSTem:TIME?", scpi_cmd_systemTimeQ) \
     SCPI_COMMAND("SYSTem:VERSion?", scpi_cmd_systemVersionQ) \
-    SCPI_COMMAND("SYSTem:SLOT:MODel?", scpi_cmd_systemSlotModelQ) \
-    SCPI_COMMAND("SYSTem:SLOT:VERSion?", scpi_cmd_systemSlotVersionQ) \
-    SCPI_COMMAND("SYSTem:SLOT:FIRMware?", scpi_cmd_systemSlotFirmwareQ) \
-    SCPI_COMMAND("SYSTem:SLOT:SNO", scpi_cmd_systemSlotSno) \
-    SCPI_COMMAND("SYSTem:SLOT:SNO?", scpi_cmd_systemSlotSnoQ) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \
     SCPI_COMMAND("TRIGger:DLOG[:IMMediate]", scpi_cmd_triggerDlogImmediate) \

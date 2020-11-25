@@ -31,17 +31,17 @@
     {
       "name": "din_pins",
       "type": "list",
-      "defaultValue": "[\n  { \"input_no\": 1, \"input_state\": 0 },\n  { \"input_no\": 2, \"input_state\": 1 },\n  { \"input_no\": 3, \"input_state\": 1 },\n  { \"input_no\": 4, \"input_state\": 1 },\n  { \"input_no\": 5, \"input_state\": 0 },\n  { \"input_no\": 6, \"input_state\": 1 },\n  { \"input_no\": 7, \"input_state\": 0 },\n  { \"input_no\": 8, \"input_state\": 1 }\n]"
+      "defaultValue": "[\n  { \"input_no\": 1, \"input_state\": 0, \"din_label_label\": \"DIN1 label:\", \"din_label\": \"DIN1\" },\n  { \"input_no\": 2, \"input_state\": 1, \"din_label_label\": \"DIN2 label:\", \"din_label\": \"DIN2\" },\n  { \"input_no\": 3, \"input_state\": 1, \"din_label_label\": \"DIN3 label:\", \"din_label\": \"DIN3\" },\n  { \"input_no\": 4, \"input_state\": 1, \"din_label_label\": \"DIN4 label:\", \"din_label\": \"DIN4\" },\n  { \"input_no\": 5, \"input_state\": 0, \"din_label_label\": \"DIN5 label:\", \"din_label\": \"DIN5\" },\n  { \"input_no\": 6, \"input_state\": 1, \"din_label_label\": \"DIN6 label:\", \"din_label\": \"DIN6\" },\n  { \"input_no\": 7, \"input_state\": 0, \"din_label_label\": \"DIN7 label:\", \"din_label\": \"DIN7\" },\n  { \"input_no\": 8, \"input_state\": 1, \"din_label_label\": \"DIN8 label:\", \"din_label\": \"DIN8\" }\n]"
     },
     {
       "name": "din_pins_1_4",
       "type": "list",
-      "defaultValue": "[\n  { \"din_no\": 1, \"din_state\": 0, \"din_range\": 0, \"din_has_speed\": 1, \"input_speed\": 0 },\n  { \"din_no\": 2, \"din_state\": 1, \"din_range\": 1, \"din_has_speed\": 1, \"input_speed\": 1 },\n  { \"din_no\": 3, \"din_state\": 1, \"din_range\": 1, \"din_has_speed\": 0 },\n  { \"din_no\": 4, \"din_state\": 0, \"din_range\": 1, \"din_has_speed\": 0 }\n]"
+      "defaultValue": "[\n  { \"input_no\": 1, \"input_state\": 0, \"din_label_label\": \"DIN1 label:\", \"din_label\": \"DIN1\", \"input_speed\": 0 },\n  { \"input_no\": 2, \"input_state\": 1, \"din_label_label\": \"DIN2 label:\", \"din_label\": \"DIN2\", \"input_speed\": 1 },\n  { \"input_no\": 3, \"input_state\": 1, \"din_label_label\": \"DIN3 label:\", \"din_label\": \"DIN3\" },\n  { \"input_no\": 4, \"input_state\": 1, \"din_label_label\": \"DIN4 label:\", \"din_label\": \"DIN4\" }\n]"
     },
     {
       "name": "din_pins_5_8",
       "type": "list",
-      "defaultValue": "[\n  { \"din_no\": 5, \"din_state\": 1, \"din_range\": 1 },\n  { \"din_no\": 6, \"din_state\": 1, \"din_range\": 1 },\n  { \"din_no\": 7, \"din_state\": 0, \"din_range\": 1 },\n  { \"din_no\": 8, \"din_state\": 0, \"din_range\": 0 }\n]"
+      "defaultValue": "[\n  { \"input_no\": 5, \"input_state\": 0, \"din_label_label\": \"DIN5 label:\", \"din_label\": \"DIN5\" },\n  { \"input_no\": 6, \"input_state\": 1, \"din_label_label\": \"DIN6 label:\", \"din_label\": \"DIN6\" },\n  { \"input_no\": 7, \"input_state\": 0, \"din_label_label\": \"DIN7 label:\", \"din_label\": \"DIN7\" },\n  { \"input_no\": 8, \"input_state\": 1, \"din_label_label\": \"DIN8 label:\", \"din_label\": \"DIN8\" }\n]"
     },
     {
       "name": "din_no",
@@ -60,6 +60,16 @@
       "defaultValue": "0"
     },
     {
+      "name": "din_label",
+      "type": "string",
+      "defaultValue": "DIN1"
+    },
+    {
+      "name": "din_label_label",
+      "type": "string",
+      "defaultValue": "DIN1 label:"
+    },
+    {
       "name": "din_speed",
       "type": "enum",
       "enumItems": "[\"Fast\", \"Slow\"]",
@@ -68,7 +78,17 @@
     {
       "name": "dout_pins",
       "type": "list",
-      "defaultValue": "[\n  { \"output_no\": 1, \"output_state\": 1 },\n  { \"output_no\": 2, \"output_state\": 1 },\n  { \"output_no\": 3, \"output_state\": 0 },\n  { \"output_no\": 4, \"output_state\": 0 },\n  { \"output_no\": 5, \"output_state\": 1 },\n  { \"output_no\": 6, \"output_state\": 1 },\n  { \"output_no\": 7, \"output_state\": 0 },\n  { \"output_no\": 8, \"output_state\": 1 }\n]"
+      "defaultValue": "[\n  { \"output_no\": 1, \"output_state\": 1, \"dout_label_label\": \"DOUT1 label:\", \"dout_label\": \"DOUT1\" },\n  { \"output_no\": 2, \"output_state\": 1, \"dout_label_label\": \"DOUT2 label:\", \"dout_label\": \"DOUT2\" },\n  { \"output_no\": 3, \"output_state\": 0, \"dout_label_label\": \"DOUT3 label:\", \"dout_label\": \"DOUT3\" },\n  { \"output_no\": 4, \"output_state\": 0, \"dout_label_label\": \"DOUT4 label:\", \"dout_label\": \"DOUT4\" },\n  { \"output_no\": 5, \"output_state\": 1, \"dout_label_label\": \"DOUT5 label:\", \"dout_label\": \"DOUT5\" },\n  { \"output_no\": 6, \"output_state\": 1, \"dout_label_label\": \"DOUT6 label:\", \"dout_label\": \"DOUT6\" },\n  { \"output_no\": 7, \"output_state\": 0, \"dout_label_label\": \"DOUT7 label:\", \"dout_label\": \"DOUT7\" },\n  { \"output_no\": 8, \"output_state\": 1, \"dout_label_label\": \"DOUT8 label:\", \"dout_label\": \"DOUT8\" }\n]"
+    },
+    {
+      "name": "dout_pins_1_4",
+      "type": "list",
+      "defaultValue": "[\n  { \"output_no\": 1, \"output_state\": 1, \"dout_label_label\": \"DOUT1 label:\", \"dout_label\": \"DOUT1\" },\n  { \"output_no\": 2, \"output_state\": 1, \"dout_label_label\": \"DOUT2 label:\", \"dout_label\": \"DOUT2\" },\n  { \"output_no\": 3, \"output_state\": 0, \"dout_label_label\": \"DOUT3 label:\", \"dout_label\": \"DOUT3\" },\n  { \"output_no\": 4, \"output_state\": 0, \"dout_label_label\": \"DOUT4 label:\", \"dout_label\": \"DOUT4\" }\n]"
+    },
+    {
+      "name": "dout_pins_5_8",
+      "type": "list",
+      "defaultValue": "[\n  { \"output_no\": 5, \"output_state\": 1, \"dout_label_label\": \"DOUT5 label:\", \"dout_label\": \"DOUT5\" },\n  { \"output_no\": 6, \"output_state\": 1, \"dout_label_label\": \"DOUT6 label:\", \"dout_label\": \"DOUT6\" },\n  { \"output_no\": 7, \"output_state\": 0, \"dout_label_label\": \"DOUT7 label:\", \"dout_label\": \"DOUT7\" },\n  { \"output_no\": 8, \"output_state\": 1, \"dout_label_label\": \"DOUT8 label:\", \"dout_label\": \"DOUT8\" }\n]"
     },
     {
       "name": "dout_no",
@@ -81,14 +101,29 @@
       "defaultValue": "1"
     },
     {
+      "name": "dout_label",
+      "type": "string",
+      "defaultValue": "DOUT1"
+    },
+    {
+      "name": "dout_label_label",
+      "type": "string",
+      "defaultValue": "DOUT1 label:"
+    },
+    {
       "name": "ain_channels",
       "type": "list",
-      "defaultValue": "[\n  { \"analog_input_label\": \"AIN1\", \"analog_input_value\": \"1.0 V\" },\n  { \"analog_input_label\": \"AIN2\", \"analog_input_value\": \"2.0 V\" },\n  { \"analog_input_label\": \"AIN3\", \"analog_input_value\": \"3.0 V\" },\n  { \"analog_input_label\": \"AIN4\", \"analog_input_value\": \"4.0 V\" }\n]"
+      "defaultValue": "[\n  { \"analog_input_label\": \"AIN1\", \"analog_input_value\": \"1.0 V\", \"ain_label_label\": \"AIN1 label:\", \"ain_label\": \"AIN1\" },\n  { \"analog_input_label\": \"AIN2\", \"analog_input_value\": \"2.0 V\", \"ain_label_label\": \"AIN2 label:\", \"ain_label\": \"AIN2\" },\n  { \"analog_input_label\": \"AIN3\", \"analog_input_value\": \"3.0 V\", \"ain_label_label\": \"AIN3 label:\", \"ain_label\": \"AIN3\" },\n  { \"analog_input_label\": \"AIN4\", \"analog_input_value\": \"4.0 V\", \"ain_label_label\": \"AIN4 label:\", \"ain_label\": \"AIN4\" }\n]"
     },
     {
       "name": "ain_label",
       "type": "string",
       "defaultValue": "AIN1"
+    },
+    {
+      "name": "ain_label_label",
+      "type": "string",
+      "defaultValue": "AIN1 label:"
     },
     {
       "name": "ain_value",
@@ -119,12 +154,17 @@
     {
       "name": "aout_channels",
       "type": "list",
-      "defaultValue": "[\n  { \"analog_output_label\": \"AO1\", \"analog_output_value\": \"2.1 V\", \"aout_channel_has_settings\": 1 },\n  { \"analog_output_label\": \"AO2\", \"analog_output_value\": \"2.2 V\", \"aout_channel_has_settings\": 1 },\n  { \"analog_output_label\": \"AO3\", \"analog_output_value\": \"2.3 V\", \"aout_channel_has_settings\": 0 },\n  { \"analog_output_label\": \"AO4\", \"analog_output_value\": \"2.4 V\", \"aout_channel_has_settings\": 0 }\n]"
+      "defaultValue": "[\n  { \"analog_output_label\": \"AO1\", \"analog_output_value\": \"2.1 V\", \"aout_channel_has_settings\": 1, \"aout_label_label\": \"AOUT1 label:\", \"aout_label\": \"AOUT1\" },\n  { \"analog_output_label\": \"AO2\", \"analog_output_value\": \"2.2 V\", \"aout_channel_has_settings\": 1, \"aout_label_label\": \"AOUT2 label:\", \"aout_label\": \"AOUT2\" },\n  { \"analog_output_label\": \"AO3\", \"analog_output_value\": \"2.3 V\", \"aout_channel_has_settings\": 0, \"aout_label_label\": \"AOUT3 label:\", \"aout_label\": \"AOUT3\" },\n  { \"analog_output_label\": \"AO4\", \"analog_output_value\": \"2.4 V\", \"aout_channel_has_settings\": 0, \"aout_label_label\": \"AOUT4 label:\", \"aout_label\": \"AOUT4\" }\n]"
     },
     {
       "name": "aout_label",
       "type": "string",
       "defaultValue": "AO1"
+    },
+    {
+      "name": "aout_label_label",
+      "type": "string",
+      "defaultValue": "AOUT1 label:"
     },
     {
       "name": "aout_value",
@@ -160,12 +200,17 @@
     {
       "name": "pwm_channels",
       "type": "list",
-      "defaultValue": "[\n  { \"pwm_label\": \"PWM1\", \"pwm_freq\": \"100 Hz\", \"pwm_duty\": \"80 %\" },\n  { \"pwm_label\": \"PWM2\", \"pwm_freq\": \"1.2 KHz\", \"pwm_duty\": \"50 %\" }\n]"
+      "defaultValue": "[\n  { \"pwm_label\": \"PWM1\", \"pwm_freq\": \"100 Hz\", \"pwm_duty\": \"80 %\", \"pwm_label_label\": \"PWM1 label:\", \"pwm_label\": \"PWM1\" },\n  { \"pwm_label\": \"PWM2\", \"pwm_freq\": \"1.2 KHz\", \"pwm_duty\": \"50 %\", \"pwm_label_label\": \"PWM2 label:\", \"pwm_label\": \"PWM2\" }\n]\n"
     },
     {
       "name": "pwm_label",
       "type": "string",
       "defaultValue": "PWM1"
+    },
+    {
+      "name": "pwm_label_label",
+      "type": "string",
+      "defaultValue": "PWM1 label:"
     },
     {
       "name": "pwm_freq",
@@ -209,6 +254,9 @@
       "name": "ain_select_range"
     },
     {
+      "name": "ain_change_label"
+    },
+    {
       "name": "aout_toggle_output_enabled"
     },
     {
@@ -224,10 +272,31 @@
       "name": "aout_show_configuration"
     },
     {
+      "name": "aout_change_label"
+    },
+    {
       "name": "show_info"
     },
     {
       "name": "show_calibration"
+    },
+    {
+      "name": "show_channel_labels"
+    },
+    {
+      "name": "show_din_channel_labels"
+    },
+    {
+      "name": "show_dout_channel_labels"
+    },
+    {
+      "name": "change_din_label"
+    },
+    {
+      "name": "change_dout_label"
+    },
+    {
+      "name": "pwm_change_label"
     }
   ],
   "gui": {
@@ -612,8 +681,7 @@
                   "type": "Text",
                   "style": {
                     "inheritFrom": "default_S_left",
-                    "font": "RobotoCondensed-Regular",
-                    "alignHorizontal": "right"
+                    "font": "RobotoCondensed-Regular"
                   },
                   "data": "aout_label",
                   "left": 0,
@@ -1864,9 +1932,9 @@
               "font": "Oswald14"
             },
             "action": "change_slot_label",
-            "left": 7,
-            "top": 37,
-            "width": 144,
+            "left": 8,
+            "top": 39,
+            "width": 142,
             "height": 32,
             "text": "Change label"
           },
@@ -1877,11 +1945,24 @@
               "font": "Oswald14"
             },
             "action": "show_slot_color_picker",
-            "left": 7,
-            "top": 74,
-            "width": 144,
+            "left": 8,
+            "top": 77,
+            "width": 142,
             "height": 32,
             "text": "Pick color"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "option_toggle_L_center",
+              "font": "Oswald14"
+            },
+            "action": "show_channel_labels",
+            "left": 8,
+            "top": 115,
+            "width": 142,
+            "height": 32,
+            "text": "Channel labels"
           },
           {
             "type": "Rectangle",
@@ -1921,6 +2002,618 @@
         "top": 0,
         "width": 158,
         "height": 238
+      },
+      {
+        "name": "channel_labels",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 240,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "show_din_channel_labels",
+                "left": 32,
+                "top": 6,
+                "width": 200,
+                "height": 32,
+                "text": "DIN labels"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "show_dout_channel_labels",
+                "left": 240,
+                "top": 6,
+                "width": 200,
+                "height": 32,
+                "text": "DOUT labels"
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 32,
+                "top": 43,
+                "width": 408,
+                "height": 2
+              },
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "ain_channels",
+                "left": 32,
+                "top": 50,
+                "width": 200,
+                "height": 144,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 200,
+                  "height": 36,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
+                      },
+                      "data": "ain_label_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "option_toggle_L_center",
+                        "font": "Oswald14"
+                      },
+                      "data": "ain_label",
+                      "action": "ain_change_label",
+                      "left": 100,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "aout_channels",
+                "left": 240,
+                "top": 50,
+                "width": 200,
+                "height": 144,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 200,
+                  "height": 36,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
+                      },
+                      "data": "aout_label_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "option_toggle_L_center",
+                        "font": "Oswald14"
+                      },
+                      "data": "aout_label",
+                      "action": "aout_change_label",
+                      "left": 100,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 32,
+                "top": 196,
+                "width": 408,
+                "height": 2
+              },
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "pwm_channels",
+                "left": 32,
+                "top": 202,
+                "width": 416,
+                "height": 36,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 208,
+                  "height": 36,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
+                      },
+                      "data": "pwm_label_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "option_toggle_L_center",
+                        "font": "Oswald14"
+                      },
+                      "data": "pwm_label",
+                      "action": "pwm_change_label",
+                      "left": 100,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title",
+                  "alignHorizontal": "center"
+                },
+                "data": "labels_and_colors_page_slot_title",
+                "left": 41,
+                "top": 0,
+                "width": 140,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 181,
+                "top": 0,
+                "width": 299,
+                "height": 32,
+                "text": "Channel labels"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272,
+        "dataContextOverrides": ""
+      },
+      {
+        "name": "din_channel_labels",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 240,
+            "widgets": [
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "din_pins_1_4",
+                "left": 32,
+                "top": 50,
+                "width": 208,
+                "height": 144,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 208,
+                  "height": 36,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
+                      },
+                      "data": "din_label_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "option_toggle_L_center",
+                        "font": "Oswald14"
+                      },
+                      "data": "din_label",
+                      "action": "change_din_label",
+                      "left": 100,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "din_pins_5_8",
+                "left": 240,
+                "top": 50,
+                "width": 208,
+                "height": 144,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 208,
+                  "height": 36,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
+                      },
+                      "data": "din_label_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "option_toggle_L_center",
+                        "font": "Oswald14"
+                      },
+                      "data": "din_label",
+                      "action": "change_din_label",
+                      "left": 100,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title",
+                  "alignHorizontal": "center"
+                },
+                "data": "labels_and_colors_page_slot_title",
+                "left": 41,
+                "top": 0,
+                "width": 140,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 181,
+                "top": 0,
+                "width": 299,
+                "height": 32,
+                "text": "DIN Channel labels"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272,
+        "dataContextOverrides": ""
+      },
+      {
+        "name": "dout_channel_labels",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 240,
+            "widgets": [
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "dout_pins_1_4",
+                "left": 32,
+                "top": 50,
+                "width": 208,
+                "height": 144,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 208,
+                  "height": 36,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
+                      },
+                      "data": "dout_label_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "option_toggle_L_center",
+                        "font": "Oswald14"
+                      },
+                      "data": "dout_label",
+                      "action": "change_dout_label",
+                      "left": 100,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Grid",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "dout_pins_5_8",
+                "left": 240,
+                "top": 50,
+                "width": 208,
+                "height": 144,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 208,
+                  "height": 36,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_S_left",
+                        "font": "Oswald14"
+                      },
+                      "data": "dout_label_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "option_toggle_L_center",
+                        "font": "Oswald14"
+                      },
+                      "data": "dout_label",
+                      "action": "change_dout_label",
+                      "left": 100,
+                      "top": 0,
+                      "width": 100,
+                      "height": 32,
+                      "text": ""
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_previous_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "E"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title",
+                  "alignHorizontal": "center"
+                },
+                "data": "labels_and_colors_page_slot_title",
+                "left": 41,
+                "top": 0,
+                "width": 140,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 181,
+                "top": 0,
+                "width": 299,
+                "height": 32,
+                "text": "DOUT Channel labels"
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272,
+        "dataContextOverrides": ""
       },
       {
         "name": "settings",
@@ -3740,6 +4433,19 @@
                 "width": 176,
                 "height": 32,
                 "displayOption": 0
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "show_channel_labels",
+                "left": 0,
+                "top": 180,
+                "width": 142,
+                "height": 32,
+                "text": "Channel labels"
               }
             ]
           },
@@ -3796,20 +4502,6 @@
                 "text": "Information"
               }
             ]
-          },
-          {
-            "type": "MultilineText",
-            "style": {
-              "inheritFrom": "option_toggle_L_center",
-              "font": "Oswald14"
-            },
-            "left": 0,
-            "top": 180,
-            "width": 144,
-            "height": 56,
-            "text": "Channel labels\\nand colors",
-            "firstLineIndent": 4,
-            "hangingIndent": 0
           }
         ],
         "left": 0,

@@ -271,7 +271,7 @@ void getParentDir(const char *path, char *parentDirPath) {
 
 bool parseMacAddress(const char *macAddressStr, size_t macAddressStrLength, uint8_t *macAddress) {
     int state = 0;
-    int a;
+    int a = 0;
     int i = 0;
     uint8_t resultMacAddress[6];
 

@@ -79,7 +79,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     int chartZoom;
 
     auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
-    ChSettingsCalibrationViewPage *viewPage;
+    ChSettingsCalibrationViewPage *viewPage = nullptr;
     if (editPage) {
         calibrationValueType = editPage->getCalibrationValueType();
         dacValue = editPage->getChannelDacValue();

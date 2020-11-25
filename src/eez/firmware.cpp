@@ -95,10 +95,6 @@ void boot() {
     //mcu::sdram::test();
 #endif
 
-#if OPTION_DISPLAY
-    gui::startThread();
-#endif
-
 #ifdef EEZ_PLATFORM_SIMULATOR
     eez::psu::simulator::init();
 #endif
@@ -196,6 +192,7 @@ void boot() {
     psu::persist_conf::initChannels();
 
 #if OPTION_DISPLAY
+    gui::startThread();
     psu::gui::showWelcomePage();
 #endif
 

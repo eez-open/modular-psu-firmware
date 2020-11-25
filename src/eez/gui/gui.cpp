@@ -83,6 +83,13 @@ void mainLoop(const void *) {
 	oneIter();
 #else
     while (1) {
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+    if (g_shutdown) {
+        break;
+    }
+#endif
+
         oneIter();
     }
 #endif

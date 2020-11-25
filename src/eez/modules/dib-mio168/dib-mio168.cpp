@@ -39,7 +39,9 @@
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/gui/psu.h>
 #include "eez/modules/psu/gui/keypad.h"
+#include "eez/modules/psu/gui/labels_and_colors.h"
 #include "eez/modules/psu/gui/edit_mode.h"
+#include "eez/modules/psu/gui/animations.h"
 #include <eez/modules/bp3c/comm.h>
 #include <eez/modules/bp3c/flash_slave.h>
 
@@ -91,6 +93,8 @@ static float AOUT_DAC7563_ENCODER_STEP_VALUES_CAL[] = { 0.001f, 0.01f, 0.02f, 0.
 
 static float PWM_MIN_FREQUENCY = 0.1f;
 static float PWM_MAX_FREQUENCY = 1000000.0f;
+
+static const size_t CHANNEL_LABEL_MAX_LENGTH = 5;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -180,41 +184,58 @@ struct DinChannel : public MioChannel {
     // 0 - FAST, 1 - SLOW
     uint8_t m_pinSpeeds = 0;
 
+    char m_pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+
     struct ProfileParameters {
         uint8_t pinRanges;
         uint8_t pinSpeeds;
+        char pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
     };
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
         parameters.pinRanges = 0;
         parameters.pinSpeeds = 0;
+        memset(parameters.pinLabels, 0, sizeof(m_pinLabels));
     }
 
     void getProfileParameters(ProfileParameters &parameters) {
         parameters.pinRanges = m_pinRanges;
         parameters.pinSpeeds = m_pinSpeeds;
+        memcpy(parameters.pinLabels, m_pinLabels, sizeof(m_pinLabels));
     }
 
     void setProfileParameters(ProfileParameters &parameters) {
         m_pinRanges = parameters.pinRanges;
         m_pinSpeeds = parameters.pinSpeeds;
+        memcpy(m_pinLabels, parameters.pinLabels, sizeof(m_pinLabels));
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, ProfileParameters &parameters) {
         WRITE_PROPERTY("din_pinRanges", parameters.pinRanges);
         WRITE_PROPERTY("din_pinSpeeds", parameters.pinSpeeds);
+        for (int i = 0; i < 8; i++) {
+            char propName[32];
+            sprintf(propName, "din_pin%dLabel", i);
+            WRITE_PROPERTY(propName, parameters.pinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1));
+        }
         return true;
     }
 
     bool readProfileProperties(psu::profile::ReadContext &ctx, ProfileParameters &parameters) {
         READ_PROPERTY("din_pinRanges", parameters.pinRanges);
         READ_PROPERTY("din_pinSpeeds", parameters.pinSpeeds);
+        for (int i = 0; i < 8; i++) {
+            char propName[32];
+            sprintf(propName, "din_pin%dLabel", i);
+            READ_STRING_PROPERTY(propName, parameters.pinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), CHANNEL_LABEL_MAX_LENGTH);
+        }
         return false;
     }
 
     void resetConfiguration() {
         m_pinRanges = 0;
         m_pinSpeeds = 0;
+        memset(&m_pinLabels, 0, sizeof(m_pinLabels));
     }
 
     uint8_t getDigitalInputData() {
@@ -237,34 +258,51 @@ struct DinChannel : public MioChannel {
 struct DoutChannel : public MioChannel {
     uint8_t m_pinStates = 0;
 
-     struct ProfileParameters {
+    char m_pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+    
+    struct ProfileParameters {
         uint8_t pinStates;
+        char pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
     };
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
         parameters.pinStates = 0;
+        memset(parameters.pinLabels, 0, sizeof(m_pinLabels));
     }
 
     void getProfileParameters(ProfileParameters &parameters) {
         parameters.pinStates = m_pinStates;
+        memcpy(parameters.pinLabels, m_pinLabels, sizeof(m_pinLabels));
     }
 
     void setProfileParameters(ProfileParameters &parameters) {
         m_pinStates = parameters.pinStates;
+        memcpy(m_pinLabels, parameters.pinLabels, sizeof(m_pinLabels));
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, ProfileParameters &parameters) {
         WRITE_PROPERTY("dout_pinStates", parameters.pinStates);
+        for (int i = 0; i < 8; i++) {
+            char propName[32];
+            sprintf(propName, "dout_pin%dLabel", i);
+            WRITE_PROPERTY(propName, parameters.pinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1));
+        }
         return true;
     }
 
     bool readProfileProperties(psu::profile::ReadContext &ctx, ProfileParameters &parameters) {
         READ_PROPERTY("dout_pinStates", parameters.pinStates);
+        for (int i = 0; i < 8; i++) {
+            char propName[32];
+            sprintf(propName, "dout_pin%dLabel", i);
+            READ_STRING_PROPERTY(propName, parameters.pinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), CHANNEL_LABEL_MAX_LENGTH);
+        }
         return false;
     }
 
    void resetConfiguration() {
         m_pinStates = 0;
+        memset(&m_pinLabels, 0, sizeof(m_pinLabels));
     }
 
     uint8_t getDigitalOutputData() {
@@ -293,29 +331,34 @@ struct AinChannel : public MioChannel {
     uint8_t m_mode = 1;
     uint8_t m_range = 0;
     uint8_t m_tempSensorBias = 0;
+    char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
 
     struct ProfileParameters {
         uint8_t mode;
         uint8_t range;
         uint8_t tempSensorBias;
+        char label[CHANNEL_LABEL_MAX_LENGTH + 1];
     };
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
         parameters.mode = 1;
         parameters.range = 0;
         parameters.tempSensorBias = 0;
+        *parameters.label = 0;
     }
 
     void getProfileParameters(ProfileParameters &parameters) {
         parameters.mode = m_mode;
         parameters.range = m_range;
         parameters.tempSensorBias = m_tempSensorBias;
+        memcpy(parameters.label, m_label, sizeof(m_label));
     }
 
     void setProfileParameters(ProfileParameters &parameters) {
         m_mode = parameters.mode;
         m_range = parameters.range;
         m_tempSensorBias = parameters.tempSensorBias;
+        memcpy(m_label, parameters.label, sizeof(m_label));
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
@@ -329,6 +372,12 @@ struct AinChannel : public MioChannel {
 
         sprintf(propName, "ain_%d_tempSensorBias", i+1);
         WRITE_PROPERTY(propName, parameters.tempSensorBias);
+
+        sprintf(propName, "ain_%d_tempSensorBias", i+1);
+        WRITE_PROPERTY(propName, parameters.tempSensorBias);
+
+        sprintf(propName, "ain_%d_label", i+1);
+        WRITE_PROPERTY(propName, parameters.label);
 
         return true;
     }
@@ -345,6 +394,9 @@ struct AinChannel : public MioChannel {
         sprintf(propName, "ain_%d_tempSensorBias", i+1);
         READ_PROPERTY(propName, parameters.tempSensorBias);
 
+        sprintf(propName, "ain_%d_label", i+1);
+        READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
+
         return false;
     }
 
@@ -352,6 +404,7 @@ struct AinChannel : public MioChannel {
         m_mode = 1;
         m_range = 0;
         m_tempSensorBias = 0;
+        *m_label = 0;
     }
 
     float convertU16Value(uint16_t value) {
@@ -422,6 +475,8 @@ struct AoutDac7760Channel : public MioChannel {
     CalConf calConf[7];
     bool ongoingCal = false;
 
+    char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
+
     AoutDac7760Channel() {
         memset(calConf, 0, sizeof(CalConf));
     }
@@ -433,6 +488,7 @@ struct AoutDac7760Channel : public MioChannel {
         uint8_t voltageRange;
         float currentValue;
         float voltageValue;
+        char label[CHANNEL_LABEL_MAX_LENGTH + 1];
     };
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
@@ -442,6 +498,7 @@ struct AoutDac7760Channel : public MioChannel {
         parameters.voltageRange = 0;
         parameters.currentValue = 0;
         parameters.voltageValue = 0;
+        *parameters.label = 0;
     }
 
     void getProfileParameters(ProfileParameters &parameters) {
@@ -451,6 +508,7 @@ struct AoutDac7760Channel : public MioChannel {
         parameters.voltageRange = m_voltageRange;
         parameters.currentValue = m_currentValue;
         parameters.voltageValue = m_voltageValue;
+        memcpy(parameters.label, m_label, sizeof(m_label));
     }
 
     void setProfileParameters(ProfileParameters &parameters) {
@@ -460,6 +518,7 @@ struct AoutDac7760Channel : public MioChannel {
         m_voltageRange = parameters.voltageRange;
         m_currentValue = parameters.currentValue;
         m_voltageValue = parameters.voltageValue;
+        memcpy(m_label, parameters.label, sizeof(m_label));
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
@@ -482,6 +541,9 @@ struct AoutDac7760Channel : public MioChannel {
 
         sprintf(propName, "aout_dac7760_%d_voltageValue", i+1);
         WRITE_PROPERTY(propName, parameters.voltageValue);
+
+        sprintf(propName, "aout_dac7760_%d_label", i+1);
+        WRITE_PROPERTY(propName, parameters.label);
 
         return true;
     }
@@ -507,6 +569,9 @@ struct AoutDac7760Channel : public MioChannel {
         sprintf(propName, "aout_dac7760_%d_voltageValue", i+1);
         READ_PROPERTY(propName, parameters.voltageValue);
 
+        sprintf(propName, "aout_dac7760_%d_label", i+1);
+        READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
+
         return false;
     }
 
@@ -517,6 +582,7 @@ struct AoutDac7760Channel : public MioChannel {
         m_voltageRange = 0;
         m_currentValue = 0;
         m_voltageValue = 0;
+        *m_label = 0;
     }
 
     SourceMode getMode() {
@@ -704,12 +770,15 @@ struct AoutDac7563Channel : public MioChannel {
     bool ongoingCal = false;
     CalConf calConf;
 
+    char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
+
     AoutDac7563Channel() {
         memset(&calConf, 0, sizeof(CalConf));
     }
 
     struct ProfileParameters {
         float value;
+        char label[CHANNEL_LABEL_MAX_LENGTH + 1];
     };
 
     float getCalibratedValue() {
@@ -718,14 +787,17 @@ struct AoutDac7563Channel : public MioChannel {
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
         parameters.value = 0;
+        *parameters.label = 0;
     }
 
     void getProfileParameters(ProfileParameters &parameters) {
         parameters.value = m_value;
+        memcpy(parameters.label, m_label, sizeof(m_label));
     }
 
     void setProfileParameters(ProfileParameters &parameters) {
         m_value = parameters.value;
+        memcpy(m_label, parameters.label, sizeof(m_label));
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
@@ -733,6 +805,9 @@ struct AoutDac7563Channel : public MioChannel {
 
         sprintf(propName, "aout_dac7563_%d_value", i+1);
         WRITE_PROPERTY(propName, parameters.value);
+
+        sprintf(propName, "aout_dac7563_%d_label", i+1);
+        WRITE_PROPERTY(propName, parameters.label);
 
         return true;
     }
@@ -743,11 +818,15 @@ struct AoutDac7563Channel : public MioChannel {
         sprintf(propName, "aout_dac7563_%d_value", i+1);
         READ_PROPERTY(propName, parameters.value);
 
+        sprintf(propName, "aout_dac7563_%d_label", i+1);
+        READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
+
         return false;
     }
 
     void resetConfiguration() {
         m_value = 0;
+        *m_label = 0;
     }
 
     float getResolution() {
@@ -781,29 +860,30 @@ struct PwmChannel : public MioChannel {
     float m_freq = 0;
     float m_duty = 0;
 
+    char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
+
     struct ProfileParameters {
         float freq;
         float duty;
+        char label[CHANNEL_LABEL_MAX_LENGTH + 1];
     };
     
     void resetProfileToDefaults(ProfileParameters &parameters) {
         parameters.freq = 0;
         parameters.duty = 0;
+        *parameters.label = 0;
     }
 
     void getProfileParameters(ProfileParameters &parameters) {
         parameters.freq = m_freq;
         parameters.duty = m_duty;
+        memcpy(parameters.label, m_label, sizeof(m_label));
     }
 
     void setProfileParameters(ProfileParameters &parameters) {
         m_freq = parameters.freq;
         m_duty = parameters.duty;
-    }
-
-    void resetConfiguration() {
-        m_freq = 0;
-        m_duty = 0;
+        memcpy(m_label, parameters.label, sizeof(m_label));
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
@@ -814,6 +894,9 @@ struct PwmChannel : public MioChannel {
 
         sprintf(propName, "pwm_%d_duty", i+1);
         WRITE_PROPERTY(propName, parameters.duty);
+
+        sprintf(propName, "pwm_%d_label", i+1);
+        WRITE_PROPERTY(propName, parameters.label);
 
         return true;
     }
@@ -827,7 +910,16 @@ struct PwmChannel : public MioChannel {
         sprintf(propName, "pwm_%d_duty", i+1);
         READ_PROPERTY(propName, parameters.duty);
 
+        sprintf(propName, "pwm_%d_label", i+1);
+        READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
+
         return false;
+    }
+
+    void resetConfiguration() {
+        m_freq = 0;
+        m_duty = 0;
+        *m_label = 0;
     }
 };
 
@@ -992,6 +1084,22 @@ public:
     }
 
     Page *getPageFromId(int pageId) override;
+
+    virtual void animatePageAppearance(int previousPageId, int activePageId) {
+        if (
+            (previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS && activePageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS) ||
+            (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_DIN_CHANNEL_LABELS) ||
+            (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_DOUT_CHANNEL_LABELS)
+        ) {
+            psu::gui::animateSettingsSlideLeft(true);
+        } else if (
+            (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS) ||
+            (previousPageId == PAGE_ID_DIB_MIO168_DIN_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS) ||
+            (previousPageId == PAGE_ID_DIB_MIO168_DOUT_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS)
+        ) {
+            psu::gui::animateSettingsSlideRight(true);
+        }
+    }
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
@@ -1185,6 +1293,203 @@ public:
         for (int i = 0; i < 2; i++) {
             pwmChannels[i].resetConfiguration();
         }
+    }
+
+    size_t getChannelLabelMaxLength(int subchannelIndex) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX || subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            return 8 * (CHANNEL_LABEL_MAX_LENGTH + 1);
+        }
+        return CHANNEL_LABEL_MAX_LENGTH;
+    }
+
+    eez_err_t getChannelLabel(int subchannelIndex, const char *&label) override {
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            label = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_label;
+            return SCPI_RES_OK;
+        }
+
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            label = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_label;
+            return SCPI_RES_OK;
+        }
+
+        if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            label = aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].m_label;
+            return SCPI_RES_OK;
+        }
+
+        if (subchannelIndex >= PWM_1_SUBCHANNEL_INDEX && subchannelIndex <= PWM_2_SUBCHANNEL_INDEX) {
+            label = pwmChannels[subchannelIndex - PWM_1_SUBCHANNEL_INDEX].m_label;
+            return SCPI_RES_OK;
+        }
+
+        return SCPI_ERROR_HARDWARE_MISSING;
+    }
+
+    const char *getChannelLabel(int subchannelIndex) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+            return dinChannel.m_pinLabels;
+        } 
+        if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            return doutChannel.m_pinLabels;
+        }
+
+        const char *label;
+        auto err = getChannelLabel(subchannelIndex, label);
+        if (err == SCPI_RES_OK) {
+            return label;
+        } 
+        return "";
+    }
+
+    const char *getDefaultChannelLabel(int subchannelIndex) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+            return "DIN1\0\0DIN2\0\0DIN3\0\0DIN4\0\0DIN5\0\0DIN6\0\0DIN7\0\0DIN8\0\0";
+        } 
+        if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            return "DOUT1\0DOUT2\0DOUT3\0DOUT4\0DOUT5\0DOUT6\0DOUT7\0DOUT8\0";
+        }
+        if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
+            return "AIN1";
+        }
+        if (subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+            return "AIN2";
+        }
+        if (subchannelIndex == AIN_3_SUBCHANNEL_INDEX) {
+            return "AIN3";
+        }
+        if (subchannelIndex == AIN_4_SUBCHANNEL_INDEX) {
+            return "AIN4";
+        }
+        if (subchannelIndex == AOUT_1_SUBCHANNEL_INDEX) {
+            return "AOUT1";
+        }
+        if (subchannelIndex == AOUT_2_SUBCHANNEL_INDEX) {
+            return "AOUT2";
+        }
+        if (subchannelIndex == AOUT_3_SUBCHANNEL_INDEX) {
+            return "AOUT3";
+        }
+        if (subchannelIndex == AOUT_4_SUBCHANNEL_INDEX) {
+            return "AOUT4";
+        }
+        if (subchannelIndex == PWM_1_SUBCHANNEL_INDEX) {
+            return "PWM1";
+        }
+        if (subchannelIndex == PWM_2_SUBCHANNEL_INDEX) {
+            return "PWM2";
+        }
+        return "";
+    }
+
+    eez_err_t setChannelLabel(int subchannelIndex, const char *label, int length) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+            if (length != -1) {
+                return SCPI_ERROR_HARDWARE_MISSING;
+            }
+            memcpy(dinChannel.m_pinLabels, label, 8 * (CHANNEL_LABEL_MAX_LENGTH + 1));
+            return SCPI_RES_OK;
+        }
+        
+        if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            if (length != -1) {
+                return SCPI_ERROR_HARDWARE_MISSING;
+            }
+            memcpy(doutChannel.m_pinLabels, label, 8 * (CHANNEL_LABEL_MAX_LENGTH + 1));
+            return SCPI_RES_OK;
+        } 
+
+        if (length == -1) {
+            length = strlen(label);
+        }
+
+        int maxLength = getChannelLabelMaxLength(subchannelIndex);
+        if (length > maxLength) {
+            length = maxLength;
+        }
+        
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            strncpy(ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_label, label, length);
+            ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_label[length] = 0;
+            return SCPI_RES_OK;
+        }
+        
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            strncpy(aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_label, label, length);
+            aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_label[length] = 0;
+            return SCPI_RES_OK;
+        }
+        
+        if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            strncpy(aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].m_label, label, length);
+            aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].m_label[length] = 0;
+            return SCPI_RES_OK;
+        }
+        
+        if (subchannelIndex >= PWM_1_SUBCHANNEL_INDEX && subchannelIndex <= PWM_2_SUBCHANNEL_INDEX) {
+            strncpy(pwmChannels[subchannelIndex - PWM_1_SUBCHANNEL_INDEX].m_label, label, length);
+            pwmChannels[subchannelIndex - PWM_1_SUBCHANNEL_INDEX].m_label[length] = 0;
+            return SCPI_RES_OK;
+        }
+
+        return SCPI_ERROR_HARDWARE_MISSING;
+    }
+
+    size_t getChannelPinLabelMaxLength(int subchannelIndex, int pin) override {
+        return CHANNEL_LABEL_MAX_LENGTH;
+    }
+
+    const char *getDefaultChannelPinLabel(int subchannelIndex, int pin) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX || subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            if (pin >= 1 && pin <= 8) {
+                const char *label = getDefaultChannelLabel(subchannelIndex);
+                return label + (pin - 1) * (CHANNEL_LABEL_MAX_LENGTH + 1);
+            }
+        }
+        return "";
+    }
+
+    eez_err_t getChannelPinLabel(int subchannelIndex, int pin, const char *&label) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX || subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            if (pin >= 1 && pin <= 8) {
+                const char *channelLabel = getChannelLabel(subchannelIndex);
+                label = channelLabel + (pin - 1) * (CHANNEL_LABEL_MAX_LENGTH + 1);
+                return SCPI_RES_OK;
+            }
+        }
+        return SCPI_ERROR_HARDWARE_MISSING;
+    }
+
+    eez_err_t setChannelPinLabel(int subchannelIndex, int pin, const char *label, int length) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX || subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            if (pin >= 1 && pin <= 8) {
+                if (length == -1) {
+                    length = strlen(label);
+                }
+
+                auto maxLength = getChannelPinLabelMaxLength(subchannelIndex, pin);
+                if (length > (int)maxLength) {
+                    length = maxLength;
+                }
+
+                const char *channelLabel = getChannelLabel(subchannelIndex);
+                char *pinLabel = (char *)(channelLabel + (pin - 1) * (CHANNEL_LABEL_MAX_LENGTH + 1));
+
+                strncpy(pinLabel, label, length);
+                pinLabel[length] = 0;
+
+                return SCPI_RES_OK;
+            }
+        }
+        return SCPI_ERROR_HARDWARE_MISSING;
+    }
+
+    const char *getPinLabelOrDefault(char subchannelIndex, int pin) {
+        const char *label = getChannelLabel(subchannelIndex) + pin * (CHANNEL_LABEL_MAX_LENGTH + 1);
+        if (*label) {
+            return label;
+        }
+        return getDefaultChannelLabel(subchannelIndex) + pin * (CHANNEL_LABEL_MAX_LENGTH + 1);
     }
 
     bool getDigitalInputData(int subchannelIndex, uint8_t &data, int *err) override {
@@ -1625,7 +1930,7 @@ public:
 
     bool saveChannelCalibration(int subchannelIndex, int *err) override {
         CalConf *calConf = nullptr;
-        int calConfIndex;
+        int calConfIndex = 0;
 
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             int dac7760ChannelIndex = subchannelIndex - AOUT_1_SUBCHANNEL_INDEX;
@@ -2117,6 +2422,35 @@ namespace gui {
 
 using namespace dib_mio168;
 
+////////////////////////////////////////////////////////////////////////////////
+
+const char *getPinLabel(int subchannelIndex, Cursor cursor) {
+    int slotIndex = cursor / 8;
+    int pinIndex = cursor % 8;
+
+    if (isPageOnStack(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS)) {
+        const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, subchannelIndex);
+        const char *pinLabel = label + pinIndex * (CHANNEL_LABEL_MAX_LENGTH + 1);
+        if (!*pinLabel) {
+            pinLabel = g_slots[slotIndex]->getDefaultChannelLabel(subchannelIndex) + pinIndex * (CHANNEL_LABEL_MAX_LENGTH + 1);
+        }
+        return pinLabel;
+    } else {
+        return ((Mio168Module *)g_slots[slotIndex])->getPinLabelOrDefault(subchannelIndex, pinIndex);
+    }
+}
+
+const char *getChannelLabel(int slotIndex, int subchannelIndex) {
+    auto module = (Mio168Module *)g_slots[slotIndex];
+    const char *label = module->getChannelLabel(subchannelIndex);
+    if (*label) {
+        return label;
+    }
+    return module->getDefaultChannelLabel(subchannelIndex);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void data_dib_mio168_din_pins(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 8;
@@ -2177,6 +2511,23 @@ void data_dib_mio168_din_speed(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
+void data_dib_mio168_din_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = getPinLabel(DIN_SUBCHANNEL_INDEX, cursor);
+    }
+}
+
+void data_dib_mio168_din_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        static const char *g_dinLabelLabels[8] = {
+            "DIN1 label:", "DIN2 label:", "DIN3 label:", "DIN4 label:",
+            "DIN5 label:", "DIN6 label:", "DIN7 label:", "DIN8 label:",
+        };
+        value = g_dinLabelLabels[cursor % 8];
+
+    }
+}
+
 void action_dib_mio168_din_select_speed() {
     uint8_t pin = getFoundWidgetAtDown().cursor % 8;
     g_dinConfigurationPage.setPinSpeed(pin, g_dinConfigurationPage.getPinSpeed(pin) ? 0 : 1);
@@ -2189,6 +2540,62 @@ void action_dib_mio168_din_show_configuration() {
     pushPage(PAGE_ID_DIB_MIO168_DIN_CONFIGURATION);
 }
 
+void action_dib_mio168_show_din_channel_labels() {
+    pushPage(PAGE_ID_DIB_MIO168_DIN_CHANNEL_LABELS);
+}
+
+static int g_editLabelSlotIndex;
+static int g_editSubchannelIndex;
+static int g_editLabelPinIndex;
+
+void onSetPinLabel(char *value) {
+    const char *label = LabelsAndColorsPage::getChannelLabel(g_editLabelSlotIndex, g_editSubchannelIndex);
+    char pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+    memcpy(pinLabels, label, 8 * (CHANNEL_LABEL_MAX_LENGTH + 1));
+
+    strcpy(pinLabels + g_editLabelPinIndex * (CHANNEL_LABEL_MAX_LENGTH + 1), value);
+    
+    LabelsAndColorsPage::setChannelLabel(g_editLabelSlotIndex, g_editSubchannelIndex, pinLabels);
+    
+    popPage();
+}
+
+void onSetPinDefaultLabel() {
+    const char *label = LabelsAndColorsPage::getChannelLabel(g_editLabelSlotIndex, g_editSubchannelIndex);
+    char pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+    memcpy(pinLabels, label, 8 * (CHANNEL_LABEL_MAX_LENGTH + 1));
+
+    *(pinLabels + g_editLabelPinIndex * (CHANNEL_LABEL_MAX_LENGTH + 1)) = 0;
+
+    LabelsAndColorsPage::setChannelLabel(g_editLabelSlotIndex, g_editSubchannelIndex, pinLabels);
+    popPage();
+}
+
+void editPinLabel(int subchannelIndex) {
+    int cursor = getFoundWidgetAtDown().cursor;
+    g_editLabelSlotIndex = cursor / 8;
+    g_editSubchannelIndex = subchannelIndex;
+    g_editLabelPinIndex = cursor % 8;
+
+    const char *label = LabelsAndColorsPage::getChannelLabel(g_editLabelSlotIndex, g_editSubchannelIndex);
+    const char *pinLabel = label + g_editLabelPinIndex * (CHANNEL_LABEL_MAX_LENGTH + 1);
+    const char *pinLabelOrDefault = pinLabel;
+    if (!*pinLabelOrDefault) {
+        pinLabelOrDefault = g_slots[g_editLabelSlotIndex]->getDefaultChannelLabel(g_editSubchannelIndex) + g_editLabelPinIndex * (CHANNEL_LABEL_MAX_LENGTH + 1);
+    }
+
+    Keypad::startPush(0, 
+        pinLabelOrDefault,
+        1, CHANNEL_LABEL_MAX_LENGTH,
+        false, 
+        onSetPinLabel, popPage, 
+        *pinLabel ? onSetPinDefaultLabel : nullptr);
+}
+
+void action_dib_mio168_change_din_label() {
+    editPinLabel(DIN_SUBCHANNEL_INDEX);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void data_dib_mio168_dout_pins(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2196,6 +2603,22 @@ void data_dib_mio168_dout_pins(DataOperationEnum operation, Cursor cursor, Value
         value = 8;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
         value = hmi::g_selectedSlotIndex * 8 + value.getInt();
+    }
+}
+
+void data_dib_mio168_dout_pins_1_4(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 4;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * 8 + value.getInt();
+    }
+}
+
+void data_dib_mio168_dout_pins_5_8(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 4;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * 8 + 4 + value.getInt();
     }
 }
 
@@ -2212,11 +2635,35 @@ void data_dib_mio168_dout_state(DataOperationEnum operation, Cursor cursor, Valu
     }
 }
 
+void data_dib_mio168_dout_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = getPinLabel(DOUT_SUBCHANNEL_INDEX, cursor);
+    }
+}
+
+void data_dib_mio168_dout_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        static const char *g_doutLabelLabels[8] = {
+            "DOUT1 label:", "DOUT2 label:", "DOUT3 label:", "DOUT4 label:",
+            "DOUT5 label:", "DOUT6 label:", "DOUT7 label:", "DOUT8 label:",
+        };
+        value = g_doutLabelLabels[cursor % 8];
+    }
+}
+
 void action_dib_mio168_dout_toggle_state() {
     int cursor = getFoundWidgetAtDown().cursor;
     auto mio168Module = (Mio168Module *)g_slots[cursor / 8];
     int pin = cursor % 8;
     mio168Module->doutChannel.setPinState(pin, !mio168Module->doutChannel.getPinState(pin));
+}
+
+void action_dib_mio168_show_dout_channel_labels() {
+    pushPage(PAGE_ID_DIB_MIO168_DOUT_CHANNEL_LABELS);
+}
+
+void action_dib_mio168_change_dout_label() {
+    editPinLabel(DOUT_SUBCHANNEL_INDEX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2231,15 +2678,35 @@ void data_dib_mio168_ain_channels(DataOperationEnum operation, Cursor cursor, Va
 
 void data_dib_mio168_ain_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        static const char *labels[4] = { "AIN1", "AIN2", "AIN3", "AIN4" };
-        int ainChannelIndex;
-        AinConfigurationPage *page = (AinConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AIN_CONFIGURATION);
-        if (page) {
-            ainChannelIndex = page->g_selectedChannelIndex - AIN_1_SUBCHANNEL_INDEX;
+        int slotIndex = cursor / 4;
+        int subchannelIndex = cursor % 4;
+
+        if (isPageOnStack(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS)) {
+            const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, AIN_1_SUBCHANNEL_INDEX + subchannelIndex);
+            if (*label) {
+                value = label;
+            } else {
+                value = g_slots[slotIndex]->getDefaultChannelLabel(AIN_1_SUBCHANNEL_INDEX + subchannelIndex);
+            }            
         } else {
-            ainChannelIndex = cursor % 4;
+            int ainChannelIndex;
+            AinConfigurationPage *page = (AinConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AIN_CONFIGURATION);
+            if (page) {
+                ainChannelIndex = page->g_selectedChannelIndex - AIN_1_SUBCHANNEL_INDEX;
+            } else {
+                ainChannelIndex = subchannelIndex;
+            }
+
+            value = getChannelLabel(slotIndex, AIN_1_SUBCHANNEL_INDEX + ainChannelIndex);
         }
-        value = labels[ainChannelIndex];
+    }
+}
+
+void data_dib_mio168_ain_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        static const char *g_inLabelLabels[4] = { "AIN1 label:", "AIN2 label:", "AIN3 label:", "AIN4 label:" };
+        value = g_inLabelLabels[cursor % 4];
+
     }
 }
 
@@ -2332,9 +2799,14 @@ void action_dib_mio168_ain_show_configuration() {
     pushPage(PAGE_ID_DIB_MIO168_AIN_CONFIGURATION);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+void action_dib_mio168_ain_change_label() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    int slotIndex = cursor / 4;
+    int subchannelIndex = cursor % 4;
+    LabelsAndColorsPage::editChannelLabel(slotIndex, AIN_1_SUBCHANNEL_INDEX + subchannelIndex);
+}
 
-static const char *aoutLabels[4] = { "AO1", "AO2", "AO3", "AO4" };
+////////////////////////////////////////////////////////////////////////////////
 
 void data_dib_mio168_aout_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
@@ -2346,22 +2818,40 @@ void data_dib_mio168_aout_channels(DataOperationEnum operation, Cursor cursor, V
 
 void data_dib_mio168_aout_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
+        int slotIndex = cursor / 4;
+        int subchannelIndex = cursor % 4;
 
-        int aoutChannelIndex;
-
-        AoutDac7760ConfigurationPage *page = (AoutDac7760ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION);
-        if (page) {
-            aoutChannelIndex = AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX;
-        } else {
-            AoutDac7563ConfigurationPage *page = (AoutDac7563ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION);
-            if (page) {
-                aoutChannelIndex = AoutDac7563ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX;
+        if (isPageOnStack(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS)) {
+            const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, AOUT_1_SUBCHANNEL_INDEX + subchannelIndex);
+            if (*label) {
+                value = label;
             } else {
-                aoutChannelIndex = cursor % 4;
-            }
-        }
+                value = g_slots[slotIndex]->getDefaultChannelLabel(AOUT_1_SUBCHANNEL_INDEX + subchannelIndex);
+            }            
+        } else {
+            int aoutChannelIndex;
 
-        value = aoutLabels[aoutChannelIndex];
+            AoutDac7760ConfigurationPage *page = (AoutDac7760ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION);
+            if (page) {
+                aoutChannelIndex = AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX;
+            } else {
+                AoutDac7563ConfigurationPage *page = (AoutDac7563ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION);
+                if (page) {
+                    aoutChannelIndex = AoutDac7563ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX;
+                } else {
+                    aoutChannelIndex = subchannelIndex;
+                }
+            }
+
+            value = getChannelLabel(slotIndex, AOUT_1_SUBCHANNEL_INDEX + aoutChannelIndex);
+        }
+    }
+}
+
+void data_dib_mio168_aout_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        static const char *g_aoutLabelLabels[4] = { "AOUT1 label:", "AOUT2 label:", "AOUT3 label:", "AOUT4 label:" };
+        value = g_aoutLabelLabels[cursor % 4];
     }
 }
 
@@ -2398,7 +2888,7 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Valu
             value = MakeValue(AOUT_DAC7563_MAX, UNIT_VOLT);
         }
     } else if (operation == DATA_OPERATION_GET_NAME) {
-        value = aoutLabels[aoutChannelIndex];
+        value = getChannelLabel(slotIndex, AOUT_1_SUBCHANNEL_INDEX + aoutChannelIndex);
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         if (aoutChannelIndex < 2) {
             auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
@@ -2533,6 +3023,13 @@ void data_dib_mio168_aout_channel_has_settings(DataOperationEnum operation, Curs
     }
 }
 
+void action_dib_mio168_aout_change_label() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    int slotIndex = cursor / 4;
+    int subchannelIndex = cursor % 4;
+    LabelsAndColorsPage::editChannelLabel(slotIndex, AOUT_1_SUBCHANNEL_INDEX + subchannelIndex);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void data_dib_mio168_pwm_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2545,9 +3042,26 @@ void data_dib_mio168_pwm_channels(DataOperationEnum operation, Cursor cursor, Va
 
 void data_dib_mio168_pwm_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        static const char *labels[2] = { "P1", "P2" };
-        static const char *labels2Col[2] = { "PWM1", "PWM2" };
-        value = g_isCol2Mode || persist_conf::isMaxView() ? labels2Col[cursor % 2] : labels[cursor % 2];
+        int slotIndex = cursor / 2;
+        int subchannelIndex = cursor % 2;
+
+        if (isPageOnStack(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS)) {
+            const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, PWM_1_SUBCHANNEL_INDEX + subchannelIndex);
+            if (*label) {
+                value = label;
+            } else {
+                value = g_slots[slotIndex]->getDefaultChannelLabel(PWM_1_SUBCHANNEL_INDEX + subchannelIndex);
+            }            
+        } else {
+            value = getChannelLabel(slotIndex, PWM_1_SUBCHANNEL_INDEX + subchannelIndex);
+        }        
+    }
+}
+
+void data_dib_mio168_pwm_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        static const char *g_pwmLabelLabels[2] = { "PWM1 label:", "PWM2 label:"};
+        value = g_pwmLabelLabels[cursor % 2];
     }
 }
 
@@ -2637,6 +3151,13 @@ void data_dib_mio168_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
     } 
 }
 
+void action_dib_mio168_pwm_change_label() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    int slotIndex = cursor / 2;
+    int subchannelIndex = cursor % 2;
+    LabelsAndColorsPage::editChannelLabel(slotIndex, PWM_1_SUBCHANNEL_INDEX + subchannelIndex);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void action_dib_mio168_show_info() {
@@ -2670,6 +3191,10 @@ void action_dib_mio168_show_calibration() {
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
 }
 
+void action_dib_mio168_show_channel_labels() {
+    hmi::selectSlot(getFoundWidgetAtDown().cursor);
+    pushPage(PAGE_ID_DIB_MIO168_CHANNEL_LABELS);
+}
 
 } // namespace gui
 

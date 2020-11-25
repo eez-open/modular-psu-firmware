@@ -2066,6 +2066,242 @@ scpi_result_t scpi_cmd_systemRelayCyclesQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+bool getLabelFromParam(scpi_t *context, const char *&label, size_t &labelLength, size_t maxLength) {
+    if (!SCPI_ParamCharacters(context, &label, &labelLength, true)) {
+        return false;
+    }
+
+    if (labelLength < 0 || labelLength > maxLength) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+        return false;
+    }
+
+    return true;
+}
+
+scpi_result_t scpi_cmd_systemSlotLabel(scpi_t *context) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
+        return SCPI_RES_ERR;
+    }
+
+    const char *label;
+    size_t labelLength;
+    if (!getLabelFromParam(context, label, labelLength, SLOT_LABEL_MAX_LENGTH)) {
+        return SCPI_RES_ERR;
+    }
+
+    module->setLabel(label, labelLength);
+
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemSlotLabelQ(scpi_t *context) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
+        return SCPI_RES_ERR;
+    }
+
+    const char *label = module->getLabelOrDefault();
+    SCPI_ResultText(context, label);
+
+    return SCPI_RES_OK;
+}
+
+bool getColorFromParam(scpi_t *context, uint8_t &color) {
+    int32_t colorIndex;
+    if (!SCPI_ParamInt(context, &colorIndex, TRUE)) {
+        return false;
+    }
+    if (colorIndex < 0 || colorIndex > 24) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+        return false;
+    }
+    color = (uint8_t)colorIndex;
+    return true;
+}
+
+scpi_result_t scpi_cmd_systemSlotColor(scpi_t *context) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
+        return SCPI_RES_ERR;
+    }
+
+    uint8_t color;
+    if (!getColorFromParam(context, color)) {
+        return SCPI_RES_ERR;
+    }
+
+    module->setColor(color);
+
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemSlotColorQ(scpi_t *context) {
+    auto module = getModuleFromSlotIndexParam(context);
+    if (!module) {
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt8(context, module->getColor());
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemChannelLabel(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    const char *label;
+    size_t labelLength;
+    if (!getLabelFromParam(context, label, labelLength, g_slots[slotAndSubchannelIndex.slotIndex]->getChannelLabelMaxLength(slotAndSubchannelIndex.subchannelIndex))) {
+        return SCPI_RES_ERR;
+    }
+
+    auto err = g_slots[slotAndSubchannelIndex.slotIndex]->setChannelLabel(slotAndSubchannelIndex.subchannelIndex, label, labelLength);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemChannelLabelQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    const char *label;
+    auto err = g_slots[slotAndSubchannelIndex.slotIndex]->getChannelLabel(slotAndSubchannelIndex.subchannelIndex, label);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    if (*label) {
+        SCPI_ResultText(context, label);
+    } else {
+        SCPI_ResultText(context, g_slots[slotAndSubchannelIndex.slotIndex]->getDefaultChannelLabel(slotAndSubchannelIndex.subchannelIndex));
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemChannelColor(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    uint8_t color;
+    if (!getColorFromParam(context, color)) {
+        return SCPI_RES_ERR;
+    }
+
+    auto err = g_slots[slotAndSubchannelIndex.slotIndex]->setChannelColor(slotAndSubchannelIndex.subchannelIndex, color);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemChannelColorQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    uint8_t color;
+    auto err = g_slots[slotAndSubchannelIndex.slotIndex]->getChannelColor(slotAndSubchannelIndex.subchannelIndex, color);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt8(context, color);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemChannelPinLabel(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    const char *label;
+    size_t labelLength;
+    if (!getLabelFromParam(context, label, labelLength, g_slots[slotAndSubchannelIndex.slotIndex]->getChannelPinLabelMaxLength(slotAndSubchannelIndex.subchannelIndex, pin))) {
+        return SCPI_RES_ERR;
+    }
+
+    auto err = g_slots[slotAndSubchannelIndex.slotIndex]->setChannelPinLabel(slotAndSubchannelIndex.subchannelIndex, pin, label, labelLength);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemChannelPinLabelQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    const char *label;
+    auto err = g_slots[slotAndSubchannelIndex.slotIndex]->getChannelPinLabel(slotAndSubchannelIndex.subchannelIndex, pin, label);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    if (*label) {
+        SCPI_ResultText(context, label);
+    } else {
+        SCPI_ResultText(context, g_slots[slotAndSubchannelIndex.slotIndex]->getDefaultChannelPinLabel(slotAndSubchannelIndex.subchannelIndex, pin));
+    }
+
+    return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

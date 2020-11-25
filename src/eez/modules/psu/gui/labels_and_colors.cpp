@@ -32,15 +32,15 @@ namespace gui {
 
 struct ChannelLabelAndColor {
     int subchannelIndex;
-    char label[SLOT_LABEL_MAX_CHARS + 1];
+    char *label;
     uint8_t color;
+    ChannelLabelAndColor *next;
 };
 
 struct SlotLabelAndColor {
-    char label[SLOT_LABEL_MAX_CHARS + 1];
+    char label[SLOT_LABEL_MAX_LENGTH + 1];
     uint8_t color;
-    int numChannels;
-    ChannelLabelAndColor* channelLabelAndColors;
+    ChannelLabelAndColor* first;
 };
 
 SlotLabelAndColor *g_slotLabelAndColors = (SlotLabelAndColor *)FILE_VIEW_BUFFER;
@@ -51,9 +51,9 @@ SlotLabelAndColor *getSlotLabelAndColor(int slotIndex) {
 
 ChannelLabelAndColor *getChannelLabelAndColor(int slotIndex, int subchannelIndex) {
     SlotLabelAndColor *slotLabelAndColors = getSlotLabelAndColor(slotIndex);
-    for (int i = 0; i < slotLabelAndColors->numChannels; i++) {
-        if (slotLabelAndColors->channelLabelAndColors[i].subchannelIndex == subchannelIndex) {
-            return slotLabelAndColors->channelLabelAndColors + i;
+    for (ChannelLabelAndColor *p = slotLabelAndColors->first; p; p = p->next) {
+        if (p->subchannelIndex == subchannelIndex) {
+            return p;
         }
     }
     return nullptr;
@@ -62,12 +62,14 @@ ChannelLabelAndColor *getChannelLabelAndColor(int slotIndex, int subchannelIndex
 ////////////////////////////////////////////////////////////////////////////////
 
 int LabelsAndColorsPage::g_colorIndex;
+int LabelsAndColorsPage::g_editSlotIndex;
+int LabelsAndColorsPage::g_editSubchannelIndex;
 
-Value LabelsAndColorsPage::getSlotLabel(int slotIndex) {
+const char *LabelsAndColorsPage::getSlotLabel(int slotIndex) {
     return getSlotLabelAndColor(slotIndex)->label;
 }
 
-Value LabelsAndColorsPage::getSlotLabelOrDefault(int slotIndex) {
+const char *LabelsAndColorsPage::getSlotLabelOrDefault(int slotIndex) {
     const char *label = getSlotLabelAndColor(slotIndex)->label;
     return *label ? label : g_slots[slotIndex]->getDefaultLabel();
 }
@@ -92,17 +94,39 @@ bool LabelsAndColorsPage::isSlotColorModified(int slotIndex) {
     return getSlotLabelAndColor(slotIndex)->color != 0;
 }
 
-Value LabelsAndColorsPage::getChannelLabel(int slotIndex, int subchannelIndex) {
+void LabelsAndColorsPage::editChannelLabel(int slotIndex, int subchannelIndex) {
+    g_editSlotIndex = slotIndex;
+    g_editSubchannelIndex = subchannelIndex;
+    Keypad::startPush(0, 
+        LabelsAndColorsPage::getChannelLabelOrDefault(slotIndex, subchannelIndex), 
+        1, g_slots[slotIndex]->getChannelLabelMaxLength(subchannelIndex),
+        false, 
+        onSetChannelLabel, popPage, 
+        LabelsAndColorsPage::isChannelLabelModified(slotIndex, subchannelIndex) ? onSetChannelDefaultLabel : nullptr);
+}
+
+void LabelsAndColorsPage::onSetChannelLabel(char *value) {
+    LabelsAndColorsPage::setChannelLabel(g_editSlotIndex, g_editSubchannelIndex, value);
+    popPage();
+}
+
+void LabelsAndColorsPage::onSetChannelDefaultLabel() {
+    LabelsAndColorsPage::setChannelLabel(g_editSlotIndex, g_editSubchannelIndex, "");
+    popPage();
+}
+
+const char *LabelsAndColorsPage::getChannelLabel(int slotIndex, int subchannelIndex) {
     return getChannelLabelAndColor(slotIndex, subchannelIndex)->label;
 }
 
-Value LabelsAndColorsPage::getChannelLabelOrDefault(int slotIndex, int subchannelIndex) {
+const char *LabelsAndColorsPage::getChannelLabelOrDefault(int slotIndex, int subchannelIndex) {
     const char *label = getChannelLabelAndColor(slotIndex, subchannelIndex)->label;
     return *label ? label : g_slots[slotIndex]->getDefaultChannelLabel(subchannelIndex);
 }
 
 void LabelsAndColorsPage::setChannelLabel(int slotIndex, int subchannelIndex, const char *label) {
-    strcpy(getChannelLabelAndColor(slotIndex, subchannelIndex)->label, label);
+    auto labelMaxLength = g_slots[slotIndex]->getChannelLabelMaxLength(subchannelIndex);    
+    memcpy(getChannelLabelAndColor(slotIndex, subchannelIndex)->label, label, labelMaxLength);
 }
 
 bool LabelsAndColorsPage::isChannelLabelModified(int slotIndex, int subchannelIndex) {
@@ -127,17 +151,35 @@ void LabelsAndColorsPage::pageAlloc() {
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         strcpy(g_slotLabelAndColors[slotIndex].label, g_slots[slotIndex]->getLabel());
         g_slotLabelAndColors[slotIndex].color = g_slots[slotIndex]->getColor();
-        g_slotLabelAndColors[slotIndex].channelLabelAndColors = channelLabelAndColors;
-        g_slotLabelAndColors[slotIndex].numChannels = g_slots[slotIndex]->getNumSubchannels();
+        g_slotLabelAndColors[slotIndex].first = channelLabelAndColors;
 
-        for (int relativeChannelIndex = 0; relativeChannelIndex < g_slotLabelAndColors[slotIndex].numChannels; relativeChannelIndex++) {
-            int subchannelIndex = g_slots[slotIndex]->getSubchannelIndexFromRelativeChannelIndex(relativeChannelIndex);
-            channelLabelAndColors[relativeChannelIndex].subchannelIndex = subchannelIndex;
-            strcpy(channelLabelAndColors[relativeChannelIndex].label, g_slots[slotIndex]->getChannelLabel(subchannelIndex));
-            channelLabelAndColors[relativeChannelIndex].color = g_slots[slotIndex]->getChannelColor(subchannelIndex);
+        auto numChannels = g_slots[slotIndex]->getNumSubchannels();
+        if (numChannels > 0) {
+            g_slotLabelAndColors[slotIndex].first = channelLabelAndColors;
+
+            for (int relativeChannelIndex = 0; relativeChannelIndex < numChannels; relativeChannelIndex++) {
+                int subchannelIndex = g_slots[slotIndex]->getSubchannelIndexFromRelativeChannelIndex(relativeChannelIndex);
+                channelLabelAndColors->subchannelIndex = subchannelIndex;
+                
+                auto labelMaxLength = g_slots[slotIndex]->getChannelLabelMaxLength(subchannelIndex);
+
+                channelLabelAndColors->label = (char *)(channelLabelAndColors + 1);
+                memcpy(channelLabelAndColors->label, g_slots[slotIndex]->getChannelLabel(subchannelIndex), labelMaxLength);
+                channelLabelAndColors->color = g_slots[slotIndex]->getChannelColor(subchannelIndex);
+
+                ChannelLabelAndColor *next = (ChannelLabelAndColor *)((uint8_t *)(channelLabelAndColors + 1) + (((labelMaxLength + 1) + 3) / 4) * 4);
+
+                if (relativeChannelIndex < numChannels - 1) {
+                    channelLabelAndColors->next = next;
+                } else {
+                    channelLabelAndColors->next = 0;
+                }
+
+                channelLabelAndColors = next;
+            }
+        } else {
+            g_slotLabelAndColors[slotIndex].first = 0;
         }
-
-        channelLabelAndColors += g_slotLabelAndColors[slotIndex].numChannels;
     }
 }
 
@@ -151,10 +193,12 @@ int LabelsAndColorsPage::getDirty() {
             return 1;
         }
 
-        for (int relativeChannelIndex = 0; relativeChannelIndex < g_slotLabelAndColors[slotIndex].numChannels; relativeChannelIndex++) {
-            ChannelLabelAndColor &channelLabelAndColors = g_slotLabelAndColors[slotIndex].channelLabelAndColors[relativeChannelIndex];
+        for (ChannelLabelAndColor *p = g_slotLabelAndColors[slotIndex].first; p; p = p->next) {
+            ChannelLabelAndColor &channelLabelAndColors = *p;
 
-            if (strcmp(channelLabelAndColors.label, g_slots[slotIndex]->getChannelLabel(channelLabelAndColors.subchannelIndex)) != 0) {
+            auto labelMaxLength = g_slots[slotIndex]->getChannelLabelMaxLength(channelLabelAndColors.subchannelIndex);
+
+            if (memcmp(channelLabelAndColors.label, g_slots[slotIndex]->getChannelLabel(channelLabelAndColors.subchannelIndex), labelMaxLength) != 0) {
                 return 1;
             }
 
@@ -177,10 +221,12 @@ void LabelsAndColorsPage::set() {
             g_slots[slotIndex]->setColor(g_slotLabelAndColors[slotIndex].color);
         }
 
-        for (int relativeChannelIndex = 0; relativeChannelIndex < g_slotLabelAndColors[slotIndex].numChannels; relativeChannelIndex++) {
-            ChannelLabelAndColor &channelLabelAndColors = g_slotLabelAndColors[slotIndex].channelLabelAndColors[relativeChannelIndex];
-            
-            if (strcmp(channelLabelAndColors.label, g_slots[slotIndex]->getChannelLabel(channelLabelAndColors.subchannelIndex)) != 0) {
+        for (ChannelLabelAndColor *p = g_slotLabelAndColors[slotIndex].first; p; p = p->next) {
+            ChannelLabelAndColor &channelLabelAndColors = *p;
+
+            auto labelMaxLength = g_slots[slotIndex]->getChannelLabelMaxLength(channelLabelAndColors.subchannelIndex);
+
+            if (memcmp(channelLabelAndColors.label, g_slots[slotIndex]->getChannelLabel(channelLabelAndColors.subchannelIndex), labelMaxLength) != 0) {
                 g_slots[slotIndex]->setChannelLabel(channelLabelAndColors.subchannelIndex, channelLabelAndColors.label);
             }
             
@@ -269,27 +315,14 @@ void onSetSlotDefaultLabel() {
 void action_change_slot_label() {
     hmi::selectSlot(getFoundWidgetAtDown().cursor);
     Keypad::startPush(0,
-        LabelsAndColorsPage::getSlotLabelOrDefault(hmi::g_selectedSlotIndex).getString(), 1, SLOT_LABEL_MAX_CHARS, false,
+        LabelsAndColorsPage::getSlotLabelOrDefault(hmi::g_selectedSlotIndex), 1, SLOT_LABEL_MAX_LENGTH, false,
         onSetSlotLabel, popPage,
         LabelsAndColorsPage::isSlotLabelModified(hmi::g_selectedSlotIndex) ? onSetSlotDefaultLabel : nullptr);
 }
 
-void onSetChannelLabel(char *value) {
-    LabelsAndColorsPage::setChannelLabel(g_channel->slotIndex, g_channel->subchannelIndex, value);
-    popPage();
-}
-
-void onSetChannelDefaultLabel() {
-    LabelsAndColorsPage::setChannelLabel(g_channel->slotIndex, g_channel->subchannelIndex, "");
-    popPage();
-}
-
 void action_change_channel_label() {
     selectChannelByCursor();
-    Keypad::startPush(0, 
-        LabelsAndColorsPage::getChannelLabelOrDefault(g_channel->slotIndex, g_channel->subchannelIndex).getString(), 1, CHANNEL_LABEL_MAX_CHARS, false, 
-        onSetChannelLabel, popPage, 
-        LabelsAndColorsPage::isChannelLabelModified(g_channel->slotIndex, g_channel->subchannelIndex) ? onSetChannelDefaultLabel : nullptr);
+    LabelsAndColorsPage::editChannelLabel(g_channel->slotIndex, g_channel->subchannelIndex);
 }
 
 void action_show_channel_color_picker() {

@@ -40,6 +40,7 @@
 #include "eez/modules/psu/gui/psu.h"
 #include "eez/modules/psu/gui/animations.h"
 #include "eez/modules/psu/gui/keypad.h"
+#include "eez/modules/psu/gui/labels_and_colors.h"
 #include "eez/modules/bp3c/comm.h"
 #include "eez/modules/psu/gui/edit_mode.h"
 
@@ -104,6 +105,9 @@ public:
     float dac2;
     bool calibrationEnabled[2];
     CalibrationConfiguration calConf[2];
+
+    static const size_t CHANNEL_LABEL_MAX_LENGTH = 5;
+    char aoChannelLabels[2][CHANNEL_LABEL_MAX_LENGTH + 1];
 
     bool relayOn;
 
@@ -292,11 +296,16 @@ public:
         char rowLabels[NUM_ROWS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
         float dac1;
         float dac2;
+        char aoChannelLabels[2][CHANNEL_LABEL_MAX_LENGTH + 1];
         bool relayOn;
     };
 
     int getSlotSettingsPageId() override {
         return getTestResult() == TEST_OK ? PAGE_ID_DIB_SMX46_SETTINGS : PAGE_ID_SLOT_SETTINGS;
+    }
+
+    int getLabelsAndColorsPageId() override {
+        return PAGE_ID_DIB_SMX46_LABELS_AND_COLORS;
     }
 
     void onLowPriorityThreadMessage(uint8_t type, uint32_t param) override {
@@ -315,6 +324,7 @@ public:
         memcpy(&parameters->rowLabels[0][0], &rowLabels[0][0], sizeof(rowLabels));
         parameters->dac1 = dac1;
         parameters->dac2 = dac2;
+        memcpy(&parameters->aoChannelLabels[0][0], &aoChannelLabels[0][0], sizeof(aoChannelLabels));
         parameters->relayOn = relayOn;
     }
     
@@ -326,6 +336,7 @@ public:
         memcpy(&rowLabels[0][0], &parameters->rowLabels[0][0], sizeof(rowLabels));
         dac1 = parameters->dac1;
         dac2 = parameters->dac2;
+        memcpy(&aoChannelLabels[0][0], &parameters->aoChannelLabels[0][0], sizeof(aoChannelLabels));
         relayOn = parameters->relayOn;
     }
     
@@ -348,7 +359,10 @@ public:
 
         WRITE_PROPERTY("dac1", parameters->dac1);
         WRITE_PROPERTY("dac2", parameters->dac2);
-        
+
+        WRITE_PROPERTY("ao1Label", parameters->aoChannelLabels[0]);
+        WRITE_PROPERTY("ao2Label", parameters->aoChannelLabels[1]);
+
         WRITE_PROPERTY("relayOn", parameters->relayOn);
 
         return true;
@@ -374,6 +388,9 @@ public:
         READ_PROPERTY("dac1", parameters->dac1);
         READ_PROPERTY("dac2", parameters->dac2);
 
+        READ_STRING_PROPERTY("ao1Label", parameters->aoChannelLabels[0], CHANNEL_LABEL_MAX_LENGTH);
+        READ_STRING_PROPERTY("ao2Label", parameters->aoChannelLabels[1], CHANNEL_LABEL_MAX_LENGTH);
+
         READ_PROPERTY("relayOn", parameters->relayOn);
 
         return false;
@@ -398,6 +415,9 @@ public:
 
         dac1 = 0.0f;
         dac2 = 0.0f;
+
+        strcpy(aoChannelLabels[0], "");
+        strcpy(aoChannelLabels[1], "");
 
         relayOn = false;
     }
@@ -425,6 +445,66 @@ public:
             subchannelIndex = relativeChannelIndex;
         }
         return subchannelIndex;
+    }
+
+    size_t getChannelLabelMaxLength(int subchannelIndex) override {
+        return CHANNEL_LABEL_MAX_LENGTH;
+    }
+
+    eez_err_t getChannelLabel(int subchannelIndex, const char *&label) override {
+        if (subchannelIndex == 0) {
+            label = aoChannelLabels[0];
+            return SCPI_RES_OK;
+        } 
+        
+        if (subchannelIndex == 1) {
+            label = aoChannelLabels[1];
+            return SCPI_RES_OK;
+        }
+        
+        return SCPI_ERROR_HARDWARE_MISSING;
+    }
+
+    const char *getChannelLabel(int subchannelIndex) override {
+        const char *label;
+        auto err = getChannelLabel(subchannelIndex, label);
+        if (err == SCPI_RES_OK) {
+            return label;
+        } 
+        return "";
+    }
+
+    const char *getDefaultChannelLabel(int subchannelIndex) override {
+        if (subchannelIndex == 0) {
+            return "AO1";
+        } 
+        if (subchannelIndex == 1) {
+            return "AO2";
+        }
+        return "";
+    }
+
+    eez_err_t setChannelLabel(int subchannelIndex, const char *label, int length) override {
+        if (length == -1) {
+            length = strlen(label);
+        }
+        if (length > (int)CHANNEL_LABEL_MAX_LENGTH) {
+            length = CHANNEL_LABEL_MAX_LENGTH;
+        }
+
+        if (subchannelIndex == 0) {
+            strncpy(aoChannelLabels[0], label, length);
+            aoChannelLabels[0][length] = 0;
+            return SCPI_RES_OK;
+        }
+        
+        if (subchannelIndex == 1) {
+            strcpy(aoChannelLabels[1], label);
+            aoChannelLabels[1][length] = 0;
+            return SCPI_RES_OK;
+        }
+
+        return SCPI_ERROR_HARDWARE_MISSING;
     }
 
     bool isRouteOpen(int subchannelIndex, bool &isRouteOpen_, int *err) override {
@@ -932,7 +1012,7 @@ void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &valu
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(DAC_MAX, UNIT_VOLT);
     }else if (operation == DATA_OPERATION_GET_NAME) {
-        value = "AO1";
+        value = ((Smx46Module *)g_slots[cursor])->aoChannelLabels[0];
     }  else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
@@ -967,7 +1047,7 @@ void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &valu
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(DAC_MAX, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_NAME) {
-        value = "AO2";
+        value = ((Smx46Module *)g_slots[cursor])->aoChannelLabels[0];
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
@@ -984,6 +1064,49 @@ void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &valu
         value = 1;
     } else if (operation == DATA_OPERATION_SET) {
         ((Smx46Module *)g_slots[cursor])->dac2 = roundPrec(value.getFloat(), DAC_RESOLUTION);
+    }
+}
+
+void data_dib_smx46_analog_outputs(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 2;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * 2 + value.getInt();
+    } 
+}
+
+void data_dib_smx46_ao_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int slotIndex = cursor / 2;
+        int subchannelIndex = cursor % 2;
+        const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, subchannelIndex);
+        if (*label) {
+            value = label;
+        } else {
+            value = g_slots[slotIndex]->getDefaultChannelLabel(subchannelIndex);
+        }
+    }
+}
+
+void data_dib_smx46_ao1_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        const char *label = ((Smx46Module *)g_slots[cursor])->aoChannelLabels[0];
+        if (*label) {
+            value = label;
+        } else {
+            value = ((Smx46Module *)g_slots[cursor])->getDefaultChannelLabel(0);
+        }
+    }
+}
+
+void data_dib_smx46_ao2_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        const char *label = ((Smx46Module *)g_slots[cursor])->aoChannelLabels[1];
+        if (*label) {
+            value = label;
+        } else {
+            value = ((Smx46Module *)g_slots[cursor])->getDefaultChannelLabel(1);
+        }
     }
 }
 
@@ -1084,6 +1207,13 @@ void action_dib_smx46_show_dac2_calibration() {
     hmi::g_selectedSubchannelIndex = 1;
     calibration::g_viewer.start(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
+}
+
+void action_dib_smx46_change_subchannel_label() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    int slotIndex = cursor / 2;
+    int subchannelIndex = cursor % 2;
+    LabelsAndColorsPage::editChannelLabel(slotIndex, subchannelIndex);
 }
 
 void action_dib_smx46_show_info() {

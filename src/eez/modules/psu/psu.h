@@ -75,11 +75,17 @@ public:
     float getProfileUSet(uint8_t *buffer) override;
     float getProfileISet(uint8_t *buffer) override;
 
+    size_t getChannelLabelMaxLength(int subchannelIndex) override;
     const char *getChannelLabel(int subchannelIndex) override;
     const char *getDefaultChannelLabel(int subchannelIndex) override;
-    void setChannelLabel(int subchannelIndex, const char *label) override;
+
+    eez_err_t getChannelLabel(int subchannelIndex, const char *&label) override;
+    eez_err_t setChannelLabel(int subchannelIndex, const char *label, int length) override;
+
     uint8_t getChannelColor(int subchannelIndex) override;
-    void setChannelColor(int subchannelIndex, uint8_t color) override;
+
+    eez_err_t getChannelColor(int subchannelIndex, uint8_t &color) override;
+    eez_err_t setChannelColor(int subchannelIndex, uint8_t color) override;
 
     bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) override;
     bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) override;
@@ -129,7 +135,7 @@ struct PowerChannelProfileParameters {
     float u_rampDuration;
     float i_rampDuration;
     float outputDelayDuration;
-    char label[CHANNEL_LABEL_MAX_CHARS + 1];
+    char label[Channel::CHANNEL_LABEL_MAX_LENGTH + 1];
     uint8_t color;
 #ifdef EEZ_PLATFORM_SIMULATOR
     bool load_enabled;

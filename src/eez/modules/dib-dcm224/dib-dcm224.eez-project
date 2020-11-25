@@ -7030,9 +7030,9 @@
               "font": "Oswald14"
             },
             "action": "change_channel_label",
-            "left": 7,
-            "top": 37,
-            "width": 144,
+            "left": 8,
+            "top": 39,
+            "width": 142,
             "height": 32,
             "text": "Change label"
           },
@@ -7043,9 +7043,9 @@
               "font": "Oswald14"
             },
             "action": "show_channel_color_picker",
-            "left": 7,
-            "top": 74,
-            "width": 144,
+            "left": 8,
+            "top": 77,
+            "width": 142,
             "height": 32,
             "text": "Pick color"
           },

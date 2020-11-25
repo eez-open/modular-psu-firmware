@@ -47,7 +47,7 @@ scpi_result_t scpi_cmd_apply(scpi_t *context) {
     }
 
     bool call_set_current = false;
-    float current;
+    float current = 0.0f;
 
     scpi_number_t param;
     if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &param, false)) {

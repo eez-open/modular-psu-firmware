@@ -568,7 +568,7 @@ bool PsuModule::readPowerChannelProfileProperties(profile::ReadContext &ctx, uin
 
     READ_PROPERTY("outputDelayDuration", parameters->outputDelayDuration);
 
-    READ_STRING_PROPERTY("label", parameters->label, CHANNEL_LABEL_MAX_CHARS);
+    READ_STRING_PROPERTY("label", parameters->label, Channel::CHANNEL_LABEL_MAX_LENGTH);
     READ_PROPERTY("color", parameters->color);
 
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -595,6 +595,10 @@ float PsuModule::getProfileISet(uint8_t *buffer) {
     return parameters->i_set;
 }
 
+size_t PsuModule::getChannelLabelMaxLength(int subchannelIndex) {
+    return Channel::CHANNEL_LABEL_MAX_LENGTH;
+}
+
 const char *PsuModule::getChannelLabel(int subchannelIndex) {
     Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     return channel->getLabel();
@@ -605,9 +609,23 @@ const char *PsuModule::getDefaultChannelLabel(int subchannelIndex) {
     return channel->getDefaultLabel();
 }
 
-void PsuModule::setChannelLabel(int subchannelIndex, const char *label) {
+eez_err_t PsuModule::getChannelLabel(int subchannelIndex, const char *&label) {
+    label = getChannelLabel(subchannelIndex);
+    return SCPI_RES_OK;
+}
+
+eez_err_t PsuModule::setChannelLabel(int subchannelIndex, const char *label, int length) {
+    if (length == -1) {
+        length = strlen(label);
+    }
+    if (length > (int)Channel::CHANNEL_LABEL_MAX_LENGTH) {
+        length = Channel::CHANNEL_LABEL_MAX_LENGTH;
+    }
+
     Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    strcpy(channel->label, label);
+    strncpy(channel->label, label, length);
+    channel->label[length] = 0;
+    return SCPI_RES_OK;
 }
 
 uint8_t PsuModule::getChannelColor(int subchannelIndex) {
@@ -615,9 +633,15 @@ uint8_t PsuModule::getChannelColor(int subchannelIndex) {
     return channel->color;
 }
 
-void PsuModule::setChannelColor(int subchannelIndex, uint8_t color) {
+eez_err_t PsuModule::getChannelColor(int subchannelIndex, uint8_t &color) {
+    color = getChannelColor(subchannelIndex);
+    return SCPI_RES_OK;
+}
+
+eez_err_t PsuModule::setChannelColor(int subchannelIndex, uint8_t color) {
     Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     channel->color = color;
+    return SCPI_RES_OK;
 }
 
 bool PsuModule::getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) {

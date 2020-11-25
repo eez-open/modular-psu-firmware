@@ -30,8 +30,8 @@ class LabelsAndColorsPage : public SetPage {
 public:
     static int g_colorIndex;
 
-    static Value getSlotLabel(int slotIndex);
-    static Value getSlotLabelOrDefault(int slotIndex);
+    static const char *getSlotLabel(int slotIndex);
+    static const char *getSlotLabelOrDefault(int slotIndex);
     static void setSlotLabel(int slotIndex, const char *label);
     static bool isSlotLabelModified(int slotIndex);
     
@@ -39,8 +39,10 @@ public:
     static void setSlotColor(int slotIndex, uint8_t color);
     static bool isSlotColorModified(int slotIndex);
 
-    static Value getChannelLabel(int slotIndex, int subchannelIndex);
-    static Value getChannelLabelOrDefault(int slotIndex, int subchannelIndex);
+    static void editChannelLabel(int slotIndex, int subchannelIndex);
+
+    static const char *getChannelLabel(int slotIndex, int subchannelIndex);
+    static const char *getChannelLabelOrDefault(int slotIndex, int subchannelIndex);
     static void setChannelLabel(int slotIndex, int subchannelIndex, const char *label);
     static bool isChannelLabelModified(int slotIndex, int subchannelIndex);
     
@@ -52,6 +54,13 @@ public:
 
     int getDirty();
     void set();
+
+private:
+    static int g_editSlotIndex;
+    static int g_editSubchannelIndex;
+
+    static void onSetChannelLabel(char *value);
+    static void onSetChannelDefaultLabel();
 };
 
 } // namespace gui

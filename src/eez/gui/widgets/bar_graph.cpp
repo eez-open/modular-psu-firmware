@@ -162,7 +162,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
         // calc line 1 position (set value)
         int pLine1 = calcValuePosInBarGraphWidget(currentState->line1Data, min, max, d);
 
-        int pLine2;
+        int pLine2 = 0;
         if (!fullScale) {
             // calc line 2 position (limit value)
             pLine2 = calcValuePosInBarGraphWidget(currentState->line2Data, min, max, d);

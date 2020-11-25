@@ -152,8 +152,9 @@ struct StepValues {
     } encoderSettings;
 };
 
-static const size_t SLOT_LABEL_MAX_CHARS = 10;
-static const size_t CHANNEL_LABEL_MAX_CHARS = 10;
+static const size_t SLOT_LABEL_MAX_LENGTH = 8;
+
+typedef int eez_err_t;
 
 struct Module {
     uint16_t moduleType;
@@ -166,7 +167,7 @@ struct Module {
     uint8_t numPowerChannels;
     uint8_t numOtherChannels;
 
-    uint8_t slotIndex = -1;
+    uint8_t slotIndex;
     bool enabled;
     uint16_t moduleRevision = 0;
     bool firmareBasedModule = true;
@@ -177,7 +178,7 @@ struct Module {
 	uint32_t idw0 = 0;
 	uint32_t idw1 = 0;
 	uint32_t idw2 = 0;
-    char label[SLOT_LABEL_MAX_CHARS + 1] = { 0 };
+    char label[SLOT_LABEL_MAX_LENGTH + 1] = { 0 };
     uint8_t color = 0;
 
     virtual void setEnabled(bool value);
@@ -214,7 +215,7 @@ struct Module {
     virtual float getProfileISet(uint8_t *buffer);
 
     struct ProfileParameters {
-        char label[SLOT_LABEL_MAX_CHARS + 1];
+        char label[SLOT_LABEL_MAX_LENGTH + 1];
         uint8_t color;
     };
 
@@ -230,18 +231,29 @@ struct Module {
     virtual bool isValidSubchannelIndex(int subchannelIndex);
     virtual int getSubchannelIndexFromRelativeChannelIndex(int relativeChannelIndex);
 
-    const char *getLabel();
+    const char * getLabel();
     const char *getDefaultLabel();
     const char *getLabelOrDefault() {return *label ? label : getDefaultLabel(); }
-    void setLabel(const char *label);
+    void setLabel(const char *label, int length = -1);
     uint8_t getColor();
     void setColor(uint8_t color);
 
+    virtual size_t getChannelLabelMaxLength(int subchannelIndex);
     virtual const char *getChannelLabel(int subchannelIndex);
     virtual const char *getDefaultChannelLabel(int subchannelIndex);
-    virtual void setChannelLabel(int subchannelIndex, const char *label);
+
+    virtual eez_err_t getChannelLabel(int subchannelIndex, const char *&label);
+    virtual eez_err_t setChannelLabel(int subchannelIndex, const char *label, int length = -1);
+    
+    virtual size_t getChannelPinLabelMaxLength(int subchannelIndex, int pin);
+    virtual const char *getDefaultChannelPinLabel(int subchannelIndex, int pin);
+    virtual eez_err_t getChannelPinLabel(int subchannelIndex, int pin, const char *&label);
+    virtual eez_err_t setChannelPinLabel(int subchannelIndex, int pin, const char *label, int length = -1);
+
     virtual uint8_t getChannelColor(int subchannelIndex);
-    virtual void setChannelColor(int subchannelIndex, uint8_t color);
+
+    virtual eez_err_t getChannelColor(int subchannelIndex, uint8_t &color);
+    virtual eez_err_t setChannelColor(int subchannelIndex, uint8_t color);
 
     virtual bool getDigitalInputData(int subchannelIndex, uint8_t &data, int *err);
 

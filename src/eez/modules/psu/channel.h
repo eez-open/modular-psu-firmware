@@ -410,7 +410,8 @@ public:
 
     float outputDelayDuration;
 
-    char label[CHANNEL_LABEL_MAX_CHARS + 1];
+    static const size_t CHANNEL_LABEL_MAX_LENGTH = 8;
+    char label[CHANNEL_LABEL_MAX_LENGTH + 1];
     uint8_t color;
 
 #ifdef EEZ_PLATFORM_SIMULATOR

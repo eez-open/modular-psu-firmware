@@ -487,6 +487,8 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
             animateSettingsSlideRight(previousPageId == PAGE_ID_SYS_INFO || previousPageId == PAGE_ID_SYS_SETTINGS_ENCODER || previousPageId == PAGE_ID_SYS_SETTINGS_DATE_TIME);
         } else if (activePageId == PAGE_ID_SYS_SETTINGS_MQTT) {
             animateSettingsSlideLeft(false);
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS) {
+            animateSettingsSlideLeft(true);
         }
     } else if (previousPageId == PAGE_ID_CH_SETTINGS) {
         if (activePageId == PAGE_ID_MAIN) {
@@ -528,6 +530,10 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         animateFadeOutFadeIn();
     } else if (previousPageId == PAGE_ID_SYS_SETTINGS_MQTT) {
         if (activePageId == PAGE_ID_SYS_SETTINGS_ETHERNET) {
+            animateSettingsSlideRight(false);
+        }
+    } else if (previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS) {
+        if (activePageId == PAGE_ID_SYS_INFO) {
             animateSlideRight();
         }
     }

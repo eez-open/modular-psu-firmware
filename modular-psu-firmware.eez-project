@@ -35603,6 +35603,7 @@
                   "inheritFrom": "labels_and_colors_slot"
                 },
                 "data": "labels_and_colors_page_slot_title",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 158,
@@ -35616,9 +35617,9 @@
                   "font": "Oswald14"
                 },
                 "action": "change_slot_label",
-                "left": 7,
-                "top": 37,
-                "width": 144,
+                "left": 8,
+                "top": 39,
+                "width": 142,
                 "height": 32,
                 "text": "Change label"
               },
@@ -35629,9 +35630,9 @@
                   "font": "Oswald14"
                 },
                 "action": "show_slot_color_picker",
-                "left": 7,
-                "top": 74,
-                "width": 144,
+                "left": 8,
+                "top": 77,
+                "width": 142,
                 "height": 32,
                 "text": "Pick color"
               },
@@ -65047,6 +65048,60 @@
             }
           },
           {
+            "name": "SYSTem:CHANnel:COLor",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "color_index",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:CHANnel:COLor?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
+          },
+          {
             "name": "SYSTem:CHANnel:INFOrmation:CURRent?",
             "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_curr",
             "parameters": [
@@ -65162,6 +65217,60 @@
             }
           },
           {
+            "name": "SYSTem:CHANnel:LABel",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "label",
+                "type": [
+                  {
+                    "type": "quoted-string"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:CHANnel:LABel?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
             "name": "SYSTem:CHANnel:MODel?",
             "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
             "parameters": [
@@ -65203,6 +65312,76 @@
               "type": [
                 {
                   "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:CHANnel:PIN:LABel",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "label",
+                "type": [
+                  {
+                    "type": "quoted-string"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:CHANnel:PIN:LABel?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
                 }
               ]
             }
@@ -66645,6 +66824,209 @@
             }
           },
           {
+            "name": "SYSTem:SLOT[:COUNt]?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_coun",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:SLOT:COLor",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_coun",
+            "parameters": [
+              {
+                "name": "slot_index",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "color_index",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:SLOT:COLor?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_coun",
+            "parameters": [
+              {
+                "name": "slot_index",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:SLOT:FIRMware?",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
+            "parameters": [
+              {
+                "name": "slot_index",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:SLOT:LABel",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
+            "parameters": [
+              {
+                "name": "slot_index",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "label",
+                "type": [
+                  {
+                    "type": "quoted-string"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:SLOT:LABel?",
+            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
+            "parameters": [
+              {
+                "name": "slot_index",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:SLOT:MODel?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_mod",
+            "parameters": [
+              {
+                "name": "slot",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:SLOT:SNO",
+            "parameters": [
+              {
+                "name": "slot",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "sno",
+                "type": [
+                  {
+                    "type": "quoted-string"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:SLOT:SNO?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_sno",
+            "parameters": [
+              {
+                "name": "slot",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
             "name": "SYSTem:SLOT:STATe",
             "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_stat",
             "parameters": [
@@ -66698,13 +67080,23 @@
             }
           },
           {
-            "name": "SYSTem:SLOT[:COUNt]?",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_coun",
-            "parameters": [],
+            "name": "SYSTem:SLOT:VERSion?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_vers",
+            "parameters": [
+              {
+                "name": "slot",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
             "response": {
               "type": [
                 {
-                  "type": "nr1"
+                  "type": "quoted-string"
                 }
               ]
             }
@@ -67047,119 +67439,6 @@
               "type": [
                 {
                   "type": "numeric"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SYSTem:SLOT:MODel?",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_mod",
-            "parameters": [
-              {
-                "name": "slot",
-                "type": [
-                  {
-                    "type": "nr1"
-                  }
-                ],
-                "isOptional": false
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "quoted-string"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SYSTem:SLOT:VERSion?",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_vers",
-            "parameters": [
-              {
-                "name": "slot",
-                "type": [
-                  {
-                    "type": "nr1"
-                  }
-                ],
-                "isOptional": false
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "quoted-string"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SYSTem:SLOT:FIRMware?",
-            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
-            "parameters": [
-              {
-                "name": "slot_index",
-                "type": [
-                  {
-                    "type": "nr1"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "quoted-string"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SYSTem:SLOT:SNO",
-            "parameters": [
-              {
-                "name": "slot",
-                "type": [
-                  {
-                    "type": "nr1"
-                  }
-                ]
-              },
-              {
-                "name": "sno",
-                "type": [
-                  {
-                    "type": "quoted-string"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "SYSTem:SLOT:SNO?",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_sno",
-            "parameters": [
-              {
-                "name": "slot",
-                "type": [
-                  {
-                    "type": "nr1"
-                  }
-                ],
-                "isOptional": false
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "quoted-string"
                 }
               ]
             }
