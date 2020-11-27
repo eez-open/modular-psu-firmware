@@ -2409,6 +2409,26 @@
       "name": "labels_and_colors_is_color_modified",
       "type": "boolean",
       "defaultValue": "0"
+    },
+    {
+      "name": "log_items",
+      "type": "list",
+      "defaultValue": "[]"
+    },
+    {
+      "name": "log_item_index",
+      "type": "string",
+      "defaultValue": "1"
+    },
+    {
+      "name": "log_item_channel",
+      "type": "string",
+      "defaultValue": "101"
+    },
+    {
+      "name": "log_item_label",
+      "type": "string",
+      "defaultValue": "DCP405 #1 U"
     }
   ],
   "actions": [
@@ -2938,9 +2958,6 @@
     },
     {
       "name": "dlog_power_toggle"
-    },
-    {
-      "name": "dlog_value_toggle"
     },
     {
       "name": "dlog_edit_period"
@@ -24729,9 +24746,7 @@
                                 {
                                   "type": "Text",
                                   "style": {
-                                    "inheritFrom": "default",
-                                    "font": "Oswald14",
-                                    "alignHorizontal": "left",
+                                    "inheritFrom": "default_S",
                                     "color": "status_line_text_disabled",
                                     "activeBackgroundColor": "status_line_text_disabled"
                                   },
@@ -24784,10 +24799,7 @@
                                     {
                                       "type": "Text",
                                       "style": {
-                                        "inheritFrom": "default",
-                                        "font": "Oswald14",
-                                        "alignHorizontal": "left",
-                                        "padding": "0 0 0 2"
+                                        "inheritFrom": "default_S"
                                       },
                                       "left": 0,
                                       "top": 0,
@@ -24798,10 +24810,7 @@
                                     {
                                       "type": "Text",
                                       "style": {
-                                        "inheritFrom": "default",
-                                        "font": "Oswald14",
-                                        "alignHorizontal": "left",
-                                        "padding": "0 0 0 2"
+                                        "inheritFrom": "default_S"
                                       },
                                       "left": 0,
                                       "top": 0,
@@ -25830,10 +25839,7 @@
                           {
                             "type": "Text",
                             "style": {
-                              "inheritFrom": "default",
-                              "font": "Oswald14",
-                              "alignHorizontal": "left",
-                              "padding": "0 0 0 2"
+                              "inheritFrom": "default_S"
                             },
                             "left": 0,
                             "top": 0,
@@ -25844,10 +25850,7 @@
                           {
                             "type": "Text",
                             "style": {
-                              "inheritFrom": "default",
-                              "font": "Oswald14",
-                              "alignHorizontal": "left",
-                              "padding": "0 0 0 2"
+                              "inheritFrom": "default_S"
                             },
                             "left": 0,
                             "top": 0,
@@ -26509,9 +26512,7 @@
                                     {
                                       "type": "Text",
                                       "style": {
-                                        "inheritFrom": "default",
-                                        "font": "Oswald14",
-                                        "padding": "0 0 0 2"
+                                        "inheritFrom": "default_S"
                                       },
                                       "left": 0,
                                       "top": 0,
@@ -26561,9 +26562,7 @@
                                     {
                                       "type": "Text",
                                       "style": {
-                                        "inheritFrom": "default",
-                                        "font": "Oswald14",
-                                        "padding": "0 0 0 2"
+                                        "inheritFrom": "default_S"
                                       },
                                       "left": 0,
                                       "top": 0,
@@ -32091,7 +32090,7 @@
         "height": 272
       },
       {
-        "name": "dlog_params",
+        "name": "dlog_params_old",
         "style": "default",
         "widgets": [
           {
@@ -32273,8 +32272,7 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default",
-                                "font": "Oswald14",
+                                "inheritFrom": "default_S",
                                 "color": "status_line_text_disabled",
                                 "activeBackgroundColor": "status_line_text_disabled"
                               },
@@ -32287,8 +32285,7 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default",
-                                "font": "Oswald14",
+                                "inheritFrom": "default_S",
                                 "color": "status_line_text_disabled",
                                 "activeBackgroundColor": "status_line_text_disabled"
                               },
@@ -32301,8 +32298,7 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default",
-                                "font": "Oswald14",
+                                "inheritFrom": "default_S",
                                 "color": "status_line_text_disabled",
                                 "activeBackgroundColor": "status_line_text_disabled"
                               },
@@ -32340,9 +32336,7 @@
                                 {
                                   "type": "Text",
                                   "style": {
-                                    "inheritFrom": "default",
-                                    "font": "Oswald14",
-                                    "padding": "0 0 0 2"
+                                    "inheritFrom": "default_S"
                                   },
                                   "left": 0,
                                   "top": 0,
@@ -32353,9 +32347,7 @@
                                 {
                                   "type": "Text",
                                   "style": {
-                                    "inheritFrom": "default",
-                                    "font": "Oswald14",
-                                    "padding": "0 0 0 2"
+                                    "inheritFrom": "default_S"
                                   },
                                   "left": 0,
                                   "top": 0,
@@ -32380,9 +32372,7 @@
                                 {
                                   "type": "Text",
                                   "style": {
-                                    "inheritFrom": "default",
-                                    "font": "Oswald14",
-                                    "padding": "0 0 0 2"
+                                    "inheritFrom": "default_S"
                                   },
                                   "left": 0,
                                   "top": 0,
@@ -32393,9 +32383,7 @@
                                 {
                                   "type": "Text",
                                   "style": {
-                                    "inheritFrom": "default",
-                                    "font": "Oswald14",
-                                    "padding": "0 0 0 2"
+                                    "inheritFrom": "default_S"
                                   },
                                   "left": 0,
                                   "top": 0,
@@ -32420,9 +32408,7 @@
                                 {
                                   "type": "Text",
                                   "style": {
-                                    "inheritFrom": "default",
-                                    "font": "Oswald14",
-                                    "padding": "0 0 0 2"
+                                    "inheritFrom": "default_S"
                                   },
                                   "left": 0,
                                   "top": 0,
@@ -32433,9 +32419,7 @@
                                 {
                                   "type": "Text",
                                   "style": {
-                                    "inheritFrom": "default",
-                                    "font": "Oswald14",
-                                    "padding": "0 0 0 2"
+                                    "inheritFrom": "default_S"
                                   },
                                   "left": 0,
                                   "top": 0,
@@ -32571,6 +32555,482 @@
         "dataContextOverrides": "{\n    \"channels\": [\n        {\n            \"channel_short_title_without_tracking_icon\": \"#1\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#2\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#3\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#4\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#5\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#6\"\n        }\n    ]\n}"
       },
       {
+        "name": "dlog_params",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 240,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 232,
+                "height": 240,
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 232,
+                    "height": 2
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 2,
+                    "width": 2,
+                    "height": 36
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 230,
+                    "top": 2,
+                    "width": 2,
+                    "height": 36
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 38,
+                    "width": 232,
+                    "height": 2
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 2,
+                    "top": 2,
+                    "width": 228,
+                    "height": 36,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_S_centered"
+                        },
+                        "left": 152,
+                        "top": 0,
+                        "width": 38,
+                        "height": 36,
+                        "text": "+"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_S_centered"
+                        },
+                        "left": 190,
+                        "top": 0,
+                        "width": 38,
+                        "height": 36,
+                        "text": "-"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 81,
+                        "height": 36,
+                        "text": "Log items:"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left",
+                      "color": "text_regular",
+                      "backgroundColor": "status_line_background",
+                      "activeColor": "status_line_background",
+                      "activeBackgroundColor": "text_regular"
+                    },
+                    "left": 2,
+                    "top": 40,
+                    "width": 29,
+                    "height": 20,
+                    "text": "No."
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "color": "text_regular",
+                      "backgroundColor": "status_line_background",
+                      "activeColor": "status_line_background",
+                      "activeBackgroundColor": "text_regular"
+                    },
+                    "data": "",
+                    "left": 32,
+                    "top": 40,
+                    "width": 63,
+                    "height": 20,
+                    "text": "Channel"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "color": "text_regular",
+                      "backgroundColor": "status_line_background",
+                      "activeColor": "status_line_background",
+                      "activeBackgroundColor": "text_regular"
+                    },
+                    "data": "",
+                    "left": 96,
+                    "top": 40,
+                    "width": 134,
+                    "height": 20,
+                    "text": "Value"
+                  },
+                  {
+                    "type": "List",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "log_items",
+                    "left": 2,
+                    "top": 60,
+                    "width": 228,
+                    "height": 176,
+                    "itemWidget": {
+                      "type": "Container",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 228,
+                      "height": 22,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_S_left",
+                            "alignHorizontal": "center",
+                            "padding": "0"
+                          },
+                          "data": "log_item_index",
+                          "left": 0,
+                          "top": 0,
+                          "width": 32,
+                          "height": 22,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_S_left",
+                            "alignHorizontal": "center",
+                            "padding": "0"
+                          },
+                          "data": "log_item_channel",
+                          "left": 32,
+                          "top": 0,
+                          "width": 64,
+                          "height": 22,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_S_left",
+                            "alignHorizontal": "left",
+                            "padding": "0"
+                          },
+                          "data": "log_item_label",
+                          "left": 96,
+                          "top": 0,
+                          "width": 132,
+                          "height": 22,
+                          "text": ""
+                        }
+                      ]
+                    },
+                    "listType": "vertical",
+                    "gap": 0
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 40,
+                    "width": 2,
+                    "height": 198
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 230,
+                    "top": 40,
+                    "width": 2,
+                    "height": 198
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 2,
+                    "top": 236,
+                    "width": 230,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 240,
+                "top": 0,
+                "width": 240,
+                "height": 240,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 4,
+                    "width": 59,
+                    "height": 32,
+                    "text": "Period:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "padding": "0 5"
+                    },
+                    "data": "dlog_period",
+                    "action": "dlog_edit_period",
+                    "left": 76,
+                    "top": 4,
+                    "width": 115,
+                    "height": 32,
+                    "displayOption": 0
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 44,
+                    "width": 76,
+                    "height": 32,
+                    "text": "Duration:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "padding": "0 5"
+                    },
+                    "data": "dlog_duration",
+                    "action": "dlog_edit_duration",
+                    "left": 76,
+                    "top": 44,
+                    "width": 115,
+                    "height": 32,
+                    "displayOption": 0
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 84,
+                    "width": 58,
+                    "height": 32,
+                    "text": "Name:"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "padding": "0 5"
+                    },
+                    "data": "dlog_file_name",
+                    "action": "dlog_edit_file_name",
+                    "left": 76,
+                    "top": 84,
+                    "width": 164,
+                    "height": 32,
+                    "displayOption": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_main_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "H"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 40,
+                "top": 0,
+                "width": 358,
+                "height": 32,
+                "text": "Log settings"
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "set_page_dirty",
+                "left": 398,
+                "top": 0,
+                "width": 82,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 82,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background",
+                          "activeColor": "status_line_background",
+                          "activeBackgroundColor": "status_line_text"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 82,
+                        "height": 32,
+                        "invertColors": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 82,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14",
+                          "alignVertical": "center",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background",
+                          "activeColor": "status_line_background",
+                          "activeBackgroundColor": "status_line_text"
+                        },
+                        "action": "set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "_"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14",
+                          "alignVertical": "center",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background",
+                          "activeColor": "status_line_background",
+                          "activeBackgroundColor": "status_line_text"
+                        },
+                        "action": "discard",
+                        "left": 41,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "X"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 1,
+        "width": 480,
+        "height": 272,
+        "dataContextOverrides": "{\n    \"log_items\": [\n        {\n            \"log_item_index\": \"1\",\n            \"log_item_channel\": \"101\",\n            \"log_item_label\": \"DCP405 #1 U\"\n        },\n        {\n            \"log_item_index\": \"2\",\n            \"log_item_channel\": \"101\",\n            \"log_item_label\": \"DCP405 #1 I\"\n        },\n        {\n            \"log_item_index\": \"3\",\n            \"log_item_channel\": \"201\",\n            \"log_item_label\": \"DCP405 #2 U\"\n        },\n        {\n            \"log_item_index\": \"4\",\n            \"log_item_channel\": \"201\",\n            \"log_item_label\": \"DCP405 #2 I\"\n        }\n    ]\n}"
+      },
+      {
         "name": "dlog_view_overlay_options",
         "style": "default",
         "widgets": [
@@ -32686,12 +33146,9 @@
                   {
                     "type": "Text",
                     "style": {
-                      "inheritFrom": "default",
-                      "font": "Oswald14",
-                      "alignHorizontal": "left",
+                      "inheritFrom": "default_S",
                       "color": "Action color",
-                      "activeBackgroundColor": "Action color",
-                      "padding": "0 0 0 2"
+                      "activeBackgroundColor": "Action color"
                     },
                     "left": 0,
                     "top": 0,
@@ -41187,7 +41644,7 @@
           {
             "encoding": 159,
             "x": 0,
-            "y": -1,
+            "y": -2,
             "width": 19,
             "height": 19,
             "dx": 19,

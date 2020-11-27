@@ -497,6 +497,17 @@ float getUMonLast(const Channel &channel) {
     return channel.u.mon_last;
 }
 
+float getUMonLast(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        return getUMonLast(*channel);
+    }
+
+    float value;
+    getMeasuredVoltage(slotIndex, subchannelIndex, value, nullptr);
+    return value;
+}
+
 float getUMonDac(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
         return Channel::get(0).u.mon_dac + Channel::get(1).u.mon_dac;
@@ -852,6 +863,17 @@ float getIMonLast(const Channel &channel) {
         return Channel::get(0).i.mon_last + Channel::get(1).i.mon_last;
     }
     return channel.i.mon_last;
+}
+
+float getIMonLast(int slotIndex, int subchannelIndex) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        return getIMonLast(*channel);
+    }
+
+    float value;
+    getMeasuredCurrent(slotIndex, subchannelIndex, value, nullptr);
+    return value;
 }
 
 float getIMonDac(const Channel &channel) {

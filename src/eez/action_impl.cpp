@@ -1151,19 +1151,7 @@ void action_drag_overlay() {
 }
 
 void action_show_dlog_params() {
-    pushPage(PAGE_ID_DLOG_PARAMS);
-}
-
-void action_dlog_voltage_toggle() {
-    dlog_record::g_guiParameters.logVoltage[getFoundWidgetAtDown().cursor] = !dlog_record::g_guiParameters.logVoltage[getFoundWidgetAtDown().cursor];
-}
-
-void action_dlog_current_toggle() {
-    dlog_record::g_guiParameters.logCurrent[getFoundWidgetAtDown().cursor] = !dlog_record::g_guiParameters.logCurrent[getFoundWidgetAtDown().cursor];
-}
-
-void action_dlog_power_toggle() {
-    dlog_record::g_guiParameters.logPower[getFoundWidgetAtDown().cursor] = !dlog_record::g_guiParameters.logPower[getFoundWidgetAtDown().cursor];
+    pushPage(PAGE_ID_DLOG_PARAMS_OLD);
 }
 
 void action_dlog_edit_period() {
@@ -1178,10 +1166,6 @@ void action_dlog_edit_file_name() {
     editValue(DATA_ID_DLOG_FILE_NAME);
 }
 
-void action_dlog_toggle() {
-    dlog_record::toggleStop();
-}
-
 void action_show_dlog_view() {
     dlog_view::g_showLatest = true;
     if (!dlog_record::isExecuting()) {
@@ -1190,62 +1174,8 @@ void action_show_dlog_view() {
     showPage(PAGE_ID_DLOG_VIEW);
 }
 
-void action_dlog_start_recording() {
-    popPage();
-
-    char filePath[MAX_PATH_LENGTH + 50];
-
-    if (isStringEmpty(dlog_record::g_guiParameters.filePath)) {
-        uint8_t year, month, day, hour, minute, second;
-        datetime::getDateTime(year, month, day, hour, minute, second);
-
-        if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24) {
-            snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
-                RECORDINGS_DIR,
-                dlog_record::g_guiParameters.filePath,
-                (int)day, (int)month, (int)year,
-                (int)hour, (int)minute, (int)second);
-        } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
-        	snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
-                RECORDINGS_DIR,
-                dlog_record::g_guiParameters.filePath,
-                (int)month, (int)day, (int)year,
-                (int)hour, (int)minute, (int)second);
-        } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
-            bool am;
-            datetime::convertTime24to12(hour, am);
-            snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
-                RECORDINGS_DIR,
-                dlog_record::g_guiParameters.filePath,
-                (int)day, (int)month, (int)year,
-                (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
-        } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_12) {
-            bool am;
-            datetime::convertTime24to12(hour, am);
-            snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
-                RECORDINGS_DIR,
-                dlog_record::g_guiParameters.filePath,
-                (int)month, (int)day, (int)year,
-                (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
-        }
-    } else {
-    	snprintf(filePath, sizeof(filePath), "%s/%s.dlog", RECORDINGS_DIR, dlog_record::g_guiParameters.filePath);
-    }
-
-    memcpy(&dlog_record::g_parameters, &dlog_record::g_guiParameters, sizeof(dlog_record::g_guiParameters));
-    strcpy(dlog_record::g_parameters.filePath, filePath);
-
-    dlog_record::toggleStart();
-}
-
 void action_dlog_view_show_overlay_options() {
     pushPage(PAGE_ID_DLOG_VIEW_OVERLAY_OPTIONS);
-}
-
-void action_dlog_value_toggle() {
-    dlog_view::Recording &recording = dlog_view::getRecording();
-    int dlogValueIndex = getFoundWidgetAtDown().cursor;
-    recording.dlogValues[dlogValueIndex].isVisible = !recording.dlogValues[dlogValueIndex].isVisible;
 }
 
 void onSelectDlogViewLegendViewOption(uint16_t value) {

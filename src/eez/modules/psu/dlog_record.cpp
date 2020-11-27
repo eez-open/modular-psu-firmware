@@ -72,25 +72,8 @@ dlog_view::Parameters g_parameters = {
     dlog_view::SCALE_LINEAR,
     0,
     {{}, {}, {}, {}, {}, {}},
-    {false, false, false, false, false, false},
-    {false, false, false, false, false, false},
-    {false, false, false, false, false, false},
-    PERIOD_DEFAULT,
-    TIME_DEFAULT,
-    trigger::SOURCE_IMMEDIATE
-};
-
-dlog_view::Parameters g_guiParameters = {
-    { 0 },
-    { 0 },
-    { },
-    { },
-    dlog_view::SCALE_LINEAR,
+    {},
     0,
-    {{}, {}, {}, {}, {}, {}},
-    {true, false, false, false, false, false},
-    {true, false, false, false, false, false},
-    {false, false, false, false, false, false},
     PERIOD_DEFAULT,
     TIME_DEFAULT,
     trigger::SOURCE_IMMEDIATE
@@ -503,15 +486,16 @@ static void log(uint32_t tickCount) {
                 }
 
                 // we missed a sample, write NAN's
-                for (int i = 0; i < CH_NUM; ++i) {
-                    if (g_recording.parameters.logVoltage[i]) {
+                for (int i = 0; i < g_recording.parameters.numLogItems; i++) {
+                    auto &logItem = g_recording.parameters.logItems[i];
+                    if (
+                        logItem.type == dlog_view::LOG_ITEM_TYPE_U || 
+                        logItem.type == dlog_view::LOG_ITEM_TYPE_I || 
+                        logItem.type == dlog_view::LOG_ITEM_TYPE_P
+                    ) {
                         writeFloat(NAN);
-                    }
-                    if (g_recording.parameters.logCurrent[i]) {
-                        writeFloat(NAN);
-                    }
-                    if (g_recording.parameters.logPower[i]) {
-                        writeFloat(NAN);
+                    } else {
+                        // TODO
                     }
                 }
 
@@ -519,30 +503,19 @@ static void log(uint32_t tickCount) {
             }
 
             // write sample
-            for (int i = 0; i < CH_NUM; ++i) {
-                Channel &channel = Channel::get(i);
-
-                float uMon = 0;
-                float iMon = 0;
-
-                if (g_recording.parameters.logVoltage[i]) {
-                    uMon = channel_dispatcher::getUMonLast(channel);
-                    writeFloat(uMon);
-                }
-
-                if (g_recording.parameters.logCurrent[i]) {
-                    iMon = channel_dispatcher::getIMonLast(channel);
-                    writeFloat(iMon);
-                }
-
-                if (g_recording.parameters.logPower[i]) {
-                    if (!g_recording.parameters.logVoltage[i]) {
-                        uMon = channel_dispatcher::getUMonLast(channel);
-                    }
-                    if (!g_recording.parameters.logCurrent[i]) {
-                        iMon = channel_dispatcher::getIMonLast(channel);
-                    }
-                    writeFloat(uMon * iMon);
+            for (int i = 0; i < g_recording.parameters.numLogItems; i++) {
+                auto &logItem = g_recording.parameters.logItems[i];
+                if (logItem.type == dlog_view::LOG_ITEM_TYPE_U) {
+                    writeFloat(channel_dispatcher::getUMonLast(logItem.slotIndex, logItem.subchannelIndex));
+                } else if (logItem.type == dlog_view::LOG_ITEM_TYPE_I) {
+                    writeFloat(channel_dispatcher::getIMonLast(logItem.slotIndex, logItem.subchannelIndex));
+                } else if (logItem.type == dlog_view::LOG_ITEM_TYPE_P)  {
+                    writeFloat(
+                        channel_dispatcher::getUMonLast(logItem.slotIndex, logItem.subchannelIndex) *
+                        channel_dispatcher::getIMonLast(logItem.slotIndex, logItem.subchannelIndex)
+                    );
+                } else {
+                    // TODO
                 }
             }
             
@@ -670,14 +643,7 @@ int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePa
             }
         }
     } else {
-        bool somethingToLog = false;
-        for (int i = 0; i < CH_NUM; ++i) {
-            if (parameters.logVoltage[i] || parameters.logCurrent[i] || parameters.logPower[i]) {
-                somethingToLog = true;
-                break;
-            }
-        }
-
+        bool somethingToLog = parameters.numLogItems > 0;
         if (!somethingToLog) {
             // TODO replace with more specific error
             return SCPI_ERROR_EXECUTION_ERROR;

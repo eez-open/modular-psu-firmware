@@ -101,27 +101,6 @@ enum Fields {
     FIELD_ID_CHANNEL_MODULE_REVISION = 51
 };
 
-enum DlogValueType {
-    DLOG_VALUE_CH1_U,
-    DLOG_VALUE_CH1_I,
-    DLOG_VALUE_CH1_P,
-    DLOG_VALUE_CH2_U,
-    DLOG_VALUE_CH2_I,
-    DLOG_VALUE_CH2_P,
-    DLOG_VALUE_CH3_U,
-    DLOG_VALUE_CH3_I,
-    DLOG_VALUE_CH3_P,
-    DLOG_VALUE_CH4_U,
-    DLOG_VALUE_CH4_I,
-    DLOG_VALUE_CH4_P,
-    DLOG_VALUE_CH5_U,
-    DLOG_VALUE_CH5_I,
-    DLOG_VALUE_CH5_P,
-    DLOG_VALUE_CH6_U,
-    DLOG_VALUE_CH6_I,
-    DLOG_VALUE_CH6_P,
-};
-
 struct Range {
     float min;
     float max;
@@ -149,6 +128,26 @@ struct YAxis {
     int8_t channelIndex;
 };
 
+enum LogItemType {
+    LOG_ITEM_TYPE_U,
+    LOG_ITEM_TYPE_I,
+    LOG_ITEM_TYPE_P,
+    LOG_ITEM_TYPE_DIN0,
+    LOG_ITEM_TYPE_DIN1,
+    LOG_ITEM_TYPE_DIN2,
+    LOG_ITEM_TYPE_DIN3,
+    LOG_ITEM_TYPE_DIN4,
+    LOG_ITEM_TYPE_DIN5,
+    LOG_ITEM_TYPE_DIN6,
+    LOG_ITEM_TYPE_DIN7,
+};
+
+struct LogItem {
+    uint8_t slotIndex;
+    uint8_t subchannelIndex;
+    uint8_t type;
+};
+
 struct Parameters {
     char filePath[MAX_PATH_LENGTH + 1];
     char comment[MAX_COMMENT_LENGTH + 1];
@@ -161,18 +160,21 @@ struct Parameters {
     uint8_t numYAxes;
     YAxis yAxes[MAX_NUM_OF_Y_AXES];
 
-    bool logVoltage[CH_MAX];
-    bool logCurrent[CH_MAX];
-    bool logPower[CH_MAX];
+    LogItem logItems[MAX_NUM_OF_Y_AXES];
+    int numLogItems;
+    eez_err_t enableLogItem(int slotIndex, int subchannelIndex, LogItemType type, bool enable);
+    bool isLogItemEnabled(int slotIndex, int subchannelIndex, LogItemType type);
+
     float period;
     float time;
     trigger::Source triggerSource;
+
+private:
+    bool findLogItemIndex(int slotIndex, int subchannelIndex, LogItemType type, int &logItemIndex);
 };
 
 struct DlogValueParams {
     bool isVisible;
-    DlogValueType dlogValueType;
-    int channelIndex;
     float offset;
     float div;
 };
@@ -241,6 +243,8 @@ void scaleToFit(Recording &recording);
 float roundValue(float value);
 
 void uploadFile();
+
+eez::gui::SetPage *getParamsPage();
 
 } // namespace dlog_view
 } // namespace psu

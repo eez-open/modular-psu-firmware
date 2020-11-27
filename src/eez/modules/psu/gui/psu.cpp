@@ -410,7 +410,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         }
     } else if (previousPageId == PAGE_ID_WELCOME) {
         animateFadeOutFadeIn();
-    } else if (previousPageId == PAGE_ID_EVENT_QUEUE) {
+    } else if (previousPageId == PAGE_ID_EVENT_QUEUE || previousPageId == PAGE_ID_DLOG_PARAMS) {
         if (getActivePageId() == PAGE_ID_MAIN) {
             animateSlideUp();
         }
@@ -424,6 +424,8 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         } else if (isChSettingsSubPage(activePageId)) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_EVENT_QUEUE) {
+            animateSlideDown();
+        } else if (activePageId == PAGE_ID_DLOG_PARAMS) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_USER_PROFILES) {
             animateSlideDown();
@@ -2217,6 +2219,9 @@ Page *getPageFromIdHook(int pageId) {
         break;
     case PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS:
         page = &g_LabelsAndColorsPage;
+        break;
+    case PAGE_ID_DLOG_PARAMS:
+        page = psu::dlog_view::getParamsPage();
         break;
     default :
         for (int i = 0; i < NUM_SLOTS; i++) {

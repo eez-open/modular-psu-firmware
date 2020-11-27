@@ -1255,7 +1255,7 @@ void data_channel_u_mon(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, dlog_view::LOG_ITEM_TYPE_U)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -1279,7 +1279,7 @@ void data_channel_u_mon_dac(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logVoltage[iChannel]) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, dlog_view::LOG_ITEM_TYPE_U)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     }
@@ -1369,7 +1369,7 @@ void data_channel_i_mon(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, dlog_view::LOG_ITEM_TYPE_I)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -1393,7 +1393,7 @@ void data_channel_i_mon_dac(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER);
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logCurrent[iChannel]) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, dlog_view::LOG_ITEM_TYPE_I)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } 
@@ -1470,7 +1470,7 @@ void data_channel_p_mon(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.logPower[iChannel]) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, dlog_view::LOG_ITEM_TYPE_P)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -4815,89 +4815,6 @@ void data_channel_history_values(DataOperationEnum operation, Cursor cursor, Val
         value = getLimit(cursor, value.getUInt8() == 0 ? DATA_ID_CHANNEL_DISPLAY_VALUE1 : DATA_ID_CHANNEL_DISPLAY_VALUE2);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
         value = Value(psu::persist_conf::devConf.ytGraphUpdateMethod, VALUE_TYPE_UINT8);
-    }
-}
-
-void data_dlog_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = (
-                channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || 
-                channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES
-            ) && cursor == 1 ? 0 : 1;
-    }
-}
-
-void data_dlog_voltage_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = dlog_record::g_guiParameters.logVoltage[cursor];
-    }
-}
-
-void data_dlog_current_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = dlog_record::g_guiParameters.logCurrent[cursor];
-    }
-}
-
-void data_dlog_power_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = dlog_record::g_guiParameters.logPower[cursor];
-    }
-}
-
-void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = MakeValue(dlog_record::g_guiParameters.period, UNIT_SECOND);
-    } else if (operation == DATA_OPERATION_GET_UNIT) {
-        value = UNIT_SECOND;
-    } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(dlog_record::PERIOD_MIN, UNIT_SECOND);
-    } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = MakeValue(dlog_record::PERIOD_MAX, UNIT_SECOND);
-    } else if (operation == DATA_OPERATION_SET) {
-        dlog_record::g_guiParameters.period = value.getFloat();
-    }
-}
-
-void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = MakeValue(dlog_record::g_guiParameters.time, UNIT_SECOND);
-    } else if (operation == DATA_OPERATION_GET_UNIT) {
-        value = UNIT_SECOND;
-    } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(dlog_record::TIME_MIN, UNIT_SECOND);
-    } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = MakeValue(INFINITY, UNIT_SECOND);
-    } else if (operation == DATA_OPERATION_SET) {
-        dlog_record::g_guiParameters.time = value.getFloat();
-    }
-}
-
-void data_dlog_file_name(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = dlog_record::g_guiParameters.filePath;
-    } else if (operation == DATA_OPERATION_SET) {
-        strcpy(dlog_record::g_guiParameters.filePath, value.getString());
-    } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = Value(MAX_PATH_LENGTH, VALUE_TYPE_UINT32);
-    }
-}
-
-void data_dlog_start_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = dlog_record::checkDlogParameters(dlog_record::g_guiParameters, true, false) == SCPI_RES_OK ? 1 : 0;
-    }
-}
-
-void data_dlog_view_state(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = dlog_view::getState();
-    }
-}
-
-void data_recording_ready(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = dlog_record::isExecuting() || dlog_record::getLatestFilePath() ? 1 : 0;
     }
 }
 

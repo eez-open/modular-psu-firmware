@@ -25,7 +25,7 @@ namespace eez {
 namespace psu {
 namespace dlog_record {
 
-static const float PERIOD_MIN = 0.005f;
+static const float PERIOD_MIN = 0.001f;
 static const float PERIOD_MAX = 120.0f;
 static const float PERIOD_DEFAULT = 0.02f;
 
@@ -36,7 +36,6 @@ static const float TIME_DEFAULT = 60.0f;
 extern double g_currentTime;
 extern uint32_t g_fileLength;
 extern dlog_view::Parameters g_parameters;
-extern dlog_view::Parameters g_guiParameters;
 extern dlog_view::Recording g_recording;
 
 enum State {
