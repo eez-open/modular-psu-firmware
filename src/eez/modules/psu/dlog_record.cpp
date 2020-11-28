@@ -486,16 +486,16 @@ static void log(uint32_t tickCount) {
                 }
 
                 // we missed a sample, write NAN's
-                for (int i = 0; i < g_recording.parameters.numLogItems; i++) {
-                    auto &logItem = g_recording.parameters.logItems[i];
+                for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
+                    auto &dlogItem = g_recording.parameters.dlogItems[i];
                     if (
-                        logItem.type == dlog_view::LOG_ITEM_TYPE_U || 
-                        logItem.type == dlog_view::LOG_ITEM_TYPE_I || 
-                        logItem.type == dlog_view::LOG_ITEM_TYPE_P
+                        dlogItem.resourceType == DLOG_RESOURCE_TYPE_U ||
+                        dlogItem.resourceType == DLOG_RESOURCE_TYPE_I ||
+                        dlogItem.resourceType == DLOG_RESOURCE_TYPE_P
                     ) {
                         writeFloat(NAN);
-                    } else {
-                        // TODO
+                    } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
+                        writeUint8(0);
                     }
                 }
 
@@ -503,20 +503,26 @@ static void log(uint32_t tickCount) {
             }
 
             // write sample
-            for (int i = 0; i < g_recording.parameters.numLogItems; i++) {
-                auto &logItem = g_recording.parameters.logItems[i];
-                if (logItem.type == dlog_view::LOG_ITEM_TYPE_U) {
-                    writeFloat(channel_dispatcher::getUMonLast(logItem.slotIndex, logItem.subchannelIndex));
-                } else if (logItem.type == dlog_view::LOG_ITEM_TYPE_I) {
-                    writeFloat(channel_dispatcher::getIMonLast(logItem.slotIndex, logItem.subchannelIndex));
-                } else if (logItem.type == dlog_view::LOG_ITEM_TYPE_P)  {
+            dlog_view::DlogItem *prevDlogItem = nullptr;
+            for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
+                auto &dlogItem = g_recording.parameters.dlogItems[i];
+                if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
+                    writeFloat(channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
+                } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_I) {
+                    writeFloat(channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
+                } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_P)  {
                     writeFloat(
-                        channel_dispatcher::getUMonLast(logItem.slotIndex, logItem.subchannelIndex) *
-                        channel_dispatcher::getIMonLast(logItem.slotIndex, logItem.subchannelIndex)
+                        channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex) *
+                        channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex)
                     );
-                } else {
-                    // TODO
+                } else  if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
+                    if (prevDlogItem == nullptr || prevDlogItem->slotIndex != dlogItem.slotIndex || prevDlogItem->subchannelIndex != dlogItem.subchannelIndex) {
+                        uint8_t data;
+                        channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
+                        writeUint8(data);
+                    }
                 }
+                prevDlogItem = &dlogItem;
             }
             
             ++g_recording.size;
@@ -580,11 +586,15 @@ static int doInitiate(bool traceInitiated) {
     return err;
 }
 
-static void resetParameters() {
+static void resetAllParameters() {
     memset(&g_parameters, 0, sizeof(g_parameters));
     g_parameters.period = PERIOD_DEFAULT;
     g_parameters.time = TIME_DEFAULT;
     setTriggerSource(trigger::SOURCE_IMMEDIATE);
+}
+
+static void resetFilePath() {
+    *g_parameters.filePath = 0;
 }
 
 static void doFinish(bool afterError) {
@@ -592,7 +602,7 @@ static void doFinish(bool afterError) {
         flushData();
         onSdCardFileChangeHook(g_parameters.filePath);
     }
-    resetParameters();
+    resetFilePath();
     setState(STATE_IDLE);
 }
 
@@ -643,7 +653,7 @@ int checkDlogParameters(dlog_view::Parameters &parameters, bool doNotCheckFilePa
             }
         }
     } else {
-        bool somethingToLog = parameters.numLogItems > 0;
+        bool somethingToLog = parameters.numDlogItems > 0;
         if (!somethingToLog) {
             // TODO replace with more specific error
             return SCPI_ERROR_EXECUTION_ERROR;
@@ -685,7 +695,7 @@ void stateTransition(int event, int* perr) {
         } else if (event == EVENT_TOGGLE_STOP) {
             err = SCPI_RES_OK;
         } else if (event == EVENT_ABORT || event == EVENT_RESET) {
-            resetParameters();
+            resetFilePath();
             err = SCPI_RES_OK;
         }
     } else if (g_state == STATE_INITIATED) {
@@ -694,7 +704,7 @@ void stateTransition(int event, int* perr) {
         } else if (event == EVENT_TOGGLE_START) {
             err = doInitiate(false);
         } else if (event == EVENT_ABORT || event == EVENT_RESET) {
-            resetParameters();
+            resetFilePath();
             setState(STATE_IDLE);
             err = SCPI_RES_OK;
         }
@@ -708,6 +718,10 @@ void stateTransition(int event, int* perr) {
             doFinish(true);
             err = SCPI_ERROR_MASS_STORAGE_ERROR;
         }
+    }
+
+    if (event == EVENT_RESET) {
+        resetAllParameters();
     }
 
     g_stateTransitionError = err;

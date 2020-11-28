@@ -63,7 +63,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltage(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    auto err = dlog_record::g_parameters.enableLogItem(channel->slotIndex, channel->subchannelIndex, dlog_view::LOG_ITEM_TYPE_U, enable);
+    auto err = dlog_record::g_parameters.enableDlogItem(channel->slotIndex, channel->subchannelIndex, DLOG_RESOURCE_TYPE_U, enable);
     if (err != SCPI_RES_OK) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
@@ -78,7 +78,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionVoltageQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog_record::g_parameters.isLogItemEnabled(channel->slotIndex, channel->subchannelIndex, dlog_view::LOG_ITEM_TYPE_U));
+    SCPI_ResultBool(context, dlog_record::g_parameters.isDlogItemEnabled(channel->slotIndex, channel->subchannelIndex, DLOG_RESOURCE_TYPE_U));
 
     return SCPI_RES_OK;
 }
@@ -100,7 +100,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrent(scpi_t *context) {
     }
 
 
-    auto err = dlog_record::g_parameters.enableLogItem(channel->slotIndex, channel->subchannelIndex, dlog_view::LOG_ITEM_TYPE_I, enable);
+    auto err = dlog_record::g_parameters.enableDlogItem(channel->slotIndex, channel->subchannelIndex, DLOG_RESOURCE_TYPE_I, enable);
     if (err != SCPI_RES_OK) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
@@ -115,7 +115,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionCurrentQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog_record::g_parameters.isLogItemEnabled(channel->slotIndex, channel->subchannelIndex, dlog_view::LOG_ITEM_TYPE_I));
+    SCPI_ResultBool(context, dlog_record::g_parameters.isDlogItemEnabled(channel->slotIndex, channel->subchannelIndex, DLOG_RESOURCE_TYPE_I));
 
     return SCPI_RES_OK;
 }
@@ -136,7 +136,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionPower(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    auto err = dlog_record::g_parameters.enableLogItem(channel->slotIndex, channel->subchannelIndex, dlog_view::LOG_ITEM_TYPE_P, enable);
+    auto err = dlog_record::g_parameters.enableDlogItem(channel->slotIndex, channel->subchannelIndex, DLOG_RESOURCE_TYPE_P, enable);
     if (err != SCPI_RES_OK) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
@@ -151,7 +151,7 @@ scpi_result_t scpi_cmd_senseDlogFunctionPowerQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultBool(context, dlog_record::g_parameters.isLogItemEnabled(channel->slotIndex, channel->subchannelIndex, dlog_view::LOG_ITEM_TYPE_P));
+    SCPI_ResultBool(context, dlog_record::g_parameters.isDlogItemEnabled(channel->slotIndex, channel->subchannelIndex, DLOG_RESOURCE_TYPE_P));
 
     return SCPI_RES_OK;
 }

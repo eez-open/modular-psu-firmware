@@ -154,10 +154,6 @@ int main(int argc, char **argv) {
 
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    osDelay(100);
-#endif
-
     return 0;
 }
 

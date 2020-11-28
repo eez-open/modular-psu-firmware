@@ -156,6 +156,23 @@ static const size_t SLOT_LABEL_MAX_LENGTH = 8;
 
 typedef int eez_err_t;
 
+enum DlogResourceType {
+    DLOG_RESOURCE_TYPE_NONE,
+
+    DLOG_RESOURCE_TYPE_U,
+    DLOG_RESOURCE_TYPE_I,
+    DLOG_RESOURCE_TYPE_P,
+    
+    DLOG_RESOURCE_TYPE_DIN0,
+    DLOG_RESOURCE_TYPE_DIN1,
+    DLOG_RESOURCE_TYPE_DIN2,
+    DLOG_RESOURCE_TYPE_DIN3,
+    DLOG_RESOURCE_TYPE_DIN4,
+    DLOG_RESOURCE_TYPE_DIN5,
+    DLOG_RESOURCE_TYPE_DIN6,
+    DLOG_RESOURCE_TYPE_DIN7,
+};
+
 struct Module {
     uint16_t moduleType;
     const char *moduleName;
@@ -335,6 +352,10 @@ struct Module {
     virtual bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err);
     virtual bool getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err);
     virtual bool getCalibrationDate(int subchannelIndex, uint32_t &calibrationDate, int *err);
+
+    virtual int getNumDlogResources(int subchannelIndex);
+    virtual DlogResourceType getDlogResourceType(int subchannelIndex, int resourceIndex);
+    virtual const char *getDlogResourceLabel(int subchannelIndex, int resourceIndex);
 };
 
 static const int NUM_SLOTS = 3;

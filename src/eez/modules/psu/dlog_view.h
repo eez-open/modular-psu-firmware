@@ -128,24 +128,11 @@ struct YAxis {
     int8_t channelIndex;
 };
 
-enum LogItemType {
-    LOG_ITEM_TYPE_U,
-    LOG_ITEM_TYPE_I,
-    LOG_ITEM_TYPE_P,
-    LOG_ITEM_TYPE_DIN0,
-    LOG_ITEM_TYPE_DIN1,
-    LOG_ITEM_TYPE_DIN2,
-    LOG_ITEM_TYPE_DIN3,
-    LOG_ITEM_TYPE_DIN4,
-    LOG_ITEM_TYPE_DIN5,
-    LOG_ITEM_TYPE_DIN6,
-    LOG_ITEM_TYPE_DIN7,
-};
-
-struct LogItem {
+struct DlogItem {
     uint8_t slotIndex;
     uint8_t subchannelIndex;
-    uint8_t type;
+    uint8_t resourceIndex;
+    uint8_t resourceType;
 };
 
 struct Parameters {
@@ -160,17 +147,19 @@ struct Parameters {
     uint8_t numYAxes;
     YAxis yAxes[MAX_NUM_OF_Y_AXES];
 
-    LogItem logItems[MAX_NUM_OF_Y_AXES];
-    int numLogItems;
-    eez_err_t enableLogItem(int slotIndex, int subchannelIndex, LogItemType type, bool enable);
-    bool isLogItemEnabled(int slotIndex, int subchannelIndex, LogItemType type);
+    DlogItem dlogItems[MAX_NUM_OF_Y_AXES];
+    int numDlogItems;
+    eez_err_t enableDlogItem(int slotIndex, int subchannelIndex, int resourceIndex, bool enable);
+    bool isDlogItemEnabled(int slotIndex, int subchannelIndex, int resourceIndex);
+    bool isDlogItemEnabled(int slotIndex, int subchannelIndex, DlogResourceType resourceType);
 
     float period;
     float time;
     trigger::Source triggerSource;
 
 private:
-    bool findLogItemIndex(int slotIndex, int subchannelIndex, LogItemType type, int &logItemIndex);
+    bool findDlogItemIndex(int slotIndex, int subchannelIndex, int resourceIndex, int &dlogItemIndex);
+    bool findDlogItemIndex(int slotIndex, int subchannelIndex, DlogResourceType resourceType, int &dlogItemIndex);
 };
 
 struct DlogValueParams {

@@ -451,7 +451,7 @@
                       "height": 24,
                       "widgets": [
                         {
-                          "type": "Text",
+                          "type": "DisplayData",
                           "style": {
                             "inheritFrom": "default",
                             "font": "Oswald12"
@@ -461,7 +461,7 @@
                           "top": 0,
                           "width": 20,
                           "height": 23,
-                          "text": ""
+                          "displayOption": 0
                         }
                       ]
                     },
@@ -476,7 +476,7 @@
                       "height": 24,
                       "widgets": [
                         {
-                          "type": "Text",
+                          "type": "DisplayData",
                           "style": {
                             "inheritFrom": "default_inverse",
                             "font": "Oswald12"
@@ -486,7 +486,7 @@
                           "top": 0,
                           "width": 20,
                           "height": 23,
-                          "text": ""
+                          "displayOption": 0
                         }
                       ]
                     }
@@ -892,7 +892,7 @@
                       "height": 24,
                       "widgets": [
                         {
-                          "type": "Text",
+                          "type": "DisplayData",
                           "style": {
                             "inheritFrom": "default",
                             "font": "Oswald12"
@@ -902,7 +902,7 @@
                           "top": 0,
                           "width": 20,
                           "height": 23,
-                          "text": ""
+                          "displayOption": 0
                         }
                       ]
                     },
@@ -917,7 +917,7 @@
                       "height": 24,
                       "widgets": [
                         {
-                          "type": "Text",
+                          "type": "DisplayData",
                           "style": {
                             "inheritFrom": "default_inverse",
                             "font": "Oswald12"
@@ -927,7 +927,7 @@
                           "top": 0,
                           "width": 20,
                           "height": 23,
-                          "text": ""
+                          "displayOption": 0
                         }
                       ]
                     }
@@ -1347,19 +1347,17 @@
                       "height": 26,
                       "widgets": [
                         {
-                          "type": "Text",
+                          "type": "DisplayData",
                           "style": {
                             "inheritFrom": "default",
-                            "font": "Oswald12",
-                            "alignVertical": "center"
+                            "font": "Oswald12"
                           },
                           "data": "din_no",
-                          "action": "",
                           "left": 0,
                           "top": 0,
                           "width": 31,
                           "height": 25,
-                          "text": ""
+                          "displayOption": 0
                         }
                       ]
                     },
@@ -1374,19 +1372,17 @@
                       "height": 26,
                       "widgets": [
                         {
-                          "type": "Text",
+                          "type": "DisplayData",
                           "style": {
                             "inheritFrom": "default_inverse",
-                            "font": "Oswald12",
-                            "alignVertical": "center"
+                            "font": "Oswald12"
                           },
                           "data": "din_no",
-                          "action": "",
                           "left": 0,
                           "top": 0,
                           "width": 31,
                           "height": 25,
-                          "text": ""
+                          "displayOption": 0
                         }
                       ]
                     }

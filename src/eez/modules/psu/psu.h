@@ -91,6 +91,10 @@ public:
     bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) override;
     bool getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err) override;
     bool getCalibrationDate(int subchannelIndex, uint32_t &calibrationDate, int *err) override;
+
+    int getNumDlogResources(int subchannelIndex) override;
+	DlogResourceType getDlogResourceType(int subchannelIndex, int resourceIndex) override;
+	const char *getDlogResourceLabel(int subchannelIndex, int resourceIndex) override;
 };
 
 /// Channel binary flags stored in profile.

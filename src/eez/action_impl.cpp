@@ -1151,7 +1151,7 @@ void action_drag_overlay() {
 }
 
 void action_show_dlog_params() {
-    pushPage(PAGE_ID_DLOG_PARAMS_OLD);
+    pushPage(PAGE_ID_DLOG_PARAMS);
 }
 
 void action_dlog_edit_period() {

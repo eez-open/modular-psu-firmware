@@ -2016,9 +2016,19 @@ uint16_t transformColorHook(uint16_t color) {
             if (channel.color) {
                 return color + channel.color - 1;
             } else {
-                return color + g_channelIndex;
+                return color + channel.channelIndex;
             }
         } else if (hmi::g_selectedSlotIndex >= 0 && hmi::g_selectedSlotIndex < NUM_SLOTS) {
+            if (hmi::g_selectedSubchannelIndex >= 0) {
+                psu::Channel *channel = psu::Channel::getBySlotIndex(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
+                if (channel) {
+                    if (channel->color) {
+                        return color + channel->color - 1;
+                    } else {
+                        return color + channel->channelIndex;
+                    }
+                }
+            }
             auto slotColor = g_slots[hmi::g_selectedSlotIndex]->getColor();
             if (slotColor) {
                 return color + slotColor - 1;

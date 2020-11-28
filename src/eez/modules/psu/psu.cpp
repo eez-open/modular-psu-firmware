@@ -17,6 +17,7 @@
  */
 
 #include <assert.h>
+#include <stdio.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <tim.h>
@@ -666,6 +667,32 @@ bool PsuModule::getCalibrationDate(int subchannelIndex, uint32_t &calibrationDat
     Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     calibrationDate = channel->cal_conf.calibrationDate;
     return true;
+}
+
+int PsuModule::getNumDlogResources(int subchannelIndex) {
+    if (
+        slotIndex == 1 && (
+            channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || 
+            channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES
+        )
+    ) {
+        return 0;
+    }
+
+    return 3;
+}
+
+DlogResourceType PsuModule::getDlogResourceType(int subchannelIndex, int resourceIndex) {
+    static const DlogResourceType g_resourceTypes[] = { DLOG_RESOURCE_TYPE_U, DLOG_RESOURCE_TYPE_I, DLOG_RESOURCE_TYPE_P };
+    return g_resourceTypes[resourceIndex];
+}
+
+const char *PsuModule::getDlogResourceLabel(int subchannelIndex, int resourceIndex) {
+    static const char *g_resourceTypeLabels[] = { "U", "I", "P" };
+    static char g_label[20];
+    auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    snprintf(g_label, sizeof(g_label), "%s %s", channel->getLabelOrDefault(), g_resourceTypeLabels[resourceIndex]);
+    return g_label;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

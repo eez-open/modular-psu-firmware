@@ -685,6 +685,18 @@ bool Module::getCalibrationDate(int subchannelIndex, uint32_t &calibrationDate, 
     return false;
 }
 
+int Module::getNumDlogResources(int subchannelIndex) {
+    return 0;
+}
+
+DlogResourceType Module::getDlogResourceType(int subchannelIndex, int resourceIndex) {
+    return DLOG_RESOURCE_TYPE_NONE;
+}
+
+const char *Module::getDlogResourceLabel(int subchannelIndex, int resourceIndex) {
+    return "";
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct NoneModule : public Module {

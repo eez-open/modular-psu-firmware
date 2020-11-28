@@ -22,6 +22,7 @@
 #include <assert.h>
 
 #include <eez/system.h>
+#include <eez/hmi.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -47,6 +48,8 @@ using namespace scpi;
 
 namespace psu {
 namespace dlog_view {
+
+////////////////////////////////////////////////////////////////////////////////
 
 static State g_state;
 static uint32_t g_loadingStartTickCount;
@@ -80,63 +83,106 @@ static bool g_wasExecuting;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-eez_err_t Parameters::enableLogItem(int slotIndex, int subchannelIndex, LogItemType type, bool enable) {
-    int logItemIndex;
-    bool enabled = findLogItemIndex(slotIndex, subchannelIndex, type, logItemIndex);
+eez_err_t Parameters::enableDlogItem(int slotIndex, int subchannelIndex, int resourceIndex, bool enable) {
+    int dlogItemIndex;
+    bool enabled = findDlogItemIndex(slotIndex, subchannelIndex, resourceIndex, dlogItemIndex);
     if (enable) {
         if (!enabled) {
-            if (numLogItems == MAX_NUM_OF_Y_AXES) {
+            if (numDlogItems == MAX_NUM_OF_Y_AXES) {
                 return SCPI_ERROR_TOO_MUCH_DATA;
             }
 
-            if (logItemIndex < numLogItems) {
-                for (int i = numLogItems - 1; i >= logItemIndex; i--) {
-                    memcpy(logItems + i + 1, logItems + i, sizeof(LogItem));
+            if (dlogItemIndex < numDlogItems) {
+                for (int i = numDlogItems - 1; i >= dlogItemIndex; i--) {
+                    memcpy(dlogItems + i + 1, dlogItems + i, sizeof(DlogItem));
                 }
             }
 
-            logItems[logItemIndex].slotIndex = slotIndex;
-            logItems[logItemIndex].subchannelIndex = subchannelIndex;
-            logItems[logItemIndex].type = (uint8_t)type;
+            dlogItems[dlogItemIndex].slotIndex = slotIndex;
+            dlogItems[dlogItemIndex].subchannelIndex = subchannelIndex;
+            dlogItems[dlogItemIndex].resourceIndex = resourceIndex;
+            dlogItems[dlogItemIndex].resourceType = g_slots[slotIndex]->getDlogResourceType(subchannelIndex, resourceIndex);
 
-            numLogItems++;
+            numDlogItems++;
+
+            refreshScreen();
         }
     } else {
         if (enabled) {
-            for (int i = logItemIndex + 1; i < numLogItems; i++) {
-                memcpy(logItems + i - 1, logItems + i, sizeof(LogItem));
+            for (int i = dlogItemIndex + 1; i < numDlogItems; i++) {
+                memcpy(dlogItems + i - 1, dlogItems + i, sizeof(DlogItem));
             }
-            numLogItems--;
+            
+            numDlogItems--;
+            
+            dlogItems[numDlogItems].slotIndex = 0;
+            dlogItems[numDlogItems].subchannelIndex = 0;
+            dlogItems[numDlogItems].resourceIndex = 0;
+            dlogItems[numDlogItems].resourceType = 0;
+
+            refreshScreen();
         }
     }
 
     return SCPI_RES_OK;
 }
 
-bool Parameters::isLogItemEnabled(int slotIndex, int subchannelIndex, LogItemType type) {
-    int logItemIndex;
-    bool enabled = findLogItemIndex(slotIndex, subchannelIndex, type, logItemIndex);
-    (void)logItemIndex;
+bool Parameters::isDlogItemEnabled(int slotIndex, int subchannelIndex, int resourceIndex) {
+    int dlogItemIndex;
+    bool enabled = findDlogItemIndex(slotIndex, subchannelIndex, resourceIndex, dlogItemIndex);
+    (void)dlogItemIndex;
     return enabled;
 }
 
-bool Parameters::findLogItemIndex(int slotIndex, int subchannelIndex, LogItemType type, int &logItemIndex) {
-    for (logItemIndex = 0; logItemIndex < numLogItems; logItemIndex++) {
-        if (slotIndex < logItems[logItemIndex].slotIndex) {
+bool Parameters::isDlogItemEnabled(int slotIndex, int subchannelIndex, DlogResourceType resourceType) {
+    int dlogItemIndex;
+    bool enabled = findDlogItemIndex(slotIndex, subchannelIndex, resourceType, dlogItemIndex);
+    (void)dlogItemIndex;
+    return enabled;
+}
+
+bool Parameters::findDlogItemIndex(int slotIndex, int subchannelIndex, int resourceIndex, int &dlogItemIndex) {
+    for (dlogItemIndex = 0; dlogItemIndex < numDlogItems; dlogItemIndex++) {
+        if (slotIndex < dlogItems[dlogItemIndex].slotIndex) {
             return false;
         }
 
-        if (slotIndex == logItems[logItemIndex].slotIndex) {
-            if (subchannelIndex < logItems[logItemIndex].subchannelIndex) {
+        if (slotIndex == dlogItems[dlogItemIndex].slotIndex) {
+            if (subchannelIndex < dlogItems[dlogItemIndex].subchannelIndex) {
                 return false;
             }
 
-            if (subchannelIndex == logItems[logItemIndex].subchannelIndex) {
-                if ((uint8_t)type < logItems[logItemIndex].type) {
+            if (subchannelIndex == dlogItems[dlogItemIndex].subchannelIndex) {
+                if (resourceIndex < dlogItems[dlogItemIndex].resourceIndex) {
                     return false;
                 }
 
-                if ((uint8_t)type == logItems[logItemIndex].type) {
+                if (resourceIndex == dlogItems[dlogItemIndex].resourceIndex) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool Parameters::findDlogItemIndex(int slotIndex, int subchannelIndex, DlogResourceType resourceType, int &dlogItemIndex) {
+    for (dlogItemIndex = 0; dlogItemIndex < numDlogItems; dlogItemIndex++) {
+        if (slotIndex < dlogItems[dlogItemIndex].slotIndex) {
+            return false;
+        }
+
+        if (slotIndex == dlogItems[dlogItemIndex].slotIndex) {
+            if (subchannelIndex < dlogItems[dlogItemIndex].subchannelIndex) {
+                return false;
+            }
+
+            if (subchannelIndex == dlogItems[dlogItemIndex].subchannelIndex) {
+                if (resourceType < dlogItems[dlogItemIndex].resourceType) {
+                    return false;
+                }
+
+                if (resourceType == dlogItems[dlogItemIndex].resourceType) {
                     return true;
                 }
             }
@@ -225,7 +271,7 @@ void loadBlock() {
             while (i < NUM_ELEMENTS_PER_BLOCKS) {
                 auto offset = (uint32_t)roundf((g_blockIndexToLoad * NUM_ELEMENTS_PER_BLOCKS + i) / numElementsPerRow * g_loadScale * g_recording.parameters.numYAxes);
 
-                offset = g_recording.parameters.numYAxes *((offset + g_recording.parameters.numYAxes - 1) / g_recording.parameters.numYAxes);
+                offset = g_recording.parameters.numYAxes * ((offset + g_recording.parameters.numYAxes - 1) / g_recording.parameters.numYAxes);
 
                 size_t filePosition = g_recording.dataOffset + offset * sizeof(float);
                 if (!file.seek(filePosition)) {
@@ -452,54 +498,55 @@ void initAxis(Recording &recording) {
     recording.parameters.xAxis.range.min = 0;
     recording.parameters.xAxis.range.max = recording.parameters.time;
 
-    uint8_t yAxisIndex = 0;
-    for (int8_t logItemIndex = 0; logItemIndex < recording.parameters.numLogItems; ++logItemIndex) {
-        auto &logItem = recording.parameters.logItems[logItemIndex];
-        if (logItem.type == LOG_ITEM_TYPE_U) {
-            recording.parameters.yAxes[yAxisIndex].unit = UNIT_VOLT;
-            if (logItem.slotIndex != 255) {
-                recording.parameters.yAxes[yAxisIndex].range.min = channel_dispatcher::getUMin(logItem.slotIndex, logItem.subchannelIndex);
-                recording.parameters.yAxes[yAxisIndex].range.max = channel_dispatcher::getUMax(logItem.slotIndex, logItem.subchannelIndex);
-                Channel *channel = Channel::getBySlotIndex(logItem.slotIndex, logItem.subchannelIndex);
-                recording.parameters.yAxes[yAxisIndex].channelIndex = channel ? channel->channelIndex : -1;
+    for (int8_t dlogItemIndex = 0; dlogItemIndex < recording.parameters.numDlogItems; ++dlogItemIndex) {
+        auto &dlogItem = recording.parameters.dlogItems[dlogItemIndex];
+        auto &yAxis = recording.parameters.yAxes[dlogItemIndex];
+        if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
+            yAxis.unit = UNIT_VOLT;
+            if (dlogItem.slotIndex != 255) {
+                yAxis.range.min = channel_dispatcher::getUMin(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                yAxis.range.max = channel_dispatcher::getUMax(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                Channel *channel = Channel::getBySlotIndex(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                yAxis.channelIndex = channel ? channel->channelIndex : -1;
             } else {
-                recording.parameters.yAxes[yAxisIndex].range.min = 0;
-                recording.parameters.yAxes[yAxisIndex].range.max = 40.0f;
-                recording.parameters.yAxes[yAxisIndex].channelIndex = logItem.subchannelIndex;
+                yAxis.range.min = 0;
+                yAxis.range.max = 40.0f;
+                yAxis.channelIndex = dlogItem.subchannelIndex;
             }
-            ++yAxisIndex;
-        } else if (logItem.type == LOG_ITEM_TYPE_I) {
-            recording.parameters.yAxes[yAxisIndex].unit = UNIT_AMPER;
-            if (logItem.slotIndex != 255) {
-                recording.parameters.yAxes[yAxisIndex].range.min = channel_dispatcher::getIMin(logItem.slotIndex, logItem.subchannelIndex);
-                recording.parameters.yAxes[yAxisIndex].range.max = channel_dispatcher::getIMaxLimit(logItem.slotIndex, logItem.subchannelIndex);
-                Channel *channel = Channel::getBySlotIndex(logItem.slotIndex, logItem.subchannelIndex);
-                recording.parameters.yAxes[yAxisIndex].channelIndex = channel ? channel->channelIndex : -1;
+        } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_I) {
+            yAxis.unit = UNIT_AMPER;
+            if (dlogItem.slotIndex != 255) {
+                yAxis.range.min = channel_dispatcher::getIMin(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                yAxis.range.max = channel_dispatcher::getIMaxLimit(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                Channel *channel = Channel::getBySlotIndex(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                yAxis.channelIndex = channel ? channel->channelIndex : -1;
             } else {
-                recording.parameters.yAxes[yAxisIndex].range.min = 0;
-                recording.parameters.yAxes[yAxisIndex].range.max = 5.0f;
-                recording.parameters.yAxes[yAxisIndex].channelIndex = logItem.subchannelIndex;
+                yAxis.range.min = 0;
+                yAxis.range.max = 5.0f;
+                yAxis.channelIndex = dlogItem.subchannelIndex;
             }
-            ++yAxisIndex;
-        } else if (logItem.type == LOG_ITEM_TYPE_P) {
-            recording.parameters.yAxes[yAxisIndex].unit = UNIT_WATT;
-            if (logItem.slotIndex != 255) {
-                Channel *channel = Channel::getBySlotIndex(logItem.slotIndex, logItem.subchannelIndex);
-                recording.parameters.yAxes[yAxisIndex].range.min = channel_dispatcher::getPowerMinLimit(*channel);
-                recording.parameters.yAxes[yAxisIndex].range.max = channel_dispatcher::getPowerMaxLimit(*channel);
-                recording.parameters.yAxes[yAxisIndex].channelIndex = channel->channelIndex;
+        } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_P) {
+            yAxis.unit = UNIT_WATT;
+            if (dlogItem.slotIndex != 255) {
+                Channel *channel = Channel::getBySlotIndex(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                yAxis.range.min = channel_dispatcher::getPowerMinLimit(*channel);
+                yAxis.range.max = channel_dispatcher::getPowerMaxLimit(*channel);
+                yAxis.channelIndex = channel->channelIndex;
             } else {
-                recording.parameters.yAxes[yAxisIndex].range.min = 0;
-                recording.parameters.yAxes[yAxisIndex].range.max = 200.0f;
-                recording.parameters.yAxes[yAxisIndex].channelIndex = logItem.subchannelIndex;
+                yAxis.range.min = 0;
+                yAxis.range.max = 200.0f;
+                yAxis.channelIndex = dlogItem.subchannelIndex;
             }
-            ++yAxisIndex;
-        } else {
-            // TODO
+        } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
+            yAxis.unit = UNIT_NONE;
+            yAxis.range.min = 0;
+            yAxis.range.max = 1;
+            yAxis.channelIndex = dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0;
         }
+        strcpy(yAxis.label, g_slots[dlogItem.slotIndex]->getDlogResourceLabel(dlogItem.subchannelIndex, dlogItem.resourceIndex));
     }
 
-    recording.parameters.numYAxes = yAxisIndex;
+    recording.parameters.numYAxes = recording.parameters.numDlogItems;
 }
 
 void initYAxis(Parameters &parameters, int yAxisIndex) {
@@ -687,15 +734,15 @@ bool openFile(const char *filePath, int *err) {
 
                     for (int channelIndex = 0; channelIndex < CH_MAX; ++channelIndex) {
                         if (columns & (1 << (4 * channelIndex))) {
-                            g_recording.parameters.enableLogItem(255, channelIndex, LOG_ITEM_TYPE_U, true);
+                            g_recording.parameters.enableDlogItem(255, channelIndex, 0, true);
                         }
 
                         if (columns & (2 << (4 * channelIndex))) {
-                            g_recording.parameters.enableLogItem(255, channelIndex, LOG_ITEM_TYPE_I, true);
+                            g_recording.parameters.enableDlogItem(255, channelIndex, 1, true);
                         }
 
                         if (columns & (4 << (4 * channelIndex))) {
-                            g_recording.parameters.enableLogItem(255, channelIndex, LOG_ITEM_TYPE_P, true);
+                            g_recording.parameters.enableDlogItem(255, channelIndex, 2, true);
                         }
                     }
 
@@ -909,7 +956,13 @@ void uploadFile() {
 
 class DlogParamsPage : public SetPage {
 public:
+    static Parameters g_guiParameters;
+    static const int PAGE_SIZE = 6;
+    static int g_scrollPosition;
+
     void pageAlloc() {
+        g_numDlogResources = countDlogResources();
+
         memcpy(&g_guiParameters, &dlog_record::g_parameters, sizeof(Parameters));
         memcpy(&g_guiParametersOrig, &dlog_record::g_parameters, sizeof(Parameters));
     }
@@ -919,17 +972,122 @@ public:
     }
 
     void set() {
-        // TODO
+        gui::popPage();
+
+        char filePath[MAX_PATH_LENGTH + 50];
+
+        if (isStringEmpty(DlogParamsPage::g_guiParameters.filePath)) {
+            uint8_t year, month, day, hour, minute, second;
+            datetime::getDateTime(year, month, day, hour, minute, second);
+
+            if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24) {
+                snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+                    RECORDINGS_DIR,
+                    DlogParamsPage::g_guiParameters.filePath,
+                    (int)day, (int)month, (int)year,
+                    (int)hour, (int)minute, (int)second);
+            } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
+                snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+                    RECORDINGS_DIR,
+                    DlogParamsPage::g_guiParameters.filePath,
+                    (int)month, (int)day, (int)year,
+                    (int)hour, (int)minute, (int)second);
+            } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
+                bool am;
+                datetime::convertTime24to12(hour, am);
+                snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+                    RECORDINGS_DIR,
+                    DlogParamsPage::g_guiParameters.filePath,
+                    (int)day, (int)month, (int)year,
+                    (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+            } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_12) {
+                bool am;
+                datetime::convertTime24to12(hour, am);
+                snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+                    RECORDINGS_DIR,
+                    DlogParamsPage::g_guiParameters.filePath,
+                    (int)month, (int)day, (int)year,
+                    (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+            }
+        } else {
+            snprintf(filePath, sizeof(filePath), "%s/%s.dlog", RECORDINGS_DIR, DlogParamsPage::g_guiParameters.filePath);
+        }
+
+        memcpy(&dlog_record::g_parameters, &DlogParamsPage::g_guiParameters, sizeof(DlogParamsPage::g_guiParameters));
+        strcpy(dlog_record::g_parameters.filePath, filePath);
+
+        dlog_record::toggleStart();
     }
 
-    static Parameters g_guiParameters;
+    static void setScrollPosition(int scrollPosition) {
+        if (g_numDlogResources <= PAGE_SIZE) {
+            return;
+        }
+
+        if (scrollPosition < 0) {
+            scrollPosition = 0;
+        } else if (scrollPosition > g_numDlogResources - PAGE_SIZE) {
+            scrollPosition = g_numDlogResources - PAGE_SIZE;
+        }
+        
+        if (scrollPosition != DlogParamsPage::g_scrollPosition) {
+            DlogParamsPage::g_scrollPosition = scrollPosition;
+            refreshScreen();
+        }
+}
+
+    void onEncoder(int counter) {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+        counter = -counter;
+#endif
+        setScrollPosition(g_scrollPosition + counter);
+    }
+
+    static int getNumDlogResources() {
+        if (g_numDlogResources == -1) {
+            g_numDlogResources = countDlogResources();
+        }
+        return g_numDlogResources;
+    }
+
+    static bool findResource(int absoluteResourceIndex, int &slotIndex, int &subchannelIndex, int &resourceIndex) {
+        int index = 0;
+        for (slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+            int numSubchannels = g_slots[slotIndex]->getNumSubchannels();
+            for (subchannelIndex = 0; subchannelIndex < numSubchannels; subchannelIndex++) {
+                int numResources = g_slots[slotIndex]->getNumDlogResources(subchannelIndex);
+                for (resourceIndex = 0; resourceIndex < numResources; resourceIndex++) {
+                    if (index == absoluteResourceIndex) {
+                        return true;
+                    }
+                    index++;
+                }
+            }
+        }
+
+        return false;
+    }
 
 private:
     static Parameters g_guiParametersOrig;
+    static int g_numDlogResources;
+
+    static int countDlogResources() {
+        int count = 0;
+        for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+            int numSubchannels = g_slots[slotIndex]->getNumSubchannels();
+            for (int subchannelIndex = 0; subchannelIndex < numSubchannels; subchannelIndex++) {
+                count += g_slots[slotIndex]->getNumDlogResources(subchannelIndex);
+            }
+        }
+        return count;
+    }
 };
 
 Parameters DlogParamsPage::g_guiParameters;
 Parameters DlogParamsPage::g_guiParametersOrig;
+int DlogParamsPage::g_numDlogResources = -1;
+int DlogParamsPage::g_scrollPosition;
 
 static DlogParamsPage g_dlogParamsPage;
 
@@ -947,33 +1105,27 @@ using namespace psu::gui;
 using namespace dlog_record;
 using namespace dlog_view;
 
-void data_dlog_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = (
-                channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || 
-                channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES
-            ) && cursor == 1 ? 0 : 1;
+        value = dlog_record::getState();
     }
 }
 
-void data_dlog_voltage_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_toggle_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto &channel = Channel::get(cursor);
-        value = DlogParamsPage::g_guiParameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, LOG_ITEM_TYPE_U);
-    }
-}
-
-void data_dlog_current_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        auto &channel = Channel::get(cursor);
-        value = DlogParamsPage::g_guiParameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, LOG_ITEM_TYPE_I);
-    }
-}
-
-void data_dlog_power_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        auto &channel = Channel::get(cursor);
-        value = DlogParamsPage::g_guiParameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, LOG_ITEM_TYPE_P);
+    	if (DlogParamsPage::getNumDlogResources() == 0) {
+            value = 5;
+        } else if (dlog_record::isInStateTransition()) {
+    		value = 4;
+    	} else if (dlog_record::isIdle()) {
+            value = 0;
+        } else if (dlog_record::isExecuting()) {
+            value = 1;
+        } else if (dlog_record::isInitiated() && dlog_record::g_parameters.triggerSource == trigger::SOURCE_MANUAL) {
+            value = 2;
+        } else {
+            value = 3;
+        }
     }
 }
 
@@ -1033,85 +1185,103 @@ void data_recording_ready(DataOperationEnum operation, Cursor cursor, Value &val
     }
 }
 
-void data_log_items(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_log_item_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_log_item_channel(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_log_item_label(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void toggleDlogItem(LogItemType type) {
-    auto &channel = Channel::get(getFoundWidgetAtDown().cursor);
-    bool enabled = DlogParamsPage::g_guiParameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, type);
-    auto err = DlogParamsPage::g_guiParameters.enableLogItem(channel.slotIndex, channel.subchannelIndex, type, !enabled);
-    if (err != SCPI_RES_OK) {
-        errorMessage(MakeScpiErrorValue(err));
+void data_dlog_items_scrollbar_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = DlogParamsPage::getNumDlogResources() > DlogParamsPage::PAGE_SIZE;
     }
 }
 
-void action_dlog_voltage_toggle() {
-    toggleDlogItem(LOG_ITEM_TYPE_U);
+void data_dlog_items_num_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value.type_ = VALUE_TYPE_NUM_SELECTED;
+        value.pairOfUint16_.first = DlogParamsPage::g_guiParameters.numDlogItems;
+        value.pairOfUint16_.second = DlogParamsPage::getNumDlogResources();
+    }
 }
 
-void action_dlog_current_toggle() {
-    toggleDlogItem(LOG_ITEM_TYPE_I);
-}
-
-void action_dlog_power_toggle() {
-    toggleDlogItem(LOG_ITEM_TYPE_P);
-}
-
-void action_dlog_start_recording() {
-    popPage();
-
-    char filePath[MAX_PATH_LENGTH + 50];
-
-    if (isStringEmpty(DlogParamsPage::g_guiParameters.filePath)) {
-        uint8_t year, month, day, hour, minute, second;
-        datetime::getDateTime(year, month, day, hour, minute, second);
-
-        if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24) {
-            snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
-                RECORDINGS_DIR,
-                DlogParamsPage::g_guiParameters.filePath,
-                (int)day, (int)month, (int)year,
-                (int)hour, (int)minute, (int)second);
-        } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
-            snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
-                RECORDINGS_DIR,
-                DlogParamsPage::g_guiParameters.filePath,
-                (int)month, (int)day, (int)year,
-                (int)hour, (int)minute, (int)second);
-        } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
-            bool am;
-            datetime::convertTime24to12(hour, am);
-            snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
-                RECORDINGS_DIR,
-                DlogParamsPage::g_guiParameters.filePath,
-                (int)day, (int)month, (int)year,
-                (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
-        } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_12) {
-            bool am;
-            datetime::convertTime24to12(hour, am);
-            snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
-                RECORDINGS_DIR,
-                DlogParamsPage::g_guiParameters.filePath,
-                (int)month, (int)day, (int)year,
-                (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+void data_dlog_items(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = DlogParamsPage::getNumDlogResources();
+    } else if (operation == DATA_OPERATION_SELECT) {
+        int slotIndex;
+        int subchannelIndex;
+        int resourceIndex;
+        if (DlogParamsPage::findResource(cursor, slotIndex, subchannelIndex, resourceIndex)) {
+            value.type_ = VALUE_TYPE_CHANNEL_ID;
+            value.pairOfUint16_.first = slotIndex;
+            value.pairOfUint16_.second = subchannelIndex;
+            
+            hmi::g_selectedSlotIndex = slotIndex;
+            hmi::g_selectedSubchannelIndex = subchannelIndex;
         }
-    } else {
-        snprintf(filePath, sizeof(filePath), "%s/%s.dlog", RECORDINGS_DIR, DlogParamsPage::g_guiParameters.filePath);
+    } else if (operation == DATA_OPERATION_DESELECT) {
+        if (value.getType() == VALUE_TYPE_CHANNEL_ID) {
+            hmi::g_selectedSlotIndex = value.pairOfUint16_.first;
+            hmi::g_selectedSubchannelIndex = value.pairOfUint16_.second;
+        }
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = Value(DlogParamsPage::getNumDlogResources(), VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
+        value = Value(DlogParamsPage::g_scrollPosition, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
+        DlogParamsPage::setScrollPosition((int)value.getUInt32());
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT) {
+        value = 1;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = DlogParamsPage::PAGE_SIZE;
     }
+}
 
-    memcpy(&g_parameters, &DlogParamsPage::g_guiParameters, sizeof(DlogParamsPage::g_guiParameters));
-    strcpy(g_parameters.filePath, filePath);
+void data_dlog_item_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int slotIndex;
+        int subchannelIndex;
+        int resourceIndex;
+        if (DlogParamsPage::findResource(cursor, slotIndex, subchannelIndex, resourceIndex)) {
+            bool enabled = DlogParamsPage::g_guiParameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex);
+            if (!enabled && DlogParamsPage::g_guiParameters.numDlogItems >= MAX_NUM_OF_Y_AXES) {
+                value = 2;
+            } else {
+                value = enabled;
+            }
+        } else {
+            value = 2;
+        }
+    }
+}
 
-    toggleStart();
+void data_dlog_item_channel(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int slotIndex;
+        int subchannelIndex;
+        int resourceIndex;
+        if (DlogParamsPage::findResource(cursor, slotIndex, subchannelIndex, resourceIndex)) {
+            value.type_ = VALUE_TYPE_CHANNEL_ID;
+            value.pairOfUint16_.first = slotIndex;
+            value.pairOfUint16_.second = subchannelIndex;
+        }
+    }
+}
+
+void data_dlog_item_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int slotIndex;
+        int subchannelIndex;
+        int resourceIndex;
+        if (DlogParamsPage::findResource(cursor, slotIndex, subchannelIndex, resourceIndex)) {
+            value = g_slots[slotIndex]->getDlogResourceLabel(subchannelIndex, resourceIndex);
+        }
+    }
+}
+
+void action_dlog_item_toggle() {
+    int slotIndex;
+    int subchannelIndex;
+    int resourceIndex;
+    if (DlogParamsPage::findResource(getFoundWidgetAtDown().cursor, slotIndex, subchannelIndex, resourceIndex)) {
+        DlogParamsPage::g_guiParameters.enableDlogItem(slotIndex, subchannelIndex, resourceIndex,
+            !DlogParamsPage::g_guiParameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex));
+    }
 }
 
 void action_dlog_toggle() {

@@ -62,6 +62,15 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
     int startPosition = ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 
+    // refresh when startPosition changes
+    if (widgetCursor.currentState) {
+		widgetCursor.currentState->data = startPosition;
+
+        if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
+            widgetCursor.previousState = 0;
+        }
+    }
+
 	const Widget *childWidget = GET_WIDGET_PROPERTY(gridWidget, itemWidget, const Widget *);
     widgetCursor.widget = childWidget;
 

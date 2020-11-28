@@ -791,6 +791,14 @@ void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count)
     }
 }
 
+bool compare_CHANNEL_ID_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void CHANNEL_ID_value_to_text(const Value &value, char *text, int count) {
+    snprintf(text, count - 1, "%d%02d", (int)value.getFirstUInt16() + 1, (int)value.getSecondUInt16() + 1);
+}
+
 bool compare_DLOG_VALUE_LABEL_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -1098,6 +1106,14 @@ void ZOOM_value_to_text(const Value &value, char *text, int count) {
     sprintf(text, "\xb8 x%d", value.getInt());
 }
 
+bool compare_NUM_SELECTED_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void NUM_SELECTED_value_to_text(const Value &value, char *text, int count) {
+    sprintf(text, "%d of %d selected", (int)value.getFirstUInt16(), (int)value.getSecondUInt16());
+}
+
 static Cursor g_editValueCursor(-1);
 static int16_t g_editValueDataId;
 
@@ -1211,21 +1227,22 @@ void data_channel_output_state(DataOperationEnum operation, Cursor cursor, Value
 void data_channel_is_cc(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        value = channel.getMode() == CHANNEL_MODE_CC;
+        if (iChannel < CH_NUM) {
+            Channel &channel = Channel::get(iChannel);
+            value = channel.getMode() == CHANNEL_MODE_CC;
+        }
     }
 }
 
 void data_channel_is_cv(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : -1);
-        if (iChannel != -1) {
+        if (iChannel >= 0 && iChannel < CH_NUM) {
             Channel &channel = Channel::get(iChannel);
             value = channel.getMode() == CHANNEL_MODE_CV;
         } else {
             value = g_slots[hmi::g_selectedSlotIndex]->isConstantVoltageMode(hmi::g_selectedSubchannelIndex);
         }
-
     }
 }
 
@@ -1255,7 +1272,7 @@ void data_channel_u_mon(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, dlog_view::LOG_ITEM_TYPE_U)) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_U)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -1279,7 +1296,7 @@ void data_channel_u_mon_dac(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, dlog_view::LOG_ITEM_TYPE_U)) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_U)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     }
@@ -1369,7 +1386,7 @@ void data_channel_i_mon(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, dlog_view::LOG_ITEM_TYPE_I)) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_I)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -1393,7 +1410,7 @@ void data_channel_i_mon_dac(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER);
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, dlog_view::LOG_ITEM_TYPE_I)) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_I)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } 
@@ -1470,7 +1487,7 @@ void data_channel_p_mon(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isLogItemEnabled(channel.slotIndex, channel.subchannelIndex, dlog_view::LOG_ITEM_TYPE_P)) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_P)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -2694,8 +2711,10 @@ void data_channel_rsense_installed(DataOperationEnum operation, Cursor cursor, V
 void data_channel_rsense_status(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
 		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-		Channel &channel = Channel::get(iChannel);
-        value = channel.isRemoteSensingEnabled();
+        if (iChannel < CH_NUM) {
+            Channel &channel = Channel::get(iChannel);
+            value = channel.isRemoteSensingEnabled();
+        }
     }	
 }
 
@@ -2708,8 +2727,10 @@ void data_channel_rprog_installed(DataOperationEnum operation, Cursor cursor, Va
 void data_channel_rprog_status(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
 		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-		Channel &channel = Channel::get(iChannel);
-		value = (int)channel.flags.rprogEnabled;
+        if (iChannel < CH_NUM) {
+            Channel &channel = Channel::get(iChannel);
+            value = (int)channel.flags.rprogEnabled;
+        }
     }
 }
 
@@ -4461,29 +4482,37 @@ void data_sys_display_background_luminosity_step(DataOperationEnum operation, Cu
 
 void data_simulator_load_state(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-		value = channel.simulator.getLoadEnabled() ? 1 : 0;
+        if (cursor < CH_NUM) {
+            Channel &channel = Channel::get(cursor);
+            value = channel.simulator.getLoadEnabled() ? 1 : 0;
+        }
 	}
 }
 
 void data_simulator_load(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-		value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
+        if (cursor < CH_NUM) {
+            Channel &channel = Channel::get(cursor);
+            value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
+        }
 	}
 }
 
 void data_simulator_load_state2(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor + 1);
-        value = channel.simulator.getLoadEnabled() ? 1 : 0;
+        if (cursor < CH_NUM) {
+            Channel &channel = Channel::get(cursor + 1);
+            value = channel.simulator.getLoadEnabled() ? 1 : 0;
+        }
     }
 }
 
 void data_simulator_load2(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor + 1);
-        value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
+        if (cursor < CH_NUM) {
+            Channel &channel = Channel::get(cursor + 1);
+            value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
+        }
     }
 }
 
@@ -4746,30 +4775,6 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
 }
 
 void data_nondrag_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
-void data_dlog_state(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = dlog_record::getState();
-    }
-}
-
-void data_dlog_toggle_state(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-    	if (CH_NUM == 0) {
-            value = 5;
-        } else if (dlog_record::isInStateTransition()) {
-    		value = 4;
-    	} else if (dlog_record::isIdle()) {
-            value = 0;
-        } else if (dlog_record::isExecuting()) {
-            value = 1;
-        } else if (dlog_record::isInitiated() && dlog_record::g_parameters.triggerSource == trigger::SOURCE_MANUAL) {
-            value = 2;
-        } else {
-            value = 3;
-        }
-    }
 }
 
 void data_is_show_live_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -5318,22 +5323,9 @@ void data_dlog_file_length(DataOperationEnum operation, Cursor cursor, Value &va
     }
 }
 
-void data_dlog_all_values(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_COUNT) {
-        value = MAX_NUM_OF_Y_VALUES;
-    }
-}
-
 void data_dlog_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(cursor, VALUE_TYPE_DLOG_VALUE_LABEL);
-    }
-}
-
-void data_dlog_value_state(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        auto &recording = dlog_view::getRecording();
-        value = cursor < recording.parameters.numYAxes ? recording.dlogValues[cursor].isVisible : 2;
     }
 }
 

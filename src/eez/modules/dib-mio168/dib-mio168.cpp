@@ -1,4 +1,4 @@
-/*
+    /*
  * EEZ DIB MIO168
  * Copyright (C) 2015-present, Envox d.o.o.
  *
@@ -37,6 +37,7 @@
 #include "eez/modules/psu/profile.h"
 #include "eez/modules/psu/calibration.h"
 #include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/gui/psu.h>
 #include "eez/modules/psu/gui/keypad.h"
 #include "eez/modules/psu/gui/labels_and_colors.h"
@@ -2204,6 +2205,42 @@ public:
     
     void enableCurrentCalibration(int subchannelIndex, bool enabled) override {
     }
+
+    int getNumDlogResources(int subchannelIndex) override {
+		if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+            return 8;
+        }
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            return 1;
+        }
+        return 0;
+	}
+    
+	DlogResourceType getDlogResourceType(int subchannelIndex, int resourceIndex) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+            return DlogResourceType(DLOG_RESOURCE_TYPE_DIN0 + resourceIndex);
+        }
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            return DLOG_RESOURCE_TYPE_U;
+        }
+        return DLOG_RESOURCE_TYPE_NONE;
+	}
+    
+	const char *getDlogResourceLabel(int subchannelIndex, int resourceIndex) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+            return getPinLabelOrDefault(subchannelIndex, resourceIndex);
+        }
+        
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            const char *label = getChannelLabel(subchannelIndex);
+            if (*label) {
+                return label;
+            }
+            return getDefaultChannelLabel(subchannelIndex);
+        }
+
+        return "";
+    }
 };
 
 static Mio168Module g_mio168Module;
@@ -2478,6 +2515,10 @@ void data_dib_mio168_din_pins_5_8(DataOperationEnum operation, Cursor cursor, Va
 void data_dib_mio168_din_no(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 8 + 1;
+    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(cursor / 8, DIN_SUBCHANNEL_INDEX, (DlogResourceType)(DLOG_RESOURCE_TYPE_DIN0 + cursor % 8))) {
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+        }
     }
 }
 
@@ -2711,15 +2752,21 @@ void data_dib_mio168_ain_label_label(DataOperationEnum operation, Cursor cursor,
 }
 
 void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    int slotIndex = cursor / 4;
+    int ainChannelIndex = cursor % 4;
     if (operation == DATA_OPERATION_GET) {
-        auto mio168Module = (Mio168Module *)g_slots[cursor / 4];
-        auto &channel = mio168Module->ainChannels[cursor % 4];
+        auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+        auto &channel = mio168Module->ainChannels[ainChannelIndex];
         if (channel.m_mode == MEASURE_MODE_OPEN) {
             value = "-";
         } else {
             value = MakeValue(roundPrec(channel.m_value, channel.getResolution()), channel.m_mode == MEASURE_MODE_VOLTAGE ? UNIT_VOLT : UNIT_AMPER);
         }
-    }
+    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(slotIndex, AIN_1_SUBCHANNEL_INDEX + ainChannelIndex, DLOG_RESOURCE_TYPE_U)) {
+            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+        }
+    } 
 }
 
 static EnumItem g_ainModeEnumDefinition[] = {
