@@ -495,7 +495,7 @@ static void log(uint32_t tickCount) {
                     ) {
                         writeFloat(NAN);
                     } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
-                        writeUint8(0);
+                        writeFloat(NAN);
                     }
                 }
 
@@ -503,7 +503,6 @@ static void log(uint32_t tickCount) {
             }
 
             // write sample
-            dlog_view::DlogItem *prevDlogItem = nullptr;
             for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
                 auto &dlogItem = g_recording.parameters.dlogItems[i];
                 if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
@@ -516,13 +515,10 @@ static void log(uint32_t tickCount) {
                         channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex)
                     );
                 } else  if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
-                    if (prevDlogItem == nullptr || prevDlogItem->slotIndex != dlogItem.slotIndex || prevDlogItem->subchannelIndex != dlogItem.subchannelIndex) {
-                        uint8_t data;
-                        channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
-                        writeUint8(data);
-                    }
+                    uint8_t data;
+                    channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
+                    writeFloat(data * 1.0f);
                 }
-                prevDlogItem = &dlogItem;
             }
             
             ++g_recording.size;

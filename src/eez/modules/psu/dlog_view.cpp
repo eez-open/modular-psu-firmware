@@ -538,10 +538,10 @@ void initAxis(Recording &recording) {
                 yAxis.channelIndex = dlogItem.subchannelIndex;
             }
         } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
-            yAxis.unit = UNIT_NONE;
+            yAxis.unit = UNIT_UNKNOWN;
             yAxis.range.min = 0;
             yAxis.range.max = 1;
-            yAxis.channelIndex = dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0;
+            yAxis.channelIndex = -1;
         }
         strcpy(yAxis.label, g_slots[dlogItem.slotIndex]->getDlogResourceLabel(dlogItem.subchannelIndex, dlogItem.resourceIndex));
     }

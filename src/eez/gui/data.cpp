@@ -48,6 +48,7 @@ bool compare_NONE_value(const Value &a, const Value &b) {
 }
 
 void NONE_value_to_text(const Value &value, char *text, int count) {
+    *text = 0;
 }
 
 bool compare_INT_value(const Value &a, const Value &b) {

@@ -1227,17 +1227,15 @@ void data_channel_output_state(DataOperationEnum operation, Cursor cursor, Value
 void data_channel_is_cc(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        if (iChannel < CH_NUM) {
-            Channel &channel = Channel::get(iChannel);
-            value = channel.getMode() == CHANNEL_MODE_CC;
-        }
+        Channel &channel = Channel::get(iChannel);
+        value = channel.getMode() == CHANNEL_MODE_CC;
     }
 }
 
 void data_channel_is_cv(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : -1);
-        if (iChannel >= 0 && iChannel < CH_NUM) {
+        if (iChannel != -1) {
             Channel &channel = Channel::get(iChannel);
             value = channel.getMode() == CHANNEL_MODE_CV;
         } else {
@@ -1627,8 +1625,7 @@ void data_no_channel_index(int slotIndex, DataOperationEnum operation, Cursor cu
 }
 
 void data_slot_channel_index(int slotIndex, Channel *channel, DataOperationEnum operation, Cursor cursor, Value &value) {
-    auto testResult = g_slots[slotIndex]->getTestResult();
-    if (channel && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
+    if (channel) {
         data_channel_index(*channel, operation, cursor, value);
     } else {
         data_no_channel_index(slotIndex, operation, cursor, value);
@@ -2711,10 +2708,8 @@ void data_channel_rsense_installed(DataOperationEnum operation, Cursor cursor, V
 void data_channel_rsense_status(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
 		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        if (iChannel < CH_NUM) {
-            Channel &channel = Channel::get(iChannel);
-            value = channel.isRemoteSensingEnabled();
-        }
+        Channel &channel = Channel::get(iChannel);
+        value = channel.isRemoteSensingEnabled();
     }	
 }
 
@@ -2727,10 +2722,8 @@ void data_channel_rprog_installed(DataOperationEnum operation, Cursor cursor, Va
 void data_channel_rprog_status(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
 		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        if (iChannel < CH_NUM) {
-            Channel &channel = Channel::get(iChannel);
-            value = (int)channel.flags.rprogEnabled;
-        }
+        Channel &channel = Channel::get(iChannel);
+        value = (int)channel.flags.rprogEnabled;
     }
 }
 
@@ -4482,37 +4475,29 @@ void data_sys_display_background_luminosity_step(DataOperationEnum operation, Cu
 
 void data_simulator_load_state(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-        if (cursor < CH_NUM) {
-            Channel &channel = Channel::get(cursor);
-            value = channel.simulator.getLoadEnabled() ? 1 : 0;
-        }
+        Channel &channel = Channel::get(cursor);
+        value = channel.simulator.getLoadEnabled() ? 1 : 0;
 	}
 }
 
 void data_simulator_load(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-        if (cursor < CH_NUM) {
-            Channel &channel = Channel::get(cursor);
-            value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
-        }
+        Channel &channel = Channel::get(cursor);
+        value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
 	}
 }
 
 void data_simulator_load_state2(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        if (cursor < CH_NUM) {
-            Channel &channel = Channel::get(cursor + 1);
-            value = channel.simulator.getLoadEnabled() ? 1 : 0;
-        }
+        Channel &channel = Channel::get(cursor + 1);
+        value = channel.simulator.getLoadEnabled() ? 1 : 0;
     }
 }
 
 void data_simulator_load2(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        if (cursor < CH_NUM) {
-            Channel &channel = Channel::get(cursor + 1);
-            value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
-        }
+        Channel &channel = Channel::get(cursor + 1);
+        value = MakeValue(channel.simulator.getLoad(), UNIT_OHM);
     }
 }
 
