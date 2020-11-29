@@ -743,7 +743,7 @@ void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
     if (channel.flags.trackingEnabled) {
         snprintf(text, count - 1, "\xA2 %s", channel.getLabelOrDefault());
     } else {
-        snprintf(text, count - 1, channel.getLabelOrDefault());
+        strncpy(text, channel.getLabelOrDefault(), count - 1);
     }
 }
 
