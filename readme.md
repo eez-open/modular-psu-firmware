@@ -30,7 +30,7 @@ _For EEZ H24005 firmware visit [psu-firmware](https://github.com/eez-open/psu-fi
 
 ```
 sudo apt-get update
-sudo apt-get install -y git libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev cmake build-essential
+sudo apt-get install -y git libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev cmake build-essential libbsd-dev
 git clone https://github.com/eez-open/modular-psu-firmware
 mkdir -p modular-psu-firmware/build/linux
 cd modular-psu-firmware/build/linux
