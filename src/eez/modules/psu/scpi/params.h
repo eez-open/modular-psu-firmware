@@ -31,7 +31,7 @@ extern scpi_choice_def_t unitChoice[];
 void param_channels(scpi_t *context, ChannelList &channelList, scpi_bool_t mandatory = FALSE, scpi_bool_t skip_channel_check = FALSE);
 void param_channels(scpi_t *context, scpi_parameter_t *parameter, ChannelList &channelList, scpi_bool_t skip_channel_check = FALSE);
 
-bool getChannelFromParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex);
+bool getChannelFromParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, scpi_bool_t mandatory = FALSE);
 bool getChannelFromCommandNumber(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex);
 
 bool absoluteChannelIndexToSlotAndSubchannelIndex(int absoluteChannelIndex, SlotAndSubchannelIndex &slotAndSubchannelIndex);

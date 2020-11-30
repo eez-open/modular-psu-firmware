@@ -156,6 +156,62 @@ scpi_result_t scpi_cmd_senseDlogFunctionPowerQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_senseDlogFunctionDigitalInput(scpi_t *context) {
+    if (!dlog_record::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+	if (pin < 1) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
+	pin--;
+
+    bool enable;
+    if (!SCPI_ParamBool(context, &enable, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    auto err = dlog_record::g_parameters.enableDlogItem(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, pin, enable);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDlogFunctionDigitalInputQ(scpi_t *context) {
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+	if (pin < 1) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
+	pin--;
+
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultBool(context, dlog_record::g_parameters.isDlogItemEnabled(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, pin));
+
+    return SCPI_RES_OK;
+}
+
 scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
     if (!dlog_record::isIdle()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);

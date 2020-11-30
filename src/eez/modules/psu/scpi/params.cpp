@@ -236,9 +236,9 @@ void param_channels(scpi_t *context, scpi_parameter_t *parameter, ChannelList &c
     }
 }
 
-bool getChannelFromParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex) {
+bool getChannelFromParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, scpi_bool_t mandatory) {
     ChannelList channelList;
-    param_channels(context, channelList, FALSE, FALSE);
+    param_channels(context, channelList, mandatory, FALSE);
     if (channelList.numChannels == 1) {
         slotAndSubchannelIndex = channelList.channels[0];
         return true;

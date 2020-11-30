@@ -84,13 +84,18 @@ static bool g_wasExecuting;
 ////////////////////////////////////////////////////////////////////////////////
 
 eez_err_t Parameters::enableDlogItem(int slotIndex, int subchannelIndex, int resourceIndex, bool enable) {
-    int dlogItemIndex;
+	int dlogItemIndex;
     bool enabled = findDlogItemIndex(slotIndex, subchannelIndex, resourceIndex, dlogItemIndex);
     if (enable) {
         if (!enabled) {
             if (numDlogItems == MAX_NUM_OF_Y_AXES) {
                 return SCPI_ERROR_TOO_MUCH_DATA;
             }
+
+			int numResources = g_slots[slotIndex]->getNumDlogResources(subchannelIndex);
+			if (resourceIndex >= numResources) {
+				return SCPI_ERROR_HARDWARE_MISSING;
+			}
 
             if (dlogItemIndex < numDlogItems) {
                 for (int i = numDlogItems - 1; i >= dlogItemIndex; i--) {

@@ -154,6 +154,8 @@
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:POWer?", scpi_cmd_senseDlogFunctionPowerQ) \
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:VOLTage", scpi_cmd_senseDlogFunctionVoltage) \
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:VOLTage?", scpi_cmd_senseDlogFunctionVoltageQ) \
+    SCPI_COMMAND("SENSe:DLOG:FUNCtion:DIGital[:INPut]", scpi_cmd_senseDlogFunctionDigitalInput) \
+    SCPI_COMMAND("SENSe:DLOG:FUNCtion:DIGital[:INPut]?", scpi_cmd_senseDlogFunctionDigitalInputQ) \
     SCPI_COMMAND("SENSe:DLOG:PERiod", scpi_cmd_senseDlogPeriod) \
     SCPI_COMMAND("SENSe:DLOG:PERiod?", scpi_cmd_senseDlogPeriodQ) \
     SCPI_COMMAND("SENSe:DLOG:TIME", scpi_cmd_senseDlogTime) \

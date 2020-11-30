@@ -20,5 +20,6 @@
         "xmemory0": "cpp",
         "initializer_list": "cpp",
         "queue": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }

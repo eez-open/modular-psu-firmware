@@ -2355,4 +2355,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM224_LABELS_AND_COLORS_CH = 266
 };
 
-extern const uint8_t assets[541594];
+extern const uint8_t assets[541609];

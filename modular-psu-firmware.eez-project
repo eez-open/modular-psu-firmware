@@ -62727,6 +62727,76 @@
             }
           },
           {
+            "name": "SENSe:DLOG:FUNCtion:DIGital[:INPut]",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_func_volt",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "enable",
+                "type": [
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SENSe:DLOG:FUNCtion:DIGital[:INPut]?",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_func_volt",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "boolean"
+                }
+              ]
+            }
+          },
+          {
             "name": "SENSe:DLOG:PERiod",
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_per",
             "parameters": [

@@ -2255,6 +2255,10 @@ scpi_result_t scpi_cmd_systemChannelPinLabel(scpi_t *context) {
     if (!SCPI_ParamInt(context, &pin, TRUE)) {
         return SCPI_RES_ERR;
     }
+	if (pin < 1) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
 
     const char *label;
     size_t labelLength;
@@ -2285,6 +2289,10 @@ scpi_result_t scpi_cmd_systemChannelPinLabelQ(scpi_t *context) {
     if (!SCPI_ParamInt(context, &pin, TRUE)) {
         return SCPI_RES_ERR;
     }
+	if (pin < 1) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
 
     const char *label;
     auto err = g_slots[slotAndSubchannelIndex.slotIndex]->getChannelPinLabel(slotAndSubchannelIndex.subchannelIndex, pin, label);
