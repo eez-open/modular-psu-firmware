@@ -110,20 +110,33 @@ void check(uint32_t currentTime) {
     }
 }
 
+bool isSeqInitiated(Source source) {
+    return g_triggerSource == source && g_state == STATE_INITIATED;
+
+}
+
+bool isDlogInitiated(Source source) {
+    return dlog_record::g_parameters.triggerSource == source && dlog_record::isInitiated();
+
+}
+
+bool isInitiated(Source source) {
+    return isSeqInitiated(source) || isDlogInitiated(source);
+}
+
 int generateTrigger(Source source, bool checkImmediatelly) {
-    bool seqTriggered = g_triggerSource == source && g_state == STATE_INITIATED;
+    bool seqInitiated = isSeqInitiated(source);
+    bool dlogInitiated = isDlogInitiated(source);
 
-    bool dlogTriggered = dlog_record::g_parameters.triggerSource == source && dlog_record::isInitiated();
-
-    if (!seqTriggered && !dlogTriggered) {
+    if (!seqInitiated && !dlogInitiated) {
         return SCPI_ERROR_TRIGGER_IGNORED;
     }
 
-    if (dlogTriggered) {
+    if (dlogInitiated) {
         dlog_record::triggerGenerated();
     }
 
-    if (seqTriggered) {
+    if (seqInitiated) {
         setState(STATE_TRIGGERED);
 
         g_triggeredTime = micros() / 1000;

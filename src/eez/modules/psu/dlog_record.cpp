@@ -517,7 +517,12 @@ static void log(uint32_t tickCount) {
                 } else  if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
                     uint8_t data;
                     channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
-                    writeFloat(data * 1.0f);
+
+                    if (data & (1 << (dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0))) {
+                        writeFloat(1.0f);
+                    } else {
+                        writeFloat(0.0f);
+                    }
                 }
             }
             

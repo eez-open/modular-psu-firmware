@@ -1150,64 +1150,6 @@ void action_front_panel_select_slot3() {
 void action_drag_overlay() {
 }
 
-void action_show_dlog_params() {
-    pushPage(PAGE_ID_DLOG_PARAMS);
-}
-
-void action_dlog_edit_period() {
-    editValue(DATA_ID_DLOG_PERIOD);
-}
-
-void action_dlog_edit_duration() {
-    editValue(DATA_ID_DLOG_DURATION);
-}
-
-void action_dlog_edit_file_name() {
-    editValue(DATA_ID_DLOG_FILE_NAME);
-}
-
-void action_show_dlog_view() {
-    dlog_view::g_showLatest = true;
-    if (!dlog_record::isExecuting()) {
-        dlog_view::openFile(dlog_record::getLatestFilePath());
-    }
-    showPage(PAGE_ID_DLOG_VIEW);
-}
-
-void action_dlog_view_show_overlay_options() {
-    pushPage(PAGE_ID_DLOG_VIEW_OVERLAY_OPTIONS);
-}
-
-void onSelectDlogViewLegendViewOption(uint16_t value) {
-    popPage();
-    persist_conf::setDlogViewLegendViewOption((persist_conf::DlogViewLegendViewOption)value);
-}
-
-void action_dlog_view_select_legend_view_option() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_DLOG_VIEW_LEGEND_VIEW_OPTION, persist_conf::devConf.viewFlags.dlogViewLegendViewOption, nullptr, onSelectDlogViewLegendViewOption);
-}
-
-void action_dlog_view_toggle_labels() {
-    persist_conf::setDlogViewShowLabels(!persist_conf::devConf.viewFlags.dlogViewShowLabels);
-}
-
-void action_dlog_view_select_visible_value() {
-    dlog_view::Recording &recording = dlog_view::getRecording();
-    recording.selectedVisibleValueIndex = (recording.selectedVisibleValueIndex + 1) % dlog_view::getNumVisibleDlogValues(recording);
-}
-
-void action_dlog_auto_scale() {
-    dlog_view::autoScale(dlog_view::getRecording());
-}
-
-void action_dlog_scale_to_fit() {
-    dlog_view::scaleToFit(dlog_view::getRecording());
-}
-
-void action_dlog_upload() {
-    dlog_view::uploadFile();
-}
-
 void action_show_file_manager() {
     file_manager::openFileManager();
 }

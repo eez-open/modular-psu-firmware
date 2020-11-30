@@ -51,6 +51,7 @@ float getVoltage(Channel &channel);
 void setCurrent(Channel &channel, float value);
 float getCurrent(Channel &channel);
 
+bool isInitiated(Source source);
 int generateTrigger(Source source, bool checkImmediatelly = true);
 int startImmediately();
 void startImmediatelyInPsuThread();

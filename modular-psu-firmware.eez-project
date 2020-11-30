@@ -1224,6 +1224,12 @@
       "defaultValue": "Immediate"
     },
     {
+      "name": "dlog_trigger_source",
+      "type": "enum",
+      "enumItems": "[\n\"Bus\",\n\"Immediate\",\n\"Manual\",\n\"Pin1\"\n]",
+      "defaultValue": "Immediate"
+    },
+    {
       "name": "trigger_delay",
       "type": "float",
       "defaultValue": "0"
@@ -3118,6 +3124,9 @@
     },
     {
       "name": "dlog_item_toggle"
+    },
+    {
+      "name": "dlog_trigger_select_source"
     }
   ],
   "gui": {
@@ -4805,7 +4814,7 @@
                         "style": {
                           "inheritFrom": "status_icon_enabled_blink"
                         },
-                        "action": "dlog_toggle",
+                        "action": "trigger_generate_manual",
                         "left": 0,
                         "top": 0,
                         "width": 40,
@@ -32426,9 +32435,9 @@
                 },
                 "left": 250,
                 "top": 66,
-                "width": 58,
+                "width": 111,
                 "height": 30,
-                "text": "Name:"
+                "text": "File name:"
               },
               {
                 "type": "DisplayData",
@@ -32443,6 +32452,31 @@
                 "width": 226,
                 "height": 32,
                 "displayOption": 0
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_M_left",
+                  "font": "Oswald14"
+                },
+                "left": 250,
+                "top": 132,
+                "width": 109,
+                "height": 30,
+                "text": "Trigger:"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_M_center"
+                },
+                "data": "dlog_trigger_source",
+                "action": "dlog_trigger_select_source",
+                "left": 248,
+                "top": 162,
+                "width": 111,
+                "height": 32,
+                "text": ""
               }
             ]
           },

@@ -1859,7 +1859,9 @@ void onEncoder(int counter, bool clicked) {
     }
 
     if (clicked) {
-        if (activePageId == PAGE_ID_SYS_SETTINGS_DISPLAY_TEST) {
+        if (trigger::isInitiated(trigger::SOURCE_MANUAL)) {
+            action_trigger_generate_manual();
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS_DISPLAY_TEST) {
             popPage();
         } else if (isEncoderEnabledInActivePage()) {
             if (isFocusChanged()) {

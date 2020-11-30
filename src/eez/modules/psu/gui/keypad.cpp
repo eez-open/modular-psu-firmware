@@ -1016,7 +1016,7 @@ void NumericKeypad::ok() {
                 return;
             }
 
-            if (!isNaN(m_options.min) && value < m_options.min && !(value == 0 && m_options.allowZero)) {
+            if (!isNaN(m_options.min) && (float)value < m_options.min && !(value == 0 && m_options.allowZero)) {
                 psuErrorMessage(0, MakeLessThenMinMessageValue(m_options.min, m_startValue));
             } else if (!isNaN(m_options.max) && value > m_options.max) {
                 psuErrorMessage(0, MakeGreaterThenMaxMessageValue(m_options.max, m_startValue));
