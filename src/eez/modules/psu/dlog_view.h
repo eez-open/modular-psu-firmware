@@ -192,6 +192,9 @@ struct Recording {
     uint32_t dataOffset;
 
     uint8_t selectedVisibleValueIndex;
+
+    uint32_t columnFloatIndexes[MAX_NUM_OF_Y_AXES];
+    uint32_t numFloatsPerRow;
 };
 
 extern bool g_showLatest;
@@ -212,6 +215,7 @@ Recording &getRecording();
 void initAxis(Recording &recording);
 void initYAxis(Parameters &parameters, int yAxisIndex);
 void initDlogValues(Recording &recording);
+void calcColumnIndexes(Recording &g_recording);
 int getNumVisibleDlogValues(const Recording &recording);
 int getDlogValueIndex(Recording &recording, int visibleDlogValueIndex);
 int getVisibleDlogValueIndex(Recording &recording, int dlogValueIndex);

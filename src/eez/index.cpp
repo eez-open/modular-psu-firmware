@@ -305,6 +305,15 @@ bool Module::getDigitalInputData(int subchannelIndex, uint8_t &data, int *err) {
     return false;
 }
 
+#ifdef EEZ_PLATFORM_SIMULATOR
+bool Module::setDigitalInputData(int subchannelIndex, uint8_t data, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;    
+}
+#endif
+
 bool Module::getDigitalInputRange(int subchannelIndex, uint8_t pin, uint8_t &range, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;

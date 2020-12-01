@@ -371,6 +371,31 @@ scpi_result_t scpi_cmd_simulatorPin2Q(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_simulatorDigitalDataByte(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+		return SCPI_RES_ERR;
+	}
+
+	uint32_t data;
+	if (!SCPI_ParamUInt32(context, &data, true)) {
+		return SCPI_RES_ERR;
+	}
+
+	if (data > 255) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
+
+	int err;
+	if (!channel_dispatcher::setDigitalInputData(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, data, &err)) {
+		SCPI_ErrorPush(context, err);
+		return SCPI_RES_ERR;
+	}
+
+	return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez
@@ -474,6 +499,11 @@ scpi_result_t scpi_cmd_simulatorPin2(scpi_t *context) {
 scpi_result_t scpi_cmd_simulatorPin2Q(scpi_t *context) {
     SCPI_ErrorPush(context, SCPI_ERROR_UNDEFINED_HEADER);
     return SCPI_RES_ERR;
+}
+
+scpi_result_t scpi_cmd_simulatorDigitalDataByte(scpi_t *context) {
+	SCPI_ErrorPush(context, SCPI_ERROR_UNDEFINED_HEADER);
+	return SCPI_RES_ERR;
 }
 
 } // namespace scpi

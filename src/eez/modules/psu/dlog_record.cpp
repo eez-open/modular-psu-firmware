@@ -101,6 +101,9 @@ static unsigned int g_bufferIndex;
 static unsigned int g_lastSavedBufferIndex;
 static uint32_t g_lastSavedBufferTickCount;
 
+static uint32_t g_bitMask = 0;
+static uint32_t g_bits;
+
 osMutexId(g_mutexId);
 osMutexDef(g_mutex);
 
@@ -109,7 +112,24 @@ void abortAfterError();
 ////////////////////////////////////////////////////////////////////////////////
 
 static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
-    float value = *(float *)(DLOG_RECORD_BUFFER + (g_recording.dataOffset + (rowIndex * g_recording.parameters.numYAxes + columnIndex) * 4) % DLOG_RECORD_BUFFER_SIZE);
+	auto p = DLOG_RECORD_BUFFER + (
+			g_recording.dataOffset + (
+				rowIndex * g_recording.numFloatsPerRow
+				+ g_recording.columnFloatIndexes[columnIndex]
+			) * 4
+		) % DLOG_RECORD_BUFFER_SIZE;
+
+    float value;
+
+    if (g_recording.parameters.yAxes[columnIndex].unit == UNIT_BIT) {
+        if (*(uint32_t*)p & (0x8000 >> g_recording.parameters.yAxes[columnIndex].channelIndex)) {
+            value = 1.0f;
+        } else {
+            value = 0.0f;
+        }
+	} else {
+		value = *(float *)p;
+	}
 
     if (g_recording.parameters.yAxisScale == dlog_view::SCALE_LOGARITHMIC) {
         float logOffset = 1 - g_recording.parameters.yAxes[columnIndex].range.min;
@@ -245,8 +265,20 @@ void fileWrite(bool flush) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static void writeUint32(uint32_t value);
+
+void flushBits() {
+    if (g_bitMask != 0) {
+        writeUint32(g_bits);
+        g_bits = 0;
+        g_bitMask = 0;
+    }
+}
+
 static void flushData() {
     //DebugTrace("flush before: %d\n", g_bufferIndex - g_lastSavedBufferIndex);
+
+    flushBits();
 
     uint32_t timeout = millis() + CONF_WRITE_FLUSH_TIMEOUT_MS;
     while (g_lastSavedBufferIndex < g_bufferIndex && millis() < timeout) {
@@ -277,7 +309,24 @@ static void writeUint32(uint32_t value) {
 }
 
 static void writeFloat(float value) {
+    flushBits();
     writeUint32(*((uint32_t *)&value));
+}
+
+static void writeBit(int bit) {
+    if (g_bitMask == 0) {
+        g_bitMask = 0x8000;
+    } else {
+        g_bitMask >>= 1;
+    }
+
+    if (bit) {
+        g_bits |= g_bitMask;
+    }
+
+    if (g_bitMask == 1) {
+        flushBits();
+    }
 }
 
 static void writeUint8Field(uint8_t id, uint8_t value) {
@@ -362,6 +411,7 @@ static void initRecordingStart() {
     }
 
     dlog_view::initDlogValues(g_recording);
+    dlog_view::calcColumnIndexes(g_recording);
 
     g_recording.getValue = getValue;
 }
@@ -417,7 +467,7 @@ static void writeFileHeaderAndMetaFields() {
 
         if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || g_recording.parameters.yAxes[yAxisIndex].channelIndex >= 0) {
             writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_CHANNEL_INDEX, g_recording.parameters.yAxes[yAxisIndex].channelIndex + 1, yAxisIndex + 1);
-            if (g_recording.parameters.yAxes[yAxisIndex].channelIndex >= 0) {
+            if (g_recording.parameters.yAxes[yAxisIndex].channelIndex >= 0 && g_recording.parameters.yAxes[yAxisIndex].unit != UNIT_BIT) {
                 writeChannelFields[g_recording.parameters.yAxes[yAxisIndex].channelIndex] = true;
             }
         }
@@ -495,9 +545,11 @@ static void log(uint32_t tickCount) {
                     ) {
                         writeFloat(NAN);
                     } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
-                        writeFloat(NAN);
+                        writeBit(0);
                     }
                 }
+
+                flushBits();
 
                 ++g_recording.size;
             }
@@ -517,14 +569,15 @@ static void log(uint32_t tickCount) {
                 } else  if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
                     uint8_t data;
                     channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
-
                     if (data & (1 << (dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0))) {
-                        writeFloat(1.0f);
+                        writeBit(1);
                     } else {
-                        writeFloat(0.0f);
+                        writeBit(0);
                     }
                 }
             }
+
+            flushBits();
             
             ++g_recording.size;
 

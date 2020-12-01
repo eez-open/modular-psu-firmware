@@ -35,7 +35,6 @@ enum Unit {
     UNIT_MILLI_WATT,
     UNIT_SECOND,
     UNIT_MILLI_SECOND,
-    UNIT_MINUTE,
     UNIT_CELSIUS,
     UNIT_RPM,
     UNIT_OHM,
@@ -51,7 +50,9 @@ enum Unit {
     UNIT_MILLI_FARAD,
     UNIT_MICRO_FARAD,
     UNIT_NANO_FARAD,
-    UNIT_PICO_FARAD
+    UNIT_PICO_FARAD,
+    UNIT_BIT,
+    UNIT_MINUTE,
 };
 
 extern const char *g_unitNames[];

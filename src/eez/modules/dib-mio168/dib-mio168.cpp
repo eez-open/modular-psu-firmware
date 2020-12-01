@@ -243,6 +243,12 @@ struct DinChannel : public MioChannel {
         return m_pinStates;
     }
 
+#ifdef EEZ_PLATFORM_SIMULATOR
+    void setDigitalInputData(uint8_t data) {
+        m_pinStates = data;
+    }
+#endif
+
     int getPinState(int pin) {
         return m_pinStates & (1 << pin) ? 1 : 0;
     }
@@ -1504,6 +1510,19 @@ public:
         return true;
     }
 
+#ifdef EEZ_PLATFORM_SIMULATOR
+    bool setDigitalInputData(int subchannelIndex, uint8_t data, int *err) override {
+        if (subchannelIndex != DIN_SUBCHANNEL_INDEX) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+        dinChannel.setDigitalInputData(data);
+        return true;
+    }
+#endif
+
     bool getDigitalInputRange(int subchannelIndex, uint8_t pin, uint8_t &range, int *err) override {
         if (subchannelIndex != DIN_SUBCHANNEL_INDEX) {
             if (err) {
@@ -2515,7 +2534,7 @@ void data_dib_mio168_din_pins_5_8(DataOperationEnum operation, Cursor cursor, Va
 void data_dib_mio168_din_no(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 8 + 1;
-    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+    } else if (operation == DATA_OPERATION_GET_COLOR) {
         if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(cursor / 8, DIN_SUBCHANNEL_INDEX, (DlogResourceType)(DLOG_RESOURCE_TYPE_DIN0 + cursor % 8))) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }

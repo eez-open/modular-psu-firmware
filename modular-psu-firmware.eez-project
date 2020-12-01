@@ -68222,6 +68222,33 @@
                 }
               ]
             }
+          },
+          {
+            "name": "SIMUlator:DIGital:DATA[:BYTE]",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ]
+              },
+              {
+                "name": "value",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           }
         ]
       },

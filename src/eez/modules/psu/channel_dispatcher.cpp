@@ -2178,6 +2178,11 @@ bool isEditEnabled(const WidgetCursor &widgetCursor) {
 bool getDigitalInputData(int slotIndex, int subchannelIndex, uint8_t &data, int *err) {
     return g_slots[slotIndex]->getDigitalInputData(subchannelIndex, data, err);
 }
+#ifdef EEZ_PLATFORM_SIMULATOR
+bool setDigitalInputData(int slotIndex, int subchannelIndex, uint8_t data, int *err) {
+    return g_slots[slotIndex]->setDigitalInputData(subchannelIndex, data, err);
+}
+#endif
 
 bool getDigitalInputRange(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t &range, int *err) {
     return g_slots[slotIndex]->getDigitalInputRange(subchannelIndex, pin, range, err);

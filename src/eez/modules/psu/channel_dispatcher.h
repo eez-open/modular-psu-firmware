@@ -182,6 +182,9 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex);
 bool isEditEnabled(const eez::gui::WidgetCursor &widgetCursor);
 
 bool getDigitalInputData(int slotIndex, int subchannelIndex, uint8_t &data, int *err);
+#ifdef EEZ_PLATFORM_SIMULATOR
+bool setDigitalInputData(int slotIndex, int subchannelIndex, uint8_t data, int *err);
+#endif
 
 bool getDigitalInputRange(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t &range, int *err);
 bool setDigitalInputRange(int slotIndex, int subchannelIndex, uint8_t pin, uint8_t range, int *err);

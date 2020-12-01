@@ -34,7 +34,6 @@ const char *g_unitNames[] = {
     "mW",
     "s",
     "ms",
-    "minutes",
     DEGREE_SYMBOL"C",
     "rpm",
     "\xb4",
@@ -50,7 +49,9 @@ const char *g_unitNames[] = {
     "mF",
     "uF",
     "nF",
-    "pF"
+    "pF",
+    "minutes",
+    "",
 };
 
 static const int g_scpiUnits[] = {

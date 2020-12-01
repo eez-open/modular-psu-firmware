@@ -273,6 +273,9 @@ struct Module {
     virtual eez_err_t setChannelColor(int subchannelIndex, uint8_t color);
 
     virtual bool getDigitalInputData(int subchannelIndex, uint8_t &data, int *err);
+#ifdef EEZ_PLATFORM_SIMULATOR
+    virtual bool setDigitalInputData(int subchannelIndex, uint8_t data, int *err);
+#endif
 
     virtual bool getDigitalInputRange(int subchannelIndex, uint8_t pin, uint8_t &range, int *err);
     virtual bool setDigitalInputRange(int subchannelIndex, uint8_t pin, uint8_t range, int *err);

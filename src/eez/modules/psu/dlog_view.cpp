@@ -37,6 +37,7 @@
 #endif
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/container.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
@@ -274,9 +275,14 @@ void loadBlock() {
 
             uint32_t i = g_cacheBlocks[g_blockIndexToLoad].loadedValues;
             while (i < NUM_ELEMENTS_PER_BLOCKS) {
-                auto offset = (uint32_t)roundf((g_blockIndexToLoad * NUM_ELEMENTS_PER_BLOCKS + i) / numElementsPerRow * g_loadScale * g_recording.parameters.numYAxes);
+                auto offset = (uint32_t)roundf(
+                    (g_blockIndexToLoad * NUM_ELEMENTS_PER_BLOCKS + i) / numElementsPerRow
+                        * g_loadScale * g_recording.numFloatsPerRow
+                );
 
-                offset = g_recording.parameters.numYAxes * ((offset + g_recording.parameters.numYAxes - 1) / g_recording.parameters.numYAxes);
+                offset = g_recording.numFloatsPerRow * (
+                    (offset + g_recording.numFloatsPerRow - 1) / g_recording.numFloatsPerRow
+                );
 
                 size_t filePosition = g_recording.dataOffset + offset * sizeof(float);
                 if (!file.seek(filePosition)) {
@@ -298,7 +304,7 @@ void loadBlock() {
                         }
 
                         // read up to NUM_VALUES_ROWS
-                        uint32_t bytesToRead = MIN(NUM_VALUES_ROWS, numSamplesPerValue - j) * g_recording.parameters.numYAxes * sizeof(float);
+                        uint32_t bytesToRead = MIN(NUM_VALUES_ROWS, numSamplesPerValue - j) * g_recording.numFloatsPerRow * sizeof(float);
                         uint32_t bytesRead = file.read(values, bytesToRead);
                         if (bytesToRead != bytesRead) {
                             i = NUM_ELEMENTS_PER_BLOCKS;
@@ -308,21 +314,38 @@ void loadBlock() {
                         totalBytesRead += bytesRead;
                     }
 
-                    unsigned valuesOffset = valuesRow * g_recording.parameters.numYAxes;
+					unsigned valuesOffset = valuesRow * g_recording.numFloatsPerRow;
 
-                    for (unsigned k = 0; k < g_recording.parameters.numYAxes; k++) {
-                        if (k < numElementsPerRow) {
-                            BlockElement *blockElement = blockElements + i++;
+                    uint32_t bitMask = 0;
+                    uint32_t bits = 0;
+                    uint32_t m = 0;
 
-                            float value = values[valuesOffset + k];
+                    for (unsigned k = 0; k < numElementsPerRow; k++) {
+                        BlockElement *blockElement = blockElements + i++;
 
-                            if (j == 0) {
-                                blockElement->min = blockElement->max = value;
-                            } else if (value < blockElement->min) {
-                                blockElement->min = value;
-                            } else if (value > blockElement->max) {
-                                blockElement->max = value;
+                        float value;
+
+                        auto &yAxis = g_recording.parameters.yAxes[k];
+                        if (yAxis.unit == UNIT_BIT) {
+                            if (bitMask == 0) {
+                                bits = *(uint32_t *)&values[valuesOffset + m++];
+                                bitMask = 0x8000;
+                            } else {
+                                bitMask >>= 1;
                             }
+
+                            value = (bits & bitMask) ? 1.0f : 0.0f;
+                        } else {
+                            bitMask = 0;
+                            value = values[valuesOffset + m++];
+                        }
+
+                        if (j == 0) {
+                            blockElement->min = blockElement->max = value;
+                        } else if (value < blockElement->min) {
+                            blockElement->min = value;
+                        } else if (value > blockElement->max) {
+                            blockElement->max = value;
                         }
                     }
                 }
@@ -543,10 +566,10 @@ void initAxis(Recording &recording) {
                 yAxis.channelIndex = dlogItem.subchannelIndex;
             }
         } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
-            yAxis.unit = UNIT_UNKNOWN;
+            yAxis.unit = UNIT_BIT;
             yAxis.range.min = 0;
             yAxis.range.max = 1;
-            yAxis.channelIndex = -1;
+            yAxis.channelIndex = dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0;
         }
         strcpy(yAxis.label, g_slots[dlogItem.slotIndex]->getDlogResourceLabel(dlogItem.subchannelIndex, dlogItem.resourceIndex));
     }
@@ -582,6 +605,43 @@ void initDlogValues(Recording &recording) {
     }
 
     recording.selectedVisibleValueIndex = 0;
+}
+
+void calcColumnIndexes(Recording &recording) {
+    uint32_t columnIndex = 0;
+    uint32_t bitMask = 0;
+
+    for (int yAxisIndex = 0; yAxisIndex < recording.parameters.numYAxes; yAxisIndex++) {
+        auto &yAxis = recording.parameters.yAxes[yAxisIndex];
+        
+        recording.columnFloatIndexes[yAxisIndex] = columnIndex;
+        
+        if (yAxis.unit == UNIT_BIT) {
+            if (bitMask == 0) {
+                bitMask = 0x8000;
+            } else {
+                bitMask >>= 1;
+            }
+
+            if (bitMask == 1) {
+                columnIndex++;
+                bitMask = 0;
+            }
+        } else {
+            if (bitMask != 0) {
+                columnIndex++;
+                bitMask = 0;
+            }
+
+            columnIndex++;
+        }
+    }
+
+    if (bitMask != 0) {
+        columnIndex++;
+    }
+
+    recording.numFloatsPerRow = columnIndex;
 }
 
 int getNumVisibleDlogValues(const Recording &recording) {
@@ -650,6 +710,7 @@ void autoScale(Recording &recording) {
     for (auto visibleDlogValueIndex = 0; visibleDlogValueIndex < numVisibleDlogValues; visibleDlogValueIndex++) {
         int dlogValueIndex = getDlogValueIndex(recording, visibleDlogValueIndex);
         DlogValueParams &dlogValueParams = recording.dlogValues[dlogValueIndex];
+
         float numDivisions = 1.0f * NUM_VERT_DIVISIONS / numVisibleDlogValues;
 
         float rangeMin = recording.parameters.yAxes[dlogValueIndex].range.min;
@@ -661,8 +722,13 @@ void autoScale(Recording &recording) {
             rangeMax = log10f(logOffset + rangeMax);
         }
 
-        dlogValueParams.div = (rangeMax - rangeMin) / numDivisions;
-        dlogValueParams.offset = dlogValueParams.div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions);
+        if (recording.parameters.yAxes[dlogValueIndex].unit == UNIT_BIT) {
+            dlogValueParams.div = 1.1f / numDivisions;
+            dlogValueParams.offset = dlogValueParams.div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions);
+        } else {
+            dlogValueParams.div = (rangeMax - rangeMin) / numDivisions;
+            dlogValueParams.offset = dlogValueParams.div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions);
+        }
     }
 }
 
@@ -866,10 +932,11 @@ bool openFile(const char *filePath, int *err) {
 
                 if (!invalidHeader) {
                     initDlogValues(g_recording);
+                    calcColumnIndexes(g_recording);
 
                     g_recording.pageSize = VIEW_WIDTH;
 
-                    g_recording.numSamples = (file.size() - g_recording.dataOffset) / (g_recording.parameters.numYAxes * sizeof(float));
+                    g_recording.numSamples = (file.size() - g_recording.dataOffset) / (g_recording.numFloatsPerRow * sizeof(float));
                     g_recording.xAxisDivMin = g_recording.pageSize * g_recording.parameters.period / NUM_HORZ_DIVISIONS;
                     g_recording.xAxisDivMax = MAX(g_recording.numSamples, g_recording.pageSize) * g_recording.parameters.period / NUM_HORZ_DIVISIONS;
 
@@ -1373,6 +1440,518 @@ void action_dlog_scale_to_fit() {
 
 void action_dlog_upload() {
     dlog_view::uploadFile();
+}
+
+void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
+    auto &recording = dlog_view::getRecording();
+
+    if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
+        value = Value(recording.refreshCounter, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC) {
+        value = recording.getValue;
+    } else if (operation == DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE) {
+        value = Value(recording.dlogValues[value.getUInt8()].isVisible);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SHOW_LABELS) {
+        value = persist_conf::devConf.viewFlags.dlogViewShowLabels ? 1 : 0;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SELECTED_VALUE_INDEX) {
+        value = persist_conf::devConf.viewFlags.dlogViewLegendViewOption != persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_HIDDEN ? dlog_view::getDlogValueIndex(recording, recording.selectedVisibleValueIndex) : -1;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_LABEL) {
+        YtDataGetLabelParams *params = (YtDataGetLabelParams *)value.getVoidPointer();
+        dlog_view::getLabel(dlog_view::getRecording(), params->valueIndex, params->text, params->count);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = Value(recording.size, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
+        value = Value(dlog_view::getPosition(recording), VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
+        int32_t newPosition = value.getUInt32();
+        if (newPosition < 0) {
+            newPosition = 0;
+        } else {
+            if (newPosition + recording.pageSize > recording.size) {
+                newPosition = recording.size - recording.pageSize;
+            }
+        }
+        dlog_view::changeXAxisOffset(recording, newPosition * recording.parameters.period);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = Value(recording.pageSize, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
+        uint8_t dlogValueIndex = value.getUInt8();
+        uint8_t visibleDlogValueIndex = dlog_view::getVisibleDlogValueIndex(recording, dlogValueIndex);
+        uint8_t numYtGraphStyles = sizeof(g_ytGraphStyles) / sizeof(uint16_t);
+        if (psu::dlog_view::isMulipleValuesOverlayHeuristic(recording)) {
+            value = Value(g_ytGraphStyles[visibleDlogValueIndex % numYtGraphStyles], VALUE_TYPE_UINT16);
+        } else {
+            if (persist_conf::devConf.viewFlags.dlogViewLegendViewOption != persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_HIDDEN && visibleDlogValueIndex == recording.selectedVisibleValueIndex) {
+                value = Value(STYLE_ID_YT_GRAPH_Y1, VALUE_TYPE_UINT16);
+            } else {
+                value = Value(STYLE_ID_YT_GRAPH_Y5, VALUE_TYPE_UINT16);
+            }
+        }
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS) {
+        value = dlog_view::NUM_HORZ_DIVISIONS;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS) {
+        value = dlog_view::NUM_VERT_DIVISIONS;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_DIV) {
+        value = Value(recording.dlogValues[value.getUInt8()].div, recording.parameters.yAxes[value.getUInt8()].unit);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_OFFSET) {
+        value = Value(recording.dlogValues[value.getUInt8()].offset, recording.parameters.yAxes[value.getUInt8()].unit);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
+        value = YT_GRAPH_UPDATE_METHOD_STATIC;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
+        value = Value(recording.parameters.period, UNIT_SECOND);
+    } else if (operation == DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE) {
+        value = &recording != &dlog_record::g_recording;
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET) {
+        value = Value(recording.cursorOffset, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_TOUCH_DRAG) {
+        TouchDrag *touchDrag = (TouchDrag *)value.getVoidPointer();
+        
+        static float valueAtTouchDown;
+        static int xAtTouchDown;
+        static int yAtTouchDown;
+        
+        if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET) {
+            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording,
+                !dlog_view::isMulipleValuesOverlayHeuristic(recording) || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+                ? recording.selectedVisibleValueIndex : g_focusCursor);
+
+            if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
+                valueAtTouchDown = dlogValueParams->offset;
+                yAtTouchDown = touchDrag->y;
+            } else {
+                float newOffset = valueAtTouchDown + dlogValueParams->div * (yAtTouchDown - touchDrag->y) * dlog_view::NUM_VERT_DIVISIONS / dlog_view::VIEW_HEIGHT;
+
+                float min = getMin(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_OFFSET).getFloat();
+                float max = getMax(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_OFFSET).getFloat();
+
+                newOffset = clamp(newOffset, min, max);
+                
+                dlogValueParams->offset = newOffset;
+            }
+        } else if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV) {
+            dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording,
+                !dlog_view::isMulipleValuesOverlayHeuristic(recording)  || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+                ? recording.selectedVisibleValueIndex : g_focusCursor);
+
+            if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
+                valueAtTouchDown = dlogValueParams->div;
+
+                //uint32_t position = ytDataGetPosition(cursor, DATA_ID_RECORDING);
+                //Value::YtDataGetValueFunctionPointer ytDataGetValue = ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
+                //for (int i = position + touchDrag->x - 10; i < position + touchDrag->x + 10; )
+
+                yAtTouchDown = touchDrag->y;
+            } else {
+                float scale = 1.0f * (dlog_view::VIEW_HEIGHT - yAtTouchDown) / (dlog_view::VIEW_HEIGHT - touchDrag->y);
+
+                float newDiv = valueAtTouchDown * scale;
+
+                float min = getMin(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_DIV).getFloat();
+                float max = getMax(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_DIV).getFloat();
+
+                newDiv = clamp(newDiv, min, max);
+
+                dlogValueParams->offset = dlogValueParams->offset * newDiv / dlogValueParams->div;
+                dlogValueParams->div = newDiv;
+            }
+        } else if (g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV) {
+            if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
+                valueAtTouchDown = recording.xAxisDiv;
+                xAtTouchDown = touchDrag->x;
+            } else {
+                float scale = 1.0f * (dlog_view::VIEW_WIDTH - touchDrag->x) / (dlog_view::VIEW_WIDTH - xAtTouchDown);
+
+                float newDiv = valueAtTouchDown * scale;
+
+                float min = getMin(g_focusCursor, DATA_ID_DLOG_X_AXIS_DIV).getFloat();
+                float max = getMax(g_focusCursor, DATA_ID_DLOG_X_AXIS_DIV).getFloat();
+
+                newDiv = clamp(newDiv, min, max);
+
+                dlog_view::changeXAxisDiv(recording, newDiv);
+            }
+        } else {
+            recording.cursorOffset = MIN(dlog_view::VIEW_WIDTH - 1, MAX(touchDrag->x, 0));
+        }
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE) {
+        float xValue = (dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period;
+        if (recording.parameters.xAxis.scale == dlog_view::SCALE_LOGARITHMIC) {
+            xValue = powf(10, recording.parameters.xAxis.range.min + xValue);
+        }
+        value = Value(roundPrec(xValue, 0.001f), recording.parameters.xAxis.unit);
+    } else if (operation == DATA_OPERATION_GET) {
+        value = Value((dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period, dlog_view::getXAxisUnit(recording));
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = Value(0.0f, dlog_view::getXAxisUnit(recording));
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = Value(recording.parameters.xAxis.range.max - recording.parameters.xAxis.range.min, dlog_view::getXAxisUnit(recording));
+    } else if (operation == DATA_OPERATION_GET_DEF) {
+        value = Value((recording.parameters.xAxis.range.max - recording.parameters.xAxis.range.min) / 2, dlog_view::getXAxisUnit(recording));
+    } else if (operation == DATA_OPERATION_SET) {
+        float cursorOffset = value.getFloat() / recording.parameters.period - dlog_view::getPosition(recording);
+        if (cursorOffset < 0.0f) {
+            dlog_view::changeXAxisOffset(recording, recording.xAxisOffset + cursorOffset * recording.parameters.period);
+            recording.cursorOffset = 0;
+        } else if (cursorOffset > dlog_view::VIEW_WIDTH - 1) {
+            dlog_view::changeXAxisOffset(recording, recording.xAxisOffset + (cursorOffset - (dlog_view::VIEW_WIDTH - 1)) * recording.parameters.period);
+            recording.cursorOffset = dlog_view::VIEW_WIDTH - 1;
+        } else {
+            recording.cursorOffset = (uint32_t)roundf(cursorOffset);
+        }
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        static const int COUNT = 4;
+
+        static float values[COUNT];
+
+        values[0] = recording.parameters.xAxis.step;
+        values[1] = recording.parameters.xAxis.step * 10;
+        values[2] = recording.parameters.xAxis.step * 100;
+        values[3] = recording.parameters.xAxis.step * 1000;
+
+        StepValues *stepValues = value.getStepValues();
+
+        stepValues->values = values;
+        stepValues->count = COUNT;
+        stepValues->unit = dlog_view::getXAxisUnit(recording);
+
+        stepValues->encoderSettings.accelerationEnabled = true;
+        stepValues->encoderSettings.range = 100.0f * values[0];
+        stepValues->encoderSettings.step = values[0];
+
+        value = 1;
+    }
+}
+
+void data_dlog_multiple_values_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
+    static const int NUM_WIDGETS = 2;
+
+    static const int LABELS_CONTAINER_WIDGET = 0;
+    static const int DLOG_VALUES_LIST_WIDGET = 1;
+
+    static Overlay overlay;
+    static WidgetOverride widgetOverrides[NUM_WIDGETS];
+
+    if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+        auto &recording = dlog_view::getRecording();
+        
+        int state = 0;
+        int numVisibleDlogValues = dlog_view::getNumVisibleDlogValues(recording);
+        
+        if (persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_FLOAT && dlog_view::isMulipleValuesOverlayHeuristic(recording)) {
+            state = numVisibleDlogValues;
+        }
+
+        if (overlay.state != state) {
+            overlay.state = state;
+
+            if (state != 0) {
+                overlay.widgetOverrides = widgetOverrides;
+
+                WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
+
+                const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+
+                const Widget *labelsContainerWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LABELS_CONTAINER_WIDGET);
+                const Widget *dlogValuesListWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_VALUES_LIST_WIDGET);
+
+                widgetOverrides[LABELS_CONTAINER_WIDGET].isVisible = true;
+                widgetOverrides[LABELS_CONTAINER_WIDGET].x = labelsContainerWidget->x;
+                widgetOverrides[LABELS_CONTAINER_WIDGET].y = labelsContainerWidget->y;
+                widgetOverrides[LABELS_CONTAINER_WIDGET].w = labelsContainerWidget->w;
+                widgetOverrides[LABELS_CONTAINER_WIDGET].h = labelsContainerWidget->h;
+
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].isVisible = true;
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].x = dlogValuesListWidget->x;
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].y = dlogValuesListWidget->y;
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].w = dlogValuesListWidget->w;
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].h = numVisibleDlogValues * dlogValuesListWidget->h;
+
+                overlay.width = widgetCursor.widget->w;
+                overlay.height = widgetOverrides[LABELS_CONTAINER_WIDGET].h + widgetOverrides[DLOG_VALUES_LIST_WIDGET].h;
+
+                overlay.x = 40;
+                overlay.y = 8;
+            }
+        }
+
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    }
+}
+
+void data_dlog_single_value_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
+    static Overlay overlay;
+
+    if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+        auto &recording = dlog_view::getRecording();
+        overlay.state = persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_FLOAT && !dlog_view::isMulipleValuesOverlayHeuristic(recording);
+        
+        WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
+        overlay.width = widgetCursor.widget->w;
+        overlay.height = widgetCursor.widget->h;
+        
+        overlay.x = 40;
+        overlay.y = 8;
+
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    }
+}
+
+void data_dlog_visible_values(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        auto &recording = dlog_view::getRecording();
+        value = getNumVisibleDlogValues(recording);
+    }
+}
+
+void data_dlog_visible_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        auto &recording = dlog_view::getRecording();
+        int dlogValueIndex = dlog_view::getDlogValueIndex(recording,
+            !dlog_view::isMulipleValuesOverlayHeuristic(recording) || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+            ? recording.selectedVisibleValueIndex : cursor);
+        value = Value(dlogValueIndex, VALUE_TYPE_DLOG_VALUE_LABEL);
+    }
+}
+
+void guessStepValues(StepValues *stepValues, Unit unit) {
+    if (unit == UNIT_VOLT) {
+        static float values[] = { 0.1f, 0.5f, 1.0f, 2.0f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+    } else if (unit == UNIT_AMPER) {
+        static float values[] = { 0.01f, 0.05f, 0.1f, 0.25f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+    } else if (unit == UNIT_WATT) {
+        static float values[] = { 0.5f, 1.0f, 2.0f, 5.0f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+    } else if (unit == UNIT_SECOND) {
+        static float values[] = { 1.0f, 5.0f, 10.0f, 20.0f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+    } else {
+        static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+    }
+
+    stepValues->encoderSettings.accelerationEnabled = true;
+    stepValues->encoderSettings.range = stepValues->values[0] * 10.0f;
+    stepValues->encoderSettings.step = stepValues->values[0];
+
+    stepValues->unit = unit;
+}
+
+void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Value &value) {
+    auto &recording = dlog_view::getRecording();
+    int dlogValueIndex = dlog_view::getDlogValueIndex(recording,
+        !dlog_view::isMulipleValuesOverlayHeuristic(recording) || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+        ? recording.selectedVisibleValueIndex : cursor);
+
+    if (operation == DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else {
+            value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].div), getYAxisUnit(recording, dlogValueIndex));
+        }
+    } else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else {
+            value = Value(recording.dlogValues[dlogValueIndex].div, getYAxisUnit(recording, dlogValueIndex));
+        }
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = Value(0.001f, getYAxisUnit(recording, dlogValueIndex));
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = Value(100.0f, getYAxisUnit(recording, dlogValueIndex));
+    } else if (operation == DATA_OPERATION_SET) {
+        recording.dlogValues[dlogValueIndex].offset = recording.dlogValues[dlogValueIndex].offset * value.getFloat() / recording.dlogValues[dlogValueIndex].div;
+        recording.dlogValues[dlogValueIndex].div = value.getFloat();
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "Div";
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = getYAxisUnit(recording, dlogValueIndex);
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 0;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        guessStepValues(value.getStepValues(), getYAxisUnit(recording, dlogValueIndex));
+        value = 1;
+    }
+}
+
+void data_dlog_visible_value_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
+    auto &recording = dlog_view::getRecording();
+    int dlogValueIndex = dlog_view::getDlogValueIndex(recording,
+        !dlog_view::isMulipleValuesOverlayHeuristic(recording) || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+        ? recording.selectedVisibleValueIndex : cursor);
+
+    if (operation == DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else {
+            value = Value(dlog_view::roundValue(recording.dlogValues[dlogValueIndex].offset), getYAxisUnit(recording, dlogValueIndex));
+        }
+    } else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else {
+            value = Value(recording.dlogValues[dlogValueIndex].offset, getYAxisUnit(recording, dlogValueIndex));
+        }
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = Value(-100.0f, getYAxisUnit(recording, dlogValueIndex));
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = Value(100.0f, getYAxisUnit(recording, dlogValueIndex));
+    } else if (operation == DATA_OPERATION_SET) {
+        recording.dlogValues[dlogValueIndex].offset = value.getFloat();
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "Offset";
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = getYAxisUnit(recording, dlogValueIndex);
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 0;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        guessStepValues(value.getStepValues(), getYAxisUnit(recording, dlogValueIndex));
+        value = 1;
+    }
+}
+
+void data_dlog_x_axis_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
+    auto &recording = dlog_view::getRecording();
+
+    if (operation == DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_OFFSET;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else {
+            value = Value(recording.xAxisOffset, dlog_view::getXAxisUnit(recording));
+        }
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = Value(recording.parameters.xAxis.range.min, dlog_view::getXAxisUnit(recording));
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = Value(recording.parameters.xAxis.range.max - recording.pageSize * recording.parameters.period, dlog_view::getXAxisUnit(recording));
+    } else if (operation == DATA_OPERATION_SET) {
+        dlog_view::changeXAxisOffset(recording, value.getFloat());
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "Offset";
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = dlog_view::getXAxisUnit(recording);
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 0;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        guessStepValues(value.getStepValues(), dlog_view::getXAxisUnit(recording));
+        value = 1;
+    }
+}
+
+void data_dlog_x_axis_div(DataOperationEnum operation, Cursor cursor, Value &value) {
+    auto &recording = dlog_view::getRecording();
+
+    if (operation == DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else {
+            value = Value(recording.xAxisDiv, dlog_view::getXAxisUnit(recording));
+        }
+    } else if (operation == DATA_OPERATION_GET_MIN || operation == DATA_OPERATION_GET_DEF) {
+        value = Value(recording.xAxisDivMin, dlog_view::getXAxisUnit(recording));
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = Value(recording.xAxisDivMax, dlog_view::getXAxisUnit(recording));
+    } else if (operation == DATA_OPERATION_SET) {
+        dlog_view::changeXAxisDiv(recording, value.getFloat());
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "Div";
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = dlog_view::getXAxisUnit(recording);
+    } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
+        value = 0;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        guessStepValues(value.getStepValues(), dlog_view::getXAxisUnit(recording));
+        value = 1;
+    }
+}
+
+void data_dlog_x_axis_max_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        auto &recording = dlog_view::getRecording();
+
+        float maxValue = dlog_view::getDuration(recording);
+
+        if (recording.parameters.xAxis.scale == dlog_view::SCALE_LOGARITHMIC) {
+            maxValue = powf(10, recording.parameters.xAxis.range.min + maxValue);
+        }
+
+        value = Value(maxValue, recording.parameters.xAxis.unit);
+    }
+}
+
+void data_dlog_x_axis_max_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        auto &recording = dlog_view::getRecording();
+        if (recording.parameters.xAxis.unit == UNIT_SECOND) {
+            value = "Total duration";
+        } else {
+            value = "Max.";
+        }
+    }
+}
+
+void data_dlog_visible_value_cursor(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        auto &recording = dlog_view::getRecording();
+        int dlogValueIndex = dlog_view::getDlogValueIndex(recording,
+            !dlog_view::isMulipleValuesOverlayHeuristic(recording) || persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+            ? recording.selectedVisibleValueIndex : cursor);
+        auto ytDataGetValue = ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
+        float max;
+        float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex, &max);
+        float cursorValue = (min + max) / 2;
+        if (recording.parameters.yAxisScale == dlog_view::SCALE_LOGARITHMIC) {
+            float logOffset = 1 - recording.parameters.yAxes[dlogValueIndex].range.min;
+            cursorValue = powf(10, cursorValue) - logOffset;
+        }
+        value = Value(cursorValue, recording.parameters.yAxes[dlogValueIndex].unit);
+
+    }
+}
+
+void data_dlog_current_time(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(0, VALUE_TYPE_DLOG_CURRENT_TIME);
+    }
+}
+
+void data_dlog_file_length(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(dlog_record::g_fileLength, VALUE_TYPE_FILE_LENGTH);
+    }
+}
+
+void data_dlog_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(cursor, VALUE_TYPE_DLOG_VALUE_LABEL);
+    }
+}
+
+void data_dlog_view_legend_view_option(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = (int)persist_conf::devConf.viewFlags.dlogViewLegendViewOption;
+    }
+}
+
+void data_dlog_view_show_labels(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = (int)persist_conf::devConf.viewFlags.dlogViewShowLabels;
+    }
 }
 
 } // namespace gui
