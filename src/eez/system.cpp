@@ -24,7 +24,7 @@
 #include <main.h>
 #include <iwdg.h>
 
-volatile uint32_t g_tickCount;
+volatile uint64_t g_tickCount;
 
 int g_watchdogExpectingTask = WATCHDOG_HIGH_PRIORITY_THREAD;
 
@@ -53,7 +53,7 @@ namespace eez {
 
 uint32_t millis() {
 #if defined(EEZ_PLATFORM_STM32)
-    return g_tickCount / 5;
+    return (uint32_t)(g_tickCount / 5);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -77,9 +77,9 @@ uint32_t micros() {
 	auto cnt = TIM7->CNT;
 	auto tc2 = g_tickCount;
 	if (tc1 == tc2) {
-		return tc1 * 200 + 2 * cnt;
+		return (uint32_t)(tc1 * 200 + 2 * cnt);
 	}
-	return tc2 * 200;
+	return (uint32_t)(tc2 * 200);
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

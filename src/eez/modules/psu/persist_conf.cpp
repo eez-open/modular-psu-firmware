@@ -826,6 +826,13 @@ bool writeTotalOnTime(int type, uint32_t time) {
     buffer[5] = crc32((uint8_t *)(buffer + 3), 8);
 
     if (type == ontime::ON_TIME_COUNTER_MCU) {
+        // static uint32_t lastTime = time;
+        // DebugTrace("On-time counter: %u, systick: %u\n", time, millis());
+        // if (lastTime != 0 && (time - lastTime) >= 2 * WRITE_ONTIME_INTERVAL) {
+        //     psu::gui::errorMessage("On time counter alert!");
+        // }
+        // lastTime = time;
+
         return confWrite((uint8_t *)buffer, sizeof(buffer), mcu::eeprom::EEPROM_ONTIME_START_ADDRESS);
     } else {
         return moduleConfWrite(

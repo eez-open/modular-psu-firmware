@@ -30,7 +30,7 @@
 void doWatchdogReset(int fromTask);
 #define WATCHDOG_RESET(fromTask) doWatchdogReset(fromTask)
 
-extern volatile uint32_t g_tickCount;
+extern volatile uint64_t g_tickCount;
 
 #else
 

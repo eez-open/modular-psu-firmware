@@ -51,8 +51,8 @@ enum Unit {
     UNIT_MICRO_FARAD,
     UNIT_NANO_FARAD,
     UNIT_PICO_FARAD,
-    UNIT_BIT,
     UNIT_MINUTE,
+    UNIT_BIT,
 };
 
 extern const char *g_unitNames[];
