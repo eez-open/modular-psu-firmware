@@ -152,7 +152,7 @@ struct StepValues {
     } encoderSettings;
 };
 
-static const size_t SLOT_LABEL_MAX_LENGTH = 8;
+static const size_t SLOT_LABEL_MAX_LENGTH = 10;
 
 typedef int eez_err_t;
 

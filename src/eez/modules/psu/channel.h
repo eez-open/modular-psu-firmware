@@ -410,7 +410,7 @@ public:
 
     float outputDelayDuration;
 
-    static const size_t CHANNEL_LABEL_MAX_LENGTH = 8;
+    static const size_t CHANNEL_LABEL_MAX_LENGTH = 10;
     char label[CHANNEL_LABEL_MAX_LENGTH + 1];
     uint8_t color;
 

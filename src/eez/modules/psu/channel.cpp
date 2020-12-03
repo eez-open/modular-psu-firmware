@@ -1645,7 +1645,7 @@ const char *Channel::getLabel() {
 
 const char *Channel::getDefaultLabel() {
     static char g_defaultLabel[Channel::CHANNEL_LABEL_MAX_LENGTH + 1];
-    snprintf(g_defaultLabel, Channel::CHANNEL_LABEL_MAX_LENGTH, "%s #%d", g_slots[slotIndex]->moduleName, (int)(channelIndex + 1));
+    snprintf(g_defaultLabel, Channel::CHANNEL_LABEL_MAX_LENGTH + 1, "%s #%d", g_slots[slotIndex]->moduleName, (int)(channelIndex + 1));
     g_defaultLabel[Channel::CHANNEL_LABEL_MAX_LENGTH] = 0;
     return g_defaultLabel;
 }

@@ -233,7 +233,7 @@ const char *Module::getDefaultLabel() {
 
 void Module::setLabel(const char *value, int length) {
     if (length == -1) {
-        length = strlen(label);
+        length = strlen(value);
     }
     if (length > (int)SLOT_LABEL_MAX_LENGTH) {
         length = SLOT_LABEL_MAX_LENGTH;
