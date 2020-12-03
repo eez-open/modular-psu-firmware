@@ -583,21 +583,37 @@ void initYAxis(Parameters &parameters, int yAxisIndex) {
 
 void initDlogValues(Recording &recording) {
     uint8_t yAxisIndex;
+
+    int numBitValues = 0;
+    for (yAxisIndex = 0; yAxisIndex < MIN(recording.parameters.numYAxes, MAX_NUM_OF_Y_VALUES); yAxisIndex++) {
+        if (recording.parameters.yAxes[yAxisIndex].unit == UNIT_BIT) {
+            numBitValues++;
+        }
+    }
+
+    int bitValueIndex = 0;
+
     for (yAxisIndex = 0; yAxisIndex < MIN(recording.parameters.numYAxes, MAX_NUM_OF_Y_VALUES); yAxisIndex++) {
         recording.dlogValues[yAxisIndex].isVisible = true;
 
         float rangeMin = recording.parameters.yAxes[yAxisIndex].range.min;
         float rangeMax = recording.parameters.yAxes[yAxisIndex].range.max;
 
-        if (recording.parameters.yAxisScale == SCALE_LOGARITHMIC) {
-            float logOffset = 1 - rangeMin;
-            rangeMin = 0;
-            rangeMax = log10f(logOffset + rangeMax);
-        }
+        if (recording.parameters.yAxes[yAxisIndex].unit == UNIT_BIT) {
+            float numDivisions = 1.0f * NUM_VERT_DIVISIONS / numBitValues;
+            recording.dlogValues[yAxisIndex].div = 1.1f / numDivisions;
+            recording.dlogValues[yAxisIndex].offset = recording.dlogValues[yAxisIndex].div * (NUM_VERT_DIVISIONS / 2 - (bitValueIndex++ + 1) * numDivisions);
+        } else {
+            if (recording.parameters.yAxisScale == SCALE_LOGARITHMIC) {
+                float logOffset = 1 - rangeMin;
+                rangeMin = 0;
+                rangeMax = log10f(logOffset + rangeMax);
+            }
 
-        float div = (rangeMax - rangeMin) / NUM_VERT_DIVISIONS;
-        recording.dlogValues[yAxisIndex].div = div;
-        recording.dlogValues[yAxisIndex].offset = -div * NUM_VERT_DIVISIONS / 2;
+            float div = (rangeMax - rangeMin) / NUM_VERT_DIVISIONS;
+            recording.dlogValues[yAxisIndex].div = div;
+            recording.dlogValues[yAxisIndex].offset = -div * NUM_VERT_DIVISIONS / 2;
+        }
     }
 
     for (; yAxisIndex < MAX_NUM_OF_Y_VALUES; yAxisIndex++) {
