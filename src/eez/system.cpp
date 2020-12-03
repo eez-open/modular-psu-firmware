@@ -26,23 +26,47 @@
 
 volatile uint64_t g_tickCount;
 
-int g_watchdogExpectingTask = WATCHDOG_HIGH_PRIORITY_THREAD;
+static uint32_t g_watchdogLastTime = 0;
+static int g_watchdogExpectingTask = WATCHDOG_HIGH_PRIORITY_THREAD;
+
+#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
+bool g_supervisorWatchdogEnabled = 1;
+#endif
 
 namespace eez {
 extern bool g_isBooted;
 }
 
-void doWatchdogReset(int fromTask) {
-	if (fromTask == WATCHDOG_LONG_OPERATION || !eez::g_isBooted) {
+static void doWatchdogRefresh() {
+	uint32_t currentTime = eez::millis();
+	if (!g_watchdogLastTime || currentTime - g_watchdogLastTime >= 1000) {
 		HAL_IWDG_Refresh(&hiwdg);
+
+#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
+		if (g_supervisorWatchdogEnabled) {
+			HAL_GPIO_WritePin(SPI5_CSC_GPIO_Port, SPI5_CSC_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(SPI5_CSC_GPIO_Port, SPI5_CSC_Pin, GPIO_PIN_RESET);
+		}
+#endif
+
+		g_watchdogLastTime = currentTime;
+		if (!g_watchdogLastTime) {
+			g_watchdogLastTime = 1;
+		}
+	}
+}
+
+void watchdogReset(int fromTask) {
+	if (fromTask == WATCHDOG_LONG_OPERATION || !eez::g_isBooted) {
+		doWatchdogRefresh();
 	} else if (fromTask == WATCHDOG_HIGH_PRIORITY_THREAD) {
 		if (g_watchdogExpectingTask == WATCHDOG_HIGH_PRIORITY_THREAD) {
-			HAL_IWDG_Refresh(&hiwdg);
+			doWatchdogRefresh();
 			g_watchdogExpectingTask = WATCHDOG_GUI_THREAD;
 		}
 	} else if (fromTask == WATCHDOG_GUI_THREAD) {
 		if (g_watchdogExpectingTask == WATCHDOG_GUI_THREAD) {
-			HAL_IWDG_Refresh(&hiwdg);
+			doWatchdogRefresh();
 			g_watchdogExpectingTask = WATCHDOG_HIGH_PRIORITY_THREAD;
 		}
 	}

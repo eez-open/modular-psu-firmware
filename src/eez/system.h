@@ -27,8 +27,8 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 
-void doWatchdogReset(int fromTask);
-#define WATCHDOG_RESET(fromTask) doWatchdogReset(fromTask)
+void watchdogReset(int fromTask);
+#define WATCHDOG_RESET(fromTask) watchdogReset(fromTask)
 
 extern volatile uint64_t g_tickCount;
 
