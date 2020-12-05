@@ -1044,19 +1044,22 @@ void uploadFile() {
 
 class DlogParamsPage : public SetPage {
 public:
-    static Parameters g_guiParameters;
+    static Parameters g_parameters;
     static const int PAGE_SIZE = 6;
     static int g_scrollPosition;
+	static float g_minPeriod;
 
     void pageAlloc() {
         g_numDlogResources = countDlogResources();
 
-        memcpy(&g_guiParameters, &dlog_record::g_parameters, sizeof(Parameters));
-        memcpy(&g_guiParametersOrig, &dlog_record::g_parameters, sizeof(Parameters));
+        memcpy(&g_parameters, &dlog_record::g_parameters, sizeof(Parameters));
+        memcpy(&g_parametersOrig, &dlog_record::g_parameters, sizeof(Parameters));
+
+		g_minPeriod = getMinPeriod();
     }
 
     int getDirty() {
-        return memcmp(&g_guiParameters, &g_guiParametersOrig, sizeof(Parameters)) != 0;
+        return memcmp(&g_parameters, &g_parametersOrig, sizeof(Parameters)) != 0;
     }
 
     void set() {
@@ -1064,20 +1067,20 @@ public:
 
         char filePath[MAX_PATH_LENGTH + 50];
 
-        if (isStringEmpty(DlogParamsPage::g_guiParameters.filePath)) {
+        if (isStringEmpty(DlogParamsPage::g_parameters.filePath)) {
             uint8_t year, month, day, hour, minute, second;
             datetime::getDateTime(year, month, day, hour, minute, second);
 
             if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24) {
                 snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
                     RECORDINGS_DIR,
-                    DlogParamsPage::g_guiParameters.filePath,
+                    DlogParamsPage::g_parameters.filePath,
                     (int)day, (int)month, (int)year,
                     (int)hour, (int)minute, (int)second);
             } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
                 snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
                     RECORDINGS_DIR,
-                    DlogParamsPage::g_guiParameters.filePath,
+                    DlogParamsPage::g_parameters.filePath,
                     (int)month, (int)day, (int)year,
                     (int)hour, (int)minute, (int)second);
             } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
@@ -1085,7 +1088,7 @@ public:
                 datetime::convertTime24to12(hour, am);
                 snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
                     RECORDINGS_DIR,
-                    DlogParamsPage::g_guiParameters.filePath,
+                    DlogParamsPage::g_parameters.filePath,
                     (int)day, (int)month, (int)year,
                     (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
             } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_12) {
@@ -1093,15 +1096,15 @@ public:
                 datetime::convertTime24to12(hour, am);
                 snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
                     RECORDINGS_DIR,
-                    DlogParamsPage::g_guiParameters.filePath,
+                    DlogParamsPage::g_parameters.filePath,
                     (int)month, (int)day, (int)year,
                     (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
             }
         } else {
-            snprintf(filePath, sizeof(filePath), "%s/%s.dlog", RECORDINGS_DIR, DlogParamsPage::g_guiParameters.filePath);
+            snprintf(filePath, sizeof(filePath), "%s/%s.dlog", RECORDINGS_DIR, DlogParamsPage::g_parameters.filePath);
         }
 
-        memcpy(&dlog_record::g_parameters, &DlogParamsPage::g_guiParameters, sizeof(DlogParamsPage::g_guiParameters));
+        memcpy(&dlog_record::g_parameters, &DlogParamsPage::g_parameters, sizeof(DlogParamsPage::g_parameters));
         strcpy(dlog_record::g_parameters.filePath, filePath);
 
         dlog_record::toggleStart();
@@ -1156,16 +1159,49 @@ public:
         return false;
     }
 
+	static float getResourceMinPeriod(int slotIndex, int subchannelIndex, int resourceIndex) {
+		float minPeriod = g_slots[slotIndex]->getDlogResourceMinPeriod(subchannelIndex, resourceIndex);
+		if (isNaN(minPeriod)) {
+			return dlog_record::PERIOD_MIN;
+		}
+		return minPeriod;
+	}
+
+	static void setPeriod(float value) {
+		g_parameters.period = value;
+
+		int numUnchecked = 0;
+
+		for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+			int numSubchannels = g_slots[slotIndex]->getNumSubchannels();
+			for (int subchannelIndex = 0; subchannelIndex < numSubchannels; subchannelIndex++) {
+				int numResources = g_slots[slotIndex]->getNumDlogResources(subchannelIndex);
+				for (int resourceIndex = 0; resourceIndex < numResources; resourceIndex++) {
+					if (g_parameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex)) {
+						if (getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex) > g_minPeriod) {
+							g_parameters.enableDlogItem(slotIndex, subchannelIndex, resourceIndex, false);
+							numUnchecked++;
+						}
+					}
+				}
+			}
+		}
+
+		if (numUnchecked > 0) {
+			psu::gui::infoMessage("Some resources unchecked.");
+		}
+	}
+
     static void editFileName() {
-        psu::gui::Keypad::startPush(0, DlogParamsPage::g_guiParameters.filePath, 0, MAX_PATH_LENGTH, false, onSetFileName, 0);
+        psu::gui::Keypad::startPush(0, DlogParamsPage::g_parameters.filePath, 0, MAX_PATH_LENGTH, false, onSetFileName, 0);
     }
 
     static void selectTriggerSource() {
-        psu::gui::pushSelectFromEnumPage(ENUM_DEFINITION_TRIGGER_SOURCE, g_guiParameters.triggerSource, 0, onSelectTriggerSource);
+        psu::gui::pushSelectFromEnumPage(ENUM_DEFINITION_TRIGGER_SOURCE, g_parameters.triggerSource, 0, onSelectTriggerSource);
     }
 
 private:
-    static Parameters g_guiParametersOrig;
+    static Parameters g_parametersOrig;
     static int g_numDlogResources;
 
     static int countDlogResources() {
@@ -1181,19 +1217,35 @@ private:
 
     static void onSetFileName(char *value) {
         psu::gui::popPage();
-        strcpy(g_guiParameters.filePath, value);
+        strcpy(g_parameters.filePath, value);
     }
 
     static void onSelectTriggerSource(uint16_t value) {
         psu::gui::popPage();
-        g_guiParameters.triggerSource = (trigger::Source)value;
+        g_parameters.triggerSource = (trigger::Source)value;
     }
+
+	static float getMinPeriod() {
+		float minMinPeriod = dlog_record::PERIOD_MIN;
+		for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+			int numSubchannels = g_slots[slotIndex]->getNumSubchannels();
+			for (int subchannelIndex = 0; subchannelIndex < numSubchannels; subchannelIndex++) {
+				int numResources = g_slots[slotIndex]->getNumDlogResources(subchannelIndex);
+				for (int resourceIndex = 0; resourceIndex < numResources; resourceIndex++) {
+					minMinPeriod = MIN(getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex), minMinPeriod);
+				}
+			}
+		}
+
+		return minMinPeriod;
+	}
 };
 
-Parameters DlogParamsPage::g_guiParameters;
-Parameters DlogParamsPage::g_guiParametersOrig;
+Parameters DlogParamsPage::g_parameters;
+Parameters DlogParamsPage::g_parametersOrig;
 int DlogParamsPage::g_numDlogResources = -1;
 int DlogParamsPage::g_scrollPosition;
+float DlogParamsPage::g_minPeriod;
 
 static DlogParamsPage g_dlogParamsPage;
 
@@ -1237,21 +1289,21 @@ void data_dlog_toggle_state(DataOperationEnum operation, Cursor cursor, Value &v
 
 void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = MakeValue(DlogParamsPage::g_guiParameters.period, UNIT_SECOND);
+        value = MakeValue(DlogParamsPage::g_parameters.period, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(PERIOD_MIN, UNIT_SECOND);
+        value = MakeValue(DlogParamsPage::g_minPeriod, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(PERIOD_MAX, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_SET) {
-        DlogParamsPage::g_guiParameters.period = value.getFloat();
+        DlogParamsPage::setPeriod(value.getFloat());
     }
 }
 
 void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = MakeValue(DlogParamsPage::g_guiParameters.time, UNIT_SECOND);
+        value = MakeValue(DlogParamsPage::g_parameters.time, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
     } else if (operation == DATA_OPERATION_GET_MIN) {
@@ -1259,19 +1311,19 @@ void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(INFINITY, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_SET) {
-        DlogParamsPage::g_guiParameters.time = value.getFloat();
+        DlogParamsPage::g_parameters.time = value.getFloat();
     }
 }
 
 void data_dlog_file_name(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = *DlogParamsPage::g_guiParameters.filePath ? DlogParamsPage::g_guiParameters.filePath : "<time>";
+        value = *DlogParamsPage::g_parameters.filePath ? DlogParamsPage::g_parameters.filePath : "<time>";
     }
 }
 
 void data_dlog_start_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = checkDlogParameters(DlogParamsPage::g_guiParameters, true, false) == SCPI_RES_OK ? 1 : 0;
+        value = checkDlogParameters(DlogParamsPage::g_parameters, true, false) == SCPI_RES_OK ? 1 : 0;
     }
 }
 
@@ -1296,7 +1348,7 @@ void data_dlog_items_scrollbar_enabled(DataOperationEnum operation, Cursor curso
 void data_dlog_items_num_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value.type_ = VALUE_TYPE_NUM_SELECTED;
-        value.pairOfUint16_.first = DlogParamsPage::g_guiParameters.numDlogItems;
+        value.pairOfUint16_.first = DlogParamsPage::g_parameters.numDlogItems;
         value.pairOfUint16_.second = DlogParamsPage::getNumDlogResources();
     }
 }
@@ -1340,8 +1392,12 @@ void data_dlog_item_status(DataOperationEnum operation, Cursor cursor, Value &va
         int subchannelIndex;
         int resourceIndex;
         if (DlogParamsPage::findResource(cursor, slotIndex, subchannelIndex, resourceIndex)) {
-            bool enabled = DlogParamsPage::g_guiParameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex);
-            if (!enabled && DlogParamsPage::g_guiParameters.numDlogItems >= MAX_NUM_OF_Y_AXES) {
+            bool enabled = DlogParamsPage::g_parameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex);
+            if (!enabled && (
+				DlogParamsPage::g_parameters.numDlogItems >= MAX_NUM_OF_Y_AXES || 
+				DlogParamsPage::getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex)
+					> DlogParamsPage::g_parameters.period
+			)) {
                 value = 2;
             } else {
                 value = enabled;
@@ -1381,8 +1437,8 @@ void action_dlog_item_toggle() {
     int subchannelIndex;
     int resourceIndex;
     if (DlogParamsPage::findResource(getFoundWidgetAtDown().cursor, slotIndex, subchannelIndex, resourceIndex)) {
-        DlogParamsPage::g_guiParameters.enableDlogItem(slotIndex, subchannelIndex, resourceIndex,
-            !DlogParamsPage::g_guiParameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex));
+        DlogParamsPage::g_parameters.enableDlogItem(slotIndex, subchannelIndex, resourceIndex,
+            !DlogParamsPage::g_parameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex));
     }
 }
 
@@ -1392,7 +1448,7 @@ void action_dlog_toggle() {
 
 void data_dlog_trigger_source(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = MakeEnumDefinitionValue(DlogParamsPage::g_guiParameters.triggerSource, ENUM_DEFINITION_TRIGGER_SOURCE);
+        value = MakeEnumDefinitionValue(DlogParamsPage::g_parameters.triggerSource, ENUM_DEFINITION_TRIGGER_SOURCE);
     }
 }
 

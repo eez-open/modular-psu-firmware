@@ -66,10 +66,12 @@ void triggerGenerated();
 void toggleStart();
 void toggleStop();
 void abort();
+void abortAfterSlaveOverflowError();
 void reset();
 
 void tick(uint32_t tick_usec);
 void log(float *values);
+void log(int slotIndex, int subchannelIndex, uint8_t data);
 
 void fileWrite(bool flush = false);
 void stateTransition(int event, int *perr = nullptr);

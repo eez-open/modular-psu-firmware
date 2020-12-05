@@ -1152,6 +1152,7 @@ void editValue(int16_t dataId) {
         options.editValueUnit = value.getUnit();
 
         options.min = getMin(g_editValueCursor, g_editValueDataId).getFloat();
+		options.enableMinButton();
 
         auto max = getMax(g_editValueCursor, g_editValueDataId);
         if (max.getType() != VALUE_TYPE_NONE) {
@@ -1165,10 +1166,10 @@ void editValue(int16_t dataId) {
             }
         }
 
-        auto min = getDef(g_editValueCursor, g_editValueDataId);
-        if (min.getType() != VALUE_TYPE_NONE) {
-            options.min = min.getFloat();
-            options.enableMinButton();
+        auto def = getDef(g_editValueCursor, g_editValueDataId);
+        if (def.getType() != VALUE_TYPE_NONE) {
+            options.def = def.getFloat();
+            options.enableDefButton();
         }
 
         options.flags.signButtonEnabled = options.min < 0;

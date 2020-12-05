@@ -706,6 +706,16 @@ const char *Module::getDlogResourceLabel(int subchannelIndex, int resourceIndex)
     return "";
 }
 
+float Module::getDlogResourceMinPeriod(int subchannelIndex, int resourceIndex) {
+    return NAN;
+}
+
+void Module::startDlog(int subchannelIndex, int resourceIndex) {
+}
+
+void Module::stopDlog(int subchannelIndex, int resourceIndex) {
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct NoneModule : public Module {

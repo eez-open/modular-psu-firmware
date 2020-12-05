@@ -196,7 +196,7 @@ static int getCounter() {
 
 #ifdef DEBUG
     g_totalCounter += counter;
-    psu::debug::g_encoderCounter.set(g_totalCounter);
+    //psu::debug::g_encoderCounter.set(g_totalCounter);
 #endif
 
     return counter;

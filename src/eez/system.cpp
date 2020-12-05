@@ -24,6 +24,8 @@
 #include <main.h>
 #include <iwdg.h>
 
+static const uint32_t CONF_WATCHDOG_REFRESH_FREQ_MS = 1000;
+
 volatile uint64_t g_tickCount;
 
 static uint32_t g_watchdogLastTime = 0;
@@ -39,12 +41,13 @@ extern bool g_isBooted;
 
 static void doWatchdogRefresh() {
 	uint32_t currentTime = eez::millis();
-	if (!g_watchdogLastTime || currentTime - g_watchdogLastTime >= 1000) {
+	if (!g_watchdogLastTime || currentTime - g_watchdogLastTime >= CONF_WATCHDOG_REFRESH_FREQ_MS) {
 		HAL_IWDG_Refresh(&hiwdg);
 
 #ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
 		if (g_supervisorWatchdogEnabled) {
 			HAL_GPIO_WritePin(SPI5_CSC_GPIO_Port, SPI5_CSC_Pin, GPIO_PIN_SET);
+			eez::delayMicroseconds(1);
 			HAL_GPIO_WritePin(SPI5_CSC_GPIO_Port, SPI5_CSC_Pin, GPIO_PIN_RESET);
 		}
 #endif

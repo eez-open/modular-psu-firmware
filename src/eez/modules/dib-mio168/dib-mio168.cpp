@@ -126,12 +126,18 @@ struct FromMasterToSlave {
     struct {
         float freq;
         float duty;
-    } pwm[2];    
+    } pwm[2];
+
+    uint16_t dinReadPeriod;
 };
 
 struct FromSlaveToMaster {
     uint8_t dinStates;
     uint16_t ainValues[4];
+
+    uint8_t dinReadOverflow;
+	uint16_t numDinValues;
+	uint8_t dinValues[100];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,6 +192,8 @@ struct DinChannel : public MioChannel {
     uint8_t m_pinSpeeds = 0;
 
     char m_pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+
+    uint16_t readPeriod = 0;
 
     struct ProfileParameters {
         uint8_t pinRanges;
@@ -1053,7 +1061,9 @@ public:
             data.pwm[i].duty = channel->m_duty;
         }
 
-        auto status = bp3c::comm::transferDMA(slotIndex, output, input, sizeof(FromMasterToSlave));
+        data.dinReadPeriod = dinChannel.readPeriod;
+
+        auto status = bp3c::comm::transferDMA(slotIndex, output, input, sizeof(FromSlaveToMaster));
         if (status != bp3c::comm::TRANSFER_STATUS_OK) {
         	onSpiDmaTransferCompleted(status);
         }
@@ -1070,6 +1080,22 @@ public:
             for (int i = 0; i < 4; i++) {
                 auto &channel = ainChannels[i];
                 channel.m_value = channel.convertU16Value(data.ainValues[i]);
+            }
+
+            if (data.dinReadOverflow) {
+                dlog_record::abortAfterSlaveOverflowError();
+            } else {
+                static uint32_t g_nonZeroCounter = 0;
+
+                for (int i = 0; i < data.numDinValues; i++) {
+                    if (data.dinValues[i]) {
+                        g_nonZeroCounter++;
+                    }
+
+                    dlog_record::log(slotIndex, DIN_SUBCHANNEL_INDEX, data.dinValues[i]);
+                }
+
+                psu::debug::g_encoderCounter.set(g_nonZeroCounter);
             }
         } else {
             if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
@@ -2259,6 +2285,27 @@ public:
         }
 
         return "";
+    }
+
+    float getDlogResourceMinPeriod(int subchannelIndex, int resourceIndex) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+            return 0.00001f; // 10 us
+        }
+        return Module::getDlogResourceMinPeriod(subchannelIndex, resourceIndex);
+    }
+
+    void startDlog(int subchannelIndex, int resourceIndex) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+            if (dlog_record::g_parameters.period < 0.001) {
+                dinChannel.readPeriod = (uint16_t)(dlog_record::g_parameters.period * 1000000);
+            }
+        }
+    }
+
+    void stopDlog(int subchannelIndex, int resourceIndex) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+            dinChannel.readPeriod = 0;
+        }
     }
 };
 
