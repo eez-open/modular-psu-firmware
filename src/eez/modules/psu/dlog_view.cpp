@@ -1178,7 +1178,7 @@ public:
 				int numResources = g_slots[slotIndex]->getNumDlogResources(subchannelIndex);
 				for (int resourceIndex = 0; resourceIndex < numResources; resourceIndex++) {
 					if (g_parameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex)) {
-						if (getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex) > g_minPeriod) {
+						if (fabsf(getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex) - g_minPeriod) >= 1E-6) {
 							g_parameters.enableDlogItem(slotIndex, subchannelIndex, resourceIndex, false);
 							numUnchecked++;
 						}
