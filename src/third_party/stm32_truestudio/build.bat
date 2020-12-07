@@ -1,1 +1,0 @@
-"C:\Program Files (x86)\STMicroelectronics\STM32 ST-LINK Utility\ST-LINK Utility\ST-LINK_CLI.exe" -P "C:\Users\mvladic\Dropbox\Code\EEZ\generic-firmware\src\third_party\stm32\Debug\bb3.hex" -c SWD -rst
