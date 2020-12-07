@@ -22,6 +22,7 @@
 #include <cmsis_os.h>
 
 #include <eez/index.h>
+#include <eez/tasks.h>
 #include <eez/platform/stm32/spi.h>
 #include <eez/modules/bp3c/comm.h>
 
@@ -258,9 +259,7 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 
 	deselect(slotIndex);
 
-	auto &slot = *g_slots[slotIndex];
-
-	slot.onSpiDmaTransferCompleted(TRANSFER_STATUS_OK);
+	sendMessageToPsu(PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED, slotIndex | (TRANSFER_STATUS_OK << 8));
 }
 
 void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
@@ -279,12 +278,10 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
 
 	deselect(slotIndex);
 
-	auto &slot = *g_slots[slotIndex];
-
-	if (spi::handle[slotIndex]->ErrorCode == HAL_SPI_ERROR_CRC) {
-		slot.onSpiDmaTransferCompleted(TRANSFER_STATUS_CRC_ERROR);
+	if (handle[slotIndex]->ErrorCode == HAL_SPI_ERROR_CRC) {
+        sendMessageToPsu(PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED, slotIndex | (TRANSFER_STATUS_CRC_ERROR << 8));
 	} else {
-		slot.onSpiDmaTransferCompleted(TRANSFER_STATUS_ERROR);
+        sendMessageToPsu(PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED, slotIndex | (TRANSFER_STATUS_ERROR << 8));
 	}
 }
 

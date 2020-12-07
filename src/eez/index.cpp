@@ -84,11 +84,13 @@ void Module::writeUnsavedData() {
 void Module::onPowerDown() {
 }
 
+#if defined(EEZ_PLATFORM_STM32)
 void Module::onSpiIrq() {
 }
 
 void Module::onSpiDmaTransferCompleted(int status) {
 }
+#endif
 
 gui::Page *Module::getPageFromId(int pageId) {
     return nullptr;

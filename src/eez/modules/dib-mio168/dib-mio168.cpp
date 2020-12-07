@@ -26,6 +26,7 @@
 #if defined(EEZ_PLATFORM_STM32)
 #include <spi.h>
 #include <eez/platform/stm32/spi.h>
+#include <ff_gen_drv.h>
 #endif
 
 #include <eez/debug.h>
@@ -47,6 +48,7 @@
 #include <eez/modules/bp3c/flash_slave.h>
 
 #include "./dib-mio168.h"
+#include "./fs_driver.h"
 
 #include <scpi/scpi.h>
 
@@ -57,10 +59,16 @@ using namespace eez::gui;
 namespace eez {
 namespace dib_mio168 {
 
+enum Mio168LowPriorityThreadMessage {
+    THREAD_MESSAGE_FS_LINK_DRIVER = THREAD_MESSAGE_MODULE_SPECIFIC,
+    THREAD_MESSAGE_FS_UNLINK_DRIVER
+};
+
 enum Mio168HighPriorityThreadMessage {
     PSU_MESSAGE_DIN_CONFIGURE = PSU_MESSAGE_MODULE_SPECIFIC,
     PSU_MESSAGE_AIN_CONFIGURE,
     PSU_MESSAGE_AOUT_DAC7760_CONFIGURE,
+    PSU_MESSAGE_DISK_DRIVE_OPERATION,
 };
 
 static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
@@ -97,9 +105,11 @@ static float PWM_MAX_FREQUENCY = 1000000.0f;
 
 static const size_t CHANNEL_LABEL_MAX_LENGTH = 5;
 
+static const uint32_t REFRESH_TIME_MS = 250;
+
 ////////////////////////////////////////////////////////////////////////////////
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 768
 
 struct FromMasterToSlave {
     uint8_t dinRanges;
@@ -129,15 +139,30 @@ struct FromMasterToSlave {
     } pwm[2];
 
     uint16_t dinReadPeriod;
+
+    struct {
+        uint8_t operation; // enum fs::DiskDriverOperation
+        uint32_t sector;
+        uint8_t cmd;
+        uint8_t buffer[512];
+    } diskDriverOperation;
 };
+
+#define FLAG_SD_CARD_PRESENT (1 << 0)
+#define FLAG_DIN_READ_OVERFLOW (1 << 1)
+#define FLAG_DISK_OPERATION_RESPONSE (1 << 2)
+
+#define MAX_DIN_VALUES 100
+
+#define DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE 4
 
 struct FromSlaveToMaster {
     uint8_t dinStates;
     uint16_t ainValues[4];
-
-    uint8_t dinReadOverflow;
+    uint8_t flags;
 	uint16_t numDinValues;
-	uint8_t dinValues[100];
+	uint32_t diskOperationResult;
+	uint8_t buffer[512];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -948,6 +973,13 @@ public:
     uint8_t input[BUFFER_SIZE];
     uint8_t output[BUFFER_SIZE];
     bool spiReady = false;
+    enum { IDLE, REQUEST, REQUEST_SENT, RESPONSE } diskDriveOperation;
+    uint32_t lastTransferTime = 0;
+    enum {
+        DISK_OPERATION_NOT_FINISHED,
+        DISK_OPERATION_SUCCESSFULLY_FINISHED,
+        DISK_OPERATION_UNSUCCESSFULLY_FINISHED
+    } diskOperationStatus;
 
     DinChannel dinChannel;
     DoutChannel doutChannel;
@@ -1005,32 +1037,7 @@ public:
         }
     }
 
-    void tick() override {
-        if (!synchronized) {
-            return;
-        }
-
-#if defined(EEZ_PLATFORM_STM32)
-        if (spiReady) {
-            spiReady = false;
-            transfer();
-        }
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        transfer();
-#endif
-    }
-
-#if defined(EEZ_PLATFORM_STM32)
-    void onSpiIrq() {
-        spiReady = true;
-    }
-#endif
-
-    void transfer() {
-        FromMasterToSlave &data = *((FromMasterToSlave *)output);
-
+    void fillFromMasterToSlave(FromMasterToSlave &data) {
         data.dinRanges = dinChannel.m_pinRanges;
         data.dinSpeeds = dinChannel.m_pinSpeeds;
 
@@ -1062,14 +1069,49 @@ public:
         }
 
         data.dinReadPeriod = dinChannel.readPeriod;
+    }
 
-        auto status = bp3c::comm::transferDMA(slotIndex, output, input, sizeof(FromSlaveToMaster));
-        if (status != bp3c::comm::TRANSFER_STATUS_OK) {
-        	onSpiDmaTransferCompleted(status);
+    void fillFromMasterToSlaveDiskDriverOperation(FromMasterToSlave &data) {
+        data.diskDriverOperation.operation = fs::g_operation;
+        data.diskDriverOperation.sector = fs::g_sector;
+        data.diskDriverOperation.cmd = fs::g_cmd;
+        if (data.diskDriverOperation.operation == fs::DISK_DRIVER_OPERATION_WRITE) {
+            memcpy(data.diskDriverOperation.buffer, fs::g_buff, 512);
+        } else if (data.diskDriverOperation.operation == fs::DISK_DRIVER_OPERATION_IOCTL) {
+            memcpy(data.diskDriverOperation.buffer, fs::g_buff, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
         }
     }
 
-    void onSpiDmaTransferCompleted(int status) override {
+    void prepareTransfer() {
+        fillFromMasterToSlave(*(FromMasterToSlave *)output);
+    }
+
+    void doTransfer() {
+        lastTransferTime = millis();
+        setTransferReadinessState(STATE_NOT_READY);
+        auto status = bp3c::comm::transferDMA(slotIndex, output, input, BUFFER_SIZE);
+        if (status != bp3c::comm::TRANSFER_STATUS_OK) {
+        	stateTransition(EVENT_DMA_TRANSFER_COMPLETED, status);
+        }
+    }
+
+    void transfer() {
+        prepareTransfer();
+        doTransfer();
+    }
+
+    void transferDiskDriveOperationRequest() {
+        prepareTransfer();
+        fillFromMasterToSlaveDiskDriverOperation(*(FromMasterToSlave *)output);
+        doTransfer();
+    }
+
+    void transferDiskDriveOperationResponse() {
+        prepareTransfer();
+        doTransfer();
+    }
+
+    bool onTransferCompleted(int status) {
         if (status == bp3c::comm::TRANSFER_STATUS_OK) {
             numCrcErrors = 0;
 
@@ -1082,21 +1124,25 @@ public:
                 channel.m_value = channel.convertU16Value(data.ainValues[i]);
             }
 
-            if (data.dinReadOverflow) {
+           if (data.flags & FLAG_SD_CARD_PRESENT) {
+                if (!fs::isDriverLinked(slotIndex)) {
+                    sendMessageToLowPriorityThread((LowPriorityThreadMessage)THREAD_MESSAGE_FS_LINK_DRIVER, slotIndex, 0);
+                }
+           } else {
+                if (fs::isDriverLinked(slotIndex)) {
+                    sendMessageToLowPriorityThread((LowPriorityThreadMessage)THREAD_MESSAGE_FS_UNLINK_DRIVER, slotIndex, 0);
+                }
+           }
+
+            if ((data.flags & FLAG_DIN_READ_OVERFLOW) != 0) {
                 dlog_record::abortAfterSlaveOverflowError();
             } else {
-                static uint32_t g_nonZeroCounter = 0;
-
                 for (int i = 0; i < data.numDinValues; i++) {
-                    if (data.dinValues[i]) {
-                        g_nonZeroCounter++;
-                    }
-
-                    dlog_record::log(slotIndex, DIN_SUBCHANNEL_INDEX, data.dinValues[i]);
+                    dlog_record::log(slotIndex, DIN_SUBCHANNEL_INDEX, data.buffer[i]);
                 }
-
-                psu::debug::g_encoderCounter.set(g_nonZeroCounter);
             }
+
+            return true;
         } else {
             if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
                 if (++numCrcErrors >= 10) {
@@ -1109,8 +1155,184 @@ public:
             } else {
                 DebugTrace("Slot %d SPI transfer error %d\n", slotIndex + 1, status);
             }
+
+            return false;
         }
     }
+
+    bool onDiskDriveOperationRequestTransferCompleted(int status) {
+        if (!onTransferCompleted(status)) {
+            return false;
+        }
+        return true;
+    }
+
+    bool onDiskDriveOperationResponseTransferCompleted(int status) {
+        if (!onTransferCompleted(status)) {
+            return false;
+        }
+
+        FromSlaveToMaster &data = (FromSlaveToMaster &)*input;
+
+        if (!(data.flags & FLAG_DISK_OPERATION_RESPONSE)) {
+        	return false;
+        }
+
+        fs::g_result = data.diskOperationResult;
+
+        if (fs::g_operation == fs::DISK_DRIVER_OPERATION_READ) {
+            memcpy(fs::g_buff, data.buffer, 512);
+        } else if (fs::g_operation == fs::DISK_DRIVER_OPERATION_IOCTL) {
+            memcpy(fs::g_buff, data.buffer, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
+        }
+
+        diskOperationStatus = DISK_OPERATION_SUCCESSFULLY_FINISHED;
+
+        return true;
+    }
+
+    void setDiskOperationFailed() {
+        if (fs::g_operation == fs::DISK_DRIVER_OPERATION_INITIALIZE || fs::g_operation == fs::DISK_DRIVER_OPERATION_STATUS) {
+            fs::g_result = STA_NOINIT;
+        } else {
+            fs::g_result = RES_ERROR;
+        }
+
+        diskOperationStatus = DISK_OPERATION_UNSUCCESSFULLY_FINISHED;
+    }
+
+    enum TransferReadinessState {
+        STATE_NOT_READY,
+        STATE_READY
+    };
+    TransferReadinessState transferReadinessState = STATE_NOT_READY;
+
+    enum OperationState {
+        STATE_IDLE,
+        
+        STATE_WAIT_RESULT,
+        STATE_WAIT_RESULT_AND_DISK_DRIVE_OPERATION,
+
+        STATE_DISK_DRIVE_OPERATION_REQUEST_TRANSFER_NOT_READY,
+        STATE_DISK_DRIVE_OPERATION_REQUEST_WAIT_RESULT,
+
+        STATE_DISK_DRIVE_OPERATION_RESPONSE_TRANSFER_NOT_READY,
+        STATE_DISK_DRIVE_OPERATION_RESPONSE_WAIT_RESULT,
+    };
+    OperationState operationState = STATE_IDLE;
+
+    enum {
+        EVENT_SPI_READY,
+        EVENT_DMA_TRANSFER_COMPLETED,
+        EVENT_CHANNEL_PARAMS_CHANGE,
+        EVENT_AFTER_250MS,
+        EVENT_DISK_DRIVE_OPERATION
+    };
+
+    void setTransferReadinessState(TransferReadinessState state) {
+        transferReadinessState = state;
+    }
+
+    void setOperationState(OperationState state) {
+        operationState = state;
+    }
+
+    void stateTransition(int event, int param = 0) {
+        if (transferReadinessState == STATE_NOT_READY) {
+            if (event == EVENT_SPI_READY) {
+                setTransferReadinessState(STATE_READY);
+            }
+        }
+        
+        if (operationState == STATE_IDLE) {
+            if (event == EVENT_CHANNEL_PARAMS_CHANGE || event == EVENT_AFTER_250MS) {
+                if (transferReadinessState == STATE_READY) {
+                    setOperationState(STATE_WAIT_RESULT);
+                    transfer();
+                }
+            } else if (event == EVENT_DISK_DRIVE_OPERATION) {
+                if (transferReadinessState == STATE_READY) {
+                    setOperationState(STATE_DISK_DRIVE_OPERATION_REQUEST_WAIT_RESULT);
+                    transferDiskDriveOperationRequest();
+                } else {
+                    setOperationState(STATE_DISK_DRIVE_OPERATION_REQUEST_TRANSFER_NOT_READY);
+                }
+            }
+        } else if (operationState == STATE_WAIT_RESULT) {
+            if (event == EVENT_DMA_TRANSFER_COMPLETED) {
+                onTransferCompleted(param);
+                setOperationState(STATE_IDLE);
+            } else if (event == EVENT_DISK_DRIVE_OPERATION) {
+            	setOperationState(STATE_WAIT_RESULT_AND_DISK_DRIVE_OPERATION);
+            }
+        } else if (operationState == STATE_WAIT_RESULT_AND_DISK_DRIVE_OPERATION) {
+            if (event == EVENT_DMA_TRANSFER_COMPLETED) {
+                onTransferCompleted(param);
+
+                if (transferReadinessState == STATE_READY) {
+                    setOperationState(STATE_DISK_DRIVE_OPERATION_REQUEST_WAIT_RESULT);
+                    transferDiskDriveOperationRequest();
+                } else {
+                    setOperationState(STATE_DISK_DRIVE_OPERATION_REQUEST_TRANSFER_NOT_READY);
+                }
+            }
+        } else if (operationState == STATE_DISK_DRIVE_OPERATION_REQUEST_TRANSFER_NOT_READY) {
+            if (transferReadinessState == STATE_READY) {
+                setOperationState(STATE_DISK_DRIVE_OPERATION_REQUEST_WAIT_RESULT);
+                transferDiskDriveOperationRequest();
+            }
+        } else if (operationState == STATE_DISK_DRIVE_OPERATION_REQUEST_WAIT_RESULT) {
+            if (event == EVENT_DMA_TRANSFER_COMPLETED) {
+                if (onDiskDriveOperationRequestTransferCompleted(param)) {
+                    if (transferReadinessState == STATE_READY) {
+                        setOperationState(STATE_DISK_DRIVE_OPERATION_RESPONSE_WAIT_RESULT);
+                        transferDiskDriveOperationResponse();
+                    } else {
+                        setOperationState(STATE_DISK_DRIVE_OPERATION_RESPONSE_TRANSFER_NOT_READY);
+                    }
+                } else {
+					setDiskOperationFailed();
+					setOperationState(STATE_IDLE);
+                }
+            }
+        } else if (operationState == STATE_DISK_DRIVE_OPERATION_RESPONSE_TRANSFER_NOT_READY) {
+            if (transferReadinessState == STATE_READY) {
+                setOperationState(STATE_DISK_DRIVE_OPERATION_RESPONSE_WAIT_RESULT);
+                transferDiskDriveOperationResponse();
+            }
+        } else if (operationState == STATE_DISK_DRIVE_OPERATION_RESPONSE_WAIT_RESULT) {
+            if (event == EVENT_DMA_TRANSFER_COMPLETED) {
+                if (!onDiskDriveOperationResponseTransferCompleted(param)) {
+					setDiskOperationFailed();
+                }
+                setOperationState(STATE_IDLE);
+            }
+        }
+    }
+
+    void tick() override {
+        if (!synchronized) {
+            return;
+        }
+
+        FromMasterToSlave data;
+        fillFromMasterToSlave(data);
+        if (memcmp(&data, output, offsetof(FromMasterToSlave, diskDriverOperation)) != 0) {
+            stateTransition(EVENT_CHANNEL_PARAMS_CHANGE);
+        } else if (millis() - lastTransferTime >= REFRESH_TIME_MS) {
+            stateTransition(EVENT_AFTER_250MS);
+        }
+    }
+
+#if defined(EEZ_PLATFORM_STM32)
+    void onSpiIrq() {
+        stateTransition(EVENT_SPI_READY);
+    }
+
+    void onSpiDmaTransferCompleted(int status) override {
+        stateTransition(EVENT_DMA_TRANSFER_COMPLETED, status);
+    }
+#endif
 
     void onPowerDown() override {
         synchronized = false;
@@ -1157,6 +1379,14 @@ public:
 
     int getLabelsAndColorsPageId() override {
         return PAGE_ID_DIB_MIO168_LABELS_AND_COLORS;
+    }
+
+    void onLowPriorityThreadMessage(uint8_t type, uint32_t param) override {
+        if (type == THREAD_MESSAGE_FS_LINK_DRIVER) {
+            fs::LinkDriver(slotIndex);
+        } else if (type == THREAD_MESSAGE_FS_UNLINK_DRIVER) {        
+            fs::UnLinkDriver(slotIndex);
+        }
     }
 
     void onHighPriorityThreadMessage(uint8_t type, uint32_t param) override;
@@ -2314,6 +2544,26 @@ Module *g_module = &g_mio168Module;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void executeDiskDriveOperation(int slotIndex) {
+    Mio168Module *module = (Mio168Module *)g_slots[slotIndex];
+
+    for (int nretry = 0; nretry < 10; nretry++) {
+        module->diskOperationStatus = Mio168Module::DISK_OPERATION_NOT_FINISHED;
+
+        sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_DISK_DRIVE_OPERATION, slotIndex);
+
+        while (module->diskOperationStatus == Mio168Module::DISK_OPERATION_NOT_FINISHED) {
+            osDelay(1);
+        }
+     
+        if (module->diskOperationStatus == Mio168Module::DISK_OPERATION_SUCCESSFULLY_FINISHED) {
+            break;
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 class DinConfigurationPage : public SetPage {
 public:
     static int g_selectedChannelIndex;
@@ -2516,6 +2766,8 @@ void Mio168Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
         } else if (channel.getValue() > channel.getMaxValue()) {
             channel.setValue(channel.getMaxValue());
         }
+    } else if (type == PSU_MESSAGE_DISK_DRIVE_OPERATION) {
+        stateTransition(EVENT_DISK_DRIVE_OPERATION);
     }
 }
 

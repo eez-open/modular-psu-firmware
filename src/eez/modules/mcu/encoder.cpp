@@ -44,7 +44,7 @@ static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true, false);
 #endif	
 
 #ifdef DEBUG
-static uint16_t g_totalCounter;
+//static uint16_t g_totalCounter;
 #endif
 
 static volatile int16_t g_counter;
@@ -195,7 +195,7 @@ static int getCounter() {
 #endif
 
 #ifdef DEBUG
-    g_totalCounter += counter;
+    //g_totalCounter += counter;
     //psu::debug::g_encoderCounter.set(g_totalCounter);
 #endif
 
@@ -218,7 +218,7 @@ static int getAcceleratedCounter(int increment) {
     g_lastTime = currentTime;
 
 #ifdef DEBUG
-    psu::debug::g_encoderDt.set((int32_t)dt);
+    //psu::debug::g_encoderDt.set((int32_t)dt);
 #endif
 
     const float MIN_DT_MS = 8;

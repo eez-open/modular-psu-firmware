@@ -210,8 +210,12 @@ struct Module {
     virtual void tick();
     virtual void writeUnsavedData();
     virtual void onPowerDown();
+
+#if defined(EEZ_PLATFORM_STM32)
     virtual void onSpiIrq();
     virtual void onSpiDmaTransferCompleted(int status);
+#endif
+
     virtual gui::Page *getPageFromId(int pageId);
     virtual void animatePageAppearance(int previousPageId, int activePageId);
     virtual int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor);

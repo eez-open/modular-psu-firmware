@@ -809,8 +809,6 @@ bool checkPassword(scpi_t *context, const char *againstPassword) {
 }
 
 void cleanupPath(char *filePath) {
-    replaceCharacter(filePath, '\\', '/');
-
     char *q = filePath;
 
     for (char *p = filePath; *p; ++p) {
@@ -850,8 +848,8 @@ void cleanupPath(char *filePath) {
         *q++ = *p;
     }
 
-    // remove trailing '/'
-    if (q > filePath && *(q - 1) == '/') {
+    // remove trailing '/' unless it is ':/'
+    if (q > filePath && *(q - 1) == '/' && !(q - 1 > filePath && *(q - 2) == ':')) {
         --q;
     }
 
@@ -875,7 +873,7 @@ bool getFilePath(scpi_t *context, char *filePath, bool mandatory, bool *isParame
         }
 
         // is it absolute file path?
-        if (filePathParam[0] == '/' || filePathParam[0] == '\\') {
+        if (filePathParam[0] == '/' || filePathParam[0] == '\\' || filePathParam[1] == ':') {
             // yes
             strncpy(filePath, filePathParam, filePathParamLen);
             filePath[filePathParamLen] = 0;

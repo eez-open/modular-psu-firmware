@@ -716,9 +716,18 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         reset();
     } else if (type == PSU_MESSAGE_TEST) {
         test();
-    } else if (type == PSU_MESSAGE_SPI_IRQ) {
+    } 
+#if defined(EEZ_PLATFORM_STM32)
+    else if (type == PSU_MESSAGE_SPI_IRQ) {
         g_slots[param]->onSpiIrq();
-    } else if (type == PSU_MESSAGE_ADC_MEASURE_ALL) {
+    }
+    else if (type == PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED) {
+        int slotIndex = param & 0xff;
+        int status = param >> 8;
+        g_slots[slotIndex]->onSpiDmaTransferCompleted(status);
+    }
+#endif
+    else if (type == PSU_MESSAGE_ADC_MEASURE_ALL) {
         Channel::get(param).adcMeasureAll();
         g_adcMeasureAllFinished = true;
     } else if (type == PSU_MESSAGE_TRIGGER_START_IMMEDIATELY) {
