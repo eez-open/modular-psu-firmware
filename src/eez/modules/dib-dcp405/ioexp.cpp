@@ -270,14 +270,20 @@ void IOExpander::tick(uint32_t tick_usec) {
 
     uint8_t iodira = read(REG_IODIRA);
     if (iodira == 0xFF || (gpio & gpioOutputPinsMask) != gpioWritten) {
-#if !CONF_SURVIVE_MODE
         if (iodira == 0xFF) {
+#if CONF_SURVIVE_MODE
+            DebugTrace("IOEXP reset detected on channel %d\n", channel.channelIndex + 1);
+#else
             event_queue::pushChannelEvent(event_queue::EVENT_ERROR_CH_IOEXP_RESET_DETECTED, channel.channelIndex);
+#endif
         } else {
             DebugTrace("IOEXP read: 0x%04X, expected: 0x%04X\n", (int)(gpio & gpioOutputPinsMask), (int)gpioWritten);
+#if CONF_SURVIVE_MODE
+            DebugTrace("IOEXP fault match detected on channel %d\n", channel.channelIndex + 1);
+#else
             event_queue::pushChannelEvent(event_queue::EVENT_ERROR_CH_IOEXP_FAULT_MATCH_DETECTED, channel.channelIndex);
+#endif            
         }
-#endif
 
         reinit();
         readGpio();
