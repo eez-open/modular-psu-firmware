@@ -532,17 +532,19 @@ public:
             result = TRANSFER_NOT_READY;
         }
 
-#if !CONF_SURVIVE_MODE
         if (result != TRANSFER_OK) {
             int32_t diff = millis() - lastTransferTickCount;
             if (diff > CONF_TRANSFER_TIMEOUT_MS || numConsecutiveTransferErrors > CONF_MAX_ALLOWED_CONSECUTIVE_TRANSFER_ERRORS) {
+#if CONF_SURVIVE_MODE
+                DebugTrace("CRC check error on slot %d\n", slotIndex + 1);
+#else
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                 synchronized = false;
                 testResult = TEST_FAILED;
                 result = TRANSFER_TIMEOUT;
+#endif
             }
         }
-#endif
 
         return result;
     }

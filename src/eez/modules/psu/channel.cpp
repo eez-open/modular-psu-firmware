@@ -752,7 +752,9 @@ void Channel::tick(uint32_t tick_usec) {
         }
 
         if (rpol && isOutputEnabled()) {
-#if !CONF_SURVIVE_MODE            
+#if CONF_SURVIVE_MODE
+            DebugTrace("Remote sense rpol detected on channel %d\n", channelIndex + 1);
+#else
             channel_dispatcher::outputEnable(*this, false);
             event_queue::pushChannelEvent(event_queue::EVENT_ERROR_CH_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, channelIndex);
             onProtectionTripped();

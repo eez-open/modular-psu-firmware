@@ -101,7 +101,10 @@ void TempSensor::testTemperatureValidity(float& value) {
         bool isTemperatureValueInvalid = isNaN(value) || value < TEMP_SENSOR_MIN_VALID_TEMPERATURE || value > TEMP_SENSOR_MAX_VALID_TEMPERATURE;
         if (isTemperatureValueInvalid) {
             if (g_testResult == TEST_OK) {
-#if !CONF_SURVIVE_MODE
+#if CONF_SURVIVE_MODE
+                value = 60.0f;
+                DebugTrace("Temp sensor %d failure detected\n", (int)type);
+#else
                 g_testResult = TEST_FAILED;
 
                 if (channel) {
@@ -110,8 +113,6 @@ void TempSensor::testTemperatureValidity(float& value) {
                 }
 
                 generateError(scpi_error);
-#else
-                value = 60.0f;
 #endif
             }
         } else {
@@ -137,11 +138,12 @@ bool TempSensor::test() {
     	} while (millis() - start < 1000);
         
         if (g_testResult != TEST_OK) {
-#if !CONF_SURVIVE_MODE
+#if CONF_SURVIVE_MODE
+            DebugTrace("Temp sensor %d failure detected\n", (int)type);
+            g_testResult = TEST_OK;
+#else
             g_testResult = TEST_FAILED;
             generateError(scpi_error);
-#else
-            g_testResult = TEST_OK;
 #endif
         }
     } else {
