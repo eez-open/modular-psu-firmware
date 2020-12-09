@@ -171,6 +171,9 @@ void highPriorityThreadMainLoop(const void *) {
 
 void highPriorityThreadOneIter() {
     osEvent event = osMessageGet(g_highPriorityMessageQueueId, 1);
+    
+    WATCHDOG_RESET(WATCHDOG_HIGH_PRIORITY_THREAD);
+
     if (event.status == osEventMessage) {
     	uint32_t message = event.value.v;
     	uint8_t type = QUEUE_MESSAGE_TYPE(message);
@@ -182,7 +185,6 @@ void highPriorityThreadOneIter() {
             return;
         }
 #endif
-        WATCHDOG_RESET(WATCHDOG_HIGH_PRIORITY_THREAD);
         for (int i = 0; i < NUM_SLOTS; i++) {
             g_slots[i]->tick();
         }

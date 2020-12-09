@@ -59,18 +59,6 @@ using namespace eez::psu;
 using namespace eez::psu::gui;
 using namespace eez::gui;
 
-static uint32_t g_trtMrt1;
-static uint32_t g_trtMrt2;
-static uint32_t g_trtMrt3;
-static uint32_t g_trtMrt4;
-static uint32_t g_trtMrt5;
-static uint32_t g_trtMrt6;
-static uint32_t g_trtMrt7;
-static uint32_t g_trtMrt8;
-static uint32_t g_trtMrt9;
-static uint32_t g_trtMrt10;
-static uint32_t g_trtMrt11;
-
 namespace eez {
 namespace dib_mio168 {
 
@@ -1094,7 +1082,7 @@ public:
         data.diskDriverOperation.operation = diskOperationParams->operation;
         data.diskDriverOperation.sector = diskOperationParams->sector;
         data.diskDriverOperation.cmd = diskOperationParams->cmd;
-        if (data.diskDriverOperation.operation == DISK_DRIVER_OPERATION_WRITE || data.diskDriverOperation.operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_WRITE) {
+        if (data.diskDriverOperation.operation == DISK_DRIVER_OPERATION_WRITE) {
             memcpy(data.diskDriverOperation.buffer, diskOperationParams->buff, 512);
         } else if (data.diskDriverOperation.operation == DISK_DRIVER_OPERATION_IOCTL) {
             memcpy(data.diskDriverOperation.buffer, diskOperationParams->buff, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
@@ -1199,13 +1187,10 @@ public:
 
         diskOperationParams->result = data.diskOperationResult;
 
-        if (diskOperationParams->operation == DISK_DRIVER_OPERATION_READ || diskOperationParams->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_READ) {
+        if (diskOperationParams->operation == DISK_DRIVER_OPERATION_READ) {
             memcpy(diskOperationParams->buff, data.buffer, 512);
         } else if (diskOperationParams->operation == DISK_DRIVER_OPERATION_IOCTL) {
             memcpy(diskOperationParams->buff, data.buffer, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
-        } else if (diskOperationParams->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_GET_CAPACITY) {
-            *diskOperationParams->blockNum = ((uint32_t *)data.buffer)[0];
-            *diskOperationParams->blockSize = ((uint16_t *)data.buffer)[2];
         }
 
         diskOperationStatus = DISK_OPERATION_SUCCESSFULLY_FINISHED;
@@ -1214,15 +1199,7 @@ public:
     }
 
     void setDiskOperationFailed() {
-        if (
-			diskOperationParams->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_INIT ||
-			diskOperationParams->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_GET_CAPACITY ||
-			diskOperationParams->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_IS_READY ||
-			diskOperationParams->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_READ ||
-			diskOperationParams->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_WRITE
-        ) {
-            diskOperationParams->result = USBD_FAIL;
-        } else if (diskOperationParams->operation == DISK_DRIVER_OPERATION_INITIALIZE || diskOperationParams->operation == DISK_DRIVER_OPERATION_STATUS) {
+        if (diskOperationParams->operation == DISK_DRIVER_OPERATION_INITIALIZE || diskOperationParams->operation == DISK_DRIVER_OPERATION_STATUS) {
         	diskOperationParams->result = STA_NOINIT;
         } else {
         	diskOperationParams->result = RES_ERROR;
@@ -2568,25 +2545,6 @@ public:
 
 #ifdef EEZ_PLATFORM_STM32
     void executeDiskDriveOperation(ExecuteDiskDriveOperationParams *params) override {
-        if (params->operation == DISK_DRIVER_OPERATION_INITIALIZE) g_trtMrt1++;
-        else if (params->operation == DISK_DRIVER_OPERATION_STATUS) g_trtMrt2++;
-        else if (params->operation == DISK_DRIVER_OPERATION_READ) g_trtMrt3++;
-        else if (params->operation == DISK_DRIVER_OPERATION_WRITE) g_trtMrt4++;
-        else if (params->operation == DISK_DRIVER_OPERATION_IOCTL) g_trtMrt5++;
-        else if (params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_INIT) g_trtMrt6++;
-        else if (params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_GET_CAPACITY) g_trtMrt7++;
-        else if (params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_IS_READY) g_trtMrt8++;
-        else if (params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_READ) {
-            g_trtMrt9++;
-            g_trtMrt11 = params->sector;
-        }
-        else if (params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_WRITE) g_trtMrt10++;
-
-        if (params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_INIT) {
-            params->result = USBD_OK;
-            return;
-        }
-
         diskOperationParams = params;
 
         for (int nretry = 0; nretry < 10; nretry++) {
