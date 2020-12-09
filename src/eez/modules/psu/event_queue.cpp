@@ -140,7 +140,7 @@ void init() {
 }
 
 void tick() {
-    bool isSdCardMounted = sd_card::isMounted(nullptr);
+    bool isSdCardMounted = sd_card::isMounted(nullptr, nullptr);
     if (isSdCardMounted != g_isSdCardMounted) {
         g_refreshEvents = true;
     }

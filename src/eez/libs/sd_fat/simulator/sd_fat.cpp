@@ -65,6 +65,14 @@ std::string getRealPath(const char *path) {
 
     realPath = "sd_card";
 
+    if (path[0] >= '0' && path[0] <= '9' && path[1] == ':') {
+        if (path[0] >= '1') {
+            realPath += "_slot_";
+            realPath += path[0];
+        }
+        path += 2;
+    }
+
     if (path[0]) {
         if (path[0] != '/') {
             realPath += "/";
@@ -398,6 +406,9 @@ void File::print(char value) {
 bool SdFat::mount(int *err) {
     // make sure SD card root path exists
     mkdir("/");
+	mkdir("1:/");
+	mkdir("2:/");
+	mkdir("3:/");
     
     if (!pathExists("/")) {
         *err = SCPI_ERROR_MASS_STORAGE_ERROR;
@@ -461,7 +472,7 @@ bool SdFat::rmdir(const char *path) {
     return result == 0;
 }
 
-bool SdFat::getInfo(uint64_t &usedSpace, uint64_t &freeSpace) {
+bool SdFat::getInfo(int diskDriveIndex, uint64_t &usedSpace, uint64_t &freeSpace) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     DWORD sectorsPerCluster, bytesPerSector, numberOfFreeClusters, totalNumberOfClusters;
     GetDiskFreeSpaceA(getRealPath("").c_str(), &sectorsPerCluster, &bytesPerSector,

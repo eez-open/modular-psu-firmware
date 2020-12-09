@@ -1455,7 +1455,7 @@
     {
       "name": "sys_info_sdcard_status",
       "type": "enum",
-      "enumItems": "[\"Unsupported\", \"Present\", \"Not present\", \"No FAT\", \"Failed\", \"Busy\"]",
+      "enumItems": "[\"Unsupported\", \"Present\", \"Not present\", \"No FAT\", \"Failed\", \"Busy\", \"Slot present\"]",
       "defaultValue": "1"
     },
     {
@@ -1711,7 +1711,7 @@
       "defaultValue": "2"
     },
     {
-      "name": "file_manager_is_root_directory",
+      "name": "file_manager_has_parent",
       "type": "boolean",
       "defaultValue": "0"
     },
@@ -1719,11 +1719,6 @@
       "name": "file_manager_current_directory",
       "type": "string",
       "defaultValue": "/Profiles"
-    },
-    {
-      "name": "file_manager_is_directory",
-      "type": "boolean",
-      "defaultValue": "0"
     },
     {
       "name": "file_manager_file_type",
@@ -2415,6 +2410,21 @@
       "name": "dlog_start_enabled",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "has_multiple_disk_drives",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "selected_mass_storage_device",
+      "type": "string",
+      "defaultValue": "Master"
+    },
+    {
+      "name": "file_manager_is_sort_files_option_available",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -2919,7 +2929,7 @@
       "name": "file_manager_select_file"
     },
     {
-      "name": "file_manager_go_to_parent_directory"
+      "name": "file_manager_go_to_parent"
     },
     {
       "name": "file_manager_open_file"
@@ -3127,6 +3137,9 @@
     },
     {
       "name": "dlog_trigger_select_source"
+    },
+    {
+      "name": "select_mass_storage_device"
     }
   ],
   "gui": {
@@ -4906,6 +4919,18 @@
                     "width": 40,
                     "height": 32,
                     "text": "\\u0023"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "status_icon_disabled"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 40,
+                    "height": 32,
+                    "text": "\\u0023"
                   }
                 ]
               },
@@ -4968,6 +4993,18 @@
                         "text": "\\u0027"
                       }
                     ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "status_icon_disabled"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 40,
+                    "height": 32,
+                    "text": "\\u0027"
                   },
                   {
                     "type": "Text",
@@ -5127,6 +5164,18 @@
                     "width": 40,
                     "height": 32,
                     "text": "\\u002c"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "status_icon_enabled"
+                    },
+                    "action": "show_file_manager",
+                    "left": 0,
+                    "top": 0,
+                    "width": 40,
+                    "height": 32,
+                    "text": "\\u002c"
                   }
                 ]
               },
@@ -5207,6 +5256,18 @@
                       "inheritFrom": "status_icon_enabled"
                     },
                     "action": "show_user_profiles",
+                    "left": 0,
+                    "top": 0,
+                    "width": 40,
+                    "height": 32,
+                    "text": "|"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "status_icon_disabled"
+                    },
+                    "action": "",
                     "left": 0,
                     "top": 0,
                     "width": 40,
@@ -21954,7 +22015,7 @@
             },
             "data": "usb_mode",
             "action": "select_usb_mode",
-            "left": 80,
+            "left": 87,
             "top": 10,
             "width": 120,
             "height": 32,
@@ -22068,7 +22129,7 @@
                     },
                     "data": "usb_device_class",
                     "action": "select_usb_device_class",
-                    "left": 69,
+                    "left": 77,
                     "top": 0,
                     "width": 220,
                     "height": 32,
@@ -22109,9 +22170,9 @@
                       "inheritFrom": "default"
                     },
                     "data": "usb_device_class",
-                    "left": 69,
+                    "left": 0,
                     "top": 40,
-                    "width": 366,
+                    "width": 435,
                     "height": 64,
                     "widgets": [
                       {
@@ -22121,7 +22182,7 @@
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 366,
+                        "width": 435,
                         "height": 64,
                         "widgets": [
                           {
@@ -22130,7 +22191,7 @@
                               "inheritFrom": "edit_value_S_left",
                               "font": "Oswald17"
                             },
-                            "left": 0,
+                            "left": 77,
                             "top": 0,
                             "width": 72,
                             "height": 28,
@@ -22141,7 +22202,7 @@
                             "style": {
                               "inheritFrom": "value_M_left"
                             },
-                            "left": 72,
+                            "left": 149,
                             "top": 0,
                             "width": 82,
                             "height": 28,
@@ -22153,7 +22214,7 @@
                               "inheritFrom": "edit_value_S_left",
                               "font": "Oswald17"
                             },
-                            "left": 0,
+                            "left": 77,
                             "top": 36,
                             "width": 72,
                             "height": 28,
@@ -22164,7 +22225,7 @@
                             "style": {
                               "inheritFrom": "value_M_left"
                             },
-                            "left": 72,
+                            "left": 149,
                             "top": 36,
                             "width": 82,
                             "height": 28,
@@ -22176,7 +22237,7 @@
                               "inheritFrom": "edit_value_S_left",
                               "font": "Oswald17"
                             },
-                            "left": 154,
+                            "left": 231,
                             "top": 0,
                             "width": 100,
                             "height": 28,
@@ -22187,7 +22248,7 @@
                             "style": {
                               "inheritFrom": "value_M_left"
                             },
-                            "left": 254,
+                            "left": 331,
                             "top": 0,
                             "width": 60,
                             "height": 28,
@@ -22199,7 +22260,7 @@
                               "inheritFrom": "edit_value_S_left",
                               "font": "Oswald17"
                             },
-                            "left": 154,
+                            "left": 231,
                             "top": 36,
                             "width": 100,
                             "height": 28,
@@ -22210,7 +22271,7 @@
                             "style": {
                               "inheritFrom": "value_M_left"
                             },
-                            "left": 254,
+                            "left": 331,
                             "top": 36,
                             "width": 60,
                             "height": 28,
@@ -22219,15 +22280,66 @@
                         ]
                       },
                       {
-                        "type": "Rectangle",
+                        "type": "Select",
                         "style": {
                           "inheritFrom": "default"
                         },
+                        "data": "has_multiple_disk_drives",
                         "left": 0,
                         "top": 0,
-                        "width": 366,
+                        "width": 435,
                         "height": 64,
-                        "invertColors": true
+                        "widgets": [
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 435,
+                            "height": 64,
+                            "invertColors": true
+                          },
+                          {
+                            "type": "Container",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 435,
+                            "height": 64,
+                            "widgets": [
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "edit_value_S_left",
+                                  "font": "Oswald17"
+                                },
+                                "left": 0,
+                                "top": 0,
+                                "width": 68,
+                                "height": 32,
+                                "text": "Device:"
+                              },
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "edit_value_active_S_center",
+                                  "font": "Oswald17"
+                                },
+                                "data": "selected_mass_storage_device",
+                                "action": "select_mass_storage_device",
+                                "left": 77,
+                                "top": 0,
+                                "width": 220,
+                                "height": 32,
+                                "text": ""
+                              }
+                            ]
+                          }
+                        ]
                       }
                     ]
                   }
@@ -27283,6 +27395,17 @@
                         "width": 122,
                         "height": 28,
                         "text": "Busy"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "event_error"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 122,
+                        "height": 28,
+                        "text": "Not present"
                       }
                     ]
                   }
@@ -32841,101 +32964,61 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "file_manager_is_root_directory",
+            "data": "file_manager_has_parent",
             "left": 0,
             "top": 0,
-            "width": 440,
+            "width": 36,
             "height": 36,
             "widgets": [
               {
-                "type": "Container",
+                "type": "Text",
                 "style": {
-                  "inheritFrom": "default"
+                  "inheritFrom": "default",
+                  "font": "Heydings14",
+                  "color": "text_disabled",
+                  "activeBackgroundColor": "text_disabled",
+                  "padding": "0 0 0 4"
                 },
+                "action": "",
                 "left": 0,
                 "top": 0,
-                "width": 440,
+                "width": 36,
                 "height": 36,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default",
-                      "font": "Heydings14",
-                      "color": "Action color",
-                      "activeBackgroundColor": "Action color",
-                      "padding": "0 0 0 4"
-                    },
-                    "action": "file_manager_go_to_parent_directory",
-                    "left": 0,
-                    "top": 0,
-                    "width": 36,
-                    "height": 36,
-                    "text": "\\u0060"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default",
-                      "font": "Oswald14",
-                      "alignHorizontal": "left",
-                      "padding": "0 0 0 4"
-                    },
-                    "data": "file_manager_current_directory",
-                    "action": "",
-                    "left": 36,
-                    "top": 0,
-                    "width": 404,
-                    "height": 36,
-                    "text": ""
-                  }
-                ]
+                "text": "\\u0060"
               },
               {
-                "type": "Container",
+                "type": "Text",
                 "style": {
-                  "inheritFrom": "default"
+                  "inheritFrom": "default",
+                  "font": "Heydings14",
+                  "color": "Action color",
+                  "activeBackgroundColor": "Action color",
+                  "padding": "0 0 0 4"
                 },
+                "action": "file_manager_go_to_parent",
                 "left": 0,
                 "top": 0,
-                "width": 440,
+                "width": 36,
                 "height": 36,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default",
-                      "font": "Heydings14",
-                      "color": "text_disabled",
-                      "activeBackgroundColor": "text_disabled",
-                      "padding": "0 0 0 4"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 36,
-                    "height": 36,
-                    "text": "\\u0060"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default",
-                      "font": "Oswald14",
-                      "alignHorizontal": "left",
-                      "padding": "0 0 0 4"
-                    },
-                    "data": "file_manager_current_directory",
-                    "action": "",
-                    "left": 36,
-                    "top": 0,
-                    "width": 404,
-                    "height": 36,
-                    "text": ""
-                  }
-                ]
+                "text": "\\u0060"
               }
             ]
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald14",
+              "alignHorizontal": "left",
+              "padding": "0 0 0 4"
+            },
+            "data": "file_manager_current_directory",
+            "action": "",
+            "left": 36,
+            "top": 0,
+            "width": 368,
+            "height": 36,
+            "text": ""
           },
           {
             "type": "Select",
@@ -33019,90 +33102,114 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "file_manager_sort_files_option",
-            "action": "file_manager_sort_by",
+            "data": "file_manager_is_sort_files_option_available",
             "left": 439,
             "top": 0,
             "width": 41,
             "height": 36,
             "widgets": [
               {
-                "type": "Text",
+                "type": "Rectangle",
                 "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
+                  "inheritFrom": "default"
                 },
-                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 41,
                 "height": 36,
-                "text": "\\u00aa"
+                "invertColors": true
               },
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
+                  "inheritFrom": "default"
                 },
-                "action": "",
+                "data": "file_manager_sort_files_option",
+                "action": "file_manager_sort_by",
                 "left": 0,
                 "top": 0,
                 "width": 41,
                 "height": 36,
-                "text": "\\u00ab"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 36,
-                "text": "\\u00ac"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 36,
-                "text": "\\u00ad"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 36,
-                "text": "\\u00ae"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 36,
-                "text": "\\u00af"
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00aa"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00ab"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00ac"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00ad"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00ae"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00af"
+                  }
+                ]
               }
             ]
           },
@@ -33292,191 +33399,175 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "file_manager_is_root_directory",
+            "data": "file_manager_has_parent",
             "left": 0,
             "top": 0,
-            "width": 420,
+            "width": 36,
             "height": 36,
             "widgets": [
               {
-                "type": "Container",
+                "type": "Text",
                 "style": {
-                  "inheritFrom": "default"
+                  "inheritFrom": "default",
+                  "font": "Heydings14",
+                  "color": "text_disabled",
+                  "activeBackgroundColor": "text_disabled",
+                  "padding": "0 0 0 4"
                 },
+                "action": "",
                 "left": 0,
                 "top": 0,
-                "width": 420,
+                "width": 36,
                 "height": 36,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default",
-                      "font": "Heydings14",
-                      "color": "Action color",
-                      "activeBackgroundColor": "Action color",
-                      "padding": "0 0 0 4"
-                    },
-                    "action": "file_manager_go_to_parent_directory",
-                    "left": 0,
-                    "top": 0,
-                    "width": 36,
-                    "height": 36,
-                    "text": "\\u0060"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default",
-                      "font": "Oswald14",
-                      "alignHorizontal": "left",
-                      "padding": "0 0 0 4"
-                    },
-                    "data": "file_manager_current_directory",
-                    "action": "",
-                    "left": 36,
-                    "top": 0,
-                    "width": 384,
-                    "height": 36,
-                    "text": ""
-                  }
-                ]
+                "text": "\\u0060"
               },
               {
-                "type": "Container",
+                "type": "Text",
                 "style": {
-                  "inheritFrom": "default"
+                  "inheritFrom": "default",
+                  "font": "Heydings14",
+                  "color": "Action color",
+                  "activeBackgroundColor": "Action color",
+                  "padding": "0 0 0 4"
                 },
+                "action": "file_manager_go_to_parent",
                 "left": 0,
                 "top": 0,
-                "width": 420,
+                "width": 36,
                 "height": 36,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default",
-                      "font": "Heydings14",
-                      "color": "text_disabled",
-                      "activeBackgroundColor": "text_disabled",
-                      "padding": "0 0 0 4"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 36,
-                    "height": 36,
-                    "text": "\\u0060"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default",
-                      "font": "Oswald14",
-                      "alignHorizontal": "left",
-                      "padding": "0 0 0 4"
-                    },
-                    "data": "file_manager_current_directory",
-                    "action": "",
-                    "left": 36,
-                    "top": 0,
-                    "width": 384,
-                    "height": 36,
-                    "text": ""
-                  }
-                ]
+                "text": "\\u0060"
               }
             ]
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default",
+              "font": "Oswald14",
+              "alignHorizontal": "left",
+              "padding": "0 0 0 4"
+            },
+            "data": "file_manager_current_directory",
+            "action": "",
+            "left": 36,
+            "top": 0,
+            "width": 383,
+            "height": 36,
+            "text": ""
           },
           {
             "type": "Select",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "file_manager_sort_files_option",
-            "action": "file_manager_sort_by",
+            "data": "file_manager_is_sort_files_option_available",
             "left": 419,
             "top": 0,
             "width": 41,
             "height": 36,
             "widgets": [
               {
-                "type": "Text",
+                "type": "Rectangle",
                 "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
+                  "inheritFrom": "default"
                 },
-                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 41,
                 "height": 36,
-                "text": "\\u00aa"
+                "invertColors": true
               },
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
+                  "inheritFrom": "default"
                 },
-                "action": "",
+                "data": "file_manager_sort_files_option",
+                "action": "file_manager_sort_by",
                 "left": 0,
                 "top": 0,
                 "width": 41,
                 "height": 36,
-                "text": "\\u00ab"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 36,
-                "text": "\\u00ac"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 36,
-                "text": "\\u00ad"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 36,
-                "text": "\\u00ae"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 36,
-                "text": "\\u00af"
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00aa"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00ab"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00ac"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00ad"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00ae"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 41,
+                    "height": 36,
+                    "text": "\\u00af"
+                  }
+                ]
               }
             ]
           },
@@ -53737,6 +53828,24 @@
               "size": 40,
               "encoding": 61588
             }
+          },
+          {
+            "encoding": 142,
+            "x": 3,
+            "y": -2,
+            "width": 50,
+            "height": 56,
+            "dx": 56,
+            "glyphBitmap": {
+              "width": 50,
+              "height": 56,
+              "pixelArray": "00000000000000000000000050d0fbfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcf0a41700000000000000000000000052ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd4080000000000000000000000d4ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff560000000000000000000000feffffffbd92eeffffffffbd92eeffffffffbd92eeffffffffbd92eeffffffffbd92eeffffff7f0000000000000000000000ffffffba01003affffffba01003affffffba01003affffffba01003affffffba01003affffff800000000000000000000000ffffff81000001ffffff81000001ffffff81000001ffffff81000001ffffff81000001ffffff800000000000000000000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff800000000000000000000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff800000000000000000000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff800000000000000000000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff800000000000000000000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff800000000000000000000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff80000000ffffff800000000000000000000023ffffff8d00000dffffff8d00000dffffff8d00000dffffff8d00000dffffff8d00000dffffff8000000000000000000023e2ffffffeb350b94ffffffeb350b94ffffffeb350b94ffffffeb350b94ffffffeb350b94ffffff80000000000000000023e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff800000000000000023e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8000000000000023e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000000000023e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff800000000023e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8000000023e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000023e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff800022e2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8009d9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8058ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff807fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80042eacffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000001adffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff800000002dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8000000003ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff800000000dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8000000058ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000029e7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8040a5f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff807affffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7a53ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5212f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff712008fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8f00000bd2ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd20b00000015bbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbb1500000000000152b4e9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeab55301000000"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 40,
+              "encoding": 61703
+            }
           }
         ]
       },
@@ -55639,6 +55748,24 @@
               "filePath": "fonts\\fontello.ttf",
               "size": 14,
               "encoding": 59396
+            }
+          },
+          {
+            "encoding": 137,
+            "x": 1,
+            "y": 0,
+            "width": 17,
+            "height": 19,
+            "dx": 19,
+            "glyphBitmap": {
+              "width": 17,
+              "height": 19,
+              "pixelArray": "00000007cbfcfcfcfcfcfcfcfcfcfcfcae00000028ff52ff6d6eff52ff52ff6d6eff00000028ff00ff2828ff00ff00ff2828ff00000028ff00ff2828ff00ff00ff2828ff00000071ff60ff797aff60ff60ff797aff000062ffffffffffffffffffffffffffff0059feffffffffffffffffffffffffffff43fcffffffffffffffffffffffffffffff97ffffffffffffffffffffffffffffffff58f0ffffffffffffffffffffffffffffff0077ffffffffffffffffffffffffffffff0069ffffffffffffffffffffffffffffff03a3ffffffffffffffffffffffffffffff93ffffffffffffffffffffffffffffffff98ffffffffffffffffffffffffffffffff98ffffffffffffffffffffffffffffffff97ffffffffffffffffffffffffffffffff65ffffffffffffffffffffffffffffffcc0598f6ffffffffffffffffffffffffcb2e"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 14,
+              "encoding": 61703
             }
           }
         ]

@@ -1,4 +1,4 @@
-    /*
+/*
  * EEZ DIB MIO168
  * Copyright (C) 2015-present, Envox d.o.o.
  *
@@ -33,6 +33,9 @@
 #include <eez/firmware.h>
 #include <eez/index.h>
 #include <eez/hmi.h>
+
+#include <eez/fs_driver.h>
+
 #include <eez/gui/gui.h>
 #include <eez/modules/psu/psu.h>
 #include "eez/modules/psu/profile.h"
@@ -48,7 +51,6 @@
 #include <eez/modules/bp3c/flash_slave.h>
 
 #include "./dib-mio168.h"
-#include "./fs_driver.h"
 
 #include <scpi/scpi.h>
 
@@ -58,11 +60,6 @@ using namespace eez::gui;
 
 namespace eez {
 namespace dib_mio168 {
-
-enum Mio168LowPriorityThreadMessage {
-    THREAD_MESSAGE_FS_LINK_DRIVER = THREAD_MESSAGE_MODULE_SPECIFIC,
-    THREAD_MESSAGE_FS_UNLINK_DRIVER
-};
 
 enum Mio168HighPriorityThreadMessage {
     PSU_MESSAGE_DIN_CONFIGURE = PSU_MESSAGE_MODULE_SPECIFIC,
@@ -141,7 +138,7 @@ struct FromMasterToSlave {
     uint16_t dinReadPeriod;
 
     struct {
-        uint8_t operation; // enum fs::DiskDriverOperation
+        uint8_t operation; // enum DiskDriverOperation
         uint32_t sector;
         uint8_t cmd;
         uint8_t buffer[512];
@@ -975,11 +972,14 @@ public:
     bool spiReady = false;
     enum { IDLE, REQUEST, REQUEST_SENT, RESPONSE } diskDriveOperation;
     uint32_t lastTransferTime = 0;
+#ifdef EEZ_PLATFORM_STM32
+    ExecuteDiskDriveOperationParams *diskOperationParams;
     enum {
         DISK_OPERATION_NOT_FINISHED,
         DISK_OPERATION_SUCCESSFULLY_FINISHED,
         DISK_OPERATION_UNSUCCESSFULLY_FINISHED
     } diskOperationStatus;
+#endif
 
     DinChannel dinChannel;
     DoutChannel doutChannel;
@@ -1028,6 +1028,9 @@ public:
                 synchronized = true;
                 numCrcErrors = 0;
                 testResult = TEST_OK;
+#ifdef EEZ_PLATFORM_SIMULATOR
+                sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_LINK, slotIndex, 0);
+#endif
             } else {
                 if (g_slots[slotIndex]->firmwareInstalled) {
                     event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
@@ -1037,6 +1040,7 @@ public:
         }
     }
 
+#ifdef EEZ_PLATFORM_STM32
     void fillFromMasterToSlave(FromMasterToSlave &data) {
         data.dinRanges = dinChannel.m_pinRanges;
         data.dinSpeeds = dinChannel.m_pinSpeeds;
@@ -1071,14 +1075,15 @@ public:
         data.dinReadPeriod = dinChannel.readPeriod;
     }
 
+
     void fillFromMasterToSlaveDiskDriverOperation(FromMasterToSlave &data) {
-        data.diskDriverOperation.operation = fs::g_operation;
-        data.diskDriverOperation.sector = fs::g_sector;
-        data.diskDriverOperation.cmd = fs::g_cmd;
-        if (data.diskDriverOperation.operation == fs::DISK_DRIVER_OPERATION_WRITE) {
-            memcpy(data.diskDriverOperation.buffer, fs::g_buff, 512);
-        } else if (data.diskDriverOperation.operation == fs::DISK_DRIVER_OPERATION_IOCTL) {
-            memcpy(data.diskDriverOperation.buffer, fs::g_buff, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
+        data.diskDriverOperation.operation = diskOperationParams->operation;
+        data.diskDriverOperation.sector = diskOperationParams->sector;
+        data.diskDriverOperation.cmd = diskOperationParams->cmd;
+        if (data.diskDriverOperation.operation == DISK_DRIVER_OPERATION_WRITE) {
+            memcpy(data.diskDriverOperation.buffer, diskOperationParams->buff, 512);
+        } else if (data.diskDriverOperation.operation == DISK_DRIVER_OPERATION_IOCTL) {
+            memcpy(data.diskDriverOperation.buffer, diskOperationParams->buff, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
         }
     }
 
@@ -1125,12 +1130,12 @@ public:
             }
 
            if (data.flags & FLAG_SD_CARD_PRESENT) {
-                if (!fs::isDriverLinked(slotIndex)) {
-                    sendMessageToLowPriorityThread((LowPriorityThreadMessage)THREAD_MESSAGE_FS_LINK_DRIVER, slotIndex, 0);
+                if (!fs_driver::isDriverLinked(slotIndex)) {
+                    sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_LINK, slotIndex, 0);
                 }
            } else {
-                if (fs::isDriverLinked(slotIndex)) {
-                    sendMessageToLowPriorityThread((LowPriorityThreadMessage)THREAD_MESSAGE_FS_UNLINK_DRIVER, slotIndex, 0);
+                if (fs_driver::isDriverLinked(slotIndex)) {
+                    sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_UNLINK, slotIndex, 0);
                 }
            }
 
@@ -1178,12 +1183,12 @@ public:
         	return false;
         }
 
-        fs::g_result = data.diskOperationResult;
+        diskOperationParams->result = data.diskOperationResult;
 
-        if (fs::g_operation == fs::DISK_DRIVER_OPERATION_READ) {
-            memcpy(fs::g_buff, data.buffer, 512);
-        } else if (fs::g_operation == fs::DISK_DRIVER_OPERATION_IOCTL) {
-            memcpy(fs::g_buff, data.buffer, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
+        if (diskOperationParams->operation == DISK_DRIVER_OPERATION_READ) {
+            memcpy(diskOperationParams->buff, data.buffer, 512);
+        } else if (diskOperationParams->operation == DISK_DRIVER_OPERATION_IOCTL) {
+            memcpy(diskOperationParams->buff, data.buffer, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
         }
 
         diskOperationStatus = DISK_OPERATION_SUCCESSFULLY_FINISHED;
@@ -1192,10 +1197,10 @@ public:
     }
 
     void setDiskOperationFailed() {
-        if (fs::g_operation == fs::DISK_DRIVER_OPERATION_INITIALIZE || fs::g_operation == fs::DISK_DRIVER_OPERATION_STATUS) {
-            fs::g_result = STA_NOINIT;
+        if (diskOperationParams->operation == DISK_DRIVER_OPERATION_INITIALIZE || diskOperationParams->operation == DISK_DRIVER_OPERATION_STATUS) {
+        	diskOperationParams->result = STA_NOINIT;
         } else {
-            fs::g_result = RES_ERROR;
+        	diskOperationParams->result = RES_ERROR;
         }
 
         diskOperationStatus = DISK_OPERATION_UNSUCCESSFULLY_FINISHED;
@@ -1309,12 +1314,14 @@ public:
             }
         }
     }
+#endif
 
     void tick() override {
         if (!synchronized) {
             return;
         }
 
+#ifdef EEZ_PLATFORM_STM32
         FromMasterToSlave data;
         fillFromMasterToSlave(data);
         if (memcmp(&data, output, offsetof(FromMasterToSlave, diskDriverOperation)) != 0) {
@@ -1322,6 +1329,7 @@ public:
         } else if (millis() - lastTransferTime >= REFRESH_TIME_MS) {
             stateTransition(EVENT_AFTER_250MS);
         }
+#endif
     }
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -1336,6 +1344,9 @@ public:
 
     void onPowerDown() override {
         synchronized = false;
+#ifdef EEZ_PLATFORM_SIMULATOR
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_UNLINK, slotIndex, 0);
+#endif
     }
 
     Page *getPageFromId(int pageId) override;
@@ -1379,14 +1390,6 @@ public:
 
     int getLabelsAndColorsPageId() override {
         return PAGE_ID_DIB_MIO168_LABELS_AND_COLORS;
-    }
-
-    void onLowPriorityThreadMessage(uint8_t type, uint32_t param) override {
-        if (type == THREAD_MESSAGE_FS_LINK_DRIVER) {
-            fs::LinkDriver(slotIndex);
-        } else if (type == THREAD_MESSAGE_FS_UNLINK_DRIVER) {        
-            fs::UnLinkDriver(slotIndex);
-        }
     }
 
     void onHighPriorityThreadMessage(uint8_t type, uint32_t param) override;
@@ -2537,30 +2540,30 @@ public:
             dinChannel.readPeriod = 0;
         }
     }
+
+#ifdef EEZ_PLATFORM_STM32
+    void executeDiskDriveOperation(ExecuteDiskDriveOperationParams *params) override {
+        diskOperationParams = params;
+
+        for (int nretry = 0; nretry < 10; nretry++) {
+            diskOperationStatus = Mio168Module::DISK_OPERATION_NOT_FINISHED;
+
+            sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_DISK_DRIVE_OPERATION, slotIndex);
+
+            while (diskOperationStatus == Mio168Module::DISK_OPERATION_NOT_FINISHED) {
+                osDelay(1);
+            }
+        
+            if (diskOperationStatus == Mio168Module::DISK_OPERATION_SUCCESSFULLY_FINISHED) {
+                break;
+            }
+        }
+    }
+#endif
 };
 
 static Mio168Module g_mio168Module;
 Module *g_module = &g_mio168Module;
-
-////////////////////////////////////////////////////////////////////////////////
-
-void executeDiskDriveOperation(int slotIndex) {
-    Mio168Module *module = (Mio168Module *)g_slots[slotIndex];
-
-    for (int nretry = 0; nretry < 10; nretry++) {
-        module->diskOperationStatus = Mio168Module::DISK_OPERATION_NOT_FINISHED;
-
-        sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_DISK_DRIVE_OPERATION, slotIndex);
-
-        while (module->diskOperationStatus == Mio168Module::DISK_OPERATION_NOT_FINISHED) {
-            osDelay(1);
-        }
-     
-        if (module->diskOperationStatus == Mio168Module::DISK_OPERATION_SUCCESSFULLY_FINISHED) {
-            break;
-        }
-    }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2766,9 +2769,12 @@ void Mio168Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
         } else if (channel.getValue() > channel.getMaxValue()) {
             channel.setValue(channel.getMaxValue());
         }
-    } else if (type == PSU_MESSAGE_DISK_DRIVE_OPERATION) {
+    } 
+#ifdef EEZ_PLATFORM_STM32	
+	else if (type == PSU_MESSAGE_DISK_DRIVE_OPERATION) {
         stateTransition(EVENT_DISK_DRIVE_OPERATION);
     }
+#endif
 }
 
 } // namespace dib_mio168

@@ -35,17 +35,15 @@ enum ListViewOption {
     LIST_VIEW_SCRIPTS
 };
 
-bool isListViewOptionAvailable();
 ListViewOption getListViewOption();
 int getListViewLayout();
 void toggleListViewOption();
 SortFilesOption getSortFilesOption();
 void setSortFilesOption(SortFilesOption sortFilesOption);
-const char *getCurrentDirectory();
+void getCurrentDirectoryTitle(char *text, int count);
 State getState();
 bool isRootDirectory();
 bool isScriptsDirectory();
-void goToParentDirectory();
 uint32_t getFilesCount();
 uint32_t getFilesStartPosition();
 void setFilesStartPosition(uint32_t position);

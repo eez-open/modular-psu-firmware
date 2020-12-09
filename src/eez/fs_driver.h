@@ -19,29 +19,15 @@
 #pragma once
 
 namespace eez {
-namespace dib_mio168 {
-namespace fs {
+namespace fs_driver {
 
 bool isDriverLinked(int slotIndex);
 void LinkDriver(int slotIndex);
 void UnLinkDriver(int slotIndex);
 
-enum DiskDriverOperation {
-    DISK_DRIVER_OPERATION_NONE,
-    DISK_DRIVER_OPERATION_INITIALIZE,
-    DISK_DRIVER_OPERATION_STATUS,
-    DISK_DRIVER_OPERATION_READ,
-    DISK_DRIVER_OPERATION_WRITE,
-    DISK_DRIVER_OPERATION_IOCTL
-};
+// disk drives enumeration
+int getDiskDrivesNum();
+int getDiskDriveIndex(int iterationIndex);
 
-extern DiskDriverOperation g_operation;
-extern int g_slotIndex;
-extern uint32_t g_sector;
-extern uint8_t* g_buff;
-extern uint8_t g_cmd;
-extern uint32_t g_result;
-
-} // namespace fs
-} // namespace dib_mio168
+} // namespace fs_driver
 } // namespace eez

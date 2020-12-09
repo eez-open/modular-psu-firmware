@@ -158,7 +158,7 @@ scpi_result_t scpi_cmd_mmemoryCatalogLengthQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_mmemoryInformationQ(scpi_t *context) {
     uint64_t usedSpace, freeSpace;
-    if (!sd_card::getInfo(usedSpace, freeSpace, false)) { // "false" means **do not** get storage info from cache
+    if (!sd_card::getInfo(0, usedSpace, freeSpace, false)) { // "false" means **do not** get storage info from cache
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }

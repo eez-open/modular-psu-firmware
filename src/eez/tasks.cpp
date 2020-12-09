@@ -27,6 +27,7 @@
 #include <eez/sound.h>
 #include <eez/hmi.h>
 #include <eez/usb.h>
+#include <eez/fs_driver.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/datetime.h>
@@ -288,7 +289,7 @@ void lowPriorityThreadOneIter() {
             } else if (type == THREAD_MESSAGE_ABORT_DOWNLOADING) {
                 psu::scpi::abortDownloading();
             } else if (type == THREAD_MESSAGE_SCREENSHOT) {
-                if (!sd_card::isMounted(nullptr)) {
+                if (!sd_card::isMounted(nullptr, nullptr)) {
                     g_screenshotGenerating = false;
                     generateError(SCPI_ERROR_MISSING_MASS_MEDIA);
                     return;
@@ -419,6 +420,11 @@ void lowPriorityThreadOneIter() {
             } else if (type >= THREAD_MESSAGE_MODULE_SPECIFIC) {
                 int slotIndex = param & 0xff;
                 g_slots[slotIndex]->onLowPriorityThreadMessage(type, param);
+            }
+            else if (type == THREAD_MESSAGE_FS_DRIVER_LINK) {
+                fs_driver::LinkDriver(param);
+            } else if (type == THREAD_MESSAGE_FS_DRIVER_UNLINK) {
+                fs_driver::UnLinkDriver(param);
             }
         }
     } else {

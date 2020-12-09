@@ -30,6 +30,7 @@ enum FileType {
     FILE_TYPE_MICROPYTHON,
     FILE_TYPE_HEX,
     FILE_TYPE_OTHER,
+    FILE_TYPE_DISK_DRIVE,
 };
 
 enum SortFilesOption {

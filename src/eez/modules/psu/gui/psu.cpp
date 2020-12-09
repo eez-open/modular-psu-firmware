@@ -302,7 +302,7 @@ void PsuAppContext::stateManagment() {
         errorMessageWithAction("Uncaught script exception!", showDebugTraceLog, "Show debug trace log");
     }
 
-    if (!sd_card::isMounted(nullptr)) {
+    if (!sd_card::isMounted(nullptr, nullptr)) {
         if (
             isPageOnStack(PAGE_ID_DLOG_PARAMS) ||
             isPageOnStack(PAGE_ID_DLOG_VIEW) ||

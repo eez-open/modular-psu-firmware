@@ -377,10 +377,16 @@ bool SdFat::rmdir(const char *path) {
     return result == FR_OK;
 }
 
-bool SdFat::getInfo(uint64_t &usedSpace, uint64_t &freeSpace) {
+bool SdFat::getInfo(int diskDriveIndex, uint64_t &usedSpace, uint64_t &freeSpace) {
+    char path[3];
+
+    path[0] = '0' + diskDriveIndex;
+    path[1] = ':';
+    path[3] = 0;
+
     DWORD freeClusters;
     FATFS *fs;
-    auto result = f_getfree(SDPath, &freeClusters, &fs);
+    auto result = f_getfree(path, &freeClusters, &fs);
     CHECK_ERROR("SdFat::getInfo", result);
     if (result != FR_OK) {
         return false;

@@ -100,7 +100,7 @@ void tick() {
     auto tick = millis();
     if (tick - g_lastAutoSaveTime > CONF_AUTO_SAVE_TIMEOUT_MS) {
         g_lastAutoSaveTime = tick;
-        if (isTickSaveAllowed() && isAutoSaveAllowed() && isProfile0Dirty() && sd_card::isMounted(nullptr)) {
+        if (isTickSaveAllowed() && isAutoSaveAllowed() && isProfile0Dirty() && sd_card::isMounted(nullptr, nullptr)) {
             saveStateToProfile0(true);
         }
     }
@@ -1054,7 +1054,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 }
 
 static bool saveProfileToFile(const char *filePath, Parameters &profile, List *lists, bool showProgress, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(filePath, err)) {
         if (err) {
             *err = SCPI_ERROR_MISSING_MASS_MEDIA;
         }
@@ -1385,7 +1385,7 @@ static bool profileRead(ReadContext &ctx, Parameters &parameters, List *lists, i
 }
 
 static bool loadProfileFromFile(const char *filePath, Parameters &profile, List *lists, int options, bool showProgress, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(filePath, err)) {
         if (err) {
             *err = SCPI_ERROR_MISSING_MASS_MEDIA;
         }

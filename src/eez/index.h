@@ -173,6 +173,27 @@ enum DlogResourceType {
     DLOG_RESOURCE_TYPE_DIN7,
 };
 
+#if defined(EEZ_PLATFORM_STM32)
+enum DiskDriverOperation {
+    DISK_DRIVER_OPERATION_NONE,
+    DISK_DRIVER_OPERATION_INITIALIZE,
+    DISK_DRIVER_OPERATION_STATUS,
+    DISK_DRIVER_OPERATION_READ,
+    DISK_DRIVER_OPERATION_WRITE,
+    DISK_DRIVER_OPERATION_IOCTL
+};
+
+struct ExecuteDiskDriveOperationParams {
+    DiskDriverOperation operation;
+
+    uint32_t sector;
+    uint8_t* buff;
+    uint8_t cmd;
+
+    uint32_t result;
+};
+#endif
+
 struct Module {
     uint16_t moduleType;
     const char *moduleName;
@@ -366,6 +387,10 @@ struct Module {
     virtual float getDlogResourceMinPeriod(int subchannelIndex, int resourceIndex);
     virtual void startDlog(int subchannelIndex, int resourceIndex);
     virtual void stopDlog(int subchannelIndex, int resourceIndex);
+
+#if defined(EEZ_PLATFORM_STM32)
+    virtual void executeDiskDriveOperation(ExecuteDiskDriveOperationParams *params);
+#endif
 };
 
 static const int NUM_SLOTS = 3;

@@ -165,7 +165,7 @@ class SdFat {
     bool mkdir(const char *path);
     bool rmdir(const char *path);
 
-    bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace);
+    bool getInfo(int diskDriveIndex, uint64_t &usedSpace, uint64_t &freeSpace);
 };
 
 char *getConfFilePath(const char *file_name);

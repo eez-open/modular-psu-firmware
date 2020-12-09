@@ -967,7 +967,7 @@ bool psuReset() {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool autoRecall(int recallOptions) {
-	if (sd_card::isMounted(nullptr)) {
+	if (sd_card::isMounted(nullptr, nullptr)) {
 		if (persist_conf::isProfileAutoRecallEnabled()) {
 			int location = persist_conf::getProfileAutoRecallLocation();
 			int err;

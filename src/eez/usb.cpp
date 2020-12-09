@@ -38,6 +38,7 @@
 int g_usbMode = USB_MODE_DISABLED;
 int g_otgMode = USB_MODE_DISABLED;
 int g_usbDeviceClass = USB_DEVICE_CLASS_VIRTUAL_COM_PORT;
+int g_selectedMassStorageDevice = 0;
 
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
@@ -259,13 +260,13 @@ void selectUsbDeviceClass(int usbDeviceClass) {
     if (g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) {
 #if defined(EEZ_PLATFORM_STM32)
         taskENTER_CRITICAL();
-
         MX_USB_DEVICE_DeInit();
+#endif
 
         g_usbDeviceClass = usbDeviceClass;
 
+#if defined(EEZ_PLATFORM_STM32)
         MX_USB_DEVICE_Init();
-
         taskEXIT_CRITICAL();
 #endif
 

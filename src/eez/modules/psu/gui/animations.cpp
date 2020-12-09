@@ -325,6 +325,14 @@ void animateFadeOutFadeInWorkingArea() {
     animateRects(&g_psuAppContext, BUFFER_NEW, i, 2 * psu::persist_conf::devConf.animationsDuration);
 }
 
+void animateFadeOutFadeIn(const Rect &rect) {
+    int i = 0;
+    g_animRects[i++] = { BUFFER_SOLID_COLOR, rect, rect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_OLD, rect, rect, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, rect, rect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
+    animateRects(&g_psuAppContext, BUFFER_NEW, i, 2 * psu::persist_conf::devConf.animationsDuration);
+}
+
 } // namespace gui
 } // namespace psu
 } // namespace eez

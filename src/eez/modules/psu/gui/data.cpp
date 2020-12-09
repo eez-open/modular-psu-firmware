@@ -36,6 +36,8 @@
 #include <eez/hmi.h>
 #include <eez/usb.h>
 
+#include <eez/fs_driver.h>
+
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/container.h>
 #include <eez/gui/widgets/yt_graph.h>
@@ -1021,13 +1023,15 @@ void SCPI_ERROR_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_STORAGE_INFO_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
+    return a.getUInt32() == b.getUInt32();
 }
 
 void STORAGE_INFO_value_to_text(const Value &value, char *text, int count) {
+    int diskDriveIndex = value.getUInt32() & 0xFFFF;
+
     uint64_t usedSpace;
     uint64_t freeSpace;
-    if (sd_card::getInfo(usedSpace, freeSpace, true)) { // "true" means get storage info from cache
+    if (sd_card::getInfo(diskDriveIndex, usedSpace, freeSpace, true)) { // "true" means get storage info from cache
         auto totalSpace = usedSpace + freeSpace;
 
         formatBytes(freeSpace, text, count -1);
@@ -1107,11 +1111,33 @@ void ZOOM_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_NUM_SELECTED_value(const Value &a, const Value &b) {
-    return a.getUInt32() == b.getUInt32();
+	return a.getUInt32() == b.getUInt32();
 }
 
 void NUM_SELECTED_value_to_text(const Value &value, char *text, int count) {
-    sprintf(text, "%d of %d selected", (int)value.getFirstUInt16(), (int)value.getSecondUInt16());
+	sprintf(text, "%d of %d selected", (int)value.getFirstUInt16(), (int)value.getSecondUInt16());
+}
+
+bool compare_CURRENT_DIRECTORY_TITLE_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void CURRENT_DIRECTORY_TITLE_value_to_text(const Value &value, char *text, int count) {
+	file_manager::getCurrentDirectoryTitle(text, count);
+}
+
+bool compare_MASS_STORAGE_DEVICE_LABEL_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void MASS_STORAGE_DEVICE_LABEL_value_to_text(const Value &value, char *text, int count) {
+	int massStorageDevice = value.getInt();
+	if (massStorageDevice == 0) {
+		strcpy(text, "Master (0:)");
+	} else {
+		int slotIndex = massStorageDevice - 1;
+		sprintf(text, "%s (%d:)", g_slots[slotIndex]->getLabelOrDefault(), massStorageDevice);
+	}
 }
 
 static Cursor g_editValueCursor(-1);
@@ -2996,7 +3022,7 @@ bool getSysInfoHasError() {
         // Battery
         mcu::battery::g_testResult == TEST_FAILED ||
         // SD card
-        !eez::psu::sd_card::isMounted(&err);
+        !eez::psu::sd_card::isMounted(nullptr, &err);
 }
 
 void data_sys_info_has_error(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -3065,14 +3091,18 @@ void data_battery(DataOperationEnum operation, Cursor cursor, Value &value) {
 void data_sys_info_sdcard_status(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
     	int err;
-        if (eez::psu::sd_card::isMounted(&err)) {
+        if (eez::psu::sd_card::isMounted(nullptr, &err)) {
             if (eez::psu::sd_card::isBusy()) {
                 value = 5; // busy
             } else {
                 value = 1; // present
             }
         } else if (err == SCPI_ERROR_MISSING_MASS_MEDIA) {
-            value = 2; // not present
+            if (fs_driver::getDiskDrivesNum() > 0) {
+                value = 6; // slot present
+            } else {
+                value = 2; // not present
+            }
         } else if (err == SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM) {
         	value = 3; // no FAT
 		} else {
@@ -5547,6 +5577,18 @@ void data_custom_bitmap(DataOperationEnum operation, Cursor cursor, Value &value
         if (g_customLogo.pixels) {
             value = Value(&g_customLogo, VALUE_TYPE_POINTER);
         }
+    }
+}
+
+void data_has_multiple_disk_drives(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = fs_driver::getDiskDrivesNum() > 1;
+    }
+}
+
+void data_selected_mass_storage_device(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(g_selectedMassStorageDevice, VALUE_TYPE_MASS_STORAGE_DEVICE_LABEL);
     }
 }
 

@@ -20,6 +20,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <ff_gen_drv.h>
+#endif
+
 #include <eez/index.h>
 
 #include <eez/modules/dib-dcp405/dib-dcp405.h>
@@ -717,6 +721,16 @@ void Module::startDlog(int subchannelIndex, int resourceIndex) {
 
 void Module::stopDlog(int subchannelIndex, int resourceIndex) {
 }
+
+#ifdef EEZ_PLATFORM_STM32
+void Module::executeDiskDriveOperation(ExecuteDiskDriveOperationParams *params) {
+    if (params->operation == DISK_DRIVER_OPERATION_INITIALIZE || params->operation == DISK_DRIVER_OPERATION_STATUS) {
+        params->result = STA_NOINIT;
+    } else {
+        params->result = RES_ERROR;
+    }
+}
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 

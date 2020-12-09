@@ -290,7 +290,7 @@ public:
         return PAGE_ID_DIB_SMX46_SLOT_VIEW_MICRO;
     }
 
-    struct ProfileParameters {
+    struct ProfileParameters : public Module::ProfileParameters {
         unsigned int routes;
         char columnLabels[NUM_COLUMNS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
         char rowLabels[NUM_ROWS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
@@ -314,7 +314,37 @@ public:
         }
     }
 
+    void resetProfileToDefaults(uint8_t *buffer) override {
+        Module::resetProfileToDefaults(buffer);
+
+        auto parameters = (ProfileParameters *)buffer;
+
+        parameters->routes = 0;
+
+        for (int i = 0; i < NUM_COLUMNS; i++) {
+            parameters->columnLabels[i][0] = 'X';
+            parameters->columnLabels[i][1] = '1' + i;
+            parameters->columnLabels[i][2] = 0;
+        }
+
+        for (int i = 0; i < NUM_ROWS; i++) {
+            parameters->rowLabels[i][0] = 'Y';
+            parameters->rowLabels[i][1] = '1' + i;
+            parameters->rowLabels[i][2] = 0;
+        }
+
+        parameters->dac1 = 0.0f;
+        parameters->dac2 = 0.0f;
+
+        strcpy(parameters->aoChannelLabels[0], "");
+        strcpy(parameters->aoChannelLabels[1], "");
+
+        parameters->relayOn = false;
+    }
+
     void getProfileParameters(uint8_t *buffer) override {
+        Module::getProfileParameters(buffer);
+
         assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
 
         auto parameters = (ProfileParameters *)buffer;
@@ -329,6 +359,8 @@ public:
     }
     
     void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) override {
+        Module::setProfileParameters(buffer, mismatch, recallOptions);
+
         auto parameters = (ProfileParameters *)buffer;
 
         routes = parameters->routes;
@@ -341,6 +373,10 @@ public:
     }
     
     bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) override {
+        if (!Module::writeProfileProperties(ctx, buffer)) {
+            return false;
+        }
+
         auto parameters = (const ProfileParameters *)buffer;
         
         WRITE_PROPERTY("routes", parameters->routes);
@@ -369,6 +405,10 @@ public:
     }
     
     bool readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) override {
+        if (Module::readProfileProperties(ctx, buffer)) {
+            return true;
+        }
+
         auto parameters = (ProfileParameters *)buffer;
 
         READ_PROPERTY("routes", parameters->routes);

@@ -29,6 +29,8 @@
 #include <eez/hmi.h>
 #include <eez/usb.h>
 
+#include <eez/fs_driver.h>
+
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
@@ -1269,6 +1271,26 @@ void action_edit_ntp_refresh_frequency() {
 
     SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
     NumericKeypad::start(0, Value(page->ntpRefreshFrequency, VALUE_TYPE_UINT32), options, onSetNtpRefreshFrequency, 0, 0);
+}
+
+void onSelectMassStorageDevice(uint16_t value) {
+    popPage();
+    g_selectedMassStorageDevice = value;
+}
+
+void massStorageDeviceEnumDefinition(DataOperationEnum operation, Cursor cursor, Value &value) {
+	int massStorageDevice = fs_driver::getDiskDriveIndex(cursor);
+	if (massStorageDevice >= 0) {
+        if (operation == DATA_OPERATION_GET_VALUE) {
+            value = (uint8_t)massStorageDevice;
+        } else if (operation == DATA_OPERATION_GET_LABEL) {
+            value = Value(massStorageDevice, VALUE_TYPE_MASS_STORAGE_DEVICE_LABEL);
+        }
+    }
+}
+
+void action_select_mass_storage_device() {
+    pushSelectFromEnumPage(massStorageDeviceEnumDefinition, -1, nullptr, onSelectMassStorageDevice, false, false);
 }
 
 } // namespace gui

@@ -24,6 +24,7 @@
 #include <eez/system.h>
 #include <eez/mp.h>
 #include <eez/memory.h>
+#include <eez/fs_driver.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/container.h>
@@ -64,13 +65,18 @@ static const size_t MAX_FILE_DESCRIPTION_LENGTH = 80;
 static State g_state;
 static uint32_t g_loadingStartTickCount;
 
+static int g_currentDiskDrive;
 static char g_currentDirectory[MAX_PATH_LENGTH + 1];
+
+static uint32_t g_currentDiskDriveTitleVersion;
+
+static bool g_showDiskDrives;
 
 struct FileItem {
     FileType type;
     const char *name;
     uint32_t size;
-    uint32_t dateTime;
+    uint32_t dateTime; // if type is FILE_TYPE_DISK_DRIVE this field containes disk drive index
     const char *description;
 };
 
@@ -96,6 +102,21 @@ static void (*g_fileBrowserOnFileSelected)(const char *filePath);
 static ListViewOption g_rootDirectoryListViewOption = LIST_VIEW_LARGE_ICONS;
 static ListViewOption g_scriptsDirectoryListViewOption = LIST_VIEW_SCRIPTS;
 
+bool makeAbsolutePath(const char *relativePath, char *dest) {
+    if (2 + strlen(g_currentDirectory) + (relativePath ? 1 + strlen(relativePath) : 0) > MAX_PATH_LENGTH) {
+        return false;
+    }
+
+    dest[0] = '0' + g_currentDiskDrive;
+	dest[1] = ':';
+    strcpy(dest + 2, g_currentDirectory);
+    if (relativePath) {
+    	strcat(dest, "/");
+    	strcat(dest, relativePath);
+    }
+    return true;
+}
+
 void catalogCallback(void *param, const char *name, FileType type, size_t size, bool isHiddenOrSystemFile) {
     if (isHiddenOrSystemFile || name[0] == '.' || (g_fileBrowserMode && type != FILE_TYPE_DIRECTORY && type != g_fileBrowserFileType)) {
         return;
@@ -117,21 +138,20 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size, 
 
         if (getListViewOption() == LIST_VIEW_SCRIPTS) {
             char filePath[MAX_PATH_LENGTH + 1];
-            strcpy(filePath, g_currentDirectory);
-            strcat(filePath, "/");
-            strcat(filePath, name);
-            File file;
-            if (file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-                psu::sd_card::BufferedFileRead bufferedFile(file);
+            if (makeAbsolutePath(name, filePath)) {
+                File file;
+                if (file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+                    psu::sd_card::BufferedFileRead bufferedFile(file);
 
-                psu::sd_card::matchZeroOrMoreSpaces(bufferedFile);
-                if (psu::sd_card::match(bufferedFile, '#')) {
                     psu::sd_card::matchZeroOrMoreSpaces(bufferedFile);
-                    psu::sd_card::matchUntil(bufferedFile, '\n', description, MAX_FILE_DESCRIPTION_LENGTH);
-                    description[MAX_FILE_DESCRIPTION_LENGTH] = 0;
-                }
+                    if (psu::sd_card::match(bufferedFile, '#')) {
+                        psu::sd_card::matchZeroOrMoreSpaces(bufferedFile);
+                        psu::sd_card::matchUntil(bufferedFile, '\n', description, MAX_FILE_DESCRIPTION_LENGTH);
+                        description[MAX_FILE_DESCRIPTION_LENGTH] = 0;
+                    }
 
-                file.close();
+                    file.close();
+                }
             }
         }
 
@@ -302,6 +322,8 @@ void loadDirectory() {
     g_filesStartPosition = 0;
     g_loadingStartTickCount = millis();
 
+    g_currentDiskDriveTitleVersion++;
+
     if (!isLowPriorityThread()) {
         using namespace scpi;
         sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_LOAD_DIRECTORY);
@@ -320,29 +342,77 @@ void doLoadDirectory() {
 
     int numFiles;
     int err;
-    if (psu::sd_card::catalog(g_currentDirectory, 0, catalogCallback, &numFiles, &err)) {
-        sort();
-        setFilesStartPosition(g_savedFilesStartPosition);
+
+    if (g_showDiskDrives) {
+        int diskDrivesNum = fs_driver::getDiskDrivesNum();
+
+        for (int iterationIndex = 0; iterationIndex < diskDrivesNum; iterationIndex++) {
+			int diskDriveIndex = fs_driver::getDiskDriveIndex(iterationIndex);
+			Value value = Value(diskDriveIndex, VALUE_TYPE_MASS_STORAGE_DEVICE_LABEL);
+
+            char name[MAX_PATH_LENGTH + 1];
+            value.toText(name, sizeof(name));
+
+            size_t nameLen = 4 * ((strlen(name) + 1 + 3) / 4);
+
+            if (g_frontBufferPosition + sizeof(FileItem) > g_backBufferPosition - nameLen) {
+                break;
+            }
+
+            auto fileItem = (FileItem *)g_frontBufferPosition;
+            g_frontBufferPosition += sizeof(FileItem);
+
+            fileItem->type = FILE_TYPE_DISK_DRIVE;
+
+            g_backBufferPosition -= nameLen;
+            strcpy((char *)g_backBufferPosition, name);
+            fileItem->name = (const char *)g_backBufferPosition;
+
+            fileItem->description = nullptr;
+            fileItem->size = 0;
+            fileItem->dateTime = diskDriveIndex;
+
+            g_filesCount++;
+        }
+
+        setFilesStartPosition(0);
         g_state = STATE_READY;
     } else {
-    	g_state = STATE_NOT_PRESENT;
+        static char g_loadDirectoryPath[MAX_PATH_LENGTH + 1];
+        if (makeAbsolutePath(nullptr, g_loadDirectoryPath) && psu::sd_card::catalog(g_loadDirectoryPath, 0, catalogCallback, &numFiles, &err)) {
+            sort();
+            setFilesStartPosition(g_savedFilesStartPosition);
+            g_state = STATE_READY;
+        } else {
+            g_state = STATE_NOT_PRESENT;
+        }
     }
-
 }
 
 void onSdCardMountedChange() {
-	if (psu::sd_card::isMounted(nullptr)) {
-		g_state = STATE_STARTING;
-	} else {
-		g_state = STATE_NOT_PRESENT;
-	}
-}
-
-bool isListViewOptionAvailable() {
-    return isRootDirectory() || isScriptsDirectory();
+    if (g_showDiskDrives) {
+        g_state = STATE_STARTING;
+    } else {
+        if (g_currentDiskDrive == 0) {
+            if (psu::sd_card::isMounted(nullptr, nullptr)) {
+                g_state = STATE_STARTING;
+            } else {
+                g_state = STATE_NOT_PRESENT;
+            }
+        } else {
+            if (fs_driver::isDriverLinked(g_currentDiskDrive - 1)) {
+                g_state = STATE_STARTING;
+            } else {
+                g_state = STATE_NOT_PRESENT;
+            }
+        }
+    }
 }
 
 ListViewOption getListViewOption() {
+    if (g_showDiskDrives) {
+        return LIST_VIEW_LARGE_ICONS;
+    }
     if (g_fileBrowserMode) {
         return LIST_VIEW_DETAILS;
     }
@@ -407,8 +477,21 @@ void setSortFilesOption(SortFilesOption sortFilesOption) {
     }
 }
 
-const char *getCurrentDirectory() {
-    return *g_currentDirectory == 0 ? "/<Root directory>" : g_currentDirectory;
+void getCurrentDirectoryTitle(char *text, int count) {
+    if (g_showDiskDrives) {
+        strncpy(text, "Mass Storage Devices", count - 1);
+    } else {
+        const char *str = *g_currentDirectory == 0 ? "/<Root directory>" : g_currentDirectory;
+
+    	if (psu::sd_card::isMounted(nullptr, nullptr) && fs_driver::getDiskDrivesNum() == 1 && g_currentDiskDrive == 0) {
+            strncpy(text, str, count - 1);
+        } else {
+        	text[0] = '0' + g_currentDiskDrive;
+        	text[1] = ':';
+    		strncpy(text + 2, str, count - 3);
+        }
+    }
+	text[count - 1] = 0;
 }
 
 static FileItem *getFileItem(uint32_t fileIndex) {
@@ -439,6 +522,18 @@ State getState() {
     return g_state;
 }
 
+static bool hasParent() {
+    if (g_showDiskDrives) {
+        return false;
+    }
+
+    if (!isRootDirectory()) {
+        return true;
+    }
+
+    return fs_driver::getDiskDrivesNum() > 1 || !psu::sd_card::isMounted(nullptr, nullptr) || g_currentDiskDrive != 0;
+}
+
 bool isRootDirectory() {
     return g_currentDirectory[0] == 0 || strcmp(g_currentDirectory, "/") == 0;
 }
@@ -447,22 +542,33 @@ bool isScriptsDirectory() {
     return strcmp(g_currentDirectory, SCRIPTS_DIR) == 0;
 }
 
-void goToParentDirectory() {
-    if (g_state != STATE_READY) {
+static void animateLoadDirectory() {
+    static const Rect g_rectManager = { 0, 0, 480, 272 };
+    static const Rect g_rectBrowser = { 10, 17, 460, 238 };
+
+    animateFadeOutFadeIn(g_fileBrowserMode ? g_rectBrowser : g_rectManager);
+}
+
+static void goToParent() {
+    if (g_state != STATE_READY && g_state != STATE_NOT_PRESENT) {
         return;
     }
 
-    char *p = g_currentDirectory + strlen(g_currentDirectory);
+    if (isRootDirectory()) {
+        g_showDiskDrives = true;
+    } else {
+        char *p = g_currentDirectory + strlen(g_currentDirectory);
 
-    while (p != g_currentDirectory && *p != '/') {
-        p--;
+        while (p != g_currentDirectory && *p != '/') {
+            p--;
+        }
+
+        *p = 0;
     }
-
-    *p = 0;
 
     g_filesStartPosition = 0;
     loadDirectory();
-    animateFadeOutFadeInWorkingArea();
+    animateLoadDirectory();
 }
 
 uint32_t getFilesCount() {
@@ -536,11 +642,6 @@ uint32_t getFilesPageSize() {
     return FILE_MANAGER_FILES_PAGE_SIZE_IN_DETAILS_VIEW;
 }
 
-bool isDirectory(uint32_t fileIndex) {
-    auto fileItem = getFileItem(fileIndex);
-    return fileItem ? fileItem->type == FILE_TYPE_DIRECTORY : false;
-}
-
 FileType getFileType(uint32_t fileIndex) {
     auto fileItem = getFileItem(fileIndex);
     return fileItem ? fileItem->type : FILE_TYPE_NONE;
@@ -571,6 +672,7 @@ const char *getFileIcon(uint32_t fileIndex) {
 
     return getFileTypeLargeIcon(fileType);
 }
+
 const char *getFileName(uint32_t fileIndex) {
     auto fileItem = getFileItem(fileIndex);
     return fileItem ? fileItem->name : "";
@@ -606,26 +708,39 @@ void selectFile(uint32_t fileIndex) {
 
     if (fileIndex < g_filesCount) {
         auto fileItem = getFileItem(fileIndex);
-        if (fileItem && fileItem->type == FILE_TYPE_DIRECTORY) {
-            if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) <= MAX_PATH_LENGTH) {
+        if (fileItem && fileItem->type == FILE_TYPE_DISK_DRIVE) {
+            g_showDiskDrives = false;
+            g_currentDiskDrive = fileItem->dateTime;
+            *g_currentDirectory = 0;
+            g_filesStartPosition = 0;
+            loadDirectory();
+            animateLoadDirectory();
+        } else if (fileItem && fileItem->type == FILE_TYPE_DIRECTORY) {
+            if (2 + strlen(g_currentDirectory) + 1 + strlen(fileItem->name) <= MAX_PATH_LENGTH) {
                 strcat(g_currentDirectory, "/");
                 strcat(g_currentDirectory, fileItem->name);
                 g_filesStartPosition = 0;
                 loadDirectory();
-                animateFadeOutFadeInWorkingArea();
+                animateLoadDirectory();
             }
         } else {
             g_selectedFileIndex = fileIndex;
             if (!g_fileBrowserMode) {
                 if (isScriptsDirectory() && (getListViewOption() == LIST_VIEW_SCRIPTS || getListViewOption() == LIST_VIEW_LARGE_ICONS)) {
                     if (mp::isIdle()) {
-                        char filePath[MAX_PATH_LENGTH + 1];
-                        strcpy(filePath, g_currentDirectory);
-                        strcat(filePath, "/");
-                        strcat(filePath, fileItem->name);
-                        strcat(filePath, ".py");
-
-                        mp::startScript(filePath);
+                        if (strlen(fileItem->name) + 3 <= MAX_PATH_LENGTH) {
+                            char fileName[MAX_PATH_LENGTH + 1];
+                            strcpy(fileName, fileItem->name);
+                            strcat(fileName, ".py");
+                            char filePath[MAX_PATH_LENGTH + 1];
+                            if (makeAbsolutePath(fileName, filePath)) {
+                                mp::startScript(filePath);
+                            } else {
+                                errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+                            }
+                        } else {
+                            errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+                        }
                     } else {
                         infoMessage("Script is already running!");
                     }
@@ -672,15 +787,11 @@ void openFile() {
         return;
     }
 
-    if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+    char filePath[MAX_PATH_LENGTH + 1];
+    if (!makeAbsolutePath(fileItem->name, filePath)) {
         errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
-
-    char filePath[MAX_PATH_LENGTH + 1];
-    strcpy(filePath, g_currentDirectory);
-    strcat(filePath, "/");
-    strcat(filePath, fileItem->name);
 
     if (fileItem->type == FILE_TYPE_DLOG) {
         psu::dlog_view::g_showLatest = false;
@@ -707,35 +818,22 @@ void openFile() {
 void openImageFile() {
     auto fileItem = getFileItem(g_selectedFileIndex);
     if (fileItem) {
-        if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
-            g_imageLoadFailed = true;
-            return;
-        }
-
         char filePath[MAX_PATH_LENGTH + 1];
-        strcpy(filePath, g_currentDirectory);
-        strcat(filePath, "/");
-        strcat(filePath, fileItem->name);
-
-        if (!imageDecode(filePath, &g_openedImage)) {
-            g_imageLoadFailed = true;
-        }            
+        if (makeAbsolutePath(fileItem->name, filePath)) {
+            if (!imageDecode(filePath, &g_openedImage)) {
+                g_imageLoadFailed = true;
+            }
+        }
     }
 }
 
 void openBitFile() {
     auto fileItem = getFileItem(g_selectedFileIndex);
     if (fileItem) {
-        if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
-            return;
-        }
-
         char filePath[MAX_PATH_LENGTH + 1];
-        strcpy(filePath, g_currentDirectory);
-        strcat(filePath, "/");
-        strcat(filePath, fileItem->name);
-
-        fpga::prog(filePath);
+        if (makeAbsolutePath(fileItem->name, filePath)) {
+            fpga::prog(filePath);
+        }
     }
 }
 
@@ -786,15 +884,11 @@ void uploadFile() {
         return;
     }
 
-    if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+    char filePath[MAX_PATH_LENGTH + 1];
+    if (!makeAbsolutePath(fileItem->name, filePath)) {
         errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
-
-    char filePath[MAX_PATH_LENGTH + 1];
-    strcpy(filePath, g_currentDirectory);
-    strcat(filePath, "/");
-    strcat(filePath, fileItem->name);
 
     int err;
     if (!psu::scpi::mmemUpload(filePath, context, &err)) {
@@ -827,27 +921,31 @@ void doRenameFile() {
     }
 
     // source file path
-    if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+    char srcFilePath[MAX_PATH_LENGTH + 1];
+    if (!makeAbsolutePath(fileItem->name, srcFilePath)) {
         errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
-    char srcFilePath[MAX_PATH_LENGTH + 1];
-    strcpy(srcFilePath, g_currentDirectory);
-    strcat(srcFilePath, "/");
-    strcat(srcFilePath, fileItem->name);
 
     // destination file path
     const char *extension = strrchr(fileItem->name, '.');
-    if (strlen(g_currentDirectory) + 1 + strlen(g_fileNameWithoutExtension) + (extension ? strlen(extension) : 0) > MAX_PATH_LENGTH) {
+    
+    char dstFileName[MAX_PATH_LENGTH + 1];
+    
+    if (strlen(g_fileNameWithoutExtension) + (extension ? strlen(extension) : 0) > MAX_PATH_LENGTH) {
         errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
-    char dstFilePath[MAX_PATH_LENGTH + 1];
-    strcpy(dstFilePath, g_currentDirectory);
-    strcat(dstFilePath, "/");
-    strcat(dstFilePath, g_fileNameWithoutExtension);
+    
+    strcpy(dstFileName, g_fileNameWithoutExtension);
     if (extension) {
-        strcat(dstFilePath, extension);
+        strcat(dstFileName, extension);
+    }
+    
+    char dstFilePath[MAX_PATH_LENGTH + 1];
+    if (!makeAbsolutePath(dstFileName, dstFilePath)) {
+        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+        return;
     }
 
     int err;
@@ -895,15 +993,11 @@ void deleteFile() {
         return;
     }
 
-    if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+    char filePath[MAX_PATH_LENGTH + 1];
+    if (!makeAbsolutePath(fileItem->name, filePath)) {
         errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
-
-    char filePath[MAX_PATH_LENGTH + 1];
-    strcpy(filePath, g_currentDirectory);
-    strcat(filePath, "/");
-    strcat(filePath, fileItem->name);
 
     int err;
     if (!psu::sd_card::deleteFile(filePath, &err)) {
@@ -945,15 +1039,11 @@ void FileBrowserPage::set() {
         return;
     }
 
-    if (strlen(g_currentDirectory) + 1 + strlen(fileItem->name) > MAX_PATH_LENGTH) {
+    char filePath[MAX_PATH_LENGTH + 1];
+    if (!makeAbsolutePath(fileItem->name, filePath)) {
         errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
-
-    char filePath[MAX_PATH_LENGTH + 1];
-    strcpy(filePath, g_currentDirectory);
-    strcat(filePath, "/");
-    strcat(filePath, fileItem->name);
 
     g_fileBrowserOnFileSelected(filePath);
 }
@@ -965,6 +1055,8 @@ void browseForFile(const char *title, const char *directory, FileType fileType, 
     g_fileBrowserFileType = fileType;
     g_fileBrowserOnFileSelected = onFileSelected;
 
+	g_showDiskDrives = false;
+	g_currentDiskDrive = 0;
     strcpy(g_currentDirectory, directory);
     loadDirectory();
 
@@ -983,16 +1075,20 @@ void onNewFileOk(char *fileNameWithoutExtension) {
         extension = "";
     }
 
-    if (strlen(g_currentDirectory) + 1 + strlen(fileNameWithoutExtension) + strlen(extension) > MAX_PATH_LENGTH) {
+    char fileName[MAX_PATH_LENGTH + 1];
+    if (strlen(fileNameWithoutExtension) + strlen(extension) > MAX_PATH_LENGTH) {
         errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
 
+    strcpy(fileName, fileNameWithoutExtension);
+    strcat(fileName, extension);
+
     char filePath[MAX_PATH_LENGTH + 1];
-    strcpy(filePath, g_currentDirectory);
-    strcat(filePath, "/");
-    strcat(filePath, fileNameWithoutExtension);
-    strcat(filePath, extension);
+    if (!makeAbsolutePath(fileName, filePath)) {
+        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+        return;
+    }
 
     g_fileBrowserOnFileSelected(filePath);
 }
@@ -1007,7 +1103,7 @@ void newFile() {
 bool isStorageAlarm() {
     uint64_t usedSpace;
     uint64_t freeSpace;
-    if (psu::sd_card::getInfo(usedSpace, freeSpace, true)) { // "true" means get storage info from cache
+    if (psu::sd_card::getInfo(0, usedSpace, freeSpace, true)) { // "true" means get storage info from cache
         auto totalSpace = usedSpace + freeSpace;
         auto percent = (int)floor(100.0 * freeSpace / totalSpace);
         if (percent >= 10) {
@@ -1018,9 +1114,9 @@ bool isStorageAlarm() {
 }
 
 void getStorageInfo(Value& value) {
-    if (!g_fileBrowserMode && g_state == STATE_READY) {
+    if (!g_fileBrowserMode && g_state == STATE_READY && !g_showDiskDrives) {
         if (isStorageAlarm() || isRootDirectory()) {
-            value = Value(psu::sd_card::getInfoVersion(), VALUE_TYPE_STORAGE_INFO);
+            value = Value(((uint32_t)psu::sd_card::getInfoVersion(g_currentDiskDrive) << 16) | g_currentDiskDrive, VALUE_TYPE_STORAGE_INFO);
         } else {
             value = Value(g_filesCount, VALUE_TYPE_FOLDER_INFO);
         }
@@ -1033,7 +1129,7 @@ using namespace file_manager;
 
 void data_file_manager_current_directory(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getCurrentDirectory();
+        value = Value(g_currentDiskDriveTitleVersion, VALUE_TYPE_CURRENT_DIRECTORY_TITLE);
     }
 }
 
@@ -1043,9 +1139,9 @@ void data_file_manager_state(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
-void data_file_manager_is_root_directory(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_has_parent(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = isRootDirectory() ? 1 : 0;
+        value = hasParent() ? 1 : 0;
     }
 }
 
@@ -1068,12 +1164,6 @@ void data_file_manager_files(DataOperationEnum operation, Cursor cursor, Value &
         value = Value(getFilesPositionIncrement(), VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
         value = Value(getFilesPageSize(), VALUE_TYPE_UINT32);
-    }
-}
-
-void data_file_manager_is_directory(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = isDirectory(cursor) ? 1 : 0;
     }
 }
 
@@ -1201,7 +1291,13 @@ void data_file_manager_storage_info(DataOperationEnum operation, Cursor cursor, 
 
 void data_file_manager_is_list_view_option_available(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = isListViewOptionAvailable();
+        value = !g_showDiskDrives && (isRootDirectory() || isScriptsDirectory());
+    }
+}
+
+void data_file_manager_is_sort_files_option_available(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = !g_showDiskDrives;
     }
 }
 
@@ -1248,8 +1344,8 @@ void data_file_manager_image_open_progress(DataOperationEnum operation, Cursor c
     }
 }
 
-void action_file_manager_go_to_parent_directory() {
-    goToParentDirectory();
+void action_file_manager_go_to_parent() {
+    goToParent();
 }
 
 void action_file_manager_select_file() {
@@ -1300,7 +1396,20 @@ void onSdCardFileChangeHook(const char *filePath1, const char *filePath2) {
 
 	char parentDirPath1[MAX_PATH_LENGTH + 1];
     getParentDir(filePath1, parentDirPath1);
-    if (strcmp(parentDirPath1, g_currentDirectory) == 0) {
+
+    int diskDrive = 0;
+	const char *dirPath = parentDirPath1;
+    
+    if (parentDirPath1[0] >= '0' && parentDirPath1[0] <= '9' && parentDirPath1[1] == ':') {
+        diskDrive = parentDirPath1[0] - '0';
+		dirPath += 2;
+	}
+
+    if (diskDrive != g_currentDiskDrive) {
+        return;
+    }
+
+    if (strcmp(dirPath, g_currentDirectory) == 0) {
         loadDirectory();
         return;
     }

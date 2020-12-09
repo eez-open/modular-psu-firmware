@@ -49,3 +49,4 @@ bool isOtgHostModeDetected();
 extern "C" int g_usbDeviceClass;
 extern "C" int g_usbMode;
 extern "C" int g_otgMode;
+extern "C" int g_selectedMassStorageDevice;

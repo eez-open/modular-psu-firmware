@@ -7,9 +7,5 @@ src/third_party/stm32_cubeide/Debug
 src/third_party/stm32_cubeide/Debug (R3B3)
 src/third_party/stm32_cubeide/Debug (FPGA)
 src/third_party/stm32_cubeide/Release
-src/third_party/stm32_truestudio/Debug
-src/third_party/stm32_truestudio/Debug (R3B3)
-src/third_party/stm32_truestudio/Debug (FPGA)
 *.eez-project-ui-state
-src/third_party/stm32_truestudio/.settings/language.settings.xml
 src/third_party/stm32_cubeide/.settings/language.settings.xml

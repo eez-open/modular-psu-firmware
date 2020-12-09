@@ -27,6 +27,7 @@
 
 #include <eez/firmware.h>
 #include <eez/usb.h>
+#include <eez/fs_driver.h>
 
 #include <eez/modules/psu/psu.h>
 
@@ -84,7 +85,7 @@ static File g_downloadFile;
 static uint32_t g_downloadedFileOffset;
 static char g_downloadFilePath[MAX_PATH_LENGTH + 1];
 
-static uint32_t g_getInfoVersion;
+static uint16_t g_getInfoVersion[1 + NUM_SLOTS];
 
 static uint32_t g_debounceTimeout;
 
@@ -144,18 +145,38 @@ void reinitialize() {
 #endif
 }
 
-bool isMounted(int *err) {
-	if (g_state == STATE_MOUNTED) {
-        if (err != nullptr) {
-            *err = SCPI_RES_OK;
-        }
-	    return true;
-	}
-
-    if (err != nullptr) {
-        *err = g_lastError;
+int getDiskDriveIndexFromPath(const char *filePath) {
+    if (filePath[0] >= '0' && filePath[0] <= '9' && filePath[1] == ':') {
+        return filePath[0] - '0';
     }
-	return false;
+    return 0;
+}
+
+bool isMounted(const char *filePath, int *err) {
+    int diskDriveIndex = filePath ? getDiskDriveIndexFromPath(filePath) : 0;
+    if (diskDriveIndex == 0) {
+        if (g_state == STATE_MOUNTED) {
+            if (err != nullptr) {
+                *err = SCPI_RES_OK;
+            }
+            return true;
+        }
+
+        if (err != nullptr) {
+            *err = g_lastError;
+        }
+        return false;
+    } else {
+        if (fs_driver::isDriverLinked(diskDriveIndex - 1)) {
+            return true;
+        }
+
+        if (err != nullptr) {
+            *err = SCPI_ERROR_MISSING_MASS_MEDIA;
+        }
+
+        return false;
+    }
 }
 
 bool isBusy() {
@@ -180,7 +201,7 @@ bool makeParentDir(const char *filePath, int *err) {
 }
 
 bool exists(const char *dirPath, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(dirPath, err)) {
         return false;
     }
 
@@ -198,7 +219,7 @@ bool catalog(const char *dirPath, void *param,
              int *numFiles, int *err) {
     *numFiles = 0;
 
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(dirPath, err)) {
         return false;
     }
 
@@ -239,7 +260,7 @@ bool catalog(const char *dirPath, void *param,
 }
 
 bool catalogLength(const char *dirPath, size_t *length, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(dirPath, err)) {
         return false;
     }
 
@@ -270,7 +291,7 @@ bool catalogLength(const char *dirPath, size_t *length, int *err) {
 }
 
 bool upload(const char *filePath, void *param, void (*callback)(void *param, const void *buffer, int size), int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(filePath, err)) {
         return false;
     }
 
@@ -339,7 +360,7 @@ bool upload(const char *filePath, void *param, void (*callback)(void *param, con
 }
 
 bool download(const char *filePath, bool truncate, const void *buffer, size_t size, int *perr) {
-    if (!sd_card::isMounted(perr)) {
+    if (!sd_card::isMounted(filePath, perr)) {
         return false;
     }
 
@@ -400,7 +421,11 @@ void downloadFinished() {
 }
 
 bool moveFile(const char *sourcePath, const char *destinationPath, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (getDiskDriveIndexFromPath(sourcePath) != getDiskDriveIndexFromPath(destinationPath)) {
+        return false;
+    }
+
+    if (!sd_card::isMounted(sourcePath, err)) {
         return false;
     }
 
@@ -422,7 +447,7 @@ bool moveFile(const char *sourcePath, const char *destinationPath, int *err) {
 }
 
 bool copyFile(const char *sourcePath, const char *destinationPath, bool showProgress, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(sourcePath, err) || !sd_card::isMounted(destinationPath, err)) {
         return false;
     }
 
@@ -499,7 +524,7 @@ bool copyFile(const char *sourcePath, const char *destinationPath, bool showProg
 }
 
 bool deleteFile(const char *filePath, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(filePath, err)) {
         return false;
     }
 
@@ -521,7 +546,7 @@ bool deleteFile(const char *filePath, int *err) {
 }
 
 bool makeDir(const char *dirPath, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(dirPath, err)) {
         return false;
     }
 
@@ -537,7 +562,7 @@ bool makeDir(const char *dirPath, int *err) {
 }
 
 bool removeDir(const char *dirPath, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(dirPath, err)) {
         return false;
     }
 
@@ -575,7 +600,7 @@ void getDateTime(FileInfo &fileInfo, uint8_t *resultYear, uint8_t *resultMonth, 
 }
 
 bool getDate(const char *filePath, uint8_t &year, uint8_t &month, uint8_t &day, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(filePath, err)) {
         return false;
     }
 
@@ -592,7 +617,7 @@ bool getDate(const char *filePath, uint8_t &year, uint8_t &month, uint8_t &day, 
 }
 
 bool getTime(const char *filePath, uint8_t &hour, uint8_t &minute, uint8_t &second, int *err) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(filePath, err)) {
         return false;
     }
 
@@ -608,22 +633,22 @@ bool getTime(const char *filePath, uint8_t &hour, uint8_t &minute, uint8_t &seco
     return true;
 }
 
-int getInfoVersion() {
-	return g_getInfoVersion;
+uint16_t getInfoVersion(int diskDriveIndex) {
+	return g_getInfoVersion[diskDriveIndex];
 }
 
-bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace, bool fromCache) {
-    static bool g_result;
-    static uint64_t g_usedSpace;
-    static uint64_t g_freeSpace;
+bool getInfo(int diskDriveIndex, uint64_t &usedSpace, uint64_t &freeSpace, bool fromCache) {
+    static bool g_result[1 + NUM_SLOTS];
+    static uint64_t g_usedSpace[1 + NUM_SLOTS];
+    static uint64_t g_freeSpace[1 + NUM_SLOTS];
 
-    if (!g_result || !fromCache) {
-        g_result = SD.getInfo(g_usedSpace, g_freeSpace);
-        ++g_getInfoVersion;
+    if (!g_result[diskDriveIndex] || !fromCache) {
+        g_result[diskDriveIndex] = SD.getInfo(diskDriveIndex, g_usedSpace[diskDriveIndex], g_freeSpace[diskDriveIndex]);
+        ++g_getInfoVersion[diskDriveIndex];
     }
 
-    usedSpace = g_usedSpace;
-    freeSpace = g_freeSpace;
+    usedSpace = g_usedSpace[diskDriveIndex];
+    freeSpace = g_freeSpace[diskDriveIndex];
     return g_result;
 }
 
@@ -972,7 +997,7 @@ static void setState(State state) {
 
             uint64_t usedSpace;
             uint64_t freeSpace;
-            getInfo(usedSpace, freeSpace, false); // "false" means **do not** get storage info from cache
+            getInfo(0, usedSpace, freeSpace, false); // "false" means **do not** get storage info from cache
 
             if (g_isBooted) {
                 profile::onAfterSdCardMounted();

@@ -36,6 +36,7 @@ void animateSlideLeft();
 void animateSlideRight();
 void animateFadeOutFadeIn();
 void animateFadeOutFadeInWorkingArea();
+void animateFadeOutFadeIn(const Rect &rect);
 
 } // namespace gui
 } // namespace psu

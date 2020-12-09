@@ -34,6 +34,7 @@ static const char *fileTypeExtension[] = {
     ".jpg",
     ".py",
     ".hex",
+    nullptr,
     nullptr
 };
 
@@ -47,6 +48,7 @@ static const char *scpiFileTypeNames[] = {
     "MP",
     "HEX",
     "BIN",
+    nullptr
 };
 
 static const char *smallIcons[] = {
@@ -59,6 +61,7 @@ static const char *smallIcons[] = {
     "\x7d",
     "\x6a",
     "\x6a",
+    "\x89",
 };
 
 static const char *largeIcons[] = {
@@ -71,6 +74,7 @@ static const char *largeIcons[] = {
     "\x85",
     "\x86",
     "\x86",
+    "\x8E",
 };
 
 static const char *rootDirectoryIcons[] = {

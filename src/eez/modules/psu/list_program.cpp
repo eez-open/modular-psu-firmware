@@ -322,7 +322,7 @@ bool loadList(
     bool showProgress,
     int *err
 ) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(filePath, err)) {
         return false;
     }
 
@@ -453,7 +453,7 @@ bool saveList(
     bool showProgress,
     int *err
 ) {
-    if (!sd_card::isMounted(err)) {
+    if (!sd_card::isMounted(filePath, err)) {
         return false;
     }
 

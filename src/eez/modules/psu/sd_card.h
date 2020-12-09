@@ -46,7 +46,9 @@ void onSdDetectInterruptHandler();
 
 void reinitialize();
 
-bool isMounted(int *err);
+int getDiskDriveIndexFromPath(const char *filePath);
+
+bool isMounted(const char *filePath, int *err);
 bool isBusy();
 
 bool makeParentDir(const char *filePath, int *err);
@@ -65,8 +67,8 @@ bool removeDir(const char *dirPath, int *err);
 bool getDate(const char *filePath, uint8_t &year, uint8_t &month, uint8_t &day, int *err);
 bool getTime(const char *filePath, uint8_t &hour, uint8_t &minute, uint8_t &second, int *err);
 
-int getInfoVersion();
-bool getInfo(uint64_t &usedSpace, uint64_t &freeSpace, bool fromCache);
+uint16_t getInfoVersion(int diskDriveIndex);
+bool getInfo(int diskDriveIndex, uint64_t &usedSpace, uint64_t &freeSpace, bool fromCache);
 
 ////////////////////////////////////////////////////////////////////////////////
 

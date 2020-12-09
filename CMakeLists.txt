@@ -97,6 +97,7 @@ set(src_eez
     src/eez/firmware.cpp
     src/eez/debug.cpp
     src/eez/file_type.cpp
+    src/eez/fs_driver.cpp
     src/eez/hmi.cpp
     src/eez/index.cpp
     src/eez/keyboard.cpp
@@ -117,6 +118,7 @@ set(header_eez
     src/eez/firmware.h
     src/eez/debug.h
     src/eez/file_type.h
+    src/eez/fs_driver.h
     src/eez/hmi.h
     src/eez/index.h
     src/eez/keyboard.h
