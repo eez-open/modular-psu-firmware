@@ -63,6 +63,9 @@ int g_mxUsbDeviceOperationResult;
 
 extern USBD_DescriptorsTypeDef FS_Desc_MSC;
 extern int g_usbDeviceClass;
+extern int g_selectedMassStorageDevice;
+
+extern USBD_StorageTypeDef g_fsDriver_USBD_Storage_Interface;
 
 void MX_USB_DEVICE_DeInit(void) {
   g_mxUsbDeviceOperationUsbResult = USBD_Stop(&hUsbDeviceFS);
@@ -125,7 +128,8 @@ void MX_USB_DEVICE_Init(void)
       return;
     }
 
-    g_mxUsbDeviceOperationUsbResult = USBD_MSC_RegisterStorage(&hUsbDeviceFS, &USBD_Storage_Interface_fops_FS);
+    g_mxUsbDeviceOperationUsbResult = USBD_MSC_RegisterStorage(&hUsbDeviceFS,
+      g_selectedMassStorageDevice == 0 ? &USBD_Storage_Interface_fops_FS : &g_fsDriver_USBD_Storage_Interface);
     if (g_mxUsbDeviceOperationUsbResult != USBD_OK) {
       g_mxUsbDeviceOperationResult = -3;
       return;

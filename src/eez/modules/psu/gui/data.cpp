@@ -5582,7 +5582,7 @@ void data_custom_bitmap(DataOperationEnum operation, Cursor cursor, Value &value
 
 void data_has_multiple_disk_drives(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = fs_driver::getDiskDrivesNum() > 1;
+        value = fs_driver::getDiskDrivesNum(true) > 1;
     }
 }
 

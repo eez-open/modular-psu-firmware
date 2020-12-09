@@ -18,10 +18,13 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <ff_gen_drv.h>
+#include <usbd_msc.h>
+#include <usbd_def.h>
 #endif
 
 #include <eez/index.h>
 #include <eez/debug.h>
+#include <eez/usb.h>
 #include <eez/modules/psu/sd_card.h>
 
 #if OPTION_DISPLAY
@@ -139,24 +142,34 @@ void UnLinkDriver(int slotIndex) {
     DebugTrace("Slot %d disk driver unlinked\n", slotIndex + 1);
 }
 
-int getDiskDrivesNum() {
+int getDiskDrivesNum(bool includeUsbMassStorageDevice) {
     int diskDrivesNum = 0;
 
     if (psu::sd_card::isMounted(nullptr, nullptr)) {
         diskDrivesNum++;
+    	if (g_selectedMassStorageDevice == 0) {
+    		includeUsbMassStorageDevice = false;
+    	}
     }
 
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (isDriverLinked(slotIndex)) {
+        if (isDriverLinked(slotIndex) && !(usb::isMassStorageActive() && g_selectedMassStorageDevice == slotIndex + 1)) {
             diskDrivesNum++;
+        	if (g_selectedMassStorageDevice == slotIndex + 1) {
+        		includeUsbMassStorageDevice = false;
+        	}
         }
+    }
+
+    if (includeUsbMassStorageDevice) {
+    	diskDrivesNum++;
     }
 
     return diskDrivesNum;
 }
 
-int getDiskDriveIndex(int iterationIndex) {
-    if (psu::sd_card::isMounted(nullptr, nullptr)) {
+int getDiskDriveIndex(int iterationIndex, bool includeUsbMassStorageDevice) {
+    if (psu::sd_card::isMounted(nullptr, nullptr) || (includeUsbMassStorageDevice && g_selectedMassStorageDevice == 0)) {
         if (iterationIndex == 0) {
             return 0;
         }
@@ -165,7 +178,7 @@ int getDiskDriveIndex(int iterationIndex) {
 
     int slotIndex;
     for (slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (fs_driver::isDriverLinked(slotIndex)) {
+        if (fs_driver::isDriverLinked(slotIndex) || (includeUsbMassStorageDevice && g_selectedMassStorageDevice == slotIndex + 1)) {
             if (iterationIndex == 0) {
                 return 1 + slotIndex;
             }
@@ -247,7 +260,110 @@ DRESULT DiskDriver_ioctl(BYTE lun, BYTE cmd, void *buff) {
 
     return (DRESULT)params.result;
 }
+
+static int8_t UsbStorageFS_Init(uint8_t lun) {
+    int slotIndex = g_selectedMassStorageDevice - 1;
+
+    ExecuteDiskDriveOperationParams params;
+
+    params.operation = DISK_DRIVER_OPERATION_USB_STORAGE_FS_INIT;
+
+    g_slots[slotIndex]->executeDiskDriveOperation(&params);
+
+    return (int8_t)params.result;
+}
+
+static int8_t UsbStorageFS_GetCapacity(uint8_t lun, uint32_t *block_num, uint16_t *block_size) {
+    int slotIndex = g_selectedMassStorageDevice - 1;
+
+    ExecuteDiskDriveOperationParams params;
+
+    params.operation = DISK_DRIVER_OPERATION_USB_STORAGE_FS_GET_CAPACITY;
+
+    params.blockNum = block_num;
+    params.blockSize = block_size;
+
+    g_slots[slotIndex]->executeDiskDriveOperation(&params);
+
+    return (int8_t)params.result;
+}
+
+static int8_t UsbStorageFS_IsReady(uint8_t lun) {
+    int slotIndex = g_selectedMassStorageDevice - 1;
+
+    ExecuteDiskDriveOperationParams params;
+
+    params.operation = DISK_DRIVER_OPERATION_USB_STORAGE_FS_IS_READY;
+
+    g_slots[slotIndex]->executeDiskDriveOperation(&params);
+
+    return (int8_t)params.result;
+}
+
+static int8_t UsbStorageFS_IsWriteProtected(uint8_t lun) {
+    return USBD_OK;
+}
+
+static int8_t UsbStorageFS_Read(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len) {
+    if (blk_len > 1) {
+        return USBD_FAIL;
+    }
+
+    int slotIndex = g_selectedMassStorageDevice - 1;
+
+    ExecuteDiskDriveOperationParams params;
+
+    params.operation = DISK_DRIVER_OPERATION_USB_STORAGE_FS_READ;
+
+    params.buff = buf;
+    params.sector = blk_addr;
+
+    g_slots[slotIndex]->executeDiskDriveOperation(&params);
+
+    return (int8_t)params.result;
+}
+
+static int8_t UsbStorageFS_Write(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len) {
+    if (blk_len > 1) {
+        return USBD_FAIL;
+    }
+
+    int slotIndex = g_selectedMassStorageDevice - 1;
+
+    ExecuteDiskDriveOperationParams params;
+
+    params.operation = DISK_DRIVER_OPERATION_USB_STORAGE_FS_WRITE;
+
+    params.buff = buf;
+    params.sector = blk_addr;
+
+    g_slots[slotIndex]->executeDiskDriveOperation(&params);
+
+    return (int8_t)params.result;
+}
+
+static int8_t UsbStorageFS_GetMaxLun() {
+    return 0;
+}
+
 #endif
 
 } // namespace fs_driver
 } // namespace eez
+
+#if defined(EEZ_PLATFORM_STM32)
+
+extern const int8_t STORAGE_Inquirydata_FS[];
+
+USBD_StorageTypeDef g_fsDriver_USBD_Storage_Interface = {
+    eez::fs_driver::UsbStorageFS_Init,
+	eez::fs_driver::UsbStorageFS_GetCapacity,
+	eez::fs_driver::UsbStorageFS_IsReady,
+	eez::fs_driver::UsbStorageFS_IsWriteProtected,
+	eez::fs_driver::UsbStorageFS_Read,
+	eez::fs_driver::UsbStorageFS_Write,
+	eez::fs_driver::UsbStorageFS_GetMaxLun,
+    (int8_t *)STORAGE_Inquirydata_FS
+};
+
+#endif

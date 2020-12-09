@@ -405,6 +405,8 @@ void lowPriorityThreadOneIter() {
                 usb::selectUsbMode(param, g_otgMode);
             } else if (type == THREAD_MESSAGE_SELECT_USB_DEVICE_CLASS) {
                 usb::selectUsbDeviceClass(param);
+            } else if (type == THREAD_MESSAGE_SELECT_USB_MASS_STORAGE_DEVICE) {
+                usb::selectMassStorageDevice(param);
             } 
 #if defined(EEZ_PLATFORM_STM32)
             else if (type == THREAD_MESSAGE_USBD_MSC_DATAIN) {

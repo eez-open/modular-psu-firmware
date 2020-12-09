@@ -176,11 +176,18 @@ enum DlogResourceType {
 #if defined(EEZ_PLATFORM_STM32)
 enum DiskDriverOperation {
     DISK_DRIVER_OPERATION_NONE,
+    
     DISK_DRIVER_OPERATION_INITIALIZE,
     DISK_DRIVER_OPERATION_STATUS,
     DISK_DRIVER_OPERATION_READ,
     DISK_DRIVER_OPERATION_WRITE,
-    DISK_DRIVER_OPERATION_IOCTL
+    DISK_DRIVER_OPERATION_IOCTL,
+
+    DISK_DRIVER_OPERATION_USB_STORAGE_FS_INIT,
+    DISK_DRIVER_OPERATION_USB_STORAGE_FS_GET_CAPACITY,
+    DISK_DRIVER_OPERATION_USB_STORAGE_FS_IS_READY,
+    DISK_DRIVER_OPERATION_USB_STORAGE_FS_READ,
+    DISK_DRIVER_OPERATION_USB_STORAGE_FS_WRITE,
 };
 
 struct ExecuteDiskDriveOperationParams {
@@ -189,6 +196,9 @@ struct ExecuteDiskDriveOperationParams {
     uint32_t sector;
     uint8_t* buff;
     uint8_t cmd;
+
+    uint32_t *blockNum;
+    uint16_t *blockSize;
 
     uint32_t result;
 };

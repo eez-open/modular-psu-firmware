@@ -26,8 +26,8 @@ void LinkDriver(int slotIndex);
 void UnLinkDriver(int slotIndex);
 
 // disk drives enumeration
-int getDiskDrivesNum();
-int getDiskDriveIndex(int iterationIndex);
+int getDiskDrivesNum(bool includeUsbMassStorageDevice = false);
+int getDiskDriveIndex(int iterationIndex, bool includeUsbMassStorageDevice = false);
 
 } // namespace fs_driver
 } // namespace eez

@@ -278,6 +278,23 @@ void selectUsbDeviceClass(int usbDeviceClass) {
     }
 }
 
+void selectMassStorageDevice(int massStorageDevice) {
+    if (g_selectedMassStorageDevice == massStorageDevice) {
+        return;
+    }
+
+    g_selectedMassStorageDevice = massStorageDevice;
+
+    if ((g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) && g_usbDeviceClass == USB_DEVICE_CLASS_MASS_STORAGE_CLIENT) {
+#if defined(EEZ_PLATFORM_STM32)
+        taskENTER_CRITICAL();
+        MX_USB_DEVICE_DeInit();
+        MX_USB_DEVICE_Init();
+        taskEXIT_CRITICAL();
+#endif
+    }
+}
+
 bool isVirtualComPortActive() {
     return (g_usbMode == USB_MODE_DEVICE || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_DEVICE)) && g_usbDeviceClass == USB_DEVICE_CLASS_VIRTUAL_COM_PORT;
 }

@@ -22,6 +22,7 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <ff_gen_drv.h>
+#include <usbd_def.h>
 #endif
 
 #include <eez/index.h>
@@ -724,7 +725,15 @@ void Module::stopDlog(int subchannelIndex, int resourceIndex) {
 
 #ifdef EEZ_PLATFORM_STM32
 void Module::executeDiskDriveOperation(ExecuteDiskDriveOperationParams *params) {
-    if (params->operation == DISK_DRIVER_OPERATION_INITIALIZE || params->operation == DISK_DRIVER_OPERATION_STATUS) {
+    if (
+        params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_INIT ||
+        params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_GET_CAPACITY ||
+        params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_IS_READY ||
+        params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_READ ||
+        params->operation == DISK_DRIVER_OPERATION_USB_STORAGE_FS_WRITE
+    ) {
+        params->result = USBD_FAIL;
+    } else if (params->operation == DISK_DRIVER_OPERATION_INITIALIZE || params->operation == DISK_DRIVER_OPERATION_STATUS) {
         params->result = STA_NOINIT;
     } else {
         params->result = RES_ERROR;

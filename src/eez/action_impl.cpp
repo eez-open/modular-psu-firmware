@@ -1230,17 +1230,49 @@ void action_select_usb_mode() {
     pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, g_usbMode, nullptr, onSetUsbMode);
 }
 
-bool isUsbDeviceClassDisabled(uint16_t value) {
-    return value == USB_DEVICE_CLASS_MASS_STORAGE_CLIENT && dlog_record::isExecuting();
-}
-
-void onSetUsbDeviceClass(uint16_t value) {
-	popPage();
-    sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_DEVICE_CLASS, value);
-}
-
 void action_select_usb_device_class() {
+    auto isUsbDeviceClassDisabled = [] (uint16_t value) {
+        return value == USB_DEVICE_CLASS_MASS_STORAGE_CLIENT && dlog_record::isExecuting();
+    };
+
+    auto onSetUsbDeviceClass = [] (uint16_t value) {
+        popPage();
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_DEVICE_CLASS, value);
+    };
+
     pushSelectFromEnumPage(ENUM_DEFINITION_USB_DEVICE_CLASS, g_usbDeviceClass, isUsbDeviceClassDisabled, onSetUsbDeviceClass);
+}
+
+void action_select_mass_storage_device() {
+	auto onSelectMassStorageDevice = [] (uint16_t value) {
+	    popPage();
+        sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_MASS_STORAGE_DEVICE, value);
+	};
+
+	auto massStorageDeviceEnumDefinition = [] (DataOperationEnum operation, Cursor cursor, Value &value) {
+		int massStorageDevice = fs_driver::getDiskDriveIndex(cursor, true);
+		if (massStorageDevice >= 0) {
+			if (operation == DATA_OPERATION_GET_VALUE) {
+				value = (uint8_t)massStorageDevice;
+			} else if (operation == DATA_OPERATION_GET_LABEL) {
+				value = Value(massStorageDevice, VALUE_TYPE_MASS_STORAGE_DEVICE_LABEL);
+			}
+		}
+	};
+
+	auto massStorageDeviceIsDisabledCallback = [] (uint16_t massStorageDevice) {
+		if (massStorageDevice == g_selectedMassStorageDevice) {
+			return false;
+		}
+
+		if (massStorageDevice == 0) {
+			return !sd_card::isMounted(nullptr, nullptr);
+		} else {
+			return !fs_driver::isDriverLinked(massStorageDevice - 1);
+		}
+	};
+
+	pushSelectFromEnumPage(massStorageDeviceEnumDefinition, g_selectedMassStorageDevice, massStorageDeviceIsDisabledCallback, onSelectMassStorageDevice, false, true);
 }
 
 void action_show_display_test_page() {
@@ -1271,26 +1303,6 @@ void action_edit_ntp_refresh_frequency() {
 
     SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
     NumericKeypad::start(0, Value(page->ntpRefreshFrequency, VALUE_TYPE_UINT32), options, onSetNtpRefreshFrequency, 0, 0);
-}
-
-void onSelectMassStorageDevice(uint16_t value) {
-    popPage();
-    g_selectedMassStorageDevice = value;
-}
-
-void massStorageDeviceEnumDefinition(DataOperationEnum operation, Cursor cursor, Value &value) {
-	int massStorageDevice = fs_driver::getDiskDriveIndex(cursor);
-	if (massStorageDevice >= 0) {
-        if (operation == DATA_OPERATION_GET_VALUE) {
-            value = (uint8_t)massStorageDevice;
-        } else if (operation == DATA_OPERATION_GET_LABEL) {
-            value = Value(massStorageDevice, VALUE_TYPE_MASS_STORAGE_DEVICE_LABEL);
-        }
-    }
-}
-
-void action_select_mass_storage_device() {
-    pushSelectFromEnumPage(massStorageDeviceEnumDefinition, -1, nullptr, onSelectMassStorageDevice, false, false);
 }
 
 } // namespace gui

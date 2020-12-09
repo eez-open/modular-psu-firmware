@@ -28,6 +28,7 @@ void tick(uint32_t tickCount);
 
 void selectUsbMode(int usbMode, int otgMode);
 void selectUsbDeviceClass(int usbDeviceClass);
+void selectMassStorageDevice(int massStorageDevice);
 
 bool isVirtualComPortActive();
 bool isMassStorageActive();
