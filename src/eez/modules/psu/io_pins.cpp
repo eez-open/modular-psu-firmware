@@ -410,9 +410,13 @@ void refresh() {
             } else if (ioPin.function == io_pins::FUNCTION_OUTPUT) {
                 setPinState(pin, g_pinState[pin]);
             } else if (ioPin.function == io_pins::FUNCTION_FAULT) {
-                setPinState(pin, g_lastState.outputFault);
+                if (g_lastState.outputFault != 2) {
+                    setPinState(pin, g_lastState.outputFault);
+                }
             } else if (ioPin.function == io_pins::FUNCTION_ON_COUPLE) {
-                setPinState(pin, g_lastState.outputEnabled);
+                if (g_lastState.outputEnabled != 2) {
+                    setPinState(pin, g_lastState.outputEnabled);
+                }
             }
         }
     }
