@@ -54,5 +54,7 @@ HAL_StatusTypeDef transmit(uint8_t slotIndex, uint8_t *input, uint16_t size);
 
 HAL_StatusTypeDef transferDMA(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size);
 
+void abortTransfer(uint8_t slotIndex);
+
 } // namespace spi
 } // namespace eez

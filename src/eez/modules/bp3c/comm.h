@@ -36,6 +36,7 @@ enum TransferResult {
 
 TransferResult transfer(int slotIndex, uint8_t *output, uint8_t *input, uint32_t bufferSize);
 TransferResult transferDMA(int slotIndex, uint8_t *output, uint8_t *input, uint32_t bufferSize);
+void abortTransfer(int slotIndex);
 
 } // namespace comm
 } // namespace bp3c

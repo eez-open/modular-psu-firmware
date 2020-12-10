@@ -240,6 +240,10 @@ HAL_StatusTypeDef transferDMA(uint8_t slotIndex, uint8_t *input, uint8_t *output
     return HAL_SPI_TransmitReceive_DMA(handle[slotIndex], input, output, size);
 }
 
+void abortTransfer(uint8_t slotIndex) {
+	HAL_SPI_Abort(handle[slotIndex]);
+}
+
 } // namespace spi
 } // namespace eez
 
