@@ -204,8 +204,6 @@ void boot() {
 
     psu::profile::init();
 
-    psu::io_pins::init();
-
     psu::list::init();
 
 #if OPTION_ETHERNET
@@ -230,6 +228,7 @@ void boot() {
 
     if (!psu::autoRecall()) {
         psu::psuReset();
+        psu::io_pins::refresh();
     }
 
     // play beep if there is an error during boot procedure
@@ -312,6 +311,7 @@ bool doTest() {
 
     psu::profile::saveToLocation(10);
     psu::psuReset();
+    psu::io_pins::refresh();
 
     testResult &= testMaster();
 
@@ -359,7 +359,11 @@ bool reset() {
         return true;
     }
 
-    return psuReset();
+    bool result = psuReset();
+    
+    io_pins::refresh();
+
+    return result;
 }
 
 void standBy() {

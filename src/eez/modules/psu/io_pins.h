@@ -52,8 +52,10 @@ struct IOPin {
 };
 
 extern IOPin g_ioPins[4];
+extern float g_pwmFrequency[NUM_IO_PINS - DOUT1];
+extern float g_pwmDuty[NUM_IO_PINS - DOUT1];
 
-void init();
+void reset();
 void tick(uint32_t tickCount);
 void onTrigger();
 void refresh();

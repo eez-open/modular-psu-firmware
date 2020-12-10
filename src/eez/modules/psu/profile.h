@@ -74,7 +74,9 @@ struct Parameters {
     temperature::ProtectionConfiguration tempProt[temp_sensor::MAX_NUM_TEMP_SENSORS];
     uint16_t triggerSource;
     float triggerDelay;
-    io_pins::IOPin ioPins[4];
+    io_pins::IOPin ioPins[NUM_IO_PINS];
+    float ioPinsPwmFrequency[NUM_IO_PINS - DOUT1];
+    float ioPinsPwmDuty[NUM_IO_PINS - DOUT1];
 };
 
 void init();

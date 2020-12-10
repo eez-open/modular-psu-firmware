@@ -59,8 +59,8 @@ static uint32_t g_toutputPulseStartTickCount;
 
 static bool g_pinState[NUM_IO_PINS] = { false, false, false, false };
 
-static float g_pwmFrequency[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_FREQUENCY, PWM_DEFAULT_FREQUENCY };
-static float g_pwmDuty[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_DUTY, PWM_DEFAULT_DUTY };
+float g_pwmFrequency[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_FREQUENCY, PWM_DEFAULT_FREQUENCY };
+float g_pwmDuty[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_DUTY, PWM_DEFAULT_DUTY };
 static uint32_t g_pwmPeriodInt[NUM_IO_PINS - DOUT1];
 static bool m_gPwmStarted;
 
@@ -270,7 +270,6 @@ void initOutputPin(int pin) {
             GPIO_InitStruct.Pull = GPIO_NOPULL;
             GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
             HAL_GPIO_Init(UART_TX_DOUT1_GPIO_Port, &GPIO_InitStruct);
-            HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, GPIO_PIN_RESET);
         }
 #endif
     } else if (pin == DOUT2) {
@@ -283,8 +282,15 @@ void initOutputPin(int pin) {
     }
 }
 
-void init() {
-    refresh(); // this will initialize input pins
+void reset() {
+    for (int i = 0; i < NUM_IO_PINS; i++) {
+        g_ioPins[i].polarity = 0;
+        g_ioPins[i].function = 0;
+        if (i > DOUT1) {
+            g_pwmFrequency[i - DOUT1] = PWM_DEFAULT_FREQUENCY;
+            g_pwmDuty[i - DOUT1] = PWM_DEFAULT_DUTY;
+        }
+    }
 }
 
 void tick(uint32_t tickCount) {

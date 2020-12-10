@@ -954,6 +954,9 @@ bool psuReset() {
     //
     dlog_record::reset();
 
+    //
+    io_pins::reset();
+
     // SYST:POW ON
     if (powerUp()) {
         Channel::updateAllChannels();
@@ -1049,8 +1052,6 @@ bool powerUp() {
     }
 
     g_bootTestSuccess &= testSuccess;
-
-    io_pins::refresh();
 
     return true;
 }
@@ -1161,7 +1162,9 @@ void changePowerState(bool up) {
             return;
         }
 
-        autoRecall(profile::RECALL_OPTION_IGNORE_POWER);
+        if (!autoRecall(profile::RECALL_OPTION_IGNORE_POWER)) {
+            io_pins::refresh();
+        }
     } else {
 #if OPTION_DISPLAY
         if (!g_shutdownInProgress) {

@@ -720,6 +720,8 @@ static void saveState(Parameters &profile, List *lists) {
     profile.triggerDelay = trigger::g_triggerDelay;
 
     memcpy(profile.ioPins, io_pins::g_ioPins, sizeof(profile.ioPins));
+    memcpy(profile.ioPinsPwmFrequency, io_pins::g_pwmFrequency, sizeof(profile.ioPinsPwmFrequency));
+    memcpy(profile.ioPinsPwmDuty, io_pins::g_pwmDuty, sizeof(profile.ioPinsPwmDuty));
 
     profile.flags.isValid = true;
 }
@@ -814,6 +816,8 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
     trigger::g_triggerDelay = profile.triggerDelay;
 
     memcpy(io_pins::g_ioPins, profile.ioPins, sizeof(profile.ioPins));
+    memcpy(io_pins::g_pwmFrequency, profile.ioPinsPwmFrequency, sizeof(profile.ioPinsPwmFrequency));
+    memcpy(io_pins::g_pwmDuty, profile.ioPinsPwmDuty, sizeof(profile.ioPinsPwmDuty));
     io_pins::refresh();
 
     return true;
@@ -1044,10 +1048,14 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
     WRITE_PROPERTY("source", parameters.triggerSource);
     WRITE_PROPERTY("delay", parameters.triggerDelay);
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < NUM_IO_PINS; ++i) {
         ctx.group("io_pin", i + 1);
         WRITE_PROPERTY("function", parameters.ioPins[i].function);
         WRITE_PROPERTY("polarity", parameters.ioPins[i].polarity);
+        if (i >= DOUT1) {
+            WRITE_PROPERTY("pwmFrequency", parameters.ioPinsPwmFrequency[i - DOUT1]);
+            WRITE_PROPERTY("pwmDuty", parameters.ioPinsPwmDuty[i - DOUT1]);
+        }
     }
 
     return true;
@@ -1375,6 +1383,10 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
 
         READ_FLAG("function", ioPin.function);
         READ_FLAG("polarity", ioPin.polarity);
+        if (ioPinIndex >= DOUT1) {
+            READ_FLAG("pwmFrequency", parameters.ioPinsPwmFrequency[ioPinIndex - DOUT1]);
+            READ_FLAG("pwmDuty", parameters.ioPinsPwmDuty[ioPinIndex - DOUT1]);
+        }
     }
 
     return false;
