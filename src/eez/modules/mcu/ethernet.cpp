@@ -822,7 +822,32 @@ void releaseInputBuffer() {
 
 int writeBuffer(const char *buffer, uint32_t length) {
 #if defined(EEZ_PLATFORM_STM32)
-	netconn_write(g_tcpClientConnection, (void *)buffer, (uint16_t)length, NETCONN_COPY);
+    if (length <= 1024) {
+        static const size_t NUM_BUFFERS = 4;
+        static uint8_t g_buffers[NUM_BUFFERS][1024];
+        static bool g_isBufferUsed[NUM_BUFFERS];
+
+        size_t i;
+        for (i = 0; i < NUM_BUFFERS; i++) {
+            if (!g_isBufferUsed[i]) {
+                memcpy(&g_buffers[i][0], buffer, length);
+                netconn_write(g_tcpClientConnection, (void *)&g_buffers[i][0], (uint16_t)length, NETCONN_NOCOPY);
+                g_isBufferUsed[i] = true;
+                break;
+            }
+        }
+
+        if (i == NUM_BUFFERS) {
+            netconn_write(g_tcpClientConnection, (void *)buffer, (uint16_t)length, NETCONN_COPY);
+            
+            for (size_t i = 0; i < NUM_BUFFERS; i++) {
+                g_isBufferUsed[i] = false;
+            }
+        }
+    } else {
+        netconn_write(g_tcpClientConnection, (void *)buffer, (uint16_t)length, NETCONN_COPY);
+    }
+
     return length;
 #endif
 

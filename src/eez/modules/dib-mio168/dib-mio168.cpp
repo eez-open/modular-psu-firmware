@@ -976,6 +976,7 @@ public:
     TestResult testResult = TEST_NONE;
     bool synchronized = false;
     int numCrcErrors = 0;
+    int numTransferErrors = 0;
     uint8_t input[sizeof(FromSlaveToMaster)];
     uint8_t output[sizeof(FromSlaveToMaster)];
     bool spiReady = false;
@@ -1039,6 +1040,7 @@ public:
             if (bp3c::comm::masterSynchro(slotIndex)) {
                 synchronized = true;
                 numCrcErrors = 0;
+                numTransferErrors = 0;
                 testResult = TEST_OK;
 #ifdef EEZ_PLATFORM_SIMULATOR
                 sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_LINK, slotIndex, 0);
@@ -1136,6 +1138,7 @@ public:
             }
 
             numCrcErrors = 0;
+            numTransferErrors = 0;
 
             FromSlaveToMaster &data = (FromSlaveToMaster &)*input;
 
@@ -1167,15 +1170,23 @@ public:
             return true;
         } else {
             if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
-                if (++numCrcErrors >= 10) {
+                numCrcErrors++;
+                if (numCrcErrors >= 10) {
                     event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                     synchronized = false;
                     testResult = TEST_FAILED;
-                } else {
-                    DebugTrace("Slot %d CRC %d\n", slotIndex + 1, numCrcErrors);
+                } else if (numCrcErrors > 5) {
+                    DebugTrace("Slot %d CRC error no. %d\n", slotIndex + 1, numCrcErrors);
                 }
             } else {
-                DebugTrace("Slot %d SPI transfer error %d\n", slotIndex + 1, status);
+                numTransferErrors++;
+                if (numTransferErrors >= 10) {
+                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                    synchronized = false;
+                    testResult = TEST_FAILED;
+                } else if (numTransferErrors > 5) {
+                    DebugTrace("Slot %d SPI transfer error %d no. %d\n", slotIndex + 1, status, numTransferErrors);
+                }
             }
 
             return false;
