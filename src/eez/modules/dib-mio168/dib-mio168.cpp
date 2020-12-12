@@ -55,13 +55,6 @@
 
 #include <scpi/scpi.h>
 
-// static volatile uint32_t g_profile1;
-// static volatile uint32_t g_profile2;
-// static volatile uint32_t g_profile3;
-// static volatile uint32_t g_profile4;
-// static volatile uint32_t g_profile5;
-// static volatile uint32_t g_profile6;
-
 using namespace eez::psu;
 using namespace eez::psu::gui;
 using namespace eez::gui;
@@ -986,6 +979,7 @@ public:
 #ifdef EEZ_PLATFORM_STM32
     ExecuteDiskDriveOperationParams *diskOperationParams;
     enum {
+    	DISK_OPERATION_IDLE,
         DISK_OPERATION_NOT_FINISHED,
         DISK_OPERATION_SUCCESSFULLY_FINISHED,
         DISK_OPERATION_UNSUCCESSFULLY_FINISHED
@@ -1117,13 +1111,11 @@ public:
     }
 
     void transferDiskDriveOperationRequest() {
-        // g_profile2 = micros() - g_profile1;
         fillFromMasterToSlaveDiskDriverOperation(*(FromMasterToSlaveDiskDriveOperation *)output);
         doTransfer();
     }
 
     void transferDiskDriveOperationResponse() {
-        // g_profile4 = micros() - g_profile1;
         fillFromMasterToSlaveParamsChange(*(FromMasterToSlaveParamsChange *)output);
         doTransfer();
     }
@@ -1194,7 +1186,6 @@ public:
     }
 
     bool onDiskDriveOperationRequestTransferCompleted(int status) {
-        // g_profile3 = micros() - g_profile1;
         if (!onTransferCompleted(status)) {
             return false;
         }
@@ -1202,7 +1193,6 @@ public:
     }
 
     bool onDiskDriveOperationResponseTransferCompleted(int status) {
-        // g_profile5 = micros() - g_profile1;
         if (!onTransferCompleted(status)) {
             return false;
         }
@@ -1228,7 +1218,6 @@ public:
     }
 
     void setDiskOperationFailed() {
-        // g_profile5 = micros() - g_profile1;
         if (diskOperationParams->operation == DISK_DRIVER_OPERATION_INITIALIZE || diskOperationParams->operation == DISK_DRIVER_OPERATION_STATUS) {
         	diskOperationParams->result = STA_NOINIT;
         } else {
@@ -2605,8 +2594,6 @@ public:
 
 #ifdef EEZ_PLATFORM_STM32
     void executeDiskDriveOperation(ExecuteDiskDriveOperationParams *params) override {
-        // g_profile1 = micros();
-
         diskOperationParams = params;
 
         for (int nretry = 0; nretry < 10; nretry++) {
@@ -2623,7 +2610,7 @@ public:
             }
         }
 
-        // g_profile6 = micros() - g_profile1;
+        diskOperationStatus = Mio168Module::DISK_OPERATION_IDLE;
     }
 #endif
 };

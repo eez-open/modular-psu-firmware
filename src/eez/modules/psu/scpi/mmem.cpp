@@ -184,8 +184,6 @@ void uploadCallback(void *param, const void *buffer, int size) {
     } else {
         SCPI_ResultArbitraryBlockData(context, buffer, size);
     }
-
-    osDelay(0);
 }
 
 bool mmemUpload(const char *filePath, scpi_t *context, int *err) {
