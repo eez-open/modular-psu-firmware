@@ -30,8 +30,10 @@
 #include <ip_addr.h>
 #include <netif.h>
 #include <ethernetif.h>
+#include <dns.h>
 extern struct netif gnetif;
 extern ip4_addr_t ipaddr;
+ip4_addr_t dns;
 extern ip4_addr_t netmask;
 extern ip4_addr_t gw;
 #endif
@@ -181,6 +183,8 @@ static void dhcpStart() {
             }
             osDelay(10);
         }
+    } else {
+        dns_setserver(0, &dns);
     }
 
     g_connectionState = CONNECTION_STATE_CONNECTED;
@@ -201,10 +205,12 @@ static void onEvent(uint8_t eventType) {
 
             if (psu::persist_conf::isEthernetDhcpEnabled()) {            
                 ipaddr.addr = 0;
+                dns.addr = 0;
                 netmask.addr = 0;
                 gw.addr = 0;
             } else {
             	ipaddr.addr = psu::persist_conf::devConf.ethernetIpAddress;
+                dns.addr = psu::persist_conf::devConf.ethernetDns;
             	netmask.addr = psu::persist_conf::devConf.ethernetSubnetMask;
             	gw.addr = psu::persist_conf::devConf.ethernetGateway;
             }
