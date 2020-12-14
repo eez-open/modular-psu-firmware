@@ -227,11 +227,11 @@ scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
 
     if (param.special) {
         if (param.content.tag == SCPI_NUM_MIN) {
-            period = dlog_record::PERIOD_MIN;
+            period = dlog_view::PERIOD_MIN;
         } else if (param.content.tag == SCPI_NUM_MAX) {
-            period = dlog_record::PERIOD_MAX;
+            period = dlog_view::PERIOD_MAX;
         } else if (param.content.tag == SCPI_NUM_DEF) {
-            period = dlog_record::PERIOD_DEFAULT;
+            period = dlog_view::PERIOD_DEFAULT;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
@@ -270,11 +270,11 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
 
     if (param.special) {
         if (param.content.tag == SCPI_NUM_MIN) {
-            time = dlog_record::TIME_MIN;
+            time = dlog_view::TIME_MIN;
         } else if (param.content.tag == SCPI_NUM_MAX) {
-            time = dlog_record::TIME_MAX;
+            time = dlog_view::TIME_MAX;
         } else if (param.content.tag == SCPI_NUM_DEF) {
-            time = dlog_record::TIME_DEFAULT;
+            time = dlog_view::TIME_DEFAULT;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
@@ -310,7 +310,7 @@ scpi_result_t scpi_cmd_senseDlogTraceRemark(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (len > dlog_view::MAX_COMMENT_LENGTH) {
+    if (len > dlog_file::MAX_COMMENT_LENGTH) {
         SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
         return SCPI_RES_ERR;
     }
@@ -402,8 +402,8 @@ scpi_result_t scpi_cmd_senseDlogTraceXStepQ(scpi_t *context) {
 }
 
 scpi_choice_def_t scaleChoice[] = {
-    { "LINear", dlog_view::SCALE_LINEAR },
-    { "LOGarithmic", dlog_view::SCALE_LOGARITHMIC },
+    { "LINear", dlog_file::SCALE_LINEAR },
+    { "LOGarithmic", dlog_file::SCALE_LOGARITHMIC },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
@@ -418,7 +418,7 @@ scpi_result_t scpi_cmd_senseDlogTraceXScale(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog_record::g_parameters.xAxis.scale = (dlog_view::Scale)scale;
+    dlog_record::g_parameters.xAxis.scale = (dlog_file::Scale)scale;
 
     return SCPI_RES_OK;
 }
@@ -440,7 +440,7 @@ scpi_result_t scpi_cmd_senseDlogTraceXLabel(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (len > dlog_view::MAX_LABEL_LENGTH) {
+    if (len > dlog_file::MAX_LABEL_LENGTH) {
         SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
         return SCPI_RES_ERR;
     }
@@ -536,7 +536,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYUnit(scpi_t *context) {
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
 
-    if (yAxisIndex < -1 || yAxisIndex >= dlog_view::MAX_NUM_OF_Y_AXES) {
+    if (yAxisIndex < -1 || yAxisIndex >= dlog_file::MAX_NUM_OF_Y_AXES) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
@@ -548,7 +548,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYUnit(scpi_t *context) {
 
     if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
         dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
-        dlog_view::initYAxis(dlog_record::g_parameters, yAxisIndex);
+        dlog_record::g_parameters.initYAxis(yAxisIndex);
     }
 
     if (yAxisIndex == -1) {
@@ -592,7 +592,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYLabel(scpi_t *context) {
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
 
-    if (yAxisIndex < -1 || yAxisIndex >= dlog_view::MAX_NUM_OF_Y_AXES) {
+    if (yAxisIndex < -1 || yAxisIndex >= dlog_file::MAX_NUM_OF_Y_AXES) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
@@ -603,14 +603,14 @@ scpi_result_t scpi_cmd_senseDlogTraceYLabel(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (len > dlog_view::MAX_LABEL_LENGTH) {
+    if (len > dlog_file::MAX_LABEL_LENGTH) {
         SCPI_ErrorPush(context, SCPI_ERROR_TOO_MUCH_DATA);
         return SCPI_RES_ERR;
     }
 
     if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
         dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
-        dlog_view::initYAxis(dlog_record::g_parameters, yAxisIndex);
+        dlog_record::g_parameters.initYAxis(yAxisIndex);
     }
 
     if (yAxisIndex == -1) {
@@ -653,7 +653,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMin(scpi_t *context) {
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
 
-    if (yAxisIndex < -1 || yAxisIndex >= dlog_view::MAX_NUM_OF_Y_AXES) {
+    if (yAxisIndex < -1 || yAxisIndex >= dlog_file::MAX_NUM_OF_Y_AXES) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
@@ -679,7 +679,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMin(scpi_t *context) {
 
     if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
         dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
-        dlog_view::initYAxis(dlog_record::g_parameters, yAxisIndex);
+        dlog_record::g_parameters.initYAxis(yAxisIndex);
     }
 
     if (yAxisIndex == -1) {
@@ -723,7 +723,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMax(scpi_t *context) {
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
 
-    if (yAxisIndex < -1 || yAxisIndex >= dlog_view::MAX_NUM_OF_Y_AXES) {
+    if (yAxisIndex < -1 || yAxisIndex >= dlog_file::MAX_NUM_OF_Y_AXES) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
@@ -749,7 +749,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMax(scpi_t *context) {
 
     if (yAxisIndex >= dlog_record::g_parameters.numYAxes) {
         dlog_record::g_parameters.numYAxes = yAxisIndex + 1;
-        dlog_view::initYAxis(dlog_record::g_parameters, yAxisIndex);
+        dlog_record::g_parameters.initYAxis(yAxisIndex);
     }
 
     if (yAxisIndex == -1) {
@@ -794,7 +794,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYScale(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog_record::g_parameters.yAxisScale = (dlog_view::Scale)scale;
+    dlog_record::g_parameters.yAxisScale = (dlog_file::Scale)scale;
 
     return SCPI_RES_OK;
 }
@@ -827,7 +827,7 @@ scpi_result_t scpi_cmd_senseDlogTraceData(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    float values[dlog_view::MAX_NUM_OF_Y_AXES];
+    float values[dlog_file::MAX_NUM_OF_Y_AXES];
     for (int yAxisIndex = 0; yAxisIndex < dlog_record::g_recording.parameters.numYAxes; yAxisIndex++) {
         scpi_number_t param;
         if (!SCPI_ParamNumber(context, 0, &param, true)) {

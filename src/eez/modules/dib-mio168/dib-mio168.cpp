@@ -149,7 +149,8 @@ struct FromMasterToSlaveDiskDriveOperation {
 
 #define FLAG_SD_CARD_PRESENT (1 << 0)
 #define FLAG_DIN_READ_OVERFLOW (1 << 1)
-#define FLAG_DISK_OPERATION_RESPONSE (1 << 2)
+#define FLAG_DIN_RECORD_FINISHED (1 << 2)
+#define FLAG_DISK_OPERATION_RESPONSE (1 << 3)
 
 #define MAX_DIN_VALUES 100
 
@@ -159,7 +160,6 @@ struct FromSlaveToMaster {
     uint8_t dinStates;
     uint16_t ainValues[4];
     uint8_t flags;
-	uint16_t numDinValues;
 	uint32_t diskOperationResult;
 	uint8_t buffer[512];
 };
@@ -1153,10 +1153,8 @@ public:
 
             if ((data.flags & FLAG_DIN_READ_OVERFLOW) != 0) {
                 dlog_record::abortAfterSlaveOverflowError();
-            } else {
-                for (int i = 0; i < data.numDinValues; i++) {
-                    dlog_record::log(slotIndex, DIN_SUBCHANNEL_INDEX, data.buffer[i]);
-                }
+            } else if (data.flags & FLAG_DIN_RECORD_FINISHED) {
+                dlog_record::abort();
             }
 
             return true;

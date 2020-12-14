@@ -96,6 +96,7 @@ set(src_eez
     src/eez/action_impl.cpp
     src/eez/firmware.cpp
     src/eez/debug.cpp
+    src/eez/dlog_file.cpp
     src/eez/file_type.cpp
     src/eez/fs_driver.cpp
     src/eez/hmi.cpp
@@ -117,6 +118,7 @@ list (APPEND src_files ${src_eez})
 set(header_eez
     src/eez/firmware.h
     src/eez/debug.h
+    src/eez/dlog_file.h
     src/eez/file_type.h
     src/eez/fs_driver.h
     src/eez/hmi.h

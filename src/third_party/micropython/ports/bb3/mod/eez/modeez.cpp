@@ -177,9 +177,9 @@ mp_obj_t modeez_dlogTraceData(size_t n_args, const mp_obj_t *args) {
         mp_raise_ValueError("Too many values");
     }
 
-    float values[dlog_view::MAX_NUM_OF_Y_AXES];
+    float values[eez::dlog_file::MAX_NUM_OF_Y_AXES];
 
-    for (size_t i = 0; i < MIN(n_args, dlog_view::MAX_NUM_OF_Y_AXES); i++) {
+    for (size_t i = 0; i < MIN(n_args, eez::dlog_file::MAX_NUM_OF_Y_AXES); i++) {
         if (!mp_obj_is_type(args[i], &mp_type_float)) {
             mp_raise_ValueError("Argument is not float");
         }

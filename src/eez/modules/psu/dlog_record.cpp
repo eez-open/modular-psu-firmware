@@ -19,8 +19,8 @@
 #include <math.h>
 
 #include <eez/index.h>
-#include <eez/system.h>
 #include <eez/sound.h>
+#include <eez/system.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -67,20 +67,7 @@ enum Event {
     EVENT_RESET
 };
 
-dlog_view::Parameters g_parameters = {
-    { 0 },
-    { 0 },
-    { },
-    { },
-    dlog_view::SCALE_LINEAR,
-    0,
-    {{}, {}, {}, {}, {}, {}},
-    {},
-    0,
-    PERIOD_DEFAULT,
-    TIME_DEFAULT,
-    trigger::SOURCE_IMMEDIATE
-};
+dlog_view::Parameters g_parameters;
 
 trigger::Source g_triggerSource = trigger::SOURCE_IMMEDIATE;
 
@@ -101,14 +88,11 @@ static uint32_t g_micros;
 static uint32_t g_iSample;
 double g_currentTime;
 static double g_nextTime;
-uint32_t g_fileLength;
-static unsigned int g_bufferIndex;
 
 static unsigned int g_lastSavedBufferIndex;
 static uint32_t g_lastSavedBufferTickCount;
 
-static uint32_t g_bitMask = 0;
-static uint32_t g_bits;
+static dlog_file::Writer g_writer(DLOG_RECORD_BUFFER, DLOG_RECORD_BUFFER_SIZE);
 
 osMutexId(g_mutexId);
 osMutexDef(g_mutex);
@@ -137,7 +121,7 @@ static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
 		value = *(float *)p;
 	}
 
-    if (g_recording.parameters.yAxisScale == dlog_view::SCALE_LOGARITHMIC) {
+    if (g_recording.parameters.yAxisScale == dlog_file::SCALE_LOGARITHMIC) {
         float logOffset = 1 - g_recording.parameters.yAxes[columnIndex].range.min;
         value = log10f(logOffset + value);
     }
@@ -175,13 +159,13 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
 
     if (osMutexWait(g_mutexId, 5) == osOK) {
         int32_t timeDiff = millis() - g_lastSavedBufferTickCount;
-        uint32_t alignedBufferIndex = (g_bufferIndex / 4) * 4;
+        uint32_t alignedBufferIndex = (g_writer.getBufferIndex() / 4) * 4;
         uint32_t indexDiff = alignedBufferIndex - g_lastSavedBufferIndex;
         if (indexDiff > 0 && (flush || timeDiff >= CONF_DLOG_SYNC_FILE_TIME_MS || indexDiff >= CHUNK_SIZE)) {
             bufferSize = MIN(indexDiff, CHUNK_SIZE);
             buffer = g_saveBuffer;
 
-            int32_t i = g_bufferIndex - (g_lastSavedBufferIndex + DLOG_RECORD_BUFFER_SIZE);
+            int32_t i = g_writer.getBufferIndex() - (g_lastSavedBufferIndex + DLOG_RECORD_BUFFER_SIZE);
 
             if (i <= 0) {
                 i = 0;
@@ -286,122 +270,17 @@ void fileWrite(bool flush) {
 
 static void writeUint32(uint32_t value);
 
-void flushBits() {
-    if (g_bitMask != 0) {
-        writeUint32(g_bits);
-        g_bits = 0;
-        g_bitMask = 0;
-    }
-}
-
 static void flushData() {
     //DebugTrace("flush before: %d\n", g_bufferIndex - g_lastSavedBufferIndex);
 
-    flushBits();
+	g_writer.flushBits();
 
     uint32_t timeout = millis() + CONF_WRITE_FLUSH_TIMEOUT_MS;
-    while (g_lastSavedBufferIndex < g_bufferIndex && millis() < timeout) {
+    while (g_lastSavedBufferIndex < g_writer.getBufferIndex() && millis() < timeout) {
         fileWrite(true);
     }
 
     //DebugTrace("flush after: %d\n", g_bufferIndex - g_lastSavedBufferIndex);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-static void writeUint8(uint8_t value) {
-    *(DLOG_RECORD_BUFFER + (g_bufferIndex % DLOG_RECORD_BUFFER_SIZE)) = value;
-    g_bufferIndex++;
-    g_fileLength++;
-}
-
-static void writeUint16(uint16_t value) {
-    writeUint8(value & 0xFF);
-    writeUint8((value >> 8) & 0xFF);
-}
-
-static void writeUint32(uint32_t value) {
-    writeUint8(value & 0xFF);
-    writeUint8((value >> 8) & 0xFF);
-    writeUint8((value >> 16) & 0xFF);
-    writeUint8(value >> 24);
-}
-
-static void writeFloat(float value) {
-    flushBits();
-    writeUint32(*((uint32_t *)&value));
-}
-
-static void writeBit(int bit) {
-    if (g_bitMask == 0) {
-        g_bitMask = 0x8000;
-    } else {
-        g_bitMask >>= 1;
-    }
-
-    if (bit) {
-        g_bits |= g_bitMask;
-    }
-
-    if (g_bitMask == 1) {
-        flushBits();
-    }
-}
-
-static void writeUint8Field(uint8_t id, uint8_t value) {
-    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t));
-    writeUint8(id);
-    writeUint8(value);
-}
-
-static void writeUint8FieldWithIndex(uint8_t id, uint8_t value, uint8_t index) {
-    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint8_t));
-    writeUint8(id);
-    writeUint8(index);
-    writeUint8(value);
-}
-
-//static void writeUint16Field(uint8_t id, uint16_t value) {
-//    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint16_t));
-//    writeUint8(id);
-//    writeUint16(value);
-//}
-
-static void writeUint16FieldWithIndex(uint8_t id, uint16_t value, uint8_t index) {
-    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t));
-    writeUint8(id);
-    writeUint8(index);
-    writeUint16(value);
-}
-
-static void writeFloatField(uint8_t id, float value) {
-    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(float));
-    writeUint8(id);
-    writeFloat(value);
-}
-
-static void writeFloatFieldWithIndex(uint8_t id, float value, uint8_t index) {
-    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t) + sizeof(float));
-    writeUint8(id);
-    writeUint8(index);
-    writeFloat(value);
-}
-
-static void writeStringField(uint8_t id, const char *str) {
-    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + (uint16_t)strlen(str));
-    writeUint8(id);
-    while (*str) {
-        writeUint8(*str++);
-    }
-}
-
-static void writeStringFieldWithIndex(uint8_t id, const char *str, uint8_t index) {
-    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t) + (uint16_t)strlen(str));
-    writeUint8(id);
-    writeUint8(index);
-    while (*str) {
-        writeUint8(*str++);
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -413,8 +292,6 @@ static void initRecordingStart() {
     g_iSample = 0;
     g_currentTime = 0;
     g_nextTime = 0;
-    g_fileLength = 0;
-    g_bufferIndex = 0;
     g_lastSavedBufferIndex = 0;
 
     memcpy(&g_recording.parameters, &g_parameters, sizeof(dlog_view::Parameters));
@@ -438,82 +315,8 @@ static void initRecordingStart() {
         auto &dlogItem = g_recording.parameters.dlogItems[i];
         g_slots[dlogItem.slotIndex]->startDlog(dlogItem.subchannelIndex, dlogItem.resourceIndex);
     }
-}
 
-static void writeFileHeaderAndMetaFields() {
-    // header
-    writeUint32(dlog_view::MAGIC1);
-    writeUint32(dlog_view::MAGIC2);
-    writeUint16(dlog_view::VERSION2);
-    writeUint16(g_recording.parameters.numYAxes);
-    uint32_t savedBufferIndex = g_bufferIndex;
-    writeUint32(0);
-
-    // meta fields
-    writeStringField(dlog_view::FIELD_ID_COMMENT, g_recording.parameters.comment);
-
-    writeUint8Field(dlog_view::FIELD_ID_X_UNIT, g_recording.parameters.xAxis.unit);
-    writeFloatField(dlog_view::FIELD_ID_X_STEP, g_recording.parameters.xAxis.step);
-    writeUint8Field(dlog_view::FIELD_ID_X_SCALE, g_recording.parameters.xAxis.scale);
-    writeFloatField(dlog_view::FIELD_ID_X_RANGE_MIN, g_recording.parameters.xAxis.range.min);
-    writeFloatField(dlog_view::FIELD_ID_X_RANGE_MAX, g_recording.parameters.xAxis.range.max);
-    writeStringField(dlog_view::FIELD_ID_X_LABEL, g_recording.parameters.xAxis.label);
-
-    bool writeChannelFields[CH_MAX];
-    for (uint8_t channelIndex = 0; channelIndex < CH_MAX; channelIndex++) {
-        writeChannelFields[channelIndex] = false;
-    }
-
-    if (g_recording.parameters.yAxis.unit != UNIT_UNKNOWN) {
-        writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_UNIT, g_recording.parameters.yAxis.unit, 0);
-        writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MIN, g_recording.parameters.yAxis.range.min, 0);
-        writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MAX, g_recording.parameters.yAxis.range.max, 0);
-        writeStringFieldWithIndex(dlog_view::FIELD_ID_Y_LABEL, g_recording.parameters.yAxis.label, 0);
-        writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_CHANNEL_INDEX, 0, 0);
-    }
-
-    for (uint8_t yAxisIndex = 0; yAxisIndex < g_recording.parameters.numYAxes; yAxisIndex++) {
-        if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || g_recording.parameters.yAxes[yAxisIndex].unit != g_recording.parameters.yAxis.unit) {
-            writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_UNIT, g_recording.parameters.yAxes[yAxisIndex].unit, yAxisIndex + 1);
-        }
-
-        if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || g_recording.parameters.yAxes[yAxisIndex].range.min != g_recording.parameters.yAxis.range.min) {
-            writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MIN, g_recording.parameters.yAxes[yAxisIndex].range.min, yAxisIndex + 1);
-        }
-
-        if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || g_recording.parameters.yAxes[yAxisIndex].range.max != g_recording.parameters.yAxis.range.max) {
-            writeFloatFieldWithIndex(dlog_view::FIELD_ID_Y_RANGE_MAX, g_recording.parameters.yAxes[yAxisIndex].range.max, yAxisIndex + 1);
-        }
-
-        if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || strcmp(g_recording.parameters.yAxes[yAxisIndex].label, g_recording.parameters.yAxis.label) != 0) {
-            writeStringFieldWithIndex(dlog_view::FIELD_ID_Y_LABEL, g_recording.parameters.yAxes[yAxisIndex].label, yAxisIndex + 1);
-        }
-
-        if (g_recording.parameters.yAxis.unit == UNIT_UNKNOWN || g_recording.parameters.yAxes[yAxisIndex].channelIndex >= 0) {
-            writeUint8FieldWithIndex(dlog_view::FIELD_ID_Y_CHANNEL_INDEX, g_recording.parameters.yAxes[yAxisIndex].channelIndex + 1, yAxisIndex + 1);
-            if (g_recording.parameters.yAxes[yAxisIndex].channelIndex >= 0 && g_recording.parameters.yAxes[yAxisIndex].unit != UNIT_BIT) {
-                writeChannelFields[g_recording.parameters.yAxes[yAxisIndex].channelIndex] = true;
-            }
-        }
-    }
-
-    writeUint8Field(dlog_view::FIELD_ID_Y_SCALE, g_recording.parameters.yAxisScale);
-
-    for (uint8_t channelIndex = 0; channelIndex < CH_MAX; channelIndex++) {
-        if (writeChannelFields[channelIndex]) {
-            Channel &channel = Channel::get(channelIndex);
-            writeUint16FieldWithIndex(dlog_view::FIELD_ID_CHANNEL_MODULE_TYPE, g_slots[channel.slotIndex]->moduleType, channelIndex + 1);
-            writeUint16FieldWithIndex(dlog_view::FIELD_ID_CHANNEL_MODULE_REVISION, g_slots[channel.slotIndex]->moduleRevision, channelIndex + 1);
-        }
-    }
-
-    writeUint16(0); // end of meta fields section
-
-    // write beginning of data offset
-    g_recording.dataOffset = 4 * ((g_bufferIndex + 3) / 4);
-    g_bufferIndex = savedBufferIndex;
-    writeUint32(g_recording.dataOffset);
-    g_bufferIndex = g_recording.dataOffset;
+	g_writer.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -552,7 +355,7 @@ static void log(uint32_t tickCount) {
         return;
     }
 
-    if (g_recording.parameters.period < PERIOD_MIN) {
+    if (g_recording.parameters.period < dlog_view::PERIOD_MIN) {
         if (g_currentTime >= g_recording.parameters.time) {
             stateTransition(EVENT_FINISH);
         }
@@ -575,13 +378,13 @@ static void log(uint32_t tickCount) {
                         dlogItem.resourceType == DLOG_RESOURCE_TYPE_I ||
                         dlogItem.resourceType == DLOG_RESOURCE_TYPE_P
                     ) {
-                        writeFloat(NAN);
+                        g_writer.writeFloat(NAN);
                     } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
-                        writeBit(0);
+						g_writer.writeBit(0);
                     }
                 }
 
-                flushBits();
+				g_writer.flushBits();
 
                 ++g_recording.size;
             }
@@ -590,11 +393,11 @@ static void log(uint32_t tickCount) {
             for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
                 auto &dlogItem = g_recording.parameters.dlogItems[i];
                 if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
-                    writeFloat(channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
+					g_writer.writeFloat(channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
                 } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_I) {
-                    writeFloat(channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
+					g_writer.writeFloat(channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
                 } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_P)  {
-                    writeFloat(
+					g_writer.writeFloat(
                         channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex) *
                         channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex)
                     );
@@ -602,14 +405,14 @@ static void log(uint32_t tickCount) {
                     uint8_t data;
                     channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
                     if (data & (1 << (dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0))) {
-                        writeBit(1);
+						g_writer.writeBit(1);
                     } else {
-                        writeBit(0);
+						g_writer.writeBit(0);
                     }
                 }
             }
 
-            flushBits();
+			g_writer.flushBits();
             
             ++g_recording.size;
 
@@ -637,7 +440,20 @@ static int doStartImmediately() {
 
     initRecordingStart();
 
-    writeFileHeaderAndMetaFields();
+	for (uint8_t channelIndex = 0; channelIndex < dlog_file::MAX_NUM_OF_CHANNELS; channelIndex++) {
+        if (channelIndex < CH_NUM) {
+		    Channel &channel = Channel::get(channelIndex);
+		    g_parameters.channels[channelIndex].moduleType = g_slots[channel.slotIndex]->moduleType;
+		    g_parameters.channels[channelIndex].moduleRevision = g_slots[channel.slotIndex]->moduleRevision;
+        } else {
+		    g_parameters.channels[channelIndex].moduleType = 0;
+		    g_parameters.channels[channelIndex].moduleRevision = 0;
+        }
+	}
+
+    g_writer.writeFileHeaderAndMetaFields(g_recording.parameters);
+
+	g_recording.dataOffset = g_writer.getDataOffset();
 
     g_lastSavedBufferTickCount = millis();
 
@@ -674,8 +490,8 @@ static int doInitiate(bool traceInitiated) {
 
 static void resetAllParameters() {
     memset(&g_parameters, 0, sizeof(g_parameters));
-    g_parameters.period = PERIOD_DEFAULT;
-    g_parameters.time = TIME_DEFAULT;
+    g_parameters.period = dlog_view::PERIOD_DEFAULT;
+    g_parameters.time = dlog_view::TIME_DEFAULT;
     setTriggerSource(trigger::SOURCE_IMMEDIATE);
 }
 
@@ -697,6 +513,12 @@ static void doFinish(bool afterError) {
     }
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+
+uint32_t getFileLength() {
+	return g_writer.getFileLength();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -891,8 +713,8 @@ void tick(uint32_t tickCount) {
 
 void log(float *values) {
     if (g_state == STATE_EXECUTING) {
-        for (int yAxisIndex = 0; yAxisIndex < dlog_record::g_recording.parameters.numYAxes; yAxisIndex++) {
-            writeFloat(values[yAxisIndex]);
+        for (int yAxisIndex = 0; yAxisIndex < g_recording.parameters.numYAxes; yAxisIndex++) {
+			g_writer.writeFloat(values[yAxisIndex]);
         }
         ++g_recording.size;
     }
@@ -904,13 +726,13 @@ void log(int slotIndex, int subchannelIndex, uint8_t data) {
 			auto &dlogItem = g_recording.parameters.dlogItems[i];
 			if (dlogItem.slotIndex == slotIndex && dlogItem.subchannelIndex == subchannelIndex) {
 				if (data & (1 << (dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0))) {
-					writeBit(1);
+					g_writer.writeBit(1);
 				} else {
-					writeBit(0);
+					g_writer.writeBit(0);
 				}
 			}
 		}
-		flushBits();
+		g_writer.flushBits();
 		++g_recording.size;
     }
 }

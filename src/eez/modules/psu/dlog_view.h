@@ -21,7 +21,8 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/yt_graph.h>
 #include <eez/modules/psu/trigger.h>
-#include <eez/modules/psu/dlog_view.h>
+
+#include <eez/dlog_file.h>
 
 /* DLOG File Format
 
@@ -57,21 +58,19 @@ namespace eez {
 namespace psu {
 namespace dlog_view {
 
-static const uint32_t MAGIC1 = 0x2D5A4545;
-static const uint32_t MAGIC2 = 0x474F4C44;
-static const uint16_t VERSION1 = 1;
-static const uint16_t VERSION2 = 2;
-static const uint32_t DLOG_VERSION1_HEADER_SIZE = 28;
+static const float PERIOD_MIN = 0.001f;
+static const float PERIOD_MAX = 120.0f;
+static const float PERIOD_DEFAULT = 0.02f;
+
+static const float TIME_MIN = 1.0f;
+static const float TIME_MAX = 86400000.0f;
+static const float TIME_DEFAULT = 60.0f;
 
 static const int VIEW_WIDTH = 480;
 static const int VIEW_HEIGHT = 240;
 
 static const int NUM_HORZ_DIVISIONS = 12;
 static const int NUM_VERT_DIVISIONS = 6;
-
-static const int MAX_NUM_OF_Y_AXES = CH_MAX * 3;
-
-static const int MAX_COMMENT_LENGTH = 128;
 
 enum State {
     STATE_STARTING,
@@ -80,82 +79,24 @@ enum State {
     STATE_READY
 };
 
-enum Fields {
-    FIELD_ID_COMMENT = 1,
-
-    FIELD_ID_X_UNIT = 10,
-    FIELD_ID_X_STEP = 11,
-    FIELD_ID_X_RANGE_MIN = 12,
-    FIELD_ID_X_RANGE_MAX = 13,
-    FIELD_ID_X_LABEL = 14,
-    FIELD_ID_X_SCALE = 15, // 0 - linear, 1 - logarithmic
-
-    FIELD_ID_Y_UNIT = 30,
-    FIELD_ID_Y_RANGE_MIN = 32,
-    FIELD_ID_Y_RANGE_MAX = 33,
-    FIELD_ID_Y_LABEL = 34,
-    FIELD_ID_Y_CHANNEL_INDEX = 35,
-    FIELD_ID_Y_SCALE = 36,
-
-    FIELD_ID_CHANNEL_MODULE_TYPE = 50,
-    FIELD_ID_CHANNEL_MODULE_REVISION = 51
-};
-
-struct Range {
-    float min;
-    float max;
-};
-
-static const int MAX_LABEL_LENGTH = 32;
-
-enum Scale {
-    SCALE_LINEAR,
-    SCALE_LOGARITHMIC
-};
-
-struct XAxis {
-    Unit unit;
-    float step;
-    Scale scale;
-    Range range;
-    char label[MAX_LABEL_LENGTH + 1];
-};
-
-struct YAxis {
-    Unit unit;
-    Range range;
-    char label[MAX_LABEL_LENGTH + 1];
-    int8_t channelIndex;
-};
-
 struct DlogItem {
-    uint8_t slotIndex;
-    uint8_t subchannelIndex;
-    uint8_t resourceIndex;
-    uint8_t resourceType;
+	uint8_t slotIndex;
+	uint8_t subchannelIndex;
+	uint8_t resourceIndex;
+	uint8_t resourceType;
 };
 
-struct Parameters {
-    char filePath[MAX_PATH_LENGTH + 1];
-    char comment[MAX_COMMENT_LENGTH + 1];
+struct Parameters : public dlog_file::Parameters {
+	char filePath[MAX_PATH_LENGTH + 1] = { 0 };
 
-    XAxis xAxis;
+    DlogItem dlogItems[dlog_file::MAX_NUM_OF_Y_AXES];
+    int numDlogItems = 0;
 
-    YAxis yAxis;
-    Scale yAxisScale;
-
-    uint8_t numYAxes;
-    YAxis yAxes[MAX_NUM_OF_Y_AXES];
-
-    DlogItem dlogItems[MAX_NUM_OF_Y_AXES];
-    int numDlogItems;
     eez_err_t enableDlogItem(int slotIndex, int subchannelIndex, int resourceIndex, bool enable);
     bool isDlogItemEnabled(int slotIndex, int subchannelIndex, int resourceIndex);
     bool isDlogItemEnabled(int slotIndex, int subchannelIndex, DlogResourceType resourceType);
 
-    float period;
-    float time;
-    trigger::Source triggerSource;
+    trigger::Source triggerSource = trigger::SOURCE_IMMEDIATE;
 
 private:
     bool findDlogItemIndex(int slotIndex, int subchannelIndex, int resourceIndex, int &dlogItemIndex);
@@ -193,7 +134,7 @@ struct Recording {
 
     uint8_t selectedVisibleValueIndex;
 
-    uint32_t columnFloatIndexes[MAX_NUM_OF_Y_AXES];
+    uint32_t columnFloatIndexes[dlog_file::MAX_NUM_OF_Y_AXES];
     uint32_t numFloatsPerRow;
 };
 
@@ -213,7 +154,6 @@ void stateManagment();
 Recording &getRecording();
 
 void initAxis(Recording &recording);
-void initYAxis(Parameters &parameters, int yAxisIndex);
 void initDlogValues(Recording &recording);
 void calcColumnIndexes(Recording &g_recording);
 int getNumVisibleDlogValues(const Recording &recording);

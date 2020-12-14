@@ -25,16 +25,7 @@ namespace eez {
 namespace psu {
 namespace dlog_record {
 
-static const float PERIOD_MIN = 0.001f;
-static const float PERIOD_MAX = 120.0f;
-static const float PERIOD_DEFAULT = 0.02f;
-
-static const float TIME_MIN = 1.0f;
-static const float TIME_MAX = 86400000.0f;
-static const float TIME_DEFAULT = 60.0f;
-
 extern double g_currentTime;
-extern uint32_t g_fileLength;
 extern dlog_view::Parameters g_parameters;
 extern dlog_view::Recording g_recording;
 
@@ -54,6 +45,8 @@ inline bool isInitiated() { return g_state == STATE_INITIATED; }
 inline bool isExecuting() { return g_state == STATE_EXECUTING; }
 inline bool isTraceExecuting() { return g_state == STATE_EXECUTING && g_traceInitiated; }
 inline bool isInStateTransition() { return g_inStateTransition; }
+
+uint32_t getFileLength();
 
 void setTriggerSource(trigger::Source source);
 
