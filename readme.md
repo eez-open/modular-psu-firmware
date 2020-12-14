@@ -63,4 +63,4 @@ Visual Studio solution is created in `\path\to\modular-psu-firmware\build\win32`
 
 ### STM32 firmware
 
-- Import project from `/path/to/modular-psu-firmware/src/third_party/stm32_cubeide` into [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) and build it.
+Import project from `/path/to/modular-psu-firmware/src/third_party/stm32_cubeide` into [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) and build it.
