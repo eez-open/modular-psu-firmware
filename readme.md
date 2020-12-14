@@ -59,7 +59,7 @@ Use git to clone https://github.com/eez-open/modular-psu-firmware.
 
 Execute `cmake.bat`.
 
-Visual Studio solution is created in `\path\to\modular-psu-firmware\build\win32'.
+Visual Studio solution is created in `\path\to\modular-psu-firmware\build\win32`.
 
 ### STM32 firmware
 
