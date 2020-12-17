@@ -266,15 +266,15 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    float time;
+    float duration;
 
     if (param.special) {
         if (param.content.tag == SCPI_NUM_MIN) {
-            time = dlog_view::TIME_MIN;
+			duration = dlog_view::DURATION_MIN;
         } else if (param.content.tag == SCPI_NUM_MAX) {
-            time = dlog_view::TIME_MAX;
+			duration = dlog_view::DURATION_MAX;
         } else if (param.content.tag == SCPI_NUM_DEF) {
-            time = dlog_view::TIME_DEFAULT;
+			duration = dlog_view::DURATION_DEFAULT;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
@@ -285,16 +285,16 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
             return SCPI_RES_ERR;
         }
 
-        time = (float)param.content.value;
+		duration = (float)param.content.value;
     }
 
-    dlog_record::g_parameters.time = time;
+    dlog_record::g_parameters.duration = duration;
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_senseDlogTimeQ(scpi_t *context) {
-    SCPI_ResultFloat(context, dlog_record::g_parameters.time);
+    SCPI_ResultFloat(context, dlog_record::g_parameters.duration);
     return SCPI_RES_OK;
 }
 

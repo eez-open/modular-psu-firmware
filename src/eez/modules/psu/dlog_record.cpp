@@ -355,7 +355,7 @@ static void log(uint32_t tickCount) {
     }
 
     if (isModuleLocalRecording()) {
-        if (g_currentTime >= g_recording.parameters.time) {
+        if (g_currentTime >= g_recording.parameters.duration) {
             stateTransition(EVENT_FINISH);
         }
         return;
@@ -365,7 +365,7 @@ static void log(uint32_t tickCount) {
         if (osMutexWait(g_mutexId, 5) == osOK) {
             while (1) {
                 g_nextTime = ++g_iSample * g_recording.parameters.period;
-                if (g_currentTime < g_nextTime || g_nextTime > g_recording.parameters.time) {
+                if (g_currentTime < g_nextTime || g_nextTime > g_recording.parameters.duration) {
                     break;
                 }
 
@@ -418,7 +418,7 @@ static void log(uint32_t tickCount) {
             osMutexRelease(g_mutexId);
         }        
 
-        if (g_nextTime > g_recording.parameters.time) {
+        if (g_nextTime > g_recording.parameters.duration) {
             stateTransition(EVENT_FINISH);
         }
     }
@@ -493,7 +493,7 @@ static int doInitiate(bool traceInitiated) {
 static void resetAllParameters() {
     memset(&g_parameters, 0, sizeof(g_parameters));
     g_parameters.period = dlog_view::PERIOD_DEFAULT;
-    g_parameters.time = dlog_view::TIME_DEFAULT;
+    g_parameters.duration = dlog_view::DURATION_DEFAULT;
     setTriggerSource(trigger::SOURCE_IMMEDIATE);
 }
 
@@ -736,7 +736,7 @@ void reset() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void tick(uint32_t tickCount) {
-    if (g_state == STATE_EXECUTING && g_nextTime <= g_recording.parameters.time && !g_inStateTransition) {
+    if (g_state == STATE_EXECUTING && g_nextTime <= g_recording.parameters.duration && !g_inStateTransition) {
         log(tickCount);
     }
 }

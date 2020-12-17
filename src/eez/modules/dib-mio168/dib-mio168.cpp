@@ -110,13 +110,13 @@ static const size_t CHANNEL_LABEL_MAX_LENGTH = 5;
 
 static const uint32_t REFRESH_TIME_MS = 250;
 static const uint32_t TIMEOUT_TIME_MS = 350;
-static const uint32_t ERROR_TIME_MS = 3000;
+static const uint32_t TIMEOUT_UNTIL_OUT_OF_SYNC_MS = 10000;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 struct DlogParams {
     float period;
-    float time;
+    float duration;
     uint32_t resources;
 };
 
@@ -1055,7 +1055,7 @@ public:
         memset(&lastTransferredParams, 0, sizeof(FromMasterToSlaveParamsChange));
 
         dlog.period = 0;
-        dlog.time = 0;
+        dlog.duration = 0;
         dlog.resources = 0;
     }
 
@@ -1125,7 +1125,7 @@ public:
 
         params.dlog.period = dlog.period;
         if (dlog.period > 0) {
-            params.dlog.time = dlog.time;
+            params.dlog.duration = dlog.duration;
             params.dlog.resources = dlog.resources;
             
             for (int i = 0; i < 8; i++) {
@@ -1437,7 +1437,7 @@ public:
         }
 
 #ifdef EEZ_PLATFORM_STM32
-        if (millis() - lastTransferTime >= ERROR_TIME_MS) {
+        if (millis() - lastTransferTime >= TIMEOUT_UNTIL_OUT_OF_SYNC_MS) {
             event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
             synchronized = false;
             testResult = TEST_FAILED;
@@ -2671,7 +2671,7 @@ public:
             }
 
             if (dlog.resources != 0) {
-                dlog.time = dlog_record::g_parameters.time;
+                dlog.duration = dlog_record::g_parameters.duration;
                 dlog.period = dlog_record::g_parameters.period;
             }
         }

@@ -257,7 +257,7 @@ bool Reader::readFileHeaderAndMetaFields(Parameters &parameters, uint32_t &heade
 		readUint16(); // flags
 		m_columns = readUint32();
 		parameters.period = readFloat();
-		parameters.time = readFloat();
+		parameters.duration = readFloat();
 		readUint32(); // startTime
 
 		return true;
@@ -397,7 +397,7 @@ bool Reader::readRemainingFileHeaderAndMetaFields(Parameters &parameters) {
 	}
 
 	parameters.period = parameters.xAxis.step;
-	parameters.time = parameters.xAxis.range.max - parameters.xAxis.range.min;
+	parameters.duration = parameters.xAxis.range.max - parameters.xAxis.range.min;
 
 	return !invalidHeader;
 }

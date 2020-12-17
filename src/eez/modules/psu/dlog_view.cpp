@@ -501,7 +501,7 @@ void initAxis(Recording &recording) {
     recording.parameters.xAxis.unit = UNIT_SECOND;
     recording.parameters.xAxis.step = recording.parameters.period;
     recording.parameters.xAxis.range.min = 0;
-    recording.parameters.xAxis.range.max = recording.parameters.time;
+    recording.parameters.xAxis.range.max = recording.parameters.duration;
 
     for (int8_t dlogItemIndex = 0; dlogItemIndex < recording.parameters.numDlogItems; ++dlogItemIndex) {
         auto &dlogItem = recording.parameters.dlogItems[dlogItemIndex];
@@ -1166,15 +1166,15 @@ void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) 
 
 void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = MakeValue(DlogParamsPage::g_parameters.time, UNIT_SECOND);
+        value = MakeValue(DlogParamsPage::g_parameters.duration, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(TIME_MIN, UNIT_SECOND);
+        value = MakeValue(DURATION_MIN, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(INFINITY, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_SET) {
-        DlogParamsPage::g_parameters.time = value.getFloat();
+        DlogParamsPage::g_parameters.duration = value.getFloat();
     }
 }
 

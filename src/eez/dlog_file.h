@@ -130,7 +130,7 @@ struct Parameters {
     ChannelInfo channels[MAX_NUM_OF_CHANNELS];
 
 	float period;
-	float time;
+	float duration;
 
 	void initYAxis(int yAxisIndex);
 };
