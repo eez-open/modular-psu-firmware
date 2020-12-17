@@ -160,8 +160,7 @@ extern "C" {
     X(SCPI_ERROR_CH2_NOT_CALIBRATED,                         731, "CH2 is not calibrated")                        \
     X(SCPI_ERROR_CH1_CALIBRATION_NOT_ENABLED,                741, "CH1 calibration is not enabled")               \
     X(SCPI_ERROR_CH2_CALIBRATION_NOT_ENABLED,                742, "CH2 calibration is not enabled")               \
-    X(SCPI_ERROR_DLOG_MASTER_OVERFLOW,                       750, "DLOG master overflow")                         \
-    X(SCPI_ERROR_DLOG_SLAVE_OVERFLOW,                        751, "DLOG slave overflow")
+    X(SCPI_ERROR_BUFFER_OVERFLOW,                            750, "Buffer overflow")                              \
 
 // clang-format on
 

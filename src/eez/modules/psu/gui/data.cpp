@@ -823,8 +823,9 @@ void FIRMWARE_VERSION_value_to_text(const Value &value, char *text, int count) {
 static double g_savedCurrentTime;
 
 bool compare_DLOG_CURRENT_TIME_value(const Value &a, const Value &b) {
-    bool result = g_savedCurrentTime == dlog_record::g_currentTime;
-    g_savedCurrentTime = dlog_record::g_currentTime;
+    double currentTime = dlog_record::getCurrentTime();
+    bool result = g_savedCurrentTime == currentTime;
+    g_savedCurrentTime = currentTime;
     return result;
 }
 

@@ -25,7 +25,6 @@ namespace eez {
 namespace psu {
 namespace dlog_record {
 
-extern double g_currentTime;
 extern dlog_view::Parameters g_parameters;
 extern dlog_view::Recording g_recording;
 
@@ -46,7 +45,11 @@ inline bool isExecuting() { return g_state == STATE_EXECUTING; }
 inline bool isTraceExecuting() { return g_state == STATE_EXECUTING && g_traceInitiated; }
 inline bool isInStateTransition() { return g_inStateTransition; }
 
+bool isModuleLocalRecording();
+double getCurrentTime();
 uint32_t getFileLength();
+void setFileLength(uint32_t fileLength);
+void setNumSamples(uint32_t numSamples);
 
 void setTriggerSource(trigger::Source source);
 
@@ -59,12 +62,12 @@ void triggerGenerated();
 void toggleStart();
 void toggleStop();
 void abort();
-void abortAfterSlaveOverflowError();
+void abortAfterBufferOverflowError();
+void abortAfterMassStorageError();
 void reset();
 
 void tick(uint32_t tick_usec);
 void log(float *values);
-void log(int slotIndex, int subchannelIndex, uint8_t data);
 
 void fileWrite(bool flush = false);
 void stateTransition(int event, int *perr = nullptr);

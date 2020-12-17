@@ -147,6 +147,7 @@ public:
 	void writeBit(int bit);
 	void flushBits();
 
+	uint8_t *getBuffer() { return m_buffer; }
 	uint32_t getBufferIndex() { return m_bufferIndex; }
 	uint32_t getDataOffset() { return m_dataOffset; }
 	uint32_t getFileLength() { return m_fileLength; }

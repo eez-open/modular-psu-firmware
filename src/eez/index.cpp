@@ -717,10 +717,10 @@ float Module::getDlogResourceMinPeriod(int subchannelIndex, int resourceIndex) {
     return NAN;
 }
 
-void Module::startDlog(int subchannelIndex, int resourceIndex) {
+void Module::onStartDlog() {
 }
 
-void Module::stopDlog(int subchannelIndex, int resourceIndex) {
+void Module::onStopDlog() {
 }
 
 #ifdef EEZ_PLATFORM_STM32

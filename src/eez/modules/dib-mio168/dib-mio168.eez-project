@@ -2680,9 +2680,7 @@
                           "type": "MultilineText",
                           "style": {
                             "inheritFrom": "edit_value_active_S_center",
-                            "alignHorizontal": "left",
-                            "alignVertical": "top",
-                            "padding": "13"
+                            "alignHorizontal": "left"
                           },
                           "data": "ain_label",
                           "action": "",
@@ -2753,9 +2751,7 @@
                           "type": "MultilineText",
                           "style": {
                             "inheritFrom": "edit_value_active_S_center",
-                            "alignHorizontal": "left",
-                            "alignVertical": "top",
-                            "padding": "13"
+                            "alignHorizontal": "left"
                           },
                           "data": "aout_label",
                           "action": "",
@@ -3648,12 +3644,13 @@
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "status_title"
+                  "inheritFrom": "status_title",
+                  "alignHorizontal": "center"
                 },
                 "data": "ain_label",
                 "left": 134,
                 "top": 0,
-                "width": 45,
+                "width": 84,
                 "height": 32,
                 "text": ""
               },
@@ -3663,9 +3660,9 @@
                   "inheritFrom": "status_title"
                 },
                 "data": "",
-                "left": 179,
+                "left": 218,
                 "top": 0,
-                "width": 219,
+                "width": 180,
                 "height": 32,
                 "text": "Configuration"
               },
@@ -4016,12 +4013,13 @@
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "status_title"
+                  "inheritFrom": "status_title",
+                  "alignHorizontal": "center"
                 },
                 "data": "aout_label",
                 "left": 134,
                 "top": 0,
-                "width": 45,
+                "width": 84,
                 "height": 32,
                 "text": ""
               },
@@ -4031,9 +4029,9 @@
                   "inheritFrom": "status_title"
                 },
                 "data": "",
-                "left": 179,
+                "left": 218,
                 "top": 0,
-                "width": 219,
+                "width": 180,
                 "height": 32,
                 "text": "Configuration"
               },
@@ -4196,12 +4194,13 @@
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "status_title"
+                  "inheritFrom": "status_title",
+                  "alignHorizontal": "center"
                 },
                 "data": "aout_label",
                 "left": 134,
                 "top": 0,
-                "width": 45,
+                "width": 84,
                 "height": 32,
                 "text": ""
               },
@@ -4211,9 +4210,9 @@
                   "inheritFrom": "status_title"
                 },
                 "data": "",
-                "left": 179,
+                "left": 218,
                 "top": 0,
-                "width": 219,
+                "width": 180,
                 "height": 32,
                 "text": "Configuration"
               },

@@ -62,8 +62,8 @@ enum Event {
     EVENT_TOGGLE_STOP,
     EVENT_FINISH,
     EVENT_ABORT,
-    EVENT_ABORT_AFTER_MASTER_OVERFLOW_ERROR,
-    EVENT_ABORT_AFTER_SLAVE_OVERFLOW_ERROR,
+    EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR,
+    EVENT_ABORT_AFTER_MASS_STORAGE_ERROR,
     EVENT_RESET
 };
 
@@ -86,7 +86,7 @@ static uint32_t g_lastTickCount;
 static uint32_t g_seconds;
 static uint32_t g_micros;
 static uint32_t g_iSample;
-double g_currentTime;
+static double g_currentTime;
 static double g_nextTime;
 
 static unsigned int g_lastSavedBufferIndex;
@@ -94,10 +94,10 @@ static uint32_t g_lastSavedBufferTickCount;
 
 static dlog_file::Writer g_writer(DLOG_RECORD_BUFFER, DLOG_RECORD_BUFFER_SIZE);
 
+static uint32_t g_fileLength;
+
 osMutexId(g_mutexId);
 osMutexDef(g_mutex);
-
-void abortAfterMasterOverflowError();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -172,7 +172,7 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
             } else {
                 // TODO buffer overflow, this should be reported to the user
             	osMutexRelease(g_mutexId);
-                abortAfterMasterOverflowError();
+                abortAfterBufferOverflowError();
             	return false;
 
 //
@@ -268,8 +268,6 @@ void fileWrite(bool flush) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void writeUint32(uint32_t value);
-
 static void flushData() {
     //DebugTrace("flush before: %d\n", g_bufferIndex - g_lastSavedBufferIndex);
 
@@ -311,12 +309,13 @@ static void initRecordingStart() {
 
     g_recording.getValue = getValue;
 
-    for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
-        auto &dlogItem = g_recording.parameters.dlogItems[i];
-        g_slots[dlogItem.slotIndex]->startDlog(dlogItem.subchannelIndex, dlogItem.resourceIndex);
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        g_slots[slotIndex]->onStartDlog();
     }
 
-	g_writer.reset();
+    if (!isModuleLocalRecording()) {
+	    g_writer.reset();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -355,7 +354,7 @@ static void log(uint32_t tickCount) {
         return;
     }
 
-    if (g_recording.parameters.period < dlog_view::PERIOD_MIN) {
+    if (isModuleLocalRecording()) {
         if (g_currentTime >= g_recording.parameters.time) {
             stateTransition(EVENT_FINISH);
         }
@@ -433,9 +432,11 @@ static int doStartImmediately() {
         return err;
     }
 
-    err = fileTruncate();
-    if (err != SCPI_RES_OK) {
-        return err;
+    if (!isModuleLocalRecording()) {
+        err = fileTruncate();
+        if (err != SCPI_RES_OK) {
+            return err;
+        }
     }
 
     initRecordingStart();
@@ -451,9 +452,10 @@ static int doStartImmediately() {
         }
 	}
 
-    g_writer.writeFileHeaderAndMetaFields(g_recording.parameters);
-
-	g_recording.dataOffset = g_writer.getDataOffset();
+    if (!isModuleLocalRecording()) {
+        g_writer.writeFileHeaderAndMetaFields(g_recording.parameters);
+    	g_recording.dataOffset = g_writer.getDataOffset();
+    }
 
     g_lastSavedBufferTickCount = millis();
 
@@ -501,23 +503,40 @@ static void resetFilePath() {
 
 static void doFinish(bool afterError) {
     if (!afterError) {
-        flushData();
-        onSdCardFileChangeHook(g_parameters.filePath);
+        if (!isModuleLocalRecording()) {        
+            flushData();
+            onSdCardFileChangeHook(g_parameters.filePath);
+        }
     }
     resetFilePath();
     setState(STATE_IDLE);
 
-    for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
-        auto &dlogItem = g_recording.parameters.dlogItems[i];
-        g_slots[dlogItem.slotIndex]->stopDlog(dlogItem.subchannelIndex, dlogItem.resourceIndex);
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        g_slots[slotIndex]->onStopDlog();
     }
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool isModuleLocalRecording() {
+    return g_recording.parameters.period < dlog_view::PERIOD_MIN;
+}
+
+double getCurrentTime() {
+    return isModuleLocalRecording() ? g_currentTime - ((g_recording.size - 1) * g_recording.parameters.period) : g_currentTime;
+}
+
 uint32_t getFileLength() {
-	return g_writer.getFileLength();
+	return isModuleLocalRecording() ? g_fileLength : g_writer.getFileLength();
+}
+
+void setFileLength(uint32_t fileLength) {
+    g_fileLength = fileLength;
+}
+
+void setNumSamples(uint32_t numSamples) {
+    g_recording.size = numSamples;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -610,7 +629,10 @@ void stateTransition(int event, int* perr) {
         } else if (event == EVENT_ABORT || event == EVENT_RESET) {
             resetFilePath();
             err = SCPI_RES_OK;
+        } else if (event == EVENT_ABORT_AFTER_MASS_STORAGE_ERROR || event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR) {
+            err = SCPI_RES_OK;
         }
+
     } else if (g_state == STATE_INITIATED) {
         if (event == EVENT_START || event == EVENT_TRIGGER || event == EVENT_TOGGLE_START) {
             err = doStartImmediately();
@@ -620,6 +642,14 @@ void stateTransition(int event, int* perr) {
             resetFilePath();
             setState(STATE_IDLE);
             err = SCPI_RES_OK;
+        } else if (event == EVENT_ABORT_AFTER_MASS_STORAGE_ERROR) {
+            resetFilePath();
+            setState(STATE_IDLE);
+            err = SCPI_ERROR_BUFFER_OVERFLOW;
+        } else if (event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR) {
+            resetFilePath();
+            setState(STATE_IDLE);
+            err = SCPI_ERROR_MASS_STORAGE_ERROR;
         }
     } else if (g_state == STATE_EXECUTING) {
         if (event == EVENT_TOGGLE_STOP || event == EVENT_FINISH || event == EVENT_ABORT || event == EVENT_RESET) {
@@ -627,12 +657,12 @@ void stateTransition(int event, int* perr) {
             err = SCPI_RES_OK;
         } else if (event == EVENT_TOGGLE_START) {
             err = SCPI_RES_OK;
-        } else if (event == EVENT_ABORT_AFTER_MASTER_OVERFLOW_ERROR) {
+        } else if (event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR) {
             doFinish(true);
-            err = SCPI_ERROR_DLOG_MASTER_OVERFLOW;
-        } else if (event == EVENT_ABORT_AFTER_SLAVE_OVERFLOW_ERROR) {
+            err = SCPI_ERROR_BUFFER_OVERFLOW;
+        } else if (event == EVENT_ABORT_AFTER_MASS_STORAGE_ERROR) {
             doFinish(true);
-            err = SCPI_ERROR_DLOG_SLAVE_OVERFLOW;
+            err = SCPI_ERROR_MASS_STORAGE_ERROR;
         }
     }
 
@@ -691,12 +721,12 @@ void abort() {
     stateTransition(EVENT_ABORT);
 }
 
-void abortAfterMasterOverflowError() {
-    stateTransition(EVENT_ABORT_AFTER_MASTER_OVERFLOW_ERROR);
+void abortAfterBufferOverflowError() {
+    stateTransition(EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR);
 }
 
-void abortAfterSlaveOverflowError() {
-    stateTransition(EVENT_ABORT_AFTER_SLAVE_OVERFLOW_ERROR);
+void abortAfterMassStorageError() {
+    stateTransition(EVENT_ABORT_AFTER_MASS_STORAGE_ERROR);
 }
 
 void reset() {
@@ -717,23 +747,6 @@ void log(float *values) {
 			g_writer.writeFloat(values[yAxisIndex]);
         }
         ++g_recording.size;
-    }
-}
-
-void log(int slotIndex, int subchannelIndex, uint8_t data) {
-    if (g_state == STATE_EXECUTING && !g_inStateTransition) {
-		for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
-			auto &dlogItem = g_recording.parameters.dlogItems[i];
-			if (dlogItem.slotIndex == slotIndex && dlogItem.subchannelIndex == subchannelIndex) {
-				if (data & (1 << (dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0))) {
-					g_writer.writeBit(1);
-				} else {
-					g_writer.writeBit(0);
-				}
-			}
-		}
-		g_writer.flushBits();
-		++g_recording.size;
     }
 }
 

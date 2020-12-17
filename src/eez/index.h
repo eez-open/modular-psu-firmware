@@ -389,8 +389,8 @@ struct Module {
     virtual DlogResourceType getDlogResourceType(int subchannelIndex, int resourceIndex);
     virtual const char *getDlogResourceLabel(int subchannelIndex, int resourceIndex);
     virtual float getDlogResourceMinPeriod(int subchannelIndex, int resourceIndex);
-    virtual void startDlog(int subchannelIndex, int resourceIndex);
-    virtual void stopDlog(int subchannelIndex, int resourceIndex);
+    virtual void onStartDlog();
+    virtual void onStopDlog();
 
 #if defined(EEZ_PLATFORM_STM32)
     virtual void executeDiskDriveOperation(ExecuteDiskDriveOperationParams *params);

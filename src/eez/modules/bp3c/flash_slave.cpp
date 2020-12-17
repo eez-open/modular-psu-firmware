@@ -380,9 +380,11 @@ void leaveBootloaderMode() {
     psu::io_pins::refresh();
 #endif
 
-	if (g_slots[g_slotIndex]->moduleType != MODULE_TYPE_NONE) {
-		psu::gui::showPage(g_slots[g_slotIndex]->getSlotSettingsPageId());
-	}
+#if OPTION_DISPLAY
+    if (psu::gui::isPageOnStack(g_slots[g_slotIndex]->getSlotSettingsPageId())) {
+    	psu::gui::showPage(g_slots[g_slotIndex]->getSlotSettingsPageId());
+    }
+#endif
 }
 
 struct HexRecord {
@@ -494,11 +496,9 @@ void uploadHexFile() {
 		psu::gui::hideAsyncOperationInProgress();
     	psu::gui::showProgressPageWithoutAbort("Downloading firmware...");
 		psu::gui::updateProgressPage(0, 0);
-#endif
 
-	#if OPTION_DISPLAY
 	    totalSize = file.size();
-	#endif
+#endif
 
 		while (!eofReached && readHexRecord(bufferedFile, hexRecord)) {
 			size_t currentPosition = file.tell();
@@ -523,29 +523,34 @@ void uploadHexFile() {
 		file.close();
 
 Exit:
-	#if OPTION_DISPLAY
+#if OPTION_DISPLAY
+		osDelay(100);
 		if (dowloadStarted) {
 			psu::gui::hideProgressPage();
 		} else {
 			psu::gui::hideAsyncOperationInProgress();			
 		}
-	#endif
+		osDelay(100);
+#endif
 
 		if (eofReached) {
 			uint16_t value = 0xA5A5;
 			bp3c::eeprom::write(g_slotIndex, (const uint8_t *)&value, 2, 4);
 			g_slots[g_slotIndex]->firmwareInstalled = true;
 		} else {
+#if OPTION_DISPLAY
 			psu::gui::errorMessage("Downloading failed!");
+#endif
 		}
 	} else {
-#if OPTION_DISPLAY
-		psu::gui::hideAsyncOperationInProgress();			
-#endif
-
 		DebugTrace("Failed to sync with slave\n");
 
+#if OPTION_DISPLAY
+		osDelay(100);
+		psu::gui::hideAsyncOperationInProgress();
+		osDelay(100);
 		psu::gui::errorMessage("Failed to start update!");
+#endif
 	}
 
 	sendMessageToPsu(PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE);

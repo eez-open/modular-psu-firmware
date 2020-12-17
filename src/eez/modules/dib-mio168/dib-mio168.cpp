@@ -42,6 +42,7 @@
 #include "eez/modules/psu/profile.h"
 #include "eez/modules/psu/calibration.h"
 #include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/gui/psu.h>
 #include "eez/modules/psu/gui/keypad.h"
@@ -58,6 +59,10 @@
 using namespace eez::psu;
 using namespace eez::psu::gui;
 using namespace eez::gui;
+
+#if defined(EEZ_PLATFORM_STM32)
+extern "C" DWORD get_fattime(void);
+#endif
 
 namespace eez {
 namespace dib_mio168 {
@@ -105,8 +110,21 @@ static const size_t CHANNEL_LABEL_MAX_LENGTH = 5;
 
 static const uint32_t REFRESH_TIME_MS = 250;
 static const uint32_t TIMEOUT_TIME_MS = 350;
+static const uint32_t ERROR_TIME_MS = 3000;
 
 ////////////////////////////////////////////////////////////////////////////////
+
+struct DlogParams {
+    float period;
+    float time;
+    uint32_t resources;
+};
+
+struct Labels {
+    char din[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+    char dout[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+    char ain[4 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+};
 
 struct FromMasterToSlaveParamsChange {
     uint8_t operation; // DISK_DRIVER_OPERATION_NONE
@@ -137,7 +155,11 @@ struct FromMasterToSlaveParamsChange {
         float duty;
     } pwm[2];
 
-    uint16_t dinReadPeriod;
+    DlogParams dlog;
+
+    Labels labels;
+
+    uint32_t fatTime;
 };
 
 struct FromMasterToSlaveDiskDriveOperation {
@@ -148,20 +170,32 @@ struct FromMasterToSlaveDiskDriveOperation {
 };
 
 #define FLAG_SD_CARD_PRESENT (1 << 0)
-#define FLAG_DIN_READ_OVERFLOW (1 << 1)
-#define FLAG_DIN_RECORD_FINISHED (1 << 2)
+#define FLAG_DLOG_RECORD_FINISHED (1 << 1)
+#define FLAG_DLOG_RECORD_STATUS (1 << 2)
 #define FLAG_DISK_OPERATION_RESPONSE (1 << 3)
+
+#define DLOG_RECORD_RESULT_OK 0
+#define DLOG_RECORD_RESULT_BUFFER_OVERFLOW 1
+#define DLOG_RECORD_RESULT_MASS_STORAGE_ERROR 2
 
 #define MAX_DIN_VALUES 100
 
 #define DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE 4
 
+struct DlogStatus {
+    uint32_t fileLength;
+    uint32_t numSamples;
+};
+
 struct FromSlaveToMaster {
+	uint8_t flags;
+    uint16_t result;
     uint8_t dinStates;
     uint16_t ainValues[4];
-    uint8_t flags;
-	uint32_t diskOperationResult;
-	uint8_t buffer[512];
+    union {
+    	uint8_t buffer[512];
+    	DlogStatus dlogStatus;
+    };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,8 +250,6 @@ struct DinChannel : public MioChannel {
     uint8_t m_pinSpeeds = 0;
 
     char m_pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
-
-    uint16_t readPeriod = 0;
 
     struct ProfileParameters {
         uint8_t pinRanges;
@@ -997,6 +1029,8 @@ public:
     uint8_t dac7760CalibrationChannelCurrentRange;
     uint8_t dac7760CalibrationChannelVoltageRange;
 
+    DlogParams dlog;
+
     Mio168Module() {
         moduleType = MODULE_TYPE_DIB_MIO168;
         moduleName = "MIO168";
@@ -1019,6 +1053,10 @@ public:
         memset(output, 0, sizeof(output));
 
         memset(&lastTransferredParams, 0, sizeof(FromMasterToSlaveParamsChange));
+
+        dlog.period = 0;
+        dlog.time = 0;
+        dlog.resources = 0;
     }
 
     Module *createModule() override {
@@ -1036,6 +1074,7 @@ public:
                 numCrcErrors = 0;
                 numTransferErrors = 0;
                 testResult = TEST_OK;
+                lastTransferTime = millis();
 #ifdef EEZ_PLATFORM_SIMULATOR
                 sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_LINK, slotIndex, 0);
 #endif
@@ -1084,7 +1123,25 @@ public:
             params.pwm[i].duty = channel->m_duty;
         }
 
-        params.dinReadPeriod = dinChannel.readPeriod;
+        params.dlog.period = dlog.period;
+        if (dlog.period > 0) {
+            params.dlog.time = dlog.time;
+            params.dlog.resources = dlog.resources;
+            
+            for (int i = 0; i < 8; i++) {
+                strcpy(params.labels.din + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(DIN_SUBCHANNEL_INDEX, i));
+            }
+
+            for (int i = 0; i < 8; i++) {
+                strcpy(params.labels.dout + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(DOUT_SUBCHANNEL_INDEX, i));
+            }
+
+            for (int i = 0; i < 4; i++) {
+                strcpy(params.labels.ain + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(AIN_1_SUBCHANNEL_INDEX + i, 0));
+            }
+        }
+
+        params.fatTime = get_fattime();
     }
 
     void fillFromMasterToSlaveDiskDriverOperation(FromMasterToSlaveDiskDriveOperation &data) {
@@ -1132,7 +1189,7 @@ public:
             numCrcErrors = 0;
             numTransferErrors = 0;
 
-            FromSlaveToMaster &data = (FromSlaveToMaster &)*input;
+            auto &data = (FromSlaveToMaster &)*input;
 
             dinChannel.m_pinStates = data.dinStates;
 
@@ -1151,10 +1208,23 @@ public:
                 }
             }
 
-            if ((data.flags & FLAG_DIN_READ_OVERFLOW) != 0) {
-                dlog_record::abortAfterSlaveOverflowError();
-            } else if (data.flags & FLAG_DIN_RECORD_FINISHED) {
-                dlog_record::abort();
+            if ((data.flags & FLAG_DLOG_RECORD_STATUS) != 0) {
+                dlog_record::setFileLength(data.dlogStatus.fileLength);
+                dlog_record::setNumSamples(data.dlogStatus.numSamples);
+            }
+
+            if ((data.flags & FLAG_DLOG_RECORD_FINISHED) != 0) {
+                switch (data.result) {
+                    case DLOG_RECORD_RESULT_BUFFER_OVERFLOW:
+                        dlog_record::abortAfterBufferOverflowError();
+                        break;
+                    case DLOG_RECORD_RESULT_MASS_STORAGE_ERROR:
+                        dlog_record::abortAfterMassStorageError();
+                        break;
+                    default:
+                        dlog_record::abort();
+                        break;
+                }
             }
 
             return true;
@@ -1195,13 +1265,13 @@ public:
             return false;
         }
 
-        FromSlaveToMaster &data = (FromSlaveToMaster &)*input;
+        auto &data = (FromSlaveToMaster &)*input;
 
         if (!(data.flags & FLAG_DISK_OPERATION_RESPONSE)) {
         	return false;
         }
 
-        diskOperationParams->result = data.diskOperationResult;
+        diskOperationParams->result = data.result;
 
         if (diskOperationParams->operation == DISK_DRIVER_OPERATION_READ) {
             memcpy(diskOperationParams->buff, data.buffer, 512);
@@ -1367,9 +1437,13 @@ public:
         }
 
 #ifdef EEZ_PLATFORM_STM32
-        if (operationState != STATE_IDLE && millis() - operationStateTransitionTime >= TIMEOUT_TIME_MS) {
+        if (millis() - lastTransferTime >= ERROR_TIME_MS) {
+            event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+            synchronized = false;
+            testResult = TEST_FAILED;
+        } else if (operationState != STATE_IDLE && millis() - operationStateTransitionTime >= TIMEOUT_TIME_MS) {
 			stateTransition(EVENT_TIMEOUT);
-        } else if (millis() - lastTransferTime >= REFRESH_TIME_MS) {
+        } else if (dlog.period > 0 || millis() - lastTransferTime >= REFRESH_TIME_MS) {
         	stateTransition(EVENT_REFRESH);
         } else {
             FromMasterToSlaveParamsChange params;
@@ -2576,18 +2650,35 @@ public:
         return Module::getDlogResourceMinPeriod(subchannelIndex, resourceIndex);
     }
 
-    void startDlog(int subchannelIndex, int resourceIndex) override {
-        if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
-            if (dlog_record::g_parameters.period < 0.001) {
-                dinChannel.readPeriod = (uint16_t)(dlog_record::g_parameters.period * 1000000);
+    void onStartDlog() override {
+        if (dlog_record::isModuleLocalRecording()) {
+            dlog.resources = 0;
+
+            for (int i = 0; i < dlog_record::g_recording.parameters.numDlogItems; i++) {
+                auto &dlogItem = dlog_record::g_recording.parameters.dlogItems[i];
+                if (dlogItem.slotIndex == slotIndex) {
+                    if (dlogItem.subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+                        dlog.resources |= 1 << dlogItem.resourceIndex;
+                    } else if (dlogItem.subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+                        dlog.resources |= 1 << (8 + dlogItem.resourceIndex);
+                    } else if (
+                        dlogItem.subchannelIndex >= AIN_1_SUBCHANNEL_INDEX &&
+                        dlogItem.subchannelIndex <= AIN_4_SUBCHANNEL_INDEX
+                    ) {
+                        dlog.resources |= 1 << (16 + (dlogItem.subchannelIndex - AIN_1_SUBCHANNEL_INDEX));
+                    }
+                }
+            }
+
+            if (dlog.resources != 0) {
+                dlog.time = dlog_record::g_parameters.time;
+                dlog.period = dlog_record::g_parameters.period;
             }
         }
     }
 
-    void stopDlog(int subchannelIndex, int resourceIndex) override {
-        if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
-            dinChannel.readPeriod = 0;
-        }
+    void onStopDlog() override {
+        dlog.period = 0;
     }
 
 #ifdef EEZ_PLATFORM_STM32
@@ -2823,7 +2914,11 @@ void Mio168Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
     } 
 #ifdef EEZ_PLATFORM_STM32	
 	else if (type == PSU_MESSAGE_DISK_DRIVE_OPERATION) {
-        stateTransition(EVENT_DISK_DRIVE_OPERATION);
+        if (dlog.period > 0) {
+            setDiskOperationFailed();
+        } else {
+            stateTransition(EVENT_DISK_DRIVE_OPERATION);
+        }
     }
 #endif
 }
@@ -3108,6 +3203,7 @@ void data_dib_mio168_ain_label(DataOperationEnum operation, Cursor cursor, Value
             int ainChannelIndex;
             AinConfigurationPage *page = (AinConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AIN_CONFIGURATION);
             if (page) {
+				slotIndex = hmi::g_selectedSlotIndex;
                 ainChannelIndex = page->g_selectedChannelIndex - AIN_1_SUBCHANNEL_INDEX;
             } else {
                 ainChannelIndex = subchannelIndex;
@@ -3255,10 +3351,12 @@ void data_dib_mio168_aout_label(DataOperationEnum operation, Cursor cursor, Valu
 
             AoutDac7760ConfigurationPage *page = (AoutDac7760ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION);
             if (page) {
+				slotIndex = hmi::g_selectedSlotIndex;
                 aoutChannelIndex = AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX;
             } else {
                 AoutDac7563ConfigurationPage *page = (AoutDac7563ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION);
                 if (page) {
+					slotIndex = hmi::g_selectedSlotIndex;
                     aoutChannelIndex = AoutDac7563ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX;
                 } else {
                     aoutChannelIndex = subchannelIndex;
