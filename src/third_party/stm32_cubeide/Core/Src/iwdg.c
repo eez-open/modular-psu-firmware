@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : IWDG.c
-  * Description        : This file provides code for the configuration
-  *                      of the IWDG instances.
+  * @file    iwdg.c
+  * @brief   This file provides code for the configuration
+  *          of the IWDG instances.
   ******************************************************************************
   * @attention
   *

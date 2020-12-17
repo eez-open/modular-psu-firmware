@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : JPEG.h
-  * Description        : This file provides code for the configuration
-  *                      of the JPEG instances.
+  * @file    jpeg.h
+  * @brief   This file contains all the function prototypes for
+  *          the jpeg.c file
   ******************************************************************************
   * @attention
   *
@@ -17,10 +17,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __jpeg_H
-#define __jpeg_H
+#ifndef __JPEG_H__
+#define __JPEG_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -45,14 +46,7 @@ void MX_JPEG_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ jpeg_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __JPEG_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

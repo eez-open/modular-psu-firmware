@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : DAC.c
-  * Description        : This file provides code for the configuration
-  *                      of the DAC instances.
+  * @file    dac.c
+  * @brief   This file provides code for the configuration
+  *          of the DAC instances.
   ******************************************************************************
   * @attention
   *

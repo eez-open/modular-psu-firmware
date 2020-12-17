@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : LTDC.h
-  * Description        : This file provides code for the configuration
-  *                      of the LTDC instances.
+  * @file    ltdc.h
+  * @brief   This file contains all the function prototypes for
+  *          the ltdc.c file
   ******************************************************************************
   * @attention
   *
@@ -17,10 +17,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __ltdc_H
-#define __ltdc_H
+#ifndef __LTDC_H__
+#define __LTDC_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -45,14 +46,7 @@ void MX_LTDC_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ ltdc_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __LTDC_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

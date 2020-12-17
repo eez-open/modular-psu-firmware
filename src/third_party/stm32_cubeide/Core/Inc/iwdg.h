@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : IWDG.h
-  * Description        : This file provides code for the configuration
-  *                      of the IWDG instances.
+  * @file    iwdg.h
+  * @brief   This file contains all the function prototypes for
+  *          the iwdg.c file
   ******************************************************************************
   * @attention
   *
@@ -17,10 +17,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __iwdg_H
-#define __iwdg_H
+#ifndef __IWDG_H__
+#define __IWDG_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -45,14 +46,7 @@ void MX_IWDG_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ iwdg_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __IWDG_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

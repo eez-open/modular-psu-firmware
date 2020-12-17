@@ -77,7 +77,7 @@ See BSP_SD_ErrorCallback() and BSP_SD_AbortCallback() below
  */
 /* USER CODE BEGIN enableSDDmaCacheMaintenance */
 /* #define ENABLE_SD_DMA_CACHE_MAINTENANCE  1 */
-/* USER CODE BEGIN enableSDDmaCacheMaintenance */
+/* USER CODE END enableSDDmaCacheMaintenance */
 
 /*
 * Some DMA requires 4-Byte aligned address buffer to correctly read/wite data,

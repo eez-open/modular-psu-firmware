@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : gpio.c
-  * Description        : This file provides code for the configuration
-  *                      of all used GPIO pins.
+  * @file    gpio.c
+  * @brief   This file provides code for the configuration
+  *          of all used GPIO pins.
   ******************************************************************************
   * @attention
   *
@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
+
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
@@ -226,8 +227,8 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(ENC_SW_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
- HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
- HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
 
 }
 

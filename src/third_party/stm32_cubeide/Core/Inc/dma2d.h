@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : DMA2D.h
-  * Description        : This file provides code for the configuration
-  *                      of the DMA2D instances.
+  * @file    dma2d.h
+  * @brief   This file contains all the function prototypes for
+  *          the dma2d.c file
   ******************************************************************************
   * @attention
   *
@@ -17,10 +17,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __dma2d_H
-#define __dma2d_H
+#ifndef __DMA2D_H__
+#define __DMA2D_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -45,14 +46,7 @@ void MX_DMA2D_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ dma2d_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __DMA2D_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

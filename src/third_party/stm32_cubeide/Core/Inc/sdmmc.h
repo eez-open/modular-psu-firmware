@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : SDMMC.h
-  * Description        : This file provides code for the configuration
-  *                      of the SDMMC instances.
+  * @file    sdmmc.h
+  * @brief   This file contains all the function prototypes for
+  *          the sdmmc.c file
   ******************************************************************************
   * @attention
   *
@@ -17,10 +17,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __sdmmc_H
-#define __sdmmc_H
+#ifndef __SDMMC_H__
+#define __SDMMC_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -45,14 +46,7 @@ void MX_SDMMC1_SD_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ sdmmc_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __SDMMC_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

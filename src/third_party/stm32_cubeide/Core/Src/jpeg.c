@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : JPEG.c
-  * Description        : This file provides code for the configuration
-  *                      of the JPEG instances.
+  * @file    jpeg.c
+  * @brief   This file provides code for the configuration
+  *          of the JPEG instances.
   ******************************************************************************
   * @attention
   *

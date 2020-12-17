@@ -21,8 +21,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f7xx_it.h"
-#include "FreeRTOS.h"
-#include "task.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #define USB_MODE_DISABLED 0
@@ -426,15 +424,13 @@ void ETH_IRQHandler(void)
 void OTG_FS_IRQHandler(void)
 {
   /* USER CODE BEGIN OTG_FS_IRQn 0 */
-
-  /* USER CODE END OTG_FS_IRQn 0 */
   if (g_usbMode == USB_MODE_HOST || (g_usbMode == USB_MODE_OTG && g_otgMode == USB_MODE_HOST)) {
     HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
   } else {
-    HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
+  /* USER CODE END OTG_FS_IRQn 0 */
+  HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
+  /* USER CODE BEGIN OTG_FS_IRQn 1 */
   }
-    /* USER CODE BEGIN OTG_FS_IRQn 1 */
-
   /* USER CODE END OTG_FS_IRQn 1 */
 }
 

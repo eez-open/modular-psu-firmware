@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : LTDC.c
-  * Description        : This file provides code for the configuration
-  *                      of the LTDC instances.
+  * @file    ltdc.c
+  * @brief   This file provides code for the configuration
+  *          of the LTDC instances.
   ******************************************************************************
   * @attention
   *

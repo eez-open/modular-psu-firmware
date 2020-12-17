@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : SDMMC.c
-  * Description        : This file provides code for the configuration
-  *                      of the SDMMC instances.
+  * @file    sdmmc.c
+  * @brief   This file provides code for the configuration
+  *          of the SDMMC instances.
   ******************************************************************************
   * @attention
   *
