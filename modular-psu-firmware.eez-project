@@ -2381,8 +2381,8 @@
       "defaultValue": "[]"
     },
     {
-      "name": "dlog_item_status",
-      "type": "enum",
+      "name": "dlog_item_is_checked",
+      "type": "boolean",
       "enumItems": "[\"Disabed\", \"Enabled\", \"Unavailable\"]",
       "defaultValue": "1"
     },
@@ -2423,6 +2423,14 @@
     },
     {
       "name": "file_manager_is_sort_files_option_available",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "dlog_preview_overlay"
+    },
+    {
+      "name": "dlog_item_is_available",
       "type": "boolean",
       "defaultValue": "1"
     }
@@ -32105,6 +32113,36 @@
                     ],
                     "overlay": "dlog_single_value_overlay",
                     "shadow": true
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "overlay",
+                      "opacity": 208
+                    },
+                    "data": "",
+                    "action": "",
+                    "left": 190,
+                    "top": 200,
+                    "width": 100,
+                    "height": 28,
+                    "name": "preview",
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "overlay"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 100,
+                        "height": 28,
+                        "text": "Preview"
+                      }
+                    ],
+                    "overlay": "dlog_preview_overlay",
+                    "shadow": true
                   }
                 ]
               }
@@ -32238,102 +32276,171 @@
                         "width": 242,
                         "height": 240,
                         "itemWidget": {
-                          "type": "Container",
+                          "type": "Select",
                           "style": {
                             "inheritFrom": "default"
                           },
-                          "action": "dlog_item_toggle",
+                          "data": "dlog_item_is_available",
                           "left": 0,
                           "top": 0,
                           "width": 242,
                           "height": 40,
                           "widgets": [
                             {
-                              "type": "Rectangle",
-                              "style": {
-                                "inheritFrom": "channel1"
-                              },
-                              "left": 2,
-                              "top": 2,
-                              "width": 6,
-                              "height": 36,
-                              "invertColors": true
-                            },
-                            {
-                              "type": "Select",
+                              "type": "Container",
                               "style": {
                                 "inheritFrom": "default"
                               },
-                              "data": "dlog_item_status",
-                              "left": 8,
+                              "action": "",
+                              "left": 0,
                               "top": 0,
-                              "width": 36,
+                              "width": 242,
                               "height": 40,
                               "widgets": [
                                 {
-                                  "type": "Text",
+                                  "type": "Rectangle",
                                   "style": {
-                                    "inheritFrom": "default_S"
+                                    "inheritFrom": "channel1"
                                   },
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 36,
-                                  "height": 40,
-                                  "text": "\\u00a0"
-                                },
-                                {
-                                  "type": "Text",
-                                  "style": {
-                                    "inheritFrom": "default_S"
-                                  },
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 36,
-                                  "height": 40,
-                                  "text": "\\u009F"
+                                  "left": 2,
+                                  "top": 2,
+                                  "width": 6,
+                                  "height": 36,
+                                  "invertColors": true
                                 },
                                 {
                                   "type": "Text",
                                   "style": {
                                     "inheritFrom": "default_S",
-                                    "color": "status_line_text_disabled",
-                                    "activeBackgroundColor": "status_line_text_disabled"
+                                    "color": "text_disabled",
+                                    "activeBackgroundColor": "text_disabled"
                                   },
-                                  "left": 0,
+                                  "left": 8,
                                   "top": 0,
                                   "width": 36,
                                   "height": 40,
                                   "text": "\\u00a0"
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default_S_left",
+                                    "alignHorizontal": "left",
+                                    "color": "text_disabled",
+                                    "activeBackgroundColor": "text_disabled",
+                                    "padding": "0"
+                                  },
+                                  "data": "dlog_item_channel",
+                                  "left": 44,
+                                  "top": 0,
+                                  "width": 36,
+                                  "height": 40,
+                                  "text": ""
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default_S_left",
+                                    "alignHorizontal": "left",
+                                    "color": "text_disabled",
+                                    "activeBackgroundColor": "text_disabled",
+                                    "padding": "0"
+                                  },
+                                  "data": "dlog_item_label",
+                                  "left": 80,
+                                  "top": 0,
+                                  "width": 162,
+                                  "height": 40,
+                                  "text": ""
                                 }
                               ]
                             },
                             {
-                              "type": "Text",
+                              "type": "Container",
                               "style": {
-                                "inheritFrom": "default_S_left",
-                                "alignHorizontal": "left",
-                                "padding": "0"
+                                "inheritFrom": "default"
                               },
-                              "data": "dlog_item_channel",
-                              "left": 44,
+                              "action": "dlog_item_toggle",
+                              "left": 0,
                               "top": 0,
-                              "width": 36,
+                              "width": 242,
                               "height": 40,
-                              "text": ""
-                            },
-                            {
-                              "type": "Text",
-                              "style": {
-                                "inheritFrom": "default_S_left",
-                                "alignHorizontal": "left",
-                                "padding": "0"
-                              },
-                              "data": "dlog_item_label",
-                              "left": 80,
-                              "top": 0,
-                              "width": 162,
-                              "height": 40,
-                              "text": ""
+                              "widgets": [
+                                {
+                                  "type": "Rectangle",
+                                  "style": {
+                                    "inheritFrom": "channel1"
+                                  },
+                                  "left": 2,
+                                  "top": 2,
+                                  "width": 6,
+                                  "height": 36,
+                                  "invertColors": true
+                                },
+                                {
+                                  "type": "Select",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "data": "dlog_item_is_checked",
+                                  "left": 8,
+                                  "top": 0,
+                                  "width": 36,
+                                  "height": 40,
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default_S"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 40,
+                                      "text": "\\u00a0"
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default_S"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 40,
+                                      "text": "\\u009F"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default_S_left",
+                                    "alignHorizontal": "left",
+                                    "padding": "0"
+                                  },
+                                  "data": "dlog_item_channel",
+                                  "left": 44,
+                                  "top": 0,
+                                  "width": 36,
+                                  "height": 40,
+                                  "text": ""
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default_S_left",
+                                    "alignHorizontal": "left",
+                                    "padding": "0"
+                                  },
+                                  "data": "dlog_item_label",
+                                  "left": 80,
+                                  "top": 0,
+                                  "width": 162,
+                                  "height": 40,
+                                  "text": ""
+                                }
+                              ]
                             }
                           ]
                         },
@@ -32376,102 +32483,171 @@
                         "width": 210,
                         "height": 204,
                         "itemWidget": {
-                          "type": "Container",
+                          "type": "Select",
                           "style": {
                             "inheritFrom": "default"
                           },
-                          "action": "dlog_item_toggle",
+                          "data": "dlog_item_is_available",
                           "left": 0,
                           "top": 0,
                           "width": 210,
                           "height": 34,
                           "widgets": [
                             {
-                              "type": "Rectangle",
-                              "style": {
-                                "inheritFrom": "channel1"
-                              },
-                              "left": 2,
-                              "top": 2,
-                              "width": 6,
-                              "height": 30,
-                              "invertColors": true
-                            },
-                            {
-                              "type": "Select",
+                              "type": "Container",
                               "style": {
                                 "inheritFrom": "default"
                               },
-                              "data": "dlog_item_status",
-                              "left": 8,
+                              "action": "",
+                              "left": 0,
                               "top": 0,
-                              "width": 36,
+                              "width": 210,
                               "height": 34,
                               "widgets": [
                                 {
-                                  "type": "Text",
+                                  "type": "Rectangle",
                                   "style": {
-                                    "inheritFrom": "default_S"
+                                    "inheritFrom": "channel1"
                                   },
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 36,
-                                  "height": 34,
-                                  "text": "\\u00a0"
-                                },
-                                {
-                                  "type": "Text",
-                                  "style": {
-                                    "inheritFrom": "default_S"
-                                  },
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 36,
-                                  "height": 34,
-                                  "text": "\\u009F"
+                                  "left": 2,
+                                  "top": 2,
+                                  "width": 6,
+                                  "height": 30,
+                                  "invertColors": true
                                 },
                                 {
                                   "type": "Text",
                                   "style": {
                                     "inheritFrom": "default_S",
-                                    "color": "status_line_text_disabled",
-                                    "activeBackgroundColor": "status_line_text_disabled"
+                                    "color": "text_disabled",
+                                    "activeBackgroundColor": "text_disabled"
                                   },
-                                  "left": 0,
+                                  "left": 8,
                                   "top": 0,
                                   "width": 36,
                                   "height": 34,
                                   "text": "\\u00a0"
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default_S_left",
+                                    "alignHorizontal": "left",
+                                    "color": "text_disabled",
+                                    "activeBackgroundColor": "text_disabled",
+                                    "padding": "0"
+                                  },
+                                  "data": "dlog_item_channel",
+                                  "left": 44,
+                                  "top": 0,
+                                  "width": 36,
+                                  "height": 34,
+                                  "text": ""
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default_S_left",
+                                    "alignHorizontal": "left",
+                                    "color": "text_disabled",
+                                    "activeBackgroundColor": "text_disabled",
+                                    "padding": "0"
+                                  },
+                                  "data": "dlog_item_label",
+                                  "left": 80,
+                                  "top": 0,
+                                  "width": 130,
+                                  "height": 34,
+                                  "text": ""
                                 }
                               ]
                             },
                             {
-                              "type": "Text",
+                              "type": "Container",
                               "style": {
-                                "inheritFrom": "default_S_left",
-                                "alignHorizontal": "left",
-                                "padding": "0"
+                                "inheritFrom": "default"
                               },
-                              "data": "dlog_item_channel",
-                              "left": 44,
+                              "action": "dlog_item_toggle",
+                              "left": 0,
                               "top": 0,
-                              "width": 36,
+                              "width": 210,
                               "height": 34,
-                              "text": ""
-                            },
-                            {
-                              "type": "Text",
-                              "style": {
-                                "inheritFrom": "default_S_left",
-                                "alignHorizontal": "left",
-                                "padding": "0"
-                              },
-                              "data": "dlog_item_label",
-                              "left": 80,
-                              "top": 0,
-                              "width": 130,
-                              "height": 34,
-                              "text": ""
+                              "widgets": [
+                                {
+                                  "type": "Rectangle",
+                                  "style": {
+                                    "inheritFrom": "channel1"
+                                  },
+                                  "left": 2,
+                                  "top": 2,
+                                  "width": 6,
+                                  "height": 30,
+                                  "invertColors": true
+                                },
+                                {
+                                  "type": "Select",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "data": "dlog_item_is_checked",
+                                  "left": 8,
+                                  "top": 0,
+                                  "width": 36,
+                                  "height": 34,
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default_S"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 34,
+                                      "text": "\\u00a0"
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default_S"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 34,
+                                      "text": "\\u009F"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default_S_left",
+                                    "alignHorizontal": "left",
+                                    "padding": "0"
+                                  },
+                                  "data": "dlog_item_channel",
+                                  "left": 44,
+                                  "top": 0,
+                                  "width": 36,
+                                  "height": 34,
+                                  "text": ""
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default_S_left",
+                                    "alignHorizontal": "left",
+                                    "padding": "0"
+                                  },
+                                  "data": "dlog_item_label",
+                                  "left": 80,
+                                  "top": 0,
+                                  "width": 130,
+                                  "height": 34,
+                                  "text": ""
+                                }
+                              ]
                             }
                           ]
                         },
@@ -32591,7 +32767,8 @@
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "edit_value_active_M_center"
+                  "inheritFrom": "edit_value_active_M_center",
+                  "font": "Oswald14"
                 },
                 "data": "dlog_trigger_source",
                 "action": "dlog_trigger_select_source",
@@ -32667,6 +32844,7 @@
                     "type": "Text",
                     "style": {
                       "inheritFrom": "status_bgnd",
+                      "font": "Oswald17",
                       "color": "Action color",
                       "activeBackgroundColor": "Action color"
                     },

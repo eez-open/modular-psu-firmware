@@ -46,6 +46,7 @@ inline bool isTraceExecuting() { return g_state == STATE_EXECUTING && g_traceIni
 inline bool isInStateTransition() { return g_inStateTransition; }
 
 bool isModuleLocalRecording();
+int getModuleLocalRecordingSlotIndex();
 double getCurrentTime();
 uint32_t getFileLength();
 void setFileLength(uint32_t fileLength);

@@ -306,12 +306,12 @@ void loadBlock() {
                         if (yAxis.unit == UNIT_BIT) {
                             if (bitMask == 0) {
                                 bits = *(uint32_t *)&values[valuesOffset + m++];
-                                bitMask = 0x8000;
+                                bitMask = 0x4000;
                             } else {
                                 bitMask >>= 1;
                             }
 
-                            value = (bits & bitMask) ? 1.0f : 0.0f;
+                            value = bits & 0x8000 ? ((bits & bitMask) ? 1.0f : 0.0f) : NAN;
                         } else {
                             bitMask = 0;
                             value = values[valuesOffset + m++];
@@ -607,7 +607,7 @@ void calcColumnIndexes(Recording &recording) {
         
         if (yAxis.unit == UNIT_BIT) {
             if (bitMask == 0) {
-                bitMask = 0x8000;
+                bitMask = 0x4000;
             } else {
                 bitMask >>= 1;
             }
@@ -928,43 +928,94 @@ public:
     void set() {
         gui::popPage();
 
-        char filePath[MAX_PATH_LENGTH + 50];
+        char filePath[MAX_PATH_LENGTH + 1];
+
+        int slotIndex = getModuleLocalRecordingSlotIndex();
+
+        int n;
 
         if (isStringEmpty(DlogParamsPage::g_parameters.filePath)) {
             uint8_t year, month, day, hour, minute, second;
             datetime::getDateTime(year, month, day, hour, minute, second);
 
             if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24) {
-                snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
-                    RECORDINGS_DIR,
-                    DlogParamsPage::g_parameters.filePath,
-                    (int)day, (int)month, (int)year,
-                    (int)hour, (int)minute, (int)second);
+                if (slotIndex != -1) {
+                    n = snprintf(filePath, sizeof(filePath), "%d:%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+                        slotIndex + 1,
+                        RECORDINGS_DIR,
+                        DlogParamsPage::g_parameters.filePath,
+                        (int)day, (int)month, (int)year,
+                        (int)hour, (int)minute, (int)second);
+                } else {
+                    n = snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+                        RECORDINGS_DIR,
+                        DlogParamsPage::g_parameters.filePath,
+                        (int)day, (int)month, (int)year,
+                        (int)hour, (int)minute, (int)second);
+                }
             } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
-                snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
-                    RECORDINGS_DIR,
-                    DlogParamsPage::g_parameters.filePath,
-                    (int)month, (int)day, (int)year,
-                    (int)hour, (int)minute, (int)second);
+                if (slotIndex != -1) {
+                    n = snprintf(filePath, sizeof(filePath), "%d:%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+                        slotIndex + 1,
+                        RECORDINGS_DIR,
+                        DlogParamsPage::g_parameters.filePath,
+                        (int)month, (int)day, (int)year,
+                        (int)hour, (int)minute, (int)second);
+                } else {
+                    n = snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d.dlog",
+                        RECORDINGS_DIR,
+                        DlogParamsPage::g_parameters.filePath,
+                        (int)month, (int)day, (int)year,
+                        (int)hour, (int)minute, (int)second);
+                }
             } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
                 bool am;
                 datetime::convertTime24to12(hour, am);
-                snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
-                    RECORDINGS_DIR,
-                    DlogParamsPage::g_parameters.filePath,
-                    (int)day, (int)month, (int)year,
-                    (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
-            } else if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_12) {
+                if (slotIndex != -1) {
+                    n = snprintf(filePath, sizeof(filePath), "%d:%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+                        slotIndex + 1,
+                        RECORDINGS_DIR,
+                        DlogParamsPage::g_parameters.filePath,
+                        (int)day, (int)month, (int)year,
+                        (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+                } else {
+                    n = snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+                        RECORDINGS_DIR,
+                        DlogParamsPage::g_parameters.filePath,
+                        (int)day, (int)month, (int)year,
+                        (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+                }
+            } else {
+				// persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_12
                 bool am;
                 datetime::convertTime24to12(hour, am);
-                snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
-                    RECORDINGS_DIR,
-                    DlogParamsPage::g_parameters.filePath,
-                    (int)month, (int)day, (int)year,
-                    (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+                if (slotIndex != -1) {
+                    n = snprintf(filePath, sizeof(filePath), "%d:%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+                        slotIndex + 1,
+                        RECORDINGS_DIR,
+                        DlogParamsPage::g_parameters.filePath,
+                        (int)month, (int)day, (int)year,
+                        (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+                } else {
+                    n = snprintf(filePath, sizeof(filePath), "%s/%s%02d_%02d_%02d-%02d_%02d_%02d_%s.dlog",
+                        RECORDINGS_DIR,
+                        DlogParamsPage::g_parameters.filePath,
+                        (int)month, (int)day, (int)year,
+                        (int)hour, (int)minute, (int)second, am ? "AM" : "PM");
+                }
             }
         } else {
-            snprintf(filePath, sizeof(filePath), "%s/%s.dlog", RECORDINGS_DIR, DlogParamsPage::g_parameters.filePath);
+            int slotIndex = getModuleLocalRecordingSlotIndex();
+            if (slotIndex != -1) {
+                n = snprintf(filePath, sizeof(filePath), "%d:%s/%s.dlog", slotIndex + 1, RECORDINGS_DIR, DlogParamsPage::g_parameters.filePath);
+            } else {
+                n = snprintf(filePath, sizeof(filePath), "%s/%s.dlog", RECORDINGS_DIR, DlogParamsPage::g_parameters.filePath);
+            }
+        }
+
+        if (n >= MAX_PATH_LENGTH + 1) {
+            psu::gui::errorMessage("File name too big!");
+            return;
         }
 
         memcpy(&dlog_record::g_parameters, &DlogParamsPage::g_parameters, sizeof(DlogParamsPage::g_parameters));
@@ -988,7 +1039,7 @@ public:
             DlogParamsPage::g_scrollPosition = scrollPosition;
             refreshScreen();
         }
-}
+	}
 
     void onEncoder(int counter) {
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -1062,6 +1113,16 @@ public:
     static void selectTriggerSource() {
         psu::gui::pushSelectFromEnumPage(ENUM_DEFINITION_TRIGGER_SOURCE, g_parameters.triggerSource, 0, onSelectTriggerSource);
     }
+
+	static int getModuleLocalRecordingSlotIndex() {
+		if (g_parameters.period < dlog_view::PERIOD_MIN) {
+			if (g_parameters.numDlogItems > 0) {
+				return g_parameters.dlogItems[0].slotIndex;
+			}
+		}
+		
+		return -1;
+	}
 
 private:
     static Parameters g_parametersOrig;
@@ -1180,7 +1241,17 @@ void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value
 
 void data_dlog_file_name(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = *DlogParamsPage::g_parameters.filePath ? DlogParamsPage::g_parameters.filePath : "<time>";
+        static char filePath[MAX_PATH_LENGTH + 1 + 12];
+
+        const char *fileName = *DlogParamsPage::g_parameters.filePath ? DlogParamsPage::g_parameters.filePath : "<time>";
+
+        int slotIndex = DlogParamsPage::getModuleLocalRecordingSlotIndex();
+        if (slotIndex != -1) {
+            snprintf(filePath, sizeof(filePath), "%d:%s", slotIndex + 1, fileName);
+			value = filePath;
+		} else {
+            value = fileName;
+        }
     }
 }
 
@@ -1249,7 +1320,7 @@ void data_dlog_items(DataOperationEnum operation, Cursor cursor, Value &value) {
     }
 }
 
-void data_dlog_item_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_item_is_available(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int slotIndex;
         int subchannelIndex;
@@ -1261,12 +1332,34 @@ void data_dlog_item_status(DataOperationEnum operation, Cursor cursor, Value &va
 				DlogParamsPage::getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex)
 					> DlogParamsPage::g_parameters.period
 			)) {
-                value = 2;
+                value = 0;
+            } else {
+                value = 1;
+            }
+        } else {
+            value = 0;
+        }
+    }
+}
+
+void data_dlog_item_is_checked(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int slotIndex;
+        int subchannelIndex;
+        int resourceIndex;
+        if (DlogParamsPage::findResource(cursor, slotIndex, subchannelIndex, resourceIndex)) {
+            bool enabled = DlogParamsPage::g_parameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex);
+            if (!enabled && (
+				DlogParamsPage::g_parameters.numDlogItems >= dlog_file::MAX_NUM_OF_Y_AXES || 
+				DlogParamsPage::getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex)
+					> DlogParamsPage::g_parameters.period
+			)) {
+                value = 0;
             } else {
                 value = enabled;
             }
         } else {
-            value = 2;
+            value = 0;
         }
     }
 }
@@ -1886,6 +1979,25 @@ void data_dlog_view_legend_view_option(DataOperationEnum operation, Cursor curso
 void data_dlog_view_show_labels(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::devConf.viewFlags.dlogViewShowLabels;
+    }
+}
+
+void data_dlog_preview_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
+    static Overlay overlay;
+
+    if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+        overlay.state = dlog_record::isModuleLocalRecording() ? 1 : 0;
+        
+        WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
+        overlay.width = widgetCursor.widget->w;
+        overlay.height = widgetCursor.widget->h;
+        
+        overlay.x = widgetCursor.widget->x;
+        overlay.y = widgetCursor.widget->y;
+
+        value = Value(&overlay, VALUE_TYPE_POINTER);
     }
 }
 

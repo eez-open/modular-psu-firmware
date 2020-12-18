@@ -53,6 +53,8 @@ namespace dlog_record {
 #define CONF_WRITE_TIMEOUT_MS 1000
 #define CONF_WRITE_FLUSH_TIMEOUT_MS 10000
 
+#define MODULE_LOCAL_RECORDING_PREVIEW_PERIOD 0.001f
+
 enum Event {
     EVENT_INITIATE,
     EVENT_INITIATE_TRACE,
@@ -95,6 +97,7 @@ static uint32_t g_lastSavedBufferTickCount;
 static dlog_file::Writer g_writer(DLOG_RECORD_BUFFER, DLOG_RECORD_BUFFER_SIZE);
 
 static uint32_t g_fileLength;
+static uint32_t g_numSamples;
 
 osMutexId(g_mutexId);
 osMutexDef(g_mutex);
@@ -112,10 +115,15 @@ static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     float value;
 
     if (g_recording.parameters.yAxes[columnIndex].unit == UNIT_BIT) {
-        if (*(uint32_t*)p & (0x8000 >> g_recording.parameters.yAxes[columnIndex].channelIndex)) {
-            value = 1.0f;
+        auto intValue = *(uint32_t*)p;
+        if (intValue & 0x8000) {
+            if (intValue & (0x4000 >> g_recording.parameters.yAxes[columnIndex].channelIndex)) {
+                value = 1.0f;
+            } else {
+                value = 0.0f;
+            }
         } else {
-            value = 0.0f;
+            return NAN;
         }
 	} else {
 		value = *(float *)p;
@@ -219,6 +227,10 @@ void fileWrite(bool flush) {
         return;
     }
 
+    if (isModuleLocalRecording()) {
+        return;
+    }
+
     uint32_t timeout = millis() + CONF_WRITE_TIMEOUT_MS;
     while (millis() < timeout) {
         const uint8_t *buffer = nullptr;
@@ -294,6 +306,10 @@ static void initRecordingStart() {
 
     memcpy(&g_recording.parameters, &g_parameters, sizeof(dlog_view::Parameters));
 
+    if (isModuleLocalRecording()) {
+        g_recording.parameters.period = MODULE_LOCAL_RECORDING_PREVIEW_PERIOD;
+    }
+
     g_recording.size = 0;
     g_recording.pageSize = 480;
 
@@ -354,13 +370,6 @@ static void log(uint32_t tickCount) {
         return;
     }
 
-    if (isModuleLocalRecording()) {
-        if (g_currentTime >= g_recording.parameters.duration) {
-            stateTransition(EVENT_FINISH);
-        }
-        return;
-    }
-
     if (g_currentTime >= g_nextTime) {
         if (osMutexWait(g_mutexId, 5) == osOK) {
             while (1) {
@@ -379,6 +388,9 @@ static void log(uint32_t tickCount) {
                     ) {
                         g_writer.writeFloat(NAN);
                     } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
+                        if (g_writer.getBitMask() == 0) {
+                            g_writer.writeBit(0); // mark as invalid sample
+                        }
 						g_writer.writeBit(0);
                     }
                 }
@@ -401,6 +413,10 @@ static void log(uint32_t tickCount) {
                         channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex)
                     );
                 } else  if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
+                    if (g_writer.getBitMask() == 0) {
+                        g_writer.writeBit(1); // mark as valid sample
+                    }                    
+
                     uint8_t data;
                     channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
                     if (data & (1 << (dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0))) {
@@ -454,8 +470,8 @@ static int doStartImmediately() {
 
     if (!isModuleLocalRecording()) {
         g_writer.writeFileHeaderAndMetaFields(g_recording.parameters);
-    	g_recording.dataOffset = g_writer.getDataOffset();
     }
+    g_recording.dataOffset = g_writer.getDataOffset();
 
     g_lastSavedBufferTickCount = millis();
 
@@ -520,11 +536,20 @@ static void doFinish(bool afterError) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool isModuleLocalRecording() {
-    return g_recording.parameters.period < dlog_view::PERIOD_MIN;
+    return g_parameters.period < dlog_view::PERIOD_MIN;
+}
+
+int getModuleLocalRecordingSlotIndex() {
+    if (isModuleLocalRecording()) {
+        if (g_parameters.numDlogItems > 0) {
+            return g_parameters.dlogItems[0].slotIndex;
+        }
+    }
+    return -1;
 }
 
 double getCurrentTime() {
-    return isModuleLocalRecording() ? g_currentTime - ((g_recording.size - 1) * g_recording.parameters.period) : g_currentTime;
+    return isModuleLocalRecording() ? (g_numSamples - 1) * g_parameters.period * 1.0 : g_currentTime;
 }
 
 uint32_t getFileLength() {
@@ -536,7 +561,7 @@ void setFileLength(uint32_t fileLength) {
 }
 
 void setNumSamples(uint32_t numSamples) {
-    g_recording.size = numSamples;
+    g_numSamples = numSamples;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -118,6 +118,7 @@ struct DlogParams {
     float period;
     float duration;
     uint32_t resources;
+    char filePath[MAX_PATH_LENGTH + 1];
 };
 
 struct Labels {
@@ -1032,6 +1033,9 @@ public:
     DlogParams dlog;
 
     Mio168Module() {
+		assert(sizeof(FromMasterToSlaveParamsChange) <= sizeof(FromSlaveToMaster));
+		assert(sizeof(FromMasterToSlaveDiskDriveOperation) <= sizeof(FromSlaveToMaster));
+
         moduleType = MODULE_TYPE_DIB_MIO168;
         moduleName = "MIO168";
         moduleBrand = "Envox";
@@ -1057,6 +1061,7 @@ public:
         dlog.period = 0;
         dlog.duration = 0;
         dlog.resources = 0;
+        *dlog.filePath = 0;
     }
 
     Module *createModule() override {
@@ -1127,6 +1132,7 @@ public:
         if (dlog.period > 0) {
             params.dlog.duration = dlog.duration;
             params.dlog.resources = dlog.resources;
+            strcpy(params.dlog.filePath, dlog.filePath);
             
             for (int i = 0; i < 8; i++) {
                 strcpy(params.labels.din + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(DIN_SUBCHANNEL_INDEX, i));
@@ -1214,6 +1220,8 @@ public:
             }
 
             if ((data.flags & FLAG_DLOG_RECORD_FINISHED) != 0) {
+                dlog.period = 0;
+
                 switch (data.result) {
                     case DLOG_RECORD_RESULT_BUFFER_OVERFLOW:
                         dlog_record::abortAfterBufferOverflowError();
@@ -1431,6 +1439,19 @@ public:
     }
 #endif
 
+    uint32_t getRefreshTimeMs() {
+        if (dlog_record::isExecuting()) {
+            uint32_t dlogPeriodMs = (uint32_t)(dlog_record::g_recording.parameters.period * 1000);
+            if (dlogPeriodMs < REFRESH_TIME_MS) {
+                if (dlog_record::getModuleLocalRecordingSlotIndex() == slotIndex) {
+                    return dlogPeriodMs;
+                }
+            }
+        }
+
+        return REFRESH_TIME_MS;
+    }
+
     void tick() override {
         if (!synchronized) {
             return;
@@ -1443,7 +1464,7 @@ public:
             testResult = TEST_FAILED;
         } else if (operationState != STATE_IDLE && millis() - operationStateTransitionTime >= TIMEOUT_TIME_MS) {
 			stateTransition(EVENT_TIMEOUT);
-        } else if (dlog.period > 0 || millis() - lastTransferTime >= REFRESH_TIME_MS) {
+        } else if (millis() - lastTransferTime >= getRefreshTimeMs()) {
         	stateTransition(EVENT_REFRESH);
         } else {
             FromMasterToSlaveParamsChange params;
@@ -2673,6 +2694,7 @@ public:
             if (dlog.resources != 0) {
                 dlog.duration = dlog_record::g_parameters.duration;
                 dlog.period = dlog_record::g_parameters.period;
+                strcpy(dlog.filePath, dlog_record::g_parameters.filePath + 2 /* skip drive part */ );
             }
         }
     }

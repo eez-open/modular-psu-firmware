@@ -16,6 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+
 #include <eez/modules/psu/psu.h>
 
 #include <eez/modules/psu/scpi/psu.h>
@@ -36,7 +38,25 @@ scpi_result_t scpi_cmd_initiateDlog(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    strcpy(dlog_record::g_parameters.filePath, filePath);
+    int slotIndex = dlog_record::getModuleLocalRecordingSlotIndex();
+    if (slotIndex != -1) {
+        if (filePath[0] >= '0' && filePath[0] <= '9' && filePath[1] == ':') {
+            int diskDrive = filePath[0] - '0';
+            if (diskDrive != slotIndex + 1) {
+                SCPI_ErrorPush(context, SCPI_ERROR_FILE_NAME_ERROR);
+                return SCPI_RES_ERR;
+            }
+            strcpy(dlog_record::g_parameters.filePath, filePath);
+        } else {
+            // prepend <drive>:
+            if (snprintf(dlog_record::g_parameters.filePath, MAX_PATH_LENGTH + 1, "%d:%s", slotIndex + 1, filePath) >= MAX_PATH_LENGTH + 1) {
+                SCPI_ErrorPush(context, SCPI_ERROR_CHARACTER_DATA_TOO_LONG);
+                return SCPI_RES_ERR;
+            }
+        }
+    } else {
+        strcpy(dlog_record::g_parameters.filePath, filePath);
+    }
 
     int result = dlog_record::initiate();
     if (result != SCPI_RES_OK) {

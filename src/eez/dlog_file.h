@@ -151,6 +151,7 @@ public:
 	uint32_t getBufferIndex() { return m_bufferIndex; }
 	uint32_t getDataOffset() { return m_dataOffset; }
 	uint32_t getFileLength() { return m_fileLength; }
+    uint32_t getBitMask() { return m_bitMask; }
 
 private:
     uint8_t *m_buffer;
