@@ -219,7 +219,7 @@ struct DcmChannel : public Channel {
     void onPowerDown() override;
     bool test() override;
     TestResult getTestResult() override;
-    void tickSpecific(uint32_t tickCount) override;
+    void tickSpecific() override;
 	
 	bool isInCcMode() override {
 #if defined(EEZ_PLATFORM_STM32)
@@ -649,7 +649,7 @@ TestResult DcmChannel::getTestResult() {
     return ((DcmModule *)g_slots[slotIndex])->testResult;
 }
 
-void DcmChannel::tickSpecific(uint32_t tickCount) {
+void DcmChannel::tickSpecific() {
     if (subchannelIndex == 0) {
         ((DcmModule *)g_slots[slotIndex])->tick(slotIndex);
     }
@@ -898,13 +898,6 @@ void DcmModule::tick(uint8_t slotIndex) {
 
 #if defined(EEZ_PLATFORM_STM32)
 
-#ifdef DEBUG
-    psu::debug::g_uDac[channel1.channelIndex].set(channel1.uSet);
-    psu::debug::g_iDac[channel1.channelIndex].set(channel1.iSet);
-    psu::debug::g_uDac[channel2.channelIndex].set(channel2.uSet);
-    psu::debug::g_iDac[channel2.channelIndex].set(channel2.iSet);
-#endif
-
     auto tranferResult = transfer();
 
     if (tranferResult == TRANSFER_OK) {
@@ -936,11 +929,6 @@ void DcmModule::tick(uint8_t slotIndex) {
 #endif
 
             channel.temperature = calcTemperature(*((uint16_t *)(input + 10 + subchannelIndex * 2)));
-
-#ifdef DEBUG
-            psu::debug::g_uMon[channel.channelIndex].set(uMonAdc);
-            psu::debug::g_iMon[channel.channelIndex].set(iMonAdc);
-#endif
         }
     }
 #endif // EEZ_PLATFORM_STM32

@@ -31,7 +31,7 @@ using namespace eez::psu::gui;
 namespace eez {
 namespace hmi {
 
-#define MAX_GUI_OR_ENCODER_INACTIVITY_TIME 60 * 1000
+#define MAX_GUI_OR_ENCODER_INACTIVITY_TIME_MS 60 * 1000
 
 static uint32_t g_timeOfLastActivity;
 static bool g_inactivityTimeMaxed = true;
@@ -39,25 +39,25 @@ static bool g_inactivityTimeMaxed = true;
 int g_selectedSlotIndex;
 int g_selectedSubchannelIndex;
 
-void tick(uint32_t tickCount) {
+void tick() {
     if (!g_inactivityTimeMaxed) {
-        uint32_t inactivityPeriod = getInactivityPeriod();
-        if (inactivityPeriod >= MAX_GUI_OR_ENCODER_INACTIVITY_TIME) {
+        uint32_t inactivityPeriod = getInactivityPeriodMs();
+        if (inactivityPeriod >= MAX_GUI_OR_ENCODER_INACTIVITY_TIME_MS) {
             g_inactivityTimeMaxed = true;
         }
     }
 }
 
 void noteActivity() {
-    g_timeOfLastActivity = micros();
+    g_timeOfLastActivity = millis();
     g_inactivityTimeMaxed = false;
 }
 
-uint32_t getInactivityPeriod() {
+uint32_t getInactivityPeriodMs() {
     if (g_inactivityTimeMaxed) {
-        return MAX_GUI_OR_ENCODER_INACTIVITY_TIME;
+        return MAX_GUI_OR_ENCODER_INACTIVITY_TIME_MS;
     } else {
-        return (micros() - g_timeOfLastActivity) / 1000;
+        return millis() - g_timeOfLastActivity;
     }
 }
 

@@ -703,9 +703,8 @@ void init() {
 void onThreadMessage(uint8_t type, uint32_t param) {
     if (type == PSU_MESSAGE_TICK) {
 #if defined(EEZ_PLATFORM_STM32)
-        uint32_t tickCount = micros();
-        ramp::tick(tickCount);
-        dcp405::tickDacRamp(tickCount);
+        ramp::tick();
+        dcp405::tickDacRamp();
         if (g_tickCount % 5 == 0) {
             tick();
         }
@@ -1115,7 +1114,7 @@ void powerDown() {
 
     event_queue::pushEvent(event_queue::EVENT_INFO_POWER_DOWN);
 
-    io_pins::tick(micros());
+    io_pins::tick();
     io_pins::refresh();
 
     sound::playPowerDown();
@@ -1202,7 +1201,7 @@ void onProtectionTripped() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-typedef void (*TickFunc)(uint32_t tickCount);
+typedef void (*TickFunc)();
 static TickFunc g_tickFuncs[] = {
     temperature::tick,
 #if OPTION_FAN
@@ -1214,22 +1213,23 @@ static const int NUM_TICK_FUNCS = sizeof(g_tickFuncs) / sizeof(TickFunc);
 static int g_tickFuncIndex = 0;
 
 void tick() {
-    uint32_t tickCount = micros();
-
-    trigger::tick(tickCount);
-    tickCount = micros();
-    list::tick(tickCount);
-    ramp::tick(tickCount);
-
-    for (int i = 0; i < CH_NUM; ++i) {
-        Channel::get(i).tick(tickCount);
+    for (int i = 0; i < NUM_SLOTS; i++) {
+        g_slots[i]->tick();
     }
 
-    dlog_record::tick(tickCount);
+    trigger::tick();
+    list::tick();
+    ramp::tick();
 
-    io_pins::tick(tickCount);
+    for (int i = 0; i < CH_NUM; ++i) {
+        Channel::get(i).tick();
+    }
 
-    g_tickFuncs[g_tickFuncIndex](tickCount);
+    dlog_record::tick();
+
+    io_pins::tick();
+
+    g_tickFuncs[g_tickFuncIndex]();
     g_tickFuncIndex = (g_tickFuncIndex + 1) % NUM_TICK_FUNCS;
 
     if (g_diagCallback) {

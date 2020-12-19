@@ -86,15 +86,11 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             } else {
                 psu::gui::showPage(PAGE_ID_MAIN);
             }
-        } else if (cmd == 26) {
-        	psu::gui::showPage(PAGE_ID_DEBUG_VARIABLES);
         } else if (cmd == 27) {
             int32_t relay;
             if (SCPI_ParamInt32(context, &relay, true)) {
                 bp3c::io_exp::switchChannelCoupling(relay);
             }
-        } else if (cmd == 28) {
-        	psu::gui::showPage(PAGE_ID_DEBUG_POWER_CHANNELS);
         } else if (cmd == 29) {
             int32_t slotIndex;
             if (!SCPI_ParamInt32(context, &slotIndex, false)) {
@@ -190,8 +186,6 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
     }
 #endif
 
-    debug::dumpVariables(buffer);
-
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -259,86 +253,6 @@ scpi_result_t scpi_cmd_debugCurrent(scpi_t *context) {
     }
 
     channel->setDacCurrent((uint16_t)value);
-
-    return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif // DEBUG
-}
-
-scpi_result_t scpi_cmd_debugMeasureVoltage(scpi_t *context) {
-#ifdef DEBUG
-    if (serial::g_testResult != TEST_OK) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
-
-    Channel *channel = getPowerChannelFromParam(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    while (true) {
-        uint32_t tickCount = micros();
-        temperature::tick(tickCount);
-
-#if OPTION_FAN
-        aux_ps::fan::tick(tickCount);
-#endif
-
-        channel->adcMeasureUMon();
-
-        Serial.print((int)debug::g_uMon[channel->channelIndex].get());
-        Serial.print(" ");
-        Serial.print(channel->u.mon_last, 5);
-        Serial.println("V");
-
-        int32_t diff = micros() - tickCount;
-        if (diff < 48000L) {
-            delayMicroseconds(48000L - diff);
-        }
-    }
-
-    return SCPI_RES_OK;
-#else
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-#endif // DEBUG
-}
-
-scpi_result_t scpi_cmd_debugMeasureCurrent(scpi_t *context) {
-#ifdef DEBUG
-    if (serial::g_testResult != TEST_OK) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
-
-    Channel *channel = getPowerChannelFromParam(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    while (true) {
-        uint32_t tickCount = micros();
-        temperature::tick(tickCount);
-
-#if OPTION_FAN
-        aux_ps::fan::tick(tickCount);
-#endif
-
-        channel->adcMeasureIMon();
-
-        Serial.print((int)debug::g_iMon[channel->channelIndex].get());
-        Serial.print(" ");
-        Serial.print(channel->i.mon_last, 5);
-        Serial.println("A");
-
-        int32_t diff = micros() - tickCount;
-        if (diff < 48000L) {
-            delayMicroseconds(48000L - diff);
-        }
-    }
 
     return SCPI_RES_OK;
 #else

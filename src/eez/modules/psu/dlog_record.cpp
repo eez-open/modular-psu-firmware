@@ -84,9 +84,8 @@ int g_stateTransitionError;
 bool g_traceInitiated;
 
 static uint32_t g_countingStarted;
-static uint32_t g_lastTickCount;
 static uint32_t g_seconds;
-static uint32_t g_micros;
+static uint32_t g_millis;
 static uint32_t g_iSample;
 static double g_currentTime;
 static double g_nextTime;
@@ -123,7 +122,7 @@ static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
                 value = 0.0f;
             }
         } else {
-            return NAN;
+            value = NAN;
         }
 	} else {
 		value = *(float *)p;
@@ -298,7 +297,7 @@ static void flushData() {
 static void initRecordingStart() {
     g_countingStarted = false;
     g_seconds = 0;
-    g_micros = 0;
+    g_millis = 0;
     g_iSample = 0;
     g_currentTime = 0;
     g_nextTime = 0;
@@ -350,20 +349,23 @@ static void setState(State newState) {
     }
 }
 
-static void log(uint32_t tickCount) {
-    if (!g_countingStarted) {
-        g_lastTickCount = tickCount;
+static void log() {
+	uint32_t tickCountMs = millis();
+
+    static uint32_t g_lastTickCountMs;
+    if (!g_lastTickCountMs) {
+        g_lastTickCountMs = tickCountMs;
         g_countingStarted = true;
     }
-    g_micros += tickCount - g_lastTickCount;
-    g_lastTickCount = tickCount;
+    g_millis += tickCountMs - g_lastTickCountMs;
+    g_lastTickCountMs = tickCountMs;
 
-    if (g_micros >= 1000000) {
+    if (g_millis >= 1000) {
         ++g_seconds;
-        g_micros -= 1000000;
+        g_millis -= 1000;
     }
 
-    g_currentTime = g_seconds + g_micros * 1E-6;
+    g_currentTime = g_seconds + g_millis * 1E-3;
 
     if (g_traceInitiated) {
         // data is logged with the SCPI command `SENSe:DLOG:TRACe[:DATA]`
@@ -760,9 +762,9 @@ void reset() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void tick(uint32_t tickCount) {
+void tick() {
     if (g_state == STATE_EXECUTING && g_nextTime <= g_recording.parameters.duration && !g_inStateTransition) {
-        log(tickCount);
+        log();
     }
 }
 

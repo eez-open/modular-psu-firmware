@@ -145,7 +145,6 @@ set(src_eez_modules_psu
     src/eez/modules/psu/channel.cpp
     src/eez/modules/psu/channel_dispatcher.cpp
     src/eez/modules/psu/datetime.cpp
-    src/eez/modules/psu/debug.cpp
     src/eez/modules/psu/devices.cpp
     src/eez/modules/psu/dlog_record.cpp
     src/eez/modules/psu/dlog_view.cpp
@@ -178,7 +177,6 @@ set(header_eez_modules_psu
     src/eez/modules/psu/conf_advanced.h
     src/eez/modules/psu/conf_user.h
     src/eez/modules/psu/datetime.h
-    src/eez/modules/psu/debug.h
     src/eez/modules/psu/devices.h
     src/eez/modules/psu/dlog_record.h
     src/eez/modules/psu/dlog_view.h

@@ -1988,7 +1988,7 @@ void data_dlog_preview_overlay(DataOperationEnum operation, Cursor cursor, Value
     if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
         value = Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
-        overlay.state = dlog_record::isModuleLocalRecording() ? 1 : 0;
+        overlay.state = dlog_record::isExecuting() && dlog_record::isModuleLocalRecording() ? 1 : 0;
         
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
         overlay.width = widgetCursor.widget->w;

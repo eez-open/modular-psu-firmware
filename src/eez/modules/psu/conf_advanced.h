@@ -137,7 +137,7 @@
 #define FAN_SPEED_ADJUSTMENT_INTERVAL 500
 
 /// Interval at which fan speed should be measured
-#define FAN_SPEED_MEASURMENT_INTERVAL 1500
+#define FAN_SPEED_MEASURMENT_INTERVAL_MS 1500
 
 /// Fan switch-on temperature (in oC)
 #define FAN_MIN_TEMP 50
@@ -174,7 +174,7 @@
 #define FAN_MAX_TEMP_DELAY 30
 
 /// Interval (in minutes) at which "on time" will be written to EEPROM
-#define WRITE_ONTIME_INTERVAL 10
+#define WRITE_ONTIME_INTERVAL 1
 
 /// Maximum allowed length (including label) of the keypad text.
 #define MAX_KEYPAD_TEXT_LENGTH 128

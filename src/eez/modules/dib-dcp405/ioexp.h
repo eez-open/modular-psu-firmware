@@ -56,7 +56,7 @@ public:
     void init();
     bool test();
 
-    void tick(uint32_t tick_usec);
+    void tick();
 
     bool testBit(int io_bit);
     void changeBit(int io_bit, bool set);

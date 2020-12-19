@@ -23,10 +23,10 @@
 namespace eez {
 namespace hmi {
 
-void tick(uint32_t tickCount);
+void tick();
 
 void noteActivity();
-uint32_t getInactivityPeriod();
+uint32_t getInactivityPeriodMs();
 
 extern int g_selectedSlotIndex;
 void selectSlot(int slotIndex);

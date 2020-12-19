@@ -33,7 +33,7 @@ namespace dcp405 {
 extern Module *g_module;
 
 bool isDacRampActive();
-void tickDacRamp(uint32_t tickCount);
+void tickDacRamp();
 
 } // namespace dcp405
 } // namespace eez

@@ -28,10 +28,10 @@
 
 #include <eez/gui/gui.h>
 
-#define CONF_GUI_LONG_TOUCH_TIMEOUT              1000000L // 1s
-#define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY   300000L // 300ms
-#define CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY     50000L // 50ms
-#define CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT       15000000L // 15s
+#define CONF_GUI_LONG_TOUCH_TIMEOUT_MS 1000
+#define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY_MS 300
+#define CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY_MS 50
+#define CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT_MS 15000
 
 namespace eez {
 namespace gui {
@@ -41,8 +41,6 @@ static WidgetCursor m_activeWidget;
 static bool m_touchActionExecuted;
 static bool m_touchActionExecutedAtDown;
 static OnTouchFunctionType m_onTouchFunction;
-static uint32_t m_touchDownTime;
-static uint32_t m_lastAutoRepeatEventTime;
 static bool m_longTouchGenerated;
 static bool m_extraLongTouchGenerated;
 
@@ -74,33 +72,36 @@ void eventHandling() {
         eventY = touch::getY();
     }
 
+    static uint32_t m_lastAutoRepeatEventTimeMs;
+    static uint32_t m_touchDownTimeMs;
+
     if (eventType != EVENT_TYPE_TOUCH_NONE) {
-        uint32_t tickCount = micros();
+        uint32_t tickCountMs = millis();
 
         eez::hmi::noteActivity();
 
         if (eventType == EVENT_TYPE_TOUCH_DOWN) {
-            m_touchDownTime = tickCount;
-            m_lastAutoRepeatEventTime = tickCount;
+            m_touchDownTimeMs = tickCountMs;
+            m_lastAutoRepeatEventTimeMs = tickCountMs;
             m_longTouchGenerated = false;
             m_extraLongTouchGenerated = false;
             processTouchEvent(EVENT_TYPE_TOUCH_DOWN, eventX, eventY);
         } else if (eventType == EVENT_TYPE_TOUCH_MOVE) {
             processTouchEvent(EVENT_TYPE_TOUCH_MOVE, eventX, eventY);
 
-            if (!m_longTouchGenerated && int32_t(tickCount - m_touchDownTime) >= CONF_GUI_LONG_TOUCH_TIMEOUT) {
+            if (!m_longTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_LONG_TOUCH_TIMEOUT_MS) {
                 m_longTouchGenerated = true;
                 processTouchEvent(EVENT_TYPE_LONG_TOUCH, eventX, eventY);
             }
 
-            if (m_longTouchGenerated && !m_extraLongTouchGenerated && int32_t(tickCount - m_touchDownTime) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT) {
+            if (m_longTouchGenerated && !m_extraLongTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT_MS) {
                 m_extraLongTouchGenerated = true;
                 processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH, eventX, eventY);
             }
 
-            if (int32_t(tickCount - m_lastAutoRepeatEventTime) >= (m_lastAutoRepeatEventTime == m_touchDownTime ? CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY : CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY)) {
+            if (int32_t(tickCountMs - m_lastAutoRepeatEventTimeMs) >= (m_lastAutoRepeatEventTimeMs == m_touchDownTimeMs ? CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY_MS : CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY_MS)) {
                 processTouchEvent(EVENT_TYPE_AUTO_REPEAT, eventX, eventY);
-                m_lastAutoRepeatEventTime = tickCount;
+                m_lastAutoRepeatEventTimeMs = tickCountMs;
             }
         } else if (eventType == EVENT_TYPE_TOUCH_UP) {
             processTouchEvent(EVENT_TYPE_TOUCH_UP, eventX, eventY);

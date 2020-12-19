@@ -188,7 +188,7 @@ struct DcmChannel : public Channel {
     void onPowerDown() override;
     bool test() override;
     TestResult getTestResult() override;
-    void tickSpecific(uint32_t tickCount) override;
+    void tickSpecific() override;
 	
 	bool isInCcMode() override {
 #if defined(EEZ_PLATFORM_STM32)
@@ -512,13 +512,6 @@ public:
         outputSetValues[2] = channel2.uSet;
         outputSetValues[3] = channel2.iSet;
 
-#ifdef DEBUG
-        psu::debug::g_uDac[channel1.channelIndex].set(channel1.uSet);
-        psu::debug::g_iDac[channel1.channelIndex].set(channel1.iSet);
-        psu::debug::g_uDac[channel2.channelIndex].set(channel2.uSet);
-        psu::debug::g_iDac[channel2.channelIndex].set(channel2.iSet);
-#endif
-
         transfer();
 
         if (numCrcErrors == 0) {
@@ -550,11 +543,6 @@ public:
 #endif
 
                 channel.temperature = calcTemperature(*((uint16_t *)(input + 10 + subchannelIndex * 2)));
-
-#ifdef DEBUG
-                psu::debug::g_uMon[channel.channelIndex].set(uMonAdc);
-                psu::debug::g_iMon[channel.channelIndex].set(iMonAdc);
-#endif
             }
         }
     }
@@ -612,7 +600,7 @@ TestResult DcmChannel::getTestResult() {
     return ((DcmModule *)g_slots[slotIndex])->testResult;
 }
 
-void DcmChannel::tickSpecific(uint32_t tickCount) {
+void DcmChannel::tickSpecific() {
 #if defined(EEZ_PLATFORM_STM32)
     if (subchannelIndex == 0) {
         ((DcmModule *)g_slots[slotIndex])->tick(slotIndex);

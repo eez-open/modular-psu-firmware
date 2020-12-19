@@ -67,7 +67,7 @@ void abortAfterBufferOverflowError();
 void abortAfterMassStorageError();
 void reset();
 
-void tick(uint32_t tick_usec);
+void tick();
 void log(float *values);
 
 void fileWrite(bool flush = false);

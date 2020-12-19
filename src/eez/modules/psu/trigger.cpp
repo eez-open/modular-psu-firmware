@@ -139,7 +139,7 @@ int generateTrigger(Source source, bool checkImmediatelly) {
     if (seqInitiated) {
         setState(STATE_TRIGGERED);
 
-        g_triggeredTime = micros() / 1000;
+        g_triggeredTime = millis();
 
         if (checkImmediatelly) {
             check(g_triggeredTime);
@@ -419,9 +419,9 @@ void abort() {
     }
 }
 
-void tick(uint32_t tick_usec) {
+void tick() {
     if (g_state == STATE_TRIGGERED) {
-        check(tick_usec / 1000);
+        check(millis());
     }
 }
 

@@ -139,7 +139,7 @@ static bool g_isLowPriorityThreadAlive;
 char g_listFilePath[CH_MAX][MAX_PATH_LENGTH];
 bool g_screenshotGenerating;
 
-static uint32_t g_timer1LastTickCount;
+static uint32_t g_timer1LastTickCountMs;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -185,9 +185,6 @@ void highPriorityThreadOneIter() {
             return;
         }
 #endif
-        for (int i = 0; i < NUM_SLOTS; i++) {
-            g_slots[i]->tick();
-        }
         psu::tick();
     }
 }
@@ -224,7 +221,7 @@ void initLowPriorityMessageQueue() {
 
 void startLowPriorityThread() {
     g_isLowPriorityThreadAlive = true;
-    g_timer1LastTickCount = micros();
+    g_timer1LastTickCountMs = millis();
     g_lowPriorityTaskHandle = osThreadCreate(osThread(g_lowPriorityTask), nullptr);
 }
 
@@ -436,22 +433,22 @@ void lowPriorityThreadOneIter() {
             g_isLowPriorityThreadAlive = false;
             return;
         }
-    	uint32_t tickCount = micros();
-    	int32_t diff = tickCount - g_timer1LastTickCount;
+        uint32_t tickCountMs = millis();
+    	int32_t diff = tickCountMs - g_timer1LastTickCountMs;
 
         event_queue::tick();
 
         sound::tick();
 
-    	if (diff >= 1000000L) { // 1 sec
-            g_timer1LastTickCount = tickCount;
+    	if (diff >= 1000L) { // 1 sec
+            g_timer1LastTickCountMs = tickCountMs;
 
     		profile::tick();
 
-            ontime::g_mcuCounter.tick(tickCount);
+            ontime::g_mcuCounter.tick();
             for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
                 if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
-                    ontime::g_moduleCounters[slotIndex].tick(tickCount);
+                    ontime::g_moduleCounters[slotIndex].tick();
                 }
             }
 
@@ -464,13 +461,9 @@ void lowPriorityThreadOneIter() {
 
         eez::psu::dlog_record::fileWrite();
 
-        eez::hmi::tick(tickCount);
+        eez::hmi::tick();
 
-        usb::tick(tickCount);
-
-#ifdef DEBUG
-        psu::debug::tick(tickCount);
-#endif
+        usb::tick();
     }
 
     return;

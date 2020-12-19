@@ -44,8 +44,8 @@ TempSensorTemperature sensors[temp_sensor::NUM_TEMP_SENSORS] = { TEMP_SENSORS };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static uint32_t g_lastMeasuredTick;
-static uint32_t g_maxTempCheckStartTick;
+static uint32_t g_lastMeasuredTickMs;
+static uint32_t g_maxTempCheckStartTickMs;
 static float g_lastMaxChannelTemperature;
 
 void init() {
@@ -58,12 +58,13 @@ bool test() {
     return temp_sensor::sensors[temp_sensor::AUX].test();
 }
 
-void tick(uint32_t tickCount) {
-    if (tickCount - g_lastMeasuredTick >= TEMP_SENSOR_READ_EVERY_MS * 1000L) {
-        g_lastMeasuredTick = tickCount;
+void tick() {
+	uint32_t tickCountMs = millis();
+    if (tickCountMs - g_lastMeasuredTickMs >= TEMP_SENSOR_READ_EVERY_MS) {
+		g_lastMeasuredTickMs = tickCountMs;
 
         for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
-            sensors[i].tick(tickCount);
+            sensors[i].tick(tickCountMs);
         }
 
         // find max. channel temperature
@@ -84,16 +85,16 @@ void tick(uint32_t tickCount) {
         // check if max_channel_temperature is too high
         if (isPowerUp() && maxChannelTemperature > FAN_MAX_TEMP) {
             if (g_lastMaxChannelTemperature <= FAN_MAX_TEMP) {
-                g_maxTempCheckStartTick = tickCount;
+                g_maxTempCheckStartTickMs = tickCountMs;
             }
 
-            if (tickCount - g_maxTempCheckStartTick > FAN_MAX_TEMP_DELAY * 1000000L) {
+            if (tickCountMs - g_maxTempCheckStartTickMs > FAN_MAX_TEMP_DELAY * 1000L) {
                 // turn off power
                 event_queue::pushEvent(event_queue::EVENT_ERROR_HIGH_TEMPERATURE);
                 changePowerState(false);
             }
         } else {
-            g_maxTempCheckStartTick = tickCount;
+			g_maxTempCheckStartTickMs = tickCountMs;
         }
 
         g_lastMaxChannelTemperature = maxChannelTemperature;

@@ -94,7 +94,7 @@ protected:
 
 private:
     bool m_isPassword;
-    uint32_t m_lastKeyAppendTime;
+    uint32_t m_lastKeyAppendTimeMs;
 
     void (*m_okCallback)(char *);
     void (*m_cancelCallback)();

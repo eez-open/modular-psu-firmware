@@ -105,7 +105,7 @@ int maxListsSize(Channel &channel);
 
 bool setListValue(Channel &channel, int16_t it, int *err);
 
-void tick(uint32_t tick_usec);
+void tick();
 
 bool isActive();
 bool isActive(Channel &channel);

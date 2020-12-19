@@ -43,7 +43,7 @@ namespace psu {
 static const uint8_t DATA_BUFFER_A = 0B00010000;
 static const uint8_t DATA_BUFFER_B = 0B00100100;
 
-static const uint32_t CONF_DCP405_R2B11_RAMP_DURATION = 4000; // 4 ms
+static const uint32_t CONF_DCP405_R2B11_RAMP_DURATION_USEC = 4000; // 4 ms
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -118,17 +118,19 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
     return testResult != TEST_FAILED;
 }
 
-void DigitalAnalogConverter::tick(uint32_t tickCount) {
+void DigitalAnalogConverter::tick() {
 #if defined(EEZ_PLATFORM_STM32)
     if (m_isRampActive) {
         uint16_t value;
 
-        uint32_t diff = tickCount - m_rampStartTime;
-        if (diff >= CONF_DCP405_R2B11_RAMP_DURATION) {
+        uint32_t tickCountUsec = micros();
+
+        uint32_t diff = tickCountUsec - m_rampStartTimeUsec;
+        if (diff >= CONF_DCP405_R2B11_RAMP_DURATION_USEC) {
             value = m_rampTargetValue;
             m_isRampActive = false;
         } else {
-            value = m_rampTargetValue * diff / CONF_DCP405_R2B11_RAMP_DURATION;
+            value = m_rampTargetValue * diff / CONF_DCP405_R2B11_RAMP_DURATION_USEC;
         }
         
         set(DATA_BUFFER_B, value, FROM_RAMP);
@@ -208,6 +210,7 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
             m_rampTargetValue = value;
             value = 0;
             rampOption = FROM_RAMP;
+            m_rampStartTimeUsec = micros();
         }
 
         m_rampLastValue = value;
@@ -215,14 +218,6 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
         if (rampOption != FROM_RAMP) {
             m_isRampActive = false;
         }
-
-#ifdef DEBUG
-        debug::g_uDac[channel.channelIndex].set(value);
-#endif
-    } else {
-#ifdef DEBUG
-        debug::g_iDac[channel.channelIndex].set(value);
-#endif
     }
 
     uint8_t data[3];

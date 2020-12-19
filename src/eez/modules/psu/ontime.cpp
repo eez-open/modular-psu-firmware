@@ -90,7 +90,7 @@ void Counter::stop() {
     }
 }
 
-void Counter::tick(uint32_t tick_usec) {
+void Counter::tick() {
     if (isActive()) {
         uint32_t timeMS = millis() - lastTick;
         lastTick += timeMS;
@@ -102,7 +102,7 @@ void Counter::tick(uint32_t tick_usec) {
         lastTime += time;
         fractionTime -= time * MIN_TO_MS;
 
-        if (writeInterval.test(tick_usec)) {
+        if (writeInterval.test()) {
             persist_conf::writeTotalOnTime(getType(), getTotalTime());
         }
     }

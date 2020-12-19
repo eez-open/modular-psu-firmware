@@ -33,12 +33,6 @@ option.
 // Data rate in bits per second (baud) for serial data transmission.
 #define SERIAL_SPEED 115200
 
-/// Enable only some of the debug trace to the serial port.
-#define CONF_DEBUG_LATEST 0
-
-/// Enable debug variables
-#define CONF_DEBUG_VARIABLES 0
-
 /// Maximum number of channels existing.
 #define CH_MAX 6
 

@@ -27,7 +27,6 @@
 #include <eez/unit.h>
 
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/debug.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 
@@ -78,7 +77,7 @@ struct DcpChannel : public Channel {
     bool delayed_dp_off;
 	uint32_t delayed_dp_off_start;
 	bool dpOn;
-	uint32_t dpNegMonitoringTime;
+	uint32_t dpNegMonitoringTimeMs;
 
     float uSet = 0;
 
@@ -271,12 +270,12 @@ struct DcpChannel : public Channel {
 		return ADC_DATA_TYPE_U_MON;
 	}
 
-	void tickSpecific(uint32_t tickCount) override {
+	void tickSpecific() override {
 		if (isDacTesting()) {
 			return;
 		}
 
-		ioexp.tick(tickCount);
+		ioexp.tick();
 
 #if !CONF_SKIP_PWRGOOD_TEST
 		if (!ioexp.testBit(IOExpander::IO_BIT_IN_PWRGOOD)) {
@@ -292,9 +291,6 @@ struct DcpChannel : public Channel {
 			float value = adc.read();
 			adc.start(getNextAdcDataType(adcDataType));
 			onAdcData(adcDataType, value);
-#ifdef DEBUG
-			psu::debug::g_adcCounter.inc();
-#endif
 		}
 
 		if (flags.dprogState == DPROG_STATE_ON) {
@@ -310,13 +306,14 @@ struct DcpChannel : public Channel {
 		/// and that condition lasts more then DP_NEG_DELAY seconds (default 5 s),
 		/// down-programmer circuit has to be switched off.
 		if (isOutputEnabled()) {
-			if (u.mon_last * i.mon_last >= DP_NEG_LEV || tickCount < dpNegMonitoringTime) {
-				dpNegMonitoringTime = tickCount;
+			uint32_t tickCountMs = millis();
+			if (u.mon_last * i.mon_last >= DP_NEG_LEV || tickCountMs < dpNegMonitoringTimeMs) {
+				dpNegMonitoringTimeMs = tickCountMs;
 			} else {
-				if (tickCount - dpNegMonitoringTime > DP_NEG_DELAY * 1000000UL) {
+				if (tickCountMs - dpNegMonitoringTimeMs > DP_NEG_DELAY * 1000UL) {
 					if (dpOn) {
 						// DebugTrace("CH%d, neg. P, DP off: %f", channelIndex + 1, u.mon_last * i.mon_last);
-						dpNegMonitoringTime = tickCount;
+						dpNegMonitoringTimeMs = tickCountMs;
 						generateChannelError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF, channelIndex);
 						setDpEnable(false);
 					} else {
@@ -324,7 +321,7 @@ struct DcpChannel : public Channel {
 						generateChannelError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED, channelIndex);
 						channel_dispatcher::outputEnable(*this, false);
 					}
-				} else if (tickCount - dpNegMonitoringTime > 500 * 1000UL) {
+				} else if (tickCountMs - dpNegMonitoringTimeMs > 500UL) {
 					if (dpOn && channelIndex < 2) {
 						if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
 							psu::Channel &otherChannel = psu::Channel::get(channelIndex == 0 ? 1 : 0);
@@ -396,7 +393,7 @@ struct DcpChannel : public Channel {
 	void waitConversionEnd() {
 #if defined(EEZ_PLATFORM_STM32)
         for (int i = 0; i < CONF_ADC_CONVERSION_MAX_TIME_MS; i++) {
-            ioexp.tick(micros());
+            ioexp.tick();
             if (ioexp.isAdcReady()) {
 				break;
 			}
@@ -491,7 +488,7 @@ struct DcpChannel : public Channel {
 		dpOn = enable;
 
 		if (enable) {
-			dpNegMonitoringTime = micros();
+			dpNegMonitoringTimeMs = millis();
 		}
 	}
 
@@ -527,7 +524,7 @@ struct DcpChannel : public Channel {
 			if (tasks & OUTPUT_ENABLE_TASK_DP) {
 				if (flags.dprogState == DPROG_STATE_ON) {
 					// enable DP
-					dpNegMonitoringTime = micros();
+					dpNegMonitoringTimeMs = millis();
 					delayed_dp_off = false;
 					setDpEnable(true);
 				}
@@ -1075,12 +1072,12 @@ bool isDacRampActive() {
 	return false;
 }
 
-void tickDacRamp(uint32_t tickCount) {
+void tickDacRamp() {
 	for (int i = 0; i < CH_NUM; i++) {
 		auto &channel = Channel::get(i);
 		if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCP405) {
 			if (((DcpChannel&)channel).dac.m_isRampActive) {
-				((DcpChannel&)channel).dac.tick(tickCount);
+				((DcpChannel&)channel).dac.tick();
 			}
 		}
 	}

@@ -62,19 +62,19 @@ void ChannelHistory::reset() {
     historyPosition = 1;
 }
 
-void ChannelHistory::update(uint32_t tickCount) {
+void ChannelHistory::update() {
     if (!historyStarted) {
         historyStarted = 1;
-        historyLastTick = tickCount;
+        historyLastTickMs = millis();
         historyPosition = 1;
     } else {
-        uint32_t ytViewRateMicroseconds = (int)round(channel.ytViewRate * 1000000L);
-        while (tickCount - historyLastTick >= ytViewRateMicroseconds) {
+        uint32_t ytViewRateMs = (int)round(channel.ytViewRate * 1000L);
+        while (millis() - historyLastTickMs >= ytViewRateMs) {
             uint32_t historyIndex = historyPosition % CHANNEL_HISTORY_SIZE;
             uHistory[historyIndex] = channel_dispatcher::getUMonLast(channel);
             iHistory[historyIndex] = channel_dispatcher::getIMonLast(channel);
             historyPosition++;
-            historyLastTick += ytViewRateMicroseconds;
+            historyLastTickMs += ytViewRateMs;
         }
     }
 }
@@ -471,7 +471,7 @@ void Channel::initParams(uint16_t moduleRevision) {
     flags.displayValue2 = DISPLAY_VALUE_CURRENT;
     ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
 
-    autoRangeCheckLastTickCount = 0;
+    autoRangeCheckLastTickCountMs = 0;
 
     flags.cvMode = 0;
     flags.ccMode = 0;
@@ -570,13 +570,13 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
     if (state && isOutputEnabled() && condition) {
         if (delay > 0) {
             if (cpv.flags.alarmed) {
-                if (micros() - cpv.alarm_started >= delay * 1000000UL) {
+                if (millis() - cpv.alarmStartedMs >= delay * 1000UL) {
                     cpv.flags.alarmed = 0;
                     protectionEnter(cpv, false);
                 }
             } else {
                 cpv.flags.alarmed = 1;
-                cpv.alarm_started = micros();
+                cpv.alarmStartedMs = millis();
             }
         } else {
             protectionEnter(cpv, false);
@@ -734,12 +734,12 @@ bool Channel::isOk() {
     return g_slots[slotIndex]->enabled && isPowerUp() && isPowerOk() && isTestOk() && !bp3c::flash_slave::g_bootloaderMode;
 }
 
-void Channel::tick(uint32_t tick_usec) {
+void Channel::tick() {
     if (!isOk()) {
         return;
     }
 
-    tickSpecific(tick_usec);
+    tickSpecific();
 
     if (params.features & CH_FEATURE_RPOL) {
         unsigned rpol = 0;
@@ -768,10 +768,10 @@ void Channel::tick(uint32_t tick_usec) {
     }
 
     if (channelHistory) {
-        channelHistory->update(tick_usec);
+        channelHistory->update();
     }
 
-    doAutoSelectCurrentRange(tick_usec);
+    doAutoSelectCurrentRange();
 }
 
 float Channel::getValuePrecision(Unit unit, float value) const {
@@ -1562,14 +1562,15 @@ void Channel::setCurrentRange(uint8_t currentCurrentRange) {
     }
 }
 
-void Channel::doAutoSelectCurrentRange(uint32_t tickCount) {
+void Channel::doAutoSelectCurrentRange() {
     if (calibration::g_editor.isEnabled()) {
         return;
     }
 
     if (isOutputEnabled()) {
-        if (autoRangeCheckLastTickCount != 0) {
-            if (tickCount - autoRangeCheckLastTickCount > CURRENT_AUTO_RANGE_SWITCHING_DELAY_MS * 1000L) {
+        uint32_t tickCountMs = millis();
+        if (autoRangeCheckLastTickCountMs != 0) {
+            if (tickCountMs - autoRangeCheckLastTickCountMs > CURRENT_AUTO_RANGE_SWITCHING_DELAY_MS) {
                 if (flags.autoSelectCurrentRange &&
                     flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH &&
                     hasSupportForCurrentDualRange() && 
@@ -1586,13 +1587,13 @@ void Channel::doAutoSelectCurrentRange(uint32_t tickCount) {
                         }
                     }
                 }
-                autoRangeCheckLastTickCount = tickCount;
+                autoRangeCheckLastTickCountMs = tickCountMs;
             }
         } else {
-            autoRangeCheckLastTickCount = tickCount;
+            autoRangeCheckLastTickCountMs = tickCountMs;
         }
     } else {
-        autoRangeCheckLastTickCount = 0;
+        autoRangeCheckLastTickCountMs = 0;
     }
 }
 

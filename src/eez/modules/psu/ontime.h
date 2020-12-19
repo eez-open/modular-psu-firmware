@@ -47,7 +47,7 @@ class Counter {
     void stop();
 
     void init();
-    void tick(uint32_t tick_usec);
+    void tick();
 
     uint32_t getTotalTime();
     uint32_t getLastTime();

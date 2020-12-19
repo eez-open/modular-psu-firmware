@@ -41,7 +41,7 @@ extern int g_rpm;
 
 void init();
 bool test();
-void tick(uint32_t tick_usec);
+void tick();
 
 extern double g_Kp;
 extern double g_Ki;

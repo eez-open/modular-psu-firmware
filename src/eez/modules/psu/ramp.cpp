@@ -66,10 +66,10 @@ void executionStart(Channel &channel) {
     setActive(true, true);
 }
 
-void tick(uint32_t tickUsec) {
+void tick() {
     bool active = false;
 
-    float tick = tickUsec / 1000000.0f;
+    float tick = micros() / 1000000.0f;
 
     for (int i = 0; i < CH_NUM; i++) {
         if (g_execution[i].state) {

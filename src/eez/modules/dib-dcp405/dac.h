@@ -38,7 +38,7 @@ public:
     void init();
     bool test(IOExpander &ioexp, AnalogDigitalConverter &adc);
 
-    void tick(uint32_t tickCount);
+    void tick();
 
     enum RampOption {
         NO_RAMP,
@@ -64,7 +64,7 @@ private:
     // ramp
     uint16_t m_rampLastValue;
     uint16_t m_rampTargetValue;
-    uint32_t m_rampStartTime;
+    uint32_t m_rampStartTimeUsec;
 
 #if defined(EEZ_PLATFORM_STM32)
     void set(uint8_t buffer, uint16_t value, RampOption rampOption = NO_RAMP);

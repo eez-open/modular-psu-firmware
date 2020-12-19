@@ -87,7 +87,7 @@ void init() {
     selectUsbMode(psu::persist_conf::getUsbMode(), g_otgMode);
 }
 
-void tick(uint32_t tickCount) {
+void tick() {
 #if defined(EEZ_PLATFORM_STM32)
     stateTransition(HAL_GPIO_ReadPin(USB_OTG_FS_OC_GPIO_Port, USB_OTG_FS_OC_Pin) ? EVENT_OTG_OC_HI : EVENT_OTG_OC_LOW);
     stateTransition(HAL_GPIO_ReadPin(USB_OTG_FS_ID_GPIO_Port, USB_OTG_FS_ID_Pin) ? EVENT_OTG_ID_HI : EVENT_OTG_ID_LOW);

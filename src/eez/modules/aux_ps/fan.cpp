@@ -71,7 +71,7 @@ int g_rpm = 0;
 
 #define MAX31760_DEVICE_ADDRESS 0xAE
 
-#define CONF_FAN_TEST_DURATION 10000000 // 10 sec
+#define CONF_FAN_TEST_DURATION_MS 10000 // 10 sec
 #define CONF_FAN_TEST_PWM FAN_MIN_PWM
 
 #define CONF_NUM_TACH_PULSES_PER_REVOLUTION 2
@@ -113,7 +113,7 @@ uint8_t g_cr1 = 0;
 uint8_t g_cr2 = 0;
 uint8_t g_cr3 = 0;
 
-uint32_t g_fanSpeedLastMeasuredTick;
+uint32_t g_fanSpeedLastMeasuredTickMs;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -374,7 +374,7 @@ bool test() {
 	// start testing
 	g_testResult = TEST_NONE;
 	setPwmDutyCycle(CONF_FAN_TEST_PWM);
-	g_fanSpeedLastMeasuredTick = micros();
+	g_fanSpeedLastMeasuredTickMs = millis();
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -421,10 +421,10 @@ bool checkStatus() {
 }
 
 void checkTest() {
-	int32_t diff = micros() - g_fanSpeedLastMeasuredTick;
+	int32_t diff = millis() - g_fanSpeedLastMeasuredTickMs;
 
 	if (checkStatus()) {
-    	if (diff >= CONF_FAN_TEST_DURATION) {
+    	if (diff >= CONF_FAN_TEST_DURATION_MS) {
     		g_testResult = TEST_OK;
     	}
 	} 
@@ -519,7 +519,7 @@ int updateFanSpeed() {
 	return newFanSpeedPWM;
 }
 
-void tick(uint32_t tickCount) {
+void tick() {
 #if defined(EEZ_PLATFORM_STM32)
     if (g_testResult == TEST_NONE) {
     	// still testing
@@ -532,9 +532,10 @@ void tick(uint32_t tickCount) {
     }
 
 #if defined(EEZ_PLATFORM_STM32)
-	int32_t diff = tickCount - g_fanSpeedLastMeasuredTick;
-	if (diff >= FAN_SPEED_MEASURMENT_INTERVAL * 1000L) {
-	    g_fanSpeedLastMeasuredTick = tickCount;
+	uint32_t tickCountMs = millis();
+	int32_t diff = tickCountMs - g_fanSpeedLastMeasuredTickMs;
+	if (diff >= FAN_SPEED_MEASURMENT_INTERVAL_MS) {
+	    g_fanSpeedLastMeasuredTickMs = tickCountMs;
 
 	    if (g_fanSpeedPWM != 0) {
 			if (checkStatus()) {

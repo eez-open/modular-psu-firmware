@@ -43,10 +43,6 @@ namespace encoder {
 static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true, false);
 #endif	
 
-#ifdef DEBUG
-//static uint16_t g_totalCounter;
-#endif
-
 static volatile int16_t g_counter;
 
 bool g_accelerationEnabled = false;
@@ -194,11 +190,6 @@ static int getCounter() {
     taskEXIT_CRITICAL();
 #endif
 
-#ifdef DEBUG
-    //g_totalCounter += counter;
-    //psu::debug::g_encoderCounter.set(g_totalCounter);
-#endif
-
     return counter;
 }
 
@@ -212,14 +203,10 @@ static int getAcceleratedCounter(int increment) {
     bool diffSign = sign != g_lastSign;
     g_lastSign = sign;
 
-    static uint32_t g_lastTime = 0;
-    uint32_t currentTime = micros();
-    float dt = 1.0f * (currentTime - g_lastTime) / 1000.0f * sign / increment;
-    g_lastTime = currentTime;
-
-#ifdef DEBUG
-    //psu::debug::g_encoderDt.set((int32_t)dt);
-#endif
+    static uint32_t g_lastTimeMs = 0;
+    uint32_t currentTimeMs = millis();
+    float dt = 1.0f * (currentTimeMs - g_lastTimeMs) * sign / increment;
+    g_lastTimeMs = currentTimeMs;
 
     const float MIN_DT_MS = 8;
     const float MAX_DT_MS = 150;

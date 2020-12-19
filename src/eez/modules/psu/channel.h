@@ -185,7 +185,7 @@ struct ProtectionFlags {
 /// Runtime protection values
 struct ProtectionValue {
     ProtectionFlags flags;
-    uint32_t alarm_started;
+    uint32_t alarmStartedMs;
 };
 
 enum ChannelMode {
@@ -213,7 +213,7 @@ struct ChannelHistory {
     ChannelHistory(Channel& channel_) : channel(channel_) {}
 
     void reset();
-    void update(uint32_t tickCount);
+    void update();
 
     static YtDataGetValueFunctionPointer getChannelHistoryValueFuncs(int channelIndex);
 
@@ -222,7 +222,7 @@ protected:
     float uHistory[CHANNEL_HISTORY_SIZE];
     float iHistory[CHANNEL_HISTORY_SIZE];
     uint32_t historyPosition;
-    uint32_t historyLastTick;
+    uint32_t historyLastTickMs;
 
 private: 
     Channel& channel;
@@ -435,7 +435,7 @@ public:
     bool isOk();
 
     /// Called by main loop, used for channel maintenance.
-    void tick(uint32_t tick_usec);
+    void tick();
 
     /// Called from channel driver when ADC data is ready.
     void onAdcData(AdcDataType adcDataType, float value);
@@ -623,7 +623,7 @@ public:
     /// Test the channel.
     virtual bool test() = 0;
 
-    virtual void tickSpecific(uint32_t tickCount) = 0;
+    virtual void tickSpecific() = 0;
 
     virtual TestResult getTestResult() = 0;
 
@@ -723,8 +723,8 @@ private:
     void executeOutputEnable(bool enable, uint16_t tasks);
     static void executeOutputEnable(bool inhibited);
 
-    uint32_t autoRangeCheckLastTickCount;
-    void doAutoSelectCurrentRange(uint32_t tickCount);
+    uint32_t autoRangeCheckLastTickCountMs;
+    void doAutoSelectCurrentRange();
 };
 
 #define OUTPUT_ENABLE_TASK_OE            (1 << 0)

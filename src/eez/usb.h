@@ -24,7 +24,7 @@ namespace eez {
 namespace usb {
 
 void init();
-void tick(uint32_t tickCount);
+void tick();
 
 void selectUsbMode(int usbMode, int otgMode);
 void selectUsbDeviceClass(int usbDeviceClass);

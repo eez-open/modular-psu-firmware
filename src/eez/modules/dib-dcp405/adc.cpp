@@ -337,25 +337,13 @@ float AnalogDigitalConverter::read() {
     if (adcDataType == ADC_DATA_TYPE_U_MON) {
         value = remapAdcDataToVoltage(channel, adcDataType, adcValue);
         channel.u.mon_adc = value;
-#ifdef DEBUG
-        debug::g_uMon[channelIndex].set(adcValue);
-#endif
     } else if (adcDataType == ADC_DATA_TYPE_I_MON) {
         value = remapAdcDataToCurrent(channel, adcDataType, adcValue);
         channel.i.mon_adc = value;
-#ifdef DEBUG
-        debug::g_iMon[channelIndex].set(adcValue);
-#endif
     } else if (adcDataType == ADC_DATA_TYPE_U_MON_DAC) {
         value = remapAdcDataToVoltage(channel, adcDataType, adcValue);
-#ifdef DEBUG
-        debug::g_uMonDac[channelIndex].set(adcValue);
-#endif
     } else {
         value = remapAdcDataToCurrent(channel, adcDataType, adcValue);
-#ifdef DEBUG
-        debug::g_iMonDac[channelIndex].set(adcValue);
-#endif
     }
 
     return value;

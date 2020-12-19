@@ -44,7 +44,7 @@
 #pragma warning(disable : 4996)
 #endif
 
-#define CONF_GUI_KEYPAD_PASSWORD_LAST_CHAR_VISIBLE_DURATION 500000UL
+#define CONF_GUI_KEYPAD_PASSWORD_LAST_CHAR_VISIBLE_DURATION_MS 500UL
 
 namespace eez {
 namespace psu {
@@ -160,9 +160,11 @@ void Keypad::getKeypadText(char *text) {
                 *textPtr++ = '*';
             }
 
-            uint32_t current_time = micros();
-            if (current_time - m_lastKeyAppendTime <=
-                CONF_GUI_KEYPAD_PASSWORD_LAST_CHAR_VISIBLE_DURATION) {
+            uint32_t currentTimeMs = millis();
+            if (
+                currentTimeMs - m_lastKeyAppendTimeMs <=
+                CONF_GUI_KEYPAD_PASSWORD_LAST_CHAR_VISIBLE_DURATION_MS
+            ) {
                 *textPtr++ = m_keypadText[i];
             } else {
                 *textPtr++ = '*';
@@ -216,7 +218,7 @@ void Keypad::insertChar(char c) {
         }
         m_keypadText[m_cursorPosition] = c;
         m_cursorPosition++;
-        m_lastKeyAppendTime = micros();
+        m_lastKeyAppendTimeMs = millis();
     } else {
         sound::playBeep();
     }

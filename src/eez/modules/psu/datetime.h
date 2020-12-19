@@ -27,7 +27,7 @@ extern TestResult g_testResult;
 
 void init();
 bool test();
-void tick(uint32_t tickCount);
+void tick();
 
 bool isValidDate(uint8_t year, uint8_t month, uint8_t day);
 bool getDate(uint8_t &year, uint8_t &month, uint8_t &day);

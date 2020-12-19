@@ -25,7 +25,7 @@
 using namespace eez::gui;
 using namespace eez::mcu::display;
 
-#define CONF_GUI_MOUSE_TIMEOUT                  10000000L // 10s
+#define CONF_GUI_MOUSE_TIMEOUT_MS 10 * 1000
 
 namespace eez {
 namespace mouse {
@@ -35,7 +35,7 @@ static int g_mouseCursorX;
 static int g_mouseCursorY;
 
 static bool g_mouseDown;
-static uint32_t g_mouseCursorLastActivityTime;
+static uint32_t g_mouseCursorLastActivityTimeMs;
 
 static bool g_mouseWasDown;
 static int g_mouseWasCursorX;
@@ -58,11 +58,11 @@ void init() {
 }
 
 void getEvent(bool &mouseCursorVisible, EventType &mouseEventType, int &mouseX, int &mouseY) {
-    uint32_t tickCount = micros();
+    uint32_t tickCount = millis();
 
     if (g_mouseCursorVisible && !g_mouseDown) {
-        int32_t diff = tickCount - g_mouseCursorLastActivityTime;
-        if (diff >= CONF_GUI_MOUSE_TIMEOUT) {
+        int32_t diff = tickCount - g_mouseCursorLastActivityTimeMs;
+        if (diff >= CONF_GUI_MOUSE_TIMEOUT_MS) {
             g_mouseCursorVisible = false;
         }
     }
@@ -168,24 +168,24 @@ void onPageChanged() {
 void onMouseXMove(int x) {
     g_mouseCursorX = x;
     g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTime = micros();
+    g_mouseCursorLastActivityTimeMs = millis();
 }
 
 void onMouseYMove(int y) {
     g_mouseCursorY = y;
     g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTime = micros();
+    g_mouseCursorLastActivityTimeMs = millis();
 }
 
 void onMouseButtonDown(int button) {
     g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTime = micros();
+    g_mouseCursorLastActivityTimeMs = millis();
     g_mouseDown = true;
 }
 
 void onMouseButtonUp(int button) {
     g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTime = micros();
+    g_mouseCursorLastActivityTimeMs = millis();
     g_mouseDown = false;
 }
 

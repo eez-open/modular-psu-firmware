@@ -219,7 +219,7 @@ public:
         }
 #endif
 
-        if (relayCyclesWriteInterval.test(micros())) {
+        if (relayCyclesWriteInterval.test()) {
             sendMessageToLowPriorityThread((LowPriorityThreadMessage)THREAD_MESSAGE_SAVE_RELAY_CYCLES, slotIndex);
         }
     }

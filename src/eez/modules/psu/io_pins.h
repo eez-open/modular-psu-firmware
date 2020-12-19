@@ -56,7 +56,7 @@ extern float g_pwmFrequency[NUM_IO_PINS - DOUT1];
 extern float g_pwmDuty[NUM_IO_PINS - DOUT1];
 
 void reset();
-void tick(uint32_t tickCount);
+void tick();
 void onTrigger();
 void refresh();
 

@@ -37,7 +37,7 @@ struct scpi_psu_t {
     ChannelList selectedChannels;
     char currentDirectory[MAX_PATH_LENGTH + 1];
     bool isBufferOverrun;
-    uint32_t bufferOverrunTime;
+    uint32_t bufferOverrunTimeMs;
 };
 
 void init(scpi_t &scpi_context, scpi_psu_t &scpi_psu_context, scpi_interface_t *interface,

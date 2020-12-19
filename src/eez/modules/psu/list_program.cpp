@@ -577,7 +577,7 @@ bool setListValue(Channel &channel, int16_t it, int *err) {
     return true;
 }
 
-void tick(uint32_t tick_usec) {
+void tick() {
     bool active = false;
 
     for (int i = 0; i < CH_NUM; ++i) {

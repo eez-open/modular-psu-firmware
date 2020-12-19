@@ -37,7 +37,7 @@ struct ProtectionConfiguration {
 
 void init();
 bool test();
-void tick(uint32_t tick_usec);
+void tick();
 
 bool isChannelSensorInstalled(Channel *channel);
 bool getChannelSensorState(Channel *channel);

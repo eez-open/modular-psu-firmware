@@ -443,8 +443,6 @@
     SCPI_COMMAND("DEBUg:ONTime?", scpi_cmd_debugOntimeQ) \
     SCPI_COMMAND("DEBUg:VOLTage", scpi_cmd_debugVoltage) \
     SCPI_COMMAND("DEBUg:CURRent", scpi_cmd_debugCurrent) \
-    SCPI_COMMAND("DEBUg:MEASure:VOLTage", scpi_cmd_debugMeasureVoltage) \
-    SCPI_COMMAND("DEBUg:MEASure:CURRent", scpi_cmd_debugMeasureCurrent) \
     SCPI_COMMAND("DEBUg:FAN", scpi_cmd_debugFan) \
     SCPI_COMMAND("DEBUg:FAN?", scpi_cmd_debugFanQ) \
     SCPI_COMMAND("DEBUg:FAN:PID", scpi_cmd_debugFanPid) \

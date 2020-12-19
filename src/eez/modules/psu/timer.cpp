@@ -24,20 +24,21 @@
 namespace eez {
 namespace psu {
 
-Interval::Interval(uint32_t interval_msec) : interval_usec(interval_msec * 1000L) {
+Interval::Interval(uint32_t interval) : m_interval(interval) {
     reset();
 }
 
 void Interval::reset() {
-    next_tick_usec = micros() + interval_usec;
+    m_nextTick = millis() + m_interval;
 }
 
-bool Interval::test(uint32_t tick_usec) {
-    int32_t diff = tick_usec - next_tick_usec;
+bool Interval::test() {
+    uint32_t tick = millis();
+    int32_t diff = tick - m_nextTick;
     if (diff > 0) {
         do {
-            next_tick_usec += interval_usec;
-            diff = tick_usec - next_tick_usec;
+            m_nextTick += m_interval;
+            diff = tick - m_nextTick;
         } while (diff > 0);
 
         return true;

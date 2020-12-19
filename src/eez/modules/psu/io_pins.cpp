@@ -55,7 +55,7 @@ static struct {
     unsigned inhibited : 1;
 } g_lastState = { 2, 2, 0, 0 };
 
-static uint32_t g_toutputPulseStartTickCount;
+static uint32_t g_toutputPulseStartTickCountMs;
 
 static bool g_pinState[NUM_IO_PINS] = { false, false, false, false };
 
@@ -293,7 +293,7 @@ void reset() {
     }
 }
 
-void tick(uint32_t tickCount) {
+void tick() {
     // execute input pins function
     const IOPin &inputPin1 = g_ioPins[0];
     int inputPin1Value = ioPinRead(EXT_TRIG1);
@@ -333,8 +333,8 @@ void tick(uint32_t tickCount) {
 
     // end trigger output pulse
     if (g_lastState.toutputPulse) {
-        int32_t diff = tickCount - g_toutputPulseStartTickCount;
-        if (diff > CONF_TOUTPUT_PULSE_WIDTH_MS * 1000L) {
+        int32_t diff = millis() - g_toutputPulseStartTickCountMs;
+        if (diff > CONF_TOUTPUT_PULSE_WIDTH_MS) {
             for (int pin = 2; pin < NUM_IO_PINS; ++pin) {
                 const IOPin &outputPin = g_ioPins[pin];
                 if (outputPin.function == io_pins::FUNCTION_TOUTPUT) {
@@ -391,7 +391,7 @@ void onTrigger() {
         if (outputPin.function == io_pins::FUNCTION_TOUTPUT) {
             setPinState(pin, true);
             g_lastState.toutputPulse = 1;
-            g_toutputPulseStartTickCount = micros();
+            g_toutputPulseStartTickCountMs = millis();
         }
     }
 }

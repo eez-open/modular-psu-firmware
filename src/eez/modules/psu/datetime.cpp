@@ -214,12 +214,13 @@ bool test() {
     return g_testResult != TEST_FAILED && g_testResult != TEST_WARNING;
 }
 
-void tick(uint32_t tickCount) {
-    static uint32_t g_lastTickCount;
-    int32_t diff = tickCount - g_lastTickCount;
-    if (diff > 1000000L) {
+void tick() {
+    static uint32_t g_lastTickCountMs;
+	uint32_t tickCountMs = millis();
+    int32_t diff = tickCountMs - g_lastTickCountMs;
+    if (diff > 1000L) {
         dstCheck();
-        g_lastTickCount = tickCount;
+        g_lastTickCountMs = tickCountMs;
     }
 }
 

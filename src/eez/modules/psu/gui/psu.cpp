@@ -145,7 +145,7 @@ void PsuAppContext::stateManagment() {
     }
 
     // remove alert message after period of time
-    uint32_t inactivityPeriod = eez::hmi::getInactivityPeriod();
+    uint32_t inactivityPeriod = eez::hmi::getInactivityPeriodMs();
     if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
         ToastMessagePage *page = (ToastMessagePage *)getActivePage();
         if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
@@ -250,7 +250,7 @@ void PsuAppContext::stateManagment() {
 #endif
 
 #if GUI_BACK_TO_MAIN_ENABLED
-    uint32_t inactivityPeriod = eez::idle::getInactivityPeriod();
+    uint32_t inactivityPeriod = eez::idle::getInactivityPeriodMs();
 
     if (
         activePageId == PAGE_ID_EVENT_QUEUE ||

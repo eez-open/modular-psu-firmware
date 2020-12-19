@@ -69,7 +69,7 @@ void init(scpi_t &scpi_context, scpi_psu_t &scpi_psu_context, scpi_interface_t *
 
     scpi_psu_context.currentDirectory[0] = 0;
     scpi_psu_context.isBufferOverrun = false;
-    scpi_psu_context.bufferOverrunTime = 0;
+    scpi_psu_context.bufferOverrunTimeMs = 0;
 
     scpi_context.user_context = &scpi_psu_context;
 
@@ -84,19 +84,19 @@ void onBufferOverrun(scpi_t &context) {
     emptyBuffer(context);
     scpi_psu_t *psu_context = (scpi_psu_t *)context.user_context;
     psu_context->isBufferOverrun = true;
-    psu_context->bufferOverrunTime = micros();
+    psu_context->bufferOverrunTimeMs = millis();
 }
 
 void input(scpi_t &context, const char *str, size_t size) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context.user_context;
     if (psu_context->isBufferOverrun) {
         // wait for 500ms of idle input to declare buffer overrun finished
-        uint32_t tickCount = micros();
-        int32_t diff = tickCount - psu_context->bufferOverrunTime;
-        if (diff > 500000) {
+        uint32_t tickCountMs = millis();
+        int32_t diff = tickCountMs - psu_context->bufferOverrunTimeMs;
+        if (diff > 500) {
             psu_context->isBufferOverrun = false;
         } else {
-            psu_context->bufferOverrunTime = tickCount;
+            psu_context->bufferOverrunTimeMs = tickCountMs;
             return;
         }
     }

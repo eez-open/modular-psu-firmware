@@ -262,7 +262,7 @@ void IOExpander::reinit() {
 }
 #endif
 
-void IOExpander::tick(uint32_t tick_usec) {
+void IOExpander::tick() {
     Channel &channel = Channel::get(channelIndex);
 
 #if defined(EEZ_PLATFORM_STM32)    

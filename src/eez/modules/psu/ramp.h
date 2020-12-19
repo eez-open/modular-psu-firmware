@@ -23,7 +23,7 @@ namespace psu {
 namespace ramp {
 
 void executionStart(Channel &channel);
-void tick(uint32_t tickUsec);
+void tick();
 
 bool isActive();
 bool isActive(Channel &channel);
