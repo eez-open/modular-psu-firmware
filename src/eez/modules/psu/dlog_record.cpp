@@ -53,7 +53,7 @@ namespace dlog_record {
 #define CONF_WRITE_TIMEOUT_MS 1000
 #define CONF_WRITE_FLUSH_TIMEOUT_MS 10000
 
-#define MODULE_LOCAL_RECORDING_PREVIEW_PERIOD 0.001f
+#define MODULE_LOCAL_RECORDING_PREVIEW_PERIOD dlog_view::PERIOD_MIN
 
 enum Event {
     EVENT_INITIATE,
@@ -84,9 +84,6 @@ int g_stateTransitionError;
 bool g_traceInitiated;
 
 static uint32_t g_countingStarted;
-static uint32_t g_seconds;
-static uint32_t g_millis;
-static uint32_t g_iSample;
 static double g_currentTime;
 static double g_nextTime;
 
@@ -177,22 +174,9 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
             if (i <= 0) {
                 i = 0;
             } else {
-                // TODO buffer overflow, this should be reported to the user
-            	osMutexRelease(g_mutexId);
+                osMutexRelease(g_mutexId);
                 abortAfterBufferOverflowError();
-            	return false;
-
-//
-//                if ((uint32_t)i > bufferSize) {
-//                    i = bufferSize;
-//                }
-//
-//                // TODO this is wrong in case of digital values
-//                for (int j = 0; j < i / 4; j++) {
-//                    ((float *)g_saveBuffer)[j] = NAN;
-//                }
-//
-//                //DebugTrace("NaN's: %d\n", i);
+                return false;
             }
 
             if ((uint32_t)i < bufferSize) {
@@ -205,14 +189,9 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
                     memcpy(g_saveBuffer, DLOG_RECORD_BUFFER + tail, n);
                     if (head > 0) {
                         memcpy(g_saveBuffer + n, DLOG_RECORD_BUFFER, head);
-                        //DebugTrace("boundary: %d\n", n);
                     }
                 }
             } 
-            
-            // for (uint32_t i = 0; i < bufferSize; i++) {
-            //     g_saveBuffer[i] = g_lastSavedBufferIndex + i + DLOG_RECORD_BUFFER_SIZE >= g_bufferIndex ? DLOG_RECORD_BUFFER[(g_lastSavedBufferIndex + i) % DLOG_RECORD_BUFFER_SIZE] : 0;
-            // }
         }
         osMutexRelease(g_mutexId);
     }
@@ -296,9 +275,6 @@ static void flushData() {
 
 static void initRecordingStart() {
     g_countingStarted = false;
-    g_seconds = 0;
-    g_millis = 0;
-    g_iSample = 0;
     g_currentTime = 0;
     g_nextTime = 0;
     g_lastSavedBufferIndex = 0;
@@ -328,9 +304,7 @@ static void initRecordingStart() {
         g_slots[slotIndex]->onStartDlog();
     }
 
-    if (!isModuleLocalRecording()) {
-	    g_writer.reset();
-    }
+    g_writer.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -350,13 +324,22 @@ static void setState(State newState) {
 }
 
 static void log() {
-	uint32_t tickCountMs = millis();
+    uint32_t tickCountMs = millis();
 
+    static uint32_t g_seconds;
+    static uint32_t g_millis;
+    static uint32_t g_iSample;
     static uint32_t g_lastTickCountMs;
-    if (!g_lastTickCountMs) {
-        g_lastTickCountMs = tickCountMs;
+
+    if (!g_countingStarted) {
+        g_seconds = 0;
+        g_millis = 0;
+        g_iSample = 0;
         g_countingStarted = true;
+        g_lastTickCountMs = tickCountMs;
+        return;
     }
+	
     g_millis += tickCountMs - g_lastTickCountMs;
     g_lastTickCountMs = tickCountMs;
 
@@ -393,11 +376,11 @@ static void log() {
                         if (g_writer.getBitMask() == 0) {
                             g_writer.writeBit(0); // mark as invalid sample
                         }
-						g_writer.writeBit(0);
+                        g_writer.writeBit(0);
                     }
                 }
 
-				g_writer.flushBits();
+                g_writer.flushBits();
 
                 ++g_recording.size;
             }
@@ -406,11 +389,11 @@ static void log() {
             for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
                 auto &dlogItem = g_recording.parameters.dlogItems[i];
                 if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
-					g_writer.writeFloat(channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
+                    g_writer.writeFloat(channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
                 } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_I) {
-					g_writer.writeFloat(channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
+                    g_writer.writeFloat(channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
                 } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_P)  {
-					g_writer.writeFloat(
+                    g_writer.writeFloat(
                         channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex) *
                         channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex)
                     );
@@ -422,14 +405,14 @@ static void log() {
                     uint8_t data;
                     channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
                     if (data & (1 << (dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0))) {
-						g_writer.writeBit(1);
+                        g_writer.writeBit(1);
                     } else {
-						g_writer.writeBit(0);
+                        g_writer.writeBit(0);
                     }
                 }
             }
 
-			g_writer.flushBits();
+            g_writer.flushBits();
             
             ++g_recording.size;
 
