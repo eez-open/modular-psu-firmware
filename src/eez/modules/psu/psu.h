@@ -74,6 +74,7 @@ public:
     bool getProfileOutputEnable(uint8_t *buffer) override;
     float getProfileUSet(uint8_t *buffer) override;
     float getProfileISet(uint8_t *buffer) override;
+    bool testAutoRecallValuesMatch(uint8_t *bufferRecall, uint8_t *bufferDefault) override;
 
     size_t getChannelLabelMaxLength(int subchannelIndex) override;
     const char *getChannelLabel(int subchannelIndex) override;

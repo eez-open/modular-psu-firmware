@@ -173,31 +173,6 @@ enum DlogResourceType {
     DLOG_RESOURCE_TYPE_DIN7,
 };
 
-#if defined(EEZ_PLATFORM_STM32)
-enum DiskDriverOperation {
-    DISK_DRIVER_OPERATION_NONE,
-    
-    DISK_DRIVER_OPERATION_INITIALIZE,
-    DISK_DRIVER_OPERATION_STATUS,
-    DISK_DRIVER_OPERATION_READ,
-    DISK_DRIVER_OPERATION_WRITE,
-    DISK_DRIVER_OPERATION_IOCTL
-};
-
-struct ExecuteDiskDriveOperationParams {
-    DiskDriverOperation operation;
-
-    uint32_t sector;
-    uint8_t* buff;
-    uint8_t cmd;
-
-    uint32_t *blockNum;
-    uint16_t *blockSize;
-
-    uint32_t result;
-};
-#endif
-
 struct Module {
     uint16_t moduleType;
     const char *moduleName;
@@ -208,6 +183,7 @@ struct Module {
     bool spiCrcCalculationEnable;
     uint8_t numPowerChannels;
     uint8_t numOtherChannels;
+    bool isResyncSupported;
 
     uint8_t slotIndex;
     bool enabled;
@@ -235,11 +211,10 @@ struct Module {
     virtual void tick();
     virtual void writeUnsavedData();
     virtual void onPowerDown();
+    virtual void resync();
 
-#if defined(EEZ_PLATFORM_STM32)
     virtual void onSpiIrq();
     virtual void onSpiDmaTransferCompleted(int status);
-#endif
 
     virtual gui::Page *getPageFromId(int pageId);
     virtual void animatePageAppearance(int previousPageId, int activePageId);
@@ -259,6 +234,7 @@ struct Module {
     virtual bool getProfileOutputEnable(uint8_t *buffer);
     virtual float getProfileUSet(uint8_t *buffer);
     virtual float getProfileISet(uint8_t *buffer);
+    virtual bool testAutoRecallValuesMatch(uint8_t *bufferRecall, uint8_t *bufferDefault);
 
     struct ProfileParameters {
         char label[SLOT_LABEL_MAX_LENGTH + 1];
@@ -392,9 +368,11 @@ struct Module {
     virtual void onStartDlog();
     virtual void onStopDlog();
 
-#if defined(EEZ_PLATFORM_STM32)
-    virtual void executeDiskDriveOperation(ExecuteDiskDriveOperationParams *params);
-#endif
+    virtual int diskDriveInitialize();
+    virtual int diskDriveStatus();
+    virtual int diskDriveRead(uint8_t *buff, uint32_t sector);
+    virtual int diskDriveWrite(uint8_t *buff, uint32_t sector);
+    virtual int diskDriveIoctl(uint8_t cmd, void *buff);
 };
 
 static const int NUM_SLOTS = 3;

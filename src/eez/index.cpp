@@ -89,13 +89,14 @@ void Module::writeUnsavedData() {
 void Module::onPowerDown() {
 }
 
-#if defined(EEZ_PLATFORM_STM32)
+void Module::resync() {
+}
+
 void Module::onSpiIrq() {
 }
 
 void Module::onSpiDmaTransferCompleted(int status) {
 }
-#endif
 
 gui::Page *Module::getPageFromId(int pageId) {
     return nullptr;
@@ -172,6 +173,10 @@ float Module::getProfileUSet(uint8_t *buffer) {
 
 float Module::getProfileISet(uint8_t *buffer) {
     return NAN;
+}
+
+bool Module::testAutoRecallValuesMatch(uint8_t *bufferRecall, uint8_t *bufferDefault) {
+    return true;
 }
 
 void Module::resetProfileToDefaults(uint8_t *buffer) {
@@ -723,15 +728,25 @@ void Module::onStartDlog() {
 void Module::onStopDlog() {
 }
 
-#ifdef EEZ_PLATFORM_STM32
-void Module::executeDiskDriveOperation(ExecuteDiskDriveOperationParams *params) {
-    if (params->operation == DISK_DRIVER_OPERATION_INITIALIZE || params->operation == DISK_DRIVER_OPERATION_STATUS) {
-        params->result = STA_NOINIT;
-    } else {
-        params->result = RES_ERROR;
-    }
+int Module::diskDriveInitialize() {
+    return 1; // STA_NOINIT
 }
-#endif
+
+int Module::diskDriveStatus() {
+    return 1; // STA_NOINIT
+}
+
+int Module::diskDriveRead(uint8_t *buff, uint32_t sector) {
+    return 1; // RES_ERROR
+}
+
+int Module::diskDriveWrite(uint8_t *buff, uint32_t sector) {
+    return 1; // RES_ERROR
+}
+
+int Module::diskDriveIoctl(uint8_t cmd, void *buff) {
+    return 1; // RES_ERROR
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -747,6 +762,7 @@ public:
         spiCrcCalculationEnable = false;
         numPowerChannels = 0;
         numOtherChannels = 0;
+        isResyncSupported = false;
     }
 
     Module *createModule() {

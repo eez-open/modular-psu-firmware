@@ -596,6 +596,15 @@ float PsuModule::getProfileISet(uint8_t *buffer) {
     return parameters->i_set;
 }
 
+bool PsuModule::testAutoRecallValuesMatch(uint8_t *bufferRecall, uint8_t *bufferDefault) {
+    auto recallParameters = (PowerChannelProfileParameters *)bufferRecall;
+    auto defaultParameters = (PowerChannelProfileParameters *)bufferDefault;
+
+    return 
+        recallParameters->u_set == defaultParameters->u_set &&
+        recallParameters->i_set == defaultParameters->i_set;
+}
+
 size_t PsuModule::getChannelLabelMaxLength(int subchannelIndex) {
     return Channel::CHANNEL_LABEL_MAX_LENGTH;
 }
@@ -719,8 +728,7 @@ void onThreadMessage(uint8_t type, uint32_t param) {
 #if defined(EEZ_PLATFORM_STM32)
     else if (type == PSU_MESSAGE_SPI_IRQ) {
         g_slots[param]->onSpiIrq();
-    }
-    else if (type == PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED) {
+    } else if (type == PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED) {
         int slotIndex = param & 0xff;
         int status = param >> 8;
         g_slots[slotIndex]->onSpiDmaTransferCompleted(status);
@@ -776,6 +784,8 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         channel.setDprogState((DprogState)(param & 0xFF));
     } else if (type == PSU_MESSAGE_SAVE_SERIAL_NO) {
         persist_conf::saveSerialNo(param);
+    } else if (type == PSU_MESSAGE_MODULE_RESYNC) {
+        g_slots[param]->resync();
     } else if (calibration::onHighPriorityThreadMessage(type, param)) {
         // handled
     } else if (type >= PSU_MESSAGE_MODULE_SPECIFIC) {

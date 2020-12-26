@@ -59,7 +59,7 @@ struct List {
    
 static uint32_t g_lastAutoSaveTime;
 static bool g_freeze;
-static profile::Parameters g_profilesCache[NUM_PROFILE_LOCATIONS];
+static Parameters g_profilesCache[NUM_PROFILE_LOCATIONS];
 static List g_listsProfile0[CH_MAX];
 static List g_listsProfile10[CH_MAX];
 
@@ -151,12 +151,48 @@ bool recallFromLocation(int location, int recallOptions, bool showProgress, int 
         return false;
     }
 
+    if (location != 0) {
+        auto recallProfile = &profile;
+
+        loadProfileParametersToCache(0);
+        auto defaultProfile = getProfileParameters(0);
+
+        bool forceDisableOutput = false;
+
+        if (recallProfile->flags.couplingType != defaultProfile->flags.couplingType) {
+            forceDisableOutput = true;
+        } else {
+            for (int i = 0; i < CH_NUM; ++i) {
+                Channel &channel = Channel::get(i);
+                if (
+                    !(
+                        recallProfile->channels[i].parametersAreValid && defaultProfile->channels[i].parametersAreValid &&
+                        recallProfile->channels[i].moduleType == defaultProfile->channels[i].moduleType &&
+                        g_slots[channel.slotIndex]->testAutoRecallValuesMatch(
+                            (uint8_t *)recallProfile->channels[i].parameters, 
+                            (uint8_t *)defaultProfile->channels[i].parameters
+                        )
+                    )
+                ) {
+                    forceDisableOutput = true;
+                    break;
+                }
+            }
+        }                
+
+        if (forceDisableOutput) {
+            recallOptions |= profile::RECALL_OPTION_FORCE_DISABLE_OUTPUT;
+            event_queue::pushEvent(event_queue::EVENT_WARNING_AUTO_RECALL_VALUES_MISMATCH);
+        }
+
+    }
+
     if (!recallState(profile, g_listsProfile0, recallOptions, err)) {
         return false;
     }
 
     if (location == 0) {
-        if (!(recallOptions & profile::RECALL_OPTION_IGNORE_POWER)) {
+        if (!(recallOptions & RECALL_OPTION_IGNORE_POWER)) {
             // save to cache
             memcpy(&g_profilesCache[0], &profile, sizeof(profile));
             saveState(g_profilesCache[0], g_listsProfile0);
@@ -320,7 +356,7 @@ bool isValid(int location) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void getSaveName(int location, char *name) {
-    Parameters *profile = profile::getProfileParametersFromCache(location);
+    Parameters *profile = getProfileParametersFromCache(location);
 
     if (!profile || !profile->flags.isValid || strncmp(profile->name, CONF_AUTO_NAME_PREFIX, strlen(CONF_AUTO_NAME_PREFIX)) == 0) {
         strcpy(name, CONF_AUTO_NAME_PREFIX);
@@ -397,7 +433,7 @@ void setFreezeState(bool value) {
 void loadProfileParametersToCache(int location) {
     using namespace eez::scpi;
 
-    if (!isLowPriorityThread()) {
+    if (g_isBooted && !isLowPriorityThread()) {
         if (g_profilesCache[location].loadStatus == LOAD_STATUS_LOADING) {
             return;
         }
@@ -1455,7 +1491,7 @@ static bool isTickSaveAllowed() {
 }
 
 static bool isAutoSaveAllowed() {
-    return !g_freeze && persist_conf::devConf.profileAutoRecallEnabled && persist_conf::devConf.profileAutoRecallLocation == 0;
+    return !g_freeze && persist_conf::devConf.profileAutoRecallEnabled;
 }
 
 static bool isProfile0Dirty() {
