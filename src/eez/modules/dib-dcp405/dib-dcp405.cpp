@@ -917,7 +917,8 @@ public:
         spiBaudRatePrescaler = 0;
         spiCrcCalculationEnable = false;
         numPowerChannels = 1;
-        numOtherChannels = 0;		
+        numOtherChannels = 0;
+		isResyncSupported = false;
 
 		firmareBasedModule = false;
     }

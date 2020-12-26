@@ -56,6 +56,11 @@
 
 #include <scpi/scpi.h>
 
+volatile uint32_t g_debugVarRequestStructSize;
+volatile uint32_t g_debugVarState;
+volatile uint32_t g_debugVarNumCrcErrors;
+volatile uint32_t g_debugVarNumTransferErrors;
+
 using namespace eez::psu;
 using namespace eez::psu::gui;
 using namespace eez::gui;
@@ -114,89 +119,150 @@ static const uint32_t TIMEOUT_UNTIL_OUT_OF_SYNC_MS = 10000;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct DlogParams {
-    float period;
-    float duration;
-    uint32_t resources;
-    char filePath[MAX_PATH_LENGTH + 1];
+enum Command {
+	COMMAND_NONE,
+
+    COMMAND_GET_INFO,
+    COMMAND_GET_STATE,
+    COMMAND_SET_PARAMS,
+
+    COMMAND_DLOG_RECORDING_START,
+    COMMAND_DLOG_RECORDING_STOP,
+
+    COMMAND_DISK_DRIVE_INITIALIZE,
+    COMMAND_DISK_DRIVE_STATUS,
+    COMMAND_DISK_DRIVE_READ,
+    COMMAND_DISK_DRIVE_WRITE,
+    COMMAND_DISK_DRIVE_IOCTL
 };
 
-struct Labels {
-    char din[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
-    char dout[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
-    char ain[4 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
-};
+#define GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT (1 << 0)
 
-struct FromMasterToSlaveParamsChange {
-    uint8_t operation; // DISK_DRIVER_OPERATION_NONE
+#define DLOG_STATE_IDLE 0
+#define DLOG_STATE_EXECUTING 1
+#define DLOG_STATE_FINISH_RESULT_OK 2
+#define DLOG_STATE_FINISH_RESULT_BUFFER_OVERFLOW 3
+#define DLOG_STATE_FINISH_RESULT_MASS_STORAGE_ERROR 4
 
-    uint8_t dinRanges;
-    uint8_t dinSpeeds;
-
-    uint8_t doutStates;
-
-    struct {
-        uint8_t mode; // enum SourceMode
-        uint8_t range;
-        uint8_t tempSensorBias;
-    } ain[4];
-
-    struct {
-        uint8_t outputEnabled;
-        uint8_t outputRange;
-        float outputValue;
-    } aout_dac7760[2];
-
-    struct {
-        float voltage;
-    } aout_dac7563[2];
-
-    struct {
-        float freq;
-        float duty;
-    } pwm[2];
-
-    DlogParams dlog;
-
-    Labels labels;
-
-    uint32_t fatTime;
-};
-
-struct FromMasterToSlaveDiskDriveOperation {
-    uint8_t operation; // enum DiskDriverOperation
-    uint32_t sector;
-    uint8_t cmd;
-    uint8_t buffer[512];
-};
-
-#define FLAG_SD_CARD_PRESENT (1 << 0)
-#define FLAG_DLOG_RECORD_FINISHED (1 << 1)
-#define FLAG_DLOG_RECORD_STATUS (1 << 2)
-#define FLAG_DISK_OPERATION_RESPONSE (1 << 3)
-
-#define DLOG_RECORD_RESULT_OK 0
-#define DLOG_RECORD_RESULT_BUFFER_OVERFLOW 1
-#define DLOG_RECORD_RESULT_MASS_STORAGE_ERROR 2
-
-#define MAX_DIN_VALUES 100
-
-#define DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE 4
-
-struct DlogStatus {
+struct DlogState {
+    uint8_t state; // DLOG_STATE_...
     uint32_t fileLength;
     uint32_t numSamples;
 };
 
-struct FromSlaveToMaster {
-	uint8_t flags;
-    uint16_t result;
-    uint8_t dinStates;
-    uint16_t ainValues[4];
+struct SetParams {
+	uint8_t dinRanges;
+	uint8_t dinSpeeds;
+
+	uint8_t doutStates;
+
+	struct {
+		uint8_t mode; // enum SourceMode
+		uint8_t range;
+		uint8_t tempSensorBias;
+	} ain[4];
+
+	struct {
+		uint8_t outputEnabled;
+		uint8_t outputRange;
+		float outputValue;
+	} aout_dac7760[2];
+
+	struct {
+		float voltage;
+	} aout_dac7563[2];
+
+	struct {
+		float freq;
+		float duty;
+	} pwm[2];
+};
+
+struct DlogRecordingStart {
+    float period;
+    float duration;
+    uint32_t resources;
+    char filePath[MAX_PATH_LENGTH + 1];
+    char dinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+    char doutLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+    char ainLabels[4 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+};
+
+#define DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE 4
+
+struct Request {
+    uint8_t command;
+
     union {
-    	uint8_t buffer[512];
-    	DlogStatus dlogStatus;
+        struct {
+            uint32_t fatTime;
+        } getState;
+
+		SetParams setParams;
+
+        DlogRecordingStart dlogRecordingStart;
+
+        struct {
+            uint32_t sector;
+        } diskDriveRead;
+
+        struct {
+            uint32_t sector;
+            uint8_t buffer[512];
+        } diskDriveWrite;
+
+        struct {
+            uint8_t cmd;
+            uint8_t buffer[DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE];
+        } diskDriveIoctl;
     };
+};
+
+struct Response {
+	uint8_t command;
+
+    union {
+        struct {
+            uint8_t firmwareMajorVersion;
+            uint8_t firmwareMinorVersion;
+            uint32_t idw0;
+            uint32_t idw1;
+            uint32_t idw2;
+        } getInfo;
+
+        struct {
+            uint8_t flags; // GET_STATE_COMMAND_FLAG_...
+            uint8_t dinStates;
+            uint16_t ainValues[4];
+            DlogState dlogState;
+        } getState;
+
+        struct {
+            uint8_t result; // 1 - success, 0 - failure
+        } setParams;
+
+        struct {
+            uint8_t result;
+        } diskDriveInitialize;
+
+        struct {
+            uint8_t result;
+        } diskDriveStatus;
+
+        struct {
+            uint8_t result;
+            uint8_t buffer[512];
+        } diskDriveRead;
+
+        struct {
+            uint8_t result;
+        } diskDriveWrite;
+
+        struct {
+            uint8_t result;
+            uint8_t buffer[DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE];
+        } diskDriveIoctl;
+	};
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -236,10 +302,7 @@ struct CalConf {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct MioChannel {
-};
-
-struct DinChannel : public MioChannel {
+struct DinChannel {
     uint8_t m_pinStates = 0;
 
     // Valid for all 8 digital inputs
@@ -327,7 +390,7 @@ struct DinChannel : public MioChannel {
     }
 };
 
-struct DoutChannel : public MioChannel {
+struct DoutChannel {
     uint8_t m_pinStates = 0;
 
     char m_pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
@@ -398,7 +461,7 @@ struct DoutChannel : public MioChannel {
     }
 };
 
-struct AinChannel : public MioChannel {
+struct AinChannel {
     float m_value = 0;
     uint8_t m_mode = 1;
     uint8_t m_range = 0;
@@ -526,7 +589,7 @@ struct AinChannel : public MioChannel {
     }
 };
 
-struct AoutDac7760Channel : public MioChannel {
+struct AoutDac7760Channel {
     bool m_outputEnabled = false;
     uint8_t m_mode = SOURCE_MODE_VOLTAGE;
 
@@ -836,7 +899,7 @@ struct AoutDac7760Channel : public MioChannel {
     }
 };
 
-struct AoutDac7563Channel : public MioChannel {
+struct AoutDac7563Channel {
     float m_value = 0;
 
     bool ongoingCal = false;
@@ -928,7 +991,7 @@ struct AoutDac7563Channel : public MioChannel {
     }
 };
 
-struct PwmChannel : public MioChannel {
+struct PwmChannel {
     float m_freq = 0;
     float m_duty = 0;
 
@@ -1000,24 +1063,82 @@ struct PwmChannel : public MioChannel {
 struct Mio168Module : public Module {
 public:
     TestResult testResult = TEST_NONE;
+
     bool synchronized = false;
-    int numCrcErrors = 0;
-    int numTransferErrors = 0;
-    uint8_t input[sizeof(FromSlaveToMaster)];
-    uint8_t output[sizeof(FromSlaveToMaster)];
+
+    uint32_t input[(sizeof(Request) + 3) / 4 + 1];
+    uint32_t output[(sizeof(Request) + 3) / 4];
+
     bool spiReady = false;
+    bool spiDmaTransferCompleted = false;
+    int spiDmaTransferStatus;
+
     uint32_t lastTransferTime = 0;
-    FromMasterToSlaveParamsChange lastTransferredParams;
+	SetParams lastTransferredParams;
     uint32_t operationStateTransitionTime;
-#ifdef EEZ_PLATFORM_STM32
-    ExecuteDiskDriveOperationParams *diskOperationParams;
+
+	struct CommandDef {
+		uint8_t command;
+		void (Mio168Module::*fillRequest)(Request &request);
+		void (Mio168Module::*done)(Response &response, bool isSuccess);
+	};
+
+    static const CommandDef getInfo_command;
+    static const CommandDef getState_command;
+    static const CommandDef setParams_command;
+
+    static const CommandDef dlogRecordingStart_command;
+    static const CommandDef dlogRecordingStop_command;
+
+    static const CommandDef diskDriveInitialize_command;
+    static const CommandDef diskDriveStatus_command;
+    static const CommandDef diskDriveRead_command;
+    static const CommandDef diskDriveWrite_command;
+    static const CommandDef diskDriveIoctl_command;
+
+    enum State {
+        STATE_IDLE,
+
+        STATE_WAIT_SLAVE_READY_BEFORE_REQUEST,
+        STATE_WAIT_DMA_TRANSFER_COMPLETED_FOR_REQUEST,
+
+        STATE_WAIT_SLAVE_READY_BEFORE_RESPONSE,
+        STATE_WAIT_DMA_TRANSFER_COMPLETED_FOR_RESPONSE
+    };
+
+    enum Event {
+        EVENT_SLAVE_READY,
+        EVENT_DMA_TRANSFER_COMPLETED,
+        EVENT_DMA_TRANSFER_FAILED,
+        EVENT_TIMEOUT
+    };
+
+    const CommandDef *currentCommand;
+    uint32_t refreshStartTime;
+    State state;
+    uint32_t lastStateTransitionTime;
+    uint32_t lastRefreshTime;
+    int retry;
+
+	struct ExecuteDiskDriveOperationParams {
+        const CommandDef *command;
+
+        uint32_t sector;
+        uint8_t* buff;
+        uint8_t cmd;
+
+        uint32_t *blockNum;
+        uint16_t *blockSize;
+
+        uint32_t result;
+    };
+    ExecuteDiskDriveOperationParams diskOperationParams;
     enum {
     	DISK_OPERATION_IDLE,
         DISK_OPERATION_NOT_FINISHED,
         DISK_OPERATION_SUCCESSFULLY_FINISHED,
         DISK_OPERATION_UNSUCCESSFULLY_FINISHED
-    } diskOperationStatus;
-#endif
+    } diskOperationStatus = DISK_OPERATION_IDLE;
 
     DinChannel dinChannel;
     DoutChannel doutChannel;
@@ -1030,11 +1151,13 @@ public:
     uint8_t dac7760CalibrationChannelCurrentRange;
     uint8_t dac7760CalibrationChannelVoltageRange;
 
-    DlogParams dlog;
+    const CommandDef *nextDlogCommand = nullptr;
+    DlogRecordingStart nextDlogRecordingStart;
+    DlogRecordingStart dlogRecordingStart;
 
     Mio168Module() {
-		assert(sizeof(FromMasterToSlaveParamsChange) <= sizeof(FromSlaveToMaster));
-		assert(sizeof(FromMasterToSlaveDiskDriveOperation) <= sizeof(FromSlaveToMaster));
+		assert(sizeof(Request) == sizeof(Response));
+        g_debugVarRequestStructSize = sizeof(Request);
 
         moduleType = MODULE_TYPE_DIB_MIO168;
         moduleName = "MIO168";
@@ -1050,18 +1173,19 @@ public:
 #endif
         numPowerChannels = 0;
         numOtherChannels = 12;
+        isResyncSupported = true;
 
         resetConfiguration();
 
         memset(input, 0, sizeof(input));
         memset(output, 0, sizeof(output));
 
-        memset(&lastTransferredParams, 0, sizeof(FromMasterToSlaveParamsChange));
+        memset(&lastTransferredParams, 0, sizeof(SetParams));
 
-        dlog.period = 0;
-        dlog.duration = 0;
-        dlog.resources = 0;
-        *dlog.filePath = 0;
+        //dlog.period = 0;
+        //dlog.duration = 0;
+        //dlog.resources = 0;
+        //*dlog.filePath = 0;
     }
 
     Module *createModule() override {
@@ -1074,128 +1198,63 @@ public:
 
     void initChannels() override {
         if (!synchronized) {
-            if (bp3c::comm::masterSynchro(slotIndex)) {
-                synchronized = true;
-                numCrcErrors = 0;
-                numTransferErrors = 0;
-                testResult = TEST_OK;
-                lastTransferTime = millis();
-#ifdef EEZ_PLATFORM_SIMULATOR
-                sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_LINK, slotIndex, 0);
+			executeCommand(&getInfo_command);
+
+			if (!g_isBooted) {
+				while (state != STATE_IDLE) {
+#if defined(EEZ_PLATFORM_STM32)
+					if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
+						spiReady = true;
+					}
 #endif
-            } else {
-                if (g_slots[slotIndex]->firmwareInstalled) {
-                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
-                }
-                testResult = TEST_FAILED;
+					tick();
+				}
+			}
+        }
+    }
+
+    ////////////////////////////////////////
+
+    void Command_GetInfo_Done(Response &response, bool isSuccess) {
+        if (isSuccess) {
+            auto &data = response.getInfo;
+
+            firmwareMajorVersion = data.firmwareMajorVersion;
+            firmwareMinorVersion = data.firmwareMinorVersion;
+            idw0 = data.idw0;
+            idw1 = data.idw1;
+            idw2 = data.idw2;
+
+			firmwareVersionAcquired = true;
+
+            synchronized = true;
+            testResult = TEST_OK;
+        } else {
+            synchronized = false;
+            if (g_slots[slotIndex]->firmwareInstalled) {
+                event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
             }
+            testResult = TEST_FAILED;
         }
     }
 
-#ifdef EEZ_PLATFORM_STM32
-    void fillFromMasterToSlaveParamsChange(FromMasterToSlaveParamsChange &params) {
-        memset(&params, 0, sizeof(FromMasterToSlaveParamsChange));
+    ////////////////////////////////////////
 
-        params.operation = DISK_DRIVER_OPERATION_NONE;
+	void Command_GetState_FillRequest(Request &request) {
+#if defined(EEZ_PLATFORM_STM32)
+		request.getState.fatTime = get_fattime();
+#endif
 
-        params.dinRanges = dinChannel.m_pinRanges;
-        params.dinSpeeds = dinChannel.m_pinSpeeds;
+#if defined(EEZ_PLATFORM_SIMULATOR)
+		request.getState.fatTime = 0;
+#endif
+	}
 
-        params.doutStates = doutChannel.m_pinStates;
+    void Command_GetState_Done(Response &response, bool isSuccess) {
+        if (isSuccess) {
+            lastRefreshTime = refreshStartTime;
 
-        for (int i = 0; i < 4; i++) {
-            auto channel = &ainChannels[i];
-            params.ain[i].mode = channel->m_mode;
-            params.ain[i].range = channel->m_range;
-            params.ain[i].tempSensorBias = channel->m_tempSensorBias;
-        }
-
-        for (int i = 0; i < 2; i++) {
-            auto channel = &aoutDac7760Channels[i];
-            params.aout_dac7760[i].outputEnabled = channel->m_outputEnabled;
-            params.aout_dac7760[i].outputRange = channel->getMode() == SOURCE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->m_currentRange;
-            params.aout_dac7760[i].outputValue = channel->getCalibratedValue();
-        }
-
-        for (int i = 0; i < 2; i++) {
-            auto channel = &aoutDac7563Channels[i];
-            params.aout_dac7563[i].voltage = channel->getCalibratedValue();
-        }
-
-        for (int i = 0; i < 2; i++) {
-            auto channel = &pwmChannels[i];
-            params.pwm[i].freq = channel->m_freq;
-            params.pwm[i].duty = channel->m_duty;
-        }
-
-        params.dlog.period = dlog.period;
-        if (dlog.period > 0) {
-            params.dlog.duration = dlog.duration;
-            params.dlog.resources = dlog.resources;
-            strcpy(params.dlog.filePath, dlog.filePath);
-            
-            for (int i = 0; i < 8; i++) {
-                strcpy(params.labels.din + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(DIN_SUBCHANNEL_INDEX, i));
-            }
-
-            for (int i = 0; i < 8; i++) {
-                strcpy(params.labels.dout + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(DOUT_SUBCHANNEL_INDEX, i));
-            }
-
-            for (int i = 0; i < 4; i++) {
-                strcpy(params.labels.ain + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(AIN_1_SUBCHANNEL_INDEX + i, 0));
-            }
-        }
-
-        params.fatTime = get_fattime();
-    }
-
-    void fillFromMasterToSlaveDiskDriverOperation(FromMasterToSlaveDiskDriveOperation &data) {
-        data.operation = diskOperationParams->operation;
-        data.sector = diskOperationParams->sector;
-        data.cmd = diskOperationParams->cmd;
-        if (data.operation == DISK_DRIVER_OPERATION_WRITE) {
-            memcpy(data.buffer, diskOperationParams->buff, 512);
-        } else if (data.operation == DISK_DRIVER_OPERATION_IOCTL) {
-            memcpy(data.buffer, diskOperationParams->buff, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
-        }
-    }
-
-    void doTransfer() {
-        setTransferReadinessState(STATE_NOT_READY);
-        auto status = bp3c::comm::transferDMA(slotIndex, output, input, sizeof(FromSlaveToMaster));
-        if (status != bp3c::comm::TRANSFER_STATUS_OK) {
-        	stateTransition(EVENT_DMA_TRANSFER_COMPLETED, status);
-        }
-    }
-    void transfer() {
-        fillFromMasterToSlaveParamsChange(*(FromMasterToSlaveParamsChange *)output);
-        doTransfer();
-    }
-
-    void transferDiskDriveOperationRequest() {
-        fillFromMasterToSlaveDiskDriverOperation(*(FromMasterToSlaveDiskDriveOperation *)output);
-        doTransfer();
-    }
-
-    void transferDiskDriveOperationResponse() {
-        fillFromMasterToSlaveParamsChange(*(FromMasterToSlaveParamsChange *)output);
-        doTransfer();
-    }
-
-    bool onTransferCompleted(int status) {
-        if (status == bp3c::comm::TRANSFER_STATUS_OK) {
-            lastTransferTime = millis();
-
-            FromMasterToSlaveParamsChange &params = *(FromMasterToSlaveParamsChange *)output;
-            if (params.operation == DISK_DRIVER_OPERATION_NONE) {
-                memcpy(&lastTransferredParams, &params, sizeof(FromMasterToSlaveParamsChange));
-            }
-
-            numCrcErrors = 0;
-            numTransferErrors = 0;
-
-            auto &data = (FromSlaveToMaster &)*input;
+			auto &data = response.getState;
 
             dinChannel.m_pinStates = data.dinStates;
 
@@ -1204,7 +1263,7 @@ public:
                 channel.m_value = channel.convertU16Value(data.ainValues[i]);
             }
 
-            if (data.flags & FLAG_SD_CARD_PRESENT) {
+            if (data.flags & GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT) {
                 if (!fs_driver::isDriverLinked(slotIndex)) {
                     sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_LINK, slotIndex, 0);
                 }
@@ -1214,283 +1273,471 @@ public:
                 }
             }
 
-            if ((data.flags & FLAG_DLOG_RECORD_STATUS) != 0) {
-                dlog_record::setFileLength(data.dlogStatus.fileLength);
-                dlog_record::setNumSamples(data.dlogStatus.numSamples);
+            if (dlog_record::isExecuting() && dlog_record::getModuleLocalRecordingSlotIndex() == slotIndex) {
+                dlog_record::setFileLength(data.dlogState.fileLength);
+                dlog_record::setNumSamples(data.dlogState.numSamples);
+
+				switch (data.dlogState.state) {
+					case DLOG_STATE_FINISH_RESULT_OK:
+						dlog_record::abort();
+						break;
+					case DLOG_STATE_FINISH_RESULT_BUFFER_OVERFLOW:
+						dlog_record::abortAfterBufferOverflowError();
+						break;
+					case DLOG_STATE_FINISH_RESULT_MASS_STORAGE_ERROR:
+						dlog_record::abortAfterMassStorageError();
+						break;
+				}
             }
+        }
+    }
 
-            if ((data.flags & FLAG_DLOG_RECORD_FINISHED) != 0) {
-                dlog.period = 0;
+    ////////////////////////////////////////
 
-                switch (data.result) {
-                    case DLOG_RECORD_RESULT_BUFFER_OVERFLOW:
-                        dlog_record::abortAfterBufferOverflowError();
-                        break;
-                    case DLOG_RECORD_RESULT_MASS_STORAGE_ERROR:
-                        dlog_record::abortAfterMassStorageError();
-                        break;
-                    default:
-                        dlog_record::abort();
-                        break;
-                }
+	void fillSetParams(SetParams &params) {
+		memset(&params, 0, sizeof(SetParams));
+
+		params.dinRanges = dinChannel.m_pinRanges;
+		params.dinSpeeds = dinChannel.m_pinSpeeds;
+
+		params.doutStates = doutChannel.m_pinStates;
+
+		for (int i = 0; i < 4; i++) {
+			auto channel = &ainChannels[i];
+			params.ain[i].mode = channel->m_mode;
+			params.ain[i].range = channel->m_range;
+			params.ain[i].tempSensorBias = channel->m_tempSensorBias;
+		}
+
+		for (int i = 0; i < 2; i++) {
+			auto channel = &aoutDac7760Channels[i];
+			params.aout_dac7760[i].outputEnabled = channel->m_outputEnabled;
+			params.aout_dac7760[i].outputRange = channel->getMode() == SOURCE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->m_currentRange;
+			params.aout_dac7760[i].outputValue = channel->getCalibratedValue();
+		}
+
+		for (int i = 0; i < 2; i++) {
+			auto channel = &aoutDac7563Channels[i];
+			params.aout_dac7563[i].voltage = channel->getCalibratedValue();
+		}
+
+		for (int i = 0; i < 2; i++) {
+			auto channel = &pwmChannels[i];
+			params.pwm[i].freq = channel->m_freq;
+			params.pwm[i].duty = channel->m_duty;
+		}
+	}
+
+    void Command_SetParams_FillRequest(Request &request) {
+        fillSetParams(request.setParams);
+    }
+
+    void Command_SetParams_Done(Response &response, bool isSuccess) {
+        if (isSuccess) {
+            auto &data = response.setParams;
+            if (data.result) {
+                memcpy(&lastTransferredParams, &((Request *)output)->setParams, sizeof(SetParams));
             }
+        }
+    }
 
-            return true;
+    ////////////////////////////////////////
+
+    void Command_DlogRecordingStart_FillRequest(Request &request) {
+        memcpy(&request.dlogRecordingStart, &dlogRecordingStart, sizeof(dlogRecordingStart));
+    }
+
+    void Command_DlogRecordingStart_Done(Response &response, bool isSuccess) {
+        if (isSuccess) {
+        }
+    }
+
+    ////////////////////////////////////////
+
+    void Command_DlogRecordingStop_Done(Response &response, bool isSuccess) {
+        if (isSuccess) {
+        }
+    }
+
+    ////////////////////////////////////////
+
+    void Command_DiskDriveInitialize_Done(Response &response, bool isSuccess) {
+        if (isSuccess) {
+            diskOperationParams.result = response.diskDriveInitialize.result;
+            diskOperationStatus = DISK_OPERATION_SUCCESSFULLY_FINISHED;
         } else {
-            if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
-                numCrcErrors++;
-                if (numCrcErrors >= 10) {
-                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
-                    synchronized = false;
-                    testResult = TEST_FAILED;
-                } else if (numCrcErrors > 5) {
-                    DebugTrace("Slot %d CRC error no. %d\n", slotIndex + 1, numCrcErrors);
-                }
-            } else {
-                numTransferErrors++;
-                if (numTransferErrors >= 10) {
-                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
-                    synchronized = false;
-                    testResult = TEST_FAILED;
-                } else if (numTransferErrors > 5) {
-                    DebugTrace("Slot %d SPI transfer error %d no. %d\n", slotIndex + 1, status, numTransferErrors);
-                }
-            }
-
-            return false;
+            diskOperationParams.result = 1; // STA_NOINIT, i.e. RES_ERROR
+            diskOperationStatus = DISK_OPERATION_UNSUCCESSFULLY_FINISHED;
         }
-    }
-
-    bool onDiskDriveOperationRequestTransferCompleted(int status) {
-        if (!onTransferCompleted(status)) {
-            return false;
-        }
-        return true;
-    }
-
-    bool onDiskDriveOperationResponseTransferCompleted(int status) {
-        if (!onTransferCompleted(status)) {
-            return false;
-        }
-
-        auto &data = (FromSlaveToMaster &)*input;
-
-        if (!(data.flags & FLAG_DISK_OPERATION_RESPONSE)) {
-        	return false;
-        }
-
-        diskOperationParams->result = data.result;
-
-        if (diskOperationParams->operation == DISK_DRIVER_OPERATION_READ) {
-            memcpy(diskOperationParams->buff, data.buffer, 512);
-        } else if (diskOperationParams->operation == DISK_DRIVER_OPERATION_IOCTL) {
-            memcpy(diskOperationParams->buff, data.buffer, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
-        }
-
-        diskOperationStatus = DISK_OPERATION_SUCCESSFULLY_FINISHED;
+#if defined(EEZ_PLATFORM_STM32)
         osThreadYield();
-
-        return true;
-    }
-
-    void setDiskOperationFailed() {
-        if (diskOperationParams->operation == DISK_DRIVER_OPERATION_INITIALIZE || diskOperationParams->operation == DISK_DRIVER_OPERATION_STATUS) {
-        	diskOperationParams->result = STA_NOINIT;
-        } else {
-        	diskOperationParams->result = RES_ERROR;
-        }
-
-        diskOperationStatus = DISK_OPERATION_UNSUCCESSFULLY_FINISHED;
-        osThreadYield();
-    }
-
-    enum TransferReadinessState {
-        STATE_NOT_READY,
-        STATE_READY
-    };
-    TransferReadinessState transferReadinessState = STATE_NOT_READY;
-
-    enum OperationState {
-        STATE_IDLE,
-        
-        STATE_WAIT_RESULT,
-        STATE_WAIT_RESULT_AND_DISK_DRIVE_OPERATION,
-
-        STATE_DISK_DRIVE_OPERATION_REQUEST_TRANSFER_NOT_READY,
-        STATE_DISK_DRIVE_OPERATION_REQUEST_WAIT_RESULT,
-
-        STATE_DISK_DRIVE_OPERATION_RESPONSE_TRANSFER_NOT_READY,
-        STATE_DISK_DRIVE_OPERATION_RESPONSE_WAIT_RESULT,
-    };
-    OperationState operationState = STATE_IDLE;
-
-    enum {
-        EVENT_SPI_READY,
-        EVENT_DMA_TRANSFER_COMPLETED,
-        EVENT_CHANNEL_PARAMS_CHANGE,
-        EVENT_REFRESH,
-		EVENT_TIMEOUT,
-        EVENT_DISK_DRIVE_OPERATION
-    };
-
-    void setTransferReadinessState(TransferReadinessState state) {
-        transferReadinessState = state;
-    }
-
-    void setOperationState(OperationState state) {
-        operationStateTransitionTime = millis();
-        operationState = state;
-    }
-
-    void stateTransition(int event, int param = 0) {
-        if (transferReadinessState == STATE_NOT_READY) {
-            if (event == EVENT_SPI_READY) {
-                setTransferReadinessState(STATE_READY);
-            }
-        }
-        
-        if (operationState == STATE_IDLE) {
-            if (event == EVENT_CHANNEL_PARAMS_CHANGE || event == EVENT_REFRESH) {
-                if (transferReadinessState == STATE_READY) {
-                    setOperationState(STATE_WAIT_RESULT);
-                    transfer();
-                }
-            } else if (event == EVENT_DISK_DRIVE_OPERATION) {
-                if (transferReadinessState == STATE_READY) {
-                    setOperationState(STATE_DISK_DRIVE_OPERATION_REQUEST_WAIT_RESULT);
-                    transferDiskDriveOperationRequest();
-                } else {
-                    setOperationState(STATE_DISK_DRIVE_OPERATION_REQUEST_TRANSFER_NOT_READY);
-                }
-            }
-        } else if (operationState == STATE_WAIT_RESULT) {
-            if (event == EVENT_DMA_TRANSFER_COMPLETED) {
-                onTransferCompleted(param);
-                setOperationState(STATE_IDLE);
-            } else if (event == EVENT_DISK_DRIVE_OPERATION) {
-            	setOperationState(STATE_WAIT_RESULT_AND_DISK_DRIVE_OPERATION);
-            } else if (event == EVENT_TIMEOUT) {
-            	bp3c::comm::abortTransfer(slotIndex);
-            	setOperationState(STATE_IDLE);
-            }
-        } else if (operationState == STATE_WAIT_RESULT_AND_DISK_DRIVE_OPERATION) {
-            if (event == EVENT_DMA_TRANSFER_COMPLETED) {
-                onTransferCompleted(param);
-
-                if (transferReadinessState == STATE_READY) {
-                    setOperationState(STATE_DISK_DRIVE_OPERATION_REQUEST_WAIT_RESULT);
-                    transferDiskDriveOperationRequest();
-                } else {
-                    setOperationState(STATE_DISK_DRIVE_OPERATION_REQUEST_TRANSFER_NOT_READY);
-                }
-            } else if (event == EVENT_TIMEOUT) {
-            	bp3c::comm::abortTransfer(slotIndex);
-                setDiskOperationFailed();
-                setOperationState(STATE_IDLE);
-            }
-        } else if (operationState == STATE_DISK_DRIVE_OPERATION_REQUEST_TRANSFER_NOT_READY) {
-            if (transferReadinessState == STATE_READY) {
-                setOperationState(STATE_DISK_DRIVE_OPERATION_REQUEST_WAIT_RESULT);
-                transferDiskDriveOperationRequest();
-            } else if (event == EVENT_TIMEOUT) {
-            	bp3c::comm::abortTransfer(slotIndex);
-                setDiskOperationFailed();
-                setOperationState(STATE_IDLE);
-            }
-        } else if (operationState == STATE_DISK_DRIVE_OPERATION_REQUEST_WAIT_RESULT) {
-            if (event == EVENT_DMA_TRANSFER_COMPLETED) {
-                if (onDiskDriveOperationRequestTransferCompleted(param)) {
-                    if (transferReadinessState == STATE_READY) {
-                        setOperationState(STATE_DISK_DRIVE_OPERATION_RESPONSE_WAIT_RESULT);
-                        transferDiskDriveOperationResponse();
-                    } else {
-                        setOperationState(STATE_DISK_DRIVE_OPERATION_RESPONSE_TRANSFER_NOT_READY);
-                    }
-                } else {
-					setDiskOperationFailed();
-					setOperationState(STATE_IDLE);
-                }
-            } else if (event == EVENT_TIMEOUT) {
-            	bp3c::comm::abortTransfer(slotIndex);
-                setDiskOperationFailed();
-                setOperationState(STATE_IDLE);
-            }
-        } else if (operationState == STATE_DISK_DRIVE_OPERATION_RESPONSE_TRANSFER_NOT_READY) {
-            if (transferReadinessState == STATE_READY) {
-                setOperationState(STATE_DISK_DRIVE_OPERATION_RESPONSE_WAIT_RESULT);
-                transferDiskDriveOperationResponse();
-            } else if (event == EVENT_TIMEOUT) {
-            	bp3c::comm::abortTransfer(slotIndex);
-                setDiskOperationFailed();
-                setOperationState(STATE_IDLE);
-            }
-        } else if (operationState == STATE_DISK_DRIVE_OPERATION_RESPONSE_WAIT_RESULT) {
-            if (event == EVENT_DMA_TRANSFER_COMPLETED) {
-                if (!onDiskDriveOperationResponseTransferCompleted(param)) {
-					setDiskOperationFailed();
-                }
-                setOperationState(STATE_IDLE);
-            } else if (event == EVENT_TIMEOUT) {
-            	bp3c::comm::abortTransfer(slotIndex);
-                setDiskOperationFailed();
-                setOperationState(STATE_IDLE);
-            }
-        }
-    }
 #endif
+    }
 
-    uint32_t getRefreshTimeMs() {
-        if (dlog_record::isExecuting()) {
-            uint32_t dlogPeriodMs = (uint32_t)(dlog_record::g_recording.parameters.period * 1000);
-            if (dlogPeriodMs < REFRESH_TIME_MS) {
-                if (dlog_record::getModuleLocalRecordingSlotIndex() == slotIndex) {
-                    return dlogPeriodMs;
-                }
-            }
+
+    ////////////////////////////////////////
+
+    void Command_DiskDriveStatus_Done(Response &response, bool isSuccess) {
+        if (isSuccess) {
+            diskOperationParams.result = response.diskDriveStatus.result;
+            diskOperationStatus = DISK_OPERATION_SUCCESSFULLY_FINISHED;
+        } else {
+            diskOperationStatus = DISK_OPERATION_UNSUCCESSFULLY_FINISHED;
+        }
+#if defined(EEZ_PLATFORM_STM32)
+        osThreadYield();
+#endif
+    }
+
+
+    ////////////////////////////////////////
+
+    void Command_DiskDriveRead_FillRequest(Request &request) {
+        request.diskDriveRead.sector = diskOperationParams.sector;
+    }
+
+    void Command_DiskDriveRead_Done(Response &response, bool isSuccess) {
+        if (isSuccess) {
+            memcpy(diskOperationParams.buff, response.diskDriveRead.buffer, 512);
+            diskOperationParams.result = response.diskDriveRead.result;
+            diskOperationStatus = DISK_OPERATION_SUCCESSFULLY_FINISHED;
+        } else {
+            diskOperationStatus = DISK_OPERATION_UNSUCCESSFULLY_FINISHED;
+        }
+#if defined(EEZ_PLATFORM_STM32)
+        osThreadYield();
+#endif
+    }
+
+
+    ////////////////////////////////////////
+
+    void Command_DiskDriveWrite_FillRequest(Request &request) {
+        request.diskDriveWrite.sector = diskOperationParams.sector;
+        memcpy(request.diskDriveWrite.buffer, diskOperationParams.buff, 512);
+    }
+
+    void Command_DiskDriveWrite_Done(Response &response, bool isSuccess) {
+        if (isSuccess) {
+            diskOperationParams.result = response.diskDriveWrite.result;
+            diskOperationStatus = DISK_OPERATION_SUCCESSFULLY_FINISHED;
+        } else {
+            diskOperationStatus = DISK_OPERATION_UNSUCCESSFULLY_FINISHED;
+        }
+#if defined(EEZ_PLATFORM_STM32)
+        osThreadYield();
+#endif
+    }
+
+    ////////////////////////////////////////
+
+    void Command_DiskDriveIoctl_FillRequest(Request &request) {
+        request.diskDriveIoctl.cmd = diskOperationParams.cmd;
+        memcpy(request.diskDriveIoctl.buffer, diskOperationParams.buff, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
+    }
+
+    void Command_DiskDriveIoctl_Done(Response &response, bool isSuccess) {
+        if (isSuccess) {
+            memcpy(diskOperationParams.buff, response.diskDriveIoctl.buffer, DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE);
+            diskOperationParams.result = response.diskDriveIoctl.result;
+            diskOperationStatus = DISK_OPERATION_SUCCESSFULLY_FINISHED;
+        } else {
+            diskOperationStatus = DISK_OPERATION_UNSUCCESSFULLY_FINISHED;
+        }
+#if defined(EEZ_PLATFORM_STM32)
+        osThreadYield();
+#endif
+    }
+
+    ////////////////////////////////////////
+
+	uint32_t getRefreshTimeMs() {
+		if (dlog_record::isExecuting()) {
+			uint32_t dlogPeriodMs = (uint32_t)(dlog_record::g_recording.parameters.period * 1000);
+			if (dlogPeriodMs < REFRESH_TIME_MS) {
+				if (dlog_record::getModuleLocalRecordingSlotIndex() == slotIndex) {
+					return dlogPeriodMs;
+				}
+			}
+		}
+
+		return REFRESH_TIME_MS;
+	}
+
+    void executeCommand(const CommandDef *command) {
+        currentCommand = command;
+        retry = 0;
+        setState(STATE_WAIT_SLAVE_READY_BEFORE_REQUEST);
+	}
+
+    bool startCommand() {
+		Request &request = *(Request *)output;
+
+		request.command = currentCommand->command;
+
+		if (currentCommand->fillRequest) {
+			(this->*currentCommand->fillRequest)(request);
+		}
+        spiDmaTransferCompleted = false;
+        auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)output, (uint8_t *)input, sizeof(Request));
+        return status == bp3c::comm::TRANSFER_STATUS_OK;
+    }
+
+    bool getCommandResult() {
+        Request &request = *(Request *)output;
+        request.command = COMMAND_NONE;
+        spiDmaTransferCompleted = false;
+        auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)output, (uint8_t *)input, sizeof(Request));
+        return status == bp3c::comm::TRANSFER_STATUS_OK;
+    }
+
+    bool isCommandResponse() {
+        Response &response = *(Response *)input;
+        return response.command == (0x80 | currentCommand->command);
+    }
+
+    void doRetry() {
+    	bp3c::comm::abortTransfer(slotIndex);
+        
+        static const int NUM_REQUEST_RETRIES = 5;
+
+        if (++retry < NUM_REQUEST_RETRIES) {
+            // try again
+            setState(STATE_WAIT_SLAVE_READY_BEFORE_REQUEST);
+        } else {
+            // give up
+            doCommandDone(false);
+        }
+    }
+
+    void doCommandDone(bool isSuccess) {
+        if (isSuccess) {
+            lastTransferTime = millis();
         }
 
-        return REFRESH_TIME_MS;
+		if (currentCommand->done) {
+			Response &response = *(Response *)input;
+			(this->*currentCommand->done)(response, isSuccess);
+		}
+
+		currentCommand = nullptr;
+        setState(STATE_IDLE);
+    }
+
+    void setState(State newState) {
+        state = newState;
+        lastStateTransitionTime = millis();
+    }
+
+    void stateTransition(Event event) {
+    	if (event == EVENT_DMA_TRANSFER_COMPLETED) {
+            numCrcErrors = 0;
+            g_debugVarNumCrcErrors = 0;
+            numTransferErrors = 0;
+            g_debugVarNumTransferErrors = 0;
+    	}
+ 
+        if (state == STATE_WAIT_SLAVE_READY_BEFORE_REQUEST) {
+            if (event == EVENT_TIMEOUT) {
+				doRetry();
+            } else if (event == EVENT_SLAVE_READY) {
+                if (startCommand()) {
+                    setState(STATE_WAIT_DMA_TRANSFER_COMPLETED_FOR_REQUEST);
+                } else {
+                    doRetry();
+                }
+            }
+        } else if (state == STATE_WAIT_DMA_TRANSFER_COMPLETED_FOR_REQUEST) {
+            if (event == EVENT_TIMEOUT) {
+                doRetry();
+            } else if (event == EVENT_DMA_TRANSFER_COMPLETED) {
+                setState(STATE_WAIT_SLAVE_READY_BEFORE_RESPONSE);
+            } else if (event == EVENT_DMA_TRANSFER_FAILED) {
+                doRetry();
+            }
+        } else if (state == STATE_WAIT_SLAVE_READY_BEFORE_RESPONSE) {
+            if (event == EVENT_TIMEOUT) {
+				doRetry();
+            } else if (event == EVENT_SLAVE_READY) {
+                if (getCommandResult()) {
+                    setState(STATE_WAIT_DMA_TRANSFER_COMPLETED_FOR_RESPONSE);
+                } else {
+                    doRetry();
+                }
+            }
+        } else if (state == STATE_WAIT_DMA_TRANSFER_COMPLETED_FOR_RESPONSE) {
+            if (event == EVENT_TIMEOUT) {
+                doRetry();
+            } else if (event == EVENT_DMA_TRANSFER_COMPLETED) {
+                if (isCommandResponse()) {
+                    doCommandDone(true);
+                } else {
+                    doRetry();
+                }
+            } else if (event == EVENT_DMA_TRANSFER_FAILED) {
+                doRetry();
+            }
+        } 
+    }
+
+    int numCrcErrors = 0;
+    int numTransferErrors = 0;
+
+    void reportDmaTransferFailed(int status) {
+        if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
+            numCrcErrors++;
+            g_debugVarNumCrcErrors = numCrcErrors;
+            if (numCrcErrors >= 5) {
+                event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
+                synchronized = false;
+                testResult = TEST_FAILED;
+            }
+            //else if (numCrcErrors > 5) {
+            //    DebugTrace("Slot %d CRC error no. %d\n", slotIndex + 1, numCrcErrors);
+            //}
+        } else {
+            numTransferErrors++;
+            g_debugVarNumTransferErrors = numTransferErrors;
+            if (numTransferErrors >= 5) {
+                event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                synchronized = false;
+                testResult = TEST_FAILED;
+            }
+            //else if (numTransferErrors > 5) {
+            //    DebugTrace("Slot %d SPI transfer error %d no. %d\n", slotIndex + 1, status, numTransferErrors);
+            //}
+        }
     }
 
     void tick() override {
-        if (!synchronized) {
-            return;
-        }
+        if (currentCommand) {
+            if (!synchronized && currentCommand->command != COMMAND_GET_INFO) {
+                doCommandDone(false);
+            } else {
+                if (
+                    state == STATE_WAIT_SLAVE_READY_BEFORE_REQUEST ||
+                    state == STATE_WAIT_SLAVE_READY_BEFORE_RESPONSE
+                ) {
+                    #if defined(EEZ_PLATFORM_STM32)
+                	if (spiReady) {
+                        spiReady = false;
+                		stateTransition(EVENT_SLAVE_READY);
+                	}
+                    #endif
 
-#ifdef EEZ_PLATFORM_STM32
-        if (millis() - lastTransferTime >= TIMEOUT_UNTIL_OUT_OF_SYNC_MS) {
-            event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
-            synchronized = false;
-            testResult = TEST_FAILED;
-        } else if (operationState != STATE_IDLE && millis() - operationStateTransitionTime >= TIMEOUT_TIME_MS) {
-			stateTransition(EVENT_TIMEOUT);
-        } else if (millis() - lastTransferTime >= getRefreshTimeMs()) {
-        	stateTransition(EVENT_REFRESH);
+                    #if defined(EEZ_PLATFORM_SIMULATOR)
+                    stateTransition(EVENT_SLAVE_READY);
+                    #endif
+                } 
+                
+                if (
+                    state == STATE_WAIT_DMA_TRANSFER_COMPLETED_FOR_REQUEST ||
+                    state == STATE_WAIT_DMA_TRANSFER_COMPLETED_FOR_RESPONSE
+                ) {
+                
+                    #if defined(EEZ_PLATFORM_STM32)
+                    if (spiDmaTransferCompleted) {
+                        if (spiDmaTransferStatus == bp3c::comm::TRANSFER_STATUS_OK) {
+                            stateTransition(EVENT_DMA_TRANSFER_COMPLETED);
+                        } else {
+                            reportDmaTransferFailed(spiDmaTransferStatus);
+                            stateTransition(EVENT_DMA_TRANSFER_FAILED);
+                        }
+                    }
+                    #endif                
+
+                    #if defined(EEZ_PLATFORM_SIMULATOR)
+                    auto response = (Response *)input;
+
+                    response->command = 0x80 | currentCommand->command;
+
+                    if (currentCommand->command == COMMAND_GET_INFO) {
+                        response->getInfo.firmwareMajorVersion = 1;
+                        response->getInfo.firmwareMinorVersion = 0;
+                        response->getInfo.idw0 = 0;
+                        response->getInfo.idw1 = 0;
+                        response->getInfo.idw2 = 0;
+                    } else if (currentCommand->command == COMMAND_GET_STATE) {
+                        response->getState.flags |= GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT;
+                    }
+
+                    stateTransition(EVENT_DMA_TRANSFER_COMPLETED);
+                    #endif
+                } 
+                
+                uint32_t tickCountMs = millis();
+                if (tickCountMs - lastStateTransitionTime >= TIMEOUT_TIME_MS) {
+                    stateTransition(EVENT_TIMEOUT);
+                }
+            }
         } else {
-            FromMasterToSlaveParamsChange params;
-            fillFromMasterToSlaveParamsChange(params);
-            if (memcmp(&params, &lastTransferredParams, sizeof(FromMasterToSlaveParamsChange)) != 0) {
-            	stateTransition(EVENT_CHANNEL_PARAMS_CHANGE);
+            if (!synchronized) {
+                if (nextDlogCommand) {
+                    executeCommand(nextDlogCommand);
+                    doCommandDone(false);
+                }
+                if (diskOperationStatus == DISK_OPERATION_NOT_FINISHED) {
+                    executeCommand(diskOperationParams.command);
+                    doCommandDone(false);
+                }
+            } else {
+            	uint32_t tickCountMs = millis();
+                if (nextDlogCommand) {
+                    memcpy(&dlogRecordingStart, &nextDlogRecordingStart, sizeof(DlogRecordingStart));
+                    executeCommand(nextDlogCommand);
+                    nextDlogCommand = nullptr;
+                } else if (diskOperationStatus == DISK_OPERATION_NOT_FINISHED) {
+                    executeCommand(diskOperationParams.command);
+                } else if (tickCountMs - lastTransferTime >= TIMEOUT_UNTIL_OUT_OF_SYNC_MS) {
+                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+                    synchronized = false;
+                    testResult = TEST_FAILED;
+                } else if (tickCountMs - lastRefreshTime >= getRefreshTimeMs()) {
+                    refreshStartTime = tickCountMs;
+                    executeCommand(&getState_command);
+                } else {
+                    SetParams params;
+                    fillSetParams(params);
+                    if (memcmp(&params, &lastTransferredParams, sizeof(SetParams)) != 0) {
+                        executeCommand(&setParams_command);
+                    }
+                }
             }
         }
-#endif
     }
 
-#if defined(EEZ_PLATFORM_STM32)
     void onSpiIrq() {
-        stateTransition(EVENT_SPI_READY);
+        spiReady = true;
+		if (g_isBooted) {
+			stateTransition(EVENT_SLAVE_READY);
+		}
     }
 
     void onSpiDmaTransferCompleted(int status) override {
-        stateTransition(EVENT_DMA_TRANSFER_COMPLETED, status);
+         if (g_isBooted) {
+             if (status == bp3c::comm::TRANSFER_STATUS_OK) {
+                 stateTransition(EVENT_DMA_TRANSFER_COMPLETED);
+             } else {
+                 reportDmaTransferFailed(status);
+                 stateTransition(EVENT_DMA_TRANSFER_FAILED);
+             }
+         } else {
+             spiDmaTransferCompleted = true;
+             spiDmaTransferStatus = status;
+         }
     }
-#endif
 
     void onPowerDown() override {
         synchronized = false;
 #ifdef EEZ_PLATFORM_SIMULATOR
         sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_UNLINK, slotIndex, 0);
 #endif
+    }
+
+    void resync() override {
+        if (!synchronized) {
+            executeCommand(&getInfo_command);
+        }
     }
 
     Page *getPageFromId(int pageId) override;
@@ -1529,7 +1776,7 @@ public:
     }
 
     int getSlotSettingsPageId() override {
-        return getTestResult() == TEST_OK ? PAGE_ID_DIB_MIO168_SETTINGS : PAGE_ID_SLOT_SETTINGS;
+        return PAGE_ID_DIB_MIO168_SETTINGS;
     }
 
     int getLabelsAndColorsPageId() override {
@@ -2673,39 +2920,55 @@ public:
 
     void onStartDlog() override {
         if (dlog_record::isModuleLocalRecording()) {
-            dlog.resources = 0;
+           uint32_t resources = 0;
 
-            for (int i = 0; i < dlog_record::g_recording.parameters.numDlogItems; i++) {
-                auto &dlogItem = dlog_record::g_recording.parameters.dlogItems[i];
-                if (dlogItem.slotIndex == slotIndex) {
-                    if (dlogItem.subchannelIndex == DIN_SUBCHANNEL_INDEX) {
-                        dlog.resources |= 1 << dlogItem.resourceIndex;
-                    } else if (dlogItem.subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
-                        dlog.resources |= 1 << (8 + dlogItem.resourceIndex);
-                    } else if (
-                        dlogItem.subchannelIndex >= AIN_1_SUBCHANNEL_INDEX &&
-                        dlogItem.subchannelIndex <= AIN_4_SUBCHANNEL_INDEX
-                    ) {
-                        dlog.resources |= 1 << (16 + (dlogItem.subchannelIndex - AIN_1_SUBCHANNEL_INDEX));
-                    }
+           for (int i = 0; i < dlog_record::g_recording.parameters.numDlogItems; i++) {
+               auto &dlogItem = dlog_record::g_recording.parameters.dlogItems[i];
+               if (dlogItem.slotIndex == slotIndex) {
+                   if (dlogItem.subchannelIndex == DIN_SUBCHANNEL_INDEX) {
+                       resources |= 1 << dlogItem.resourceIndex;
+                   } else if (dlogItem.subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+                       resources |= 1 << (8 + dlogItem.resourceIndex);
+                   } else if (
+                       dlogItem.subchannelIndex >= AIN_1_SUBCHANNEL_INDEX &&
+                       dlogItem.subchannelIndex <= AIN_4_SUBCHANNEL_INDEX
+                   ) {
+                       resources |= 1 << (16 + (dlogItem.subchannelIndex - AIN_1_SUBCHANNEL_INDEX));
+                   }
+               }
+           }
+
+            if (resources != 0) {
+                nextDlogRecordingStart.duration = dlog_record::g_parameters.duration;
+                nextDlogRecordingStart.period = dlog_record::g_parameters.period;
+                nextDlogRecordingStart.resources = resources;
+
+                strcpy(nextDlogRecordingStart.filePath, dlog_record::g_parameters.filePath + 2 /* skip drive part */ );
+
+                for (int i = 0; i < 8; i++) {
+                    strcpy(nextDlogRecordingStart.dinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(DIN_SUBCHANNEL_INDEX, i));
                 }
-            }
 
-            if (dlog.resources != 0) {
-                dlog.duration = dlog_record::g_parameters.duration;
-                dlog.period = dlog_record::g_parameters.period;
-                strcpy(dlog.filePath, dlog_record::g_parameters.filePath + 2 /* skip drive part */ );
+                for (int i = 0; i < 8; i++) {
+                    strcpy(nextDlogRecordingStart.doutLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(DOUT_SUBCHANNEL_INDEX, i));
+                }
+
+                for (int i = 0; i < 4; i++) {
+                    strcpy(nextDlogRecordingStart.ainLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(AIN_1_SUBCHANNEL_INDEX + i, 0));
+                }
+
+                nextDlogCommand = &dlogRecordingStart_command;
             }
         }
     }
 
     void onStopDlog() override {
-        dlog.period = 0;
+        nextDlogCommand = &dlogRecordingStop_command;
     }
 
-#ifdef EEZ_PLATFORM_STM32
-    void executeDiskDriveOperation(ExecuteDiskDriveOperationParams *params) override {
-        diskOperationParams = params;
+    // These are executed from the low priority thread which is solely in charge of disk operations.
+    void executeDiskDriveOperation() {
+        g_debugVarState = 1;
 
         for (int nretry = 0; nretry < 10; nretry++) {
             diskOperationStatus = Mio168Module::DISK_OPERATION_NOT_FINISHED;
@@ -2722,9 +2985,110 @@ public:
         }
 
         diskOperationStatus = Mio168Module::DISK_OPERATION_IDLE;
+
+        g_debugVarState = 2;
     }
-#endif
+
+    int diskDriveInitialize() override {
+        diskOperationParams.command = &diskDriveInitialize_command;
+        executeDiskDriveOperation();
+        return diskOperationParams.result;
+    }
+
+    int diskDriveStatus() override {
+        diskOperationParams.command = &diskDriveStatus_command;
+        executeDiskDriveOperation();
+        return diskOperationParams.result;
+    }
+
+    int diskDriveRead(uint8_t *buff, uint32_t sector) override {
+        diskOperationParams.command = &diskDriveRead_command;
+        diskOperationParams.buff = buff;
+        diskOperationParams.sector = sector;
+        executeDiskDriveOperation();
+        return diskOperationParams.result;
+    }
+    
+    int diskDriveWrite(uint8_t *buff, uint32_t sector) override {
+        diskOperationParams.command = &diskDriveWrite_command;
+        diskOperationParams.buff = buff;
+        diskOperationParams.sector = sector;
+        executeDiskDriveOperation();
+        return diskOperationParams.result;
+    }
+    
+    int diskDriveIoctl(uint8_t cmd, void *buff) override {
+        diskOperationParams.command = &diskDriveIoctl_command;
+        diskOperationParams.cmd = cmd;
+        diskOperationParams.buff = (uint8_t *)buff;
+        executeDiskDriveOperation();
+        return diskOperationParams.result;
+    }
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+const Mio168Module::CommandDef Mio168Module::getInfo_command = {
+	COMMAND_GET_INFO,
+	nullptr,
+	&Mio168Module::Command_GetInfo_Done
+};
+
+const Mio168Module::CommandDef Mio168Module::getState_command = {
+	COMMAND_GET_STATE,
+	&Mio168Module::Command_GetState_FillRequest,
+	&Mio168Module::Command_GetState_Done
+};
+
+const Mio168Module::CommandDef Mio168Module::setParams_command = {
+	COMMAND_SET_PARAMS,
+	&Mio168Module::Command_SetParams_FillRequest,
+	&Mio168Module::Command_SetParams_Done
+};
+
+const Mio168Module::CommandDef Mio168Module::dlogRecordingStart_command = {
+	COMMAND_DLOG_RECORDING_START,
+	&Mio168Module::Command_DlogRecordingStart_FillRequest,
+	&Mio168Module::Command_DlogRecordingStart_Done
+};
+
+const Mio168Module::CommandDef Mio168Module::dlogRecordingStop_command = {
+	COMMAND_DLOG_RECORDING_STOP,
+	nullptr,
+	&Mio168Module::Command_DlogRecordingStop_Done
+};
+
+const Mio168Module::CommandDef Mio168Module::diskDriveInitialize_command = {
+	COMMAND_DISK_DRIVE_INITIALIZE,
+	nullptr,
+	&Mio168Module::Command_DiskDriveInitialize_Done
+};
+
+const Mio168Module::CommandDef Mio168Module::diskDriveStatus_command = {
+	COMMAND_DISK_DRIVE_STATUS,
+	nullptr,
+	&Mio168Module::Command_DiskDriveStatus_Done
+};
+
+const Mio168Module::CommandDef Mio168Module::diskDriveRead_command = {
+	COMMAND_DISK_DRIVE_READ,
+	&Mio168Module::Command_DiskDriveRead_FillRequest,
+	&Mio168Module::Command_DiskDriveRead_Done
+};
+
+const Mio168Module::CommandDef Mio168Module::diskDriveWrite_command = {
+	COMMAND_DISK_DRIVE_WRITE,
+	&Mio168Module::Command_DiskDriveWrite_FillRequest,
+	&Mio168Module::Command_DiskDriveWrite_Done
+};
+
+const Mio168Module::CommandDef Mio168Module::diskDriveIoctl_command = {
+	COMMAND_DISK_DRIVE_IOCTL,
+	&Mio168Module::Command_DiskDriveIoctl_FillRequest,
+	&Mio168Module::Command_DiskDriveIoctl_Done
+};
+
+////////////////////////////////////////////////////////////////////////////////
 
 static Mio168Module g_mio168Module;
 Module *g_module = &g_mio168Module;
@@ -2934,15 +3298,9 @@ void Mio168Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
             channel.setValue(channel.getMaxValue());
         }
     } 
-#ifdef EEZ_PLATFORM_STM32	
 	else if (type == PSU_MESSAGE_DISK_DRIVE_OPERATION) {
-        if (dlog.period > 0) {
-            setDiskOperationFailed();
-        } else {
-            stateTransition(EVENT_DISK_DRIVE_OPERATION);
-        }
+        tick();
     }
-#endif
 }
 
 } // namespace dib_mio168

@@ -141,6 +141,7 @@ TransferResult transferDMA(int slotIndex, uint8_t *output, uint8_t *input, uint3
 void abortTransfer(int slotIndex) {
 #if defined(EEZ_PLATFORM_STM32)
 	spi::abortTransfer(slotIndex);
+    spi::deselect(slotIndex);
 #endif
 }
 

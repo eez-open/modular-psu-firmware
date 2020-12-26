@@ -133,6 +133,7 @@ public:
 #endif
         numPowerChannels = 0;
         numOtherChannels = 2 + 1 + NUM_ROWS * NUM_COLUMNS;
+        isResyncSupported = false;
 
         resetConfiguration();
 
@@ -301,7 +302,7 @@ public:
     };
 
     int getSlotSettingsPageId() override {
-        return getTestResult() == TEST_OK ? PAGE_ID_DIB_SMX46_SETTINGS : PAGE_ID_SLOT_SETTINGS;
+        return PAGE_ID_DIB_SMX46_SETTINGS;
     }
 
     int getLabelsAndColorsPageId() override {

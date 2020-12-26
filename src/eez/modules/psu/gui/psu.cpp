@@ -347,6 +347,16 @@ void PsuAppContext::stateManagment() {
             }
         }
     }
+
+    //
+    if (hmi::g_selectedSlotIndex != -1) {
+        auto slotSettingsPageId = g_slots[hmi::g_selectedSlotIndex]->getSlotSettingsPageId();
+        if (psu::gui::isPageOnStack(slotSettingsPageId) && g_slots[hmi::g_selectedSlotIndex]->getTestResult() != TEST_OK) {
+            psu::gui::showPage(PAGE_ID_SLOT_SETTINGS);
+        } else if (psu::gui::isPageOnStack(PAGE_ID_SLOT_SETTINGS) && g_slots[hmi::g_selectedSlotIndex]->getTestResult() == TEST_OK) {
+            psu::gui::showPage(slotSettingsPageId);
+        }
+    }
 }
 
 bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {

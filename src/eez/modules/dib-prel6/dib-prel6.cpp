@@ -64,6 +64,7 @@ public:
 #endif
         numPowerChannels = 0;
         numOtherChannels = 0;
+        isResyncSupported = false;
     }
 
     Module *createModule() override {

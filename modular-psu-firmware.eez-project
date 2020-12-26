@@ -2373,6 +2373,11 @@
       "name": "dlog_item_is_available",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "module_is_resync_supported",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -3088,6 +3093,9 @@
     },
     {
       "name": "select_mass_storage_device"
+    },
+    {
+      "name": "module_resync"
     }
   ],
   "gui": {
@@ -9985,6 +9993,46 @@
                     "text": "\\u00bb Firmware update",
                     "firstLineIndent": 0,
                     "hangingIndent": 24
+                  }
+                ]
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "module_is_resync_supported",
+                "left": 226,
+                "top": 162,
+                "width": 114,
+                "height": 50,
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 50,
+                    "invertColors": true
+                  },
+                  {
+                    "type": "MultilineText",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "alignHorizontal": "center",
+                      "alignVertical": "center"
+                    },
+                    "action": "module_resync",
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 50,
+                    "text": "Resync",
+                    "firstLineIndent": 0,
+                    "hangingIndent": 0
                   }
                 ]
               }

@@ -379,12 +379,6 @@ void leaveBootloaderMode() {
     HAL_UART_DeInit(phuart);
     psu::io_pins::refresh();
 #endif
-
-#if OPTION_DISPLAY
-    if (psu::gui::isPageOnStack(g_slots[g_slotIndex]->getSlotSettingsPageId())) {
-    	psu::gui::showPage(g_slots[g_slotIndex]->getSlotSettingsPageId());
-    }
-#endif
 }
 
 struct HexRecord {

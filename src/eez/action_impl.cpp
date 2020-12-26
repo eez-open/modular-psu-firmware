@@ -308,7 +308,12 @@ void action_show_edit_mode_slider_help() {
 
 void action_show_slot_settings() {
     hmi::selectSlot(getFoundWidgetAtDown().cursor);
-    showPage(g_slots[hmi::g_selectedSlotIndex]->getSlotSettingsPageId());
+    
+    showPage(
+        g_slots[hmi::g_selectedSlotIndex]->getTestResult() == TEST_OK ? 
+        g_slots[hmi::g_selectedSlotIndex]->getSlotSettingsPageId() :
+        PAGE_ID_SLOT_SETTINGS
+    );
 }
 
 void action_show_ch_settings() {
@@ -1303,6 +1308,10 @@ void action_edit_ntp_refresh_frequency() {
 
     SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
     NumericKeypad::start(0, Value(page->ntpRefreshFrequency, VALUE_TYPE_UINT32), options, onSetNtpRefreshFrequency, 0, 0);
+}
+
+void action_module_resync() {
+    sendMessageToPsu(PSU_MESSAGE_MODULE_RESYNC, hmi::g_selectedSlotIndex);
 }
 
 } // namespace gui

@@ -145,7 +145,7 @@ enum {
 	POWER_DOWN_TUNE
 };
 
-float g_clickTune[] = {
+static const float g_clickTune[] = {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     440.0f, 1.0f / 32.0f,
 #else
@@ -154,18 +154,18 @@ float g_clickTune[] = {
 	NAN // end!
 };
 
-float g_beepTune[] = {
+static const float g_beepTune[] = {
 	NOTE_C6, 1/4.0f,
     NAN // end!
 };
 
-float g_powerUpTune[] = {
+static const float g_powerUpTune[] = {
     NOTE_C6, 1/8.0f,
     NOTE_C6, 1/2.0f,
     NAN // end!
 };
 
-float g_powerDownTune[] = {
+static const float g_powerDownTune[] = {
     NOTE_C6, 1/10.0f,
     NOTE_A5, 1/10.0f,
     NOTE_G5, 1/5.0f,
@@ -173,7 +173,7 @@ float g_powerDownTune[] = {
 };
 
 #if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-int16_t g_shutterSamples[] = {
+static const int16_t g_shutterSamples[] = {
 0, -1, 1, 0, 0, 0, 0, -1, 2, -2, 4, -5, 6, -7, 8, -5, 3, 0, -2, 4,
 -3, 4, -3, 4, -4, 4, 0, -2, 7, -7, 7, -3, 2, 2, -2, 5, -4, 6, -3, 4,
 1, 0, 2, 1, 2, 2, 1, 1, 4, -1, 4, 1, 2, 4, 1, 2, 3, 0, 6, -1,
@@ -748,7 +748,7 @@ static const size_t g_shutterSamplesSize = sizeof(g_shutterSamples) / sizeof(int
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
-uint8_t g_shutterSamples[16377] = {
+static const uint8_t g_shutterSamples[16377] = {
 255, 0, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 
 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 
 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 
@@ -1437,7 +1437,7 @@ static const size_t g_shutterSamplesSize = sizeof(g_shutterSamples) / sizeof(uin
 #endif
 
 struct Tune {
-	float *tune;
+	const float *tune;
 	uint32_t sampleRate;
 	float durationBetweenNotesFactor;
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -1456,9 +1456,13 @@ struct Tune {
 #define SAMPLE_RATE 12000
 #endif
 
-Tune g_tunes[] = {
+static Tune g_tunes[] = {
 	{ g_clickTune, SAMPLE_RATE, 1.3f },
-	{ nullptr, 48000, 0, g_shutterSamples, g_shutterSamplesSize },
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	{ nullptr, 48000, 0, (int16_t *)g_shutterSamples, g_shutterSamplesSize },
+#elif defined(EEZ_PLATFORM_STM32)
+	{ nullptr, 48000, 0, (uint8_t *)g_shutterSamples, g_shutterSamplesSize },
+#endif
 	{ g_beepTune, SAMPLE_RATE, 1.3f },
 	{ g_powerUpTune, SAMPLE_RATE, 1.3f },
 	{ g_powerDownTune, SAMPLE_RATE, 0.75f }
@@ -1488,9 +1492,9 @@ uint8_t *g_memoryForTuneSamples = SOUND_TUNES_MEMORY;
 uint32_t g_memoryForTuneSamplesOffset;
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-unsigned int generateTuneSamples(float *tune, int sampleRate, int16_t *pMemBuffer, float durationBetweenNotesFactor) {
+unsigned int generateTuneSamples(const float *tune, int sampleRate, int16_t *pMemBuffer, float durationBetweenNotesFactor) {
 #elif defined(EEZ_PLATFORM_STM32)
-unsigned int generateTuneSamples(float *tune, int sampleRate, uint8_t *pMemBuffer, float durationBetweenNotesFactor) {
+unsigned int generateTuneSamples(const float *tune, int sampleRate, uint8_t *pMemBuffer, float durationBetweenNotesFactor) {
 #endif
 
     unsigned int size = 0;

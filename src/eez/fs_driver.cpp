@@ -97,6 +97,7 @@ void LinkDriver(int slotIndex) {
     path[2] = '/';
     auto result = f_mount(&g_fatFS[slotIndex], path, 1);
     if (result != FR_OK) {
+        disk.drv[driverIndex] = 0;
         DebugTrace("Slot %d disk mount failed\n", slotIndex + 1);
         return;
     }
@@ -198,74 +199,35 @@ int getDiskDriveIndex(int iterationIndex, bool includeUsbMassStorageDevice) {
 #if defined(EEZ_PLATFORM_STM32)
 
 DSTATUS DiskDriver_initialize(BYTE lun) {
-    ExecuteDiskDriveOperationParams params;
-
-    params.operation = DISK_DRIVER_OPERATION_INITIALIZE;
-
-    g_slots[lun]->executeDiskDriveOperation(&params);
-
-    return (DSTATUS)params.result;
+    return (DSTATUS)g_slots[lun]->diskDriveInitialize();
 }
 
 DSTATUS DiskDriver_status(BYTE lun) {
-    ExecuteDiskDriveOperationParams params;
-
-    params.operation = DISK_DRIVER_OPERATION_STATUS;
-
-    g_slots[lun]->executeDiskDriveOperation(&params);
-
-    return (DSTATUS)params.result;
+    return (DSTATUS)g_slots[lun]->diskDriveStatus();
 }
 
 DRESULT DiskDriver_read(BYTE lun, BYTE* buff, DWORD sector, UINT count) {
-    ExecuteDiskDriveOperationParams params;
-
-    params.operation = DISK_DRIVER_OPERATION_READ;
-
     for (UINT i = 0; i < count; i++) {
-        params.buff = buff + i * 512;
-        params.sector = sector + i;
-
-        g_slots[lun]->executeDiskDriveOperation(&params);
-
-        if (params.result != RES_OK) {
-            return (DRESULT)params.result;
+        auto result = (DRESULT)g_slots[lun]->diskDriveRead(buff + i * 512, sector + i);
+        if (result != RES_OK) {
+            return result;
         }
     }
-
     return RES_OK;
 }
 
 DRESULT DiskDriver_write(BYTE lun, const BYTE* buff, DWORD sector, UINT count) {
-    ExecuteDiskDriveOperationParams params;
-
-    params.operation = DISK_DRIVER_OPERATION_WRITE;
-    
     for (UINT i = 0; i < count; i++) {
-        params.buff = (BYTE *)buff + i * 512;
-        params.sector = sector + i;
-
-        g_slots[lun]->executeDiskDriveOperation(&params);
-
-        if (params.result != RES_OK) {
-            return (DRESULT)params.result;
+        auto result = (DRESULT)g_slots[lun]->diskDriveWrite((BYTE *)buff + i * 512, sector + i);
+        if (result != RES_OK) {
+            return result;
         }
     }
-
     return RES_OK;
 }
 
 DRESULT DiskDriver_ioctl(BYTE lun, BYTE cmd, void *buff) {
-    ExecuteDiskDriveOperationParams params;
-
-    params.operation = DISK_DRIVER_OPERATION_IOCTL;
-
-    params.cmd = cmd;
-    params.buff = (BYTE *)buff;
-
-    g_slots[lun]->executeDiskDriveOperation(&params);
-
-    return (DRESULT)params.result;
+    return (DRESULT)g_slots[lun]->diskDriveIoctl(cmd, (BYTE *)buff);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -277,27 +239,15 @@ static int8_t UsbStorageFS_Init(uint8_t lun) {
 static int8_t UsbStorageFS_GetCapacity(uint8_t lun, uint32_t *block_num, uint16_t *block_size) {
     int slotIndex = g_selectedMassStorageDevice - 1;
 
-    ExecuteDiskDriveOperationParams params;
-
-    params.operation = DISK_DRIVER_OPERATION_IOCTL;
-
     // get block_num
-    params.cmd = GET_SECTOR_COUNT;
-    params.buff = (uint8_t *)block_num;
-
-    g_slots[slotIndex]->executeDiskDriveOperation(&params);
-
-    if ((DRESULT)params.result != RES_OK) {
+    auto result = DiskDriver_ioctl(slotIndex, GET_SECTOR_COUNT, block_num);
+    if (result != RES_OK) {
         return -1;
     }
 
     // get block_size
-    params.cmd = GET_SECTOR_SIZE;
-    params.buff = (uint8_t *)block_size;
-
-    g_slots[slotIndex]->executeDiskDriveOperation(&params);
-    
-    if ((DRESULT)params.result != RES_OK) {
+    result = DiskDriver_ioctl(slotIndex, GET_SECTOR_SIZE, block_size);
+    if (result != RES_OK) {
         return -1;
     }
     
@@ -306,14 +256,7 @@ static int8_t UsbStorageFS_GetCapacity(uint8_t lun, uint32_t *block_num, uint16_
 
 static int8_t UsbStorageFS_IsReady(uint8_t lun) {
     int slotIndex = g_selectedMassStorageDevice - 1;
-
-    ExecuteDiskDriveOperationParams params;
-
-    params.operation = DISK_DRIVER_OPERATION_STATUS;
-
-    g_slots[slotIndex]->executeDiskDriveOperation(&params);
-
-    return (DSTATUS)params.result & STA_NOINIT ? -1 : USBD_OK;
+    return DiskDriver_status(slotIndex) & STA_NOINIT ? -1 : USBD_OK;
 }
 
 static int8_t UsbStorageFS_IsWriteProtected(uint8_t lun) {
@@ -321,41 +264,15 @@ static int8_t UsbStorageFS_IsWriteProtected(uint8_t lun) {
 }
 
 static int8_t UsbStorageFS_Read(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len) {
-    if (blk_len > 1) {
-        return -1;
-    }
-
     int slotIndex = g_selectedMassStorageDevice - 1;
-
-    ExecuteDiskDriveOperationParams params;
-
-    params.operation = DISK_DRIVER_OPERATION_READ;
-
-    params.buff = buf;
-    params.sector = blk_addr;
-
-    g_slots[slotIndex]->executeDiskDriveOperation(&params);
-
-    return (DRESULT)params.result == RES_OK ? USBD_OK : -1;
+    auto result = DiskDriver_read(slotIndex, buf, blk_addr, blk_len);
+    return result == RES_OK ? USBD_OK : -1;
 }
 
 static int8_t UsbStorageFS_Write(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len) {
-    if (blk_len > 1) {
-        return -1;
-    }
-
     int slotIndex = g_selectedMassStorageDevice - 1;
-
-    ExecuteDiskDriveOperationParams params;
-
-    params.operation = DISK_DRIVER_OPERATION_WRITE;
-
-    params.buff = buf;
-    params.sector = blk_addr;
-
-    g_slots[slotIndex]->executeDiskDriveOperation(&params);
-
-    return (DRESULT)params.result == RES_OK ? USBD_OK : -1;
+    auto result = DiskDriver_write(slotIndex, buf, blk_addr, blk_len);
+    return result == RES_OK ? USBD_OK : -1;
 }
 
 static int8_t UsbStorageFS_GetMaxLun() {

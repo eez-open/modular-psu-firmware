@@ -370,6 +370,7 @@ public:
 #endif
         numPowerChannels = 2;
         numOtherChannels = 0;
+        isResyncSupported = false;
 
     	memset(output, 0, sizeof(output));
     	memset(input, 0, sizeof(input));

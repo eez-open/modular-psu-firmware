@@ -5421,6 +5421,12 @@ void data_selected_mass_storage_device(DataOperationEnum operation, Cursor curso
     }
 }
 
+void data_module_is_resync_supported(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_slots[hmi::g_selectedSlotIndex]->isResyncSupported;
+    }
+}
+
 } // namespace gui
 } // namespace eez
 
