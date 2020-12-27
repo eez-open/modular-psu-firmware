@@ -56,11 +56,6 @@
 
 #include <scpi/scpi.h>
 
-volatile uint32_t g_debugVarRequestStructSize;
-volatile uint32_t g_debugVarState;
-volatile uint32_t g_debugVarNumCrcErrors;
-volatile uint32_t g_debugVarNumTransferErrors;
-
 using namespace eez::psu;
 using namespace eez::psu::gui;
 using namespace eez::gui;
@@ -1157,7 +1152,6 @@ public:
 
     Mio168Module() {
 		assert(sizeof(Request) == sizeof(Response));
-        g_debugVarRequestStructSize = sizeof(Request);
 
         moduleType = MODULE_TYPE_DIB_MIO168;
         moduleName = "MIO168";
@@ -1532,9 +1526,7 @@ public:
     void stateTransition(Event event) {
     	if (event == EVENT_DMA_TRANSFER_COMPLETED) {
             numCrcErrors = 0;
-            g_debugVarNumCrcErrors = 0;
             numTransferErrors = 0;
-            g_debugVarNumTransferErrors = 0;
     	}
  
         if (state == STATE_WAIT_SLAVE_READY_BEFORE_REQUEST) {
@@ -1586,7 +1578,6 @@ public:
     void reportDmaTransferFailed(int status) {
         if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
             numCrcErrors++;
-            g_debugVarNumCrcErrors = numCrcErrors;
             if (numCrcErrors >= 5) {
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                 synchronized = false;
@@ -1597,7 +1588,6 @@ public:
             //}
         } else {
             numTransferErrors++;
-            g_debugVarNumTransferErrors = numTransferErrors;
             if (numTransferErrors >= 5) {
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
                 synchronized = false;
@@ -2968,8 +2958,6 @@ public:
 
     // These are executed from the low priority thread which is solely in charge of disk operations.
     void executeDiskDriveOperation() {
-        g_debugVarState = 1;
-
         for (int nretry = 0; nretry < 10; nretry++) {
             diskOperationStatus = Mio168Module::DISK_OPERATION_NOT_FINISHED;
 
@@ -2985,8 +2973,6 @@ public:
         }
 
         diskOperationStatus = Mio168Module::DISK_OPERATION_IDLE;
-
-        g_debugVarState = 2;
     }
 
     int diskDriveInitialize() override {

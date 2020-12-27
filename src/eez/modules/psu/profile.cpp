@@ -97,13 +97,17 @@ void init() {
 }
 
 void tick() {
+#if !CONF_SURVIVE_MODE
     auto tick = millis();
     if (tick - g_lastAutoSaveTime > CONF_AUTO_SAVE_TIMEOUT_MS) {
         g_lastAutoSaveTime = tick;
+#endif
         if (isTickSaveAllowed() && isAutoSaveAllowed() && isProfile0Dirty() && sd_card::isMounted(nullptr, nullptr)) {
             saveStateToProfile0(true);
         }
+#if !CONF_SURVIVE_MODE        
     }
+#endif
 }
 
 void onAfterSdCardMounted() {
