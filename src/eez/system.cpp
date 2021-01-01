@@ -79,7 +79,13 @@ void watchdogReset(int fromTask) {
 namespace eez {
 
 uint32_t millis() {
-    return HAL_GetTick();
+#if defined(EEZ_PLATFORM_STM32)
+	return HAL_GetTick();
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	return osKernelSysTick();
+#endif
 }
 
 void delay(uint32_t millis) {

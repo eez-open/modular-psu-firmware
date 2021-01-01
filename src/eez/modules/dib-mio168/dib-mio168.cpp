@@ -89,8 +89,8 @@ static const int AOUT_4_SUBCHANNEL_INDEX = 9;
 static const int PWM_1_SUBCHANNEL_INDEX = 10;
 static const int PWM_2_SUBCHANNEL_INDEX = 11;
 
-static float AIN_VOLTAGE_RESOLUTION = 0.005f;
-static float AIN_CURRENT_RESOLUTION = 0.00005f;
+static float AIN_VOLTAGE_RESOLUTION = 0.0001f;
+static float AIN_CURRENT_RESOLUTION = 0.00001f;
 
 static float AOUT_DAC7760_ENCODER_STEP_VALUES[] = { 0.01f, 0.1f, 0.2f, 0.5f };
 static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES[] = { 0.001f, 0.005f, 0.01f, 0.05f };
@@ -154,7 +154,6 @@ struct SetParams {
 	struct {
 		uint8_t mode; // enum SourceMode
 		uint8_t range;
-		uint8_t tempSensorBias;
 	} ain[4];
 
 	struct {
@@ -223,12 +222,13 @@ struct Response {
             uint32_t idw0;
             uint32_t idw1;
             uint32_t idw2;
+            uint8_t afeVersion;
         } getInfo;
 
         struct {
             uint8_t flags; // GET_STATE_COMMAND_FLAG_...
             uint8_t dinStates;
-            uint16_t ainValues[4];
+            float ainValues[4];
             DlogState dlogState;
         } getState;
 
@@ -460,34 +460,29 @@ struct AinChannel {
     float m_value = 0;
     uint8_t m_mode = 1;
     uint8_t m_range = 0;
-    uint8_t m_tempSensorBias = 0;
     char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
 
     struct ProfileParameters {
         uint8_t mode;
         uint8_t range;
-        uint8_t tempSensorBias;
         char label[CHANNEL_LABEL_MAX_LENGTH + 1];
     };
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
         parameters.mode = 1;
         parameters.range = 0;
-        parameters.tempSensorBias = 0;
         *parameters.label = 0;
     }
 
     void getProfileParameters(ProfileParameters &parameters) {
         parameters.mode = m_mode;
         parameters.range = m_range;
-        parameters.tempSensorBias = m_tempSensorBias;
         memcpy(parameters.label, m_label, sizeof(m_label));
     }
 
     void setProfileParameters(ProfileParameters &parameters) {
         m_mode = parameters.mode;
         m_range = parameters.range;
-        m_tempSensorBias = parameters.tempSensorBias;
         memcpy(m_label, parameters.label, sizeof(m_label));
     }
 
@@ -499,12 +494,6 @@ struct AinChannel {
 
         sprintf(propName, "ain_%d_range", i+1);
         WRITE_PROPERTY(propName, parameters.range);
-
-        sprintf(propName, "ain_%d_tempSensorBias", i+1);
-        WRITE_PROPERTY(propName, parameters.tempSensorBias);
-
-        sprintf(propName, "ain_%d_tempSensorBias", i+1);
-        WRITE_PROPERTY(propName, parameters.tempSensorBias);
 
         sprintf(propName, "ain_%d_label", i+1);
         WRITE_PROPERTY(propName, parameters.label);
@@ -521,9 +510,6 @@ struct AinChannel {
         sprintf(propName, "ain_%d_range", i+1);
         READ_PROPERTY(propName, parameters.range);
 
-        sprintf(propName, "ain_%d_tempSensorBias", i+1);
-        READ_PROPERTY(propName, parameters.tempSensorBias);
-
         sprintf(propName, "ain_%d_label", i+1);
         READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
 
@@ -533,55 +519,24 @@ struct AinChannel {
     void resetConfiguration() {
         m_mode = 1;
         m_range = 0;
-        m_tempSensorBias = 0;
         *m_label = 0;
-    }
-
-    float convertU16Value(uint16_t value) {
-        float min = 0;
-        float max = 0;
-
-        if (m_range == 0) {
-            min = -10.24f;
-            max = 10.24f;
-        } else if (m_range == 1) {
-            min = -5.12f;
-            max = 5.12f;
-        } else if (m_range == 2) {
-            min = -2.56f;
-            max = 2.56f;
-        } else if (m_range == 3) {
-            min = -1.28f;
-            max = 1.28f;
-        } else if (m_range == 11) {
-            min = -0.64f;
-            max = 0.64f;
-        } else if (m_range == 5) {
-            min = 0;
-            max = 10.24f;
-        } else if (m_range == 6) {
-            min = 0;
-            max = 5.12f;
-        } else if (m_range == 7) {
-            min = 0;
-            max = 2.56f;
-        } else if (m_range == 15) {
-            min = 0;
-            max = 1.28f;
-        }
-
-        float fValue = remap(value * 1.0f, 0.0f, min, 65535.0f, max);
-
-        if (m_mode == MEASURE_MODE_CURRENT) {
-            fValue /= 100.0f;
-        }
-
-        return fValue;
     }
 
     float getResolution() {
         return m_mode == MEASURE_MODE_VOLTAGE ? AIN_VOLTAGE_RESOLUTION : m_mode == MEASURE_MODE_CURRENT ? AIN_CURRENT_RESOLUTION : 1.0f;
     }
+
+    void addValue(float value) {
+        m_value = value;
+    }
+
+	static uint8_t getRangeMaxValue(int subchannelIndex, uint8_t mode) {
+		if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX || subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+			return mode == SOURCE_MODE_VOLTAGE ? 2 : 0;
+		} else {
+			return mode == SOURCE_MODE_VOLTAGE ? 1 : mode == SOURCE_MODE_CURRENT ? 2 : 0;
+		}
+	}
 };
 
 struct AoutDac7760Channel {
@@ -1059,6 +1014,8 @@ struct Mio168Module : public Module {
 public:
     TestResult testResult = TEST_NONE;
 
+    uint8_t afeVersion;
+
     bool synchronized = false;
 
     uint32_t input[(sizeof(Request) + 3) / 4 + 1];
@@ -1174,8 +1131,6 @@ public:
         memset(input, 0, sizeof(input));
         memset(output, 0, sizeof(output));
 
-        memset(&lastTransferredParams, 0, sizeof(SetParams));
-
         //dlog.period = 0;
         //dlog.duration = 0;
         //dlog.resources = 0;
@@ -1192,6 +1147,12 @@ public:
 
     void initChannels() override {
         if (!synchronized) {
+            // give some time for MIO168 module to boot
+        	auto t = millis();
+        	if (t < 1600) {
+        		osDelay(1600 - t);
+        	}
+
 			executeCommand(&getInfo_command);
 
 			if (!g_isBooted) {
@@ -1204,6 +1165,8 @@ public:
 					tick();
 				}
 			}
+
+            memset(&lastTransferredParams, 0, sizeof(SetParams));
         }
     }
 
@@ -1218,6 +1181,7 @@ public:
             idw0 = data.idw0;
             idw1 = data.idw1;
             idw2 = data.idw2;
+            afeVersion = data.afeVersion;
 
 			firmwareVersionAcquired = true;
 
@@ -1254,7 +1218,7 @@ public:
 
             for (int i = 0; i < 4; i++) {
                 auto &channel = ainChannels[i];
-                channel.m_value = channel.convertU16Value(data.ainValues[i]);
+                channel.addValue(data.ainValues[i]);
             }
 
             if (data.flags & GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT) {
@@ -1300,7 +1264,6 @@ public:
 			auto channel = &ainChannels[i];
 			params.ain[i].mode = channel->m_mode;
 			params.ain[i].range = channel->m_range;
-			params.ain[i].tempSensorBias = channel->m_tempSensorBias;
 		}
 
 		for (int i = 0; i < 2; i++) {
@@ -1449,7 +1412,7 @@ public:
 		if (dlog_record::isExecuting()) {
 			uint32_t dlogPeriodMs = (uint32_t)(dlog_record::g_recording.parameters.period * 1000);
 			if (dlogPeriodMs < REFRESH_TIME_MS) {
-				if (dlog_record::getModuleLocalRecordingSlotIndex() == slotIndex) {
+				if (dlog_record::isModuleAtSlotRecording(slotIndex)) {
 					return dlogPeriodMs;
 				}
 			}
@@ -1493,7 +1456,7 @@ public:
     void doRetry() {
     	bp3c::comm::abortTransfer(slotIndex);
         
-        static const int NUM_REQUEST_RETRIES = 5;
+        static const int NUM_REQUEST_RETRIES = 10;
 
         if (++retry < NUM_REQUEST_RETRIES) {
             // try again
@@ -1647,6 +1610,7 @@ public:
                         response->getInfo.idw0 = 0;
                         response->getInfo.idw1 = 0;
                         response->getInfo.idw2 = 0;
+                        response->getInfo.afeVersion = 1;
                     } else if (currentCommand->command == COMMAND_GET_STATE) {
                         response->getState.flags |= GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT;
                     }
@@ -1837,6 +1801,9 @@ public:
         doutChannel.setProfileParameters(parameters->doutChannel);
         for (int i = 0; i < 4; i++) {
             ainChannels[i].setProfileParameters(parameters->ainChannels[i]);
+			if (ainChannels[i].m_range > AinChannel::getRangeMaxValue(AIN_1_SUBCHANNEL_INDEX + i, ainChannels[i].m_mode)) {
+				ainChannels[i].m_range = 0;
+			}
         }
         for (int i = 0; i < 2; i++) {
             aoutDac7760Channels[i].setProfileParameters(parameters->aoutDac7760Channels[i]);
@@ -2380,7 +2347,7 @@ public:
             return false;
         }
 
-        if (range != 0 && range != 1 && range != 2 && range != 3 && range != 11 && range != 5 && range != 6 && range != 7 && range != 15) {
+        if (range > AinChannel::getRangeMaxValue(subchannelIndex, ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_mode)) {
             if (err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
@@ -2388,30 +2355,6 @@ public:
         }
 
         ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_range = range;
-
-        return true;
-    }
-
-    bool getMeasureTempSensorBias(int subchannelIndex, bool &enabled, int *err) override {
-        if (subchannelIndex != AIN_1_SUBCHANNEL_INDEX && subchannelIndex != AIN_2_SUBCHANNEL_INDEX) {
-            if (err) {
-                *err = SCPI_ERROR_HARDWARE_MISSING;
-            }
-            return false;
-        }
-        enabled = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_tempSensorBias;
-        return true;
-    }
-    
-    bool setMeasureTempSensorBias(int subchannelIndex, bool enabled, int *err) override {
-        if (subchannelIndex != AIN_1_SUBCHANNEL_INDEX && subchannelIndex != AIN_2_SUBCHANNEL_INDEX) {
-            if (err) {
-                *err = SCPI_ERROR_HARDWARE_MISSING;
-            }
-            return false;
-        }
-
-        ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_tempSensorBias = enabled;
 
         return true;
     }
@@ -3150,11 +3093,10 @@ public:
 
         m_mode = m_modeOrig = channel.m_mode;
         m_range = m_rangeOrig = channel.m_range;
-        m_tempSensorBias = m_tempSensorBiasOrig = channel.m_tempSensorBias;
     }
 
     int getDirty() { 
-        return m_mode != m_modeOrig || m_range != m_rangeOrig || m_tempSensorBias != m_tempSensorBiasOrig;
+        return m_mode != m_modeOrig || m_range != m_rangeOrig;
     }
 
     void set() {
@@ -3165,14 +3107,41 @@ public:
         popPage();
     }
 
+    EnumItem *getRangeEnumDefinition() {
+		static EnumItem g_ain12VoltageRangeEnumDefinition[] = {
+			{ 0, "\xbd""2.4 V" },
+			{ 1, "\xbd""48 V" },
+			{ 2, "\xbd""240 V" },
+			{ 0, 0 }
+		};
+
+		static EnumItem g_ain34VoltageRangeEnumDefinition[] = {
+			{ 0, "\xbd""2.4 V" },
+			{ 1, "\xbd""12 V" },
+			{ 0, 0 }
+		};
+
+		static EnumItem g_ain34CurrentRangeEnumDefinition[] = {
+			{ 0, "\xbd""24 mA" },
+			{ 1, "\xbd""1.2 A" },
+			{ 2, "\xbd""10 A" },
+			{ 0, 0 }
+		};
+
+		if (g_selectedChannelIndex == AIN_1_SUBCHANNEL_INDEX || g_selectedChannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+            return m_mode == MEASURE_MODE_VOLTAGE ? g_ain12VoltageRangeEnumDefinition : nullptr;
+        } else {
+			return m_mode == MEASURE_MODE_VOLTAGE ? g_ain34VoltageRangeEnumDefinition : 
+				m_mode == MEASURE_MODE_CURRENT ? g_ain34CurrentRangeEnumDefinition : nullptr;
+        }
+    }
+
     uint8_t m_mode;
     uint8_t m_range;
-    uint8_t m_tempSensorBias;
 
 private:
     uint8_t m_modeOrig;
     uint8_t m_rangeOrig;
-    uint8_t m_tempSensorBiasOrig;
 };
 
 int AinConfigurationPage::g_selectedChannelIndex;
@@ -3270,7 +3239,6 @@ void Mio168Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
         AinChannel &channel = ainChannels[AinConfigurationPage::g_selectedChannelIndex - AIN_1_SUBCHANNEL_INDEX];
         channel.m_mode = g_ainConfigurationPage.m_mode;
         channel.m_range = g_ainConfigurationPage.m_range;
-        channel.m_tempSensorBias = g_ainConfigurationPage.m_tempSensorBias;
     } else if (type == PSU_MESSAGE_AOUT_DAC7760_CONFIGURE) {
         AoutDac7760Channel &channel = aoutDac7760Channels[AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX];
         channel.m_outputEnabled = g_aoutDac7760ConfigurationPage.m_outputEnabled;
@@ -3622,28 +3590,24 @@ void data_dib_mio168_ain_mode(DataOperationEnum operation, Cursor cursor, Value 
 void onSetAinMode(uint16_t value) {
     popPage();
     g_ainConfigurationPage.m_mode = (uint8_t)value;
+    if (g_ainConfigurationPage.m_range > AinChannel::getRangeMaxValue(g_ainConfigurationPage.g_selectedChannelIndex, g_ainConfigurationPage.m_mode)) {
+        g_ainConfigurationPage.m_range = 0;
+    }
 }
 
 void action_dib_mio168_ain_select_mode() {
     pushSelectFromEnumPage(g_ainModeEnumDefinition, g_ainConfigurationPage.m_mode, nullptr, onSetAinMode);
 }
 
-static EnumItem g_ainRangeEnumDefinition[] = {
-    { 0, "\xbd""10.24 V" },
-    { 1, "\xbd""5.12 V" },
-    { 2, "\xbd""2.56 V" },
-    { 3, "\xbd""1.28 V" },
-    { 11, "\xbd""0.64 V" },
-    { 5, "0 V to 10.24 V" },
-    { 6, "0 V to 5.12 V" },
-    { 7, "0 V to 2.56 V" },
-    { 15, "0 V to 1.28 V" },
-    { 0, 0 }
-};
+void data_dib_mio168_ain_range_is_available(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_ainConfigurationPage.getRangeEnumDefinition() ? 1 : 0;
+    }
+}
 
 void data_dib_mio168_ain_range(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getWidgetLabel(g_ainRangeEnumDefinition, g_ainConfigurationPage.m_range);
+        value = getWidgetLabel(g_ainConfigurationPage.getRangeEnumDefinition(), g_ainConfigurationPage.m_range);
     }
 }
 
@@ -3653,23 +3617,7 @@ void onSetAinRange(uint16_t value) {
 }
 
 void action_dib_mio168_ain_select_range() {
-    pushSelectFromEnumPage(g_ainRangeEnumDefinition, g_ainConfigurationPage.m_range, nullptr, onSetAinRange);
-}
-
-void data_dib_mio168_ain_has_temp_sensor_bias_feature(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = AinConfigurationPage::g_selectedChannelIndex < AIN_3_SUBCHANNEL_INDEX ? 1 : 0;
-    }
-}
-
-void data_dib_mio168_ain_temp_sensor_bias(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = g_ainConfigurationPage.m_tempSensorBias;
-    }
-}
-
-void action_dib_mio168_ain_toggle_temp_sensor_bias() {
-    g_ainConfigurationPage.m_tempSensorBias = !g_ainConfigurationPage.m_tempSensorBias;
+    pushSelectFromEnumPage(g_ainConfigurationPage.getRangeEnumDefinition(), g_ainConfigurationPage.m_range, nullptr, onSetAinRange);
 }
 
 void action_dib_mio168_ain_show_configuration() {
@@ -4045,6 +3993,13 @@ void action_dib_mio168_pwm_change_label() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void data_dib_mio168_afe_version(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		auto module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
+		value = module->afeVersion;
+	}
+}
 
 void action_dib_mio168_show_info() {
     pushPage(PAGE_ID_DIB_MIO168_INFO);

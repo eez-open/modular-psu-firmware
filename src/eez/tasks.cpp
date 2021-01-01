@@ -171,22 +171,38 @@ void highPriorityThreadMainLoop(const void *) {
 
 void highPriorityThreadOneIter() {
     osEvent event = osMessageGet(g_highPriorityMessageQueueId, 1);
-    
-    WATCHDOG_RESET(WATCHDOG_HIGH_PRIORITY_THREAD);
+
+#if defined(EEZ_PLATFORM_STM32)
+    static uint32_t g_lastTickCountMs;
+#endif
 
     if (event.status == osEventMessage) {
-    	uint32_t message = event.value.v;
+        uint32_t message = event.value.v;
     	uint8_t type = QUEUE_MESSAGE_TYPE(message);
         uint32_t param = QUEUE_MESSAGE_PARAM(message);
         psu::onThreadMessage(type, param);
-    } else {
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        if (g_isForcedPsuThreadMessageHandling) {
+
+#if defined(EEZ_PLATFORM_STM32)
+        uint32_t diffMs = millis() - g_lastTickCountMs;
+        if (diffMs == 0) {
             return;
         }
 #endif
-        psu::tick();
     }
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    if (g_isForcedPsuThreadMessageHandling) {
+        return;
+    }
+#endif
+
+    WATCHDOG_RESET(WATCHDOG_HIGH_PRIORITY_THREAD);
+
+#if defined(EEZ_PLATFORM_STM32)
+    g_lastTickCountMs = millis();
+#endif
+
+    psu::tick();
 }
 
 bool isPsuThread() {

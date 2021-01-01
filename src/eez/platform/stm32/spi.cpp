@@ -229,11 +229,11 @@ HAL_StatusTypeDef transfer5(uint8_t slotIndex, uint8_t *input, uint8_t *output) 
 }
 
 HAL_StatusTypeDef transfer(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size) {
-	return HAL_SPI_TransmitReceive(handle[slotIndex], input, output, size, 100);
+	return HAL_SPI_TransmitReceive(handle[slotIndex], input, output, size, 5);
 }
 
 HAL_StatusTypeDef transmit(uint8_t slotIndex, uint8_t *input, uint16_t size) {
-    return HAL_SPI_Transmit(handle[slotIndex], input, size, 100);
+    return HAL_SPI_Transmit(handle[slotIndex], input, size, 5);
 }
 
 HAL_StatusTypeDef transferDMA(uint8_t slotIndex, uint8_t *input, uint8_t *output, uint16_t size) {

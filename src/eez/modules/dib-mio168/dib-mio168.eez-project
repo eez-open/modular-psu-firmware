@@ -142,12 +142,7 @@
       "defaultValue": "0 V to +5 V"
     },
     {
-      "name": "ain_has_temp_sensor_bias_feature",
-      "type": "boolean",
-      "defaultValue": "1"
-    },
-    {
-      "name": "ain_temp_sensor_bias",
+      "name": "ain_range_is_available",
       "type": "boolean",
       "defaultValue": "1"
     },
@@ -226,6 +221,11 @@
       "name": "din_has_speed",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "afe_version",
+      "type": "string",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -240,9 +240,6 @@
     },
     {
       "name": "dout_toggle_state"
-    },
-    {
-      "name": "ain_toggle_temp_sensor_bias"
     },
     {
       "name": "ain_show_configuration"
@@ -3473,38 +3470,14 @@
                 ]
               },
               {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_M_left"
-                },
-                "left": 0,
-                "top": 48,
-                "width": 143,
-                "height": 40,
-                "text": "Range:"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_M_center"
-                },
-                "data": "ain_range",
-                "action": "ain_select_range",
-                "left": 178,
-                "top": 48,
-                "width": 200,
-                "height": 40,
-                "text": ""
-              },
-              {
                 "type": "Select",
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "ain_has_temp_sensor_bias_feature",
+                "data": "ain_range_is_available",
                 "left": 0,
-                "top": 96,
-                "width": 253,
+                "top": 48,
+                "width": 378,
                 "height": 40,
                 "widgets": [
                   {
@@ -3514,7 +3487,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 253,
+                    "width": 378,
                     "height": 40,
                     "invertColors": true
                   },
@@ -3525,59 +3498,32 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 253,
+                    "width": 378,
                     "height": 40,
                     "widgets": [
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "edit_value_M_left",
-                          "alignHorizontal": "left"
+                          "inheritFrom": "edit_value_M_left"
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 178,
+                        "width": 143,
                         "height": 40,
-                        "text": "Temp. sensor bias:"
+                        "text": "Range:"
                       },
                       {
-                        "type": "Select",
+                        "type": "Text",
                         "style": {
-                          "inheritFrom": "default"
+                          "inheritFrom": "edit_value_active_M_center"
                         },
-                        "data": "ain_temp_sensor_bias",
-                        "action": "ain_toggle_temp_sensor_bias",
+                        "data": "ain_range",
+                        "action": "ain_select_range",
                         "left": 178,
                         "top": 0,
-                        "width": 75,
+                        "width": 200,
                         "height": 40,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "edit_value_active_M_center"
-                            },
-                            "data": "",
-                            "action": "",
-                            "left": 0,
-                            "top": 0,
-                            "width": 75,
-                            "height": 40,
-                            "text": "OFF"
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "edit_value_active_M_center"
-                            },
-                            "action": "",
-                            "left": 0,
-                            "top": 0,
-                            "width": 75,
-                            "height": 40,
-                            "text": "ON"
-                          }
-                        ]
+                        "text": ""
                       }
                     ]
                   }
@@ -3593,7 +3539,7 @@
                 },
                 "action": "show_calibration",
                 "left": 0,
-                "top": 144,
+                "top": 98,
                 "width": 178,
                 "height": 40,
                 "text": "Calibration"
@@ -4386,10 +4332,33 @@
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "default_M_left"
+                  "inheritFrom": "edit_value_M_left"
                 },
                 "left": 0,
                 "top": 108,
+                "width": 137,
+                "height": 32,
+                "text": "AFE version:"
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "value_M_left"
+                },
+                "data": "afe_version",
+                "left": 137,
+                "top": 108,
+                "width": 176,
+                "height": 32,
+                "displayOption": 0
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "default_M_left"
+                },
+                "left": 0,
+                "top": 144,
                 "width": 137,
                 "height": 32,
                 "text": "Total On time:"
@@ -4401,7 +4370,7 @@
                 },
                 "data": "channel_on_time_total",
                 "left": 137,
-                "top": 108,
+                "top": 144,
                 "width": 176,
                 "height": 32,
                 "displayOption": 0
@@ -4412,7 +4381,7 @@
                   "inheritFrom": "edit_value_M_left"
                 },
                 "left": 0,
-                "top": 144,
+                "top": 180,
                 "width": 137,
                 "height": 32,
                 "text": "Last On time:"
@@ -4424,23 +4393,10 @@
                 },
                 "data": "channel_on_time_last",
                 "left": 137,
-                "top": 144,
+                "top": 180,
                 "width": 176,
                 "height": 32,
                 "displayOption": 0
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
-                },
-                "action": "show_channel_labels",
-                "left": 0,
-                "top": 180,
-                "width": 142,
-                "height": 32,
-                "text": "Channel labels"
               }
             ]
           },

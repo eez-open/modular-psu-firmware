@@ -95,9 +95,6 @@ static dlog_file::Writer g_writer(DLOG_RECORD_BUFFER, DLOG_RECORD_BUFFER_SIZE);
 static uint32_t g_fileLength;
 static uint32_t g_numSamples;
 
-osMutexId(g_mutexId);
-osMutexDef(g_mutex);
-
 ////////////////////////////////////////////////////////////////////////////////
 
 static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
@@ -161,40 +158,45 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
     buffer = nullptr;
     bufferSize = 0;
 
-    if (osMutexWait(g_mutexId, 5) == osOK) {
-        int32_t timeDiff = millis() - g_lastSavedBufferTickCount;
-        uint32_t alignedBufferIndex = (g_writer.getBufferIndex() / 4) * 4;
-        uint32_t indexDiff = alignedBufferIndex - g_lastSavedBufferIndex;
-        if (indexDiff > 0 && (flush || timeDiff >= CONF_DLOG_SYNC_FILE_TIME_MS || indexDiff >= CHUNK_SIZE)) {
-            bufferSize = MIN(indexDiff, CHUNK_SIZE);
-            buffer = g_saveBuffer;
+#if defined(EEZ_PLATFORM_STM32)
+    taskENTER_CRITICAL();
+#endif
+    int32_t timeDiff = millis() - g_lastSavedBufferTickCount;
+    uint32_t alignedBufferIndex = (g_writer.getBufferIndex() / 4) * 4;
+    uint32_t indexDiff = alignedBufferIndex - g_lastSavedBufferIndex;
+    if (indexDiff > 0 && (flush || timeDiff >= CONF_DLOG_SYNC_FILE_TIME_MS || indexDiff >= CHUNK_SIZE)) {
+        bufferSize = MIN(indexDiff, CHUNK_SIZE);
+        buffer = g_saveBuffer;
 
-            int32_t i = g_writer.getBufferIndex() - (g_lastSavedBufferIndex + DLOG_RECORD_BUFFER_SIZE);
+        int32_t i = g_writer.getBufferIndex() - (g_lastSavedBufferIndex + DLOG_RECORD_BUFFER_SIZE);
 
-            if (i <= 0) {
-                i = 0;
-            } else {
-                osMutexRelease(g_mutexId);
-                abortAfterBufferOverflowError();
-                return false;
-            }
-
-            if ((uint32_t)i < bufferSize) {
-                uint32_t tail = (g_lastSavedBufferIndex + i) % DLOG_RECORD_BUFFER_SIZE;
-                uint32_t head = (g_lastSavedBufferIndex + bufferSize) % DLOG_RECORD_BUFFER_SIZE;
-                if (tail < head) {
-                    memcpy(g_saveBuffer + i, DLOG_RECORD_BUFFER + tail, head - tail);
-                } else {
-                    uint32_t n = DLOG_RECORD_BUFFER_SIZE - tail;
-                    memcpy(g_saveBuffer, DLOG_RECORD_BUFFER + tail, n);
-                    if (head > 0) {
-                        memcpy(g_saveBuffer + n, DLOG_RECORD_BUFFER, head);
-                    }
-                }
-            } 
+        if (i <= 0) {
+            i = 0;
+        } else {
+#if defined(EEZ_PLATFORM_STM32)
+            taskEXIT_CRITICAL();
+#endif
+            abortAfterBufferOverflowError();
+            return false;
         }
-        osMutexRelease(g_mutexId);
+
+        if ((uint32_t)i < bufferSize) {
+            uint32_t tail = (g_lastSavedBufferIndex + i) % DLOG_RECORD_BUFFER_SIZE;
+            uint32_t head = (g_lastSavedBufferIndex + bufferSize) % DLOG_RECORD_BUFFER_SIZE;
+            if (tail < head) {
+                memcpy(g_saveBuffer + i, DLOG_RECORD_BUFFER + tail, head - tail);
+            } else {
+                uint32_t n = DLOG_RECORD_BUFFER_SIZE - tail;
+                memcpy(g_saveBuffer, DLOG_RECORD_BUFFER + tail, n);
+                if (head > 0) {
+                    memcpy(g_saveBuffer + n, DLOG_RECORD_BUFFER, head);
+                }
+            }
+        } 
     }
+#if defined(EEZ_PLATFORM_STM32)
+    taskEXIT_CRITICAL();
+#endif
 
     return true;
 }
@@ -356,68 +358,64 @@ static void log() {
     }
 
     if (g_currentTime >= g_nextTime) {
-        if (osMutexWait(g_mutexId, 5) == osOK) {
-            while (1) {
-                g_nextTime = ++g_iSample * g_recording.parameters.period;
-                if (g_currentTime < g_nextTime || g_nextTime > g_recording.parameters.duration) {
-                    break;
-                }
-
-                // we missed a sample, write NAN's
-                for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
-                    auto &dlogItem = g_recording.parameters.dlogItems[i];
-                    if (
-                        dlogItem.resourceType == DLOG_RESOURCE_TYPE_U ||
-                        dlogItem.resourceType == DLOG_RESOURCE_TYPE_I ||
-                        dlogItem.resourceType == DLOG_RESOURCE_TYPE_P
-                    ) {
-                        g_writer.writeFloat(NAN);
-                    } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
-                        if (g_writer.getBitMask() == 0) {
-                            g_writer.writeBit(0); // mark as invalid sample
-                        }
-                        g_writer.writeBit(0);
-                    }
-                }
-
-                g_writer.flushBits();
-
-                ++g_recording.size;
+        while (1) {
+            g_nextTime = ++g_iSample * g_recording.parameters.period;
+            if (g_currentTime < g_nextTime || g_nextTime > g_recording.parameters.duration) {
+                break;
             }
 
-            // write sample
+            // we missed a sample, write NAN's
             for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
                 auto &dlogItem = g_recording.parameters.dlogItems[i];
-                if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
-                    g_writer.writeFloat(channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
-                } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_I) {
-                    g_writer.writeFloat(channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
-                } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_P)  {
-                    g_writer.writeFloat(
-                        channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex) *
-                        channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex)
-                    );
-                } else  if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
+                if (
+                    dlogItem.resourceType == DLOG_RESOURCE_TYPE_U ||
+                    dlogItem.resourceType == DLOG_RESOURCE_TYPE_I ||
+                    dlogItem.resourceType == DLOG_RESOURCE_TYPE_P
+                ) {
+                    g_writer.writeFloat(NAN);
+                } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
                     if (g_writer.getBitMask() == 0) {
-                        g_writer.writeBit(1); // mark as valid sample
-                    }                    
-
-                    uint8_t data;
-                    channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
-                    if (data & (1 << (dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0))) {
-                        g_writer.writeBit(1);
-                    } else {
-                        g_writer.writeBit(0);
+                        g_writer.writeBit(0); // mark as invalid sample
                     }
+                    g_writer.writeBit(0);
                 }
             }
 
             g_writer.flushBits();
-            
-            ++g_recording.size;
 
-            osMutexRelease(g_mutexId);
-        }        
+            ++g_recording.size;
+        }
+
+        // write sample
+        for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
+            auto &dlogItem = g_recording.parameters.dlogItems[i];
+            if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
+                g_writer.writeFloat(channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
+            } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_I) {
+                g_writer.writeFloat(channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
+            } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_P)  {
+                g_writer.writeFloat(
+                    channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex) *
+                    channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex)
+                );
+            } else  if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
+                if (g_writer.getBitMask() == 0) {
+                    g_writer.writeBit(1); // mark as valid sample
+                }                    
+
+                uint8_t data;
+                channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
+                if (data & (1 << (dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0))) {
+                    g_writer.writeBit(1);
+                } else {
+                    g_writer.writeBit(0);
+                }
+            }
+        }
+
+        g_writer.flushBits();
+        
+        ++g_recording.size;
 
         if (g_nextTime > g_recording.parameters.duration) {
             stateTransition(EVENT_FINISH);
@@ -466,10 +464,6 @@ static int doStartImmediately() {
 }
 
 static int doInitiate(bool traceInitiated) {
-    if (!g_mutexId) {
-        g_mutexId = osMutexCreate(osMutex(g_mutex));
-    }
-
     int err;
 
     g_traceInitiated = traceInitiated;
@@ -531,6 +525,15 @@ int getModuleLocalRecordingSlotIndex() {
         }
     }
     return -1;
+}
+
+bool isModuleAtSlotRecording(int slotIndex) {
+	for (int i = 0; i < g_parameters.numDlogItems; i++) {
+		if (g_parameters.dlogItems[i].slotIndex == slotIndex) {
+			return true;
+		}
+	}
+	return false;
 }
 
 double getCurrentTime() {
