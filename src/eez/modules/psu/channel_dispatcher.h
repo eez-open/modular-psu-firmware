@@ -210,9 +210,6 @@ bool setMeasureMode(int slotIndex, int subchannelIndex, MeasureMode mode, int *e
 bool getMeasureRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
 bool setMeasureRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
 
-bool getMeasureTempSensorBias(int slotIndex, int subchannelIndex, bool &enabled, int *err);
-bool setMeasureTempSensorBias(int slotIndex, int subchannelIndex, bool enabled, int *err);
-
 bool isRouteOpen(int slotIndex, int subchannelIndex, int *err);
 bool routeOpen(ChannelList channelList, int *err);
 bool routeClose(ChannelList channelList, int *err);

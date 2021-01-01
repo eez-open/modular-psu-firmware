@@ -2248,14 +2248,6 @@ bool setMeasureRange(int slotIndex, int subchannelIndex, uint8_t range, int *err
     return g_slots[slotIndex]->setMeasureRange(subchannelIndex, range, err);
 }
 
-bool getMeasureTempSensorBias(int slotIndex, int subchannelIndex, bool &enabled, int *err) {
-    return g_slots[slotIndex]->getMeasureTempSensorBias(subchannelIndex, enabled, err);
-}
-
-bool setMeasureTempSensorBias(int slotIndex, int subchannelIndex, bool enabled, int *err) {
-    return g_slots[slotIndex]->setMeasureTempSensorBias(subchannelIndex, enabled, err);
-}
-
 bool routeOpen(ChannelList channelList, int *err) {
     int slotIndex = channelList.channels[0].slotIndex;
 
