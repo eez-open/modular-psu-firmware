@@ -306,9 +306,6 @@ struct Module {
     virtual bool getMeasureRange(int subchannelIndex, uint8_t &range, int *err);
     virtual bool setMeasureRange(int subchannelIndex, uint8_t range, int *err);
 
-    virtual bool getMeasureTempSensorBias(int subchannelIndex, bool &enabled, int *err);
-    virtual bool setMeasureTempSensorBias(int subchannelIndex, bool enabled, int *err);
-
     virtual bool isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err);
     virtual bool routeOpen(ChannelList channelList, int *err);
     virtual bool routeClose(ChannelList channelList, int *err);

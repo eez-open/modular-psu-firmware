@@ -181,44 +181,6 @@ scpi_result_t scpi_cmd_measureScalarRangeQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_measureScalarTemperatureSensorBias(scpi_t *context) {
-    bool enabled;
-    if (!SCPI_ParamBool(context, &enabled, TRUE)) {
-        return SCPI_RES_ERR;
-    }
-
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
-    int err;
-    if (!channel_dispatcher::setMeasureTempSensorBias(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, enabled, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_measureScalarTemperatureSensorBiasQ(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
-    bool enabled;
-    int err;
-    if (!channel_dispatcher::getMeasureTempSensorBias(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, enabled, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
-
-    SCPI_ResultBool(context, enabled);
-
-    return SCPI_RES_OK;
-}
-
 scpi_result_t scpi_cmd_measureDigitalByteQ(scpi_t *context) {
     SlotAndSubchannelIndex slotAndSubchannelIndex;
     if (!getChannelFromParam(context, slotAndSubchannelIndex)) {

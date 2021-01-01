@@ -83,8 +83,6 @@
     SCPI_COMMAND("MEASure[:SCALar]:MODe?", scpi_cmd_measureScalarModeQ) \
     SCPI_COMMAND("MEASure[:SCALar]:RANGe", scpi_cmd_measureScalarRange) \
     SCPI_COMMAND("MEASure[:SCALar]:RANGe?", scpi_cmd_measureScalarRangeQ) \
-    SCPI_COMMAND("MEASure[:SCALar]:TEMPerature:SENSor:BIAS", scpi_cmd_measureScalarTemperatureSensorBias) \
-    SCPI_COMMAND("MEASure[:SCALar]:TEMPerature:SENSor:BIAS?", scpi_cmd_measureScalarTemperatureSensorBiasQ) \
     SCPI_COMMAND("MEASure:DIGital[:BYTE]?", scpi_cmd_measureDigitalByteQ) \
     SCPI_COMMAND("MEMory:NSTates?", scpi_cmd_memoryNstatesQ) \
     SCPI_COMMAND("MEMory:STATe:CATalog?", scpi_cmd_memoryStateCatalogQ) \

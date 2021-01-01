@@ -438,20 +438,6 @@ bool Module::setMeasureRange(int subchannelIndex, uint8_t range, int *err) {
     return false;
 }
 
-bool Module::getMeasureTempSensorBias(int subchannelIndex, bool &enabled, int *err) {
-    if (err) {
-        *err = SCPI_ERROR_HARDWARE_MISSING;
-    }
-    return false;
-}
-
-bool Module::setMeasureTempSensorBias(int subchannelIndex, bool enabled, int *err) {
-    if (err) {
-        *err = SCPI_ERROR_HARDWARE_MISSING;
-    }
-    return false;
-}
-
 bool Module::isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
