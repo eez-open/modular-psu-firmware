@@ -433,7 +433,9 @@ void animate() {
 		DMA2D_WAIT;
 
 		// wait for VSYNC
-		while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS));
+		while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
+			osDelay(1);
+		}
 
 		HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_animationBuffer, 0);
 	} else {
@@ -443,7 +445,9 @@ void animate() {
 
 void swapBuffers() {
     // wait for VSYNC
-    while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {}
+    while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
+    	osDelay(1);
+    }
 
     HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
 

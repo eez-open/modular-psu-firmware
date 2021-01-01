@@ -125,7 +125,7 @@ void touchMeasure() {
 
     uint8_t result[5];
     memset(result, 0, 5);
-    HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result, 5, 100);
+    HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result, 5, 5);
     
     taskEXIT_CRITICAL();
 

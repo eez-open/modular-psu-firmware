@@ -718,7 +718,7 @@ void onThreadMessage(uint8_t type, uint32_t param) {
             tick();
         }
 #endif
-    } if (type == PSU_MESSAGE_CHANGE_POWER_STATE) {
+    } else if (type == PSU_MESSAGE_CHANGE_POWER_STATE) {
         changePowerState(param ? true : false);
     } else if (type == PSU_MESSAGE_RESET) {
         reset();
@@ -1211,17 +1211,6 @@ void onProtectionTripped() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-typedef void (*TickFunc)();
-static TickFunc g_tickFuncs[] = {
-    temperature::tick,
-#if OPTION_FAN
-    aux_ps::fan::tick,
-#endif
-    datetime::tick
-};
-static const int NUM_TICK_FUNCS = sizeof(g_tickFuncs) / sizeof(TickFunc);
-static int g_tickFuncIndex = 0;
-
 void tick() {
     for (int i = 0; i < NUM_SLOTS; i++) {
         g_slots[i]->tick();
@@ -1238,9 +1227,10 @@ void tick() {
     dlog_record::tick();
 
     io_pins::tick();
-
-    g_tickFuncs[g_tickFuncIndex]();
-    g_tickFuncIndex = (g_tickFuncIndex + 1) % NUM_TICK_FUNCS;
+    temperature::tick();
+    aux_ps::fan::tick();
+    datetime::tick();
+    touch::tickHighPriority();
 
     if (g_diagCallback) {
         g_diagCallback();
