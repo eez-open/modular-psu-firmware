@@ -28739,6 +28739,238 @@
         "style": "select_enum_item_popup_container",
         "widgets": [
           {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "select_enum_item_popup_item"
+            },
+            "action": "reset",
+            "left": 10,
+            "top": 10,
+            "width": 155,
+            "height": 80,
+            "name": "Default (*RST)",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "select_enum_item_popup_item",
+                  "font": "Oswald24",
+                  "alignHorizontal": "center",
+                  "alignVertical": "center",
+                  "padding": "4 0 0 0"
+                },
+                "data": "",
+                "left": 0,
+                "top": 0,
+                "width": 155,
+                "height": 50,
+                "text": "\\u00b8"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "select_enum_item_popup_item",
+                  "font": "Oswald14",
+                  "alignHorizontal": "center"
+                },
+                "data": "",
+                "left": 0,
+                "top": 50,
+                "width": 155,
+                "height": 30,
+                "text": "Default (*RST)"
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "select_enum_item_popup_item"
+            },
+            "action": "turn_display_off",
+            "left": 175,
+            "top": 10,
+            "width": 155,
+            "height": 80,
+            "name": "Display off",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "select_enum_item_popup_item",
+                  "font": "Oswald24",
+                  "alignHorizontal": "center",
+                  "alignVertical": "center",
+                  "padding": "4 0 0 0"
+                },
+                "data": "",
+                "left": 0,
+                "top": 0,
+                "width": 155,
+                "height": 50,
+                "text": "\\u00b9"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "select_enum_item_popup_item",
+                  "font": "Oswald14",
+                  "alignHorizontal": "center"
+                },
+                "data": "",
+                "left": 0,
+                "top": 50,
+                "width": 155,
+                "height": 30,
+                "text": "Display off"
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "select_enum_item_popup_item"
+            },
+            "action": "stand_by",
+            "left": 10,
+            "top": 112,
+            "width": 100,
+            "height": 80,
+            "name": "Standby",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "select_enum_item_popup_item",
+                  "font": "Oswald24",
+                  "alignHorizontal": "center",
+                  "alignVertical": "center",
+                  "padding": "4 0 0 0"
+                },
+                "data": "",
+                "left": 0,
+                "top": 0,
+                "width": 100,
+                "height": 50,
+                "text": "\\u00b7"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "select_enum_item_popup_item",
+                  "font": "Oswald14",
+                  "alignHorizontal": "center"
+                },
+                "data": "",
+                "left": 0,
+                "top": 50,
+                "width": 100,
+                "height": 30,
+                "text": "Standby"
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "select_enum_item_popup_item"
+            },
+            "action": "restart",
+            "left": 120,
+            "top": 112,
+            "width": 100,
+            "height": 80,
+            "name": "Restart",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "select_enum_item_popup_item",
+                  "font": "Oswald24",
+                  "alignHorizontal": "center",
+                  "alignVertical": "center",
+                  "padding": "4 0 0 0"
+                },
+                "data": "",
+                "left": 0,
+                "top": 0,
+                "width": 100,
+                "height": 50,
+                "text": "\\u00b6"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "select_enum_item_popup_item",
+                  "font": "Oswald14",
+                  "alignHorizontal": "center"
+                },
+                "data": "",
+                "left": 0,
+                "top": 50,
+                "width": 100,
+                "height": 30,
+                "text": "Restart"
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "select_enum_item_popup_item"
+            },
+            "action": "shutdown",
+            "left": 230,
+            "top": 112,
+            "width": 100,
+            "height": 80,
+            "name": "Shutdown",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "select_enum_item_popup_item",
+                  "font": "Oswald24",
+                  "alignHorizontal": "center",
+                  "alignVertical": "center",
+                  "padding": "4 0 0 0"
+                },
+                "data": "",
+                "left": 0,
+                "top": 0,
+                "width": 100,
+                "height": 50,
+                "text": "\\u00b5"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "select_enum_item_popup_item",
+                  "font": "Oswald14",
+                  "alignHorizontal": "center"
+                },
+                "data": "",
+                "left": 0,
+                "top": 50,
+                "width": 100,
+                "height": 30,
+                "text": "Shutdown"
+              }
+            ]
+          }
+        ],
+        "closePageIfTouchedOutside": true,
+        "left": 70,
+        "top": 35,
+        "width": 340,
+        "height": 202
+      },
+      {
+        "name": "stand_by_menu_old",
+        "description": "Standby menu",
+        "style": "select_enum_item_popup_container",
+        "widgets": [
+          {
             "type": "Text",
             "style": {
               "inheritFrom": "select_enum_item_popup_item"
@@ -49868,6 +50100,96 @@
               "size": 28,
               "encoding": 937
             }
+          },
+          {
+            "encoding": 181,
+            "x": 0,
+            "y": -5,
+            "width": 39,
+            "height": 39,
+            "dx": 39,
+            "glyphBitmap": {
+              "width": 39,
+              "height": 39,
+              "pixelArray": "000000000000000000000000000000000026c0f7b51800000000000000000000000000000000000000000000000000000000000000000000c4ffffffa500000000000000000000000000000000000000000000000000000000000000000000feffffffde00000000000000000000000000000000000000000000000000000000000000000000ffffffffe000000000000000000000000000000000000000000000000313000000000000000000ffffffffe00000000000000000001403000000000000000000000024daffb70f00000000000000ffffffffe00000000000000016c1ffdf280000000000000000001ce1ffffff8500000000000000ffffffffe00000000000000096ffffffdf180000000000000008ceffffffffb300000000000000ffffffffe000000000000000c3ffffffffc70600000000000094ffffffffff8600000000000000ffffffffe0000000000000008effffffffff8b00000000003affffffffffd31100000000000000ffffffffe00000000000000011d2fffffffffd3200000001c9ffffffffea1f0000000000000000ffffffffe000000000000000001eeaffffffffc100000048ffffffffff4f000000000000000000ffffffffe00000000000000000004fffffffffff3f0000b5ffffffffb300000000000000000000ffffffffe000000000000000000000b6ffffffffad0012fcffffffff3000000000000000000000ffffffffe00000000000000000000033fffffffffa0f58ffffffffc50000000000000000000000ffffffffe00000000000000000000000caffffffff5395ffffffff730000000000000000000000ffffffffe0000000000000000000000076ffffffff92c3ffffffff340000000000000000000000ffffffffe0000000000000000000000036ffffffffc1e2ffffffff080000000000000000000000f0ffffffd0000000000000000000000009ffffffffe0f8ffffffed00000000000000000000000083ffffff63000000000000000000000000edfffffff7ffffffffe2000000000000000000000000014b7f3d00000000000000000000000000e2fffffffff9ffffffeb0000000000000000000000000000000000000000000000000000000000ecfffffff8e1ffffffff0a0000000000000000000000000000000000000000000000000000000bffffffffe0c0ffffffff3000000000000000000000000000000000000000000000000000000032ffffffffc298ffffffff7100000000000000000000000000000000000000000000000000000074ffffffff9056ffffffffc1000000000000000000000000000000000000000000000000000000c4ffffffff5614feffffffff2c000000000000000000000000000000000000000000000000002efffffffffa0e00b4ffffffffa600000000000000000000000000000000000000000000000000aaffffffffb0000049ffffffffff41000000000000000000000000000000000000000000000044ffffffffff46000002d3ffffffffe61700000000000000000000000000000000000000000018e8ffffffffc60100000046ffffffffffc80e000000000000000000000000000000000000000fc8ffffffffff3d0000000000a0ffffffffffc817000000000000000000000000000000000017c8ffffffffff990000000000000bd4ffffffffffe54000000000000000000000000000000040e6ffffffffffd70e0000000000000026eaffffffffffffa429000000000000000000000029a4ffffffffffffee250000000000000000002beaffffffffffffffbf6f2d08000000082d6ebeffffffffffffffee34000000000000000000000027d4ffffffffffffffffffffe8dfe8ffffffffffffffffffffd826000000000000000000000000000ba0ffffffffffffffffffffffffffffffffffffffffff9c0e0000000000000000000000000000000047d3ffffffffffffffffffffffffffffffffffcb41000000000000000000000000000000000000000249b3fefffffffffffffffffffffffcb64c010000000000000000000000000000000000000000000000145597bfdff8fef8e0c392591100000000000000000000000000"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 28,
+              "encoding": 61725
+            }
+          },
+          {
+            "encoding": 182,
+            "x": 0,
+            "y": -6,
+            "width": 39,
+            "height": 39,
+            "dx": 39,
+            "glyphBitmap": {
+              "width": 39,
+              "height": 39,
+              "pixelArray": "ccbd0b000000000000000000000b4e8dbdddf4fbf4dcbe8c510b00000000000000000000000000ffffbe0b0000000000000037a6f7fffffffffffffffffffffff7a93b0000000000000000000000ffffffbe0b000000002cb7ffffffffffffffffffffffffffffffffffbb31000000000000000000feffffffbe0b000483fbfffffffffffffffffffffffffffffffffffffffd890800000000000000fdffffffffbe21c3fffffffffffffffffffff0e7f0ffffffffffffffffffffcb1b000000000000fcfffffffffffcffffffffffffffd0743e110000000e3577c8ffffffffffffffe5280000000000fbffffffffffffffffffffffbb33000000000000000000000033afffffffffffffe51d00000000faffffffffffffffffffeb570100000000000000000000000000004aebffffffffffcd09000000f9fffffffffffffffffd2d00000000000000000000000000000000001bcdffffffffff8e000000f8ffffffffffffffffffc70e000000000000000000000000000000000011cdfffffffffe360000f7ffffffffffffffffffffc70e00000000000000000000000000000000001beaffffffffc00100f6ffffffffffffffffffffffc70e000000000000000000000000000000000049ffffffffff4000f5ffffffffffffffffffffffffc70e0000000000000000000000000000000000adffffffffac00d7ffffffffffffffffffffffffff99000000000000000000000000000000000031fffffffff80d3ea4a4a4a4a4a4a4a4a4a4a4a4a443000000000000000000000000000000000000c6ffffffff5400000000000000000000000000000000000000000000000000000000000000000075ffffffff8f00000000000000000000000000000000000000000000000000000000000000000033ffffffffc10000000000000000000000000000000000000000000000000000000000000000000cffffffffdf00000000000000000000000000000000000000000000000000000000000000000000edfffffff700000000000000000000000000000000000000000000000000000000000000000000e3ffffffff00000000000000000000000000000000000000000000000000000000000000000000ecfffffff80000000000000000000000000000000000000000000000000000000000000000000bffffffffe000000000000000000000000000000000000000000000000000000000000000000032ffffffffc200000000000000000000000000000000000000000000000000000000000000000074ffffffff90000000000000000000000000000000000000000000000000000000000000000000c4ffffffff5600000000000000000000000000000000000000000000000000000000000000002efffffffffa0e0000000000000000000000000000000000000000000000000000000000000000aaffffffffb0000000000000000000000000000000000000000000000000000000000000000044ffffffffff460000000000000000020e00000000000000000000000000000000000000000018e8ffffffffc6010000000000000010b2cb0f000000000000000000000000000000000000000fc8ffffffffff3d000000000000002ddbffffcb18000000000000000000000000000000000017c8ffffffffff99000000000000004cf5ffffffffe54400000000000000000000000000000040e6ffffffffffd70e0000000000000021e7ffffffffffffa727000000000000000000000029a4ffffffffffffee2500000000000000000027e6ffffffffffffffc16c2e05000000082d6ebeffffffffffffffee34000000000000000000000021d0fffffffffffffffffffee8dfe9ffffffffffffffffffffd826000000000000000000000000000a99ffffffffffffffffffffffffffffffffffffffffff9c0e000000000000000000000000000000003ccfffffffffffffffffffffffffffffffffffcb4100000000000000000000000000000000000000024cb3fafffffffffffffffffffffffcb64c010000000000000000000000000000000000000000000000125992c3dff8fef8e0c392591100000000000000000000000000"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 28,
+              "encoding": 62250
+            }
+          },
+          {
+            "encoding": 183,
+            "x": 0,
+            "y": -6,
+            "width": 39,
+            "height": 39,
+            "dx": 39,
+            "glyphBitmap": {
+              "width": 39,
+              "height": 39,
+              "pixelArray": "00000000000000000000000000000000000000000000000052f3fcfcfcfcfcfcfcfcfcfcfcfc950000000000000000000000000000000000000000000000008dffffffffffffffffffffffffffea0000000000000000000000000000000000000000000000000f6b747474747474747474e1ffff5e0000000000000000000000000000000000000000000000000000000000000000000055ffffa6010000000000000000000000000000000000000000000000000000000000000000001eefffdf0f00000000000000000000000000000000000000000000000000000000000000000003c1fffd3b000000000000000000000000000000000000000000000000000000000000000000007bffff7f0000000000000000000000000000000000000000000000000000000000000000000037fcffc4040000000000000000000000000000000000000000000000000000000000000000000dddfff12000000000000000000000000000000000000000000000000000000000000000000000a0ffff580000000000000000000000000000000000000000000000000000000000000000000058ffffa0000000000000000000000000000000000000000000000000000000000000000000001ff0ffdc0d00000000000000000000000000000000000000000000000000000000000000000004c4fffb36000000000000000000000000000000000000000000000000000000000000000000007effff790000000000000000000000000000000000000000000000000000000000000000000039fcffc0030000000000000000000000000000000000000000000000000000000000000000000edeffee1d00000000000000000000000000000000000000000000000000000000000000000000a3ffff530000000000000000000000000000000000000009cefcfcfcfcfcfcfcfcfcfc96000057fffffffcfcfcfcfcfcfcfcfcfca70000000000000000001effffffffffffffffffffffe800008dffffffffffffffffffffffffffed000000000000000000004774747474747475e5fffe4c00000f6b74747474747474747474747432000000000000000000000000000000000073ffff75000000000000000000000000000000000000000000000000000000000000000000004afeffa1010000000000000000000000000000000000000000000000000000000000000000002af2ffc60700000000000000000000000000000000000000000000000000000000000000000013ddffe11700000000000000000000000000000000000000000000000000000000000000000005bffff52f0000000000000000000000000000000000000000000000000000000000000000000198ffff51000000000000000000000000000000000000000000000000000000000000000000006bffff7a0000000000000000000000000000000000000000000000000000000000000000000045fcffa50100000000000000000000000000000000000000000000000000000000000000000026efffc909000000000000000000000000000000000000000000000000a7fcfcfcfcfcd10f0008d9fffffefcfcfcfcfcfcfca70000000000000000000000000000000000edffffffffffff3d001fffffffffffffffffffffffed0000000000000000000000000000000000327474b2ffffc2010000487474747474747474747432000000000000000000000000000000000000000be1fffa29000000000000000000000000000000000000000000000000000000000000000000008bffff82000000000000000000000000000000000000000000000000000000000000000000002ffcffda0800000000000000000000000000000000000000000000000000000000000000000003c8ffff42000000000000000000000000000000000000000000000000000000000000000000006bffffdd6c6c4d0100000000000000000000000000000000000000000000000000000000000000efffffffffffff3b00000000000000000000000000000000000000000000000000000000000000aaffffffffffe21b00000000000000000000000000000000000000000000000000000000000000"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 28,
+              "encoding": 63042
+            }
+          },
+          {
+            "encoding": 184,
+            "x": 0,
+            "y": -6,
+            "width": 39,
+            "height": 39,
+            "dx": 39,
+            "glyphBitmap": {
+              "width": 39,
+              "height": 39,
+              "pixelArray": "000000000000000000000000000000000026c1f6b11500000000000000000000000000000000000000000000000000000000000000000000c4ffffffa200000000000000000000000000000000000000000000000000000000000000000000feffffffde00000000000000000000000000000000000000000000000000000000000000000000ffffffffe00000000000000000000000000000000000000000000000040c000000000000000000ffffffffe00000000000000000000e02000000000000000000000056e9ffb21000000000000000ffffffffe0000000000000001dc5ffdb380000000000000000000ff5ffffffcb12000000000000ffffffffe00000000000001eddffffffd901000000000000000032ffffffffffce130000000000f9ffffffda000000000020dfffffffffff0a000000000000000005e1ffffffffffd11500000000a5ffffff8a0000000020e0ffffffffffbe000000000000000000002debffffffffffc8010000000c86be7c0700000006dcffffffffffd91900000000000000000000002eebffffffffff2b000000000000000000000047ffffffffffda1a000000000000000000000000002eebfffffffd1a000000000000000000000033ffffffffdb1b0000000000000000000000000000002ee5ffff8600000000000000000000000001a0ffffd61c00000000000000000000000000000000000843240000000000000000000000000000002c3e0400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019a3dbdcdcdcdcd57b03000000000000000000000000000000000000000581d5dcdcdcdcdba318b7ffffffffffffffff6d0000000000000000000000000000000000000075ffffffffffffffffb6fbffffffffffffffffb900000000000000000000000000000000000000bafffffffffffffffffac9ffffffffffffffff870000000000000000000000000000000000000087ffffffffffffffffc92ccbfffffffffffca70d000000000000000000000000000000000000000ea8fcffffffffffcb2c00000304040404020000000000000000000000000000000000000000000000020404040403000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004371a000000000000000000000000000000213201000000000000000000000000000000000024dbfffd780000000000000000000000000091ffffca1500000000000000000000000000000024e4fffffffb1600000000000000000000002dffffffffd1130000000000000000000000000023e3ffffffffff2f00000000000000000000004affffffffffce11000000000000000000000021e2ffffffffffd502000000097db671040000000ae6ffffffffffcb1000000000000000000003d6ffffffffffdf20000000009fffffff81000000002eebffffffffffb00000000000000000002fffffffffffde1f0000000000f8ffffffd900000000002eebffffffffff09000000000000000014faffffffdd1e000000000000ffffffffe00000000000002eebffffffe20200000000000000000070f9ffd01d00000000000000ffffffffe0000000000000002de0fff14d0000000000000000000000132a010000000000000000ffffffffe00000000000000000042e0b0000000000000000000000000000000000000000000000ffffffffe000000000000000000000000000000000000000000000000000000000000000000000ffffffffde00000000000000000000000000000000000000000000000000000000000000000000c9ffffffa9000000000000000000000000000000000000000000000000000000000000000000002cc8fbba1c0000000000000000000000000000000000"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 28,
+              "encoding": 61727
+            }
+          },
+          {
+            "encoding": 185,
+            "x": 0,
+            "y": -4,
+            "width": 39,
+            "height": 30,
+            "dx": 39,
+            "glyphBitmap": {
+              "width": 39,
+              "height": 30,
+              "pixelArray": "00015bc7f5fcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcf5c75a0100019dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff99015fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5dccffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffcbfafffffffffffce5e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e6fcfffffffffffaffffffffffb0160000000000000000000000000000000000000000000000000018b5fffffffffffffffffffa1400000000000000000000000000000000000000000000000000000017faffffffffffffffffe10000000000000000000000000000000f759c9c9c9c9c9c9c9a60030000e2ffffffffffffffffe0000000000000000000000000000001c3ffffffffffffffffffff8e0000e0ffffffffffffffffe0000000000000000000000000000024fffffffffffffffffffffff40000e0ffffffffffffffffe0000000000000000000000000000030ffffffffffffffffffffffff0000e0ffffffffffffffffe0000000000000000000000000000030ffffffffffffffffffffffff0000e0ffffffffffffffffe0000000000000000000000000000030ffffffffffffffffffffffff0000e0ffffffffffffffffe0000000000000000000000000000030ffffffffffffffffffffffff0000e0ffffffffffffffffe0000000000000000000000000000030ffffffffffffffffffffffff0000e0ffffffffffffffffe0000000000000000000000000000030ffffffffffffffffffffffff0000e0ffffffffffffffffe0000000000000000000000000000030ffffffffffffffffffffffff0000e0ffffffffffffffffe0000000000000000000000000000030ffffffffffffffffffffffff0000e0ffffffffffffffffe0000000000000000000000000000030ffffffffffffffffffffffff0000e0ffffffffffffffffe000000000000000000000000000002ffffffffffffffffffffffffe0000e0ffffffffffffffffe0000000000000000000000000000009eeffffffffffffffffffffc30000e0ffffffffffffffffe100000000000000000000000000000047dbffffffffffffffffc6250000e1fffffffffffffffffa1400000000000000000000000000000000040404040404040300000016faffffffffffffffffffad130000000000000000000000000000000000000000000000000015b3fffffffffffbfffffffffff9dedcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdefafffffffffffbceffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffcd65ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff6202a7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa401000263cefcfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffcce630100000000000204040404040404040404040404040404040404040404040404040404040200000000"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 28,
+              "encoding": 62253
+            }
           }
         ]
       },
@@ -60994,61 +61316,6 @@
               "type": [
                 {
                   "type": "nr1"
-                }
-              ]
-            }
-          },
-          {
-            "name": "MEASure[:SCALar]:TEMPerature:SENSor:BIAS",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
-            "parameters": [
-              {
-                "name": "enable",
-                "type": [
-                  {
-                    "type": "boolean"
-                  }
-                ],
-                "isOptional": false
-              },
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "numeric"
-                }
-              ]
-            }
-          },
-          {
-            "name": "MEASure[:SCALar]:TEMPerature:SENSor:BIAS?",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
-            "parameters": [
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "boolean"
                 }
               ]
             }
