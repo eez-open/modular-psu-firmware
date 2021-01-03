@@ -294,10 +294,6 @@ void action_show_sys_info() {
     pushPage(PAGE_ID_SYS_INFO);
 }
 
-void action_show_main_help_page() {
-    showPage(PAGE_ID_MAIN_HELP);
-}
-
 void action_show_edit_mode_step_help() {
     pushPage(PAGE_ID_EDIT_MODE_STEP_HELP);
 }

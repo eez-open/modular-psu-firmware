@@ -69,7 +69,7 @@ static bool g_takeScreenshot;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define DMA2D_WAIT while (HAL_DMA2D_PollForTransfer(&hdma2d, 1000) != HAL_OK)
+#define DMA2D_WAIT HAL_DMA2D_PollForTransfer(&hdma2d, HAL_MAX_DELAY)
 
 uint32_t vramOffset(uint16_t *vram, int x, int y) {
     return (uint32_t)(vram + y * DISPLAY_WIDTH + x);
@@ -370,6 +370,14 @@ void setBufferPointer(void *buffer) {
     g_buffer = (uint16_t *)buffer;
 }
 
+static void setAddress(void *buffer) {
+    // Configure the color frame buffer start address
+	auto layer = (LTDC_Layer_TypeDef *)((uint32_t)hltdc.Instance + 0x84U);
+	layer->CFBAR = (uint32_t)buffer;
+    // Set the Immediate Reload type
+	hltdc.Instance->SRCR = LTDC_SRCR_IMR;
+}
+
 void turnOn() {
     if (g_displayState != ON && g_displayState != TURNING_ON) {
         __HAL_RCC_DMA2D_CLK_ENABLE();
@@ -390,7 +398,7 @@ void turnOn() {
         fillRect(g_bufferNew, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
 
         // set video RAM address
-        HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
+        setAddress(g_buffer);
 
         // backlight on, minimal brightness
         HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
@@ -434,10 +442,10 @@ void animate() {
 
 		// wait for VSYNC
 		while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
-			osDelay(1);
+			osDelay(0);
 		}
 
-		HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_animationBuffer, 0);
+		setAddress(g_animationBuffer);
 	} else {
 		g_animationState.enabled = false;
 	}
@@ -446,10 +454,10 @@ void animate() {
 void swapBuffers() {
     // wait for VSYNC
     while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
-    	osDelay(1);
+    	osDelay(0);
     }
 
-    HAL_LTDC_SetAddress(&hltdc, (uint32_t)g_buffer, 0);
+    setAddress(g_buffer);
 
     auto temp = g_bufferNew;
     g_bufferNew = g_bufferOld;

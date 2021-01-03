@@ -166,19 +166,9 @@ void oneIter() {
     eventHandling();
     stateManagmentHook();
 
-    bool wasOn = mcu::display::isOn();
-    if (wasOn) {
-        mcu::display::beginBuffersDrawing();
-    }
-
     if (mcu::display::isOn()) {
-        if (!wasOn) {
-            mcu::display::beginBuffersDrawing();
-        }
+        mcu::display::beginBuffersDrawing();
         updateScreen();
-    }
-
-    if (wasOn || mcu::display::isOn()) {
         mcu::display::endBuffersDrawing();
     }
 }

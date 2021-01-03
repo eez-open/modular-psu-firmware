@@ -168,6 +168,7 @@ struct DeviceConfiguration {
     unsigned maxSubchannelIndex : 1; // 
     unsigned channelsViewModeInMax : 3;
     unsigned isInhibitedByUser : 1;
+    unsigned reservedView : 5;
 
     // block 7
     UserSwitchAction userSwitchAction;

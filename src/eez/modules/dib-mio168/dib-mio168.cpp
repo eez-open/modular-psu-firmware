@@ -1149,8 +1149,8 @@ public:
         if (!synchronized) {
             // give some time for MIO168 module to boot
         	auto t = millis();
-        	if (t < 1600) {
-        		osDelay(1600 - t);
+        	if (t < 1700) {
+        		osDelay(1700 - t);
         	}
 
 			executeCommand(&getInfo_command);

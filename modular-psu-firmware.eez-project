@@ -2522,9 +2522,6 @@
       "name": "show_sys_info"
     },
     {
-      "name": "show_main_help_page"
-    },
-    {
       "name": "show_edit_mode_step_help"
     },
     {
@@ -5679,61 +5676,6 @@
         "width": 480,
         "height": 272,
         "dataContextOverrides": "{\n    \"channels_is_max_view\": 0\n}"
-      },
-      {
-        "name": "main_help",
-        "description": "Main menu help page",
-        "style": "default",
-        "widgets": [
-          {
-            "type": "MultilineText",
-            "style": {
-              "inheritFrom": "edit_value_S_left"
-            },
-            "left": 8,
-            "top": 19,
-            "width": 464,
-            "height": 154,
-            "text": "TODO: add new text here!"
-          },
-          {
-            "type": "MultilineText",
-            "style": {
-              "inheritFrom": "edit_value_S_left"
-            },
-            "left": 8,
-            "top": 173,
-            "width": 464,
-            "height": 51,
-            "text": "For more information please visit: www.envox.hr/eez or github.com/eez-open"
-          },
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "bottom_button_background"
-            },
-            "left": 0,
-            "top": 236,
-            "width": 432,
-            "height": 36
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "bottom_button"
-            },
-            "action": "show_main_page",
-            "left": 432,
-            "top": 236,
-            "width": 48,
-            "height": 36,
-            "text": "X"
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 480,
-        "height": 272
       },
       {
         "name": "edit_mode_keypad",
@@ -28966,98 +28908,6 @@
         "height": 202
       },
       {
-        "name": "stand_by_menu_old",
-        "description": "Standby menu",
-        "style": "select_enum_item_popup_container",
-        "widgets": [
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "select_enum_item_popup_item"
-            },
-            "action": "reset",
-            "left": 20,
-            "top": 10,
-            "width": 150,
-            "height": 32,
-            "text": "Default (*RST)"
-          },
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "select_enum_item_popup_item"
-            },
-            "left": 20,
-            "top": 48,
-            "width": 150,
-            "height": 2
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "select_enum_item_popup_item"
-            },
-            "action": "stand_by",
-            "left": 20,
-            "top": 56,
-            "width": 150,
-            "height": 32,
-            "text": "Standby"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "select_enum_item_popup_item"
-            },
-            "action": "restart",
-            "left": 20,
-            "top": 88,
-            "width": 150,
-            "height": 32,
-            "text": "Restart"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "select_enum_item_popup_item"
-            },
-            "action": "shutdown",
-            "left": 20,
-            "top": 120,
-            "width": 150,
-            "height": 32,
-            "text": "Shutdown"
-          },
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "select_enum_item_popup_item"
-            },
-            "left": 20,
-            "top": 158,
-            "width": 150,
-            "height": 2
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "select_enum_item_popup_item"
-            },
-            "action": "turn_display_off",
-            "left": 20,
-            "top": 166,
-            "width": 150,
-            "height": 32,
-            "text": "Display off"
-          }
-        ],
-        "closePageIfTouchedOutside": true,
-        "left": 145,
-        "top": 32,
-        "width": 190,
-        "height": 208
-      },
-      {
         "name": "entering_standby",
         "description": "Information about entering standby mode",
         "style": "default",
@@ -34436,105 +34286,6 @@
         "top": 56,
         "width": 140,
         "height": 164
-      },
-      {
-        "name": "Storyboard",
-        "style": "bar_graph_I_default",
-        "widgets": [
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 5003,
-            "top": 4982,
-            "width": 480,
-            "height": 240,
-            "layout": "main"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 5155,
-            "top": 3983,
-            "width": 480,
-            "height": 272,
-            "layout": "sys_settings_screen_calibration"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 4411,
-            "top": 3983,
-            "width": 480,
-            "height": 272,
-            "layout": "sys_settings_display"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 5783,
-            "top": 3455,
-            "width": 480,
-            "height": 272,
-            "layout": "touch_calibration"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 5783,
-            "top": 3983,
-            "width": 480,
-            "height": 272,
-            "layout": "touch_calibration"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 6422,
-            "top": 3455,
-            "width": 480,
-            "height": 272,
-            "layout": "touch_calibration_yes_no"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 6422,
-            "top": 3983,
-            "width": 480,
-            "height": 272,
-            "layout": "touch_calibration_yes_no_cancel"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 5155,
-            "top": 3468,
-            "width": 480,
-            "height": 272,
-            "layout": "touch_calibration_intro"
-          }
-        ],
-        "usedIn": [],
-        "left": -10,
-        "top": -2,
-        "width": 10000,
-        "height": 10000
       },
       {
         "name": "file_manager_details_view",
