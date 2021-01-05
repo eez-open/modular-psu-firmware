@@ -443,4 +443,11 @@ bool isDefaultViewVertical();
 
 } // namespace gui
 } // namespace psu
+
+namespace gui {
+
+bool isSlotFullScreenView();
+
+} // namespace gui
+
 } // namespace eez

@@ -1211,6 +1211,40 @@ void editValue(int16_t dataId) {
     }
 }
 
+int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
+    auto testResult = g_slots[slotIndex]->getTestResult();
+    if (g_slots[slotIndex]->enabled && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
+        return g_slots[slotIndex]->getSlotView(slotViewType, slotIndex, cursor);
+    } else {
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
+            int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;        
+            return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
+            int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;        
+            return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR_2COL : PAGE_ID_SLOT_DEF_HORZ_ERROR_2COL;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
+            return PAGE_ID_SLOT_MAX_ERROR;
+        }
+
+        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+            return PAGE_ID_SLOT_MIN_ERROR;
+        }
+
+        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
+        return PAGE_ID_SLOT_MICRO_ERROR;
+    }
+}
+
+bool isSlotFullScreenView() {
+	int pageId = getSlotView(SLOT_VIEW_TYPE_MAX, persist_conf::getMaxSlotIndex(), 0);
+	auto page = getPageWidget(pageId);
+	return page->h == 240;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -1531,9 +1565,13 @@ void data_channel_other_value_mon(DataOperationEnum operation, Cursor cursor, Va
     }
 }
 
-void data_channels_is_max_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_slot_view_type(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = (int)persist_conf::isMaxView();
+        if (persist_conf::isMaxView()) {
+            value = isSlotFullScreenView() ? 2 : 1;
+        } else {
+            value = 0;
+        }
     }
 }
 
@@ -1570,34 +1608,6 @@ void data_slot_is_enabled(DataOperationEnum operation, Cursor cursor, Value &val
 void data_slot_is_dcpsupply_module(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_slots[hmi::g_selectedSlotIndex]->numPowerChannels > 0;
-    }
-}
-
-int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
-    auto testResult = g_slots[slotIndex]->getTestResult();
-    if (g_slots[slotIndex]->enabled && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
-        return g_slots[slotIndex]->getSlotView(slotViewType, slotIndex, cursor);
-    } else {
-        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;        
-            return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR : PAGE_ID_SLOT_DEF_HORZ_ERROR;
-        }
-
-        if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;        
-            return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR_2COL : PAGE_ID_SLOT_DEF_HORZ_ERROR_2COL;
-        }
-
-        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-            return PAGE_ID_SLOT_MAX_ERROR;
-        }
-
-        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-            return PAGE_ID_SLOT_MIN_ERROR;
-        }
-
-        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-        return PAGE_ID_SLOT_MICRO_ERROR;
     }
 }
 

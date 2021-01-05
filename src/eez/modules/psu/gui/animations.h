@@ -22,10 +22,11 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-void animateFromDefaultViewToMaxView();
-void animateFromMaxViewToDefaultView();
-void animateFromMinViewToMaxView(int maxSlotIndexBefore);
+void animateFromDefaultViewToMaxView(int iMax, bool isFullScreenView);
+void animateFromMaxViewToDefaultView(int iMax, bool isFullScreenView);
+void animateFromMinViewToMaxView(int maxSlotIndexBefore, bool isFullScreenView);
 void animateFromMicroViewToMaxView();
+
 void animateShowSysSettings();
 void animateHideSysSettings();
 void animateSettingsSlideLeft(bool noChannels);
@@ -34,6 +35,8 @@ void animateSlideUp();
 void animateSlideDown();
 void animateSlideLeft();
 void animateSlideRight();
+void animateSlideLeftWithoutHeader();
+void animateSlideRightWithoutHeader();
 void animateFadeOutFadeIn();
 void animateFadeOutFadeInWorkingArea();
 void animateFadeOutFadeIn(const Rect &rect);

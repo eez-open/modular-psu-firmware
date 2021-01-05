@@ -89,9 +89,6 @@ static const int AOUT_4_SUBCHANNEL_INDEX = 9;
 static const int PWM_1_SUBCHANNEL_INDEX = 10;
 static const int PWM_2_SUBCHANNEL_INDEX = 11;
 
-static float AIN_VOLTAGE_RESOLUTION = 0.0001f;
-static float AIN_CURRENT_RESOLUTION = 0.00001f;
-
 static float AOUT_DAC7760_ENCODER_STEP_VALUES[] = { 0.01f, 0.1f, 0.2f, 0.5f };
 static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES[] = { 0.001f, 0.005f, 0.01f, 0.05f };
 
@@ -522,8 +519,32 @@ struct AinChannel {
         *m_label = 0;
     }
 
+	Unit getUnit() {
+		return m_mode == MEASURE_MODE_VOLTAGE ? UNIT_VOLT : UNIT_AMPER;
+	}
+
+	int getNumFixedDecimals() {
+		if (m_mode == MEASURE_MODE_VOLTAGE) {
+            if (m_range == 0) {
+                return 4;
+            } else if (m_range == 1) {
+                return 3;
+            } else {
+                return 2;
+            }
+		} else {
+            if (m_range == 0) {
+                return 5;
+            } else if (m_range == 1) {
+                return 4;
+            } else {
+                return 3;
+            }
+        }
+	}
+
     float getResolution() {
-        return m_mode == MEASURE_MODE_VOLTAGE ? AIN_VOLTAGE_RESOLUTION : m_mode == MEASURE_MODE_CURRENT ? AIN_CURRENT_RESOLUTION : 1.0f;
+        return 1.0f / powf(10.0f, getNumFixedDecimals());
     }
 
     void addValue(float value) {
@@ -1106,6 +1127,8 @@ public:
     const CommandDef *nextDlogCommand = nullptr;
     DlogRecordingStart nextDlogRecordingStart;
     DlogRecordingStart dlogRecordingStart;
+
+    uint8_t selectedPage = 0;;
 
     Mio168Module() {
 		assert(sizeof(Request) == sizeof(Response));
@@ -1746,6 +1769,7 @@ public:
         AoutDac7760Channel::ProfileParameters aoutDac7760Channels[2];
         AoutDac7563Channel::ProfileParameters aoutDac7563Channels[2];
         PwmChannel::ProfileParameters pwmChannels[2];
+        uint8_t selectedPage;
     };
 
     void resetProfileToDefaults(uint8_t *buffer) override {
@@ -1767,6 +1791,8 @@ public:
         for (int i = 0; i < 2; i++) {
             pwmChannels[i].resetProfileToDefaults(parameters->pwmChannels[i]);
         }
+
+        selectedPage = 0;
     }
 
     void getProfileParameters(uint8_t *buffer) override {
@@ -1790,6 +1816,8 @@ public:
         for (int i = 0; i < 2; i++) {
             pwmChannels[i].getProfileParameters(parameters->pwmChannels[i]);
         }
+
+        parameters->selectedPage = selectedPage;
     }
     
     void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) override {
@@ -1814,6 +1842,8 @@ public:
         for (int i = 0; i < 2; i++) {
             pwmChannels[i].setProfileParameters(parameters->pwmChannels[i]);
         }
+
+        selectedPage = parameters->selectedPage;
     }
     
     bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) override {
@@ -1849,6 +1879,8 @@ public:
                 return false;
             }
         }
+
+        WRITE_PROPERTY("selectedPage", parameters->selectedPage);
 
         return true;
     }
@@ -1887,6 +1919,8 @@ public:
             }
         }
 
+        READ_PROPERTY("selectedPage", parameters->selectedPage);
+
         return false;
     }
 
@@ -1907,6 +1941,8 @@ public:
         for (int i = 0; i < 2; i++) {
             pwmChannels[i].resetConfiguration();
         }
+
+        selectedPage = 0;
     }
 
     size_t getChannelLabelMaxLength(int subchannelIndex) override {
@@ -3115,6 +3151,11 @@ public:
 			{ 0, 0 }
 		};
 
+		static EnumItem g_ain12CurrentRangeEnumDefinition[] = {
+			{ 0, "\xbd""48 mA" },
+			{ 1, 0 }
+		};
+
 		static EnumItem g_ain34VoltageRangeEnumDefinition[] = {
 			{ 0, "\xbd""2.4 V" },
 			{ 1, "\xbd""12 V" },
@@ -3129,7 +3170,8 @@ public:
 		};
 
 		if (g_selectedChannelIndex == AIN_1_SUBCHANNEL_INDEX || g_selectedChannelIndex == AIN_2_SUBCHANNEL_INDEX) {
-            return m_mode == MEASURE_MODE_VOLTAGE ? g_ain12VoltageRangeEnumDefinition : nullptr;
+            return m_mode == MEASURE_MODE_VOLTAGE ? g_ain12VoltageRangeEnumDefinition : 
+				m_mode == MEASURE_MODE_CURRENT ? g_ain12CurrentRangeEnumDefinition : nullptr;
         } else {
 			return m_mode == MEASURE_MODE_VOLTAGE ? g_ain34VoltageRangeEnumDefinition : 
 				m_mode == MEASURE_MODE_CURRENT ? g_ain34CurrentRangeEnumDefinition : nullptr;
@@ -3138,6 +3180,85 @@ public:
 
     uint8_t m_mode;
     uint8_t m_range;
+
+    static EnumItem *getModeRangeEnumDefinition(int slotIndex, int subchannelIndex) {
+		static EnumItem g_ain12ModeRangeEnumDefinition[] = {
+			{ 0, "\xbd""2.4 V" },
+			{ 1, "\xbd""48 V" },
+			{ 2, "\xbd""240 V" },
+            { 3, "\xbd""48 mA" },
+            { 4, "Open" },
+			{ 0, 0 }
+		};
+
+		static EnumItem g_ain34ModeRangeEnumDefinition[] = {
+			{ 0, "\xbd""2.4 V" },
+			{ 1, "\xbd""12 V" },
+			{ 2, "\xbd""24 mA" },
+            { 3, "\xbd""1.2 A" },
+            { 4, "\xbd""10 A" },
+            { 5, "Open" },
+			{ 0, 0 }
+		};
+
+		if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX || subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+            return g_ain12ModeRangeEnumDefinition;
+        } else {
+			return g_ain34ModeRangeEnumDefinition;
+        }
+    }
+
+    static uint8_t getModeRange(int slotIndex, int subchannelIndex) {
+        Mio168Module *module = (Mio168Module *)g_slots[slotIndex];
+        AinChannel &channel = module->ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+
+        if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX || subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+            if (channel.m_mode == MEASURE_MODE_VOLTAGE) {
+                return channel.m_range;
+            } else if (channel.m_mode == MEASURE_MODE_CURRENT) {
+                return 3;
+            } else {
+                return 4;
+            }
+        } else {
+            if (channel.m_mode == MEASURE_MODE_VOLTAGE) {
+                return channel.m_range;
+            } else if (channel.m_mode == MEASURE_MODE_CURRENT) {
+                return 2 + channel.m_range;
+            } else {
+                return 5;
+            }
+        }
+    }
+
+   static  void setModeRange(int slotIndex, int subchannelIndex, uint8_t modeRange) {
+        Mio168Module *module = (Mio168Module *)g_slots[slotIndex];
+        AinChannel &channel = module->ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+
+        if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX || subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+            if (modeRange < 3) {
+                channel.m_mode = MEASURE_MODE_VOLTAGE;
+                channel.m_range = modeRange;
+            } else if (modeRange < 4) {
+                channel.m_mode = MEASURE_MODE_CURRENT;
+                channel.m_range = 0;
+            } else {
+                channel.m_mode = MEASURE_MODE_OPEN;
+                channel.m_range = 0;
+            }
+        } else {
+            if (modeRange < 2) {
+                channel.m_mode = MEASURE_MODE_VOLTAGE;
+                channel.m_range = modeRange;
+            } else if (modeRange < 5) {
+                channel.m_mode = MEASURE_MODE_CURRENT;
+                channel.m_range = modeRange - 2;
+            } else {
+                channel.m_mode = MEASURE_MODE_OPEN;
+                channel.m_range = 0;
+            }
+        }
+    }
 
 private:
     uint8_t m_modeOrig;
@@ -3182,6 +3303,71 @@ public:
     uint8_t m_mode;
     uint8_t m_currentRange;
     uint8_t m_voltageRange;
+
+    static EnumItem *getModeRangeEnumDefinition(int slotIndex, int subchannelIndex) {
+		static EnumItem g_aoutMdeRangeEnumDefinition[] = {
+			{ 0, "0 V to 5 V" },
+			{ 1, "0 V to 10 V" },
+            { 2, "\xbd""5 V" },
+            { 3, "\xbd""10 V" },
+            { 4, "4 mA to 20 mA" },
+            { 5, "0 mA to 20 mA" },
+            { 6, "0 mA to 24 mA" },
+			{ 7, "OFF" },
+			{ 0, 0 }
+		};
+
+        return g_aoutMdeRangeEnumDefinition;
+    }
+
+    static EnumItem *getModeRangeShortEnumDefinition(int slotIndex, int subchannelIndex) {
+		static EnumItem g_aoutMdeRangeEnumDefinition[] = {
+			{ 0, "0-5 V" },
+			{ 1, "0-10 V" },
+            { 2, "\xbd""5 V" },
+            { 3, "\xbd""10 V" },
+            { 4, "4-20 mA" },
+            { 5, "0-20 mA" },
+            { 6, "0-24 mA" },
+			{ 7, "OFF" },
+			{ 0, 0 }
+		};
+
+        return g_aoutMdeRangeEnumDefinition;
+    }
+
+    static uint8_t getModeRange(int slotIndex, int subchannelIndex) {
+        Mio168Module *module = (Mio168Module *)g_slots[slotIndex];
+        AoutDac7760Channel &channel = module->aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+
+		if (channel.m_outputEnabled) {
+			if (channel.m_mode == MEASURE_MODE_VOLTAGE) {
+				return channel.m_voltageRange;
+			} else {
+				return channel.m_currentRange;
+			}
+		}
+		else {
+			return 7;
+		}
+    }
+
+   static  void setModeRange(int slotIndex, int subchannelIndex, uint8_t modeRange) {
+        Mio168Module *module = (Mio168Module *)g_slots[slotIndex];
+        AoutDac7760Channel &channel = module->aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+
+        if (modeRange < 4) {
+			channel.m_outputEnabled = true;
+            channel.m_mode = MEASURE_MODE_VOLTAGE;
+            channel.m_voltageRange = modeRange;
+        } else if (modeRange < 7) {
+			channel.m_outputEnabled = true;
+            channel.m_mode = MEASURE_MODE_CURRENT;
+            channel.m_currentRange = modeRange;
+        } else {
+			channel.m_outputEnabled = false;
+        }
+    }
 
 private:
     bool m_outputEnabledOrig;
@@ -3557,21 +3743,32 @@ void data_dib_mio168_ain_label_label(DataOperationEnum operation, Cursor cursor,
 }
 
 void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value &value) {
-    int slotIndex = cursor / 4;
-    int ainChannelIndex = cursor % 4;
-    if (operation == DATA_OPERATION_GET) {
-        auto mio168Module = (Mio168Module *)g_slots[slotIndex];
-        auto &channel = mio168Module->ainChannels[ainChannelIndex];
-        if (channel.m_mode == MEASURE_MODE_OPEN) {
-            value = "-";
-        } else {
-            value = MakeValue(roundPrec(channel.m_value, channel.getResolution()), channel.m_mode == MEASURE_MODE_VOLTAGE ? UNIT_VOLT : UNIT_AMPER);
-        }
-    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(slotIndex, AIN_1_SUBCHANNEL_INDEX + ainChannelIndex, DLOG_RESOURCE_TYPE_U)) {
-            value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
-        }
-    } 
+	int slotIndex = cursor / 4;
+	int ainChannelIndex = cursor % 4;
+	if (operation == DATA_OPERATION_GET) {
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+		auto &channel = mio168Module->ainChannels[ainChannelIndex];
+		if (channel.m_mode == MEASURE_MODE_OPEN) {
+			value = "-";
+		} else {
+			value = MakeValue(
+                channel.m_value,
+                channel.getUnit(),
+                FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(channel.getNumFixedDecimals())
+            );
+		}
+	} else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+		if (
+            !dlog_record::isIdle() &&
+            dlog_record::g_recording.parameters.isDlogItemEnabled(
+                slotIndex,
+                AIN_1_SUBCHANNEL_INDEX + ainChannelIndex,
+                DLOG_RESOURCE_TYPE_U
+            )
+        ) {
+			value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+		}
+	}
 }
 
 static EnumItem g_ainModeEnumDefinition[] = {
@@ -3605,6 +3802,12 @@ void data_dib_mio168_ain_range_is_available(DataOperationEnum operation, Cursor 
     }
 }
 
+void data_dib_mio168_ain_range_is_multiple_selection_available(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_ainConfigurationPage.getRangeEnumDefinition() && g_ainConfigurationPage.getRangeEnumDefinition()[1].menuLabel ? 1 : 0;
+    }
+}
+
 void data_dib_mio168_ain_range(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getWidgetLabel(g_ainConfigurationPage.getRangeEnumDefinition(), g_ainConfigurationPage.m_range);
@@ -3618,6 +3821,44 @@ void onSetAinRange(uint16_t value) {
 
 void action_dib_mio168_ain_select_range() {
     pushSelectFromEnumPage(g_ainConfigurationPage.getRangeEnumDefinition(), g_ainConfigurationPage.m_range, nullptr, onSetAinRange);
+}
+
+void data_dib_mio168_ain_mode_and_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+        int slotIndex = cursor / 4;
+        int subchannelIndex = AIN_1_SUBCHANNEL_INDEX + cursor % 4;
+		value = getWidgetLabel(
+            AinConfigurationPage::getModeRangeEnumDefinition(slotIndex, subchannelIndex), 
+            AinConfigurationPage::getModeRange(slotIndex, subchannelIndex)
+        );
+	}
+}
+
+void onSetAinModeRange(uint16_t value) {
+    popPage();
+    AinConfigurationPage::setModeRange(
+        hmi::g_selectedSlotIndex,
+        AinConfigurationPage::g_selectedChannelIndex,
+        (uint8_t)value\
+    );
+}
+
+void action_dib_mio168_ain_select_mode_and_range() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    
+    int slotIndex = cursor / 4;
+    int subchannelIndex = AIN_1_SUBCHANNEL_INDEX + cursor % 4;
+
+    hmi::selectSlot(slotIndex);
+    AinConfigurationPage::g_selectedChannelIndex = subchannelIndex;
+
+    pushSelectFromEnumPage(
+        AinConfigurationPage::getModeRangeEnumDefinition(slotIndex, subchannelIndex),
+        AinConfigurationPage::getModeRange(slotIndex, subchannelIndex),
+        nullptr, 
+        onSetAinModeRange,
+		subchannelIndex == AIN_3_SUBCHANNEL_INDEX || subchannelIndex == AIN_4_SUBCHANNEL_INDEX
+    );
 }
 
 void action_dib_mio168_ain_show_configuration() {
@@ -3835,6 +4076,43 @@ void action_dib_mio168_aout_toggle_output_enabled() {
     g_aoutDac7760ConfigurationPage.m_outputEnabled = !g_aoutDac7760ConfigurationPage.m_outputEnabled;
 }
 
+void data_dib_mio168_aout_mode_and_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+        int slotIndex = cursor / 4;
+        int subchannelIndex = AOUT_1_SUBCHANNEL_INDEX + cursor % 4;
+		value = getWidgetLabel(
+            AoutDac7760ConfigurationPage::getModeRangeShortEnumDefinition(slotIndex, subchannelIndex), 
+            AoutDac7760ConfigurationPage::getModeRange(slotIndex, subchannelIndex)
+        );
+	}
+}
+
+void onSetAoutModeRange(uint16_t value) {
+    popPage();
+    AoutDac7760ConfigurationPage::setModeRange(
+        hmi::g_selectedSlotIndex,
+        AoutDac7760ConfigurationPage::g_selectedChannelIndex,
+        (uint8_t)value
+    );
+}
+
+void action_dib_mio168_aout_select_mode_and_range() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    
+    int slotIndex = cursor / 4;
+    int subchannelIndex = AOUT_1_SUBCHANNEL_INDEX + cursor % 4;
+
+    hmi::selectSlot(slotIndex);
+    AoutDac7760ConfigurationPage::g_selectedChannelIndex = subchannelIndex;
+
+    pushSelectFromEnumPage(
+        AoutDac7760ConfigurationPage::getModeRangeEnumDefinition(slotIndex, subchannelIndex),
+        AoutDac7760ConfigurationPage::getModeRange(slotIndex, subchannelIndex),
+        nullptr, 
+		onSetAoutModeRange
+    );
+}
+
 void action_dib_mio168_aout_show_configuration() {
     int cursor = getFoundWidgetAtDown().cursor;
     
@@ -4035,6 +4313,45 @@ void action_dib_mio168_show_calibration() {
 void action_dib_mio168_show_channel_labels() {
     hmi::selectSlot(getFoundWidgetAtDown().cursor);
     pushPage(PAGE_ID_DIB_MIO168_CHANNEL_LABELS);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void data_dib_mio168_pager_list(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_COUNT) {
+        value = 6;
+    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+        value = hmi::g_selectedSlotIndex * 6 + value.getInt();
+    }
+}
+
+void data_dib_mio168_pager_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		auto module = (Mio168Module *)g_slots[cursor / 6];
+		value = module->selectedPage == cursor % 6 ? 1 : 0;
+	}
+}
+
+void data_dib_mio168_pager_selected_page(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		auto module = (Mio168Module *)g_slots[cursor];
+		value = module->selectedPage;
+	}
+}
+
+void action_dib_mio168_pager_select_page() {
+	auto cursor = getFoundWidgetAtDown().cursor;
+	auto module = (Mio168Module *)g_slots[cursor / 6];
+    if (cursor % 6 != module->selectedPage) {
+        auto selectedPage = module->selectedPage;
+        module->selectedPage = cursor % 6;
+
+        if (module->selectedPage > selectedPage) {
+            animateSlideLeftWithoutHeader();
+        } else {
+            animateSlideRightWithoutHeader();
+        }
+    }
 }
 
 } // namespace gui

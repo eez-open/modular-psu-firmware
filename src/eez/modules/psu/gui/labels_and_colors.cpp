@@ -126,7 +126,7 @@ const char *LabelsAndColorsPage::getChannelLabelOrDefault(int slotIndex, int sub
 
 void LabelsAndColorsPage::setChannelLabel(int slotIndex, int subchannelIndex, const char *label) {
     auto labelMaxLength = g_slots[slotIndex]->getChannelLabelMaxLength(subchannelIndex);    
-    memcpy(getChannelLabelAndColor(slotIndex, subchannelIndex)->label, label, labelMaxLength);
+    memcpy(getChannelLabelAndColor(slotIndex, subchannelIndex)->label, label, labelMaxLength + 1);
 }
 
 bool LabelsAndColorsPage::isChannelLabelModified(int slotIndex, int subchannelIndex) {
@@ -164,7 +164,7 @@ void LabelsAndColorsPage::pageAlloc() {
                 auto labelMaxLength = g_slots[slotIndex]->getChannelLabelMaxLength(subchannelIndex);
 
                 channelLabelAndColors->label = (char *)(channelLabelAndColors + 1);
-                memcpy(channelLabelAndColors->label, g_slots[slotIndex]->getChannelLabel(subchannelIndex), labelMaxLength);
+                memcpy(channelLabelAndColors->label, g_slots[slotIndex]->getChannelLabel(subchannelIndex), labelMaxLength + 1);
                 channelLabelAndColors->color = g_slots[slotIndex]->getChannelColor(subchannelIndex);
 
                 ChannelLabelAndColor *next = (ChannelLabelAndColor *)((uint8_t *)(channelLabelAndColors + 1) + (((labelMaxLength + 1) + 3) / 4) * 4);

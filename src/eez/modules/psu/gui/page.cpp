@@ -479,13 +479,15 @@ void SelectFromEnumPage::findPagePosition() {
     const WidgetCursor &widgetCursorAtTouchDown = getFoundWidgetAtDown();
     if (widgetCursorAtTouchDown.widget) {
         x = widgetCursorAtTouchDown.x;
-        int right = appContext->rect.x + appContext->rect.w - 22;
+        int xMargin = MAX(MIN(22, (appContext->rect.w - width) / 2), 0);
+        int right = appContext->rect.x + appContext->rect.w - xMargin;
         if (x + width > right) {
             x = right - width;
         }
 
         y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.widget->h;
-        int bottom = appContext->rect.y + appContext->rect.h - 30;
+        int yMargin = MAX(MIN(30, (appContext->rect.h - height) / 2), 0);
+        int bottom = appContext->rect.y + appContext->rect.h - yMargin;
         if (y + height > bottom) {
             y = bottom - height;
         }

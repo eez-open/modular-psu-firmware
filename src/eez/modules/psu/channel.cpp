@@ -274,14 +274,16 @@ void Channel::Value::init(float set_, float step_, float limit_) {
 
 void Channel::Value::resetMonValues() {
     mon_adc = 0;
-    mon = 0;
+
     mon_last = 0;
-    mon_dac = 0;
-
-    mon_index = -1;
-    mon_dac_index = -1;
-
+    mon = 0;
+	monMovingAverage.reset();
     mon_measured = false;
+
+    mon_dac_last = 0;
+    mon_dac = 0;
+	monDacMovingAverage.reset();
+    mon_dac_measured = false;
 }
 
 void Channel::Value::addMonValue(float value, float prec) {
@@ -291,73 +293,39 @@ void Channel::Value::addMonValue(float value, float prec) {
     
     mon_last = roundPrec(value, prec);
 
-    if (mon_index == -1) {
-        mon_index = 0;
-        for (int i = 0; i < NUM_ADC_AVERAGING_VALUES; ++i) {
-            mon_arr[i] = value;
-        }
-        mon_total = NUM_ADC_AVERAGING_VALUES * value;
-        mon = mon_last;
-        mon_prev = mon_last;
-    } else {
-        mon_total -= mon_arr[mon_index];
-        mon_total += value;
-        mon_arr[mon_index] = value;
-        mon_index = (mon_index + 1) % NUM_ADC_AVERAGING_VALUES;
+    monMovingAverage(value);
 
-        if (io_pins::isInhibited()) {
-            mon = 0;
-            mon_prev = 0;
-        } else {
-#if defined(EEZ_PLATFORM_STM32)
-            float mon_next = mon_total / NUM_ADC_AVERAGING_VALUES;
-            if (fabs(mon_prev - mon_next) >= prec) {
-                mon = roundPrec(mon_next, prec);
-                mon_prev = mon_next;
+    if (io_pins::isInhibited()) {
+        mon = mon_prev = 0;
+		mon_measured = true;
+	} else {
+        if (mon_measured) {
+            float next = monMovingAverage;
+            if (fabs(mon_prev - next) >= prec) {
+                mon = roundPrec(next, prec);
+                mon_prev = next;
             }
-#endif
-            
-#if defined(EEZ_PLATFORM_SIMULATOR)
-            float mon_next = roundPrec(mon_total / NUM_ADC_AVERAGING_VALUES, prec);
-            mon = mon_next;
-            mon_prev = mon_next;
-#endif
-        }
+        } else {
+            mon = mon_prev = mon_last;            
+			mon_measured = true;
+		}
     }
-
-    mon_measured = true;
 }
 
 void Channel::Value::addMonDacValue(float value, float prec) {
     mon_dac_last = roundPrec(value, prec);
 
-    if (mon_dac_index == -1) {
-        mon_dac_index = 0;
-        for (int i = 0; i < NUM_ADC_AVERAGING_VALUES; ++i) {
-            mon_dac_arr[i] = value;
-        }
-        mon_dac_total = NUM_ADC_AVERAGING_VALUES * value;
-        mon_dac = mon_dac_last;
-        mon_dac_prev = mon_dac_last;
-    } else {
-        mon_dac_total -= mon_dac_arr[mon_dac_index];
-        mon_dac_total += value;
-        mon_dac_arr[mon_dac_index] = value;
-        mon_dac_index = (mon_dac_index + 1) % NUM_ADC_AVERAGING_VALUES;
+    monDacMovingAverage(value);
 
-#if defined(EEZ_PLATFORM_STM32)
-        float mon_dac_next = mon_dac_total / NUM_ADC_AVERAGING_VALUES;
-		if (fabs(mon_dac_prev - mon_dac_next) >= prec) {
-			mon_dac = roundPrec(mon_dac_next, prec);
-			mon_dac_prev = mon_dac_next;
-		}
-#endif
-        
-#if defined(EEZ_PLATFORM_SIMULATOR)
-        float mon_next = roundPrec(mon_total / NUM_ADC_AVERAGING_VALUES, prec);
-        mon = mon_next;
-        mon_prev = mon_next;
-#endif
+    if (mon_dac_measured) {
+        float next = monDacMovingAverage;
+        if (fabs(mon_dac_prev - next) >= prec) {
+            mon_dac = roundPrec(next, prec);
+            mon_dac_prev = next;
+        }
+    } else {
+        mon_dac = mon_dac_prev = mon_dac_last;            
+        mon_dac_measured = true;
     }
 }
 

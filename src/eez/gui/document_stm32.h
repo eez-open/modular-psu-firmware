@@ -21,10 +21,10 @@ enum DataEnum {
     DATA_ID_CHANNEL_I_EDIT = 19,
     DATA_ID_CHANNEL_P_MON = 20,
     DATA_ID_CHANNEL_OTHER_VALUE_MON = 21,
-    DATA_ID_CHANNELS_IS_MAX_VIEW = 22,
-    DATA_ID_CHANNELS_VIEW_MODE = 23,
-    DATA_ID_CHANNELS_VIEW_MODE_IN_DEFAULT = 24,
-    DATA_ID_CHANNELS_VIEW_MODE_IN_MAX = 25,
+    DATA_ID_CHANNELS_VIEW_MODE = 22,
+    DATA_ID_CHANNELS_VIEW_MODE_IN_DEFAULT = 23,
+    DATA_ID_CHANNELS_VIEW_MODE_IN_MAX = 24,
+    DATA_ID_SLOT_VIEW_TYPE = 25,
     DATA_ID_SLOT_MAX_CHANNEL_INDEX = 26,
     DATA_ID_SLOT_MAX_VIEW = 27,
     DATA_ID_SLOT_MIN1_CHANNEL_INDEX = 28,
@@ -448,56 +448,62 @@ enum DataEnum {
     DATA_ID_DIB_MIO168_AIN_MODE = 446,
     DATA_ID_DIB_MIO168_AIN_RANGE = 447,
     DATA_ID_DIB_MIO168_AIN_RANGE_IS_AVAILABLE = 448,
-    DATA_ID_DIB_MIO168_AOUT_CHANNELS = 449,
-    DATA_ID_DIB_MIO168_AOUT_LABEL = 450,
-    DATA_ID_DIB_MIO168_AOUT_LABEL_LABEL = 451,
-    DATA_ID_DIB_MIO168_AOUT_VALUE = 452,
-    DATA_ID_DIB_MIO168_AOUT_OUTPUT_ENABLED = 453,
-    DATA_ID_DIB_MIO168_AOUT_OUTPUT_MODE = 454,
-    DATA_ID_DIB_MIO168_AOUT_VOLTAGE_RANGE = 455,
-    DATA_ID_DIB_MIO168_AOUT_CURRENT_RANGE = 456,
-    DATA_ID_DIB_MIO168_AOUT_CHANNEL_HAS_SETTINGS = 457,
-    DATA_ID_DIB_MIO168_PWM_CHANNELS = 458,
-    DATA_ID_DIB_MIO168_PWM_LABEL = 459,
-    DATA_ID_DIB_MIO168_PWM_LABEL_LABEL = 460,
-    DATA_ID_DIB_MIO168_PWM_FREQ = 461,
-    DATA_ID_DIB_MIO168_PWM_DUTY = 462,
-    DATA_ID_DIB_MIO168_DIN_HAS_SPEED = 463,
-    DATA_ID_DIB_MIO168_AFE_VERSION = 464,
-    DATA_ID_DIB_SMX46_ROUTES = 465,
-    DATA_ID_DIB_SMX46_ROUTE_OPEN = 466,
-    DATA_ID_DIB_SMX46_X_LABELS = 467,
-    DATA_ID_DIB_SMX46_X_LABEL = 468,
-    DATA_ID_DIB_SMX46_Y_LABELS = 469,
-    DATA_ID_DIB_SMX46_Y_LABEL = 470,
-    DATA_ID_DIB_SMX46_DAC1 = 471,
-    DATA_ID_DIB_SMX46_DAC2 = 472,
-    DATA_ID_DIB_SMX46_RELAY_ON = 473,
-    DATA_ID_DIB_SMX46_SIGNAL_RELAY_CYCLES = 474,
-    DATA_ID_DIB_SMX46_POWER_RELAY_CYCLES = 475,
-    DATA_ID_DIB_SMX46_ANALOG_OUTPUTS = 476,
-    DATA_ID_DIB_SMX46_AO_LABEL = 477,
-    DATA_ID_DIB_SMX46_AO1_LABEL = 478,
-    DATA_ID_DIB_SMX46_AO2_LABEL = 479,
-    DATA_ID_DIB_DCM220_SLOT_DEF_2CH_VIEW = 480,
-    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_VIEW = 481,
-    DATA_ID_DIB_DCM220_SLOT_MIN_2CH_VIEW = 482,
-    DATA_ID_DIB_DCM220_SLOT_MICRO_2CH_VIEW = 483,
-    DATA_ID_DIB_DCM220_SLOT_2CH_CH1_INDEX = 484,
-    DATA_ID_DIB_DCM220_SLOT_2CH_CH2_INDEX = 485,
-    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_MIN_VIEW = 486,
-    DATA_ID_DIB_DCM224_PWM_FREQUENCY = 487,
-    DATA_ID_DIB_DCM224_PWM_DUTY = 488,
-    DATA_ID_DIB_DCM224_COUNTERPHASE_FREQUENCY = 489,
-    DATA_ID_DIB_DCM224_COUNTERPHASE_DITHERING = 490,
-    DATA_ID_DIB_DCM224_PWM_ENABLED = 491,
-    DATA_ID_DIB_DCM224_SLOT_DEF_2CH_VIEW = 492,
-    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_VIEW = 493,
-    DATA_ID_DIB_DCM224_SLOT_MIN_2CH_VIEW = 494,
-    DATA_ID_DIB_DCM224_SLOT_MICRO_2CH_VIEW = 495,
-    DATA_ID_DIB_DCM224_SLOT_2CH_CH1_INDEX = 496,
-    DATA_ID_DIB_DCM224_SLOT_2CH_CH2_INDEX = 497,
-    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_VIEW = 498
+    DATA_ID_DIB_MIO168_AIN_MODE_AND_RANGE = 449,
+    DATA_ID_DIB_MIO168_AOUT_CHANNELS = 450,
+    DATA_ID_DIB_MIO168_AOUT_LABEL = 451,
+    DATA_ID_DIB_MIO168_AOUT_LABEL_LABEL = 452,
+    DATA_ID_DIB_MIO168_AOUT_VALUE = 453,
+    DATA_ID_DIB_MIO168_AOUT_OUTPUT_ENABLED = 454,
+    DATA_ID_DIB_MIO168_AOUT_OUTPUT_MODE = 455,
+    DATA_ID_DIB_MIO168_AOUT_VOLTAGE_RANGE = 456,
+    DATA_ID_DIB_MIO168_AOUT_CURRENT_RANGE = 457,
+    DATA_ID_DIB_MIO168_AOUT_CHANNEL_HAS_SETTINGS = 458,
+    DATA_ID_DIB_MIO168_AOUT_MODE_AND_RANGE = 459,
+    DATA_ID_DIB_MIO168_PWM_CHANNELS = 460,
+    DATA_ID_DIB_MIO168_PWM_LABEL = 461,
+    DATA_ID_DIB_MIO168_PWM_LABEL_LABEL = 462,
+    DATA_ID_DIB_MIO168_PWM_FREQ = 463,
+    DATA_ID_DIB_MIO168_PWM_DUTY = 464,
+    DATA_ID_DIB_MIO168_DIN_HAS_SPEED = 465,
+    DATA_ID_DIB_MIO168_AFE_VERSION = 466,
+    DATA_ID_DIB_MIO168_PAGER_LIST = 467,
+    DATA_ID_DIB_MIO168_PAGER_IS_SELECTED = 468,
+    DATA_ID_DIB_MIO168_PAGER_SELECTED_PAGE = 469,
+    DATA_ID_DIB_MIO168_AIN_RANGE_IS_MULTIPLE_SELECTION_AVAILABLE = 470,
+    DATA_ID_DIB_SMX46_ROUTES = 471,
+    DATA_ID_DIB_SMX46_ROUTE_OPEN = 472,
+    DATA_ID_DIB_SMX46_X_LABELS = 473,
+    DATA_ID_DIB_SMX46_X_LABEL = 474,
+    DATA_ID_DIB_SMX46_Y_LABELS = 475,
+    DATA_ID_DIB_SMX46_Y_LABEL = 476,
+    DATA_ID_DIB_SMX46_DAC1 = 477,
+    DATA_ID_DIB_SMX46_DAC2 = 478,
+    DATA_ID_DIB_SMX46_RELAY_ON = 479,
+    DATA_ID_DIB_SMX46_SIGNAL_RELAY_CYCLES = 480,
+    DATA_ID_DIB_SMX46_POWER_RELAY_CYCLES = 481,
+    DATA_ID_DIB_SMX46_ANALOG_OUTPUTS = 482,
+    DATA_ID_DIB_SMX46_AO_LABEL = 483,
+    DATA_ID_DIB_SMX46_AO1_LABEL = 484,
+    DATA_ID_DIB_SMX46_AO2_LABEL = 485,
+    DATA_ID_DIB_DCM220_SLOT_DEF_2CH_VIEW = 486,
+    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_VIEW = 487,
+    DATA_ID_DIB_DCM220_SLOT_MIN_2CH_VIEW = 488,
+    DATA_ID_DIB_DCM220_SLOT_MICRO_2CH_VIEW = 489,
+    DATA_ID_DIB_DCM220_SLOT_2CH_CH1_INDEX = 490,
+    DATA_ID_DIB_DCM220_SLOT_2CH_CH2_INDEX = 491,
+    DATA_ID_DIB_DCM220_SLOT_MAX_2CH_MIN_VIEW = 492,
+    DATA_ID_DIB_DCM224_PWM_FREQUENCY = 493,
+    DATA_ID_DIB_DCM224_PWM_DUTY = 494,
+    DATA_ID_DIB_DCM224_COUNTERPHASE_FREQUENCY = 495,
+    DATA_ID_DIB_DCM224_COUNTERPHASE_DITHERING = 496,
+    DATA_ID_DIB_DCM224_PWM_ENABLED = 497,
+    DATA_ID_DIB_DCM224_SLOT_DEF_2CH_VIEW = 498,
+    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_VIEW = 499,
+    DATA_ID_DIB_DCM224_SLOT_MIN_2CH_VIEW = 500,
+    DATA_ID_DIB_DCM224_SLOT_MICRO_2CH_VIEW = 501,
+    DATA_ID_DIB_DCM224_SLOT_2CH_CH1_INDEX = 502,
+    DATA_ID_DIB_DCM224_SLOT_2CH_CH2_INDEX = 503,
+    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_VIEW = 504
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -522,10 +528,10 @@ void data_channel_display_value2_limit(DataOperationEnum operation, Cursor curso
 void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_p_mon(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channel_other_value_mon(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_channels_is_max_view(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channels_view_mode(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channels_view_mode_in_default(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_channels_view_mode_in_max(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_slot_view_type(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot_max_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot_max_view(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_slot_min1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -949,6 +955,7 @@ void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value
 void data_dib_mio168_ain_mode(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_ain_range(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_ain_range_is_available(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mio168_ain_mode_and_range(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_aout_channels(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_aout_label(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_aout_label_label(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -958,6 +965,7 @@ void data_dib_mio168_aout_output_mode(DataOperationEnum operation, Cursor cursor
 void data_dib_mio168_aout_voltage_range(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_aout_current_range(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_aout_channel_has_settings(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mio168_aout_mode_and_range(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_pwm_channels(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_pwm_label(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_pwm_label_label(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -965,6 +973,10 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, Cursor cursor, Value 
 void data_dib_mio168_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_din_has_speed(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mio168_afe_version(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mio168_pager_list(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mio168_pager_is_selected(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mio168_pager_selected_page(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mio168_ain_range_is_multiple_selection_available(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_smx46_routes(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_smx46_route_open(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_smx46_x_labels(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -1248,34 +1260,37 @@ enum ActionsEnum {
     ACTION_ID_DIB_MIO168_AIN_SELECT_MODE = 240,
     ACTION_ID_DIB_MIO168_AIN_SELECT_RANGE = 241,
     ACTION_ID_DIB_MIO168_AIN_CHANGE_LABEL = 242,
-    ACTION_ID_DIB_MIO168_AOUT_TOGGLE_OUTPUT_ENABLED = 243,
-    ACTION_ID_DIB_MIO168_AOUT_SELECT_OUTPUT_MODE = 244,
-    ACTION_ID_DIB_MIO168_AOUT_SELECT_VOLTAGE_RANGE = 245,
-    ACTION_ID_DIB_MIO168_AOUT_SELECT_CURRENT_RANGE = 246,
-    ACTION_ID_DIB_MIO168_AOUT_SHOW_CONFIGURATION = 247,
-    ACTION_ID_DIB_MIO168_AOUT_CHANGE_LABEL = 248,
-    ACTION_ID_DIB_MIO168_SHOW_INFO = 249,
-    ACTION_ID_DIB_MIO168_SHOW_CALIBRATION = 250,
-    ACTION_ID_DIB_MIO168_SHOW_CHANNEL_LABELS = 251,
-    ACTION_ID_DIB_MIO168_SHOW_DIN_CHANNEL_LABELS = 252,
-    ACTION_ID_DIB_MIO168_SHOW_DOUT_CHANNEL_LABELS = 253,
-    ACTION_ID_DIB_MIO168_CHANGE_DIN_LABEL = 254,
-    ACTION_ID_DIB_MIO168_CHANGE_DOUT_LABEL = 255,
-    ACTION_ID_DIB_MIO168_PWM_CHANGE_LABEL = 256,
-    ACTION_ID_DIB_SMX46_TOGGLE_ROUTE = 257,
-    ACTION_ID_DIB_SMX46_TOGGLE_RELAY = 258,
-    ACTION_ID_DIB_SMX46_SHOW_CONFIGURE_ROUTES = 259,
-    ACTION_ID_DIB_SMX46_CLEAR_ALL_ROUTES = 260,
-    ACTION_ID_DIB_SMX46_CLEAR_ALL_LABELS = 261,
-    ACTION_ID_DIB_SMX46_SHOW_DAC1_CALIBRATION = 262,
-    ACTION_ID_DIB_SMX46_SHOW_DAC2_CALIBRATION = 263,
-    ACTION_ID_DIB_SMX46_SHOW_INFO = 264,
-    ACTION_ID_DIB_SMX46_SHOW_RELAY_CYCLES = 265,
-    ACTION_ID_DIB_SMX46_EDIT_Y_LABEL = 266,
-    ACTION_ID_DIB_SMX46_EDIT_X_LABEL = 267,
-    ACTION_ID_DIB_SMX46_CHANGE_SUBCHANNEL_LABEL = 268,
-    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_COUNTERPHASE_DITHERING = 269,
-    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_PWM_ENABLED = 270
+    ACTION_ID_DIB_MIO168_AIN_SELECT_MODE_AND_RANGE = 243,
+    ACTION_ID_DIB_MIO168_AOUT_TOGGLE_OUTPUT_ENABLED = 244,
+    ACTION_ID_DIB_MIO168_AOUT_SELECT_OUTPUT_MODE = 245,
+    ACTION_ID_DIB_MIO168_AOUT_SELECT_VOLTAGE_RANGE = 246,
+    ACTION_ID_DIB_MIO168_AOUT_SELECT_CURRENT_RANGE = 247,
+    ACTION_ID_DIB_MIO168_AOUT_SELECT_MODE_AND_RANGE = 248,
+    ACTION_ID_DIB_MIO168_AOUT_SHOW_CONFIGURATION = 249,
+    ACTION_ID_DIB_MIO168_AOUT_CHANGE_LABEL = 250,
+    ACTION_ID_DIB_MIO168_SHOW_INFO = 251,
+    ACTION_ID_DIB_MIO168_SHOW_CALIBRATION = 252,
+    ACTION_ID_DIB_MIO168_SHOW_CHANNEL_LABELS = 253,
+    ACTION_ID_DIB_MIO168_SHOW_DIN_CHANNEL_LABELS = 254,
+    ACTION_ID_DIB_MIO168_SHOW_DOUT_CHANNEL_LABELS = 255,
+    ACTION_ID_DIB_MIO168_CHANGE_DIN_LABEL = 256,
+    ACTION_ID_DIB_MIO168_CHANGE_DOUT_LABEL = 257,
+    ACTION_ID_DIB_MIO168_PWM_CHANGE_LABEL = 258,
+    ACTION_ID_DIB_MIO168_PAGER_SELECT_PAGE = 259,
+    ACTION_ID_DIB_SMX46_TOGGLE_ROUTE = 260,
+    ACTION_ID_DIB_SMX46_TOGGLE_RELAY = 261,
+    ACTION_ID_DIB_SMX46_SHOW_CONFIGURE_ROUTES = 262,
+    ACTION_ID_DIB_SMX46_CLEAR_ALL_ROUTES = 263,
+    ACTION_ID_DIB_SMX46_CLEAR_ALL_LABELS = 264,
+    ACTION_ID_DIB_SMX46_SHOW_DAC1_CALIBRATION = 265,
+    ACTION_ID_DIB_SMX46_SHOW_DAC2_CALIBRATION = 266,
+    ACTION_ID_DIB_SMX46_SHOW_INFO = 267,
+    ACTION_ID_DIB_SMX46_SHOW_RELAY_CYCLES = 268,
+    ACTION_ID_DIB_SMX46_EDIT_Y_LABEL = 269,
+    ACTION_ID_DIB_SMX46_EDIT_X_LABEL = 270,
+    ACTION_ID_DIB_SMX46_CHANGE_SUBCHANNEL_LABEL = 271,
+    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_COUNTERPHASE_DITHERING = 272,
+    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_PWM_ENABLED = 273
 };
 
 void action_channel_toggle_output();
@@ -1520,10 +1535,12 @@ void action_dib_mio168_ain_show_configuration();
 void action_dib_mio168_ain_select_mode();
 void action_dib_mio168_ain_select_range();
 void action_dib_mio168_ain_change_label();
+void action_dib_mio168_ain_select_mode_and_range();
 void action_dib_mio168_aout_toggle_output_enabled();
 void action_dib_mio168_aout_select_output_mode();
 void action_dib_mio168_aout_select_voltage_range();
 void action_dib_mio168_aout_select_current_range();
+void action_dib_mio168_aout_select_mode_and_range();
 void action_dib_mio168_aout_show_configuration();
 void action_dib_mio168_aout_change_label();
 void action_dib_mio168_show_info();
@@ -1534,6 +1551,7 @@ void action_dib_mio168_show_dout_channel_labels();
 void action_dib_mio168_change_din_label();
 void action_dib_mio168_change_dout_label();
 void action_dib_mio168_pwm_change_label();
+void action_dib_mio168_pager_select_page();
 void action_dib_smx46_toggle_route();
 void action_dib_smx46_toggle_relay();
 void action_dib_smx46_show_configure_routes();
@@ -1878,39 +1896,42 @@ enum StylesEnum {
     STYLE_ID_INLINE290 = 290,
     STYLE_ID_INLINE291 = 291,
     STYLE_ID_INLINE292 = 292,
-    STYLE_ID_MON_VALUE_48_RIGHT = 293,
+    STYLE_ID_INLINE293 = 293,
     STYLE_ID_INLINE294 = 294,
-    STYLE_ID_MON_VALUE_20_LEFT = 295,
-    STYLE_ID_BAR_GRAPH_U_DEFAULT = 296,
-    STYLE_ID_BAR_GRAPH_TEXT = 297,
-    STYLE_ID_BAR_GRAPH_SET_LINE = 298,
-    STYLE_ID_BAR_GRAPH_LIMIT_LINE = 299,
-    STYLE_ID_BAR_GRAPH_I_DEFAULT = 300,
-    STYLE_ID_LABELS_AND_COLORS_CHANNEL = 301,
-    STYLE_ID_INLINE302 = 302,
-    STYLE_ID_INLINE303 = 303,
-    STYLE_ID_TRIGGER_BUTTON_24 = 304,
+    STYLE_ID_INLINE295 = 295,
+    STYLE_ID_MON_VALUE_48_RIGHT = 296,
+    STYLE_ID_INLINE297 = 297,
+    STYLE_ID_MON_VALUE_20_LEFT = 298,
+    STYLE_ID_BAR_GRAPH_U_DEFAULT = 299,
+    STYLE_ID_BAR_GRAPH_TEXT = 300,
+    STYLE_ID_BAR_GRAPH_SET_LINE = 301,
+    STYLE_ID_BAR_GRAPH_LIMIT_LINE = 302,
+    STYLE_ID_BAR_GRAPH_I_DEFAULT = 303,
+    STYLE_ID_LABELS_AND_COLORS_CHANNEL = 304,
     STYLE_ID_INLINE305 = 305,
     STYLE_ID_INLINE306 = 306,
-    STYLE_ID_CHANNEL_OFF_BUTTON_38 = 307,
-    STYLE_ID_TRIGGER_BUTTON_14 = 308,
+    STYLE_ID_TRIGGER_BUTTON_24 = 307,
+    STYLE_ID_INLINE308 = 308,
     STYLE_ID_INLINE309 = 309,
-    STYLE_ID_INST_SELECTED = 310,
-    STYLE_ID_MON_VALUE_38_RIGHT = 311,
+    STYLE_ID_CHANNEL_OFF_BUTTON_38 = 310,
+    STYLE_ID_TRIGGER_BUTTON_14 = 311,
     STYLE_ID_INLINE312 = 312,
-    STYLE_ID_CH_PROT_OFF = 313,
-    STYLE_ID_CH_PROT_ON = 314,
-    STYLE_ID_CH_PROT_TRIPPED = 315,
-    STYLE_ID_INLINE316 = 316,
-    STYLE_ID_MON_VALUE_20_RIGHT = 317,
-    STYLE_ID_MON_VALUE_14_LEFT = 318,
-    STYLE_ID_MON_VALUE_14_CENTER = 319,
-    STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED = 320,
-    STYLE_ID_CHANNEL_OFF_BUTTON_20 = 321,
-    STYLE_ID_MON_VALUE_14_RIGHT = 322,
-    STYLE_ID_CHANNEL_OFF_BUTTON_14 = 323,
-    STYLE_ID_MON_VALUE_24_RIGHT = 324,
-    STYLE_ID_INLINE325 = 325
+    STYLE_ID_INST_SELECTED = 313,
+    STYLE_ID_MON_VALUE_38_RIGHT = 314,
+    STYLE_ID_INLINE315 = 315,
+    STYLE_ID_CH_PROT_OFF = 316,
+    STYLE_ID_CH_PROT_ON = 317,
+    STYLE_ID_CH_PROT_TRIPPED = 318,
+    STYLE_ID_INLINE319 = 319,
+    STYLE_ID_MON_VALUE_20_RIGHT = 320,
+    STYLE_ID_MON_VALUE_14_LEFT = 321,
+    STYLE_ID_MON_VALUE_14_CENTER = 322,
+    STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED = 323,
+    STYLE_ID_CHANNEL_OFF_BUTTON_20 = 324,
+    STYLE_ID_MON_VALUE_14_RIGHT = 325,
+    STYLE_ID_CHANNEL_OFF_BUTTON_14 = 326,
+    STYLE_ID_MON_VALUE_24_RIGHT = 327,
+    STYLE_ID_INLINE328 = 328
 };
 
 enum ThemesEnum {
@@ -2282,4 +2303,4 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM224_LABELS_AND_COLORS_CH = 252
 };
 
-extern const uint8_t assets[335607];
+extern const uint8_t assets[336307];

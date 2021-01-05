@@ -20,6 +20,7 @@
 
 #include <math.h>
 
+#include <eez/util.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/temp_sensor.h>
 
@@ -299,26 +300,19 @@ public:
     struct Value {
         float set;
     
-        bool mon_measured;
-
         float mon_adc; // uncalibrated
 
         float mon_last; // calibrated, latest measurement
-
         float mon; // calibrated, average value
-
-        // used for calculating average value
         float mon_prev;
-        int8_t mon_index;
-        float mon_arr[NUM_ADC_AVERAGING_VALUES];
-        float mon_total;
+        MovingAverage<float, double, NUM_ADC_AVERAGING_VALUES> monMovingAverage;
+        bool mon_measured;
 
+        float mon_dac_last;
         float mon_dac;
         float mon_dac_prev;
-        float mon_dac_last;
-        int8_t mon_dac_index;
-        float mon_dac_arr[NUM_ADC_AVERAGING_VALUES];
-        float mon_dac_total;
+        MovingAverage<float, double, NUM_ADC_AVERAGING_VALUES> monDacMovingAverage;
+        bool mon_dac_measured;
 
         float step;
         float limit;

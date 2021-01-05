@@ -1230,7 +1230,13 @@ void tick() {
     temperature::tick();
     aux_ps::fan::tick();
     datetime::tick();
-    touch::tickHighPriority();
+
+    // call every 10 ms
+    static int counter = 0;
+    if (++counter == 10) {
+        touch::tickHighPriority();
+        counter = 0;
+    }
 
     if (g_diagCallback) {
         g_diagCallback();

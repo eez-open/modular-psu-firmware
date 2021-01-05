@@ -113,7 +113,7 @@
     {
       "name": "ain_channels",
       "type": "list",
-      "defaultValue": "[\n  { \"analog_input_label\": \"AIN1\", \"analog_input_value\": \"1.0 V\", \"ain_label_label\": \"AIN1 label:\", \"ain_label\": \"AIN1\" },\n  { \"analog_input_label\": \"AIN2\", \"analog_input_value\": \"2.0 V\", \"ain_label_label\": \"AIN2 label:\", \"ain_label\": \"AIN2\" },\n  { \"analog_input_label\": \"AIN3\", \"analog_input_value\": \"3.0 V\", \"ain_label_label\": \"AIN3 label:\", \"ain_label\": \"AIN3\" },\n  { \"analog_input_label\": \"AIN4\", \"analog_input_value\": \"4.0 V\", \"ain_label_label\": \"AIN4 label:\", \"ain_label\": \"AIN4\" }\n]"
+      "defaultValue": "[\n  { \"analog_input_label\": \"AIN1\", \"ain_value\": \"0.1234 V\", \"ain_label_label\": \"AIN1 label:\", \"ain_label\": \"AIN1\", \"ain_mode_and_range\": \"\\u00bd2.4 V\" },\n  { \"analog_input_label\": \"AIN2\", \"ain_value\": \"125.25 V\", \"ain_label_label\": \"AIN2 label:\", \"ain_label\": \"AIN2\", \"ain_mode_and_range\": \"\\u00bd240 V\" },\n  { \"analog_input_label\": \"AIN3\", \"ain_value\": \"12.4567 mA\", \"ain_label_label\": \"AIN3 label:\", \"ain_label\": \"AIN3\", \"ain_mode_and_range\": \"\\u00bd24 mA\" },\n  { \"analog_input_label\": \"AIN4\", \"ain_value\": \"5.345 V\", \"ain_label_label\": \"AIN4 label:\", \"ain_label\": \"AIN4\", \"ain_mode_and_range\": \"\\u00bd12 V\" }\n]"
     },
     {
       "name": "ain_label",
@@ -128,7 +128,7 @@
     {
       "name": "ain_value",
       "type": "float",
-      "defaultValue": "5.0 V"
+      "defaultValue": "5.1234 V"
     },
     {
       "name": "ain_mode",
@@ -147,9 +147,14 @@
       "defaultValue": "1"
     },
     {
+      "name": "ain_mode_and_range",
+      "type": "string",
+      "defaultValue": "\\u00bd 240 V"
+    },
+    {
       "name": "aout_channels",
       "type": "list",
-      "defaultValue": "[\n  { \"analog_output_label\": \"AO1\", \"analog_output_value\": \"2.1 V\", \"aout_channel_has_settings\": 1, \"aout_label_label\": \"AOUT1 label:\", \"aout_label\": \"AOUT1\" },\n  { \"analog_output_label\": \"AO2\", \"analog_output_value\": \"2.2 V\", \"aout_channel_has_settings\": 1, \"aout_label_label\": \"AOUT2 label:\", \"aout_label\": \"AOUT2\" },\n  { \"analog_output_label\": \"AO3\", \"analog_output_value\": \"2.3 V\", \"aout_channel_has_settings\": 0, \"aout_label_label\": \"AOUT3 label:\", \"aout_label\": \"AOUT3\" },\n  { \"analog_output_label\": \"AO4\", \"analog_output_value\": \"2.4 V\", \"aout_channel_has_settings\": 0, \"aout_label_label\": \"AOUT4 label:\", \"aout_label\": \"AOUT4\" }\n]"
+      "defaultValue": "[\n  { \"analog_output_label\": \"AO1\", \"aout_value\": \"5.123 V\", \"aout_channel_has_settings\": 1, \"aout_label_label\": \"AOUT1 label:\", \"aout_label\": \"AOUT1\", \"aout_mode_and_range\": \"\\u00bd10 V\" },\n  { \"analog_output_label\": \"AO2\", \"aout_value\": \"0.5 V\", \"aout_channel_has_settings\": 1, \"aout_label_label\": \"AOUT2 label:\", \"aout_label\": \"AOUT2\", \"aout_mode_and_range\": \"0-5 V\" },\n  { \"analog_output_label\": \"AO3\", \"aout_value\": \"10.12 mA\", \"aout_channel_has_settings\": 0, \"aout_label_label\": \"AOUT3 label:\", \"aout_label\": \"AOUT3\", \"aout_mode_and_range\": \"4-20 mA\" },\n  { \"analog_output_label\": \"AO4\", \"aout_value\": \"0.23 mA\", \"aout_channel_has_settings\": 0, \"aout_label_label\": \"AOUT4 label:\", \"aout_label\": \"AOUT4\", \"aout_mode_and_range\": \"0-24 mA\" }\n]"
     },
     {
       "name": "aout_label",
@@ -193,6 +198,11 @@
       "defaultValue": "1"
     },
     {
+      "name": "aout_mode_and_range",
+      "type": "string",
+      "defaultValue": "Off"
+    },
+    {
       "name": "pwm_channels",
       "type": "list",
       "defaultValue": "[\n  { \"pwm_label\": \"PWM1\", \"pwm_freq\": \"100 Hz\", \"pwm_duty\": \"80 %\", \"pwm_label_label\": \"PWM1 label:\", \"pwm_label\": \"PWM1\" },\n  { \"pwm_label\": \"PWM2\", \"pwm_freq\": \"1.2 KHz\", \"pwm_duty\": \"50 %\", \"pwm_label_label\": \"PWM2 label:\", \"pwm_label\": \"PWM2\" }\n]\n"
@@ -226,6 +236,25 @@
       "name": "afe_version",
       "type": "string",
       "defaultValue": "1"
+    },
+    {
+      "name": "pager_list"
+    },
+    {
+      "name": "pager_is_selected",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
+      "name": "pager_selected_page",
+      "type": "enum",
+      "enumItems": "[\"Overview\", \"Digital Inputs\", \"Digital Outputs\", \"Analog Inputs\", \"Analog Outputs\", \"PWM\"]",
+      "defaultValue": "0"
+    },
+    {
+      "name": "ain_range_is_multiple_selection_available",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -254,6 +283,9 @@
       "name": "ain_change_label"
     },
     {
+      "name": "ain_select_mode_and_range"
+    },
+    {
       "name": "aout_toggle_output_enabled"
     },
     {
@@ -264,6 +296,9 @@
     },
     {
       "name": "aout_select_current_range"
+    },
+    {
+      "name": "aout_select_mode_and_range"
     },
     {
       "name": "aout_show_configuration"
@@ -294,6 +329,9 @@
     },
     {
       "name": "pwm_change_label"
+    },
+    {
+      "name": "pager_select_page"
     }
   ],
   "gui": {
@@ -1242,9 +1280,73 @@
                 "data": "slot_title_max",
                 "left": 0,
                 "top": 0,
-                "width": 380,
+                "width": 144,
                 "height": 32,
                 "text": ""
+              },
+              {
+                "type": "List",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "pager_list",
+                "left": 144,
+                "top": 0,
+                "width": 192,
+                "height": 32,
+                "itemWidget": {
+                  "type": "Select",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "data": "pager_is_selected",
+                  "action": "pager_select_page",
+                  "left": 0,
+                  "top": 0,
+                  "width": 32,
+                  "height": 32,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "channel1",
+                        "font": "Heydings14"
+                      },
+                      "action": "",
+                      "left": 0,
+                      "top": 0,
+                      "width": 32,
+                      "height": 32,
+                      "text": "\\u008a"
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "channel1",
+                        "font": "Heydings14"
+                      },
+                      "action": "",
+                      "left": 0,
+                      "top": 0,
+                      "width": 32,
+                      "height": 32,
+                      "text": "\\u008b"
+                    }
+                  ]
+                },
+                "listType": "horizontal",
+                "gap": 0
+              },
+              {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "channel1"
+                },
+                "left": 336,
+                "top": 0,
+                "width": 44,
+                "height": 32,
+                "invertColors": true
               },
               {
                 "type": "Text",
@@ -1275,548 +1377,797 @@
             ]
           },
           {
-            "type": "Container",
+            "type": "Select",
             "style": {
               "inheritFrom": "default"
             },
-            "left": 1,
+            "data": "pager_selected_page",
+            "left": 0,
             "top": 32,
-            "width": 65,
-            "height": 136,
-            "name": "din",
+            "width": 480,
+            "height": 208,
             "widgets": [
               {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left",
-                  "font": "Oswald12",
-                  "alignHorizontal": "center"
-                },
-                "left": 1,
-                "top": 0,
-                "width": 27,
-                "height": 32,
-                "text": "DIN"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "encoder_cursor_14_enabled",
-                  "font": "Heydings14"
-                },
-                "action": "din_show_configuration",
-                "left": 28,
-                "top": 1,
-                "width": 36,
-                "height": 30,
-                "text": "D"
-              },
-              {
-                "type": "Grid",
+                "type": "Container",
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "din_pins",
-                "left": 1,
-                "top": 32,
-                "width": 64,
-                "height": 104,
-                "itemWidget": {
-                  "type": "Select",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "data": "din_state",
-                  "action": "",
-                  "left": 0,
-                  "top": 0,
-                  "width": 32,
-                  "height": 26,
-                  "widgets": [
-                    {
-                      "type": "Container",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "left": 0,
-                      "top": 0,
-                      "width": 32,
-                      "height": 26,
-                      "widgets": [
-                        {
-                          "type": "DisplayData",
-                          "style": {
-                            "inheritFrom": "default",
-                            "font": "Oswald12"
-                          },
-                          "data": "din_no",
-                          "left": 0,
-                          "top": 0,
-                          "width": 31,
-                          "height": 25,
-                          "displayOption": 0
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Container",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "left": 0,
-                      "top": 0,
-                      "width": 32,
-                      "height": 26,
-                      "widgets": [
-                        {
-                          "type": "DisplayData",
-                          "style": {
-                            "inheritFrom": "default_inverse",
-                            "font": "Oswald12"
-                          },
-                          "data": "din_no",
-                          "left": 0,
-                          "top": 0,
-                          "width": 31,
-                          "height": 25,
-                          "displayOption": 0
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "gridFlow": "row"
-              }
-            ]
-          },
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 66,
-            "top": 32,
-            "width": 1,
-            "height": 135
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 67,
-            "top": 32,
-            "width": 81,
-            "height": 136,
-            "name": "dout",
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left",
-                  "font": "Oswald12",
-                  "alignHorizontal": "center"
-                },
-                "left": 1,
+                "left": 0,
                 "top": 0,
-                "width": 79,
-                "height": 32,
-                "text": "DOUT"
-              },
-              {
-                "type": "Grid",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "dout_pins",
-                "left": 1,
-                "top": 32,
-                "width": 80,
-                "height": 104,
-                "itemWidget": {
-                  "type": "Select",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "data": "dout_state",
-                  "action": "",
-                  "left": 0,
-                  "top": 0,
-                  "width": 40,
-                  "height": 26,
-                  "widgets": [
-                    {
-                      "type": "Container",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "left": 0,
-                      "top": 0,
-                      "width": 40,
-                      "height": 26,
-                      "widgets": [
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "default",
-                            "font": "Oswald12",
-                            "alignVertical": "center",
-                            "color": "Action color",
-                            "activeBackgroundColor": "Action color"
-                          },
-                          "data": "dout_no",
-                          "action": "dout_toggle_state",
-                          "left": 0,
-                          "top": 0,
-                          "width": 39,
-                          "height": 25,
-                          "text": ""
-                        }
-                      ]
+                "width": 480,
+                "height": 208,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
                     },
-                    {
-                      "type": "Container",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "left": 0,
-                      "top": 0,
-                      "width": 40,
-                      "height": 26,
-                      "widgets": [
-                        {
-                          "type": "Text",
-                          "style": {
-                            "inheritFrom": "default_inverse",
-                            "font": "Oswald12",
-                            "alignVertical": "center",
-                            "backgroundColor": "Action color",
-                            "activeColor": "Action color"
-                          },
-                          "data": "dout_no",
-                          "action": "dout_toggle_state",
-                          "left": 0,
-                          "top": 0,
-                          "width": 39,
-                          "height": 25,
-                          "text": ""
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "gridFlow": "row"
-              }
-            ]
-          },
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 148,
-            "top": 32,
-            "width": 1,
-            "height": 135
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 149,
-            "top": 32,
-            "width": 110,
-            "height": 136,
-            "name": "analog inputs",
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left",
-                  "font": "Oswald12",
-                  "alignHorizontal": "center"
-                },
-                "data": "",
-                "left": 1,
-                "top": 0,
-                "width": 108,
-                "height": 32,
-                "text": "Analog in"
-              },
-              {
-                "type": "Grid",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "ain_channels",
-                "left": 1,
-                "top": 32,
-                "width": 108,
-                "height": 104,
-                "itemWidget": {
-                  "type": "Container",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "left": 0,
-                  "top": 0,
-                  "width": 108,
-                  "height": 26,
-                  "widgets": [
-                    {
-                      "type": "DisplayData",
-                      "style": {
-                        "inheritFrom": "default",
-                        "font": "Oswald12"
-                      },
-                      "data": "ain_value",
-                      "left": 2,
-                      "top": 0,
-                      "width": 70,
-                      "height": 26,
-                      "displayOption": 0
-                    },
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled",
-                        "font": "Heydings14"
-                      },
-                      "action": "ain_show_configuration",
-                      "left": 73,
-                      "top": 0,
-                      "width": 35,
-                      "height": 25,
-                      "text": "D"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 259,
-            "top": 33,
-            "width": 1,
-            "height": 135
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 260,
-            "top": 32,
-            "width": 122,
-            "height": 136,
-            "name": "analog outputs",
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S_left",
-                  "font": "Oswald12",
-                  "alignHorizontal": "center"
-                },
-                "data": "",
-                "left": 1,
-                "top": 0,
-                "width": 120,
-                "height": 32,
-                "text": "Analog out"
-              },
-              {
-                "type": "Grid",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "aout_channels",
-                "left": 1,
-                "top": 32,
-                "width": 120,
-                "height": 104,
-                "itemWidget": {
-                  "type": "Container",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "left": 0,
-                  "top": 0,
-                  "width": 120,
-                  "height": 26,
-                  "widgets": [
-                    {
-                      "type": "DisplayData",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled",
-                        "font": "Oswald12"
-                      },
-                      "data": "aout_value",
-                      "action": "edit",
-                      "left": 0,
-                      "top": 0,
-                      "width": 84,
-                      "height": 25,
-                      "displayOption": 0
-                    },
-                    {
-                      "type": "Select",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "data": "aout_channel_has_settings",
-                      "left": 85,
-                      "top": 0,
-                      "width": 35,
-                      "height": 25,
-                      "widgets": [
-                        {
-                          "type": "Rectangle",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "left": 0,
-                          "top": 0,
-                          "width": 35,
-                          "height": 25,
-                          "invertColors": true
+                    "left": 0,
+                    "top": 0,
+                    "width": 65,
+                    "height": 176,
+                    "name": "din",
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "font": "Oswald12",
+                          "alignHorizontal": "center"
                         },
-                        {
+                        "left": 1,
+                        "top": 0,
+                        "width": 27,
+                        "height": 32,
+                        "text": "DIN"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled",
+                          "font": "Heydings14"
+                        },
+                        "action": "din_show_configuration",
+                        "left": 28,
+                        "top": 1,
+                        "width": 36,
+                        "height": 30,
+                        "text": "D"
+                      },
+                      {
+                        "type": "Grid",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "din_pins",
+                        "left": 1,
+                        "top": 32,
+                        "width": 64,
+                        "height": 144,
+                        "itemWidget": {
                           "type": "Select",
                           "style": {
                             "inheritFrom": "default"
                           },
-                          "data": "aout_output_enabled",
+                          "data": "din_state",
+                          "action": "",
                           "left": 0,
                           "top": 0,
-                          "width": 35,
-                          "height": 25,
+                          "width": 32,
+                          "height": 36,
                           "widgets": [
                             {
-                              "type": "Text",
+                              "type": "Container",
                               "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled",
-                                "font": "Oswald12",
-                                "color": "status_warning",
-                                "activeBackgroundColor": "status_warning"
+                                "inheritFrom": "default"
                               },
-                              "action": "aout_show_configuration",
                               "left": 0,
                               "top": 0,
-                              "width": 35,
-                              "height": 25,
-                              "text": "Off"
+                              "width": 32,
+                              "height": 36,
+                              "widgets": [
+                                {
+                                  "type": "DisplayData",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "font": "Oswald12"
+                                  },
+                                  "data": "din_no",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 31,
+                                  "height": 35,
+                                  "displayOption": 0
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Container",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 0,
+                              "top": 0,
+                              "width": 32,
+                              "height": 36,
+                              "widgets": [
+                                {
+                                  "type": "DisplayData",
+                                  "style": {
+                                    "inheritFrom": "default_inverse",
+                                    "font": "Oswald12"
+                                  },
+                                  "data": "din_no",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 31,
+                                  "height": 35,
+                                  "displayOption": 0
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "gridFlow": "row"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 65,
+                    "top": 0,
+                    "width": 1,
+                    "height": 176
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 66,
+                    "top": 0,
+                    "width": 81,
+                    "height": 176,
+                    "name": "dout",
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "font": "Oswald12",
+                          "alignHorizontal": "center"
+                        },
+                        "left": 1,
+                        "top": 0,
+                        "width": 79,
+                        "height": 32,
+                        "text": "DOUT"
+                      },
+                      {
+                        "type": "Grid",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "dout_pins",
+                        "left": 1,
+                        "top": 32,
+                        "width": 80,
+                        "height": 144,
+                        "itemWidget": {
+                          "type": "Select",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "data": "dout_state",
+                          "action": "",
+                          "left": 0,
+                          "top": 0,
+                          "width": 40,
+                          "height": 36,
+                          "widgets": [
+                            {
+                              "type": "Container",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 0,
+                              "top": 0,
+                              "width": 40,
+                              "height": 36,
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "font": "Oswald12",
+                                    "alignVertical": "center",
+                                    "color": "Action color",
+                                    "activeBackgroundColor": "Action color"
+                                  },
+                                  "data": "dout_no",
+                                  "action": "dout_toggle_state",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 39,
+                                  "height": 35,
+                                  "text": ""
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Container",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 0,
+                              "top": 0,
+                              "width": 40,
+                              "height": 36,
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default_inverse",
+                                    "font": "Oswald12",
+                                    "alignVertical": "center",
+                                    "backgroundColor": "Action color",
+                                    "activeColor": "Action color"
+                                  },
+                                  "data": "dout_no",
+                                  "action": "dout_toggle_state",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 39,
+                                  "height": 35,
+                                  "text": ""
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "gridFlow": "row"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 147,
+                    "top": 0,
+                    "width": 1,
+                    "height": 176
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 148,
+                    "top": 0,
+                    "width": 160,
+                    "height": 176,
+                    "name": "analog inputs",
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "font": "Oswald12",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "",
+                        "left": 1,
+                        "top": 0,
+                        "width": 159,
+                        "height": 32,
+                        "text": "Analog in"
+                      },
+                      {
+                        "type": "Grid",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "ain_channels",
+                        "left": 1,
+                        "top": 32,
+                        "width": 159,
+                        "height": 144,
+                        "itemWidget": {
+                          "type": "Container",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "left": 0,
+                          "top": 0,
+                          "width": 159,
+                          "height": 36,
+                          "widgets": [
+                            {
+                              "type": "DisplayData",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "data": "ain_value",
+                              "left": 0,
+                              "top": 0,
+                              "width": 94,
+                              "height": 34,
+                              "displayOption": 0
                             },
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled",
-                                "font": "Oswald12",
-                                "color": "Action color",
-                                "activeBackgroundColor": "Action color"
+                                "inheritFrom": "edit_value_active_M_center",
+                                "font": "Oswald14"
                               },
-                              "action": "aout_show_configuration",
+                              "data": "ain_mode_and_range",
+                              "action": "ain_select_mode_and_range",
+                              "left": 94,
+                              "top": 0,
+                              "width": 65,
+                              "height": 34,
+                              "text": ""
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 309,
+                    "top": 0,
+                    "width": 1,
+                    "height": 176
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 310,
+                    "top": 0,
+                    "width": 170,
+                    "height": 176,
+                    "name": "analog outputs",
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "font": "Oswald12",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "",
+                        "left": 1,
+                        "top": 0,
+                        "width": 169,
+                        "height": 32,
+                        "text": "Analog out"
+                      },
+                      {
+                        "type": "Grid",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "aout_channels",
+                        "left": 1,
+                        "top": 32,
+                        "width": 169,
+                        "height": 144,
+                        "itemWidget": {
+                          "type": "Container",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "left": 0,
+                          "top": 0,
+                          "width": 169,
+                          "height": 36,
+                          "widgets": [
+                            {
+                              "type": "DisplayData",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "Oswald12"
+                              },
+                              "data": "aout_value",
+                              "action": "edit",
                               "left": 0,
                               "top": 0,
-                              "width": 35,
-                              "height": 25,
-                              "text": "On"
+                              "width": 94,
+                              "height": 34,
+                              "displayOption": 0
+                            },
+                            {
+                              "type": "Select",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "data": "aout_channel_has_settings",
+                              "left": 96,
+                              "top": 0,
+                              "width": 73,
+                              "height": 34,
+                              "widgets": [
+                                {
+                                  "type": "Rectangle",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 73,
+                                  "height": 34,
+                                  "invertColors": true
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_M_center",
+                                    "font": "Oswald14"
+                                  },
+                                  "data": "aout_mode_and_range",
+                                  "action": "aout_select_mode_and_range",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 73,
+                                  "height": 34,
+                                  "text": ""
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 176,
+                    "width": 480,
+                    "height": 1
+                  },
+                  {
+                    "type": "List",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "pwm_channels",
+                    "left": 0,
+                    "top": 177,
+                    "width": 480,
+                    "height": 30,
+                    "itemWidget": {
+                      "type": "Container",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 240,
+                      "height": 30,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_S_left",
+                            "font": "Oswald12",
+                            "alignHorizontal": "center"
+                          },
+                          "data": "pwm_label",
+                          "left": 0,
+                          "top": 1,
+                          "width": 71,
+                          "height": 29,
+                          "text": ""
+                        },
+                        {
+                          "type": "DisplayData",
+                          "style": {
+                            "inheritFrom": "encoder_cursor_14_enabled",
+                            "font": "RobotoCondensed-Regular"
+                          },
+                          "data": "pwm_freq",
+                          "action": "edit",
+                          "left": 71,
+                          "top": 1,
+                          "width": 94,
+                          "height": 29,
+                          "displayOption": 0
+                        },
+                        {
+                          "type": "DisplayData",
+                          "style": {
+                            "inheritFrom": "encoder_cursor_14_enabled",
+                            "font": "RobotoCondensed-Regular"
+                          },
+                          "data": "pwm_duty",
+                          "action": "edit",
+                          "left": 167,
+                          "top": 1,
+                          "width": 73,
+                          "height": 29,
+                          "displayOption": 0
+                        }
+                      ]
+                    },
+                    "listType": "horizontal",
+                    "gap": 0
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 208,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald12",
+                      "alignHorizontal": "center"
+                    },
+                    "data": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 120,
+                    "height": 32,
+                    "text": "Digital Inputs"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 208,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald12",
+                      "alignHorizontal": "center"
+                    },
+                    "data": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 120,
+                    "height": 32,
+                    "text": "Digital Outputs"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 208,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald17",
+                      "alignHorizontal": "center"
+                    },
+                    "data": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 32,
+                    "text": "Analog Inputs"
+                  },
+                  {
+                    "type": "Grid",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "ain_channels",
+                    "left": 0,
+                    "top": 32,
+                    "width": 480,
+                    "height": 176,
+                    "itemWidget": {
+                      "type": "Container",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 240,
+                      "height": 88,
+                      "widgets": [
+                        {
+                          "type": "Container",
+                          "style": {
+                            "inheritFrom": "default",
+                            "backgroundColor": "text_enable_background",
+                            "activeColor": "text_enable_background"
+                          },
+                          "left": 2,
+                          "top": 0,
+                          "width": 236,
+                          "height": 84,
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "edit_value_M_left",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "0 0 0 2"
+                              },
+                              "data": "ain_label",
+                              "action": "",
+                              "left": 0,
+                              "top": 0,
+                              "width": 100,
+                              "height": 22,
+                              "text": ""
+                            },
+                            {
+                              "type": "DisplayData",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "data": "ain_value",
+                              "action": "",
+                              "left": 0,
+                              "top": 22,
+                              "width": 100,
+                              "height": 62,
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "style": {
+                                "inheritFrom": "mon_value_20_left",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "0 4"
+                              },
+                              "data": "ain_value",
+                              "action": "",
+                              "left": 100,
+                              "top": 10,
+                              "width": 43,
+                              "height": 36,
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "DisplayData",
+                              "style": {
+                                "inheritFrom": "mon_value_20_left",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "data": "ain_value",
+                              "action": "",
+                              "left": 100,
+                              "top": 46,
+                              "width": 133,
+                              "height": 38,
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "edit_value_active_M_center",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "borderSize": "1",
+                                "borderRadius": 4,
+                                "borderColor": "Action color"
+                              },
+                              "data": "ain_mode_and_range",
+                              "action": "ain_select_mode_and_range",
+                              "left": 146,
+                              "top": 3,
+                              "width": 87,
+                              "height": 34,
+                              "text": ""
                             }
                           ]
                         }
                       ]
                     }
-                  ]
-                }
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 208,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald12",
+                      "alignHorizontal": "center"
+                    },
+                    "data": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 120,
+                    "height": 32,
+                    "text": "Analog Outputs"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 208,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S_left",
+                      "font": "Oswald12",
+                      "alignHorizontal": "center"
+                    },
+                    "data": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 120,
+                    "height": 32,
+                    "text": "PWM Outputs"
+                  }
+                ]
               }
             ]
-          },
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 382,
-            "top": 32,
-            "width": 1,
-            "height": 135
-          },
-          {
-            "type": "List",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "pwm_channels",
-            "left": 384,
-            "top": 64,
-            "width": 96,
-            "height": 104,
-            "itemWidget": {
-              "type": "Container",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "left": 0,
-              "top": 0,
-              "width": 96,
-              "height": 52,
-              "widgets": [
-                {
-                  "type": "Text",
-                  "style": {
-                    "inheritFrom": "default_S_left",
-                    "font": "RobotoCondensed-Regular"
-                  },
-                  "data": "pwm_label",
-                  "left": 0,
-                  "top": 0,
-                  "width": 50,
-                  "height": 25,
-                  "text": ""
-                },
-                {
-                  "type": "DisplayData",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled",
-                    "font": "RobotoCondensed-Regular"
-                  },
-                  "data": "pwm_duty",
-                  "action": "edit",
-                  "left": 46,
-                  "top": 0,
-                  "width": 49,
-                  "height": 25,
-                  "displayOption": 0
-                },
-                {
-                  "type": "DisplayData",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled",
-                    "font": "RobotoCondensed-Regular"
-                  },
-                  "data": "pwm_freq",
-                  "action": "edit",
-                  "left": 0,
-                  "top": 26,
-                  "width": 95,
-                  "height": 25,
-                  "displayOption": 0
-                }
-              ]
-            },
-            "listType": "vertical",
-            "gap": 0
           }
         ],
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 168
+        "height": 240,
+        "dataContextOverrides": "{\n    \"slot_title_max\": \"MIO R3B3\",\n    \"pager_list\": [\n        { \"pager_is_selected\": 1 },\n        { \"pager_is_selected\": 0 },\n        { \"pager_is_selected\": 0 },\n        { \"pager_is_selected\": 0 },\n        { \"pager_is_selected\": 0 },\n        { \"pager_is_selected\": 0 }\n    ]\n}"
       },
       {
         "name": "slot_view_min",
@@ -3492,38 +3843,88 @@
                     "invertColors": true
                   },
                   {
-                    "type": "Container",
+                    "type": "Select",
                     "style": {
                       "inheritFrom": "default"
                     },
+                    "data": "ain_range_is_multiple_selection_available",
                     "left": 0,
                     "top": 0,
                     "width": 378,
                     "height": 40,
                     "widgets": [
                       {
-                        "type": "Text",
+                        "type": "Container",
                         "style": {
-                          "inheritFrom": "edit_value_M_left"
+                          "inheritFrom": "default"
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 143,
+                        "width": 378,
                         "height": 40,
-                        "text": "Range:"
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 143,
+                            "height": 40,
+                            "text": "Range:"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left",
+                              "alignHorizontal": "center"
+                            },
+                            "data": "ain_range",
+                            "action": "",
+                            "left": 178,
+                            "top": 0,
+                            "width": 200,
+                            "height": 40,
+                            "text": ""
+                          }
+                        ]
                       },
                       {
-                        "type": "Text",
+                        "type": "Container",
                         "style": {
-                          "inheritFrom": "edit_value_active_M_center"
+                          "inheritFrom": "default"
                         },
-                        "data": "ain_range",
-                        "action": "ain_select_range",
-                        "left": 178,
+                        "left": 0,
                         "top": 0,
-                        "width": 200,
+                        "width": 378,
                         "height": 40,
-                        "text": ""
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 143,
+                            "height": 40,
+                            "text": "Range:"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_active_M_center"
+                            },
+                            "data": "ain_range",
+                            "action": "ain_select_range",
+                            "left": 178,
+                            "top": 0,
+                            "width": 200,
+                            "height": 40,
+                            "text": ""
+                          }
+                        ]
                       }
                     ]
                   }

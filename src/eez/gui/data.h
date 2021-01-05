@@ -71,9 +71,12 @@ typedef uint8_t ValueType;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define STRING_OPTIONS_FILE_ELLIPSIS 1
+#define STRING_OPTIONS_FILE_ELLIPSIS (1 << 0)
 
-#define FLOAT_OPTIONS_LESS_THEN 1
+#define FLOAT_OPTIONS_LESS_THEN (1 << 0)
+#define FLOAT_OPTIONS_FIXED_DECIMALS (1 << 1)
+#define FLOAT_OPTIONS_GET_NUM_FIXED_DECIMALS(options) (((options) >> 2) & 0b111)
+#define FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(n) (FLOAT_OPTIONS_FIXED_DECIMALS | ((n & 0b111) << 2))
 
 struct Value {
   public:

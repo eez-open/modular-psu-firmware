@@ -557,16 +557,17 @@ void action_toggle_channels_max_view() {
         animateFromMicroViewToMaxView();
     } else {
         auto isMaxViewBefore = persist_conf::isMaxView();
+		auto wasFullScreenView = isMaxViewBefore && isSlotFullScreenView();
         auto maxSlotIndexBefore = isMaxViewBefore ? persist_conf::getMaxSlotIndex() : -1;
 
         persist_conf::toggleMaxChannelIndex(g_channel->channelIndex);
         
         if (!isMaxViewBefore && persist_conf::isMaxView()) {
-            animateFromDefaultViewToMaxView();
+            animateFromDefaultViewToMaxView(g_channel->slotIndex, isSlotFullScreenView());
         } else if (isMaxViewBefore && !persist_conf::isMaxView()) {
-            animateFromMaxViewToDefaultView();
+            animateFromMaxViewToDefaultView(maxSlotIndexBefore, wasFullScreenView);
         } else {
-            animateFromMinViewToMaxView(maxSlotIndexBefore);
+            animateFromMinViewToMaxView(maxSlotIndexBefore, isSlotFullScreenView());
         }
     }
 }
@@ -580,16 +581,17 @@ void action_toggle_slot_max_view() {
         animateFromMicroViewToMaxView();
     } else {
         auto isMaxViewBefore = persist_conf::isMaxView();
+		auto wasFullScreenView = isMaxViewBefore && isSlotFullScreenView();
         auto maxSlotIndexBefore = isMaxViewBefore ? persist_conf::getMaxSlotIndex() : -1;
 
         persist_conf::toggleMaxSlotIndex(slotIndex);
         
         if (!isMaxViewBefore && persist_conf::isMaxView()) {
-            animateFromDefaultViewToMaxView();
+            animateFromDefaultViewToMaxView(slotIndex, isSlotFullScreenView());
         } else if (isMaxViewBefore && !persist_conf::isMaxView()) {
-            animateFromMaxViewToDefaultView();
+            animateFromMaxViewToDefaultView(maxSlotIndexBefore, wasFullScreenView);
         } else {
-            animateFromMinViewToMaxView(maxSlotIndexBefore);
+            animateFromMinViewToMaxView(maxSlotIndexBefore, isSlotFullScreenView());
         }
     }
 }

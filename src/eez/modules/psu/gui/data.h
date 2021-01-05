@@ -47,6 +47,7 @@ ENUM_DEFINITIONS
 #undef ENUM_DEFINITION
 
 Value MakeValue(float value, Unit unit);
+Value MakeValue(float value, Unit unit, uint16_t options);
 Value MakeLessThenMinMessageValue(float float_, const Value &value_);
 Value MakeGreaterThenMaxMessageValue(float float_, const Value &value_);
 Value MakeScpiErrorValue(int16_t errorCode);
