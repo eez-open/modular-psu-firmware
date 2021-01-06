@@ -113,7 +113,7 @@
     {
       "name": "ain_channels",
       "type": "list",
-      "defaultValue": "[\n  { \"analog_input_label\": \"AIN1\", \"ain_value\": \"0.1234 V\", \"ain_label_label\": \"AIN1 label:\", \"ain_label\": \"AIN1\", \"ain_mode_and_range\": \"\\u00bd2.4 V\" },\n  { \"analog_input_label\": \"AIN2\", \"ain_value\": \"125.25 V\", \"ain_label_label\": \"AIN2 label:\", \"ain_label\": \"AIN2\", \"ain_mode_and_range\": \"\\u00bd240 V\" },\n  { \"analog_input_label\": \"AIN3\", \"ain_value\": \"12.4567 mA\", \"ain_label_label\": \"AIN3 label:\", \"ain_label\": \"AIN3\", \"ain_mode_and_range\": \"\\u00bd24 mA\" },\n  { \"analog_input_label\": \"AIN4\", \"ain_value\": \"5.345 V\", \"ain_label_label\": \"AIN4 label:\", \"ain_label\": \"AIN4\", \"ain_mode_and_range\": \"\\u00bd12 V\" }\n]"
+      "defaultValue": "[\n  { \"analog_input_label\": \"AIN1\", \"ain_value\": \"0.1234 V\", \"ain_label_label\": \"AIN1 label:\", \"ain_label\": \"AIN1\", \"ain_mode_and_range\": \"\\u00bd2.4 V\" },\n  { \"analog_input_label\": \"AIN2\", \"ain_value\": \"125.25 V\", \"ain_label_label\": \"AIN2 label:\", \"ain_label\": \"AIN2\", \"ain_mode_and_range\": \"\\u00bd240 V\" },\n  { \"analog_input_label\": \"AIN3\", \"ain_value\": \"12.45678 mA\", \"ain_label_label\": \"AIN3 label:\", \"ain_label\": \"AIN3\", \"ain_mode_and_range\": \"\\u00bd24 mA\" },\n  { \"analog_input_label\": \"AIN4\", \"ain_value\": \"5.345 V\", \"ain_label_label\": \"AIN4 label:\", \"ain_label\": \"AIN4\", \"ain_mode_and_range\": \"\\u00bd12 V\" }\n]"
     },
     {
       "name": "ain_label",
@@ -255,6 +255,11 @@
       "name": "ain_range_is_multiple_selection_available",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "ain_fault_status",
+      "type": "string",
+      "defaultValue": "PN"
     }
   ],
   "actions": [
@@ -2013,17 +2018,17 @@
                             "backgroundColor": "text_enable_background",
                             "activeColor": "text_enable_background"
                           },
+                          "data": "ain_value",
                           "left": 2,
                           "top": 0,
                           "width": 236,
                           "height": 84,
                           "widgets": [
                             {
-                              "type": "Text",
+                              "type": "DisplayData",
                               "style": {
                                 "inheritFrom": "edit_value_M_left",
                                 "font": "Oswald14",
-                                "alignHorizontal": "left",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
                                 "padding": "0 0 0 2"
@@ -2034,7 +2039,7 @@
                               "top": 0,
                               "width": 100,
                               "height": 22,
-                              "text": ""
+                              "displayOption": 0
                             },
                             {
                               "type": "DisplayData",
@@ -2055,32 +2060,56 @@
                               "type": "DisplayData",
                               "style": {
                                 "inheritFrom": "mon_value_20_left",
+                                "font": "Oswald20",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
-                                "padding": "0 4"
+                                "padding": "10 0 0 8"
                               },
                               "data": "ain_value",
                               "action": "",
                               "left": 100,
-                              "top": 10,
+                              "top": 0,
                               "width": 43,
-                              "height": 36,
+                              "height": 40,
                               "displayOption": 4
                             },
                             {
                               "type": "DisplayData",
                               "style": {
                                 "inheritFrom": "mon_value_20_left",
+                                "alignVertical": "top",
                                 "backgroundColor": "text_enable_background",
-                                "activeColor": "text_enable_background"
+                                "activeColor": "text_enable_background",
+                                "padding": "9 0 0 4"
                               },
                               "data": "ain_value",
                               "action": "",
                               "left": 100,
-                              "top": 46,
-                              "width": 133,
-                              "height": 38,
+                              "top": 40,
+                              "width": 88,
+                              "height": 44,
                               "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "style": {
+                                "inheritFrom": "mon_value_20_left",
+                                "font": "Oswald24",
+                                "alignHorizontal": "center",
+                                "color": "status_warning",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "activeBackgroundColor": "status_warning"
+                              },
+                              "data": "ain_fault_status",
+                              "action": "",
+                              "left": 188,
+                              "top": 40,
+                              "width": 47,
+                              "height": 44,
+                              "displayOption": 0
                             },
                             {
                               "type": "Text",

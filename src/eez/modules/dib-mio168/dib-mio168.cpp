@@ -226,6 +226,7 @@ struct Response {
             uint8_t flags; // GET_STATE_COMMAND_FLAG_...
             uint8_t dinStates;
             float ainValues[4];
+            uint16_t ainFaultStatus;
             DlogState dlogState;
         } getState;
 
@@ -454,10 +455,13 @@ struct DoutChannel {
 };
 
 struct AinChannel {
+	int m_subchannelIndex;
     float m_value = 0;
     uint8_t m_mode = 1;
     uint8_t m_range = 0;
     char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
+
+	AinChannel(int subchannelIndex) : m_subchannelIndex(subchannelIndex) {}
 
     struct ProfileParameters {
         uint8_t mode;
@@ -520,27 +524,43 @@ struct AinChannel {
     }
 
 	Unit getUnit() {
-		return m_mode == MEASURE_MODE_VOLTAGE ? UNIT_VOLT : UNIT_AMPER;
+		if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+			return m_mode == MEASURE_MODE_VOLTAGE ? UNIT_VOLT : UNIT_MILLI_AMPER;
+		} else {
+			return m_mode == MEASURE_MODE_VOLTAGE ? UNIT_VOLT : m_range == 0 ? UNIT_MILLI_AMPER : UNIT_AMPER;
+		}
 	}
 
 	int getNumFixedDecimals() {
-		if (m_mode == MEASURE_MODE_VOLTAGE) {
-            if (m_range == 0) {
-                return 4;
-            } else if (m_range == 1) {
-                return 3;
-            } else {
-                return 2;
-            }
+		if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+			if (m_mode == MEASURE_MODE_VOLTAGE) {
+				if (m_range == 0) {
+					return 4; // +/- 2.4 V
+				} else if (m_range == 1) {
+					return 3; // +/- 48 V
+				} else {
+					return 2; // +/- 240 V
+				}
+			} else {
+				return 2; // +/- 48 mA -> 5-3 = 2
+			}
 		} else {
-            if (m_range == 0) {
-                return 5;
-            } else if (m_range == 1) {
-                return 4;
-            } else {
-                return 3;
-            }
-        }
+			if (m_mode == MEASURE_MODE_VOLTAGE) {
+				if (m_range == 0) {
+					return 4; // +/- 2.4 V
+				} else {
+					return 3; // +/- 12 V
+				}
+			} else {
+				if (m_range == 0) {
+					return 2; // +/- 24 mA -> 5-3 = 2
+				} else if (m_range == 1) {
+					return 4; // +/- 1.2 A
+				} else {
+					return 3; // +/- 10 A
+				}
+			}
+		}
 	}
 
     float getResolution() {
@@ -1115,10 +1135,23 @@ public:
 
     DinChannel dinChannel;
     DoutChannel doutChannel;
-    AinChannel ainChannels[4];
+	AinChannel ainChannels[4]{ 
+		AinChannel(AIN_1_SUBCHANNEL_INDEX),
+		AinChannel(AIN_2_SUBCHANNEL_INDEX),
+		AinChannel(AIN_3_SUBCHANNEL_INDEX),
+		AinChannel(AIN_4_SUBCHANNEL_INDEX)
+	};
     AoutDac7760Channel aoutDac7760Channels[2];
     AoutDac7563Channel aoutDac7563Channels[2];
     PwmChannel pwmChannels[2];
+
+    uint16_t ainFaultStatus;
+    bool isFaultP(int subchannelIndex) {
+        return (ainFaultStatus & (1 << (8 + subchannelIndex - AIN_1_SUBCHANNEL_INDEX))) != 0;
+    }
+    bool isFaultN(int subchannelIndex) {
+        return (ainFaultStatus & (1 << (subchannelIndex - AIN_1_SUBCHANNEL_INDEX))) != 0;
+    }
 
     uint8_t dac7760CalibrationChannelMode;
     uint8_t dac7760CalibrationChannelCurrentRange;
@@ -1243,6 +1276,7 @@ public:
                 auto &channel = ainChannels[i];
                 channel.addValue(data.ainValues[i]);
             }
+            ainFaultStatus = data.ainFaultStatus;
 
             if (data.flags & GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT) {
                 if (!fs_driver::isDriverLinked(slotIndex)) {
@@ -3187,7 +3221,6 @@ public:
 			{ 1, "\xbd""48 V" },
 			{ 2, "\xbd""240 V" },
             { 3, "\xbd""48 mA" },
-            { 4, "Open" },
 			{ 0, 0 }
 		};
 
@@ -3197,7 +3230,6 @@ public:
 			{ 2, "\xbd""24 mA" },
             { 3, "\xbd""1.2 A" },
             { 4, "\xbd""10 A" },
-            { 5, "Open" },
 			{ 0, 0 }
 		};
 
@@ -3239,23 +3271,17 @@ public:
             if (modeRange < 3) {
                 channel.m_mode = MEASURE_MODE_VOLTAGE;
                 channel.m_range = modeRange;
-            } else if (modeRange < 4) {
-                channel.m_mode = MEASURE_MODE_CURRENT;
-                channel.m_range = 0;
             } else {
-                channel.m_mode = MEASURE_MODE_OPEN;
+                channel.m_mode = MEASURE_MODE_CURRENT;
                 channel.m_range = 0;
             }
         } else {
             if (modeRange < 2) {
                 channel.m_mode = MEASURE_MODE_VOLTAGE;
                 channel.m_range = modeRange;
-            } else if (modeRange < 5) {
+            } else {
                 channel.m_mode = MEASURE_MODE_CURRENT;
                 channel.m_range = modeRange - 2;
-            } else {
-                channel.m_mode = MEASURE_MODE_OPEN;
-                channel.m_range = 0;
             }
         }
     }
@@ -3708,10 +3734,10 @@ void data_dib_mio168_ain_channels(DataOperationEnum operation, Cursor cursor, Va
 }
 
 void data_dib_mio168_ain_label(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int slotIndex = cursor / 4;
-        int subchannelIndex = cursor % 4;
-
+	int slotIndex = cursor / 4;
+	int subchannelIndex = cursor % 4;
+	
+	if (operation == DATA_OPERATION_GET) {
         if (isPageOnStack(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS)) {
             const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, AIN_1_SUBCHANNEL_INDEX + subchannelIndex);
             if (*label) {
@@ -3731,7 +3757,18 @@ void data_dib_mio168_ain_label(DataOperationEnum operation, Cursor cursor, Value
 
             value = getChannelLabel(slotIndex, AIN_1_SUBCHANNEL_INDEX + ainChannelIndex);
         }
-    }
+    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+		if (
+            !dlog_record::isIdle() &&
+            dlog_record::g_recording.parameters.isDlogItemEnabled(
+                slotIndex,
+                AIN_1_SUBCHANNEL_INDEX + subchannelIndex,
+                DLOG_RESOURCE_TYPE_U
+            )
+        ) {
+			value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+		}
+	}
 }
 
 void data_dib_mio168_ain_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -3748,15 +3785,12 @@ void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value
 	if (operation == DATA_OPERATION_GET) {
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
 		auto &channel = mio168Module->ainChannels[ainChannelIndex];
-		if (channel.m_mode == MEASURE_MODE_OPEN) {
-			value = "-";
-		} else {
-			value = MakeValue(
-                channel.m_value,
-                channel.getUnit(),
-                FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(channel.getNumFixedDecimals())
-            );
-		}
+        Unit unit = channel.getUnit();
+        value = MakeValue(
+            unit == UNIT_MILLI_AMPER ? channel.m_value * 1000.0f : channel.m_value,
+            unit,
+            FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(channel.getNumFixedDecimals())
+        );
 	} else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
 		if (
             !dlog_record::isIdle() &&
@@ -3771,12 +3805,33 @@ void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value
 	}
 }
 
-static EnumItem g_ainModeEnumDefinition[] = {
-    { MEASURE_MODE_CURRENT, "Current" },
-    { MEASURE_MODE_VOLTAGE, "Voltage" },
-    { MEASURE_MODE_OPEN, "Open" },
-    { 0, 0 }
-};
+void data_dib_mio168_ain_fault_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+	int slotIndex = cursor / 4;
+	int subchannelIndex = AIN_1_SUBCHANNEL_INDEX + cursor % 4;
+	if (operation == DATA_OPERATION_GET) {
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+        if (mio168Module->isFaultP(subchannelIndex) && mio168Module->isFaultN(subchannelIndex)) {
+            value = "PN";
+        } else if (mio168Module->isFaultP(subchannelIndex)) {
+            value = "P";
+        } else if (mio168Module->isFaultN(subchannelIndex)) {
+            value = "N";
+        } else {
+            value = "";
+        }
+	} else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+		if (
+            !dlog_record::isIdle() &&
+            dlog_record::g_recording.parameters.isDlogItemEnabled(
+                slotIndex,
+				subchannelIndex,
+                DLOG_RESOURCE_TYPE_U
+            )
+        ) {
+			value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+		}
+	}
+}
 
 void data_dib_mio168_ain_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
@@ -3784,16 +3839,11 @@ void data_dib_mio168_ain_mode(DataOperationEnum operation, Cursor cursor, Value 
     }
 }
 
-void onSetAinMode(uint16_t value) {
-    popPage();
-    g_ainConfigurationPage.m_mode = (uint8_t)value;
+void action_dib_mio168_ain_select_mode() {
+    g_ainConfigurationPage.m_mode = g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE ? MEASURE_MODE_CURRENT : MEASURE_MODE_VOLTAGE;
     if (g_ainConfigurationPage.m_range > AinChannel::getRangeMaxValue(g_ainConfigurationPage.g_selectedChannelIndex, g_ainConfigurationPage.m_mode)) {
         g_ainConfigurationPage.m_range = 0;
     }
-}
-
-void action_dib_mio168_ain_select_mode() {
-    pushSelectFromEnumPage(g_ainModeEnumDefinition, g_ainConfigurationPage.m_mode, nullptr, onSetAinMode);
 }
 
 void data_dib_mio168_ain_range_is_available(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -3856,8 +3906,7 @@ void action_dib_mio168_ain_select_mode_and_range() {
         AinConfigurationPage::getModeRangeEnumDefinition(slotIndex, subchannelIndex),
         AinConfigurationPage::getModeRange(slotIndex, subchannelIndex),
         nullptr, 
-        onSetAinModeRange,
-		subchannelIndex == AIN_3_SUBCHANNEL_INDEX || subchannelIndex == AIN_4_SUBCHANNEL_INDEX
+        onSetAinModeRange
     );
 }
 
@@ -4357,3 +4406,4 @@ void action_dib_mio168_pager_select_page() {
 } // namespace gui
 
 } // namespace eez
+

@@ -96,7 +96,6 @@ scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
 static scpi_choice_def_t g_measureModeChoice[] = {
     { "CURRent", MEASURE_MODE_CURRENT },
     { "VOLTage", MEASURE_MODE_VOLTAGE },
-    { "VOLTage", MEASURE_MODE_OPEN },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 

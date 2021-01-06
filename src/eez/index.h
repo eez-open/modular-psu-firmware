@@ -68,8 +68,7 @@ enum SourceMode {
 
 enum MeasureMode {
     MEASURE_MODE_CURRENT,
-    MEASURE_MODE_VOLTAGE,
-    MEASURE_MODE_OPEN
+    MEASURE_MODE_VOLTAGE
 };
 
 static const int MAX_NUM_CH_IN_CH_LIST = 32;
