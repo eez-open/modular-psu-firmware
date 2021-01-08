@@ -149,11 +149,11 @@ struct DeviceConfiguration {
     float reserved52; // was triggerDelay
 
     struct {
-        unsigned reserved1 : 1;
-        unsigned reserved2 : 7;
+        unsigned reserved2 : 8;
     } reserved53[4]; // was ioPins
 
-    unsigned reserved54 : 1; // was triggerContinuousInitializationEnabled
+
+    unsigned powerLineFrequencyMode : 1; // 0 - 50 Hz, 1 - 60 Hz
 
     unsigned isFrontPanelLocked : 1;
 
@@ -342,6 +342,12 @@ void setDlogViewShowLabels(bool showLabels);
 
 bool isSlotEnabled(int slotIndex);
 void setSlotEnabled(int slotIndex, bool enabled);
+
+// returns 50 or 60
+int getPowerLineFrequency();
+
+// powerLineFrequency parameter accepts value 50 or 60
+void setPowerLineFrequency(int powerLineFrequency);
 
 ////////////////////////////////////////////////////////////////////////////////
 

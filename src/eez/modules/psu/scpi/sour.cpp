@@ -1467,19 +1467,19 @@ static scpi_choice_def_t g_sourceModeChoice[] = {
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
-scpi_result_t scpi_cmd_sourceMode(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
+scpi_result_t scpi_cmd_sourceFunctionOn(scpi_t *context) {
     int32_t mode;
     if (!SCPI_ParamChoice(context, g_sourceModeChoice, &mode, true)) {
         return SCPI_RES_ERR;
     }
 
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
     int err;
-    if (!channel_dispatcher::setMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, (SourceMode)mode, &err)) {
+    if (!channel_dispatcher::setSourceMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, (SourceMode)mode, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -1487,15 +1487,15 @@ scpi_result_t scpi_cmd_sourceMode(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceModeQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionOnQ(scpi_t *context) {
     SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
     SourceMode mode;
     int err;
-    if (!channel_dispatcher::getMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, mode, &err)) {
+    if (!channel_dispatcher::getSourceMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, mode, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -1506,23 +1506,18 @@ scpi_result_t scpi_cmd_sourceModeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceCurrentRange(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
     int32_t range;
     if (!SCPI_ParamInt32(context, &range, true)) {
         return SCPI_RES_ERR;
     }
 
-    if (range < 5 || range > 7) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
     int err;
-    if (!channel_dispatcher::setCurrentRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
+    if (!channel_dispatcher::setSourceCurrentRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -1532,13 +1527,13 @@ scpi_result_t scpi_cmd_sourceCurrentRange(scpi_t *context) {
 
 scpi_result_t scpi_cmd_sourceCurrentRangeQ(scpi_t *context) {
     SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
     uint8_t range;
     int err;
-    if (!channel_dispatcher::getCurrentRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
+    if (!channel_dispatcher::getSourceCurrentRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -1549,23 +1544,18 @@ scpi_result_t scpi_cmd_sourceCurrentRangeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceVoltageRange(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
     int32_t range;
     if (!SCPI_ParamInt32(context, &range, true)) {
         return SCPI_RES_ERR;
     }
 
-    if (range < 0 || range > 3) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
     int err;
-    if (!channel_dispatcher::setVoltageRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
+    if (!channel_dispatcher::setSourceVoltageRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -1575,13 +1565,13 @@ scpi_result_t scpi_cmd_sourceVoltageRange(scpi_t *context) {
 
 scpi_result_t scpi_cmd_sourceVoltageRangeQ(scpi_t *context) {
     SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
     uint8_t range;
     int err;
-    if (!channel_dispatcher::getVoltageRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
+    if (!channel_dispatcher::getSourceVoltageRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }

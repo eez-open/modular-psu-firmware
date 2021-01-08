@@ -79,10 +79,6 @@
     SCPI_COMMAND("MEASure[:SCALar]:CURRent[:DC]?", scpi_cmd_measureScalarCurrentDcQ) \
     SCPI_COMMAND("MEASure[:SCALar]:POWer[:DC]?", scpi_cmd_measureScalarPowerDcQ) \
     SCPI_COMMAND("MEASure[:SCALar][:VOLTage][:DC]?", scpi_cmd_measureScalarVoltageDcQ) \
-    SCPI_COMMAND("MEASure[:SCALar]:MODe", scpi_cmd_measureScalarMode) \
-    SCPI_COMMAND("MEASure[:SCALar]:MODe?", scpi_cmd_measureScalarModeQ) \
-    SCPI_COMMAND("MEASure[:SCALar]:RANGe", scpi_cmd_measureScalarRange) \
-    SCPI_COMMAND("MEASure[:SCALar]:RANGe?", scpi_cmd_measureScalarRangeQ) \
     SCPI_COMMAND("MEASure:DIGital[:BYTE]?", scpi_cmd_measureDigitalByteQ) \
     SCPI_COMMAND("MEMory:NSTates?", scpi_cmd_memoryNstatesQ) \
     SCPI_COMMAND("MEMory:STATe:CATalog?", scpi_cmd_memoryStateCatalogQ) \
@@ -144,8 +140,18 @@
     SCPI_COMMAND("ROUTe:LABel:COLumn?", scpi_cmd_routeLabelColumnQ) \
     SCPI_COMMAND("ROUTe:LABel:CHANnel", scpi_cmd_routeLabelChannel) \
     SCPI_COMMAND("ROUTe:LABel:CHANnel?", scpi_cmd_routeLabelChannelQ) \
-    SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe[:UPPer]", scpi_cmd_senseCurrentDcRangeUpper) \
-    SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe[:UPPer]?", scpi_cmd_senseCurrentDcRangeUpperQ) \
+    SCPI_COMMAND("SENSe:FUNCtion[:ON]", scpi_cmd_senseFunctionOn) \
+    SCPI_COMMAND("SENSe:FUNCtion[:ON]?", scpi_cmd_senseFunctionOnQ) \
+    SCPI_COMMAND("[SENSe]:CURRent[:DC]:RANGe", scpi_cmd_senseCurrentDcRange) \
+    SCPI_COMMAND("[SENSe]:CURRent[:DC]:RANGe?", scpi_cmd_senseCurrentDcRangeQ) \
+    SCPI_COMMAND("[SENSe]:VOLTage[:DC]:RANGe", scpi_cmd_senseVoltageDcRange) \
+    SCPI_COMMAND("[SENSe]:VOLTage[:DC]:RANGe?", scpi_cmd_senseVoltageDcRangeQ) \
+    SCPI_COMMAND("SENSe:CURRent[:DC]:NPLCycles", scpi_cmd_senseCurrentDcNplcycles) \
+    SCPI_COMMAND("SENSe:CURRent[:DC]:NPLCycles?", scpi_cmd_senseCurrentDcNplcyclesQ) \
+    SCPI_COMMAND("SENSe:CURRent[:DC]:APERture?", scpi_cmd_senseCurrentDcApertureQ) \
+    SCPI_COMMAND("SENSe:VOLTage[:DC]:NPLCycles", scpi_cmd_senseVoltageDcNplcycles) \
+    SCPI_COMMAND("SENSe:VOLTage[:DC]:NPLCycles?", scpi_cmd_senseVoltageDcNplcyclesQ) \
+    SCPI_COMMAND("SENSe:VOLTage[:DC]:APERture?", scpi_cmd_senseVoltageDcApertureQ) \
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:CURRent", scpi_cmd_senseDlogFunctionCurrent) \
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:CURRent?", scpi_cmd_senseDlogFunctionCurrentQ) \
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:POWer", scpi_cmd_senseDlogFunctionPower) \
@@ -248,12 +254,12 @@
     SCPI_COMMAND("[SOURce#]:DIGital:RANGe?", scpi_cmd_sourceDigitalRangeQ) \
     SCPI_COMMAND("[SOURce#]:DIGital:SPEED", scpi_cmd_sourceDigitalSpeed) \
     SCPI_COMMAND("[SOURce#]:DIGital:SPEED?", scpi_cmd_sourceDigitalSpeedQ) \
-    SCPI_COMMAND("[SOURce#]:MODe", scpi_cmd_sourceMode) \
-    SCPI_COMMAND("[SOURce#]:MODe?", scpi_cmd_sourceModeQ) \
-    SCPI_COMMAND("[SOURce#]:CURRent:RANGe", scpi_cmd_sourceCurrentRange) \
-    SCPI_COMMAND("[SOURce#]:CURRent:RANGe?", scpi_cmd_sourceCurrentRangeQ) \
-    SCPI_COMMAND("[SOURce#]:VOLTage:RANGe", scpi_cmd_sourceVoltageRange) \
-    SCPI_COMMAND("[SOURce#]:VOLTage:RANGe?", scpi_cmd_sourceVoltageRangeQ) \
+    SCPI_COMMAND("SOURce:FUNCtion[:ON]", scpi_cmd_sourceFunctionOn) \
+    SCPI_COMMAND("SOURce:FUNCtion[:ON]?", scpi_cmd_sourceFunctionOnQ) \
+    SCPI_COMMAND("SOURce:CURRent:RANGe", scpi_cmd_sourceCurrentRange) \
+    SCPI_COMMAND("SOURce:CURRent:RANGe?", scpi_cmd_sourceCurrentRangeQ) \
+    SCPI_COMMAND("SOURce:VOLTage:RANGe", scpi_cmd_sourceVoltageRange) \
+    SCPI_COMMAND("SOURce:VOLTage:RANGe?", scpi_cmd_sourceVoltageRangeQ) \
     SCPI_COMMAND("STATus:OPERation:CONDition?", scpi_cmd_statusOperationConditionQ) \
     SCPI_COMMAND("STATus:OPERation:ENABle", scpi_cmd_statusOperationEnable) \
     SCPI_COMMAND("STATus:OPERation:ENABle?", scpi_cmd_statusOperationEnableQ) \
@@ -404,6 +410,8 @@
     SCPI_COMMAND("SYSTem:TIME:ZONE?", scpi_cmd_systemTimeZoneQ) \
     SCPI_COMMAND("SYSTem:TIME?", scpi_cmd_systemTimeQ) \
     SCPI_COMMAND("SYSTem:VERSion?", scpi_cmd_systemVersionQ) \
+    SCPI_COMMAND("SYSTem:LFRequency", scpi_cmd_systemLfrequency) \
+    SCPI_COMMAND("SYSTem:LFRequency?", scpi_cmd_systemLfrequencyQ) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \
     SCPI_COMMAND("TRIGger:DLOG[:IMMediate]", scpi_cmd_triggerDlogImmediate) \

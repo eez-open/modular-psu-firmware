@@ -2208,28 +2208,28 @@ bool setDigitalOutputData(int slotIndex, int subchannelIndex, uint8_t data, int 
     return g_slots[slotIndex]->setDigitalOutputData(subchannelIndex, data, err);
 }
 
-bool getMode(int slotIndex, int subchannelIndex, SourceMode &mode, int *err) {
-    return g_slots[slotIndex]->getMode(subchannelIndex, mode, err);
+bool getSourceMode(int slotIndex, int subchannelIndex, SourceMode &mode, int *err) {
+    return g_slots[slotIndex]->getSourceMode(subchannelIndex, mode, err);
 }
 
-bool setMode(int slotIndex, int subchannelIndex, SourceMode mode, int *err) {
-    return g_slots[slotIndex]->setMode(subchannelIndex, mode, err);
+bool setSourceMode(int slotIndex, int subchannelIndex, SourceMode mode, int *err) {
+    return g_slots[slotIndex]->setSourceMode(subchannelIndex, mode, err);
 }
 
-bool getCurrentRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err) {
-    return g_slots[slotIndex]->getCurrentRange(subchannelIndex, range, err);
+bool getSourceCurrentRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err) {
+    return g_slots[slotIndex]->getSourceCurrentRange(subchannelIndex, range, err);
 }
 
-bool setCurrentRange(int slotIndex, int subchannelIndex, uint8_t range, int *err) {
-    return g_slots[slotIndex]->setCurrentRange(subchannelIndex, range, err);
+bool setSourceCurrentRange(int slotIndex, int subchannelIndex, uint8_t range, int *err) {
+    return g_slots[slotIndex]->setSourceCurrentRange(subchannelIndex, range, err);
 }
 
-bool getVoltageRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err) {
-    return g_slots[slotIndex]->getVoltageRange(subchannelIndex, range, err);
+bool getSourceVoltageRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err) {
+    return g_slots[slotIndex]->getSourceVoltageRange(subchannelIndex, range, err);
 }
 
-bool setVoltageRange(int slotIndex, int subchannelIndex, uint8_t range, int *err) {
-    return g_slots[slotIndex]->setVoltageRange(subchannelIndex, range, err);
+bool setSourceVoltageRange(int slotIndex, int subchannelIndex, uint8_t range, int *err) {
+    return g_slots[slotIndex]->setSourceVoltageRange(subchannelIndex, range, err);
 }
 
 bool getMeasureMode(int slotIndex, int subchannelIndex, MeasureMode &mode, int *err) {
@@ -2240,12 +2240,36 @@ bool setMeasureMode(int slotIndex, int subchannelIndex, MeasureMode mode, int *e
     return g_slots[slotIndex]->setMeasureMode(subchannelIndex, mode, err);
 }
 
-bool getMeasureRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err) {
-    return g_slots[slotIndex]->getMeasureRange(subchannelIndex, range, err);
+bool getMeasureCurrentRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err) {
+    return g_slots[slotIndex]->getMeasureCurrentRange(subchannelIndex, range, err);
 }
 
-bool setMeasureRange(int slotIndex, int subchannelIndex, uint8_t range, int *err) {
-    return g_slots[slotIndex]->setMeasureRange(subchannelIndex, range, err);
+bool setMeasureCurrentRange(int slotIndex, int subchannelIndex, uint8_t range, int *err) {
+    return g_slots[slotIndex]->setMeasureCurrentRange(subchannelIndex, range, err);
+}
+
+bool getMeasureVoltageRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err) {
+    return g_slots[slotIndex]->getMeasureVoltageRange(subchannelIndex, range, err);
+}
+
+bool setMeasureVoltageRange(int slotIndex, int subchannelIndex, uint8_t range, int *err) {
+    return g_slots[slotIndex]->setMeasureVoltageRange(subchannelIndex, range, err);
+}
+
+bool getMeasureCurrentNumPowerLineCycles(int slotIndex, int subchannelIndex, uint8_t &numPowerLineCycles, int *err) {
+    return g_slots[slotIndex]->getMeasureCurrentNumPowerLineCycles(subchannelIndex, numPowerLineCycles, err);
+}
+
+bool setMeasureCurrentNumPowerLineCylces(int slotIndex, int subchannelIndex, uint8_t numPowerLineCycles, int *err) {
+    return g_slots[slotIndex]->setMeasureCurrentNumPowerLineCycles(subchannelIndex, numPowerLineCycles, err);
+}
+
+bool getMeasureVoltageNumPowerLineCycles(int slotIndex, int subchannelIndex, uint8_t &numPowerLineCycles, int *err) {
+    return g_slots[slotIndex]->getMeasureVoltageNumPowerLineCycles(subchannelIndex, numPowerLineCycles, err);
+}
+
+bool setMeasureVoltageNumPowerLineCylces(int slotIndex, int subchannelIndex, uint8_t numPowerLineCycles, int *err) {
+    return g_slots[slotIndex]->setMeasureVoltageNumPowerLineCycles(subchannelIndex, numPowerLineCycles, err);
 }
 
 bool routeOpen(ChannelList channelList, int *err) {

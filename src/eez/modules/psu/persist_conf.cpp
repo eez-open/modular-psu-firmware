@@ -1297,6 +1297,18 @@ void setSlotEnabled(int slotIndex, bool enabled) {
     }
 }
 
+int getPowerLineFrequency() {
+    return g_devConf.powerLineFrequencyMode == 0 ? 50 : 60;
+}
+
+void setPowerLineFrequency(int powerLineFrequency) {
+    if (powerLineFrequency == 50) {
+        g_devConf.powerLineFrequencyMode = 0;
+    } else if (powerLineFrequency == 60) {
+        g_devConf.powerLineFrequencyMode = 1;
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 ModuleConfiguration g_moduleConf[NUM_SLOTS];

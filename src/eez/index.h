@@ -290,20 +290,29 @@ struct Module {
     virtual bool getDigitalOutputData(int subchannelIndex, uint8_t &data, int *err);
     virtual bool setDigitalOutputData(int subchannelIndex, uint8_t data, int *err);
 
-    virtual bool getMode(int subchannelIndex, SourceMode &mode, int *err);
-    virtual bool setMode(int subchannelIndex, SourceMode mode, int *err);
+    virtual bool getSourceMode(int subchannelIndex, SourceMode &mode, int *err);
+    virtual bool setSourceMode(int subchannelIndex, SourceMode mode, int *err);
 
-    virtual bool getCurrentRange(int subchannelIndex, uint8_t &range, int *err);
-    virtual bool setCurrentRange(int subchannelIndex, uint8_t range, int *err);
+    virtual bool getSourceCurrentRange(int subchannelIndex, uint8_t &range, int *err);
+    virtual bool setSourceCurrentRange(int subchannelIndex, uint8_t range, int *err);
 
-    virtual bool getVoltageRange(int subchannelIndex, uint8_t &range, int *err);
-    virtual bool setVoltageRange(int subchannelIndex, uint8_t range, int *err);
+    virtual bool getSourceVoltageRange(int subchannelIndex, uint8_t &range, int *err);
+    virtual bool setSourceVoltageRange(int subchannelIndex, uint8_t range, int *err);
 
     virtual bool getMeasureMode(int subchannelIndex, MeasureMode &mode, int *err);
     virtual bool setMeasureMode(int subchannelIndex, MeasureMode mode, int *err);
 
-    virtual bool getMeasureRange(int subchannelIndex, uint8_t &range, int *err);
-    virtual bool setMeasureRange(int subchannelIndex, uint8_t range, int *err);
+    virtual bool getMeasureCurrentRange(int subchannelIndex, uint8_t &range, int *err);
+    virtual bool setMeasureCurrentRange(int subchannelIndex, uint8_t range, int *err);
+
+    virtual bool getMeasureVoltageRange(int subchannelIndex, uint8_t &range, int *err);
+    virtual bool setMeasureVoltageRange(int subchannelIndex, uint8_t range, int *err);
+
+    virtual bool getMeasureCurrentNumPowerLineCycles(int subchannelIndex, uint8_t &numPowerLineCycles, int *err);
+    virtual bool setMeasureCurrentNumPowerLineCycles(int subchannelIndex, uint8_t numPowerLineCycles, int *err);
+
+    virtual bool getMeasureVoltageNumPowerLineCycles(int subchannelIndex, uint8_t &numPowerLineCycles, int *err);
+    virtual bool setMeasureVoltageNumPowerLineCycles(int subchannelIndex, uint8_t numPowerLineCycles, int *err);
 
     virtual bool isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err);
     virtual bool routeOpen(ChannelList channelList, int *err);

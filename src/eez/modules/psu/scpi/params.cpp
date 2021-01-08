@@ -243,6 +243,7 @@ bool getChannelFromParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchan
         slotAndSubchannelIndex = channelList.channels[0];
         return true;
     }
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
     return false;
 }
 

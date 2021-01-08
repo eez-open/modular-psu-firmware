@@ -69,7 +69,7 @@ scpi_result_t scpi_cmd_instrumentSelect(scpi_t *context) {
 
     SlotAndSubchannelIndex slotAndSubchannelIndex;
     if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
+		return SCPI_RES_ERR;
     }
 
     Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);

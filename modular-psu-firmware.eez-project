@@ -61010,118 +61010,6 @@
             }
           },
           {
-            "name": "MEASure[:SCALar]:MODe",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
-            "parameters": [
-              {
-                "name": "mode",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "MeasureMode"
-                  }
-                ],
-                "isOptional": false
-              },
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "numeric"
-                }
-              ]
-            }
-          },
-          {
-            "name": "MEASure[:SCALar]:MODe?",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
-            "parameters": [
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "discrete",
-                  "enumeration": "MeasureMode"
-                }
-              ]
-            }
-          },
-          {
-            "name": "MEASure[:SCALar]:RANGe",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
-            "parameters": [
-              {
-                "name": "range",
-                "type": [
-                  {
-                    "type": "nr1"
-                  }
-                ],
-                "isOptional": false
-              },
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "numeric"
-                }
-              ]
-            }
-          },
-          {
-            "name": "MEASure[:SCALar]:RANGe?",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
-            "parameters": [
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "nr1"
-                }
-              ]
-            }
-          },
-          {
             "name": "MEASure:DIGital[:BYTE]?",
             "parameters": [
               {
@@ -62477,7 +62365,64 @@
         "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html",
         "commands": [
           {
-            "name": "SENSe:CURRent[:DC]:RANGe[:UPPer]",
+            "name": "SENSe:FUNCtion[:ON]",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "function",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "MeasureFunction"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SENSe:FUNCtion[:ON]?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "MeasureFunction"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SENSe]:CURRent[:DC]:RANGe",
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_curr_rang",
             "parameters": [
               {
@@ -62492,6 +62437,16 @@
                   }
                 ],
                 "isOptional": false
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
               }
             ],
             "response": {
@@ -62501,13 +62456,234 @@
             }
           },
           {
-            "name": "SENSe:CURRent[:DC]:RANGe[:UPPer]?",
+            "name": "[SENSe]:CURRent[:DC]:RANGe?",
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_curr_rang",
-            "parameters": [],
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ]
+              }
+            ],
             "response": {
               "type": [
                 {
                   "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SENSe]:VOLTage[:DC]:RANGe",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "range",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SENSe]:VOLTage[:DC]:RANGe?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SENSe:CURRent[:DC]:NPLCycles",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "cycles",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SENSe:CURRent[:DC]:NPLCycles?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SENSe:CURRent[:DC]:APERture?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SENSe:VOLTage[:DC]:NPLCycles",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "cycles",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SENSe:VOLTage[:DC]:NPLCycles?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SENSe:VOLTage[:DC]:APERture?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
                 }
               ]
             }
@@ -64549,14 +64725,14 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:MODe",
+            "name": "SOURce:FUNCtion[:ON]",
             "parameters": [
               {
-                "name": "mode",
+                "name": "function",
                 "type": [
                   {
                     "type": "discrete",
-                    "enumeration": "SourceMode"
+                    "enumeration": "SourceFunction"
                   }
                 ]
               }
@@ -64568,19 +64744,19 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:MODe?",
+            "name": "SOURce:FUNCtion[:ON]?",
             "parameters": [],
             "response": {
               "type": [
                 {
                   "type": "discrete",
-                  "enumeration": "SourceMode"
+                  "enumeration": "SourceFunction"
                 }
               ]
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:RANGe",
+            "name": "SOURce:CURRent:RANGe",
             "parameters": [
               {
                 "name": "range",
@@ -64598,7 +64774,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:RANGe?",
+            "name": "SOURce:CURRent:RANGe?",
             "parameters": [],
             "response": {
               "type": [
@@ -64609,7 +64785,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:RANGe",
+            "name": "SOURce:VOLTage:RANGe",
             "parameters": [
               {
                 "name": "range",
@@ -64627,7 +64803,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:RANGe?",
+            "name": "SOURce:VOLTage:RANGe?",
             "parameters": [],
             "response": {
               "type": [
@@ -67496,6 +67672,33 @@
                 }
               ]
             }
+          },
+          {
+            "name": "SYSTem:LFRequency",
+            "parameters": [
+              {
+                "name": "mode",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:LFRequency?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           }
         ]
       },
@@ -69354,7 +69557,7 @@
         ]
       },
       {
-        "name": "SourceMode",
+        "name": "SourceFunction",
         "members": [
           {
             "name": "CURRent",
@@ -69397,7 +69600,7 @@
         ]
       },
       {
-        "name": "MeasureMode",
+        "name": "MeasureFunction",
         "members": [
           {
             "name": "CURRent",

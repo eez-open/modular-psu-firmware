@@ -195,20 +195,29 @@ bool setDigitalInputSpeed(int slotIndex, int subchannelIndex, uint8_t pin, uint8
 bool getDigitalOutputData(int slotIndex, int subchannelIndex, uint8_t &data, int *err);
 bool setDigitalOutputData(int slotIndex, int subchannelIndex, uint8_t data, int *err);
 
-bool getMode(int slotIndex, int subchannelIndex, SourceMode &mode, int *err);
-bool setMode(int slotIndex, int subchannelIndex, SourceMode mode, int *err);
+bool getSourceMode(int slotIndex, int subchannelIndex, SourceMode &mode, int *err);
+bool setSourceMode(int slotIndex, int subchannelIndex, SourceMode mode, int *err);
 
-bool getCurrentRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
-bool setCurrentRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
+bool getSourceCurrentRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
+bool setSourceCurrentRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
 
-bool getVoltageRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
-bool setVoltageRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
+bool getSourceVoltageRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
+bool setSourceVoltageRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
 
 bool getMeasureMode(int slotIndex, int subchannelIndex, MeasureMode &mode, int *err);
 bool setMeasureMode(int slotIndex, int subchannelIndex, MeasureMode mode, int *err);
 
-bool getMeasureRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
-bool setMeasureRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
+bool getMeasureCurrentRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
+bool setMeasureCurrentRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
+
+bool getMeasureVoltageRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
+bool setMeasureVoltageRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
+
+bool getMeasureCurrentNumPowerLineCycles(int slotIndex, int subchannelIndex, uint8_t &numPowerLineCycles, int *err);
+bool setMeasureCurrentNumPowerLineCylces(int slotIndex, int subchannelIndex, uint8_t numPowerLineCycles, int *err);
+
+bool getMeasureVoltageNumPowerLineCycles(int slotIndex, int subchannelIndex, uint8_t &numPowerLineCycles, int *err);
+bool setMeasureVoltageNumPowerLineCylces(int slotIndex, int subchannelIndex, uint8_t numPowerLineCycles, int *err);
 
 bool isRouteOpen(int slotIndex, int subchannelIndex, int *err);
 bool routeOpen(ChannelList channelList, int *err);

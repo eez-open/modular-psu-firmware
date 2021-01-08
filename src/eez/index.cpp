@@ -368,42 +368,42 @@ bool Module::setDigitalOutputData(int subchannelIndex, uint8_t data, int *err) {
     return false;
 }
 
-bool Module::getMode(int subchannelIndex, SourceMode &mode, int *err) {
+bool Module::getSourceMode(int subchannelIndex, SourceMode &mode, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
     return false;
 }
 
-bool Module::setMode(int subchannelIndex, SourceMode mode, int *err) {
+bool Module::setSourceMode(int subchannelIndex, SourceMode mode, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
     return false;
 }
 
-bool Module::getCurrentRange(int subchannelIndex, uint8_t &range, int *err) {
+bool Module::getSourceCurrentRange(int subchannelIndex, uint8_t &range, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
     return false;
 }
 
-bool Module::setCurrentRange(int subchannelIndex, uint8_t range, int *err) {
+bool Module::setSourceCurrentRange(int subchannelIndex, uint8_t range, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
     return false;
 }
 
-bool Module::getVoltageRange(int subchannelIndex, uint8_t &range, int *err) {
+bool Module::getSourceVoltageRange(int subchannelIndex, uint8_t &range, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
     return false;
 }
 
-bool Module::setVoltageRange(int subchannelIndex, uint8_t range, int *err) {
+bool Module::setSourceVoltageRange(int subchannelIndex, uint8_t range, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
@@ -424,18 +424,60 @@ bool Module::setMeasureMode(int subchannelIndex, MeasureMode mode, int *err) {
     return false;
 }
 
-bool Module::getMeasureRange(int subchannelIndex, uint8_t &range, int *err) {
+bool Module::getMeasureCurrentRange(int subchannelIndex, uint8_t &range, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
     return false;
 }
 
-bool Module::setMeasureRange(int subchannelIndex, uint8_t range, int *err) {
+bool Module::setMeasureCurrentRange(int subchannelIndex, uint8_t range, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
     return false;
+}
+
+bool Module::getMeasureVoltageRange(int subchannelIndex, uint8_t &range, int *err) {
+	if (err) {
+		*err = SCPI_ERROR_HARDWARE_MISSING;
+	}
+	return false;
+}
+
+bool Module::setMeasureVoltageRange(int subchannelIndex, uint8_t range, int *err) {
+	if (err) {
+		*err = SCPI_ERROR_HARDWARE_MISSING;
+	}
+	return false;
+}
+
+bool Module::getMeasureCurrentNumPowerLineCycles(int subchannelIndex, uint8_t &numPowerLineCycles, int *err) {
+	if (err) {
+		*err = SCPI_ERROR_HARDWARE_MISSING;
+	}
+	return false;
+}
+
+bool Module::setMeasureCurrentNumPowerLineCycles(int subchannelIndex, uint8_t numPowerLineCycles, int *err) {
+	if (err) {
+		*err = SCPI_ERROR_HARDWARE_MISSING;
+	}
+	return false;
+}
+
+bool Module::getMeasureVoltageNumPowerLineCycles(int subchannelIndex, uint8_t &numPowerLineCycles, int *err) {
+	if (err) {
+		*err = SCPI_ERROR_HARDWARE_MISSING;
+	}
+	return false;
+}
+
+bool Module::setMeasureVoltageNumPowerLineCycles(int subchannelIndex, uint8_t numPowerLineCycles, int *err) {
+	if (err) {
+		*err = SCPI_ERROR_HARDWARE_MISSING;
+	}
+	return false;
 }
 
 bool Module::isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err) {

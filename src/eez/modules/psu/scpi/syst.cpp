@@ -2310,6 +2310,27 @@ scpi_result_t scpi_cmd_systemChannelPinLabelQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_systemLfrequency(scpi_t *context) {
+	uint32_t powerLineFrequency;
+	if (!SCPI_ParamUInt32(context, &powerLineFrequency, false)) {
+		return SCPI_RES_ERR;
+	}
+
+	if (powerLineFrequency != 50 && powerLineFrequency != 60) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
+
+	persist_conf::setPowerLineFrequency(powerLineFrequency);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemLfrequencyQ(scpi_t *context) {
+	SCPI_ResultUInt32(context, persist_conf::getPowerLineFrequency());
+	return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez
