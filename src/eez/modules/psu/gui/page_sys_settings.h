@@ -54,6 +54,7 @@ class SysSettingsDateTimePage : public SetPage {
     datetime::DstRule dstRule;
     datetime::Format dateTimeFormat;
     bool dateTimeModified;
+    int powerLineFrequency;
 
   private:
     bool origNtpEnabled;
@@ -62,6 +63,7 @@ class SysSettingsDateTimePage : public SetPage {
     int16_t origTimeZone;
     datetime::DstRule origDstRule;
     datetime::Format origDateTimeFormat;
+    int origPowerLineFrequency;
 
     static void onDstRuleSet(uint16_t value);
     static void onDateTimeFormatSet(uint16_t value);

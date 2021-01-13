@@ -1312,6 +1312,11 @@ void action_module_resync() {
     sendMessageToPsu(PSU_MESSAGE_MODULE_RESYNC, hmi::g_selectedSlotIndex);
 }
 
+void action_select_ac_mains() {
+    SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
+    page->powerLineFrequency = page->powerLineFrequency == 50 ? 60 : 50;
+}
+
 } // namespace gui
 } // namespace eez
 

@@ -452,29 +452,29 @@ bool Module::setMeasureVoltageRange(int subchannelIndex, uint8_t range, int *err
 	return false;
 }
 
-bool Module::getMeasureCurrentNumPowerLineCycles(int subchannelIndex, uint8_t &numPowerLineCycles, int *err) {
+bool Module::getMeasureCurrentNPLC(int subchannelIndex, float &nplc, int *err) {
 	if (err) {
 		*err = SCPI_ERROR_HARDWARE_MISSING;
 	}
 	return false;
 }
 
-bool Module::setMeasureCurrentNumPowerLineCycles(int subchannelIndex, uint8_t numPowerLineCycles, int *err) {
+bool Module::setMeasureCurrentNPLC(int subchannelIndex, float nplc, int *err) {
 	if (err) {
 		*err = SCPI_ERROR_HARDWARE_MISSING;
 	}
 	return false;
 }
 
-bool Module::getMeasureVoltageNumPowerLineCycles(int subchannelIndex, uint8_t &numPowerLineCycles, int *err) {
+bool Module::getMeasureVoltageNPLC(int subchannelIndex, float &nplc, int *err) {
 	if (err) {
 		*err = SCPI_ERROR_HARDWARE_MISSING;
 	}
 	return false;
 }
 
-bool Module::setMeasureVoltageNumPowerLineCycles(int subchannelIndex, uint8_t numPowerLineCycles, int *err) {
-	if (err) {
+bool Module::setMeasureVoltageNPLC(int subchannelIndex, float nplc, int *err) {
+	if (err) { 
 		*err = SCPI_ERROR_HARDWARE_MISSING;
 	}
 	return false;
@@ -687,7 +687,22 @@ bool Module::saveChannelCalibration(int subchannelIndex, int *err) {
     return false;
 }
 
+void Module::initChannelCalibration(int subchannelIndex) {
+}
+
 void Module::startChannelCalibration(int subchannelIndex) {
+}
+
+bool Module::calibrationReadAdcValue(int subchannelIndex, float &adcValue, int *err) {
+    adcValue = 0.0f;
+    return true;
+}
+
+bool Module::calibrationMeasure(int subchannelIndex, float &measuredValue, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS;
+    }
+    return false;
 }
 
 void Module::stopChannelCalibration(int subchannelIndex) {
@@ -699,6 +714,14 @@ unsigned int Module::getMaxCalibrationPoints(int m_subchannelIndex) {
 
 CalibrationValueType Module::getCalibrationValueType(int subchannelIndex) {
     return CALIBRATION_VALUE_U;
+}
+
+const char *Module::getCalibrationValueRangeDescription(int subchannelIndex) {
+    return nullptr;
+}
+
+bool Module::isCalibrationValueSource(int subchannelIndex) {
+    return true;
 }
 
 void Module::getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points) {

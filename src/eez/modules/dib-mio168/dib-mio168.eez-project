@@ -133,7 +133,7 @@
     {
       "name": "ain_mode",
       "type": "enum",
-      "enumItems": "[\"Current\", \"Voltage\", \"Open\"]",
+      "enumItems": "[\"Current\", \"Voltage\"]",
       "defaultValue": "0"
     },
     {
@@ -150,6 +150,26 @@
       "name": "ain_mode_and_range",
       "type": "string",
       "defaultValue": "\\u00bd 240 V"
+    },
+    {
+      "name": "ain_range_is_multiple_selection_available",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "ain_fault_status",
+      "type": "string",
+      "defaultValue": "PN"
+    },
+    {
+      "name": "ain_nplc",
+      "type": "float",
+      "defaultValue": "1"
+    },
+    {
+      "name": "ain_aperture",
+      "type": "float",
+      "defaultValue": "20 ms"
     },
     {
       "name": "aout_channels",
@@ -250,16 +270,6 @@
       "type": "enum",
       "enumItems": "[\"Overview\", \"Digital Inputs\", \"Digital Outputs\", \"Analog Inputs\", \"Analog Outputs\", \"PWM\"]",
       "defaultValue": "0"
-    },
-    {
-      "name": "ain_range_is_multiple_selection_available",
-      "type": "boolean",
-      "defaultValue": "1"
-    },
-    {
-      "name": "ain_fault_status",
-      "type": "string",
-      "defaultValue": "PN"
     }
   ],
   "actions": [
@@ -3792,7 +3802,7 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 143,
+                "width": 78,
                 "height": 40,
                 "text": "Mode:"
               },
@@ -3803,7 +3813,7 @@
                 },
                 "data": "ain_mode",
                 "action": "ain_select_mode",
-                "left": 178,
+                "left": 78,
                 "top": 0,
                 "width": 200,
                 "height": 40,
@@ -3833,19 +3843,6 @@
                     "width": 200,
                     "height": 40,
                     "text": "Voltage"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_M_center"
-                    },
-                    "data": "",
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 200,
-                    "height": 40,
-                    "text": "Open"
                   }
                 ]
               },
@@ -3857,7 +3854,7 @@
                 "data": "ain_range_is_available",
                 "left": 0,
                 "top": 48,
-                "width": 378,
+                "width": 278,
                 "height": 40,
                 "widgets": [
                   {
@@ -3867,7 +3864,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 378,
+                    "width": 278,
                     "height": 40,
                     "invertColors": true
                   },
@@ -3879,7 +3876,7 @@
                     "data": "ain_range_is_multiple_selection_available",
                     "left": 0,
                     "top": 0,
-                    "width": 378,
+                    "width": 278,
                     "height": 40,
                     "widgets": [
                       {
@@ -3889,7 +3886,7 @@
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 378,
+                        "width": 278,
                         "height": 40,
                         "widgets": [
                           {
@@ -3899,7 +3896,7 @@
                             },
                             "left": 0,
                             "top": 0,
-                            "width": 143,
+                            "width": 78,
                             "height": 40,
                             "text": "Range:"
                           },
@@ -3907,11 +3904,12 @@
                             "type": "Text",
                             "style": {
                               "inheritFrom": "edit_value_M_left",
-                              "alignHorizontal": "center"
+                              "alignHorizontal": "center",
+                              "borderSize": "1"
                             },
                             "data": "ain_range",
                             "action": "",
-                            "left": 178,
+                            "left": 78,
                             "top": 0,
                             "width": 200,
                             "height": 40,
@@ -3926,7 +3924,7 @@
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 378,
+                        "width": 278,
                         "height": 40,
                         "widgets": [
                           {
@@ -3936,7 +3934,7 @@
                             },
                             "left": 0,
                             "top": 0,
-                            "width": 143,
+                            "width": 78,
                             "height": 40,
                             "text": "Range:"
                           },
@@ -3947,7 +3945,7 @@
                             },
                             "data": "ain_range",
                             "action": "ain_select_range",
-                            "left": 178,
+                            "left": 78,
                             "top": 0,
                             "width": 200,
                             "height": 40,
@@ -3956,6 +3954,70 @@
                         ]
                       }
                     ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 96,
+                "width": 464,
+                "height": 40,
+                "name": "NPLC & Aperture",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_M_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 78,
+                    "height": 40,
+                    "text": "NPLC:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "ain_nplc",
+                    "action": "edit_no_focus",
+                    "left": 78,
+                    "top": 0,
+                    "width": 100,
+                    "height": 40,
+                    "text": ""
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_M_left",
+                      "margin": "0"
+                    },
+                    "left": 186,
+                    "top": 0,
+                    "width": 92,
+                    "height": 40,
+                    "text": "Aperture:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_M_left",
+                      "alignHorizontal": "center",
+                      "borderSize": "1"
+                    },
+                    "data": "ain_aperture",
+                    "action": "",
+                    "left": 278,
+                    "top": 0,
+                    "width": 100,
+                    "height": 40,
+                    "text": ""
                   }
                 ]
               },
@@ -3969,7 +4031,7 @@
                 },
                 "action": "show_calibration",
                 "left": 0,
-                "top": 98,
+                "top": 144,
                 "width": 178,
                 "height": 40,
                 "text": "Calibration"

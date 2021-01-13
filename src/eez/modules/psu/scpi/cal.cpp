@@ -87,6 +87,7 @@ static scpi_result_t calibration_level(scpi_t *context, calibration::Value &cali
 
     return SCPI_RES_OK;
 }
+
 static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calibrationValue) {
     if (!calibration::g_editor.isEnabled()) {
         SCPI_ErrorPush(context, SCPI_ERROR_CALIBRATION_STATE_IS_OFF);
@@ -115,20 +116,71 @@ static scpi_result_t calibration_data(scpi_t *context, calibration::Value &calib
         return SCPI_RES_ERR;
     }
 
-    if (param.unit != SCPI_UNIT_NONE &&
-        param.unit != (calibrationValue.type == CALIBRATION_VALUE_U ? SCPI_UNIT_VOLT : SCPI_UNIT_AMPER)) {
+    if (
+        param.unit != SCPI_UNIT_NONE &&
+        param.unit != (calibrationValue.type == CALIBRATION_VALUE_U ? SCPI_UNIT_VOLT : SCPI_UNIT_AMPER)
+    ) {
         SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
         return SCPI_RES_ERR;
     }
 
     float value = (float)param.content.value;
 
-    float adc = calibrationValue.readAdcValue();
+    int err;
+    float adc;
+    if (!calibrationValue.readAdcValue(adc, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
     if (!calibrationValue.checkValueAndAdc(value, adc)) {
         SCPI_ErrorPush(context, SCPI_ERROR_CAL_VALUE_OUT_OF_RANGE);
         return SCPI_RES_ERR;
     }
+
     calibrationValue.setValueAndAdc(value, adc);
+
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t calibration_measure(scpi_t *context, calibration::Value &calibrationValue) {
+    if (!calibration::g_editor.isEnabled()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CALIBRATION_STATE_IS_OFF);
+        return SCPI_RES_ERR;
+    }
+
+    if (calibrationValue.currentPointIndex == -1) {
+        SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+        return SCPI_RES_ERR;
+    }
+
+    if (calibrationValue.type == CALIBRATION_VALUE_U) {
+        if (!calibration::g_editor.isCalibrationValueTypeSelectable() && calibration::g_editor.getCalibrationValueType() != CALIBRATION_VALUE_U) {
+            SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+            return SCPI_RES_ERR;
+        }
+    } else {
+        if (!calibration::g_editor.isCalibrationValueTypeSelectable() && calibration::g_editor.getCalibrationValueType() != CALIBRATION_VALUE_I_HI_RANGE && calibration::g_editor.getCalibrationValueType() != CALIBRATION_VALUE_I_HI_RANGE) {
+            SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+            return SCPI_RES_ERR;
+        }
+    }
+
+    float measuredValue;
+    int err;
+    if (!calibrationValue.measure(measuredValue, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+    
+    if (isNaN(measuredValue)) {
+        SCPI_ResultBool(context, 0);
+        return SCPI_RES_OK;
+    }
+
+    calibrationValue.setValueAndAdc(measuredValue, 0);
+    
+    SCPI_ResultBool(context, 1);
 
     return SCPI_RES_OK;
 }
@@ -225,6 +277,10 @@ scpi_result_t scpi_cmd_calibrationCurrentData(scpi_t *context) {
 
 scpi_result_t scpi_cmd_calibrationCurrentLevel(scpi_t *context) {
     return calibration_level(context, calibration::g_editor.getCurrent());
+}
+
+scpi_result_t scpi_cmd_calibrationCurrentMeasureQ(scpi_t *context) {
+    return calibration_measure(context, calibration::g_editor.getCurrent());
 }
 
 scpi_result_t scpi_cmd_calibrationCurrentRange(scpi_t *context) {
@@ -418,6 +474,10 @@ scpi_result_t scpi_cmd_calibrationVoltageData(scpi_t *context) {
 
 scpi_result_t scpi_cmd_calibrationVoltageLevel(scpi_t *context) {
     return calibration_level(context, calibration::g_editor.getVoltage());
+}
+
+scpi_result_t scpi_cmd_calibrationVoltageMeasureQ(scpi_t *context) {
+    return calibration_measure(context, calibration::g_editor.getVoltage());
 }
 
 scpi_result_t scpi_cmd_calibrationScreenInit(scpi_t *context) {

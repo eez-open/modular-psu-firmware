@@ -62,7 +62,7 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
 
 	const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
 	
-    widgetCursor.widget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, + indexValue.getInt());
+    widgetCursor.widget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, indexValue.getInt());
 
     enumWidget(widgetCursor, callback);
 

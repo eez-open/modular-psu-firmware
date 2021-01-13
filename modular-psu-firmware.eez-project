@@ -694,7 +694,7 @@
       "description": "",
       "type": "boolean",
       "enumItems": "",
-      "defaultValue": "1"
+      "defaultValue": "0"
     },
     {
       "name": "coupling_type",
@@ -2379,6 +2379,26 @@
       "name": "module_is_resync_supported",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "channel_is_calibration_value_source",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "calibration_point_can_edit_set_value",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "calibration_point_live_measured_value",
+      "type": "float",
+      "defaultValue": "2.44 A"
+    },
+    {
+      "name": "ac_mains",
+      "type": "string",
+      "defaultValue": "50 Hz"
     }
   ],
   "actions": [
@@ -3094,6 +3114,9 @@
     },
     {
       "name": "module_resync"
+    },
+    {
+      "name": "select_ac_mains"
     }
   ],
   "gui": {
@@ -15760,147 +15783,286 @@
                 "height": 1
               },
               {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_M_left",
-                  "alignHorizontal": "right"
-                },
-                "left": 0,
-                "top": 49,
-                "width": 96,
-                "height": 38,
-                "text": "Set:"
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "encoder_cursor_17_enabled"
-                },
-                "data": "calibration_point_measured_value",
-                "action": "edit",
-                "left": 100,
-                "top": 93,
-                "width": 120,
-                "height": 38,
-                "displayOption": 0
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "encoder_cursor_17_enabled"
-                },
-                "data": "calibration_point_set_value",
-                "action": "edit",
-                "left": 100,
-                "top": 49,
-                "width": 120,
-                "height": 38,
-                "displayOption": 0
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_M_left",
-                  "alignHorizontal": "right"
-                },
-                "left": 0,
-                "top": 93,
-                "width": 96,
-                "height": 38,
-                "text": "Measured:"
-              },
-              {
                 "type": "Select",
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "channel_calibration_is_power_channel",
+                "data": "channel_is_calibration_value_source",
                 "left": 0,
-                "top": 137,
-                "width": 54,
-                "height": 38,
+                "top": 49,
+                "width": 220,
+                "height": 126,
                 "widgets": [
                   {
-                    "type": "Rectangle",
+                    "type": "Container",
                     "style": {
                       "inheritFrom": "default"
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 54,
-                    "height": 38,
-                    "invertColors": true
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "channel_calibration_value_is_voltage",
-                    "left": 0,
-                    "top": 0,
-                    "width": 54,
-                    "height": 38,
+                    "width": 220,
+                    "height": 126,
                     "widgets": [
                       {
-                        "type": "Select",
+                        "type": "Text",
                         "style": {
-                          "inheritFrom": "default"
+                          "inheritFrom": "default_M_left",
+                          "alignHorizontal": "right"
                         },
-                        "data": "channel_is_cc",
                         "left": 0,
                         "top": 0,
-                        "width": 54,
+                        "width": 96,
                         "height": 38,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "default_M_warning",
-                              "blink": true
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 54,
-                            "height": 38,
-                            "text": "\\u0081CV"
-                          },
-                          {
-                            "type": "Rectangle",
-                            "style": {
-                              "inheritFrom": "default"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 54,
-                            "height": 38,
-                            "invertColors": true
-                          }
-                        ]
+                        "text": "Set:"
                       },
                       {
                         "type": "Select",
                         "style": {
                           "inheritFrom": "default"
                         },
-                        "data": "channel_is_cv",
-                        "left": 0,
+                        "data": "calibration_point_can_edit_set_value",
+                        "action": "",
+                        "left": 100,
                         "top": 0,
-                        "width": 54,
+                        "width": 120,
                         "height": 38,
                         "widgets": [
                           {
-                            "type": "Text",
+                            "type": "DisplayData",
                             "style": {
-                              "inheritFrom": "default_M_warning",
-                              "blink": true
+                              "inheritFrom": "default_M_left",
+                              "alignHorizontal": "center"
+                            },
+                            "data": "calibration_point_set_value",
+                            "action": "",
+                            "left": 0,
+                            "top": 0,
+                            "width": 120,
+                            "height": 38,
+                            "displayOption": 0
+                          },
+                          {
+                            "type": "DisplayData",
+                            "style": {
+                              "inheritFrom": "encoder_cursor_17_enabled"
+                            },
+                            "data": "calibration_point_set_value",
+                            "action": "edit",
+                            "left": 0,
+                            "top": 0,
+                            "width": 120,
+                            "height": 38,
+                            "displayOption": 0
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_M_left",
+                          "alignHorizontal": "right"
+                        },
+                        "left": 0,
+                        "top": 44,
+                        "width": 96,
+                        "height": 38,
+                        "text": "Measured:"
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "default_M_left",
+                          "alignHorizontal": "center"
+                        },
+                        "data": "calibration_point_live_measured_value",
+                        "action": "",
+                        "left": 100,
+                        "top": 44,
+                        "width": 120,
+                        "height": 38,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "channel_calibration_point_can_delete",
+                        "left": 0,
+                        "top": 88,
+                        "width": 164,
+                        "height": 38,
+                        "widgets": [
+                          {
+                            "type": "Rectangle",
+                            "style": {
+                              "inheritFrom": "default"
                             },
                             "left": 0,
                             "top": 0,
-                            "width": 54,
+                            "width": 164,
                             "height": 38,
-                            "text": "\\u0081CC"
+                            "invertColors": true
                           },
+                          {
+                            "type": "Container",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 164,
+                            "height": 38,
+                            "widgets": [
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "default_M_left",
+                                  "font": "Oswald14"
+                                },
+                                "left": 0,
+                                "top": 0,
+                                "width": 54,
+                                "height": 38,
+                                "text": "Saved:"
+                              },
+                              {
+                                "type": "DisplayData",
+                                "style": {
+                                  "inheritFrom": "default_M_left",
+                                  "font": "Oswald14",
+                                  "alignHorizontal": "left"
+                                },
+                                "data": "calibration_point_measured_value",
+                                "action": "",
+                                "left": 54,
+                                "top": 0,
+                                "width": 106,
+                                "height": 38,
+                                "displayOption": 0
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Button",
+                        "style": {
+                          "inheritFrom": "button_M",
+                          "blink": false
+                        },
+                        "action": "channel_calibration_point_save",
+                        "left": 164,
+                        "top": 88,
+                        "width": 55,
+                        "height": 38,
+                        "text": "\\u0086",
+                        "enabled": "channel_calibration_point_can_save",
+                        "disabledStyle": {
+                          "inheritFrom": "button_M_disabled"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 220,
+                    "height": 126,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_M_left",
+                          "alignHorizontal": "right"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 96,
+                        "height": 38,
+                        "text": "Set:"
+                      },
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "calibration_point_can_edit_set_value",
+                        "action": "",
+                        "left": 100,
+                        "top": 0,
+                        "width": 120,
+                        "height": 38,
+                        "widgets": [
+                          {
+                            "type": "DisplayData",
+                            "style": {
+                              "inheritFrom": "default_M_left",
+                              "alignHorizontal": "center"
+                            },
+                            "data": "calibration_point_set_value",
+                            "action": "",
+                            "left": 0,
+                            "top": 0,
+                            "width": 120,
+                            "height": 38,
+                            "displayOption": 0
+                          },
+                          {
+                            "type": "DisplayData",
+                            "style": {
+                              "inheritFrom": "encoder_cursor_17_enabled"
+                            },
+                            "data": "calibration_point_set_value",
+                            "action": "edit",
+                            "left": 0,
+                            "top": 0,
+                            "width": 120,
+                            "height": 38,
+                            "displayOption": 0
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_M_left",
+                          "alignHorizontal": "right"
+                        },
+                        "left": 0,
+                        "top": 44,
+                        "width": 96,
+                        "height": 38,
+                        "text": "Measured:"
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_17_enabled"
+                        },
+                        "data": "calibration_point_measured_value",
+                        "action": "edit",
+                        "left": 100,
+                        "top": 44,
+                        "width": 120,
+                        "height": 38,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "channel_calibration_is_power_channel",
+                        "left": 0,
+                        "top": 88,
+                        "width": 54,
+                        "height": 38,
+                        "widgets": [
                           {
                             "type": "Rectangle",
                             "style": {
@@ -15911,29 +16073,114 @@
                             "width": 54,
                             "height": 38,
                             "invertColors": true
+                          },
+                          {
+                            "type": "Select",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "data": "channel_calibration_value_is_voltage",
+                            "left": 0,
+                            "top": 0,
+                            "width": 54,
+                            "height": 38,
+                            "widgets": [
+                              {
+                                "type": "Select",
+                                "style": {
+                                  "inheritFrom": "default"
+                                },
+                                "data": "channel_is_cc",
+                                "left": 0,
+                                "top": 0,
+                                "width": 54,
+                                "height": 38,
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "style": {
+                                      "inheritFrom": "default_M_warning",
+                                      "blink": true
+                                    },
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 54,
+                                    "height": 38,
+                                    "text": "\\u0081CV"
+                                  },
+                                  {
+                                    "type": "Rectangle",
+                                    "style": {
+                                      "inheritFrom": "default"
+                                    },
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 54,
+                                    "height": 38,
+                                    "invertColors": true
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Select",
+                                "style": {
+                                  "inheritFrom": "default"
+                                },
+                                "data": "channel_is_cv",
+                                "left": 0,
+                                "top": 0,
+                                "width": 54,
+                                "height": 38,
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "style": {
+                                      "inheritFrom": "default_M_warning",
+                                      "blink": true
+                                    },
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 54,
+                                    "height": 38,
+                                    "text": "\\u0081CC"
+                                  },
+                                  {
+                                    "type": "Rectangle",
+                                    "style": {
+                                      "inheritFrom": "default"
+                                    },
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 54,
+                                    "height": 38,
+                                    "invertColors": true
+                                  }
+                                ]
+                              }
+                            ]
                           }
                         ]
+                      },
+                      {
+                        "type": "Button",
+                        "style": {
+                          "inheritFrom": "button_M",
+                          "blink": true
+                        },
+                        "action": "channel_calibration_point_save",
+                        "left": 164,
+                        "top": 88,
+                        "width": 55,
+                        "height": 38,
+                        "text": "\\u0086",
+                        "enabled": "channel_calibration_point_can_save",
+                        "disabledStyle": {
+                          "inheritFrom": "button_M_disabled"
+                        }
                       }
                     ]
                   }
                 ]
-              },
-              {
-                "type": "Button",
-                "style": {
-                  "inheritFrom": "button_M",
-                  "blink": true
-                },
-                "action": "channel_calibration_point_save",
-                "left": 164,
-                "top": 137,
-                "width": 55,
-                "height": 38,
-                "text": "\\u0086",
-                "enabled": "channel_calibration_point_can_save",
-                "disabledStyle": {
-                  "inheritFrom": "button_M_disabled"
-                }
               },
               {
                 "type": "Rectangle",
@@ -21194,7 +21441,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "left": 248,
+            "left": 258,
             "top": 5,
             "width": 192,
             "height": 32,
@@ -21231,7 +21478,7 @@
             "style": {
               "inheritFrom": "default"
             },
-            "left": 248,
+            "left": 258,
             "top": 43,
             "width": 192,
             "height": 32,
@@ -21297,6 +21544,43 @@
                 "width": 157,
                 "height": 32,
                 "displayOption": 0
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 258,
+            "top": 81,
+            "width": 192,
+            "height": 32,
+            "name": "AC mains",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_M_left"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 98,
+                "height": 32,
+                "text": "AC mains:"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "edit_value_active_M_center"
+                },
+                "data": "ac_mains",
+                "action": "select_ac_mains",
+                "left": 100,
+                "top": 0,
+                "width": 92,
+                "height": 32,
+                "text": ""
               }
             ]
           },
@@ -59796,6 +60080,18 @@
             }
           },
           {
+            "name": "CALibration:CURRent:MEASure?",
+            "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_volt",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
+          },
+          {
             "name": "CALibration:PASSword:NEW",
             "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_pass_new",
             "parameters": [
@@ -59957,6 +60253,18 @@
               "type": [
                 {
                   "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CALibration:VOLTage:MEASure?",
+            "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_volt",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
                 }
               ]
             }

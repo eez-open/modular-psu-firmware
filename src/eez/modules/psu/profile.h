@@ -29,7 +29,7 @@ namespace psu {
 /// PSU configuration profiles (save, recall, ...).
 namespace profile {
 
-#define MAX_CHANNEL_PARAMETERS_SIZE 280
+#define MAX_CHANNEL_PARAMETERS_SIZE 300
 #define MAX_SLOT_PARAMETERS_SIZE 200
 
 /// Channel parameters stored in profile.

@@ -19,6 +19,7 @@
 #if OPTION_DISPLAY
 
 #include <string.h>
+#include <stdio.h>
 
 #include <eez/system.h>
 #include <eez/hmi.h>
@@ -82,7 +83,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     ChSettingsCalibrationViewPage *viewPage = nullptr;
     if (editPage) {
         calibrationValueType = editPage->getCalibrationValueType();
-        dacValue = editPage->getChannelDacValue();
+        dacValue = editPage->getDacValue();
         chartZoom = editPage->getChartZoom();
     } else {
         viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
@@ -187,15 +188,15 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     }
 
     if (configuration.numPoints > 1) {
-        xPoints[0] = (w - 2 * MARGIN - 1) * scale(0);
-        yPoints[0] = (h - 2 * MARGIN - 1) * scale(remapDacValue(calibrationBase, configuration, unit, 0));
+        xPoints[0] = (w - 2 * MARGIN - 1) * scale(minLimit);
+        yPoints[0] = (h - 2 * MARGIN - 1) * scale(remapDacValue(calibrationBase, configuration, unit, minLimit));
 
         xPoints[configuration.numPoints + 1] = (w - 2 * MARGIN - 1) * scale(maxLimit);
-        yPoints[configuration.numPoints + 1] = (w - 2 * MARGIN - 1) * scale(remapDacValue(calibrationBase, configuration, unit, maxLimit));
+        yPoints[configuration.numPoints + 1] = (h - 2 * MARGIN - 1) * scale(remapDacValue(calibrationBase, configuration, unit, maxLimit));
 
         RectangleF clipRectangle = { 0.0f, 0.0f, 1.0f * (w - 2 * MARGIN - 1), 1.0f * (h - 2 * MARGIN - 1) };
 
-        for (unsigned int i = 0; i < configuration.numPoints; i++) {
+        for (unsigned int i = 0; i < configuration.numPoints + 1; i++) {
             PointF p1 = { xPoints[i], yPoints[i] };
             PointF p2 = { xPoints[i + 1], yPoints[i + 1] };
             if (clipSegment(clipRectangle, p1, p2)) {
@@ -289,6 +290,18 @@ float remapDacValue(calibration::CalibrationBase &calibrationBase, CalibrationVa
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void getCalibrationValueTypeInfo(char *text, int count) {
+    auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+    if (editPage) {
+        editPage->getCalibrationValueTypeInfo(text, count);
+    } else {
+        auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+        viewPage->getCalibrationValueTypeInfo(text, count);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void ChSettingsCalibrationEditPage::onStartPasswordOk() {
 	removePageFromStack(PAGE_ID_KEYPAD);
     removePageFromStack(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
@@ -304,9 +317,12 @@ void ChSettingsCalibrationEditPage::onStartPasswordOk() {
 
 void ChSettingsCalibrationEditPage::start() {
     checkPassword("Password: ", persist_conf::devConf.calibrationPassword, onStartPasswordOk);
+    onStartPasswordOk();
 }
 
 void ChSettingsCalibrationEditPage::pageAlloc() {
+    m_dacValue = 0;
+
     if (calibration::g_editor.isEnabled()) {
         calibration::g_editor.copyValuesFromChannel();
     }
@@ -368,6 +384,22 @@ CalibrationValueType ChSettingsCalibrationEditPage::getCalibrationValueType() {
     return m_calibrationValueType;
 }
 
+void ChSettingsCalibrationEditPage::getCalibrationValueTypeInfo(char *text, int count) {
+    int slotIndex;
+    int subchannelIndex;
+    calibration::g_editor.getCalibrationChannel(slotIndex, subchannelIndex);
+
+    const char *valueTypeDescription = m_calibrationValueType == CALIBRATION_VALUE_U ? "Voltage" : "Current";
+    const char *rangeDescription = g_slots[slotIndex]->getCalibrationValueRangeDescription(subchannelIndex);
+
+    if (rangeDescription) {
+        snprintf(text, count - 1, "%s [%s]", valueTypeDescription, rangeDescription);
+    } else {
+        strncpy(text, valueTypeDescription, count - 1);
+    }
+    text[count - 1] = 0;
+}
+
 void ChSettingsCalibrationEditPage::setCalibrationValueType(CalibrationValueType type) {
     m_calibrationValueType = type;
 
@@ -403,27 +435,46 @@ void ChSettingsCalibrationEditPage::setCalibrationValueType(CalibrationValueType
     m_chartVersion++;
 }
 
+float ChSettingsCalibrationEditPage::getDacValue() {
+    return m_dacValue;
+}
+
 void ChSettingsCalibrationEditPage::setDacValue(float value) {
+    m_dacValue = value;
+
     if (m_calibrationValueType == CALIBRATION_VALUE_U) {
         calibration::g_editor.getVoltage().setDacValue(value);
     } else {
         calibration::g_editor.getCurrent().setDacValue(value);
     }
 
-    m_measuredValue = remapDacValue(
-        calibration::g_editor,
-        getCalibrationValue().configuration,
-        m_calibrationValueType == CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER,
-        value
-    );
-    
-    m_measuredValueChanged = false;
+    if (getCalibrationValue().measure(m_measuredValue, nullptr)) {
+        m_measuredValueChanged = true;
+    } else {
+        m_measuredValue = remapDacValue(
+            calibration::g_editor,
+            getCalibrationValue().configuration,
+            m_calibrationValueType == CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER,
+            value
+        );
+        m_measuredValueChanged = false;
+    }
 
     m_chartVersion++;
 }
 
+bool ChSettingsCalibrationEditPage::isCalibrationValueSource() {
+    return calibration::g_editor.isCalibrationValueSource();
+}
+
 float ChSettingsCalibrationEditPage::getMeasuredValue() {
     return m_measuredValue;
+}
+
+float ChSettingsCalibrationEditPage::getLiveMeasuredValue() {
+    float measuredValue;
+    getCalibrationValue().measure(measuredValue, nullptr);
+    return measuredValue;
 }
 
 void ChSettingsCalibrationEditPage::setMeasuredValue(float value) {
@@ -439,10 +490,10 @@ bool ChSettingsCalibrationEditPage::canEditMeasuredValue() {
         return true;
     }
 
-    float dac = getChannelDacValue();
+    float dac = getDacValue();
 
     for (unsigned int i = 0; i < configuration.numPoints; i++) {
-        if (compareDacValues(configuration.points[i].dac, dac) == 0) {
+        if (compareValues(configuration.points[i].dac, dac) == 0) {
             return true;
         }
     }
@@ -453,10 +504,10 @@ bool ChSettingsCalibrationEditPage::canEditMeasuredValue() {
 bool ChSettingsCalibrationEditPage::canMoveToPreviousPoint() {
     auto &configuration = getCalibrationValue().configuration;
 
-    float dac = getChannelDacValue();
+    float dac = getDacValue();
 
     for (int8_t i = configuration.numPoints - 1; i >= 0; i--) {
-        if (compareDacValues(configuration.points[i].dac, dac) < 0) {
+        if (compareValues(configuration.points[i].dac, dac) < 0) {
             return true;
         }
     }
@@ -467,10 +518,10 @@ bool ChSettingsCalibrationEditPage::canMoveToPreviousPoint() {
 void ChSettingsCalibrationEditPage::moveToPreviousPoint() {
     auto &configuration = getCalibrationValue().configuration;
 
-    float dac = getChannelDacValue();
+    float dac = getDacValue();
 
     for (int8_t i = configuration.numPoints - 1; i >= 0; i--) {
-        if (compareDacValues(configuration.points[i].dac, dac) < 0) {
+        if (compareValues(configuration.points[i].dac, dac) < 0) {
             selectPointAtIndex(i);
             break;
         }
@@ -480,10 +531,10 @@ void ChSettingsCalibrationEditPage::moveToPreviousPoint() {
 bool ChSettingsCalibrationEditPage::canMoveToNextPoint() {
     auto &configuration = getCalibrationValue().configuration;
 
-    float dac = getChannelDacValue();
+    float dac = getDacValue();
 
     for (unsigned int i = 0; i < configuration.numPoints; i++) {
-        if (compareDacValues(configuration.points[i].dac, dac) > 0) {
+        if (compareValues(configuration.points[i].dac, dac) > 0) {
             return true;
         }
     }
@@ -494,14 +545,19 @@ bool ChSettingsCalibrationEditPage::canMoveToNextPoint() {
 void ChSettingsCalibrationEditPage::moveToNextPoint() {
     auto &configuration = getCalibrationValue().configuration;
 
-    float dac = getChannelDacValue();
+    float dac = getDacValue();
 
     for (unsigned int i = 0; i < configuration.numPoints; i++) {
-        if (compareDacValues(configuration.points[i].dac, dac) > 0) {
+        if (compareValues(configuration.points[i].dac, dac) > 0) {
             selectPointAtIndex(i);
             break;
         }
     }
+}
+
+bool ChSettingsCalibrationEditPage::canEditSetValue() {
+    auto &configuration = getCalibrationValue().configuration;
+    return configuration.numPoints < calibration::g_editor.getMaxCalibrationPoints();
 }
 
 bool ChSettingsCalibrationEditPage::canSavePoint() {
@@ -509,8 +565,21 @@ bool ChSettingsCalibrationEditPage::canSavePoint() {
         return false;
     }
 
-    if (!m_measuredValueChanged) {
-        return false;
+    float measuredValue;
+    if (getCalibrationValue().measure(measuredValue, nullptr)) {
+        if (isNaN(measuredValue)) {
+            return false;
+        }
+
+        if (!m_measuredValueChanged && compareValues(measuredValue, m_measuredValue) == 0) {
+            return false;
+        }
+    } else {
+        if (!m_measuredValueChanged) {
+            return false;
+        }
+
+        measuredValue = m_measuredValue;
     }
 
     if (calibration::g_editor.isPowerChannel()) {
@@ -529,17 +598,17 @@ bool ChSettingsCalibrationEditPage::canSavePoint() {
         return true;
     }
 
-    float dac = getChannelDacValue();
+    float dac = getDacValue();
 
     unsigned int i;
     for (i = 0; i < configuration.numPoints; i++) {
-        if (compareDacValues(configuration.points[i].dac, dac) >= 0) {
+        if (compareValues(configuration.points[i].dac, dac) >= 0) {
             break;
         }
     }
 
-    if (compareDacValues(configuration.points[i].dac, dac) == 0) {
-        return configuration.points[i].value != m_measuredValue;
+    if (compareValues(configuration.points[i].dac, dac) == 0) {
+        return configuration.points[i].value != measuredValue;
     } else {
         if (configuration.numPoints < calibration::g_editor.getMaxCalibrationPoints()) {
             return true;
@@ -554,8 +623,21 @@ void ChSettingsCalibrationEditPage::savePoint() {
         return;
     }
 
-    if (!m_measuredValueChanged) {
-        return;
+    float measuredValue;
+    if (getCalibrationValue().measure(measuredValue, nullptr)) {
+        if (isNaN(measuredValue)) {
+            return;
+        }
+
+        if (!m_measuredValueChanged && compareValues(measuredValue, m_measuredValue) == 0) {
+            return;
+        }
+    } else {
+        if (!m_measuredValueChanged) {
+            return;
+        }
+
+        measuredValue = m_measuredValue;
     }
 
     if (calibration::g_editor.isPowerChannel()) {
@@ -571,23 +653,25 @@ void ChSettingsCalibrationEditPage::savePoint() {
     auto &calibrationValue = getCalibrationValue();
     auto &configuration = calibrationValue.configuration;
 
-    float dac = getChannelDacValue();
-    float adc = getChannelAdcValue();
+    float dac = getDacValue();
+    float adc = getAdcValue();
 
     unsigned int i;
     for (i = 0; i < configuration.numPoints; i++) {
-        if (compareDacValues(configuration.points[i].dac, dac) >= 0) {
+        if (compareValues(configuration.points[i].dac, dac) >= 0) {
             break;
         }
     }
 
-    if (i < configuration.numPoints && compareDacValues(configuration.points[i].dac, dac) == 0) {
+    if (i < configuration.numPoints && compareValues(configuration.points[i].dac, dac) == 0) {
         calibrationValue.isPointSet[i] = true;
-        configuration.points[i].value = m_measuredValue;
+        configuration.points[i].value = measuredValue;
         configuration.points[i].adc = adc;
 
         m_version++;
         m_chartVersion++;
+
+        m_measuredValue = measuredValue;
     } else {
         if (configuration.numPoints < calibration::g_editor.getMaxCalibrationPoints()) {
             for (unsigned int j = configuration.numPoints; j > i; j--) {
@@ -599,15 +683,19 @@ void ChSettingsCalibrationEditPage::savePoint() {
 
             calibrationValue.isPointSet[i] = true;
             configuration.points[i].dac = dac;
-            configuration.points[i].value = m_measuredValue;
+            configuration.points[i].value = measuredValue;
             configuration.points[i].adc = adc;
 
             configuration.numPoints++;
 
             m_version++;
             m_chartVersion++;
+
+            m_measuredValue = measuredValue;
         }
     }
+
+    m_measuredValueChanged = false;
 }
 
 bool ChSettingsCalibrationEditPage::canDeletePoint() {
@@ -617,10 +705,10 @@ bool ChSettingsCalibrationEditPage::canDeletePoint() {
 
     auto &configuration = getCalibrationValue().configuration;
 
-    float dac = getChannelDacValue();
+    float dac = getDacValue();
 
     for (unsigned int i = 0; i < configuration.numPoints; i++) {
-        if (compareDacValues(configuration.points[i].dac, dac) == 0) {
+        if (compareValues(configuration.points[i].dac, dac) == 0) {
             return true;
         }
     }
@@ -636,10 +724,10 @@ void ChSettingsCalibrationEditPage::deletePoint() {
     auto &calibrationValue = getCalibrationValue();
     auto &configuration = calibrationValue.configuration;
 
-    float dac = getChannelDacValue();
+    float dac = getDacValue();
 
     for (unsigned int i = 0; i < configuration.numPoints; i++) {
-        if (compareDacValues(configuration.points[i].dac, dac) == 0) {
+        if (compareValues(configuration.points[i].dac, dac) == 0) {
             for (; i < configuration.numPoints - 1; i++) {
                 calibrationValue.isPointSet[i] = calibrationValue.isPointSet[i + 1];
                 configuration.points[i].dac = configuration.points[i + 1].dac;
@@ -666,10 +754,10 @@ void ChSettingsCalibrationEditPage::deletePoint() {
 int ChSettingsCalibrationEditPage::getCurrentPointIndex() {
     auto &configuration = getCalibrationValue().configuration;
 
-    float dac = getChannelDacValue();
+    float dac = getDacValue();
 
     for (unsigned int i = 0; i < configuration.numPoints; i++) {
-        if (compareDacValues(configuration.points[i].dac, dac) == 0) {
+        if (compareValues(configuration.points[i].dac, dac) == 0) {
             return i;
         }
     }
@@ -690,15 +778,11 @@ calibration::Value &ChSettingsCalibrationEditPage::getCalibrationValue() {
     }
 }
 
-float ChSettingsCalibrationEditPage::getChannelDacValue() {
-    return calibration::g_editor.getDacValue(m_calibrationValueType);
-}
-
-float ChSettingsCalibrationEditPage::getChannelAdcValue() {
+float ChSettingsCalibrationEditPage::getAdcValue() {
     return calibration::g_editor.getAdcValue(m_calibrationValueType);
 }
 
-int ChSettingsCalibrationEditPage::compareDacValues(float dac1, float dac2) {
+int ChSettingsCalibrationEditPage::compareValues(float dac1, float dac2) {
     Unit unit = m_calibrationValueType == CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER;
     dac1 = calibration::g_editor.roundCalibrationValue(unit, dac1);
     dac2 = calibration::g_editor.roundCalibrationValue(unit, dac2);
@@ -708,6 +792,7 @@ int ChSettingsCalibrationEditPage::compareDacValues(float dac1, float dac2) {
 void ChSettingsCalibrationEditPage::selectPointAtIndex(int8_t i) {
     auto &configuration = getCalibrationValue().configuration;
     
+    m_dacValue = configuration.points[i].dac;
     m_measuredValue = configuration.points[i].value;
     m_measuredValueChanged = false;
     
@@ -752,6 +837,22 @@ CalibrationValueType ChSettingsCalibrationViewPage::getCalibrationValueType() {
     return m_calibrationValueType;
 }
 
+void ChSettingsCalibrationViewPage::getCalibrationValueTypeInfo(char *text, int count) {
+    int slotIndex;
+    int subchannelIndex;
+    calibration::g_viewer.getCalibrationChannel(slotIndex, subchannelIndex);
+
+    const char *valueTypeDescription = m_calibrationValueType == CALIBRATION_VALUE_U ? "Voltage" : "Current";
+    const char *rangeDescription = g_slots[slotIndex]->getCalibrationValueRangeDescription(subchannelIndex);
+
+    if (rangeDescription) {
+        snprintf(text, count - 1, "%s [%s]", valueTypeDescription, rangeDescription);
+    } else {
+        strncpy(text, valueTypeDescription, count - 1);
+    }
+    text[count - 1] = 0;
+}
+
 void ChSettingsCalibrationViewPage::setCalibrationValueType(CalibrationValueType type) {
     m_calibrationValueType = type;
 
@@ -763,6 +864,10 @@ void ChSettingsCalibrationViewPage::setCalibrationValueType(CalibrationValueType
     }
 
     m_chartVersion++;
+}
+
+bool ChSettingsCalibrationViewPage::isCalibrationValueSource() {
+    return calibration::g_viewer.isCalibrationValueSource();
 }
 
 float ChSettingsCalibrationViewPage::getDacValue() {
@@ -917,19 +1022,27 @@ void data_channel_calibration_value_type(DataOperationEnum operation, Cursor cur
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
-            if (calibration::g_editor.hasSupportForCurrentDualRange()) {
-                value = MakeEnumDefinitionValue(editPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
-            } else {
-                value = MakeEnumDefinitionValue(editPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE);
-            }
+			if (editPage->isCalibrationValueTypeSelectable()) {
+				if (calibration::g_editor.hasSupportForCurrentDualRange()) {
+					value = MakeEnumDefinitionValue(editPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
+				} else {
+					value = MakeEnumDefinitionValue(editPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE);
+				}
+			} else {
+				value = Value(0, VALUE_TYPE_CALIBRATION_VALUE_TYPE_INFO);
+			}
         } else {
-            auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
-            if (calibration::g_editor.hasSupportForCurrentDualRange()) {
-                value = MakeEnumDefinitionValue(viewPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
-            } else {
-                value = MakeEnumDefinitionValue(viewPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE);
-            }
-        }
+			if (editPage->isCalibrationValueTypeSelectable()) {
+				auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+				if (calibration::g_editor.hasSupportForCurrentDualRange()) {
+					value = MakeEnumDefinitionValue(viewPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE);
+				} else {
+					value = MakeEnumDefinitionValue(viewPage->getCalibrationValueType(), ENUM_DEFINITION_CALIBRATION_VALUE_TYPE);
+				}
+			} else {
+				value = Value(0, VALUE_TYPE_CALIBRATION_VALUE_TYPE_INFO);
+			}
+		}
     }
 }
 
@@ -943,6 +1056,13 @@ void data_channel_calibration_value_is_voltage(DataOperationEnum operation, Curs
     if (operation == DATA_OPERATION_GET) {
         auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         value = page->getCalibrationValueType() == CALIBRATION_VALUE_U;
+    }
+}
+
+void data_calibration_point_can_edit_set_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+        value = page->canEditSetValue();
     }
 }
 
@@ -962,9 +1082,9 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
                 data_keypad_text(operation, cursor, value);
             } else {
                 if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                    value = MakeValue(channel_dispatcher::getUSet(slotIndex, subchannelIndex), UNIT_VOLT);
+                    value = MakeValue(editPage->getDacValue(), UNIT_VOLT);
                 } else {
-                    value = MakeValue(channel_dispatcher::getISet(slotIndex, subchannelIndex), UNIT_AMPER);
+                    value = MakeValue(editPage->getDacValue(), UNIT_AMPER);
                 }
             }
         } else if (operation == DATA_OPERATION_GET_MIN) {
@@ -997,6 +1117,18 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
         auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
         if (operation == DATA_OPERATION_GET) {
             value = MakeValue(viewPage->getDacValue(), viewPage->getCalibrationValueType() == CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
+        }
+    }
+}
+
+void data_channel_is_calibration_value_source(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+        if (editPage) {
+            value = editPage->isCalibrationValueSource();
+        } else {
+            auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
+            value = viewPage->isCalibrationValueSource();
         }
     }
 }
@@ -1052,6 +1184,18 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
         auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
         if (operation == DATA_OPERATION_GET) {
             value = MakeValue(viewPage->getMeasuredValue(), viewPage->getCalibrationValueType() == CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
+        }
+    }
+}
+
+void data_calibration_point_live_measured_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+        float fValue = editPage->getLiveMeasuredValue();
+        if (isNaN(fValue)) {
+            value = "";
+        } else {
+            value = MakeValue(fValue, editPage->getCalibrationValueType() == CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
         }
     }
 }

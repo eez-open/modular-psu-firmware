@@ -131,11 +131,6 @@ scpi_result_t scpi_cmd_senseCurrentDcRange(scpi_t *context) {
             return SCPI_RES_ERR;
         }
 
-        if (range < 0 || range > 255) {
-            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-            return SCPI_RES_ERR;
-        }
-
         int err;
         if (!channel_dispatcher::setMeasureCurrentRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, range, &err)) {
             SCPI_ErrorPush(context, err);
@@ -197,11 +192,6 @@ scpi_result_t scpi_cmd_senseVoltageDcRange(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (range < 0 || range > 255) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-        return SCPI_RES_ERR;
-    }
-
     SlotAndSubchannelIndex slotAndSubchannelIndex;
     if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
@@ -235,13 +225,8 @@ scpi_result_t scpi_cmd_senseVoltageDcRangeQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_senseCurrentDcNplcycles(scpi_t *context) {
-    int32_t numPowerLineCycles;
-    if (!SCPI_ParamInt32(context, &numPowerLineCycles, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (numPowerLineCycles < 0) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    float nplc;
+    if (!SCPI_ParamFloat(context, &nplc, true)) {
         return SCPI_RES_ERR;
     }
 
@@ -251,7 +236,7 @@ scpi_result_t scpi_cmd_senseCurrentDcNplcycles(scpi_t *context) {
     }
 
     int err;
-    if (!channel_dispatcher::setMeasureCurrentNumPowerLineCylces(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, numPowerLineCycles, &err)) {
+    if (!channel_dispatcher::setMeasureCurrentNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -265,14 +250,14 @@ scpi_result_t scpi_cmd_senseCurrentDcNplcyclesQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    uint8_t numPowerLineCycles;
+    float nplc;
     int err;
-    if (!channel_dispatcher::getMeasureCurrentNumPowerLineCycles(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, numPowerLineCycles, &err)) {
+    if (!channel_dispatcher::getMeasureCurrentNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultUInt8(context, numPowerLineCycles);
+    SCPI_ResultFloat(context, nplc);
 
     return SCPI_RES_OK;
 }
@@ -283,26 +268,21 @@ scpi_result_t scpi_cmd_senseCurrentDcApertureQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    uint8_t numPowerLineCycles;
+    float nplc;
     int err;
-    if (!channel_dispatcher::getMeasureCurrentNumPowerLineCycles(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, numPowerLineCycles, &err)) {
+    if (!channel_dispatcher::getMeasureCurrentNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultFloat(context, numPowerLineCycles / persist_conf::getPowerLineFrequency());
+    SCPI_ResultFloat(context, nplc / persist_conf::getPowerLineFrequency());
 
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_senseVoltageDcNplcycles(scpi_t *context) {
-    int32_t numPowerLineCycles;
-    if (!SCPI_ParamInt32(context, &numPowerLineCycles, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (numPowerLineCycles < 0) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    float nplc;
+    if (!SCPI_ParamFloat(context, &nplc, true)) {
         return SCPI_RES_ERR;
     }
 
@@ -312,7 +292,7 @@ scpi_result_t scpi_cmd_senseVoltageDcNplcycles(scpi_t *context) {
     }
 
     int err;
-    if (!channel_dispatcher::setMeasureVoltageNumPowerLineCylces(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, numPowerLineCycles, &err)) {
+    if (!channel_dispatcher::setMeasureVoltageNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -326,14 +306,14 @@ scpi_result_t scpi_cmd_senseVoltageDcNplcyclesQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    uint8_t numPowerLineCycles;
+    float nplc;
     int err;
-    if (!channel_dispatcher::getMeasureVoltageNumPowerLineCycles(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, numPowerLineCycles, &err)) {
+    if (!channel_dispatcher::getMeasureVoltageNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultUInt8(context, numPowerLineCycles);
+    SCPI_ResultUInt8(context, nplc);
 
     return SCPI_RES_OK;
 }
@@ -344,14 +324,14 @@ scpi_result_t scpi_cmd_senseVoltageDcApertureQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    uint8_t numPowerLineCycles;
+    float nplc;
     int err;
-    if (!channel_dispatcher::getMeasureVoltageNumPowerLineCycles(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, numPowerLineCycles, &err)) {
+    if (!channel_dispatcher::getMeasureVoltageNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultFloat(context, numPowerLineCycles / persist_conf::getPowerLineFrequency());
+    SCPI_ResultFloat(context, nplc / persist_conf::getPowerLineFrequency());
 
     return SCPI_RES_OK;
 }

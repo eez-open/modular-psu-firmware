@@ -29,6 +29,7 @@ namespace gui {
 
 void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const WidgetCursor &widgetCursor);
 float remapDacValue(calibration::CalibrationBase &calibrationBase, CalibrationValueConfiguration &configuration, Unit unit, float value);
+void getCalibrationValueTypeInfo(char *text, int count);
 
 class ChSettingsCalibrationEditPage : public SetPage {
     friend void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const WidgetCursor &widgetCursor);
@@ -48,20 +49,28 @@ public:
 
     bool isCalibrationValueTypeSelectable();
     CalibrationValueType getCalibrationValueType();
+    void getCalibrationValueTypeInfo(char *text, int count);
     void setCalibrationValueType(CalibrationValueType type);
 
+    float getDacValue();
     void setDacValue(float value);
+
+    bool isCalibrationValueSource();
 
     // get and set value measured with external instrument
     float getMeasuredValue();
     void setMeasuredValue(float value);
     bool canEditMeasuredValue();
 
+    float getLiveMeasuredValue();
+
     bool canMoveToPreviousPoint();
     void moveToPreviousPoint();
 
     bool canMoveToNextPoint();
     void moveToNextPoint();
+
+    bool canEditSetValue();
 
     bool canSavePoint();
     void savePoint();
@@ -75,6 +84,7 @@ public:
 private:
     uint32_t m_version;
     CalibrationValueType m_calibrationValueType;
+    float m_dacValue;
     float m_measuredValue;
     bool m_measuredValueChanged;
     uint32_t m_chartVersion;
@@ -86,9 +96,8 @@ private:
 
     calibration::Value &getCalibrationValue();
 
-    float getChannelDacValue();
-    float getChannelAdcValue();
-    int compareDacValues(float dac1, float dac2);
+    float getAdcValue();
+    int compareValues(float value, float value2);
     void selectPointAtIndex(int8_t i);
 };
 
@@ -106,7 +115,10 @@ public:
 
     bool isCalibrationValueTypeSelectable();
     CalibrationValueType getCalibrationValueType();
+    void getCalibrationValueTypeInfo(char *text, int count);
     void setCalibrationValueType(CalibrationValueType type);
+
+    bool isCalibrationValueSource();
 
     float getDacValue();
     float getMeasuredValue();

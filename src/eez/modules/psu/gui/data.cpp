@@ -78,6 +78,7 @@
 #include <eez/modules/psu/gui/page_ch_settings.h>
 #include <eez/modules/psu/gui/page_sys_settings.h>
 #include <eez/modules/psu/gui/page_user_profiles.h>
+#include <eez/modules/psu/gui/channel_calibration.h>
 
 using namespace eez::psu;
 using namespace eez::psu::gui;
@@ -1074,6 +1075,14 @@ bool compare_MODULE_SERIAL_INFO_value(const Value &a, const Value &b) {
 
 void MODULE_SERIAL_INFO_value_to_text(const Value &value, char *text, int count) {
     getModuleSerialInfo(value.getInt(), text);
+}
+
+bool compare_CALIBRATION_VALUE_TYPE_INFO_value(const Value &a, const Value &b) {
+    return true;
+}
+
+void CALIBRATION_VALUE_TYPE_INFO_value_to_text(const Value &value, char *text, int count) {
+    getCalibrationValueTypeInfo(text, count);
 }
 
 bool compare_CALIBRATION_POINT_INFO_value(const Value &a, const Value &b) {
@@ -5434,6 +5443,13 @@ void data_selected_mass_storage_device(DataOperationEnum operation, Cursor curso
 void data_module_is_resync_supported(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_slots[hmi::g_selectedSlotIndex]->isResyncSupported;
+    }
+}
+
+void data_ac_mains(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
+        value = Value(1.0f * page->powerLineFrequency, UNIT_HERTZ);
     }
 }
 

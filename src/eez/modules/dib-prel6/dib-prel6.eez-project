@@ -27,8 +27,28 @@
       "files": []
     }
   },
-  "data": [],
-  "actions": [],
+  "data": [
+    {
+      "name": "relays",
+      "type": "list",
+      "defaultValue": "[\n    { \"relay_label\": \"1: ON\", \"relay_is_on\": true },\n    { \"relay_label\": \"2: ON\", \"relay_is_on\": true },\n    { \"relay_label\": \"3: OFF\", \"relay_is_on\": false },\n    { \"relay_label\": \"4: ON\", \"relay_is_on\": true },\n    { \"relay_label\": \"5: OFF\", \"relay_is_on\": false },\n    { \"relay_label\": \"6: OFF\", \"relay_is_on\": false }\n]"
+    },
+    {
+      "name": "relay_is_on",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "relay_label",
+      "type": "string",
+      "defaultValue": "1: ON"
+    }
+  ],
+  "actions": [
+    {
+      "name": "toggle_relay"
+    }
+  ],
   "gui": {
     "pages": [
       {
@@ -126,82 +146,74 @@
             ]
           },
           {
-            "type": "Text",
+            "type": "Grid",
             "style": {
-              "inheritFrom": "default_inverse",
-              "font": "Oswald17",
-              "borderSize": "0"
+              "inheritFrom": "default"
             },
-            "left": 1,
+            "data": "relays",
+            "left": 0,
             "top": 33,
-            "width": 78,
-            "height": 68,
-            "text": "1: ON"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_inverse",
-              "font": "Oswald17",
-              "borderSize": "0"
+            "width": 160,
+            "height": 207,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "left": 0,
+              "top": 0,
+              "width": 80,
+              "height": 69,
+              "widgets": [
+                {
+                  "type": "Select",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "data": "relay_is_on",
+                  "action": "toggle_relay",
+                  "left": 0,
+                  "top": 0,
+                  "width": 79,
+                  "height": 68,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default",
+                        "font": "Oswald17",
+                        "alignHorizontal": "left",
+                        "borderSize": "0",
+                        "padding": "0 0 0 12"
+                      },
+                      "data": "relay_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 79,
+                      "height": 68,
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_inverse",
+                        "font": "Oswald17",
+                        "alignHorizontal": "left",
+                        "borderSize": "0",
+                        "padding": "0 0 0 12"
+                      },
+                      "data": "relay_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 79,
+                      "height": 68,
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
             },
-            "left": 80,
-            "top": 33,
-            "width": 79,
-            "height": 68,
-            "text": "2: ON"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_inverse",
-              "font": "Oswald17",
-              "borderSize": "0"
-            },
-            "left": 1,
-            "top": 102,
-            "width": 78,
-            "height": 68,
-            "text": "3: ON"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default",
-              "font": "Oswald17",
-              "borderSize": "0"
-            },
-            "left": 80,
-            "top": 102,
-            "width": 79,
-            "height": 68,
-            "text": "4: OFF"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default",
-              "font": "Oswald17",
-              "borderSize": "0"
-            },
-            "left": 1,
-            "top": 171,
-            "width": 78,
-            "height": 68,
-            "text": "5: OFF"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_inverse",
-              "font": "Oswald17",
-              "borderSize": "0"
-            },
-            "left": 80,
-            "top": 171,
-            "width": 79,
-            "height": 68,
-            "text": "6: ON"
+            "gridFlow": "row"
           }
         ],
         "left": 0,
@@ -267,82 +279,74 @@
             ]
           },
           {
-            "type": "Text",
+            "type": "Grid",
             "style": {
-              "inheritFrom": "default_inverse",
-              "font": "Oswald17",
-              "borderSize": "0"
+              "inheritFrom": "default"
             },
-            "left": 1,
+            "data": "relays",
+            "left": 0,
             "top": 33,
-            "width": 118,
-            "height": 68,
-            "text": "1: ON"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_inverse",
-              "font": "Oswald17",
-              "borderSize": "0"
+            "width": 240,
+            "height": 207,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "left": 0,
+              "top": 0,
+              "width": 120,
+              "height": 69,
+              "widgets": [
+                {
+                  "type": "Select",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "data": "relay_is_on",
+                  "action": "toggle_relay",
+                  "left": 0,
+                  "top": 0,
+                  "width": 119,
+                  "height": 68,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default",
+                        "font": "Oswald17",
+                        "alignHorizontal": "left",
+                        "borderSize": "0",
+                        "padding": "0 0 0 26"
+                      },
+                      "data": "relay_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 119,
+                      "height": 68,
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_inverse",
+                        "font": "Oswald17",
+                        "alignHorizontal": "left",
+                        "borderSize": "0",
+                        "padding": "0 0 0 26"
+                      },
+                      "data": "relay_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 119,
+                      "height": 68,
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
             },
-            "left": 120,
-            "top": 33,
-            "width": 119,
-            "height": 68,
-            "text": "2: ON"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_inverse",
-              "font": "Oswald17",
-              "borderSize": "0"
-            },
-            "left": 1,
-            "top": 102,
-            "width": 118,
-            "height": 68,
-            "text": "3: ON"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default",
-              "font": "Oswald17",
-              "borderSize": "0"
-            },
-            "left": 120,
-            "top": 102,
-            "width": 119,
-            "height": 68,
-            "text": "4: OFF"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default",
-              "font": "Oswald17",
-              "borderSize": "0"
-            },
-            "left": 1,
-            "top": 171,
-            "width": 118,
-            "height": 68,
-            "text": "5: OFF"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_inverse",
-              "font": "Oswald17",
-              "borderSize": "0"
-            },
-            "left": 120,
-            "top": 171,
-            "width": 119,
-            "height": 68,
-            "text": "6: ON"
+            "gridFlow": "row"
           }
         ],
         "left": 0,
@@ -406,6 +410,76 @@
                 "text": "E"
               }
             ]
+          },
+          {
+            "type": "Grid",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "relays",
+            "left": 0,
+            "top": 32,
+            "width": 480,
+            "height": 136,
+            "itemWidget": {
+              "type": "Container",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "left": 0,
+              "top": 0,
+              "width": 160,
+              "height": 68,
+              "widgets": [
+                {
+                  "type": "Select",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "data": "relay_is_on",
+                  "action": "toggle_relay",
+                  "left": 0,
+                  "top": 0,
+                  "width": 159,
+                  "height": 67,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default",
+                        "font": "Oswald17",
+                        "alignHorizontal": "left",
+                        "borderSize": "0",
+                        "padding": "0 0 0 48"
+                      },
+                      "data": "relay_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 159,
+                      "height": 67,
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "default_inverse",
+                        "font": "Oswald17",
+                        "alignHorizontal": "left",
+                        "borderSize": "0",
+                        "padding": "0 0 0 48"
+                      },
+                      "data": "relay_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 159,
+                      "height": 67,
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            "gridFlow": "row"
           }
         ],
         "left": 0,
@@ -500,6 +574,162 @@
         "width": 158,
         "height": 72,
         "dataContextOverrides": "{\"slot_title_micro\": \"PREL6\"}"
+      },
+      {
+        "name": "settings",
+        "description": "Clear, disable and define channel's protection parameters",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 8,
+            "top": 8,
+            "width": 471,
+            "height": 232,
+            "name": "Settings",
+            "widgets": [
+              {
+                "type": "MultilineText",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "alignHorizontal": "left",
+                  "alignVertical": "top",
+                  "padding": "13"
+                },
+                "action": "channel_update_firmware",
+                "left": 244,
+                "top": 173,
+                "width": 220,
+                "height": 50,
+                "text": "\\u00bb Firmware update",
+                "firstLineIndent": 0,
+                "hangingIndent": 24
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 480,
+            "height": 32,
+            "name": "Status line",
+            "widgets": [
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_icon_enabled"
+                },
+                "action": "show_main_page",
+                "left": 0,
+                "top": 0,
+                "width": 41,
+                "height": 32,
+                "text": "H"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "slot_title_settings",
+                "left": 40,
+                "top": 0,
+                "width": 96,
+                "height": 32,
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "status_title"
+                },
+                "data": "",
+                "left": 136,
+                "top": 0,
+                "width": 238,
+                "height": 32,
+                "text": "Settings"
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_has_firmware_update",
+                "left": 374,
+                "top": 0,
+                "width": 106,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "status_line_background"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 106,
+                    "height": 32
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 106,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background",
+                          "activeColor": "status_line_background",
+                          "activeBackgroundColor": "status_line_text"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": "FW ver."
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "color": "status_line_text",
+                          "backgroundColor": "status_line_background"
+                        },
+                        "data": "channel_firmware_version",
+                        "left": 60,
+                        "top": 0,
+                        "width": 46,
+                        "height": 32,
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272,
+        "dataContextOverrides": ""
       }
     ],
     "styles": [],

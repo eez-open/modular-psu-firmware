@@ -213,11 +213,11 @@ bool setMeasureCurrentRange(int slotIndex, int subchannelIndex, uint8_t range, i
 bool getMeasureVoltageRange(int slotIndex, int subchannelIndex, uint8_t &range, int *err);
 bool setMeasureVoltageRange(int slotIndex, int subchannelIndex, uint8_t range, int *err);
 
-bool getMeasureCurrentNumPowerLineCycles(int slotIndex, int subchannelIndex, uint8_t &numPowerLineCycles, int *err);
-bool setMeasureCurrentNumPowerLineCylces(int slotIndex, int subchannelIndex, uint8_t numPowerLineCycles, int *err);
+bool getMeasureCurrentNPLC(int slotIndex, int subchannelIndex, float &nplc, int *err);
+bool setMeasureCurrentNPLC(int slotIndex, int subchannelIndex, float nplc, int *err);
 
-bool getMeasureVoltageNumPowerLineCycles(int slotIndex, int subchannelIndex, uint8_t &numPowerLineCycles, int *err);
-bool setMeasureVoltageNumPowerLineCylces(int slotIndex, int subchannelIndex, uint8_t numPowerLineCycles, int *err);
+bool getMeasureVoltageNPLC(int slotIndex, int subchannelIndex, float &nplc, int *err);
+bool setMeasureVoltageNPLC(int slotIndex, int subchannelIndex, float nplc, int *err);
 
 bool isRouteOpen(int slotIndex, int subchannelIndex, int *err);
 bool routeOpen(ChannelList channelList, int *err);

@@ -64,6 +64,7 @@ void SysSettingsDateTimePage::pageAlloc() {
     timeZone = origTimeZone = persist_conf::devConf.timeZone;
     dstRule = origDstRule = (datetime::DstRule)persist_conf::devConf.dstRule;
     dateTimeFormat = origDateTimeFormat = (datetime::Format)persist_conf::devConf.dateTimeFormat;
+    powerLineFrequency = origPowerLineFrequency = persist_conf::getPowerLineFrequency();
 }
 
 void SysSettingsDateTimePage::toggleNtp() {
@@ -247,7 +248,12 @@ int SysSettingsDateTimePage::getDirty() {
         }
     }
 
-    return (timeZone != origTimeZone || dstRule != origDstRule || dateTimeFormat != origDateTimeFormat) ? 1 : 0;
+    return (
+        timeZone != origTimeZone || 
+        dstRule != origDstRule || 
+        dateTimeFormat != origDateTimeFormat || 
+        powerLineFrequency != origPowerLineFrequency
+    ) ? 1 : 0;
 }
 
 #if OPTION_ETHERNET
@@ -328,6 +334,10 @@ void SysSettingsDateTimePage::doSet() {
     if (ntpEnabled || !dateTimeModified) {
         event_queue::pushEvent(event_queue::EVENT_INFO_SYSTEM_DATE_TIME_CHANGED);
     }
+
+	if (powerLineFrequency != origPowerLineFrequency) {
+		persist_conf::setPowerLineFrequency(powerLineFrequency);
+	}
 
     popPage();
     

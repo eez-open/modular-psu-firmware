@@ -128,9 +128,11 @@ float Value::getDacValue() {
     return configuration.points[currentPointIndex].dac;
 }
 
-float Value::readAdcValue() {
+bool Value::readAdcValue(float &adcValue, int *err) {
     Channel *channel = Channel::getBySlotIndex(editor.m_slotIndex, editor.m_subchannelIndex);
-    return channel ? (type == CALIBRATION_VALUE_U ? channel->u.mon_last : channel->i.mon_last) : NAN;
+    return channel ? 
+		(type == CALIBRATION_VALUE_U ? channel->u.mon_last : channel->i.mon_last) : 
+		g_slots[editor.m_slotIndex]->calibrationReadAdcValue(editor.m_subchannelIndex, adcValue, err);
 }
 
 bool Value::checkValueAndAdc(float value, float adc) {
@@ -199,6 +201,10 @@ bool Value::checkPoints() {
     return true;
 }
 
+bool Value::measure(float &measuredValue, int *err) {
+    return g_slots[editor.m_slotIndex]->calibrationMeasure(editor.m_subchannelIndex, measuredValue, err);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void CalibrationBase::getCalibrationChannel(int &slotIndex, int &subchannelIndex) {
@@ -243,7 +249,14 @@ CalibrationValueType CalibrationBase::getCalibrationValueType() {
         auto viewPage = (eez::psu::gui::ChSettingsCalibrationViewPage *)eez::psu::gui::getPage(eez::gui::PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
         return viewPage->getCalibrationValueType();
     }
-    return CALIBRATION_VALUE_U;
+	return g_slots[slotIndex]->getCalibrationValueType(subchannelIndex);
+}
+
+bool CalibrationBase::isCalibrationValueSource() {
+    int slotIndex;
+    int subchannelIndex;
+    getCalibrationChannel(slotIndex, subchannelIndex);
+    return g_slots[slotIndex]->isCalibrationValueSource(subchannelIndex);
 }
 
 bool CalibrationBase::isCalibrationExists() {
@@ -349,6 +362,8 @@ float CalibrationBase::getDacValue(CalibrationValueType valueType) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void CalibrationEditor::doStart() {
+    g_slots[m_slotIndex]->initChannelCalibration(m_subchannelIndex);
+
     Channel *channel = Channel::getBySlotIndex(m_slotIndex, m_subchannelIndex);
 
     if (channel) {
@@ -616,32 +631,36 @@ bool CalibrationEditor::canSave(int16_t &scpiErr, int16_t *uiErr) {
     // at least one value should be calibrated
     bool valueCalibrated = false;
 
-    if (isCalibrated(m_voltageValue)) {
-        if (!checkCalibrationValue(m_voltageValue, scpiErr)) {
-            if (uiErr) {
-                if (scpiErr == SCPI_ERROR_TOO_FEW_CAL_POINTS) {
-                    *uiErr = SCPI_ERROR_CALIBRATION_TOO_FEW_VOLTAGE_CAL_POINTS;
-                } else {
-                    *uiErr = SCPI_ERROR_CALIBRATION_INVALID_VOLTAGE_CAL_DATA;
+    if (calibration::g_editor.isCalibrationValueTypeSelectable() || calibration::g_editor.getCalibrationValueType() == CALIBRATION_VALUE_U) {
+        if (isCalibrated(m_voltageValue)) {
+            if (!checkCalibrationValue(m_voltageValue, scpiErr)) {
+                if (uiErr) {
+                    if (scpiErr == SCPI_ERROR_TOO_FEW_CAL_POINTS) {
+                        *uiErr = SCPI_ERROR_CALIBRATION_TOO_FEW_VOLTAGE_CAL_POINTS;
+                    } else {
+                        *uiErr = SCPI_ERROR_CALIBRATION_INVALID_VOLTAGE_CAL_DATA;
+                    }
                 }
+                return false;
             }
-            return false;
+            valueCalibrated = true;
         }
-        valueCalibrated = true;
     }
 
-    if (isCalibrated(m_currentsValue[0])) {
-        if (!checkCalibrationValue(m_currentsValue[0], scpiErr)) {
-            if (uiErr) {
-                if (scpiErr == SCPI_ERROR_TOO_FEW_CAL_POINTS) {
-                    *uiErr = hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_H_CAL_POINTS : SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_CAL_POINTS;
-                } else {
-                    *uiErr = hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_INVALID_CURRENT_H_CAL_DATA : SCPI_ERROR_CALIBRATION_INVALID_CURRENT_CAL_DATA;
+    if (calibration::g_editor.isCalibrationValueTypeSelectable() || calibration::g_editor.getCalibrationValueType() == CALIBRATION_VALUE_I_HI_RANGE) {
+        if (isCalibrated(m_currentsValue[0])) {
+            if (!checkCalibrationValue(m_currentsValue[0], scpiErr)) {
+                if (uiErr) {
+                    if (scpiErr == SCPI_ERROR_TOO_FEW_CAL_POINTS) {
+                        *uiErr = hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_H_CAL_POINTS : SCPI_ERROR_CALIBRATION_TOO_FEW_CURRENT_CAL_POINTS;
+                    } else {
+                        *uiErr = hasSupportForCurrentDualRange() ? SCPI_ERROR_CALIBRATION_INVALID_CURRENT_H_CAL_DATA : SCPI_ERROR_CALIBRATION_INVALID_CURRENT_CAL_DATA;
+                    }
                 }
+                return false;
             }
-            return false;
+            valueCalibrated = true;
         }
-        valueCalibrated = true;
     }
 
     if (hasSupportForCurrentDualRange()) {
@@ -731,6 +750,8 @@ bool CalibrationEditor::save() {
 void CalibrationViewer::start(int slotIndex, int subchannelIndex) {
     m_slotIndex = slotIndex;
     m_subchannelIndex = subchannelIndex;
+
+    g_slots[m_slotIndex]->initChannelCalibration(m_subchannelIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

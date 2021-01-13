@@ -62,11 +62,6 @@ static void selectChannel(scpi_t *context, SlotAndSubchannelIndex &slotAndSubcha
 ////////////////////////////////////////////////////////////////////////////////
 
 scpi_result_t scpi_cmd_instrumentSelect(scpi_t *context) {
-    if (calibration::g_editor.isEnabled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
-        return SCPI_RES_ERR;
-    }
-
     SlotAndSubchannelIndex slotAndSubchannelIndex;
     if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
 		return SCPI_RES_ERR;
@@ -97,11 +92,6 @@ scpi_result_t scpi_cmd_instrumentSelectQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_instrumentNselect(scpi_t *context) {
-    if (calibration::g_editor.isEnabled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
-        return SCPI_RES_ERR;
-    }
-
     int32_t channelIndex;
     if (!SCPI_ParamInt(context, &channelIndex, TRUE)) {
         return SCPI_RES_ERR;

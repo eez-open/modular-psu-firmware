@@ -151,7 +151,7 @@ struct SetParams {
 	struct {
 		uint8_t mode; // enum SourceMode
 		uint8_t range;
-        uint8_t numPowerLineCycles; // from 0 to 25
+        float nplc; // from 0 to 25
 	} ain[4];
 
     uint8_t powerLineFrequency; // 50 or 60
@@ -468,7 +468,7 @@ struct AinChannel {
 	//     0: +/- 24 mA
 	//     1: +/- 1.2 A
 	//     2: +/- 10 A
-	uint8_t m_currentRange = 0;
+	uint8_t m_currentRange;
 
 	// AIN1 and AIN2:
 	//     0: +/- 2.4 V
@@ -477,30 +477,51 @@ struct AinChannel {
 	// AIN3 and AIN4:
 	//     0: +/- 2.4 V
 	//     1: +/- 12 V
-	uint8_t m_voltageRange = 0;
+	uint8_t m_voltageRange;
 
-    uint8_t m_numCurrentPowerLineCycles = 25;
-    uint8_t m_numVoltagePowerLineCycles = 25;
+    float m_currentNPLC = 1.0f;
+    float m_voltageNPLC = 1.0f;
     
 	char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
 
-	AinChannel(int subchannelIndex) : m_subchannelIndex(subchannelIndex) {}
+    CalConf calConf[9];
+    bool ongoingCal = false;
+
+	AinChannel(int subchannelIndex) : m_subchannelIndex(subchannelIndex) {
+        if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+        	m_currentRange = 0;
+        	m_voltageRange = 2;
+        } else {
+        	m_currentRange = 2;
+        	m_voltageRange = 1;
+        }
+        memset(calConf, 0, sizeof(CalConf));
+    }
+
+	MeasureMode getMode() {
+		return (MeasureMode)m_mode;
+	}
 
     struct ProfileParameters {
         uint8_t mode;
 		uint8_t currentRange;
         uint8_t voltageRange;
-        uint8_t numCurrentPowerLineCycles;
-        uint8_t numVoltagePowerLineCycles;
+        float currentNPLC;
+        float voltageNPLC;
         char label[CHANNEL_LABEL_MAX_LENGTH + 1];
     };
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
         parameters.mode = MEASURE_MODE_VOLTAGE;
-		parameters.currentRange = 0;
-		parameters.voltageRange = 0;
-        parameters.numCurrentPowerLineCycles = 25;
-        parameters.numVoltagePowerLineCycles = 25;
+        if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+        	parameters.currentRange = 0;
+        	parameters.voltageRange = 2;
+        } else {
+        	parameters.currentRange = 2;
+        	parameters.voltageRange = 1;
+        }
+        parameters.currentNPLC = 1.0f;
+        parameters.voltageNPLC = 1.0f;
         *parameters.label = 0;
     }
 
@@ -508,8 +529,8 @@ struct AinChannel {
         parameters.mode = m_mode;
 		parameters.currentRange = m_currentRange;
         parameters.voltageRange = m_voltageRange;
-        parameters.numCurrentPowerLineCycles = m_numCurrentPowerLineCycles;
-        parameters.numVoltagePowerLineCycles = m_numVoltagePowerLineCycles;
+        parameters.currentNPLC = m_currentNPLC;
+        parameters.voltageNPLC = m_voltageNPLC;
         memcpy(parameters.label, m_label, sizeof(m_label));
     }
 
@@ -517,8 +538,8 @@ struct AinChannel {
         m_mode = parameters.mode;
 		m_currentRange = parameters.currentRange;
 		m_voltageRange = parameters.voltageRange;
-        m_numCurrentPowerLineCycles = parameters.numCurrentPowerLineCycles;
-        m_numVoltagePowerLineCycles = parameters.numVoltagePowerLineCycles;
+        m_currentNPLC = parameters.currentNPLC;
+        m_voltageNPLC = parameters.voltageNPLC;
         memcpy(m_label, parameters.label, sizeof(m_label));
     }
 
@@ -534,11 +555,11 @@ struct AinChannel {
 		sprintf(propName, "ain_%d_voltageRange", i + 1);
 		WRITE_PROPERTY(propName, parameters.voltageRange);
 		
-		sprintf(propName, "ain_%d_numCurrentPowerLineCycles", i + 1);
-		WRITE_PROPERTY(propName, parameters.numCurrentPowerLineCycles);
+		sprintf(propName, "ain_%d_currentNPLC", i + 1);
+		WRITE_PROPERTY(propName, parameters.currentNPLC);
 
-		sprintf(propName, "ain_%d_numVoltagePowerLineCycles", i + 1);
-		WRITE_PROPERTY(propName, parameters.numVoltagePowerLineCycles);
+		sprintf(propName, "ain_%d_voltageNPLC", i + 1);
+		WRITE_PROPERTY(propName, parameters.voltageNPLC);
 
 		sprintf(propName, "ain_%d_label", i+1);
         WRITE_PROPERTY(propName, parameters.label);
@@ -558,11 +579,11 @@ struct AinChannel {
 		sprintf(propName, "ain_%d_voltageRange", i + 1);
 		READ_PROPERTY(propName, parameters.voltageRange);
 		
-		sprintf(propName, "ain_%d_numCurrentPowerLineCycles", i + 1);
-		READ_PROPERTY(propName, parameters.numCurrentPowerLineCycles);
+		sprintf(propName, "ain_%d_currentNPLC", i + 1);
+		READ_PROPERTY(propName, parameters.currentNPLC);
 
-		sprintf(propName, "ain_%d_numVoltagePowerLineCycles", i + 1);
-		READ_PROPERTY(propName, parameters.numVoltagePowerLineCycles);
+		sprintf(propName, "ain_%d_voltageNPLC", i + 1);
+		READ_PROPERTY(propName, parameters.voltageNPLC);
 
 		sprintf(propName, "ain_%d_label", i+1);
         READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
@@ -572,10 +593,15 @@ struct AinChannel {
 
     void resetConfiguration() {
         m_mode = MEASURE_MODE_VOLTAGE;
-        m_currentRange = 0;
-		m_voltageRange = 0;
-        m_numCurrentPowerLineCycles = 25;
-        m_numVoltagePowerLineCycles = 25;
+        if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+            m_currentRange = 0;
+    		m_voltageRange = 2;
+        } else {
+            m_currentRange = 2;
+    		m_voltageRange = 1;
+        }
+        m_currentNPLC = 1.0f;
+        m_voltageNPLC = 1.0f;
         *m_label = 0;
     }
 
@@ -636,12 +662,85 @@ struct AinChannel {
 	}
 
     float getResolution() {
-        return 1.0f / powf(10.0f, getNumFixedDecimals());
+        float resolution = 1.0f / powf(10.0f, getNumFixedDecimals());
+        if (ongoingCal) {
+            return resolution / 10.0f;
+        }
+        return resolution;
     }
 
-    void addValue(float value) {
+	float getMinValue() {
+		if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+			if (m_mode == MEASURE_MODE_VOLTAGE) {
+				if (m_voltageRange == 0) {
+					return -2.4f;
+				} else if (m_voltageRange == 1) {
+					return -48.0f;
+				} else {
+					return -240.0f;
+				}
+			} else {
+				return -48.0E-3f;
+			}
+		} else {
+			if (m_mode == MEASURE_MODE_VOLTAGE) {
+				if (m_voltageRange == 0) {
+					return -2.4f;
+				} else {
+					return -12.0f;
+				}
+			} else {
+				if (m_currentRange == 0) {
+					return -24.0E-3f;
+				} else if (m_currentRange == 1) {
+					return -1.2f;
+				} else {
+					return -10.0f;
+				}
+			}
+		}
+	}
+
+	float getMaxValue() {
+		if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+			if (m_mode == MEASURE_MODE_VOLTAGE) {
+				if (m_voltageRange == 0) {
+					return 2.4f;
+				} else if (m_voltageRange == 1) {
+					return 48.0f;
+				} else {
+					return 240.0f;
+				}
+			} else {
+				return -48.0E-3f;
+			}
+		} else {
+			if (m_mode == MEASURE_MODE_VOLTAGE) {
+				if (m_voltageRange == 0) {
+					return 2.4f;
+				} else {
+					return 12.0f;
+				}
+			} else {
+				if (m_currentRange == 0) {
+					return 24.0E-3f;
+				} else if (m_currentRange == 1) {
+					return 1.2f;
+				} else {
+					return 10.0f;
+				}
+			}
+		}
+
+	}
+	
+	void addValue(float value) {
         m_value = value;
     }
+
+	float getValue() {
+		return roundPrec(calConf[getCalConfIndex()].toCalibratedValue(m_value), getResolution());
+	}
 
 	static uint8_t getCurrentRangeMaxValue(int subchannelIndex) {
 		if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX || subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
@@ -659,21 +758,89 @@ struct AinChannel {
 			return 1;
 		}
 	}
+
+    static EnumItem *getModeRangeEnumDefinition(int slotIndex, int subchannelIndex) {
+		static EnumItem g_ain12ModeRangeEnumDefinition[] = {
+			{ 0, "\xbd""2.4 V" },
+			{ 1, "\xbd""48 V" },
+			{ 2, "\xbd""240 V" },
+            { 3, "\xbd""48 mA" },
+			{ 0, 0 }
+		};
+
+		static EnumItem g_ain34ModeRangeEnumDefinition[] = {
+			{ 0, "\xbd""2.4 V" },
+			{ 1, "\xbd""12 V" },
+			{ 2, "\xbd""24 mA" },
+            { 3, "\xbd""1.2 A" },
+            { 4, "\xbd""10 A" },
+			{ 0, 0 }
+		};
+
+		if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX || subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+            return g_ain12ModeRangeEnumDefinition;
+        } else {
+			return g_ain34ModeRangeEnumDefinition;
+        }
+    }
+
+    int getCalConfIndex() {
+        if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+            if (m_mode == SOURCE_MODE_VOLTAGE) {
+                return m_voltageRange;
+            } else {
+                return 3;
+            }
+        } else {
+            if (m_mode == SOURCE_MODE_VOLTAGE) {
+                return 4 + m_voltageRange;
+            } else {
+                return 6 + m_currentRange;
+            }
+        }
+    }
+
+    CalConf *getCalConf() {
+        return &calConf[getCalConfIndex()];
+    }
+
+	void getStepValues(StepValues *stepValues) {
+		static float ENCODER_STEP_VALUES_CAL[] = { 0.001f, 0.01f, 0.02f, 0.05f };
+		static float AMPER_ENCODER_STEP_VALUES_CAL[] = { 0.0001f, 0.0005f, 0.001f, 0.005f };
+
+		if (getMode() == MEASURE_MODE_VOLTAGE) {
+			stepValues->values = ENCODER_STEP_VALUES_CAL;
+			stepValues->count = sizeof(ENCODER_STEP_VALUES_CAL) / sizeof(float);
+			stepValues->unit = UNIT_VOLT;
+		} else {
+			stepValues->values = AMPER_ENCODER_STEP_VALUES_CAL;
+			stepValues->count = sizeof(AMPER_ENCODER_STEP_VALUES_CAL) / sizeof(float);
+			stepValues->unit = UNIT_AMPER;
+		}
+	}
+};
+
+static EnumItem g_aoutCurrentRangeEnumDefinition[] = {
+	{ 5, "4 mA - 20 mA" },
+	{ 6, "0 mA - 20 mA" },
+	{ 7, "0 mA - 24 mA" },
+	{ 0, 0 }
+};
+
+static EnumItem g_aoutVoltageRangeEnumDefinition[] = {
+	{ 0, "0 V - 5 V" },
+	{ 1, "0 V - 10 V" },
+	{ 2, "\xbd""5 V" },
+	{ 3, "\xbd""10 V" },
+	{ 0, 0 }
 };
 
 struct AoutDac7760Channel {
     bool m_outputEnabled = false;
     uint8_t m_mode = SOURCE_MODE_VOLTAGE;
 
-    // 5: 4 mA to 20 mA
-    // 6: 0 mA to 20 mA
-    // 7: 0 mA to 24 mA
     uint8_t m_currentRange = 5;
 
-    // 0: 0 V to +5 V
-    // 1: 0 V to +10 V
-    // 2: +/- 5 V
-    // 3: +/- 10 V
     uint8_t m_voltageRange = 0;
 
     float m_currentValue = 0;
@@ -1149,7 +1316,6 @@ public:
 
     uint32_t lastTransferTime = 0;
 	SetParams lastTransferredParams;
-    uint32_t operationStateTransitionTime;
 
 	struct CommandDef {
 		uint8_t command;
@@ -1234,9 +1400,9 @@ public:
         return (ainFaultStatus & (1 << (subchannelIndex - AIN_1_SUBCHANNEL_INDEX))) != 0;
     }
 
-    uint8_t dac7760CalibrationChannelMode;
-    uint8_t dac7760CalibrationChannelCurrentRange;
-    uint8_t dac7760CalibrationChannelVoltageRange;
+    uint8_t calibrationChannelMode;
+    uint8_t calibrationChannelCurrentRange;
+    uint8_t calibrationChannelVoltageRange;
 
     const CommandDef *nextDlogCommand = nullptr;
     DlogRecordingStart nextDlogRecordingStart;
@@ -1296,7 +1462,10 @@ public:
 				while (state != STATE_IDLE) {
 #if defined(EEZ_PLATFORM_STM32)
 					if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
-						spiReady = true;
+                        osDelay(1);
+                        if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
+						    spiReady = true;
+                        }
 					}
 #endif
 					tick();
@@ -1326,7 +1495,7 @@ public:
             testResult = TEST_OK;
         } else {
             synchronized = false;
-            if (g_slots[slotIndex]->firmwareInstalled) {
+            if (firmwareInstalled) {
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
             }
             testResult = TEST_FAILED;
@@ -1402,7 +1571,7 @@ public:
 			auto channel = &ainChannels[i];
 			params.ain[i].mode = channel->m_mode;
 			params.ain[i].range = channel->m_mode == MEASURE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
-            params.ain[i].numPowerLineCycles = channel->m_mode == MEASURE_MODE_VOLTAGE ? channel->m_numVoltagePowerLineCycles : channel->m_numCurrentPowerLineCycles;
+            params.ain[i].nplc = channel->ongoingCal ? 25.0f : (channel->m_mode == MEASURE_MODE_VOLTAGE ? channel->m_voltageNPLC : channel->m_currentNPLC);
 		}
 
         params.powerLineFrequency = persist_conf::getPowerLineFrequency();
@@ -2420,7 +2589,7 @@ public:
             }
             return false;
         }
-        range = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCurrentRange();
+        range = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCurrentRange() - 4; // 5:7 -> 1:3
         return true;
     }
     
@@ -2431,6 +2600,8 @@ public:
             }
             return false;
         }
+
+        range += 4; // 1:3 -> 5:7
 
         if (range < 5 || range > 7) {
             if (err) {
@@ -2450,7 +2621,7 @@ public:
             }
             return false;
         }
-        range = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getVoltageRange();
+        range = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getVoltageRange() + 1; // 0:3 -> 1:4
         return true;
     }
     
@@ -2461,6 +2632,8 @@ public:
             }
             return false;
         }
+
+        range -= 1; // 1:4 -> 0:3
 
         if (range < 0 || range > 3) {
             if (err) {
@@ -2502,7 +2675,7 @@ public:
             }
             return false;
         }
-        range = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCurrentRange();
+        range = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCurrentRange() + 1;
         return true;
     }
     
@@ -2513,6 +2686,8 @@ public:
             }
             return false;
         }
+        
+        range -= 1;
 
         if (range > AinChannel::getCurrentRangeMaxValue(subchannelIndex)) {
             if (err) {
@@ -2533,7 +2708,7 @@ public:
 			}
 			return false;
 		}
-		range = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getVoltageRange();
+		range = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getVoltageRange() + 1;
 		return true;
 	}
 
@@ -2544,6 +2719,8 @@ public:
 			}
 			return false;
 		}
+
+        range -= 1;
 
 		if (range > AinChannel::getVoltageRangeMaxValue(subchannelIndex)) {
 			if (err) {
@@ -2557,18 +2734,18 @@ public:
 		return true;
 	}
 
-    bool getMeasureCurrentNumPowerLineCycles(int subchannelIndex, uint8_t &numPowerLineCycles, int *err) override {
+    bool getMeasureCurrentNPLC(int subchannelIndex, float &nplc, int *err) override {
 		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
 			return false;
 		}
-        numPowerLineCycles = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_numCurrentPowerLineCycles;
+        nplc = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_currentNPLC;
         return true;
     }
 
-    bool setMeasureCurrentNumPowerLineCycles(int subchannelIndex, uint8_t numPowerLineCycles, int *err) override {
+    bool setMeasureCurrentNPLC(int subchannelIndex, float nplc, int *err) override {
 		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
@@ -2576,30 +2753,30 @@ public:
 			return false;
 		}
  
-		if (numPowerLineCycles > 25) {
+		if (nplc < 0.0f || nplc > 25.0f) {
 			if (err) {
 				*err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
 			}
 			return false;
 		}
 
-		ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_numCurrentPowerLineCycles = numPowerLineCycles;
+		ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_currentNPLC = nplc;
 
 		return true;
     }
 
-    bool getMeasureVoltageNumPowerLineCycles(int subchannelIndex, uint8_t &numPowerLineCycles, int *err) override {
+    bool getMeasureVoltageNPLC(int subchannelIndex, float &nplc, int *err) override {
 		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
 			return false;
 		}
-        numPowerLineCycles = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_numVoltagePowerLineCycles;
+        nplc = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_voltageNPLC;
         return true;
     }
 
-    bool setMeasureVoltageNumPowerLineCycles(int subchannelIndex, uint8_t numPowerLineCycles, int *err) override {
+    bool setMeasureVoltageNPLC(int subchannelIndex, float nplc, int *err) override {
 		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
@@ -2607,14 +2784,14 @@ public:
 			return false;
 		}
  
-		if (numPowerLineCycles > 25) {
+		if (nplc < 0.0f || nplc > 25.0f) {
 			if (err) {
 				*err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
 			}
 			return false;
 		}
 
-		ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_numVoltagePowerLineCycles = numPowerLineCycles;
+		ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_voltageNPLC = nplc;
 
 		return true;
     }
@@ -2695,7 +2872,7 @@ public:
             return false;
         }
 
-        value = channel.m_value;
+        value = channel.getValue();
         return true;
     }
 
@@ -2715,25 +2892,33 @@ public:
     float getVoltageResolution(int subchannelIndex) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getVoltageResolution();
-        } else {
+		} else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             return aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].getResolution();
-        }
+		} else {
+			return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getResolution();
+		}
     }
 
     float getVoltageMinValue(int subchannelIndex) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getVoltageMinValue();
-        } else {
-            return AOUT_DAC7563_MIN;
-        }    
+		} else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+			return AOUT_DAC7563_MIN;
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getMinValue();
+		}
+		return NAN;
     }
 
     float getVoltageMaxValue(int subchannelIndex) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getVoltageMaxValue();
-        } else {
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             return AOUT_DAC7563_MAX;
-        }    
+		} else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getMaxValue();
+		}
+		return NAN;
     }
 
     bool isConstantVoltageMode(int subchannelIndex) override {
@@ -2745,6 +2930,8 @@ public:
             return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf()->state.calState;
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             return aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calState;
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf()->state.calState;
         }
         return false;
     }
@@ -2754,6 +2941,8 @@ public:
             return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf()->state.calEnabled;
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             return aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calEnabled;
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf()->state.calEnabled;
         }
         return false;
     }
@@ -2763,6 +2952,8 @@ public:
             aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf()->state.calEnabled = enabled;
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calEnabled = enabled;
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf()->state.calEnabled = enabled;
         } else {
             return;
         }
@@ -2785,7 +2976,15 @@ public:
             if (!persist_conf::loadChannelCalibrationConfiguration(slotIndex, 2 * 7 + (subchannelIndex - AOUT_3_SUBCHANNEL_INDEX), &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
                 calConf->clear();
             }
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            for (int i = 0; i < 9; i++) {
+                CalConf *calConf = &ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].calConf[i];
+                if (!persist_conf::loadChannelCalibrationConfiguration(slotIndex, 2 * 7 + 2 + (subchannelIndex - AIN_1_SUBCHANNEL_INDEX) * 9 + i, &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
+                    calConf->clear();
+                }
+            }
         } else {
+
         }
 
         return true;
@@ -2802,6 +3001,10 @@ public:
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             calConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
             calConfIndex = 2 * 7 + (subchannelIndex - AOUT_3_SUBCHANNEL_INDEX);
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            int ainChannelIndex = subchannelIndex - AIN_1_SUBCHANNEL_INDEX;
+            calConf = ainChannels[ainChannelIndex].getCalConf();
+            calConfIndex = 2 * 7 + 2 + ainChannelIndex * 9 + ainChannels[ainChannelIndex].getCalConfIndex();
         }
 
         if (calConf) {
@@ -2814,23 +3017,70 @@ public:
         return false;
     }
 
+    void initChannelCalibration(int subchannelIndex) {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+            calibrationChannelMode = channel.getMode();
+            calibrationChannelCurrentRange = channel.getCurrentRange();
+            calibrationChannelVoltageRange = channel.getVoltageRange();
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            auto &channel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+            calibrationChannelMode = channel.getMode();
+            calibrationChannelCurrentRange = channel.getCurrentRange();
+            calibrationChannelVoltageRange = channel.getVoltageRange();
+        }
+    }
+
     void startChannelCalibration(int subchannelIndex) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
             channel.ongoingCal = 1;
-            channel.m_mode = dac7760CalibrationChannelMode;
-            channel.m_voltageRange = dac7760CalibrationChannelVoltageRange;
-            channel.m_currentRange = dac7760CalibrationChannelCurrentRange;
+            channel.m_mode = calibrationChannelMode;
+            channel.m_voltageRange = calibrationChannelVoltageRange;
+            channel.m_currentRange = calibrationChannelCurrentRange;
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].ongoingCal = 1;
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            auto &channel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+            channel.ongoingCal = 1;
+            channel.m_mode = calibrationChannelMode;
+            channel.m_voltageRange = calibrationChannelVoltageRange;
+            channel.m_currentRange = calibrationChannelCurrentRange;
         }
     }
     
+    bool calibrationReadAdcValue(int subchannelIndex, float &adcValue, int *err) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            adcValue = 0;
+            return true;
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS;
+        }
+        return false;
+    }
+
+    bool calibrationMeasure(int subchannelIndex, float &measuredValue, int *err) override {
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            auto &channel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+            measuredValue = channel.getValue();
+            return true;
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS;
+        }
+        return false;
+    }
+
     void stopChannelCalibration(int subchannelIndex) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].ongoingCal = 0;
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].ongoingCal = 0;
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].ongoingCal = 0;
         }
     }
 
@@ -2843,8 +3093,44 @@ public:
             if (aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getMode() == SOURCE_MODE_CURRENT) {
                 return CALIBRATION_VALUE_I_HI_RANGE;
             }
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            if (ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getMode() == MEASURE_MODE_CURRENT) {
+                return CALIBRATION_VALUE_I_HI_RANGE;
+            }
         }
         return CALIBRATION_VALUE_U;
+    }
+
+    const char *getCalibrationValueRangeDescription(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            if (calibrationChannelMode == SOURCE_MODE_VOLTAGE) {
+                return g_aoutVoltageRangeEnumDefinition[calibrationChannelVoltageRange].menuLabel;
+            } else {
+                return g_aoutCurrentRangeEnumDefinition[calibrationChannelCurrentRange - 5].menuLabel;
+            }
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            return "\xbd""10 V";
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_2_SUBCHANNEL_INDEX){
+            if (calibrationChannelMode == SOURCE_MODE_VOLTAGE) {
+                return AinChannel::getModeRangeEnumDefinition(slotIndex, subchannelIndex)[calibrationChannelVoltageRange].menuLabel;
+            } else {
+                return AinChannel::getModeRangeEnumDefinition(slotIndex, subchannelIndex)[3 + calibrationChannelCurrentRange].menuLabel;
+            }
+        } else if (subchannelIndex >= AIN_3_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX){
+            if (calibrationChannelMode == SOURCE_MODE_VOLTAGE) {
+                return AinChannel::getModeRangeEnumDefinition(slotIndex, subchannelIndex)[calibrationChannelVoltageRange].menuLabel;
+            } else {
+                return AinChannel::getModeRangeEnumDefinition(slotIndex, subchannelIndex)[2 + calibrationChannelCurrentRange].menuLabel;
+            }
+        }
+        return nullptr;
+    }
+
+    bool isCalibrationValueSource(int subchannelIndex) override {
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            return false;
+        }
+        return true;
     }
 
     void getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points) override {
@@ -2858,14 +3144,24 @@ public:
         }
     }
 
-    bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) override {
-        CalConf *mioCalConf = nullptr;
-
+    CalConf *getCalConf(int subchannelIndex) {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            mioCalConf = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf();
-        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            mioCalConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
+            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf();
+        } 
+        
+        if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+			return &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
         }
+        
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf();
+		}
+
+        return nullptr;
+    }
+    
+    bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) override {
+        CalConf *mioCalConf = getCalConf(subchannelIndex);
 
         if (mioCalConf) {
             memset(&calConf, 0, sizeof(CalibrationConfiguration));
@@ -2902,15 +3198,9 @@ public:
         }
         return false;
     }
-    
-    bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) override {
-        CalConf *mioCalConf = nullptr;
 
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            mioCalConf = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf();
-        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            mioCalConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
-        }
+    bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) override {
+        CalConf *mioCalConf = getCalConf(subchannelIndex);
 
         if (mioCalConf) {
             memset(mioCalConf, 0, sizeof(CalConf));
@@ -2927,7 +3217,7 @@ public:
                 }
             }
 
-            mioCalConf->state.calState = calConf.u.numPoints == 2;
+            mioCalConf->state.calState = isVoltage ? calConf.u.numPoints == 2 : calConf.i[0].numPoints == 2;
             mioCalConf->state.calEnabled = mioCalConf->state.calState;
 
             mioCalConf->calibrationDate = calConf.calibrationDate;
@@ -2944,13 +3234,7 @@ public:
     }
 
     bool getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err) override {
-        CalConf *mioCalConf = nullptr;
-
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            mioCalConf = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf();
-        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            mioCalConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
-        }
+        CalConf *mioCalConf = getCalConf(subchannelIndex);
 
         if (mioCalConf) {
             calibrationRemark = mioCalConf->calibrationRemark;
@@ -2962,13 +3246,7 @@ public:
     }
 
     bool getCalibrationDate(int subchannelIndex, uint32_t &calibrationDate, int *err) override {
-        CalConf *mioCalConf = nullptr;
-
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            mioCalConf = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf();
-        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            mioCalConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
-        }
+        CalConf *mioCalConf = getCalConf(subchannelIndex);
 
         if (mioCalConf) {
             calibrationDate = mioCalConf->calibrationDate;
@@ -3022,7 +3300,7 @@ public:
             return false;
         }
 
-        value = channel.m_value;
+        value = channel.getValue();
         return true;
     }
 
@@ -3033,28 +3311,44 @@ public:
                 stepValues->encoderSettings.step /= 10.0f;
                 stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
             }
-        }
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getStepValues(stepValues);
+			if (calibrationMode) {
+				stepValues->encoderSettings.step /= 10.0f;
+				stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
+			}
+		}
     }
     
     float getCurrentResolution(int subchannelIndex) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCurrentResolution();
-        }
-        return 0.0f;
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getResolution();
+		}
+		return NAN;
     }
 
     float getCurrentMinValue(int subchannelIndex) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCurrentMinValue();
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            return 0.0f;
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getMinValue();
         }
-        return 0.0f;
+		return NAN;
     }
 
     float getCurrentMaxValue(int subchannelIndex) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCurrentMaxValue();
-        }
-        return 0.0f;    
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            return 0.0f;
+		} else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getMaxValue();
+		}
+		return NAN;
     }
 
     bool isCurrentCalibrationExists(int subchannelIndex) override {
@@ -3352,11 +3646,22 @@ public:
         AinChannel &channel = module->ainChannels[g_selectedChannelIndex - AIN_1_SUBCHANNEL_INDEX];
 
         m_mode = m_modeOrig = channel.m_mode;
-        m_range = m_rangeOrig = channel.m_mode == MEASURE_MODE_VOLTAGE ? channel.getVoltageRange() : channel.getCurrentRange();
+        m_currentRange = m_currentRangeOrig = channel.getCurrentRange();
+		m_voltageRange = m_voltageRangeOrig = channel.getVoltageRange();
+        m_currentNPLC = m_currentNPLCOrig = channel.m_currentNPLC;
+        m_voltageNPLC = m_voltageNPLCOrig = channel.m_voltageNPLC;
     }
 
     int getDirty() { 
-        return m_mode != m_modeOrig || m_range != m_rangeOrig;
+        if (m_mode != m_modeOrig) {
+            return true;
+        }
+
+        if (m_mode == MEASURE_MODE_VOLTAGE) {
+            return m_voltageRange != m_voltageRangeOrig || m_voltageNPLC != m_voltageNPLCOrig;
+        }
+
+        return m_currentRange != m_currentRangeOrig || m_currentNPLC != m_currentNPLCOrig;
     }
 
     void set() {
@@ -3403,32 +3708,10 @@ public:
     }
 
     uint8_t m_mode;
-    uint8_t m_range;
-
-    static EnumItem *getModeRangeEnumDefinition(int slotIndex, int subchannelIndex) {
-		static EnumItem g_ain12ModeRangeEnumDefinition[] = {
-			{ 0, "\xbd""2.4 V" },
-			{ 1, "\xbd""48 V" },
-			{ 2, "\xbd""240 V" },
-            { 3, "\xbd""48 mA" },
-			{ 0, 0 }
-		};
-
-		static EnumItem g_ain34ModeRangeEnumDefinition[] = {
-			{ 0, "\xbd""2.4 V" },
-			{ 1, "\xbd""12 V" },
-			{ 2, "\xbd""24 mA" },
-            { 3, "\xbd""1.2 A" },
-            { 4, "\xbd""10 A" },
-			{ 0, 0 }
-		};
-
-		if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX || subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
-            return g_ain12ModeRangeEnumDefinition;
-        } else {
-			return g_ain34ModeRangeEnumDefinition;
-        }
-    }
+	uint8_t m_currentRange;
+    uint8_t m_voltageRange;
+    float m_currentNPLC;
+    float m_voltageNPLC;
 
     static uint8_t getModeRange(int slotIndex, int subchannelIndex) {
         Mio168Module *module = (Mio168Module *)g_slots[slotIndex];
@@ -3471,14 +3754,17 @@ public:
                 channel.setVoltageRange(modeRange);
             } else {
                 channel.m_mode = MEASURE_MODE_CURRENT;
-                channel.setCurrentRange(modeRange);
+                channel.setCurrentRange(modeRange - 2);
             }
         }
     }
 
 private:
     uint8_t m_modeOrig;
-    uint8_t m_rangeOrig;
+    uint8_t m_currentRangeOrig;
+	uint8_t m_voltageRangeOrig;
+    float m_currentNPLCOrig;
+    float m_voltageNPLCOrig;
 };
 
 int AinConfigurationPage::g_selectedChannelIndex;
@@ -3503,8 +3789,7 @@ public:
     int getDirty() { 
         return m_outputEnabled != m_outputEnabledOrig ||
             m_mode != m_modeOrig ||
-            m_currentRange != m_currentRangeOrig ||
-            m_voltageRange != m_voltageRangeOrig;
+			(m_mode == SOURCE_MODE_VOLTAGE ? m_voltageRange != m_voltageRangeOrig : m_currentRange != m_currentRangeOrig);
     }
 
     void set() {
@@ -3522,13 +3807,13 @@ public:
 
     static EnumItem *getModeRangeEnumDefinition(int slotIndex, int subchannelIndex) {
 		static EnumItem g_aoutMdeRangeEnumDefinition[] = {
-			{ 0, "0 V to 5 V" },
-			{ 1, "0 V to 10 V" },
+			{ 0, "0 V - 5 V" },
+			{ 1, "0 V - 10 V" },
             { 2, "\xbd""5 V" },
             { 3, "\xbd""10 V" },
-            { 4, "4 mA to 20 mA" },
-            { 5, "0 mA to 20 mA" },
-            { 6, "0 mA to 24 mA" },
+            { 4, "4 mA - 20 mA" },
+            { 5, "0 mA - 20 mA" },
+            { 6, "0 mA - 24 mA" },
 			{ 7, "OFF" },
 			{ 0, 0 }
 		};
@@ -3641,9 +3926,11 @@ void Mio168Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
         AinChannel &channel = ainChannels[AinConfigurationPage::g_selectedChannelIndex - AIN_1_SUBCHANNEL_INDEX];
         channel.m_mode = g_ainConfigurationPage.m_mode;
 		if (g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE) {
-			channel.setVoltageRange(g_ainConfigurationPage.m_range);
+			channel.setVoltageRange(g_ainConfigurationPage.m_voltageRange);
+            channel.m_voltageNPLC = g_ainConfigurationPage.m_voltageNPLC;
 		} else {
-			channel.setCurrentRange(g_ainConfigurationPage.m_range);
+			channel.setCurrentRange(g_ainConfigurationPage.m_currentRange);
+            channel.m_currentNPLC = g_ainConfigurationPage.m_currentNPLC;
 		}
     } else if (type == PSU_MESSAGE_AOUT_DAC7760_CONFIGURE) {
         AoutDac7760Channel &channel = aoutDac7760Channels[AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX];
@@ -3981,7 +4268,7 @@ void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value
 		auto &channel = mio168Module->ainChannels[ainChannelIndex];
         Unit unit = channel.getUnit();
         value = MakeValue(
-            unit == UNIT_MILLI_AMPER ? channel.m_value * 1000.0f : channel.m_value,
+            unit == UNIT_MILLI_AMPER ? channel.getValue() * 1000.0f : channel.getValue(),
             unit,
             FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(channel.getNumFixedDecimals())
         );
@@ -4051,17 +4338,79 @@ void data_dib_mio168_ain_range_is_multiple_selection_available(DataOperationEnum
 
 void data_dib_mio168_ain_range(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getWidgetLabel(g_ainConfigurationPage.getRangeEnumDefinition(), g_ainConfigurationPage.m_range);
+        value = getWidgetLabel(g_ainConfigurationPage.getRangeEnumDefinition(),
+			g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE ? g_ainConfigurationPage.m_voltageRange : g_ainConfigurationPage.m_currentRange);
     }
 }
 
 void onSetAinRange(uint16_t value) {
     popPage();
-    g_ainConfigurationPage.m_range = (uint8_t)value;
+	if (g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE) {
+		g_ainConfigurationPage.m_voltageRange = (uint8_t)value;
+	} else {
+		g_ainConfigurationPage.m_currentRange = (uint8_t)value;
+	}
 }
 
 void action_dib_mio168_ain_select_range() {
-    pushSelectFromEnumPage(g_ainConfigurationPage.getRangeEnumDefinition(), g_ainConfigurationPage.m_range, nullptr, onSetAinRange);
+    pushSelectFromEnumPage(g_ainConfigurationPage.getRangeEnumDefinition(),
+		g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE ? g_ainConfigurationPage.m_voltageRange : g_ainConfigurationPage.m_currentRange,
+		nullptr, onSetAinRange);
+}
+
+void data_dib_mio168_ain_nplc(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_AIN_NPLC;
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            value = g_focusEditValue;
+        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
+            data_keypad_text(operation, cursor, value);
+        } else {
+            value = MakeValue(
+                g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE ?
+                    g_ainConfigurationPage.m_voltageNPLC :
+                    g_ainConfigurationPage.m_currentNPLC,
+                UNIT_UNKNOWN
+            );
+        }
+    } else if (operation == DATA_OPERATION_GET_MIN) {
+        value = MakeValue(0.0f, UNIT_UNKNOWN);
+    } else if (operation == DATA_OPERATION_GET_MAX) {
+        value = MakeValue(25.0f, UNIT_UNKNOWN);
+    } else if (operation == DATA_OPERATION_GET_NAME) {
+        value = "NPLC";
+    } else if (operation == DATA_OPERATION_GET_UNIT) {
+        value = UNIT_UNKNOWN;
+    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+        static float values[] = { 0.1f, 0.2f, 0.5f, 1.0f };
+
+        StepValues *stepValues = value.getStepValues();
+
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+        stepValues->unit = UNIT_UNKNOWN;
+
+        stepValues->encoderSettings.accelerationEnabled = false;
+
+        value = 1;
+    } else if (operation == DATA_OPERATION_SET) {
+        if (g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE) {
+            g_ainConfigurationPage.m_voltageNPLC = value.getFloat();
+        } else {
+            g_ainConfigurationPage.m_currentNPLC = value.getFloat();
+        }
+    }
+}
+
+void data_dib_mio168_ain_aperture(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(
+            (
+                g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE ?
+                    g_ainConfigurationPage.m_voltageNPLC :
+                    g_ainConfigurationPage.m_currentNPLC
+            ) / persist_conf::getPowerLineFrequency(), UNIT_SECOND);
+    }
 }
 
 void data_dib_mio168_ain_mode_and_range(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -4069,7 +4418,7 @@ void data_dib_mio168_ain_mode_and_range(DataOperationEnum operation, Cursor curs
         int slotIndex = cursor / 4;
         int subchannelIndex = AIN_1_SUBCHANNEL_INDEX + cursor % 4;
 		value = getWidgetLabel(
-            AinConfigurationPage::getModeRangeEnumDefinition(slotIndex, subchannelIndex), 
+            AinChannel::getModeRangeEnumDefinition(slotIndex, subchannelIndex), 
             AinConfigurationPage::getModeRange(slotIndex, subchannelIndex)
         );
 	}
@@ -4094,7 +4443,7 @@ void action_dib_mio168_ain_select_mode_and_range() {
     AinConfigurationPage::g_selectedChannelIndex = subchannelIndex;
 
     pushSelectFromEnumPage(
-        AinConfigurationPage::getModeRangeEnumDefinition(slotIndex, subchannelIndex),
+		AinChannel::getModeRangeEnumDefinition(slotIndex, subchannelIndex),
         AinConfigurationPage::getModeRange(slotIndex, subchannelIndex),
         nullptr, 
         onSetAinModeRange
@@ -4267,17 +4616,9 @@ void action_dib_mio168_aout_select_output_mode() {
     g_aoutDac7760ConfigurationPage.m_mode = g_aoutDac7760ConfigurationPage.m_mode == SOURCE_MODE_VOLTAGE ? SOURCE_MODE_CURRENT : SOURCE_MODE_VOLTAGE;
 }
 
-static EnumItem g_aoutVoltageRangeEnumDefinition[] = {
-    { 0, "0 V to +5 V" },
-    { 1, "0 V to +10 V" },
-    { 2, "\xbd""5 V" },
-    { 3, "\xbd""10 V" },
-    { 0, 0 }
-};
-
 void data_dib_mio168_aout_voltage_range(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getWidgetLabel(g_aoutVoltageRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_voltageRange);
+        value = getWidgetLabel(::g_aoutVoltageRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_voltageRange);
     }
 }
 
@@ -4289,13 +4630,6 @@ void onSetVoltageRange(uint16_t value) {
 void action_dib_mio168_aout_select_voltage_range() {
     pushSelectFromEnumPage(g_aoutVoltageRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_voltageRange, nullptr, onSetVoltageRange);
 }
-
-static EnumItem g_aoutCurrentRangeEnumDefinition[] = {
-    { 5, "4 mA to 20 mA" },
-    { 6, "0 mA to 20 mA" },
-    { 7, "0 mA to 24 mA" },
-    { 0, 0 }
-};
 
 void data_dib_mio168_aout_current_range(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
@@ -4531,19 +4865,13 @@ void action_dib_mio168_show_calibration() {
         pushPage(pageId);
     }
 
-    auto module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
-
     if (getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION)) {
         hmi::g_selectedSubchannelIndex = g_aoutDac7760ConfigurationPage.g_selectedChannelIndex;
-        auto &channel = module->aoutDac7760Channels[hmi::g_selectedSubchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
-        module->dac7760CalibrationChannelMode = channel.getMode();
-        module->dac7760CalibrationChannelCurrentRange = channel.getCurrentRange();
-        module->dac7760CalibrationChannelVoltageRange = channel.getVoltageRange();
     } else if (getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION)) {
         hmi::g_selectedSubchannelIndex = g_aoutDac7563ConfigurationPage.g_selectedChannelIndex;
     } else {
-        hmi::g_selectedSubchannelIndex = g_ainConfigurationPage.g_selectedChannelIndex;
-    }
+		hmi::g_selectedSubchannelIndex = g_ainConfigurationPage.g_selectedChannelIndex;
+	}
 
     calibration::g_viewer.start(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
     

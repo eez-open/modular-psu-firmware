@@ -21,6 +21,7 @@
     SCPI_COMMAND("CALibration:CURRent:LEVel", scpi_cmd_calibrationCurrentLevel) \
     SCPI_COMMAND("CALibration:CURRent:RANGe", scpi_cmd_calibrationCurrentRange) \
     SCPI_COMMAND("CALibration:CURRent[:DATA]", scpi_cmd_calibrationCurrentData) \
+    SCPI_COMMAND("CALibration:CURRent:MEASure?", scpi_cmd_calibrationCurrentMeasureQ) \
     SCPI_COMMAND("CALibration:PASSword:NEW", scpi_cmd_calibrationPasswordNew) \
     SCPI_COMMAND("CALibration:REMark", scpi_cmd_calibrationRemark) \
     SCPI_COMMAND("CALibration:REMark?", scpi_cmd_calibrationRemarkQ) \
@@ -29,6 +30,7 @@
     SCPI_COMMAND("CALibration:STATe?", scpi_cmd_calibrationStateQ) \
     SCPI_COMMAND("CALibration:VOLTage:LEVel", scpi_cmd_calibrationVoltageLevel) \
     SCPI_COMMAND("CALibration:VOLTage[:DATA]", scpi_cmd_calibrationVoltageData) \
+    SCPI_COMMAND("CALibration:VOLTage:MEASure?", scpi_cmd_calibrationVoltageMeasureQ) \
     SCPI_COMMAND("CALibration[:MODE]", scpi_cmd_calibrationMode) \
     SCPI_COMMAND("CALibration[:MODE]?", scpi_cmd_calibrationModeQ) \
     SCPI_COMMAND("CALibration:SCReen:INIT", scpi_cmd_calibrationScreenInit) \

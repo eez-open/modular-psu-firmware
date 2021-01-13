@@ -308,11 +308,11 @@ struct Module {
     virtual bool getMeasureVoltageRange(int subchannelIndex, uint8_t &range, int *err);
     virtual bool setMeasureVoltageRange(int subchannelIndex, uint8_t range, int *err);
 
-    virtual bool getMeasureCurrentNumPowerLineCycles(int subchannelIndex, uint8_t &numPowerLineCycles, int *err);
-    virtual bool setMeasureCurrentNumPowerLineCycles(int subchannelIndex, uint8_t numPowerLineCycles, int *err);
+    virtual bool getMeasureCurrentNPLC(int subchannelIndex, float &nplc, int *err);
+    virtual bool setMeasureCurrentNPLC(int subchannelIndex, float nplc, int *err);
 
-    virtual bool getMeasureVoltageNumPowerLineCycles(int subchannelIndex, uint8_t &numPowerLineCycles, int *err);
-    virtual bool setMeasureVoltageNumPowerLineCycles(int subchannelIndex, uint8_t numPowerLineCycles, int *err);
+    virtual bool getMeasureVoltageNPLC(int subchannelIndex, float &nplc, int *err);
+    virtual bool setMeasureVoltageNPLC(int subchannelIndex, float nplc, int *err);
 
     virtual bool isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err);
     virtual bool routeOpen(ChannelList channelList, int *err);
@@ -356,10 +356,15 @@ struct Module {
 
     virtual bool loadChannelCalibration(int subchannelIndex, int *err);
     virtual bool saveChannelCalibration(int subchannelIndex, int *err);
+    virtual void initChannelCalibration(int subchannelIndex);
     virtual void startChannelCalibration(int subchannelIndex);
+    virtual bool calibrationReadAdcValue(int subchannelIndex, float &adcValue, int *err);
+    virtual bool calibrationMeasure(int subchannelIndex, float &measuredValue, int *err);
     virtual void stopChannelCalibration(int subchannelIndex);
     virtual unsigned int getMaxCalibrationPoints(int m_subchannelIndex);
     virtual CalibrationValueType getCalibrationValueType(int subchannelIndex);
+    virtual const char *getCalibrationValueRangeDescription(int subchannelIndex);
+    virtual bool isCalibrationValueSource(int subchannelIndex);
     virtual void getDefaultCalibrationPoints(int subchannelIndex, CalibrationValueType type, unsigned int &numPoints, float *&points);
     virtual bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err);
     virtual bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err);

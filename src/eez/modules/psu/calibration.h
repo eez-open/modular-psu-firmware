@@ -33,6 +33,7 @@ public:
     bool hasSupportForCurrentDualRange();
     CalibrationValueType getInitialCalibrationValueType();
     CalibrationValueType getCalibrationValueType();
+    bool isCalibrationValueSource();
     bool isCalibrationExists();
     void getMinValue(CalibrationValueType valueType, float &value, Unit &unit);
     void getMaxValue(CalibrationValueType valueType, float &value, Unit &unit);
@@ -67,12 +68,14 @@ struct Value {
     void setDacValue(float value);
     float getDacValue();
 
-    float readAdcValue();
+    bool readAdcValue(float &adcValue, int *err);
 
     bool checkValueAndAdc(float value, float adc);
     void setValueAndAdc(float value, float adc);
 
     bool checkPoints();
+
+    bool measure(float &measuredValue, int *err);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
