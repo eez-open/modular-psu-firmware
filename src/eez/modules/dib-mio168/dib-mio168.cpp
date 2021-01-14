@@ -739,7 +739,7 @@ struct AinChannel {
     }
 
 	float getValue() {
-		return roundPrec(calConf[getCalConfIndex()].toCalibratedValue(m_value), getResolution());
+		return roundPrec(ongoingCal ? m_value : calConf[getCalConfIndex()].toCalibratedValue(m_value), getResolution());
 	}
 
 	static uint8_t getCurrentRangeMaxValue(int subchannelIndex) {
@@ -1000,7 +1000,7 @@ struct AoutDac7760Channel {
     }
 
     float getCalibratedValue() {
-        return getCalConf()->toCalibratedValue(getValue());
+        return ongoingCal ? getValue() : getCalConf()->toCalibratedValue(getValue());
     }
 
     Unit getUnit() {
@@ -1156,7 +1156,7 @@ struct AoutDac7563Channel {
     };
 
     float getCalibratedValue() {
-        return calConf.toCalibratedValue(m_value);
+        return ongoingCal ? m_value : calConf.toCalibratedValue(m_value);
     }
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
@@ -1353,7 +1353,7 @@ public:
         EVENT_TIMEOUT
     };
 
-    const CommandDef *currentCommand;
+    const CommandDef *currentCommand = nullptr;
     uint32_t refreshStartTime;
     State state;
     uint32_t lastStateTransitionTime;
@@ -1460,6 +1460,8 @@ public:
 
 			if (!g_isBooted) {
 				while (state != STATE_IDLE) {
+                    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
 #if defined(EEZ_PLATFORM_STM32)
 					if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
                         osDelay(1);
