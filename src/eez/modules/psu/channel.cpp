@@ -758,15 +758,15 @@ float Channel::getValuePrecision(Unit unit, float value) const {
 }
 
 float Channel::getVoltageResolution() const {
-    return calibration::g_editor.isEnabled() ? params.U_RESOLUTION_DURING_CALIBRATION : params.U_RESOLUTION;
+    return calibration::isChannelCalibrating(*this) ? params.U_RESOLUTION_DURING_CALIBRATION : params.U_RESOLUTION;
 }
 
 float Channel::getCurrentResolution(float value) const {
-    float precision = calibration::g_editor.isEnabled() ? params.I_RESOLUTION_DURING_CALIBRATION : params.I_RESOLUTION; // 0.5mA
+    float precision = calibration::isChannelCalibrating(*this) ? params.I_RESOLUTION_DURING_CALIBRATION : params.I_RESOLUTION; // 0.5mA
 
     if (hasSupportForCurrentDualRange()) {
         if (!isNaN(value) && value <= 0.05f && isMicroAmperAllowed()) {
-            precision = calibration::g_editor.isEnabled() ? params.I_LOW_RESOLUTION_DURING_CALIBRATION : params.I_LOW_RESOLUTION; // 5uA
+            precision = calibration::isChannelCalibrating(*this) ? params.I_LOW_RESOLUTION_DURING_CALIBRATION : params.I_LOW_RESOLUTION; // 5uA
         }
     }
     
@@ -775,10 +775,10 @@ float Channel::getCurrentResolution(float value) const {
 
 float Channel::getCurrentResolution() const {
     if (flags.currentCurrentRange == CURRENT_RANGE_LOW) {
-        return calibration::g_editor.isEnabled() ? params.I_LOW_RESOLUTION_DURING_CALIBRATION : params.I_LOW_RESOLUTION; // 5uA
+        return calibration::isChannelCalibrating(*this) ? params.I_LOW_RESOLUTION_DURING_CALIBRATION : params.I_LOW_RESOLUTION; // 5uA
     }
     
-    return  calibration::g_editor.isEnabled() ? params.I_RESOLUTION_DURING_CALIBRATION : params.I_RESOLUTION; // 0.5mA
+    return  calibration::isChannelCalibrating(*this) ? params.I_RESOLUTION_DURING_CALIBRATION : params.I_RESOLUTION; // 0.5mA
 }
 
 float Channel::getPowerResolution() const {
@@ -936,7 +936,7 @@ void Channel::executeOutputEnable(bool enable, uint16_t tasks) {
             setCvMode(false);
             setCcMode(false);
 
-            if (calibration::g_editor.isEnabled()) {
+            if (calibration::isChannelCalibrating(*this)) {
                 calibration::g_editor.stop();
             }
         }
@@ -1209,7 +1209,7 @@ void Channel::doSetVoltage(float value) {
 }
 
 void Channel::setVoltage(float value) {
-    if (!calibration::g_editor.isEnabled()) {
+    if (!calibration::isChannelCalibrating(*this)) {
         value = roundPrec(value, getVoltageResolution());
     }
 
@@ -1217,7 +1217,7 @@ void Channel::setVoltage(float value) {
 }
 
 void Channel::doSetCurrent(float value) {
-    if (!calibration::g_editor.isEnabled()) {
+    if (!calibration::isChannelCalibrating(*this)) {
         if (hasSupportForCurrentDualRange()) {
             if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH) {
                 setCurrentRange(value > 0.05f ? CURRENT_RANGE_HIGH : CURRENT_RANGE_LOW);
@@ -1242,7 +1242,7 @@ void Channel::doSetCurrent(float value) {
 }
 
 void Channel::setCurrent(float value) {
-    if (!calibration::g_editor.isEnabled()) {
+    if (!calibration::isChannelCalibrating(*this)) {
         value = roundPrec(value, getCurrentResolution(value));
     }
 
@@ -1531,7 +1531,7 @@ void Channel::setCurrentRange(uint8_t currentCurrentRange) {
 }
 
 void Channel::doAutoSelectCurrentRange() {
-    if (calibration::g_editor.isEnabled()) {
+    if (calibration::isChannelCalibrating(*this)) {
         return;
     }
 
@@ -1543,7 +1543,7 @@ void Channel::doAutoSelectCurrentRange() {
                     flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH &&
                     hasSupportForCurrentDualRange() && 
                     !isDacTesting() &&
-                    !calibration::g_editor.isEnabled()) {
+                    !calibration::isChannelCalibrating(*this)) {
                     if (flags.currentCurrentRange == CURRENT_RANGE_LOW) {
                         if (i.set > 0.05f && isCcMode()) {
                             doSetCurrent(i.set);

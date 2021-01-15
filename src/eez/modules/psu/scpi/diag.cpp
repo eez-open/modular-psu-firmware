@@ -147,7 +147,7 @@ scpi_result_t scpi_cmd_diagnosticInformationCalibrationQ(scpi_t *context) {
 
     Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
 
-    if (calibration::g_editor.isEnabled()) {
+    if (calibration::isChannelCalibrating(*channel)) {
         if (calibration::g_editor.isRemarkSet()) {
             char buffer[128] = { 0 };
             sprintf(buffer, "remark=%s", calibration::g_editor.getRemark());

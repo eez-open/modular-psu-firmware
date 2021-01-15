@@ -84,6 +84,12 @@ class CalibrationEditor : public CalibrationBase {
 public:
     bool isEnabled() { return m_enabled; }
 
+    bool isChannelCalibrating(const Channel& channel) {
+        return m_enabled &&
+            m_slotIndex == channel.slotIndex &&
+            m_subchannelIndex == channel.subchannelIndex;
+    }
+
     /// Start calibration procedure on the channel.
     void start(int slotIndex, int subchannelIndex);
 
@@ -163,6 +169,10 @@ void clearCalibrationConf(CalibrationConfiguration *calConf);
 float remapValue(float value, CalibrationValueConfiguration &cal);
 
 bool onHighPriorityThreadMessage(uint8_t type, uint32_t param);
+
+inline bool isChannelCalibrating(const Channel& channel) {
+    return g_editor.isChannelCalibrating(channel);
+}
 
 } // namespace calibration
 } // namespace psu
