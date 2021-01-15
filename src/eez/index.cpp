@@ -128,10 +128,6 @@ int Module::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
     return PAGE_ID_SLOT_MICRO_NOT_INSTALLED;
 }
 
-int Module::getChannelSettingsPageId() {
-    return PAGE_ID_NONE;
-}
-
 int Module::getSlotSettingsPageId() {
     return PAGE_ID_SLOT_SETTINGS;
 }

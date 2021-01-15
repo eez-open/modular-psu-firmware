@@ -1664,7 +1664,8 @@ void data_no_channel_index(int slotIndex, DataOperationEnum operation, Cursor cu
 }
 
 void data_slot_channel_index(int slotIndex, Channel *channel, DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (channel) {
+    auto testResult = g_slots[slotIndex]->getTestResult();
+    if (channel && g_slots[slotIndex]->enabled && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
         data_channel_index(*channel, operation, cursor, value);
     } else {
         data_no_channel_index(slotIndex, operation, cursor, value);
@@ -2699,27 +2700,6 @@ void data_channel_has_error_settings(DataOperationEnum operation, Cursor cursor,
             value = 1;
         } else {
             value = 0;
-        }
-    }
-}
-
-void data_channel_settings_page(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-    	auto temp = hmi::g_selectedSlotIndex;
-        auto &slot = *g_slots[temp];
-        if (slot.getTestResult() == TEST_OK) {
-            value = PAGE_ID_CH_SETTINGS_OK;
-        } else {
-            auto modulType = slot.moduleType;
-            if (modulType != MODULE_TYPE_DCP405) {
-            	if (!bp3c::flash_slave::g_bootloaderMode || (slot.firmwareMajorVersion == 0 && slot.firmwareMinorVersion == 0)) {
-            		value = PAGE_ID_DIB_DCM220_CH_SETTINGS_ERROR;
-            	} else {
-            		value = PAGE_ID_CH_SETTINGS_OK;
-            	}
-            } else {
-                value = PAGE_ID_CH_SETTINGS_ERROR;
-            }
         }
     }
 }

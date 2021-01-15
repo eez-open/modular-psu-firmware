@@ -194,11 +194,8 @@ struct DcpChannel : public Channel {
 		params.U_RAMP_DURATION_MIN_VALUE = moduleRevision <= MODULE_REVISION_DCP405_R2B11 ? 0.004f : 0.002f;
 	}
 
-	void init() override {
-        if (!g_slots[slotIndex]->enabled) {
-            return;
-        }
-
+	void init() {
+		ioexp.testResult = TEST_OK;
 		ioexp.init();
 		adc.init();
 		dac.init();
@@ -908,20 +905,20 @@ struct DcpModule : public PsuModule {
 public:
 	float temperature = 0;
 
-    DcpModule() {
-        moduleType = MODULE_TYPE_DCP405;
-        moduleName = "DCP405";
-        moduleBrand = "Envox";
-        latestModuleRevision = MODULE_REVISION_DCP405_R2B11;
-        flashMethod = FLASH_METHOD_NONE;
-        spiBaudRatePrescaler = 0;
-        spiCrcCalculationEnable = false;
-        numPowerChannels = 1;
-        numOtherChannels = 0;
+	DcpModule() {
+		moduleType = MODULE_TYPE_DCP405;
+		moduleName = "DCP405";
+		moduleBrand = "Envox";
+		latestModuleRevision = MODULE_REVISION_DCP405_R2B11;
+		flashMethod = FLASH_METHOD_NONE;
+		spiBaudRatePrescaler = 0;
+		spiCrcCalculationEnable = false;
+		numPowerChannels = 1;
+		numOtherChannels = 0;
 		isResyncSupported = false;
 
 		firmareBasedModule = false;
-    }
+	}
 
 	void boot() override {
 		PsuModule::boot();
@@ -934,8 +931,8 @@ public:
 	}
 
 	Channel *createPowerChannel(int slotIndex, int channelIndex, int subchannelIndex) override {
-        void *buffer = malloc(sizeof(DcpChannel));
-        memset(buffer, 0, sizeof(DcpChannel));
+		void *buffer = malloc(sizeof(DcpChannel));
+		memset(buffer, 0, sizeof(DcpChannel));
 		return new (buffer) DcpChannel(slotIndex, channelIndex, subchannelIndex);
 	}
 
@@ -945,6 +942,21 @@ public:
 		dcpChannel->onSpiIrq();
 	}
 #endif
+
+	void initChannels() override {
+		if (!enabled) {
+			return;
+		}
+		auto channel = (DcpChannel *)Channel::getBySlotIndex(slotIndex, 0);
+		channel->init();
+	}
+
+	int getSlotSettingsPageId() override {
+		if (getTestResult() != TEST_OK) {
+			return eez::gui::PAGE_ID_DIB_DCP405_CH_SETTINGS_ERROR;
+		}    
+		return PsuModule::getSlotSettingsPageId();
+	}
 
 	int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
 		int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;

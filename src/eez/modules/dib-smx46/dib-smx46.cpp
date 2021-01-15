@@ -302,7 +302,10 @@ public:
     };
 
     int getSlotSettingsPageId() override {
-        return PAGE_ID_DIB_SMX46_SETTINGS;
+        if (getTestResult() == TEST_OK) {
+            return PAGE_ID_DIB_SMX46_SETTINGS;
+        }
+        return Module::getSlotSettingsPageId();
     }
 
     int getLabelsAndColorsPageId() override {

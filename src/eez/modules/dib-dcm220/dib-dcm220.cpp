@@ -184,7 +184,6 @@ struct DcmChannel : public Channel {
 		params.U_RAMP_DURATION_MIN_VALUE = 0.002f;
 	}
 
-    void init() override;
     void onPowerDown() override;
     bool test() override;
     TestResult getTestResult() override;
@@ -380,8 +379,8 @@ public:
         return new DcmModule();
     }
 
-    void init() {
-        if (/*enabled && */!synchronized) {
+    void initChannels() override {
+        if (enabled && !synchronized) {
             if (bp3c::comm::masterSynchro(slotIndex)) {
                 //DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
                 synchronized = true;
@@ -402,7 +401,9 @@ public:
 
     void onPowerDown() {
 #if defined(EEZ_PLATFORM_STM32)
-        transfer();
+        if (synchronized) {
+            transfer();
+        }
 #endif
         synchronized = false;
         testResult = TEST_FAILED;
@@ -549,6 +550,13 @@ public:
     }
 #endif
 
+	int getSlotSettingsPageId() override {
+		if (getTestResult() != TEST_OK) {
+			return eez::gui::PAGE_ID_DIB_DCM220_CH_SETTINGS_ERROR;
+		}    
+		return PsuModule::getSlotSettingsPageId();
+	}
+
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
         int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
 
@@ -576,12 +584,6 @@ public:
         return PAGE_ID_DIB_DCM220_LABELS_AND_COLORS;
     }
 };
-
-void DcmChannel::init() {
-    if (subchannelIndex == 0) {
-        ((DcmModule *)g_slots[slotIndex])->init();
-    }
-}
 
 void DcmChannel::onPowerDown() {
     Channel::onPowerDown();

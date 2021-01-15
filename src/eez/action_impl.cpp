@@ -304,17 +304,12 @@ void action_show_edit_mode_slider_help() {
 
 void action_show_slot_settings() {
     hmi::selectSlot(getFoundWidgetAtDown().cursor);
-    
-    showPage(
-        g_slots[hmi::g_selectedSlotIndex]->getTestResult() == TEST_OK ? 
-        g_slots[hmi::g_selectedSlotIndex]->getSlotSettingsPageId() :
-        PAGE_ID_SLOT_SETTINGS
-    );
+    showPage(g_slots[hmi::g_selectedSlotIndex]->getSlotSettingsPageId());
 }
 
 void action_show_ch_settings() {
     selectChannelByCursor();
-    showPage(g_slots[g_channel->slotIndex]->getChannelSettingsPageId());
+    showPage(g_slots[g_channel->slotIndex]->getSlotSettingsPageId());
 }
 
 void action_show_ch_settings_prot_clear() {
