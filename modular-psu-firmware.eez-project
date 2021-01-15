@@ -9514,6 +9514,19 @@
                     "top": 0,
                     "width": 64,
                     "height": 40,
+                    "text": "ABC"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "key_spec_icons",
+                      "font": "Oswald17"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 64,
+                    "height": 40,
                     "text": "sym"
                   },
                   {
@@ -9528,19 +9541,6 @@
                     "width": 64,
                     "height": 40,
                     "text": "abc"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "key_spec_icons",
-                      "font": "Oswald17"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 64,
-                    "height": 40,
-                    "text": "ABC"
                   }
                 ]
               },
