@@ -432,8 +432,23 @@ scpi_result_t scpi_cmd_debugDownloadFirmware(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
+    if (bp3c::flash_slave::g_bootloaderMode) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        return SCPI_RES_ERR;
+    }
+
     bp3c::flash_slave::start(slotIndex - 1, hexFilePath);
 
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif // DEBUG
+}
+
+scpi_result_t scpi_cmd_debugDownloadFirmwareQ(scpi_t *context) {
+#if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
+    SCPI_ResultBool(context, bp3c::flash_slave::g_bootloaderMode);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

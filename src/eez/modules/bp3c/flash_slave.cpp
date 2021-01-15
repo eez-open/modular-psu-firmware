@@ -369,9 +369,6 @@ void leaveBootloaderMode() {
     osDelay(5);
 	io_exp::hardResetModules();
 
-	// give some time to the modules to initialize
-	osDelay(100);
-
     psu::initChannels();
     psu::testChannels();
 #endif

@@ -460,6 +460,7 @@
     SCPI_COMMAND("DEBUg:IOEXp?", scpi_cmd_debugIoexpQ) \
     SCPI_COMMAND("DEBUg:DCM220?", scpi_cmd_debugDcm220Q) \
     SCPI_COMMAND("DEBUg:DOWNload:FIRMware", scpi_cmd_debugDownloadFirmware) \
+    SCPI_COMMAND("DEBUg:DOWNload:FIRMware?", scpi_cmd_debugDownloadFirmwareQ) \
     SCPI_COMMAND("DEBUg:EVENt", scpi_cmd_debugEvent) \
     SCPI_COMMAND("SYSTem:DATE:CLEar", scpi_cmd_systemDateClear) \
     SCPI_COMMAND("SYSTem:TIME:CLEar", scpi_cmd_systemTimeClear)
