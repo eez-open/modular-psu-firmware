@@ -49,6 +49,8 @@ namespace dib_prel6 {
 
 static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
 
+static const int NUM_REQUEST_RETRIES = 100;
+static const int MAX_DMA_TRANSFER_ERRORS = 100;
 static const uint32_t REFRESH_TIME_MS = 250;
 static const uint32_t TIMEOUT_TIME_MS = 350;
 static const uint32_t TIMEOUT_UNTIL_OUT_OF_SYNC_MS = 10000;
@@ -145,7 +147,7 @@ public:
         EVENT_TIMEOUT
     };
 
-    const CommandDef *currentCommand;
+    const CommandDef *currentCommand = nullptr;
     uint32_t refreshStartTime;
     State state;
     uint32_t lastStateTransitionTime;
@@ -192,6 +194,8 @@ public:
 
 			if (!g_isBooted) {
 				while (state != STATE_IDLE) {
+                    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
 #if defined(EEZ_PLATFORM_STM32)
 					if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
                         osDelay(1);
@@ -303,8 +307,6 @@ public:
     void doRetry() {
     	bp3c::comm::abortTransfer(slotIndex);
         
-        static const int NUM_REQUEST_RETRIES = 100;
-
         if (++retry < NUM_REQUEST_RETRIES) {
             // try again
             setState(STATE_WAIT_SLAVE_READY_BEFORE_REQUEST);
@@ -388,7 +390,7 @@ public:
     void reportDmaTransferFailed(int status) {
         if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
             numCrcErrors++;
-            if (numCrcErrors >= 100) {
+            if (numCrcErrors >= MAX_DMA_TRANSFER_ERRORS) {
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                 synchronized = false;
                 testResult = TEST_FAILED;
@@ -398,7 +400,7 @@ public:
             //}
         } else {
             numTransferErrors++;
-            if (numTransferErrors >= 100) {
+            if (numTransferErrors >= MAX_DMA_TRANSFER_ERRORS) {
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
                 synchronized = false;
                 testResult = TEST_FAILED;
@@ -449,7 +451,7 @@ public:
                     #if defined(EEZ_PLATFORM_SIMULATOR)
                     auto response = (Response *)input;
 
-                    response->command = 0x80 | currentCommand->command;
+                    response->command = 0x8000 | currentCommand->command;
 
                     if (currentCommand->command == COMMAND_GET_INFO) {
                         response->getInfo.firmwareMajorVersion = 1;
@@ -538,7 +540,10 @@ public:
     }
 
     int getSlotSettingsPageId() override {
-        return PAGE_ID_DIB_PREL6_SETTINGS;
+        if (getTestResult() == TEST_OK) {
+            return PAGE_ID_DIB_PREL6_SETTINGS;
+        }
+        return Module::getSlotSettingsPageId();
     }
 
     struct ProfileParameters : public Module::ProfileParameters {
