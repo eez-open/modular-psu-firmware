@@ -347,7 +347,6 @@ void PsuAppContext::stateManagment() {
             }
         }
     }
-
     //
     if (hmi::g_selectedSlotIndex != -1) {
         auto slotSettingsPageId = g_slots[hmi::g_selectedSlotIndex]->getSlotSettingsPageId();

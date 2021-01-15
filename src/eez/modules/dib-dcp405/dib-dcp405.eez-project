@@ -6792,68 +6792,6 @@
         "top": 0,
         "width": 158,
         "height": 72
-      },
-      {
-        "name": "ch_settings_error",
-        "description": "Clear, disable and define channel's protection parameters",
-        "style": "default",
-        "widgets": [
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 240,
-            "width": 480,
-            "height": 32,
-            "name": "Status line",
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14"
-                },
-                "action": "show_main_page",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 32,
-                "text": "H"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left"
-                },
-                "data": "channel_short_label",
-                "left": 41,
-                "top": 0,
-                "width": 36,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "alignHorizontal": "left"
-                },
-                "left": 77,
-                "top": 0,
-                "width": 403,
-                "height": 32,
-                "text": "Settings (Error)"
-              }
-            ]
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 480,
-        "height": 272
       }
     ],
     "styles": [],

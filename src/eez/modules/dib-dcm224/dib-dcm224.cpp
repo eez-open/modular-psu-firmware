@@ -425,15 +425,15 @@ public:
 
     void initChannels() override {
         if (enabled && !synchronized) {
-            if (bp3c::comm::masterSynchro(slotIndex)) {
-                synchronized = true;
-                lastTransferTickCount = millis();
-                numConsecutiveTransferErrors = 0;
-            } else {
-                if (g_slots[slotIndex]->firmwareInstalled) {
-                    event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
-                }
-            }
+           if (bp3c::comm::masterSynchro(slotIndex)) {
+               synchronized = true;
+               lastTransferTickCount = millis();
+               numConsecutiveTransferErrors = 0;
+           } else {
+               if (g_slots[slotIndex]->firmwareInstalled) {
+                   event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
+               }
+           }
         }
     }
 
@@ -581,13 +581,6 @@ public:
     void tick(uint8_t slotIndex);
 
     Page *getPageFromId(int pageId) override;
-
-	int getSlotSettingsPageId() override {
-		if (getTestResult() != TEST_OK) {
-			return eez::gui::PAGE_ID_DIB_DCM224_CH_SETTINGS_ERROR;
-		}    
-		return PsuModule::getSlotSettingsPageId();
-	}
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
         int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;

@@ -540,10 +540,7 @@ public:
     }
 
     int getSlotSettingsPageId() override {
-        if (getTestResult() == TEST_OK) {
-            return PAGE_ID_DIB_PREL6_SETTINGS;
-        }
-        return Module::getSlotSettingsPageId();
+        return PAGE_ID_DIB_PREL6_SETTINGS;
     }
 
     struct ProfileParameters : public Module::ProfileParameters {

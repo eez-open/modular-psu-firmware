@@ -302,14 +302,21 @@ void action_show_edit_mode_slider_help() {
     pushPage(PAGE_ID_EDIT_MODE_SLIDER_HELP);
 }
 
+int getSlotSettingsPageId(int slotIndex) {
+    if (g_slots[slotIndex]->getTestResult() != TEST_OK) {
+        return PAGE_ID_SLOT_SETTINGS;
+    }
+    return g_slots[slotIndex]->getSlotSettingsPageId();
+}
+
 void action_show_slot_settings() {
     hmi::selectSlot(getFoundWidgetAtDown().cursor);
-    showPage(g_slots[hmi::g_selectedSlotIndex]->getSlotSettingsPageId());
+    showPage(getSlotSettingsPageId(hmi::g_selectedSlotIndex));
 }
 
 void action_show_ch_settings() {
     selectChannelByCursor();
-    showPage(g_slots[g_channel->slotIndex]->getSlotSettingsPageId());
+    showPage(getSlotSettingsPageId(g_channel->slotIndex));
 }
 
 void action_show_ch_settings_prot_clear() {

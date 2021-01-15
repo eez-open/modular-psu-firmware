@@ -129,7 +129,7 @@ int Module::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
 }
 
 int Module::getSlotSettingsPageId() {
-    return PAGE_ID_SLOT_SETTINGS;
+    return PAGE_ID_NONE;
 }
 
 int Module::getLabelsAndColorsPageId() {

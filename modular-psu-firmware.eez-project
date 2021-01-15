@@ -9923,10 +9923,10 @@
             "style": {
               "inheritFrom": "default"
             },
-            "left": 8,
-            "top": 8,
-            "width": 464,
-            "height": 231,
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 240,
             "name": "Settings",
             "widgets": [
               {
@@ -9935,9 +9935,9 @@
                   "inheritFrom": "default"
                 },
                 "data": "channel_has_firmware_update",
-                "left": 350,
-                "top": 162,
-                "width": 114,
+                "left": 150,
+                "top": 70,
+                "width": 180,
                 "height": 50,
                 "widgets": [
                   {
@@ -9947,7 +9947,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 114,
+                    "width": 180,
                     "height": 50,
                     "invertColors": true
                   },
@@ -9955,14 +9955,12 @@
                     "type": "MultilineText",
                     "style": {
                       "inheritFrom": "edit_value_active_S_center",
-                      "alignHorizontal": "left",
-                      "alignVertical": "top",
                       "padding": "3"
                     },
                     "action": "channel_update_firmware",
                     "left": 0,
                     "top": 0,
-                    "width": 114,
+                    "width": 180,
                     "height": 50,
                     "text": "\\u00bb Firmware update",
                     "firstLineIndent": 0,
@@ -9976,10 +9974,10 @@
                   "inheritFrom": "default"
                 },
                 "data": "module_is_resync_supported",
-                "left": 226,
-                "top": 162,
-                "width": 114,
-                "height": 50,
+                "left": 150,
+                "top": 130,
+                "width": 180,
+                "height": 40,
                 "widgets": [
                   {
                     "type": "Rectangle",
@@ -9988,8 +9986,8 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 114,
-                    "height": 50,
+                    "width": 180,
+                    "height": 40,
                     "invertColors": true
                   },
                   {
@@ -10002,8 +10000,8 @@
                     "action": "module_resync",
                     "left": 0,
                     "top": 0,
-                    "width": 114,
-                    "height": 50,
+                    "width": 180,
+                    "height": 40,
                     "text": "Resync",
                     "firstLineIndent": 0,
                     "hangingIndent": 0

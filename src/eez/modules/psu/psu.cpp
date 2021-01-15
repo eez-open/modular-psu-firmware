@@ -248,10 +248,7 @@ TestResult PsuModule::getTestResult() {
 }
 
 int PsuModule::getSlotSettingsPageId() {
-    if (getTestResult() == TEST_OK) {
-        return eez::gui::PAGE_ID_CH_SETTINGS;
-    }    
-    return Module::getSlotSettingsPageId();
+    return eez::gui::PAGE_ID_CH_SETTINGS;
 }
 
 void PsuModule::resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer) {

@@ -550,13 +550,6 @@ public:
     }
 #endif
 
-	int getSlotSettingsPageId() override {
-		if (getTestResult() != TEST_OK) {
-			return eez::gui::PAGE_ID_DIB_DCM220_CH_SETTINGS_ERROR;
-		}    
-		return PsuModule::getSlotSettingsPageId();
-	}
-
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
         int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
 
