@@ -603,10 +603,6 @@ public:
 
     virtual void getParams(uint16_t moduleRevision) = 0;
 
-    /// Initialize channel and underlying hardware.
-    /// Makes a required tests, for example ADC, DAC and IO Expander tests.
-    virtual void init() = 0;
-
     /// Called when device power is turned off, so channel
     /// can do its own housekeeping.
     virtual void onPowerDown();

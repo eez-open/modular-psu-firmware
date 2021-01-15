@@ -21,5 +21,6 @@
         "initializer_list": "cpp",
         "queue": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    "cmake.configureOnOpen": true
 }

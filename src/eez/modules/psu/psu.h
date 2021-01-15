@@ -63,7 +63,6 @@ public:
 
     void setEnabled(bool value) override;
 
-	int getChannelSettingsPageId() override;
     int getSlotSettingsPageId() override;
 
     void resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer) override;

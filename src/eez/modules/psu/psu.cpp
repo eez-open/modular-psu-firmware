@@ -216,8 +216,8 @@ void PsuModule::setEnabled(bool value) {
                         channel_dispatcher::setCouplingType(channel_dispatcher::COUPLING_TYPE_NONE, nullptr);
                     }
 
-                    channel.setVoltage(0);
-                    channel.setCurrent(0);
+                    channel.setVoltage(channel.params.U_MIN);
+                    channel.setCurrent(channel.params.I_MIN);
                     channel_dispatcher::outputEnable(channel, false);
                     channel.onPowerDown();
                 }
@@ -227,13 +227,15 @@ void PsuModule::setEnabled(bool value) {
         Module::setEnabled(value);
 
         if (enabled) {
+            initChannels();
+
             for (int i = channelIndex; i < channelIndex + numPowerChannels; i++) {
                 Channel &channel = Channel::get(i);
                 channel.test();
 
                 if (channel.isOk()) {
-                    channel.setVoltage(0);
-                    channel.setCurrent(0);
+                    channel.setVoltage(channel.params.U_MIN);
+                    channel.setCurrent(channel.params.I_MIN);
                     channel_dispatcher::outputEnable(channel, false);
                 }
             }
@@ -245,12 +247,11 @@ TestResult PsuModule::getTestResult() {
     return Channel::getBySlotIndex(slotIndex)->getTestResult();
 }
 
-int PsuModule::getChannelSettingsPageId() {
-    return eez::gui::PAGE_ID_CH_SETTINGS;
-}
-
 int PsuModule::getSlotSettingsPageId() {
-    return eez::gui::PAGE_ID_CH_SETTINGS;
+    if (getTestResult() == TEST_OK) {
+        return eez::gui::PAGE_ID_CH_SETTINGS;
+    }    
+    return Module::getSlotSettingsPageId();
 }
 
 void PsuModule::resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *buffer) {
@@ -813,10 +814,6 @@ bool measureAllAdcValuesOnChannel(int channelIndex) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void initChannels() {
-    for (int i = 0; i < CH_NUM; ++i) {
-        Channel::get(i).init();
-    }
-
     for (int i = 0; i < NUM_SLOTS; ++i) {
     	g_slots[i]->initChannels();
     }    
@@ -1016,7 +1013,7 @@ bool powerUp() {
     g_powerIsUp = true;
 
     bp3c::io_exp::hardResetModules();
-
+    
     psuReset();
 
     ontime::g_mcuCounter.start();
@@ -1175,12 +1172,6 @@ void changePowerState(bool up) {
             io_pins::refresh();
         }
     } else {
-#if OPTION_DISPLAY
-        if (!g_shutdownInProgress) {
-            gui::showEnteringStandbyPage();
-        }
-#endif
-
         powerDown();
 
         g_testPowerUpDelay = true;
@@ -1225,7 +1216,6 @@ void tick() {
     }
 
     dlog_record::tick();
-
     io_pins::tick();
     temperature::tick();
     aux_ps::fan::tick();
