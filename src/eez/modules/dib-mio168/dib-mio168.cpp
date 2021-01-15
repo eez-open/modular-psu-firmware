@@ -291,8 +291,12 @@ struct CalConf {
         memset(this, 0, sizeof(CalConf));
     }
 
-    float toCalibratedValue(float value) {
+    float offsetAndScale(float value) {
         return state.calEnabled ? remap(value, points[0].calValue, points[0].uncalValue, points[1].calValue, points[1].uncalValue) : value;
+    }
+
+    float scale(float value) {
+        return state.calEnabled ? (value * (points[1].uncalValue - points[0].uncalValue) / (points[1].calValue - points[0].calValue)) : value;
     }
 };
 
@@ -640,7 +644,7 @@ struct AinChannel {
 					return 2; // +/- 240 V
 				}
 			} else {
-				return 2; // +/- 48 mA -> 5-3 = 2
+				return 6; // +/- 48 mA
 			}
 		} else {
 			if (m_mode == MEASURE_MODE_VOLTAGE) {
@@ -651,7 +655,7 @@ struct AinChannel {
 				}
 			} else {
 				if (m_currentRange == 0) {
-					return 2; // +/- 24 mA -> 5-3 = 2
+					return 6; // +/- 24 mA
 				} else if (m_currentRange == 1) {
 					return 4; // +/- 1.2 A
 				} else {
@@ -662,11 +666,7 @@ struct AinChannel {
 	}
 
     float getResolution() {
-        float resolution = 1.0f / powf(10.0f, getNumFixedDecimals());
-        if (ongoingCal) {
-            return resolution / 10.0f;
-        }
-        return resolution;
+        return 1.0f / powf(10.0f, getNumFixedDecimals());
     }
 
 	float getMinValue() {
@@ -739,7 +739,7 @@ struct AinChannel {
     }
 
 	float getValue() {
-		return roundPrec(ongoingCal ? m_value : calConf[getCalConfIndex()].toCalibratedValue(m_value), getResolution());
+		return roundPrec(ongoingCal ? m_value : calConf[getCalConfIndex()].scale(m_value), getResolution());
 	}
 
 	static uint8_t getCurrentRangeMaxValue(int subchannelIndex) {
@@ -800,8 +800,8 @@ struct AinChannel {
         }
     }
 
-    CalConf *getCalConf() {
-        return &calConf[getCalConfIndex()];
+    CalConf &getCalConf() {
+        return calConf[getCalConfIndex()];
     }
 
 	void getStepValues(StepValues *stepValues) {
@@ -995,12 +995,12 @@ struct AoutDac7760Channel {
         }
     }
 
-    CalConf *getCalConf() {
-        return &calConf[getCalConfIndex()];
+    CalConf &getCalConf() {
+        return calConf[getCalConfIndex()];
     }
 
     float getCalibratedValue() {
-        return ongoingCal ? getValue() : getCalConf()->toCalibratedValue(getValue());
+        return ongoingCal ? getValue() : getCalConf().offsetAndScale(getValue());
     }
 
     Unit getUnit() {
@@ -1156,7 +1156,7 @@ struct AoutDac7563Channel {
     };
 
     float getCalibratedValue() {
-        return ongoingCal ? m_value : calConf.toCalibratedValue(m_value);
+        return ongoingCal ? m_value : calConf.offsetAndScale(m_value);
     }
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
@@ -2042,7 +2042,10 @@ public:
     }
 
     int getSlotSettingsPageId() override {
-        return PAGE_ID_DIB_MIO168_SETTINGS;
+        if (getTestResult() == TEST_OK) {
+            return PAGE_ID_DIB_MIO168_SETTINGS;
+        }
+        return Module::getSlotSettingsPageId();
     }
 
     int getLabelsAndColorsPageId() override {
@@ -2928,39 +2931,44 @@ public:
     }
 
     bool isVoltageCalibrationExists(int subchannelIndex) override {
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf()->state.calState;
-        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            return aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calState;
-        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
-            return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf()->state.calState;
+        if (getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_U) {
+            if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+                return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf().state.calState;
+            } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+                return aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calState;
+            } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+                return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf().state.calState;
+            }
         }
         return false;
     }
 
     bool isVoltageCalibrationEnabled(int subchannelIndex) override {
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf()->state.calEnabled;
-        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            return aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calEnabled;
-        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
-            return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf()->state.calEnabled;
+        if (getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_U) {
+            if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+                return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf().state.calEnabled;
+            } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+                return aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calEnabled;
+            } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+                return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf().state.calEnabled;
+            }
         }
         return false;
     }
     
     void enableVoltageCalibration(int subchannelIndex, bool enabled) override {
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf()->state.calEnabled = enabled;
-        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calEnabled = enabled;
-        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
-            ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf()->state.calEnabled = enabled;
-        } else {
-            return;
+        if (getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_U) {
+            if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+                aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf().state.calEnabled = enabled;
+            } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+                aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf.state.calEnabled = enabled;
+            } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+                ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf().state.calEnabled = enabled;
+            } else {
+                return;
+            }
+            saveChannelCalibration(subchannelIndex, nullptr);
         }
-
-        saveChannelCalibration(subchannelIndex, nullptr);
     }
 
     bool loadChannelCalibration(int subchannelIndex, int *err) override {
@@ -2998,14 +3006,14 @@ public:
 
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             int dac7760ChannelIndex = subchannelIndex - AOUT_1_SUBCHANNEL_INDEX;
-            calConf = aoutDac7760Channels[dac7760ChannelIndex].getCalConf();
+            calConf = &aoutDac7760Channels[dac7760ChannelIndex].getCalConf();
             calConfIndex = dac7760ChannelIndex * 7 + aoutDac7760Channels[dac7760ChannelIndex].getCalConfIndex();
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             calConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
             calConfIndex = 2 * 7 + (subchannelIndex - AOUT_3_SUBCHANNEL_INDEX);
         } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
             int ainChannelIndex = subchannelIndex - AIN_1_SUBCHANNEL_INDEX;
-            calConf = ainChannels[ainChannelIndex].getCalConf();
+            calConf = &ainChannels[ainChannelIndex].getCalConf();
             calConfIndex = 2 * 7 + 2 + ainChannelIndex * 9 + ainChannels[ainChannelIndex].getCalConfIndex();
         }
 
@@ -3148,7 +3156,7 @@ public:
 
     CalConf *getCalConf(int subchannelIndex) {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf();
+            return &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf();
         } 
         
         if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
@@ -3156,7 +3164,7 @@ public:
         }
         
         if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
-			return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf();
+			return &ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf();
 		}
 
         return nullptr;
@@ -3354,14 +3362,32 @@ public:
     }
 
     bool isCurrentCalibrationExists(int subchannelIndex) override {
+        if (getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_I_HI_RANGE) {
+            if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+                return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf().state.calState;
+            }            
+        }
         return false;
     }
 
     bool isCurrentCalibrationEnabled(int subchannelIndex) override {
+        if (getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_I_HI_RANGE) {
+            if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+                return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf().state.calEnabled;
+            }
+        }
         return false;
     }
     
     void enableCurrentCalibration(int subchannelIndex, bool enabled) override {
+        if (getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_I_HI_RANGE) {
+            if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+                ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf().state.calEnabled = enabled;
+            } else {
+                return;
+            }
+            saveChannelCalibration(subchannelIndex, nullptr);          
+        }
     }
 
     int getNumDlogResources(int subchannelIndex) override {
@@ -4269,10 +4295,11 @@ void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
 		auto &channel = mio168Module->ainChannels[ainChannelIndex];
         Unit unit = channel.getUnit();
+        auto numFixedDecimals = channel.getNumFixedDecimals();
         value = MakeValue(
             unit == UNIT_MILLI_AMPER ? channel.getValue() * 1000.0f : channel.getValue(),
             unit,
-            FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(channel.getNumFixedDecimals())
+            FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(unit == UNIT_MILLI_AMPER ? numFixedDecimals - 3 : numFixedDecimals)
         );
 	} else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
 		if (
