@@ -340,6 +340,11 @@ void PsuAppContext::stateManagment() {
                 dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_OPP) || !channel.isTripped();
             } else if (eventId == event_queue::EVENT_ERROR_CH_REMOTE_SENSE_REVERSE_POLARITY_DETECTED) {
                 dismissPage = !eez::scpi::is_ques_bit_enabled(channelIndex, QUES_ISUM_RPOL);
+            } else if (
+                eventId >= event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR &&
+                eventId <= event_queue::EVENT_ERROR_SLOT3_SYNC_ERROR
+            ) {
+                dismissPage = g_slots[eventId - event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR]->getTestResult() == TEST_OK;
             }
 
             if (dismissPage) {

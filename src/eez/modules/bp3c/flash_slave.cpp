@@ -22,6 +22,7 @@
 #include <eez/system.h>
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/profile.h>
@@ -47,6 +48,8 @@
 
 namespace eez {
 
+void highPriorityThreadOneIter();
+
 using namespace scpi;
 
 namespace bp3c {
@@ -55,6 +58,7 @@ namespace flash_slave {
 bool g_bootloaderMode = false;
 static int g_slotIndex;
 static char g_hexFilePath[MAX_PATH_LENGTH + 1];
+bool g_ate;
 
 #ifdef EEZ_PLATFORM_STM32
 
@@ -68,7 +72,7 @@ static const uint8_t BL_SPI_SOF = 0x5A;
 static const uint8_t ACK = 0x79;
 static const uint8_t NACK = 0x1F;
 
-static const uint32_t SYNC_TIMEOUT = 30000;
+static const uint32_t SYNC_TIMEOUT = 5000;
 static const uint32_t CMD_TIMEOUT = 100;
 
 #ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
@@ -76,6 +80,223 @@ static UART_HandleTypeDef *phuart = &huart4;
 #else
 static UART_HandleTypeDef *phuart = &huart7;
 #endif
+
+struct HexRecord {
+	uint8_t recordLength;
+	uint16_t address;
+	uint8_t recordType;
+	uint8_t data[256];
+	uint8_t checksum;
+};
+
+void enterBootloaderMode(int slotIndex);
+bool syncWithSlave(int slotIndex);
+bool eraseAll(int slotIndex);
+bool readHexRecord(psu::sd_card::BufferedFileRead &file, HexRecord &hexRecord);
+bool writeMemory(int slotIndex, uint32_t address, const uint8_t *buffer, uint32_t bufferSize);
+
+void start(int slotIndex, const char *hexFilePath, bool ate) {
+	g_slotIndex = slotIndex;
+	strcpy(g_hexFilePath, hexFilePath);
+	g_ate = ate;
+
+	if (isPsuThread()) {
+		doStart();
+	} else {
+		sendMessageToPsu(PSU_MESSAGE_FLASH_SLAVE_START);
+	}
+}
+
+void doStart() {
+#if OPTION_DISPLAY
+	psu::gui::showAsyncOperationInProgress("Preparing...");
+#endif
+	enterBootloaderMode(g_slotIndex);
+	sendMessageToLowPriorityThread(THREAD_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE);
+}
+
+void enterBootloaderMode(int slotIndex) {
+    psu::profile::saveToLocation(10);
+
+    g_bootloaderMode = true;
+
+#if defined(EEZ_PLATFORM_STM32)
+    reset();
+
+    // power down channels
+    psu::powerDownChannels();
+
+    osDelay(25);
+
+    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
+    // enable BOOT0 flag for selected slot and reset modules
+
+    if (slotIndex == 0) {
+        io_exp::writeToOutputPort(0b10010000);
+    } else if (slotIndex == 1) {
+        io_exp::writeToOutputPort(0b10100000);
+    } else if (slotIndex == 2) {
+        io_exp::writeToOutputPort(0b11000000);
+    }
+
+    osDelay(5);
+
+    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
+    if (slotIndex == 0) {
+        io_exp::writeToOutputPort(0b00010000);
+    } else if (slotIndex == 1) {
+        io_exp::writeToOutputPort(0b00100000);
+    } else if (slotIndex == 2) {
+        io_exp::writeToOutputPort(0b01000000);
+    }
+
+    osDelay(25);
+
+    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
+    if (slotIndex == 0) {
+        io_exp::writeToOutputPort(0b10010000);
+    } else if (slotIndex == 1) {
+        io_exp::writeToOutputPort(0b10100000);
+    } else if (slotIndex == 2) {
+        io_exp::writeToOutputPort(0b11000000);
+    }
+
+    osDelay(25);
+
+    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
+#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
+    MX_UART4_Init();
+#else
+    MX_UART7_Init();
+#endif
+
+#endif // EEZ_PLATFORM_STM32
+
+	using namespace psu;
+	if (g_ate && g_slotIndex == 2 && g_slots[0]->moduleType == MODULE_TYPE_DCP405) {
+		g_slots[0]->initChannels();
+		auto &channel = Channel::get(0);
+
+		channel_dispatcher::setVoltage(channel, 40);
+		channel_dispatcher::setCurrent(channel, 3.5);
+		channel_dispatcher::outputEnable(channel, true);
+
+		osDelay(100);
+	}
+}
+
+void uploadHexFile() {
+	bool dowloadStarted = false;
+	if (syncWithSlave(g_slotIndex)) {
+		bool eofReached = false;
+	    File file;
+	    psu::sd_card::BufferedFileRead bufferedFile(file);
+	    size_t totalSize = 0;
+		HexRecord hexRecord;
+		uint32_t addressUpperBits = 0;
+
+	    if (!eraseAll(g_slotIndex)) {
+			DebugTrace("Failed to erase all!\n");
+			goto Exit;
+		}
+
+	    if (!file.open(g_hexFilePath, FILE_OPEN_EXISTING | FILE_READ)) {
+			DebugTrace("Can't open firmware hex file!\n");
+			goto Exit;
+	    }
+
+		dowloadStarted = true;
+
+#if OPTION_DISPLAY
+		psu::gui::hideAsyncOperationInProgress();
+    	psu::gui::showProgressPageWithoutAbort("Downloading firmware...");
+		psu::gui::updateProgressPage(0, 0);
+
+	    totalSize = file.size();
+#endif
+
+		while (!eofReached && readHexRecord(bufferedFile, hexRecord)) {
+			size_t currentPosition = file.tell();
+
+	#if OPTION_DISPLAY
+			psu::gui::updateProgressPage(currentPosition, totalSize);
+	#endif
+
+			if (hexRecord.recordType == 0x04) {
+				addressUpperBits = ((hexRecord.data[0] << 8) + hexRecord.data[1]) << 16;
+			} else if (hexRecord.recordType == 0x00) {
+				uint32_t address = addressUpperBits | hexRecord.address;
+				if (!writeMemory(g_slotIndex, address, hexRecord.data, hexRecord.recordLength)) {
+					DebugTrace("Failed to write memory at address %08x\n", address);
+					break;
+				}
+			} else if (hexRecord.recordType == 0x01) {
+				eofReached = true;
+			}
+		}
+
+		file.close();
+
+Exit:
+#if OPTION_DISPLAY
+		osDelay(100);
+		if (dowloadStarted) {
+			psu::gui::hideProgressPage();
+		} else {
+			psu::gui::hideAsyncOperationInProgress();
+		}
+		osDelay(100);
+#endif
+
+		if (eofReached) {
+			uint16_t value = 0xA5A5;
+			bp3c::eeprom::write(g_slotIndex, (const uint8_t *)&value, 2, 4);
+			g_slots[g_slotIndex]->firmwareInstalled = true;
+		} else {
+#if OPTION_DISPLAY
+			psu::gui::errorMessage("Downloading failed!");
+#endif
+		}
+	} else {
+		DebugTrace("Failed to sync with slave\n");
+
+#if OPTION_DISPLAY
+		osDelay(100);
+		psu::gui::hideAsyncOperationInProgress();
+		osDelay(100);
+		psu::gui::errorMessage("Failed to start update!");
+#endif
+	}
+
+	sendMessageToPsu(PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE);
+}
+
+void leaveBootloaderMode() {
+    g_bootloaderMode = false;
+
+#if defined(EEZ_PLATFORM_STM32)
+    // disable BOOT0 flag
+    io_exp::writeToOutputPort(0b10000000);
+    osDelay(5);
+	io_exp::hardResetModules();
+
+    psu::initChannels();
+    psu::testChannels();
+#endif
+
+    psu::profile::recallFromLocation(10);
+
+#if defined(EEZ_PLATFORM_STM32)
+    HAL_UART_DeInit(phuart);
+    psu::io_pins::refresh();
+#endif
+
+    g_ate = 0;
+}
 
 void sendDataAndCRC(uint8_t data) {
 	uint8_t sendData[1];
@@ -122,7 +343,10 @@ bool waitForAck(int slotIndex) {
 		if (rxData == NACK) {
       		// Received NACK
       		return false;
-    	} 
+    	}
+
+		osDelay(1);
+		WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
 	} while (HAL_GetTick() - startTime < SYNC_TIMEOUT);
 #endif
     return false;
@@ -151,6 +375,9 @@ bool syncWithSlave(int slotIndex) {
 			if (result == HAL_OK && rxData[0] == ACK) {
 				return true;
 			}
+
+			osDelay(1);
+			WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
 		} while (HAL_GetTick() - startTime < SYNC_TIMEOUT);
 		return false;
 	}
@@ -305,90 +532,6 @@ bool writeMemory(int slotIndex, uint32_t address, const uint8_t *buffer, uint32_
 #endif
 }
 
-void enterBootloaderMode(int slotIndex) {
-    g_bootloaderMode = true;
-
-    psu::profile::saveToLocation(10);
-
-#if defined(EEZ_PLATFORM_STM32)
-
-    reset();
-
-    // power down channels
-    psu::powerDownChannels();
-
-    osDelay(25);
-
-    // enable BOOT0 flag for selected slot and reset modules
-
-    if (slotIndex == 0) {
-        io_exp::writeToOutputPort(0b10010000);
-    } else if (slotIndex == 1) {
-        io_exp::writeToOutputPort(0b10100000);
-    } else if (slotIndex == 2) {
-        io_exp::writeToOutputPort(0b11000000);
-    }
-
-    osDelay(5);
-
-    if (slotIndex == 0) {
-        io_exp::writeToOutputPort(0b00010000);
-    } else if (slotIndex == 1) {
-        io_exp::writeToOutputPort(0b00100000);
-    } else if (slotIndex == 2) {
-        io_exp::writeToOutputPort(0b01000000);
-    }
-
-    osDelay(25);
-
-    if (slotIndex == 0) {
-        io_exp::writeToOutputPort(0b10010000);
-    } else if (slotIndex == 1) {
-        io_exp::writeToOutputPort(0b10100000);
-    } else if (slotIndex == 2) {
-        io_exp::writeToOutputPort(0b11000000);
-    }
-
-    osDelay(25);
-
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
-    MX_UART4_Init();
-#else
-    MX_UART7_Init();
-#endif
-
-#endif
-}
-
-void leaveBootloaderMode() {
-    g_bootloaderMode = false;
-
-#if defined(EEZ_PLATFORM_STM32)
-    // disable BOOT0 flag
-    io_exp::writeToOutputPort(0b10000000);
-    osDelay(5);
-	io_exp::hardResetModules();
-
-    psu::initChannels();
-    psu::testChannels();
-#endif
-
-    psu::profile::recallFromLocation(10);
-
-#if defined(EEZ_PLATFORM_STM32)
-    HAL_UART_DeInit(phuart);
-    psu::io_pins::refresh();
-#endif
-}
-
-struct HexRecord {
-	uint8_t recordLength;
-	uint16_t address;
-	uint8_t recordType;
-	uint8_t data[256];
-	uint8_t checksum;
-};
-
 uint8_t hex(uint8_t digit) {
 	if (digit < 'A') {
 		return digit - '0';
@@ -439,115 +582,6 @@ bool readHexRecord(psu::sd_card::BufferedFileRead &file, HexRecord &hexRecord) {
 	}
 
 	return true;
-}
-
-void doStart() {
-#if OPTION_DISPLAY
-	psu::gui::showAsyncOperationInProgress("Preparing...");
-#endif
-
-	psu::channel_dispatcher::disableOutputForAllChannels();
-
-	enterBootloaderMode(g_slotIndex);
-
-	sendMessageToLowPriorityThread(THREAD_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE);
-}
-
-void start(int slotIndex, const char *hexFilePath) {
-	g_slotIndex = slotIndex;
-	strcpy(g_hexFilePath, hexFilePath);
-
-	if (isPsuThread()) {
-		doStart();
-	} else {
-		sendMessageToPsu(PSU_MESSAGE_FLASH_SLAVE_START);
-	}
-}
-
-void uploadHexFile() {
-	bool dowloadStarted = false;
-	if (syncWithSlave(g_slotIndex)) {
-		bool eofReached = false;
-	    File file;
-	    psu::sd_card::BufferedFileRead bufferedFile(file);
-	    size_t totalSize = 0;
-		HexRecord hexRecord;
-		uint32_t addressUpperBits = 0;
-
-	    if (!eraseAll(g_slotIndex)) {
-			DebugTrace("Failed to erase all!\n");
-			goto Exit;
-		}
-
-	    if (!file.open(g_hexFilePath, FILE_OPEN_EXISTING | FILE_READ)) {
-			DebugTrace("Can't open firmware hex file!\n");
-			goto Exit;
-	    }
-
-		dowloadStarted = true;
-
-#if OPTION_DISPLAY
-		psu::gui::hideAsyncOperationInProgress();
-    	psu::gui::showProgressPageWithoutAbort("Downloading firmware...");
-		psu::gui::updateProgressPage(0, 0);
-
-	    totalSize = file.size();
-#endif
-
-		while (!eofReached && readHexRecord(bufferedFile, hexRecord)) {
-			size_t currentPosition = file.tell();
-
-	#if OPTION_DISPLAY
-			psu::gui::updateProgressPage(currentPosition, totalSize);
-	#endif
-
-			if (hexRecord.recordType == 0x04) {
-				addressUpperBits = ((hexRecord.data[0] << 8) + hexRecord.data[1]) << 16;
-			} else if (hexRecord.recordType == 0x00) {
-				uint32_t address = addressUpperBits | hexRecord.address;
-				if (!writeMemory(g_slotIndex, address, hexRecord.data, hexRecord.recordLength)) {
-					DebugTrace("Failed to write memory at address %08x\n", address);
-					break;
-				}
-			} else if (hexRecord.recordType == 0x01) {
-				eofReached = true;
-			}
-		}
-
-		file.close();
-
-Exit:
-#if OPTION_DISPLAY
-		osDelay(100);
-		if (dowloadStarted) {
-			psu::gui::hideProgressPage();
-		} else {
-			psu::gui::hideAsyncOperationInProgress();			
-		}
-		osDelay(100);
-#endif
-
-		if (eofReached) {
-			uint16_t value = 0xA5A5;
-			bp3c::eeprom::write(g_slotIndex, (const uint8_t *)&value, 2, 4);
-			g_slots[g_slotIndex]->firmwareInstalled = true;
-		} else {
-#if OPTION_DISPLAY
-			psu::gui::errorMessage("Downloading failed!");
-#endif
-		}
-	} else {
-		DebugTrace("Failed to sync with slave\n");
-
-#if OPTION_DISPLAY
-		osDelay(100);
-		psu::gui::hideAsyncOperationInProgress();
-		osDelay(100);
-		psu::gui::errorMessage("Failed to start update!");
-#endif
-	}
-
-	sendMessageToPsu(PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE);
 }
 
 } // namespace flash_slave

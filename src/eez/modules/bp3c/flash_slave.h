@@ -23,8 +23,9 @@ namespace bp3c {
 namespace flash_slave {
 
 extern bool g_bootloaderMode;
+extern bool g_ate;
 
-void start(int slotIndex, const char *hexFilePath);
+void start(int slotIndex, const char *hexFilePath, bool ate = false);
 void doStart();
 void leaveBootloaderMode();
 

@@ -432,12 +432,19 @@ scpi_result_t scpi_cmd_debugDownloadFirmware(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
+    bool ate = false;
+    if (!SCPI_ParamBool(context, &ate, false)) {
+        if (SCPI_ParamErrorOccurred(context)) {
+            return SCPI_RES_ERR;
+        }
+    }
+
     if (bp3c::flash_slave::g_bootloaderMode) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }
 
-    bp3c::flash_slave::start(slotIndex - 1, hexFilePath);
+    bp3c::flash_slave::start(slotIndex - 1, hexFilePath, ate);
 
     return SCPI_RES_OK;
 #else
@@ -448,7 +455,7 @@ scpi_result_t scpi_cmd_debugDownloadFirmware(scpi_t *context) {
 
 scpi_result_t scpi_cmd_debugDownloadFirmwareQ(scpi_t *context) {
 #if defined(DEBUG) && defined(EEZ_PLATFORM_STM32)
-    SCPI_ResultBool(context, bp3c::flash_slave::g_bootloaderMode);
+    SCPI_ResultBool(context, bp3c::flash_slave::g_bootloaderMode || bp3c::flash_slave::g_ate);
     return SCPI_RES_OK;
 #else
     SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

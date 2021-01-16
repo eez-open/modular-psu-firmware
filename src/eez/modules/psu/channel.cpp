@@ -699,7 +699,8 @@ bool Channel::isTestOk() {
 }
 
 bool Channel::isOk() {
-    return g_slots[slotIndex]->enabled && isPowerUp() && isPowerOk() && isTestOk() && !bp3c::flash_slave::g_bootloaderMode;
+    return (g_slots[slotIndex]->enabled && isPowerUp() && isPowerOk() && isTestOk() && !bp3c::flash_slave::g_bootloaderMode) ||
+    	(bp3c::flash_slave::g_bootloaderMode && bp3c::flash_slave::g_ate && channelIndex == 0);
 }
 
 void Channel::tick() {

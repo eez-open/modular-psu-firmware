@@ -68823,6 +68823,16 @@
                     "type": "quoted-string"
                   }
                 ]
+              },
+              {
+                "name": "ate",
+                "type": [
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "isOptional": true,
+                "description": "If ate (automatic testing environment) is true and slot is 3 and on slot 1 there is a DCP then set the following on that DCP so it can drive channel on slot 3: volt 40, curr 3.5 and outp 1."
               }
             ],
             "response": {

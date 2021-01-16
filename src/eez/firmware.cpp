@@ -402,6 +402,7 @@ void shutdown() {
     sendMessageToLowPriorityThread(THREAD_MESSAGE_SHUTDOWN);
     do {
         osDelay(10);
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
     } while (isLowPriorityThreadAlive());
 #endif
 
@@ -415,6 +416,7 @@ void shutdown() {
 
     while (persist_conf::saveAllDirtyBlocks()) {
         delay(1);
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
     }
 
     event_queue::shutdownSave();
@@ -425,11 +427,13 @@ void shutdown() {
         if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
             persist_conf::writeTotalOnTime(ontime::g_moduleCounters[slotIndex].getType(), ontime::g_moduleCounters[slotIndex].getTotalTime());
         }
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
     }
 
     //
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         g_slots[slotIndex]->writeUnsavedData();
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
     }
 
     if (g_restart) {
