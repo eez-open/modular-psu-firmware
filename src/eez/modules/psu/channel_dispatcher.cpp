@@ -2390,6 +2390,30 @@ bool getMeasuredCurrent(int slotIndex, int subchannelIndex, float &value, int *e
     }
 }
 
+bool getSourcePwmState(int slotIndex, int subchannelIndex, bool &enabled, int *err) {
+    return g_slots[slotIndex]->getSourcePwmState(subchannelIndex, enabled, err);
+}
+
+bool setSourcePwmState(int slotIndex, int subchannelIndex, bool enabled, int *err) {
+	return g_slots[slotIndex]->setSourcePwmState(subchannelIndex, enabled, err);
+}
+
+bool getSourcePwmFrequency(int slotIndex, int subchannelIndex, float &frequency, int *err) {
+	return g_slots[slotIndex]->getSourcePwmFrequency(subchannelIndex, frequency, err);
+}
+
+bool setSourcePwmFrequency(int slotIndex, int subchannelIndex, float frequency, int *err) {
+	return g_slots[slotIndex]->setSourcePwmFrequency(subchannelIndex, frequency, err);
+}
+
+bool getSourcePwmDuty(int slotIndex, int subchannelIndex, float &duty, int *err) {
+	return g_slots[slotIndex]->getSourcePwmDuty(subchannelIndex, duty, err);
+}
+
+bool setSourcePwmDuty(int slotIndex, int subchannelIndex, float duty, int *err) {
+	return g_slots[slotIndex]->setSourcePwmDuty(subchannelIndex, duty, err);
+}
+
 } // namespace channel_dispatcher
 } // namespace psu
 } // namespace eez

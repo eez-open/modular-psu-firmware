@@ -795,6 +795,48 @@ int Module::diskDriveIoctl(uint8_t cmd, void *buff) {
     return 1; // RES_ERROR
 }
 
+bool Module::getSourcePwmState(int subchannelIndex, bool &enabled, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::setSourcePwmState(int subchannelIndex, bool enabled, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::getSourcePwmFrequency(int subchannelIndex, float &frequency, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::setSourcePwmFrequency(int subchannelIndex, float frequency, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::getSourcePwmDuty(int subchannelIndex, float &duty, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
+bool Module::setSourcePwmDuty(int subchannelIndex, float duty, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct NoneModule : public Module {

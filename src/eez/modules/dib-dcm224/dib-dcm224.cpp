@@ -382,6 +382,54 @@ struct DcmChannel : public Channel {
 	int getAdvancedOptionsPageId() override {
 		return PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS;
 	}
+
+	void setSourcePwmState(bool enabled) {
+        pwmEnabled = enabled;
+
+		if (flags.trackingEnabled) {
+			for (int i = 0; i < CH_NUM; i++) {
+				if (i != channelIndex) {
+					auto &channel = Channel::get(i);
+					if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCM224) {
+						auto &dcmChannel = (DcmChannel &)channel;
+						dcmChannel.pwmEnabled = enabled;
+					}
+				}
+			}
+		}
+	}
+
+	void setSourcePwmFrequency(float frequency) {
+        pwmFrequency = frequency;
+
+		if (flags.trackingEnabled) {
+			for (int i = 0; i < CH_NUM; i++) {
+				if (i != channelIndex) {
+					auto &channel = Channel::get(i);
+					if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCM224) {
+						auto &dcmChannel = (DcmChannel &)channel;
+						dcmChannel.pwmFrequency = frequency;
+					}
+				}
+			}
+		}
+	}    
+
+	void setSourcePwmDuty(float duty) {
+        pwmDuty = duty;
+
+		if (flags.trackingEnabled) {
+			for (int i = 0; i < CH_NUM; i++) {
+				if (i != channelIndex) {
+					auto &channel = Channel::get(i);
+					if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCM224) {
+						auto &dcmChannel = (DcmChannel &)channel;
+						dcmChannel.pwmDuty = duty;
+					}
+				}
+			}
+		}
+	}    
 };
 
 static const float DEFAULT_COUNTERPHASE_FREQUENCY = 500000.0f;
@@ -624,6 +672,104 @@ public:
     void setPowerChannelProfileParameters(int channelIndex, uint8_t *buffer, bool mismatch, int recallOptions, int &numTrackingChannels) override;
     bool writePowerChannelProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
     bool readPowerChannelProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) override;
+
+    bool getSourcePwmState(int subchannelIndex, bool &enabled, int *err) {
+        auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
+        if (!channel) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        enabled = channel->pwmEnabled;
+
+		return true;
+	}
+    
+    bool setSourcePwmState(int subchannelIndex, bool enabled, int *err) {
+        auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
+        if (!channel) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        channel->setSourcePwmState(enabled);
+
+		return true;
+	}
+
+    bool getSourcePwmFrequency(int subchannelIndex, float &frequency, int *err) {
+        auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
+        if (!channel) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        enabled = channel->pwmFrequency;
+
+		return true;
+	}
+    
+    bool setSourcePwmFrequency(int subchannelIndex, float frequency, int *err) {
+        auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
+        if (!channel) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        if (frequency < PWM_MIN_FREQUENCY || frequency > PWM_MAX_FREQUENCY) {
+            if (err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+
+        channel->setSourcePwmFrequency(frequency);
+
+		return true;
+	}
+
+    bool getSourcePwmDuty(int subchannelIndex, float &duty, int *err) {
+        auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
+        if (!channel) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        enabled = channel->pwmDuty;
+
+		return true;
+	}
+    
+    bool setSourcePwmDuty(int subchannelIndex, float duty, int *err) {
+        auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
+        if (!channel) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+        if (duty < PWM_MIN_DUTY || duty > PWM_MAX_DUTY) {
+            if (err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+
+        channel->setSourcePwmDuty(duty);
+
+		return true;
+	}
 };
 
 void DcmChannel::onPowerDown() {
@@ -807,23 +953,12 @@ public:
     void set() {
         if (getDirty()) {
             auto channel = (DcmChannel *)g_channel;
-            channel->pwmEnabled = m_pwmEnabled;
-            channel->pwmFrequency = m_pwmFrequency;
-            channel->pwmDuty = m_pwmDuty;
 
-            if (channel->flags.trackingEnabled) {
-                for (int i = 0; i < CH_NUM; i++) {
-                    if (i != channel->channelIndex) {
-                        auto &otherChannel = Channel::get(i);
-                        if (g_slots[otherChannel.slotIndex]->moduleType == MODULE_TYPE_DCM224) {
-                            auto &dcmOtherChannel = (DcmChannel &)otherChannel;
-                            dcmOtherChannel.pwmEnabled = m_pwmEnabled;
-                            dcmOtherChannel.pwmFrequency = m_pwmFrequency;
-                            dcmOtherChannel.pwmDuty = m_pwmDuty;
-                        }
-                    }
-                }
-            }
+            channel->setSourcePwmState(m_pwmEnabled);
+			if (m_pwmEnabled) {
+				channel->setSourcePwmFrequency(m_pwmFrequency);
+				channel->setSourcePwmDuty(m_pwmDuty);
+			}
 
             auto module = (DcmModule *)g_slots[g_selectedSlotIndex];
             module->counterphaseFrequency = m_counterphaseFrequency;
@@ -875,18 +1010,18 @@ void DcmModule::tick(uint8_t slotIndex) {
     float *floatValues = (float *)(outputSetValues + 4);
 
     if (page && (g_channel == &channel1 || (g_channel->flags.trackingEnabled && channel1.flags.trackingEnabled))) {
-        floatValues[0] = page->m_pwmFrequency;
+        floatValues[0] = page->m_pwmEnabled ? page->m_pwmFrequency : 1.0f;
         floatValues[1] = page->m_pwmEnabled ? page->m_pwmDuty : 100.0f;
     } else {
-        floatValues[0] = channel1.pwmFrequency;
+        floatValues[0] = channel1.pwmEnabled ? channel1.pwmFrequency : 1.0f;
         floatValues[1] = channel1.pwmEnabled ? channel1.pwmDuty : 100.0f;
     }
 
     if (page && (g_channel == &channel2 || (g_channel->flags.trackingEnabled && channel2.flags.trackingEnabled))) {
-        floatValues[2] = page->m_pwmFrequency;
+        floatValues[2] = page->m_pwmEnabled ? page->m_pwmFrequency : 1.0f;
         floatValues[3] = page->m_pwmEnabled ? page->m_pwmDuty : 100.0f;
     } else {
-        floatValues[2] = channel2.pwmFrequency;
+        floatValues[2] = channel2.pwmEnabled ? channel2.pwmFrequency : 1.0f;
         floatValues[3] = channel2.pwmEnabled ? channel2.pwmDuty : 100.0f;
     }
 

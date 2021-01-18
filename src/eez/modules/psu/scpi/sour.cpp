@@ -1581,6 +1581,120 @@ scpi_result_t scpi_cmd_sourceVoltageRangeQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_sourcePwmState(scpi_t *context) {
+    bool enabled;
+    if (!SCPI_ParamBool(context, &enabled, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::setSourcePwmState(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, enabled, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourcePwmStateQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    bool enabled;
+    int err;
+    if (!channel_dispatcher::getSourcePwmState(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, enabled, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultBool(context, enabled);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourcePwmFrequency(scpi_t *context) {
+    float frequency;
+    if (!SCPI_ParamFloat(context, &frequency, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::setSourcePwmFrequency(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, frequency, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourcePwmFrequencyQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    float frequency;
+    int err;
+    if (!channel_dispatcher::getSourcePwmFrequency(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, frequency, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, frequency);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourcePwmDuty(scpi_t *context) {
+    float duty;
+    if (!SCPI_ParamFloat(context, &duty, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::setSourcePwmDuty(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, duty, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourcePwmDutyQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    float duty;
+    int err;
+    if (!channel_dispatcher::getSourcePwmDuty(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, duty, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, duty);
+
+    return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

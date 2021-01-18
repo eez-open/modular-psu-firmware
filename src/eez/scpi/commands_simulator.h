@@ -262,6 +262,12 @@
     SCPI_COMMAND("SOURce:CURRent:RANGe?", scpi_cmd_sourceCurrentRangeQ) \
     SCPI_COMMAND("SOURce:VOLTage:RANGe", scpi_cmd_sourceVoltageRange) \
     SCPI_COMMAND("SOURce:VOLTage:RANGe?", scpi_cmd_sourceVoltageRangeQ) \
+    SCPI_COMMAND("SOURce:PWM:STATe", scpi_cmd_sourcePwmState) \
+    SCPI_COMMAND("SOURce:PWM:STATe?", scpi_cmd_sourcePwmStateQ) \
+    SCPI_COMMAND("SOURce:PWM:DUTY", scpi_cmd_sourcePwmDuty) \
+    SCPI_COMMAND("SOURce:PWM:DUTY?", scpi_cmd_sourcePwmDutyQ) \
+    SCPI_COMMAND("SOURce:PWM:FREQuency", scpi_cmd_sourcePwmFrequency) \
+    SCPI_COMMAND("SOURce:PWM:FREQuency?", scpi_cmd_sourcePwmFrequencyQ) \
     SCPI_COMMAND("STATus:OPERation:CONDition?", scpi_cmd_statusOperationConditionQ) \
     SCPI_COMMAND("STATus:OPERation:ENABle", scpi_cmd_statusOperationEnable) \
     SCPI_COMMAND("STATus:OPERation:ENABle?", scpi_cmd_statusOperationEnableQ) \

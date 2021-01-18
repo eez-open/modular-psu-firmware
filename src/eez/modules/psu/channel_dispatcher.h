@@ -240,6 +240,15 @@ float getCurrentMaxValue(int slotIndex, int subchannelIndex);
 bool getMeasuredVoltage(int slotIndex, int subchannelIndex, float &value, int *err);
 bool getMeasuredCurrent(int slotIndex, int subchannelIndex, float &value, int *err);
 
+bool getSourcePwmState(int slotIndex, int subchannelIndex, bool &enabled, int *err);
+bool setSourcePwmState(int slotIndex, int subchannelIndex, bool enabled, int *err);
+
+bool getSourcePwmFrequency(int slotIndex, int subchannelIndex, float &frequency, int *err);
+bool setSourcePwmFrequency(int slotIndex, int subchannelIndex, float frequency, int *err);
+
+bool getSourcePwmDuty(int slotIndex, int subchannelIndex, float &duty, int *err);
+bool setSourcePwmDuty(int slotIndex, int subchannelIndex, float duty, int *err);
+
 } // namespace channel_dispatcher
 } // namespace psu
 } // namespace eez

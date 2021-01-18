@@ -65029,6 +65029,104 @@
                 }
               ]
             }
+          },
+          {
+            "name": "SOURce:PWM:STATe",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_prot",
+            "parameters": [
+              {
+                "name": "enable",
+                "type": [
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:PWM:STATe?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_prot",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "boolean"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:PWM:DUTY",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_dig_outp_pwm_duty",
+            "parameters": [
+              {
+                "name": "duty",
+                "type": [
+                  {
+                    "type": "nr3"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:PWM:DUTY?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_dig_outp_pwm_duty",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr3"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:PWM:FREQuency",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_dig_outp_pwm_freq",
+            "parameters": [
+              {
+                "name": "frequency",
+                "type": [
+                  {
+                    "type": "nr3"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:PWM:FREQuency?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_dig_outp_pwm_freq",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr3"
+                }
+              ]
+            }
           }
         ]
       },

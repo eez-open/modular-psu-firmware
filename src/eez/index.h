@@ -382,6 +382,15 @@ struct Module {
     virtual int diskDriveRead(uint8_t *buff, uint32_t sector);
     virtual int diskDriveWrite(uint8_t *buff, uint32_t sector);
     virtual int diskDriveIoctl(uint8_t cmd, void *buff);
+
+    virtual bool getSourcePwmState(int subchannelIndex, bool &enabled, int *err);
+    virtual bool setSourcePwmState(int subchannelIndex, bool enabled, int *err);
+
+    virtual bool getSourcePwmFrequency(int subchannelIndex, float &frequency, int *err);
+    virtual bool setSourcePwmFrequency(int subchannelIndex, float frequency, int *err);
+
+    virtual bool getSourcePwmDuty(int subchannelIndex, float &duty, int *err);
+    virtual bool setSourcePwmDuty(int subchannelIndex, float duty, int *err);
 };
 
 static const int NUM_SLOTS = 3;
