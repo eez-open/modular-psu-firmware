@@ -130,9 +130,11 @@ float Value::getDacValue() {
 
 bool Value::readAdcValue(float &adcValue, int *err) {
     Channel *channel = Channel::getBySlotIndex(editor.m_slotIndex, editor.m_subchannelIndex);
-    return channel ? 
-		(type == CALIBRATION_VALUE_U ? channel->u.mon_last : channel->i.mon_last) : 
-		g_slots[editor.m_slotIndex]->calibrationReadAdcValue(editor.m_subchannelIndex, adcValue, err);
+    if (channel) {
+    	adcValue = type == CALIBRATION_VALUE_U ? channel->u.mon_last : channel->i.mon_last;
+    	return true;
+    }
+    return g_slots[editor.m_slotIndex]->calibrationReadAdcValue(editor.m_subchannelIndex, adcValue, err);
 }
 
 bool Value::checkValueAndAdc(float value, float adc) {
@@ -378,8 +380,6 @@ void CalibrationEditor::doStart() {
 
     profile::saveToLocation(10);
     profile::setFreezeState(true);
-
-    reset();
 
     selectCurrentRange(0);
 
