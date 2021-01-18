@@ -69,7 +69,7 @@ static bool g_takeScreenshot;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define DMA2D_WAIT HAL_DMA2D_PollForTransfer(&hdma2d, HAL_MAX_DELAY)
+#define DMA2D_WAIT while (HAL_DMA2D_PollForTransfer(&hdma2d, 1000) != HAL_OK)
 
 uint32_t vramOffset(uint16_t *vram, int x, int y) {
     return (uint32_t)(vram + y * DISPLAY_WIDTH + x);
