@@ -286,6 +286,7 @@ public:
 		if (currentCommand->fillRequest) {
 			(this->*currentCommand->fillRequest)(request);
 		}
+        spiReady = false;
         spiDmaTransferCompleted = false;
         auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)output, (uint8_t *)input, BUFFER_SIZE);
         return status == bp3c::comm::TRANSFER_STATUS_OK;
@@ -294,6 +295,7 @@ public:
     bool getCommandResult() {
         Request &request = *(Request *)output;
         request.command = COMMAND_NONE;
+        spiReady = false;
         spiDmaTransferCompleted = false;
         auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)output, (uint8_t *)input, BUFFER_SIZE);
         return status == bp3c::comm::TRANSFER_STATUS_OK;
@@ -422,7 +424,6 @@ public:
                 ) {
                     #if defined(EEZ_PLATFORM_STM32)
                 	if (spiReady) {
-                        spiReady = false;
                 		stateTransition(EVENT_SLAVE_READY);
                 	}
                     #endif

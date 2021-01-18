@@ -93,6 +93,7 @@ struct Parameters : public dlog_file::Parameters {
     int numDlogItems = 0;
 
     eez_err_t enableDlogItem(int slotIndex, int subchannelIndex, int resourceIndex, bool enable);
+    eez_err_t enableDlogItem(int slotIndex, int subchannelIndex, DlogResourceType resourceType, bool enable);
     bool isDlogItemEnabled(int slotIndex, int subchannelIndex, int resourceIndex);
     bool isDlogItemEnabled(int slotIndex, int subchannelIndex, DlogResourceType resourceType);
 

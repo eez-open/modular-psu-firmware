@@ -64,6 +64,8 @@ using namespace eez::gui;
 extern "C" DWORD get_fattime(void);
 #endif
 
+volatile uint32_t g_debugVar;
+
 namespace eez {
 namespace dib_mio168 {
 
@@ -105,6 +107,8 @@ static float PWM_MAX_FREQUENCY = 1000000.0f;
 
 static const size_t CHANNEL_LABEL_MAX_LENGTH = 5;
 
+static const int NUM_REQUEST_RETRIES = 10;
+static const int MAX_DMA_TRANSFER_ERRORS = 10;
 static const uint32_t REFRESH_TIME_MS = 249;
 static const uint32_t TIMEOUT_TIME_MS = 350;
 static const uint32_t TIMEOUT_UNTIL_OUT_OF_SYNC_MS = 10000;
@@ -112,20 +116,20 @@ static const uint32_t TIMEOUT_UNTIL_OUT_OF_SYNC_MS = 10000;
 ////////////////////////////////////////////////////////////////////////////////
 
 enum Command {
-	COMMAND_NONE,
+	COMMAND_NONE = 0x69365f39,
 
-    COMMAND_GET_INFO,
-    COMMAND_GET_STATE,
-    COMMAND_SET_PARAMS,
+    COMMAND_GET_INFO = 0x0200ccb7,
+    COMMAND_GET_STATE = 0x0093f106,
+    COMMAND_SET_PARAMS = 0x1ff1c78c,
 
-    COMMAND_DLOG_RECORDING_START,
-    COMMAND_DLOG_RECORDING_STOP,
+    COMMAND_DLOG_RECORDING_START = 0x7d3f9f28,
+    COMMAND_DLOG_RECORDING_STOP = 0x7de480a1,
 
-    COMMAND_DISK_DRIVE_INITIALIZE,
-    COMMAND_DISK_DRIVE_STATUS,
-    COMMAND_DISK_DRIVE_READ,
-    COMMAND_DISK_DRIVE_WRITE,
-    COMMAND_DISK_DRIVE_IOCTL
+    COMMAND_DISK_DRIVE_INITIALIZE = 0x0f8066f8,
+    COMMAND_DISK_DRIVE_STATUS = 0x457f0700,
+    COMMAND_DISK_DRIVE_READ = 0x4478491d,
+    COMMAND_DISK_DRIVE_WRITE = 0x7d652b00,
+    COMMAND_DISK_DRIVE_IOCTL = 0x22cc23c8
 };
 
 #define GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT (1 << 0)
@@ -185,7 +189,7 @@ struct DlogRecordingStart {
 #define DISK_DRIVER_IOCTL_BUFFER_MAX_SIZE 4
 
 struct Request {
-    uint8_t command;
+    uint32_t command;
 
     union {
         struct {
@@ -213,7 +217,7 @@ struct Request {
 };
 
 struct Response {
-	uint8_t command;
+	uint32_t command;
 
     union {
         struct {
@@ -1318,7 +1322,7 @@ public:
 	SetParams lastTransferredParams;
 
 	struct CommandDef {
-		uint8_t command;
+		uint32_t command;
 		void (Mio168Module::*fillRequest)(Request &request);
 		void (Mio168Module::*done)(Response &response, bool isSuccess);
 	};
@@ -1747,6 +1751,7 @@ public:
 		if (currentCommand->fillRequest) {
 			(this->*currentCommand->fillRequest)(request);
 		}
+        spiReady = false;
         spiDmaTransferCompleted = false;
         auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)output, (uint8_t *)input, sizeof(Request));
         return status == bp3c::comm::TRANSFER_STATUS_OK;
@@ -1755,6 +1760,7 @@ public:
     bool getCommandResult() {
         Request &request = *(Request *)output;
         request.command = COMMAND_NONE;
+        spiReady = false;
         spiDmaTransferCompleted = false;
         auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)output, (uint8_t *)input, sizeof(Request));
         return status == bp3c::comm::TRANSFER_STATUS_OK;
@@ -1762,14 +1768,12 @@ public:
 
     bool isCommandResponse() {
         Response &response = *(Response *)input;
-        return response.command == (0x80 | currentCommand->command);
+        return response.command == (0x8000 | currentCommand->command);
     }
 
     void doRetry() {
     	bp3c::comm::abortTransfer(slotIndex);
         
-        static const int NUM_REQUEST_RETRIES = 10;
-
         if (++retry < NUM_REQUEST_RETRIES) {
             // try again
             setState(STATE_WAIT_SLAVE_READY_BEFORE_REQUEST);
@@ -1802,6 +1806,7 @@ public:
     	if (event == EVENT_DMA_TRANSFER_COMPLETED) {
             numCrcErrors = 0;
             numTransferErrors = 0;
+            g_debugVar= 0;
     	}
  
         if (state == STATE_WAIT_SLAVE_READY_BEFORE_REQUEST) {
@@ -1853,7 +1858,7 @@ public:
     void reportDmaTransferFailed(int status) {
         if (status == bp3c::comm::TRANSFER_STATUS_CRC_ERROR) {
             numCrcErrors++;
-            if (numCrcErrors >= 5) {
+            if (numCrcErrors >= MAX_DMA_TRANSFER_ERRORS) {
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                 synchronized = false;
                 testResult = TEST_FAILED;
@@ -1863,7 +1868,7 @@ public:
             //}
         } else {
             numTransferErrors++;
-            if (numTransferErrors >= 5) {
+            if (numTransferErrors >= MAX_DMA_TRANSFER_ERRORS) {
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
                 synchronized = false;
                 testResult = TEST_FAILED;
@@ -1872,6 +1877,7 @@ public:
             //    DebugTrace("Slot %d SPI transfer error %d no. %d\n", slotIndex + 1, status, numTransferErrors);
             //}
         }
+        g_debugVar++;
     }
 
     void tick() override {
@@ -1885,7 +1891,6 @@ public:
                 ) {
                     #if defined(EEZ_PLATFORM_STM32)
                 	if (spiReady) {
-                        spiReady = false;
                 		stateTransition(EVENT_SLAVE_READY);
                 	}
                     #endif
@@ -1914,7 +1919,7 @@ public:
                     #if defined(EEZ_PLATFORM_SIMULATOR)
                     auto response = (Response *)input;
 
-                    response->command = 0x80 | currentCommand->command;
+                    response->command = 0x8000 | currentCommand->command;
 
                     if (currentCommand->command == COMMAND_GET_INFO) {
                         response->getInfo.firmwareMajorVersion = 1;
@@ -3402,7 +3407,9 @@ public:
             return DlogResourceType(DLOG_RESOURCE_TYPE_DIN0 + resourceIndex);
         }
         if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
-            return DLOG_RESOURCE_TYPE_U;
+            return 
+                ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getMode() == MEASURE_MODE_VOLTAGE ?
+                    DLOG_RESOURCE_TYPE_U : DLOG_RESOURCE_TYPE_I;
         }
         return DLOG_RESOURCE_TYPE_NONE;
 	}

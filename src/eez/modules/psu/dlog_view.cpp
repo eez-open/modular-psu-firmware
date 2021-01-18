@@ -133,6 +133,16 @@ eez_err_t Parameters::enableDlogItem(int slotIndex, int subchannelIndex, int res
     return SCPI_RES_OK;
 }
 
+eez_err_t Parameters::enableDlogItem(int slotIndex, int subchannelIndex, DlogResourceType resourceType, bool enable) {
+    int numResources = g_slots[slotIndex]->getNumDlogResources(subchannelIndex);
+    for (int resourceIndex = 0; resourceIndex < numResources; resourceIndex++) {
+        if (g_slots[slotIndex]->getDlogResourceType(subchannelIndex, resourceIndex) == resourceType) {
+            return enableDlogItem(slotIndex, subchannelIndex, resourceIndex, enable);
+        }
+    }
+    return SCPI_ERROR_HARDWARE_MISSING;
+}
+
 bool Parameters::isDlogItemEnabled(int slotIndex, int subchannelIndex, int resourceIndex) {
     int dlogItemIndex;
     bool enabled = findDlogItemIndex(slotIndex, subchannelIndex, resourceIndex, dlogItemIndex);
