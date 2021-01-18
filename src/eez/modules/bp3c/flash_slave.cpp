@@ -60,6 +60,14 @@ static int g_slotIndex;
 static char g_hexFilePath[MAX_PATH_LENGTH + 1];
 bool g_ate;
 
+struct HexRecord {
+	uint8_t recordLength;
+	uint16_t address;
+	uint8_t recordType;
+	uint8_t data[256];
+	uint8_t checksum;
+};
+
 #ifdef EEZ_PLATFORM_STM32
 
 static const uint8_t CMD_WRITE_MEMORY = 0x31;
@@ -72,7 +80,7 @@ static const uint8_t BL_SPI_SOF = 0x5A;
 static const uint8_t ACK = 0x79;
 static const uint8_t NACK = 0x1F;
 
-static const uint32_t SYNC_TIMEOUT = 5000;
+static const uint32_t SYNC_TIMEOUT = 30000;
 static const uint32_t CMD_TIMEOUT = 100;
 
 #ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
@@ -81,13 +89,7 @@ static UART_HandleTypeDef *phuart = &huart4;
 static UART_HandleTypeDef *phuart = &huart7;
 #endif
 
-struct HexRecord {
-	uint8_t recordLength;
-	uint16_t address;
-	uint8_t recordType;
-	uint8_t data[256];
-	uint8_t checksum;
-};
+#endif
 
 void enterBootloaderMode(int slotIndex);
 bool syncWithSlave(int slotIndex);
@@ -128,8 +130,6 @@ void enterBootloaderMode(int slotIndex) {
 
     osDelay(25);
 
-    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
-
     // enable BOOT0 flag for selected slot and reset modules
 
     if (slotIndex == 0) {
@@ -142,8 +142,6 @@ void enterBootloaderMode(int slotIndex) {
 
     osDelay(5);
 
-    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
-
     if (slotIndex == 0) {
         io_exp::writeToOutputPort(0b00010000);
     } else if (slotIndex == 1) {
@@ -153,8 +151,6 @@ void enterBootloaderMode(int slotIndex) {
     }
 
     osDelay(25);
-
-    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
 
     if (slotIndex == 0) {
         io_exp::writeToOutputPort(0b10010000);
@@ -166,8 +162,6 @@ void enterBootloaderMode(int slotIndex) {
 
     osDelay(25);
 
-    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
-
 #ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
     MX_UART4_Init();
 #else
@@ -178,7 +172,9 @@ void enterBootloaderMode(int slotIndex) {
 
 	using namespace psu;
 	if (g_ate && g_slotIndex == 2 && g_slots[0]->moduleType == MODULE_TYPE_DCP405) {
-		g_slots[0]->initChannels();
+	    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
+	    g_slots[0]->initChannels();
 		auto &channel = Channel::get(0);
 
 		channel_dispatcher::setVoltage(channel, 40);
@@ -199,9 +195,12 @@ void uploadHexFile() {
 		HexRecord hexRecord;
 		uint32_t addressUpperBits = 0;
 
-	    if (!eraseAll(g_slotIndex)) {
+		for (int ntry = 1; !eraseAll(g_slotIndex); ntry++) {
 			DebugTrace("Failed to erase all!\n");
-			goto Exit;
+			if (ntry == 5) {
+				goto Exit;
+			}
+			osDelay(10);
 		}
 
 	    if (!file.open(g_hexFilePath, FILE_OPEN_EXISTING | FILE_READ)) {
@@ -298,6 +297,8 @@ void leaveBootloaderMode() {
     g_ate = 0;
 }
 
+#if defined(EEZ_PLATFORM_STM32)
+
 void sendDataAndCRC(uint8_t data) {
 	uint8_t sendData[1];
 	sendData[0] = data;
@@ -344,9 +345,6 @@ bool waitForAck(int slotIndex) {
       		// Received NACK
       		return false;
     	}
-
-		osDelay(1);
-		WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
 	} while (HAL_GetTick() - startTime < SYNC_TIMEOUT);
 #endif
     return false;
@@ -375,9 +373,6 @@ bool syncWithSlave(int slotIndex) {
 			if (result == HAL_OK && rxData[0] == ACK) {
 				return true;
 			}
-
-			osDelay(1);
-			WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
 		} while (HAL_GetTick() - startTime < SYNC_TIMEOUT);
 		return false;
 	}
