@@ -111,13 +111,13 @@ void boot() {
     psu::rtc::init();
     psu::datetime::init();
 
+    psu::sd_card::init();
+
     mcu::eeprom::init();
     mcu::eeprom::test();
 
     bp3c::eeprom::init();
     bp3c::eeprom::test();
-
-    psu::sd_card::init();
 
     bp3c::io_exp::init();
 

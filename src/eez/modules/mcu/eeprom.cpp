@@ -18,17 +18,19 @@
 
 #include <memory.h>
 
+#include <eez/system.h>
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/mcu/eeprom.h>
+
+#define USE_EEPROM (defined(EEZ_PLATFORM_STM32) && !CONF_SURVIVE_MODE)
+
 #if defined(EEZ_PLATFORM_STM32)
 #include <i2c.h>
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
-#include <stdio.h>
+#if !USE_EEPROM
+#include <eez/libs/sd_fat/sd_fat.h>
 #endif
-
-#include <eez/system.h>
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/mcu/eeprom.h>
 
 #include <scpi/scpi.h>
 
@@ -41,7 +43,6 @@ namespace eeprom {
 // I2C-Compatible (2-Wire) Serial EEPROM
 // 256-Kbit (32,768 x 8)
 // http://ww1.microchip.com/downloads/en/devicedoc/atmel-8568-seeprom-at24c256c-datasheet.pdf
-
 static const uint16_t EEPROM_ADDRESS = 0b10100000;
 #endif
 
@@ -50,12 +51,11 @@ TestResult g_testResult = TEST_FAILED;
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(EEZ_PLATFORM_STM32)
+
 const int MAX_READ_CHUNK_SIZE = 16;
-#endif
+const int MAX_WRITE_CHUNK_SIZE = 16;
 
-bool read(uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
-
-#if defined(EEZ_PLATFORM_STM32)
+bool readFromEEPROM(uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
     for (uint16_t i = 0; i < bufferSize; i += MAX_READ_CHUNK_SIZE) {
         uint16_t chunkAddress = address + i;
 
@@ -82,38 +82,9 @@ bool read(uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
     }
 
     return true;
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    char *file_path = getConfFilePath("EEPROM.state");
-    FILE *fp = fopen(file_path, "r+b");
-    if (fp == NULL) {
-        fp = fopen(file_path, "w+b");
-    }
-    if (fp == NULL) {
-        return false;
-    }
-
-    fseek(fp, address, SEEK_SET);
-    size_t readBytes = fread(buffer, 1, bufferSize, fp);
-    fclose(fp);
-
-    if (readBytes < bufferSize) {
-        memset(buffer + readBytes, 0xFF, bufferSize - readBytes);
-    }
-
-    return true;
-#endif
-
 }
 
-#if defined(EEZ_PLATFORM_STM32)
-const int MAX_WRITE_CHUNK_SIZE = 16;
-#endif
-
-bool write(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
-
-#if defined(EEZ_PLATFORM_STM32)
+bool writeToEEPROM(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
     for (uint16_t i = 0; i < bufferSize; i += MAX_WRITE_CHUNK_SIZE) {
         uint16_t chunkAddress = address + i;
 
@@ -159,43 +130,71 @@ bool write(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
     }
 
     return true;
+}
+
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    char *file_path = getConfFilePath("EEPROM.state");
-    FILE *fp = fopen(file_path, "r+b");
-    if (fp == NULL) {
-        fp = fopen(file_path, "w+b");
-    }
-    if (fp == NULL) {
+#if !USE_EEPROM
+const char *EEPROM_FILE_PATH = "/EEPROM.state";
+#endif
+
+bool read(uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+#if USE_EEPROM
+    return readFromEEPROM(buffer, bufferSize, address);
+#else
+    File file;
+    if (!file.open(EEPROM_FILE_PATH, FILE_READ)) {
         return false;
     }
-
-    fseek(fp, address, SEEK_SET);
-    fwrite(buffer, 1, bufferSize, fp);
-    fclose(fp);
-
+    file.seek(address);
+    size_t readBytes = file.read(buffer, bufferSize);
+    if (readBytes < bufferSize) {
+        memset(buffer + readBytes, 0xFF, bufferSize - readBytes);
+    }
+    file.close();
     return true;
 #endif
+}
 
+bool write(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+#if USE_EEPROM
+    return writeToEEPROM(buffer, bufferSize, address);
+#else
+    File file;
+    if (!file.open(EEPROM_FILE_PATH, FILE_OPEN_ALWAYS | FILE_WRITE)) {
+        return false;
+    }
+    file.seek(address);
+    file.write(buffer, bufferSize);
+    file.close();
+    return true;
+#endif
 }
 
 void init() {
+#if !USE_EEPROM
+    File file;
+    if (!file.open(EEPROM_FILE_PATH, FILE_READ)) {
+        if (file.open(EEPROM_FILE_PATH, FILE_CREATE_ALWAYS | FILE_WRITE)) {
+#if defined(EEZ_PLATFORM_STM32)
+			uint8_t bufferTemp[MAX_WRITE_CHUNK_SIZE];
+			for (size_t address = 0; address < EEPROM_SIZE; address += MAX_WRITE_CHUNK_SIZE) {
+				readFromEEPROM(bufferTemp, MAX_WRITE_CHUNK_SIZE, address);
+				file.write(bufferTemp, MAX_WRITE_CHUNK_SIZE);
+				WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+			}
+#endif
+        	file.close();
+        }
+    }
+#endif
+
+	g_testResult = TEST_OK;
 }
 
 bool test() {
-#if OPTION_EXT_EEPROM
     // TODO add test
-    g_testResult = TEST_OK;
-#else
-    g_testResult = TEST_SKIPPED;
-#endif
-
-    if (g_testResult == TEST_FAILED) {
-        generateError(SCPI_ERROR_MCU_EEPROM_TEST_FAILED);
-    }
-
-    return g_testResult != TEST_FAILED;
+    return g_testResult == TEST_OK;
 }
 
 void resetAllExceptOnTimeCounters() {
