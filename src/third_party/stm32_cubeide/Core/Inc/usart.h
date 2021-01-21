@@ -28,24 +28,18 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart4;
 
 /* USER CODE BEGIN Private defines */
-#else
 extern UART_HandleTypeDef huart7;
-#endif
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
 /* USER CODE END Private defines */
 
 void MX_UART4_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-#else
 void MX_UART7_Init(void);
-#endif
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

@@ -229,16 +229,9 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         } else {
             g_slots[2]->onSpiIrq();
         }
-    } 
-
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
-#else
-    else if (GPIO_Pin == SD_DETECT_Pin) {
+    } else if (g_mcuRevision < MCU_REVISION_R3B3 && GPIO_Pin == R2B4_SD_DETECT_Pin) {
         eez::psu::sd_card::onSdDetectInterrupt();
-    } 
-#endif
-    
-    else if (GPIO_Pin == ENC_A_Pin || GPIO_Pin == ENC_B_Pin) {
+    } else if (GPIO_Pin == ENC_A_Pin || GPIO_Pin == ENC_B_Pin) {
         eez::mcu::encoder::onPinInterrupt();
     }
 }

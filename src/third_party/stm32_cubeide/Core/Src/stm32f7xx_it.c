@@ -59,7 +59,6 @@ extern int g_otgMode;
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -81,25 +80,7 @@ extern UART_HandleTypeDef huart4;
 extern TIM_HandleTypeDef htim10;
 
 /* USER CODE BEGIN EV */
-#else
-extern ETH_HandleTypeDef heth;
-extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
-extern ADC_HandleTypeDef hadc1;
-extern DMA_HandleTypeDef hdma_dac1;
-extern DMA_HandleTypeDef hdma_sdmmc1_rx;
-extern DMA_HandleTypeDef hdma_sdmmc1_tx;
-extern SD_HandleTypeDef hsd1;
-extern DMA_HandleTypeDef hdma_spi2_rx;
-extern DMA_HandleTypeDef hdma_spi2_tx;
-extern DMA_HandleTypeDef hdma_spi4_rx;
-extern DMA_HandleTypeDef hdma_spi4_tx;
-extern DMA_HandleTypeDef hdma_spi5_rx;
-extern DMA_HandleTypeDef hdma_spi5_tx;
-extern TIM_HandleTypeDef htim7;
 extern UART_HandleTypeDef huart7;
-extern TIM_HandleTypeDef htim10;
-#endif
-
 extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
 /* USER CODE END EV */
 
@@ -293,14 +274,16 @@ void TIM1_UP_TIM10_IRQHandler(void)
 void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
+  extern int g_mcuRevision;
+#define MCU_REVISION_R3B3 0x0303
+  if (g_mcuRevision >= MCU_REVISION_R3B3) {
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
-#else
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
-#endif
+  } else {
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
+  }
   /* USER CODE END EXTI15_10_IRQn 1 */
 }
 
@@ -318,7 +301,6 @@ void SDMMC1_IRQHandler(void)
   /* USER CODE END SDMMC1_IRQn 1 */
 }
 
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
 /**
   * @brief This function handles UART4 global interrupt.
   */
@@ -332,7 +314,6 @@ void UART4_IRQHandler(void)
 
   /* USER CODE END UART4_IRQn 1 */
 }
-#endif
 
 /**
   * @brief This function handles TIM7 global interrupt.
@@ -462,10 +443,6 @@ void DMA2_Stream6_IRQHandler(void)
   /* USER CODE END DMA2_Stream6_IRQn 1 */
 }
 
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
-
-#else
-
 /**
   * @brief This function handles UART7 global interrupt.
   */
@@ -480,19 +457,6 @@ void UART7_IRQHandler(void)
   /* USER CODE END UART7_IRQn 1 */
 }
 
-#endif
-
 /* USER CODE BEGIN 1 */
-extern void byteFromSlave();
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
-	if (huart == &huart4) {
-#else
-	if (huart == &huart7) {
-#endif
-		byteFromSlave();
-	}
-}
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

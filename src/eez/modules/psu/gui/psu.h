@@ -33,6 +33,9 @@ struct Channel;
 
 namespace gui {
 
+extern bool g_askMcuRevisionInProgress;
+int askMcuRevision();
+
 void channelToggleOutput();
 
 void selectChannel(Channel *channel);

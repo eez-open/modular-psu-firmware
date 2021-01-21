@@ -1309,6 +1309,11 @@ void setPowerLineFrequency(int powerLineFrequency) {
     }
 }
 
+void setMcuRevision(int mcuRevision) {
+    g_devConf.mcuRevisionTag = MCU_REVISION_TAG;
+    g_devConf.mcuRevision = mcuRevision;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 ModuleConfiguration g_moduleConf[NUM_SLOTS];

@@ -694,7 +694,9 @@ scpi_result_t scpi_cmd_systemCpuModelQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCpuVersionQ(scpi_t *context) {
-    SCPI_ResultText(context, MCU_REVISION);
+    char revision[32];
+    snprintf(revision, 32, "R%dB%d", g_mcuRevision >> 8, g_mcuRevision & 0xFF);
+    SCPI_ResultText(context, revision);
     return SCPI_RES_OK;
 }
 

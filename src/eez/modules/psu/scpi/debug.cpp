@@ -50,9 +50,7 @@
 
 #include <eez/modules/fpga/prog.h>
 
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
 extern bool g_supervisorWatchdogEnabled;
-#endif
 
 namespace eez {
 namespace psu {
@@ -126,14 +124,14 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             }
             return fpga::prog(filePath);
         } 
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
+#if defined(EEZ_PLATFORM_STM32)        
         else if (cmd == 32) {
             bool enable;
             if (!SCPI_ParamBool(context, &enable, TRUE)) {
                 return SCPI_RES_ERR;
             }
             g_supervisorWatchdogEnabled = enable;
-        }
+        } 
 #endif
         else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

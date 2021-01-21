@@ -71,6 +71,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+int g_mcuRevision;
+#if defined(EEZ_PLATFORM_STM32)
+extern "C" void SystemClock_Config_R2B4();
+extern "C" void MX_GPIO_Init_R2B4();
+#endif
+
 #if defined(EEZ_PLATFORM_STM32)
 extern uint32_t g_RCC_CSR;
 #endif
@@ -111,7 +117,10 @@ void boot() {
     psu::rtc::init();
     psu::datetime::init();
 
+#if CONF_SURVIVE_MODE
+    g_mcuRevision = MCU_REVISION_R3B3;
     psu::sd_card::init();
+#endif
 
     mcu::eeprom::init();
     mcu::eeprom::test();
@@ -124,6 +133,25 @@ void boot() {
     psu::ontime::g_mcuCounter.init();
 
     psu::persist_conf::init();
+
+    gui::startThread();
+
+#if !CONF_SURVIVE_MODE
+    if (psu::persist_conf::devConf.mcuRevisionTag == MCU_REVISION_TAG && psu::persist_conf::devConf.mcuRevision != 0) {
+        g_mcuRevision = psu::persist_conf::devConf.mcuRevision;
+    } else {
+        g_mcuRevision = psu::gui::askMcuRevision();
+    }
+
+#if defined(EEZ_PLATFORM_STM32)
+    if (g_mcuRevision < MCU_REVISION_R3B3) {
+        SystemClock_Config_R2B4();
+        MX_GPIO_Init_R2B4();
+    }
+#endif
+
+    psu::sd_card::init();
+#endif
 
     int numInstalledModules = 0;
     for (uint8_t slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
@@ -191,10 +219,7 @@ void boot() {
 
     psu::persist_conf::initChannels();
 
-#if OPTION_DISPLAY
-    gui::startThread();
     psu::gui::showWelcomePage();
-#endif
 
     sound::init();
 

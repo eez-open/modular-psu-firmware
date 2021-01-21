@@ -19,6 +19,8 @@
 #include <stdio.h>
 
 #include <eez/system.h>
+#include <eez/firmware.h>
+#include <eez/modules/psu/conf_advanced.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
@@ -31,9 +33,7 @@ volatile uint64_t g_tickCount;
 static uint32_t g_watchdogLastTime = 0;
 static int g_watchdogExpectingTask = WATCHDOG_HIGH_PRIORITY_THREAD;
 
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
 bool g_supervisorWatchdogEnabled = 1;
-#endif
 
 namespace eez {
 extern bool g_isBooted;
@@ -44,13 +44,15 @@ static void doWatchdogRefresh() {
 	if (!g_watchdogLastTime || currentTime - g_watchdogLastTime >= CONF_WATCHDOG_REFRESH_FREQ_MS) {
 		HAL_IWDG_Refresh(&hiwdg);
 
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
+#if CONF_SURVIVE_MODE
 		if (g_supervisorWatchdogEnabled) {
+#else
+		if (g_mcuRevision != MCU_REVISION_R2B4 && g_supervisorWatchdogEnabled) {
+#endif
 			HAL_GPIO_WritePin(SPI5_CSC_GPIO_Port, SPI5_CSC_Pin, GPIO_PIN_SET);
 			eez::delayMicroseconds(1);
 			HAL_GPIO_WritePin(SPI5_CSC_GPIO_Port, SPI5_CSC_Pin, GPIO_PIN_RESET);
 		}
-#endif
 
 		g_watchdogLastTime = currentTime;
 		if (!g_watchdogLastTime) {

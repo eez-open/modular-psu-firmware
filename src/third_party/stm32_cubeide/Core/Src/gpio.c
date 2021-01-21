@@ -28,7 +28,6 @@
 /* Configure GPIO                                                             */
 /*----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
 /* USER CODE END 1 */
 
 /** Configure pins as
@@ -233,9 +232,7 @@ void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 2 */
-#else
-
-void MX_GPIO_Init(void)
+void MX_GPIO_Init_R2B4(void)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -252,16 +249,16 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, SPI4_CSA_Pin|SPI4_CSB_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, R2B4_SPI4_CSA_Pin|R2B4_SPI4_CSB_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, SPI2_CSB_Pin|SPI2_CSA_Pin|OE_SYNC_Pin|USB_OTG_FS_PSO_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, SPI2_CSB_Pin|R2B4_SPI2_CSA_Pin|OE_SYNC_Pin|USB_OTG_FS_PSO_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, PWR_DIRECT_Pin|PWR_SSTART_Pin|SPI5_CSB_Pin|SPI5_CSA_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOG, R2B4_PWR_DIRECT_Pin|PWR_SSTART_Pin|SPI5_CSB_Pin|R2B4_SPI5_CSA_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PEPin PEPin */
-  GPIO_InitStruct.Pin = SPI4_CSA_Pin|SPI4_CSB_Pin;
+  GPIO_InitStruct.Pin = R2B4_SPI4_CSA_Pin|R2B4_SPI4_CSB_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -286,7 +283,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(NFAULT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PDPin PDPin */
-  GPIO_InitStruct.Pin = SPI2_CSB_Pin|SPI2_CSA_Pin;
+  GPIO_InitStruct.Pin = SPI2_CSB_Pin|R2B4_SPI2_CSA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -300,7 +297,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PGPin PGPin */
-  GPIO_InitStruct.Pin = PWR_DIRECT_Pin|PWR_SSTART_Pin;
+  GPIO_InitStruct.Pin = R2B4_PWR_DIRECT_Pin|PWR_SSTART_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -339,10 +336,10 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = SD_DETECT_Pin;
+  GPIO_InitStruct.Pin = R2B4_SD_DETECT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(SD_DETECT_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(R2B4_SD_DETECT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = USB_OTG_FS_OC_Pin;
@@ -369,7 +366,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(USER_SW_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PGPin PGPin */
-  GPIO_InitStruct.Pin = SPI5_CSB_Pin|SPI5_CSA_Pin;
+  GPIO_InitStruct.Pin = SPI5_CSB_Pin|R2B4_SPI5_CSA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -393,8 +390,6 @@ void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
 
 }
-
-#endif
 /* USER CODE END 2 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -145,11 +145,7 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_RTC
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
                               |RCC_PERIPHCLK_UART4|RCC_PERIPHCLK_I2C1
-#else
-                              |RCC_PERIPHCLK_UART7|RCC_PERIPHCLK_I2C1
-#endif                              
                               |RCC_PERIPHCLK_SDMMC1|RCC_PERIPHCLK_CLK48;
   PeriphClkInitStruct.PLLSAI.PLLSAIN = 200;
 #if CONF_OPTION_FPGA  
@@ -162,11 +158,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PLLSAIDivQ = 1;
   PeriphClkInitStruct.PLLSAIDivR = RCC_PLLSAIDIVR_4;
   PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER  
   PeriphClkInitStruct.Uart4ClockSelection = RCC_UART4CLKSOURCE_PCLK1;
-#else
-  PeriphClkInitStruct.Uart7ClockSelection = RCC_UART7CLKSOURCE_PCLK1;
-#endif
   PeriphClkInitStruct.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLL;
   PeriphClkInitStruct.Sdmmc1ClockSelection = RCC_SDMMC1CLKSOURCE_CLK48;
@@ -181,6 +173,81 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void SystemClock_Config_R2B4(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+  /** Configure LSE Drive Capability
+  */
+  HAL_PWR_EnableBkUpAccess();
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_HIGH);
+  /** Configure the main internal regulator output voltage
+  */
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE
+                              |RCC_OSCILLATORTYPE_LSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 25;
+  RCC_OscInitStruct.PLL.PLLN = 432;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 9;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Activate the Over-Drive mode
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_RTC
+                              |RCC_PERIPHCLK_UART7|RCC_PERIPHCLK_I2C1
+                              |RCC_PERIPHCLK_SDMMC1|RCC_PERIPHCLK_CLK48;
+  PeriphClkInitStruct.PLLSAI.PLLSAIN = 200;
+  PeriphClkInitStruct.PLLSAI.PLLSAIR = 5;
+  PeriphClkInitStruct.PLLSAI.PLLSAIQ = 2;
+  PeriphClkInitStruct.PLLSAI.PLLSAIP = RCC_PLLSAIP_DIV2;
+  PeriphClkInitStruct.PLLSAIDivQ = 1;
+  PeriphClkInitStruct.PLLSAIDivR = RCC_PLLSAIDIVR_4;
+  PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+  PeriphClkInitStruct.Uart7ClockSelection = RCC_UART7CLKSOURCE_PCLK1;
+  PeriphClkInitStruct.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
+  PeriphClkInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLL;
+  PeriphClkInitStruct.Sdmmc1ClockSelection = RCC_SDMMC1CLKSOURCE_CLK48;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_HSE, RCC_MCODIV_1);
+  /** Enables the Clock Security System
+  */
+  HAL_RCC_EnableCSS();
+}
+
 void PSU_IncTick();
 /* USER CODE END 4 */
 

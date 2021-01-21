@@ -33,6 +33,8 @@
 
 #include <eez/file_type.h>
 
+#define MCU_REVISION_TAG  0xABCD
+
 namespace eez {
 namespace psu {
 
@@ -71,7 +73,9 @@ struct ViewFlags {
 /// Device configuration block.
 struct DeviceConfiguration {
     // block 1
-    char reserved1[7 + 1]; // was serialNumber
+    uint16_t mcuRevisionTag;
+    uint16_t mcuRevision;
+    uint32_t reserved1;
     char systemPassword[PASSWORD_MAX_LENGTH + 1];
     char calibrationPassword[PASSWORD_MAX_LENGTH + 1];
 
@@ -348,6 +352,8 @@ int getPowerLineFrequency();
 
 // powerLineFrequency parameter accepts value 50 or 60
 void setPowerLineFrequency(int powerLineFrequency);
+
+void setMcuRevision(int mcuRevision);
 
 ////////////////////////////////////////////////////////////////////////////////
 

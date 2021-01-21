@@ -83,11 +83,7 @@ static const uint8_t NACK = 0x1F;
 static const uint32_t SYNC_TIMEOUT = 30000;
 static const uint32_t CMD_TIMEOUT = 100;
 
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
-static UART_HandleTypeDef *phuart = &huart4;
-#else
-static UART_HandleTypeDef *phuart = &huart7;
-#endif
+#define phuart (g_mcuRevision >= MCU_REVISION_R3B3 ? &huart4 : &huart7)
 
 #endif
 
@@ -162,11 +158,11 @@ void enterBootloaderMode(int slotIndex) {
 
     osDelay(25);
 
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
-    MX_UART4_Init();
-#else
-    MX_UART7_Init();
-#endif
+	if (g_mcuRevision >= MCU_REVISION_R3B3) {
+    	MX_UART4_Init();
+	} else {
+    	MX_UART7_Init();
+	}
 
 #endif // EEZ_PLATFORM_STM32
 
@@ -582,9 +578,3 @@ bool readHexRecord(psu::sd_card::BufferedFileRead &file, HexRecord &hexRecord) {
 } // namespace flash_slave
 } // namespace bp3c
 } // namespace eez
-
-#ifdef EEZ_PLATFORM_STM32
-void byteFromSlave() {
-	// TODO
-}
-#endif

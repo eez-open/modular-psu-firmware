@@ -76,7 +76,7 @@ int ioPinRead(int pin) {
         if (bp3c::flash_slave::g_bootloaderMode) {
             return 0;
         }
-        return HAL_GPIO_ReadPin(UART_RX_DIN1_GPIO_Port, UART_RX_DIN1_Pin) ? 1 : 0;
+        return HAL_GPIO_ReadPin(MCU_REV_GPIO(UART_RX_DIN1_GPIO_Port), MCU_REV_GPIO(UART_RX_DIN1_Pin)) ? 1 : 0;
 #else
         return HAL_GPIO_ReadPin(DIN1_GPIO_Port, DIN1_Pin) ? 1 : 0;
 #endif
@@ -90,7 +90,7 @@ void ioPinWrite(int pin, int state) {
     if (pin == DOUT1) {
 #if EEZ_MCU_REVISION_R1B5
         if (!bp3c::flash_slave::g_bootloaderMode) {
-    	    HAL_GPIO_WritePin(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin, state ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    	    HAL_GPIO_WritePin(MCU_REV_GPIO(UART_TX_DOUT1_GPIO_Port), MCU_REV_GPIO(UART_TX_DOUT1_Pin), state ? GPIO_PIN_SET : GPIO_PIN_RESET);
         }
 #else
     	HAL_GPIO_WritePin(DOUT1_GPIO_Port, DOUT1_Pin, state ? GPIO_PIN_SET : GPIO_PIN_RESET);
@@ -152,11 +152,11 @@ void initInputPin(int pin) {
 
         const IOPin &ioPin = g_ioPins[pin];
 
-        GPIO_InitStruct.Pin = pin == 0 ? UART_RX_DIN1_Pin : DIN2_Pin;
+        GPIO_InitStruct.Pin = pin == 0 ? MCU_REV_GPIO(UART_RX_DIN1_Pin) : DIN2_Pin;
         GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
         GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-        HAL_GPIO_Init(pin == 0 ? UART_RX_DIN1_GPIO_Port : DIN2_GPIO_Port, &GPIO_InitStruct);
+        HAL_GPIO_Init(pin == 0 ? MCU_REV_GPIO(UART_RX_DIN1_GPIO_Port) : DIN2_GPIO_Port, &GPIO_InitStruct);
     }
 #endif
 }
@@ -265,11 +265,11 @@ void initOutputPin(int pin) {
         if (!bp3c::flash_slave::g_bootloaderMode) {
             // Configure DOUT1 GPIO pin
 	        GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-            GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
+            GPIO_InitStruct.Pin = MCU_REV_GPIO(UART_TX_DOUT1_Pin);
             GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
             GPIO_InitStruct.Pull = GPIO_NOPULL;
             GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-            HAL_GPIO_Init(UART_TX_DOUT1_GPIO_Port, &GPIO_InitStruct);
+            HAL_GPIO_Init(MCU_REV_GPIO(UART_TX_DOUT1_GPIO_Port), &GPIO_InitStruct);
         }
 #endif
     } else if (pin == DOUT2) {

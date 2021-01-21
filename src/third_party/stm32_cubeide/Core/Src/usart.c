@@ -21,7 +21,6 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-#ifdef MASTER_MCU_REVISION_R3B3_OR_NEWER
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart4;
@@ -54,7 +53,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
   if(uartHandle->Instance==UART4)
   {
   /* USER CODE BEGIN UART4_MspInit 0 */
-
   /* USER CODE END UART4_MspInit 0 */
     /* UART4 clock enable */
     __HAL_RCC_UART4_CLK_ENABLE();
@@ -75,6 +73,29 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     HAL_NVIC_SetPriority(UART4_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(UART4_IRQn);
   /* USER CODE BEGIN UART4_MspInit 1 */
+  } else if (uartHandle->Instance==UART7) {
+    __HAL_RCC_UART7_CLK_ENABLE();
+
+    __HAL_RCC_GPIOF_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+
+    GPIO_InitStruct.Pin = R2B4_UART_RX_DIN1_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF8_UART7;
+    HAL_GPIO_Init(R2B4_UART_RX_DIN1_GPIO_Port, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = R2B4_UART_TX_DOUT1_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF12_UART7;
+    HAL_GPIO_Init(R2B4_UART_TX_DOUT1_GPIO_Port, &GPIO_InitStruct);
+
+    /* UART7 interrupt Init */
+    HAL_NVIC_SetPriority(UART7_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(UART7_IRQn);
 
   /* USER CODE END UART4_MspInit 1 */
   }
@@ -100,14 +121,19 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     /* UART4 interrupt Deinit */
     HAL_NVIC_DisableIRQ(UART4_IRQn);
   /* USER CODE BEGIN UART4_MspDeInit 1 */
+  } else if(uartHandle->Instance==UART7) {
+    __HAL_RCC_UART7_CLK_DISABLE();
+  
+    HAL_GPIO_DeInit(R2B4_UART_RX_DIN1_GPIO_Port, R2B4_UART_RX_DIN1_Pin);
 
+    HAL_GPIO_DeInit(R2B4_UART_TX_DOUT1_GPIO_Port, R2B4_UART_TX_DOUT1_Pin);
+
+    HAL_NVIC_DisableIRQ(UART7_IRQn);
   /* USER CODE END UART4_MspDeInit 1 */
   }
 }
 
 /* USER CODE BEGIN 1 */
-#else
-
 UART_HandleTypeDef huart7;
 
 /* UART7 init function */
@@ -130,76 +156,6 @@ void MX_UART7_Init(void)
   }
 
 }
-
-void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
-{
-
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(uartHandle->Instance==UART7)
-  {
-  /* USER CODE BEGIN UART7_MspInit 0 */
-
-  /* USER CODE END UART7_MspInit 0 */
-    /* UART7 clock enable */
-    __HAL_RCC_UART7_CLK_ENABLE();
-  
-    __HAL_RCC_GPIOF_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**UART7 GPIO Configuration    
-    PF6     ------> UART7_RX
-    PB4     ------> UART7_TX 
-    */
-    GPIO_InitStruct.Pin = UART_RX_DIN1_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF8_UART7;
-    HAL_GPIO_Init(UART_RX_DIN1_GPIO_Port, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = UART_TX_DOUT1_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF12_UART7;
-    HAL_GPIO_Init(UART_TX_DOUT1_GPIO_Port, &GPIO_InitStruct);
-
-    /* UART7 interrupt Init */
-    HAL_NVIC_SetPriority(UART7_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(UART7_IRQn);
-  /* USER CODE BEGIN UART7_MspInit 1 */
-
-  /* USER CODE END UART7_MspInit 1 */
-  }
-}
-
-void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
-{
-
-  if(uartHandle->Instance==UART7)
-  {
-  /* USER CODE BEGIN UART7_MspDeInit 0 */
-
-  /* USER CODE END UART7_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_UART7_CLK_DISABLE();
-  
-    /**UART7 GPIO Configuration    
-    PF6     ------> UART7_RX
-    PB4     ------> UART7_TX 
-    */
-    HAL_GPIO_DeInit(UART_RX_DIN1_GPIO_Port, UART_RX_DIN1_Pin);
-
-    HAL_GPIO_DeInit(UART_TX_DOUT1_GPIO_Port, UART_TX_DOUT1_Pin);
-
-    /* UART7 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(UART7_IRQn);
-  /* USER CODE BEGIN UART7_MspDeInit 1 */
-
-  /* USER CODE END UART7_MspDeInit 1 */
-  }
-} 
-
-#endif
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

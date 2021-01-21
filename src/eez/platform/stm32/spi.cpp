@@ -23,6 +23,8 @@
 
 #include <eez/index.h>
 #include <eez/tasks.h>
+#include <eez/firmware.h>
+#include <eez/modules/psu/conf_advanced.h>
 #include <eez/platform/stm32/spi.h>
 #include <eez/modules/bp3c/comm.h>
 
@@ -33,9 +35,13 @@ SPI_HandleTypeDef *handle[] = { &hspi2, &hspi4, &hspi5 };
 
 static GPIO_TypeDef *SPI_CSA_GPIO_Port[] = { SPI2_CSA_GPIO_Port, SPI4_CSA_GPIO_Port, SPI5_CSA_GPIO_Port };
 static GPIO_TypeDef *SPI_CSB_GPIO_Port[] = { SPI2_CSB_GPIO_Port, SPI4_CSB_GPIO_Port, SPI5_CSB_GPIO_Port };
-
 static const uint16_t SPI_CSA_Pin[] = { SPI2_CSA_Pin, SPI4_CSA_Pin, SPI5_CSA_Pin };
 static const uint16_t SPI_CSB_Pin[] = { SPI2_CSB_Pin, SPI4_CSB_Pin, SPI5_CSB_Pin };
+
+static GPIO_TypeDef *R2B4_SPI_CSA_GPIO_Port[] = { R2B4_SPI2_CSA_GPIO_Port, R2B4_SPI4_CSA_GPIO_Port, R2B4_SPI5_CSA_GPIO_Port };
+static GPIO_TypeDef *R2B4_SPI_CSB_GPIO_Port[] = { SPI2_CSB_GPIO_Port, R2B4_SPI4_CSB_GPIO_Port, SPI5_CSB_GPIO_Port };
+static const uint16_t R2B4_SPI_CSA_Pin[] = { R2B4_SPI2_CSA_Pin, R2B4_SPI4_CSA_Pin, R2B4_SPI5_CSA_Pin };
+static const uint16_t R2B4_SPI_CSB_Pin[] = { SPI2_CSB_Pin, R2B4_SPI4_CSB_Pin, SPI5_CSB_Pin };
 
 static int g_chip[] = { -1, -1, -1 };
 
@@ -71,39 +77,74 @@ void select(uint8_t slotIndex, int chip) {
         // __HAL_SPI_ENABLE(handle[slotIndex]);
     }
 
-    if (slot.moduleType == MODULE_TYPE_DCP405) {
-        if (chip == CHIP_DAC) {
-            // 00
-            SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
-            SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
-        } else if (chip == CHIP_ADC) {
-            // 01
-            SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
-            SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
-        } else if (chip == CHIP_IOEXP) {
-            // 10
-            SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
-            SPI_CSB_GPIO_Port[slotIndex]->BSRR = SPI_CSB_Pin[slotIndex]; // SET CSA
-        } else {
-            // TEMP_SENSOR
-            // 11
-            SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
-            SPI_CSB_GPIO_Port[slotIndex]->BSRR = SPI_CSB_Pin[slotIndex]; // SET CSA
-        }
+    if (g_mcuRevision >= MCU_REVISION_R3B3) {
+		if (slot.moduleType == MODULE_TYPE_DCP405) {
+			if (chip == CHIP_DAC) {
+				// 00
+				SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
+				SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
+			} else if (chip == CHIP_ADC) {
+				// 01
+				SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
+				SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
+			} else if (chip == CHIP_IOEXP) {
+				// 10
+				SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
+				SPI_CSB_GPIO_Port[slotIndex]->BSRR = SPI_CSB_Pin[slotIndex]; // SET CSA
+			} else {
+				// TEMP_SENSOR
+				// 11
+				SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
+				SPI_CSB_GPIO_Port[slotIndex]->BSRR = SPI_CSB_Pin[slotIndex]; // SET CSA
+			}
+		} else {
+			SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
+		}
     } else {
-        SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
+		if (slot.moduleType == MODULE_TYPE_DCP405) {
+			if (chip == CHIP_DAC) {
+				// 00
+				R2B4_SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)R2B4_SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
+				R2B4_SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)R2B4_SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
+			} else if (chip == CHIP_ADC) {
+				// 01
+				R2B4_SPI_CSA_GPIO_Port[slotIndex]->BSRR = R2B4_SPI_CSA_Pin[slotIndex]; // SET CSA
+				R2B4_SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)R2B4_SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
+			} else if (chip == CHIP_IOEXP) {
+				// 10
+				R2B4_SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)R2B4_SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
+				R2B4_SPI_CSB_GPIO_Port[slotIndex]->BSRR = R2B4_SPI_CSB_Pin[slotIndex]; // SET CSA
+			} else {
+				// TEMP_SENSOR
+				// 11
+				R2B4_SPI_CSA_GPIO_Port[slotIndex]->BSRR = R2B4_SPI_CSA_Pin[slotIndex]; // SET CSA
+				R2B4_SPI_CSB_GPIO_Port[slotIndex]->BSRR = R2B4_SPI_CSB_Pin[slotIndex]; // SET CSA
+			}
+		} else {
+			R2B4_SPI_CSA_GPIO_Port[slotIndex]->BSRR = (uint32_t)R2B4_SPI_CSA_Pin[slotIndex] << 16U; // RESET CSB
+		}
     }
 }
 
 void deselect(uint8_t slotIndex) {
     auto &slot = *g_slots[slotIndex];
 
-    if (slot.moduleType == MODULE_TYPE_DCP405) {
-        // 01 ADC
-        SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
-        SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
+    if (g_mcuRevision >= MCU_REVISION_R3B3) {
+		if (slot.moduleType == MODULE_TYPE_DCP405) {
+			// 01 ADC
+			SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
+			SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
+		} else {
+			SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
+		}
     } else {
-        SPI_CSA_GPIO_Port[slotIndex]->BSRR = SPI_CSA_Pin[slotIndex]; // SET CSA
+		if (slot.moduleType == MODULE_TYPE_DCP405) {
+			// 01 ADC
+			R2B4_SPI_CSA_GPIO_Port[slotIndex]->BSRR = R2B4_SPI_CSA_Pin[slotIndex]; // SET CSA
+			R2B4_SPI_CSB_GPIO_Port[slotIndex]->BSRR = (uint32_t)R2B4_SPI_CSB_Pin[slotIndex] << 16U; // RESET CSB
+		} else {
+			R2B4_SPI_CSA_GPIO_Port[slotIndex]->BSRR = R2B4_SPI_CSA_Pin[slotIndex]; // SET CSA
+		}
     }
 }
 

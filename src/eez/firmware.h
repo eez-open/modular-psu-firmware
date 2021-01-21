@@ -43,3 +43,5 @@ void restart();
 void shutdown();
 
 } // namespace eez
+
+extern "C" int g_mcuRevision;

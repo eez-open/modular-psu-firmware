@@ -77,6 +77,8 @@ static void touchCalibrationDialogYes() {
     if (isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY)) {
         popPage();
         infoMessage("Touch screen is calibrated.");
+    } else if (g_askMcuRevisionInProgress) {
+		showPage(PAGE_ID_SELECT_MCU_REVISION);
     } else {
         showPage(PAGE_ID_MAIN);
     }

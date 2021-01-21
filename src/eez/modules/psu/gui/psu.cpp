@@ -2466,4 +2466,107 @@ void onUncaughtScriptExceptionHook() {
 }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+namespace eez {
+namespace psu {
+namespace gui {
+
+static int g_mcuRevisionSelectedByUser;
+
+bool g_askMcuRevisionInProgress;
+
+int askMcuRevision() {
+	g_askMcuRevisionInProgress = true;
+
+	if (isTouchCalibrated()) {
+		showPage(PAGE_ID_SELECT_MCU_REVISION);
+	} else {
+		showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
+	}
+
+	while (!g_mcuRevisionSelectedByUser) {
+		WATCHDOG_RESET(WATCHDOG_HIGH_PRIORITY_THREAD);
+        psu::tick();
+		osDelay(1);
+	}
+
+    showPage(PAGE_ID_NONE);
+	psu::persist_conf::setMcuRevision(g_mcuRevisionSelectedByUser);
+
+	g_askMcuRevisionInProgress = false;
+
+    return g_mcuRevisionSelectedByUser;
+}
+
+} // namespace psu
+} // namespace gui
+
+namespace gui {
+
+using namespace psu::gui;
+
+static int g_selectedMcuRevision; // 0 - None, 1 - R2B4, 2 - R3B3
+
+void data_selected_mcu_revision(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_selectedMcuRevision;
+    }
+}
+
+void data_is_mcu_revision_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_selectedMcuRevision != 0;
+    }
+}
+
+void doSwitchToR3B3() {
+    psu::persist_conf::setMcuRevision(MCU_REVISION_R3B3);
+    eez::reset();
+}
+
+void doSwitchToR2B4() {
+    psu::persist_conf::setMcuRevision(MCU_REVISION_R2B4);
+    eez::reset();
+}
+
+void action_show_select_mcu_revision_page() {
+	if (g_mcuRevision == MCU_REVISION_R2B4) {
+		yesNoDialog(PAGE_ID_YES_NO, "Switch to R3B3?", doSwitchToR3B3, nullptr, nullptr);
+	} else {
+		yesNoDialog(PAGE_ID_YES_NO, "Switch to R2B4?", doSwitchToR2B4, nullptr, nullptr);
+	}
+}
+
+void action_select_r2b4_revision() {
+    g_selectedMcuRevision = 1;
+}
+
+void action_select_r3b3_revision() {
+    g_selectedMcuRevision = 2;
+}
+
+void doSelect() {
+	if (g_selectedMcuRevision == 1) {
+		g_mcuRevisionSelectedByUser = MCU_REVISION_R2B4;
+	} else {
+		g_mcuRevisionSelectedByUser = MCU_REVISION_R3B3;
+	}
+}
+
+void action_select_mcu_revision() {
+    if (g_selectedMcuRevision != 0) {
+		if (g_selectedMcuRevision == 1) {
+			areYouSureWithMessage("You selected R2B4.", doSelect);
+		} else {
+			areYouSureWithMessage("You selected R3B3.", doSelect);
+		}
+    }
+}
+
+} // gui
+} // eez
+
+////////////////////////////////////////////////////////////////////////////////
+
 #endif

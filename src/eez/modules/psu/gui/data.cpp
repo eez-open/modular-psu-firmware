@@ -977,7 +977,7 @@ bool compare_MASTER_INFO_value(const Value &a, const Value &b) {
 }
 
 void MASTER_INFO_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%s %s", MCU_NAME, MCU_REVISION);
+    snprintf(text, count - 1, "%s R%dB%d", MCU_NAME, g_mcuRevision >> 8, g_mcuRevision & 0xFF);
     text[count - 1] = 0;
 }
 
@@ -986,7 +986,7 @@ bool compare_MASTER_INFO_WITH_FW_VER_value(const Value &a, const Value &b) {
 }
 
 void MASTER_INFO_WITH_FW_VER_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%s %s v%s", MCU_NAME, MCU_REVISION, MCU_FIRMWARE);
+    snprintf(text, count - 1, "%s R%dB%d v%s", MCU_NAME, g_mcuRevision >> 8, g_mcuRevision & 0xFF, MCU_FIRMWARE);
     text[count - 1] = 0;
 }
 

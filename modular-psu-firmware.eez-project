@@ -2394,6 +2394,15 @@
       "name": "ac_mains",
       "type": "string",
       "defaultValue": "50 Hz"
+    },
+    {
+      "name": "selected_mcu_revision",
+      "type": "enum",
+      "enumItems": "[\"None\", \"R2B4\", \"R3B3\"]",
+      "defaultValue": "0"
+    },
+    {
+      "name": "is_mcu_revision_selected"
     }
   ],
   "actions": [
@@ -3112,10 +3121,182 @@
     },
     {
       "name": "select_ac_mains"
+    },
+    {
+      "name": "show_select_mcu_revision_page"
+    },
+    {
+      "name": "select_r2b4_revision"
+    },
+    {
+      "name": "select_r3b3_revision"
+    },
+    {
+      "name": "select_mcu_revision"
     }
   ],
   "gui": {
     "pages": [
+      {
+        "name": "select_mcu_revision",
+        "description": "Welcome screen, display channels capacity and firmware revision",
+        "style": "default",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "default_M"
+            },
+            "left": 0,
+            "top": 30,
+            "width": 480,
+            "height": 32,
+            "text": "MCU version is not available. Please choose:"
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "selected_mcu_revision",
+            "left": 155,
+            "top": 82,
+            "width": 110,
+            "height": 88,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 110,
+                "height": 88,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "action": "select_r2b4_revision",
+                    "left": 0,
+                    "top": 0,
+                    "width": 110,
+                    "height": 44,
+                    "text": "\\u008d R2B4"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "data": "",
+                    "action": "select_r3b3_revision",
+                    "left": 0,
+                    "top": 44,
+                    "width": 110,
+                    "height": 44,
+                    "text": "\\u008d R3B3"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 110,
+                "height": 88,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 110,
+                    "height": 44,
+                    "text": "\\u008e R2B4"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "data": "",
+                    "action": "select_r3b3_revision",
+                    "left": 0,
+                    "top": 44,
+                    "width": 110,
+                    "height": 44,
+                    "text": "\\u008d R3B3"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 110,
+                "height": 88,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "action": "select_r2b4_revision",
+                    "left": 0,
+                    "top": 0,
+                    "width": 110,
+                    "height": 44,
+                    "text": "\\u008d R2B4"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M"
+                    },
+                    "left": 0,
+                    "top": 44,
+                    "width": 110,
+                    "height": 44,
+                    "text": "\\u008e R3B3"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Button",
+            "style": {
+              "inheritFrom": "button_M"
+            },
+            "action": "select_mcu_revision",
+            "left": 354,
+            "top": 194,
+            "width": 96,
+            "height": 48,
+            "text": "Next",
+            "enabled": "is_mcu_revision_selected",
+            "disabledStyle": {
+              "inheritFrom": "button_M_disabled"
+            }
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272,
+        "dataContextOverrides": "{\n    \"slots\": [\n        {\n            \"slot_index\": \"Slot #1:\",\n            \"slot_info_with_fw_ver\": \"DCP405 R3B3\"\n        },\n        {\n            \"slot_index\": \"Slot #2:\",\n            \"slot_info_with_fw_ver\": \"SMX46 R1B2 v0.7\"\n        },\n        {\n            \"slot_index\": \"Slot #3:\",\n            \"slot_info_with_fw_ver\": \"MIO168 R1B2 ---\"\n        }\n    ]\n}"
+      },
       {
         "name": "welcome",
         "description": "Welcome screen, display channels capacity and firmware revision",
@@ -27617,12 +27798,13 @@
                   {
                     "type": "DisplayData",
                     "style": {
-                      "inheritFrom": "value_S_left"
+                      "inheritFrom": "edit_value_active_S_left"
                     },
                     "data": "sys_info_cpu",
+                    "action": "show_select_mcu_revision_page",
                     "left": 114,
                     "top": 0,
-                    "width": 122,
+                    "width": 114,
                     "height": 28,
                     "displayOption": 0
                   }
@@ -27760,7 +27942,7 @@
                 "action": "show_labels_and_colors",
                 "left": 236,
                 "top": 140,
-                "width": 236,
+                "width": 228,
                 "height": 28,
                 "text": "Labels & Colors"
               },

@@ -872,7 +872,7 @@ static Module *g_modules[] = {
     dib_smx46::g_module
 };
 
-Module *g_slots[NUM_SLOTS];
+Module *g_slots[NUM_SLOTS] = { &noneModule, &noneModule, &noneModule };
 
 ////////////////////////////////////////////////////////////////////////////////
 
