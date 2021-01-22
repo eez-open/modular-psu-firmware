@@ -461,12 +461,14 @@ void lowPriorityThreadOneIter() {
 
     		profile::tick();
 
+#if !CONF_SURVIVE_MODE
             ontime::g_mcuCounter.tick();
             for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
                 if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
                     ontime::g_moduleCounters[slotIndex].tick();
                 }
             }
+#endif
 
             mcu::battery::tick();
     	}

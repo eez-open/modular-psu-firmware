@@ -1013,12 +1013,14 @@ bool powerUp() {
     
     psuReset();
 
+#if !CONF_SURVIVE_MODE
     ontime::g_mcuCounter.start();
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
             ontime::g_moduleCounters[slotIndex].start();
         }
     }
+#endif
 
     // init channels
     initChannels();
@@ -1069,11 +1071,13 @@ void powerDownOnlyPowerChannels() {
 
     board::powerDown();
 
+#if !CONF_SURVIVE_MODE
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE && g_slots[slotIndex]->numPowerChannels > 0) {
             ontime::g_moduleCounters[slotIndex].stop();
         }
     }
+#endif
 }
 
 void powerDown() {
@@ -1109,12 +1113,14 @@ void powerDown() {
 
     g_powerIsUp = false;
 
+#if !CONF_SURVIVE_MODE
     ontime::g_mcuCounter.stop();
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
             ontime::g_moduleCounters[slotIndex].stop();
         }
     }
+#endif
 
     event_queue::pushEvent(event_queue::EVENT_INFO_POWER_DOWN);
 

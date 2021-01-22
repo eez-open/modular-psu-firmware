@@ -130,7 +130,9 @@ void boot() {
 
     bp3c::io_exp::init();
 
+#if !CONF_SURVIVE_MODE
     psu::ontime::g_mcuCounter.init();
+#endif
 
     psu::persist_conf::init();
 
@@ -175,8 +177,9 @@ void boot() {
         if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
             g_slots[slotIndex]->enabled = psu::persist_conf::isSlotEnabled(slotIndex);
             psu::persist_conf::loadModuleConf(slotIndex);
+#if !CONF_SURVIVE_MODE
             psu::ontime::g_moduleCounters[slotIndex].init();
-
+#endif
             numInstalledModules++;
         }
 
@@ -446,6 +449,7 @@ void shutdown() {
 
     event_queue::shutdownSave();
 
+#if !CONF_SURVIVE_MODE
     // save on-time counters
     persist_conf::writeTotalOnTime(ontime::g_mcuCounter.getType(), ontime::g_mcuCounter.getTotalTime());
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
@@ -454,6 +458,7 @@ void shutdown() {
         }
         WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
     }
+#endif
 
     //
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
