@@ -80,6 +80,9 @@ struct DcpChannel : public Channel {
 	uint32_t dpNegMonitoringTimeMs;
 
     float uSet = 0;
+#if CONF_SURVIVE_MODE
+	float iSet = 0;
+#endif
 
 	float uBeforeBalancing = NAN;
 	float iBeforeBalancing = NAN;
@@ -210,6 +213,9 @@ struct DcpChannel : public Channel {
 		Channel::reset();
 
 		uSet = 0;
+#if CONF_SURVIVE_MODE		
+		iSet = 0;
+#endif
         dpOn = false;
 		uBeforeBalancing = NAN;
 		iBeforeBalancing = NAN;
@@ -493,12 +499,16 @@ struct DcpChannel : public Channel {
 		if (enable) {
 			// OE
 			if (tasks & OUTPUT_ENABLE_TASK_OE) {
+				ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE, true);
 			}
 
 			// DAC
 			if (tasks & OUTPUT_ENABLE_TASK_DAC) {
 				dac.setVoltage(uSet, DigitalAnalogConverter::WITH_RAMP);
+#if CONF_SURVIVE_MODE
+				dac.setCurrent(iSet);
+#endif
 			}
 
 			// Current range
@@ -543,6 +553,9 @@ struct DcpChannel : public Channel {
 			// DAC
 			if (tasks & OUTPUT_ENABLE_TASK_DAC) {
 				dac.setDacVoltage(0);
+#if CONF_SURVIVE_MODE
+				dac.setDacCurrent(0);
+#endif
 			}
 
 			// OE
@@ -678,6 +691,10 @@ struct DcpChannel : public Channel {
 				}
 			}
 		}
+
+#if CONF_SURVIVE_MODE
+		iSet = value;
+#endif
 
 		dac.setCurrent(value);
 
@@ -1070,7 +1087,7 @@ bool isDacRampActive() {
 	for (int i = 0; i < CH_NUM; i++) {
 		auto &channel = Channel::get(i);
 		if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCP405) {
-			if (((DcpChannel&)channel).dac.m_isRampActive) {
+			if (((DcpChannel&)channel).dac.isRampActive()) {
 				return true;
 			}
 		}
@@ -1082,7 +1099,7 @@ void tickDacRamp() {
 	for (int i = 0; i < CH_NUM; i++) {
 		auto &channel = Channel::get(i);
 		if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCP405) {
-			if (((DcpChannel&)channel).dac.m_isRampActive) {
+			if (((DcpChannel&)channel).dac.isRampActive()) {
 				((DcpChannel&)channel).dac.tick();
 			}
 		}

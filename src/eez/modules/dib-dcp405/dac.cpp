@@ -40,11 +40,17 @@ namespace psu {
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(EEZ_PLATFORM_STM32)
+
 static const uint8_t DATA_BUFFER_A = 0B00010000;
 static const uint8_t DATA_BUFFER_B = 0B00100100;
 
 static const uint32_t CONF_DCP405_R2B11_RAMP_DURATION_USEC = 4000; // 4 ms
+
+#if CONF_SURVIVE_MODE
+static const uint32_t CONF_I_RAMP_DURATION_USEC = 300000; // 300 ms
 #endif
+
+#endif // EEZ_PLATFORM_STM32
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 extern float g_uSet[CH_MAX];
@@ -120,28 +126,47 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
 
 void DigitalAnalogConverter::tick() {
 #if defined(EEZ_PLATFORM_STM32)
-    if (m_isRampActive) {
+    if (m_uIsRampActive) {
         uint16_t value;
 
         uint32_t tickCountUsec = micros();
 
-        uint32_t diff = tickCountUsec - m_rampStartTimeUsec;
+        uint32_t diff = tickCountUsec - m_uRampStartTimeUsec;
         if (diff >= CONF_DCP405_R2B11_RAMP_DURATION_USEC) {
-            value = m_rampTargetValue;
-            m_isRampActive = false;
+            value = m_uRampTargetValue;
+            m_uIsRampActive = false;
         } else {
-            value = m_rampTargetValue * diff / CONF_DCP405_R2B11_RAMP_DURATION_USEC;
+            value = m_uRampTargetValue * diff / CONF_DCP405_R2B11_RAMP_DURATION_USEC;
         }
         
         set(DATA_BUFFER_B, value, FROM_RAMP);
     }
-#endif
+
+#if CONF_SURVIVE_MODE
+    if (m_iIsRampActive) {
+        uint16_t value;
+
+        uint32_t tickCountUsec = micros();
+
+        uint32_t diff = tickCountUsec - m_iRampStartTimeUsec;
+        if (diff >= CONF_I_RAMP_DURATION_USEC) {
+            value = m_iRampTargetValue;
+            m_iIsRampActive = false;
+        } else {
+            value = (uint64_t)m_iRampTargetValue * diff / CONF_I_RAMP_DURATION_USEC;
+        }
+        
+        set(DATA_BUFFER_A, value, FROM_RAMP);
+    }
+#endif // CONF_SURVIVE_MODE
+
+#endif // EEZ_PLATFORM_STM32
 }
 
 bool DigitalAnalogConverter::isOverHwOvpThreshold() {
     static const float CONF_OVP_HW_VOLTAGE_THRESHOLD = 1.0f;
     Channel &channel = Channel::get(channelIndex);
-    float u_set = remap(m_rampLastValue, (float)DAC_MIN, channel.params.U_MIN, (float)DAC_MAX, channel.params.U_MAX);
+    float u_set = remap(m_uRampLastValue, (float)DAC_MIN, channel.params.U_MIN, (float)DAC_MAX, channel.params.U_MAX);
     return u_set > channel.getCalibratedVoltage(CONF_OVP_HW_VOLTAGE_THRESHOLD);
 }
 
@@ -206,19 +231,41 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
             g_slots[slotIndex]->moduleRevision <= MODULE_REVISION_DCP405_R2B11 &&
             !ramp::isActive(channel)
         ) {
-            m_isRampActive = true;
-            m_rampTargetValue = value;
+            m_uIsRampActive = true;
+            m_uRampTargetValue = value;
             value = 0;
             rampOption = FROM_RAMP;
-            m_rampStartTimeUsec = micros();
+            m_uRampStartTimeUsec = micros();
         }
 
-        m_rampLastValue = value;
+        m_uRampLastValue = value;
         
         if (rampOption != FROM_RAMP) {
-            m_isRampActive = false;
+            m_uIsRampActive = false;
+        }
+    } 
+#if CONF_SURVIVE_MODE    
+    else {
+        if (
+        	rampOption != FROM_RAMP &&
+        	!m_testing &&
+            CONF_I_RAMP_DURATION_USEC > 0 &&
+            !ramp::isActive(channel)
+        ) {
+            m_iIsRampActive = true;
+            m_iRampTargetValue = value;
+            value = m_iRampLastValue;
+            rampOption = FROM_RAMP;
+            m_iRampStartTimeUsec = micros();
+        }
+
+        m_iRampLastValue = value;
+        
+        if (rampOption != FROM_RAMP) {
+            m_iIsRampActive = false;
         }
     }
+#endif // CONF_SURVIVE_MODE
 
     uint8_t data[3];
     uint8_t result[3];

@@ -33,7 +33,6 @@ public:
     uint8_t slotIndex;
     uint8_t channelIndex;
     TestResult testResult;
-    bool m_isRampActive = false;
 
     void init();
     bool test(IOExpander &ioexp, AnalogDigitalConverter &adc);
@@ -58,13 +57,30 @@ public:
 
     bool isOverHwOvpThreshold();
 
+    bool isRampActive() {
+#if CONF_SURVIVE_MODE
+        return m_uIsRampActive|| m_iIsRampActive;
+#else
+        return m_uIsRampActive;
+#endif
+    }
+
 private:
     bool m_testing;
 
-    // ramp
-    uint16_t m_rampLastValue;
-    uint16_t m_rampTargetValue;
-    uint32_t m_rampStartTimeUsec;
+    // U ramp
+    bool m_uIsRampActive = false;
+    uint16_t m_uRampLastValue;
+    uint16_t m_uRampTargetValue;
+    uint32_t m_uRampStartTimeUsec;
+
+    // I ramp
+#if CONF_SURVIVE_MODE    
+    bool m_iIsRampActive = false;
+    uint16_t m_iRampLastValue;
+    uint16_t m_iRampTargetValue;
+    uint32_t m_iRampStartTimeUsec;
+#endif
 
 #if defined(EEZ_PLATFORM_STM32)
     void set(uint8_t buffer, uint16_t value, RampOption rampOption = NO_RAMP);
