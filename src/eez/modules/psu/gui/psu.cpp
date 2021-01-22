@@ -2522,12 +2522,12 @@ void data_is_mcu_revision_selected(DataOperationEnum operation, Cursor cursor, V
 
 void doSwitchToR3B3() {
     psu::persist_conf::setMcuRevision(MCU_REVISION_R3B3);
-    eez::reset();
+    eez::restart();
 }
 
 void doSwitchToR2B4() {
     psu::persist_conf::setMcuRevision(MCU_REVISION_R2B4);
-    eez::reset();
+    eez::restart();
 }
 
 void action_show_select_mcu_revision_page() {
