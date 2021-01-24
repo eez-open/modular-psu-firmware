@@ -222,8 +222,8 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
 
             if (i == 1) {
                 Channel &channel1 = Channel::get(0);
-                channel.flags.displayValue1 = channel1.flags.displayValue1;
-                channel.flags.displayValue2 = channel1.flags.displayValue2;
+                channel.displayValues[0] = channel1.displayValues[0];
+				channel.displayValues[1] = channel1.displayValues[1];
                 channel.ytViewRate = channel1.ytViewRate;
 
                 channel.u.rampDuration = channel1.u.rampDuration;
@@ -1704,20 +1704,20 @@ void setOtpDelay(int sensor, float delay) {
     }
 }
 
-void setDisplayViewSettings(Channel &channel, int displayValue1, int displayValue2, float ytViewRate) {
+void setDisplayViewSettings(Channel &channel, DisplayValue *displayValues, float ytViewRate) {
     bool resetHistory = false;
 
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
-        Channel::get(0).flags.displayValue1 = displayValue1;
-        Channel::get(0).flags.displayValue2 = displayValue2;
+        Channel::get(0).displayValues[0] = displayValues[0];
+		Channel::get(0).displayValues[1] = displayValues[1];
         if (Channel::get(0).ytViewRate != ytViewRate) {
             Channel::get(0).ytViewRate = ytViewRate;
             resetHistory = true;
         }
 
-        Channel::get(1).flags.displayValue1 = displayValue1;
-        Channel::get(1).flags.displayValue2 = displayValue2;
-        if (Channel::get(1).ytViewRate != ytViewRate) {
+		Channel::get(1).displayValues[0] = displayValues[0];
+		Channel::get(1).displayValues[1] = displayValues[1];
+		if (Channel::get(1).ytViewRate != ytViewRate) {
             Channel::get(1).ytViewRate = ytViewRate;
             resetHistory = true;
         }
@@ -1725,8 +1725,8 @@ void setDisplayViewSettings(Channel &channel, int displayValue1, int displayValu
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
-                trackingChannel.flags.displayValue1 = displayValue1;
-                trackingChannel.flags.displayValue2 = displayValue2;
+                trackingChannel.displayValues[1] = displayValues[0];
+				trackingChannel.displayValues[1] = displayValues[0];
                 if (trackingChannel.ytViewRate != ytViewRate) {
                     trackingChannel.ytViewRate = ytViewRate;
                     resetHistory = true;
@@ -1734,8 +1734,8 @@ void setDisplayViewSettings(Channel &channel, int displayValue1, int displayValu
             }
         }
     } else {
-        channel.flags.displayValue1 = displayValue1;
-        channel.flags.displayValue2 = displayValue2;
+        channel.displayValues[0] = displayValues[0];
+		channel.displayValues[1] = displayValues[1];
         if (channel.ytViewRate != ytViewRate) {
             channel.ytViewRate = ytViewRate;
             resetHistory = true;
@@ -2125,17 +2125,7 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
         dstChannel.flags.rprogEnabled = srcChannel.flags.rprogEnabled;
     }
 
-    auto displayValue1 = srcChannel.flags.displayValue1;
-    auto displayValue2 = srcChannel.flags.displayValue2;
-    auto ytViewRate = srcChannel.ytViewRate;
-    if (displayValue1 == 0 && displayValue2 == 0) {
-        displayValue1 = DISPLAY_VALUE_VOLTAGE;
-        displayValue2 = DISPLAY_VALUE_CURRENT;
-    }
-    if (ytViewRate == 0) {
-        ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
-    }
-    channel_dispatcher::setDisplayViewSettings(dstChannel, displayValue1, displayValue2, ytViewRate);
+    channel_dispatcher::setDisplayViewSettings(dstChannel, srcChannel.displayValues, srcChannel.ytViewRate);
 
     channel_dispatcher::setVoltageTriggerMode(dstChannel, (TriggerMode)srcChannel.flags.voltageTriggerMode);
     channel_dispatcher::setCurrentTriggerMode(dstChannel, (TriggerMode)srcChannel.flags.currentTriggerMode);

@@ -105,8 +105,6 @@ struct PowerChannelProfileChannelFlags {
     unsigned i_state : 1;
     unsigned p_state : 1;
     unsigned rprog_enabled : 1;
-    unsigned displayValue1 : 2;
-    unsigned displayValue2 : 2;
     unsigned u_triggerMode : 2;
     unsigned i_triggerMode : 2;
     unsigned currentRangeSelectionMode : 2;
@@ -141,6 +139,7 @@ struct PowerChannelProfileParameters {
     float outputDelayDuration;
     char label[Channel::CHANNEL_LABEL_MAX_LENGTH + 1];
     uint8_t color;
+	DisplayValue displayValues[2];
 #ifdef EEZ_PLATFORM_SIMULATOR
     bool load_enabled;
     float load;

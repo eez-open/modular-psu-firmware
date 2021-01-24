@@ -185,21 +185,20 @@ scpi_result_t scpi_cmd_instrumentDisplayTrace(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (traceNumber == 1) {
-        if (traceValue == channel->flags.displayValue2) {
-            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-            return SCPI_RES_ERR;
-        }
-        channel_dispatcher::setDisplayViewSettings(
-            *channel, traceValue, channel->flags.displayValue2, channel->ytViewRate);
-    } else {
-        if (traceValue == channel->flags.displayValue1) {
-            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-            return SCPI_RES_ERR;
-        }
-        channel_dispatcher::setDisplayViewSettings(*channel, channel->flags.displayValue1,
-                                                   traceValue, channel->ytViewRate);
+    int displayValueIndex = traceNumber - 1;
+    int otherDisplayValueIndex = displayValueIndex == 0 ? 1 : 0;
+
+    if (traceValue == channel->displayValues[otherDisplayValueIndex].type) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        return SCPI_RES_ERR;
     }
+
+	DisplayValue displayValues[2];
+	displayValues[0] = channel->displayValues[0];
+	displayValues[1] = channel->displayValues[1];
+    displayValues[displayValueIndex].type = (DisplayValueType)traceValue;
+
+    channel_dispatcher::setDisplayViewSettings(*channel, displayValues, channel->ytViewRate);
 
     return SCPI_RES_OK;
 }
@@ -217,18 +216,14 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    int8_t traceValue;
-    if (traceNumber == 1) {
-        traceValue = channel->flags.displayValue1;
-    } else {
-        traceValue = channel->flags.displayValue2;
-    }
+    int displayValueIndex = traceNumber - 1;
+    auto type = channel->displayValues[displayValueIndex].type;
 
     char result[16];
 
-    if (traceValue == DISPLAY_VALUE_VOLTAGE) {
+    if (type == DISPLAY_VALUE_VOLTAGE) {
         strcpy(result, "VOLT");
-    } else if (traceValue == DISPLAY_VALUE_CURRENT) {
+    } else if (type == DISPLAY_VALUE_CURRENT) {
         strcpy(result, "CURR");
     } else {
         strcpy(result, "POW");
@@ -245,7 +240,11 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceSwap(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    channel_dispatcher::setDisplayViewSettings(*channel, channel->flags.displayValue2, channel->flags.displayValue1, channel->ytViewRate);
+	DisplayValue displayValues[2];
+	displayValues[0] = channel->displayValues[1];
+	displayValues[1] = channel->displayValues[0];
+
+	channel_dispatcher::setDisplayViewSettings(*channel, displayValues, channel->ytViewRate);
 
     return SCPI_RES_OK;
 }
@@ -262,7 +261,7 @@ scpi_result_t scpi_cmd_instrumentDisplayYtRate(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    channel_dispatcher::setDisplayViewSettings(*channel, channel->flags.displayValue1, channel->flags.displayValue2, ytViewRate);
+    channel_dispatcher::setDisplayViewSettings(*channel, channel->displayValues, ytViewRate);
 
     return SCPI_RES_OK;
 }

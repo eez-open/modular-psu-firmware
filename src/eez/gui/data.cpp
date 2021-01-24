@@ -637,6 +637,12 @@ Value set(Cursor cursor, int16_t id, Value value) {
     return value;
 }
 
+Value getDisplayValueRange(Cursor cursor, int16_t id) {
+    Value value;
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_DISPLAY_VALUE_RANGE, cursor, value);
+    return value;
+}
+
 uint32_t getTextRefreshRate(Cursor cursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_TEXT_REFRESH_RATE, cursor, value);

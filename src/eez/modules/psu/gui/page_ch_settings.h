@@ -48,27 +48,24 @@ class ChSettingsAdvViewPage : public SetPage {
   public:
     void pageAlloc();
 
-    void editDisplayValue1();
-    void editDisplayValue2();
-    void swapDisplayValues();
-    void editYTViewRate();
+    void edit();
 
     int getDirty();
     void set();
 
-    uint8_t displayValue1;
-    uint8_t displayValue2;
+    DisplayValue displayValues[2];
+
     float ytViewRate;
 
   private:
-    uint8_t origDisplayValue1;
-    uint8_t origDisplayValue2;
+    DisplayValue origDisplayValues[2];
     float origYTViewRate;
 
-    static bool isDisabledDisplayValue1(uint16_t value);
-    static void onDisplayValue1Set(uint16_t value);
-    static bool isDisabledDisplayValue2(uint16_t value);
-    static void onDisplayValue2Set(uint16_t value);
+    int displayValueIndex;
+
+    static void onDisplayValueTypeSet(uint16_t value);
+    static void onDisplayValueScaleSet(uint16_t value);
+    static void onDisplayValueRangeSet(float value);
     static void onYTViewRateSet(float value);
 };
 

@@ -2302,15 +2302,15 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
             int iChannel = widgetCursor.cursor >= 0 ? widgetCursor.cursor : (g_channel ? g_channel->channelIndex : 0);
             Channel &channel = Channel::get(iChannel);
             if (widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE1) {
-                if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+                if (channel.displayValues[0].type == DISPLAY_VALUE_VOLTAGE) {
                     return STYLE_ID_YT_GRAPH_U_DEFAULT;
-                } else if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+                } else if (channel.displayValues[0].type == DISPLAY_VALUE_CURRENT) {
                     return STYLE_ID_YT_GRAPH_I_DEFAULT;
                 }
             } else {
-                if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+                if (channel.displayValues[1].type == DISPLAY_VALUE_VOLTAGE) {
                     return STYLE_ID_YT_GRAPH_U_DEFAULT;
-                } else if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+                } else if (channel.displayValues[1].type == DISPLAY_VALUE_CURRENT) {
                     return STYLE_ID_YT_GRAPH_I_DEFAULT;
                 }
             }
@@ -2321,15 +2321,15 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
             int iChannel = widgetCursor.cursor >= 0 ? widgetCursor.cursor : (g_channel ? g_channel->channelIndex : 0);
             Channel &channel = Channel::get(iChannel);
             if (widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE1) {
-                if (channel.flags.displayValue1 == DISPLAY_VALUE_VOLTAGE) {
+                if (channel.displayValues[0].type == DISPLAY_VALUE_VOLTAGE) {
                     return STYLE_ID_BAR_GRAPH_U_DEFAULT;
-                } else if (channel.flags.displayValue1 == DISPLAY_VALUE_CURRENT) {
+                } else if (channel.displayValues[0].type == DISPLAY_VALUE_CURRENT) {
                     return STYLE_ID_BAR_GRAPH_I_DEFAULT;
                 }
             } else {
-                if (channel.flags.displayValue2 == DISPLAY_VALUE_VOLTAGE) {
+                if (channel.displayValues[1].type == DISPLAY_VALUE_VOLTAGE) {
                     return STYLE_ID_BAR_GRAPH_U_DEFAULT;
-                } else if (channel.flags.displayValue2 == DISPLAY_VALUE_CURRENT) {
+                } else if (channel.displayValues[1].type == DISPLAY_VALUE_CURRENT) {
                     return STYLE_ID_BAR_GRAPH_I_DEFAULT;
                 }
             }

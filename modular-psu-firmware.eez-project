@@ -1043,16 +1043,37 @@
       "defaultValue": "1"
     },
     {
-      "name": "channel_display_view_settings_display_value1",
+      "name": "channel_display_view_settings_display_values",
+      "type": "list",
+      "enumItems": "[\n\"Voltage (V)\",\n\"Current (A)\",\n\"Power (W)\"\n]",
+      "defaultValue": "[{}, {}]"
+    },
+    {
+      "name": "channel_display_view_settings_display_value_label",
+      "type": "string",
+      "enumItems": "[\n\"Voltage (V)\",\n\"Current (A)\",\n\"Power (W)\"\n]",
+      "defaultValue": "Display value #1:"
+    },
+    {
+      "name": "channel_display_view_settings_display_value",
       "type": "enum",
       "enumItems": "[\n\"Voltage (V)\",\n\"Current (A)\",\n\"Power (W)\"\n]",
       "defaultValue": "Voltage (V)"
     },
     {
-      "name": "channel_display_view_settings_display_value2",
-      "type": "enum",
-      "enumItems": "[\n\"Voltage (V)\",\n\"Current (A)\",\n\"Power (W)\"\n]",
-      "defaultValue": "Power (W)"
+      "name": "channel_display_view_settings_scale",
+      "type": "string",
+      "defaultValue": "Limit"
+    },
+    {
+      "name": "channel_display_view_settings_is_custom_scale",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "channel_display_view_settings_range",
+      "type": "string",
+      "defaultValue": "10 V"
     },
     {
       "name": "channel_display_view_settings_yt_view_rate",
@@ -1402,19 +1423,9 @@
       "defaultValue": "2"
     },
     {
-      "name": "slot1_default_view",
+      "name": "slot_default_view",
       "type": "string",
-      "defaultValue": "dib_dcp405::slot_def_1ch_num_on_2col"
-    },
-    {
-      "name": "slot2_default_view",
-      "type": "string",
-      "defaultValue": "dib_dcp405::slot_def_1ch_vbar_on_2col"
-    },
-    {
-      "name": "slot3_default_view",
-      "type": "string",
-      "defaultValue": "dib_dcp405::slot_def_1ch_vert_off"
+      "defaultValue": "dib_dcp405::slot_def_1ch_num_on"
     },
     {
       "name": "slot1_channel_index",
@@ -2733,16 +2744,7 @@
       "name": "sys_settings_sound_toggle_click"
     },
     {
-      "name": "ch_settings_adv_view_edit_display_value1"
-    },
-    {
-      "name": "ch_settings_adv_view_edit_display_value2"
-    },
-    {
-      "name": "ch_settings_adv_view_swap_display_values"
-    },
-    {
-      "name": "ch_settings_adv_view_edit_ytview_rate"
+      "name": "ch_settings_adv_view_edit"
     },
     {
       "name": "sys_settings_encoder_toggle_confirmation_mode"
@@ -17912,32 +17914,133 @@
             "left": 8,
             "top": 8,
             "width": 464,
-            "height": 203,
+            "height": 224,
             "name": "Body",
             "widgets": [
               {
-                "type": "Text",
+                "type": "List",
                 "style": {
-                  "inheritFrom": "edit_value_M_left"
+                  "inheritFrom": "default"
                 },
+                "data": "channel_display_view_settings_display_values",
                 "left": 0,
                 "top": 0,
-                "width": 166,
-                "height": 32,
-                "text": "Display value #1:"
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "edit_value_active_M_center"
+                "width": 415,
+                "height": 152,
+                "itemWidget": {
+                  "type": "Container",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "left": 0,
+                  "top": 0,
+                  "width": 415,
+                  "height": 76,
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "edit_value_M_left"
+                      },
+                      "data": "channel_display_view_settings_display_value_label",
+                      "left": 0,
+                      "top": 0,
+                      "width": 166,
+                      "height": 32,
+                      "text": ""
+                    },
+                    {
+                      "type": "DisplayData",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center"
+                      },
+                      "data": "channel_display_view_settings_display_value",
+                      "action": "ch_settings_adv_view_edit",
+                      "left": 166,
+                      "top": 0,
+                      "width": 120,
+                      "height": 32,
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "edit_value_M_left"
+                      },
+                      "left": 101,
+                      "top": 34,
+                      "width": 65,
+                      "height": 32,
+                      "text": "Scale:"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center"
+                      },
+                      "data": "channel_display_view_settings_scale",
+                      "action": "ch_settings_adv_view_edit",
+                      "left": 166,
+                      "top": 36,
+                      "width": 85,
+                      "height": 32,
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "Text",
+                      "style": {
+                        "inheritFrom": "edit_value_M_left",
+                        "alignHorizontal": "center"
+                      },
+                      "left": 251,
+                      "top": 36,
+                      "width": 79,
+                      "height": 32,
+                      "text": "Range:"
+                    },
+                    {
+                      "type": "Select",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "data": "channel_display_view_settings_is_custom_scale",
+                      "left": 330,
+                      "top": 36,
+                      "width": 85,
+                      "height": 32,
+                      "widgets": [
+                        {
+                          "type": "DisplayData",
+                          "style": {
+                            "inheritFrom": "edit_value_M_left"
+                          },
+                          "data": "channel_display_view_settings_range",
+                          "action": "",
+                          "left": 0,
+                          "top": 0,
+                          "width": 85,
+                          "height": 32,
+                          "displayOption": 0
+                        },
+                        {
+                          "type": "DisplayData",
+                          "style": {
+                            "inheritFrom": "edit_value_active_M_center"
+                          },
+                          "data": "channel_display_view_settings_range",
+                          "action": "ch_settings_adv_view_edit",
+                          "left": 0,
+                          "top": 0,
+                          "width": 85,
+                          "height": 32,
+                          "displayOption": 0
+                        }
+                      ]
+                    }
+                  ]
                 },
-                "data": "channel_display_view_settings_display_value1",
-                "action": "ch_settings_adv_view_edit_display_value1",
-                "left": 166,
-                "top": 0,
-                "width": 119,
-                "height": 32,
-                "displayOption": 0
+                "listType": "vertical",
+                "gap": 0
               },
               {
                 "type": "Text",
@@ -17945,43 +18048,7 @@
                   "inheritFrom": "edit_value_M_left"
                 },
                 "left": 0,
-                "top": 36,
-                "width": 166,
-                "height": 32,
-                "text": "Display value #2:"
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "edit_value_active_M_center"
-                },
-                "data": "channel_display_view_settings_display_value2",
-                "action": "ch_settings_adv_view_edit_display_value2",
-                "left": 166,
-                "top": 36,
-                "width": 119,
-                "height": 32,
-                "displayOption": 0
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_M_center"
-                },
-                "action": "ch_settings_adv_view_swap_display_values",
-                "left": 295,
-                "top": 18,
-                "width": 142,
-                "height": 32,
-                "text": "Swap values"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_M_left"
-                },
-                "left": 0,
-                "top": 80,
+                "top": 164,
                 "width": 217,
                 "height": 32,
                 "text": "YT view sampling rate:"
@@ -17992,9 +18059,9 @@
                   "inheritFrom": "edit_value_active_M_center"
                 },
                 "data": "channel_display_view_settings_yt_view_rate",
-                "action": "ch_settings_adv_view_edit_ytview_rate",
+                "action": "ch_settings_adv_view_edit",
                 "left": 217,
-                "top": 80,
+                "top": 164,
                 "width": 101,
                 "height": 32,
                 "text": ""
@@ -18303,7 +18370,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "dataContextOverrides": "{\n    \"channel_display_view_settings_display_values\": [\n        {\n        },\n        {\n            \"channel_display_view_settings_display_value_label\": \"Display value #2:\",\n            \"channel_display_view_settings_display_value\": \"Current (A)\",\n            \"channel_display_view_settings_range\": \"2 A\"\n        }\n    ]\n}"
       },
       {
         "name": "ch_settings_info",
@@ -29514,7 +29582,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot1_default_view",
+                    "data": "slot_default_view",
                     "left": 0,
                     "top": 0,
                     "width": 160,
@@ -29527,7 +29595,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot2_default_view",
+                    "data": "slot_default_view",
                     "left": 160,
                     "top": 0,
                     "width": 160,
@@ -29540,7 +29608,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot3_default_view",
+                    "data": "slot_default_view",
                     "left": 320,
                     "top": 0,
                     "width": 160,
@@ -29565,7 +29633,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot1_default_view",
+                    "data": "slot_default_view",
                     "left": 0,
                     "top": 0,
                     "width": 240,
@@ -29578,7 +29646,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot2_default_view",
+                    "data": "slot_default_view",
                     "left": 240,
                     "top": 0,
                     "width": 240,
@@ -30208,7 +30276,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot1_default_view",
+                    "data": "slot_default_view",
                     "left": 0,
                     "top": 0,
                     "width": 480,
@@ -30221,7 +30289,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot2_default_view",
+                    "data": "slot_default_view",
                     "left": 0,
                     "top": 80,
                     "width": 480,
@@ -30234,7 +30302,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot3_default_view",
+                    "data": "slot_default_view",
                     "left": 0,
                     "top": 160,
                     "width": 480,
@@ -30259,7 +30327,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot1_default_view",
+                    "data": "slot_default_view",
                     "left": 0,
                     "top": 0,
                     "width": 480,
@@ -30272,7 +30340,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot2_default_view",
+                    "data": "slot_default_view",
                     "left": 0,
                     "top": 120,
                     "width": 480,
@@ -30289,7 +30357,7 @@
         "top": 0,
         "width": 480,
         "height": 240,
-        "dataContextOverrides": "{\n    \"slot1_default_view\": \"slot_def_1ch_hbar_on\",\n    \"slot2_default_view\": \"slot_def_1ch_yt_on\",\n    \"slot3_default_view\": \"slot_def_1ch_horz_off\"\n}"
+        "dataContextOverrides": ""
       },
       {
         "name": "slot_def_horz_title",

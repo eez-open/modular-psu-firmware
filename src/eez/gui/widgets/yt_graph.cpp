@@ -99,36 +99,51 @@ struct YTGraphDrawHelper {
         }
 
         int y = (int)round((widget->h - 1) * (value - min[valueIndex]) / (max[valueIndex] - min[valueIndex]));
-
-        if (y < 0 || y >= widget->h) {
-            return INT_MIN;
-        }
-
         return widget->h - 1 - y;
     }
 
     void drawValue(int valueIndex) {
-        if (y[valueIndex] == INT_MIN) {
+		int yPrevValue = yPrev[valueIndex];
+		int yValue = y[valueIndex];
+		
+		if (yValue == INT_MIN) {
             return;
         }
 
+		// clipping
+		if (yPrevValue >= 0 && yValue < 0) {
+            yValue = 0;
+        } else if (yPrevValue < 0 && yValue >= 0) {
+            yPrevValue = 0;
+        } else if (yPrevValue < widget->h && yValue >= widget->h) {
+            yValue = widget->h - 1;
+        } else if (yPrevValue >= widget->h && yValue < widget->h) {
+            yPrevValue = widget->h - 1;
+        }
+
+		if (yValue < 0 || yPrevValue < 0 || yValue >= widget->h || yPrevValue >= widget->h) {
+			return;
+		}
+
         display::setColor16(dataColor16[valueIndex]);
 
-        if (yPrev[valueIndex] == INT_MIN || abs(yPrev[valueIndex] - y[valueIndex]) <= 1) {
-            display::drawPixel(x, widgetCursor.y + y[valueIndex]);
+        if (yPrevValue == INT_MIN || abs(yPrevValue - yValue) <= 1) {
+            display::drawPixel(x, widgetCursor.y + yValue);
         } else {
-            if (yPrev[valueIndex] < y[valueIndex]) {
-                display::drawVLine(x, widgetCursor.y + yPrev[valueIndex] + 1, y[valueIndex] - yPrev[valueIndex] - 1);
+            if (yPrevValue < yValue) {
+                display::drawVLine(x, widgetCursor.y + yPrevValue + 1, yValue - yPrevValue - 1);
             } else {
-                display::drawVLine(x, widgetCursor.y + y[valueIndex], yPrev[valueIndex] - y[valueIndex] - 1);
+                display::drawVLine(x, widgetCursor.y + yValue, yPrevValue - yValue - 1);
             }
         }
     }
 
     void drawStep() {
         if (y[0] != INT_MIN && y[1] != INT_MIN && abs(yPrev[0] - y[0]) <= 1 && abs(yPrev[1] - y[1]) <= 1 && y[0] == y[1]) {
-            display::setColor16(position % 2 ? dataColor16[1] : dataColor16[0]);
-            display::drawPixel(x, widgetCursor.y + y[0]);
+			if (y[0] >= 0 && y[0] < widget->h) {
+				display::setColor16(position % 2 ? dataColor16[1] : dataColor16[0]);
+				display::drawPixel(x, widgetCursor.y + y[0]);
+			}
         } else {
             drawValue(0);
             drawValue(1);

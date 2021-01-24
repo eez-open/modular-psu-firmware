@@ -335,6 +335,7 @@ typedef int Cursor;
 
 enum DataOperationEnum {
     DATA_OPERATION_GET,
+    DATA_OPERATION_GET_DISPLAY_VALUE_RANGE,
     DATA_OPERATION_GET_EDIT_VALUE,
     DATA_OPERATION_GET_ALLOW_ZERO,
     DATA_OPERATION_GET_MIN,
@@ -424,6 +425,8 @@ bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues);
 Value get(Cursor cursor, int16_t id);
 const char *isValidValue(Cursor cursor, int16_t id, Value value);
 Value set(Cursor cursor, int16_t id, Value value);
+
+Value getDisplayValueRange(Cursor cursor, int16_t id);
 
 uint32_t getTextRefreshRate(Cursor cursor, int16_t id);
 

@@ -285,9 +285,13 @@ void PsuModule::resetPowerChannelProfileToDefaults(int channelIndex, uint8_t *bu
     parameters->p_delay = channel.params.OPP_DEFAULT_DELAY;
     parameters->p_level = channel.params.OPP_DEFAULT_LEVEL;
 
-    parameters->flags.displayValue1 = DISPLAY_VALUE_VOLTAGE;
-    parameters->flags.displayValue2 = DISPLAY_VALUE_CURRENT;
-    parameters->ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
+    parameters->displayValues[0].type = DISPLAY_VALUE_VOLTAGE;
+	parameters->displayValues[0].scale = DISPLAY_VALUE_SCALE_LIMIT;
+
+	parameters->displayValues[1].type = DISPLAY_VALUE_CURRENT;
+	parameters->displayValues[1].scale = DISPLAY_VALUE_SCALE_LIMIT;
+	
+	parameters->ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     parameters->load_enabled = 0;
@@ -354,8 +358,8 @@ void PsuModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buff
     parameters->p_delay = channel.prot_conf.p_delay;
     parameters->p_level = channel.prot_conf.p_level;
 
-    parameters->flags.displayValue1 = channel.flags.displayValue1;
-    parameters->flags.displayValue2 = channel.flags.displayValue2;
+    parameters->displayValues[0] = channel.displayValues[0];
+    parameters->displayValues[1] = channel.displayValues[1];
     parameters->ytViewRate = channel.ytViewRate;
 
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -431,13 +435,16 @@ void PsuModule::setPowerChannelProfileParameters(int channelIndex, uint8_t *buff
         channel.flags.rprogEnabled = 0;
     }
 
-    channel.flags.displayValue1 = parameters->flags.displayValue1;
-    channel.flags.displayValue2 = parameters->flags.displayValue2;
+    channel.displayValues[0] = parameters->displayValues[0];
+    channel.displayValues[1] = parameters->displayValues[1];
     channel.ytViewRate = parameters->ytViewRate;
-    if (channel.flags.displayValue1 == 0 && channel.flags.displayValue2 == 0) {
-        channel.flags.displayValue1 = DISPLAY_VALUE_VOLTAGE;
-        channel.flags.displayValue2 = DISPLAY_VALUE_CURRENT;
-    }
+    if (channel.displayValues[0].type == 0 && channel.displayValues[1].type == 0) {
+		channel.displayValues[0].type = DISPLAY_VALUE_VOLTAGE;
+		channel.displayValues[0].scale = DISPLAY_VALUE_SCALE_LIMIT;
+
+		channel.displayValues[1].type = DISPLAY_VALUE_CURRENT;
+		channel.displayValues[1].scale = DISPLAY_VALUE_SCALE_LIMIT;
+	}
     if (channel.ytViewRate == 0) {
         channel.ytViewRate = GUI_YT_VIEW_RATE_DEFAULT;
     }
@@ -478,9 +485,7 @@ bool PsuModule::writePowerChannelProfileProperties(profile::WriteContext &ctx, c
     WRITE_PROPERTY("i_state", parameters->flags.i_state);
     WRITE_PROPERTY("p_state", parameters->flags.p_state);
     WRITE_PROPERTY("rprog_enabled", parameters->flags.rprog_enabled);
-    WRITE_PROPERTY("displayValue1", parameters->flags.displayValue1);
-    WRITE_PROPERTY("displayValue2", parameters->flags.displayValue2);
-    WRITE_PROPERTY("u_triggerMode", parameters->flags.u_triggerMode);
+	WRITE_PROPERTY("u_triggerMode", parameters->flags.u_triggerMode);
     WRITE_PROPERTY("i_triggerMode", parameters->flags.i_triggerMode);
     WRITE_PROPERTY("currentRangeSelectionMode", parameters->flags.currentRangeSelectionMode);
     WRITE_PROPERTY("autoSelectCurrentRange", parameters->flags.autoSelectCurrentRange);
@@ -502,8 +507,18 @@ bool PsuModule::writePowerChannelProfileProperties(profile::WriteContext &ctx, c
     WRITE_PROPERTY("p_limit", parameters->p_limit);
     WRITE_PROPERTY("p_delay", parameters->p_delay);
     WRITE_PROPERTY("p_level", parameters->p_level);
-    WRITE_PROPERTY("ytViewRate", parameters->ytViewRate);
-    WRITE_PROPERTY("u_triggerValue", parameters->u_triggerValue);
+	
+	WRITE_PROPERTY("displayValue1.type", parameters->displayValues[0].type);
+	WRITE_PROPERTY("displayValue1.scale", parameters->displayValues[0].scale);
+	WRITE_PROPERTY("displayValue1.range", parameters->displayValues[0].range);
+	
+	WRITE_PROPERTY("displayValue2.type", parameters->displayValues[1].type);
+	WRITE_PROPERTY("displayValue2.scale", parameters->displayValues[1].scale);
+	WRITE_PROPERTY("displayValue2.range", parameters->displayValues[1].range);
+
+	WRITE_PROPERTY("ytViewRate", parameters->ytViewRate);
+
+	WRITE_PROPERTY("u_triggerValue", parameters->u_triggerValue);
     WRITE_PROPERTY("i_triggerValue", parameters->i_triggerValue);
     WRITE_PROPERTY("listCount", parameters->listCount);
 
@@ -533,8 +548,6 @@ bool PsuModule::readPowerChannelProfileProperties(profile::ReadContext &ctx, uin
     READ_FLAG("i_state", parameters->flags.i_state);
     READ_FLAG("p_state", parameters->flags.p_state);
     READ_FLAG("rprog_enabled", parameters->flags.rprog_enabled);
-    READ_FLAG("displayValue1", parameters->flags.displayValue1);
-    READ_FLAG("displayValue2", parameters->flags.displayValue2);
     READ_FLAG("u_triggerMode", parameters->flags.u_triggerMode);
     READ_FLAG("i_triggerMode", parameters->flags.i_triggerMode);
     READ_FLAG("currentRangeSelectionMode", parameters->flags.currentRangeSelectionMode);
@@ -557,8 +570,18 @@ bool PsuModule::readPowerChannelProfileProperties(profile::ReadContext &ctx, uin
     READ_PROPERTY("p_limit", parameters->p_limit);
     READ_PROPERTY("p_delay", parameters->p_delay);
     READ_PROPERTY("p_level", parameters->p_level);
-    READ_PROPERTY("ytViewRate", parameters->ytViewRate);
-    READ_PROPERTY("u_triggerValue", parameters->u_triggerValue);
+
+	READ_PROPERTY("displayValue1.type", parameters->displayValues[0].type);
+	READ_PROPERTY("displayValue1.scale", parameters->displayValues[0].scale);
+	READ_PROPERTY("displayValue1.range", parameters->displayValues[0].range);
+	
+	READ_PROPERTY("displayValue2.type", parameters->displayValues[1].type);
+	READ_PROPERTY("displayValue2.scale", parameters->displayValues[1].scale);
+	READ_PROPERTY("displayValue2.range", parameters->displayValues[1].range);
+
+	READ_PROPERTY("ytViewRate", parameters->ytViewRate);
+	
+	READ_PROPERTY("u_triggerValue", parameters->u_triggerValue);
     READ_PROPERTY("i_triggerValue", parameters->i_triggerValue);
     READ_PROPERTY("listCount", parameters->listCount);
 
@@ -1009,7 +1032,7 @@ bool powerUp() {
     board::powerUp();
     g_powerIsUp = true;
 
-    bp3c::io_exp::hardResetModules();
+    //bp3c::io_exp::hardResetModules();
     
     psuReset();
 
@@ -1224,12 +1247,14 @@ void tick() {
     aux_ps::fan::tick();
     datetime::tick();
 
+#if defined(EEZ_PLATFORM_STM32)
     // call every 10 ms
     static int counter = 0;
     if (++counter == 10) {
         touch::tickHighPriority();
         counter = 0;
     }
+#endif
 
     if (g_diagCallback) {
         g_diagCallback();

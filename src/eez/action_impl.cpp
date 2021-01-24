@@ -750,26 +750,14 @@ void action_sys_settings_sound_toggle_click() {
     ((SysSettingsSoundPage *)getActivePage())->toggleClickSound();
 }
 
-void action_ch_settings_adv_view_edit_display_value1() {
-    ((ChSettingsAdvViewPage *)getActivePage())->editDisplayValue1();
-}
-
-void action_ch_settings_adv_view_edit_display_value2() {
-    ((ChSettingsAdvViewPage *)getActivePage())->editDisplayValue2();
-}
-
-void action_ch_settings_adv_view_swap_display_values() {
-    ((ChSettingsAdvViewPage *)getActivePage())->swapDisplayValues();
-}
-
-void action_ch_settings_adv_view_edit_ytview_rate() {
-    ((ChSettingsAdvViewPage *)getActivePage())->editYTViewRate();
+void action_ch_settings_adv_view_edit() {
+    ((ChSettingsAdvViewPage *)getActivePage())->edit();
 }
 
 void action_sys_settings_encoder_toggle_confirmation_mode() {
-    #if OPTION_ENCODER
+#if OPTION_ENCODER
     ((SysSettingsEncoderPage *)getActivePage())->toggleConfirmationMode();
-    #endif
+#endif
 }
 
 void action_ch_settings_trigger_edit_trigger_mode() {
@@ -1004,7 +992,7 @@ void action_edit_animations_duration() {
     options.editValueUnit = UNIT_SECOND;
 
     options.min = 0.0f;
-    options.max = 2.0f;
+    options.max = 5.0f;
     options.def = CONF_DEFAULT_ANIMATIONS_DURATION;
 
     options.enableDefButton();

@@ -82,79 +82,157 @@ void ChSettingsAdvRangesPage::toggleAutoRanging() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void ChSettingsAdvViewPage::pageAlloc() {
-    origDisplayValue1 = displayValue1 = g_channel->flags.displayValue1;
-    origDisplayValue2 = displayValue2 = g_channel->flags.displayValue2;
+    origDisplayValues[0] = displayValues[0] = g_channel->displayValues[0];
+    origDisplayValues[1] = displayValues[1] = g_channel->displayValues[1];
     origYTViewRate = ytViewRate = g_channel->ytViewRate;
 }
 
-bool ChSettingsAdvViewPage::isDisabledDisplayValue1(uint16_t value) {
-    ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getPage(PAGE_ID_CH_SETTINGS_ADV_VIEW);
-    return value == page->displayValue2;
+void ChSettingsAdvViewPage::edit() {
+    auto &widgetCursor = getFoundWidgetAtDown();
+    auto dataId = widgetCursor.widget->data;
+
+    displayValueIndex = widgetCursor.cursor;
+
+    if (dataId == DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_DISPLAY_VALUE) {
+        pushSelectFromEnumPage(
+            ENUM_DEFINITION_CHANNEL_DISPLAY_VALUE,
+            displayValues[displayValueIndex].type,
+            nullptr,
+            onDisplayValueTypeSet
+        );
+    } else if (dataId == DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_SCALE) {
+        pushSelectFromEnumPage(
+            ENUM_DEFINITION_CHANNEL_DISPLAY_VALUE_SCALE,
+            displayValues[displayValueIndex].scale,
+            nullptr,
+            onDisplayValueScaleSet
+        );
+    } else if (dataId == DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_RANGE) {
+        if (displayValues[displayValueIndex].scale == DISPLAY_VALUE_SCALE_CUSTOM) {
+            NumericKeypadOptions options;
+
+            options.editValueUnit = displayValues[displayValueIndex].getUnit();
+
+            options.min = 0;
+            options.max = displayValues[displayValueIndex].getMaxRange(g_channel);
+            options.def = options.max;
+
+            options.enableDefButton();
+            options.flags.signButtonEnabled = false;
+            options.flags.dotButtonEnabled = true;
+
+            NumericKeypad::start(0, MakeValue(displayValues[displayValueIndex].range, options.editValueUnit), options, onDisplayValueRangeSet, 0, 0);
+        }
+    } else if (dataId == DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_YT_VIEW_RATE) {
+        NumericKeypadOptions options;
+
+        options.editValueUnit = UNIT_SECOND;
+
+        options.min = GUI_YT_VIEW_RATE_MIN;
+        options.max = GUI_YT_VIEW_RATE_MAX;
+        options.def = GUI_YT_VIEW_RATE_DEFAULT;
+
+        options.enableDefButton();
+        options.flags.signButtonEnabled = false;
+        options.flags.dotButtonEnabled = true;
+
+        NumericKeypad::start(0, MakeValue(ytViewRate, UNIT_SECOND), options, onYTViewRateSet, 0, 0);
+    }
 }
 
-void ChSettingsAdvViewPage::onDisplayValue1Set(uint16_t value) {
+int ChSettingsAdvViewPage::getDirty() {
+    return (
+        origDisplayValues[0].type != displayValues[0].type ||
+        origDisplayValues[0].scale != displayValues[0].scale ||
+        (displayValues[0].scale == DISPLAY_VALUE_SCALE_CUSTOM && origDisplayValues[0].range != displayValues[0].range) ||
+
+        origDisplayValues[1].type != displayValues[1].type ||
+        origDisplayValues[1].scale != displayValues[1].scale ||
+		(displayValues[1].scale == DISPLAY_VALUE_SCALE_CUSTOM && origDisplayValues[1].range != displayValues[1].range) ||
+
+        origYTViewRate != ytViewRate
+    ) ? 1 : 0;
+}
+
+void ChSettingsAdvViewPage::set() {
+    if (getDirty()) {
+        channel_dispatcher::setDisplayViewSettings(*g_channel, displayValues, ytViewRate);
+        g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS]();
+    }
+}
+
+void ChSettingsAdvViewPage::onDisplayValueTypeSet(uint16_t value) {
     popPage();
+
     ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getActivePage();
-    page->displayValue1 = (uint8_t)value;
+
+    int otherDisplayValueIndex = page->displayValueIndex == 0 ? 1 : 0;
+
+    DisplayValueType type = (DisplayValueType)value;
+
+    if (type == page->displayValues[otherDisplayValueIndex].type) {
+        // swap
+        DisplayValue temp = page->displayValues[page->displayValueIndex];
+        page->displayValues[page->displayValueIndex] = page->displayValues[otherDisplayValueIndex];
+        page->displayValues[otherDisplayValueIndex] = temp;
+    } else {
+        page->displayValues[page->displayValueIndex].type = type;
+        page->displayValues[page->displayValueIndex].scale = DISPLAY_VALUE_SCALE_LIMIT;
+    }
+
+	if (
+		page->displayValues[page->displayValueIndex].scale == DISPLAY_VALUE_SCALE_CUSTOM &&
+		(
+			page->displayValues[page->displayValueIndex].range <= 0 ||
+			page->displayValues[page->displayValueIndex].range > page->displayValues[page->displayValueIndex].getMaxRange(g_channel)
+		)
+	) {
+		page->displayValues[page->displayValueIndex].range = page->displayValues[page->displayValueIndex].getMaxRange(g_channel);
+	}
 }
 
-void ChSettingsAdvViewPage::editDisplayValue1() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_DISPLAY_VALUE, displayValue1, isDisabledDisplayValue1, onDisplayValue1Set);
-}
-
-bool ChSettingsAdvViewPage::isDisabledDisplayValue2(uint16_t value) {
-    ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getPage(PAGE_ID_CH_SETTINGS_ADV_VIEW);
-    return value == page->displayValue1;
-}
-
-void ChSettingsAdvViewPage::onDisplayValue2Set(uint16_t value) {
+void ChSettingsAdvViewPage::onDisplayValueScaleSet(uint16_t value) {
     popPage();
+
     ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getActivePage();
-    page->displayValue2 = (uint8_t)value;
+
+    DisplayValueScale scale = (DisplayValueScale)value;
+
+	page->displayValues[page->displayValueIndex].scale = scale;
+
+	if (
+		page->displayValues[page->displayValueIndex].scale == DISPLAY_VALUE_SCALE_CUSTOM &&
+		(
+			page->displayValues[page->displayValueIndex].range <= 0 ||
+			page->displayValues[page->displayValueIndex].range > page->displayValues[page->displayValueIndex].getMaxRange(g_channel)
+			)
+		) {
+		page->displayValues[page->displayValueIndex].range = page->displayValues[page->displayValueIndex].getMaxRange(g_channel);
+	}
 }
 
-void ChSettingsAdvViewPage::editDisplayValue2() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_DISPLAY_VALUE, displayValue2, isDisabledDisplayValue2, onDisplayValue2Set);
+void ChSettingsAdvViewPage::onDisplayValueRangeSet(float value) {
+    popPage();
+
+    ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getActivePage();
+
+    page->displayValues[page->displayValueIndex].range = value;
+
+	if (
+		page->displayValues[page->displayValueIndex].scale == DISPLAY_VALUE_SCALE_CUSTOM &&
+		(
+			page->displayValues[page->displayValueIndex].range <= 0 ||
+			page->displayValues[page->displayValueIndex].range > page->displayValues[page->displayValueIndex].getMaxRange(g_channel)
+			)
+		) {
+		page->displayValues[page->displayValueIndex].range = page->displayValues[page->displayValueIndex].getMaxRange(g_channel);
+	}
 }
 
 void ChSettingsAdvViewPage::onYTViewRateSet(float value) {
     popPage();
     ChSettingsAdvViewPage *page = (ChSettingsAdvViewPage *)getActivePage();
     page->ytViewRate = value;
-}
-
-void ChSettingsAdvViewPage::swapDisplayValues() {
-    uint8_t temp = displayValue1;
-    displayValue1 = displayValue2;
-    displayValue2 = temp;
-}
-
-void ChSettingsAdvViewPage::editYTViewRate() {
-    NumericKeypadOptions options;
-
-    options.editValueUnit = UNIT_SECOND;
-
-    options.min = GUI_YT_VIEW_RATE_MIN;
-    options.max = GUI_YT_VIEW_RATE_MAX;
-    options.def = GUI_YT_VIEW_RATE_DEFAULT;
-
-    options.enableDefButton();
-    options.flags.signButtonEnabled = true;
-    options.flags.dotButtonEnabled = true;
-
-    NumericKeypad::start(0, MakeValue(ytViewRate, UNIT_SECOND), options, onYTViewRateSet, 0, 0);
-}
-
-int ChSettingsAdvViewPage::getDirty() {
-    return (origDisplayValue1 != displayValue1 || origDisplayValue2 != displayValue2 || origYTViewRate != ytViewRate) ? 1 : 0;
-}
-
-void ChSettingsAdvViewPage::set() {
-    if (getDirty()) {
-        channel_dispatcher::setDisplayViewSettings(*g_channel, displayValue1, displayValue2, ytViewRate);
-        g_actionExecFunctions[ACTION_ID_SHOW_CH_SETTINGS]();
-        infoMessage("View settings changed!");
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

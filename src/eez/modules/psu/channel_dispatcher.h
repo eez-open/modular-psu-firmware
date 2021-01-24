@@ -141,7 +141,7 @@ void setOtpState(int sensor, int state);
 void setOtpLevel(int sensor, float level);
 void setOtpDelay(int sensor, float delay);
 
-void setDisplayViewSettings(Channel &channel, int displayValue1, int displayValue2, float ytViewRate);
+void setDisplayViewSettings(Channel &channel, DisplayValue *displayValues, float ytViewRate);
 
 TriggerMode getVoltageTriggerMode(Channel &channel);
 void setVoltageTriggerMode(Channel &channel, TriggerMode mode);

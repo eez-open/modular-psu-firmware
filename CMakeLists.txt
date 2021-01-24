@@ -853,7 +853,7 @@ if(WIN32)
 
     add_custom_command(TARGET modular-psu-firmware POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PROJECT_SOURCE_DIR}/../SDL2-2.0.9/lib/x86/SDL2.dll"
+            "${PROJECT_SOURCE_DIR}/../SDL2-2.0.14/lib/x86/SDL2.dll"
             $<TARGET_FILE_DIR:modular-psu-firmware>)
 
     add_custom_command(TARGET modular-psu-firmware POST_BUILD

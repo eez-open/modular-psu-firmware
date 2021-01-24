@@ -46,7 +46,28 @@ namespace calibration {
 struct Value;
 }
 
-enum DisplayValue { DISPLAY_VALUE_VOLTAGE, DISPLAY_VALUE_CURRENT, DISPLAY_VALUE_POWER };
+enum DisplayValueType {
+    DISPLAY_VALUE_VOLTAGE,
+    DISPLAY_VALUE_CURRENT,
+    DISPLAY_VALUE_POWER 
+};
+
+enum DisplayValueScale {
+    DISPLAY_VALUE_SCALE_FULL,
+    DISPLAY_VALUE_SCALE_LIMIT,
+    DISPLAY_VALUE_SCALE_AUTO,
+    DISPLAY_VALUE_SCALE_CUSTOM,
+};
+
+struct DisplayValue {
+    uint8_t type;
+	uint8_t scale;
+    float range;
+
+    Unit getUnit();
+    float getRange(Channel *channel);
+    float getMaxRange(Channel *channel);
+};
 
 enum TriggerMode { TRIGGER_MODE_FIXED, TRIGGER_MODE_LIST, TRIGGER_MODE_STEP };
 
@@ -228,6 +249,8 @@ protected:
 private: 
     Channel& channel;
 
+    static inline float getChannelHistoryValue(Channel &channel, uint32_t rowIndex, uint8_t columnIndex, float *max);
+
     static float getChannel0HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
     static float getChannel1HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
     static float getChannel2HistoryValue(uint32_t rowIndex, uint8_t columnIndex, float *max);
@@ -283,8 +306,6 @@ public:
         unsigned rprogEnabled : 1;
         unsigned reserved2 : 1;
         unsigned rpol : 1; // remote sense reverse polarity is detected
-        unsigned displayValue1 : 2;
-        unsigned displayValue2 : 2;
         unsigned voltageTriggerMode : 2;
         unsigned currentTriggerMode : 2;
         unsigned triggerOutputState : 1;
@@ -400,6 +421,7 @@ public:
     ProtectionValue ocp;
     ProtectionValue opp;
 
+    DisplayValue displayValues[2];
     float ytViewRate;
 
     float outputDelayDuration;
