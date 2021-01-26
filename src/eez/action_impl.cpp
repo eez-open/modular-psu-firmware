@@ -319,11 +319,6 @@ void action_show_ch_settings() {
     showPage(getSlotSettingsPageId(g_channel->slotIndex));
 }
 
-void action_show_ch_settings_prot_clear() {
-    selectChannelByCursor();
-    pushPage(PAGE_ID_CH_SETTINGS_PROT_CLEAR);
-}
-
 void action_show_ch_settings_prot_ocp() {
     selectChannelByCursor();
     pushPage(PAGE_ID_CH_SETTINGS_PROT_OCP);
@@ -426,11 +421,9 @@ void action_ch_settings_calibration_toggle_enable() {
 }
 
 void action_ch_settings_prot_clear() {
-    ChSettingsProtectionPage::clear();
-}
-
-void action_ch_settings_prot_clear_and_disable() {
-    ChSettingsProtectionPage::clearAndDisable();
+    channel_dispatcher::clearProtection(*g_channel);
+    popPage();
+    infoMessage("Cleared!");
 }
 
 void action_ch_settings_prot_toggle_state() {

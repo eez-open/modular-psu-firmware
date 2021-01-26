@@ -197,7 +197,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 160,
+            "width": 154,
             "height": 32,
             "widgets": [
               {
@@ -208,9 +208,9 @@
                   "padding": "0 5"
                 },
                 "data": "slot_title_def",
-                "left": 1,
+                "left": 0,
                 "top": 0,
-                "width": 101,
+                "width": 97,
                 "height": 32,
                 "text": ""
               },
@@ -221,7 +221,7 @@
                   "font": "Heydings14"
                 },
                 "action": "show_slot_settings",
-                "left": 102,
+                "left": 97,
                 "top": 0,
                 "width": 32,
                 "height": 32,
@@ -234,7 +234,7 @@
                   "font": "Heydings14"
                 },
                 "action": "toggle_slot_max_view",
-                "left": 134,
+                "left": 129,
                 "top": 0,
                 "width": 25,
                 "height": 32,
@@ -251,7 +251,7 @@
             "action": "show_configure_routes",
             "left": 2,
             "top": 34,
-            "width": 156,
+            "width": 150,
             "height": 104,
             "itemWidget": {
               "type": "Container",
@@ -260,7 +260,7 @@
               },
               "left": 0,
               "top": 0,
-              "width": 26,
+              "width": 25,
               "height": 26,
               "widgets": [
                 {
@@ -271,7 +271,7 @@
                   "data": "route_open",
                   "left": 0,
                   "top": 0,
-                  "width": 26,
+                  "width": 25,
                   "height": 26,
                   "widgets": [
                     {
@@ -281,7 +281,7 @@
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 26,
+                      "width": 25,
                       "height": 26,
                       "widgets": [
                         {
@@ -301,7 +301,7 @@
                           },
                           "left": 0,
                           "top": 12,
-                          "width": 26,
+                          "width": 25,
                           "height": 1
                         },
                         {
@@ -325,7 +325,7 @@
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 26,
+                      "width": 25,
                       "height": 26,
                       "widgets": [
                         {
@@ -345,7 +345,7 @@
                           },
                           "left": 0,
                           "top": 12,
-                          "width": 26,
+                          "width": 25,
                           "height": 1
                         }
                       ]
@@ -363,9 +363,9 @@
             },
             "data": "ao1_label",
             "left": 0,
-            "top": 140,
+            "top": 139,
             "width": 51,
-            "height": 32,
+            "height": 31,
             "text": ""
           },
           {
@@ -376,9 +376,9 @@
             "data": "dac1",
             "action": "edit",
             "left": 52,
-            "top": 140,
+            "top": 139,
             "width": 102,
-            "height": 32,
+            "height": 31,
             "displayOption": 0
           },
           {
@@ -389,9 +389,9 @@
             },
             "data": "ao2_label",
             "left": 0,
-            "top": 174,
+            "top": 172,
             "width": 52,
-            "height": 32,
+            "height": 31,
             "text": ""
           },
           {
@@ -402,9 +402,9 @@
             "data": "dac2",
             "action": "edit",
             "left": 52,
-            "top": 174,
+            "top": 172,
             "width": 102,
-            "height": 32,
+            "height": 31,
             "displayOption": 0
           },
           {
@@ -414,9 +414,9 @@
             },
             "data": "relay_on",
             "action": "toggle_relay",
-            "left": 6,
-            "top": 208,
-            "width": 148,
+            "left": 1,
+            "top": 205,
+            "width": 152,
             "height": 30,
             "widgets": [
               {
@@ -427,7 +427,7 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 148,
+                "width": 152,
                 "height": 30,
                 "text": "Power relay: OFF"
               },
@@ -439,7 +439,7 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 148,
+                "width": 152,
                 "height": 30,
                 "text": "Power relay: ON"
               }
@@ -448,8 +448,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 160,
-        "height": 240,
+        "width": 154,
+        "height": 236,
         "dataContextOverrides": "{\"slot_title_def\": \"SMX46\"}"
       },
       {
@@ -463,7 +463,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 240,
+            "width": 234,
             "height": 32,
             "widgets": [
               {
@@ -474,9 +474,9 @@
                   "padding": "0 5"
                 },
                 "data": "slot_title_def",
-                "left": 1,
+                "left": 0,
                 "top": 0,
-                "width": 175,
+                "width": 170,
                 "height": 32,
                 "text": ""
               },
@@ -487,7 +487,7 @@
                   "font": "Heydings14"
                 },
                 "action": "show_slot_settings",
-                "left": 176,
+                "left": 170,
                 "top": 0,
                 "width": 32,
                 "height": 32,
@@ -500,7 +500,7 @@
                   "font": "Heydings14"
                 },
                 "action": "toggle_slot_max_view",
-                "left": 208,
+                "left": 202,
                 "top": 0,
                 "width": 32,
                 "height": 32,
@@ -517,7 +517,7 @@
             "action": "show_configure_routes",
             "left": 0,
             "top": 34,
-            "width": 240,
+            "width": 234,
             "height": 104,
             "itemWidget": {
               "type": "Container",
@@ -526,7 +526,7 @@
               },
               "left": 0,
               "top": 0,
-              "width": 40,
+              "width": 39,
               "height": 26,
               "widgets": [
                 {
@@ -537,7 +537,7 @@
                   "data": "route_open",
                   "left": 0,
                   "top": 0,
-                  "width": 40,
+                  "width": 39,
                   "height": 26,
                   "widgets": [
                     {
@@ -547,7 +547,7 @@
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 40,
+                      "width": 39,
                       "height": 26,
                       "widgets": [
                         {
@@ -567,7 +567,7 @@
                           },
                           "left": 0,
                           "top": 12,
-                          "width": 40,
+                          "width": 39,
                           "height": 1
                         },
                         {
@@ -591,7 +591,7 @@
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 40,
+                      "width": 39,
                       "height": 26,
                       "widgets": [
                         {
@@ -611,7 +611,7 @@
                           },
                           "left": 0,
                           "top": 12,
-                          "width": 40,
+                          "width": 39,
                           "height": 1
                         }
                       ]
@@ -629,9 +629,9 @@
             },
             "data": "ao1_label",
             "left": 0,
-            "top": 140,
+            "top": 139,
             "width": 76,
-            "height": 32,
+            "height": 31,
             "text": ""
           },
           {
@@ -642,9 +642,9 @@
             "data": "dac1",
             "action": "edit",
             "left": 76,
-            "top": 140,
+            "top": 139,
             "width": 134,
-            "height": 32,
+            "height": 31,
             "displayOption": 0
           },
           {
@@ -655,9 +655,9 @@
             },
             "data": "ao2_label",
             "left": 0,
-            "top": 174,
+            "top": 172,
             "width": 76,
-            "height": 32,
+            "height": 31,
             "text": ""
           },
           {
@@ -668,9 +668,9 @@
             "data": "dac2",
             "action": "edit",
             "left": 76,
-            "top": 174,
+            "top": 172,
             "width": 134,
-            "height": 32,
+            "height": 31,
             "displayOption": 0
           },
           {
@@ -681,9 +681,9 @@
             "data": "relay_on",
             "action": "toggle_relay",
             "left": 30,
-            "top": 208,
+            "top": 205,
             "width": 180,
-            "height": 32,
+            "height": 31,
             "widgets": [
               {
                 "type": "Text",
@@ -694,7 +694,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 180,
-                "height": 32,
+                "height": 31,
                 "text": "Power relay: OFF"
               },
               {
@@ -706,7 +706,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 180,
-                "height": 32,
+                "height": 31,
                 "text": "Power relay: ON"
               }
             ]
@@ -714,8 +714,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 240,
+        "width": 234,
+        "height": 236,
         "dataContextOverrides": "{\"slot_title_def\": \"SMX46\"}"
       },
       {
@@ -728,7 +728,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 480,
+            "width": 476,
             "height": 32,
             "widgets": [
               {
@@ -742,7 +742,7 @@
                 "data": "slot_title_max",
                 "left": 0,
                 "top": 0,
-                "width": 380,
+                "width": 376,
                 "height": 32,
                 "text": ""
               },
@@ -753,7 +753,7 @@
                   "font": "Heydings14"
                 },
                 "action": "show_slot_settings",
-                "left": 380,
+                "left": 376,
                 "top": 0,
                 "width": 50,
                 "height": 32,
@@ -766,7 +766,7 @@
                   "font": "Heydings14"
                 },
                 "action": "toggle_slot_max_view",
-                "left": 430,
+                "left": 426,
                 "top": 0,
                 "width": 50,
                 "height": 32,
@@ -948,7 +948,7 @@
             "left": 44,
             "top": 148,
             "width": 240,
-            "height": 20,
+            "height": 16,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -957,7 +957,7 @@
               "left": 0,
               "top": 0,
               "width": 40,
-              "height": 20,
+              "height": 16,
               "widgets": [
                 {
                   "type": "Text",
@@ -969,7 +969,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 40,
-                  "height": 20,
+                  "height": 16,
                   "text": ""
                 }
               ]
@@ -985,7 +985,7 @@
             },
             "data": "ao1_label",
             "left": 290,
-            "top": 36,
+            "top": 35,
             "width": 54,
             "height": 38,
             "text": ""
@@ -998,7 +998,7 @@
             "data": "dac1",
             "action": "edit",
             "left": 344,
-            "top": 37,
+            "top": 36,
             "width": 131,
             "height": 38,
             "displayOption": 0
@@ -1011,7 +1011,7 @@
             },
             "data": "ao2_label",
             "left": 290,
-            "top": 81,
+            "top": 80,
             "width": 54,
             "height": 38,
             "text": ""
@@ -1024,7 +1024,7 @@
             "data": "dac2",
             "action": "edit",
             "left": 344,
-            "top": 81,
+            "top": 80,
             "width": 131,
             "height": 38,
             "displayOption": 0
@@ -1037,7 +1037,7 @@
             "data": "relay_on",
             "action": "toggle_relay",
             "left": 290,
-            "top": 125,
+            "top": 124,
             "width": 185,
             "height": 38,
             "widgets": [
@@ -1070,8 +1070,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 480,
-        "height": 168,
+        "width": 476,
+        "height": 164,
         "dataContextOverrides": "{\"slot_title_max\": \"SMX46\"}"
       },
       {
@@ -1084,7 +1084,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 238,
+            "width": 235,
             "height": 24,
             "widgets": [
               {
@@ -1097,7 +1097,7 @@
                 "data": "slot_title_min",
                 "left": 0,
                 "top": 0,
-                "width": 193,
+                "width": 190,
                 "height": 24,
                 "text": ""
               },
@@ -1110,7 +1110,7 @@
                 },
                 "data": "",
                 "action": "toggle_slot_max_view",
-                "left": 193,
+                "left": 190,
                 "top": 0,
                 "width": 45,
                 "height": 24,
@@ -1125,10 +1125,10 @@
             },
             "data": "dac1",
             "action": "",
-            "left": 137,
+            "left": 157,
             "top": 24,
             "width": 78,
-            "height": 23,
+            "height": 21,
             "displayOption": 0
           },
           {
@@ -1138,10 +1138,10 @@
             },
             "data": "dac2",
             "action": "",
-            "left": 137,
-            "top": 49,
+            "left": 157,
+            "top": 47,
             "width": 78,
-            "height": 23,
+            "height": 21,
             "displayOption": 0
           },
           {
@@ -1158,8 +1158,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 238,
-        "height": 72,
+        "width": 235,
+        "height": 68,
         "dataContextOverrides": "{\"slot_title_min\": \"SMX46\"}"
       },
       {
@@ -1172,7 +1172,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 158,
+            "width": 154,
             "height": 24,
             "widgets": [
               {
@@ -1185,7 +1185,7 @@
                 "data": "slot_title_micro",
                 "left": 0,
                 "top": 0,
-                "width": 158,
+                "width": 154,
                 "height": 24,
                 "text": ""
               }
@@ -1201,7 +1201,7 @@
             "left": 0,
             "top": 24,
             "width": 51,
-            "height": 23,
+            "height": 21,
             "displayOption": 0
           },
           {
@@ -1212,16 +1212,16 @@
             "data": "dac2",
             "action": "",
             "left": 0,
-            "top": 49,
+            "top": 47,
             "width": 51,
-            "height": 23,
+            "height": 21,
             "displayOption": 0
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 158,
-        "height": 72,
+        "width": 154,
+        "height": 68,
         "dataContextOverrides": "{\"slot_title_micro\": \"SMX46\"}"
       },
       {
@@ -2347,35 +2347,35 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "labels_and_colors_page_slot_color"
+              "inheritFrom": "labels_and_colors_slot"
             },
             "left": 0,
             "top": 32,
             "width": 2,
-            "height": 206
+            "height": 206,
+            "invertColors": true
           },
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "labels_and_colors_page_slot_color"
+              "inheritFrom": "labels_and_colors_slot"
             },
             "left": 156,
             "top": 32,
             "width": 2,
-            "height": 206
+            "height": 206,
+            "invertColors": true
           },
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "labels_and_colors_page_slot_color"
+              "inheritFrom": "labels_and_colors_slot"
             },
             "left": 2,
             "top": 236,
             "width": 154,
-            "height": 2
+            "height": 2,
+            "invertColors": true
           }
         ],
         "left": 0,

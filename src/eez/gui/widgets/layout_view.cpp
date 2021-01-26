@@ -64,7 +64,9 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
 		const PageWidget *layoutSpecific = GET_WIDGET_PROPERTY(layout, specific, const PageWidget *);
 		enumContainer(widgetCursor, callback, layoutSpecific->widgets);
 	} else {
-        widgetCursor.currentState->size = 0;
+		if (widgetCursor.currentState) {
+			widgetCursor.currentState->size = 0;
+		}
     }
 
     if (layoutViewSpecific->context) {

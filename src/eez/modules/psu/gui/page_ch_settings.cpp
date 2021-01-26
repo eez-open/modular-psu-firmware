@@ -237,27 +237,6 @@ void ChSettingsAdvViewPage::onYTViewRateSet(float value) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ChSettingsProtectionPage::clear() {
-    channel_dispatcher::clearProtection(*g_channel);
-
-    popPage();
-    infoMessage("Cleared!");
-}
-
-void onClearAndDisableYes() {
-    channel_dispatcher::clearProtection(*g_channel);
-    channel_dispatcher::disableProtection(*g_channel);
-
-    popPage();
-    infoMessage("Cleared and disabled!");
-}
-
-void ChSettingsProtectionPage::clearAndDisable() {
-    areYouSure(onClearAndDisableYes);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 int ChSettingsProtectionSetPage::getDirty() {
     return (origState != state || origType != type || origLimit != limit || origLevel != level || origDelay != delay) ? 1 : 0;
 }

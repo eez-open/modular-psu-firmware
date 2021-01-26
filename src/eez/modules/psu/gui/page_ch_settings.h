@@ -69,12 +69,6 @@ class ChSettingsAdvViewPage : public SetPage {
     static void onYTViewRateSet(float value);
 };
 
-class ChSettingsProtectionPage : public Page {
-  public:
-    static void clear();
-    static void clearAndDisable();
-};
-
 class ChSettingsProtectionSetPage : public SetPage {
   public:
     int getDirty();

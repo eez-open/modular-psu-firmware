@@ -1598,6 +1598,13 @@ void data_channels_is_2col_view(DataOperationEnum operation, Cursor cursor, Valu
     }
 }
 
+void data_slot_is_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_slots[hmi::g_selectedSlotIndex]->numPowerChannels == 2;
+    }
+}
+
+
 void data_channels_view_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::devConf.channelsViewMode;
@@ -1707,9 +1714,6 @@ void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Va
     data_slot_channel_index(persist_conf::getMin2SlotIndex(), channelIndex == -1 ? nullptr : &Channel::get(channelIndex), operation, cursor, value);
 }
 
-void do_data_slot_default_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
-}
-
 void data_slot_default_view(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = getSlotView(g_isCol2Mode ? SLOT_VIEW_TYPE_DEFAULT_2COL : SLOT_VIEW_TYPE_DEFAULT, hmi::g_selectedSlotIndex, cursor);
@@ -1722,34 +1726,16 @@ void data_slot_max_view(DataOperationEnum operation, Cursor cursor, Value &value
     }
 }
 
-void data_slot_min1_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_slot_min_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getSlotView(SLOT_VIEW_TYPE_MIN, persist_conf::getMin1SlotIndex(), cursor);
+        value = getSlotView(SLOT_VIEW_TYPE_MIN, hmi::g_selectedSlotIndex, cursor);
     }
 }
 
-void data_slot_min2_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_slot_micro_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = getSlotView(SLOT_VIEW_TYPE_MIN, persist_conf::getMin2SlotIndex(), cursor);
+        value = getSlotView(SLOT_VIEW_TYPE_MICRO, hmi::g_selectedSlotIndex, cursor);
     }
-}
-
-void data_slot_micro_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = getSlotView(SLOT_VIEW_TYPE_MICRO, slotIndex, cursor);
-    }
-}
-
-void data_slot1_micro_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_micro_view(0, operation, cursor, value);
-}
-
-void data_slot2_micro_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_micro_view(1, operation, cursor, value);
-}
-
-void data_slot3_micro_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_micro_view(2, operation, cursor, value);
 }
 
 void data_channel_display_value1(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -4559,8 +4545,10 @@ void data_simulator_load(DataOperationEnum operation, Cursor cursor, Value &valu
 
 void data_simulator_load_state2(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor + 1);
-        value = channel.simulator.getLoadEnabled() ? 1 : 0;
+		if (cursor + 1 < CH_NUM) {
+			Channel &channel = Channel::get(cursor + 1);
+			value = channel.simulator.getLoadEnabled() ? 1 : 0;
+		}
     }
 }
 

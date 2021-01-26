@@ -395,8 +395,8 @@ bool isSysSettingsSubPage(int pageId) {
 }
 
 bool isChSettingsSubPage(int pageId) {
-    return pageId == PAGE_ID_CH_SETTINGS_PROT_CLEAR ||
-        pageId == PAGE_ID_CH_SETTINGS_PROT_OVP ||
+    return
+    	pageId == PAGE_ID_CH_SETTINGS_PROT_OVP ||
         pageId == PAGE_ID_CH_SETTINGS_PROT_OCP ||
         pageId == PAGE_ID_CH_SETTINGS_PROT_OPP ||
         pageId == PAGE_ID_CH_SETTINGS_PROT_OTP ||

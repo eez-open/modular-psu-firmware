@@ -349,11 +349,11 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_def_2ch_view",
             "left": 0,
             "top": 0,
-            "width": 160,
-            "height": 120,
+            "width": 158,
+            "height": 118,
+            "layout": "slot_def_2ch_vert_with_border",
             "context": "slot_2ch_ch1_index"
           },
           {
@@ -361,22 +361,22 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_def_2ch_view",
             "left": 0,
             "top": 120,
-            "width": 160,
-            "height": 120,
+            "width": 158,
+            "height": 118,
+            "layout": "slot_def_2ch_vert_with_border",
             "context": "slot_2ch_ch2_index"
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 160,
-        "height": 240,
+        "width": 158,
+        "height": 238,
         "dataContextOverrides": "{\n    \"channel_i_mon\": \"< 300 mA\"\n}"
       },
       {
-        "name": "slot_def_2ch_vert_2col",
+        "name": "slot_def_2ch_vert_with_border",
         "widgets": [
           {
             "type": "LayoutView",
@@ -384,30 +384,51 @@
               "inheritFrom": "default"
             },
             "data": "slot_def_2ch_view",
-            "left": 0,
+            "left": 2,
             "top": 0,
-            "width": 240,
-            "height": 120,
-            "context": "slot_2ch_ch1_index"
+            "width": 154,
+            "height": 116,
+            "layout": "",
+            "context": ""
           },
           {
-            "type": "LayoutView",
+            "type": "Rectangle",
             "style": {
-              "inheritFrom": "default"
+              "inheritFrom": "default",
+              "color": "channel1"
             },
-            "data": "slot_def_2ch_view",
             "left": 0,
-            "top": 120,
-            "width": 240,
-            "height": 120,
-            "context": "slot_2ch_ch2_index"
+            "top": 0,
+            "width": 2,
+            "height": 118
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 156,
+            "top": 0,
+            "width": 2,
+            "height": 118
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 2,
+            "top": 116,
+            "width": 156,
+            "height": 2
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 240,
-        "dataContextOverrides": "{\n    \"channel_i_mon\": \"< 300 mA\",\n    \"slot_def_2ch_view\": \"slot_def_2ch_vert_on_2col\"\n}"
+        "width": 158,
+        "height": 118
       },
       {
         "name": "slot_def_2ch_vert_on",
@@ -419,7 +440,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 160,
+            "width": 154,
             "height": 32,
             "layout": "slot_def_vert_title"
           },
@@ -429,131 +450,9 @@
               "inheritFrom": "default"
             },
             "action": "channel_toggle_output",
-            "left": 1,
-            "top": 34,
-            "width": 78,
-            "height": 84,
-            "name": "mon section",
-            "widgets": [
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "mon_value_14_right"
-                },
-                "data": "channel_u_mon",
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 78,
-                "height": 27,
-                "displayOption": 0
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "mon_value_14_right",
-                  "font": "Oswald14",
-                  "alignHorizontal": "right",
-                  "color": "text_regular",
-                  "activeBackgroundColor": "text_regular",
-                  "opacity": 255
-                },
-                "data": "channel_i_mon",
-                "action": "",
-                "left": 0,
-                "top": 29,
-                "width": 78,
-                "height": 27,
-                "displayOption": 0
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "mon_value_14_right",
-                  "font": "Oswald14",
-                  "alignHorizontal": "right",
-                  "color": "text_regular",
-                  "activeBackgroundColor": "text_regular",
-                  "opacity": 255
-                },
-                "data": "channel_p_mon",
-                "action": "",
-                "left": 0,
-                "top": 58,
-                "width": 78,
-                "height": 26,
-                "displayOption": 0
-              }
-            ]
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "encoder_cursor_14_right_enabled"
-            },
-            "data": "channel_u_edit",
-            "action": "edit",
-            "left": 81,
-            "top": 34,
-            "width": 78,
-            "height": 27,
-            "displayOption": 0
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "encoder_cursor_14_right_enabled"
-            },
-            "data": "channel_i_edit",
-            "action": "edit",
-            "left": 81,
-            "top": 63,
-            "width": 78,
-            "height": 27,
-            "displayOption": 0
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "encoder_cursor_14_right_enabled"
-            },
-            "data": "channel_protection_opp_limit",
-            "action": "edit",
-            "left": 81,
-            "top": 92,
-            "width": 78,
-            "height": 26,
-            "displayOption": 0
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 160,
-        "height": 120
-      },
-      {
-        "name": "slot_def_2ch_vert_on_2col",
-        "widgets": [
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
             "left": 0,
-            "top": 0,
-            "width": 240,
-            "height": 32,
-            "layout": "slot_def_vert_title_2col"
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "action": "channel_toggle_output",
-            "left": 1,
-            "top": 34,
-            "width": 118,
+            "top": 32,
+            "width": 76,
             "height": 84,
             "name": "mon section",
             "widgets": [
@@ -566,7 +465,7 @@
                 "action": "",
                 "left": 0,
                 "top": 0,
-                "width": 118,
+                "width": 76,
                 "height": 27,
                 "displayOption": 0
               },
@@ -584,7 +483,7 @@
                 "action": "",
                 "left": 0,
                 "top": 29,
-                "width": 118,
+                "width": 76,
                 "height": 27,
                 "displayOption": 0
               },
@@ -602,7 +501,7 @@
                 "action": "",
                 "left": 0,
                 "top": 58,
-                "width": 118,
+                "width": 76,
                 "height": 26,
                 "displayOption": 0
               }
@@ -615,9 +514,9 @@
             },
             "data": "channel_u_edit",
             "action": "edit",
-            "left": 121,
-            "top": 34,
-            "width": 118,
+            "left": 76,
+            "top": 32,
+            "width": 78,
             "height": 27,
             "displayOption": 0
           },
@@ -628,9 +527,9 @@
             },
             "data": "channel_i_edit",
             "action": "edit",
-            "left": 121,
-            "top": 63,
-            "width": 118,
+            "left": 76,
+            "top": 61,
+            "width": 78,
             "height": 27,
             "displayOption": 0
           },
@@ -641,17 +540,17 @@
             },
             "data": "channel_protection_opp_limit",
             "action": "edit",
-            "left": 121,
-            "top": 92,
-            "width": 118,
+            "left": 76,
+            "top": 90,
+            "width": 78,
             "height": 26,
             "displayOption": 0
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 120
+        "width": 154,
+        "height": 116
       },
       {
         "name": "slot_def_2ch_vert_off",
@@ -663,7 +562,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 158,
+            "width": 154,
             "height": 32,
             "layout": "slot_def_vert_title"
           },
@@ -674,9 +573,9 @@
             },
             "data": "channel_off_label",
             "action": "channel_toggle_output",
-            "left": 1,
-            "top": 34,
-            "width": 78,
+            "left": 0,
+            "top": 32,
+            "width": 74,
             "height": 84,
             "text": ""
           },
@@ -686,8 +585,8 @@
               "inheritFrom": "default"
             },
             "data": "trigger_is_initiated",
-            "left": 81,
-            "top": 34,
+            "left": 76,
+            "top": 32,
             "width": 78,
             "height": 84,
             "widgets": [
@@ -819,8 +718,219 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 160,
-        "height": 120
+        "width": 154,
+        "height": 116
+      },
+      {
+        "name": "slot_def_2ch_vert_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 238,
+            "height": 118,
+            "layout": "slot_def_2ch_vert_with_border_2col",
+            "context": "slot_2ch_ch1_index"
+          },
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 120,
+            "width": 238,
+            "height": 118,
+            "layout": "slot_def_2ch_vert_with_border_2col",
+            "context": "slot_2ch_ch2_index"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 238,
+        "height": 238,
+        "dataContextOverrides": "{\n    \"channel_i_mon\": \"< 300 mA\",\n    \"slot_def_2ch_view\": \"slot_def_2ch_vert_on_2col\"\n}"
+      },
+      {
+        "name": "slot_def_2ch_vert_with_border_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_def_2ch_view",
+            "left": 2,
+            "top": 0,
+            "width": 234,
+            "height": 116,
+            "layout": "",
+            "context": ""
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 2,
+            "height": 118
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 236,
+            "top": 0,
+            "width": 2,
+            "height": 118
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 2,
+            "top": 116,
+            "width": 236,
+            "height": 2
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 238,
+        "height": 118
+      },
+      {
+        "name": "slot_def_2ch_vert_on_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 234,
+            "height": 32,
+            "layout": "slot_def_vert_title_2col"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "action": "channel_toggle_output",
+            "left": 0,
+            "top": 32,
+            "width": 116,
+            "height": 84,
+            "name": "mon section",
+            "widgets": [
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "mon_value_14_right"
+                },
+                "data": "channel_u_mon",
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 116,
+                "height": 27,
+                "displayOption": 0
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "mon_value_14_right",
+                  "font": "Oswald14",
+                  "alignHorizontal": "right",
+                  "color": "text_regular",
+                  "activeBackgroundColor": "text_regular",
+                  "opacity": 255
+                },
+                "data": "channel_i_mon",
+                "action": "",
+                "left": 0,
+                "top": 29,
+                "width": 116,
+                "height": 27,
+                "displayOption": 0
+              },
+              {
+                "type": "DisplayData",
+                "style": {
+                  "inheritFrom": "mon_value_14_right",
+                  "font": "Oswald14",
+                  "alignHorizontal": "right",
+                  "color": "text_regular",
+                  "activeBackgroundColor": "text_regular",
+                  "opacity": 255
+                },
+                "data": "channel_p_mon",
+                "action": "",
+                "left": 0,
+                "top": 58,
+                "width": 116,
+                "height": 26,
+                "displayOption": 0
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_right_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 116,
+            "top": 32,
+            "width": 118,
+            "height": 27,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_right_enabled"
+            },
+            "data": "channel_i_edit",
+            "action": "edit",
+            "left": 116,
+            "top": 61,
+            "width": 118,
+            "height": 27,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_right_enabled"
+            },
+            "data": "channel_protection_opp_limit",
+            "action": "edit",
+            "left": 116,
+            "top": 90,
+            "width": 118,
+            "height": 26,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 234,
+        "height": 116
       },
       {
         "name": "slot_def_2ch_vert_off_2col",
@@ -832,7 +942,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 240,
+            "width": 234,
             "height": 32,
             "layout": "slot_def_vert_title_2col"
           },
@@ -843,9 +953,9 @@
             },
             "data": "channel_off_label",
             "action": "channel_toggle_output",
-            "left": 1,
-            "top": 34,
-            "width": 118,
+            "left": 0,
+            "top": 32,
+            "width": 114,
             "height": 84,
             "text": ""
           },
@@ -855,8 +965,8 @@
               "inheritFrom": "default"
             },
             "data": "trigger_is_initiated",
-            "left": 121,
-            "top": 34,
+            "left": 116,
+            "top": 32,
             "width": 118,
             "height": 84,
             "widgets": [
@@ -988,8 +1098,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 120
+        "width": 234,
+        "height": 116
       },
       {
         "name": "slot_def_2ch_horz",
@@ -999,11 +1109,11 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_def_2ch_view",
             "left": 0,
             "top": 0,
-            "width": 240,
-            "height": 80,
+            "width": 239,
+            "height": 78,
+            "layout": "slot_def_2ch_horz_with_border",
             "context": "slot_2ch_ch1_index"
           },
           {
@@ -1011,22 +1121,22 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_def_2ch_view",
-            "left": 240,
+            "left": 241,
             "top": 0,
-            "width": 240,
-            "height": 80,
+            "width": 239,
+            "height": 78,
+            "layout": "slot_def_2ch_horz_with_border",
             "context": "slot_2ch_ch2_index"
           }
         ],
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 80,
+        "height": 78,
         "dataContextOverrides": "{\n    \"slot_def_2ch_view\": \"slot_def_2ch_horz_on\"\n}"
       },
       {
-        "name": "slot_def_2ch_horz_2col",
+        "name": "slot_def_2ch_horz_with_border",
         "widgets": [
           {
             "type": "LayoutView",
@@ -1035,29 +1145,50 @@
             },
             "data": "slot_def_2ch_view",
             "left": 0,
-            "top": 0,
-            "width": 240,
-            "height": 120,
-            "context": "slot_2ch_ch1_index"
+            "top": 2,
+            "width": 237,
+            "height": 74,
+            "layout": "",
+            "context": ""
           },
           {
-            "type": "LayoutView",
+            "type": "Rectangle",
             "style": {
-              "inheritFrom": "default"
+              "inheritFrom": "default",
+              "color": "channel1"
             },
-            "data": "slot_def_2ch_view",
-            "left": 240,
+            "left": 0,
             "top": 0,
-            "width": 240,
-            "height": 120,
-            "context": "slot_2ch_ch2_index"
+            "width": 239,
+            "height": 2
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 0,
+            "top": 76,
+            "width": 239,
+            "height": 2
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 237,
+            "top": 2,
+            "width": 2,
+            "height": 74
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 480,
-        "height": 120,
-        "dataContextOverrides": "{\n    \"slot_def_2ch_view\": \"slot_def_2ch_horz_on_2col\"\n}"
+        "width": 239,
+        "height": 78
       },
       {
         "name": "slot_def_2ch_horz_on",
@@ -1070,7 +1201,7 @@
             "left": 0,
             "top": 0,
             "width": 52,
-            "height": 80,
+            "height": 74,
             "layout": "slot_def_horz_title"
           },
           {
@@ -1080,125 +1211,9 @@
             },
             "action": "channel_toggle_output",
             "left": 54,
-            "top": 1,
-            "width": 106,
-            "height": 78,
-            "name": "mon section",
-            "widgets": [
-              {
-                "type": "BarGraph",
-                "style": {
-                  "inheritFrom": "bar_graph_U_default",
-                  "font": "Oswald14",
-                  "color": "bar_graph_voltage",
-                  "backgroundColor": "bar_graph_background",
-                  "activeColor": "bar_graph_background",
-                  "activeBackgroundColor": "bar_graph_voltage"
-                },
-                "data": "channel_display_value1",
-                "left": 0,
-                "top": 0,
-                "width": 106,
-                "height": 38,
-                "orientation": "left-right",
-                "textStyle": {
-                  "inheritFrom": "bar_graph_text"
-                },
-                "line1Data": "channel_display_value1_set",
-                "line1Style": {
-                  "inheritFrom": "bar_graph_set_line"
-                },
-                "line2Data": "channel_display_value1_limit",
-                "line2Style": {
-                  "inheritFrom": "bar_graph_limit_line"
-                }
-              },
-              {
-                "type": "BarGraph",
-                "style": {
-                  "inheritFrom": "bar_graph_I_default",
-                  "font": "Oswald14",
-                  "color": "bar_graph_current",
-                  "backgroundColor": "bar_graph_background",
-                  "activeColor": "bar_graph_background",
-                  "activeBackgroundColor": "bar_graph_current"
-                },
-                "data": "channel_display_value2",
-                "left": 0,
-                "top": 40,
-                "width": 106,
-                "height": 38,
-                "orientation": "left-right",
-                "textStyle": {
-                  "inheritFrom": "bar_graph_text"
-                },
-                "line1Data": "channel_display_value2_set",
-                "line1Style": {
-                  "inheritFrom": "bar_graph_set_line"
-                },
-                "line2Data": "channel_display_value2_limit",
-                "line2Style": {
-                  "inheritFrom": "bar_graph_limit_line"
-                }
-              }
-            ]
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
-            },
-            "data": "channel_u_edit",
-            "action": "edit",
-            "left": 162,
-            "top": 1,
-            "width": 76,
-            "height": 38,
-            "displayOption": 0
-          },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "encoder_cursor_14_enabled"
-            },
-            "data": "channel_i_edit",
-            "action": "edit",
-            "left": 162,
-            "top": 41,
-            "width": 76,
-            "height": 38,
-            "displayOption": 0
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 240,
-        "height": 80
-      },
-      {
-        "name": "slot_def_2ch_horz_on_2col",
-        "widgets": [
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
             "top": 0,
-            "width": 52,
-            "height": 120,
-            "layout": "slot_def_horz_title_2col"
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "action": "channel_toggle_output",
-            "left": 54,
-            "top": 1,
-            "width": 106,
-            "height": 118,
+            "width": 105,
+            "height": 74,
             "name": "mon section",
             "widgets": [
               {
@@ -1214,8 +1229,8 @@
                 "data": "channel_display_value1",
                 "left": 0,
                 "top": 0,
-                "width": 106,
-                "height": 58,
+                "width": 105,
+                "height": 36,
                 "orientation": "left-right",
                 "textStyle": {
                   "inheritFrom": "bar_graph_text"
@@ -1241,9 +1256,9 @@
                 },
                 "data": "channel_display_value2",
                 "left": 0,
-                "top": 60,
-                "width": 106,
-                "height": 58,
+                "top": 38,
+                "width": 105,
+                "height": 36,
                 "orientation": "left-right",
                 "textStyle": {
                   "inheritFrom": "bar_graph_text"
@@ -1266,10 +1281,10 @@
             },
             "data": "channel_u_edit",
             "action": "edit",
-            "left": 162,
-            "top": 1,
+            "left": 161,
+            "top": 0,
             "width": 76,
-            "height": 58,
+            "height": 36,
             "displayOption": 0
           },
           {
@@ -1279,17 +1294,17 @@
             },
             "data": "channel_i_edit",
             "action": "edit",
-            "left": 162,
-            "top": 61,
+            "left": 161,
+            "top": 38,
             "width": 76,
-            "height": 58,
+            "height": 36,
             "displayOption": 0
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 120
+        "width": 237,
+        "height": 74
       },
       {
         "name": "slot_def_2ch_horz_off",
@@ -1302,7 +1317,7 @@
             "left": 0,
             "top": 0,
             "width": 52,
-            "height": 80,
+            "height": 74,
             "layout": "slot_def_horz_title"
           },
           {
@@ -1313,9 +1328,9 @@
             "data": "channel_off_label",
             "action": "channel_toggle_output",
             "left": 54,
-            "top": 1,
-            "width": 106,
-            "height": 78,
+            "top": 0,
+            "width": 105,
+            "height": 74,
             "text": ""
           },
           {
@@ -1324,10 +1339,10 @@
               "inheritFrom": "default"
             },
             "data": "trigger_is_initiated",
-            "left": 162,
-            "top": 1,
+            "left": 161,
+            "top": 0,
             "width": 76,
-            "height": 78,
+            "height": 74,
             "widgets": [
               {
                 "type": "Select",
@@ -1338,7 +1353,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 76,
-                "height": 78,
+                "height": 74,
                 "widgets": [
                   {
                     "type": "Container",
@@ -1348,7 +1363,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 76,
-                    "height": 78,
+                    "height": 74,
                     "widgets": [
                       {
                         "type": "DisplayData",
@@ -1360,7 +1375,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 76,
-                        "height": 38,
+                        "height": 36,
                         "displayOption": 0
                       },
                       {
@@ -1371,9 +1386,9 @@
                         "data": "channel_i_edit",
                         "action": "edit",
                         "left": 0,
-                        "top": 40,
+                        "top": 38,
                         "width": 76,
-                        "height": 38,
+                        "height": 36,
                         "displayOption": 0
                       }
                     ]
@@ -1389,7 +1404,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 76,
-                    "height": 78,
+                    "height": 74,
                     "text": "\\u00a1"
                   },
                   {
@@ -1403,7 +1418,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 76,
-                    "height": 78,
+                    "height": 74,
                     "text": "\\u00b5"
                   }
                 ]
@@ -1416,7 +1431,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 76,
-                "height": 78,
+                "height": 74,
                 "widgets": [
                   {
                     "type": "Button",
@@ -1428,7 +1443,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 76,
-                    "height": 78,
+                    "height": 74,
                     "text": "\\u00a4 TRG",
                     "enabled": "trigger_is_manual",
                     "disabledStyle": {
@@ -1444,8 +1459,213 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 80
+        "width": 237,
+        "height": 74
+      },
+      {
+        "name": "slot_def_2ch_horz_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 239,
+            "height": 118,
+            "layout": "slot_def_2ch_horz_with_border_2col",
+            "context": "slot_2ch_ch1_index"
+          },
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 241,
+            "top": 0,
+            "width": 239,
+            "height": 118,
+            "layout": "slot_def_2ch_horz_with_border_2col",
+            "context": "slot_2ch_ch2_index"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 118,
+        "dataContextOverrides": "{\n    \"slot_def_2ch_view\": \"slot_def_2ch_horz_on_2col\"\n}"
+      },
+      {
+        "name": "slot_def_2ch_horz_with_border_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_def_2ch_view",
+            "left": 0,
+            "top": 2,
+            "width": 237,
+            "height": 114,
+            "layout": "",
+            "context": ""
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 239,
+            "height": 2
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 0,
+            "top": 116,
+            "width": 239,
+            "height": 2
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 237,
+            "top": 2,
+            "width": 2,
+            "height": 114
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 239,
+        "height": 118
+      },
+      {
+        "name": "slot_def_2ch_horz_on_2col",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 52,
+            "height": 114,
+            "layout": "slot_def_horz_title_2col"
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "action": "channel_toggle_output",
+            "left": 54,
+            "top": 0,
+            "width": 105,
+            "height": 114,
+            "name": "mon section",
+            "widgets": [
+              {
+                "type": "BarGraph",
+                "style": {
+                  "inheritFrom": "bar_graph_U_default",
+                  "font": "Oswald14",
+                  "color": "bar_graph_voltage",
+                  "backgroundColor": "bar_graph_background",
+                  "activeColor": "bar_graph_background",
+                  "activeBackgroundColor": "bar_graph_voltage"
+                },
+                "data": "channel_display_value1",
+                "left": 0,
+                "top": 0,
+                "width": 105,
+                "height": 56,
+                "orientation": "left-right",
+                "textStyle": {
+                  "inheritFrom": "bar_graph_text"
+                },
+                "line1Data": "channel_display_value1_set",
+                "line1Style": {
+                  "inheritFrom": "bar_graph_set_line"
+                },
+                "line2Data": "channel_display_value1_limit",
+                "line2Style": {
+                  "inheritFrom": "bar_graph_limit_line"
+                }
+              },
+              {
+                "type": "BarGraph",
+                "style": {
+                  "inheritFrom": "bar_graph_I_default",
+                  "font": "Oswald14",
+                  "color": "bar_graph_current",
+                  "backgroundColor": "bar_graph_background",
+                  "activeColor": "bar_graph_background",
+                  "activeBackgroundColor": "bar_graph_current"
+                },
+                "data": "channel_display_value2",
+                "left": 0,
+                "top": 58,
+                "width": 105,
+                "height": 56,
+                "orientation": "left-right",
+                "textStyle": {
+                  "inheritFrom": "bar_graph_text"
+                },
+                "line1Data": "channel_display_value2_set",
+                "line1Style": {
+                  "inheritFrom": "bar_graph_set_line"
+                },
+                "line2Data": "channel_display_value2_limit",
+                "line2Style": {
+                  "inheritFrom": "bar_graph_limit_line"
+                }
+              }
+            ]
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_u_edit",
+            "action": "edit",
+            "left": 161,
+            "top": 0,
+            "width": 76,
+            "height": 56,
+            "displayOption": 0
+          },
+          {
+            "type": "DisplayData",
+            "style": {
+              "inheritFrom": "encoder_cursor_14_enabled"
+            },
+            "data": "channel_i_edit",
+            "action": "edit",
+            "left": 161,
+            "top": 58,
+            "width": 76,
+            "height": 56,
+            "displayOption": 0
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 237,
+        "height": 114
       },
       {
         "name": "slot_def_2ch_horz_off_2col",
@@ -1458,7 +1678,7 @@
             "left": 0,
             "top": 0,
             "width": 52,
-            "height": 120,
+            "height": 114,
             "layout": "slot_def_horz_title_2col"
           },
           {
@@ -1469,9 +1689,9 @@
             "data": "channel_off_label",
             "action": "channel_toggle_output",
             "left": 54,
-            "top": 1,
-            "width": 106,
-            "height": 118,
+            "top": 0,
+            "width": 105,
+            "height": 114,
             "text": ""
           },
           {
@@ -1480,10 +1700,10 @@
               "inheritFrom": "default"
             },
             "data": "trigger_is_initiated",
-            "left": 162,
-            "top": 1,
+            "left": 161,
+            "top": 0,
             "width": 76,
-            "height": 118,
+            "height": 114,
             "widgets": [
               {
                 "type": "Select",
@@ -1494,7 +1714,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 76,
-                "height": 118,
+                "height": 114,
                 "widgets": [
                   {
                     "type": "Container",
@@ -1504,7 +1724,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 76,
-                    "height": 118,
+                    "height": 114,
                     "widgets": [
                       {
                         "type": "DisplayData",
@@ -1516,7 +1736,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 76,
-                        "height": 58,
+                        "height": 56,
                         "displayOption": 0
                       },
                       {
@@ -1527,9 +1747,9 @@
                         "data": "channel_i_edit",
                         "action": "edit",
                         "left": 0,
-                        "top": 60,
+                        "top": 58,
                         "width": 76,
-                        "height": 58,
+                        "height": 56,
                         "displayOption": 0
                       }
                     ]
@@ -1545,7 +1765,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 76,
-                    "height": 118,
+                    "height": 114,
                     "text": "\\u00a1"
                   },
                   {
@@ -1559,7 +1779,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 76,
-                    "height": 118,
+                    "height": 114,
                     "text": "\\u00b5"
                   }
                 ]
@@ -1572,7 +1792,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 76,
-                "height": 118,
+                "height": 114,
                 "widgets": [
                   {
                     "type": "Button",
@@ -1584,7 +1804,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 76,
-                    "height": 118,
+                    "height": 114,
                     "text": "\\u00a4 TRG",
                     "enabled": "trigger_is_manual",
                     "disabledStyle": {
@@ -1600,8 +1820,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 120
+        "width": 237,
+        "height": 114
       },
       {
         "name": "slot_max_2ch",
@@ -1611,11 +1831,11 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_max_2ch_view",
             "left": 0,
             "top": 0,
-            "width": 400,
-            "height": 168,
+            "width": 399,
+            "height": 166,
+            "layout": "slot_max_2ch_with_border",
             "context": "slot_2ch_ch1_index"
           },
           {
@@ -1623,19 +1843,127 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_max_2ch_min_view",
-            "left": 400,
+            "left": 401,
             "top": 0,
-            "width": 80,
-            "height": 168,
-            "layout": "",
+            "width": 79,
+            "height": 166,
+            "layout": "slot_max_2ch_with_border_min",
             "context": "slot_2ch_ch2_index"
           }
         ],
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 168
+        "height": 166
+      },
+      {
+        "name": "slot_max_2ch_with_border",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_max_2ch_view",
+            "left": 2,
+            "top": 0,
+            "width": 395,
+            "height": 164,
+            "context": ""
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 2,
+            "height": 166
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 397,
+            "top": 0,
+            "width": 2,
+            "height": 166
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 2,
+            "top": 164,
+            "width": 395,
+            "height": 2
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 399,
+        "height": 166
+      },
+      {
+        "name": "slot_max_2ch_with_border_min",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_max_2ch_min_view",
+            "left": 2,
+            "top": 0,
+            "width": 75,
+            "height": 164,
+            "layout": "",
+            "context": ""
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 2,
+            "height": 166
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 77,
+            "top": 0,
+            "width": 2,
+            "height": 166
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 2,
+            "top": 164,
+            "width": 75,
+            "height": 2
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 79,
+        "height": 166
       },
       {
         "name": "slot_max_2ch_title",
@@ -1651,17 +1979,18 @@
             "data": "channel_long_title",
             "left": 0,
             "top": 0,
-            "width": 267,
+            "width": 263,
             "height": 32,
             "text": ""
           },
           {
             "type": "Select",
             "style": {
-              "inheritFrom": "inst_selected"
+              "inheritFrom": "default"
             },
             "data": "channel_protection_status",
-            "left": 267,
+            "action": "show_ch_settings",
+            "left": 263,
             "top": 0,
             "width": 44,
             "height": 32,
@@ -1672,7 +2001,7 @@
                   "inheritFrom": "channel1",
                   "font": "Heydings14"
                 },
-                "action": "show_ch_settings",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 44,
@@ -1687,7 +2016,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 44,
@@ -1702,7 +2031,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 44,
@@ -1717,7 +2046,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 44,
@@ -1732,7 +2061,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 44,
@@ -1747,7 +2076,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 44,
@@ -1763,7 +2092,7 @@
               "font": "Heydings14"
             },
             "action": "show_ch_settings_info",
-            "left": 311,
+            "left": 307,
             "top": 0,
             "width": 44,
             "height": 32,
@@ -1776,7 +2105,7 @@
               "font": "Heydings14"
             },
             "action": "toggle_channels_max_view",
-            "left": 355,
+            "left": 351,
             "top": 0,
             "width": 44,
             "height": 32,
@@ -1785,7 +2114,7 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 400,
+        "width": 395,
         "height": 32
       },
       {
@@ -1810,8 +2139,8 @@
             },
             "left": 0,
             "top": 32,
-            "width": 400,
-            "height": 134,
+            "width": 395,
+            "height": 132,
             "widgets": [
               {
                 "type": "Container",
@@ -1821,7 +2150,7 @@
                 "action": "channel_toggle_output",
                 "left": 0,
                 "top": 2,
-                "width": 400,
+                "width": 395,
                 "height": 64,
                 "name": "mon section",
                 "widgets": [
@@ -1881,7 +2210,7 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "left": 144,
+                    "left": 143,
                     "top": 0,
                     "width": 142,
                     "height": 64,
@@ -1931,9 +2260,9 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "left": 288,
+                    "left": 286,
                     "top": 0,
-                    "width": 111,
+                    "width": 109,
                     "height": 64,
                     "name": "Power",
                     "widgets": [
@@ -1957,7 +2286,7 @@
                         "data": "channel_p_mon",
                         "left": 63,
                         "top": 0,
-                        "width": 48,
+                        "width": 46,
                         "height": 30,
                         "displayOption": 4
                       },
@@ -1969,7 +2298,7 @@
                         "data": "channel_p_mon",
                         "left": 63,
                         "top": 30,
-                        "width": 48,
+                        "width": 46,
                         "height": 34,
                         "displayOption": 3
                       }
@@ -1983,8 +2312,8 @@
                   "inheritFrom": "default"
                 },
                 "left": 0,
-                "top": 68,
-                "width": 400,
+                "top": 66,
+                "width": 395,
                 "height": 66,
                 "widgets": [
                   {
@@ -1995,7 +2324,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 142,
+                    "width": 141,
                     "height": 66,
                     "name": "Set voltage",
                     "widgets": [
@@ -2056,7 +2385,7 @@
                         "action": "show_ch_settings_prot_ovp",
                         "left": 96,
                         "top": 0,
-                        "width": 46,
+                        "width": 45,
                         "height": 32,
                         "widgets": [
                           {
@@ -2067,7 +2396,7 @@
                             "action": "",
                             "left": 0,
                             "top": 0,
-                            "width": 46,
+                            "width": 45,
                             "height": 32,
                             "text": "OVP"
                           },
@@ -2079,7 +2408,7 @@
                             "action": "",
                             "left": 0,
                             "top": 0,
-                            "width": 46,
+                            "width": 45,
                             "height": 32,
                             "text": "OVP"
                           },
@@ -2088,10 +2417,10 @@
                             "style": {
                               "inheritFrom": "ch_prot_tripped"
                             },
-                            "action": "show_ch_settings_prot_clear",
+                            "action": "show_ch_settings",
                             "left": 0,
                             "top": 0,
-                            "width": 46,
+                            "width": 45,
                             "height": 32,
                             "text": "OVP"
                           }
@@ -2104,7 +2433,7 @@
                         },
                         "left": 96,
                         "top": 34,
-                        "width": 46,
+                        "width": 45,
                         "height": 32,
                         "layout": "ovp_type"
                       }
@@ -2116,9 +2445,9 @@
                       "inheritFrom": "default",
                       "font": "Oswald14"
                     },
-                    "left": 144,
+                    "left": 143,
                     "top": 0,
-                    "width": 142,
+                    "width": 141,
                     "height": 66,
                     "name": "Set current",
                     "widgets": [
@@ -2134,6 +2463,17 @@
                         "text": "Set"
                       },
                       {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "default_S"
+                        },
+                        "left": 48,
+                        "top": 0,
+                        "width": 46,
+                        "height": 32,
+                        "text": "Limit"
+                      },
+                      {
                         "type": "DisplayData",
                         "style": {
                           "inheritFrom": "encoder_cursor_14_enabled"
@@ -2145,17 +2485,6 @@
                         "width": 46,
                         "height": 32,
                         "displayOption": 0
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "left": 48,
-                        "top": 0,
-                        "width": 46,
-                        "height": 32,
-                        "text": "Limit"
                       },
                       {
                         "type": "DisplayData",
@@ -2179,7 +2508,7 @@
                         "action": "show_ch_settings_prot_ocp",
                         "left": 96,
                         "top": 0,
-                        "width": 46,
+                        "width": 45,
                         "height": 32,
                         "widgets": [
                           {
@@ -2190,7 +2519,7 @@
                             "action": "",
                             "left": 0,
                             "top": 0,
-                            "width": 46,
+                            "width": 45,
                             "height": 32,
                             "text": "OCP"
                           },
@@ -2202,7 +2531,7 @@
                             "action": "",
                             "left": 0,
                             "top": 0,
-                            "width": 46,
+                            "width": 45,
                             "height": 32,
                             "text": "OCP"
                           },
@@ -2211,52 +2540,26 @@
                             "style": {
                               "inheritFrom": "ch_prot_tripped"
                             },
-                            "action": "show_ch_settings_prot_clear",
+                            "action": "show_ch_settings",
                             "left": 0,
                             "top": 0,
-                            "width": 46,
+                            "width": 45,
                             "height": 32,
                             "text": "OCP"
                           }
                         ]
                       },
                       {
-                        "type": "Select",
+                        "type": "Text",
                         "style": {
-                          "inheritFrom": "default"
+                          "inheritFrom": "default_S"
                         },
-                        "data": "channel_has_support_for_current_dual_range",
+                        "data": "",
                         "left": 96,
                         "top": 34,
-                        "width": 46,
+                        "width": 45,
                         "height": 32,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "default_S"
-                            },
-                            "data": "",
-                            "left": 0,
-                            "top": 0,
-                            "width": 46,
-                            "height": 32,
-                            "text": "High"
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "encoder_cursor_14_enabled"
-                            },
-                            "data": "channel_ranges_currently_selected",
-                            "action": "ch_settings_adv_ranges_select_mode",
-                            "left": 0,
-                            "top": 0,
-                            "width": 46,
-                            "height": 32,
-                            "text": ""
-                          }
-                        ]
+                        "text": "High"
                       }
                     ]
                   },
@@ -2266,9 +2569,9 @@
                       "inheritFrom": "default",
                       "font": "Oswald14"
                     },
-                    "left": 288,
+                    "left": 286,
                     "top": 0,
-                    "width": 112,
+                    "width": 109,
                     "height": 66,
                     "name": "Set power",
                     "widgets": [
@@ -2279,37 +2582,9 @@
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 66,
+                        "width": 64,
                         "height": 32,
                         "text": "Lim./Tri."
-                      },
-                      {
-                        "type": "DisplayData",
-                        "style": {
-                          "inheritFrom": "encoder_cursor_14_enabled"
-                        },
-                        "data": "channel_protection_opp_limit",
-                        "action": "edit",
-                        "left": 0,
-                        "top": 34,
-                        "width": 55,
-                        "height": 32,
-                        "displayOption": 0
-                      },
-                      {
-                        "type": "DisplayData",
-                        "style": {
-                          "inheritFrom": "encoder_cursor_14_enabled",
-                          "backgroundColor": "text_enable_background",
-                          "activeColor": "text_enable_background"
-                        },
-                        "data": "channel_protection_opp_level",
-                        "action": "edit",
-                        "left": 57,
-                        "top": 34,
-                        "width": 54,
-                        "height": 32,
-                        "displayOption": 0
                       },
                       {
                         "type": "Select",
@@ -2318,7 +2593,7 @@
                         },
                         "data": "opp",
                         "action": "show_ch_settings_prot_opp",
-                        "left": 66,
+                        "left": 64,
                         "top": 0,
                         "width": 45,
                         "height": 32,
@@ -2352,7 +2627,7 @@
                             "style": {
                               "inheritFrom": "ch_prot_tripped"
                             },
-                            "action": "show_ch_settings_prot_clear",
+                            "action": "show_ch_settings",
                             "left": 0,
                             "top": 0,
                             "width": 45,
@@ -2360,165 +2635,36 @@
                             "text": "OPP"
                           }
                         ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 400,
-        "height": 168,
-        "dataContextOverrides": "{\n    \"channel_i_mon\": \"< 300 mA\"\n}"
-      },
-      {
-        "name": "slot_max_2ch_min_off",
-        "widgets": [
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 0,
-            "width": 80,
-            "height": 32,
-            "layout": "slot_max_2ch_min_title"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "channel_off_button_20"
-            },
-            "data": "channel_off_label",
-            "action": "channel_toggle_output",
-            "left": 1,
-            "top": 33,
-            "width": 79,
-            "height": 65,
-            "text": ""
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "trigger_is_initiated",
-            "left": 1,
-            "top": 100,
-            "width": 79,
-            "height": 68,
-            "widgets": [
-              {
-                "type": "Select",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "channel_trigger_mode",
-                "left": 0,
-                "top": 0,
-                "width": 79,
-                "height": 68,
-                "widgets": [
-                  {
-                    "type": "Container",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 79,
-                    "height": 68,
-                    "widgets": [
+                      },
                       {
                         "type": "DisplayData",
                         "style": {
-                          "inheritFrom": "encoder_cursor_14_right_enabled"
+                          "inheritFrom": "encoder_cursor_14_enabled"
                         },
-                        "data": "channel_u_edit",
+                        "data": "channel_protection_opp_limit",
                         "action": "edit",
                         "left": 0,
-                        "top": 0,
-                        "width": 79,
+                        "top": 34,
+                        "width": 54,
                         "height": 32,
                         "displayOption": 0
                       },
                       {
                         "type": "DisplayData",
                         "style": {
-                          "inheritFrom": "encoder_cursor_14_right_enabled"
+                          "inheritFrom": "encoder_cursor_14_enabled",
+                          "backgroundColor": "text_enable_background",
+                          "activeColor": "text_enable_background"
                         },
-                        "data": "channel_i_edit",
+                        "data": "channel_protection_opp_level",
                         "action": "edit",
-                        "left": 0,
+                        "left": 56,
                         "top": 34,
-                        "width": 79,
+                        "width": 53,
                         "height": 32,
                         "displayOption": 0
                       }
                     ]
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "encoder_cursor_14_enabled",
-                      "font": "Oswald17"
-                    },
-                    "data": "",
-                    "action": "show_ch_settings_trigger",
-                    "left": 0,
-                    "top": 0,
-                    "width": 79,
-                    "height": 68,
-                    "text": "\\u00a1"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "encoder_cursor_14_enabled",
-                      "font": "Oswald17"
-                    },
-                    "data": "",
-                    "action": "show_ch_settings_trigger",
-                    "left": 0,
-                    "top": 0,
-                    "width": 79,
-                    "height": 68,
-                    "text": "\\u00b5"
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 79,
-                "height": 68,
-                "widgets": [
-                  {
-                    "type": "Button",
-                    "style": {
-                      "inheritFrom": "trigger_button_14"
-                    },
-                    "data": "trigger_is_initiated",
-                    "action": "trigger_generate_manual",
-                    "left": 0,
-                    "top": 0,
-                    "width": 79,
-                    "height": 68,
-                    "text": "\\u00a4 TRG",
-                    "enabled": "trigger_is_manual",
-                    "disabledStyle": {
-                      "inheritFrom": "trigger_button_14",
-                      "color": "text_regular",
-                      "activeBackgroundColor": "text_regular"
-                    }
                   }
                 ]
               }
@@ -2527,8 +2673,9 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 80,
-        "height": 168
+        "width": 395,
+        "height": 164,
+        "dataContextOverrides": "{\n    \"channel_i_mon\": \"< 300 mA\"\n}"
       },
       {
         "name": "slot_max_2ch_num_off",
@@ -2551,8 +2698,8 @@
             },
             "left": 0,
             "top": 32,
-            "width": 400,
-            "height": 134,
+            "width": 395,
+            "height": 132,
             "widgets": [
               {
                 "type": "Select",
@@ -2562,8 +2709,8 @@
                 "data": "trigger_is_initiated",
                 "left": 0,
                 "top": 0,
-                "width": 400,
-                "height": 134,
+                "width": 395,
+                "height": 132,
                 "widgets": [
                   {
                     "type": "Container",
@@ -2572,8 +2719,8 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 400,
-                    "height": 134,
+                    "width": 395,
+                    "height": 132,
                     "widgets": [
                       {
                         "type": "Text",
@@ -2584,8 +2731,8 @@
                         "action": "channel_toggle_output",
                         "left": 2,
                         "top": 2,
-                        "width": 397,
-                        "height": 64,
+                        "width": 391,
+                        "height": 62,
                         "text": ""
                       },
                       {
@@ -2594,8 +2741,8 @@
                           "inheritFrom": "default"
                         },
                         "left": 0,
-                        "top": 68,
-                        "width": 400,
+                        "top": 66,
+                        "width": 395,
                         "height": 66,
                         "widgets": [
                           {
@@ -2606,7 +2753,7 @@
                             },
                             "left": 0,
                             "top": 0,
-                            "width": 142,
+                            "width": 141,
                             "height": 66,
                             "name": "Set voltage",
                             "widgets": [
@@ -2744,7 +2891,7 @@
                                 "action": "show_ch_settings_prot_ovp",
                                 "left": 96,
                                 "top": 0,
-                                "width": 46,
+                                "width": 45,
                                 "height": 32,
                                 "widgets": [
                                   {
@@ -2760,7 +2907,7 @@
                                     "action": "",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 46,
+                                    "width": 45,
                                     "height": 32,
                                     "text": "OVP"
                                   },
@@ -2777,7 +2924,7 @@
                                     "action": "",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 46,
+                                    "width": 45,
                                     "height": 32,
                                     "text": "OVP"
                                   },
@@ -2791,10 +2938,10 @@
                                       "activeColor": "status_warning",
                                       "activeBackgroundColor": "text_enabled"
                                     },
-                                    "action": "show_ch_settings_prot_clear",
+                                    "action": "show_ch_settings",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 46,
+                                    "width": 45,
                                     "height": 32,
                                     "text": "OVP"
                                   }
@@ -2807,7 +2954,7 @@
                                 },
                                 "left": 96,
                                 "top": 34,
-                                "width": 46,
+                                "width": 45,
                                 "height": 32,
                                 "layout": "ovp_type"
                               }
@@ -2819,9 +2966,9 @@
                               "inheritFrom": "default",
                               "font": "Oswald14"
                             },
-                            "left": 144,
+                            "left": 143,
                             "top": 0,
-                            "width": 142,
+                            "width": 141,
                             "height": 66,
                             "name": "Set current",
                             "widgets": [
@@ -2935,7 +3082,7 @@
                                 "action": "show_ch_settings_prot_ocp",
                                 "left": 96,
                                 "top": 0,
-                                "width": 46,
+                                "width": 45,
                                 "height": 32,
                                 "widgets": [
                                   {
@@ -2951,7 +3098,7 @@
                                     "action": "",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 46,
+                                    "width": 45,
                                     "height": 32,
                                     "text": "OCP"
                                   },
@@ -2968,7 +3115,7 @@
                                     "action": "",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 46,
+                                    "width": 45,
                                     "height": 32,
                                     "text": "OCP"
                                   },
@@ -2982,52 +3129,26 @@
                                       "activeColor": "status_warning",
                                       "activeBackgroundColor": "text_enabled"
                                     },
-                                    "action": "show_ch_settings_prot_clear",
+                                    "action": "show_ch_settings",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 46,
+                                    "width": 45,
                                     "height": 32,
                                     "text": "OCP"
                                   }
                                 ]
                               },
                               {
-                                "type": "Select",
+                                "type": "Text",
                                 "style": {
-                                  "inheritFrom": "default"
+                                  "inheritFrom": "default_S"
                                 },
-                                "data": "channel_has_support_for_current_dual_range",
+                                "data": "",
                                 "left": 96,
                                 "top": 34,
-                                "width": 46,
+                                "width": 45,
                                 "height": 32,
-                                "widgets": [
-                                  {
-                                    "type": "Text",
-                                    "style": {
-                                      "inheritFrom": "default_S"
-                                    },
-                                    "data": "",
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 46,
-                                    "height": 32,
-                                    "text": "High"
-                                  },
-                                  {
-                                    "type": "Text",
-                                    "style": {
-                                      "inheritFrom": "encoder_cursor_14_enabled"
-                                    },
-                                    "data": "channel_ranges_currently_selected",
-                                    "action": "ch_settings_adv_ranges_select_mode",
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 46,
-                                    "height": 32,
-                                    "text": ""
-                                  }
-                                ]
+                                "text": "High"
                               }
                             ]
                           },
@@ -3037,9 +3158,9 @@
                               "inheritFrom": "default",
                               "font": "Oswald14"
                             },
-                            "left": 288,
+                            "left": 286,
                             "top": 0,
-                            "width": 112,
+                            "width": 109,
                             "height": 66,
                             "name": "Set power",
                             "widgets": [
@@ -3050,7 +3171,7 @@
                                 },
                                 "left": 0,
                                 "top": 0,
-                                "width": 66,
+                                "width": 64,
                                 "height": 32,
                                 "text": "Lim./Tri."
                               },
@@ -3063,7 +3184,7 @@
                                 "action": "edit",
                                 "left": 0,
                                 "top": 34,
-                                "width": 55,
+                                "width": 54,
                                 "height": 32,
                                 "displayOption": 0
                               },
@@ -3077,9 +3198,9 @@
                                 },
                                 "data": "channel_protection_opp_level",
                                 "action": "edit",
-                                "left": 57,
+                                "left": 56,
                                 "top": 34,
-                                "width": 54,
+                                "width": 53,
                                 "height": 32,
                                 "displayOption": 0
                               },
@@ -3090,7 +3211,7 @@
                                 },
                                 "data": "opp",
                                 "action": "show_ch_settings_prot_opp",
-                                "left": 66,
+                                "left": 64,
                                 "top": 0,
                                 "width": 45,
                                 "height": 32,
@@ -3124,7 +3245,7 @@
                                     "style": {
                                       "inheritFrom": "ch_prot_tripped"
                                     },
-                                    "action": "show_ch_settings_prot_clear",
+                                    "action": "show_ch_settings",
                                     "left": 0,
                                     "top": 0,
                                     "width": 45,
@@ -3146,8 +3267,8 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 400,
-                    "height": 134,
+                    "width": 395,
+                    "height": 132,
                     "widgets": [
                       {
                         "type": "Text",
@@ -3158,8 +3279,8 @@
                         "action": "",
                         "left": 2,
                         "top": 2,
-                        "width": 397,
-                        "height": 64,
+                        "width": 391,
+                        "height": 62,
                         "text": ""
                       },
                       {
@@ -3170,9 +3291,9 @@
                         "data": "trigger_is_initiated",
                         "action": "trigger_generate_manual",
                         "left": 2,
-                        "top": 69,
-                        "width": 397,
-                        "height": 65,
+                        "top": 66,
+                        "width": 391,
+                        "height": 64,
                         "text": "\\u00a4 TRG",
                         "enabled": "trigger_is_manual",
                         "disabledStyle": {
@@ -3190,8 +3311,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 400,
-        "height": 168
+        "width": 395,
+        "height": 164
       },
       {
         "name": "slot_max_2ch_hbar_on",
@@ -3203,7 +3324,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 400,
+            "width": 395,
             "height": 32,
             "layout": "slot_max_2ch_title"
           },
@@ -3214,19 +3335,266 @@
             },
             "left": 0,
             "top": 32,
-            "width": 400,
-            "height": 136,
+            "width": 395,
+            "height": 132,
             "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default",
+                  "font": "Oswald14"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 143,
+                "height": 65,
+                "name": "Set voltage",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 46,
+                    "height": 31,
+                    "text": "Set"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled"
+                    },
+                    "data": "channel_u_edit",
+                    "action": "edit",
+                    "left": 0,
+                    "top": 33,
+                    "width": 46,
+                    "height": 32,
+                    "displayOption": 0
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 48,
+                    "top": 0,
+                    "width": 46,
+                    "height": 31,
+                    "text": "Limit"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled"
+                    },
+                    "data": "channel_protection_ovp_limit",
+                    "action": "edit",
+                    "left": 48,
+                    "top": 33,
+                    "width": 46,
+                    "height": 32,
+                    "displayOption": 0
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "ovp",
+                    "action": "show_ch_settings_prot_ovp",
+                    "left": 96,
+                    "top": 0,
+                    "width": 45,
+                    "height": 31,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "ch_prot_off"
+                        },
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 45,
+                        "height": 31,
+                        "text": "OVP"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "ch_prot_on"
+                        },
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 45,
+                        "height": 31,
+                        "text": "OVP"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "ch_prot_tripped"
+                        },
+                        "action": "show_ch_settings",
+                        "left": 0,
+                        "top": 0,
+                        "width": 45,
+                        "height": 31,
+                        "text": "OVP"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 96,
+                    "top": 33,
+                    "width": 45,
+                    "height": 32,
+                    "layout": "ovp_type"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default",
+                  "font": "Oswald14"
+                },
+                "left": 0,
+                "top": 67,
+                "width": 143,
+                "height": 65,
+                "name": "Set current",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 46,
+                    "height": 31,
+                    "text": "Set"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled"
+                    },
+                    "data": "channel_i_edit",
+                    "action": "edit",
+                    "left": 0,
+                    "top": 33,
+                    "width": 46,
+                    "height": 32,
+                    "displayOption": 0
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "left": 48,
+                    "top": 0,
+                    "width": 46,
+                    "height": 31,
+                    "text": "Limit"
+                  },
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "encoder_cursor_14_enabled"
+                    },
+                    "data": "channel_protection_ocp_limit",
+                    "action": "edit",
+                    "left": 48,
+                    "top": 33,
+                    "width": 46,
+                    "height": 32,
+                    "displayOption": 0
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "ocp",
+                    "action": "show_ch_settings_prot_ocp",
+                    "left": 96,
+                    "top": 0,
+                    "width": 45,
+                    "height": 31,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "ch_prot_off"
+                        },
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 45,
+                        "height": 31,
+                        "text": "OCP"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "ch_prot_on"
+                        },
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 45,
+                        "height": 31,
+                        "text": "OCP"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "ch_prot_tripped"
+                        },
+                        "action": "show_ch_settings",
+                        "left": 0,
+                        "top": 0,
+                        "width": 45,
+                        "height": 31,
+                        "text": "OCP"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "data": "",
+                    "left": 96,
+                    "top": 33,
+                    "width": 45,
+                    "height": 32,
+                    "text": "High"
+                  }
+                ]
+              },
               {
                 "type": "Container",
                 "style": {
                   "inheritFrom": "default"
                 },
                 "action": "channel_toggle_output",
-                "left": 144,
+                "left": 143,
                 "top": 0,
-                "width": 205,
-                "height": 134,
+                "width": 202,
+                "height": 132,
                 "name": "mon section",
                 "widgets": [
                   {
@@ -3243,8 +3611,8 @@
                     "action": "",
                     "left": 0,
                     "top": 0,
-                    "width": 205,
-                    "height": 66,
+                    "width": 202,
+                    "height": 65,
                     "orientation": "left-right",
                     "textStyle": {
                       "inheritFrom": "bar_graph_text"
@@ -3271,9 +3639,9 @@
                     "data": "channel_display_value2",
                     "action": "",
                     "left": 0,
-                    "top": 68,
-                    "width": 205,
-                    "height": 66,
+                    "top": 67,
+                    "width": 202,
+                    "height": 65,
                     "orientation": "left-right",
                     "textStyle": {
                       "inheritFrom": "bar_graph_text"
@@ -3292,285 +3660,12 @@
               {
                 "type": "Container",
                 "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 144,
-                "height": 66,
-                "name": "Set voltage",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default_S"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 46,
-                    "height": 32,
-                    "text": "Set"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "encoder_cursor_14_enabled"
-                    },
-                    "data": "channel_u_edit",
-                    "action": "edit",
-                    "left": 0,
-                    "top": 34,
-                    "width": 46,
-                    "height": 32,
-                    "displayOption": 0
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default_S"
-                    },
-                    "left": 48,
-                    "top": 0,
-                    "width": 46,
-                    "height": 32,
-                    "text": "Limit"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "encoder_cursor_14_enabled"
-                    },
-                    "data": "channel_protection_ovp_limit",
-                    "action": "edit",
-                    "left": 48,
-                    "top": 34,
-                    "width": 46,
-                    "height": 32,
-                    "displayOption": 0
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "ovp",
-                    "action": "show_ch_settings_prot_ovp",
-                    "left": 96,
-                    "top": 0,
-                    "width": 46,
-                    "height": 32,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "ch_prot_off"
-                        },
-                        "action": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 46,
-                        "height": 32,
-                        "text": "OVP"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "ch_prot_on"
-                        },
-                        "action": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 46,
-                        "height": 32,
-                        "text": "OVP"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "ch_prot_tripped"
-                        },
-                        "action": "show_ch_settings_prot_clear",
-                        "left": 0,
-                        "top": 0,
-                        "width": 46,
-                        "height": 32,
-                        "text": "OVP"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "LayoutView",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "left": 96,
-                    "top": 34,
-                    "width": 46,
-                    "height": 32,
-                    "layout": "ovp_type"
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald14"
-                },
-                "left": 0,
-                "top": 68,
-                "width": 144,
-                "height": 66,
-                "name": "Set current",
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default_S"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 46,
-                    "height": 32,
-                    "text": "Set"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "encoder_cursor_14_enabled"
-                    },
-                    "data": "channel_i_edit",
-                    "action": "edit",
-                    "left": 0,
-                    "top": 34,
-                    "width": 46,
-                    "height": 32,
-                    "displayOption": 0
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default_S"
-                    },
-                    "left": 48,
-                    "top": 0,
-                    "width": 46,
-                    "height": 32,
-                    "text": "Limit"
-                  },
-                  {
-                    "type": "DisplayData",
-                    "style": {
-                      "inheritFrom": "encoder_cursor_14_enabled"
-                    },
-                    "data": "channel_protection_ocp_limit",
-                    "action": "edit",
-                    "left": 48,
-                    "top": 34,
-                    "width": 46,
-                    "height": 32,
-                    "displayOption": 0
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "ocp",
-                    "action": "show_ch_settings_prot_ocp",
-                    "left": 96,
-                    "top": 0,
-                    "width": 46,
-                    "height": 32,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "ch_prot_off"
-                        },
-                        "action": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 46,
-                        "height": 32,
-                        "text": "OCP"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "ch_prot_on"
-                        },
-                        "action": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 46,
-                        "height": 32,
-                        "text": "OCP"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "ch_prot_tripped"
-                        },
-                        "action": "show_ch_settings_prot_clear",
-                        "left": 0,
-                        "top": 0,
-                        "width": 46,
-                        "height": 32,
-                        "text": "OCP"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "channel_has_support_for_current_dual_range",
-                    "left": 96,
-                    "top": 34,
-                    "width": 46,
-                    "height": 32,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "data": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 46,
-                        "height": 32,
-                        "text": "High"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "encoder_cursor_14_enabled"
-                        },
-                        "data": "channel_ranges_currently_selected",
-                        "action": "ch_settings_adv_ranges_select_mode",
-                        "left": 0,
-                        "top": 0,
-                        "width": 46,
-                        "height": 32,
-                        "text": ""
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "Container",
-                "style": {
                   "inheritFrom": "default"
                 },
-                "left": 351,
+                "left": 347,
                 "top": 0,
                 "width": 48,
-                "height": 136,
+                "height": 132,
                 "name": "Power",
                 "widgets": [
                   {
@@ -3582,7 +3677,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 48,
-                    "height": 24,
+                    "height": 23,
                     "displayOption": 1
                   },
                   {
@@ -3592,9 +3687,9 @@
                     },
                     "data": "channel_display_value3",
                     "left": 0,
-                    "top": 25,
+                    "top": 24,
                     "width": 48,
-                    "height": 24,
+                    "height": 23,
                     "displayOption": 2
                   },
                   {
@@ -3605,7 +3700,7 @@
                     "data": "opp",
                     "action": "show_ch_settings_prot_opp",
                     "left": 0,
-                    "top": 49,
+                    "top": 47,
                     "width": 48,
                     "height": 27,
                     "widgets": [
@@ -3638,7 +3733,7 @@
                         "style": {
                           "inheritFrom": "ch_prot_tripped"
                         },
-                        "action": "show_ch_settings_prot_clear",
+                        "action": "show_ch_settings",
                         "left": 0,
                         "top": 0,
                         "width": 48,
@@ -3655,7 +3750,7 @@
                     "data": "channel_protection_opp_level",
                     "action": "edit",
                     "left": 0,
-                    "top": 78,
+                    "top": 76,
                     "width": 48,
                     "height": 27,
                     "displayOption": 0
@@ -3668,7 +3763,7 @@
                     "data": "channel_protection_opp_delay",
                     "action": "edit",
                     "left": 0,
-                    "top": 107,
+                    "top": 105,
                     "width": 48,
                     "height": 27,
                     "displayOption": 0
@@ -3680,8 +3775,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 400,
-        "height": 168
+        "width": 395,
+        "height": 164
       },
       {
         "name": "slot_max_2ch_hbar_off",
@@ -3693,7 +3788,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 400,
+            "width": 395,
             "height": 32,
             "layout": "slot_max_2ch_title"
           },
@@ -3704,8 +3799,8 @@
             },
             "left": 0,
             "top": 32,
-            "width": 400,
-            "height": 136,
+            "width": 395,
+            "height": 132,
             "widgets": [
               {
                 "type": "Select",
@@ -3715,8 +3810,8 @@
                 "data": "trigger_is_initiated",
                 "left": 0,
                 "top": 0,
-                "width": 400,
-                "height": 136,
+                "width": 395,
+                "height": 132,
                 "widgets": [
                   {
                     "type": "Container",
@@ -3725,8 +3820,8 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 400,
-                    "height": 136,
+                    "width": 395,
+                    "height": 132,
                     "widgets": [
                       {
                         "type": "Select",
@@ -3737,7 +3832,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 46,
-                        "height": 134,
+                        "height": 132,
                         "widgets": [
                           {
                             "type": "Container",
@@ -3748,7 +3843,7 @@
                             "left": 0,
                             "top": 0,
                             "width": 46,
-                            "height": 134,
+                            "height": 132,
                             "name": "Set",
                             "widgets": [
                               {
@@ -3759,7 +3854,7 @@
                                 "left": 0,
                                 "top": 0,
                                 "width": 46,
-                                "height": 32,
+                                "height": 31,
                                 "text": "Set"
                               },
                               {
@@ -3770,7 +3865,7 @@
                                 "data": "channel_u_edit",
                                 "action": "edit",
                                 "left": 0,
-                                "top": 34,
+                                "top": 33,
                                 "width": 46,
                                 "height": 32,
                                 "displayOption": 0
@@ -3781,9 +3876,9 @@
                                   "inheritFrom": "default_S"
                                 },
                                 "left": 0,
-                                "top": 68,
+                                "top": 67,
                                 "width": 46,
-                                "height": 32,
+                                "height": 31,
                                 "text": "Set"
                               },
                               {
@@ -3794,7 +3889,7 @@
                                 "data": "channel_i_edit",
                                 "action": "edit",
                                 "left": 0,
-                                "top": 102,
+                                "top": 100,
                                 "width": 46,
                                 "height": 32,
                                 "displayOption": 0
@@ -3812,7 +3907,7 @@
                             "left": 0,
                             "top": 0,
                             "width": 46,
-                            "height": 134,
+                            "height": 132,
                             "text": "\\u00a1"
                           },
                           {
@@ -3826,7 +3921,7 @@
                             "left": 0,
                             "top": 0,
                             "width": 46,
-                            "height": 134,
+                            "height": 132,
                             "text": "\\u00b5"
                           }
                         ]
@@ -3839,8 +3934,8 @@
                         },
                         "left": 48,
                         "top": 0,
-                        "width": 96,
-                        "height": 66,
+                        "width": 93,
+                        "height": 65,
                         "name": "Set voltage",
                         "widgets": [
                           {
@@ -3851,7 +3946,7 @@
                             "left": 0,
                             "top": 0,
                             "width": 46,
-                            "height": 32,
+                            "height": 31,
                             "text": "Limit"
                           },
                           {
@@ -3862,7 +3957,7 @@
                             "data": "channel_protection_ovp_limit",
                             "action": "edit",
                             "left": 0,
-                            "top": 34,
+                            "top": 33,
                             "width": 46,
                             "height": 32,
                             "displayOption": 0
@@ -3876,8 +3971,8 @@
                             "action": "show_ch_settings_prot_ovp",
                             "left": 48,
                             "top": 0,
-                            "width": 46,
-                            "height": 32,
+                            "width": 45,
+                            "height": 31,
                             "widgets": [
                               {
                                 "type": "Text",
@@ -3892,8 +3987,8 @@
                                 "action": "",
                                 "left": 0,
                                 "top": 0,
-                                "width": 46,
-                                "height": 32,
+                                "width": 45,
+                                "height": 31,
                                 "text": "OVP"
                               },
                               {
@@ -3909,8 +4004,8 @@
                                 "action": "",
                                 "left": 0,
                                 "top": 0,
-                                "width": 46,
-                                "height": 32,
+                                "width": 45,
+                                "height": 31,
                                 "text": "OVP"
                               },
                               {
@@ -3923,11 +4018,11 @@
                                   "activeColor": "status_warning",
                                   "activeBackgroundColor": "text_enabled"
                                 },
-                                "action": "show_ch_settings_prot_clear",
+                                "action": "show_ch_settings",
                                 "left": 0,
                                 "top": 0,
-                                "width": 46,
-                                "height": 32,
+                                "width": 45,
+                                "height": 31,
                                 "text": "OVP"
                               }
                             ]
@@ -3938,8 +4033,8 @@
                               "inheritFrom": "default"
                             },
                             "left": 48,
-                            "top": 34,
-                            "width": 46,
+                            "top": 33,
+                            "width": 45,
                             "height": 32,
                             "layout": "ovp_type"
                           }
@@ -3952,9 +4047,9 @@
                           "font": "Oswald14"
                         },
                         "left": 48,
-                        "top": 68,
-                        "width": 96,
-                        "height": 66,
+                        "top": 67,
+                        "width": 93,
+                        "height": 65,
                         "name": "Set current",
                         "widgets": [
                           {
@@ -3965,7 +4060,7 @@
                             "left": 0,
                             "top": 0,
                             "width": 46,
-                            "height": 32,
+                            "height": 31,
                             "text": "Limit"
                           },
                           {
@@ -3976,7 +4071,7 @@
                             "data": "channel_protection_ocp_limit",
                             "action": "edit",
                             "left": 0,
-                            "top": 34,
+                            "top": 33,
                             "width": 46,
                             "height": 32,
                             "displayOption": 0
@@ -3990,8 +4085,8 @@
                             "action": "show_ch_settings_prot_ocp",
                             "left": 48,
                             "top": 0,
-                            "width": 46,
-                            "height": 32,
+                            "width": 45,
+                            "height": 31,
                             "widgets": [
                               {
                                 "type": "Text",
@@ -4006,8 +4101,8 @@
                                 "action": "",
                                 "left": 0,
                                 "top": 0,
-                                "width": 46,
-                                "height": 32,
+                                "width": 45,
+                                "height": 31,
                                 "text": "OCP"
                               },
                               {
@@ -4023,8 +4118,8 @@
                                 "action": "",
                                 "left": 0,
                                 "top": 0,
-                                "width": 46,
-                                "height": 32,
+                                "width": 45,
+                                "height": 31,
                                 "text": "OCP"
                               },
                               {
@@ -4037,52 +4132,26 @@
                                   "activeColor": "status_warning",
                                   "activeBackgroundColor": "text_enabled"
                                 },
-                                "action": "show_ch_settings_prot_clear",
+                                "action": "show_ch_settings",
                                 "left": 0,
                                 "top": 0,
-                                "width": 46,
-                                "height": 32,
+                                "width": 45,
+                                "height": 31,
                                 "text": "OCP"
                               }
                             ]
                           },
                           {
-                            "type": "Select",
+                            "type": "Text",
                             "style": {
-                              "inheritFrom": "default"
+                              "inheritFrom": "default_S"
                             },
-                            "data": "channel_has_support_for_current_dual_range",
+                            "data": "",
                             "left": 48,
-                            "top": 34,
-                            "width": 46,
+                            "top": 33,
+                            "width": 45,
                             "height": 32,
-                            "widgets": [
-                              {
-                                "type": "Text",
-                                "style": {
-                                  "inheritFrom": "default_S"
-                                },
-                                "data": "",
-                                "left": 0,
-                                "top": 0,
-                                "width": 46,
-                                "height": 32,
-                                "text": "High"
-                              },
-                              {
-                                "type": "Text",
-                                "style": {
-                                  "inheritFrom": "encoder_cursor_14_enabled"
-                                },
-                                "data": "channel_ranges_currently_selected",
-                                "action": "ch_settings_adv_ranges_select_mode",
-                                "left": 0,
-                                "top": 0,
-                                "width": 46,
-                                "height": 32,
-                                "text": ""
-                              }
-                            ]
+                            "text": "High"
                           }
                         ]
                       },
@@ -4093,9 +4162,9 @@
                         },
                         "data": "channel_off_label",
                         "action": "channel_toggle_output",
-                        "left": 144,
-                        "top": 2,
-                        "width": 205,
+                        "left": 143,
+                        "top": 0,
+                        "width": 202,
                         "height": 132,
                         "text": ""
                       },
@@ -4104,10 +4173,10 @@
                         "style": {
                           "inheritFrom": "default"
                         },
-                        "left": 351,
+                        "left": 347,
                         "top": 0,
                         "width": 48,
-                        "height": 136,
+                        "height": 132,
                         "name": "Power",
                         "widgets": [
                           {
@@ -4119,7 +4188,7 @@
                             "left": 0,
                             "top": 0,
                             "width": 48,
-                            "height": 24,
+                            "height": 23,
                             "displayOption": 1
                           },
                           {
@@ -4129,9 +4198,9 @@
                             },
                             "data": "channel_display_value3",
                             "left": 0,
-                            "top": 25,
+                            "top": 24,
                             "width": 48,
-                            "height": 24,
+                            "height": 23,
                             "displayOption": 2
                           },
                           {
@@ -4142,7 +4211,7 @@
                             "data": "opp",
                             "action": "show_ch_settings_prot_opp",
                             "left": 0,
-                            "top": 49,
+                            "top": 47,
                             "width": 48,
                             "height": 27,
                             "widgets": [
@@ -4175,7 +4244,7 @@
                                 "style": {
                                   "inheritFrom": "ch_prot_tripped"
                                 },
-                                "action": "show_ch_settings_prot_clear",
+                                "action": "show_ch_settings",
                                 "left": 0,
                                 "top": 0,
                                 "width": 48,
@@ -4192,7 +4261,7 @@
                             "data": "channel_protection_opp_level",
                             "action": "edit",
                             "left": 0,
-                            "top": 78,
+                            "top": 76,
                             "width": 48,
                             "height": 27,
                             "displayOption": 0
@@ -4205,7 +4274,7 @@
                             "data": "channel_protection_opp_delay",
                             "action": "edit",
                             "left": 0,
-                            "top": 107,
+                            "top": 105,
                             "width": 48,
                             "height": 27,
                             "displayOption": 0
@@ -4221,8 +4290,8 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 400,
-                    "height": 136,
+                    "width": 395,
+                    "height": 132,
                     "widgets": [
                       {
                         "type": "Button",
@@ -4233,8 +4302,8 @@
                         "action": "trigger_generate_manual",
                         "left": 2,
                         "top": 2,
-                        "width": 197,
-                        "height": 132,
+                        "width": 195,
+                        "height": 128,
                         "text": "\\u00a4 TRG",
                         "enabled": "trigger_is_manual",
                         "disabledStyle": {
@@ -4250,10 +4319,10 @@
                         },
                         "data": "channel_off_label",
                         "action": "channel_toggle_output",
-                        "left": 201,
+                        "left": 199,
                         "top": 2,
-                        "width": 198,
-                        "height": 132,
+                        "width": 194,
+                        "height": 128,
                         "text": ""
                       }
                     ]
@@ -4265,8 +4334,45 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 400,
-        "height": 168
+        "width": 395,
+        "height": 164
+      },
+      {
+        "name": "slot_max_2ch_min_title",
+        "widgets": [
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "alignHorizontal": "left",
+              "padding": "0 5"
+            },
+            "data": "channel_short_title",
+            "left": 0,
+            "top": 0,
+            "width": 53,
+            "height": 32,
+            "text": ""
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel1",
+              "font": "Heydings14",
+              "alignVertical": "top"
+            },
+            "action": "toggle_channels_max_view",
+            "left": 53,
+            "top": 0,
+            "width": 22,
+            "height": 32,
+            "text": "e"
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 75,
+        "height": 32
       },
       {
         "name": "slot_max_2ch_min_on",
@@ -4278,7 +4384,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 80,
+            "width": 75,
             "height": 32,
             "layout": "slot_max_2ch_min_title"
           },
@@ -4288,9 +4394,9 @@
               "inheritFrom": "default"
             },
             "action": "channel_toggle_output",
-            "left": 1,
+            "left": 0,
             "top": 34,
-            "width": 79,
+            "width": 75,
             "height": 64,
             "name": "mon section",
             "widgets": [
@@ -4302,7 +4408,7 @@
                 "data": "channel_display_value1",
                 "left": 0,
                 "top": 0,
-                "width": 79,
+                "width": 75,
                 "height": 31,
                 "displayOption": 0
               },
@@ -4314,7 +4420,7 @@
                 "data": "channel_display_value2",
                 "left": 0,
                 "top": 33,
-                "width": 79,
+                "width": 75,
                 "height": 31,
                 "displayOption": 0
               }
@@ -4327,10 +4433,10 @@
             },
             "data": "channel_u_edit",
             "action": "edit",
-            "left": 1,
+            "left": 0,
             "top": 100,
-            "width": 79,
-            "height": 32,
+            "width": 75,
+            "height": 31,
             "displayOption": 0
           },
           {
@@ -4340,17 +4446,197 @@
             },
             "data": "channel_i_edit",
             "action": "edit",
-            "left": 1,
-            "top": 134,
-            "width": 79,
-            "height": 32,
+            "left": 0,
+            "top": 133,
+            "width": 75,
+            "height": 31,
             "displayOption": 0
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 80,
-        "height": 168
+        "width": 75,
+        "height": 164
+      },
+      {
+        "name": "slot_max_2ch_min_off",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 75,
+            "height": 32,
+            "layout": "slot_max_2ch_min_title"
+          },
+          {
+            "type": "Text",
+            "style": {
+              "inheritFrom": "channel_off_button_20"
+            },
+            "data": "channel_off_label",
+            "action": "channel_toggle_output",
+            "left": 1,
+            "top": 33,
+            "width": 73,
+            "height": 65,
+            "text": ""
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "trigger_is_initiated",
+            "left": 0,
+            "top": 100,
+            "width": 75,
+            "height": 64,
+            "widgets": [
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_trigger_mode",
+                "left": 0,
+                "top": 0,
+                "width": 75,
+                "height": 64,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 75,
+                    "height": 64,
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_right_enabled"
+                        },
+                        "data": "channel_u_edit",
+                        "action": "edit",
+                        "left": 0,
+                        "top": 0,
+                        "width": 75,
+                        "height": 31,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_right_enabled"
+                        },
+                        "data": "channel_i_edit",
+                        "action": "edit",
+                        "left": 0,
+                        "top": 33,
+                        "width": 75,
+                        "height": 31,
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 75,
+                    "height": 64,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled",
+                          "font": "Oswald17"
+                        },
+                        "data": "",
+                        "action": "show_ch_settings_trigger",
+                        "left": 1,
+                        "top": 0,
+                        "width": 73,
+                        "height": 63,
+                        "text": "\\u00a1"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 75,
+                    "height": 64,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled",
+                          "font": "Oswald17"
+                        },
+                        "data": "",
+                        "action": "show_ch_settings_trigger",
+                        "left": 1,
+                        "top": 0,
+                        "width": 73,
+                        "height": 63,
+                        "text": "\\u00b5"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 75,
+                "height": 64,
+                "widgets": [
+                  {
+                    "type": "Button",
+                    "style": {
+                      "inheritFrom": "trigger_button_14"
+                    },
+                    "data": "trigger_is_initiated",
+                    "action": "trigger_generate_manual",
+                    "left": 1,
+                    "top": 0,
+                    "width": 73,
+                    "height": 63,
+                    "text": "\\u00a4 TRG",
+                    "enabled": "trigger_is_manual",
+                    "disabledStyle": {
+                      "inheritFrom": "trigger_button_14",
+                      "color": "text_regular",
+                      "activeBackgroundColor": "text_regular"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 75,
+        "height": 164
       },
       {
         "name": "slot_max_2ch_yt_on",
@@ -4362,7 +4648,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 400,
+            "width": 395,
             "height": 32,
             "layout": "slot_max_2ch_title"
           },
@@ -4373,8 +4659,8 @@
             },
             "left": 0,
             "top": 32,
-            "width": 400,
-            "height": 136,
+            "width": 395,
+            "height": 132,
             "widgets": [
               {
                 "type": "Container",
@@ -4384,7 +4670,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 66,
-                "height": 134,
+                "height": 132,
                 "widgets": [
                   {
                     "type": "DisplayData",
@@ -4409,46 +4695,20 @@
                     "left": 0,
                     "top": 34,
                     "width": 66,
-                    "height": 32,
+                    "height": 31,
                     "displayOption": 0
                   },
                   {
-                    "type": "Select",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "default_S"
                     },
-                    "data": "channel_has_support_for_current_dual_range",
+                    "data": "",
                     "left": 0,
-                    "top": 68,
+                    "top": 67,
                     "width": 66,
-                    "height": 32,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "default_S"
-                        },
-                        "data": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 66,
-                        "height": 32,
-                        "text": "High"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "encoder_cursor_14_enabled"
-                        },
-                        "data": "channel_ranges_currently_selected",
-                        "action": "ch_settings_adv_ranges_select_mode",
-                        "left": 0,
-                        "top": 0,
-                        "width": 66,
-                        "height": 32,
-                        "text": ""
-                      }
-                    ]
+                    "height": 31,
+                    "text": "High"
                   },
                   {
                     "type": "DisplayData",
@@ -4458,7 +4718,7 @@
                     "data": "channel_protection_opp_limit",
                     "action": "edit",
                     "left": 0,
-                    "top": 102,
+                    "top": 100,
                     "width": 66,
                     "height": 32,
                     "displayOption": 0
@@ -4474,8 +4734,8 @@
                 "action": "channel_toggle_output",
                 "left": 68,
                 "top": 0,
-                "width": 331,
-                "height": 134,
+                "width": 327,
+                "height": 132,
                 "y1Style": {
                   "inheritFrom": "yt_graph_U_default"
                 },
@@ -4492,7 +4752,7 @@
                 },
                 "action": "channel_toggle_output",
                 "left": 70,
-                "top": 0,
+                "top": 2,
                 "width": 66,
                 "height": 67,
                 "widgets": [
@@ -4532,8 +4792,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 400,
-        "height": 168
+        "width": 395,
+        "height": 164
       },
       {
         "name": "slot_max_2ch_yt_off",
@@ -4545,7 +4805,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 400,
+            "width": 395,
             "height": 32,
             "layout": "slot_max_2ch_title"
           },
@@ -4556,8 +4816,8 @@
             },
             "left": 0,
             "top": 32,
-            "width": 400,
-            "height": 136,
+            "width": 395,
+            "height": 132,
             "widgets": [
               {
                 "type": "Select",
@@ -4568,7 +4828,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 66,
-                "height": 134,
+                "height": 132,
                 "widgets": [
                   {
                     "type": "Container",
@@ -4578,7 +4838,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 66,
-                    "height": 134,
+                    "height": 132,
                     "widgets": [
                       {
                         "type": "Select",
@@ -4589,7 +4849,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 66,
-                        "height": 66,
+                        "height": 65,
                         "widgets": [
                           {
                             "type": "Container",
@@ -4599,7 +4859,7 @@
                             "left": 0,
                             "top": 0,
                             "width": 66,
-                            "height": 66,
+                            "height": 65,
                             "widgets": [
                               {
                                 "type": "DisplayData",
@@ -4624,7 +4884,7 @@
                                 "left": 0,
                                 "top": 34,
                                 "width": 66,
-                                "height": 32,
+                                "height": 31,
                                 "displayOption": 0
                               }
                             ]
@@ -4640,7 +4900,7 @@
                             "left": 0,
                             "top": 0,
                             "width": 66,
-                            "height": 66,
+                            "height": 65,
                             "text": "\\u00a1"
                           },
                           {
@@ -4654,48 +4914,22 @@
                             "left": 0,
                             "top": 0,
                             "width": 66,
-                            "height": 66,
+                            "height": 65,
                             "text": "\\u00b5"
                           }
                         ]
                       },
                       {
-                        "type": "Select",
+                        "type": "Text",
                         "style": {
-                          "inheritFrom": "default"
+                          "inheritFrom": "default_S"
                         },
-                        "data": "channel_has_support_for_current_dual_range",
+                        "data": "",
                         "left": 0,
-                        "top": 68,
+                        "top": 67,
                         "width": 66,
-                        "height": 32,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "default_S"
-                            },
-                            "data": "",
-                            "left": 0,
-                            "top": 0,
-                            "width": 66,
-                            "height": 32,
-                            "text": "High"
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "encoder_cursor_14_enabled"
-                            },
-                            "data": "channel_ranges_currently_selected",
-                            "action": "ch_settings_adv_ranges_select_mode",
-                            "left": 0,
-                            "top": 0,
-                            "width": 66,
-                            "height": 32,
-                            "text": ""
-                          }
-                        ]
+                        "height": 31,
+                        "text": "High"
                       },
                       {
                         "type": "DisplayData",
@@ -4705,7 +4939,7 @@
                         "data": "channel_protection_opp_limit",
                         "action": "edit",
                         "left": 0,
-                        "top": 102,
+                        "top": 100,
                         "width": 66,
                         "height": 32,
                         "displayOption": 0
@@ -4720,7 +4954,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 66,
-                    "height": 134,
+                    "height": 132,
                     "widgets": [
                       {
                         "type": "Button",
@@ -4732,7 +4966,7 @@
                         "left": 2,
                         "top": 2,
                         "width": 64,
-                        "height": 132,
+                        "height": 128,
                         "text": "\\u00a4 TRG",
                         "enabled": "trigger_is_manual",
                         "disabledStyle": {
@@ -4753,8 +4987,8 @@
                 "action": "channel_toggle_output",
                 "left": 66,
                 "top": 0,
-                "width": 333,
-                "height": 136,
+                "width": 329,
+                "height": 132,
                 "name": "YT-view off",
                 "widgets": [
                   {
@@ -4766,8 +5000,8 @@
                     "action": "",
                     "left": 2,
                     "top": 2,
-                    "width": 331,
-                    "height": 132,
+                    "width": 325,
+                    "height": 128,
                     "text": ""
                   }
                 ]
@@ -4777,45 +5011,95 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 400,
-        "height": 168
+        "width": 395,
+        "height": 164
       },
       {
-        "name": "slot_max_2ch_min_title",
+        "name": "slot_min_2ch",
         "widgets": [
           {
-            "type": "Text",
+            "type": "LayoutView",
             "style": {
-              "inheritFrom": "channel1",
-              "alignHorizontal": "left",
-              "padding": "0 5"
+              "inheritFrom": "default"
             },
-            "data": "channel_short_title",
-            "left": 1,
+            "left": 0,
             "top": 0,
-            "width": 57,
-            "height": 32,
-            "text": ""
+            "width": 118,
+            "height": 70,
+            "layout": "slot_min_2ch_with_border",
+            "context": "slot_2ch_ch1_index"
           },
           {
-            "type": "Text",
+            "type": "LayoutView",
             "style": {
-              "inheritFrom": "channel1",
-              "font": "Heydings14",
-              "alignVertical": "top"
+              "inheritFrom": "default"
             },
-            "action": "toggle_channels_max_view",
-            "left": 58,
+            "left": 120,
             "top": 0,
-            "width": 22,
-            "height": 32,
-            "text": "e"
+            "width": 118,
+            "height": 70,
+            "layout": "slot_min_2ch_with_border",
+            "context": "slot_2ch_ch2_index"
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 80,
-        "height": 32
+        "width": 239,
+        "height": 70
+      },
+      {
+        "name": "slot_min_2ch_with_border",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_min_2ch_view",
+            "left": 2,
+            "top": 0,
+            "width": 114,
+            "height": 68,
+            "context": ""
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 2,
+            "height": 70
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 116,
+            "top": 0,
+            "width": 2,
+            "height": 70
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 2,
+            "top": 68,
+            "width": 114,
+            "height": 2
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 118,
+        "height": 70
       },
       {
         "name": "slot_min_2ch_title",
@@ -4830,7 +5114,7 @@
             "data": "channel_title",
             "left": 0,
             "top": 0,
-            "width": 98,
+            "width": 94,
             "height": 24,
             "text": ""
           },
@@ -4842,7 +5126,7 @@
               "alignVertical": "bottom"
             },
             "action": "toggle_channels_max_view",
-            "left": 98,
+            "left": 94,
             "top": 0,
             "width": 20,
             "height": 24,
@@ -4851,41 +5135,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 118,
+        "width": 114,
         "height": 24
-      },
-      {
-        "name": "slot_min_2ch",
-        "widgets": [
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "slot_min_2ch_view",
-            "left": 0,
-            "top": 0,
-            "width": 118,
-            "height": 72,
-            "context": "slot_2ch_ch1_index"
-          },
-          {
-            "type": "LayoutView",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "slot_min_2ch_view",
-            "left": 120,
-            "top": 0,
-            "width": 118,
-            "height": 72,
-            "context": "slot_2ch_ch2_index"
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 238,
-        "height": 72
       },
       {
         "name": "slot_min_2ch_on",
@@ -4897,7 +5148,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 118,
+            "width": 114,
             "height": 24,
             "layout": "slot_min_2ch_title"
           },
@@ -4908,9 +5159,9 @@
             },
             "action": "channel_toggle_output",
             "left": 0,
-            "top": 25,
+            "top": 24,
             "width": 58,
-            "height": 46,
+            "height": 44,
             "name": "mon section",
             "widgets": [
               {
@@ -4922,7 +5173,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 58,
-                "height": 22,
+                "height": 21,
                 "displayOption": 0
               },
               {
@@ -4932,9 +5183,9 @@
                 },
                 "data": "channel_display_value2",
                 "left": 0,
-                "top": 24,
+                "top": 23,
                 "width": 58,
-                "height": 22,
+                "height": 21,
                 "displayOption": 0
               }
             ]
@@ -4946,10 +5197,10 @@
             },
             "data": "channel_u_edit",
             "action": "edit_no_focus",
-            "left": 60,
-            "top": 25,
-            "width": 58,
-            "height": 22,
+            "left": 58,
+            "top": 24,
+            "width": 56,
+            "height": 21,
             "displayOption": 0
           },
           {
@@ -4959,17 +5210,17 @@
             },
             "data": "channel_i_edit",
             "action": "edit_no_focus",
-            "left": 60,
-            "top": 49,
-            "width": 58,
-            "height": 22,
+            "left": 58,
+            "top": 47,
+            "width": 56,
+            "height": 21,
             "displayOption": 0
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 118,
-        "height": 72
+        "width": 114,
+        "height": 68
       },
       {
         "name": "slot_min_2ch_off",
@@ -4981,7 +5232,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 118,
+            "width": 114,
             "height": 24,
             "layout": "slot_min_2ch_title"
           },
@@ -4993,8 +5244,8 @@
             "data": "trigger_is_initiated",
             "left": 0,
             "top": 24,
-            "width": 118,
-            "height": 48,
+            "width": 114,
+            "height": 44,
             "widgets": [
               {
                 "type": "Container",
@@ -5003,8 +5254,8 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 118,
-                "height": 48,
+                "width": 114,
+                "height": 44,
                 "widgets": [
                   {
                     "type": "Text",
@@ -5013,10 +5264,10 @@
                     },
                     "data": "channel_off_label",
                     "action": "channel_toggle_output",
-                    "left": 0,
+                    "left": 1,
                     "top": 1,
-                    "width": 58,
-                    "height": 46,
+                    "width": 55,
+                    "height": 42,
                     "text": ""
                   },
                   {
@@ -5025,10 +5276,10 @@
                       "inheritFrom": "default"
                     },
                     "data": "channel_trigger_mode",
-                    "left": 60,
-                    "top": 1,
-                    "width": 58,
-                    "height": 46,
+                    "left": 58,
+                    "top": 0,
+                    "width": 56,
+                    "height": 44,
                     "widgets": [
                       {
                         "type": "Container",
@@ -5037,8 +5288,8 @@
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 58,
-                        "height": 46,
+                        "width": 56,
+                        "height": 44,
                         "widgets": [
                           {
                             "type": "DisplayData",
@@ -5049,8 +5300,8 @@
                             "action": "edit_no_focus",
                             "left": 0,
                             "top": 0,
-                            "width": 58,
-                            "height": 22,
+                            "width": 56,
+                            "height": 21,
                             "displayOption": 0
                           },
                           {
@@ -5061,40 +5312,64 @@
                             "data": "channel_i_edit",
                             "action": "edit_no_focus",
                             "left": 0,
-                            "top": 24,
-                            "width": 58,
-                            "height": 22,
+                            "top": 23,
+                            "width": 56,
+                            "height": 21,
                             "displayOption": 0
                           }
                         ]
                       },
                       {
-                        "type": "Text",
+                        "type": "Container",
                         "style": {
-                          "inheritFrom": "encoder_cursor_14_enabled",
-                          "font": "Oswald17"
+                          "inheritFrom": "default"
                         },
-                        "data": "",
-                        "action": "show_ch_settings_trigger",
                         "left": 0,
                         "top": 0,
-                        "width": 58,
-                        "height": 46,
-                        "text": "\\u00a1"
+                        "width": 56,
+                        "height": 44,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "encoder_cursor_14_enabled",
+                              "font": "Oswald17"
+                            },
+                            "data": "",
+                            "action": "show_ch_settings_trigger",
+                            "left": 0,
+                            "top": 1,
+                            "width": 55,
+                            "height": 42,
+                            "text": "\\u00a1"
+                          }
+                        ]
                       },
                       {
-                        "type": "Text",
+                        "type": "Container",
                         "style": {
-                          "inheritFrom": "encoder_cursor_14_enabled",
-                          "font": "Oswald17"
+                          "inheritFrom": "default"
                         },
-                        "data": "",
-                        "action": "show_ch_settings_trigger",
                         "left": 0,
                         "top": 0,
-                        "width": 58,
-                        "height": 46,
-                        "text": "\\u00b5"
+                        "width": 56,
+                        "height": 44,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "encoder_cursor_14_enabled",
+                              "font": "Oswald17"
+                            },
+                            "data": "",
+                            "action": "show_ch_settings_trigger",
+                            "left": 0,
+                            "top": 1,
+                            "width": 55,
+                            "height": 42,
+                            "text": "\\u00b5"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -5107,8 +5382,8 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 118,
-                "height": 48,
+                "width": 114,
+                "height": 44,
                 "widgets": [
                   {
                     "type": "Button",
@@ -5117,10 +5392,10 @@
                     },
                     "data": "trigger_is_initiated",
                     "action": "trigger_generate_manual",
-                    "left": 0,
+                    "left": 1,
                     "top": 1,
-                    "width": 118,
-                    "height": 46,
+                    "width": 112,
+                    "height": 42,
                     "text": "\\u00a4 TRG",
                     "enabled": "trigger_is_manual",
                     "disabledStyle": {
@@ -5136,8 +5411,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 118,
-        "height": 72
+        "width": 114,
+        "height": 68
       },
       {
         "name": "slot_micro_2ch",
@@ -5148,11 +5423,11 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_micro_2ch_view",
             "left": 0,
             "top": 0,
             "width": 78,
-            "height": 72,
+            "height": 70,
+            "layout": "slot_micro_2ch_with_border",
             "context": "slot_2ch_ch1_index"
           },
           {
@@ -5160,18 +5435,72 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot_micro_2ch_view",
             "left": 80,
             "top": 0,
             "width": 78,
-            "height": 72,
+            "height": 70,
+            "layout": "slot_micro_2ch_with_border",
             "context": "slot_2ch_ch2_index"
           }
         ],
         "left": 0,
         "top": 0,
         "width": 158,
-        "height": 72
+        "height": 70
+      },
+      {
+        "name": "slot_micro_2ch_with_border",
+        "widgets": [
+          {
+            "type": "LayoutView",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_micro_2ch_view",
+            "left": 2,
+            "top": 0,
+            "width": 74,
+            "height": 68,
+            "context": ""
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 0,
+            "top": 0,
+            "width": 2,
+            "height": 70
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 76,
+            "top": 0,
+            "width": 2,
+            "height": 70
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default",
+              "color": "channel1"
+            },
+            "left": 2,
+            "top": 68,
+            "width": 74,
+            "height": 2
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 78,
+        "height": 70
       },
       {
         "name": "slot_micro_2ch_title",
@@ -5186,14 +5515,14 @@
             "data": "channel_short_title",
             "left": 0,
             "top": 0,
-            "width": 78,
+            "width": 74,
             "height": 24,
             "text": ""
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 78,
+        "width": 74,
         "height": 24
       },
       {
@@ -5206,7 +5535,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 78,
+            "width": 74,
             "height": 24,
             "layout": "slot_micro_2ch_title"
           },
@@ -5217,8 +5546,8 @@
             },
             "action": "channel_toggle_output",
             "left": 0,
-            "top": 26,
-            "width": 78,
+            "top": 24,
+            "width": 74,
             "height": 44,
             "name": "mon section",
             "widgets": [
@@ -5230,21 +5559,9 @@
                 "data": "channel_display_value1",
                 "left": 0,
                 "top": 0,
-                "width": 54,
+                "width": 74,
                 "height": 21,
-                "displayOption": 5
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "mon_value_14_left"
-                },
-                "data": "channel_display_value1",
-                "left": 54,
-                "top": 0,
-                "width": 24,
-                "height": 21,
-                "displayOption": 4
+                "displayOption": 0
               },
               {
                 "type": "DisplayData",
@@ -5254,29 +5571,17 @@
                 "data": "channel_display_value2",
                 "left": 0,
                 "top": 23,
-                "width": 54,
+                "width": 74,
                 "height": 21,
-                "displayOption": 5
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "mon_value_14_left"
-                },
-                "data": "channel_display_value2",
-                "left": 54,
-                "top": 23,
-                "width": 24,
-                "height": 21,
-                "displayOption": 4
+                "displayOption": 0
               }
             ]
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 78,
-        "height": 72
+        "width": 74,
+        "height": 68
       },
       {
         "name": "slot_micro_2ch_off",
@@ -5288,7 +5593,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 78,
+            "width": 74,
             "height": 24,
             "layout": "slot_micro_2ch_title"
           },
@@ -5299,8 +5604,8 @@
             },
             "data": "trigger_is_initiated",
             "left": 0,
-            "top": 26,
-            "width": 78,
+            "top": 24,
+            "width": 74,
             "height": 44,
             "widgets": [
               {
@@ -5311,22 +5616,9 @@
                 "data": "channel_trigger_mode",
                 "left": 0,
                 "top": 0,
-                "width": 78,
+                "width": 74,
                 "height": 44,
                 "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "channel_off_button_14"
-                    },
-                    "data": "channel_off_label",
-                    "action": "channel_toggle_output",
-                    "left": 0,
-                    "top": 0,
-                    "width": 78,
-                    "height": 44,
-                    "text": ""
-                  },
                   {
                     "type": "Container",
                     "style": {
@@ -5334,7 +5626,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 78,
+                    "width": 74,
                     "height": 44,
                     "widgets": [
                       {
@@ -5344,10 +5636,35 @@
                         },
                         "data": "channel_off_label",
                         "action": "channel_toggle_output",
-                        "left": 0,
-                        "top": 0,
-                        "width": 38,
-                        "height": 44,
+                        "left": 1,
+                        "top": 1,
+                        "width": 72,
+                        "height": 42,
+                        "text": ""
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 74,
+                    "height": 44,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "channel_off_button_14"
+                        },
+                        "data": "channel_off_label",
+                        "action": "channel_toggle_output",
+                        "left": 1,
+                        "top": 1,
+                        "width": 36,
+                        "height": 42,
                         "text": ""
                       },
                       {
@@ -5358,10 +5675,10 @@
                         },
                         "data": "",
                         "action": "show_ch_settings_trigger",
-                        "left": 40,
-                        "top": 0,
-                        "width": 38,
-                        "height": 44,
+                        "left": 38,
+                        "top": 1,
+                        "width": 35,
+                        "height": 42,
                         "text": "\\u00a1"
                       }
                     ]
@@ -5373,7 +5690,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 78,
+                    "width": 74,
                     "height": 44,
                     "widgets": [
                       {
@@ -5383,10 +5700,10 @@
                         },
                         "data": "channel_off_label",
                         "action": "channel_toggle_output",
-                        "left": 0,
-                        "top": 0,
-                        "width": 38,
-                        "height": 44,
+                        "left": 1,
+                        "top": 1,
+                        "width": 36,
+                        "height": 42,
                         "text": ""
                       },
                       {
@@ -5397,10 +5714,10 @@
                         },
                         "data": "",
                         "action": "show_ch_settings_trigger",
-                        "left": 40,
-                        "top": 0,
-                        "width": 38,
-                        "height": 44,
+                        "left": 38,
+                        "top": 1,
+                        "width": 35,
+                        "height": 42,
                         "text": "\\u00b5"
                       }
                     ]
@@ -5408,31 +5725,43 @@
                 ]
               },
               {
-                "type": "Button",
+                "type": "Container",
                 "style": {
-                  "inheritFrom": "trigger_button_14"
+                  "inheritFrom": "default"
                 },
-                "data": "trigger_is_initiated",
-                "action": "trigger_generate_manual",
                 "left": 0,
                 "top": 0,
-                "width": 78,
+                "width": 74,
                 "height": 44,
-                "text": "\\u00a4 TRG",
-                "enabled": "trigger_is_manual",
-                "disabledStyle": {
-                  "inheritFrom": "trigger_button_14",
-                  "color": "text_regular",
-                  "activeBackgroundColor": "text_regular"
-                }
+                "widgets": [
+                  {
+                    "type": "Button",
+                    "style": {
+                      "inheritFrom": "trigger_button_14"
+                    },
+                    "data": "trigger_is_initiated",
+                    "action": "trigger_generate_manual",
+                    "left": 1,
+                    "top": 1,
+                    "width": 72,
+                    "height": 42,
+                    "text": "\\u00a4 TRG",
+                    "enabled": "trigger_is_manual",
+                    "disabledStyle": {
+                      "inheritFrom": "trigger_button_14",
+                      "color": "text_regular",
+                      "activeBackgroundColor": "text_regular"
+                    }
+                  }
+                ]
               }
             ]
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 78,
-        "height": 72
+        "width": 74,
+        "height": 68
       },
       {
         "name": "labels_and_colors",
@@ -5511,35 +5840,35 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "labels_and_colors_page_channel_color"
+              "inheritFrom": "labels_and_colors_channel"
             },
             "left": 0,
             "top": 32,
             "width": 2,
-            "height": 86
+            "height": 86,
+            "invertColors": true
           },
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "labels_and_colors_page_channel_color"
+              "inheritFrom": "labels_and_colors_channel"
             },
             "left": 156,
             "top": 32,
             "width": 2,
-            "height": 86
+            "height": 86,
+            "invertColors": true
           },
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "labels_and_colors_page_channel_color"
+              "inheritFrom": "labels_and_colors_channel"
             },
             "left": 2,
             "top": 116,
             "width": 154,
-            "height": 2
+            "height": 2,
+            "invertColors": true
           }
         ],
         "left": 0,

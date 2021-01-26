@@ -100,7 +100,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 160,
+            "width": 154,
             "height": 32,
             "widgets": [
               {
@@ -111,9 +111,9 @@
                   "padding": "0 5"
                 },
                 "data": "slot_title_def",
-                "left": 1,
+                "left": 0,
                 "top": 0,
-                "width": 101,
+                "width": 97,
                 "height": 32,
                 "text": ""
               },
@@ -124,7 +124,7 @@
                   "font": "Heydings14"
                 },
                 "action": "show_slot_settings",
-                "left": 102,
+                "left": 97,
                 "top": 0,
                 "width": 32,
                 "height": 32,
@@ -137,7 +137,7 @@
                   "font": "Heydings14"
                 },
                 "action": "toggle_slot_max_view",
-                "left": 134,
+                "left": 129,
                 "top": 0,
                 "width": 25,
                 "height": 32,
@@ -152,9 +152,9 @@
             },
             "data": "relays",
             "left": 0,
-            "top": 33,
-            "width": 160,
-            "height": 207,
+            "top": 32,
+            "width": 154,
+            "height": 204,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -162,8 +162,8 @@
               },
               "left": 0,
               "top": 0,
-              "width": 80,
-              "height": 69,
+              "width": 154,
+              "height": 34,
               "widgets": [
                 {
                   "type": "Select",
@@ -172,10 +172,10 @@
                   },
                   "data": "relay_is_on",
                   "action": "toggle_relay",
-                  "left": 0,
-                  "top": 0,
-                  "width": 79,
-                  "height": 68,
+                  "left": 1,
+                  "top": 1,
+                  "width": 152,
+                  "height": 32,
                   "widgets": [
                     {
                       "type": "Text",
@@ -184,13 +184,13 @@
                         "font": "Oswald17",
                         "alignHorizontal": "left",
                         "borderSize": "0",
-                        "padding": "0 0 0 12"
+                        "padding": "0 0 0 45"
                       },
                       "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 79,
-                      "height": 68,
+                      "width": 152,
+                      "height": 32,
                       "text": ""
                     },
                     {
@@ -200,13 +200,13 @@
                         "font": "Oswald17",
                         "alignHorizontal": "left",
                         "borderSize": "0",
-                        "padding": "0 0 0 12"
+                        "padding": "0 0 0 45"
                       },
                       "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 79,
-                      "height": 68,
+                      "width": 152,
+                      "height": 32,
                       "text": ""
                     }
                   ]
@@ -218,8 +218,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 160,
-        "height": 240,
+        "width": 154,
+        "height": 236,
         "dataContextOverrides": "{\"slot_title_def\": \"PREL6\"}"
       },
       {
@@ -233,7 +233,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 240,
+            "width": 234,
             "height": 32,
             "widgets": [
               {
@@ -244,9 +244,9 @@
                   "padding": "0 5"
                 },
                 "data": "slot_title_def",
-                "left": 1,
+                "left": 0,
                 "top": 0,
-                "width": 175,
+                "width": 170,
                 "height": 32,
                 "text": ""
               },
@@ -257,7 +257,7 @@
                   "font": "Heydings14"
                 },
                 "action": "show_slot_settings",
-                "left": 176,
+                "left": 170,
                 "top": 0,
                 "width": 32,
                 "height": 32,
@@ -270,7 +270,7 @@
                   "font": "Heydings14"
                 },
                 "action": "toggle_slot_max_view",
-                "left": 208,
+                "left": 202,
                 "top": 0,
                 "width": 32,
                 "height": 32,
@@ -285,9 +285,9 @@
             },
             "data": "relays",
             "left": 0,
-            "top": 33,
-            "width": 240,
-            "height": 207,
+            "top": 32,
+            "width": 234,
+            "height": 204,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -295,8 +295,8 @@
               },
               "left": 0,
               "top": 0,
-              "width": 120,
-              "height": 69,
+              "width": 234,
+              "height": 34,
               "widgets": [
                 {
                   "type": "Select",
@@ -305,10 +305,10 @@
                   },
                   "data": "relay_is_on",
                   "action": "toggle_relay",
-                  "left": 0,
-                  "top": 0,
-                  "width": 119,
-                  "height": 68,
+                  "left": 1,
+                  "top": 1,
+                  "width": 232,
+                  "height": 32,
                   "widgets": [
                     {
                       "type": "Text",
@@ -317,13 +317,13 @@
                         "font": "Oswald17",
                         "alignHorizontal": "left",
                         "borderSize": "0",
-                        "padding": "0 0 0 26"
+                        "padding": "0 0 0 88"
                       },
                       "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 119,
-                      "height": 68,
+                      "width": 232,
+                      "height": 32,
                       "text": ""
                     },
                     {
@@ -333,13 +333,13 @@
                         "font": "Oswald17",
                         "alignHorizontal": "left",
                         "borderSize": "0",
-                        "padding": "0 0 0 26"
+                        "padding": "0 0 0 88"
                       },
                       "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 119,
-                      "height": 68,
+                      "width": 232,
+                      "height": 32,
                       "text": ""
                     }
                   ]
@@ -351,8 +351,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 240,
+        "width": 234,
+        "height": 236,
         "dataContextOverrides": "{\"slot_title_def\": \"PREL6\"}"
       },
       {
@@ -365,7 +365,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 480,
+            "width": 476,
             "height": 32,
             "widgets": [
               {
@@ -379,7 +379,7 @@
                 "data": "slot_title_max",
                 "left": 0,
                 "top": 0,
-                "width": 380,
+                "width": 376,
                 "height": 32,
                 "text": ""
               },
@@ -390,7 +390,7 @@
                   "font": "Heydings14"
                 },
                 "action": "show_slot_settings",
-                "left": 380,
+                "left": 376,
                 "top": 0,
                 "width": 50,
                 "height": 32,
@@ -403,7 +403,7 @@
                   "font": "Heydings14"
                 },
                 "action": "toggle_slot_max_view",
-                "left": 430,
+                "left": 426,
                 "top": 0,
                 "width": 50,
                 "height": 32,
@@ -417,10 +417,10 @@
               "inheritFrom": "default"
             },
             "data": "relays",
-            "left": 0,
+            "left": 1,
             "top": 32,
-            "width": 480,
-            "height": 136,
+            "width": 474,
+            "height": 132,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -428,8 +428,8 @@
               },
               "left": 0,
               "top": 0,
-              "width": 160,
-              "height": 68,
+              "width": 158,
+              "height": 66,
               "widgets": [
                 {
                   "type": "Select",
@@ -438,10 +438,10 @@
                   },
                   "data": "relay_is_on",
                   "action": "toggle_relay",
-                  "left": 0,
-                  "top": 0,
-                  "width": 159,
-                  "height": 67,
+                  "left": 1,
+                  "top": 1,
+                  "width": 156,
+                  "height": 64,
                   "widgets": [
                     {
                       "type": "Text",
@@ -450,13 +450,13 @@
                         "font": "Oswald17",
                         "alignHorizontal": "left",
                         "borderSize": "0",
-                        "padding": "0 0 0 48"
+                        "padding": "0 0 0 28"
                       },
                       "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 159,
-                      "height": 67,
+                      "width": 156,
+                      "height": 64,
                       "text": ""
                     },
                     {
@@ -466,13 +466,13 @@
                         "font": "Oswald17",
                         "alignHorizontal": "left",
                         "borderSize": "0",
-                        "padding": "0 0 0 48"
+                        "padding": "0 0 0 28"
                       },
                       "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 159,
-                      "height": 67,
+                      "width": 156,
+                      "height": 64,
                       "text": ""
                     }
                   ]
@@ -484,8 +484,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 480,
-        "height": 168,
+        "width": 476,
+        "height": 164,
         "dataContextOverrides": "{\"slot_title_max\": \"PREL6\"}"
       },
       {
@@ -498,7 +498,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 238,
+            "width": 235,
             "height": 24,
             "widgets": [
               {
@@ -511,7 +511,7 @@
                 "data": "slot_title_min",
                 "left": 0,
                 "top": 0,
-                "width": 193,
+                "width": 190,
                 "height": 24,
                 "text": ""
               },
@@ -524,7 +524,7 @@
                 },
                 "data": "",
                 "action": "toggle_slot_max_view",
-                "left": 193,
+                "left": 190,
                 "top": 0,
                 "width": 45,
                 "height": 24,
@@ -535,8 +535,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 238,
-        "height": 72,
+        "width": 235,
+        "height": 68,
         "dataContextOverrides": "{\"slot_title_min\": \"PREL6\"}"
       },
       {
@@ -549,7 +549,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 158,
+            "width": 154,
             "height": 24,
             "widgets": [
               {
@@ -562,7 +562,7 @@
                 "data": "slot_title_micro",
                 "left": 0,
                 "top": 0,
-                "width": 158,
+                "width": 154,
                 "height": 24,
                 "text": ""
               }
@@ -571,8 +571,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 158,
-        "height": 72,
+        "width": 154,
+        "height": 68,
         "dataContextOverrides": "{\"slot_title_micro\": \"PREL6\"}"
       },
       {

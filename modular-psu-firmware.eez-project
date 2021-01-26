@@ -256,7 +256,7 @@
       "defaultValue": "2"
     },
     {
-      "name": "slot_min1_view",
+      "name": "slot_min_view",
       "type": "string",
       "defaultValue": "dib_dcp405::slot_min_1ch_on"
     },
@@ -266,24 +266,9 @@
       "defaultValue": "3"
     },
     {
-      "name": "slot_min2_view",
-      "type": "string",
-      "defaultValue": "dib_dcp405::slot_min_1ch_off"
-    },
-    {
-      "name": "slot1_micro_view",
+      "name": "slot_micro_view",
       "type": "string",
       "defaultValue": "dib_dcp405::slot_micro_1ch_on"
-    },
-    {
-      "name": "slot2_micro_view",
-      "type": "string",
-      "defaultValue": "dib_dcp405::slot_micro_1ch_off"
-    },
-    {
-      "name": "slot3_micro_view",
-      "type": "string",
-      "defaultValue": "dib_dcm224::slot_micro_2ch"
     },
     {
       "name": "channel_display_value1",
@@ -2414,6 +2399,11 @@
     },
     {
       "name": "is_mcu_revision_selected"
+    },
+    {
+      "name": "slot_is_2ch_view",
+      "type": "boolean",
+      "defaultValue": "0"
     }
   ],
   "actions": [
@@ -2567,9 +2557,6 @@
       "name": "show_ch_settings"
     },
     {
-      "name": "show_ch_settings_prot_clear"
-    },
-    {
       "name": "show_ch_settings_prot_ocp"
     },
     {
@@ -2613,9 +2600,6 @@
     },
     {
       "name": "ch_settings_prot_clear"
-    },
-    {
-      "name": "ch_settings_prot_clear_and_disable"
     },
     {
       "name": "ch_settings_prot_toggle_state"
@@ -4553,12 +4537,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_max_view",
+                    "data": "",
                     "left": 0,
                     "top": 0,
                     "width": 480,
-                    "height": 168,
-                    "layout": "",
+                    "height": 166,
+                    "layout": "slot_max_with_border",
                     "context": "slot_max_channel_index"
                   },
                   {
@@ -4566,12 +4550,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_min1_view",
-                    "left": 1,
+                    "data": "",
+                    "left": 0,
                     "top": 168,
-                    "width": 238,
-                    "height": 72,
-                    "layout": "",
+                    "width": 239,
+                    "height": 70,
+                    "layout": "slot_min_with_border",
                     "context": "slot_min1_channel_index"
                   },
                   {
@@ -4579,12 +4563,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_min2_view",
+                    "data": "",
                     "left": 241,
                     "top": 168,
-                    "width": 238,
-                    "height": 72,
-                    "layout": "",
+                    "width": 239,
+                    "height": 70,
+                    "layout": "slot_min_with_border",
                     "context": "slot_min2_channel_index"
                   }
                 ]
@@ -10369,52 +10353,244 @@
                 "text": "\\u009d Protections"
               },
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "edit_value_active_S_center"
+                  "inheritFrom": "default"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "data": "channel_protection_status",
                 "left": 6,
                 "top": 35,
                 "width": 208,
                 "height": 32,
-                "text": "Clear / Disable protection"
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "color": "text_regular",
+                      "activeBackgroundColor": "text_regular"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "ch_settings_prot_clear",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "ch_settings_prot_clear",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "ch_settings_prot_clear",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "ch_settings_prot_clear",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "ch_settings_prot_clear",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  }
+                ]
               },
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "edit_value_active_S_center"
+                  "inheritFrom": "default"
                 },
-                "action": "show_ch_settings_prot_ocp",
+                "data": "ocp",
                 "left": 6,
                 "top": 78,
                 "width": 208,
                 "height": 32,
-                "text": "Current limit and OCP"
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "show_ch_settings_prot_ocp",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Current limit and OCP"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "show_ch_settings_prot_ocp",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Current limit and OCP"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "color": "status_warning",
+                      "activeBackgroundColor": "status_warning"
+                    },
+                    "action": "show_ch_settings_prot_ocp",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Current limit and OCP"
+                  }
+                ]
               },
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "edit_value_active_S_center"
+                  "inheritFrom": "default"
                 },
-                "action": "show_ch_settings_prot_ovp",
+                "data": "ovp",
                 "left": 6,
                 "top": 114,
                 "width": 208,
                 "height": 32,
-                "text": "Voltage limit and OVP"
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "show_ch_settings_prot_ovp",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Voltage limit and OVP"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "show_ch_settings_prot_ovp",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Voltage limit and OVP"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "color": "status_warning",
+                      "activeBackgroundColor": "status_warning"
+                    },
+                    "action": "show_ch_settings_prot_ovp",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Voltage limit and OVP"
+                  }
+                ]
               },
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "edit_value_active_S_center"
+                  "inheritFrom": "default"
                 },
-                "action": "show_ch_settings_prot_opp",
+                "data": "opp",
                 "left": 6,
                 "top": 150,
                 "width": 208,
                 "height": 32,
-                "text": "Power limit and OPP"
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "show_ch_settings_prot_opp",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Power limit and OPP"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "show_ch_settings_prot_opp",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Power limit and OPP"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "color": "status_warning",
+                      "activeBackgroundColor": "status_warning"
+                    },
+                    "action": "show_ch_settings_prot_opp",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Power limit and OPP"
+                  }
+                ]
               },
               {
                 "type": "Select",
@@ -10450,16 +10626,55 @@
                     "height": 32,
                     "widgets": [
                       {
-                        "type": "Text",
+                        "type": "Select",
                         "style": {
-                          "inheritFrom": "edit_value_active_S_center"
+                          "inheritFrom": "default"
                         },
-                        "action": "show_ch_settings_prot_otp",
+                        "data": "otp_ch",
                         "left": 0,
                         "top": 0,
                         "width": 208,
                         "height": 32,
-                        "text": "Temperature (OTP)"
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_active_S_center"
+                            },
+                            "action": "show_ch_settings_prot_otp",
+                            "left": 0,
+                            "top": 0,
+                            "width": 208,
+                            "height": 32,
+                            "text": "Temperature (OTP)"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_active_S_center"
+                            },
+                            "action": "show_ch_settings_prot_otp",
+                            "left": 0,
+                            "top": 0,
+                            "width": 208,
+                            "height": 32,
+                            "text": "Temperature (OTP)"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_active_S_center",
+                              "color": "status_warning",
+                              "activeBackgroundColor": "status_warning"
+                            },
+                            "action": "show_ch_settings_prot_otp",
+                            "left": 0,
+                            "top": 0,
+                            "width": 208,
+                            "height": 32,
+                            "text": "Temperature (OTP)"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -11046,215 +11261,6 @@
                                 "text": ""
                               }
                             ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 480,
-        "height": 272
-      },
-      {
-        "name": "ch_settings_prot_clear",
-        "description": "Clear and/or disable selected channel's protection(s)",
-        "style": "default",
-        "widgets": [
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 10,
-            "top": 10,
-            "width": 460,
-            "height": 164,
-            "name": "Body",
-            "widgets": [
-              {
-                "type": "MultilineText",
-                "style": {
-                  "inheritFrom": "edit_value_M_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 460,
-                "height": 60,
-                "text": "Make sure that load is disconnected before clear tripped protection(s)."
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_M_center"
-                },
-                "action": "ch_settings_prot_clear",
-                "left": 20,
-                "top": 86,
-                "width": 143,
-                "height": 46,
-                "text": "Clear"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_M_center"
-                },
-                "action": "ch_settings_prot_clear_and_disable",
-                "left": 200,
-                "top": 86,
-                "width": 240,
-                "height": 46,
-                "text": "Clear and disable"
-              }
-            ]
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 240,
-            "width": 480,
-            "height": 32,
-            "name": "Status line",
-            "widgets": [
-              {
-                "type": "Select",
-                "style": {
-                  "inheritFrom": "default",
-                  "color": "status_line_text",
-                  "backgroundColor": "status_line_background",
-                  "activeColor": "status_line_background",
-                  "activeBackgroundColor": "status_line_text"
-                },
-                "data": "channel_is_par_ser_coupled_or_tracked",
-                "left": 0,
-                "top": 0,
-                "width": 480,
-                "height": 32,
-                "widgets": [
-                  {
-                    "type": "Container",
-                    "style": {
-                      "inheritFrom": "default",
-                      "color": "status_line_text",
-                      "backgroundColor": "status_line_background",
-                      "activeColor": "status_line_background",
-                      "activeBackgroundColor": "status_line_text"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 480,
-                    "height": 32,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "channel1",
-                          "font": "Heydings14",
-                          "alignVertical": "center"
-                        },
-                        "action": "show_previous_page",
-                        "left": 0,
-                        "top": 0,
-                        "width": 41,
-                        "height": 32,
-                        "text": "E"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "channel1",
-                          "alignHorizontal": "left"
-                        },
-                        "data": "channel_short_label",
-                        "left": 41,
-                        "top": 0,
-                        "width": 36,
-                        "height": 32,
-                        "text": ""
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "channel1",
-                          "alignHorizontal": "left"
-                        },
-                        "left": 77,
-                        "top": 0,
-                        "width": 403,
-                        "height": 32,
-                        "text": "Clear channel protection"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Container",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 480,
-                    "height": 32,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "status_bgnd",
-                          "font": "Heydings14",
-                          "alignVertical": "center",
-                          "color": "status_line_text",
-                          "backgroundColor": "status_line_background",
-                          "activeColor": "status_line_background",
-                          "activeBackgroundColor": "status_line_text"
-                        },
-                        "action": "show_previous_page",
-                        "left": 0,
-                        "top": 0,
-                        "width": 41,
-                        "height": 32,
-                        "text": "E"
-                      },
-                      {
-                        "type": "Select",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "data": "channel_tracking_is_enabled",
-                        "left": 41,
-                        "top": 0,
-                        "width": 439,
-                        "height": 32,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "status_title"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 439,
-                            "height": 32,
-                            "text": "Clear channels protection"
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "status_title"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 439,
-                            "height": 32,
-                            "text": "\\u00a2 Clear channels protection"
                           }
                         ]
                       }
@@ -29516,11 +29522,12 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot1_micro_view",
+            "data": "",
             "left": 0,
             "top": 0,
-            "width": 160,
-            "height": 72,
+            "width": 158,
+            "height": 70,
+            "layout": "slot_micro_with_border",
             "context": "slot1_channel_index"
           },
           {
@@ -29528,11 +29535,12 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot2_micro_view",
-            "left": 160,
+            "data": "",
+            "left": 161,
             "top": 0,
-            "width": 160,
-            "height": 72,
+            "width": 158,
+            "height": 70,
+            "layout": "slot_micro_with_border",
             "context": "slot2_channel_index"
           },
           {
@@ -29540,11 +29548,12 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "slot3_micro_view",
-            "left": 320,
+            "data": "",
+            "left": 322,
             "top": 0,
-            "width": 160,
-            "height": 72,
+            "width": 158,
+            "height": 70,
+            "layout": "slot_micro_with_border",
             "context": "slot3_channel_index"
           }
         ],
@@ -29582,12 +29591,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_default_view",
+                    "data": "",
                     "left": 0,
                     "top": 0,
-                    "width": 160,
-                    "height": 240,
-                    "layout": "",
+                    "width": 158,
+                    "height": 238,
+                    "layout": "slot_def_vert_view_with_border",
                     "context": "slot1_channel_index"
                   },
                   {
@@ -29595,12 +29604,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_default_view",
-                    "left": 160,
+                    "data": "",
+                    "left": 161,
                     "top": 0,
-                    "width": 160,
-                    "height": 240,
-                    "layout": "",
+                    "width": 158,
+                    "height": 238,
+                    "layout": "slot_def_vert_view_with_border",
                     "context": "slot2_channel_index"
                   },
                   {
@@ -29608,12 +29617,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_default_view",
-                    "left": 320,
+                    "data": "",
+                    "left": 322,
                     "top": 0,
-                    "width": 160,
-                    "height": 240,
-                    "layout": "",
+                    "width": 158,
+                    "height": 238,
+                    "layout": "slot_def_vert_view_with_border",
                     "context": "slot3_channel_index"
                   }
                 ]
@@ -29633,12 +29642,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_default_view",
+                    "data": "",
                     "left": 0,
                     "top": 0,
-                    "width": 240,
-                    "height": 240,
-                    "layout": "",
+                    "width": 238,
+                    "height": 238,
+                    "layout": "slot_def_vert_view_with_border_2col",
                     "context": "slot1_channel_index"
                   },
                   {
@@ -29646,12 +29655,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_default_view",
-                    "left": 240,
+                    "data": "",
+                    "left": 241,
                     "top": 0,
-                    "width": 240,
-                    "height": 240,
-                    "layout": "",
+                    "width": 239,
+                    "height": 238,
+                    "layout": "slot_def_vert_view_with_border_2col",
                     "context": "slot2_channel_index"
                   }
                 ]
@@ -29666,6 +29675,217 @@
         "dataContextOverrides": ""
       },
       {
+        "name": "slot_def_vert_view_with_border",
+        "widgets": [
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_is_2ch_view",
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 238,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 238,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_default_view",
+                    "left": 2,
+                    "top": 0,
+                    "width": 154,
+                    "height": 236,
+                    "layout": "",
+                    "context": ""
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 2,
+                    "height": 238
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 156,
+                    "top": 0,
+                    "width": 2,
+                    "height": 238
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 2,
+                    "top": 236,
+                    "width": 156,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 238,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_default_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 158,
+                    "height": 238,
+                    "layout": "",
+                    "context": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 238
+      },
+      {
+        "name": "slot_def_vert_view_with_border_2col",
+        "widgets": [
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_is_2ch_view",
+            "left": 0,
+            "top": 0,
+            "width": 238,
+            "height": 238,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 238,
+                "height": 238,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_default_view",
+                    "left": 2,
+                    "top": 0,
+                    "width": 234,
+                    "height": 236,
+                    "layout": "",
+                    "context": ""
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 2,
+                    "height": 238
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 236,
+                    "top": 0,
+                    "width": 2,
+                    "height": 238
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 2,
+                    "top": 236,
+                    "width": 236,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 238,
+                "height": 238,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_default_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 238,
+                    "height": 238,
+                    "layout": "",
+                    "context": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 238,
+        "height": 238,
+        "dataContextOverrides": "{\n    \"slot_default_view\": \"dib_dcp405::slot_def_1ch_num_on_2col\"\n}"
+      },
+      {
         "name": "slot_def_vert_title",
         "widgets": [
           {
@@ -29676,9 +29896,9 @@
               "padding": "0 5"
             },
             "data": "channel_title",
-            "left": 1,
+            "left": 0,
             "top": 0,
-            "width": 105,
+            "width": 101,
             "height": 32,
             "text": ""
           },
@@ -29688,7 +29908,8 @@
               "inheritFrom": "default"
             },
             "data": "channel_protection_status",
-            "left": 106,
+            "action": "show_ch_settings",
+            "left": 101,
             "top": 0,
             "width": 28,
             "height": 32,
@@ -29699,7 +29920,22 @@
                   "inheritFrom": "channel1",
                   "font": "Heydings14"
                 },
-                "action": "show_ch_settings",
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 28,
+                "height": 32,
+                "text": "D"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 28,
@@ -29714,7 +29950,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 28,
@@ -29729,7 +29965,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 28,
@@ -29744,7 +29980,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 28,
@@ -29759,22 +29995,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
-                "left": 0,
-                "top": 0,
-                "width": 28,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 28,
@@ -29790,7 +30011,7 @@
               "font": "Heydings14"
             },
             "action": "toggle_channels_max_view",
-            "left": 134,
+            "left": 129,
             "top": 0,
             "width": 25,
             "height": 32,
@@ -29799,7 +30020,7 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 160,
+        "width": 154,
         "height": 32
       },
       {
@@ -29815,7 +30036,7 @@
             "data": "channel_title",
             "left": 0,
             "top": 0,
-            "width": 175,
+            "width": 170,
             "height": 32,
             "text": ""
           },
@@ -29825,7 +30046,8 @@
               "inheritFrom": "default"
             },
             "data": "channel_protection_status",
-            "left": 175,
+            "action": "show_ch_settings",
+            "left": 170,
             "top": 0,
             "width": 32,
             "height": 32,
@@ -29836,7 +30058,22 @@
                   "inheritFrom": "channel1",
                   "font": "Heydings14"
                 },
-                "action": "show_ch_settings",
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "D"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 32,
@@ -29851,7 +30088,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 32,
@@ -29866,7 +30103,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 32,
@@ -29881,7 +30118,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 32,
@@ -29896,22 +30133,7 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
-                "left": 0,
-                "top": 0,
-                "width": 32,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 32,
@@ -29927,7 +30149,7 @@
               "font": "Heydings14"
             },
             "action": "toggle_channels_max_view",
-            "left": 207,
+            "left": 202,
             "top": 0,
             "width": 32,
             "height": 32,
@@ -29936,7 +30158,7 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
+        "width": 234,
         "height": 32
       },
       {
@@ -29948,9 +30170,9 @@
               "inheritFrom": "default"
             },
             "data": "channel_has_error_settings",
-            "left": 1,
+            "left": 0,
             "top": 0,
-            "width": 158,
+            "width": 154,
             "height": 32,
             "widgets": [
               {
@@ -29958,16 +30180,12 @@
                 "style": {
                   "inheritFrom": "channel1",
                   "alignHorizontal": "left",
-                  "color": "inst_min_header_text",
-                  "backgroundColor": "inst_min_header_bgnd",
-                  "activeColor": "inst_min_header_bgnd",
-                  "activeBackgroundColor": "inst_min_header_text",
                   "padding": "0 5"
                 },
                 "data": "slot_title_def",
                 "left": 0,
                 "top": 0,
-                "width": 158,
+                "width": 154,
                 "height": 32,
                 "text": ""
               },
@@ -29978,7 +30196,7 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 158,
+                "width": 154,
                 "height": 32,
                 "widgets": [
                   {
@@ -29986,16 +30204,12 @@
                     "style": {
                       "inheritFrom": "channel1",
                       "alignHorizontal": "left",
-                      "color": "inst_min_header_text",
-                      "backgroundColor": "inst_min_header_bgnd",
-                      "activeColor": "inst_min_header_bgnd",
-                      "activeBackgroundColor": "inst_min_header_text",
                       "padding": "0 5"
                     },
                     "data": "slot_title_def",
-                    "left": 1,
+                    "left": 0,
                     "top": 0,
-                    "width": 107,
+                    "width": 104,
                     "height": 32,
                     "text": ""
                   },
@@ -30005,7 +30219,7 @@
                       "inheritFrom": "default"
                     },
                     "data": "slot_is_enabled",
-                    "left": 108,
+                    "left": 104,
                     "top": 0,
                     "width": 50,
                     "height": 32,
@@ -30013,7 +30227,7 @@
                       {
                         "type": "Rectangle",
                         "style": {
-                          "inheritFrom": "inst_min_header"
+                          "inheritFrom": "channel1"
                         },
                         "left": 0,
                         "top": 0,
@@ -30024,7 +30238,8 @@
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "inst_min_header"
+                          "inheritFrom": "channel1",
+                          "font": "Heydings14"
                         },
                         "action": "show_slot_settings",
                         "left": 0,
@@ -30050,15 +30265,15 @@
             "data": "slot_error_message",
             "left": 0,
             "top": 32,
-            "width": 160,
-            "height": 208,
+            "width": 154,
+            "height": 204,
             "text": ""
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 160,
-        "height": 240
+        "width": 154,
+        "height": 236
       },
       {
         "name": "slot_def_vert_error_2col",
@@ -30069,9 +30284,9 @@
               "inheritFrom": "default"
             },
             "data": "channel_has_error_settings",
-            "left": 1,
+            "left": 0,
             "top": 0,
-            "width": 238,
+            "width": 234,
             "height": 32,
             "widgets": [
               {
@@ -30079,16 +30294,12 @@
                 "style": {
                   "inheritFrom": "channel1",
                   "alignHorizontal": "left",
-                  "color": "inst_min_header_text",
-                  "backgroundColor": "inst_min_header_bgnd",
-                  "activeColor": "inst_min_header_bgnd",
-                  "activeBackgroundColor": "inst_min_header_text",
                   "padding": "0 5"
                 },
                 "data": "slot_title_def",
                 "left": 0,
                 "top": 0,
-                "width": 238,
+                "width": 234,
                 "height": 32,
                 "text": ""
               },
@@ -30099,7 +30310,7 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 238,
+                "width": 234,
                 "height": 32,
                 "widgets": [
                   {
@@ -30107,16 +30318,12 @@
                     "style": {
                       "inheritFrom": "channel1",
                       "alignHorizontal": "left",
-                      "color": "inst_min_header_text",
-                      "backgroundColor": "inst_min_header_bgnd",
-                      "activeColor": "inst_min_header_bgnd",
-                      "activeBackgroundColor": "inst_min_header_text",
                       "padding": "0 5"
                     },
                     "data": "slot_title_def",
                     "left": 0,
                     "top": 0,
-                    "width": 238,
+                    "width": 184,
                     "height": 32,
                     "text": ""
                   },
@@ -30126,7 +30333,7 @@
                       "inheritFrom": "default"
                     },
                     "data": "slot_is_enabled",
-                    "left": 188,
+                    "left": 184,
                     "top": 0,
                     "width": 50,
                     "height": 32,
@@ -30134,7 +30341,7 @@
                       {
                         "type": "Rectangle",
                         "style": {
-                          "inheritFrom": "inst_min_header"
+                          "inheritFrom": "channel1"
                         },
                         "left": 0,
                         "top": 0,
@@ -30145,7 +30352,8 @@
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "inst_min_header"
+                          "inheritFrom": "channel1",
+                          "font": "Heydings14"
                         },
                         "action": "show_slot_settings",
                         "left": 0,
@@ -30171,15 +30379,15 @@
             "data": "slot_error_message",
             "left": 0,
             "top": 32,
-            "width": 240,
-            "height": 208,
+            "width": 234,
+            "height": 204,
             "text": ""
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 240
+        "width": 234,
+        "height": 236
       },
       {
         "name": "slot_def_vert_not_installed",
@@ -30187,14 +30395,13 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "inst_min_header_bgnd",
-              "activeBackgroundColor": "inst_min_header_bgnd"
+              "inheritFrom": "channel1"
             },
-            "left": 1,
+            "left": 0,
             "top": 0,
-            "width": 158,
-            "height": 32
+            "width": 154,
+            "height": 32,
+            "invertColors": true
           },
           {
             "type": "Text",
@@ -30204,15 +30411,15 @@
             },
             "left": 0,
             "top": 32,
-            "width": 160,
-            "height": 208,
+            "width": 154,
+            "height": 204,
             "text": "Not installed"
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 160,
-        "height": 240
+        "width": 154,
+        "height": 236
       },
       {
         "name": "slot_def_vert_not_installed_2col",
@@ -30220,14 +30427,13 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "inst_min_header_bgnd",
-              "activeBackgroundColor": "inst_min_header_bgnd"
+              "inheritFrom": "channel1"
             },
             "left": 1,
             "top": 0,
-            "width": 239,
-            "height": 32
+            "width": 233,
+            "height": 32,
+            "invertColors": true
           },
           {
             "type": "Text",
@@ -30237,15 +30443,15 @@
             },
             "left": 0,
             "top": 32,
-            "width": 240,
-            "height": 208,
+            "width": 234,
+            "height": 204,
             "text": "Not installed"
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 240
+        "width": 234,
+        "height": 236
       },
       {
         "name": "slot_def_horz",
@@ -30276,12 +30482,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_default_view",
+                    "data": "",
                     "left": 0,
                     "top": 0,
                     "width": 480,
-                    "height": 80,
-                    "layout": "",
+                    "height": 78,
+                    "layout": "slot_def_horz_view_with_border",
                     "context": "slot1_channel_index"
                   },
                   {
@@ -30289,12 +30495,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_default_view",
+                    "data": "",
                     "left": 0,
                     "top": 80,
                     "width": 480,
-                    "height": 80,
-                    "layout": "",
+                    "height": 78,
+                    "layout": "slot_def_horz_view_with_border",
                     "context": "slot2_channel_index"
                   },
                   {
@@ -30302,12 +30508,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_default_view",
+                    "data": "",
                     "left": 0,
                     "top": 160,
                     "width": 480,
-                    "height": 80,
-                    "layout": "",
+                    "height": 78,
+                    "layout": "slot_def_horz_view_with_border",
                     "context": "slot3_channel_index"
                   }
                 ]
@@ -30327,12 +30533,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_default_view",
+                    "data": "",
                     "left": 0,
                     "top": 0,
                     "width": 480,
-                    "height": 120,
-                    "layout": "",
+                    "height": 118,
+                    "layout": "slot_def_horz_view_with_border_2col",
                     "context": "slot1_channel_index"
                   },
                   {
@@ -30340,12 +30546,12 @@
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "slot_default_view",
+                    "data": "",
                     "left": 0,
                     "top": 120,
                     "width": 480,
-                    "height": 120,
-                    "layout": "",
+                    "height": 118,
+                    "layout": "slot_def_horz_view_with_border_2col",
                     "context": "slot2_channel_index"
                   }
                 ]
@@ -30358,6 +30564,218 @@
         "width": 480,
         "height": 240,
         "dataContextOverrides": ""
+      },
+      {
+        "name": "slot_def_horz_view_with_border",
+        "widgets": [
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_is_2ch_view",
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 78,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 78,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_default_view",
+                    "left": 0,
+                    "top": 2,
+                    "width": 478,
+                    "height": 74,
+                    "layout": "",
+                    "context": ""
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 2
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 0,
+                    "top": 76,
+                    "width": 480,
+                    "height": 2
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 478,
+                    "top": 2,
+                    "width": 2,
+                    "height": 74
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 78,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_default_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 78,
+                    "layout": "",
+                    "context": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 78,
+        "dataContextOverrides": "{\n    \"slot_default_view\": \"dib_dcp405::slot_def_1ch_hbar_on\"\n}"
+      },
+      {
+        "name": "slot_def_horz_view_with_border_2col",
+        "widgets": [
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_is_2ch_view",
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 118,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 118,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_default_view",
+                    "left": 0,
+                    "top": 2,
+                    "width": 478,
+                    "height": 114,
+                    "layout": "",
+                    "context": ""
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 2
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 0,
+                    "top": 116,
+                    "width": 480,
+                    "height": 2
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 478,
+                    "top": 2,
+                    "width": 2,
+                    "height": 114
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 118,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_default_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 118,
+                    "layout": "",
+                    "context": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 118,
+        "dataContextOverrides": "{\n    \"slot_default_view\": \"dib_dcp405::lot_def_1ch_hbar_on_2col\"\n}"
       },
       {
         "name": "slot_def_horz_title",
@@ -30373,9 +30791,9 @@
             "data": "channel_short_title",
             "action": "",
             "left": 0,
-            "top": 1,
+            "top": 0,
             "width": 28,
-            "height": 39,
+            "height": 37,
             "text": ""
           },
           {
@@ -30387,9 +30805,9 @@
             },
             "action": "toggle_channels_max_view",
             "left": 28,
-            "top": 1,
+            "top": 0,
             "width": 24,
-            "height": 39,
+            "height": 37,
             "text": "e"
           },
           {
@@ -30398,10 +30816,11 @@
               "inheritFrom": "default"
             },
             "data": "channel_protection_status",
+            "action": "show_ch_settings",
             "left": 0,
-            "top": 40,
+            "top": 37,
             "width": 52,
-            "height": 39,
+            "height": 37,
             "widgets": [
               {
                 "type": "Text",
@@ -30409,11 +30828,26 @@
                   "inheritFrom": "channel1",
                   "font": "Heydings14"
                 },
-                "action": "show_ch_settings",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 39,
+                "height": 37,
+                "text": "D"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 37,
                 "text": "9"
               },
               {
@@ -30424,11 +30858,11 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 39,
+                "height": 37,
                 "text": "9"
               },
               {
@@ -30439,11 +30873,11 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 39,
+                "height": 37,
                 "text": "9"
               },
               {
@@ -30454,11 +30888,11 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 39,
+                "height": 37,
                 "text": "9"
               },
               {
@@ -30469,26 +30903,11 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 39,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "show_ch_settings_prot_clear",
-                "left": 0,
-                "top": 0,
-                "width": 52,
-                "height": 39,
+                "height": 37,
                 "text": "9"
               }
             ]
@@ -30497,7 +30916,7 @@
         "left": 0,
         "top": 0,
         "width": 52,
-        "height": 80
+        "height": 74
       },
       {
         "name": "slot_def_horz_title_2col",
@@ -30513,9 +30932,9 @@
             "data": "channel_short_title",
             "action": "",
             "left": 0,
-            "top": 1,
+            "top": 0,
             "width": 28,
-            "height": 59,
+            "height": 57,
             "text": ""
           },
           {
@@ -30527,9 +30946,9 @@
             },
             "action": "toggle_channels_max_view",
             "left": 28,
-            "top": 1,
+            "top": 0,
             "width": 24,
-            "height": 59,
+            "height": 57,
             "text": "e"
           },
           {
@@ -30539,9 +30958,9 @@
             },
             "data": "channel_protection_status",
             "left": 0,
-            "top": 60,
+            "top": 57,
             "width": 52,
-            "height": 59,
+            "height": 57,
             "widgets": [
               {
                 "type": "Text",
@@ -30549,11 +30968,26 @@
                   "inheritFrom": "channel1",
                   "font": "Heydings14"
                 },
-                "action": "show_ch_settings",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 59,
+                "height": 57,
+                "text": "D"
+              },
+              {
+                "type": "Text",
+                "style": {
+                  "inheritFrom": "channel1",
+                  "font": "Heydings14",
+                  "color": "status_warning",
+                  "activeBackgroundColor": "status_warning"
+                },
+                "action": "",
+                "left": 0,
+                "top": 0,
+                "width": 52,
+                "height": 57,
                 "text": "9"
               },
               {
@@ -30564,11 +30998,11 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 59,
+                "height": 57,
                 "text": "9"
               },
               {
@@ -30579,11 +31013,11 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 59,
+                "height": 57,
                 "text": "9"
               },
               {
@@ -30594,11 +31028,11 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 59,
+                "height": 57,
                 "text": "9"
               },
               {
@@ -30609,26 +31043,11 @@
                   "color": "status_warning",
                   "activeBackgroundColor": "status_warning"
                 },
-                "action": "show_ch_settings_prot_clear",
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 59,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "show_ch_settings_prot_clear",
-                "left": 0,
-                "top": 0,
-                "width": 52,
-                "height": 59,
+                "height": 57,
                 "text": "9"
               }
             ]
@@ -30637,23 +31056,11 @@
         "left": 0,
         "top": 0,
         "width": 52,
-        "height": 120
+        "height": 114
       },
       {
         "name": "slot_def_horz_error",
         "widgets": [
-          {
-            "type": "Rectangle",
-            "style": {
-              "inheritFrom": "default",
-              "color": "inst_min_header_bgnd",
-              "activeBackgroundColor": "inst_min_header_bgnd"
-            },
-            "left": 0,
-            "top": 0,
-            "width": 52,
-            "height": 78
-          },
           {
             "type": "Select",
             "style": {
@@ -30663,19 +31070,18 @@
             "left": 0,
             "top": 0,
             "width": 52,
-            "height": 78,
+            "height": 74,
             "widgets": [
               {
                 "type": "Rectangle",
                 "style": {
-                  "inheritFrom": "default",
-                  "color": "inst_min_header_bgnd",
-                  "activeBackgroundColor": "inst_min_header_bgnd"
+                  "inheritFrom": "channel1"
                 },
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 78
+                "height": 74,
+                "invertColors": true
               },
               {
                 "type": "Container",
@@ -30685,7 +31091,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 78,
+                "height": 74,
                 "widgets": [
                   {
                     "type": "Select",
@@ -30701,7 +31107,7 @@
                       {
                         "type": "Rectangle",
                         "style": {
-                          "inheritFrom": "inst_min_header"
+                          "inheritFrom": "channel1"
                         },
                         "left": 0,
                         "top": 0,
@@ -30712,7 +31118,8 @@
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "inst_min_header"
+                          "inheritFrom": "channel1",
+                          "font": "Heydings14"
                         },
                         "action": "show_slot_settings",
                         "left": 0,
@@ -30726,14 +31133,13 @@
                   {
                     "type": "Rectangle",
                     "style": {
-                      "inheritFrom": "default",
-                      "color": "inst_min_header_bgnd",
-                      "activeBackgroundColor": "inst_min_header_bgnd"
+                      "inheritFrom": "channel1"
                     },
                     "left": 0,
                     "top": 39,
                     "width": 52,
-                    "height": 39
+                    "height": 35,
+                    "invertColors": true
                   }
                 ]
               }
@@ -30749,15 +31155,15 @@
             "data": "slot_error_message",
             "left": 52,
             "top": 0,
-            "width": 428,
-            "height": 78,
+            "width": 426,
+            "height": 74,
             "text": ""
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 480,
-        "height": 78
+        "width": 478,
+        "height": 74
       },
       {
         "name": "slot_def_horz_error_2col",
@@ -30765,14 +31171,12 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "inst_min_header_bgnd",
-              "activeBackgroundColor": "inst_min_header_bgnd"
+              "inheritFrom": "channel1"
             },
             "left": 0,
             "top": 0,
             "width": 52,
-            "height": 118
+            "height": 114
           },
           {
             "type": "Select",
@@ -30783,19 +31187,18 @@
             "left": 0,
             "top": 0,
             "width": 52,
-            "height": 118,
+            "height": 114,
             "widgets": [
               {
                 "type": "Rectangle",
                 "style": {
-                  "inheritFrom": "default",
-                  "color": "inst_min_header_bgnd",
-                  "activeBackgroundColor": "inst_min_header_bgnd"
+                  "inheritFrom": "channel1"
                 },
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 118
+                "height": 114,
+                "invertColors": true
               },
               {
                 "type": "Container",
@@ -30805,7 +31208,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 52,
-                "height": 118,
+                "height": 114,
                 "widgets": [
                   {
                     "type": "Select",
@@ -30821,7 +31224,7 @@
                       {
                         "type": "Rectangle",
                         "style": {
-                          "inheritFrom": "inst_min_header"
+                          "inheritFrom": "channel1"
                         },
                         "left": 0,
                         "top": 0,
@@ -30832,7 +31235,8 @@
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "inst_min_header"
+                          "inheritFrom": "channel1",
+                          "font": "Heydings14"
                         },
                         "action": "show_slot_settings",
                         "left": 0,
@@ -30846,14 +31250,13 @@
                   {
                     "type": "Rectangle",
                     "style": {
-                      "inheritFrom": "default",
-                      "color": "inst_min_header_bgnd",
-                      "activeBackgroundColor": "inst_min_header_bgnd"
+                      "inheritFrom": "channel1"
                     },
                     "left": 0,
                     "top": 39,
                     "width": 52,
-                    "height": 79
+                    "height": 75,
+                    "invertColors": true
                   }
                 ]
               }
@@ -30869,15 +31272,15 @@
             "data": "slot_error_message",
             "left": 52,
             "top": 0,
-            "width": 428,
-            "height": 118,
+            "width": 426,
+            "height": 114,
             "text": ""
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 480,
-        "height": 118
+        "width": 478,
+        "height": 114
       },
       {
         "name": "slot_def_horz_not_installed",
@@ -30885,14 +31288,13 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "inst_min_header_bgnd",
-              "activeBackgroundColor": "inst_min_header_bgnd"
+              "inheritFrom": "channel1"
             },
             "left": 0,
             "top": 0,
             "width": 52,
-            "height": 78
+            "height": 74,
+            "invertColors": true
           },
           {
             "type": "Text",
@@ -30902,15 +31304,15 @@
             },
             "left": 52,
             "top": 0,
-            "width": 428,
-            "height": 78,
+            "width": 426,
+            "height": 74,
             "text": "Not installed"
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 480,
-        "height": 78
+        "width": 478,
+        "height": 74
       },
       {
         "name": "slot_def_horz_not_installed_2col",
@@ -30918,14 +31320,13 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "inst_min_header_bgnd",
-              "activeBackgroundColor": "inst_min_header_bgnd"
+              "inheritFrom": "channel1"
             },
             "left": 0,
             "top": 0,
             "width": 52,
-            "height": 118
+            "height": 114,
+            "invertColors": true
           },
           {
             "type": "Text",
@@ -30935,15 +31336,15 @@
             },
             "left": 52,
             "top": 0,
-            "width": 428,
-            "height": 118,
+            "width": 426,
+            "height": 114,
             "text": "Not installed"
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 480,
-        "height": 118
+        "width": 478,
+        "height": 114
       },
       {
         "name": "slot_def_horz_empty",
@@ -30962,14 +31363,14 @@
             "left": 0,
             "top": 0,
             "width": 52,
-            "height": 80,
+            "height": 74,
             "text": " "
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 480,
-        "height": 80
+        "width": 478,
+        "height": 74
       },
       {
         "name": "slot_def_horz_empty_2col",
@@ -30988,14 +31389,119 @@
             "left": 0,
             "top": 0,
             "width": 52,
-            "height": 120,
+            "height": 114,
             "text": " "
           }
         ],
         "left": 0,
         "top": 0,
+        "width": 478,
+        "height": 114
+      },
+      {
+        "name": "slot_max_with_border",
+        "widgets": [
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_is_2ch_view",
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 166,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 166,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_max_view",
+                    "left": 2,
+                    "top": 0,
+                    "width": 476,
+                    "height": 164,
+                    "layout": "",
+                    "context": ""
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 2,
+                    "height": 166
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 478,
+                    "top": 0,
+                    "width": 2,
+                    "height": 166
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 2,
+                    "top": 164,
+                    "width": 476,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 480,
+                "height": 166,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_max_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 480,
+                    "height": 166,
+                    "layout": "",
+                    "context": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
         "width": 480,
-        "height": 120
+        "height": 166
       },
       {
         "name": "slot_max_error",
@@ -31008,7 +31514,7 @@
             "data": "channel_has_error_settings",
             "left": 0,
             "top": 0,
-            "width": 430,
+            "width": 426,
             "height": 32,
             "widgets": [
               {
@@ -31016,16 +31522,12 @@
                 "style": {
                   "inheritFrom": "channel1",
                   "alignHorizontal": "left",
-                  "color": "inst_max_header_text",
-                  "backgroundColor": "inst_max_header_bgnd",
-                  "activeColor": "inst_max_header_bgnd",
-                  "activeBackgroundColor": "inst_max_header_text",
                   "padding": "0 5"
                 },
                 "data": "slot_title_def",
                 "left": 0,
                 "top": 0,
-                "width": 430,
+                "width": 426,
                 "height": 32,
                 "text": ""
               },
@@ -31036,7 +31538,7 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 430,
+                "width": 426,
                 "height": 32,
                 "widgets": [
                   {
@@ -31044,16 +31546,12 @@
                     "style": {
                       "inheritFrom": "channel1",
                       "alignHorizontal": "left",
-                      "color": "inst_max_header_text",
-                      "backgroundColor": "inst_max_header_bgnd",
-                      "activeColor": "inst_max_header_bgnd",
-                      "activeBackgroundColor": "inst_max_header_text",
                       "padding": "0 5"
                     },
                     "data": "slot_title_def",
                     "left": 1,
                     "top": 0,
-                    "width": 379,
+                    "width": 375,
                     "height": 32,
                     "text": ""
                   },
@@ -31063,7 +31561,7 @@
                       "inheritFrom": "default"
                     },
                     "data": "slot_is_enabled",
-                    "left": 380,
+                    "left": 376,
                     "top": 0,
                     "width": 50,
                     "height": 32,
@@ -31071,7 +31569,7 @@
                       {
                         "type": "Rectangle",
                         "style": {
-                          "inheritFrom": "inst_max_header"
+                          "inheritFrom": "channel1"
                         },
                         "left": 0,
                         "top": 0,
@@ -31082,7 +31580,8 @@
                       {
                         "type": "Text",
                         "style": {
-                          "inheritFrom": "inst_max_header"
+                          "inheritFrom": "channel1",
+                          "font": "Heydings14"
                         },
                         "action": "show_slot_settings",
                         "left": 0,
@@ -31100,12 +31599,12 @@
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "inst_selected",
+              "inheritFrom": "channel1",
               "font": "Heydings14",
               "alignVertical": "center"
             },
             "action": "toggle_channels_max_view",
-            "left": 430,
+            "left": 426,
             "top": 0,
             "width": 50,
             "height": 32,
@@ -31122,15 +31621,15 @@
             "data": "slot_error_message",
             "left": 0,
             "top": 32,
-            "width": 480,
-            "height": 136,
+            "width": 476,
+            "height": 132,
             "text": ""
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 480,
-        "height": 168
+        "width": 476,
+        "height": 164
       },
       {
         "name": "slot_max_not_installed",
@@ -31138,24 +31637,23 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "inst_max_header_bgnd",
-              "activeBackgroundColor": "inst_max_header_bgnd"
+              "inheritFrom": "channel1"
             },
             "left": 0,
             "top": 0,
-            "width": 430,
-            "height": 32
+            "width": 426,
+            "height": 32,
+            "invertColors": true
           },
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "inst_selected",
+              "inheritFrom": "channel1",
               "font": "Heydings14",
               "alignVertical": "center"
             },
             "action": "toggle_channels_max_view",
-            "left": 430,
+            "left": 426,
             "top": 0,
             "width": 50,
             "height": 32,
@@ -31169,15 +31667,120 @@
             },
             "left": 0,
             "top": 32,
-            "width": 480,
-            "height": 136,
+            "width": 476,
+            "height": 132,
             "text": "Not installed"
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 480,
-        "height": 168
+        "width": 476,
+        "height": 164
+      },
+      {
+        "name": "slot_min_with_border",
+        "widgets": [
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_is_2ch_view",
+            "left": 0,
+            "top": 0,
+            "width": 239,
+            "height": 70,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 239,
+                "height": 70,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_min_view",
+                    "left": 2,
+                    "top": 0,
+                    "width": 235,
+                    "height": 68,
+                    "layout": "",
+                    "context": ""
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 2,
+                    "height": 70
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 237,
+                    "top": 0,
+                    "width": 2,
+                    "height": 70
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 2,
+                    "top": 68,
+                    "width": 237,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 239,
+                "height": 70,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_min_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 239,
+                    "height": 70,
+                    "layout": "",
+                    "context": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 239,
+        "height": 70
       },
       {
         "name": "slot_min_error",
@@ -31187,29 +31790,25 @@
             "style": {
               "inheritFrom": "channel1",
               "alignHorizontal": "left",
-              "color": "inst_min_header_text",
-              "backgroundColor": "inst_min_header_bgnd",
-              "activeColor": "inst_min_header_bgnd",
-              "activeBackgroundColor": "inst_min_header_text",
               "padding": "0 5"
             },
             "data": "slot_title_min",
-            "left": 1,
+            "left": 0,
             "top": 0,
-            "width": 191,
+            "width": 190,
             "height": 24,
             "text": ""
           },
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "inst_minimized",
+              "inheritFrom": "channel1",
               "font": "Heydings14",
               "alignVertical": "bottom"
             },
             "data": "",
             "action": "toggle_channels_max_view",
-            "left": 192,
+            "left": 190,
             "top": 0,
             "width": 45,
             "height": 24,
@@ -31226,15 +31825,15 @@
             "data": "slot_error_message",
             "left": 0,
             "top": 24,
-            "width": 238,
-            "height": 48,
+            "width": 235,
+            "height": 44,
             "text": ""
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 238,
-        "height": 72
+        "width": 235,
+        "height": 68
       },
       {
         "name": "slot_min_not_installed",
@@ -31242,25 +31841,24 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "inst_min_header_bgnd",
-              "activeBackgroundColor": "inst_min_header_bgnd"
+              "inheritFrom": "channel1"
             },
             "left": 0,
             "top": 0,
-            "width": 192,
-            "height": 24
+            "width": 190,
+            "height": 24,
+            "invertColors": true
           },
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "inst_minimized",
+              "inheritFrom": "channel1",
               "font": "Heydings14",
               "alignVertical": "bottom"
             },
             "data": "",
             "action": "toggle_channels_max_view",
-            "left": 192,
+            "left": 190,
             "top": 0,
             "width": 45,
             "height": 24,
@@ -31274,15 +31872,120 @@
             },
             "left": 0,
             "top": 24,
-            "width": 238,
-            "height": 48,
+            "width": 235,
+            "height": 44,
             "text": "Not installed"
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 238,
-        "height": 72
+        "width": 235,
+        "height": 68
+      },
+      {
+        "name": "slot_micro_with_border",
+        "widgets": [
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "slot_is_2ch_view",
+            "left": 0,
+            "top": 0,
+            "width": 158,
+            "height": 70,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 70,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_micro_view",
+                    "left": 2,
+                    "top": 0,
+                    "width": 154,
+                    "height": 68,
+                    "layout": "",
+                    "context": ""
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 2,
+                    "height": 70
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 156,
+                    "top": 0,
+                    "width": 2,
+                    "height": 70
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "channel1"
+                    },
+                    "left": 2,
+                    "top": 68,
+                    "width": 154,
+                    "height": 2
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 158,
+                "height": 70,
+                "widgets": [
+                  {
+                    "type": "LayoutView",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "slot_micro_view",
+                    "left": 0,
+                    "top": 0,
+                    "width": 158,
+                    "height": 70,
+                    "layout": "",
+                    "context": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "left": 0,
+        "top": 0,
+        "width": 158,
+        "height": 70
       },
       {
         "name": "slot_micro_error",
@@ -31290,18 +31993,12 @@
           {
             "type": "Text",
             "style": {
-              "inheritFrom": "channel1",
-              "alignHorizontal": "left",
-              "color": "inst_min_header_text",
-              "backgroundColor": "inst_min_header_bgnd",
-              "activeColor": "inst_min_header_bgnd",
-              "activeBackgroundColor": "inst_min_header_text",
-              "padding": "0 5"
+              "inheritFrom": "channel1"
             },
             "data": "slot_title_micro",
-            "left": 1,
+            "left": 0,
             "top": 0,
-            "width": 157,
+            "width": 154,
             "height": 24,
             "text": ""
           },
@@ -31316,15 +32013,15 @@
             "data": "slot_error_message",
             "left": 0,
             "top": 24,
-            "width": 158,
-            "height": 48,
+            "width": 154,
+            "height": 44,
             "text": ""
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 158,
-        "height": 72
+        "width": 154,
+        "height": 68
       },
       {
         "name": "slot_micro_not_installed",
@@ -31332,13 +32029,11 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "backgroundColor": "inst_min_header_bgnd",
-              "activeColor": "inst_min_header_bgnd"
+              "inheritFrom": "channel1"
             },
             "left": 0,
             "top": 0,
-            "width": 158,
+            "width": 154,
             "height": 24,
             "invertColors": true
           },
@@ -31350,15 +32045,15 @@
             },
             "left": 0,
             "top": 24,
-            "width": 158,
-            "height": 48,
+            "width": 154,
+            "height": 44,
             "text": "Not installed"
           }
         ],
         "left": 0,
         "top": 0,
-        "width": 158,
-        "height": 72
+        "width": 154,
+        "height": 68
       },
       {
         "name": "dlog_view",
@@ -35846,7 +36541,7 @@
             "data": "channel_protection_ovp_type",
             "left": 0,
             "top": 0,
-            "width": 46,
+            "width": 45,
             "height": 32,
             "widgets": [
               {
@@ -35857,7 +36552,7 @@
                 "action": "ch_settings_prot_toggle_type",
                 "left": 0,
                 "top": 0,
-                "width": 46,
+                "width": 45,
                 "height": 32,
                 "text": "HW"
               },
@@ -35869,7 +36564,7 @@
                 "action": "ch_settings_prot_toggle_type",
                 "left": 0,
                 "top": 0,
-                "width": 46,
+                "width": 45,
                 "height": 32,
                 "text": "SW"
               },
@@ -35880,7 +36575,7 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 46,
+                "width": 45,
                 "height": 32,
                 "text": "SW"
               },
@@ -35892,7 +36587,7 @@
                 "action": "ch_settings_prot_toggle_type",
                 "left": 0,
                 "top": 0,
-                "width": 46,
+                "width": 45,
                 "height": 32,
                 "text": "HW*"
               }
@@ -35901,7 +36596,7 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 46,
+        "width": 45,
         "height": 32
       },
       {
@@ -35959,35 +36654,35 @@
               {
                 "type": "Rectangle",
                 "style": {
-                  "inheritFrom": "default",
-                  "color": "labels_and_colors_page_slot_color"
+                  "inheritFrom": "labels_and_colors_slot"
                 },
                 "left": 0,
                 "top": 32,
                 "width": 2,
-                "height": 206
+                "height": 206,
+                "invertColors": true
               },
               {
                 "type": "Rectangle",
                 "style": {
-                  "inheritFrom": "default",
-                  "color": "labels_and_colors_page_slot_color"
+                  "inheritFrom": "labels_and_colors_slot"
                 },
                 "left": 156,
                 "top": 32,
                 "width": 2,
-                "height": 206
+                "height": 206,
+                "invertColors": true
               },
               {
                 "type": "Rectangle",
                 "style": {
-                  "inheritFrom": "default",
-                  "color": "labels_and_colors_page_slot_color"
+                  "inheritFrom": "labels_and_colors_slot"
                 },
                 "left": 2,
                 "top": 236,
                 "width": 154,
-                "height": 2
+                "height": 2,
+                "invertColors": true
               }
             ]
           }
@@ -36960,22 +37655,6 @@
         "activeBackgroundColor": "text_enabled"
       },
       {
-        "name": "inst_selected",
-        "inheritFrom": "default_S",
-        "color": "inst_max_header_text",
-        "backgroundColor": "inst_max_header_bgnd",
-        "activeColor": "inst_max_header_bgnd",
-        "activeBackgroundColor": "inst_max_header_text"
-      },
-      {
-        "name": "inst_minimized",
-        "inheritFrom": "default_S",
-        "color": "inst_min_header_text",
-        "backgroundColor": "inst_min_header_bgnd",
-        "activeColor": "inst_min_header_bgnd",
-        "activeBackgroundColor": "inst_min_header_text"
-      },
-      {
         "name": "encoder_cursor_enabled",
         "inheritFrom": "default",
         "font": "Oswald14",
@@ -37424,24 +38103,6 @@
         "inheritFrom": "touch_calibration",
         "activeColor": "#00ff00",
         "activeBackgroundColor": "text_disabled_background"
-      },
-      {
-        "name": "inst_min_header",
-        "inheritFrom": "channel1",
-        "font": "Heydings14",
-        "color": "inst_min_header_text",
-        "backgroundColor": "inst_min_header_bgnd",
-        "activeColor": "inst_min_header_bgnd",
-        "activeBackgroundColor": "inst_min_header_text"
-      },
-      {
-        "name": "inst_max_header",
-        "inheritFrom": "channel1",
-        "font": "Heydings14",
-        "color": "inst_max_header_text",
-        "backgroundColor": "inst_max_header_bgnd",
-        "activeColor": "inst_max_header_bgnd",
-        "activeBackgroundColor": "inst_max_header_text"
       },
       {
         "name": "labels_and_colors_slot",
@@ -59237,18 +59898,6 @@
         "name": "status_warning"
       },
       {
-        "name": "inst_max_header_bgnd"
-      },
-      {
-        "name": "inst_min_header_bgnd"
-      },
-      {
-        "name": "inst_max_header_text"
-      },
-      {
-        "name": "inst_min_header_text"
-      },
-      {
         "name": "text_selectable_background"
       },
       {
@@ -59531,10 +60180,6 @@
           "#b3b7b7",
           "#55f2e6",
           "#ff0000",
-          "#f5c7c1",
-          "#272eb0",
-          "#404040",
-          "#ffffff",
           "#ffff00",
           "#ffffff",
           "#a8acfd",
@@ -59640,10 +60285,6 @@
           "#b3b7b7",
           "#0c857b",
           "#ff0000",
-          "#3d15a3",
-          "#2f73bf",
-          "#ffffff",
-          "#ffffff",
           "#181e8a",
           "#f0f0f0",
           "#909090",
@@ -59749,10 +60390,6 @@
           "#187397",
           "#50cec5",
           "#ff0000",
-          "#f8fac0",
-          "#66999b",
-          "#454545",
-          "#ededed",
           "#e3e3e3",
           "#c0c0c0",
           "#808080",

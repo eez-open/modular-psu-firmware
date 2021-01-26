@@ -400,7 +400,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 160,
+            "width": 154,
             "height": 32,
             "widgets": [
               {
@@ -411,9 +411,9 @@
                   "padding": "0 5"
                 },
                 "data": "slot_title_def",
-                "left": 1,
+                "left": 0,
                 "top": 0,
-                "width": 101,
+                "width": 97,
                 "height": 32,
                 "text": ""
               },
@@ -424,7 +424,7 @@
                   "font": "Heydings14"
                 },
                 "action": "show_slot_settings",
-                "left": 102,
+                "left": 97,
                 "top": 0,
                 "width": 32,
                 "height": 32,
@@ -437,7 +437,7 @@
                   "font": "Heydings14"
                 },
                 "action": "toggle_slot_max_view",
-                "left": 134,
+                "left": 129,
                 "top": 0,
                 "width": 25,
                 "height": 32,
@@ -452,8 +452,8 @@
             },
             "left": 0,
             "top": 32,
-            "width": 21,
-            "height": 208,
+            "width": 20,
+            "height": 204,
             "name": "din",
             "widgets": [
               {
@@ -466,7 +466,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 20,
-                "height": 16,
+                "height": 12,
                 "text": "DIN"
               },
               {
@@ -475,8 +475,8 @@
                   "inheritFrom": "default"
                 },
                 "data": "din_pins",
-                "left": 1,
-                "top": 16,
+                "left": 0,
+                "top": 12,
                 "width": 20,
                 "height": 192,
                 "itemWidget": {
@@ -552,10 +552,10 @@
             "style": {
               "inheritFrom": "default"
             },
-            "left": 22,
+            "left": 21,
             "top": 32,
-            "width": 40,
-            "height": 208,
+            "width": 36,
+            "height": 204,
             "name": "dout",
             "widgets": [
               {
@@ -567,8 +567,8 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 40,
-                "height": 16,
+                "width": 36,
+                "height": 12,
                 "text": "DOUT"
               },
               {
@@ -578,8 +578,8 @@
                 },
                 "data": "dout_pins",
                 "left": 0,
-                "top": 16,
-                "width": 40,
+                "top": 12,
+                "width": 36,
                 "height": 192,
                 "itemWidget": {
                   "type": "Select",
@@ -590,7 +590,7 @@
                   "action": "",
                   "left": 0,
                   "top": 0,
-                  "width": 40,
+                  "width": 36,
                   "height": 24,
                   "widgets": [
                     {
@@ -600,7 +600,7 @@
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 40,
+                      "width": 36,
                       "height": 24,
                       "widgets": [
                         {
@@ -616,7 +616,7 @@
                           "action": "dout_toggle_state",
                           "left": 0,
                           "top": 0,
-                          "width": 40,
+                          "width": 36,
                           "height": 23,
                           "text": ""
                         }
@@ -629,7 +629,7 @@
                       },
                       "left": 0,
                       "top": 0,
-                      "width": 40,
+                      "width": 36,
                       "height": 24,
                       "widgets": [
                         {
@@ -646,7 +646,7 @@
                           "action": "dout_toggle_state",
                           "left": 0,
                           "top": 0,
-                          "width": 40,
+                          "width": 36,
                           "height": 23,
                           "text": ""
                         }
@@ -664,7 +664,7 @@
               "inheritFrom": "default"
             },
             "data": "ain_channels",
-            "left": 63,
+            "left": 58,
             "top": 32,
             "width": 96,
             "height": 64,
@@ -713,7 +713,7 @@
               "inheritFrom": "default"
             },
             "data": "aout_channels",
-            "left": 63,
+            "left": 58,
             "top": 96,
             "width": 96,
             "height": 96,
@@ -763,10 +763,10 @@
               "inheritFrom": "default"
             },
             "data": "pwm_channels",
-            "left": 63,
+            "left": 58,
             "top": 192,
             "width": 96,
-            "height": 48,
+            "height": 44,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -775,7 +775,7 @@
               "left": 0,
               "top": 0,
               "width": 96,
-              "height": 24,
+              "height": 22,
               "widgets": [
                 {
                   "type": "Text",
@@ -787,7 +787,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 16,
-                  "height": 24,
+                  "height": 22,
                   "text": ""
                 },
                 {
@@ -801,7 +801,7 @@
                   "left": 16,
                   "top": 0,
                   "width": 46,
-                  "height": 23,
+                  "height": 21,
                   "displayOption": 0
                 },
                 {
@@ -815,7 +815,7 @@
                   "left": 63,
                   "top": 0,
                   "width": 33,
-                  "height": 23,
+                  "height": 21,
                   "displayOption": 0
                 }
               ]
@@ -826,8 +826,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 160,
-        "height": 240,
+        "width": 154,
+        "height": 236,
         "dataContextOverrides": "{\n    \"pwms\": [\n      { \"pwm_label\": \"P1\", \"pwm_freq\": \"100 Hz\", \"pwm_duty\": \"80 %\" },\n      { \"pwm_label\": \"P2\", \"pwm_freq\": \"1.2 KHz\", \"pwm_duty\": \"50 %\" }\n    ]\n}"
       },
       {
@@ -841,7 +841,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 240,
+            "width": 234,
             "height": 32,
             "widgets": [
               {
@@ -852,9 +852,9 @@
                   "padding": "0 5"
                 },
                 "data": "slot_title_def",
-                "left": 1,
+                "left": 0,
                 "top": 0,
-                "width": 175,
+                "width": 170,
                 "height": 32,
                 "text": ""
               },
@@ -865,7 +865,7 @@
                   "font": "Heydings14"
                 },
                 "action": "show_slot_settings",
-                "left": 176,
+                "left": 170,
                 "top": 0,
                 "width": 32,
                 "height": 32,
@@ -878,7 +878,7 @@
                   "font": "Heydings14"
                 },
                 "action": "toggle_slot_max_view",
-                "left": 208,
+                "left": 202,
                 "top": 0,
                 "width": 32,
                 "height": 32,
@@ -894,7 +894,7 @@
             "left": 0,
             "top": 32,
             "width": 21,
-            "height": 208,
+            "height": 204,
             "name": "din",
             "widgets": [
               {
@@ -907,7 +907,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 20,
-                "height": 16,
+                "height": 12,
                 "text": "DIN"
               },
               {
@@ -917,7 +917,7 @@
                 },
                 "data": "din_pins",
                 "left": 1,
-                "top": 16,
+                "top": 12,
                 "width": 20,
                 "height": 192,
                 "itemWidget": {
@@ -996,7 +996,7 @@
             "left": 26,
             "top": 32,
             "width": 40,
-            "height": 208,
+            "height": 204,
             "name": "dout",
             "widgets": [
               {
@@ -1009,7 +1009,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 40,
-                "height": 16,
+                "height": 12,
                 "text": "DOUT"
               },
               {
@@ -1019,7 +1019,7 @@
                 },
                 "data": "dout_pins",
                 "left": 0,
-                "top": 16,
+                "top": 12,
                 "width": 40,
                 "height": 192,
                 "itemWidget": {
@@ -1105,9 +1105,9 @@
               "inheritFrom": "default"
             },
             "data": "ain_channels",
-            "left": 71,
+            "left": 70,
             "top": 32,
-            "width": 168,
+            "width": 164,
             "height": 64,
             "itemWidget": {
               "type": "Container",
@@ -1116,7 +1116,7 @@
               },
               "left": 0,
               "top": 0,
-              "width": 168,
+              "width": 164,
               "height": 16,
               "widgets": [
                 {
@@ -1141,7 +1141,7 @@
                   "data": "ain_value",
                   "left": 44,
                   "top": 0,
-                  "width": 124,
+                  "width": 120,
                   "height": 16,
                   "displayOption": 0
                 }
@@ -1154,9 +1154,9 @@
               "inheritFrom": "default"
             },
             "data": "aout_channels",
-            "left": 71,
+            "left": 70,
             "top": 96,
-            "width": 168,
+            "width": 164,
             "height": 96,
             "itemWidget": {
               "type": "Container",
@@ -1165,7 +1165,7 @@
               },
               "left": 0,
               "top": 0,
-              "width": 168,
+              "width": 164,
               "height": 24,
               "widgets": [
                 {
@@ -1191,7 +1191,7 @@
                   "action": "edit",
                   "left": 43,
                   "top": 0,
-                  "width": 125,
+                  "width": 121,
                   "height": 23,
                   "displayOption": 0
                 }
@@ -1204,10 +1204,10 @@
               "inheritFrom": "default"
             },
             "data": "pwm_channels",
-            "left": 71,
+            "left": 70,
             "top": 192,
-            "width": 168,
-            "height": 48,
+            "width": 164,
+            "height": 44,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -1215,8 +1215,8 @@
               },
               "left": 0,
               "top": 0,
-              "width": 168,
-              "height": 24,
+              "width": 164,
+              "height": 22,
               "widgets": [
                 {
                   "type": "Text",
@@ -1228,7 +1228,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 44,
-                  "height": 24,
+                  "height": 22,
                   "text": ""
                 },
                 {
@@ -1239,10 +1239,10 @@
                   },
                   "data": "pwm_freq",
                   "action": "edit",
-                  "left": 44,
+                  "left": 43,
                   "top": 0,
-                  "width": 62,
-                  "height": 23,
+                  "width": 61,
+                  "height": 21,
                   "displayOption": 0
                 },
                 {
@@ -1253,10 +1253,10 @@
                   },
                   "data": "pwm_duty",
                   "action": "edit",
-                  "left": 107,
+                  "left": 105,
                   "top": 0,
-                  "width": 61,
-                  "height": 23,
+                  "width": 59,
+                  "height": 21,
                   "displayOption": 0
                 }
               ]
@@ -1267,8 +1267,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 240,
-        "height": 240,
+        "width": 234,
+        "height": 236,
         "dataContextOverrides": "{\n    \"analog_inputs\": [\n      { \"analog_input_label\": \"AIN1\", \"analog_input_value\": \"1.0 V\" },\n      { \"analog_input_label\": \"AIN2\", \"analog_input_value\": \"2.0 V\" },\n      { \"analog_input_label\": \"AIN3\", \"analog_input_value\": \"3.0 V\" },\n      { \"analog_input_label\": \"AIN4\", \"analog_input_value\": \"4.0 V\" }\n    ],\n    \"analog_outputs\": [\n      { \"analog_output_label\": \"AOUT1\", \"analog_output_value\": \"2.1 V\" },\n      { \"analog_output_label\": \"AOUT2\", \"analog_output_value\": \"2.2 V\" },\n      { \"analog_output_label\": \"AOUT3\", \"analog_output_value\": \"2.3 V\" },\n      { \"analog_output_label\": \"AOUT4\", \"analog_output_value\": \"2.4 V\" }\n    ]    \n}"
       },
       {
@@ -2218,7 +2218,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 238,
+            "width": 235,
             "height": 24,
             "widgets": [
               {
@@ -2231,7 +2231,7 @@
                 "data": "slot_title_min",
                 "left": 0,
                 "top": 0,
-                "width": 193,
+                "width": 190,
                 "height": 24,
                 "text": ""
               },
@@ -2244,7 +2244,7 @@
                 },
                 "data": "",
                 "action": "toggle_slot_max_view",
-                "left": 193,
+                "left": 190,
                 "top": 0,
                 "width": 45,
                 "height": 24,
@@ -2255,8 +2255,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 238,
-        "height": 72
+        "width": 235,
+        "height": 68
       },
       {
         "name": "slot_view_micro",
@@ -2268,7 +2268,7 @@
             },
             "left": 0,
             "top": 0,
-            "width": 158,
+            "width": 154,
             "height": 24,
             "widgets": [
               {
@@ -2281,7 +2281,7 @@
                 "data": "slot_title_micro",
                 "left": 0,
                 "top": 0,
-                "width": 158,
+                "width": 154,
                 "height": 24,
                 "text": ""
               }
@@ -2290,8 +2290,8 @@
         ],
         "left": 0,
         "top": 0,
-        "width": 158,
-        "height": 72
+        "width": 154,
+        "height": 68
       },
       {
         "name": "labels_and_colors",
@@ -2350,35 +2350,35 @@
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "labels_and_colors_page_slot_color"
+              "inheritFrom": "labels_and_colors_slot"
             },
             "left": 0,
             "top": 32,
             "width": 2,
-            "height": 206
+            "height": 206,
+            "invertColors": true
           },
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "labels_and_colors_page_slot_color"
+              "inheritFrom": "labels_and_colors_slot"
             },
             "left": 156,
             "top": 32,
             "width": 2,
-            "height": 206
+            "height": 206,
+            "invertColors": true
           },
           {
             "type": "Rectangle",
             "style": {
-              "inheritFrom": "default",
-              "color": "labels_and_colors_page_slot_color"
+              "inheritFrom": "labels_and_colors_slot"
             },
             "left": 2,
             "top": 236,
             "width": 154,
-            "height": 2
+            "height": 2,
+            "invertColors": true
           }
         ],
         "left": 0,
