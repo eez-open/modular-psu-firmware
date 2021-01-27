@@ -3044,66 +3044,6 @@
                 "width": 44,
                 "height": 32,
                 "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 44,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 44,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 44,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 44,
-                "height": 32,
-                "text": "9"
               }
             ]
           },

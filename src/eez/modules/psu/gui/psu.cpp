@@ -1924,16 +1924,16 @@ void channelReinitiateTrigger() {
     channelInitiateTrigger();
 }
 
-void clearTrip(int channelIndex) {
-    Channel &channel = Channel::get(channelIndex);
-    channel_dispatcher::clearProtection(channel);
+// void clearTrip(int channelIndex) {
+//     Channel &channel = Channel::get(channelIndex);
+//     channel_dispatcher::clearProtection(channel);
 
-    if (temperature::sensors[temp_sensor::AUX].isTripped()) {
-        temperature::sensors[temp_sensor::AUX].clearProtection();
-    }
+//     if (temperature::sensors[temp_sensor::AUX].isTripped()) {
+//         temperature::sensors[temp_sensor::AUX].clearProtection();
+//     }
 
-    channelToggleOutput();
-}
+//     channelToggleOutput();
+// }
 
 void doChannelToggleOutput() {
     Channel &channel = *g_channel;
@@ -1978,9 +1978,11 @@ void channelToggleOutput() {
     int channelIndex;
     if (channel_dispatcher::isTripped(channel, channelIndex)) {
         if (temperature::sensors[temp_sensor::AUX].isTripped()) {
-            errorMessageWithAction("AUX temp. sensor is tripped!", clearTrip, "Clear", channelIndex);
+            // errorMessageWithAction("AUX temp. sensor is tripped!", clearTrip, "Clear", channelIndex);
+            errorMessage("AUX temp. sensor is tripped!");
         } else {
-            errorMessageWithAction("Channel is tripped!", clearTrip, "Clear", channelIndex);
+            // errorMessageWithAction("Channel is tripped!", clearTrip, "Clear", channelIndex);
+            errorMessage("Channel is tripped!");
         }
     } else {
         if (!channel.isOutputEnabled() && !channel.isCalibrationExists()) {

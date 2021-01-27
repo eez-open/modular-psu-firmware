@@ -2250,19 +2250,43 @@ void data_channel_protection_status(DataOperationEnum operation, Cursor cursor, 
         bool opp = channel_dispatcher::isOppTripped(channel);
         bool otp = channel_dispatcher::isOtpTripped(channel);
 
-        if (!ovp && !ocp && !opp && !otp) {
-            value = 0;
-        } else if (ovp && !ocp && !opp && !otp) {
-            value = 1;
-        } else if (!ovp && ocp && !opp && !otp) {
-            value = 2;
-        } else if (!ovp && !ocp && opp && !otp) {
-            value = 3;
-        } else if (!ovp && !ocp && !opp && otp) {
-            value = 4;
-        } else {
-            value = 5;
-        }
+        value = ovp || ocp || opp || otp;
+    }
+}
+
+void data_channel_protection_status_ovp(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+
+        value = channel_dispatcher::isOvpTripped(channel);
+    }
+}
+
+void data_channel_protection_status_ocp(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+
+        value = channel_dispatcher::isOcpTripped(channel);
+    }
+}
+
+void data_channel_protection_status_opp(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+
+        value = channel_dispatcher::isOppTripped(channel);
+    }
+}
+
+void data_channel_protection_status_otp(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+        Channel &channel = Channel::get(iChannel);
+
+        value = channel_dispatcher::isOtpTripped(channel);
     }
 }
 

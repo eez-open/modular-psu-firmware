@@ -1312,7 +1312,7 @@
             "left": 0,
             "top": 34,
             "width": 234,
-            "height": 134,
+            "height": 136,
             "text": ""
           },
           {
@@ -1322,9 +1322,9 @@
             },
             "data": "trigger_is_initiated",
             "left": 0,
-            "top": 170,
+            "top": 172,
             "width": 234,
-            "height": 66,
+            "height": 64,
             "widgets": [
               {
                 "type": "Select",
@@ -1335,7 +1335,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 234,
-                "height": 66,
+                "height": 64,
                 "widgets": [
                   {
                     "type": "Container",
@@ -1345,7 +1345,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 234,
-                    "height": 66,
+                    "height": 64,
                     "widgets": [
                       {
                         "type": "DisplayData",
@@ -1357,7 +1357,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 116,
-                        "height": 32,
+                        "height": 31,
                         "displayOption": 0
                       },
                       {
@@ -1370,7 +1370,7 @@
                         "left": 118,
                         "top": 0,
                         "width": 116,
-                        "height": 32,
+                        "height": 31,
                         "displayOption": 0
                       },
                       {
@@ -1381,9 +1381,9 @@
                         "data": "channel_protection_opp_limit",
                         "action": "edit",
                         "left": 118,
-                        "top": 34,
+                        "top": 33,
                         "width": 116,
-                        "height": 32,
+                        "height": 31,
                         "displayOption": 0
                       }
                     ]
@@ -1399,7 +1399,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 234,
-                    "height": 66,
+                    "height": 64,
                     "text": "\\u00a1"
                   },
                   {
@@ -1413,7 +1413,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 234,
-                    "height": 66,
+                    "height": 64,
                     "text": "\\u00b5"
                   }
                 ]
@@ -1428,7 +1428,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 234,
-                "height": 66,
+                "height": 64,
                 "text": "\\u00A4 TRG",
                 "enabled": "trigger_is_manual",
                 "disabledStyle": {
@@ -2555,66 +2555,6 @@
                 "width": 50,
                 "height": 32,
                 "text": "D"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 50,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 50,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 50,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 50,
-                "height": 32,
-                "text": "9"
               },
               {
                 "type": "Text",

@@ -514,9 +514,29 @@
     },
     {
       "name": "channel_protection_status",
-      "type": "enum",
-      "enumItems": "[\n\"None\",\n\"OVP\",\n\"OCP\",\n\"OTP\",\n\"OPP\",\n\"Multiple\"\n]",
-      "defaultValue": "0"
+      "type": "boolean",
+      "enumItems": "[\n\"Off\",\n\"On\"\n]",
+      "defaultValue": "1"
+    },
+    {
+      "name": "channel_protection_status_ovp",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "channel_protection_status_ocp",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "channel_protection_status_opp",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "channel_protection_status_otp",
+      "type": "boolean",
+      "defaultValue": "1"
     },
     {
       "name": "channel_protection_ovp_state",
@@ -6933,7 +6953,7 @@
                   {
                     "type": "DisplayData",
                     "style": {
-                      "inheritFrom": "value",
+                      "inheritFrom": "default",
                       "font": "Oswald20",
                       "alignHorizontal": "center",
                       "color": "text_regular",
@@ -6949,7 +6969,7 @@
                   {
                     "type": "DisplayData",
                     "style": {
-                      "inheritFrom": "value",
+                      "inheritFrom": "default",
                       "font": "Oswald20",
                       "alignHorizontal": "center",
                       "color": "text_regular",
@@ -10388,54 +10408,6 @@
                     "width": 208,
                     "height": 32,
                     "text": "Clear protection"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center"
-                    },
-                    "action": "ch_settings_prot_clear",
-                    "left": 0,
-                    "top": 0,
-                    "width": 208,
-                    "height": 32,
-                    "text": "Clear protection"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center"
-                    },
-                    "action": "ch_settings_prot_clear",
-                    "left": 0,
-                    "top": 0,
-                    "width": 208,
-                    "height": 32,
-                    "text": "Clear protection"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center"
-                    },
-                    "action": "ch_settings_prot_clear",
-                    "left": 0,
-                    "top": 0,
-                    "width": 208,
-                    "height": 32,
-                    "text": "Clear protection"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center"
-                    },
-                    "action": "ch_settings_prot_clear",
-                    "left": 0,
-                    "top": 0,
-                    "width": 208,
-                    "height": 32,
-                    "text": "Clear protection"
                   }
                 ]
               },
@@ -11647,6 +11619,45 @@
                         "invertColors": true
                       }
                     ]
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "channel_protection_status_ovp",
+                    "left": 0,
+                    "top": 160,
+                    "width": 208,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center",
+                          "color": "text_regular",
+                          "activeBackgroundColor": "text_regular"
+                        },
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 208,
+                        "height": 32,
+                        "text": "Clear protection"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center"
+                        },
+                        "action": "ch_settings_prot_clear",
+                        "left": 0,
+                        "top": 0,
+                        "width": 208,
+                        "height": 32,
+                        "text": "Clear protection"
+                      }
+                    ]
                   }
                 ]
               },
@@ -12567,6 +12578,45 @@
                 "width": 74,
                 "height": 32,
                 "displayOption": 0
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_protection_status_ocp",
+                "left": 0,
+                "top": 186,
+                "width": 208,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "color": "text_regular",
+                      "activeBackgroundColor": "text_regular"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "ch_settings_prot_clear",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  }
+                ]
               }
             ]
           },
@@ -13150,6 +13200,45 @@
                 "width": 78,
                 "height": 32,
                 "displayOption": 0
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_protection_status_opp",
+                "left": 0,
+                "top": 186,
+                "width": 208,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "color": "text_regular",
+                      "activeBackgroundColor": "text_regular"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "ch_settings_prot_clear",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  }
+                ]
               }
             ]
           },
@@ -13764,6 +13853,45 @@
                         }
                       }
                     ]
+                  }
+                ]
+              },
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_protection_status_otp",
+                "left": 0,
+                "top": 150,
+                "width": 208,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "color": "text_regular",
+                      "activeBackgroundColor": "text_regular"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "ch_settings_prot_clear",
+                    "left": 0,
+                    "top": 0,
+                    "width": 208,
+                    "height": 32,
+                    "text": "Clear protection"
                   }
                 ]
               }
@@ -29941,66 +30069,6 @@
                 "width": 28,
                 "height": 32,
                 "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 28,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 28,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 28,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 28,
-                "height": 32,
-                "text": "9"
               }
             ]
           },
@@ -30064,66 +30132,6 @@
                 "width": 32,
                 "height": 32,
                 "text": "D"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 32,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 32,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 32,
-                "height": 32,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 32,
-                "height": 32,
-                "text": "9"
               },
               {
                 "type": "Text",
@@ -30849,66 +30857,6 @@
                 "width": 52,
                 "height": 37,
                 "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 52,
-                "height": 37,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 52,
-                "height": 37,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 52,
-                "height": 37,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 52,
-                "height": 37,
-                "text": "9"
               }
             ]
           }
@@ -30974,66 +30922,6 @@
                 "width": 52,
                 "height": 57,
                 "text": "D"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 52,
-                "height": 57,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 52,
-                "height": 57,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 52,
-                "height": 57,
-                "text": "9"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "channel1",
-                  "font": "Heydings14",
-                  "color": "status_warning",
-                  "activeBackgroundColor": "status_warning"
-                },
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 52,
-                "height": 57,
-                "text": "9"
               },
               {
                 "type": "Text",
@@ -37314,15 +37202,6 @@
         "padding": 0
       },
       {
-        "name": "value",
-        "inheritFrom": "default",
-        "font": "Oswald24",
-        "alignHorizontal": "left",
-        "color": "text_value",
-        "activeBackgroundColor": "text_value",
-        "padding": 0
-      },
-      {
         "name": "value_S_left",
         "inheritFrom": "value_S",
         "alignHorizontal": "left"
@@ -37623,17 +37502,6 @@
         "backgroundColor": "text_disabled_background",
         "activeColor": "text_disabled_background",
         "activeBackgroundColor": "protection_text",
-        "padding": 0
-      },
-      {
-        "name": "home",
-        "description": "",
-        "font": "Oswald24",
-        "color": "status_line_text",
-        "backgroundColor": "status_line_background",
-        "activeColor": "status_line_background",
-        "activeBackgroundColor": "status_line_text",
-        "borderColor": "#D3D3D3",
         "padding": 0
       },
       {
