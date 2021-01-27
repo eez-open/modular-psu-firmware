@@ -18,6 +18,8 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include <memory.h>
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -33,7 +35,10 @@
 #include "eez/modules/psu/psu.h"
 #include "eez/modules/psu/event_queue.h"
 #include "eez/modules/psu/profile.h"
+#include "eez/modules/psu/timer.h"
 #include "eez/modules/psu/gui/psu.h"
+#include "eez/modules/psu/gui/labels_and_colors.h"
+#include "eez/modules/psu/gui/animations.h"
 #include "eez/modules/bp3c/comm.h"
 
 #include "scpi/scpi.h"
@@ -47,7 +52,15 @@ using namespace eez::gui;
 namespace eez {
 namespace dib_prel6 {
 
+enum Prel6LowPriorityThreadMessage {
+    THREAD_MESSAGE_SAVE_RELAY_CYCLES = THREAD_MESSAGE_MODULE_SPECIFIC
+};
+
 static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
+
+static const int NUM_RELAYS = 6;
+
+static const uint32_t MIN_TO_MS = 60L * 1000L;
 
 static const int NUM_REQUEST_RETRIES = 100;
 static const int MAX_DMA_TRANSFER_ERRORS = 100;
@@ -156,6 +169,14 @@ public:
 
     uint8_t relayStates = 0;
 
+    static const size_t RELAY_LABEL_MAX_LENGTH = 10;
+    char relayLabels[NUM_RELAYS][RELAY_LABEL_MAX_LENGTH + 1];
+
+    // relay cycles counting    
+    uint32_t relayCycles[NUM_RELAYS];
+    uint32_t lastWrittenRelayCycles[NUM_RELAYS];
+    Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
+
     Prel6Module() {
         assert(sizeof(Request) <= BUFFER_SIZE);
         assert(sizeof(Response) <= BUFFER_SIZE);
@@ -173,11 +194,17 @@ public:
         spiCrcCalculationEnable = false;
 #endif
         numPowerChannels = 0;
-        numOtherChannels = 6;
+        numOtherChannels = NUM_RELAYS;
         isResyncSupported = true;
 
         memset(input, 0, sizeof(input));
         memset(output, 0, sizeof(output));
+    }
+
+    void boot() override {
+        Module::boot();
+
+        loadRelayCylces();
     }
 
     Module *createModule() override {
@@ -261,7 +288,11 @@ public:
         if (isSuccess) {
             auto &data = response.setParams;
             if (data.result) {
-                memcpy(&lastTransferredParams, &((Request *)output)->setParams, sizeof(SetParams));
+                SetParams &params = ((Request *)output)->setParams;
+
+                updateRelayCycles(lastTransferredParams.relayStates, params.relayStates);
+
+                memcpy(&lastTransferredParams, &params, sizeof(SetParams));
             }
         }
     }
@@ -414,6 +445,10 @@ public:
     }
 
     void tick() override {
+        if (relayCyclesWriteInterval.test()) {
+            sendMessageToLowPriorityThread((LowPriorityThreadMessage)THREAD_MESSAGE_SAVE_RELAY_CYCLES, slotIndex);
+        }
+
         if (currentCommand) {
             if (!synchronized && currentCommand->command != COMMAND_GET_INFO) {
                 doCommandDone(false);
@@ -523,6 +558,18 @@ public:
         }
     }
 
+    void writeUnsavedData() override {
+        saveRelayCycles();
+    }
+
+    void animatePageAppearance(int previousPageId, int activePageId) override {
+        if (previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS && activePageId == PAGE_ID_DIB_PREL6_CHANNEL_LABELS) {
+            psu::gui::animateSettingsSlideLeft(true);
+        } else if (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS) {
+            psu::gui::animateSettingsSlideRight(true);
+        }
+    }
+
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
             return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_DEF : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
@@ -544,14 +591,20 @@ public:
         return PAGE_ID_DIB_PREL6_SETTINGS;
     }
 
+    int getLabelsAndColorsPageId() override {
+        return PAGE_ID_DIB_PREL6_LABELS_AND_COLORS;
+    }
+
     struct ProfileParameters : public Module::ProfileParameters {
         uint8_t relayStates;
+        char relayLabels[NUM_RELAYS][RELAY_LABEL_MAX_LENGTH + 1];
     };
 
     void resetProfileToDefaults(uint8_t *buffer) override {
         Module::resetProfileToDefaults(buffer);
         auto parameters = (ProfileParameters *)buffer;
         parameters->relayStates = relayStates;
+        memset(parameters->relayLabels, 0, sizeof(relayLabels));
     }
 
     void getProfileParameters(uint8_t *buffer) override {
@@ -559,12 +612,14 @@ public:
         assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
         auto parameters = (ProfileParameters *)buffer;
         parameters->relayStates = relayStates;
+        memcpy(parameters->relayLabels, relayLabels, sizeof(relayLabels));
     }
     
     void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) override {
         Module::setProfileParameters(buffer, mismatch, recallOptions);
         auto parameters = (ProfileParameters *)buffer;
         relayStates = parameters->relayStates;
+        memcpy(relayLabels, parameters->relayLabels, sizeof(relayLabels));
     }
     
     bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) override {
@@ -572,7 +627,15 @@ public:
             return false;
         }
         auto parameters = (const ProfileParameters *)buffer;
+
         WRITE_PROPERTY("relayStates", parameters->relayStates);
+
+        for (int i = 0; i < NUM_RELAYS; i++) {
+            char propName[16];
+            sprintf(propName, "channelLabel%d", i+1);
+            WRITE_PROPERTY(propName, parameters->relayLabels[i]);
+        }
+
         return true;
     }
     
@@ -581,13 +644,83 @@ public:
             return true;
         }
         auto parameters = (ProfileParameters *)buffer;
+        
         READ_PROPERTY("relayStates", parameters->relayStates);
-		return false;
+		
+        for (int i = 0; i < NUM_RELAYS; i++) {
+            char propName[16];
+            sprintf(propName, "channelLabel%d", i+1);
+            READ_STRING_PROPERTY(propName, parameters->relayLabels[i], RELAY_LABEL_MAX_LENGTH);
+        }
+
+        return false;
     }
 
     void resetConfiguration() {
         Module::resetConfiguration();
         relayStates = 0;
+        memset(relayLabels, 0, sizeof(relayLabels));
+    }
+
+    size_t getChannelLabelMaxLength(int subchannelIndex) override {
+        return RELAY_LABEL_MAX_LENGTH;
+    }
+
+    eez_err_t getChannelLabel(int subchannelIndex, const char *&label) override {
+        if (subchannelIndex < 0 || subchannelIndex >= NUM_RELAYS) {
+            return SCPI_ERROR_HARDWARE_MISSING;
+        } 
+        
+        label = relayLabels[subchannelIndex];
+        return SCPI_RES_OK;
+    }
+
+    const char *getChannelLabel(int subchannelIndex) override {
+        const char *label;
+        auto err = getChannelLabel(subchannelIndex, label);
+        if (err == SCPI_RES_OK) {
+            return label;
+        } 
+        return "";
+    }
+
+    const char *getDefaultChannelLabel(int subchannelIndex) override {
+        static const char *g_relayLabels[NUM_RELAYS] = {
+            "Relay #1",
+            "Relay #2",
+            "Relay #3",
+            "Relay #4",
+            "Relay #5",
+            "Relay #6"
+        };
+
+		return g_relayLabels[subchannelIndex];
+    }
+
+    const char *getRelayLabelOrDefault(char subchannelIndex) {
+        const char *label = getChannelLabel(subchannelIndex);
+        if (*label) {
+            return label;
+        }
+        return getDefaultChannelLabel(subchannelIndex);
+    }
+
+    eez_err_t setChannelLabel(int subchannelIndex, const char *label, int length) override {
+        if (subchannelIndex < 0 || subchannelIndex >= NUM_RELAYS) {
+            return SCPI_ERROR_HARDWARE_MISSING;
+        } 
+
+        if (length == -1) {
+            length = strlen(label);
+        }
+        if (length > (int)RELAY_LABEL_MAX_LENGTH) {
+            length = RELAY_LABEL_MAX_LENGTH;
+        }
+
+        strncpy(relayLabels[subchannelIndex], label, length);
+        relayLabels[subchannelIndex][length] = 0;
+
+        return SCPI_RES_OK;
     }
 
     bool isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err) override {
@@ -639,6 +772,48 @@ public:
 
         return true;
     }
+
+    void onLowPriorityThreadMessage(uint8_t type, uint32_t param) override {
+        if (type == THREAD_MESSAGE_SAVE_RELAY_CYCLES) {
+            saveRelayCycles();
+        }
+    }
+
+    bool getRelayCycles(int subchannelIndex, uint32_t &relayCycles, int *err) override {
+        if (subchannelIndex < 0 || subchannelIndex >= NUM_RELAYS) {
+            if (err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+
+		relayCycles = this->relayCycles[subchannelIndex];
+
+        return true;
+    }
+
+    void updateRelayCycles(uint8_t oldRelayStates, uint8_t newRelayStates) {
+        for (int i = 0; i < NUM_RELAYS; i++) {
+            if (!(oldRelayStates & (1 << i)) && (newRelayStates & (1 << i))) {
+                relayCycles[i]++;
+            }
+        }
+    }
+
+    void loadRelayCylces() {
+        for (int i = 0; i < NUM_RELAYS; i++) {
+            relayCycles[i] = lastWrittenRelayCycles[i] = persist_conf::readCounter(slotIndex, i);
+        }
+    }
+
+    void saveRelayCycles() {
+        for (int i = 0; i < NUM_RELAYS; i++) {
+            if (relayCycles[i] != lastWrittenRelayCycles[i]) {
+                persist_conf::writeCounter(slotIndex, i, relayCycles[i]);
+                lastWrittenRelayCycles[i] = relayCycles[i];
+            }
+        }
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -674,55 +849,81 @@ using namespace dib_prel6;
 
 void data_dib_prel6_relays(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
-        value = 6;
+        value = NUM_RELAYS;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
-        value = hmi::g_selectedSlotIndex * 6 + value.getInt();
+        value = hmi::g_selectedSlotIndex * NUM_RELAYS + value.getInt();
     } 
 }
 
 void data_dib_prel6_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        int slotIndex = cursor / 6;
-        int subchannelIndex = cursor % 6;
+        int slotIndex = cursor / NUM_RELAYS;
+        int subchannelIndex = cursor % NUM_RELAYS;
         value = ((Prel6Module *)g_slots[slotIndex])->relayStates & (1 << subchannelIndex) ? 1 : 0;
     }
 }
 
 void data_dib_prel6_relay_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-		static const char *OFF_LABELS[] = {
-			"1: OFF",
-			"2: OFF",
-			"3: OFF",
-			"4: OFF",
-			"5: OFF",
-			"6: OFF"
-		};
-		static const char *ON_LABELS[] = {
-			"1: ON",
-			"2: ON",
-			"3: ON",
-			"4: ON",
-			"5: ON",
-			"6: ON"
-		};
-
-        int slotIndex = cursor / 6;
-        int subchannelIndex = cursor % 6;
-
-        if (((Prel6Module *)g_slots[slotIndex])->relayStates & (1 << subchannelIndex)) {
-            value = ON_LABELS[subchannelIndex];
+        int slotIndex = cursor / NUM_RELAYS;
+        int subchannelIndex = cursor % NUM_RELAYS;
+        if (isPageOnStack(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS)) {
+            const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, subchannelIndex);
+            if (*label) {
+                value = label;
+            } else {
+                value = g_slots[slotIndex]->getDefaultChannelLabel(subchannelIndex);
+            }   
         } else {
-            value = OFF_LABELS[subchannelIndex];
+            value = ((Prel6Module *)g_slots[slotIndex])->getRelayLabelOrDefault(subchannelIndex);
         }
     }
 }
 
+void data_dib_prel6_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex = cursor / NUM_RELAYS;
+		int subchannelIndex = cursor % NUM_RELAYS;
+		value = Value(((Prel6Module *)g_slots[slotIndex])->relayCycles[subchannelIndex], VALUE_TYPE_UINT32);
+	}
+}
+
 void action_dib_prel6_toggle_relay() {
     int cursor = getFoundWidgetAtDown().cursor;
-    int slotIndex = cursor / 6;
-    int subchannelIndex = cursor % 6;
+    int slotIndex = cursor / NUM_RELAYS;
+    int subchannelIndex = cursor % NUM_RELAYS;
     ((Prel6Module *)g_slots[slotIndex])->relayStates ^= 1 << subchannelIndex;
+}
+
+void action_dib_prel6_show_relay_cycles() {
+	pushPage(PAGE_ID_DIB_PREL6_RELAY_CYCLES);
+
+}
+
+void action_dib_prel6_show_relay_labels() {
+    hmi::selectSlot(getFoundWidgetAtDown().cursor);
+    pushPage(PAGE_ID_DIB_PREL6_CHANNEL_LABELS);
+}
+
+void data_dib_prel6_relay_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        static const char *g_relayLabelLabels[NUM_RELAYS] = {
+            "Relay #1 label:",
+            "Relay #2 label:",
+            "Relay #3 label:",
+            "Relay #4 label:",
+            "Relay #5 label:",
+            "Relay #6 label:"
+        };
+        value = g_relayLabelLabels[cursor % NUM_RELAYS];
+    }
+}
+
+void action_dib_prel6_change_relay_label() {
+    int cursor = getFoundWidgetAtDown().cursor;
+    int slotIndex = cursor / NUM_RELAYS;
+    int subchannelIndex = cursor % NUM_RELAYS;
+    LabelsAndColorsPage::editChannelLabel(slotIndex, subchannelIndex);
 }
 
 } // namespace gui

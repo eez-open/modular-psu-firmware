@@ -2013,7 +2013,7 @@ public:
 
     Page *getPageFromId(int pageId) override;
 
-    virtual void animatePageAppearance(int previousPageId, int activePageId) {
+    void animatePageAppearance(int previousPageId, int activePageId) override {
         if (
             (previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS && activePageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS) ||
             (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_DIN_CHANNEL_LABELS) ||
@@ -4094,7 +4094,6 @@ void data_dib_mio168_din_label_label(DataOperationEnum operation, Cursor cursor,
             "DIN5 label:", "DIN6 label:", "DIN7 label:", "DIN8 label:",
         };
         value = g_dinLabelLabels[cursor % 8];
-
     }
 }
 

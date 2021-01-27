@@ -422,7 +422,6 @@ void action_ch_settings_calibration_toggle_enable() {
 
 void action_ch_settings_prot_clear() {
     channel_dispatcher::clearProtection(*g_channel);
-    popPage();
     infoMessage("Cleared!");
 }
 
