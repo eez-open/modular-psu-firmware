@@ -107,6 +107,15 @@ bool isCouplingTypeAllowed(CouplingType couplingType, int *err) {
             }
             return false;
         }
+
+        if (couplingType == COUPLING_TYPE_PARALLEL || couplingType == COUPLING_TYPE_SERIES) {
+            if (Channel::get(0).flags.trackingEnabled || Channel::get(1).flags.trackingEnabled) {
+                if (err) {
+                    *err = SCPI_ERROR_EXECUTION_ERROR;
+                }
+                return false;
+            }
+        }
     }
 
     return true;
@@ -1726,7 +1735,7 @@ void setDisplayViewSettings(Channel &channel, DisplayValue *displayValues, float
             Channel &trackingChannel = Channel::get(i);
             if (trackingChannel.flags.trackingEnabled) {
                 trackingChannel.displayValues[1] = displayValues[0];
-				trackingChannel.displayValues[1] = displayValues[0];
+				trackingChannel.displayValues[1] = displayValues[1];
                 if (trackingChannel.ytViewRate != ytViewRate) {
                     trackingChannel.ytViewRate = ytViewRate;
                     resetHistory = true;

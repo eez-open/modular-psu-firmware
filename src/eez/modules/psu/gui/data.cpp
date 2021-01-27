@@ -104,7 +104,7 @@ EnumItem g_enumDefinition_CHANNEL_DISPLAY_VALUE[] = {
 };
 
 EnumItem g_enumDefinition_CHANNEL_DISPLAY_VALUE_SCALE[] = {
-    { DISPLAY_VALUE_SCALE_FULL, "Full" },
+    { DISPLAY_VALUE_SCALE_MAXIMUM, "Maximum" },
     { DISPLAY_VALUE_SCALE_LIMIT, "Limit" },
     { DISPLAY_VALUE_SCALE_AUTO, "Auto" },
     { DISPLAY_VALUE_SCALE_CUSTOM, "Custom" },

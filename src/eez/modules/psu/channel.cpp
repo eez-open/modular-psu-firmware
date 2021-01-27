@@ -1517,7 +1517,7 @@ Unit DisplayValue::getUnit() {
 }
 
 float DisplayValue::getRange(Channel *channel) {
-    if (scale == DISPLAY_VALUE_SCALE_FULL) {
+    if (scale == DISPLAY_VALUE_SCALE_MAXIMUM) {
         if (type == DISPLAY_VALUE_VOLTAGE) {
             return channel_dispatcher::getUMaxLimit(*channel);
         }

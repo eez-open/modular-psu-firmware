@@ -855,6 +855,13 @@ void data_dib_prel6_relays(DataOperationEnum operation, Cursor cursor, Value &va
     } 
 }
 
+void data_dib_prel6_is_relay_1_or_6(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int subchannelIndex = cursor % NUM_RELAYS;
+        value = subchannelIndex == 0 || subchannelIndex == 5;
+    }
+}
+
 void data_dib_prel6_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_RELAYS;
@@ -893,11 +900,6 @@ void action_dib_prel6_toggle_relay() {
     int slotIndex = cursor / NUM_RELAYS;
     int subchannelIndex = cursor % NUM_RELAYS;
     ((Prel6Module *)g_slots[slotIndex])->relayStates ^= 1 << subchannelIndex;
-}
-
-void action_dib_prel6_show_relay_cycles() {
-	pushPage(PAGE_ID_DIB_PREL6_RELAY_CYCLES);
-
 }
 
 void action_dib_prel6_show_relay_labels() {

@@ -11276,49 +11276,87 @@
                 "name": "settings",
                 "widgets": [
                   {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_M_left"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 120,
-                    "height": 32,
-                    "text": "Output:"
-                  },
-                  {
                     "type": "Select",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "channel_output_state",
-                    "left": 120,
+                    "data": "channel_protection_status_ovp",
+                    "left": 0,
                     "top": 0,
-                    "width": 108,
+                    "width": 228,
                     "height": 32,
                     "widgets": [
                       {
-                        "type": "Text",
+                        "type": "Container",
                         "style": {
-                          "inheritFrom": "value_M_left"
+                          "inheritFrom": "default"
                         },
                         "left": 0,
                         "top": 0,
-                        "width": 108,
+                        "width": 228,
                         "height": 32,
-                        "text": "OFF"
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "edit_value_M_left"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 120,
+                            "height": 32,
+                            "text": "Output:"
+                          },
+                          {
+                            "type": "Select",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "data": "channel_output_state",
+                            "left": 120,
+                            "top": 0,
+                            "width": 108,
+                            "height": 32,
+                            "widgets": [
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "value_M_left"
+                                },
+                                "left": 0,
+                                "top": 0,
+                                "width": 108,
+                                "height": 32,
+                                "text": "OFF"
+                              },
+                              {
+                                "type": "DisplayData",
+                                "style": {
+                                  "inheritFrom": "value_M_left"
+                                },
+                                "data": "channel_u_mon",
+                                "left": 0,
+                                "top": 0,
+                                "width": 108,
+                                "height": 32,
+                                "displayOption": 0
+                              }
+                            ]
+                          }
+                        ]
                       },
                       {
-                        "type": "DisplayData",
+                        "type": "Text",
                         "style": {
-                          "inheritFrom": "value_M_left"
+                          "inheritFrom": "edit_value_active_S_center",
+                          "font": "Oswald17"
                         },
-                        "data": "channel_u_mon",
+                        "action": "ch_settings_prot_clear",
                         "left": 0,
                         "top": 0,
-                        "width": 108,
+                        "width": 228,
                         "height": 32,
-                        "displayOption": 0
+                        "text": "Clear protection"
                       }
                     ]
                   },
@@ -11617,45 +11655,6 @@
                         "width": 208,
                         "height": 68,
                         "invertColors": true
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "channel_protection_status_ovp",
-                    "left": 0,
-                    "top": 160,
-                    "width": 208,
-                    "height": 32,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_active_S_center",
-                          "color": "text_regular",
-                          "activeBackgroundColor": "text_regular"
-                        },
-                        "action": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 208,
-                        "height": 32,
-                        "text": "Clear protection"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_active_S_center"
-                        },
-                        "action": "ch_settings_prot_clear",
-                        "left": 0,
-                        "top": 0,
-                        "width": 208,
-                        "height": 32,
-                        "text": "Clear protection"
                       }
                     ]
                   }
@@ -12368,49 +12367,87 @@
                 "height": 176
               },
               {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_M_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 119,
-                "height": 32,
-                "text": "Output:"
-              },
-              {
                 "type": "Select",
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "channel_output_state",
-                "left": 119,
+                "data": "channel_protection_status_ocp",
+                "left": 0,
                 "top": 0,
-                "width": 106,
+                "width": 225,
                 "height": 32,
                 "widgets": [
                   {
-                    "type": "Text",
+                    "type": "Container",
                     "style": {
-                      "inheritFrom": "value_M_left"
+                      "inheritFrom": "default"
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 106,
+                    "width": 225,
                     "height": 32,
-                    "text": "OFF"
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_M_left"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 119,
+                        "height": 32,
+                        "text": "Output:"
+                      },
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "channel_output_state",
+                        "left": 119,
+                        "top": 0,
+                        "width": 106,
+                        "height": 32,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "value_M_left"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 106,
+                            "height": 32,
+                            "text": "OFF"
+                          },
+                          {
+                            "type": "DisplayData",
+                            "style": {
+                              "inheritFrom": "value_M_left"
+                            },
+                            "data": "channel_i_mon",
+                            "left": 0,
+                            "top": 0,
+                            "width": 106,
+                            "height": 32,
+                            "displayOption": 0
+                          }
+                        ]
+                      }
+                    ]
                   },
                   {
-                    "type": "DisplayData",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "value_M_left"
+                      "inheritFrom": "edit_value_active_S_center",
+                      "font": "Oswald17"
                     },
-                    "data": "channel_i_mon",
+                    "action": "ch_settings_prot_clear",
                     "left": 0,
                     "top": 0,
-                    "width": 106,
+                    "width": 225,
                     "height": 32,
-                    "displayOption": 0
+                    "text": "Clear protection"
                   }
                 ]
               },
@@ -12578,45 +12615,6 @@
                 "width": 74,
                 "height": 32,
                 "displayOption": 0
-              },
-              {
-                "type": "Select",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "channel_protection_status_ocp",
-                "left": 0,
-                "top": 186,
-                "width": 208,
-                "height": 32,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center",
-                      "color": "text_regular",
-                      "activeBackgroundColor": "text_regular"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 208,
-                    "height": 32,
-                    "text": "Clear protection"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center"
-                    },
-                    "action": "ch_settings_prot_clear",
-                    "left": 0,
-                    "top": 0,
-                    "width": 208,
-                    "height": 32,
-                    "text": "Clear protection"
-                  }
-                ]
               }
             ]
           },
@@ -13035,49 +13033,87 @@
                 "height": 176
               },
               {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_M_left"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 119,
-                "height": 32,
-                "text": "Output:"
-              },
-              {
                 "type": "Select",
                 "style": {
                   "inheritFrom": "default"
                 },
-                "data": "channel_output_state",
-                "left": 119,
+                "data": "channel_protection_status_opp",
+                "left": 0,
                 "top": 0,
-                "width": 111,
+                "width": 230,
                 "height": 32,
                 "widgets": [
                   {
-                    "type": "Text",
+                    "type": "Container",
                     "style": {
-                      "inheritFrom": "value_M_left"
+                      "inheritFrom": "default"
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 111,
+                    "width": 230,
                     "height": 32,
-                    "text": "OFF"
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_M_left"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 119,
+                        "height": 32,
+                        "text": "Output:"
+                      },
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "channel_output_state",
+                        "left": 119,
+                        "top": 0,
+                        "width": 111,
+                        "height": 32,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "value_M_left"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 111,
+                            "height": 32,
+                            "text": "OFF"
+                          },
+                          {
+                            "type": "DisplayData",
+                            "style": {
+                              "inheritFrom": "value_M_left"
+                            },
+                            "data": "channel_p_mon",
+                            "left": 0,
+                            "top": 0,
+                            "width": 111,
+                            "height": 32,
+                            "displayOption": 0
+                          }
+                        ]
+                      }
+                    ]
                   },
                   {
-                    "type": "DisplayData",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "value_M_left"
+                      "inheritFrom": "edit_value_active_S_center",
+                      "font": "Oswald17"
                     },
-                    "data": "channel_p_mon",
+                    "action": "ch_settings_prot_clear",
                     "left": 0,
                     "top": 0,
-                    "width": 111,
+                    "width": 230,
                     "height": 32,
-                    "displayOption": 0
+                    "text": "Clear protection"
                   }
                 ]
               },
@@ -13200,45 +13236,6 @@
                 "width": 78,
                 "height": 32,
                 "displayOption": 0
-              },
-              {
-                "type": "Select",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "channel_protection_status_opp",
-                "left": 0,
-                "top": 186,
-                "width": 208,
-                "height": 32,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center",
-                      "color": "text_regular",
-                      "activeBackgroundColor": "text_regular"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 208,
-                    "height": 32,
-                    "text": "Clear protection"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center"
-                    },
-                    "action": "ch_settings_prot_clear",
-                    "left": 0,
-                    "top": 0,
-                    "width": 208,
-                    "height": 32,
-                    "text": "Clear protection"
-                  }
-                ]
               }
             ]
           },
@@ -13573,16 +13570,56 @@
             "left": 8,
             "top": 8,
             "width": 472,
-            "height": 224,
+            "height": 225,
             "name": "Body",
             "widgets": [
+              {
+                "type": "Select",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "data": "channel_protection_status_otp",
+                "left": 0,
+                "top": 0,
+                "width": 215,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "color": "text_regular",
+                      "activeBackgroundColor": "text_regular"
+                    },
+                    "action": "",
+                    "left": 0,
+                    "top": 0,
+                    "width": 215,
+                    "height": 32,
+                    "text": "Clear protection"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center",
+                      "font": "Oswald17"
+                    },
+                    "action": "ch_settings_prot_clear",
+                    "left": 0,
+                    "top": 0,
+                    "width": 215,
+                    "height": 32,
+                    "text": "Clear protection"
+                  }
+                ]
+              },
               {
                 "type": "Text",
                 "style": {
                   "inheritFrom": "edit_value_M_left"
                 },
                 "left": 0,
-                "top": 0,
+                "top": 36,
                 "width": 119,
                 "height": 32,
                 "text": "OTP active:"
@@ -13594,7 +13631,7 @@
                 },
                 "data": "channel_protection_otp_state",
                 "left": 119,
-                "top": 0,
+                "top": 36,
                 "width": 60,
                 "height": 32,
                 "widgets": [
@@ -13630,7 +13667,7 @@
                   "inheritFrom": "edit_value_M_left"
                 },
                 "left": 0,
-                "top": 36,
+                "top": 72,
                 "width": 119,
                 "height": 32,
                 "text": "Trip level:"
@@ -13643,7 +13680,7 @@
                 "data": "channel_protection_otp_level",
                 "action": "ch_settings_prot_edit_level",
                 "left": 119,
-                "top": 36,
+                "top": 72,
                 "width": 96,
                 "height": 32,
                 "displayOption": 0
@@ -13654,7 +13691,7 @@
                   "inheritFrom": "edit_value_M_left"
                 },
                 "left": 0,
-                "top": 72,
+                "top": 108,
                 "width": 119,
                 "height": 32,
                 "text": "Trip delay:"
@@ -13667,7 +13704,7 @@
                 "data": "channel_protection_otp_delay",
                 "action": "ch_settings_prot_edit_delay",
                 "left": 119,
-                "top": 72,
+                "top": 108,
                 "width": 96,
                 "height": 32,
                 "displayOption": 0
@@ -13678,9 +13715,9 @@
                   "inheritFrom": "edit_value_M_left"
                 },
                 "left": 0,
-                "top": 108,
+                "top": 144,
                 "width": 140,
-                "height": 32,
+                "height": 27,
                 "text": "Current temp.:"
               },
               {
@@ -13690,9 +13727,9 @@
                 },
                 "data": "channel_is_par_ser_coupled_or_tracked",
                 "left": 140,
-                "top": 108,
+                "top": 144,
                 "width": 332,
-                "height": 96,
+                "height": 81,
                 "widgets": [
                   {
                     "type": "Container",
@@ -13702,7 +13739,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 332,
-                    "height": 96,
+                    "height": 81,
                     "widgets": [
                       {
                         "type": "Select",
@@ -13764,7 +13801,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 332,
-                    "height": 96,
+                    "height": 81,
                     "widgets": [
                       {
                         "type": "Grid",
@@ -13775,7 +13812,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 332,
-                        "height": 96,
+                        "height": 81,
                         "itemWidget": {
                           "type": "Container",
                           "style": {
@@ -13784,7 +13821,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 166,
-                          "height": 32,
+                          "height": 27,
                           "widgets": [
                             {
                               "type": "Text",
@@ -13795,7 +13832,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 45,
-                              "height": 32,
+                              "height": 27,
                               "text": ""
                             },
                             {
@@ -13807,7 +13844,7 @@
                               "left": 45,
                               "top": 0,
                               "width": 121,
-                              "height": 32,
+                              "height": 27,
                               "widgets": [
                                 {
                                   "type": "Text",
@@ -13819,7 +13856,7 @@
                                   "left": 0,
                                   "top": 0,
                                   "width": 121,
-                                  "height": 32,
+                                  "height": 27,
                                   "text": "Invalid"
                                 },
                                 {
@@ -13831,7 +13868,7 @@
                                   "left": 0,
                                   "top": 0,
                                   "width": 121,
-                                  "height": 32,
+                                  "height": 27,
                                   "displayOption": 0
                                 },
                                 {
@@ -13844,7 +13881,7 @@
                                   "left": 0,
                                   "top": 0,
                                   "width": 121,
-                                  "height": 32,
+                                  "height": 27,
                                   "text": "Not installed"
                                 }
                               ]
@@ -13853,45 +13890,6 @@
                         }
                       }
                     ]
-                  }
-                ]
-              },
-              {
-                "type": "Select",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "channel_protection_status_otp",
-                "left": 0,
-                "top": 150,
-                "width": 208,
-                "height": 32,
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center",
-                      "color": "text_regular",
-                      "activeBackgroundColor": "text_regular"
-                    },
-                    "action": "",
-                    "left": 0,
-                    "top": 0,
-                    "width": 208,
-                    "height": 32,
-                    "text": "Clear protection"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center"
-                    },
-                    "action": "ch_settings_prot_clear",
-                    "left": 0,
-                    "top": 0,
-                    "width": 208,
-                    "height": 32,
-                    "text": "Clear protection"
                   }
                 ]
               }
@@ -18101,11 +18099,11 @@
                       "style": {
                         "inheritFrom": "edit_value_M_left"
                       },
-                      "left": 101,
+                      "left": 64,
                       "top": 34,
-                      "width": 65,
+                      "width": 100,
                       "height": 32,
-                      "text": "Scale:"
+                      "text": "Full scale:"
                     },
                     {
                       "type": "DisplayData",
@@ -18116,21 +18114,9 @@
                       "action": "ch_settings_adv_view_edit",
                       "left": 166,
                       "top": 36,
-                      "width": 85,
+                      "width": 120,
                       "height": 32,
                       "displayOption": 0
-                    },
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "edit_value_M_left",
-                        "alignHorizontal": "center"
-                      },
-                      "left": 251,
-                      "top": 36,
-                      "width": 79,
-                      "height": 32,
-                      "text": "Range:"
                     },
                     {
                       "type": "Select",
@@ -18138,9 +18124,9 @@
                         "inheritFrom": "default"
                       },
                       "data": "channel_display_view_settings_is_custom_scale",
-                      "left": 330,
+                      "left": 290,
                       "top": 36,
-                      "width": 85,
+                      "width": 124,
                       "height": 32,
                       "widgets": [
                         {
@@ -18152,7 +18138,7 @@
                           "action": "",
                           "left": 0,
                           "top": 0,
-                          "width": 85,
+                          "width": 124,
                           "height": 32,
                           "displayOption": 0
                         },
@@ -18165,7 +18151,7 @@
                           "action": "ch_settings_adv_view_edit",
                           "left": 0,
                           "top": 0,
-                          "width": 85,
+                          "width": 124,
                           "height": 32,
                           "displayOption": 0
                         }
@@ -45441,6 +45427,78 @@
               "width": 13,
               "height": 17,
               "pixelArray": "00000000001b281a00000000000000000000a8ffa400000000000000000000a8ffa400000000000000000000a8ffa400000000000000000000a8ffa400000000000000000000a8ffa40000000000c1fcfcfcfcfffffffcfcfcfcc1c4ffffffffffffffffffffffc43848484848c1ffbe48484848380000000000a8ffa400000000000000000000a8ffa400000000000000000000a8ffa400000000000000000000a8ffa4000000000000000000004a7048000000000031404040404040404040404031c4ffffffffffffffffffffffc4c4ffffffffffffffffffffffc4"
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 177
+            }
+          },
+          {
+            "encoding": 190,
+            "x": 1,
+            "y": -4,
+            "width": 25,
+            "height": 26,
+            "dx": 15,
+            "glyphBitmap": {
+              "width": 25,
+              "height": 26,
+              "pixelArray": "a1bebebebebebebebebebebebebebebebebebebebe0b000000c3e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5f1f70f00000012151515151515151515151515151515151515acf70f024d1d00000000000000000000000000000000000000a5f727a2f3a400000000000000000000000000000000000000a5fae9f6bb2a00000000000000000000000000000000000027d4ffe568050000000000000000000000000000000000086ee9f6af2200000000000000000000000000000000000032bff6dd570400000000000000000000000201000000000a82eef59c1400000000000000000000001989c6c0780d0141cff7d1450100000000000000000000001bd3f6dfe4f6bd93f2f0880f000000000000000000030404048ff67a1017a0fefac4390000000000000000000000c9eeeeeefadc0b000021f6c10a000000000000000000000000b3cececef1e00f000025f0a100000000000000000000000000000000007ff69b222bb5f556000000000000000000000000000000000010baf6eff1f69e040000000000000000000000000000000000000c67a69f570600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002c420300000000000000000000000000000000000000000000a6f70e00000000000000000000000000000000000000000000a6f70e00000000000000000000000000000000000000000000a6f70e00000012151515151515151515151515151515151515adf70e000000c4e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5f1f70e000000a2bebebebebebebebebebebebebebebebebebebebe0a000000"
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 177
+            }
+          },
+          {
+            "encoding": 191,
+            "x": 1,
+            "y": -4,
+            "width": 25,
+            "height": 26,
+            "dx": 15,
+            "glyphBitmap": {
+              "width": 25,
+              "height": 26,
+              "pixelArray": "a2bebebebebebebebebebebebebebebebebebebebe0a000000c4e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5f1f70e00000012151515151515151515151515151515151515adf70e00000000000000000000000000000000000000000000a6f70e00000000000000000000000000000000000000000000a6f70e00000000000000000000000000000000000000000000a6f70e000000000000000000000000000000000000000000002c4203000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c67a69f570600000000000000000000000000000000000010baf6eff1f69e0400000000000000000000000000000000007ff69b222bb5f55600000000000000000000000000b3cececef1e00f000025f0a100000000000000000000000000c9eeeeeefadc0b000021f6c10a000000000000000000000000030404048ff67a1017a0fefac4390000000000000000000000000000001bd3f6dfe4f6bd93f2f0880f00000000000000000000000000001989c6c0780d0141cff7d1450100000000000000000000000000000201000000000a82eef59c1400000000000000000000000000000000000000000032bff6dd57040000000000000000000000000000000000000000086ee9f6af2200000000000000000000000000000000000000000027d4ffe568050000000000000000000000000000000000000000a5fae9f6bb2a00000000000000000000000000000000000000a5f727a2f3a412151515151515151515151515151515151515acf70f024d1dc3e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5f1f70f000000a1bebebebebebebebebebebebebebebebebebebebe0b000000"
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 177
+            }
+          },
+          {
+            "encoding": 192,
+            "x": 1,
+            "y": -4,
+            "width": 25,
+            "height": 26,
+            "dx": 15,
+            "glyphBitmap": {
+              "width": 25,
+              "height": 26,
+              "pixelArray": "a1bebebebebebebebebebebebebebebebebebebebe0b000000c3e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5f1f70f00000012151515151515151515151515151515151515acf70f024d1d00000000000000000000000000000000000000a5f727a2f3a400000000000000000000000000000000000000a5fae9f6bb2a00000000000000000000000000000000000027d4ffe568050000000000000000000000000000000000086ee9f6af2200000000000000000000000000000000000032bff6dd570400000000000000000000000201000000000a82eef59c1400000000000000000000001989c6c0780d0141cff7d1450100000000000000000000001bd3f6dfe4f6bd93f2f0880f000000000000000000030404048ff67a1017a0fefac4390000000000000000000000c9eeeeeefadc0b000021f6c10a000000000000000000000000b3cececef1e00f000025f0a100000000000000000000000000000000007ff69b222bb5f556000000000000000000000000000000000010baf6eff1f69e040000000000000000000000000000000000000c67a69f57060000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "source": {
+              "filePath": "fonts\\OpenSans-SemiBold.ttf",
+              "size": 19,
+              "encoding": 177
+            }
+          },
+          {
+            "encoding": 193,
+            "x": 1,
+            "y": -4,
+            "width": 25,
+            "height": 26,
+            "dx": 15,
+            "glyphBitmap": {
+              "width": 25,
+              "height": 26,
+              "pixelArray": "a2bebebebebebebebebebebebebebebebebebebebe0a000000c4e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5f1f70e00000012151515151515151515151515151515151515adf70e00000000000000000000000000000000000000000000a6f70e00000000000000000000000000000000000000000000a6f70e00000000000000000000000000000000000000000000a6f70e000000000000000000000000000000000000000000002c4203000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c67a69f570600000000000000000000000000000000000010baf6eff1f69e0400000000000000000000000000000000007ff69b222bb5f55600000000000000000000000000b3cececef1e00f000025f0a100000000000000000000000000c9eeeeeefadc0b000021f6c10a000000000000000000000000030404048ff67a1017a0fefac4390000000000000000000000000000001bd3f6dfe4f6bd93f2f0880f00000000000000000000000000001989c6c0780d0141cff7d1450100000000000000000000000000000201000000000a82eef59c1400000000000000000000000000000000000000000032bff6dd57040000000000000000000000000000000000000000086ee9f6af22000000000000000000000000000000000000000000177be5e568050000000000000000000000000000000000000000007bcef6bb2a000000000000000000000000000000000000000000138af3a400000000000000000000000000000000000000000000024d1d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
             },
             "source": {
               "filePath": "fonts\\OpenSans-SemiBold.ttf",

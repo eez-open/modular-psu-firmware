@@ -31,7 +31,7 @@
     {
       "name": "relays",
       "type": "list",
-      "defaultValue": "[\n    { \"relay_label\": \"Relay #1\", \"relay_is_on\": true, \"relay_cycles\": 42 },\n    { \"relay_label\": \"Relay #2\", \"relay_is_on\": true, \"relay_cycles\": 23 },\n    { \"relay_label\": \"Relay #3\", \"relay_is_on\": false, \"relay_cycles\": 11 },\n    { \"relay_label\": \"Relay #4\", \"relay_is_on\": true, \"relay_cycles\": 5 },\n    { \"relay_label\": \"Relay #5\", \"relay_is_on\": false, \"relay_cycles\": 3 },\n    { \"relay_label\": \"Relay #6\", \"relay_is_on\": false, \"relay_cycles\": 1 }\n]"
+      "defaultValue": "[\n    { \"relay_label\": \"Relay #1\", \"relay_is_on\": true, \"relay_cycles\": 99999 },\n    { \"relay_label\": \"Relay #2\", \"relay_is_on\": true, \"relay_cycles\": 23 },\n    { \"relay_label\": \"Relay #3\", \"relay_is_on\": false, \"relay_cycles\": 11 },\n    { \"relay_label\": \"Relay #4\", \"relay_is_on\": true, \"relay_cycles\": 5 },\n    { \"relay_label\": \"Relay #5\", \"relay_is_on\": false, \"relay_cycles\": 3 },\n    { \"relay_label\": \"Relay #6\", \"relay_is_on\": false, \"relay_cycles\": 1 }\n]"
     },
     {
       "name": "relay_is_on",
@@ -52,14 +52,15 @@
       "name": "relay_label_label",
       "type": "string",
       "defaultValue": "Relay #1 label:"
+    },
+    {
+      "name": "is_relay_1_or_6",
+      "type": "boolean"
     }
   ],
   "actions": [
     {
       "name": "toggle_relay"
-    },
-    {
-      "name": "show_relay_cycles"
     },
     {
       "name": "show_relay_labels"
@@ -170,10 +171,10 @@
               "inheritFrom": "default"
             },
             "data": "relays",
-            "left": 0,
-            "top": 32,
-            "width": 154,
-            "height": 204,
+            "left": 4,
+            "top": 36,
+            "width": 146,
+            "height": 198,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -181,8 +182,8 @@
               },
               "left": 0,
               "top": 0,
-              "width": 154,
-              "height": 34,
+              "width": 146,
+              "height": 33,
               "widgets": [
                 {
                   "type": "Select",
@@ -191,42 +192,171 @@
                   },
                   "data": "relay_is_on",
                   "action": "toggle_relay",
-                  "left": 1,
-                  "top": 1,
-                  "width": 152,
-                  "height": 32,
+                  "left": 0,
+                  "top": 0,
+                  "width": 146,
+                  "height": 30,
                   "widgets": [
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
                         "inheritFrom": "default",
-                        "font": "Oswald17",
-                        "alignHorizontal": "left",
-                        "borderSize": "0",
-                        "padding": "0 0 0 45"
+                        "borderSize": "1",
+                        "borderColor": "text_regular"
                       },
-                      "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 152,
-                      "height": 32,
-                      "text": ""
+                      "width": 146,
+                      "height": 30,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default",
+                            "font": "Oswald14",
+                            "borderSize": "0",
+                            "borderRadius": 0,
+                            "borderColor": "text_regular",
+                            "padding": "0"
+                          },
+                          "data": "relay_label",
+                          "left": 1,
+                          "top": 1,
+                          "width": 114,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Select",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "data": "is_relay_1_or_6",
+                          "action": "",
+                          "left": 115,
+                          "top": 1,
+                          "width": 28,
+                          "height": 28,
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 28,
+                              "text": "\\u00bf"
+                            },
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 28,
+                              "text": "\\u00c1"
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
                         "inheritFrom": "default_inverse",
-                        "font": "Oswald17",
-                        "alignHorizontal": "left",
-                        "borderSize": "0",
-                        "padding": "0 0 0 45"
+                        "borderSize": "1",
+                        "borderColor": "text_regular"
                       },
-                      "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 152,
-                      "height": 32,
-                      "text": ""
+                      "width": 146,
+                      "height": 30,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_inverse",
+                            "font": "Oswald14",
+                            "borderSize": "0",
+                            "borderRadius": 0,
+                            "borderColor": "text_regular",
+                            "padding": "0"
+                          },
+                          "data": "relay_label",
+                          "left": 1,
+                          "top": 1,
+                          "width": 114,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Select",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "data": "is_relay_1_or_6",
+                          "left": 115,
+                          "top": 1,
+                          "width": 28,
+                          "height": 28,
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default_inverse",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "relay_label",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 28,
+                              "text": "\\u00be"
+                            },
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default_inverse",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "relay_label",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 28,
+                              "text": "\\u00c0"
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }
@@ -303,10 +433,10 @@
               "inheritFrom": "default"
             },
             "data": "relays",
-            "left": 0,
-            "top": 32,
-            "width": 234,
-            "height": 204,
+            "left": 4,
+            "top": 36,
+            "width": 226,
+            "height": 198,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -314,8 +444,8 @@
               },
               "left": 0,
               "top": 0,
-              "width": 234,
-              "height": 34,
+              "width": 226,
+              "height": 33,
               "widgets": [
                 {
                   "type": "Select",
@@ -324,42 +454,171 @@
                   },
                   "data": "relay_is_on",
                   "action": "toggle_relay",
-                  "left": 1,
-                  "top": 1,
-                  "width": 232,
-                  "height": 32,
+                  "left": 0,
+                  "top": 0,
+                  "width": 226,
+                  "height": 30,
                   "widgets": [
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
                         "inheritFrom": "default",
-                        "font": "Oswald17",
-                        "alignHorizontal": "left",
-                        "borderSize": "0",
-                        "padding": "0 0 0 88"
+                        "borderSize": "1",
+                        "borderColor": "text_regular"
                       },
-                      "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 232,
-                      "height": 32,
-                      "text": ""
+                      "width": 226,
+                      "height": 30,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default",
+                            "font": "Oswald14",
+                            "borderSize": "0",
+                            "borderRadius": 0,
+                            "borderColor": "text_regular",
+                            "padding": "0"
+                          },
+                          "data": "relay_label",
+                          "left": 32,
+                          "top": 1,
+                          "width": 114,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Select",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "data": "is_relay_1_or_6",
+                          "action": "",
+                          "left": 146,
+                          "top": 1,
+                          "width": 28,
+                          "height": 28,
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 28,
+                              "text": "\\u00bf"
+                            },
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 28,
+                              "text": "\\u00c1"
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
                         "inheritFrom": "default_inverse",
-                        "font": "Oswald17",
-                        "alignHorizontal": "left",
-                        "borderSize": "0",
-                        "padding": "0 0 0 88"
+                        "borderSize": "1",
+                        "borderColor": "text_regular"
                       },
-                      "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 232,
-                      "height": 32,
-                      "text": ""
+                      "width": 226,
+                      "height": 30,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_inverse",
+                            "font": "Oswald14",
+                            "borderSize": "0",
+                            "borderRadius": 0,
+                            "borderColor": "text_regular",
+                            "padding": "0"
+                          },
+                          "data": "relay_label",
+                          "left": 32,
+                          "top": 1,
+                          "width": 114,
+                          "height": 28,
+                          "text": ""
+                        },
+                        {
+                          "type": "Select",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "data": "is_relay_1_or_6",
+                          "left": 146,
+                          "top": 1,
+                          "width": 28,
+                          "height": 28,
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default_inverse",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "relay_label",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 28,
+                              "text": "\\u00be"
+                            },
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default_inverse",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "relay_label",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 28,
+                              "text": "\\u00c0"
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }
@@ -436,10 +695,10 @@
               "inheritFrom": "default"
             },
             "data": "relays",
-            "left": 1,
-            "top": 32,
-            "width": 474,
-            "height": 132,
+            "left": 5,
+            "top": 35,
+            "width": 462,
+            "height": 120,
             "itemWidget": {
               "type": "Container",
               "style": {
@@ -447,8 +706,8 @@
               },
               "left": 0,
               "top": 0,
-              "width": 158,
-              "height": 66,
+              "width": 154,
+              "height": 60,
               "widgets": [
                 {
                   "type": "Select",
@@ -457,42 +716,171 @@
                   },
                   "data": "relay_is_on",
                   "action": "toggle_relay",
-                  "left": 1,
-                  "top": 1,
-                  "width": 156,
-                  "height": 64,
+                  "left": 6,
+                  "top": 8,
+                  "width": 146,
+                  "height": 50,
                   "widgets": [
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
                         "inheritFrom": "default",
-                        "font": "Oswald17",
-                        "alignHorizontal": "left",
-                        "borderSize": "0",
-                        "padding": "0 0 0 28"
+                        "borderSize": "1",
+                        "borderColor": "text_regular"
                       },
-                      "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 156,
-                      "height": 64,
-                      "text": ""
+                      "width": 146,
+                      "height": 50,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default",
+                            "font": "Oswald17",
+                            "borderSize": "0",
+                            "borderRadius": 0,
+                            "borderColor": "text_regular",
+                            "padding": "0"
+                          },
+                          "data": "relay_label",
+                          "left": 1,
+                          "top": 1,
+                          "width": 114,
+                          "height": 48,
+                          "text": ""
+                        },
+                        {
+                          "type": "Select",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "data": "is_relay_1_or_6",
+                          "action": "",
+                          "left": 115,
+                          "top": 1,
+                          "width": 28,
+                          "height": 48,
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 48,
+                              "text": "\\u00bf"
+                            },
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 48,
+                              "text": "\\u00c1"
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
                         "inheritFrom": "default_inverse",
-                        "font": "Oswald17",
-                        "alignHorizontal": "left",
-                        "borderSize": "0",
-                        "padding": "0 0 0 28"
+                        "borderSize": "1",
+                        "borderColor": "text_regular"
                       },
-                      "data": "relay_label",
                       "left": 0,
                       "top": 0,
-                      "width": 156,
-                      "height": 64,
-                      "text": ""
+                      "width": 146,
+                      "height": 50,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_inverse",
+                            "font": "Oswald17",
+                            "borderSize": "0",
+                            "borderRadius": 0,
+                            "borderColor": "text_regular",
+                            "padding": "0"
+                          },
+                          "data": "relay_label",
+                          "left": 1,
+                          "top": 1,
+                          "width": 114,
+                          "height": 48,
+                          "text": ""
+                        },
+                        {
+                          "type": "Select",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "data": "is_relay_1_or_6",
+                          "left": 115,
+                          "top": 1,
+                          "width": 28,
+                          "height": 48,
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default_inverse",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "relay_label",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 48,
+                              "text": "\\u00be"
+                            },
+                            {
+                              "type": "Text",
+                              "style": {
+                                "inheritFrom": "default_inverse",
+                                "font": "Oswald17",
+                                "alignHorizontal": "left",
+                                "borderSize": "0",
+                                "borderRadius": 0,
+                                "borderColor": "text_regular",
+                                "padding": "0"
+                              },
+                              "data": "relay_label",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 48,
+                              "text": "\\u00c0"
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }
@@ -606,26 +994,152 @@
             },
             "left": 8,
             "top": 8,
-            "width": 471,
-            "height": 232,
+            "width": 464,
+            "height": 224,
             "name": "Settings",
             "widgets": [
               {
-                "type": "MultilineText",
+                "type": "Container",
                 "style": {
-                  "inheritFrom": "edit_value_active_S_center",
-                  "alignHorizontal": "left",
-                  "alignVertical": "top",
-                  "padding": "13"
+                  "inheritFrom": "default"
                 },
-                "action": "show_relay_cycles",
                 "left": 0,
                 "top": 0,
-                "width": 228,
-                "height": 50,
-                "text": "\\u00bc Relay Cycles",
-                "firstLineIndent": 0,
-                "hangingIndent": 24
+                "width": 200,
+                "height": 224,
+                "name": "Relay cycles",
+                "widgets": [
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 11,
+                    "width": 37,
+                    "height": 2
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 13,
+                    "width": 2,
+                    "height": 211
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 2,
+                    "top": 222,
+                    "width": 198,
+                    "height": 2
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 198,
+                    "top": 11,
+                    "width": 2,
+                    "height": 211
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 157,
+                    "top": 11,
+                    "width": 41,
+                    "height": 2
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Oswald14",
+                      "alignHorizontal": "left"
+                    },
+                    "left": 40,
+                    "top": 0,
+                    "width": 116,
+                    "height": 22,
+                    "text": "\\u00bc Relay cycles"
+                  },
+                  {
+                    "type": "List",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "relays",
+                    "left": 2,
+                    "top": 26,
+                    "width": 196,
+                    "height": 192,
+                    "itemWidget": {
+                      "type": "Container",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "left": 1,
+                      "top": 0,
+                      "width": 195,
+                      "height": 32,
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_M",
+                            "font": "Oswald14",
+                            "alignHorizontal": "right"
+                          },
+                          "data": "relay_label",
+                          "left": 0,
+                          "top": 0,
+                          "width": 109,
+                          "height": 32,
+                          "text": ""
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_M",
+                            "font": "Oswald14",
+                            "alignHorizontal": "left"
+                          },
+                          "data": "",
+                          "left": 109,
+                          "top": 0,
+                          "width": 16,
+                          "height": 32,
+                          "text": ":"
+                        },
+                        {
+                          "type": "Text",
+                          "style": {
+                            "inheritFrom": "default_M",
+                            "font": "Oswald14",
+                            "alignHorizontal": "left"
+                          },
+                          "data": "relay_cycles",
+                          "left": 125,
+                          "top": 0,
+                          "width": 70,
+                          "height": 32,
+                          "text": ""
+                        }
+                      ]
+                    },
+                    "listType": "vertical",
+                    "gap": 0
+                  }
+                ]
               },
               {
                 "type": "MultilineText",
@@ -637,7 +1151,7 @@
                 },
                 "action": "channel_update_firmware",
                 "left": 236,
-                "top": 0,
+                "top": 174,
                 "width": 228,
                 "height": 50,
                 "text": "\\u00bb Firmware update",
@@ -766,148 +1280,6 @@
         "width": 480,
         "height": 272,
         "dataContextOverrides": ""
-      },
-      {
-        "name": "relay_cycles",
-        "description": "Retrieve channel's informations such as how long channel output is active, sensor temperature, self-test result and calibration status (CAL:STAT command). \"Calib. params:\" can be ON, OFF, Uncalibrated, Corrupted. Selecting this option when it's uncalibrated or calibration data is corrupted will lead to Calibration wizard.",
-        "style": "default",
-        "widgets": [
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 10,
-            "top": 10,
-            "width": 460,
-            "height": 220,
-            "widgets": [
-              {
-                "type": "List",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "relays",
-                "left": 0,
-                "top": 0,
-                "width": 460,
-                "height": 216,
-                "itemWidget": {
-                  "type": "Container",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "left": 0,
-                  "top": 0,
-                  "width": 460,
-                  "height": 36,
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "default_M",
-                        "alignHorizontal": "right"
-                      },
-                      "data": "relay_label",
-                      "left": 0,
-                      "top": 0,
-                      "width": 219,
-                      "height": 36,
-                      "text": ""
-                    },
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "default_M",
-                        "alignHorizontal": "left"
-                      },
-                      "data": "",
-                      "left": 219,
-                      "top": 0,
-                      "width": 22,
-                      "height": 36,
-                      "text": ":"
-                    },
-                    {
-                      "type": "Text",
-                      "style": {
-                        "inheritFrom": "default_M",
-                        "alignHorizontal": "left"
-                      },
-                      "data": "relay_cycles",
-                      "left": 241,
-                      "top": 0,
-                      "width": 219,
-                      "height": 36,
-                      "text": ""
-                    }
-                  ]
-                },
-                "listType": "vertical",
-                "gap": 0
-              }
-            ]
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 240,
-            "width": 480,
-            "height": 32,
-            "name": "Status line",
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "status_bgnd",
-                  "font": "Heydings14",
-                  "alignVertical": "center",
-                  "color": "status_line_text",
-                  "backgroundColor": "status_line_background",
-                  "activeColor": "status_line_background",
-                  "activeBackgroundColor": "status_line_text"
-                },
-                "action": "show_previous_page",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 32,
-                "text": "E"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "status_title"
-                },
-                "data": "slot_title_settings",
-                "left": 40,
-                "top": 0,
-                "width": 84,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "status_title"
-                },
-                "left": 124,
-                "top": 0,
-                "width": 356,
-                "height": 32,
-                "text": "Relay Cycles"
-              }
-            ]
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 480,
-        "height": 272,
-        "dataContextOverrides": "{\n    \"slot_title_settings\": \"SMX46 #3:\"\n}"
       },
       {
         "name": "labels_and_colors",
