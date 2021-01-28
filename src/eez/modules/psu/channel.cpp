@@ -790,16 +790,31 @@ void Channel::updateAllChannels() {
         }
     }
 
+    bool initiateTrigger = false;
+
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
         if (channel.isOk()) {
+            bool triggerModeEnabled = channel.flags.outputEnabled &&
+                (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED ||
+                channel_dispatcher::getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) && !channel.isRemoteProgrammingEnabled();
+            
+            if (triggerModeEnabled && trigger::g_triggerSource == trigger::SOURCE_IMMEDIATE) {
+                initiateTrigger = true;
+            }
+
             channel.flags.outputEnabledValueOnNextSync = channel.flags.outputEnabled;
             channel.flags.outputEnabled = !channel.flags.outputEnabled;
             channel.flags.doOutputEnableOnNextSync = 1;
         }
     }
 
-    Channel::syncOutputEnable();
+    if (initiateTrigger) {
+        // trigger will call syncOutputEnable
+        trigger::initiate();
+    } else {
+        Channel::syncOutputEnable();
+    }
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);

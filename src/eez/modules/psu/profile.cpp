@@ -849,11 +849,11 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
         }
     }
 
-    Channel::updateAllChannels();
-
     trigger::g_triggerContinuousInitializationEnabled = profile.flags.triggerContinuousInitializationEnabled;
     trigger::g_triggerSource = (trigger::Source)profile.triggerSource;
     trigger::g_triggerDelay = profile.triggerDelay;
+
+    Channel::updateAllChannels();
 
     memcpy(io_pins::g_ioPins, profile.ioPins, sizeof(profile.ioPins));
     memcpy(io_pins::g_pwmFrequency, profile.ioPinsPwmFrequency, sizeof(profile.ioPinsPwmFrequency));
