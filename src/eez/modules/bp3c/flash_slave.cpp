@@ -182,6 +182,7 @@ void enterBootloaderMode(int slotIndex) {
 }
 
 void uploadHexFile() {
+	bool success = false;
 	bool dowloadStarted = false;
 	if (syncWithSlave(g_slotIndex)) {
 		bool eofReached = false;
@@ -251,6 +252,8 @@ Exit:
 			uint16_t value = 0xA5A5;
 			bp3c::eeprom::write(g_slotIndex, (const uint8_t *)&value, 2, 4);
 			g_slots[g_slotIndex]->firmwareInstalled = true;
+
+			success = true;
 		} else {
 #if OPTION_DISPLAY
 			psu::gui::errorMessage("Downloading failed!");
@@ -265,6 +268,12 @@ Exit:
 		osDelay(100);
 		psu::gui::errorMessage("Failed to start update!");
 #endif
+	}
+
+	if (success) {
+		psu::event_queue::pushEvent(psu::event_queue::EVENT_INFO_FIRMWARE_UPDATED_ON_SLOT1 + g_slotIndex);
+	} else {
+		psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_FIRMWARE_UPDATE_FAILED_ON_SLOT1 + g_slotIndex);
 	}
 
 	sendMessageToPsu(PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE);

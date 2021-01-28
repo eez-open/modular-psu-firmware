@@ -110,6 +110,9 @@ static const int EVENT_TYPE_ERROR = 4;
     EVENT_ERROR(TOO_MANY_LOG_EVENTS, 150, "Too many log events")                                   \
 	EVENT_ERROR(WATCHDOG_RESET, 151, "Watchdog reset")                                             \
     EVENT_ERROR(HIGH_TEMPERATURE, 152, "High temperature")                                         \
+    EVENT_ERROR(FIRMWARE_UPDATE_FAILED_ON_SLOT1, 160, "Firmware update failed on slot 1")          \
+    EVENT_ERROR(FIRMWARE_UPDATE_FAILED_ON_SLOT2, 161, "Firmware update failed on slot 2")          \
+    EVENT_ERROR(FIRMWARE_UPDATE_FAILED_ON_SLOT3, 162, "Firmware update failed on slot 3")          \
     EVENT_WARNING(CH_CALIBRATION_DISABLED, 0, "Ch%d calibration disabled")                         \
     EVENT_WARNING(ETHERNET_NOT_CONNECTED, 20, "Ethernet not connected")                            \
     EVENT_WARNING(AUTO_RECALL_VALUES_MISMATCH, 21, "Auto-recall values mismatch")                  \
@@ -178,7 +181,10 @@ static const int EVENT_TYPE_ERROR = 4;
     EVENT_INFO(DLOG_START, 130, "DLOG recording started")                                          \
     EVENT_INFO(DLOG_FINISH, 131, "DLOG recording finished")                                        \
     EVENT_INFO(ETHERNET_CONNECTED, 132, "Ethernet connected")                                      \
-    EVENT_INFO(NTP_REFRESH_SUCCEEDED, 133, "NTP refresh succeeded")
+    EVENT_INFO(NTP_REFRESH_SUCCEEDED, 133, "NTP refresh succeeded")                                \
+    EVENT_INFO(FIRMWARE_UPDATED_ON_SLOT1, 140, "Firmware updated on slot 1")                       \
+    EVENT_INFO(FIRMWARE_UPDATED_ON_SLOT2, 141, "Firmware updated on slot 2")                       \
+    EVENT_INFO(FIRMWARE_UPDATED_ON_SLOT3, 142, "Firmware updated on slot 3")                       \
 
 #define EVENT_ERROR_START_ID 10000
 #define EVENT_WARNING_START_ID 12000
