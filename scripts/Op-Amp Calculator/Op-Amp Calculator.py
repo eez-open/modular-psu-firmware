@@ -146,7 +146,7 @@ def calc_Vin():
         if opAmpType == TYPE_NON_INV:
             Vin = Vout * R2 / (R1 + R2)
         else:
-            Vin = -Vout * R1 / R2
+            Vin = -Vout * R2 / R1
         setVoltageData("Vin", Vin)
     else:
         error("Enter R1, R2 and Vout")
@@ -185,7 +185,7 @@ def calc_R1():
         if opAmpType == TYPE_NON_INV:
             R1 = R2 * (Vout - Vin) / Vin
         elif opAmpType == TYPE_INV:
-            R1 = -R2 * Vin / Vout
+            R1 = -R2 * Vout / Vin
         elif opAmpType == TYPE_DIFF_SIMPL:
             R1 = R2 * (Vin1 - Vin2) / Vout
         else:
@@ -205,7 +205,7 @@ def calc_R2():
         if opAmpType == TYPE_NON_INV:
             R2 = R1 * Vin / (Vout - Vin)
         elif opAmpType == TYPE_INV:
-            R2 = -R1 * Vout / Vin
+            R2 = -R1 * Vin / Vout
         elif opAmpType == TYPE_DIFF_SIMPL:
             R2 = R1 * Vout / (Vin1 - Vin2)
         else:
@@ -242,7 +242,7 @@ def calc_Vout():
         if opAmpType == TYPE_NON_INV:
             Vout = Vin * (1 + R1 / R2)
         elif opAmpType == TYPE_INV:
-            Vout = -Vin * R2 / R1
+            Vout = -Vin * R1 / R2
         elif opAmpType == TYPE_DIFF_SIMPL:
             Vout = R2 / R1 * (Vin1 - Vin2)
         else:
