@@ -2051,7 +2051,7 @@ uint16_t transformColorHook(uint16_t color) {
             if (slotColor) {
                 return color + slotColor - 1;
             } else {
-                return color;
+                return color + psu::CH_NUM + hmi::g_selectedSlotIndex;
             }
         }
     } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_SLOT_COLOR) {
