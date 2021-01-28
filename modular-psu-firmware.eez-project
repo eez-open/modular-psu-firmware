@@ -30891,6 +30891,7 @@
               "inheritFrom": "default"
             },
             "data": "channel_protection_status",
+            "action": "show_ch_settings",
             "left": 0,
             "top": 57,
             "width": 52,

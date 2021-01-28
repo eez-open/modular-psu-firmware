@@ -1058,10 +1058,17 @@ bool powerUp() {
     // test channels
     testSuccess &= testChannels();
 
+    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
     int32_t diff = millis() - initTime;
     static const int32_t CONF_INIT_TIME = 1000;
     if (diff < CONF_INIT_TIME) {
-        delay(CONF_INIT_TIME - diff);
+        uint32_t d = CONF_INIT_TIME - diff;
+        if (d > 500) {
+            delay(500);
+            d -= 500;
+            WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+        }
+        delay(d);
     }
 
     // turn on Power On (PON) bit of ESE register

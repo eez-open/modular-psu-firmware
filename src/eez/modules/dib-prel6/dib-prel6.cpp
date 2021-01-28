@@ -121,6 +121,7 @@ struct Prel6Module : public Module {
 public:
     TestResult testResult = TEST_NONE;
 
+    bool powerDown = false;
     bool synchronized = false;
 
     uint32_t input[(BUFFER_SIZE + 3) / 4 + 1];
@@ -132,6 +133,7 @@ public:
 
     uint32_t lastTransferTime = 0;
 	SetParams lastTransferredParams;
+    bool forceTransferSetParams;
 
 	struct CommandDef {
 		uint32_t command;
@@ -216,6 +218,8 @@ public:
     }
 
     void initChannels() override {
+        powerDown = false;
+
         if (!synchronized) {
 			executeCommand(&getInfo_command);
 
@@ -235,7 +239,7 @@ public:
 				}
 			}
 
-            memset(&lastTransferredParams, 0, sizeof(SetParams));
+            forceTransferSetParams = true;
         }
     }
 
@@ -276,8 +280,7 @@ public:
 
 	void fillSetParams(SetParams &params) {
 		memset(&params, 0, sizeof(SetParams));
-
-		params.relayStates = relayStates;
+        params.relayStates = powerDown ? 0 : relayStates;
 	}
 
     void Command_SetParams_FillRequest(Request &request) {
@@ -358,6 +361,10 @@ public:
 			Response &response = *(Response *)input;
 			(this->*currentCommand->done)(response, isSuccess);
 		}
+
+        if (powerDown) {
+            synchronized = false;
+        }
 
 		currentCommand = nullptr;
         setState(STATE_IDLE);
@@ -516,6 +523,9 @@ public:
                 } else if (tickCountMs - lastRefreshTime >= getRefreshTimeMs()) {
                     refreshStartTime = tickCountMs;
                     executeCommand(&getState_command);
+                } else if (forceTransferSetParams) {
+                    forceTransferSetParams = false;
+                    executeCommand(&setParams_command);
                 } else {
                     SetParams params;
                     fillSetParams(params);
@@ -549,7 +559,8 @@ public:
     }
 
     void onPowerDown() override {
-        synchronized = false;
+        powerDown = true;
+        executeCommand(&setParams_command);
     }
 
     void resync() override {

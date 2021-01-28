@@ -138,6 +138,7 @@ struct Smx46Module : public Module {
 public:
     TestResult testResult = TEST_NONE;
 
+    bool powerDown = false;
     bool synchronized = false;
 
     ////////////////////////////////////////
@@ -150,6 +151,7 @@ public:
 
     uint32_t lastTransferTime = 0;
 	SetParams lastTransferredParams;
+    bool forceTransferSetParams;
 
 	struct CommandDef {
 		uint32_t command;
@@ -250,6 +252,8 @@ public:
     }
 
     void initChannels() override {
+        powerDown = false;
+
         if (!synchronized) {
 			executeCommand(&getInfo_command);
 
@@ -269,7 +273,7 @@ public:
 				}
 			}
 
-            memset(&lastTransferredParams, 0, sizeof(SetParams));
+            forceTransferSetParams = true;
         }
     }
 
@@ -311,10 +315,12 @@ public:
 	void fillSetParams(SetParams &params) {
 		memset(&params, 0, sizeof(SetParams));
 
-		params.routes = routes;
-        params.dac1 = calibrationEnabled[0] && isVoltageCalibrationExists(0) ? calibration::remapValue(dac1, calConf[0].u) : dac1;
-        params.dac2 = calibrationEnabled[1] && isVoltageCalibrationExists(1) ? calibration::remapValue(dac2, calConf[1].u) : dac2;
-        params.relayOn = relayOn ? 1 : 0;
+        if (!powerDown) {
+            params.routes = routes;
+            params.dac1 = calibrationEnabled[0] && isVoltageCalibrationExists(0) ? calibration::remapValue(dac1, calConf[0].u) : dac1;
+            params.dac2 = calibrationEnabled[1] && isVoltageCalibrationExists(1) ? calibration::remapValue(dac2, calConf[1].u) : dac2;
+            params.relayOn = relayOn ? 1 : 0;
+        }
 	}
 
     void Command_SetParams_FillRequest(Request &request) {
@@ -395,6 +401,10 @@ public:
 			Response &response = *(Response *)input;
 			(this->*currentCommand->done)(response, isSuccess);
 		}
+
+        if (powerDown) {
+            synchronized = false;
+        }
 
 		currentCommand = nullptr;
         setState(STATE_IDLE);
@@ -553,6 +563,9 @@ public:
                 } else if (tickCountMs - lastRefreshTime >= getRefreshTimeMs()) {
                     refreshStartTime = tickCountMs;
                     executeCommand(&getState_command);
+                } else if (forceTransferSetParams) {
+                    forceTransferSetParams = false;
+                    executeCommand(&setParams_command);
                 } else {
                     SetParams params;
                     fillSetParams(params);
@@ -586,7 +599,8 @@ public:
     }
 
     void onPowerDown() override {
-        synchronized = false;
+        powerDown = true;
+        executeCommand(&setParams_command);
     }
 
     void resync() override {

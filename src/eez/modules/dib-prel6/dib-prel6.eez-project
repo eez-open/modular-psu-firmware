@@ -200,8 +200,8 @@
                     {
                       "type": "Container",
                       "style": {
-                        "inheritFrom": "default",
-                        "borderSize": "1",
+                        "inheritFrom": "option_toggle_L_center",
+                        "borderSize": "0",
                         "borderColor": "text_regular"
                       },
                       "left": 0,
@@ -212,7 +212,7 @@
                         {
                           "type": "Text",
                           "style": {
-                            "inheritFrom": "default",
+                            "inheritFrom": "option_toggle_L_center",
                             "font": "Oswald14",
                             "borderSize": "0",
                             "borderRadius": 0,
@@ -241,13 +241,13 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "",
                               "left": 0,
@@ -259,13 +259,13 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "",
                               "left": 0,
@@ -281,8 +281,8 @@
                     {
                       "type": "Container",
                       "style": {
-                        "inheritFrom": "default_inverse",
-                        "borderSize": "1",
+                        "inheritFrom": "option_toggle_L_center",
+                        "borderSize": "0",
                         "borderColor": "text_regular"
                       },
                       "left": 0,
@@ -293,7 +293,7 @@
                         {
                           "type": "Text",
                           "style": {
-                            "inheritFrom": "default_inverse",
+                            "inheritFrom": "option_toggle_L_center",
                             "font": "Oswald14",
                             "borderSize": "0",
                             "borderRadius": 0,
@@ -310,7 +310,7 @@
                         {
                           "type": "Select",
                           "style": {
-                            "inheritFrom": "default"
+                            "inheritFrom": "option_toggle_L_center"
                           },
                           "data": "is_relay_1_or_6",
                           "left": 115,
@@ -321,13 +321,17 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default_inverse",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
+                                "color": "text_enable_background",
+                                "backgroundColor": "Action color",
+                                "activeColor": "Action color",
+                                "activeBackgroundColor": "text_enable_background",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "relay_label",
                               "left": 0,
@@ -339,13 +343,17 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default_inverse",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
+                                "color": "text_enable_background",
+                                "backgroundColor": "Action color",
+                                "activeColor": "Action color",
+                                "activeBackgroundColor": "text_enable_background",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "relay_label",
                               "left": 0,
@@ -462,8 +470,8 @@
                     {
                       "type": "Container",
                       "style": {
-                        "inheritFrom": "default",
-                        "borderSize": "1",
+                        "inheritFrom": "option_toggle_L_center",
+                        "borderSize": "0",
                         "borderColor": "text_regular"
                       },
                       "left": 0,
@@ -474,7 +482,7 @@
                         {
                           "type": "Text",
                           "style": {
-                            "inheritFrom": "default",
+                            "inheritFrom": "option_toggle_L_center",
                             "font": "Oswald14",
                             "borderSize": "0",
                             "borderRadius": 0,
@@ -491,7 +499,7 @@
                         {
                           "type": "Select",
                           "style": {
-                            "inheritFrom": "default"
+                            "inheritFrom": "option_toggle_L_center"
                           },
                           "data": "is_relay_1_or_6",
                           "action": "",
@@ -503,13 +511,13 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "",
                               "left": 0,
@@ -521,13 +529,13 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "",
                               "left": 0,
@@ -543,8 +551,8 @@
                     {
                       "type": "Container",
                       "style": {
-                        "inheritFrom": "default_inverse",
-                        "borderSize": "1",
+                        "inheritFrom": "option_toggle_L_center",
+                        "borderSize": "0",
                         "borderColor": "text_regular"
                       },
                       "left": 0,
@@ -555,7 +563,7 @@
                         {
                           "type": "Text",
                           "style": {
-                            "inheritFrom": "default_inverse",
+                            "inheritFrom": "option_toggle_L_center",
                             "font": "Oswald14",
                             "borderSize": "0",
                             "borderRadius": 0,
@@ -572,7 +580,7 @@
                         {
                           "type": "Select",
                           "style": {
-                            "inheritFrom": "default"
+                            "inheritFrom": "option_toggle_L_center"
                           },
                           "data": "is_relay_1_or_6",
                           "left": 146,
@@ -583,13 +591,17 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default_inverse",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
+                                "color": "text_enable_background",
+                                "backgroundColor": "Action color",
+                                "activeColor": "Action color",
+                                "activeBackgroundColor": "text_enable_background",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "relay_label",
                               "left": 0,
@@ -601,13 +613,17 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default_inverse",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
+                                "color": "text_enable_background",
+                                "backgroundColor": "Action color",
+                                "activeColor": "Action color",
+                                "activeBackgroundColor": "text_enable_background",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "relay_label",
                               "left": 0,
@@ -724,8 +740,8 @@
                     {
                       "type": "Container",
                       "style": {
-                        "inheritFrom": "default",
-                        "borderSize": "1",
+                        "inheritFrom": "option_toggle_L_center",
+                        "borderSize": "0",
                         "borderColor": "text_regular"
                       },
                       "left": 0,
@@ -736,7 +752,7 @@
                         {
                           "type": "Text",
                           "style": {
-                            "inheritFrom": "default",
+                            "inheritFrom": "option_toggle_L_center",
                             "font": "Oswald17",
                             "borderSize": "0",
                             "borderRadius": 0,
@@ -753,7 +769,7 @@
                         {
                           "type": "Select",
                           "style": {
-                            "inheritFrom": "default"
+                            "inheritFrom": "option_toggle_L_center"
                           },
                           "data": "is_relay_1_or_6",
                           "action": "",
@@ -765,37 +781,37 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "",
                               "left": 0,
-                              "top": 0,
+                              "top": 10,
                               "width": 28,
-                              "height": 48,
+                              "height": 28,
                               "text": "\\u00bf"
                             },
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "",
                               "left": 0,
-                              "top": 0,
+                              "top": 10,
                               "width": 28,
-                              "height": 48,
+                              "height": 28,
                               "text": "\\u00c1"
                             }
                           ]
@@ -805,8 +821,8 @@
                     {
                       "type": "Container",
                       "style": {
-                        "inheritFrom": "default_inverse",
-                        "borderSize": "1",
+                        "inheritFrom": "option_toggle_L_center",
+                        "borderSize": "0",
                         "borderColor": "text_regular"
                       },
                       "left": 0,
@@ -817,7 +833,7 @@
                         {
                           "type": "Text",
                           "style": {
-                            "inheritFrom": "default_inverse",
+                            "inheritFrom": "option_toggle_L_center",
                             "font": "Oswald17",
                             "borderSize": "0",
                             "borderRadius": 0,
@@ -834,7 +850,7 @@
                         {
                           "type": "Select",
                           "style": {
-                            "inheritFrom": "default"
+                            "inheritFrom": "option_toggle_L_center"
                           },
                           "data": "is_relay_1_or_6",
                           "left": 115,
@@ -845,37 +861,45 @@
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default_inverse",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
+                                "color": "text_enable_background",
+                                "backgroundColor": "Action color",
+                                "activeColor": "Action color",
+                                "activeBackgroundColor": "text_enable_background",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "relay_label",
                               "left": 0,
-                              "top": 0,
+                              "top": 9,
                               "width": 28,
-                              "height": 48,
+                              "height": 30,
                               "text": "\\u00be"
                             },
                             {
                               "type": "Text",
                               "style": {
-                                "inheritFrom": "default_inverse",
+                                "inheritFrom": "option_toggle_L_center",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
+                                "color": "text_enable_background",
+                                "backgroundColor": "Action color",
+                                "activeColor": "Action color",
+                                "activeBackgroundColor": "text_enable_background",
                                 "borderSize": "0",
                                 "borderRadius": 0,
                                 "borderColor": "text_regular",
-                                "padding": "0"
+                                "padding": "0 0 0 2"
                               },
                               "data": "relay_label",
                               "left": 0,
-                              "top": 0,
+                              "top": 10,
                               "width": 28,
-                              "height": 48,
+                              "height": 28,
                               "text": "\\u00c0"
                             }
                           ]

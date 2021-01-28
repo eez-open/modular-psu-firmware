@@ -391,6 +391,8 @@ void lowPriorityThreadOneIter() {
                 dlog_view::uploadFile();
             } else if (type == THREAD_MESSAGE_FLASH_SLAVE_UPLOAD_HEX_FILE) {
                 bp3c::flash_slave::uploadHexFile();
+            } else if (type == THREAD_MESSAGE_PROFILE_SAVE) {
+                profile::saveIfDirty();
             } else if (type == THREAD_MESSAGE_RECALL_PROFILE) {
                 int err;
                 if (!profile::recallFromLocation(param, 0, false, &err)) {

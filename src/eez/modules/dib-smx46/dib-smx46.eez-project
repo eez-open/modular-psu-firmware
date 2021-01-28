@@ -420,28 +420,92 @@
             "height": 30,
             "widgets": [
               {
-                "type": "Text",
+                "type": "Container",
                 "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
+                  "inheritFrom": "option_toggle_L_center"
                 },
                 "left": 0,
                 "top": 0,
                 "width": 152,
                 "height": 30,
-                "text": "Power relay: OFF"
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 30,
+                    "text": "Power relay:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald17",
+                      "alignHorizontal": "left",
+                      "borderSize": "0",
+                      "borderRadius": 0,
+                      "borderColor": "text_regular",
+                      "padding": "0 0 0 2"
+                    },
+                    "data": "",
+                    "left": 114,
+                    "top": 1,
+                    "width": 28,
+                    "height": 28,
+                    "text": "\\u00bf"
+                  }
+                ]
               },
               {
-                "type": "Text",
+                "type": "Container",
                 "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
+                  "inheritFrom": "option_toggle_L_center"
                 },
                 "left": 0,
                 "top": 0,
                 "width": 152,
                 "height": 30,
-                "text": "Power relay: ON"
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 114,
+                    "height": 30,
+                    "text": "Power relay:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald17",
+                      "alignHorizontal": "left",
+                      "color": "text_enable_background",
+                      "backgroundColor": "Action color",
+                      "activeColor": "Action color",
+                      "activeBackgroundColor": "text_enable_background",
+                      "borderSize": "0",
+                      "borderRadius": 0,
+                      "borderColor": "text_regular",
+                      "padding": "0 0 0 2"
+                    },
+                    "data": "",
+                    "left": 114,
+                    "top": 1,
+                    "width": 28,
+                    "height": 28,
+                    "text": "\\u00be"
+                  }
+                ]
               }
             ]
           }
@@ -686,28 +750,92 @@
             "height": 31,
             "widgets": [
               {
-                "type": "Text",
+                "type": "Container",
                 "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
+                  "inheritFrom": "option_toggle_L_center"
                 },
                 "left": 0,
                 "top": 0,
                 "width": 180,
                 "height": 31,
-                "text": "Power relay: OFF"
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 128,
+                    "height": 30,
+                    "text": "Power relay:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald17",
+                      "alignHorizontal": "left",
+                      "borderSize": "0",
+                      "borderRadius": 0,
+                      "borderColor": "text_regular",
+                      "padding": "0 0 0 2"
+                    },
+                    "data": "",
+                    "left": 128,
+                    "top": 1,
+                    "width": 28,
+                    "height": 28,
+                    "text": "\\u00bf"
+                  }
+                ]
               },
               {
-                "type": "Text",
+                "type": "Container",
                 "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
+                  "inheritFrom": "option_toggle_L_center"
                 },
                 "left": 0,
                 "top": 0,
                 "width": 180,
                 "height": 31,
-                "text": "Power relay: ON"
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald14"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 128,
+                    "height": 30,
+                    "text": "Power relay:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald17",
+                      "alignHorizontal": "left",
+                      "color": "text_enable_background",
+                      "backgroundColor": "Action color",
+                      "activeColor": "Action color",
+                      "activeBackgroundColor": "text_enable_background",
+                      "borderSize": "0",
+                      "borderRadius": 0,
+                      "borderColor": "text_regular",
+                      "padding": "0 0 0 2"
+                    },
+                    "data": "",
+                    "left": 128,
+                    "top": 1,
+                    "width": 28,
+                    "height": 28,
+                    "text": "\\u00be"
+                  }
+                ]
               }
             ]
           }
@@ -1064,6 +1192,110 @@
                 "width": 185,
                 "height": 38,
                 "text": "Power relay: ON"
+              }
+            ]
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "relay_on",
+            "action": "toggle_relay",
+            "left": 290,
+            "top": 124,
+            "width": 185,
+            "height": 38,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 185,
+                "height": 38,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald17",
+                      "padding": "0 0 0 2"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 146,
+                    "height": 38,
+                    "text": "Power relay:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald17",
+                      "alignHorizontal": "left",
+                      "borderSize": "0",
+                      "borderRadius": 0,
+                      "borderColor": "text_regular",
+                      "padding": "0 0 0 2"
+                    },
+                    "data": "",
+                    "left": 146,
+                    "top": 6,
+                    "width": 28,
+                    "height": 28,
+                    "text": "\\u00bf"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "option_toggle_L_center"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 185,
+                "height": 38,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald17",
+                      "padding": "0 0 0 2"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 146,
+                    "height": 38,
+                    "text": "Power relay:"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald17",
+                      "alignHorizontal": "left",
+                      "color": "text_enable_background",
+                      "backgroundColor": "Action color",
+                      "activeColor": "Action color",
+                      "activeBackgroundColor": "text_enable_background",
+                      "borderSize": "0",
+                      "borderRadius": 0,
+                      "borderColor": "text_regular",
+                      "padding": "0 0 0 2"
+                    },
+                    "data": "",
+                    "left": 146,
+                    "top": 5,
+                    "width": 28,
+                    "height": 30,
+                    "text": "\\u00be"
+                  }
+                ]
               }
             ]
           }

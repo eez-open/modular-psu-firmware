@@ -727,9 +727,9 @@
             },
             "data": "channel_display_value3",
             "left": 0,
-            "top": 204,
+            "top": 205,
             "width": 116,
-            "height": 32,
+            "height": 31,
             "displayOption": 0
           },
           {
@@ -740,9 +740,9 @@
             "data": "channel_u_edit",
             "action": "edit",
             "left": 0,
-            "top": 170,
+            "top": 172,
             "width": 116,
-            "height": 32,
+            "height": 31,
             "displayOption": 0
           },
           {
@@ -753,9 +753,9 @@
             "data": "channel_i_edit",
             "action": "edit",
             "left": 118,
-            "top": 170,
+            "top": 172,
             "width": 116,
-            "height": 32,
+            "height": 31,
             "displayOption": 0
           },
           {
@@ -766,9 +766,9 @@
             "data": "channel_protection_opp_limit",
             "action": "edit",
             "left": 118,
-            "top": 204,
+            "top": 205,
             "width": 116,
-            "height": 32,
+            "height": 31,
             "displayOption": 0
           }
         ],

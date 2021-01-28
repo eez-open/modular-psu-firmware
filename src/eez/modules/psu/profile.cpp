@@ -116,7 +116,7 @@ void onAfterSdCardMounted() {
     }
 }
 
-void shutdownSave() {
+void saveIfDirty() {
     if (isAutoSaveAllowed() && isProfile0Dirty()) {
         saveStateToProfile0(true);
     }

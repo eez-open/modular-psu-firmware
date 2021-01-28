@@ -84,7 +84,7 @@ void tick();
 
 void onAfterSdCardMounted();
 
-void shutdownSave();
+void saveIfDirty();
 
 Parameters *getProfileParameters(int location);
 

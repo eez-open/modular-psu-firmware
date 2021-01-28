@@ -395,6 +395,8 @@ bool reset() {
 }
 
 void standBy() {
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_PROFILE_SAVE);
+
     psu::changePowerState(false);
 }
 
@@ -434,7 +436,7 @@ void shutdown() {
     } while (isLowPriorityThreadAlive());
 #endif
 
-    profile::shutdownSave();
+    profile::saveIfDirty();
 
     if (psu::isPowerUp()) {
     	psu::changePowerState(false);

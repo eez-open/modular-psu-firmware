@@ -64,8 +64,6 @@ using namespace eez::gui;
 extern "C" DWORD get_fattime(void);
 #endif
 
-volatile uint32_t g_debugVar;
-
 namespace eez {
 namespace dib_mio168 {
 
@@ -1309,6 +1307,7 @@ public:
 
     uint8_t afeVersion;
 
+    bool powerDown = false;
     bool synchronized = false;
 
     uint32_t input[(sizeof(Request) + 3) / 4 + 1];
@@ -1320,6 +1319,7 @@ public:
 
     uint32_t lastTransferTime = 0;
 	SetParams lastTransferredParams;
+    bool forceTransferSetParams;
 
 	struct CommandDef {
 		uint32_t command;
@@ -1453,13 +1453,9 @@ public:
     }
 
     void initChannels() override {
-        if (!synchronized) {
-            // give some time for MIO168 module to boot
-        	auto t = millis();
-        	if (t < 1700) {
-        		osDelay(1700 - t);
-        	}
+        powerDown = false;
 
+        if (!synchronized) {
 			executeCommand(&getInfo_command);
 
 			if (!g_isBooted) {
@@ -1478,7 +1474,7 @@ public:
 				}
 			}
 
-            memset(&lastTransferredParams, 0, sizeof(SetParams));
+            forceTransferSetParams = true;
         }
     }
 
@@ -1568,37 +1564,37 @@ public:
 	void fillSetParams(SetParams &params) {
 		memset(&params, 0, sizeof(SetParams));
 
-		params.dinRanges = dinChannel.m_pinRanges;
-		params.dinSpeeds = dinChannel.m_pinSpeeds;
+            params.dinRanges = dinChannel.m_pinRanges;
+            params.dinSpeeds = dinChannel.m_pinSpeeds;
 
-		params.doutStates = doutChannel.m_pinStates;
+            params.doutStates = doutChannel.m_pinStates;
 
-		for (int i = 0; i < 4; i++) {
-			auto channel = &ainChannels[i];
-			params.ain[i].mode = channel->m_mode;
-			params.ain[i].range = channel->m_mode == MEASURE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
-            params.ain[i].nplc = channel->ongoingCal ? 25.0f : (channel->m_mode == MEASURE_MODE_VOLTAGE ? channel->m_voltageNPLC : channel->m_currentNPLC);
-		}
+            for (int i = 0; i < 4; i++) {
+                auto channel = &ainChannels[i];
+                params.ain[i].mode = channel->m_mode;
+                params.ain[i].range = channel->m_mode == MEASURE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
+                params.ain[i].nplc = channel->ongoingCal ? 25.0f : (channel->m_mode == MEASURE_MODE_VOLTAGE ? channel->m_voltageNPLC : channel->m_currentNPLC);
+            }
 
-        params.powerLineFrequency = persist_conf::getPowerLineFrequency();
+            params.powerLineFrequency = persist_conf::getPowerLineFrequency();
 
-		for (int i = 0; i < 2; i++) {
-			auto channel = &aoutDac7760Channels[i];
-			params.aout_dac7760[i].outputEnabled = channel->m_outputEnabled;
-			params.aout_dac7760[i].outputRange = channel->getMode() == SOURCE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
-			params.aout_dac7760[i].outputValue = channel->getCalibratedValue();
-		}
+            for (int i = 0; i < 2; i++) {
+                auto channel = &aoutDac7760Channels[i];
+                params.aout_dac7760[i].outputEnabled = !powerDown && channel->m_outputEnabled;
+                params.aout_dac7760[i].outputRange = channel->getMode() == SOURCE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
+                params.aout_dac7760[i].outputValue = channel->getCalibratedValue();
+            }
 
-		for (int i = 0; i < 2; i++) {
-			auto channel = &aoutDac7563Channels[i];
-			params.aout_dac7563[i].voltage = channel->getCalibratedValue();
-		}
+            for (int i = 0; i < 2; i++) {
+                auto channel = &aoutDac7563Channels[i];
+                params.aout_dac7563[i].voltage = powerDown ? 0 : channel->getCalibratedValue();
+            }
 
-		for (int i = 0; i < 2; i++) {
-			auto channel = &pwmChannels[i];
-			params.pwm[i].freq = channel->m_freq;
-			params.pwm[i].duty = channel->m_duty;
-		}
+            for (int i = 0; i < 2; i++) {
+                auto channel = &pwmChannels[i];
+                params.pwm[i].freq = powerDown ? 0 : channel->m_freq;
+                params.pwm[i].duty = powerDown ? 0 : channel->m_duty;
+            }
 	}
 
     void Command_SetParams_FillRequest(Request &request) {
@@ -1793,6 +1789,10 @@ public:
 			(this->*currentCommand->done)(response, isSuccess);
 		}
 
+        if (powerDown) {
+            synchronized = false;
+        }
+
 		currentCommand = nullptr;
         setState(STATE_IDLE);
     }
@@ -1806,7 +1806,6 @@ public:
     	if (event == EVENT_DMA_TRANSFER_COMPLETED) {
             numCrcErrors = 0;
             numTransferErrors = 0;
-            g_debugVar= 0;
     	}
  
         if (state == STATE_WAIT_SLAVE_READY_BEFORE_REQUEST) {
@@ -1877,7 +1876,6 @@ public:
             //    DebugTrace("Slot %d SPI transfer error %d no. %d\n", slotIndex + 1, status, numTransferErrors);
             //}
         }
-        g_debugVar++;
     }
 
     void tick() override {
@@ -1966,6 +1964,9 @@ public:
                 } else if (tickCountMs - lastRefreshTime >= getRefreshTimeMs()) {
                     refreshStartTime = tickCountMs;
                     executeCommand(&getState_command);
+                } else if (forceTransferSetParams) {
+                    forceTransferSetParams = false;
+                    executeCommand(&setParams_command);
                 } else {
                     SetParams params;
                     fillSetParams(params);
@@ -1999,7 +2000,9 @@ public:
     }
 
     void onPowerDown() override {
-        synchronized = false;
+        powerDown = true;
+        executeCommand(&setParams_command);
+
 #ifdef EEZ_PLATFORM_SIMULATOR
         sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_UNLINK, slotIndex, 0);
 #endif
