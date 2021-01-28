@@ -130,6 +130,13 @@
                     "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Op-Amp%20Calculator/Op-Amp%20Calculator.py",
                     "https://github.com/eez-open/modular-psu-firmware/raw/1.0/scripts/Op-Amp%20Calculator/Op-Amp%20Calculator.res"
                 ]
+            },
+            {
+                "version": "1.1",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/a00f836306637fe20d25d045dd2084d66462a751/scripts/Op-Amp%20Calculator/Op-Amp%20Calculator.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/a00f836306637fe20d25d045dd2084d66462a751/scripts/Op-Amp%20Calculator/Op-Amp%20Calculator.res"
+                ]
             }
         ]
     },
