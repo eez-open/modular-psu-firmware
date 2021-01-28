@@ -57,8 +57,6 @@ static struct {
 
 static uint32_t g_toutputPulseStartTickCountMs;
 
-static bool g_pinState[NUM_IO_PINS] = { false, false, false, false };
-
 float g_pwmFrequency[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_FREQUENCY, PWM_DEFAULT_FREQUENCY };
 float g_pwmDuty[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_DUTY, PWM_DEFAULT_DUTY };
 static uint32_t g_pwmPeriodInt[NUM_IO_PINS - DOUT1];
@@ -320,16 +318,16 @@ void tick() {
         Channel::onInhibitedChanged(inhibited);
     }
 
-    if ((inputPin1.function == io_pins::FUNCTION_SYSTRIG || inputPin1.function == io_pins::FUNCTION_DLOGTRIG) && inputPin1State && !g_pinState[0]) {
+    if ((inputPin1.function == io_pins::FUNCTION_SYSTRIG || inputPin1.function == io_pins::FUNCTION_DLOGTRIG) && inputPin1State && !g_ioPins[0].state) {
         trigger::generateTrigger(trigger::SOURCE_PIN1);
     }
 
-    if ((inputPin2.function == io_pins::FUNCTION_SYSTRIG || inputPin2.function == io_pins::FUNCTION_DLOGTRIG) && inputPin2State && !g_pinState[1]) {
+    if ((inputPin2.function == io_pins::FUNCTION_SYSTRIG || inputPin2.function == io_pins::FUNCTION_DLOGTRIG) && inputPin2State && !g_ioPins[1].state) {
         trigger::generateTrigger(trigger::SOURCE_PIN2);
     }
 
-    g_pinState[0] = inputPin1State;
-    g_pinState[1] = inputPin2State;
+    g_ioPins[0].state = inputPin1State;
+    g_ioPins[1].state = inputPin2State;
 
     // end trigger output pulse
     if (g_lastState.toutputPulse) {
@@ -408,7 +406,7 @@ void refresh() {
             if (ioPin.function == io_pins::FUNCTION_NONE) {
                 setPinState(pin, false);
             } else if (ioPin.function == io_pins::FUNCTION_OUTPUT) {
-                setPinState(pin, g_pinState[pin]);
+                setPinState(pin, g_ioPins[pin].state);
             } else if (ioPin.function == io_pins::FUNCTION_FAULT) {
                 if (g_lastState.outputFault != 2) {
                     setPinState(pin, g_lastState.outputFault);
@@ -489,7 +487,7 @@ void setPinFunction(int pin, unsigned function) {
 
 void setPinState(int pin, bool state) {
     if (pin >= 2) {
-        g_pinState[pin] = state;
+        g_ioPins[pin].state = state;
 
         if (g_ioPins[pin].polarity == io_pins::POLARITY_NEGATIVE) {
             state = !state;
@@ -516,7 +514,7 @@ bool getPinState(int pin) {
         return state;
     }
 
-    return g_pinState[pin];
+    return g_ioPins[pin].state;
 }
 
 void setPwmFrequency(int pin, float frequency) {

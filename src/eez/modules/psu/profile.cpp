@@ -1092,6 +1092,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
         ctx.group("io_pin", i + 1);
         WRITE_PROPERTY("function", parameters.ioPins[i].function);
         WRITE_PROPERTY("polarity", parameters.ioPins[i].polarity);
+        WRITE_PROPERTY("state", parameters.ioPins[i].state);
         if (i >= DOUT1) {
             WRITE_PROPERTY("pwmFrequency", parameters.ioPinsPwmFrequency[i - DOUT1]);
             WRITE_PROPERTY("pwmDuty", parameters.ioPinsPwmDuty[i - DOUT1]);
@@ -1423,6 +1424,7 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
 
         READ_FLAG("function", ioPin.function);
         READ_FLAG("polarity", ioPin.polarity);
+        READ_FLAG("state", ioPin.state);
         if (ioPinIndex >= DOUT1) {
             READ_FLAG("pwmFrequency", parameters.ioPinsPwmFrequency[ioPinIndex - DOUT1]);
             READ_FLAG("pwmDuty", parameters.ioPinsPwmDuty[ioPinIndex - DOUT1]);

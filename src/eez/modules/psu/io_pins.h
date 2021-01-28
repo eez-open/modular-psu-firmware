@@ -48,10 +48,11 @@ enum Function {
 
 struct IOPin {
     unsigned polarity : 1;
-    unsigned function : 7;
+    unsigned function : 6;
+    unsigned state : 1;
 };
 
-extern IOPin g_ioPins[4];
+extern IOPin g_ioPins[NUM_IO_PINS];
 extern float g_pwmFrequency[NUM_IO_PINS - DOUT1];
 extern float g_pwmDuty[NUM_IO_PINS - DOUT1];
 
