@@ -346,7 +346,7 @@ struct DinChannel {
         WRITE_PROPERTY("din_pinSpeeds", parameters.pinSpeeds);
         for (int i = 0; i < 8; i++) {
             char propName[32];
-            sprintf(propName, "din_pin%dLabel", i);
+            snprintf(propName, sizeof(propName), "din_pin%dLabel", i);
             WRITE_PROPERTY(propName, parameters.pinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1));
         }
         return true;
@@ -357,7 +357,7 @@ struct DinChannel {
         READ_PROPERTY("din_pinSpeeds", parameters.pinSpeeds);
         for (int i = 0; i < 8; i++) {
             char propName[32];
-            sprintf(propName, "din_pin%dLabel", i);
+            snprintf(propName, sizeof(propName), "din_pin%dLabel", i);
             READ_STRING_PROPERTY(propName, parameters.pinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), CHANNEL_LABEL_MAX_LENGTH);
         }
         return false;
@@ -421,7 +421,7 @@ struct DoutChannel {
         WRITE_PROPERTY("dout_pinStates", parameters.pinStates);
         for (int i = 0; i < 8; i++) {
             char propName[32];
-            sprintf(propName, "dout_pin%dLabel", i);
+            snprintf(propName, sizeof(propName), "dout_pin%dLabel", i);
             WRITE_PROPERTY(propName, parameters.pinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1));
         }
         return true;
@@ -431,7 +431,7 @@ struct DoutChannel {
         READ_PROPERTY("dout_pinStates", parameters.pinStates);
         for (int i = 0; i < 8; i++) {
             char propName[32];
-            sprintf(propName, "dout_pin%dLabel", i);
+            snprintf(propName, sizeof(propName), "dout_pin%dLabel", i);
             READ_STRING_PROPERTY(propName, parameters.pinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), CHANNEL_LABEL_MAX_LENGTH);
         }
         return false;
@@ -552,22 +552,22 @@ struct AinChannel {
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
         char propName[32];
 
-        sprintf(propName, "ain_%d_mode", i+1);
+        snprintf(propName, sizeof(propName), "ain_%d_mode", i+1);
         WRITE_PROPERTY(propName, parameters.mode);
 
-        sprintf(propName, "ain_%d_currentRange", i+1);
+        snprintf(propName, sizeof(propName), "ain_%d_currentRange", i+1);
         WRITE_PROPERTY(propName, parameters.currentRange);
 
-		sprintf(propName, "ain_%d_voltageRange", i + 1);
+		snprintf(propName, sizeof(propName), "ain_%d_voltageRange", i + 1);
 		WRITE_PROPERTY(propName, parameters.voltageRange);
 		
-		sprintf(propName, "ain_%d_currentNPLC", i + 1);
+		snprintf(propName, sizeof(propName), "ain_%d_currentNPLC", i + 1);
 		WRITE_PROPERTY(propName, parameters.currentNPLC);
 
-		sprintf(propName, "ain_%d_voltageNPLC", i + 1);
+		snprintf(propName, sizeof(propName), "ain_%d_voltageNPLC", i + 1);
 		WRITE_PROPERTY(propName, parameters.voltageNPLC);
 
-		sprintf(propName, "ain_%d_label", i+1);
+		snprintf(propName, sizeof(propName), "ain_%d_label", i+1);
         WRITE_PROPERTY(propName, parameters.label);
 
         return true;
@@ -576,22 +576,22 @@ struct AinChannel {
     bool readProfileProperties(psu::profile::ReadContext &ctx, int i, ProfileParameters &parameters) {
         char propName[32];
 
-        sprintf(propName, "ain_%d_mode", i+1);
+        snprintf(propName, sizeof(propName), "ain_%d_mode", i+1);
         READ_PROPERTY(propName, parameters.mode);
 
-        sprintf(propName, "ain_%d_currentRange", i+1);
+        snprintf(propName, sizeof(propName), "ain_%d_currentRange", i+1);
         READ_PROPERTY(propName, parameters.currentRange);
 
-		sprintf(propName, "ain_%d_voltageRange", i + 1);
+		snprintf(propName, sizeof(propName), "ain_%d_voltageRange", i + 1);
 		READ_PROPERTY(propName, parameters.voltageRange);
 		
-		sprintf(propName, "ain_%d_currentNPLC", i + 1);
+		snprintf(propName, sizeof(propName), "ain_%d_currentNPLC", i + 1);
 		READ_PROPERTY(propName, parameters.currentNPLC);
 
-		sprintf(propName, "ain_%d_voltageNPLC", i + 1);
+		snprintf(propName, sizeof(propName), "ain_%d_voltageNPLC", i + 1);
 		READ_PROPERTY(propName, parameters.voltageNPLC);
 
-		sprintf(propName, "ain_%d_label", i+1);
+		snprintf(propName, sizeof(propName), "ain_%d_label", i+1);
         READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
 
         return false;
@@ -900,25 +900,25 @@ struct AoutDac7760Channel {
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
         char propName[32];
 
-        sprintf(propName, "aout_dac7760_%d_outputEnabled", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_outputEnabled", i+1);
         WRITE_PROPERTY(propName, parameters.outputEnabled);
 
-        sprintf(propName, "aout_dac7760_%d_mode", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_mode", i+1);
         WRITE_PROPERTY(propName, parameters.mode);
 
-        sprintf(propName, "aout_dac7760_%d_currentRange", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_currentRange", i+1);
         WRITE_PROPERTY(propName, parameters.currentRange);
 
-        sprintf(propName, "aout_dac7760_%d_voltageRange", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_voltageRange", i+1);
         WRITE_PROPERTY(propName, parameters.voltageRange);
 
-        sprintf(propName, "aout_dac7760_%d_currentValue", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_currentValue", i+1);
         WRITE_PROPERTY(propName, parameters.currentValue);
 
-        sprintf(propName, "aout_dac7760_%d_voltageValue", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_voltageValue", i+1);
         WRITE_PROPERTY(propName, parameters.voltageValue);
 
-        sprintf(propName, "aout_dac7760_%d_label", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_label", i+1);
         WRITE_PROPERTY(propName, parameters.label);
 
         return true;
@@ -927,25 +927,25 @@ struct AoutDac7760Channel {
     bool readProfileProperties(psu::profile::ReadContext &ctx, int i, ProfileParameters &parameters) {
         char propName[32];
 
-        sprintf(propName, "aout_dac7760_%d_outputEnabled", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_outputEnabled", i+1);
         READ_PROPERTY(propName, parameters.outputEnabled);
 
-        sprintf(propName, "aout_dac7760_%d_mode", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_mode", i+1);
         READ_PROPERTY(propName, parameters.mode);
 
-        sprintf(propName, "aout_dac7760_%d_currentRange", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_currentRange", i+1);
         READ_PROPERTY(propName, parameters.currentRange);
 
-        sprintf(propName, "aout_dac7760_%d_voltageRange", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_voltageRange", i+1);
         READ_PROPERTY(propName, parameters.voltageRange);
 
-        sprintf(propName, "aout_dac7760_%d_currentValue", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_currentValue", i+1);
         READ_PROPERTY(propName, parameters.currentValue);
 
-        sprintf(propName, "aout_dac7760_%d_voltageValue", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_voltageValue", i+1);
         READ_PROPERTY(propName, parameters.voltageValue);
 
-        sprintf(propName, "aout_dac7760_%d_label", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_label", i+1);
         READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
 
         return false;
@@ -1179,10 +1179,10 @@ struct AoutDac7563Channel {
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
         char propName[32];
 
-        sprintf(propName, "aout_dac7563_%d_value", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7563_%d_value", i+1);
         WRITE_PROPERTY(propName, parameters.value);
 
-        sprintf(propName, "aout_dac7563_%d_label", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7563_%d_label", i+1);
         WRITE_PROPERTY(propName, parameters.label);
 
         return true;
@@ -1191,10 +1191,10 @@ struct AoutDac7563Channel {
     bool readProfileProperties(psu::profile::ReadContext &ctx, int i, ProfileParameters &parameters) {
         char propName[32];
 
-        sprintf(propName, "aout_dac7563_%d_value", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7563_%d_value", i+1);
         READ_PROPERTY(propName, parameters.value);
 
-        sprintf(propName, "aout_dac7563_%d_label", i+1);
+        snprintf(propName, sizeof(propName), "aout_dac7563_%d_label", i+1);
         READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
 
         return false;
@@ -1265,13 +1265,13 @@ struct PwmChannel {
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
         char propName[32];
 
-        sprintf(propName, "pwm_%d_freq", i+1);
+        snprintf(propName, sizeof(propName), "pwm_%d_freq", i+1);
         WRITE_PROPERTY(propName, parameters.freq);
 
-        sprintf(propName, "pwm_%d_duty", i+1);
+        snprintf(propName, sizeof(propName), "pwm_%d_duty", i+1);
         WRITE_PROPERTY(propName, parameters.duty);
 
-        sprintf(propName, "pwm_%d_label", i+1);
+        snprintf(propName, sizeof(propName), "pwm_%d_label", i+1);
         WRITE_PROPERTY(propName, parameters.label);
 
         return true;
@@ -1280,13 +1280,13 @@ struct PwmChannel {
     bool readProfileProperties(psu::profile::ReadContext &ctx, int i, ProfileParameters &parameters) {
         char propName[32];
 
-        sprintf(propName, "pwm_%d_freq", i+1);
+        snprintf(propName, sizeof(propName), "pwm_%d_freq", i+1);
         READ_PROPERTY(propName, parameters.freq);
 
-        sprintf(propName, "pwm_%d_duty", i+1);
+        snprintf(propName, sizeof(propName), "pwm_%d_duty", i+1);
         READ_PROPERTY(propName, parameters.duty);
 
-        sprintf(propName, "pwm_%d_label", i+1);
+        snprintf(propName, sizeof(propName), "pwm_%d_label", i+1);
         READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
 
         return false;
@@ -1412,7 +1412,7 @@ public:
     DlogRecordingStart nextDlogRecordingStart;
     DlogRecordingStart dlogRecordingStart;
 
-    uint8_t selectedPage = 0;;
+    uint8_t selectedPage = 0;
 
     Mio168Module() {
 		assert(sizeof(Request) == sizeof(Response));

@@ -284,7 +284,8 @@ namespace gui {
 
 void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        static char g_keyboardInfoStr[2][256] = { 0 };
+        static const size_t KEYBOARD_INFO_STRING_SIZE = 256;
+        static char g_keyboardInfoStr[2][KEYBOARD_INFO_STRING_SIZE] = { 0 };
         static KeyboardInfo g_latestKeyboardInfo;
         static MouseInfo g_latestMouseInfo;
         static int g_keyboardInfoStrIndex = 0;
@@ -303,7 +304,7 @@ void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &
             str[0] = 0;
 
             if (g_keyboardInfo.state != 0) {
-                sprintf(str, "State=0x%02X", g_keyboardInfo.state);
+                snprintf(str, KEYBOARD_INFO_STRING_SIZE, "State=0x%02X", g_keyboardInfo.state);
             }
 
             if (g_keyboardInfo.lctrl) {
@@ -338,36 +339,21 @@ void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &
                 strcat(str, " RGUI");
             }
 
-            if (g_keyboardInfo.keys[0]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[0]);
-            }
-
-            if (g_keyboardInfo.keys[1]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[1]);
-            }
-
-            if (g_keyboardInfo.keys[2]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[2]);
-            }
-
-            if (g_keyboardInfo.keys[3]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[3]);
-            }
-
-            if (g_keyboardInfo.keys[4]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[4]);
-            }
-
-            if (g_keyboardInfo.keys[5]) {
-                sprintf(str + strlen(str), " 0x%02X", g_keyboardInfo.keys[5]);
+            for (int i = 0; i < 6; i++) {
+                if (g_keyboardInfo.keys[0]) {
+                    auto n = strlen(str);
+                    snprintf(str + n, KEYBOARD_INFO_STRING_SIZE - n, " 0x%02X", g_keyboardInfo.keys[0]);
+                }
             }
 
             if (g_mouseInfo.x != 0) {
-                sprintf(str + strlen(str), " / X=%d", (int8_t)g_mouseInfo.x);
+                auto n = strlen(str);
+                snprintf(str + n, KEYBOARD_INFO_STRING_SIZE - n, " / X=%d", (int8_t)g_mouseInfo.x);
             }
 
             if (g_mouseInfo.y != 0) {
-                sprintf(str + strlen(str), " Y=%d", (int8_t)g_mouseInfo.y);
+                auto n = strlen(str);
+                snprintf(str + n, KEYBOARD_INFO_STRING_SIZE - n, " Y=%d", (int8_t)g_mouseInfo.y);
             }
 
             if (g_mouseInfo.button1) {

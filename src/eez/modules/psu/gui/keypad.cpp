@@ -447,7 +447,7 @@ void NumericKeypad::init(
     reset();
 
     if (value.getType() == VALUE_TYPE_IP_ADDRESS) {
-        ipAddressToString(value.getUInt32(), m_keypadText);
+        ipAddressToString(value.getUInt32(), m_keypadText, sizeof(m_keypadText));
         m_cursorPosition = strlen(m_keypadText);
         m_state = BEFORE_DOT;
     }

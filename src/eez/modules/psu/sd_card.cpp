@@ -742,7 +742,7 @@ bool BufferedFileWrite::write(const uint8_t *buf, size_t size) {
 
 bool BufferedFileWrite::print(float value, int numDecimalDigits) {
     char buf[32];
-    sprintf(buf, "%.*f", numDecimalDigits, value);
+    snprintf(buf, sizeof(buf), "%.*f", numDecimalDigits, value);
     int len = strlen(buf);
     return write((const uint8_t *)buf, len);
 }

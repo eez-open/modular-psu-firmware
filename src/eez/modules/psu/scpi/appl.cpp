@@ -104,22 +104,22 @@ scpi_result_t scpi_cmd_applyQ(scpi_t *context) {
         }
 
         // return both current and voltage
-        sprintf(buffer, "CH%d:", channel->channelIndex + 1);
-        strcatVoltage(buffer, channel_dispatcher::getUMax(*channel));
+        snprintf(buffer, sizeof(buffer), "CH%d:", channel->channelIndex + 1);
+        strcatVoltage(buffer, sizeof(buffer), channel_dispatcher::getUMax(*channel));
         strcat(buffer, "/");
-        strcatCurrent(buffer, channel_dispatcher::getIMax(*channel));
+        strcatCurrent(buffer, sizeof(buffer), channel_dispatcher::getIMax(*channel));
         strcat(buffer, ", ");
 
-        strcatFloat(buffer, channel_dispatcher::getUSet(*channel));
+        strcatFloat(buffer, sizeof(buffer), channel_dispatcher::getUSet(*channel));
         strcat(buffer, ", ");
-        strcatFloat(buffer, channel_dispatcher::getISet(*channel));
+        strcatFloat(buffer, sizeof(buffer), channel_dispatcher::getISet(*channel));
     } else {
         if (current_or_voltage == 0) {
             // return only current
-            strcatFloat(buffer, channel_dispatcher::getISet(*channel));
+            strcatFloat(buffer, sizeof(buffer), channel_dispatcher::getISet(*channel));
         } else {
             // return only voltage
-            strcatFloat(buffer, channel_dispatcher::getUSet(*channel));
+            strcatFloat(buffer, sizeof(buffer), channel_dispatcher::getUSet(*channel));
         }
     }
 

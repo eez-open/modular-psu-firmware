@@ -765,7 +765,7 @@ bool get_power_limit_from_param(scpi_t *context, const scpi_number_t &param, flo
 
 scpi_result_t result_float(scpi_t *context, float value, Unit unit) {
     char buffer[32] = { 0 };
-    strcatFloat(buffer, value);
+    strcatFloat(buffer, sizeof(buffer), value);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
     return SCPI_RES_OK;
 }

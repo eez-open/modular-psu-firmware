@@ -67,9 +67,9 @@ scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_
     if (serial::g_testResult == TEST_OK) {
         char errorOutputBuffer[256];
         if (SCPI_CTRL_SRQ == ctrl) {
-            sprintf(errorOutputBuffer, "**SRQ: 0x%X (%d)\r\n", val, val);
+            snprintf(errorOutputBuffer, sizeof(errorOutputBuffer), "**SRQ: 0x%X (%d)\r\n", val, val);
         } else {
-            sprintf(errorOutputBuffer, "**CTRL %02x: 0x%X (%d)\r\n", ctrl, val, val);
+            snprintf(errorOutputBuffer, sizeof(errorOutputBuffer), "**CTRL %02x: 0x%X (%d)\r\n", ctrl, val, val);
         }
         g_outputBufferWriter.write(errorOutputBuffer, strlen(errorOutputBuffer));
     }

@@ -109,7 +109,7 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size, 
     buffer[position++] = ',';
 
     // max. 10 characters (for 4294967296)
-    sprintf(buffer + position, "%lu", (unsigned long)size);
+    snprintf(buffer + position, sizeof(buffer) - position, "%lu", (unsigned long)size);
 
     SCPI_ResultText(context, buffer);
 }
@@ -486,7 +486,7 @@ scpi_result_t scpi_cmd_mmemoryDateQ(scpi_t *context) {
     }
 
     char buffer[16] = { 0 };
-    sprintf(buffer, "%d, %d, %d", (int)(year + 2000), (int)month, (int)day);
+    snprintf(buffer, sizeof(buffer), "%d, %d, %d", (int)(year + 2000), (int)month, (int)day);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -508,7 +508,7 @@ scpi_result_t scpi_cmd_mmemoryTimeQ(scpi_t *context) {
     }
 
     char buffer[16] = { 0 };
-    sprintf(buffer, "%d, %d, %d", (int)hour, (int)minute, (int)second);
+    snprintf(buffer, sizeof(buffer), "%d, %d, %d", (int)hour, (int)minute, (int)second);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;

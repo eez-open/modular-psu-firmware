@@ -196,16 +196,14 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
 scpi_result_t scpi_cmd_debugOntimeQ(scpi_t *context) {
 #ifdef DEBUG
     char buffer[512] = { 0 };
-    char *p = buffer;
 
-    sprintf(p, "power active: %d\n", int(ontime::g_mcuCounter.isActive() ? 1 : 0));
-    p += strlen(p);
+    snprintf(buffer, sizeof(buffer), "power active: %d\n", int(ontime::g_mcuCounter.isActive() ? 1 : 0));
 
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
 
-        sprintf(p, "CH%d active: %d\n", channel.channelIndex + 1, int(ontime::g_mcuCounter.isActive() ? 1 : 0));
-        p += strlen(p);
+        auto n = strlen(buffer);
+        snprintf(buffer + n, sizeof(buffer) - n, "CH%d active: %d\n", channel.channelIndex + 1, int(ontime::g_mcuCounter.isActive() ? 1 : 0));
     }
 
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
@@ -404,7 +402,7 @@ scpi_result_t scpi_cmd_debugIoexpQ(scpi_t *context) {
 scpi_result_t scpi_cmd_debugDcm220Q(scpi_t *context) {
 #if defined(EEZ_PLATFORM_STM32)
 	char text[100];
-	sprintf(text, "TODO");
+	snprintf(text, sizeof(text), "TODO");
 	SCPI_ResultText(context, text);
 	return SCPI_RES_OK;
 #else

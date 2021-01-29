@@ -149,7 +149,7 @@ bool getDevice(int deviceIndex, Device &device) {
     for (int channelIndex = 0; channelIndex < 6; channelIndex++) {
         if (deviceIndex == i++) {
             device.id = (DeviceId)(DEVICE_ID_CH1_TEMP + channelIndex);
-            sprintf(device.name, "CH%d temp", channelIndex + 1);
+            snprintf(device.name, sizeof(device.name), "CH%d temp", channelIndex + 1);
             if (channelIndex < CH_NUM) {
                 device.installed = true;
                 device.testResult = temp_sensor::sensors[temp_sensor::CH1 + channelIndex].g_testResult;
@@ -164,7 +164,7 @@ bool getDevice(int deviceIndex, Device &device) {
     for (int channelIndex = 0; channelIndex < 6; channelIndex++) {
         if (deviceIndex == i++) {
             device.id = (DeviceId)(DEVICE_ID_CH1 + channelIndex);
-            sprintf(device.name, "CH%d", channelIndex + 1);
+            snprintf(device.name, sizeof(device.name), "CH%d", channelIndex + 1);
             if (channelIndex < CH_NUM) {
                 device.installed = true;
                 device.testResult = Channel::get(channelIndex).getTestResult();
@@ -179,7 +179,7 @@ bool getDevice(int deviceIndex, Device &device) {
     for (int slotIndex = 0; slotIndex < 3; slotIndex++) {
         if (deviceIndex == i++) {
             device.id = (DeviceId)(DEVICE_ID_SLOT1 + slotIndex);
-            sprintf(device.name, "SLOT%d", slotIndex + 1);
+            snprintf(device.name, sizeof(device.name), "SLOT%d", slotIndex + 1);
             if (slotIndex < NUM_SLOTS) {
                 device.installed = g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE;
                 device.testResult = g_slots[slotIndex]->getTestResult();

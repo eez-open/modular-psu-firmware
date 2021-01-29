@@ -546,7 +546,7 @@ static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
     eventType = getEventType(event->eventId);
 
     char dateTimeAndEventTypeStr[32];
-    sprintf(dateTimeAndEventTypeStr, "%04d-%02d-%02d %02d:%02d:%02d %s ", year, month, day, hour, minute, second, EVENT_TYPE_NAMES[eventType]);
+    snprintf(dateTimeAndEventTypeStr, sizeof(dateTimeAndEventTypeStr), "%04d-%02d-%02d %02d:%02d:%02d %s ", year, month, day, hour, minute, second, EVENT_TYPE_NAMES[eventType]);
     bool result = bufferedFile.write((const uint8_t *)dateTimeAndEventTypeStr, strlen(dateTimeAndEventTypeStr));
 
     if (result) {
@@ -556,7 +556,7 @@ static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
             const char *message = getEventMessage(event->eventId);
             if (event->channelIndex != -1) {
                 char buffer[128];
-                sprintf(buffer, message, event->channelIndex + 1);
+                snprintf(buffer, sizeof(buffer), message, event->channelIndex + 1);
                 result = bufferedFile.write((const uint8_t *)buffer, strlen(buffer));
             } else {
                 result = bufferedFile.write((const uint8_t *)message, strlen(message));
@@ -779,7 +779,7 @@ static void readEvents(uint32_t fromPosition) {
                             if (g_writeQueue[i].channelIndex == -1 || g_writeQueue[i].message) {
                                 strcpy(event.message, g_writeQueue[i].eventId == EVENT_DEBUG_TRACE || g_writeQueue[i].eventId == EVENT_INFO_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
                             } else {
-                                sprintf(event.message, getEventMessage(g_writeQueue[i].eventId), g_writeQueue[i].channelIndex + 1);
+                                snprintf(event.message, sizeof(event.message), getEventMessage(g_writeQueue[i].eventId), g_writeQueue[i].channelIndex + 1);
                             }
                             updateIsLongMessageText(event);
                             event.logOffset = i;

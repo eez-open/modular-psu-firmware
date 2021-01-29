@@ -363,9 +363,9 @@ const char *getSerialNumber() {
 		uint32_t idw2 = 0x00000001;
 #endif
 
-		sprintf(g_serialNumber, "%08X", (unsigned int)idw0);
-		sprintf(g_serialNumber + 8, "%08X", (unsigned int)idw1);
-		sprintf(g_serialNumber + 16, "%08X", (unsigned int)idw2);
+		snprintf(g_serialNumber, 9, "%08X", (unsigned int)idw0);
+		snprintf(g_serialNumber + 8, 9, "%08X", (unsigned int)idw1);
+		snprintf(g_serialNumber + 16, 9, "%08X", (unsigned int)idw2);
 
 		g_serialNumber[24] = 0;
 	}

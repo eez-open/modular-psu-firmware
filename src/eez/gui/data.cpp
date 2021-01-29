@@ -56,7 +56,7 @@ bool compare_INT_value(const Value &a, const Value &b) {
 }
 
 void INT_value_to_text(const Value &value, char *text, int count) {
-    strcatInt(text, value.getInt());
+    strcatInt(text, count, value.getInt());
 }
 
 bool compare_UINT8_value(const Value &a, const Value &b) {
@@ -64,7 +64,7 @@ bool compare_UINT8_value(const Value &a, const Value &b) {
 }
 
 void UINT8_value_to_text(const Value &value, char *text, int count) {
-    strcatUInt32(text, value.getUInt8());
+    strcatUInt32(text, count, value.getUInt8());
 }
 
 bool compare_UINT16_value(const Value &a, const Value &b) {
@@ -72,7 +72,7 @@ bool compare_UINT16_value(const Value &a, const Value &b) {
 }
 
 void UINT16_value_to_text(const Value &value, char *text, int count) {
-    strcatUInt32(text, value.getUInt16());
+    strcatUInt32(text, count, value.getUInt16());
 }
 
 bool compare_UINT32_value(const Value &a, const Value &b) {
@@ -80,7 +80,7 @@ bool compare_UINT32_value(const Value &a, const Value &b) {
 }
 
 void UINT32_value_to_text(const Value &value, char *text, int count) {
-    strcatUInt32(text, value.getUInt32());
+    strcatUInt32(text, count, value.getUInt32());
 }
 
 bool compare_FLOAT_value(const Value &a, const Value &b) {
@@ -176,12 +176,12 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
         }
 
         if (fixedDecimals) {
-            strcatFloat(text, floatValue, FLOAT_OPTIONS_GET_NUM_FIXED_DECIMALS(options));
+            strcatFloat(text, count, floatValue, FLOAT_OPTIONS_GET_NUM_FIXED_DECIMALS(options));
         } else {
             if (unit == UNIT_WATT || unit == UNIT_MILLI_WATT) {
-                strcatFloat(text, floatValue, 2);
+                strcatFloat(text, count, floatValue, 2);
             } else {
-                strcatFloat(text, floatValue);
+                strcatFloat(text, count, floatValue);
             }
 
             int n = strlen(text);

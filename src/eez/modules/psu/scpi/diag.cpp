@@ -58,13 +58,13 @@ static void printCalibrationValue(scpi_t *context, calibration::CalibrationBase 
 
     for (unsigned int i = 0; i < value.configuration.numPoints; i++) {
         if (value.isPointSet[i]) {
-            sprintf(buffer, "%s_point%d_dac=%f", prefix, i + 1, value.configuration.points[i].dac);
+            snprintf(buffer, sizeof(buffer), "%s_point%d_dac=%f", prefix, i + 1, value.configuration.points[i].dac);
             SCPI_ResultText(context, buffer);
 
-            sprintf(buffer, "%s_point%d_data=%f", prefix, i + 1, value.configuration.points[i].value);
+            snprintf(buffer, sizeof(buffer), "%s_point%d_data=%f", prefix, i + 1, value.configuration.points[i].value);
             SCPI_ResultText(context, buffer);
 
-            sprintf(buffer, "%s_point%d_adc=%f", prefix, i + 1, value.configuration.points[i].adc);
+            snprintf(buffer, sizeof(buffer), "%s_point%d_adc=%f", prefix, i + 1, value.configuration.points[i].adc);
             SCPI_ResultText(context, buffer);
         }
     }
@@ -86,19 +86,19 @@ void printCalibrationParameters(scpi_t *context, Unit unit, uint8_t currentRange
 
     char buffer[128] = { 0 };
 
-    sprintf(buffer, "%s_cal_params_exists=%d", prefix, calParamsExists);
+    snprintf(buffer, sizeof(buffer), "%s_cal_params_exists=%d", prefix, calParamsExists);
     SCPI_ResultText(context, buffer);
 
     if (calParamsExists) {
         for (unsigned int i = 0; i < calibrationValue.numPoints; i++) {
-            sprintf(buffer, "%s_point%d_dac=%f", prefix, i + 1, calibrationValue.points[i].dac);
+            snprintf(buffer, sizeof(buffer), "%s_point%d_dac=%f", prefix, i + 1, calibrationValue.points[i].dac);
             SCPI_ResultText(context, buffer);
 
-            sprintf(buffer, "%s_point%d_data=%f", prefix, i + 1, calibrationValue.points[i].value);
+            snprintf(buffer, sizeof(buffer), "%s_point%d_data=%f", prefix, i + 1, calibrationValue.points[i].value);
             SCPI_ResultText(context, buffer);
 
             if (!isNaN(calibrationValue.points[i].adc)) {
-                sprintf(buffer, "%s_point%d_adc=%f", prefix, i + 1, calibrationValue.points[i].adc);
+                snprintf(buffer, sizeof(buffer), "%s_point%d_adc=%f", prefix, i + 1, calibrationValue.points[i].adc);
                 SCPI_ResultText(context, buffer);
             }
         }
@@ -121,19 +121,19 @@ scpi_result_t scpi_cmd_diagnosticInformationAdcQ(scpi_t *context) {
     char buffer[64] = { 0 };
 
     strcpy(buffer, "U_SET=");
-    strcatVoltage(buffer, channel->u.mon_dac_last);
+    strcatVoltage(buffer, sizeof(buffer), channel->u.mon_dac_last);
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "U_MON=");
-    strcatVoltage(buffer, channel->u.mon_last);
+    strcatVoltage(buffer, sizeof(buffer), channel->u.mon_last);
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "I_SET=");
-    strcatCurrent(buffer, channel->i.mon_dac_last);
+    strcatCurrent(buffer, sizeof(buffer), channel->i.mon_dac_last);
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "I_MON=");
-    strcatCurrent(buffer, channel->i.mon_last);
+    strcatCurrent(buffer, sizeof(buffer), channel->i.mon_last);
     SCPI_ResultText(context, buffer);
 
     return SCPI_RES_OK;
@@ -150,7 +150,7 @@ scpi_result_t scpi_cmd_diagnosticInformationCalibrationQ(scpi_t *context) {
     if (calibration::isChannelCalibrating(*channel)) {
         if (calibration::g_editor.isRemarkSet()) {
             char buffer[128] = { 0 };
-            sprintf(buffer, "remark=%s", calibration::g_editor.getRemark());
+            snprintf(buffer, sizeof(buffer), "remark=%s", calibration::g_editor.getRemark());
             SCPI_ResultText(context, buffer);
         }
         printCalibrationValue(context, calibration::g_editor, calibration::g_editor.getVoltage());
@@ -162,7 +162,7 @@ scpi_result_t scpi_cmd_diagnosticInformationCalibrationQ(scpi_t *context) {
             int year, month, day, hour, minute, second;
             datetime::breakTime(channel->cal_conf.calibrationDate, year, month, day, hour, minute, second);
 
-            sprintf(buffer, "remark=%04d-%02d-%02d %s", year, month, day, channel->cal_conf.calibrationRemark);
+            snprintf(buffer, sizeof(buffer), "remark=%04d-%02d-%02d %s", year, month, day, channel->cal_conf.calibrationRemark);
             SCPI_ResultText(context, buffer);
 
             printCalibrationParameters(context, UNIT_VOLT, -1, channel->isVoltageCalibrationExists(), channel->cal_conf.u);
@@ -183,7 +183,7 @@ scpi_result_t scpi_cmd_diagnosticInformationCalibrationQ(scpi_t *context) {
             int year, month, day, hour, minute, second;
             datetime::breakTime(calConf.calibrationDate, year, month, day, hour, minute, second);
 
-            sprintf(buffer, "remark=%04d-%02d-%02d %s", year, month, day, calConf.calibrationRemark);
+            snprintf(buffer, sizeof(buffer), "remark=%04d-%02d-%02d %s", year, month, day, calConf.calibrationRemark);
             SCPI_ResultText(context, buffer);
 
             g_slots[slotAndSubchannelIndex.slotIndex]->isVoltageCalibrationExists(slotAndSubchannelIndex.subchannelIndex);
@@ -205,40 +205,40 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
         int channelIndex = channel->channelIndex + 1;
 
         // voltage
-        sprintf(buffer, "CH%d u_tripped=%d", channelIndex, (int)channel->ovp.flags.tripped);
+        snprintf(buffer, sizeof(buffer), "CH%d u_tripped=%d", channelIndex, (int)channel->ovp.flags.tripped);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d u_state=%d", channelIndex, (int)channel->prot_conf.flags.u_state);
+        snprintf(buffer, sizeof(buffer), "CH%d u_state=%d", channelIndex, (int)channel->prot_conf.flags.u_state);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d u_type=%d", channelIndex, (int)channel->prot_conf.flags.u_type);
+        snprintf(buffer, sizeof(buffer), "CH%d u_type=%d", channelIndex, (int)channel->prot_conf.flags.u_type);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d u_delay=", channelIndex);
-        strcatDuration(buffer, channel->prot_conf.u_delay);
+        snprintf(buffer, sizeof(buffer), "CH%d u_delay=", channelIndex);
+        strcatDuration(buffer, sizeof(buffer), channel->prot_conf.u_delay);
         SCPI_ResultText(context, buffer);
 
-        sprintf(buffer, "CH%d u_level=", channelIndex);
-        strcatVoltage(buffer, channel->prot_conf.u_level);
+        snprintf(buffer, sizeof(buffer), "CH%d u_level=", channelIndex);
+        strcatVoltage(buffer, sizeof(buffer), channel->prot_conf.u_level);
         SCPI_ResultText(context, buffer);
 
         // current
-        sprintf(buffer, "CH%d i_tripped=%d", channelIndex, (int)channel->ocp.flags.tripped);
+        snprintf(buffer, sizeof(buffer), "CH%d i_tripped=%d", channelIndex, (int)channel->ocp.flags.tripped);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d i_state=%d", channelIndex, (int)channel->prot_conf.flags.i_state);
+        snprintf(buffer, sizeof(buffer), "CH%d i_state=%d", channelIndex, (int)channel->prot_conf.flags.i_state);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d i_delay=", channelIndex);
-        strcatDuration(buffer, channel->prot_conf.i_delay);
+        snprintf(buffer, sizeof(buffer), "CH%d i_delay=", channelIndex);
+        strcatDuration(buffer, sizeof(buffer), channel->prot_conf.i_delay);
         SCPI_ResultText(context, buffer);
 
         // power
-        sprintf(buffer, "CH%d p_tripped=%d", channelIndex, (int)channel->opp.flags.tripped);
+        snprintf(buffer, sizeof(buffer), "CH%d p_tripped=%d", channelIndex, (int)channel->opp.flags.tripped);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d p_state=%d", channelIndex, (int)channel->prot_conf.flags.p_state);
+        snprintf(buffer, sizeof(buffer), "CH%d p_state=%d", channelIndex, (int)channel->prot_conf.flags.p_state);
         SCPI_ResultText(context, buffer);
-        sprintf(buffer, "CH%d p_delay=", channelIndex);
-        strcatDuration(buffer, channel->prot_conf.p_delay);
+        snprintf(buffer, sizeof(buffer), "CH%d p_delay=", channelIndex);
+        strcatDuration(buffer, sizeof(buffer), channel->prot_conf.p_delay);
         SCPI_ResultText(context, buffer);
 
-        sprintf(buffer, "CH%d p_level=", channelIndex);
-        strcatPower(buffer, channel->prot_conf.p_level);
+        snprintf(buffer, sizeof(buffer), "CH%d p_level=", channelIndex);
+        strcatPower(buffer, sizeof(buffer), channel->prot_conf.p_level);
         SCPI_ResultText(context, buffer);
     }
 
@@ -247,18 +247,18 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
         if (sensor.isInstalled()) {
             temperature::TempSensorTemperature &sensorTemperature = temperature::sensors[i];
 
-            sprintf(buffer, "temp_%s_tripped=%d", sensor.name, (int)sensorTemperature.isTripped());
+            snprintf(buffer, sizeof(buffer), "temp_%s_tripped=%d", sensor.name, (int)sensorTemperature.isTripped());
             SCPI_ResultText(context, buffer);
 
-            sprintf(buffer, "temp_%s_state=%d", sensor.name, (int)sensorTemperature.prot_conf.state);
+            snprintf(buffer, sizeof(buffer), "temp_%s_state=%d", sensor.name, (int)sensorTemperature.prot_conf.state);
             SCPI_ResultText(context, buffer);
 
-            sprintf(buffer, "temp_%s_delay=", sensor.name);
-            strcatDuration(buffer, sensorTemperature.prot_conf.delay);
+            snprintf(buffer, sizeof(buffer), "temp_%s_delay=", sensor.name);
+            strcatDuration(buffer, sizeof(buffer), sensorTemperature.prot_conf.delay);
             SCPI_ResultText(context, buffer);
 
-            sprintf(buffer, "temp_%s_level=", sensor.name);
-            strcatFloat(buffer, sensorTemperature.prot_conf.level);
+            snprintf(buffer, sizeof(buffer), "temp_%s_level=", sensor.name);
+            strcatFloat(buffer, sizeof(buffer), sensorTemperature.prot_conf.level);
             strcat(buffer, " oC");
             SCPI_ResultText(context, buffer);
         }
@@ -279,7 +279,7 @@ scpi_result_t scpi_cmd_diagnosticInformationTestQ(scpi_t *context) {
         char buffer[128] = { 0 };
         devices::Device device;
         for (int i = 0; devices::getDevice(i, device); ++i) {
-            sprintf(buffer, "%d, %s, %s, %s",
+            snprintf(buffer, sizeof(buffer), "%d, %s, %s, %s",
                 device.testResult ? (int)device.testResult : TEST_SKIPPED, device.name,
                 devices::getInstalledString(device.installed),
                 devices::getTestResultString(device.testResult));
@@ -322,37 +322,37 @@ scpi_result_t scpi_cmd_diagnosticInformationRegsQ(scpi_t *context) {
     for (int i = 0; i < CH_NUM; i++) {
         Channel& channel = Channel::get(i);
         if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCP405) {
-            sprintf(buffer + strlen(buffer), "CH%d:\n", i + 1);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "CH%d:\n", i + 1);
 
-            sprintf(buffer + strlen(buffer), "\tIOEXP:\n");
-            sprintf(buffer + strlen(buffer), "\t\tIODIRA   %X\n", (int)g_ioexpRegisters[i][0]);
-            sprintf(buffer + strlen(buffer), "\t\tIODIRB   %X\n", (int)g_ioexpRegisters[i][1]);
-            sprintf(buffer + strlen(buffer), "\t\tIPOLA    %X\n", (int)g_ioexpRegisters[i][2]);
-            sprintf(buffer + strlen(buffer), "\t\tIPOLB    %X\n", (int)g_ioexpRegisters[i][3]);
-            sprintf(buffer + strlen(buffer), "\t\tGPINTENA %X\n", (int)g_ioexpRegisters[i][4]);
-            sprintf(buffer + strlen(buffer), "\t\tGPINTENB %X\n", (int)g_ioexpRegisters[i][5]);
-            sprintf(buffer + strlen(buffer), "\t\tDEFVALA  %X\n", (int)g_ioexpRegisters[i][6]);
-            sprintf(buffer + strlen(buffer), "\t\tDEFVALB  %X\n", (int)g_ioexpRegisters[i][7]);
-            sprintf(buffer + strlen(buffer), "\t\tINTCONA  %X\n", (int)g_ioexpRegisters[i][8]);
-            sprintf(buffer + strlen(buffer), "\t\tINTCONB  %X\n", (int)g_ioexpRegisters[i][9]);
-            sprintf(buffer + strlen(buffer), "\t\tIOCON    %X\n", (int)g_ioexpRegisters[i][10]);
-            sprintf(buffer + strlen(buffer), "\t\tIOCON    %X\n", (int)g_ioexpRegisters[i][11]);
-            sprintf(buffer + strlen(buffer), "\t\tGPPUA    %X\n", (int)g_ioexpRegisters[i][12]);
-            sprintf(buffer + strlen(buffer), "\t\tGPPUB    %X\n", (int)g_ioexpRegisters[i][13]);
-            sprintf(buffer + strlen(buffer), "\t\tINTFA    %X\n", (int)g_ioexpRegisters[i][14]);
-            sprintf(buffer + strlen(buffer), "\t\tINTFB    %X\n", (int)g_ioexpRegisters[i][15]);
-            sprintf(buffer + strlen(buffer), "\t\tINTCAPA  %X\n", (int)g_ioexpRegisters[i][16]);
-            sprintf(buffer + strlen(buffer), "\t\tINTCAPB  %X\n", (int)g_ioexpRegisters[i][17]);
-            sprintf(buffer + strlen(buffer), "\t\tGPIOA    %X\n", (int)g_ioexpRegisters[i][18]);
-            sprintf(buffer + strlen(buffer), "\t\tGPIOB    %X\n", (int)g_ioexpRegisters[i][19]);
-            sprintf(buffer + strlen(buffer), "\t\tOLATA    %X\n", (int)g_ioexpRegisters[i][20]);
-            sprintf(buffer + strlen(buffer), "\t\tOLATB    %X\n", (int)g_ioexpRegisters[i][21]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\tIOEXP:\n");
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tIODIRA   %X\n", (int)g_ioexpRegisters[i][0]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tIODIRB   %X\n", (int)g_ioexpRegisters[i][1]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tIPOLA    %X\n", (int)g_ioexpRegisters[i][2]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tIPOLB    %X\n", (int)g_ioexpRegisters[i][3]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tGPINTENA %X\n", (int)g_ioexpRegisters[i][4]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tGPINTENB %X\n", (int)g_ioexpRegisters[i][5]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tDEFVALA  %X\n", (int)g_ioexpRegisters[i][6]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tDEFVALB  %X\n", (int)g_ioexpRegisters[i][7]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tINTCONA  %X\n", (int)g_ioexpRegisters[i][8]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tINTCONB  %X\n", (int)g_ioexpRegisters[i][9]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tIOCON    %X\n", (int)g_ioexpRegisters[i][10]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tIOCON    %X\n", (int)g_ioexpRegisters[i][11]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tGPPUA    %X\n", (int)g_ioexpRegisters[i][12]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tGPPUB    %X\n", (int)g_ioexpRegisters[i][13]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tINTFA    %X\n", (int)g_ioexpRegisters[i][14]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tINTFB    %X\n", (int)g_ioexpRegisters[i][15]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tINTCAPA  %X\n", (int)g_ioexpRegisters[i][16]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tINTCAPB  %X\n", (int)g_ioexpRegisters[i][17]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tGPIOA    %X\n", (int)g_ioexpRegisters[i][18]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tGPIOB    %X\n", (int)g_ioexpRegisters[i][19]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tOLATA    %X\n", (int)g_ioexpRegisters[i][20]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tOLATB    %X\n", (int)g_ioexpRegisters[i][21]);
 
-            sprintf(buffer + strlen(buffer), "\tADC:\n");
-            sprintf(buffer + strlen(buffer), "\t\tREG0     %X\n", (int)g_adcRegisters[i][0]);
-            sprintf(buffer + strlen(buffer), "\t\tREG1     %X\n", (int)g_adcRegisters[i][1]);
-            sprintf(buffer + strlen(buffer), "\t\tREG2     %X\n", (int)g_adcRegisters[i][2]);
-            sprintf(buffer + strlen(buffer), "\t\tREG3     %X\n", (int)g_adcRegisters[i][3]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\tADC:\n");
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tREG0     %X\n", (int)g_adcRegisters[i][0]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tREG1     %X\n", (int)g_adcRegisters[i][1]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tREG2     %X\n", (int)g_adcRegisters[i][2]);
+            snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\t\tREG3     %X\n", (int)g_adcRegisters[i][3]);
         }
     }
 

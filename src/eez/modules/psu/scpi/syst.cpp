@@ -142,7 +142,7 @@ scpi_result_t scpi_cmd_systemDateQ(scpi_t *context) {
     }
 
     char buffer[16] = { 0 };
-    sprintf(buffer, "%d, %d, %d", (int)(year + 2000), (int)month, (int)day);
+    snprintf(buffer, sizeof(buffer), "%d, %d, %d", (int)(year + 2000), (int)month, (int)day);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -190,7 +190,7 @@ scpi_result_t scpi_cmd_systemTimeQ(scpi_t *context) {
     }
 
     char buffer[16] = { 0 };
-    sprintf(buffer, "%d, %d, %d", (int)hour, (int)minute, (int)second);
+    snprintf(buffer, sizeof(buffer), "%d, %d, %d", (int)hour, (int)minute, (int)second);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -438,7 +438,7 @@ scpi_result_t scpi_cmd_systemSlotVersionQ(scpi_t *context) {
 
     if (module->moduleType != MODULE_TYPE_NONE) {
         char text[50];
-        sprintf(text, "R%dB%d", (int)(module->moduleRevision >> 8), (int)(module->moduleRevision & 0xFF));
+        snprintf(text, sizeof(text), "R%dB%d", (int)(module->moduleRevision >> 8), (int)(module->moduleRevision & 0xFF));
         SCPI_ResultText(context, text);
     } else {
         SCPI_ResultText(context, "");
@@ -455,7 +455,7 @@ scpi_result_t scpi_cmd_systemSlotFirmwareQ(scpi_t *context) {
 
     if (module->moduleType != MODULE_TYPE_NONE) {
         char text[50];
-        sprintf(text, "%d.%d", (int)(module->firmwareMajorVersion), (int)(module->firmwareMinorVersion));
+        snprintf(text, sizeof(text), "%d.%d", (int)(module->firmwareMajorVersion), (int)(module->firmwareMinorVersion));
         SCPI_ResultText(context, text);
     } else {
         SCPI_ResultText(context, "");
@@ -657,7 +657,7 @@ scpi_result_t scpi_cmd_systemChannelVersionQ(scpi_t *context) {
 
     auto &slot = *g_slots[channel->slotIndex];
     char text[50];
-    sprintf(text, "R%dB%d", (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+    snprintf(text, sizeof(text), "R%dB%d", (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     SCPI_ResultText(context, text);
 
     return SCPI_RES_OK;
@@ -695,7 +695,7 @@ scpi_result_t scpi_cmd_systemCpuModelQ(scpi_t *context) {
 
 scpi_result_t scpi_cmd_systemCpuVersionQ(scpi_t *context) {
     char revision[32];
-    snprintf(revision, 32, "R%dB%d", g_mcuRevision >> 8, g_mcuRevision & 0xFF);
+    snprintf(revision, sizeof(revision), "R%dB%d", g_mcuRevision >> 8, g_mcuRevision & 0xFF);
     SCPI_ResultText(context, revision);
     return SCPI_RES_OK;
 }
@@ -1085,9 +1085,9 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetAddressQ(scpi_t *context) {
 
     char ipAddressStr[16];
     if (persist_conf::devConf.ethernetDhcpEnabled) {
-        ipAddressToString(ethernet::getIpAddress(), ipAddressStr);
+        ipAddressToString(ethernet::getIpAddress(), ipAddressStr, sizeof(ipAddressStr));
     } else {
-        ipAddressToString(persist_conf::devConf.ethernetIpAddress, ipAddressStr);
+        ipAddressToString(persist_conf::devConf.ethernetIpAddress, ipAddressStr, sizeof(ipAddressStr));
     }
     SCPI_ResultText(context, ipAddressStr);
     return SCPI_RES_OK;
@@ -1137,7 +1137,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetDnsQ(scpi_t *context) {
         SCPI_ResultText(context, "unknown");
     } else {
         char ipAddressStr[16];
-        ipAddressToString(persist_conf::devConf.ethernetDns, ipAddressStr);
+        ipAddressToString(persist_conf::devConf.ethernetDns, ipAddressStr, sizeof(ipAddressStr));
         SCPI_ResultText(context, ipAddressStr);
     }
     return SCPI_RES_OK;
@@ -1187,7 +1187,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetGatewayQ(scpi_t *context) {
         SCPI_ResultText(context, "unknown");
     } else {
         char ipAddressStr[16];
-        ipAddressToString(persist_conf::devConf.ethernetGateway, ipAddressStr);
+        ipAddressToString(persist_conf::devConf.ethernetGateway, ipAddressStr, sizeof(ipAddressStr));
         SCPI_ResultText(context, ipAddressStr);
     }
     return SCPI_RES_OK;
@@ -1288,7 +1288,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetSmaskQ(scpi_t *context) {
         SCPI_ResultText(context, "unknown");
     } else {
         char ipAddressStr[16];
-        ipAddressToString(persist_conf::devConf.ethernetSubnetMask, ipAddressStr);
+        ipAddressToString(persist_conf::devConf.ethernetSubnetMask, ipAddressStr, sizeof(ipAddressStr));
         SCPI_ResultText(context, ipAddressStr);
     }
     return SCPI_RES_OK;
@@ -1993,7 +1993,7 @@ scpi_result_t scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ(scpi_t *conte
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, temperature::sensors[sensor].measure());
+    strcatFloat(buffer, sizeof(buffer), temperature::sensors[sensor].measure());
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;

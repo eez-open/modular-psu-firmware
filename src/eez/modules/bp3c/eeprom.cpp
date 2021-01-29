@@ -99,7 +99,7 @@ bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t addr
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
     char fileName[20];
-    sprintf(fileName, "EEPROM_SLOT%d.state", slotIndex + 1);
+    snprintf(fileName, sizeof(fileName), "EEPROM_SLOT%d.state", slotIndex + 1);
     char *filePath = getConfFilePath(fileName);
     FILE *fp = fopen(filePath, "r+b");
     if (fp == NULL) {
@@ -178,7 +178,7 @@ bool write(uint8_t slotIndex, const uint8_t *buffer, uint16_t bufferSize, uint16
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
     char fileName[20];
-    sprintf(fileName, "EEPROM_SLOT%d.state", slotIndex + 1);
+    snprintf(fileName, sizeof(fileName), "EEPROM_SLOT%d.state", slotIndex + 1);
     char *filePath = getConfFilePath(fileName);
     FILE *fp = fopen(filePath, "r+b");
     if (fp == NULL) {

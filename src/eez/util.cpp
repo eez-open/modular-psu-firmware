@@ -93,63 +93,60 @@ float clamp(float x, float min, float max) {
     return x;
 }
 
-void strcatInt(char *str, int value) {
-    str = str + strlen(str);
-    sprintf(str, "%d", value);
+void strcatInt(char *str, size_t maxStrLength, int value) {
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%d", value);
 }
 
-void strcatInt32(char *str, int32_t value) {
-    str = str + strlen(str);
-    sprintf(str, "%ld", (long)value);
+void strcatUInt32(char *str, size_t maxStrLength, uint32_t value) {
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%lu", (unsigned long)value);
 }
 
-void strcatUInt32(char *str, uint32_t value) {
-    str = str + strlen(str);
-    sprintf(str, "%lu", (unsigned long)value);
+void strcatFloat(char *str, size_t maxStrLength, float value) {
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%g", value);
 }
 
-void strcatFloat(char *str, float value) {
-    sprintf(str + strlen(str), "%g", value);
+void strcatFloat(char *str, size_t maxStrLength, float value, int numDecimalPlaces) {
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%.*f", numDecimalPlaces, value);
 }
 
-void strcatFloat(char *str, float value, int numDecimalPlaces) {
-    sprintf(str + strlen(str), "%.*f", numDecimalPlaces, value);
-}
-
-void strcatVoltage(char *str, float value) {
-    strcatFloat(str, value);
+void strcatVoltage(char *str, size_t maxStrLength, float value) {
+    strcatFloat(str, maxStrLength, value);
     strcat(str, "V");
 }
 
-void strcatCurrent(char *str, float value) {
-    strcatFloat(str, value);
+void strcatCurrent(char *str, size_t maxStrLength, float value) {
+    strcatFloat(str, maxStrLength, value);
     strcat(str, "A");
 }
 
-void strcatPower(char *str, float value) {
-    strcatFloat(str, value);
+void strcatPower(char *str, size_t maxStrLength, float value) {
+    strcatFloat(str, maxStrLength, value);
     strcat(str, "W");
 }
 
-void strcatDuration(char *str, float value) {
+void strcatDuration(char *str, size_t maxStrLength, float value) {
     if (value > 0.1) {
-        strcatFloat(str, value);
+        strcatFloat(str, maxStrLength, value);
         strcat(str, " s");
     } else {
-        strcatFloat(str, value * 1000);
+        strcatFloat(str, maxStrLength, value * 1000);
         strcat(str, " ms");
     }
 }
 
-void strcatLoad(char *str, float value) {
+void strcatLoad(char *str, size_t maxStrLength, float value) {
     if (value < 1000) {
-        strcatFloat(str, value);
+        strcatFloat(str, maxStrLength, value);
         strcat(str, " ohm");
     } else if (value < 1000000) {
-        strcatFloat(str, value / 1000);
+        strcatFloat(str, maxStrLength, value / 1000);
         strcat(str, " Kohm");
     } else {
-        strcatFloat(str, value / 1000000);
+        strcatFloat(str, maxStrLength, value / 1000000);
         strcat(str, " Mohm");
     }
 }
@@ -407,9 +404,10 @@ uint32_t getIpAddress(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
     return ipAddress;
 }
 
-void ipAddressToString(uint32_t ipAddress, char *ipAddressStr) {
-    sprintf(ipAddressStr, "%d.%d.%d.%d", getIpAddressPartA(ipAddress), getIpAddressPartB(ipAddress),
-            getIpAddressPartC(ipAddress), getIpAddressPartD(ipAddress));
+void ipAddressToString(uint32_t ipAddress, char *ipAddressStr, size_t maxIpAddressStrLength) {
+    snprintf(ipAddressStr, maxIpAddressStrLength, "%d.%d.%d.%d",
+        getIpAddressPartA(ipAddress), getIpAddressPartB(ipAddress),
+        getIpAddressPartC(ipAddress), getIpAddressPartD(ipAddress));
 }
 
 void macAddressToString(const uint8_t *macAddress, char *macAddressStr) {

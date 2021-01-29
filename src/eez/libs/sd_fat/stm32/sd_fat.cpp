@@ -310,7 +310,7 @@ bool File::sync() {
 
 void File::print(float value, int numDecimalDigits) {
     char buffer[32];
-    sprintf(buffer, "%.*f", numDecimalDigits, value);
+    snprintf(buffer, sizeof(buffer), "%.*f", numDecimalDigits, value);
     write((uint8_t *)buffer, strlen(buffer));
 }
 

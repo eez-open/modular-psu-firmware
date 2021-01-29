@@ -76,9 +76,9 @@ int SCPI_Error(scpi_t *context, int_fast16_t err) {
 scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_t val) {
     char outputBuffer[256];
     if (SCPI_CTRL_SRQ == ctrl) {
-        sprintf(outputBuffer, "**SRQ: 0x%X (%d)\r\n", val, val);
+        snprintf(outputBuffer, sizeof(outputBuffer), "**SRQ: 0x%X (%d)\r\n", val, val);
     } else {
-        sprintf(outputBuffer, "**CTRL %02x: 0x%X (%d)\r\n", ctrl, val, val);
+        snprintf(outputBuffer, sizeof(outputBuffer), "**CTRL %02x: 0x%X (%d)\r\n", ctrl, val, val);
     }
 
     g_outputBufferWriter.write(outputBuffer, strlen(outputBuffer));

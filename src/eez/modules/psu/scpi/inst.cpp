@@ -84,7 +84,7 @@ scpi_result_t scpi_cmd_instrumentSelectQ(scpi_t *context) {
 
     for (int i = 0; i < psu_context->selectedChannels.numChannels; i++) {
         char buffer[20];
-        sprintf(buffer, "(@%d%02d)", psu_context->selectedChannels.channels[i].slotIndex + 1, psu_context->selectedChannels.channels[i].subchannelIndex + 1);
+        snprintf(buffer, sizeof(buffer), "(@%d%02d)", psu_context->selectedChannels.channels[i].slotIndex + 1, psu_context->selectedChannels.channels[i].subchannelIndex + 1);
         SCPI_ResultCharacters(context, buffer, strlen(buffer));
     }
 
@@ -382,7 +382,7 @@ void dumpCatalog(scpi_t *context, bool dumpIndex) {
     if (CH_NUM > 0) {
         for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
             char channelStr[10];
-            sprintf(channelStr, "CH%d", channelIndex + 1);
+            snprintf(channelStr, sizeof(channelStr), "CH%d", channelIndex + 1);
             SCPI_ResultText(context, channelStr);
             if (dumpIndex) {
                 SCPI_ResultInt(context, channelIndex + 1);
@@ -397,7 +397,7 @@ void dumpCatalog(scpi_t *context, bool dumpIndex) {
             int subchannelIndex = module->getSubchannelIndexFromRelativeChannelIndex(relativeChannelIndex);
 
             char channelStr[10];
-            sprintf(channelStr, "(@%d%02d)", slotIndex + 1, subchannelIndex + 1);
+            snprintf(channelStr, sizeof(channelStr), "(@%d%02d)", slotIndex + 1, subchannelIndex + 1);
             SCPI_ResultText(context, channelStr);
             if (dumpIndex) {
                 SCPI_ResultInt(context, 0);

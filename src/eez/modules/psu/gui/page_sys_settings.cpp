@@ -1270,7 +1270,7 @@ void SysSettingsRampAndDelayPage::drawRamp(const WidgetCursor &widgetCursor, int
     y2 -= yOffset;
 
     char label[20];
-    sprintf(label, "Ch%d %s", channelIndex + 1, (drawVoltageRamps ? "U" : "I"));
+    snprintf(label, sizeof(label), "Ch%d %s", channelIndex + 1, (drawVoltageRamps ? "U" : "I"));
 
     auto tmp = g_channelIndex;
     g_channelIndex = channelIndex;

@@ -643,7 +643,7 @@ public:
 
         for (int i = 0; i < NUM_RELAYS; i++) {
             char propName[16];
-            sprintf(propName, "channelLabel%d", i+1);
+            snprintf(propName, sizeof(propName), "channelLabel%d", i+1);
             WRITE_PROPERTY(propName, parameters->relayLabels[i]);
         }
 
@@ -660,7 +660,7 @@ public:
 		
         for (int i = 0; i < NUM_RELAYS; i++) {
             char propName[16];
-            sprintf(propName, "channelLabel%d", i+1);
+            snprintf(propName, sizeof(propName), "channelLabel%d", i+1);
             READ_STRING_PROPERTY(propName, parameters->relayLabels[i], RELAY_LABEL_MAX_LENGTH);
         }
 

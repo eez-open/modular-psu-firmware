@@ -54,17 +54,16 @@ float remapExp(float x, float x1, float y1, float x2, float y2);
 float remapOutExp(float x, float x1, float y1, float x2, float y2);
 float clamp(float x, float min, float max);
 
-void strcatInt(char *str, int value);
-void strcatInt32(char *str, int32_t value);
-void strcatUInt32(char *str, uint32_t value);
-void strcatFloat(char *str, float value);
-void strcatFloat(char *str, float value, int numDecimalPlaces);
+void strcatInt(char *str, size_t maxStrLength, int value);
+void strcatUInt32(char *str, size_t maxStrLength, uint32_t value);
+void strcatFloat(char *str, size_t maxStrLength, float value);
+void strcatFloat(char *str, size_t maxStrLength, float value, int numDecimalPlaces);
 
-void strcatVoltage(char *str, float value);
-void strcatCurrent(char *str, float value);
-void strcatPower(char *str, float value);
-void strcatDuration(char *str, float value);
-void strcatLoad(char *str, float value);
+void strcatVoltage(char *str, size_t maxStrLength, float value);
+void strcatCurrent(char *str, size_t maxStrLength, float value);
+void strcatPower(char *str, size_t maxStrLength, float value);
+void strcatDuration(char *str, size_t maxStrLength, float value);
+void strcatLoad(char *str, size_t maxStrLength, float value);
 
 uint32_t crc32(const uint8_t *message, size_t size);
 
@@ -109,7 +108,7 @@ uint32_t arrayToIpAddress(uint8_t *ipAddressArray);
 uint32_t getIpAddress(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
 
 bool parseIpAddress(const char *ipAddressStr, size_t ipAddressStrLength, uint32_t &ipAddress);
-void ipAddressToString(uint32_t ipAddress, char *ipAddressStr);
+void ipAddressToString(uint32_t ipAddress, char *ipAddressStr, size_t maxIpAddressStrLength);
 
 void macAddressToString(const uint8_t *macAddress, char *macAddressStr);
 

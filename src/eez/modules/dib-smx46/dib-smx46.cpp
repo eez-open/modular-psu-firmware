@@ -733,13 +733,13 @@ public:
 
         for (int i = 0; i < NUM_COLUMNS; i++) {
             char propName[16];
-            sprintf(propName, "xLabel%d", i+1);
+            snprintf(propName, sizeof(propName), "xLabel%d", i+1);
             WRITE_PROPERTY(propName, parameters->columnLabels[i]);
         }
 
         for (int i = 0; i < NUM_ROWS; i++) {
             char propName[16];
-            sprintf(propName, "yLabel%d", i+1);
+            snprintf(propName, sizeof(propName), "yLabel%d", i+1);
             WRITE_PROPERTY(propName, parameters->rowLabels[i]);
         }
 
@@ -765,13 +765,13 @@ public:
         
         for (int i = 0; i < NUM_COLUMNS; i++) {
             char propName[16];
-            sprintf(propName, "xLabel%d", i+1);
+            snprintf(propName, sizeof(propName), "xLabel%d", i+1);
             READ_STRING_PROPERTY(propName, parameters->columnLabels[i], MAX_SWITCH_MATRIX_LABEL_LENGTH);
         }
 
         for (int i = 0; i < NUM_ROWS; i++) {
             char propName[16];
-            sprintf(propName, "yLabel%d", i+1);
+            snprintf(propName, sizeof(propName), "yLabel%d", i+1);
             READ_STRING_PROPERTY(propName, parameters->rowLabels[i], MAX_SWITCH_MATRIX_LABEL_LENGTH);
         }
 

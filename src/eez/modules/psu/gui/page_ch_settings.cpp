@@ -728,7 +728,7 @@ void ChSettingsListsPage::edit() {
             min.toText(dwell, sizeof(dwell));
             strcat(label, dwell);
         } else {
-            strcatFloat(label, options.min);
+            strcatFloat(label, sizeof(label), options.min);
         }
         strcat(label, "-");
         if (dataId == DATA_ID_CHANNEL_LIST_DWELL) {
@@ -736,9 +736,9 @@ void ChSettingsListsPage::edit() {
             max.toText(dwell, sizeof(dwell));
             strcat(label, dwell);
         } else if (dataId == DATA_ID_CHANNEL_LIST_VOLTAGE) {
-            strcatVoltage(label, options.max);
+            strcatVoltage(label, sizeof(label), options.max);
         } else {
-            strcatCurrent(label, options.max);
+            strcatCurrent(label, sizeof(label), options.max);
         }
         strcat(label, "]: ");
 

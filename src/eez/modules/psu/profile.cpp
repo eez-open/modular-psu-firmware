@@ -68,7 +68,7 @@ static List g_listsProfile10[CH_MAX];
 static void loadProfileName(int location);
 static Parameters *getProfileParametersFromCache(int location);
 
-static void getProfileFilePath(int location, char *filePath);
+static void getProfileFilePath(int location, char *filePath, size_t filePathStrLength);
 
 static void resetProfileToDefaults(Parameters &profile);
 
@@ -147,7 +147,7 @@ bool recallFromLocation(int location, int recallOptions, bool showProgress, int 
     }
 
     char filePath[MAX_PATH_LENGTH];
-    getProfileFilePath(location, filePath);
+    getProfileFilePath(location, filePath, sizeof(filePath));
 
     Parameters profile;
     resetProfileToDefaults(profile);
@@ -254,7 +254,7 @@ bool saveToLocation(int location, const char *name, bool showProgress, int *err)
     }
 
     char filePath[MAX_PATH_LENGTH];
-    getProfileFilePath(location, filePath);
+    getProfileFilePath(location, filePath, sizeof(filePath));
 
     Parameters profile;
     memset(&profile, 0, sizeof(Parameters));
@@ -284,7 +284,7 @@ bool saveToFile(const char *filePath, bool showProgress, int *err) {
 
 bool importFileToLocation(const char *filePath, int location, bool showProgress, int *err) {
     char profileFilePath[MAX_PATH_LENGTH];
-    getProfileFilePath(location, profileFilePath);
+    getProfileFilePath(location, profileFilePath, sizeof(profileFilePath));
     if (sd_card::copyFile(filePath, profileFilePath, true, err)) {
         loadProfileParametersToCache(location);
         return true;
@@ -294,7 +294,7 @@ bool importFileToLocation(const char *filePath, int location, bool showProgress,
 
 bool exportLocationToFile(int location, const char *filePath, bool showProgress, int *err) {
     char profileFilePath[MAX_PATH_LENGTH];
-    getProfileFilePath(location, profileFilePath);
+    getProfileFilePath(location, profileFilePath, sizeof(profileFilePath));
     return sd_card::copyFile(profileFilePath, filePath, true, err);
 }
 
@@ -309,7 +309,7 @@ bool deleteLocation(int location, bool showProgress, int *err) {
         g_profilesCache[location].flags.isValid = false;
 
         char filePath[MAX_PATH_LENGTH];
-        getProfileFilePath(location, filePath);
+        getProfileFilePath(location, filePath, sizeof(filePath));
         if (!sd_card::exists(filePath, err)) {
             return true;
         }
@@ -379,7 +379,7 @@ bool setName(int location, const char *name, bool showProgress, int *err) {
         if (profileFromCache && profileFromCache->flags.isValid) {
 
             char filePath[MAX_PATH_LENGTH];
-            getProfileFilePath(location, filePath);
+            getProfileFilePath(location, filePath, sizeof(filePath));
 
             Parameters profile;
             resetProfileToDefaults(profile);
@@ -447,7 +447,7 @@ void loadProfileParametersToCache(int location) {
         sendMessageToLowPriorityThread(THREAD_MESSAGE_LOAD_PROFILE, location);
     } else {
         char filePath[MAX_PATH_LENGTH];
-        getProfileFilePath(location, filePath);
+        getProfileFilePath(location, filePath, sizeof(filePath));
         int err;
         if (!loadProfileFromFile(filePath, g_profilesCache[location], nullptr, 0, false, &err)) {
             if (err != SCPI_ERROR_FILE_NOT_FOUND && err != SCPI_ERROR_MISSING_MASS_MEDIA) {
@@ -463,7 +463,7 @@ void loadProfileParametersToCache(int location) {
 
 static void loadProfileName(int location) {
     char filePath[MAX_PATH_LENGTH];
-    getProfileFilePath(location, filePath);
+    getProfileFilePath(location, filePath, sizeof(filePath));
     int err;
     if (!loadProfileFromFile(filePath, g_profilesCache[location], nullptr, LOAD_PROFILE_FROM_FILE_OPTION_ONLY_NAME, false, &err)) {
         if (err != SCPI_ERROR_FILE_NOT_FOUND && err != SCPI_ERROR_MISSING_MASS_MEDIA) {
@@ -489,10 +489,10 @@ static Parameters *getProfileParametersFromCache(int location) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void getProfileFilePath(int location, char *filePath) {
+static void getProfileFilePath(int location, char *filePath, size_t filePathStrLength) {
     strcpy(filePath, PROFILES_DIR);
     strcat(filePath, PATH_SEPARATOR);
-    strcatInt(filePath, location);
+    strcatInt(filePath, filePathStrLength - strlen(filePath), location);
     strcat(filePath, getExtensionFromFileType(FILE_TYPE_PROFILE));
 }
 
@@ -872,37 +872,37 @@ WriteContext::WriteContext(File &file_)
 
 bool WriteContext::group(const char *groupName) {
     char line[256 + 1];
-    sprintf(line, "[%s]\n", groupName);
+    snprintf(line, sizeof(line), "[%s]\n", groupName);
     return file.write((uint8_t *)line, strlen(line));
 }
 
 bool WriteContext::group(const char *groupNamePrefix, unsigned int index) {
     char line[256 + 1];
-    sprintf(line, "[%s%d]\n", groupNamePrefix, index);
+    snprintf(line, sizeof(line), "[%s%d]\n", groupNamePrefix, index);
     return file.write((uint8_t *)line, strlen(line));
 }
 
 bool WriteContext::property(const char *propertyName, int value) {
     char line[256 + 1];
-    sprintf(line, "\t%s=%d\n", propertyName, (int)value);
+    snprintf(line, sizeof(line), "\t%s=%d\n", propertyName, (int)value);
     return file.write((uint8_t *)line, strlen(line));
 }
 
 bool WriteContext::property(const char *propertyName, unsigned int value) {
     char line[256 + 1];
-    sprintf(line, "\t%s=%u\n", propertyName, (unsigned int)value);
+    snprintf(line, sizeof(line), "\t%s=%u\n", propertyName, (unsigned int)value);
     return file.write((uint8_t *)line, strlen(line));
 }
 
 bool WriteContext::property(const char *propertyName, float value) {
     char line[256 + 1];
-    sprintf(line, "\t%s=%g\n", propertyName, value);
+    snprintf(line, sizeof(line), "\t%s=%g\n", propertyName, value);
     return file.write((uint8_t *)line, strlen(line));
 }
 
 bool WriteContext::property(const char *propertyName, const char *str) {
     char line[256 + 1];
-    sprintf(line, "\t%s=\"", propertyName);
+    snprintf(line, sizeof(line), "\t%s=\"", propertyName);
     if (!file.write((uint8_t *)line, strlen(line))) {
         return false;
     }
@@ -937,7 +937,7 @@ bool WriteContext::property(
     float *currentList, uint16_t &currentListLength
 ) {
     char line[256 + 1];
-    sprintf(line, "\t%s=```\n", propertyName);
+    snprintf(line, sizeof(line), "\t%s=```\n", propertyName);
     if (!file.write((uint8_t *)line, strlen(line))) {
         return false;
     }
@@ -947,7 +947,7 @@ bool WriteContext::property(
         return false;
     }
 
-    sprintf(line, "```\n");
+    snprintf(line, sizeof(line), "```\n");
     if (!file.write((uint8_t *)line, strlen(line))) {
         return false;
     }
@@ -1144,7 +1144,7 @@ static bool saveProfileToFile(const char *filePath, Parameters &profile, List *l
 
 static void saveStateToProfile0(bool merge) {
     char filePath[MAX_PATH_LENGTH];
-    getProfileFilePath(0, filePath);
+    getProfileFilePath(0, filePath, sizeof(filePath));
 
     if (!merge) {
         memset(&g_profilesCache[0], 0, sizeof(Parameters));

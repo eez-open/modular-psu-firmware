@@ -248,7 +248,9 @@ void oneIter() {
 void startScript(const char *filePath) {
     if (g_state == STATE_IDLE) {
         g_state = STATE_EXECUTING;
-        strcpy(g_scriptPath, filePath);
+        strncpy(g_scriptPath, filePath, sizeof(g_scriptPath));
+        g_scriptPath[sizeof(g_scriptPath) - 1] = 0;
+
         //DebugTrace("T1 %d\n", millis());
         sendMessageToLowPriorityThread(MP_LOAD_SCRIPT);
 

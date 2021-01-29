@@ -691,7 +691,7 @@ bool compare_IP_ADDRESS_value(const Value &a, const Value &b) {
 }
 
 void IP_ADDRESS_value_to_text(const Value &value, char *text, int count) {
-    ipAddressToString(value.getUInt32(), text);
+    ipAddressToString(value.getUInt32(), text, count);
 }
 
 bool compare_PORT_value(const Value &a, const Value &b) {
@@ -1026,7 +1026,7 @@ bool compare_SCPI_ERROR_value(const Value &a, const Value &b) {
 
 void SCPI_ERROR_value_to_text(const Value &value, char *text, int count) {
     if (value.getSecondInt16() != -1) {
-        sprintf(text, "Ch%d: ", value.getSecondInt16() + 1);
+        snprintf(text, count, "Ch%d: ", value.getSecondInt16() + 1);
     }
     strncpy(text + strlen(text), SCPI_ErrorTranslate(value.getFirstInt16()), count - 1 - strlen(text));
     text[count - 1] = 0;
@@ -1102,12 +1102,12 @@ void CALIBRATION_POINT_INFO_value_to_text(const Value &value, char *text, int co
     int numPoints = value.getSecondInt16();
 
     if (currentPointIndex != -1) {
-        sprintf(text, "%d of %d", currentPointIndex + 1, numPoints);
+        snprintf(text, count, "%d of %d", currentPointIndex + 1, numPoints);
     } else {
         if (numPoints == 1) {
             strcpy(text, "1 point");
         } else {
-            sprintf(text, "%d points", numPoints);
+            snprintf(text, count, "%d points", numPoints);
         }
     }
 }
@@ -1117,7 +1117,7 @@ bool compare_ZOOM_value(const Value &a, const Value &b) {
 }
 
 void ZOOM_value_to_text(const Value &value, char *text, int count) {
-    sprintf(text, "\xb8 x%d", value.getInt());
+    snprintf(text, count, "\xb8 x%d", value.getInt());
 }
 
 bool compare_NUM_SELECTED_value(const Value &a, const Value &b) {
@@ -1125,7 +1125,7 @@ bool compare_NUM_SELECTED_value(const Value &a, const Value &b) {
 }
 
 void NUM_SELECTED_value_to_text(const Value &value, char *text, int count) {
-	sprintf(text, "%d of %d selected", (int)value.getFirstUInt16(), (int)value.getSecondUInt16());
+	snprintf(text, count, "%d of %d selected", (int)value.getFirstUInt16(), (int)value.getSecondUInt16());
 }
 
 bool compare_CURRENT_DIRECTORY_TITLE_value(const Value &a, const Value &b) {
@@ -1146,7 +1146,7 @@ void MASS_STORAGE_DEVICE_LABEL_value_to_text(const Value &value, char *text, int
 		strcpy(text, "Master (0:)");
 	} else {
 		int slotIndex = massStorageDevice - 1;
-		sprintf(text, "%s (%d:)", g_slots[slotIndex]->getLabelOrDefault(), massStorageDevice);
+		snprintf(text, count, "%s (%d:)", g_slots[slotIndex]->getLabelOrDefault(), massStorageDevice);
 	}
 }
 

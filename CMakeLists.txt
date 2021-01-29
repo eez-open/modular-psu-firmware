@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(modular-psu-firmware)
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 14)
 
 if(MSVC)
   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4 /wd4100 /wd4214 /wd4200 /wd4244 /wd4456 /wd4457 /wd4458 /wd4459 /wd4245 /wd4389 /wd4706 /wd4611 /wd4310")
@@ -30,7 +30,7 @@ else()
 endif()
 
 if (UNIX)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fpermissive -pedantic -Wall")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fpermissive -pedantic")
 endif (UNIX)
 
 add_definitions(-DDEBUG)

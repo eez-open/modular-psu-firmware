@@ -22,7 +22,11 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/mcu/eeprom.h>
 
-#define USE_EEPROM (defined(EEZ_PLATFORM_STM32) && !CONF_SURVIVE_MODE)
+#if defined(EEZ_PLATFORM_STM32) && !CONF_SURVIVE_MODE
+#define USE_EEPROM 1
+#else
+#define USE_EEPROM 0
+#endif
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <i2c.h>

@@ -336,7 +336,7 @@ bool isDirty() {
 
     // if (g_dirtyX1 <= g_dirtyX2 && g_dirtyY1 <= g_dirtyY2) {
     //     // char msg[50];
-    //     // sprintf(msg, "%d x %d\n", g_dirtyX2 - g_dirtyX1 + 1, g_dirtyY2 - g_dirtyY1 + 1);
+    //     // snprintf(msg, sizeof(msg), "%d x %d\n", g_dirtyX2 - g_dirtyX1 + 1, g_dirtyY2 - g_dirtyY1 + 1);
     //     // Serial.println(msg);
     //     return true;
     // }

@@ -426,37 +426,38 @@ bool publish(char *topic, char *payload, bool retain) {
 
 bool publish(const char *pubTopic, int value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
-    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName);
+    snprintf(topic, sizeof(topic), pubTopic, persist_conf::devConf.ethernetHostName);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
-    sprintf(payload, "%d", value);
+    snprintf(payload, sizeof(payload), "%d", value);
 
     return publish(topic, payload, retain);
 }
 
 bool publishOnTimeCounter(const char *pubTopic, uint32_t value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
-    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName);
+    snprintf(topic, sizeof(topic), pubTopic, persist_conf::devConf.ethernetHostName);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
     ontime::counterToString(payload, MAX_PAYLOAD_LENGTH, value);
+	payload[MAX_PAYLOAD_LENGTH] = 0;
 
     return publish(topic, payload, retain);
 }
 
 bool publish(const char *pubTopic, float value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
-    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName);
+    snprintf(topic, sizeof(topic), pubTopic, persist_conf::devConf.ethernetHostName);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
-    sprintf(payload, "%g", value);
+    snprintf(payload, sizeof(payload), "%g", value);
 
     return publish(topic, payload, retain);
 }
 
 bool publishEvent(int16_t eventId, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
-    sprintf(topic, PUB_TOPIC_SYSTEM_EVENT, persist_conf::devConf.ethernetHostName);
+    snprintf(topic, sizeof(topic), PUB_TOPIC_SYSTEM_EVENT, persist_conf::devConf.ethernetHostName);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
     snprintf(payload, MAX_PAYLOAD_LENGTH, "[%d, \"%s\", \"%s\"]", (int)eventId, event_queue::getEventTypeName(eventId), event_queue::getEventMessage(eventId));
@@ -467,18 +468,18 @@ bool publishEvent(int16_t eventId, bool retain) {
 
 bool publishFanStatus(const char *pubTopic, TestResult fanTestResult, int rpm, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
-    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName);
+    snprintf(topic, sizeof(topic), pubTopic, persist_conf::devConf.ethernetHostName);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
 
     if (fanTestResult == TEST_FAILED || fanTestResult == TEST_WARNING) {
-        strcpy(payload, "Fault");
+        snprintf(payload, sizeof(payload), "Fault");
     } else if (fanTestResult == TEST_OK) {
-        snprintf(payload, MAX_PAYLOAD_LENGTH, "%d rpm", rpm);
+        snprintf(payload, sizeof(payload), "%d rpm", rpm);
     } else if (fanTestResult == TEST_NONE) {
-        strcpy(payload, "Testing...");
+        snprintf(payload, sizeof(payload), "Testing...");
     } else {
-        strcpy(payload, "Not installed");
+        snprintf(payload, sizeof(payload), "Not installed");
     }
 
     payload[MAX_PAYLOAD_LENGTH] = 0;
@@ -488,34 +489,34 @@ bool publishFanStatus(const char *pubTopic, TestResult fanTestResult, int rpm, b
 
 bool publish(int channelIndex, const char *pubTopic, int value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
-    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
+    snprintf(topic, sizeof(topic), pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
-    sprintf(payload, "%d", value);
+    snprintf(payload, sizeof(payload), "%d", value);
 
     return publish(topic, payload, retain);
 }
 
 bool publish(int channelIndex, const char *pubTopic, float value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
-    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
+    snprintf(topic, sizeof(topic), pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
-    sprintf(payload, "%g", value);
+    snprintf(payload, sizeof(payload), "%g", value);
 
     return publish(topic, payload, retain);
 }
 
 bool publish(int channelIndex, const char *pubTopic, char *payload, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
-    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
+    snprintf(topic, sizeof(topic), pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
 
     return publish(topic, payload, retain);
 }
 
 bool publishOnTimeCounter(int channelIndex, const char *pubTopic, uint32_t value, bool retain) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
-    sprintf(topic, pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
+    snprintf(topic, sizeof(topic), pubTopic, persist_conf::devConf.ethernetHostName, channelIndex + 1);
 
     char payload[MAX_PAYLOAD_LENGTH + 1];
     ontime::counterToString(payload, MAX_PAYLOAD_LENGTH, value);
@@ -528,11 +529,11 @@ const char *getClientId() {
 
     if (!g_clientId[0]) {
 #if defined(EEZ_PLATFORM_STM32)
-        sprintf(g_clientId, "BB3_STM32_%s", getSerialNumber());
+        snprintf(g_clientId, sizeof(g_clientId), "BB3_STM32_%s", getSerialNumber());
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-        sprintf(g_clientId, "BB3_Simulator_%s", getSerialNumber());
+        snprintf(g_clientId, sizeof(g_clientId), "BB3_Simulator_%s", getSerialNumber());
 #endif
     }
     
@@ -713,7 +714,7 @@ void tick() {
                 if (!g_channelStates[channelIndex].modelPublished) {
                     char moduleInfo[50];
                     auto &slot = *g_slots[channel.slotIndex];
-                    sprintf(moduleInfo, "%s_R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+                    snprintf(moduleInfo, sizeof(moduleInfo), "%s_R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
                     if (publish(channelIndex, PUB_TOPIC_DCPSUPPLY_MODEL, moduleInfo, true)) {
                         g_channelStates[channelIndex].modelPublished = true;
                     }
@@ -870,7 +871,7 @@ void tick() {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
         char port[16];
-        sprintf(port, "%d", persist_conf::devConf.mqttPort);
+        snprintf(port, sizeof(port), "%d", persist_conf::devConf.mqttPort);
         g_sockfd = open_nb_socket(persist_conf::devConf.mqttHost, port);
         if (g_sockfd != -1) {
             /* initialize the client */

@@ -185,14 +185,18 @@ void Module::resetProfileToDefaults(uint8_t *buffer) {
 void Module::getProfileParameters(uint8_t *buffer) {
     auto parameters = (ProfileParameters *)buffer;
 
-    strcpy(parameters->label, label);
+    strncpy(parameters->label, label, sizeof(parameters->label));
+    parameters->label[sizeof(parameters->label) - 1] = 0;
+
     parameters->color = color;
 }
 
 void Module::setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) {
     auto parameters = (ProfileParameters *)buffer;
 
-    strcpy(label, parameters->label);
+    strncpy(label, parameters->label, sizeof(label));
+    label[sizeof(label) - 1] = 0;
+
     color = parameters->color;
 }
 
@@ -247,7 +251,7 @@ void Module::setLabel(const char *value, int length) {
         length = SLOT_LABEL_MAX_LENGTH;
     }
     strncpy(label, value, length);
-    label[length] = 0;
+    label[length - 1] = 0;
 }
 
 uint8_t Module::getColor() {
@@ -888,11 +892,11 @@ Module *getModule(uint16_t moduleType) {
 void getModuleSerialInfo(uint8_t slotIndex, char *serialStr) {
     auto &module = *g_slots[slotIndex];
     if (module.idw0 != 0 || module.idw1 != 0 || module.idw2 != 0) {
-        sprintf(serialStr, "%08X", (unsigned int)module.idw0);
-        sprintf(serialStr + 8, "%08X", (unsigned int)module.idw1);
-        sprintf(serialStr + 16, "%08X", (unsigned int)module.idw2);
+        snprintf(serialStr, 9, "%08X", (unsigned int)module.idw0);
+        snprintf(serialStr + 8, 9, "%08X", (unsigned int)module.idw1);
+        snprintf(serialStr + 16, 9, "%08X", (unsigned int)module.idw2);
     } else {
-        strcpy(serialStr, "N/A");
+        strncpy(serialStr, "N/A", 8);
     }
 }
 

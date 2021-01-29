@@ -113,7 +113,7 @@ int UARTClass::print(const char *data) {
 int UARTClass::println(const char *data) {
 #if defined(EEZ_PLATFORM_STM32)    
     char buffer[1024];
-    int size = sprintf(buffer, "%s\n", data);
+    int size = snprintf(buffer, sizeof(buffer), "%s\n", data);
     return write(buffer, size);
 #endif
 
@@ -125,7 +125,7 @@ int UARTClass::println(const char *data) {
 int UARTClass::print(int value) {
 #if defined(EEZ_PLATFORM_STM32)    
     char buffer[1024];
-    int size = sprintf(buffer, "%d", value);
+    int size = snprintf(buffer, sizeof(buffer), "%d", value);
     return write(buffer, size);
 #endif
 
@@ -137,7 +137,7 @@ int UARTClass::print(int value) {
 int UARTClass::println(int value) {
 #if defined(EEZ_PLATFORM_STM32)    
     char buffer[1024];
-    int size = sprintf(buffer, "%d\n", value);
+    int size = snprintf(buffer, sizeof(buffer), "%d\n", value);
     return write(buffer, size);
 #endif
 
@@ -150,7 +150,7 @@ int UARTClass::print(float value, int numDigits) {
 #if defined(EEZ_PLATFORM_STM32)    
     // TODO numDigits
     char buffer[1024];
-    int size = sprintf(buffer, "%f", value);
+    int size = snprintf(buffer, sizeof(buffer), "%f", value);
     return write(buffer, size);
 #endif
 
@@ -163,7 +163,7 @@ int UARTClass::println(float value, int numDigits) {
 #if defined(EEZ_PLATFORM_STM32)    
     // TODO numDigits
     char buffer[1024];
-    int size = sprintf(buffer, "%f\n", value);
+    int size = snprintf(buffer, sizeof(buffer), "%f\n", value);
     return write(buffer, size);
 #endif
 

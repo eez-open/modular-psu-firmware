@@ -194,7 +194,7 @@ void getInfoText(char *infoText, int count) {
         if ((channel.channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel.flags.trackingEnabled) {
             strcpy(infoText, "Set ");
         } else {
-            sprintf(infoText, "Set Ch%d ", getFocusCursor() + 1);
+            snprintf(infoText, count, "Set Ch%d ", getFocusCursor() + 1);
         }
         
         strcat(infoText, dataName);
