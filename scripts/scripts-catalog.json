@@ -23,6 +23,13 @@
                     "https://github.com/eez-open/modular-psu-firmware/raw/b1ad16effbabd0109529b8fe58eb438f2e97b726/scripts/CapReform/CapReform.py",
                     "https://github.com/eez-open/modular-psu-firmware/raw/b1ad16effbabd0109529b8fe58eb438f2e97b726/scripts/CapReform/CapReform.res"
                 ]
+            },
+            {
+                "version": "1.3",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/c28ca7012783c70b9c4723d2e4db45565559f781/scripts/CapReform/CapReform.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/c28ca7012783c70b9c4723d2e4db45565559f781/scripts/CapReform/CapReform.res"
+                ]
             }
         ]
     },
@@ -50,6 +57,13 @@
                     "https://github.com/eez-open/modular-psu-firmware/raw/d98a851c06189880ceedc680f7f82fd299f65408/scripts/Curve%20Tracer/Curve%20Tracer.py",
                     "https://github.com/eez-open/modular-psu-firmware/raw/d98a851c06189880ceedc680f7f82fd299f65408/scripts/Curve%20Tracer/Curve%20Tracer.res"
                 ]
+            },
+            {
+                "version": "1.3",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/c28ca7012783c70b9c4723d2e4db45565559f781/scripts/Curve%20Tracer/Curve%20Tracer.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/c28ca7012783c70b9c4723d2e4db45565559f781/scripts/Curve%20Tracer/Curve%20Tracer.res"
+                ]
             }
         ]
     },
@@ -69,6 +83,13 @@
                 "files": [
                     "https://github.com/eez-open/modular-psu-firmware/raw/13ff1d0f40519484dd6f49e97f89b71f8bc0f5b9/scripts/Diode%20Tester/Diode%20Tester.py",
                     "https://github.com/eez-open/modular-psu-firmware/raw/13ff1d0f40519484dd6f49e97f89b71f8bc0f5b9/scripts/Diode%20Tester/Diode%20Tester.res"
+                ]
+            },
+            {
+                "version": "1.2",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/c28ca7012783c70b9c4723d2e4db45565559f781/scripts/Diode%20Tester/Diode%20Tester.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/c28ca7012783c70b9c4723d2e4db45565559f781/scripts/Diode%20Tester/Diode%20Tester.res"
                 ]
             }
         ]
