@@ -299,44 +299,38 @@ ErrorNoClose:
     return;
 }
 
-// static const char *g_commandOrQueryText;
+static const char *g_commandOrQueryText;
 
 void onQueueMessage(uint32_t type, uint32_t param) {
     if (type == MP_LOAD_SCRIPT) {
         loadScript();
-    }
-//    else if (type == MP_EXECUTE_SCPI) {
-//        input(g_scpiContext, (const char *)g_commandOrQueryText, strlen(g_commandOrQueryText));
-//        input(g_scpiContext, "\r\n", 2);
-//
-//        osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_SCPI_RESULT, osWaitForever);
-//    }
+    } else if (type == MP_EXECUTE_SCPI) {
+       input(g_scpiContext, (const char *)g_commandOrQueryText, strlen(g_commandOrQueryText));
+       input(g_scpiContext, "\r\n", 2);
+
+       osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_SCPI_RESULT, osWaitForever);
+   }
 }
 
 bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen) {
-    //DebugTrace("T4 %d\n", millis());
-
     g_scpiDataLen = 0;
-
-    // g_commandOrQueryText = commandOrQueryText;
-    // sendMessageToLowPriorityThread(MP_EXECUTE_SCPI);
-
-    // while (true) {
-    //    osEvent event = osMessageGet(g_mpMessageQueueId, osWaitForever);
-    //    if (event.status == osEventMessage) {
-    //        switch (event.value.v) {
-    //        case QUEUE_MESSAGE_SCPI_RESULT:
-    //            *resultText = g_scpiData;
-    //            *resultTextLen = g_scpiDataLen;
-    //            return true;
-    //        }
-    //    }
-    // }
 
     g_lastError = 0;
 
+#if  1
+    g_commandOrQueryText = commandOrQueryText;
+    sendMessageToLowPriorityThread(MP_EXECUTE_SCPI);
+
+    while (true) {
+       osEvent event = osMessageGet(g_mpMessageQueueId, osWaitForever);
+       if (event.status == osEventMessage && event.value.v == QUEUE_MESSAGE_SCPI_RESULT) {
+            break;
+       }
+    }
+#else
     input(g_scpiContext, (const char *)commandOrQueryText, strlen(commandOrQueryText));
     input(g_scpiContext, "\r\n", 2);
+#endif
 
     if (g_lastError != 0) {
         static char g_scpiError[48];

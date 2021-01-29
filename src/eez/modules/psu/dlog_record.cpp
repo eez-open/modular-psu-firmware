@@ -203,7 +203,7 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
 
 // returns true if there is more data to write
 void fileWrite(bool flush) {
-    if (g_state != STATE_EXECUTING) {
+    if (!flush && g_state != STATE_EXECUTING) {
         return;
     }
 
@@ -497,14 +497,16 @@ static void resetFilePath() {
 }
 
 static void doFinish(bool afterError) {
+    setState(STATE_IDLE);
+
     if (!afterError) {
         if (!isModuleLocalRecording()) {        
             flushData();
             onSdCardFileChangeHook(g_parameters.filePath);
         }
     }
+
     resetFilePath();
-    setState(STATE_IDLE);
 
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         g_slots[slotIndex]->onStopDlog();
@@ -515,7 +517,7 @@ static void doFinish(bool afterError) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool isModuleLocalRecording() {
-    return g_parameters.period < dlog_view::PERIOD_MIN;
+    return !g_traceInitiated && g_parameters.period < dlog_view::PERIOD_MIN;
 }
 
 int getModuleLocalRecordingSlotIndex() {
