@@ -876,13 +876,7 @@ Recording &getRecording() {
 }
 
 float roundValue(float value) {
-    if (value >= 10) {
-        return roundPrec(value, 0.1f);
-    } else if (value >= 1) {
-        return roundPrec(value, 0.01f);
-    } else {
-        return roundPrec(value, 0.001f);
-    }
+    return roundPrec(value, powf(10.0f, floorf(log10f(fabs(value)))) / 1000.0f);
 }
 
 void uploadFile() {
@@ -1757,11 +1751,11 @@ void data_dlog_visible_value_label(DataOperationEnum operation, Cursor cursor, V
 
 void guessStepValues(StepValues *stepValues, Unit unit) {
     if (unit == UNIT_VOLT) {
-        static float values[] = { 0.1f, 0.5f, 1.0f, 2.0f };
+        static float values[] = { 0.001f, 0.01f, 0.1f, 1.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     } else if (unit == UNIT_AMPER) {
-        static float values[] = { 0.01f, 0.05f, 0.1f, 0.25f };
+        static float values[] = { 0.00001f, 0.0001f, 0.001f, 0.01f, 0.1f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     } else if (unit == UNIT_WATT) {
@@ -1773,7 +1767,7 @@ void guessStepValues(StepValues *stepValues, Unit unit) {
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     } else {
-        static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
+        static float values[] = { 0.001f, 0.01f, 0.1f, 1.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     }
@@ -1806,7 +1800,7 @@ void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Val
             value = Value(recording.dlogValues[dlogValueIndex].div, getYAxisUnit(recording, dlogValueIndex));
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = Value(0.001f, getYAxisUnit(recording, dlogValueIndex));
+        value = Value(0.000001f, getYAxisUnit(recording, dlogValueIndex));
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(100.0f, getYAxisUnit(recording, dlogValueIndex));
     } else if (operation == DATA_OPERATION_SET) {

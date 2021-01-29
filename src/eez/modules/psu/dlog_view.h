@@ -174,8 +174,6 @@ void getLabel(Recording& recording, int valueIndex, char *text, int count);
 void autoScale(Recording &recording);
 void scaleToFit(Recording &recording);
 
-float roundValue(float value);
-
 void uploadFile();
 
 eez::gui::SetPage *getParamsPage();
