@@ -3531,8 +3531,10 @@ void data_ethernet_ip_address(DataOperationEnum operation, Cursor cursor, Value 
                 if (page->m_dhcpEnabled) {
                     value = Value(ethernet::getIpAddress(), VALUE_TYPE_IP_ADDRESS);
                 } else {
-                    value = Value(psu::persist_conf::devConf.ethernetIpAddress, VALUE_TYPE_IP_ADDRESS);
+                    value = Value(page->m_ipAddress, VALUE_TYPE_IP_ADDRESS);
                 }
+            } else {
+                value = Value(psu::persist_conf::devConf.ethernetIpAddress, VALUE_TYPE_IP_ADDRESS);
             }
         }
     }

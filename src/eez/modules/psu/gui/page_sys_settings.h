@@ -108,13 +108,14 @@ class SysSettingsEthernetPage : public SetPage {
 
     char m_hostName[ETHERNET_HOST_NAME_SIZE + 1];
 
+    uint32_t m_ipAddress;
+
   private:
     bool m_enabledOrig;
 
     bool m_dhcpEnabledOrig;
 
     uint32_t m_ipAddressOrig;
-    uint32_t m_ipAddress;
 
     uint32_t m_dnsOrig;
     uint32_t m_dns;
