@@ -182,8 +182,9 @@ void oneIter() {
             getBaseFileName(g_scriptPath, scriptName, sizeof(scriptName));
             InfoTrace("Script started: %s\n", scriptName);
 
-#if 0
+#if 1
         	// this version reinitialise MP every time
+
 			volatile char dummy;
 			mp_stack_set_top((void *)&dummy);
 			gc_init(g_scriptSource + MAX_SCRIPT_LENGTH, MP_BUFFER + MP_BUFFER_SIZE - MAX_SCRIPT_LENGTH);
@@ -207,8 +208,9 @@ void oneIter() {
             mp_deinit();
 #endif
 
-#if 1
+#if 0
         	// this version doesn't reinitialise MP every time
+
 			static bool g_initialized = false;
 			if (!g_initialized) {
 				volatile char dummy;
@@ -232,7 +234,6 @@ void oneIter() {
 				mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
                 onUncaughtScriptExceptionHook();
 			}
-
 #endif
 
             psu::gui::hideAsyncOperationInProgress();
