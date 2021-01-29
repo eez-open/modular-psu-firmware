@@ -275,7 +275,7 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
     data[2] = value & 0xFF;
 
 	if (g_isBooted && !isPsuThread()) {
-        DebugTrace("wrong thread\n");
+        DebugTrace("wrong thread 6\n");
     }
 
 	spi::select(slotIndex, spi::CHIP_DAC);

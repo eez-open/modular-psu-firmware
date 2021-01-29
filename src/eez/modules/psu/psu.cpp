@@ -1032,7 +1032,7 @@ bool powerUp() {
     board::powerUp();
     g_powerIsUp = true;
 
-    //bp3c::io_exp::hardResetModules();
+    bp3c::io_exp::hardResetModules();
     
     psuReset();
 
