@@ -111,8 +111,8 @@ bool makeAbsolutePath(const char *relativePath, char *dest) {
 	dest[1] = ':';
     strcpy(dest + 2, g_currentDirectory);
     if (relativePath) {
-    	strcat(dest, "/");
-    	strcat(dest, relativePath);
+    	strncat(dest, "/", MAX_PATH_LENGTH - strlen(dest) - 1);
+    	strncat(dest, relativePath, MAX_PATH_LENGTH - strlen(dest) - 1);
     }
     return true;
 }
@@ -717,8 +717,8 @@ void selectFile(uint32_t fileIndex) {
             animateLoadDirectory();
         } else if (fileItem && fileItem->type == FILE_TYPE_DIRECTORY) {
             if (2 + strlen(g_currentDirectory) + 1 + strlen(fileItem->name) <= MAX_PATH_LENGTH) {
-                strcat(g_currentDirectory, "/");
-                strcat(g_currentDirectory, fileItem->name);
+                strncat(g_currentDirectory, "/", MAX_PATH_LENGTH - strlen(g_currentDirectory) - 1);
+                strncat(g_currentDirectory, fileItem->name, MAX_PATH_LENGTH - strlen(g_currentDirectory) - 1);
                 g_filesStartPosition = 0;
                 loadDirectory();
                 animateLoadDirectory();
@@ -731,7 +731,7 @@ void selectFile(uint32_t fileIndex) {
                         if (strlen(fileItem->name) + 3 <= MAX_PATH_LENGTH) {
                             char fileName[MAX_PATH_LENGTH + 1];
                             strcpy(fileName, fileItem->name);
-                            strcat(fileName, ".py");
+                            strncat(fileName, ".py", MAX_PATH_LENGTH - strlen(fileName) - 1);
                             char filePath[MAX_PATH_LENGTH + 1];
                             if (makeAbsolutePath(fileName, filePath)) {
                                 mp::startScript(filePath);
@@ -939,7 +939,7 @@ void doRenameFile() {
     
     strcpy(dstFileName, g_fileNameWithoutExtension);
     if (extension) {
-        strcat(dstFileName, extension);
+        strncat(dstFileName, extension, MAX_PATH_LENGTH - strlen(dstFileName) - 1);
     }
     
     char dstFilePath[MAX_PATH_LENGTH + 1];
@@ -1082,7 +1082,7 @@ void onNewFileOk(char *fileNameWithoutExtension) {
     }
 
     strcpy(fileName, fileNameWithoutExtension);
-    strcat(fileName, extension);
+    strncat(fileName, extension, MAX_PATH_LENGTH - strlen(fileName) - 1);
 
     char filePath[MAX_PATH_LENGTH + 1];
     if (!makeAbsolutePath(fileName, filePath)) {

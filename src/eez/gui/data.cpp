@@ -94,7 +94,7 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
 
 #if defined(INFINITY_SYMBOL)
     if (isinf(floatValue)) {
-        strcat(text, INFINITY_SYMBOL);
+        snprintf(text, count, INFINITY_SYMBOL);
         return;
     }
 #endif
@@ -172,7 +172,7 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
 
     if (!isNaN(floatValue)) {
         if ((value.getOptions() & FLOAT_OPTIONS_LESS_THEN) != 0) {
-            strcat(text, "< ");
+            strncat(text, "< ", count - strlen(text) - 1); 
         }
 
         if (fixedDecimals) {
@@ -196,12 +196,12 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
             if (decimalPointIndex == n) {
                 if (appendDotZero) {
                     // 1 => 1.0
-                    strcat(text, ".0");
+                    strncat(text, ".0", count - strlen(text) - 1); 
                 }
             } else if (decimalPointIndex == n - 1) {
                 if (appendDotZero) {
                     // 1. => 1.0
-                    strcat(text, "0");
+                    strncat(text, "0", count - strlen(text) - 1); 
                 } else {
                     text[decimalPointIndex] = 0;
                 }
@@ -219,8 +219,8 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
             }
         }
 
-        strcat(text, " ");
-        strcat(text, getUnitName(unit));
+        strncat(text, " ", count - strlen(text) - 1); 
+        strncat(text, getUnitName(unit), count - strlen(text) - 1);
     } else {
         text[0] = 0;
     }

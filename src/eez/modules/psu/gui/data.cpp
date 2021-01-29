@@ -1975,8 +1975,8 @@ void data_firmware_info(DataOperationEnum operation, Cursor cursor, Value &value
         static char firmware_info[sizeof(FIRMWARE_LABEL) - 1 + sizeof(MCU_FIRMWARE) - 1 + 1];
 
         if (*firmware_info == 0) {
-            strcat(firmware_info, FIRMWARE_LABEL);
-            strcat(firmware_info, MCU_FIRMWARE);
+            strncat(firmware_info, FIRMWARE_LABEL, sizeof(firmware_info) - strlen(firmware_info) - 1);
+            strncat(firmware_info, MCU_FIRMWARE, sizeof(firmware_info) - strlen(firmware_info) - 1);
         }
 
         value = firmware_info;

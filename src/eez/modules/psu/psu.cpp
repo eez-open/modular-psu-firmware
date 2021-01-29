@@ -108,22 +108,22 @@ char *getConfFilePath(const char *file_name) {
 
 #ifdef _WIN32
     if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, file_path))) {
-        strcat(file_path, "\\.eez_psu_sim");
+        strncat(file_path, "\\.eez_psu_sim", sizeof(file_path) - strlen(file_path) - 1);
         _mkdir(file_path);
-        strcat(file_path, "\\");
+        strncat(file_path, "\\", sizeof(file_path) - strlen(file_path) - 1);
     }
 #elif defined(__EMSCRIPTEN__)
-    strcat(file_path, "/eez_modular_firmware/");
+    strncat(file_path, "/eez_modular_firmware/", sizeof(file_path) - strlen(file_path) - 1);
 #else
     const char *home_dir = 0;
     if ((home_dir = getenv("HOME")) == NULL) {
         home_dir = getpwuid(getuid())->pw_dir;
     }
     if (home_dir) {
-        strcat(file_path, home_dir);
-        strcat(file_path, "/.eez_psu_sim");
+        strncat(file_path, home_dir, sizeof(file_path) - strlen(file_path) - 1);
+        strncat(file_path, "/.eez_psu_sim", sizeof(file_path) - strlen(file_path) - 1);
         mkdir(file_path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        strcat(file_path, "/");
+        strncat(file_path, "/", sizeof(file_path) - strlen(file_path) - 1);
     }
 #endif
 

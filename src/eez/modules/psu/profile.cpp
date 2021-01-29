@@ -490,10 +490,8 @@ static Parameters *getProfileParametersFromCache(int location) {
 ////////////////////////////////////////////////////////////////////////////////
 
 static void getProfileFilePath(int location, char *filePath, size_t filePathStrLength) {
-    strcpy(filePath, PROFILES_DIR);
-    strcat(filePath, PATH_SEPARATOR);
-    strcatInt(filePath, filePathStrLength - strlen(filePath), location);
-    strcat(filePath, getExtensionFromFileType(FILE_TYPE_PROFILE));
+    snprintf(filePath, filePathStrLength, "%s%s%d%s",
+        PROFILES_DIR, PATH_SEPARATOR, location, getExtensionFromFileType(FILE_TYPE_PROFILE));
 }
 
 static void resetProfileToDefaults(Parameters &profile) {

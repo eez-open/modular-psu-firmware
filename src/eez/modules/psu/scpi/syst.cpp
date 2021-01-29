@@ -710,42 +710,42 @@ scpi_result_t scpi_cmd_systemCpuOptionQ(scpi_t *context) {
 
 #if OPTION_BP
     if (strFeatures[0]) {
-        strcat(strFeatures, ", ");
+        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
     }
-    strcat(strFeatures, "BPost");
+    strncat(strFeatures, "BPost", sizeof(strFeatures) - strlen(strFeatures) - 1);
 #endif
 
 #if OPTION_EXT_EEPROM
     if (strFeatures[0]) {
-        strcat(strFeatures, ", ");
+        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
     }
-    strcat(strFeatures, "EEPROM");
+    strncat(strFeatures, "EEPROM", sizeof(strFeatures) - strlen(strFeatures) - 1);
 #endif
 
 #if OPTION_EXT_RTC
     if (strFeatures[0]) {
-        strcat(strFeatures, ", ");
+        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
     }
-    strcat(strFeatures, "RTC");
+    strncat(strFeatures, "RTC", sizeof(strFeatures) - strlen(strFeatures) - 1);
 #endif
 
     if (strFeatures[0]) {
-        strcat(strFeatures, ", ");
+        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
     }
-    strcat(strFeatures, "SDcard");
+    strncat(strFeatures, "SDcard", sizeof(strFeatures) - strlen(strFeatures) - 1);
 
 #if OPTION_ETHERNET
     if (strFeatures[0]) {
-        strcat(strFeatures, ", ");
+        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
     }
-    strcat(strFeatures, "Ethernet");
+    strncat(strFeatures, "Ethernet", sizeof(strFeatures) - strlen(strFeatures) - 1);
 #endif
 
 #if OPTION_DISPLAY
     if (strFeatures[0]) {
-        strcat(strFeatures, ", ");
+        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
     }
-    strcat(strFeatures, "Display");
+    strncat(strFeatures, "Display", sizeof(strFeatures) - strlen(strFeatures) - 1);
 #endif
 
     SCPI_ResultText(context, strFeatures);

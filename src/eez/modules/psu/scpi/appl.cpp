@@ -106,12 +106,12 @@ scpi_result_t scpi_cmd_applyQ(scpi_t *context) {
         // return both current and voltage
         snprintf(buffer, sizeof(buffer), "CH%d:", channel->channelIndex + 1);
         strcatVoltage(buffer, sizeof(buffer), channel_dispatcher::getUMax(*channel));
-        strcat(buffer, "/");
+        strncat(buffer, "/", sizeof(buffer) - strlen(buffer) - 1);
         strcatCurrent(buffer, sizeof(buffer), channel_dispatcher::getIMax(*channel));
-        strcat(buffer, ", ");
+        strncat(buffer, ", ", sizeof(buffer) - strlen(buffer) - 1);
 
         strcatFloat(buffer, sizeof(buffer), channel_dispatcher::getUSet(*channel));
-        strcat(buffer, ", ");
+        strncat(buffer, ", ", sizeof(buffer) - strlen(buffer) - 1);
         strcatFloat(buffer, sizeof(buffer), channel_dispatcher::getISet(*channel));
     } else {
         if (current_or_voltage == 0) {

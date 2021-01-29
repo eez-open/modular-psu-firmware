@@ -242,7 +242,7 @@ private:
     void (*m_okUint32Callback)(uint32_t);
     void (*m_cancelCallback)();
 
-    void appendEditUnit(char *text);
+    void appendEditUnit(char *text, size_t maxTextLength);
     double getValue();
     char getDotSign();
 

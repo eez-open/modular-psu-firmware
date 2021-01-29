@@ -197,16 +197,16 @@ void getInfoText(char *infoText, int count) {
             snprintf(infoText, count, "Set Ch%d ", getFocusCursor() + 1);
         }
         
-        strcat(infoText, dataName);
+        strncat(infoText, dataName, count - strlen(infoText) - 1);
     } else {
-        strcat(infoText, dataName);
+        strncat(infoText, dataName, count - strlen(infoText) - 1);
     }
 
-    strcat(infoText, " [");
+    strncat(infoText, " [", count - strlen(infoText) - 1);
     minValue.toText(infoText + strlen(infoText), count - strlen(infoText));
-    strcat(infoText, " - ");
+    strncat(infoText, " - ", count - strlen(infoText) - 1);
     maxValue.toText(infoText + strlen(infoText), count - strlen(infoText));
-    strcat(infoText, "]");
+    strncat(infoText, "]", count - strlen(infoText) - 1);
 }
 
 static void update() {

@@ -259,7 +259,7 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
 
             snprintf(buffer, sizeof(buffer), "temp_%s_level=", sensor.name);
             strcatFloat(buffer, sizeof(buffer), sensorTemperature.prot_conf.level);
-            strcat(buffer, " oC");
+            strncat(buffer, " oC", sizeof(buffer) - strlen(buffer) - 1);
             SCPI_ResultText(context, buffer);
         }
     }

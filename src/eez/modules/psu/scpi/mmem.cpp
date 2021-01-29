@@ -47,7 +47,7 @@ namespace scpi {
 
 void addExtension(char *filePath, const char *ext) {
     if (!endsWith(filePath, ext)) {
-        strcat(filePath, ext);
+        strncat(filePath, ext, MAX_PATH_LENGTH - strlen(filePath) - 1);
     }
 }
 
