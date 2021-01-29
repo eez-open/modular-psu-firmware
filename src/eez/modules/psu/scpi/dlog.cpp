@@ -866,6 +866,12 @@ scpi_result_t scpi_cmd_senseDlogTraceData(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_senseDlogClear(scpi_t *context) {
+    dlog_record::reset();
+
+    return SCPI_RES_OK;
+}
+
 
 } // namespace scpi
 } // namespace psu

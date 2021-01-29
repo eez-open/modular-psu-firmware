@@ -64,6 +64,7 @@ def start_reform():
     scpi("CURR " + str(charge_current))
     
     # Define datalogging
+    scpi("SENS:DLOG:CLE")
     scpi('SENS:DLOG:TRAC:REM " Icharge = ' + str(charge_current) + '"')
     scpi("SENS:DLOG:TRAC:X:UNIT SECOND")
     scpi("SENS:DLOG:TRAC:X:STEP " + str(TIME_STEP))

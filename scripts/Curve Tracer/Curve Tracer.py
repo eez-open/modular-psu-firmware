@@ -126,6 +126,8 @@ def start_BJT(cgnd):
     scpi("CURR " + str(Ic_max))
     scpi("SENS:CURR:RANG BEST")
 
+    scpi("SENS:DLOG:CLE")
+
     scpi('SENS:DLOG:TRAC:REM "Device name = ' + deviceName + '; Uce,max = ' + str(Uce_max) + '; Ic,max = ' + str(Ic_max) + '"')
 
     scpi("SENS:DLOG:TRAC:X:UNIT VOLT")

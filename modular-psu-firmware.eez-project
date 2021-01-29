@@ -64433,6 +64433,15 @@
                 {}
               ]
             }
+          },
+          {
+            "name": "SENSe:DLOG:CLEar",
+            "parameters": [],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
           }
         ]
       },

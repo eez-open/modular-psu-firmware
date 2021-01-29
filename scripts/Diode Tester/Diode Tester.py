@@ -66,6 +66,9 @@ def start():
         scpi("VOLT 0")
         scpi("CURR " + str(I_SET))
 
+
+        scpi("SENS:DLOG:CLE")
+
         scpi('SENS:DLOG:TRAC:REM "Diode name = ' + diode_name + '; U step = ' + str(U_step) + '"')
 
         scpi("SENS:DLOG:TRAC:X:UNIT VOLT")
