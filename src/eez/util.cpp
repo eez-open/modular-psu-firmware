@@ -114,40 +114,37 @@ void strcatFloat(char *str, size_t maxStrLength, float value, int numDecimalPlac
 }
 
 void strcatVoltage(char *str, size_t maxStrLength, float value) {
-    strcatFloat(str, maxStrLength, value);
-    strcat(str, "V");
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%g V", value);
 }
 
 void strcatCurrent(char *str, size_t maxStrLength, float value) {
-    strcatFloat(str, maxStrLength, value);
-    strcat(str, "A");
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%g A", value);
 }
 
 void strcatPower(char *str, size_t maxStrLength, float value) {
-    strcatFloat(str, maxStrLength, value);
-    strcat(str, "W");
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%g W", value);
 }
 
 void strcatDuration(char *str, size_t maxStrLength, float value) {
+    auto n = strlen(str);
     if (value > 0.1) {
-        strcatFloat(str, maxStrLength, value);
-        strcat(str, " s");
+        snprintf(str + n, maxStrLength - n, "%g s", value);
     } else {
-        strcatFloat(str, maxStrLength, value * 1000);
-        strcat(str, " ms");
+        snprintf(str + n, maxStrLength - n, "%g ms", value * 1000);
     }
 }
 
 void strcatLoad(char *str, size_t maxStrLength, float value) {
+    auto n = strlen(str);
     if (value < 1000) {
-        strcatFloat(str, maxStrLength, value);
-        strcat(str, " ohm");
+        snprintf(str + n, maxStrLength - n, "%g ohm", value);
     } else if (value < 1000000) {
-        strcatFloat(str, maxStrLength, value / 1000);
-        strcat(str, " Kohm");
+        snprintf(str + n, maxStrLength - n, "%g Kohm", value / 1000);
     } else {
-        strcatFloat(str, maxStrLength, value / 1000000);
-        strcat(str, " Mohm");
+        snprintf(str + n, maxStrLength - n, "%g Mohm", value / 1000000);
     }
 }
 

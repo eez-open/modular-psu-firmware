@@ -308,35 +308,35 @@ void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &
             }
 
             if (g_keyboardInfo.lctrl) {
-                strcat(str, " LCTRL");
+                strncat(str, " LCTRL", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
 
             if (g_keyboardInfo.lshift) {
-                strcat(str, " LSHIFT");
+                strncat(str, " LSHIFT", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
 
             if (g_keyboardInfo.lalt) {
-                strcat(str, " LALT");
+                strncat(str, " LALT", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
 
             if (g_keyboardInfo.lgui) {
-                strcat(str, " LGUI");
+                strncat(str, " LGUI", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
 
             if (g_keyboardInfo.rctrl) {
-                strcat(str, " RCTRL");
+                strncat(str, " RCTRL", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
 
             if (g_keyboardInfo.rshift) {
-                strcat(str, " RSHIFT");
+                strncat(str, " RSHIFT", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
 
             if (g_keyboardInfo.ralt) {
-                strcat(str, " RALT");
+                strncat(str, " RALT", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
 
             if (g_keyboardInfo.rgui) {
-                strcat(str, " RGUI");
+                strncat(str, " RGUI", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
 
             for (int i = 0; i < 6; i++) {
@@ -357,15 +357,15 @@ void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &
             }
 
             if (g_mouseInfo.button1) {
-                strcat(str, " BTN1");
+                strncat(str, " BTN1", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
 
             if (g_mouseInfo.button2) {
-                strcat(str, " BTN2");
+                strncat(str, " BTN2", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
 
             if (g_mouseInfo.button3) {
-                strcat(str, " BTN3");
+                strncat(str, " BTN3", KEYBOARD_INFO_STRING_SIZE - strlen(str) - 1);
             }
         }
 

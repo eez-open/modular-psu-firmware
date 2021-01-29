@@ -395,25 +395,16 @@ static void addEventToWriteQueue(int16_t eventId, char *message, int channelInde
 }
 
 static void getIndexFilePath(int indexType, char *filePath) {
-    strcpy(filePath, LOGS_DIR);
-
-    strcat(filePath, PATH_SEPARATOR);
-
-    if (indexType == EVENT_TYPE_DEBUG) {
-        strcat(filePath, LOG_DEBUG_INDEX_FILE_NAME);
-    } else if (indexType == EVENT_TYPE_INFO) {
-        strcat(filePath, LOG_INFO_INDEX_FILE_NAME);
-    } else if (indexType == EVENT_TYPE_WARNING) {
-        strcat(filePath, LOG_WARNING_INDEX_FILE_NAME);
-    } else {
-        strcat(filePath, LOG_ERROR_INDEX_FILE_NAME);
-    }
+    snprintf(filePath, MAX_PATH_LENGTH, "%s%s%s", LOGS_DIR, PATH_SEPARATOR,
+        indexType == EVENT_TYPE_DEBUG ? LOG_DEBUG_INDEX_FILE_NAME :
+        indexType == EVENT_TYPE_INFO ? LOG_INFO_INDEX_FILE_NAME :
+        indexType == EVENT_TYPE_WARNING ? LOG_WARNING_INDEX_FILE_NAME :
+        LOG_ERROR_INDEX_FILE_NAME
+    );
 }
 
 static void getLogFilePath(char *filePath) {
-    strcpy(filePath, LOGS_DIR);
-    strcat(filePath, PATH_SEPARATOR);
-    strcat(filePath, LOG_FILE_NAME);
+    snprintf(filePath, MAX_PATH_LENGTH, "%s%s%s", LOGS_DIR, PATH_SEPARATOR, LOG_FILE_NAME);
 }
 
 static int getFilter() {

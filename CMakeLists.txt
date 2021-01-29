@@ -382,7 +382,7 @@ set(header_eez_libs_image
 list (APPEND header_files ${src_eez_libs_image})
 source_group("eez\\libs\\image" FILES ${src_eez_libs_image} ${header_eez_libs_image})
 if(MSVC)
-set_source_files_properties(src/eez/libs/image/toojpeg.cpp PROPERTIES COMPILE_FLAGS /W0)
+    set_source_files_properties(src/eez/libs/image/toojpeg.cpp PROPERTIES COMPILE_FLAGS /W0)
 endif()
 
 set(src_eez_libs_mqtt
@@ -588,7 +588,7 @@ set(header_third_party_scpi
 list (APPEND header_files ${header_third_party_scpi})
 source_group("third_party\\scpi" FILES ${src_third_party_scpi} ${header_third_party_scpi})
 if(MSVC)
-set_source_files_properties(${src_third_party_scpi} PROPERTIES COMPILE_FLAGS /W0)
+    set_source_files_properties(${src_third_party_scpi} PROPERTIES COMPILE_FLAGS /W0)
 endif()
 
 set(src_third_party_micropython_extmod
@@ -608,6 +608,9 @@ set(src_third_party_micropython_ports_bb3
     src/third_party/micropython/ports/bb3/gccollect.cpp
     src/third_party/micropython/ports/bb3/mphalport.cpp
 )
+if (UNIX)
+    set_source_files_properties(${src_third_party_micropython_ports_bb3} PROPERTIES COMPILE_FLAGS -fpermissive)
+endif()
 list (APPEND src_files ${src_third_party_micropython_ports_bb3})
 set(header_third_party_micropython_ports_bb3
     src/third_party/micropython/ports/bb3/mpconfigport.h
@@ -757,6 +760,11 @@ set(src_third_party_micropython_py
     src/third_party/micropython/py/vstr.c
     src/third_party/micropython/py/warning.c
 )
+if (UNIX)
+    set_source_files_properties(${src_third_party_micropython_py} PROPERTIES COMPILE_FLAGS -fpermissive)
+    set_source_files_properties(${src_third_party_micropython_py} PROPERTIES COMPILE_FLAGS -Wpointer-to-int-cast)
+    set_source_files_properties(${src_third_party_micropython_py} PROPERTIES COMPILE_FLAGS -Wint-to-pointer-cast)
+endif()
 list (APPEND src_files ${src_third_party_micropython_py})
 set(header_third_party_micropython_py
     src/third_party/micropython/py/asmarm.h
@@ -821,7 +829,7 @@ set(header_third_party_micropython_py
 list (APPEND header_files ${header_third_party_micropython_py})
 source_group("third_party\\micropython\\py" FILES ${src_third_party_micropython_py} ${header_third_party_micropython_py})
 if(MSVC)
-set_source_files_properties(${src_third_party_micropython_py} PROPERTIES COMPILE_FLAGS /W0)
+    set_source_files_properties(${src_third_party_micropython_py} PROPERTIES COMPILE_FLAGS /W0)
 endif()
 
 if(WIN32)
