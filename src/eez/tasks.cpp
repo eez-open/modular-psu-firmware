@@ -264,7 +264,12 @@ void lowPriorityThreadMainLoop(const void *) {
 void lowPriorityThreadOneIter() {
     using namespace psu;
 
-    osEvent event = osMessageGet(g_lowPriorityMessageQueueId, 25);
+    static const uint32_t INTERVAL = 25;
+
+    osEvent event = osMessageGet(g_lowPriorityMessageQueueId, INTERVAL);
+
+    static uint32_t g_lastTickCountMs;
+
     if (event.status == osEventMessage) {
     	uint32_t message = event.value.v;
 
@@ -446,7 +451,15 @@ void lowPriorityThreadOneIter() {
                 fs_driver::UnLinkDriver(param);
             }
         }
-    } else {
+
+        uint32_t diffMs = millis() - g_lastTickCountMs;
+        if (diffMs < INTERVAL) {
+            return;
+        }
+    }
+
+    g_lastTickCountMs = millis();
+
         if (g_shutingDown) {
             g_isLowPriorityThreadAlive = false;
             return;
@@ -484,7 +497,6 @@ void lowPriorityThreadOneIter() {
         eez::hmi::tick();
 
         usb::tick();
-    }
 
     return;
 }

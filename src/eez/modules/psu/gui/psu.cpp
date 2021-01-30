@@ -138,8 +138,8 @@ void PsuAppContext::stateManagment() {
 
     if (m_clearTextMessage) {
         m_clearTextMessage = false;
-        if (getActivePageId() == PAGE_ID_TEXT_MESSAGE) {
-            popPage();
+        if (isPageOnStack(PAGE_ID_TEXT_MESSAGE)) {
+            removePageFromStack(PAGE_ID_TEXT_MESSAGE);
             m_textMessage[0] = 0;
         }
     }
@@ -283,14 +283,13 @@ void PsuAppContext::stateManagment() {
 
     if (m_showTextMessage) {
         m_showTextMessage = false;
-        if (getActivePageId() != PAGE_ID_TEXT_MESSAGE) {
+        if (!isPageOnStack(PAGE_ID_TEXT_MESSAGE)) {
             pushPage(PAGE_ID_TEXT_MESSAGE);
         } else {
             ++m_textMessageVersion;
         }
     } else {
-        // clear text message if active page is not PAGE_ID_TEXT_MESSAGE
-        if (getActivePageId() != PAGE_ID_TEXT_MESSAGE && m_textMessage[0]) {
+        if (isPageOnStack(PAGE_ID_TEXT_MESSAGE) && m_textMessage[0]) {
             m_textMessage[0] = 0;
         }
     }

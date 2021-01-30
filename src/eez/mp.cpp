@@ -315,6 +315,8 @@ void onQueueMessage(uint32_t type, uint32_t param) {
 }
 
 bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen) {
+    // DebugTrace("> %s\n", commandOrQueryText);
+
     g_scpiDataLen = 0;
 
     g_lastError = 0;
@@ -323,10 +325,21 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
     g_commandOrQueryText = commandOrQueryText;
     sendMessageToLowPriorityThread(MP_EXECUTE_SCPI);
 
+    static const uint32_t SCPI_TIMEOUT = 3000;
+
     while (true) {
-       osEvent event = osMessageGet(g_mpMessageQueueId, osWaitForever);
+       osEvent event = osMessageGet(g_mpMessageQueueId, SCPI_TIMEOUT);
        if (event.status == osEventMessage && event.value.v == QUEUE_MESSAGE_SCPI_RESULT) {
             break;
+       } else {
+            if (g_lastError != 0) {
+                static char g_scpiError[48];
+                snprintf(g_scpiError, sizeof(g_scpiError), "SCPI timeout");
+                mp_raise_ValueError(g_scpiError);
+                *resultText = 0;
+                *resultTextLen = 0;
+                return false;
+            }
        }
     }
 #else
@@ -336,7 +349,7 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
 
     if (g_lastError != 0) {
         static char g_scpiError[48];
-        snprintf(g_scpiError, 48, "SCPI error %d, \"%s\"", (int)g_lastError, SCPI_ErrorTranslate(g_lastError));
+        snprintf(g_scpiError, sizeof(g_scpiError), "SCPI error %d, \"%s\"", (int)g_lastError, SCPI_ErrorTranslate(g_lastError));
         mp_raise_ValueError(g_scpiError);
     }
 
@@ -344,6 +357,10 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
         g_scpiDataLen -= 2;
         g_scpiData[g_scpiDataLen] = 0;
     }
+
+    // if (g_scpiDataLen > 0) {
+    //     DebugTrace("< %s\n", g_scpiData);
+    // }
 
     *resultText = g_scpiData;
     *resultTextLen = g_scpiDataLen;

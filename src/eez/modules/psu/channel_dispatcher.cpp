@@ -2119,7 +2119,7 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
 
     channel_dispatcher::setPowerLimit(dstChannel, powerLimit);
 
-    channel_dispatcher::setOvpParameters(dstChannel, srcChannel.prot_conf.flags.u_type, srcChannel.prot_conf.flags.u_state, srcChannel.prot_conf.u_level, srcChannel.prot_conf.u_delay);
+    channel_dispatcher::setOvpParameters(dstChannel, srcChannel.prot_conf.flags.u_state, srcChannel.prot_conf.flags.u_type, srcChannel.prot_conf.u_level, srcChannel.prot_conf.u_delay);
     channel_dispatcher::setOcpParameters(dstChannel, srcChannel.prot_conf.flags.i_state, srcChannel.prot_conf.i_delay);
     channel_dispatcher::setOppParameters(dstChannel, srcChannel.prot_conf.flags.p_state, srcChannel.prot_conf.p_level, srcChannel.prot_conf.p_delay);
 
