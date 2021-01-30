@@ -305,52 +305,54 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
     mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
 
-    int x;
-    int y;
-    int width;
-    int height;
-    bool withShadow;
+    if (!isPageFullyCovered(i)) {
+        int x;
+        int y;
+        int width;
+        int height;
+        bool withShadow;
 
-    if (isPageInternal(m_pageNavigationStack[i].pageId)) {
-        InternalPage *internalPage = ((InternalPage *)m_pageNavigationStack[i].page);
-        
-        if (!widgetCursor.previousState) {
-            internalPage->refresh(widgetCursor);
+        if (isPageInternal(m_pageNavigationStack[i].pageId)) {
+            InternalPage *internalPage = ((InternalPage *)m_pageNavigationStack[i].page);
+            
+            if (!widgetCursor.previousState) {
+                internalPage->refresh(widgetCursor);
+            }
+            internalPage->updatePage(widgetCursor);
+
+            x = internalPage->x;
+            y = internalPage->y;
+            width = internalPage->width;
+            height = internalPage->height;
+            withShadow = true;
+        } else {
+            const Widget *page = getPageWidget(m_pageNavigationStack[i].pageId);
+
+            auto savedPreviousState = widgetCursor.previousState;
+            auto savedWidget = widgetCursor.widget;
+
+            x = widgetCursor.x + page->x;
+            y = widgetCursor.y + page->y;
+            width = page->w;
+            height = page->h;
+            withShadow = page->x > 0;
+
+            if (!widgetCursor.previousState) {
+                // clear background
+                const Style* style = getStyle(page->style);
+                mcu::display::setColor(style->background_color);
+                mcu::display::fillRect(x, y, x + width - 1, y + height - 1);
+            }
+
+            widgetCursor.widget = page;
+            enumWidget(widgetCursor, drawWidgetCallback);
+
+            widgetCursor.widget = savedWidget;
+            widgetCursor.previousState = savedPreviousState;
         }
-        internalPage->updatePage(widgetCursor);
-
-        x = internalPage->x;
-        y = internalPage->y;
-        width = internalPage->width;
-        height = internalPage->height;
-        withShadow = true;
-    } else {
-		const Widget *page = getPageWidget(m_pageNavigationStack[i].pageId);
-
-		auto savedPreviousState = widgetCursor.previousState;
-        auto savedWidget = widgetCursor.widget;
-
-        x = widgetCursor.x + page->x;
-        y = widgetCursor.y + page->y;
-        width = page->w;
-        height = page->h;
-        withShadow = page->x > 0;
-
-        if (!widgetCursor.previousState) {
-            // clear background
-            const Style* style = getStyle(page->style);
-            mcu::display::setColor(style->background_color);
-            mcu::display::fillRect(x, y, x + width - 1, y + height - 1);
-        }
-
-        widgetCursor.widget = page;
-        enumWidget(widgetCursor, drawWidgetCallback);
-
-		widgetCursor.widget = savedWidget;
-		widgetCursor.previousState = savedPreviousState;
-    }
-
-    mcu::display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+		
+		mcu::display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+	}
 
     m_updatePageIndex = -1;
 }
@@ -399,11 +401,9 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
     }
 
     for (int i = 0; i <= m_pageNavigationStackPointer; i++) {
-        if (!isPageFullyCovered(i)) {
-            widgetCursor.cursor = -1;
-            updatePage(i, widgetCursor);
-            widgetCursor.nextState();
-        }
+        widgetCursor.cursor = -1;
+        updatePage(i, widgetCursor);
+        widgetCursor.nextState();
     }
 }
 
