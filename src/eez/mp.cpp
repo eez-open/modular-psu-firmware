@@ -318,29 +318,33 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
     // DebugTrace("> %s\n", commandOrQueryText);
 
     g_scpiDataLen = 0;
-
     g_lastError = 0;
 
-#if  1
-    g_commandOrQueryText = commandOrQueryText;
-    sendMessageToLowPriorityThread(MP_EXECUTE_SCPI);
-
-    static const uint32_t SCPI_TIMEOUT = 3000;
-
-    while (true) {
-       osEvent event = osMessageGet(g_mpMessageQueueId, SCPI_TIMEOUT);
-       if (event.status == osEventMessage && event.value.v == QUEUE_MESSAGE_SCPI_RESULT) {
-            break;
-       } else {
-            static char g_scpiError[48];
-            snprintf(g_scpiError, sizeof(g_scpiError), "SCPI timeout");
-            mp_raise_ValueError(g_scpiError);
-       }
+    bool executeInLowPriorityThread = true;
+    if (startsWithNoCase(commandOrQueryText, "DISP:INPUT?") || startsWithNoCase(commandOrQueryText, "DISP:DIALOG:ACTION?")) {
+        executeInLowPriorityThread = false;
     }
-#else
-    input(g_scpiContext, (const char *)commandOrQueryText, strlen(commandOrQueryText));
-    input(g_scpiContext, "\r\n", 2);
-#endif
+
+    if (executeInLowPriorityThread) {
+        g_commandOrQueryText = commandOrQueryText;
+        sendMessageToLowPriorityThread(MP_EXECUTE_SCPI);
+
+        static const uint32_t SCPI_TIMEOUT = 3000;
+
+        while (true) {
+            osEvent event = osMessageGet(g_mpMessageQueueId, SCPI_TIMEOUT);
+            if (event.status == osEventMessage && event.value.v == QUEUE_MESSAGE_SCPI_RESULT) {
+                break;
+            } else {
+                static char g_scpiError[48];
+                snprintf(g_scpiError, sizeof(g_scpiError), "SCPI timeout");
+                mp_raise_ValueError(g_scpiError);
+            }
+        }
+    } else {
+        input(g_scpiContext, (const char *)commandOrQueryText, strlen(commandOrQueryText));
+        input(g_scpiContext, "\r\n", 2);
+    }
 
     if (g_lastError != 0) {
         static char g_scpiError[48];

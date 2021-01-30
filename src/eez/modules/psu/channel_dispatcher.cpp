@@ -645,7 +645,7 @@ float getUMaxOvpLevel(const Channel &channel) {
 
 float getUProtectionLevel(const Channel &channel) {
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
-        return Channel::get(0).prot_conf.u_level + Channel::get(1).prot_conf.u_level;
+        return Channel::get(0).prot_conf.u_level + Channel::get(1).prot_conf.u_level + 0.01;
     }
     return channel.prot_conf.u_level;
 }

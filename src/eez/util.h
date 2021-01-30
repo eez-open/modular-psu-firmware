@@ -124,6 +124,7 @@ int strcicmp(char const *a, char const *b);
 int strncicmp(char const *a, char const *b, int n);
 bool isStringEmpty(char const *a);
 bool startsWith(const char *str, const char *prefix);
+bool startsWithNoCase(const char *str, const char *prefix);
 bool endsWith(const char *str, const char *suffix);
 bool endsWithNoCase(const char *str, const char *suffix);
 

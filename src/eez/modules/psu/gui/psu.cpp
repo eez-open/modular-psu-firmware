@@ -931,21 +931,19 @@ bool PsuAppContext::dialogOpen(int *err) {
 }
 
 DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&selectedActionName) {
-	if (timeoutMs == 0) {
-		timeoutMs = 1000;
-	}
-	timeoutMs = millis() + timeoutMs;
+    if (timeoutMs != 0) {
+        timeoutMs = millis() + timeoutMs;
+        if (timeoutMs == 0) {
+            timeoutMs = 1;
+        }
+    }
 
-    while ((int32_t)(millis() - timeoutMs) < 0) {
-    	if (g_externalActionId != ACTION_ID_NONE) {
-    		break;
-    	}
-
-    	if (!isPageOnStack(getExternalAssetsFirstPageId())) {
-    		break;
-    	}
-
-    	osDelay(5);
+    while (
+        (timeoutMs == 0 || (int32_t)(millis() - timeoutMs) < 0) &&
+        g_externalActionId == ACTION_ID_NONE &&
+        isPageOnStack(getExternalAssetsFirstPageId())
+    ) {
+        osDelay(5);
     }
 
     if (g_externalActionId != ACTION_ID_NONE) {
@@ -956,6 +954,7 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
 
     return isPageOnStack(getExternalAssetsFirstPageId()) ? DIALOG_ACTION_RESULT_TIMEOUT : DIALOG_ACTION_RESULT_EXIT;
 }
+
 
 void PsuAppContext::dialogResetDataItemValues() {
     for (uint32_t i = 0; i < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES; i++) {
