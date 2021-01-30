@@ -93,42 +93,51 @@ float clamp(float x, float min, float max) {
     return x;
 }
 
-void strcatInt(char *str, size_t maxStrLength, int value) {
+void stringCopy(char *dst, size_t maxStrLength, const char *src) {
+    strncpy(dst, src, maxStrLength);
+    dst[maxStrLength - 1] = 0;
+}
+
+void stringAppendString(char *str, size_t maxStrLength, const char *value) {
+    strncat(str, value, maxStrLength - strlen(str) - 1);
+}
+
+void stringAppendInt(char *str, size_t maxStrLength, int value) {
     auto n = strlen(str);
     snprintf(str + n, maxStrLength - n, "%d", value);
 }
 
-void strcatUInt32(char *str, size_t maxStrLength, uint32_t value) {
+void stringAppendUInt32(char *str, size_t maxStrLength, uint32_t value) {
     auto n = strlen(str);
     snprintf(str + n, maxStrLength - n, "%lu", (unsigned long)value);
 }
 
-void strcatFloat(char *str, size_t maxStrLength, float value) {
+void stringAppendFloat(char *str, size_t maxStrLength, float value) {
     auto n = strlen(str);
     snprintf(str + n, maxStrLength - n, "%g", value);
 }
 
-void strcatFloat(char *str, size_t maxStrLength, float value, int numDecimalPlaces) {
+void stringAppendFloat(char *str, size_t maxStrLength, float value, int numDecimalPlaces) {
     auto n = strlen(str);
     snprintf(str + n, maxStrLength - n, "%.*f", numDecimalPlaces, value);
 }
 
-void strcatVoltage(char *str, size_t maxStrLength, float value) {
+void stringAppendVoltage(char *str, size_t maxStrLength, float value) {
     auto n = strlen(str);
     snprintf(str + n, maxStrLength - n, "%g V", value);
 }
 
-void strcatCurrent(char *str, size_t maxStrLength, float value) {
+void stringAppendCurrent(char *str, size_t maxStrLength, float value) {
     auto n = strlen(str);
     snprintf(str + n, maxStrLength - n, "%g A", value);
 }
 
-void strcatPower(char *str, size_t maxStrLength, float value) {
+void stringAppendPower(char *str, size_t maxStrLength, float value) {
     auto n = strlen(str);
     snprintf(str + n, maxStrLength - n, "%g W", value);
 }
 
-void strcatDuration(char *str, size_t maxStrLength, float value) {
+void stringAppendDuration(char *str, size_t maxStrLength, float value) {
     auto n = strlen(str);
     if (value > 0.1) {
         snprintf(str + n, maxStrLength - n, "%g s", value);
@@ -137,7 +146,7 @@ void strcatDuration(char *str, size_t maxStrLength, float value) {
     }
 }
 
-void strcatLoad(char *str, size_t maxStrLength, float value) {
+void stringAppendLoad(char *str, size_t maxStrLength, float value) {
     auto n = strlen(str);
     if (value < 1000) {
         snprintf(str + n, maxStrLength - n, "%g ohm", value);
@@ -417,7 +426,7 @@ void macAddressToString(const uint8_t *macAddress, char *macAddressStr) {
 
 void formatTimeZone(int16_t timeZone, char *text, int count) {
     if (timeZone == 0) {
-        strncpy(text, "GMT", count - 1);
+        stringCopy(text, count, "GMT");
     } else {
         char sign;
         int16_t value;
@@ -428,9 +437,8 @@ void formatTimeZone(int16_t timeZone, char *text, int count) {
             sign = '-';
             value = -timeZone;
         }
-        snprintf(text, count - 1, "%c%02d:%02d GMT", sign, value / 100, value % 100);
+        snprintf(text, count, "%c%02d:%02d GMT", sign, value / 100, value % 100);
     }
-    text[count - 1] = 0;
 }
 
 bool parseTimeZone(const char *timeZoneStr, size_t timeZoneLength, int16_t &timeZone) {
@@ -581,15 +589,14 @@ bool endsWithNoCase(const char *str, const char *suffix) {
 
 void formatBytes(uint64_t bytes, char *text, int count) {
     if (bytes == 0) {
-        strncpy(text, "0 Bytes", count - 1);
+        stringCopy(text, count, "0 Bytes");
     } else {
         double c = 1024.0;
         const char *e[] = { "Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
         uint64_t f = (uint64_t)floor(log((double)bytes) / log(c));
         double g = round((bytes / pow(c, (double)f)) * 100) / 100;
-        snprintf(text, count - 1, "%g %s", g, e[f]);
+        snprintf(text, count, "%g %s", g, e[f]);
     }
-    text[count - 1] = 0;
 }
 
 void getBaseFileName(const char *path, char *baseName, unsigned basenameSize) {
@@ -608,7 +615,7 @@ void getBaseFileName(const char *path, char *baseName, unsigned basenameSize) {
     unsigned n = b - a;
     n = MIN(basenameSize - 1, n);
     if (n > 0) {
-        strncpy(baseName, a, n);
+        memcpy(baseName, a, n);
     }
     baseName[n] = 0;
 }

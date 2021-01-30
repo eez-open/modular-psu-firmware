@@ -489,8 +489,7 @@ float getDuration(Recording &recording) {
 
 void getLabel(Recording& recording, int valueIndex, char *text, int count) {
     if (recording.parameters.yAxes[valueIndex].label[0]) {
-        strncpy(text, recording.parameters.yAxes[valueIndex].label, count - 1);
-        text[count - 1] = 0;
+        stringCopy(text, count, recording.parameters.yAxes[valueIndex].label);
     } else {
         char dlogValueType;
         if (recording.parameters.yAxes[valueIndex].unit == UNIT_VOLT) {

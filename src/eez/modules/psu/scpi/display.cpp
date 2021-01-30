@@ -270,7 +270,7 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
     }
 
     char label[MAX_KEYPAD_LABEL_LENGTH + 1];
-    strncpy(label, labelText, labelTextLen);
+    memcpy(label, labelText, labelTextLen);
     if (type == INPUT_TYPE_TEXT || type == INPUT_TYPE_NUMBER) {
         if (labelTextLen > 0) {
             strcpy(label + labelTextLen, ": ");
@@ -317,7 +317,7 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
         }
 
         char value[MAX_KEYPAD_TEXT_LENGTH + 1];
-        strncpy(value, valueText, valueTextLen);
+        memcpy(value, valueText, valueTextLen);
         value[valueTextLen] = 0;
 
         const char *result = psu::gui::g_psuAppContext.textInput(label, min, max, value);
@@ -453,7 +453,7 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
                 return SCPI_RES_ERR;
             }
 
-            strncpy(&menuItemTexts[i][0], menuItemText, menuItemTextLen);
+            memcpy(&menuItemTexts[i][0], menuItemText, menuItemTextLen);
             menuItemTexts[i][menuItemTextLen] = 0;
 
             menuItems[i] = &menuItemTexts[i][0];
@@ -507,7 +507,7 @@ scpi_result_t scpi_cmd_displayWindowSelectQ(scpi_t *context) {
         }
 
         options[i] = optionTexts + optionTextsLen;
-        strncpy((char *)options[i], optionText, optionTextLen);
+        memcpy((char *)options[i], optionText, optionTextLen);
         optionTextsLen += optionTextLen;
         optionTexts[optionTextsLen++] = 0;
     }
@@ -600,7 +600,7 @@ scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
         return SCPI_RES_ERR;
     }
     char dataItemName[128 + 1];
-    strncpy(dataItemName, valueText, valueTextLen);
+    memcpy(dataItemName, valueText, valueTextLen);
     dataItemName[valueTextLen] = 0;
     int16_t dataId = eez::gui::getDataIdFromName(dataItemName);
     if (dataId == 0) {
@@ -658,7 +658,7 @@ scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
             return SCPI_RES_ERR;
         }
         char dataItemValue[128 + 1];
-        strncpy(dataItemValue, valueText, valueTextLen);
+        memcpy(dataItemValue, valueText, valueTextLen);
         dataItemValue[valueTextLen] = 0;
 
         psu::gui::g_psuAppContext.dialogSetDataItemValue(dataId, dataItemValue);
@@ -694,7 +694,7 @@ scpi_result_t scpi_cmd_displayWindowError(scpi_t *context) {
         return SCPI_RES_ERR;
     }
     char message[128 + 1];
-    strncpy(message, valueText, valueTextLen);
+    memcpy(message, valueText, valueTextLen);
     message[valueTextLen] = 0;
     
     psu::gui::errorMessage(message);

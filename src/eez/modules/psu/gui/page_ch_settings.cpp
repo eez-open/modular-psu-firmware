@@ -726,21 +726,21 @@ void ChSettingsListsPage::edit() {
         if (dataId == DATA_ID_CHANNEL_LIST_DWELL) {
             char dwell[64];
             min.toText(dwell, sizeof(dwell));
-            strncat(label, dwell, sizeof(label) - strlen(label) - 1);
+            stringAppendString(label, sizeof(label), dwell);
         } else {
-            strcatFloat(label, sizeof(label), options.min);
+            stringAppendFloat(label, sizeof(label), options.min);
         }
-        strncat(label, "-", sizeof(label) - strlen(label) - 1);
+        stringAppendString(label, sizeof(label), "-");
         if (dataId == DATA_ID_CHANNEL_LIST_DWELL) {
             char dwell[64];
             max.toText(dwell, sizeof(dwell));
-            strncat(label, dwell, sizeof(label) - strlen(label) - 1);
+            stringAppendString(label, sizeof(label), dwell);
         } else if (dataId == DATA_ID_CHANNEL_LIST_VOLTAGE) {
-            strcatVoltage(label, sizeof(label), options.max);
+            stringAppendVoltage(label, sizeof(label), options.max);
         } else {
-            strcatCurrent(label, sizeof(label), options.max);
+            stringAppendCurrent(label, sizeof(label), options.max);
         }
-        strncat(label, "]: ", sizeof(label) - strlen(label) - 1);
+        stringAppendString(label, sizeof(label), "]: ");
 
         NumericKeypad::start(label, value, options, onValueSet, 0, 0);
     } else {

@@ -108,22 +108,22 @@ char *getConfFilePath(const char *file_name) {
 
 #ifdef _WIN32
     if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, file_path))) {
-        strncat(file_path, "\\.eez_psu_sim", sizeof(file_path) - strlen(file_path) - 1);
+        stringAppendString(file_path, sizeof(file_path), "\\.eez_psu_sim");
         _mkdir(file_path);
-        strncat(file_path, "\\", sizeof(file_path) - strlen(file_path) - 1);
+        stringAppendString(file_path, sizeof(file_path), "\\");
     }
 #elif defined(__EMSCRIPTEN__)
-    strncat(file_path, "/eez_modular_firmware/", sizeof(file_path) - strlen(file_path) - 1);
+    stringAppendString(file_path, sizeof(file_path), "/eez_modular_firmware/");
 #else
     const char *home_dir = 0;
     if ((home_dir = getenv("HOME")) == NULL) {
         home_dir = getpwuid(getuid())->pw_dir;
     }
     if (home_dir) {
-        strncat(file_path, home_dir, sizeof(file_path) - strlen(file_path) - 1);
-        strncat(file_path, "/.eez_psu_sim", sizeof(file_path) - strlen(file_path) - 1);
+        stringAppendString(file_path, sizeof(file_path), home_dir);
+        stringAppendString(file_path, sizeof(file_path), "/.eez_psu_sim");
         mkdir(file_path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        strncat(file_path, "/", sizeof(file_path) - strlen(file_path) - 1);
+        stringAppendString(file_path, sizeof(file_path), "/");
     }
 #endif
 
@@ -654,7 +654,7 @@ eez_err_t PsuModule::setChannelLabel(int subchannelIndex, const char *label, int
     }
 
     Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    strncpy(channel->label, label, length);
+    memcpy(channel->label, label, length);
     channel->label[length] = 0;
     return SCPI_RES_OK;
 }

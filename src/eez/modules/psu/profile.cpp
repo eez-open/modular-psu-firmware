@@ -409,17 +409,15 @@ bool setName(int location, const char *name, bool showProgress, int *err) {
 void getName(int location, char *name, int count) {
     if (location >= 0 && location < NUM_PROFILE_LOCATIONS) {
         if (g_profilesCache[location].flags.isValid) {
-            strncpy(name, g_profilesCache[location].name, count - 1);
-            name[count - 1] = 0;
+            stringCopy(name, count, g_profilesCache[location].name);
             return;
         }
     }
     if (location > 0) {
-        strncpy(name, "--Empty--", count - 1);
+        stringCopy(name, count, "--Empty--");
     } else {
-        strncpy(name, "--Never used--", count - 1);
+        stringCopy(name, count, "--Never used--");
     }
-    name[count - 1] = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

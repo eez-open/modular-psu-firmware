@@ -92,7 +92,7 @@ scpi_result_t scpi_cmd_memoryStateName(scpi_t *context) {
     }
 
     char profileName[PROFILE_NAME_MAX_LENGTH + 1];
-    strncpy(profileName, name, nameLength);
+    memcpy(profileName, name, nameLength);
     profileName[nameLength] = 0;
 
     int err;

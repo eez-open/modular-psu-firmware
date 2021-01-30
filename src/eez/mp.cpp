@@ -92,7 +92,7 @@ static int_fast16_t g_lastError;
 size_t SCPI_Write(scpi_t *context, const char *data, size_t len) {
     len = MIN(len, SCPI_PARSER_INPUT_BUFFER_LENGTH - g_scpiDataLen);
     if (len > 0) {
-        strncpy(g_scpiData + g_scpiDataLen, data, len);
+        memcpy(g_scpiData + g_scpiDataLen, data, len);
         g_scpiDataLen += len;
         g_scpiData[g_scpiDataLen] = 0;
     }
@@ -249,8 +249,7 @@ void oneIter() {
 void startScript(const char *filePath) {
     if (g_state == STATE_IDLE) {
         g_state = STATE_EXECUTING;
-        strncpy(g_scriptPath, filePath, MAX_PATH_LENGTH);
-        g_scriptPath[MAX_PATH_LENGTH - 1] = 0;
+        stringCopy(g_scriptPath, MAX_PATH_LENGTH, filePath);
 
         //DebugTrace("T1 %d\n", millis());
         sendMessageToLowPriorityThread(MP_LOAD_SCRIPT);
@@ -333,9 +332,9 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
        if (event.status == osEventMessage && event.value.v == QUEUE_MESSAGE_SCPI_RESULT) {
             break;
        } else {
-                static char g_scpiError[48];
-                snprintf(g_scpiError, sizeof(g_scpiError), "SCPI timeout");
-                mp_raise_ValueError(g_scpiError);
+            static char g_scpiError[48];
+            snprintf(g_scpiError, sizeof(g_scpiError), "SCPI timeout");
+            mp_raise_ValueError(g_scpiError);
        }
     }
 #else

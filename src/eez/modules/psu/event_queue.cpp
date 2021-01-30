@@ -248,8 +248,7 @@ const char *getEventMessage(int16_t eventId) {
     }
 
     if (p_message) {
-        strncpy(message, p_message, sizeof(message) - 1);
-        message[sizeof(message) - 1] = 0;
+        stringCopy(message, sizeof(message), p_message);
         return message;
     }
 

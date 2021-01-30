@@ -292,10 +292,6 @@ void PsuAppContext::stateManagment() {
         } else {
             ++m_textMessageVersion;
         }
-    } else {
-        if (isPageOnStack(PAGE_ID_TEXT_MESSAGE) && m_textMessage[0]) {
-            m_textMessage[0] = 0;
-        }
     }
 
     dlog_view::stateManagment();
@@ -772,9 +768,7 @@ uint32_t PsuAppContext::getAsyncInProgressStartTime() {
 }
 
 void PsuAppContext::setTextMessage(const char *message, unsigned int len) {
-    len = MIN(len, MAX_TEXT_MESSAGE_LEN);
-    strncpy(m_textMessage, message, len);
-    m_textMessage[len] = 0;
+    stringCopy(m_textMessage, MIN(len, sizeof(m_textMessage)), message);
     m_showTextMessage = true;
 }
 
@@ -940,18 +934,18 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
 	if (timeoutMs == 0) {
 		timeoutMs = 1000;
 	}
-        timeoutMs = millis() + timeoutMs;
+	timeoutMs = millis() + timeoutMs;
 
     while ((int32_t)(millis() - timeoutMs) < 0) {
     	if (g_externalActionId != ACTION_ID_NONE) {
     		break;
-        }
+    	}
 
     	if (!isPageOnStack(getExternalAssetsFirstPageId())) {
     		break;
-    }
+    	}
 
-        osDelay(5);
+    	osDelay(5);
     }
 
     if (g_externalActionId != ACTION_ID_NONE) {

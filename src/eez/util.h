@@ -54,16 +54,19 @@ float remapExp(float x, float x1, float y1, float x2, float y2);
 float remapOutExp(float x, float x1, float y1, float x2, float y2);
 float clamp(float x, float min, float max);
 
-void strcatInt(char *str, size_t maxStrLength, int value);
-void strcatUInt32(char *str, size_t maxStrLength, uint32_t value);
-void strcatFloat(char *str, size_t maxStrLength, float value);
-void strcatFloat(char *str, size_t maxStrLength, float value, int numDecimalPlaces);
+void stringCopy(char *dst, size_t maxStrLength, const char *src);
 
-void strcatVoltage(char *str, size_t maxStrLength, float value);
-void strcatCurrent(char *str, size_t maxStrLength, float value);
-void strcatPower(char *str, size_t maxStrLength, float value);
-void strcatDuration(char *str, size_t maxStrLength, float value);
-void strcatLoad(char *str, size_t maxStrLength, float value);
+void stringAppendString(char *str, size_t maxStrLength, const char *value);
+void stringAppendInt(char *str, size_t maxStrLength, int value);
+void stringAppendUInt32(char *str, size_t maxStrLength, uint32_t value);
+void stringAppendFloat(char *str, size_t maxStrLength, float value);
+void stringAppendFloat(char *str, size_t maxStrLength, float value, int numDecimalPlaces);
+
+void stringAppendVoltage(char *str, size_t maxStrLength, float value);
+void stringAppendCurrent(char *str, size_t maxStrLength, float value);
+void stringAppendPower(char *str, size_t maxStrLength, float value);
+void stringAppendDuration(char *str, size_t maxStrLength, float value);
+void stringAppendLoad(char *str, size_t maxStrLength, float value);
 
 uint32_t crc32(const uint8_t *message, size_t size);
 

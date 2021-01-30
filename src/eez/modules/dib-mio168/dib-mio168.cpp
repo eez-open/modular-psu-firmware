@@ -2353,26 +2353,22 @@ public:
         }
         
         if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
-            strncpy(ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_label, label, length);
-            ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_label[length] = 0;
+            stringCopy(ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_label, length + 1, label);
             return SCPI_RES_OK;
         }
         
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            strncpy(aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_label, label, length);
-            aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_label[length] = 0;
+            stringCopy(aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].m_label, length + 1, label);
             return SCPI_RES_OK;
         }
         
         if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            strncpy(aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].m_label, label, length);
-            aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].m_label[length] = 0;
+            stringCopy(aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].m_label, length + 1, label);
             return SCPI_RES_OK;
         }
         
         if (subchannelIndex >= PWM_1_SUBCHANNEL_INDEX && subchannelIndex <= PWM_2_SUBCHANNEL_INDEX) {
-            strncpy(pwmChannels[subchannelIndex - PWM_1_SUBCHANNEL_INDEX].m_label, label, length);
-            pwmChannels[subchannelIndex - PWM_1_SUBCHANNEL_INDEX].m_label[length] = 0;
+            stringCopy(pwmChannels[subchannelIndex - PWM_1_SUBCHANNEL_INDEX].m_label, length + 1, label);
             return SCPI_RES_OK;
         }
 
@@ -2419,8 +2415,7 @@ public:
                 const char *channelLabel = getChannelLabel(subchannelIndex);
                 char *pinLabel = (char *)(channelLabel + (pin - 1) * (CHANNEL_LABEL_MAX_LENGTH + 1));
 
-                strncpy(pinLabel, label, length);
-                pinLabel[length] = 0;
+                stringCopy(pinLabel, length + 1, label);
 
                 return SCPI_RES_OK;
             }
@@ -3202,8 +3197,7 @@ public:
             }
 
             calConf.calibrationDate = mioCalConf->calibrationDate;
-            strncpy(calConf.calibrationRemark, mioCalConf->calibrationRemark, MIO_CALIBRATION_REMARK_MAX_LENGTH);
-            calConf.calibrationRemark[MIO_CALIBRATION_REMARK_MAX_LENGTH] = 0;
+            stringCopy(calConf.calibrationRemark, MIO_CALIBRATION_REMARK_MAX_LENGTH + 1, mioCalConf->calibrationRemark);
 
             return true;
         }
@@ -3236,8 +3230,7 @@ public:
             mioCalConf->state.calEnabled = mioCalConf->state.calState;
 
             mioCalConf->calibrationDate = calConf.calibrationDate;
-            strncpy(mioCalConf->calibrationRemark, calConf.calibrationRemark, MIO_CALIBRATION_REMARK_MAX_LENGTH);
-            mioCalConf->calibrationRemark[MIO_CALIBRATION_REMARK_MAX_LENGTH] = 0;
+            stringCopy(mioCalConf->calibrationRemark, MIO_CALIBRATION_REMARK_MAX_LENGTH + 1, calConf.calibrationRemark);
 
             return true;
         }
@@ -3465,18 +3458,18 @@ public:
                 nextDlogRecordingStart.period = dlog_record::g_parameters.period;
                 nextDlogRecordingStart.resources = resources;
 
-                strcpy(nextDlogRecordingStart.filePath, dlog_record::g_parameters.filePath + 2 /* skip drive part */ );
+                stringCopy(nextDlogRecordingStart.filePath, MAX_PATH_LENGTH, dlog_record::g_parameters.filePath + 2 /* skip drive part */);
 
                 for (int i = 0; i < 8; i++) {
-                    strcpy(nextDlogRecordingStart.dinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(DIN_SUBCHANNEL_INDEX, i));
+                    stringCopy(nextDlogRecordingStart.dinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), CHANNEL_LABEL_MAX_LENGTH + 1, getDlogResourceLabel(DIN_SUBCHANNEL_INDEX, i));
                 }
 
                 for (int i = 0; i < 8; i++) {
-                    strcpy(nextDlogRecordingStart.doutLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(DOUT_SUBCHANNEL_INDEX, i));
+                    stringCopy(nextDlogRecordingStart.doutLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), CHANNEL_LABEL_MAX_LENGTH + 1, getDlogResourceLabel(DOUT_SUBCHANNEL_INDEX, i));
                 }
 
                 for (int i = 0; i < 4; i++) {
-                    strcpy(nextDlogRecordingStart.ainLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), getDlogResourceLabel(AIN_1_SUBCHANNEL_INDEX + i, 0));
+                    stringCopy(nextDlogRecordingStart.ainLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), CHANNEL_LABEL_MAX_LENGTH + 1, getDlogResourceLabel(AIN_1_SUBCHANNEL_INDEX + i, 0));
                 }
 
                 nextDlogCommand = &dlogRecordingStart_command;

@@ -47,7 +47,7 @@ namespace scpi {
 
 void addExtension(char *filePath, const char *ext) {
     if (!endsWith(filePath, ext)) {
-        strncat(filePath, ext, MAX_PATH_LENGTH - strlen(filePath) - 1);
+        stringAppendString(filePath, MAX_PATH_LENGTH, ext);
     }
 }
 
@@ -93,10 +93,10 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size, 
     size_t nameLength = strlen(name);
     size_t position;
     if (nameLength > MAX_PATH_LENGTH) {
-        strncpy(buffer, name, MAX_PATH_LENGTH);
+        memcpy(buffer, name, MAX_PATH_LENGTH);
         position = MAX_PATH_LENGTH;
     } else {
-        strcpy(buffer, name);
+        memcpy(buffer, name, nameLength);
         position = nameLength;
     }
 

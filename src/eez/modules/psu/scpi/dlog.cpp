@@ -334,7 +334,7 @@ scpi_result_t scpi_cmd_senseDlogTraceRemark(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    strncpy(dlog_record::g_parameters.comment, comment, len);
+    memcpy(dlog_record::g_parameters.comment, comment, len);
     dlog_record::g_parameters.comment[len] = 0;
 
     return SCPI_RES_OK;
@@ -464,7 +464,7 @@ scpi_result_t scpi_cmd_senseDlogTraceXLabel(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    strncpy(dlog_record::g_parameters.xAxis.label, label, len);
+    memcpy(dlog_record::g_parameters.xAxis.label, label, len);
     dlog_record::g_parameters.xAxis.label[len] = 0;
 
     return SCPI_RES_OK;
@@ -633,10 +633,10 @@ scpi_result_t scpi_cmd_senseDlogTraceYLabel(scpi_t *context) {
     }
 
     if (yAxisIndex == -1) {
-        strncpy(dlog_record::g_parameters.yAxis.label, label, len);
+        memcpy(dlog_record::g_parameters.yAxis.label, label, len);
         dlog_record::g_parameters.yAxis.label[len] = 0;
     } else {
-        strncpy(dlog_record::g_parameters.yAxes[yAxisIndex].label, label, len);
+        memcpy(dlog_record::g_parameters.yAxes[yAxisIndex].label, label, len);
         dlog_record::g_parameters.yAxes[yAxisIndex].label[len] = 0;
     }
 

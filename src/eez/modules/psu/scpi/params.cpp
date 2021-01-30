@@ -765,7 +765,7 @@ bool get_power_limit_from_param(scpi_t *context, const scpi_number_t &param, flo
 
 scpi_result_t result_float(scpi_t *context, float value, Unit unit) {
     char buffer[32] = { 0 };
-    strcatFloat(buffer, sizeof(buffer), value);
+    stringAppendFloat(buffer, sizeof(buffer), value);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
     return SCPI_RES_OK;
 }
@@ -876,7 +876,7 @@ bool getFilePath(scpi_t *context, char *filePath, bool mandatory, bool *isParame
         // is it absolute file path?
         if (filePathParam[0] == '/' || filePathParam[0] == '\\' || filePathParam[1] == ':') {
             // yes
-            strncpy(filePath, filePathParam, filePathParamLen);
+            memcpy(filePath, filePathParam, filePathParamLen);
             filePath[filePathParamLen] = 0;
         } else {
             // no, combine with current directory to get absolute path
@@ -886,9 +886,9 @@ bool getFilePath(scpi_t *context, char *filePath, bool mandatory, bool *isParame
                 SCPI_ErrorPush(context, SCPI_ERROR_FILE_NAME_ERROR);
                 return false;
             }
-            strncpy(filePath, psuContext->currentDirectory, currentDirectoryLen);
+            memcpy(filePath, psuContext->currentDirectory, currentDirectoryLen);
             filePath[currentDirectoryLen] = '/';
-            strncpy(filePath + currentDirectoryLen + 1, filePathParam, filePathParamLen);
+            memcpy(filePath + currentDirectoryLen + 1, filePathParam, filePathParamLen);
             filePath[filePathLen] = 0;
         }
         if (isParameterSpecified) {

@@ -513,7 +513,7 @@ bool isSystemPasswordValid(const char *new_password, size_t new_password_len, in
 
 void changeSystemPassword(const char *new_password, size_t new_password_len) {
     memset(&g_devConf.systemPassword, 0, sizeof(g_devConf.systemPassword));
-    strncpy(g_devConf.systemPassword, new_password, new_password_len);
+    memcpy(g_devConf.systemPassword, new_password, new_password_len);
     event_queue::pushEvent(event_queue::EVENT_INFO_SYSTEM_PASSWORD_CHANGED);
 }
 
@@ -533,7 +533,7 @@ bool isCalibrationPasswordValid(const char *new_password, size_t new_password_le
 
 void changeCalibrationPassword(const char *new_password, size_t new_password_len) {
     memset(&g_devConf.calibrationPassword, 0, sizeof(g_devConf.calibrationPassword));
-    strncpy(g_devConf.calibrationPassword, new_password, new_password_len);
+    memcpy(g_devConf.calibrationPassword, new_password, new_password_len);
     event_queue::pushEvent(event_queue::EVENT_INFO_CALIBRATION_PASSWORD_CHANGED);
 }
 
@@ -1151,7 +1151,7 @@ bool isNtpEnabled() {
 }
 
 void setNtpServer(const char *ntpServer, size_t ntpServerLength) {
-    strncpy(g_devConf.ntpServer, ntpServer, ntpServerLength);
+    memcpy(g_devConf.ntpServer, ntpServer, ntpServerLength);
     g_devConf.ntpServer[ntpServerLength] = 0;
 }
 

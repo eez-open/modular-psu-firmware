@@ -149,7 +149,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
 						text[k] = 0;
 					}
 					else {
-						strcpy(text, ".0");
+						stringCopy(text, sizeof(text), ".0");
 					}
 				} else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
 					int i = findStartOfUnit(text, 0);
@@ -213,7 +213,7 @@ int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCurs
             start = text + i;
             text[k] = 0;
         } else {
-            strcpy(text, ".0");
+            stringCopy(text, sizeof(text), ".0");
         }
     } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
         int i = findStartOfUnit(text, 0);
@@ -264,7 +264,7 @@ int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widg
             start = text + i;
             text[k] = 0;
         } else {
-            strcpy(text, ".0");
+            stringCopy(text, sizeof(text), ".0");
         }
     } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
         int i = findStartOfUnit(text, 0);

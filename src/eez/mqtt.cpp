@@ -347,8 +347,7 @@ static void requestCallback(void *arg, err_t err) {
 void incomingPublishCallback(void *arg, const char *topic, u32_t tot_len) {
     // DebugTrace("Incoming publish: %s, %d\n", topic, (int)tot_len);
     size_t topicLen = MIN(strlen(topic), MAX_TOPIC_LEN);
-    strncpy(g_topic, topic, topicLen);
-    g_topic[topicLen] = 0;
+    stringCopy(g_topic, topicLen, topic);
 
     g_payloadLen = 0;
 }
@@ -374,12 +373,11 @@ static struct mqtt_client g_client; /* instantiate the client */
 
 void incomingPublishCallback(void** unused, struct mqtt_response_publish *published) {
     size_t topicLen = MIN(published->topic_name_size, MAX_TOPIC_LEN);
-    strncpy(g_topic, (const char *)published->topic_name, topicLen);
-    g_topic[topicLen] = 0;
+    stringCopy(g_topic, topicLen, (const char *)published->topic_name);
 
     size_t payloadLen = MIN(published->application_message_size, MAX_PAYLOAD_LEN);
     if (payloadLen > 0) {
-        strncpy(g_payload, (const char *)published->application_message, payloadLen);
+        stringCopy(g_payload, payloadLen, (const char *)published->application_message);
     }
     g_payload[payloadLen] = 0;
 

@@ -490,8 +490,8 @@ char NumericKeypad::getDotSign() {
 }
 
 void NumericKeypad::appendEditUnit(char *text, size_t maxTextLength) {
-    strncat(text, " ", maxTextLength - strlen(text) - 1);
-    strncat(text, getUnitName(m_options.editValueUnit), maxTextLength - strlen(text) - 1);
+    stringAppendString(text, maxTextLength, " ");
+    stringAppendString(text, maxTextLength, getUnitName(m_options.editValueUnit));
 }
 
 void NumericKeypad::getKeypadText(char *text) {

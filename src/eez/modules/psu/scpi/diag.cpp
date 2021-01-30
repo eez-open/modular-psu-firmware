@@ -121,19 +121,19 @@ scpi_result_t scpi_cmd_diagnosticInformationAdcQ(scpi_t *context) {
     char buffer[64] = { 0 };
 
     strcpy(buffer, "U_SET=");
-    strcatVoltage(buffer, sizeof(buffer), channel->u.mon_dac_last);
+    stringAppendVoltage(buffer, sizeof(buffer), channel->u.mon_dac_last);
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "U_MON=");
-    strcatVoltage(buffer, sizeof(buffer), channel->u.mon_last);
+    stringAppendVoltage(buffer, sizeof(buffer), channel->u.mon_last);
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "I_SET=");
-    strcatCurrent(buffer, sizeof(buffer), channel->i.mon_dac_last);
+    stringAppendCurrent(buffer, sizeof(buffer), channel->i.mon_dac_last);
     SCPI_ResultText(context, buffer);
 
     strcpy(buffer, "I_MON=");
-    strcatCurrent(buffer, sizeof(buffer), channel->i.mon_last);
+    stringAppendCurrent(buffer, sizeof(buffer), channel->i.mon_last);
     SCPI_ResultText(context, buffer);
 
     return SCPI_RES_OK;
@@ -212,11 +212,11 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
         snprintf(buffer, sizeof(buffer), "CH%d u_type=%d", channelIndex, (int)channel->prot_conf.flags.u_type);
         SCPI_ResultText(context, buffer);
         snprintf(buffer, sizeof(buffer), "CH%d u_delay=", channelIndex);
-        strcatDuration(buffer, sizeof(buffer), channel->prot_conf.u_delay);
+        stringAppendDuration(buffer, sizeof(buffer), channel->prot_conf.u_delay);
         SCPI_ResultText(context, buffer);
 
         snprintf(buffer, sizeof(buffer), "CH%d u_level=", channelIndex);
-        strcatVoltage(buffer, sizeof(buffer), channel->prot_conf.u_level);
+        stringAppendVoltage(buffer, sizeof(buffer), channel->prot_conf.u_level);
         SCPI_ResultText(context, buffer);
 
         // current
@@ -225,7 +225,7 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
         snprintf(buffer, sizeof(buffer), "CH%d i_state=%d", channelIndex, (int)channel->prot_conf.flags.i_state);
         SCPI_ResultText(context, buffer);
         snprintf(buffer, sizeof(buffer), "CH%d i_delay=", channelIndex);
-        strcatDuration(buffer, sizeof(buffer), channel->prot_conf.i_delay);
+        stringAppendDuration(buffer, sizeof(buffer), channel->prot_conf.i_delay);
         SCPI_ResultText(context, buffer);
 
         // power
@@ -234,11 +234,11 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
         snprintf(buffer, sizeof(buffer), "CH%d p_state=%d", channelIndex, (int)channel->prot_conf.flags.p_state);
         SCPI_ResultText(context, buffer);
         snprintf(buffer, sizeof(buffer), "CH%d p_delay=", channelIndex);
-        strcatDuration(buffer, sizeof(buffer), channel->prot_conf.p_delay);
+        stringAppendDuration(buffer, sizeof(buffer), channel->prot_conf.p_delay);
         SCPI_ResultText(context, buffer);
 
         snprintf(buffer, sizeof(buffer), "CH%d p_level=", channelIndex);
-        strcatPower(buffer, sizeof(buffer), channel->prot_conf.p_level);
+        stringAppendPower(buffer, sizeof(buffer), channel->prot_conf.p_level);
         SCPI_ResultText(context, buffer);
     }
 
@@ -254,12 +254,12 @@ scpi_result_t scpi_cmd_diagnosticInformationProtectionQ(scpi_t *context) {
             SCPI_ResultText(context, buffer);
 
             snprintf(buffer, sizeof(buffer), "temp_%s_delay=", sensor.name);
-            strcatDuration(buffer, sizeof(buffer), sensorTemperature.prot_conf.delay);
+            stringAppendDuration(buffer, sizeof(buffer), sensorTemperature.prot_conf.delay);
             SCPI_ResultText(context, buffer);
 
             snprintf(buffer, sizeof(buffer), "temp_%s_level=", sensor.name);
-            strcatFloat(buffer, sizeof(buffer), sensorTemperature.prot_conf.level);
-            strncat(buffer, " oC", sizeof(buffer) - strlen(buffer) - 1);
+            stringAppendFloat(buffer, sizeof(buffer), sensorTemperature.prot_conf.level);
+            stringAppendString(buffer, sizeof(buffer), " oC");
             SCPI_ResultText(context, buffer);
         }
     }

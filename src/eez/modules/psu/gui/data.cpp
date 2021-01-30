@@ -386,25 +386,23 @@ void printTime(double time, char *text, int count) {
 
     if (d > 0) {
         if (h > 0) {
-            snprintf(text, count - 1, "%ud %uh", d, h);
+            snprintf(text, count, "%ud %uh", d, h);
         } else if (m > 0) {
-            snprintf(text, count - 1, "%ud %um", d, m);
+            snprintf(text, count, "%ud %um", d, m);
         } else {
-            snprintf(text, count - 1, "%ud %ds", d, (unsigned int)floor(s));
+            snprintf(text, count, "%ud %ds", d, (unsigned int)floor(s));
         }
     } else if (h > 0) {
         if (m > 0) {
-            snprintf(text, count - 1, "%uh %um", h, m);
+            snprintf(text, count, "%uh %um", h, m);
         } else {
-            snprintf(text, count - 1, "%uh %ds", h, (unsigned int)floor(s));
+            snprintf(text, count, "%uh %ds", h, (unsigned int)floor(s));
         }
     } else if (m > 0) {
-        snprintf(text, count - 1, "%um %us", m, (unsigned int)floor(s));
+        snprintf(text, count, "%um %us", m, (unsigned int)floor(s));
     } else {
-        snprintf(text, count - 1, "%gs", s);
+        snprintf(text, count, "%gs", s);
     }
-
-    text[count - 1] = 0;
 }
 
 void printTime(uint32_t time, char *text, int count) {
@@ -420,8 +418,7 @@ bool compare_LESS_THEN_MIN_FLOAT_value(const Value &a, const Value &b) {
 void LESS_THEN_MIN_FLOAT_value_to_text(const Value &value, char *text, int count) {
     char valueText[64];
     MakeValue(value.getFloat(), (Unit)value.getUnit()).toText(valueText, sizeof(text));
-    snprintf(text, count - 1, "Value is less then %s", valueText);
-    text[count - 1] = 0;
+    snprintf(text, count, "Value is less then %s", valueText);
 }
 
 bool compare_GREATER_THEN_MAX_FLOAT_value(const Value &a, const Value &b) {
@@ -431,8 +428,7 @@ bool compare_GREATER_THEN_MAX_FLOAT_value(const Value &a, const Value &b) {
 void GREATER_THEN_MAX_FLOAT_value_to_text(const Value &value, char *text, int count) {
     char valueText[64];
     MakeValue(value.getFloat(), (Unit)value.getUnit()).toText(valueText, sizeof(text));
-    snprintf(text, count - 1, "Value is greater then %s", valueText);
-    text[count - 1] = 0;
+    snprintf(text, count, "Value is greater then %s", valueText);
 }
 
 bool compare_CHANNEL_LABEL_value(const Value &a, const Value &b) {
@@ -440,8 +436,7 @@ bool compare_CHANNEL_LABEL_value(const Value &a, const Value &b) {
 }
 
 void CHANNEL_LABEL_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "Channel %d:", value.getUInt8());
-    text[count - 1] = 0;
+    snprintf(text, count, "Channel %d:", value.getUInt8());
 }
 
 bool compare_CHANNEL_SHORT_LABEL_value(const Value &a, const Value &b) {
@@ -450,8 +445,7 @@ bool compare_CHANNEL_SHORT_LABEL_value(const Value &a, const Value &b) {
 
 void CHANNEL_SHORT_LABEL_value_to_text(const Value &value, char *text, int count) {
     if (value.getUInt8() < CH_NUM) {
-        snprintf(text, count - 1, "Ch%d:", value.getUInt8() + 1);
-        text[count - 1] = 0;
+        snprintf(text, count, "Ch%d:", value.getUInt8() + 1);
     } else {
         text[0] = 0;
     }
@@ -462,8 +456,7 @@ bool compare_CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value(const Value &a, const Valu
 }
 
 void CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "Ch. %d", value.getUInt8() + 1);
-    text[count - 1] = 0;
+    snprintf(text, count, "Ch. %d", value.getUInt8() + 1);
 }
 
 bool compare_CHANNEL_BOARD_INFO_LABEL_value(const Value &a, const Value &b) {
@@ -471,8 +464,7 @@ bool compare_CHANNEL_BOARD_INFO_LABEL_value(const Value &a, const Value &b) {
 }
 
 void CHANNEL_BOARD_INFO_LABEL_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "CH%d board:", value.getInt() + 1);
-    text[count - 1] = 0;
+    snprintf(text, count, "CH%d board:", value.getInt() + 1);
 }
 
 bool compare_LESS_THEN_MIN_INT_value(const Value &a, const Value &b) {
@@ -480,8 +472,7 @@ bool compare_LESS_THEN_MIN_INT_value(const Value &a, const Value &b) {
 }
 
 void LESS_THEN_MIN_INT_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "Value is less then %d", value.getInt());
-    text[count - 1] = 0;
+    snprintf(text, count, "Value is less then %d", value.getInt());
 }
 
 bool compare_LESS_THEN_MIN_TIME_ZONE_value(const Value &a, const Value &b) {
@@ -489,8 +480,7 @@ bool compare_LESS_THEN_MIN_TIME_ZONE_value(const Value &a, const Value &b) {
 }
 
 void LESS_THEN_MIN_TIME_ZONE_value_to_text(const Value &value, char *text, int count) {
-    strncpy(text, "Value is less then -12:00", count - 1);
-    text[count - 1] = 0;
+    stringCopy(text, count, "Value is less then -12:00");
 }
 
 bool compare_GREATER_THEN_MAX_INT_value(const Value &a, const Value &b) {
@@ -498,8 +488,7 @@ bool compare_GREATER_THEN_MAX_INT_value(const Value &a, const Value &b) {
 }
 
 void GREATER_THEN_MAX_INT_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "Value is greater then %d", value.getInt());
-    text[count - 1] = 0;
+    snprintf(text, count, "Value is greater then %d", value.getInt());
 }
 
 bool compare_GREATER_THEN_MAX_TIME_ZONE_value(const Value &a, const Value &b) {
@@ -507,8 +496,7 @@ bool compare_GREATER_THEN_MAX_TIME_ZONE_value(const Value &a, const Value &b) {
 }
 
 void GREATER_THEN_MAX_TIME_ZONE_value_to_text(const Value &value, char *text, int count) {
-    strncpy(text, "Value is greater then +14:00", count - 1);
-    text[count - 1] = 0;
+    stringCopy(text, count, "Value is greater then +14:00");
 }
 
 bool compare_EVENT_value(const Value &a, const Value &b) {
@@ -524,9 +512,7 @@ bool compare_EVENT_MESSAGE_value(const Value &a, const Value &b) {
 }
 
 void EVENT_MESSAGE_value_to_text(const Value &value, char *text, int count) {
-    strncpy(text, event_queue::getEventMessage(value.getInt16()), count - 1);
-    snprintf(text, count - 1, event_queue::getEventMessage(value.getFirstInt16()), value.getSecondInt16() + 1);
-    text[count - 1] = 0;
+    snprintf(text, count, event_queue::getEventMessage(value.getFirstInt16()), value.getSecondInt16() + 1);
 }
 
 bool compare_ON_TIME_COUNTER_value(const Value &a, const Value &b) {
@@ -560,8 +546,7 @@ bool compare_DATE_DMY_value(const Value &a, const Value &b) {
 void DATE_DMY_value_to_text(const Value &value, char *text, int count) {
     int year, month, day, hour, minute, second;
     datetime::breakTime(value.getUInt32(), year, month, day, hour, minute, second);
-    snprintf(text, count - 1, "%02d - %02d - %d", day, month, year);
-    text[count - 1] = 0;
+    snprintf(text, count, "%02d - %02d - %d", day, month, year);
 }
 
 bool compare_DATE_MDY_value(const Value &a, const Value &b) {
@@ -571,8 +556,7 @@ bool compare_DATE_MDY_value(const Value &a, const Value &b) {
 void DATE_MDY_value_to_text(const Value &value, char *text, int count) {
     int year, month, day, hour, minute, second;
     datetime::breakTime(value.getUInt32(), year, month, day, hour, minute, second);
-    snprintf(text, count - 1, "%02d - %02d - %d", month, day, year);
-    text[count - 1] = 0;
+    snprintf(text, count, "%02d - %02d - %d", month, day, year);
 }
 
 bool compare_YEAR_value(const Value &a, const Value &b) {
@@ -580,8 +564,7 @@ bool compare_YEAR_value(const Value &a, const Value &b) {
 }
 
 void YEAR_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%d", value.getUInt16());
-    text[count - 1] = 0;
+    snprintf(text, count, "%d", value.getUInt16());
 }
 
 bool compare_MONTH_value(const Value &a, const Value &b) {
@@ -589,8 +572,7 @@ bool compare_MONTH_value(const Value &a, const Value &b) {
 }
 
 void MONTH_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%02d", value.getUInt8());
-    text[count - 1] = 0;
+    snprintf(text, count, "%02d", value.getUInt8());
 }
 
 bool compare_DAY_value(const Value &a, const Value &b) {
@@ -598,8 +580,7 @@ bool compare_DAY_value(const Value &a, const Value &b) {
 }
 
 void DAY_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%02d", value.getUInt8());
-    text[count - 1] = 0;
+    snprintf(text, count, "%02d", value.getUInt8());
 }
 
 bool compare_TIME_value(const Value &a, const Value &b) {
@@ -609,8 +590,7 @@ bool compare_TIME_value(const Value &a, const Value &b) {
 void TIME_value_to_text(const Value &value, char *text, int count) {
     int year, month, day, hour, minute, second;
     datetime::breakTime(value.getUInt32(), year, month, day, hour, minute, second);
-    snprintf(text, count - 1, "%02d : %02d : %02d", hour, minute, second);
-    text[count - 1] = 0;
+    snprintf(text, count, "%02d : %02d : %02d", hour, minute, second);
 }
 
 bool compare_TIME12_value(const Value &a, const Value &b) {
@@ -622,8 +602,7 @@ void TIME12_value_to_text(const Value &value, char *text, int count) {
     datetime::breakTime(value.getUInt32(), year, month, day, hour, minute, second);
     bool am;
     datetime::convertTime24to12(hour, am);
-    snprintf(text, count - 1, "%02d : %02d : %02d %s", hour, minute, second, am ? "AM" : "PM");
-    text[count - 1] = 0;
+    snprintf(text, count, "%02d : %02d : %02d %s", hour, minute, second, am ? "AM" : "PM");
 }
 
 bool compare_HOUR_value(const Value &a, const Value &b) {
@@ -631,8 +610,7 @@ bool compare_HOUR_value(const Value &a, const Value &b) {
 }
 
 void HOUR_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%02d", value.getUInt8());
-    text[count - 1] = 0;
+    snprintf(text, count, "%02d", value.getUInt8());
 }
 
 bool compare_MINUTE_value(const Value &a, const Value &b) {
@@ -640,8 +618,7 @@ bool compare_MINUTE_value(const Value &a, const Value &b) {
 }
 
 void MINUTE_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%02d", value.getUInt8());
-    text[count - 1] = 0;
+    snprintf(text, count, "%02d", value.getUInt8());
 }
 
 bool compare_SECOND_value(const Value &a, const Value &b) {
@@ -649,8 +626,7 @@ bool compare_SECOND_value(const Value &a, const Value &b) {
 }
 
 void SECOND_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%02d", value.getUInt8());
-    text[count - 1] = 0;
+    snprintf(text, count, "%02d", value.getUInt8());
 }
 
 bool compare_USER_PROFILE_LABEL_value(const Value &a, const Value &b) {
@@ -658,8 +634,7 @@ bool compare_USER_PROFILE_LABEL_value(const Value &a, const Value &b) {
 }
 
 void USER_PROFILE_LABEL_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "[ %d ]", value.getInt());
-    text[count - 1] = 0;
+    snprintf(text, count, "[ %d ]", value.getInt());
 }
 
 bool compare_USER_PROFILE_REMARK_value(const Value &a, const Value &b) {
@@ -699,8 +674,7 @@ bool compare_PORT_value(const Value &a, const Value &b) {
 }
 
 void PORT_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%d", value.getUInt16());
-    text[count - 1] = 0;
+    snprintf(text, count, "%d", value.getUInt16());
 }
 
 bool compare_TEXT_MESSAGE_value(const Value &a, const Value &b) {
@@ -708,8 +682,7 @@ bool compare_TEXT_MESSAGE_value(const Value &a, const Value &b) {
 }
 
 void TEXT_MESSAGE_value_to_text(const Value &value, char *text, int count) {
-    strncpy(text, getTextMessage(), count - 1);
-    text[count - 1] = 0;
+    stringCopy(text, count, getTextMessage());
 }
 
 bool compare_STEP_VALUES_value(const Value &a, const Value &b) {
@@ -752,9 +725,9 @@ bool compare_CHANNEL_TITLE_value(const Value &a, const Value &b) {
 void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
     if (channel.flags.trackingEnabled) {
-        snprintf(text, count - 1, "\xA2 %s", channel.getLabelOrDefault());
+        snprintf(text, count, "\xA2 %s", channel.getLabelOrDefault());
     } else {
-        strncpy(text, channel.getLabelOrDefault(), count - 1);
+        snprintf(text, count, "%s", channel.getLabelOrDefault());
     }
 }
 
@@ -767,9 +740,9 @@ bool compare_CHANNEL_SHORT_TITLE_value(const Value &a, const Value &b) {
 void CHANNEL_SHORT_TITLE_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
     if (channel.flags.trackingEnabled) {
-        snprintf(text, count - 1, "\xA2");
+        snprintf(text, count, "\xA2");
     } else {
-        snprintf(text, count - 1, "#%d", channel.channelIndex + 1);
+        snprintf(text, count, "#%d", channel.channelIndex + 1);
     }
 }
 
@@ -779,7 +752,7 @@ bool compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value(const Value &a, con
 
 void CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
-    snprintf(text, count - 1, "#%d", channel.channelIndex + 1);
+    snprintf(text, count, "#%d", channel.channelIndex + 1);
 }
 
 bool compare_CHANNEL_LONG_TITLE_value(const Value &a, const Value &b) {
@@ -792,11 +765,11 @@ void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count)
     auto &channel = Channel::get(value.getInt());
     auto &slot = *g_slots[channel.slotIndex];
     if (channel.flags.trackingEnabled) {
-        snprintf(text, count - 1, "\xA2 %s: %dV/%dA, R%dB%d", channel.getLabelOrDefault(), 
+        snprintf(text, count, "\xA2 %s: %dV/%dA, R%dB%d", channel.getLabelOrDefault(), 
             (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
             (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     } else {
-        snprintf(text, count - 1, "%s: %dV/%dA, R%dB%d", channel.getLabelOrDefault(), 
+        snprintf(text, count, "%s: %dV/%dA, R%dB%d", channel.getLabelOrDefault(), 
             (int)floor(channel.params.U_MAX), (int)floor(channel.params.I_MAX), 
             (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     }
@@ -807,7 +780,7 @@ bool compare_CHANNEL_ID_value(const Value &a, const Value &b) {
 }
 
 void CHANNEL_ID_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%d%02d", (int)value.getFirstUInt16() + 1, (int)value.getSecondUInt16() + 1);
+    snprintf(text, count, "%d%02d", (int)value.getFirstUInt16() + 1, (int)value.getSecondUInt16() + 1);
 }
 
 bool compare_DLOG_VALUE_LABEL_value(const Value &a, const Value &b) {
@@ -825,8 +798,7 @@ bool compare_FIRMWARE_VERSION_value(const Value &a, const Value &b) {
 void FIRMWARE_VERSION_value_to_text(const Value &value, char *text, int count) {
     uint8_t majorVersion = value.getUInt16() >> 8;
     uint8_t minorVersion = value.getUInt16() & 0xFF;
-    snprintf(text, count - 1, "%d.%d", (int)majorVersion, (int)minorVersion);
-    text[count - 1] = 0;
+    snprintf(text, count, "%d.%d", (int)majorVersion, (int)minorVersion);
 }
 
 static double g_savedCurrentTime;
@@ -863,21 +835,19 @@ void FILE_DATE_TIME_value_to_text(const Value &value, char *text, int count) {
 
     if (yearNow == year && monthNow == month && dayNow == day) {
         if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == datetime::FORMAT_MDY_24) {
-            snprintf(text, count - 1, "%02d:%02d:%02d", hour, minute, second);
+            snprintf(text, count, "%02d:%02d:%02d", hour, minute, second);
         } else {
             bool am;
             datetime::convertTime24to12(hour, am);
-            snprintf(text, count - 1, "%02d:%02d:%02d %s", hour, minute, second, am ? "AM" : "PM");
+            snprintf(text, count, "%02d:%02d:%02d %s", hour, minute, second, am ? "AM" : "PM");
         }
     } else {
         if (persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_24 || persist_conf::devConf.dateTimeFormat == datetime::FORMAT_DMY_12) {
-            snprintf(text, count - 1, "%02d-%02d-%02d", day, month, year % 100);
+            snprintf(text, count, "%02d-%02d-%02d", day, month, year % 100);
         } else {
-            snprintf(text, count - 1, "%02d-%02d-%02d", month, day, year % 100);
+            snprintf(text, count, "%02d-%02d-%02d", month, day, year % 100);
         }
     }
-
-    text[count - 1] = 0;
 }
 
 bool compare_SLOT_INDEX_value(const Value &a, const Value &b) {
@@ -885,8 +855,7 @@ bool compare_SLOT_INDEX_value(const Value &a, const Value &b) {
 }
 
 void SLOT_INDEX_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "Slot #%d:", value.getInt() + 1);
-    text[count - 1] = 0;
+    snprintf(text, count, "Slot #%d:", value.getInt() + 1);
 }
 
 bool compare_SLOT_INFO_value(const Value &a, const Value &b) {
@@ -897,11 +866,10 @@ void SLOT_INFO_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
     if (slot.moduleType != MODULE_TYPE_NONE) {
-        snprintf(text, count - 1, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+        snprintf(text, count, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
     } else {
-        strncpy(text, "Not installed", count - 1);
+        stringCopy(text, count, "Not installed");
     }
-    text[count - 1] = 0;
 }
 
 bool compare_SLOT_INFO_WITH_FW_VER_value(const Value &a, const Value &b) {
@@ -913,16 +881,15 @@ void SLOT_INFO_WITH_FW_VER_value_to_text(const Value &value, char *text, int cou
     auto &slot = *g_slots[slotIndex];
     if (slot.moduleType != MODULE_TYPE_NONE) {
         if (slot.firmwareVersionAcquired && (slot.firmwareMajorVersion != 0 || slot.firmwareMinorVersion != 0)) {
-            snprintf(text, count - 1, "%s R%dB%d v%d.%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF), slot.firmwareMajorVersion, slot.firmwareMinorVersion);
+            snprintf(text, count, "%s R%dB%d v%d.%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF), slot.firmwareMajorVersion, slot.firmwareMinorVersion);
         } else if (slot.firmareBasedModule && slot.firmwareVersionAcquired) {
-            snprintf(text, count - 1, "%s R%dB%d ---", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+            snprintf(text, count, "%s R%dB%d ---", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
         } else {
-            snprintf(text, count - 1, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+            snprintf(text, count, "%s R%dB%d", slot.moduleName, (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
         }
     } else {
-        strncpy(text, "Not installed", count - 1);
+        stringCopy(text, count, "Not installed");
     }
-    text[count - 1] = 0;
 }
 
 bool compare_SLOT_TITLE_DEF_value(const Value &a, const Value &b) {
@@ -932,8 +899,7 @@ bool compare_SLOT_TITLE_DEF_value(const Value &a, const Value &b) {
 void SLOT_TITLE_DEF_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s", slot.getLabelOrDefault());
-    text[count - 1] = 0;
+    snprintf(text, count, "%s", slot.getLabelOrDefault());
 }
 
 bool compare_SLOT_TITLE_MAX_value(const Value &a, const Value &b) {
@@ -943,8 +909,7 @@ bool compare_SLOT_TITLE_MAX_value(const Value &a, const Value &b) {
 void SLOT_TITLE_MAX_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s R%dB%d", slot.getLabelOrDefault(), (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
-    text[count - 1] = 0;
+    snprintf(text, count, "%s R%dB%d", slot.getLabelOrDefault(), (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
 }
 
 bool compare_SLOT_TITLE_MIN_value(const Value &a, const Value &b) {
@@ -954,8 +919,7 @@ bool compare_SLOT_TITLE_MIN_value(const Value &a, const Value &b) {
 void SLOT_TITLE_MIN_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s", slot.getLabelOrDefault());
-    text[count - 1] = 0;
+    snprintf(text, count, "%s", slot.getLabelOrDefault());
 }
 
 bool compare_SLOT_TITLE_MICRO_value(const Value &a, const Value &b) {
@@ -965,8 +929,7 @@ bool compare_SLOT_TITLE_MICRO_value(const Value &a, const Value &b) {
 void SLOT_TITLE_MICRO_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s", slot.getLabelOrDefault());
-    text[count - 1] = 0;
+    snprintf(text, count, "%s", slot.getLabelOrDefault());
 }
 
 bool compare_SLOT_TITLE_SETTINGS_value(const Value &a, const Value &b) {
@@ -976,8 +939,7 @@ bool compare_SLOT_TITLE_SETTINGS_value(const Value &a, const Value &b) {
 void SLOT_TITLE_SETTINGS_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count - 1, "%s #%d:", slot.getLabelOrDefault(), slotIndex + 1);
-    text[count - 1] = 0;
+    snprintf(text, count, "%s #%d:", slot.getLabelOrDefault(), slotIndex + 1);
 }
 
 bool compare_MASTER_INFO_value(const Value &a, const Value &b) {
@@ -985,8 +947,7 @@ bool compare_MASTER_INFO_value(const Value &a, const Value &b) {
 }
 
 void MASTER_INFO_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%s R%dB%d", MCU_NAME, g_mcuRevision >> 8, g_mcuRevision & 0xFF);
-    text[count - 1] = 0;
+    snprintf(text, count, "%s R%dB%d", MCU_NAME, g_mcuRevision >> 8, g_mcuRevision & 0xFF);
 }
 
 bool compare_MASTER_INFO_WITH_FW_VER_value(const Value &a, const Value &b) {
@@ -994,8 +955,7 @@ bool compare_MASTER_INFO_WITH_FW_VER_value(const Value &a, const Value &b) {
 }
 
 void MASTER_INFO_WITH_FW_VER_value_to_text(const Value &value, char *text, int count) {
-    snprintf(text, count - 1, "%s R%dB%d v%s", MCU_NAME, g_mcuRevision >> 8, g_mcuRevision & 0xFF, MCU_FIRMWARE);
-    text[count - 1] = 0;
+    snprintf(text, count, "%s R%dB%d v%s", MCU_NAME, g_mcuRevision >> 8, g_mcuRevision & 0xFF, MCU_FIRMWARE);
 }
 
 bool compare_TEST_RESULT_value(const Value &a, const Value &b) {
@@ -1005,19 +965,18 @@ bool compare_TEST_RESULT_value(const Value &a, const Value &b) {
 void TEST_RESULT_value_to_text(const Value &value, char *text, int count) {
     TestResult testResult = (TestResult)value.getInt();
     if (testResult == TEST_FAILED) {
-        strncpy(text, "Failed", count - 1);
+        stringCopy(text, count, "Failed");
     } else if (testResult == TEST_OK) {
-        strncpy(text, "OK", count - 1);
+        stringCopy(text, count, "OK");
     } else if (testResult == TEST_CONNECTING) {
-        strncpy(text, "Connecting", count - 1);
+        stringCopy(text, count, "Connecting");
     } else if (testResult == TEST_SKIPPED) {
-        strncpy(text, "Skipped", count - 1);
+        stringCopy(text, count, "Skipped");
     } else if (testResult == TEST_WARNING) {
-        strncpy(text, "Warning", count - 1);
+        stringCopy(text, count, "Warning");
     } else {
-        strncpy(text, "", count - 1);
+        stringCopy(text, count, "");
     }
-    text[count - 1] = 0;
 }
 
 bool compare_SCPI_ERROR_value(const Value &a, const Value &b) {
@@ -1025,11 +984,12 @@ bool compare_SCPI_ERROR_value(const Value &a, const Value &b) {
 }
 
 void SCPI_ERROR_value_to_text(const Value &value, char *text, int count) {
+    const char *scpiErrorMessage = SCPI_ErrorTranslate(value.getFirstInt16());
     if (value.getSecondInt16() != -1) {
-        snprintf(text, count, "Ch%d: ", value.getSecondInt16() + 1);
+        snprintf(text, count, "Ch%d: %s", value.getSecondInt16() + 1, scpiErrorMessage);
+    } else {
+        snprintf(text, count, "%s", scpiErrorMessage);
     }
-    strncpy(text + strlen(text), SCPI_ErrorTranslate(value.getFirstInt16()), count - 1 - strlen(text));
-    text[count - 1] = 0;
 }
 
 bool compare_STORAGE_INFO_value(const Value &a, const Value &b) {
@@ -1058,8 +1018,7 @@ void STORAGE_INFO_value_to_text(const Value &value, char *text, int count) {
             }
         }
     } else {
-        strncpy(text, "Calculating storage info...", count - 1);
-        text[count - 1] = 0;
+        stringCopy(text, count, "Calculating storage info...");
     }
 }
 
@@ -1069,11 +1028,10 @@ bool compare_FOLDER_INFO_value(const Value &a, const Value &b) {
 
 void FOLDER_INFO_value_to_text(const Value &value, char *text, int count) {
     if (value.getUInt32() == 1) {
-        strncpy(text, "1 item", count - 1);
+        stringCopy(text, count, "1 item");
     } else {
-        snprintf(text, count - 1, "%u items ", (unsigned int)value.getUInt32());
+        snprintf(text, count, "%u items ", (unsigned int)value.getUInt32());
     }
-    text[count - 1] = 0;
 }
 
 
@@ -1105,7 +1063,7 @@ void CALIBRATION_POINT_INFO_value_to_text(const Value &value, char *text, int co
         snprintf(text, count, "%d of %d", currentPointIndex + 1, numPoints);
     } else {
         if (numPoints == 1) {
-            strcpy(text, "1 point");
+            stringCopy(text, count, "1 point");
         } else {
             snprintf(text, count, "%d points", numPoints);
         }
@@ -1975,8 +1933,8 @@ void data_firmware_info(DataOperationEnum operation, Cursor cursor, Value &value
         static char firmware_info[sizeof(FIRMWARE_LABEL) - 1 + sizeof(MCU_FIRMWARE) - 1 + 1];
 
         if (*firmware_info == 0) {
-            strncat(firmware_info, FIRMWARE_LABEL, sizeof(firmware_info) - strlen(firmware_info) - 1);
-            strncat(firmware_info, MCU_FIRMWARE, sizeof(firmware_info) - strlen(firmware_info) - 1);
+            stringAppendString(firmware_info, sizeof(firmware_info), FIRMWARE_LABEL);
+            stringAppendString(firmware_info, sizeof(firmware_info), MCU_FIRMWARE);
         }
 
         value = firmware_info;

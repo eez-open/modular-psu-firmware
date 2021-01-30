@@ -144,7 +144,7 @@ scpi_result_t scpi_cmd_routeLabelRow(scpi_t *context) {
     }
 
     char label[Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
-    strncpy(label, str, len);
+    memcpy(label, str, len);
     label[len] = 0;
 
     if (!g_slots[slotIndex]->setSwitchMatrixRowLabel(rowIndex, label, &err)) {
@@ -235,7 +235,7 @@ scpi_result_t scpi_cmd_routeLabelColumn(scpi_t *context) {
     }
 
     char label[Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
-    strncpy(label, str, len);
+    memcpy(label, str, len);
     label[len] = 0;
 
     if (!g_slots[slotIndex]->setSwitchMatrixColumnLabel(columnIndex, label, &err)) {

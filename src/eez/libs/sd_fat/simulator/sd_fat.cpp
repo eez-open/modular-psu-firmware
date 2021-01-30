@@ -129,8 +129,7 @@ void FileInfo::getName(char *name, size_t size) {
         str = m_dirent->d_name;
     }
 #endif
-    strncpy(name, str, size);
-    name[size] = 0;
+    stringCopy(name, size, str);
 }
 
 size_t FileInfo::getSize() {

@@ -710,42 +710,42 @@ scpi_result_t scpi_cmd_systemCpuOptionQ(scpi_t *context) {
 
 #if OPTION_BP
     if (strFeatures[0]) {
-        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
+        stringAppendString(strFeatures, sizeof(strFeatures), ", ");
     }
-    strncat(strFeatures, "BPost", sizeof(strFeatures) - strlen(strFeatures) - 1);
+    stringAppendString(strFeatures, sizeof(strFeatures), "BPost");
 #endif
 
 #if OPTION_EXT_EEPROM
     if (strFeatures[0]) {
-        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
+        stringAppendString(strFeatures, sizeof(strFeatures), ", ");
     }
-    strncat(strFeatures, "EEPROM", sizeof(strFeatures) - strlen(strFeatures) - 1);
+    stringAppendString(strFeatures, sizeof(strFeatures), "EEPROM");
 #endif
 
 #if OPTION_EXT_RTC
     if (strFeatures[0]) {
-        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
+        stringAppendString(strFeatures, sizeof(strFeatures), ", ");
     }
-    strncat(strFeatures, "RTC", sizeof(strFeatures) - strlen(strFeatures) - 1);
+    stringAppendString(strFeatures, sizeof(strFeatures), "RTC");
 #endif
 
     if (strFeatures[0]) {
-        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
+        stringAppendString(strFeatures, sizeof(strFeatures), ", ");
     }
-    strncat(strFeatures, "SDcard", sizeof(strFeatures) - strlen(strFeatures) - 1);
+    stringAppendString(strFeatures, sizeof(strFeatures), "SDcard");
 
 #if OPTION_ETHERNET
     if (strFeatures[0]) {
-        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
+        stringAppendString(strFeatures, sizeof(strFeatures), ", ");
     }
-    strncat(strFeatures, "Ethernet", sizeof(strFeatures) - strlen(strFeatures) - 1);
+    stringAppendString(strFeatures, sizeof(strFeatures), "Ethernet");
 #endif
 
 #if OPTION_DISPLAY
     if (strFeatures[0]) {
-        strncat(strFeatures, ", ", sizeof(strFeatures) - strlen(strFeatures) - 1);
+        stringAppendString(strFeatures, sizeof(strFeatures), ", ");
     }
-    strncat(strFeatures, "Display", sizeof(strFeatures) - strlen(strFeatures) - 1);
+    stringAppendString(strFeatures, sizeof(strFeatures), "Display");
 #endif
 
     SCPI_ResultText(context, strFeatures);
@@ -1217,7 +1217,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetHostname(scpi_t *context) {
     }
 
     char hostName[ETHERNET_HOST_NAME_SIZE + 1];
-    strncpy(hostName, hostNameStr, hostNameStrLength);
+    memcpy(hostName, hostNameStr, hostNameStrLength);
     hostName[hostNameStrLength] = 1;
 
     if (!persist_conf::validateEthernetHostName(hostName)) {
@@ -1993,7 +1993,7 @@ scpi_result_t scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ(scpi_t *conte
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, sizeof(buffer), temperature::sensors[sensor].measure());
+    stringAppendFloat(buffer, sizeof(buffer), temperature::sensors[sensor].measure());
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;

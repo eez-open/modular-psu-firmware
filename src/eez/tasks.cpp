@@ -460,43 +460,43 @@ void lowPriorityThreadOneIter() {
 
     g_lastTickCountMs = millis();
 
-        if (g_shutingDown) {
-            g_isLowPriorityThreadAlive = false;
-            return;
-        }
-        uint32_t tickCountMs = millis();
-    	int32_t diff = tickCountMs - g_timer1LastTickCountMs;
+    if (g_shutingDown) {
+        g_isLowPriorityThreadAlive = false;
+        return;
+    }
+    uint32_t tickCountMs = millis();
+    int32_t diff = tickCountMs - g_timer1LastTickCountMs;
 
-        event_queue::tick();
+    event_queue::tick();
 
-        sound::tick();
+    sound::tick();
 
-    	if (diff >= 1000L) { // 1 sec
-            g_timer1LastTickCountMs = tickCountMs;
+    if (diff >= 1000L) { // 1 sec
+        g_timer1LastTickCountMs = tickCountMs;
 
-    		profile::tick();
+        profile::tick();
 
 #if !CONF_SURVIVE_MODE
-            ontime::g_mcuCounter.tick();
-            for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-                if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
-                    ontime::g_moduleCounters[slotIndex].tick();
-                }
+        ontime::g_mcuCounter.tick();
+        for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+            if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
+                ontime::g_moduleCounters[slotIndex].tick();
             }
+        }
 #endif
 
-            mcu::battery::tick();
-    	}
+        mcu::battery::tick();
+    }
 
-        persist_conf::tick();
+    persist_conf::tick();
 
-        sd_card::tick();
+    sd_card::tick();
 
-        eez::psu::dlog_record::fileWrite();
+    eez::psu::dlog_record::fileWrite();
 
-        eez::hmi::tick();
+    eez::hmi::tick();
 
-        usb::tick();
+    usb::tick();
 
     return;
 }

@@ -111,8 +111,8 @@ bool makeAbsolutePath(const char *relativePath, char *dest) {
 	dest[1] = ':';
     strcpy(dest + 2, g_currentDirectory);
     if (relativePath) {
-    	strncat(dest, "/", MAX_PATH_LENGTH - strlen(dest) - 1);
-    	strncat(dest, relativePath, MAX_PATH_LENGTH - strlen(dest) - 1);
+    	stringAppendString(dest, MAX_PATH_LENGTH, "/");
+    	stringAppendString(dest, MAX_PATH_LENGTH, relativePath);
     }
     return true;
 }
@@ -163,7 +163,7 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size, 
         const char *str = strrchr(name, '.');
         if (str) {
             auto n = str - name;
-            strncpy(fileNameWithoutExtension, name, n);
+            memcpy(fileNameWithoutExtension, name, n);
             fileNameWithoutExtension[n] = 0;
             name = fileNameWithoutExtension;
         }
@@ -479,19 +479,18 @@ void setSortFilesOption(SortFilesOption sortFilesOption) {
 
 void getCurrentDirectoryTitle(char *text, int count) {
     if (g_showDiskDrives) {
-        strncpy(text, "Mass Storage Devices", count - 1);
+        stringCopy(text, count, "Mass Storage Devices");
     } else {
         const char *str = *g_currentDirectory == 0 ? "/<Root directory>" : g_currentDirectory;
 
     	if (psu::sd_card::isMounted(nullptr, nullptr) && fs_driver::getDiskDrivesNum() == 1 && g_currentDiskDrive == 0) {
-            strncpy(text, str, count - 1);
+            stringCopy(text, count, str);
         } else {
         	text[0] = '0' + g_currentDiskDrive;
         	text[1] = ':';
-    		strncpy(text + 2, str, count - 3);
+    		stringCopy(text + 2, count - 2, str);
         }
     }
-	text[count - 1] = 0;
 }
 
 static FileItem *getFileItem(uint32_t fileIndex) {
@@ -717,8 +716,8 @@ void selectFile(uint32_t fileIndex) {
             animateLoadDirectory();
         } else if (fileItem && fileItem->type == FILE_TYPE_DIRECTORY) {
             if (2 + strlen(g_currentDirectory) + 1 + strlen(fileItem->name) <= MAX_PATH_LENGTH) {
-                strncat(g_currentDirectory, "/", MAX_PATH_LENGTH - strlen(g_currentDirectory) - 1);
-                strncat(g_currentDirectory, fileItem->name, MAX_PATH_LENGTH - strlen(g_currentDirectory) - 1);
+                stringAppendString(g_currentDirectory, MAX_PATH_LENGTH, "/");
+                stringAppendString(g_currentDirectory, MAX_PATH_LENGTH, fileItem->name);
                 g_filesStartPosition = 0;
                 loadDirectory();
                 animateLoadDirectory();
@@ -731,7 +730,7 @@ void selectFile(uint32_t fileIndex) {
                         if (strlen(fileItem->name) + 3 <= MAX_PATH_LENGTH) {
                             char fileName[MAX_PATH_LENGTH + 1];
                             strcpy(fileName, fileItem->name);
-                            strncat(fileName, ".py", MAX_PATH_LENGTH - strlen(fileName) - 1);
+                            stringAppendString(fileName, MAX_PATH_LENGTH, ".py");
                             char filePath[MAX_PATH_LENGTH + 1];
                             if (makeAbsolutePath(fileName, filePath)) {
                                 mp::startScript(filePath);
@@ -939,7 +938,7 @@ void doRenameFile() {
     
     strcpy(dstFileName, g_fileNameWithoutExtension);
     if (extension) {
-        strncat(dstFileName, extension, MAX_PATH_LENGTH - strlen(dstFileName) - 1);
+        stringAppendString(dstFileName, MAX_PATH_LENGTH, extension);
     }
     
     char dstFilePath[MAX_PATH_LENGTH + 1];
@@ -967,10 +966,10 @@ void renameFile() {
     const char *str = strrchr(fileItem->name, '.');
     if (str) {
         auto n = str - fileItem->name;
-        strncpy(fileNameWithoutExtension, fileItem->name, n);
+        memcpy(fileNameWithoutExtension, fileItem->name, n);
         fileNameWithoutExtension[n] = 0;
     } else {
-        strcpy(fileNameWithoutExtension, fileItem->name);
+        stringCopy(fileNameWithoutExtension, MAX_PATH_LENGTH, fileItem->name);
     }
 
     Keypad::startPush(0, fileNameWithoutExtension, 1, MAX_PATH_LENGTH, false, onRenameFileOk, popPage);
@@ -1082,7 +1081,7 @@ void onNewFileOk(char *fileNameWithoutExtension) {
     }
 
     strcpy(fileName, fileNameWithoutExtension);
-    strncat(fileName, extension, MAX_PATH_LENGTH - strlen(fileName) - 1);
+    stringAppendString(fileName, MAX_PATH_LENGTH, extension);
 
     char filePath[MAX_PATH_LENGTH + 1];
     if (!makeAbsolutePath(fileName, filePath)) {

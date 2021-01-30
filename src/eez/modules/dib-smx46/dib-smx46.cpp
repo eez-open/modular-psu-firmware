@@ -883,8 +883,7 @@ public:
         }
 
         if (subchannelIndex == 0) {
-            strncpy(aoChannelLabels[0], label, length);
-            aoChannelLabels[0][length] = 0;
+            stringCopy(aoChannelLabels[0], length + 1, label);
             return SCPI_RES_OK;
         }
         

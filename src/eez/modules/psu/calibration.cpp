@@ -592,7 +592,7 @@ const char *CalibrationEditor::getRemark() {
 void CalibrationEditor::setRemark(const char *value, size_t len) {
     m_remarkSet = true;
     memset(m_remark, 0, sizeof(m_remark));
-    strncpy(m_remark, value, len);
+    memcpy(m_remark, value, len);
 }
 
 static bool checkCalibrationValue(Value &calibrationValue, int16_t &scpiErr) {

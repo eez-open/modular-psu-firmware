@@ -393,11 +393,10 @@ void ChSettingsCalibrationEditPage::getCalibrationValueTypeInfo(char *text, int 
     const char *rangeDescription = g_slots[slotIndex]->getCalibrationValueRangeDescription(subchannelIndex);
 
     if (rangeDescription) {
-        snprintf(text, count - 1, "%s [%s]", valueTypeDescription, rangeDescription);
+        snprintf(text, count, "%s [%s]", valueTypeDescription, rangeDescription);
     } else {
-        strncpy(text, valueTypeDescription, count - 1);
+        snprintf(text, count, "%s", valueTypeDescription);
     }
-    text[count - 1] = 0;
 }
 
 void ChSettingsCalibrationEditPage::setCalibrationValueType(CalibrationValueType type) {
@@ -846,11 +845,10 @@ void ChSettingsCalibrationViewPage::getCalibrationValueTypeInfo(char *text, int 
     const char *rangeDescription = g_slots[slotIndex]->getCalibrationValueRangeDescription(subchannelIndex);
 
     if (rangeDescription) {
-        snprintf(text, count - 1, "%s [%s]", valueTypeDescription, rangeDescription);
+        snprintf(text, count, "%s [%s]", valueTypeDescription, rangeDescription);
     } else {
-        strncpy(text, valueTypeDescription, count - 1);
+        snprintf(text, count, "%s", valueTypeDescription);
     }
-    text[count - 1] = 0;
 }
 
 void ChSettingsCalibrationViewPage::setCalibrationValueType(CalibrationValueType type) {

@@ -218,7 +218,7 @@ bool anyFailed() {
     nextIndex = index + strLength;                                                                 \
     if (nextIndex > MAX_LENGTH)                                                                    \
         break;                                                                                     \
-    strncpy(result + index, str, strLength);                                                       \
+    memcpy(result + index, str, strLength);                                                        \
     index = nextIndex
 
 void getSelfTestResultString(char *result, int MAX_LENGTH) {

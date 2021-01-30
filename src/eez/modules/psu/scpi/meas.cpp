@@ -41,7 +41,7 @@ scpi_result_t scpi_cmd_measureScalarCurrentDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, sizeof(buffer), value);
+    stringAppendFloat(buffer, sizeof(buffer), value);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -67,7 +67,7 @@ scpi_result_t scpi_cmd_measureScalarPowerDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, sizeof(buffer), voltage * current);
+    stringAppendFloat(buffer, sizeof(buffer), voltage * current);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;
@@ -87,7 +87,7 @@ scpi_result_t scpi_cmd_measureScalarVoltageDcQ(scpi_t *context) {
     }
 
     char buffer[256] = { 0 };
-    strcatFloat(buffer, sizeof(buffer), value);
+    stringAppendFloat(buffer, sizeof(buffer), value);
     SCPI_ResultCharacters(context, buffer, strlen(buffer));
 
     return SCPI_RES_OK;

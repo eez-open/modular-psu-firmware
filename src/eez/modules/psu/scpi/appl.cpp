@@ -105,21 +105,21 @@ scpi_result_t scpi_cmd_applyQ(scpi_t *context) {
 
         // return both current and voltage
         snprintf(buffer, sizeof(buffer), "CH%d:", channel->channelIndex + 1);
-        strcatVoltage(buffer, sizeof(buffer), channel_dispatcher::getUMax(*channel));
-        strncat(buffer, "/", sizeof(buffer) - strlen(buffer) - 1);
-        strcatCurrent(buffer, sizeof(buffer), channel_dispatcher::getIMax(*channel));
-        strncat(buffer, ", ", sizeof(buffer) - strlen(buffer) - 1);
+        stringAppendVoltage(buffer, sizeof(buffer), channel_dispatcher::getUMax(*channel));
+        stringAppendString(buffer, sizeof(buffer), "/");
+        stringAppendCurrent(buffer, sizeof(buffer), channel_dispatcher::getIMax(*channel));
+        stringAppendString(buffer, sizeof(buffer), ", ");
 
-        strcatFloat(buffer, sizeof(buffer), channel_dispatcher::getUSet(*channel));
-        strncat(buffer, ", ", sizeof(buffer) - strlen(buffer) - 1);
-        strcatFloat(buffer, sizeof(buffer), channel_dispatcher::getISet(*channel));
+        stringAppendFloat(buffer, sizeof(buffer), channel_dispatcher::getUSet(*channel));
+        stringAppendString(buffer, sizeof(buffer), ", ");
+        stringAppendFloat(buffer, sizeof(buffer), channel_dispatcher::getISet(*channel));
     } else {
         if (current_or_voltage == 0) {
             // return only current
-            strcatFloat(buffer, sizeof(buffer), channel_dispatcher::getISet(*channel));
+            stringAppendFloat(buffer, sizeof(buffer), channel_dispatcher::getISet(*channel));
         } else {
             // return only voltage
-            strcatFloat(buffer, sizeof(buffer), channel_dispatcher::getUSet(*channel));
+            stringAppendFloat(buffer, sizeof(buffer), channel_dispatcher::getUSet(*channel));
         }
     }
 

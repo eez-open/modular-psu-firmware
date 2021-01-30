@@ -95,7 +95,9 @@ bool writeMemory(int slotIndex, uint32_t address, const uint8_t *buffer, uint32_
 
 void start(int slotIndex, const char *hexFilePath, bool ate) {
 	g_slotIndex = slotIndex;
-	strcpy(g_hexFilePath, hexFilePath);
+	
+	stringCopy(g_hexFilePath, MAX_PATH_LENGTH, hexFilePath);
+	
 	g_ate = ate;
 
 	if (isPsuThread()) {

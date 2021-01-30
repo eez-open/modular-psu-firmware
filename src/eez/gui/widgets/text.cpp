@@ -117,9 +117,10 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
                             textLength++;
                         }
 
-                        strncpy(text, fullText, iLeft);
-                        strcpy(text + iLeft, "...");
-                        strcpy(text + iLeft + 3, fullText + iRight + 1);
+                        memcpy(text, fullText, iLeft);
+						text[iLeft] = 0;
+                        stringAppendString(text, sizeof(text), "...");
+                        stringAppendString(text, sizeof(text), fullText + iRight + 1);
 
                         drawText(text, textLength, widgetCursor.x,
                             widgetCursor.y, (int)widget->w, (int)widget->h, style,

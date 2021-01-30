@@ -728,8 +728,7 @@ public:
             length = RELAY_LABEL_MAX_LENGTH;
         }
 
-        strncpy(relayLabels[subchannelIndex], label, length);
-        relayLabels[subchannelIndex][length] = 0;
+        stringCopy(relayLabels[subchannelIndex], length + 1, label);
 
         return SCPI_RES_OK;
     }

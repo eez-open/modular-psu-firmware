@@ -56,7 +56,7 @@ bool compare_INT_value(const Value &a, const Value &b) {
 }
 
 void INT_value_to_text(const Value &value, char *text, int count) {
-    strcatInt(text, count, value.getInt());
+    stringAppendInt(text, count, value.getInt());
 }
 
 bool compare_UINT8_value(const Value &a, const Value &b) {
@@ -64,7 +64,7 @@ bool compare_UINT8_value(const Value &a, const Value &b) {
 }
 
 void UINT8_value_to_text(const Value &value, char *text, int count) {
-    strcatUInt32(text, count, value.getUInt8());
+    stringAppendUInt32(text, count, value.getUInt8());
 }
 
 bool compare_UINT16_value(const Value &a, const Value &b) {
@@ -72,7 +72,7 @@ bool compare_UINT16_value(const Value &a, const Value &b) {
 }
 
 void UINT16_value_to_text(const Value &value, char *text, int count) {
-    strcatUInt32(text, count, value.getUInt16());
+    stringAppendUInt32(text, count, value.getUInt16());
 }
 
 bool compare_UINT32_value(const Value &a, const Value &b) {
@@ -80,7 +80,7 @@ bool compare_UINT32_value(const Value &a, const Value &b) {
 }
 
 void UINT32_value_to_text(const Value &value, char *text, int count) {
-    strcatUInt32(text, count, value.getUInt32());
+    stringAppendUInt32(text, count, value.getUInt32());
 }
 
 bool compare_FLOAT_value(const Value &a, const Value &b) {
@@ -172,16 +172,16 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
 
     if (!isNaN(floatValue)) {
         if ((value.getOptions() & FLOAT_OPTIONS_LESS_THEN) != 0) {
-            strncat(text, "< ", count - strlen(text) - 1); 
+            stringAppendString(text, count, "< "); 
         }
 
         if (fixedDecimals) {
-            strcatFloat(text, count, floatValue, FLOAT_OPTIONS_GET_NUM_FIXED_DECIMALS(options));
+            stringAppendFloat(text, count, floatValue, FLOAT_OPTIONS_GET_NUM_FIXED_DECIMALS(options));
         } else {
             if (unit == UNIT_WATT || unit == UNIT_MILLI_WATT) {
-                strcatFloat(text, count, floatValue, 2);
+                stringAppendFloat(text, count, floatValue, 2);
             } else {
-                strcatFloat(text, count, floatValue);
+                stringAppendFloat(text, count, floatValue);
             }
 
             int n = strlen(text);
@@ -196,12 +196,12 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
             if (decimalPointIndex == n) {
                 if (appendDotZero) {
                     // 1 => 1.0
-                    strncat(text, ".0", count - strlen(text) - 1); 
+                    stringAppendString(text, count, ".0"); 
                 }
             } else if (decimalPointIndex == n - 1) {
                 if (appendDotZero) {
                     // 1. => 1.0
-                    strncat(text, "0", count - strlen(text) - 1); 
+                    stringAppendString(text, count, "0"); 
                 } else {
                     text[decimalPointIndex] = 0;
                 }
@@ -219,8 +219,8 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
             }
         }
 
-        strncat(text, " ", count - strlen(text) - 1); 
-        strncat(text, getUnitName(unit), count - strlen(text) - 1);
+        stringAppendString(text, count, " "); 
+        stringAppendString(text, count, getUnitName(unit));
     } else {
         text[0] = 0;
     }
@@ -249,8 +249,7 @@ bool compare_STR_value(const Value &a, const Value &b) {
 void STR_value_to_text(const Value &value, char *text, int count) {
     const char *str = value.getString();
     if (str) {
-        strncpy(text, str, count - 1);
-        text[count - 1] = 0;
+        stringCopy(text, count, str);
     } else {
         text[0] = 0;
     }
@@ -279,9 +278,9 @@ void ENUM_value_to_text(const Value &value, char *text, int count) {
     for (int i = 0; enumDefinition[i].menuLabel; ++i) {
         if (value.getEnum().enumValue == enumDefinition[i].value) {
             if (enumDefinition[i].widgetLabel) {
-                strncpy(text, enumDefinition[i].widgetLabel, count - 1);
+                stringCopy(text, count, enumDefinition[i].widgetLabel);
             } else {
-                strncpy(text, enumDefinition[i].menuLabel, count - 1);
+                stringCopy(text, count, enumDefinition[i].menuLabel);
             }
             break;
         }

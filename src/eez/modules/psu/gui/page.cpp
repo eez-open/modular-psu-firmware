@@ -60,8 +60,7 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, 
     ToastMessagePage *page = ToastMessagePage::findFreePage();
     
     page->type = type;
-    strncpy(page->messageBuffer, message, MAX_MESSAGE_LENGTH);
-    page->messageBuffer[ToastMessagePage::MAX_MESSAGE_LENGTH] = 0;
+    stringCopy(page->messageBuffer, sizeof(page->messageBuffer), message);
     page->message = page->messageBuffer;
     page->messageValue = Value();
     page->actionLabel = type == ERROR_TOAST && !autoDismiss ? "Close" : nullptr;
@@ -419,8 +418,7 @@ bool SelectFromEnumPage::getLabel(int i, char *text, int count) {
 
     if (enumDefinition[i].menuLabel) {
         if (text) {
-            strncpy(text, enumDefinition[i].menuLabel, count - 1);
-            text[count - 1] = 0;
+            stringCopy(text, count, enumDefinition[i].menuLabel);
         }
         return true;
     }
