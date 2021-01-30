@@ -237,6 +237,7 @@ void oneIter() {
 #endif
 
             psu::gui::hideAsyncOperationInProgress();
+            psu::gui::clearTextMessage();
 
             g_state = STATE_IDLE;
 
@@ -332,14 +333,9 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
        if (event.status == osEventMessage && event.value.v == QUEUE_MESSAGE_SCPI_RESULT) {
             break;
        } else {
-            if (g_lastError != 0) {
                 static char g_scpiError[48];
                 snprintf(g_scpiError, sizeof(g_scpiError), "SCPI timeout");
                 mp_raise_ValueError(g_scpiError);
-                *resultText = 0;
-                *resultTextLen = 0;
-                return false;
-            }
        }
     }
 #else

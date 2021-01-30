@@ -144,6 +144,10 @@ void PsuAppContext::stateManagment() {
         }
     }
 
+    if (isPageOnStack(PAGE_ID_TEXT_MESSAGE) && !m_textMessage[0]) {
+    	removePageFromStack(PAGE_ID_TEXT_MESSAGE);
+    }
+
     // remove alert message after period of time
     uint32_t inactivityPeriod = eez::hmi::getInactivityPeriodMs();
     if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
@@ -933,18 +937,20 @@ bool PsuAppContext::dialogOpen(int *err) {
 }
 
 DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&selectedActionName) {
-    if (timeoutMs != 0) {
+	if (timeoutMs == 0) {
+		timeoutMs = 1000;
+	}
         timeoutMs = millis() + timeoutMs;
-        if (timeoutMs == 0) {
-            timeoutMs = 1;
+
+    while ((int32_t)(millis() - timeoutMs) < 0) {
+    	if (g_externalActionId != ACTION_ID_NONE) {
+    		break;
         }
+
+    	if (!isPageOnStack(getExternalAssetsFirstPageId())) {
+    		break;
     }
 
-    while (
-        (timeoutMs == 0 || (int32_t)(millis() - timeoutMs) < 0) &&
-        g_externalActionId == ACTION_ID_NONE &&
-        isPageOnStack(getExternalAssetsFirstPageId())
-    ) {
         osDelay(5);
     }
 
