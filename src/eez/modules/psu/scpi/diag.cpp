@@ -120,19 +120,19 @@ scpi_result_t scpi_cmd_diagnosticInformationAdcQ(scpi_t *context) {
 
     char buffer[64] = { 0 };
 
-    strcpy(buffer, "U_SET=");
+    stringCopy(buffer, sizeof(buffer), "U_SET=");
     stringAppendVoltage(buffer, sizeof(buffer), channel->u.mon_dac_last);
     SCPI_ResultText(context, buffer);
 
-    strcpy(buffer, "U_MON=");
+    stringCopy(buffer, sizeof(buffer), "U_MON=");
     stringAppendVoltage(buffer, sizeof(buffer), channel->u.mon_last);
     SCPI_ResultText(context, buffer);
 
-    strcpy(buffer, "I_SET=");
+    stringCopy(buffer, sizeof(buffer), "I_SET=");
     stringAppendCurrent(buffer, sizeof(buffer), channel->i.mon_dac_last);
     SCPI_ResultText(context, buffer);
 
-    strcpy(buffer, "I_MON=");
+    stringCopy(buffer, sizeof(buffer), "I_MON=");
     stringAppendCurrent(buffer, sizeof(buffer), channel->i.mon_last);
     SCPI_ResultText(context, buffer);
 

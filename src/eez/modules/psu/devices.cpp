@@ -72,7 +72,7 @@ bool getDevice(int deviceIndex, Device &device) {
 
     if (deviceIndex == i++) {
         device.id = DEVICE_ID_EEPROM;
-        strcpy(device.name, "EEPROM");
+        stringCopy(device.name, sizeof(device.name), "EEPROM");
 #if OPTION_EXT_EEPROM        
         device.installed = true;
         device.testResult = mcu::eeprom::g_testResult;
@@ -85,7 +85,7 @@ bool getDevice(int deviceIndex, Device &device) {
     
     if (deviceIndex == i++) {
         device.id = DEVICE_ID_SD_CARD;
-        strcpy(device.name, "SD card");
+        stringCopy(device.name, sizeof(device.name), "SD card");
         device.installed = true;
         device.testResult = sd_card::g_testResult;
         return true;
@@ -93,7 +93,7 @@ bool getDevice(int deviceIndex, Device &device) {
     
     if (deviceIndex == i++) {
         device.id = DEVICE_ID_ETHERNET;
-        strcpy(device.name, "Ethernet");
+        stringCopy(device.name, sizeof(device.name), "Ethernet");
 #if OPTION_ETHERNET
         device.installed = true;
         device.testResult = ethernet::g_testResult;
@@ -106,7 +106,7 @@ bool getDevice(int deviceIndex, Device &device) {
     
     if (deviceIndex == i++) {
         device.id = DEVICE_ID_RTC;
-        strcpy(device.name, "RTC");
+        stringCopy(device.name, sizeof(device.name), "RTC");
 #if OPTION_EXT_RTC
         device.installed = true;
         device.testResult = rtc::g_testResult;
@@ -119,7 +119,7 @@ bool getDevice(int deviceIndex, Device &device) {
     
     if (deviceIndex == i++) {
         device.id = DEVICE_ID_DATETIME;
-        strcpy(device.name, "DateTime");
+        stringCopy(device.name, sizeof(device.name), "DateTime");
         device.installed = true;
         device.testResult = datetime::g_testResult;
         return true;
@@ -127,7 +127,7 @@ bool getDevice(int deviceIndex, Device &device) {
     
     if (deviceIndex == i++) {
         device.id = DEVICE_ID_FAN;
-        strcpy(device.name, "Fan");
+        stringCopy(device.name, sizeof(device.name), "Fan");
 #if OPTION_FAN
         device.installed = true;
         device.testResult = aux_ps::fan::g_testResult;
@@ -140,7 +140,7 @@ bool getDevice(int deviceIndex, Device &device) {
 
     if (deviceIndex == i++) {
         device.id = DEVICE_ID_AUX_TEMP;
-        strcpy(device.name, "AUX temp");
+        stringCopy(device.name, sizeof(device.name), "AUX temp");
         device.installed = true;
         device.testResult = temp_sensor::sensors[temp_sensor::AUX].g_testResult;
         return true;

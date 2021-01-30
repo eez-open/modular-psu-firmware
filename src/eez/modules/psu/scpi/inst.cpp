@@ -151,15 +151,15 @@ scpi_result_t scpi_cmd_instrumentCoupleTrackingQ(scpi_t *context) {
 
     channel_dispatcher::CouplingType couplingType = channel_dispatcher::getCouplingType();
     if (couplingType == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
-        strcpy(result, "PARALLEL");
+        stringCopy(result, sizeof(result), "PARALLEL");
     } else if (couplingType == channel_dispatcher::COUPLING_TYPE_SERIES) {
-        strcpy(result, "SERIES");
+        stringCopy(result, sizeof(result), "SERIES");
     } else if (couplingType == channel_dispatcher::COUPLING_TYPE_COMMON_GND) {
-        strcpy(result, "CGND");
+        stringCopy(result, sizeof(result), "CGND");
     } else if (couplingType == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
-        strcpy(result, "SRAIL");
+        stringCopy(result, sizeof(result), "SRAIL");
     } else {
-        strcpy(result, "NONE");
+        stringCopy(result, sizeof(result), "NONE");
     }
 
     SCPI_ResultText(context, result);
@@ -222,11 +222,11 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceQ(scpi_t *context) {
     char result[16];
 
     if (type == DISPLAY_VALUE_VOLTAGE) {
-        strcpy(result, "VOLT");
+        stringCopy(result, sizeof(result), "VOLT");
     } else if (type == DISPLAY_VALUE_CURRENT) {
-        strcpy(result, "CURR");
+        stringCopy(result, sizeof(result), "CURR");
     } else {
-        strcpy(result, "POW");
+        stringCopy(result, sizeof(result), "POW");
     }
 
     SCPI_ResultText(context, result);

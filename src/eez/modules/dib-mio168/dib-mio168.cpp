@@ -4118,7 +4118,7 @@ void onSetPinLabel(char *value) {
     char pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
     memcpy(pinLabels, label, 8 * (CHANNEL_LABEL_MAX_LENGTH + 1));
 
-    strcpy(pinLabels + g_editLabelPinIndex * (CHANNEL_LABEL_MAX_LENGTH + 1), value);
+    stringCopy(pinLabels + g_editLabelPinIndex * (CHANNEL_LABEL_MAX_LENGTH + 1), CHANNEL_LABEL_MAX_LENGTH + 1, value);
     
     LabelsAndColorsPage::setChannelLabel(g_editLabelSlotIndex, g_editSubchannelIndex, pinLabels);
     
