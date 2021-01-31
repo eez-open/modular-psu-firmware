@@ -688,8 +688,8 @@ public:
         parameters->dac1 = 0.0f;
         parameters->dac2 = 0.0f;
 
-        strcpy(parameters->aoChannelLabels[0], "");
-        strcpy(parameters->aoChannelLabels[1], "");
+        parameters->aoChannelLabels[0][0] = 0;
+        parameters->aoChannelLabels[1][0] = 0;
 
         parameters->relayOn = false;
     }
@@ -808,8 +808,8 @@ public:
         dac1 = 0.0f;
         dac2 = 0.0f;
 
-        strcpy(aoChannelLabels[0], "");
-        strcpy(aoChannelLabels[1], "");
+        aoChannelLabels[0][0] = 0;
+        aoChannelLabels[1][0] = 0;
 
         relayOn = false;
     }
@@ -890,8 +890,7 @@ public:
         }
         
         if (subchannelIndex == 1) {
-            strcpy(aoChannelLabels[1], label);
-            aoChannelLabels[1][length] = 0;
+            stringCopy(aoChannelLabels[1], length + 1, label);
             return SCPI_RES_OK;
         }
 
@@ -985,24 +984,24 @@ public:
     }
 
     bool setSwitchMatrixRowLabel(int rowIndex, const char *label, int *err) override {
-        strcpy(rowLabels[rowIndex], label);
+        stringCopy(rowLabels[rowIndex], sizeof(rowLabels[rowIndex]), label);
         sendMessageToGuiThread(GUI_QUEUE_MESSAGE_REFRESH_SCREEN);
         return true;
     }
     
-    bool getSwitchMatrixRowLabel(int rowIndex, char *label, int *err) override {
-        strcpy(label, rowLabels[rowIndex]);
+    bool getSwitchMatrixRowLabel(int rowIndex, char *label, size_t labelLength, int *err) override {
+        stringCopy(label, labelLength, rowLabels[rowIndex]);
         return true;
     }
 
     bool setSwitchMatrixColumnLabel(int columnIndex, const char *label, int *err) override {
-        strcpy(columnLabels[columnIndex], label);
+        stringCopy(columnLabels[columnIndex], sizeof(columnLabels[columnIndex]), label);
         sendMessageToGuiThread(GUI_QUEUE_MESSAGE_REFRESH_SCREEN);
         return true;
     }
     
-    bool getSwitchMatrixColumnLabel(int columnIndex, char *label, int *err) override {
-        strcpy(label, columnLabels[columnIndex]);
+    bool getSwitchMatrixColumnLabel(int columnIndex, char *label, size_t labelLength, int *err) override {
+        stringCopy(label, labelLength, columnLabels[columnIndex]);
         return true;
     }
 
@@ -1567,7 +1566,7 @@ void action_dib_smx46_toggle_relay() {
 static char *g_labelPointer;
 
 void onSetLabel(char *value) {
-    strcpy(g_labelPointer, value);
+    stringCopy(g_labelPointer, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1, value);
     popPage();
 }
 

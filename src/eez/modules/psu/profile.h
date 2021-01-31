@@ -112,7 +112,7 @@ bool deleteAllLocations(int *err);
 bool isLoaded(int location);
 bool isValid(int location);
 
-void getSaveName(int location, char *name);
+void getSaveName(int location, char *name, size_t nameLength);
 
 bool setName(int location, const char *name, bool showProgress, int *err);
 void getName(int location, char *name, int count);

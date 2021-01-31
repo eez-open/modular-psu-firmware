@@ -719,8 +719,8 @@ bool CalibrationEditor::save() {
 
     calConf.calibrationDate = datetime::now();
 
-    memset(&calConf.calibrationRemark, 0, CALIBRATION_REMARK_MAX_LENGTH + 1);
-    strcpy(calConf.calibrationRemark, m_remark);
+    memset(&calConf.calibrationRemark, 0, sizeof(calConf.calibrationRemark));
+    stringCopy(calConf.calibrationRemark, sizeof(calConf.calibrationRemark), m_remark);
 
     if (isCalibrated(m_voltageValue)) {
         memcpy(&calConf.u, &m_voltageValue.configuration, sizeof(CalibrationValueConfiguration));
@@ -791,7 +791,7 @@ void clearCalibrationConf(CalibrationConfiguration *calConf) {
     calConf->i[1].numPoints = 0;
     
     calConf->calibrationDate = 0;
-    strcpy(calConf->calibrationRemark, CALIBRATION_REMARK_INIT);
+    stringCopy(calConf->calibrationRemark, sizeof(calConf->calibrationRemark), CALIBRATION_REMARK_INIT);
 }
 
 float remapValue(float value, CalibrationValueConfiguration &cal) {

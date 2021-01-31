@@ -52,13 +52,13 @@ namespace gui {
 void SysSettingsDateTimePage::pageAlloc() {
 #if OPTION_ETHERNET
     ntpEnabled = origNtpEnabled = persist_conf::isEthernetEnabled() && persist_conf::isNtpEnabled();
-    strcpy(ntpServer, persist_conf::devConf.ntpServer);
-    strcpy(origNtpServer, persist_conf::devConf.ntpServer);
+    stringCopy(ntpServer, sizeof(ntpServer), persist_conf::devConf.ntpServer);
+    stringCopy(origNtpServer, sizeof(origNtpServer), persist_conf::devConf.ntpServer);
     ntpRefreshFrequency = origNtpRefreshFrequency = persist_conf::devConf.ntpRefreshFrequency;
 #else
     ntpEnabled = origNtpEnabled = false;
-    strcpy(ntpServer, "");
-    strcpy(origNtpServer, "");
+    stringCopy(ntpServer, sizeof(ntpServer), "");
+    stringCopy(origNtpServer, sizeof(origNtpServer), "");
 #endif
     dateTimeModified = false;
     timeZone = origTimeZone = persist_conf::devConf.timeZone;
@@ -82,7 +82,7 @@ void SysSettingsDateTimePage::editNtpServer() {
 #if OPTION_ETHERNET
 void SysSettingsDateTimePage::onSetNtpServer(char *value) {
     SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
-    strcpy(page->ntpServer, value);
+    stringCopy(page->ntpServer, sizeof(page->ntpServer), value);
 
     popPage();
 }
@@ -358,8 +358,8 @@ void SysSettingsEthernetPage::pageAlloc() {
     m_scpiPortOrig = m_scpiPort = persist_conf::devConf.ethernetScpiPort;
     memcpy(m_macAddressOrig, persist_conf::devConf.ethernetMacAddress, 6);
     memcpy(m_macAddress, persist_conf::devConf.ethernetMacAddress, 6);
-    strcpy(m_hostNameOrig, persist_conf::devConf.ethernetHostName);
-    strcpy(m_hostName, persist_conf::devConf.ethernetHostName);
+    stringCopy(m_hostNameOrig, sizeof(m_hostNameOrig), persist_conf::devConf.ethernetHostName);
+    stringCopy(m_hostName, sizeof(m_hostName), persist_conf::devConf.ethernetHostName);
 }
 
 void SysSettingsEthernetPage::toggle() {
@@ -509,13 +509,13 @@ void SysSettingsEthernetStaticPage::set() {
 
 void SysSettingsMqttPage::pageAlloc() {
     m_enabledOrig = m_enabled = persist_conf::devConf.mqttEnabled;
-    strcpy(m_hostOrig, persist_conf::devConf.mqttHost);
-    strcpy(m_host, persist_conf::devConf.mqttHost);
+    stringCopy(m_hostOrig, sizeof(m_hostOrig), persist_conf::devConf.mqttHost);
+    stringCopy(m_host, sizeof(m_host), persist_conf::devConf.mqttHost);
     m_portOrig = m_port = persist_conf::devConf.mqttPort;
-    strcpy(m_usernameOrig, persist_conf::devConf.mqttUsername);
-    strcpy(m_username, persist_conf::devConf.mqttUsername);
-    strcpy(m_passwordOrig, persist_conf::devConf.mqttPassword);
-    strcpy(m_password, persist_conf::devConf.mqttPassword);
+    stringCopy(m_usernameOrig, sizeof(m_usernameOrig), persist_conf::devConf.mqttUsername);
+    stringCopy(m_username, sizeof(m_username), persist_conf::devConf.mqttUsername);
+    stringCopy(m_passwordOrig, sizeof(m_passwordOrig), persist_conf::devConf.mqttPassword);
+    stringCopy(m_password, sizeof(m_password), persist_conf::devConf.mqttPassword);
     m_periodOrig = m_period = persist_conf::devConf.mqttPeriod;
 }
 

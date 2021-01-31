@@ -387,7 +387,7 @@ void PsuModule::getPowerChannelProfileParameters(int channelIndex, uint8_t *buff
 
     parameters->outputDelayDuration = channel.outputDelayDuration;
 
-    strcpy(parameters->label, channel.label);
+    stringCopy(parameters->label, sizeof(parameters->label), channel.label);
     parameters->color = channel.color;
 }
 
@@ -472,7 +472,7 @@ void PsuModule::setPowerChannelProfileParameters(int channelIndex, uint8_t *buff
 
     channel.outputDelayDuration = parameters->outputDelayDuration;
 
-    strcpy(channel.label, parameters->label);
+    stringCopy(channel.label, sizeof(channel.label), parameters->label);
     channel.color = parameters->color;
 }
 

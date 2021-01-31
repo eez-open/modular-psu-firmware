@@ -110,7 +110,7 @@ void initDefaultDevConf() {
     memset(&g_defaultDevConf, 0, sizeof(g_defaultDevConf));
 
     // block 1
-    strcpy(g_defaultDevConf.calibrationPassword, CALIBRATION_PASSWORD_DEFAULT);
+    stringCopy(g_defaultDevConf.calibrationPassword, sizeof(g_defaultDevConf.calibrationPassword), CALIBRATION_PASSWORD_DEFAULT);
 
     g_defaultDevConf.touchScreenCalTlx = 0;
     g_defaultDevConf.touchScreenCalTly = 0;
@@ -156,7 +156,7 @@ void initDefaultDevConf() {
     g_defaultDevConf.ethernetGateway = getIpAddress(192, 168, 1, 1);
     g_defaultDevConf.ethernetSubnetMask = getIpAddress(255, 255, 255, 0);
     g_defaultDevConf.ethernetScpiPort = TCP_PORT;
-    strcpy(g_defaultDevConf.ntpServer, CONF_DEFAULT_NTP_SERVER);
+    stringCopy(g_defaultDevConf.ntpServer, sizeof(g_defaultDevConf.ntpServer), CONF_DEFAULT_NTP_SERVER);
     uint8_t macAddress[] = ETHERNET_MAC_ADDRESS;
     memcpy(g_defaultDevConf.ethernetMacAddress, macAddress, 6);
 
@@ -189,7 +189,7 @@ void initDefaultDevConf() {
     g_defaultDevConf.ntpRefreshFrequency = NTP_REFRESH_FREQUENCY_DEF;
 
     // block 8
-    strcpy(g_defaultDevConf.ethernetHostName, DEFAULT_ETHERNET_HOST_NAME);
+    stringCopy(g_defaultDevConf.ethernetHostName, sizeof(g_defaultDevConf.ethernetHostName), DEFAULT_ETHERNET_HOST_NAME);
     
     g_defaultDevConf.mqttEnabled = 0;
     g_defaultDevConf.mqttPort = 1883;
@@ -1066,7 +1066,7 @@ const char *validateEthernetHostName(const char *hostName) {
 bool setEthernetHostName(const char *hostName) {
 #if OPTION_ETHERNET
     if (!g_devConf.skipEthernetSetup) {
-        strcpy(g_devConf.ethernetHostName, hostName);
+        stringCopy(g_devConf.ethernetHostName, sizeof(g_devConf.ethernetHostName), hostName);
         g_devConf.skipEthernetSetup = 1;
         ethernet::update();
     }
@@ -1130,7 +1130,7 @@ bool setEthernetSettings(bool enable, bool dhcpEnable, uint32_t ipAddress, uint3
         g_devConf.ethernetGateway = gateway;
         g_devConf.ethernetSubnetMask = subnetMask;
         g_devConf.ethernetScpiPort = scpiPort;
-        strcpy(g_devConf.ethernetHostName, hostName);
+        stringCopy(g_devConf.ethernetHostName, sizeof(g_devConf.ethernetHostName), hostName);
 
         g_devConf.skipEthernetSetup = 1;
         ethernet::update();
@@ -1161,7 +1161,7 @@ void setNtpRefreshFrequency(uint32_t ntpRefreshFrequency) {
 
 void setNtpSettings(bool enable, const char *ntpServer, uint32_t ntpRefreshFrequency) {
     g_devConf.ntpEnabled = enable ? 1 : 0;
-    strcpy(g_devConf.ntpServer, ntpServer);
+    stringCopy(g_devConf.ntpServer, sizeof(g_devConf.ntpServer), ntpServer);
     g_devConf.ntpRefreshFrequency = ntpRefreshFrequency;
 }
 
@@ -1174,10 +1174,10 @@ bool setMqttSettings(bool enable, const char *host, uint16_t port, const char *u
         strcmp(g_devConf.mqttPassword, password) != 0;
 
     g_devConf.mqttEnabled = enable ? 1 : 0;
-    strcpy(g_devConf.mqttHost, host);
+    stringCopy(g_devConf.mqttHost, sizeof(g_devConf.mqttHost), host);
     g_devConf.mqttPort = port;
-    strcpy(g_devConf.mqttUsername, username);
-    strcpy(g_devConf.mqttPassword, password);
+    stringCopy(g_devConf.mqttUsername, sizeof(g_devConf.mqttUsername), username);
+    stringCopy(g_devConf.mqttPassword, sizeof(g_devConf.mqttPassword), password);
     g_devConf.mqttPeriod = period;
 
     if (reconnectRequired) {

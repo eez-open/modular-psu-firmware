@@ -183,7 +183,7 @@ scpi_result_t scpi_cmd_routeLabelRowQ(scpi_t *context) {
     rowIndex--;
 
     char label[Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
-    if (!g_slots[slotIndex]->getSwitchMatrixRowLabel(rowIndex, label, &err)) {
+    if (!g_slots[slotIndex]->getSwitchMatrixRowLabel(rowIndex, label, sizeof(label), &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -274,7 +274,7 @@ scpi_result_t scpi_cmd_routeLabelColumnQ(scpi_t *context) {
     columnIndex--;
 
     char label[Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
-    if (!g_slots[slotIndex]->getSwitchMatrixColumnLabel(columnIndex, label, &err)) {
+    if (!g_slots[slotIndex]->getSwitchMatrixColumnLabel(columnIndex, label, sizeof(label), &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }

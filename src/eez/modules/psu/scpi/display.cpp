@@ -273,7 +273,7 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
     memcpy(label, labelText, labelTextLen);
     if (type == INPUT_TYPE_TEXT || type == INPUT_TYPE_NUMBER) {
         if (labelTextLen > 0) {
-            strcpy(label + labelTextLen, ": ");
+            stringCopy(label + labelTextLen, sizeof(label) - labelTextLen, ": ");
             labelTextLen += 2;
         } else {
             label[labelTextLen] = 0;

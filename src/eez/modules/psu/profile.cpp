@@ -260,7 +260,7 @@ bool saveToLocation(int location, const char *name, bool showProgress, int *err)
     memset(&profile, 0, sizeof(Parameters));
     saveState(profile, nullptr);
     if (name) {
-        strcpy(profile.name, name);
+        stringCopy(profile.name, sizeof(profile.name), name);
     }
 
     if (!saveProfileToFile(filePath, profile, nullptr, showProgress, err)) {
@@ -359,14 +359,14 @@ bool isValid(int location) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void getSaveName(int location, char *name) {
+void getSaveName(int location, char *name, size_t nameLength) {
     Parameters *profile = getProfileParametersFromCache(location);
 
     if (!profile || !profile->flags.isValid || strncmp(profile->name, CONF_AUTO_NAME_PREFIX, strlen(CONF_AUTO_NAME_PREFIX)) == 0) {
-        strcpy(name, CONF_AUTO_NAME_PREFIX);
+        stringCopy(name, nameLength, CONF_AUTO_NAME_PREFIX);
         datetime::getDateTimeAsString(name + strlen(CONF_AUTO_NAME_PREFIX));
     } else {
-        strcpy(name, profile->name);
+        stringCopy(name, nameLength, profile->name);
     }
 }
 
@@ -389,7 +389,7 @@ bool setName(int location, const char *name, bool showProgress, int *err) {
 
             memcpy(&profile, profileFromCache, sizeof(profile));
             if (name) {
-                strcpy(profile.name, name);
+                stringCopy(profile.name, sizeof(profile.name), name);
             }
 
             if (!saveProfileToFile(filePath, profile, g_listsProfile10, showProgress, err)) {

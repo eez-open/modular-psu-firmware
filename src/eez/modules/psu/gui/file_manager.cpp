@@ -109,7 +109,7 @@ bool makeAbsolutePath(const char *relativePath, char *dest) {
 
     dest[0] = '0' + g_currentDiskDrive;
 	dest[1] = ':';
-    strcpy(dest + 2, g_currentDirectory);
+    stringCopy(dest + 2, MAX_PATH_LENGTH - 2, g_currentDirectory);
     if (relativePath) {
     	stringAppendString(dest, MAX_PATH_LENGTH, "/");
     	stringAppendString(dest, MAX_PATH_LENGTH, relativePath);
@@ -128,6 +128,7 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size, 
 
     char description[MAX_FILE_DESCRIPTION_LENGTH + 1];
     size_t descriptionLen = 0;
+    size_t descriptionLenWithPadding = 0;
 
     if (isScriptsDirectory() && (getListViewOption() == LIST_VIEW_SCRIPTS || getListViewOption() == LIST_VIEW_LARGE_ICONS)) {
         if (type != FILE_TYPE_MICROPYTHON) {
@@ -156,8 +157,9 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size, 
         }
 
         descriptionLen = strlen(description);
-        if (descriptionLen > 0) {
-            descriptionLen = 4 * ((descriptionLen + 1 + 3) / 4);
+        descriptionLenWithPadding = descriptionLen;
+        if (descriptionLenWithPadding > 0) {
+            descriptionLenWithPadding = 4 * ((descriptionLenWithPadding + 1 + 3) / 4);
         }
 
         const char *str = strrchr(name, '.');
@@ -169,9 +171,10 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size, 
         }
     }
 
-    size_t nameLen = 4 * ((strlen(name) + 1 + 3) / 4);
+    size_t nameLen = strlen(name);
+    size_t nameLenWithPadding = 4 * ((nameLen + 1 + 3) / 4);
 
-    if (g_frontBufferPosition + sizeof(FileItem) > g_backBufferPosition - nameLen - descriptionLen) {
+    if (g_frontBufferPosition + sizeof(FileItem) > g_backBufferPosition - nameLenWithPadding - descriptionLenWithPadding) {
         return;
     }
 
@@ -180,13 +183,13 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size, 
 
     fileItem->type = type;
 
-    g_backBufferPosition -= nameLen;
-    strcpy((char *)g_backBufferPosition, name);
+    g_backBufferPosition -= nameLenWithPadding;
+    stringCopy((char *)g_backBufferPosition, nameLen + 1, name);
     fileItem->name = (const char *)g_backBufferPosition;
 
-    if (descriptionLen > 0) {
-        g_backBufferPosition -= descriptionLen;
-        strcpy((char *)g_backBufferPosition, description);
+    if (descriptionLenWithPadding > 0) {
+        g_backBufferPosition -= descriptionLenWithPadding;
+        stringCopy((char *)g_backBufferPosition, descriptionLen + 1, description);
         fileItem->description = (const char *)g_backBufferPosition;
     } else {
         fileItem->description = nullptr;
@@ -353,9 +356,10 @@ void doLoadDirectory() {
             char name[MAX_PATH_LENGTH + 1];
             value.toText(name, sizeof(name));
 
-            size_t nameLen = 4 * ((strlen(name) + 1 + 3) / 4);
+            size_t nameLen = strlen(name);
+            size_t nameLenWithPadding = 4 * ((nameLen + 1 + 3) / 4);
 
-            if (g_frontBufferPosition + sizeof(FileItem) > g_backBufferPosition - nameLen) {
+            if (g_frontBufferPosition + sizeof(FileItem) > g_backBufferPosition - nameLenWithPadding) {
                 break;
             }
 
@@ -364,8 +368,8 @@ void doLoadDirectory() {
 
             fileItem->type = FILE_TYPE_DISK_DRIVE;
 
-            g_backBufferPosition -= nameLen;
-            strcpy((char *)g_backBufferPosition, name);
+            g_backBufferPosition -= nameLenWithPadding;
+            stringCopy((char *)g_backBufferPosition, nameLen + 1, name);
             fileItem->name = (const char *)g_backBufferPosition;
 
             fileItem->description = nullptr;
@@ -729,7 +733,7 @@ void selectFile(uint32_t fileIndex) {
                     if (mp::isIdle()) {
                         if (strlen(fileItem->name) + 3 <= MAX_PATH_LENGTH) {
                             char fileName[MAX_PATH_LENGTH + 1];
-                            strcpy(fileName, fileItem->name);
+                            stringCopy(fileName, sizeof(fileName), fileItem->name);
                             stringAppendString(fileName, MAX_PATH_LENGTH, ".py");
                             char filePath[MAX_PATH_LENGTH + 1];
                             if (makeAbsolutePath(fileName, filePath)) {
@@ -902,7 +906,7 @@ bool isRenameFileEnabled() {
 static char g_fileNameWithoutExtension[MAX_PATH_LENGTH + 1];
 
 void onRenameFileOk(char *fileNameWithoutExtension) {
-    strcpy(g_fileNameWithoutExtension, fileNameWithoutExtension);
+    stringCopy(g_fileNameWithoutExtension, sizeof(g_fileNameWithoutExtension), fileNameWithoutExtension);
 
     if (!isLowPriorityThread()) {
         popPage();
@@ -936,7 +940,7 @@ void doRenameFile() {
         return;
     }
     
-    strcpy(dstFileName, g_fileNameWithoutExtension);
+    stringCopy(dstFileName, sizeof(dstFileName), g_fileNameWithoutExtension);
     if (extension) {
         stringAppendString(dstFileName, MAX_PATH_LENGTH, extension);
     }
@@ -1056,7 +1060,7 @@ void browseForFile(const char *title, const char *directory, FileType fileType, 
 
 	g_showDiskDrives = false;
 	g_currentDiskDrive = 0;
-    strcpy(g_currentDirectory, directory);
+    stringCopy(g_currentDirectory, sizeof(g_currentDirectory), directory);
     loadDirectory();
 
     pushPage(PAGE_ID_FILE_BROWSER);
@@ -1080,7 +1084,7 @@ void onNewFileOk(char *fileNameWithoutExtension) {
         return;
     }
 
-    strcpy(fileName, fileNameWithoutExtension);
+    stringCopy(fileName, sizeof(fileName), fileNameWithoutExtension);
     stringAppendString(fileName, MAX_PATH_LENGTH, extension);
 
     char filePath[MAX_PATH_LENGTH + 1];

@@ -491,7 +491,7 @@ bool saveList(
 
 bool saveList(int iChannel, const char *filePath, int *err) {
     if (!g_shutdownInProgress && !isLowPriorityThread()) {
-        strcpy(&g_listFilePath[iChannel][0], filePath);
+        stringCopy(&g_listFilePath[iChannel][0], sizeof(g_listFilePath[iChannel]), filePath);
         sendMessageToLowPriorityThread(THREAD_MESSAGE_SAVE_LIST, iChannel);
         return true;
     }

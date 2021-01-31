@@ -557,7 +557,7 @@ void initAxis(Recording &recording) {
             yAxis.range.max = 1;
             yAxis.channelIndex = dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0;
         }
-        strcpy(yAxis.label, g_slots[dlogItem.slotIndex]->getDlogResourceLabel(dlogItem.subchannelIndex, dlogItem.resourceIndex));
+        stringCopy(yAxis.label, sizeof(yAxis.label), g_slots[dlogItem.slotIndex]->getDlogResourceLabel(dlogItem.subchannelIndex, dlogItem.resourceIndex));
     }
 
     recording.parameters.numYAxes = recording.parameters.numDlogItems;
@@ -765,7 +765,7 @@ bool openFile(const char *filePath, int *err) {
     g_state = STATE_LOADING;
     g_loadingStartTickCount = millis();
 
-    strcpy(g_filePath, filePath);
+    stringCopy(g_filePath, sizeof(g_filePath), filePath);
     memset(&g_recording, 0, sizeof(Recording));
 
     if (!isLowPriorityThread()) {
@@ -1020,7 +1020,7 @@ public:
         }
 
         memcpy(&dlog_record::g_parameters, &DlogParamsPage::g_parameters, sizeof(DlogParamsPage::g_parameters));
-        strcpy(dlog_record::g_parameters.filePath, filePath);
+        stringCopy(dlog_record::g_parameters.filePath, sizeof(dlog_record::g_parameters.filePath), filePath);
 
         dlog_record::toggleStart();
     }
@@ -1142,7 +1142,7 @@ private:
 
     static void onSetFileName(char *value) {
         psu::gui::popPage();
-        strcpy(g_parameters.filePath, value);
+        stringCopy(g_parameters.filePath, sizeof(g_parameters.filePath), value);
     }
 
     static void onSelectTriggerSource(uint16_t value) {

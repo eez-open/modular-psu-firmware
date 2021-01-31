@@ -519,7 +519,7 @@ bool Module::setSwitchMatrixRowLabel(int subchannelIndex, const char *label, int
     return false;
 }
 
-bool Module::getSwitchMatrixRowLabel(int subchannelIndex, char *label, int *err) {
+bool Module::getSwitchMatrixRowLabel(int subchannelIndex, char *label, size_t labelLength, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }
@@ -533,7 +533,7 @@ bool Module::setSwitchMatrixColumnLabel(int subchannelIndex, const char *label, 
     return false;
 }
 
-bool Module::getSwitchMatrixColumnLabel(int subchannelIndex, char *label, int *err) {
+bool Module::getSwitchMatrixColumnLabel(int subchannelIndex, char *label, size_t labelLength, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;
     }

@@ -46,7 +46,7 @@ scpi_result_t scpi_cmd_initiateDlog(scpi_t *context) {
                 SCPI_ErrorPush(context, SCPI_ERROR_FILE_NAME_ERROR);
                 return SCPI_RES_ERR;
             }
-            strcpy(dlog_record::g_parameters.filePath, filePath);
+            stringCopy(dlog_record::g_parameters.filePath, sizeof(dlog_record::g_parameters.filePath), filePath);
         } else {
             // prepend <drive>:
             if (snprintf(dlog_record::g_parameters.filePath, MAX_PATH_LENGTH + 1, "%d:%s", slotIndex + 1, filePath) >= MAX_PATH_LENGTH + 1) {
@@ -55,7 +55,7 @@ scpi_result_t scpi_cmd_initiateDlog(scpi_t *context) {
             }
         }
     } else {
-        strcpy(dlog_record::g_parameters.filePath, filePath);
+        stringCopy(dlog_record::g_parameters.filePath, sizeof(dlog_record::g_parameters.filePath), filePath);
     }
 
     int result = dlog_record::initiate();
@@ -829,7 +829,7 @@ scpi_result_t scpi_cmd_initiateDlogTrace(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    strcpy(dlog_record::g_parameters.filePath, filePath);
+    stringCopy(dlog_record::g_parameters.filePath, sizeof(dlog_record::g_parameters.filePath), filePath);
 
     int result = dlog_record::initiateTrace();
     if (result != SCPI_RES_OK) {

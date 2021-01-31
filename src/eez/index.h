@@ -321,9 +321,9 @@ struct Module {
     virtual bool getSwitchMatrixNumColumns(int &numColumns, int *err);
     static const int MAX_SWITCH_MATRIX_LABEL_LENGTH = 5;
     virtual bool setSwitchMatrixRowLabel(int rowIndex, const char *label, int *err);
-    virtual bool getSwitchMatrixRowLabel(int columnIndex, char *label, int *err);
+    virtual bool getSwitchMatrixRowLabel(int columnIndex, char *label, size_t labelLength, int *err);
     virtual bool setSwitchMatrixColumnLabel(int rowIndex, const char *label, int *err);
-    virtual bool getSwitchMatrixColumnLabel(int columnIndex, char *label, int *err);
+    virtual bool getSwitchMatrixColumnLabel(int columnIndex, char *label, size_t labelLength, int *err);
 
     virtual bool getRelayCycles(int subchannelIndex, uint32_t &relayCycles, int *err);
     

@@ -192,7 +192,7 @@ void getInfoText(char *infoText, int count) {
     if (isChannelData(getFocusCursor(), g_focusDataId)) {
         Channel& channel = Channel::get(getFocusCursor());
         if ((channel.channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel.flags.trackingEnabled) {
-            strcpy(infoText, "Set ");
+            stringCopy(infoText, count, "Set ");
         } else {
             snprintf(infoText, count, "Set Ch%d ", getFocusCursor() + 1);
         }

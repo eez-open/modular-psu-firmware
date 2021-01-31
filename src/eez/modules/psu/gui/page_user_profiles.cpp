@@ -88,7 +88,7 @@ void UserProfilesPage::saveProfile() {
 void UserProfilesPage::onSaveYes() {
     if (g_selectedProfileLocation > 0) {
         char remark[PROFILE_NAME_MAX_LENGTH + 1];
-        profile::getSaveName(g_selectedProfileLocation, remark);
+        profile::getSaveName(g_selectedProfileLocation, remark, sizeof(remark));
 
         Keypad::startPush(0, remark, 0, PROFILE_NAME_MAX_LENGTH, false, onSaveEditRemarkOk, 0);
     } else {
@@ -105,7 +105,7 @@ void UserProfilesPage::onSaveFinish(char *remark, void (*callback)()) {
         callback();
     }
 
-    strcpy(g_remark, remark);
+    stringCopy(g_remark, sizeof(g_remark), remark);
 
     showProgressPageWithoutAbort("Saving profile...");
 
@@ -146,7 +146,7 @@ void UserProfilesPage::importProfile() {
 
 void UserProfilesPage::onImportProfileFileSelected(const char *profileFilePath) {
     auto *page = (UserProfilesPage *)getUserProfileSettingsPage();
-    strcpy(page->m_profileFilePath, profileFilePath);
+    stringCopy(page->m_profileFilePath, sizeof(page->m_profileFilePath), profileFilePath);
     
     showProgressPageWithoutAbort("Importing profile...");
 
@@ -172,7 +172,7 @@ void UserProfilesPage::exportProfile() {
 
 void UserProfilesPage::onExportProfileFileSelected(const char *profileFilePath) {
     auto *page = (UserProfilesPage *)getUserProfileSettingsPage();
-    strcpy(page->m_profileFilePath, profileFilePath);
+    stringCopy(page->m_profileFilePath, sizeof(page->m_profileFilePath), profileFilePath);
     
     showProgressPageWithoutAbort("Exporting profile...");
 
@@ -220,7 +220,7 @@ void UserProfilesPage::editRemark() {
 }
 
 void UserProfilesPage::onEditRemarkOk(char *newRemark) {
-    strcpy(g_remark, newRemark);
+    stringCopy(g_remark, sizeof(g_remark), newRemark);
 
     popPage();
 

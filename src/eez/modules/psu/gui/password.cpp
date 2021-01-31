@@ -95,7 +95,7 @@ static void onNewPasswordOk(char *text) {
         return;
     }
 
-    strcpy(g_newPassword, text);
+    stringCopy(g_newPassword, sizeof(g_newPassword), text);
     Keypad::startReplace("Retype new password: ", 0, 0, PASSWORD_MAX_LENGTH, true, onRetypeNewPasswordOk, popPage);
 }
 

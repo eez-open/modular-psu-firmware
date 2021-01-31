@@ -985,7 +985,7 @@ void PsuAppContext::dialogSetDataItemValue(int16_t dataId, const char *str) {
         } else {
             g_externalDataItemValues[dataId].textIndex = 1;
         }
-        strcpy(g_externalDataItemValues[dataId].text + textIndex, str);
+        stringCopy(g_externalDataItemValues[dataId].text + textIndex, sizeof(g_externalDataItemValues[dataId].text) - textIndex, str);
         g_externalDataItemValues[dataId].value = (const char *)g_externalDataItemValues[dataId].text + textIndex;
     }
 }

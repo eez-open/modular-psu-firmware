@@ -898,7 +898,7 @@ bool getFilePath(scpi_t *context, char *filePath, bool mandatory, bool *isParame
         if (SCPI_ParamErrorOccurred(context)) {
             return false;
         }
-        strcpy(filePath, psuContext->currentDirectory);
+        stringCopy(filePath, sizeof(filePath), psuContext->currentDirectory);
         if (isParameterSpecified) {
             *isParameterSpecified = false;
         }

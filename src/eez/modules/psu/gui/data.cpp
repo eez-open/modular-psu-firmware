@@ -1101,7 +1101,7 @@ bool compare_MASS_STORAGE_DEVICE_LABEL_value(const Value &a, const Value &b) {
 void MASS_STORAGE_DEVICE_LABEL_value_to_text(const Value &value, char *text, int count) {
 	int massStorageDevice = value.getInt();
 	if (massStorageDevice == 0) {
-		strcpy(text, "Master (0:)");
+		stringCopy(text, count, "Master (0:)");
 	} else {
 		int slotIndex = massStorageDevice - 1;
 		snprintf(text, count, "%s (%d:)", g_slots[slotIndex]->getLabelOrDefault(), massStorageDevice);
@@ -3515,7 +3515,7 @@ void data_ethernet_host_name(DataOperationEnum operation, Cursor cursor, Value &
     } else if (operation == DATA_OPERATION_SET) {
         SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
-            strcpy(page->m_hostName, value.getString());
+            stringCopy(page->m_hostName, sizeof(page->m_hostName), value.getString());
         }
     }
 #endif
@@ -4906,7 +4906,7 @@ void data_mqtt_host(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_SET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
-            strcpy(page->m_host, value.getString());
+            stringCopy(page->m_host, sizeof(page->m_host), value.getString());
         }
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(64, VALUE_TYPE_UINT32);
@@ -4953,7 +4953,7 @@ void data_mqtt_username(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_SET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
-            strcpy(page->m_username, value.getString());
+            stringCopy(page->m_username, sizeof(page->m_username), value.getString());
         }
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(32, VALUE_TYPE_UINT32);
@@ -4973,7 +4973,7 @@ void data_mqtt_password(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_SET) {
         SysSettingsMqttPage *page = (SysSettingsMqttPage *)getPage(PAGE_ID_SYS_SETTINGS_MQTT);
         if (page) {
-            strcpy(page->m_password, value.getString());
+            stringCopy(page->m_password, sizeof(page->m_password), value.getString());
         }
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(32, VALUE_TYPE_UINT32);

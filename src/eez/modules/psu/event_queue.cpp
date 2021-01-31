@@ -366,7 +366,7 @@ static void addEventToWriteQueue(int16_t eventId, char *message, int channelInde
         g_writeQueue[g_writeQueueHead].channelIndex = channelIndex;
 
         if (message) {
-            strcpy(g_writeQueue[g_writeQueueHead].message, message);
+            stringCopy(g_writeQueue[g_writeQueueHead].message, sizeof(g_writeQueue[g_writeQueueHead].message), message);
         } else {
             g_writeQueue[g_writeQueueHead].message[0] = 0;
         }
@@ -716,7 +716,7 @@ static bool readEvent(File &indexFile, File &logFile, int eventIndex, Event &eve
 
     event.dateTime = datetime::makeTime(year, month, day, hour, minute, second);
     event.eventType = eventType;
-    strcpy(event.message, message);
+    stringCopy(event.message, sizeof(event.message), message);
 
     updateIsLongMessageText(event);
 
@@ -767,7 +767,7 @@ static void readEvents(uint32_t fromPosition) {
                             event.dateTime = g_writeQueue[i].dateTime;
                             event.eventType = eventType;
                             if (g_writeQueue[i].channelIndex == -1 || g_writeQueue[i].message) {
-                                strcpy(event.message, g_writeQueue[i].eventId == EVENT_DEBUG_TRACE || g_writeQueue[i].eventId == EVENT_INFO_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
+                                stringCopy(event.message, sizeof(event.message), g_writeQueue[i].eventId == EVENT_DEBUG_TRACE || g_writeQueue[i].eventId == EVENT_INFO_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
                             } else {
                                 snprintf(event.message, sizeof(event.message), getEventMessage(g_writeQueue[i].eventId), g_writeQueue[i].channelIndex + 1);
                             }

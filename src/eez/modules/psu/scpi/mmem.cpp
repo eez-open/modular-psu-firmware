@@ -66,7 +66,7 @@ scpi_result_t scpi_cmd_mmemoryCdirectory(scpi_t *context) {
     }
 
     scpi_psu_t *psuContext = (scpi_psu_t *)context->user_context;
-    strcpy(psuContext->currentDirectory, dirPath);
+    stringCopy(psuContext->currentDirectory, sizeof(psuContext->currentDirectory), dirPath);
 
     return SCPI_RES_OK;
 }
@@ -104,7 +104,7 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size, 
     const char *scpiTypeName = getFileTypeScpiName(type);
 
     buffer[position++] = ',';
-    strcpy(buffer + position, scpiTypeName);
+    stringCopy(buffer + position, sizeof(buffer) - position, scpiTypeName);
     position += strlen(scpiTypeName);
     buffer[position++] = ',';
 

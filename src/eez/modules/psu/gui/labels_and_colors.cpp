@@ -75,7 +75,7 @@ const char *LabelsAndColorsPage::getSlotLabelOrDefault(int slotIndex) {
 }
 
 void LabelsAndColorsPage::setSlotLabel(int slotIndex, const char *label) {
-    strcpy(getSlotLabelAndColor(slotIndex)->label, label);
+    stringCopy(getSlotLabelAndColor(slotIndex)->label, SLOT_LABEL_MAX_LENGTH + 1, label);
 }
 
 bool LabelsAndColorsPage::isSlotLabelModified(int slotIndex) {
@@ -149,7 +149,7 @@ void LabelsAndColorsPage::pageAlloc() {
     ChannelLabelAndColor *channelLabelAndColors = (ChannelLabelAndColor *)(FILE_VIEW_BUFFER + NUM_SLOTS * sizeof(SlotLabelAndColor));
 
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        strcpy(g_slotLabelAndColors[slotIndex].label, g_slots[slotIndex]->getLabel());
+        stringCopy(g_slotLabelAndColors[slotIndex].label, SLOT_LABEL_MAX_LENGTH + 1, g_slots[slotIndex]->getLabel());
         g_slotLabelAndColors[slotIndex].color = g_slots[slotIndex]->getColor();
         g_slotLabelAndColors[slotIndex].first = channelLabelAndColors;
 

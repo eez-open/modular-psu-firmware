@@ -63,7 +63,7 @@ class Keypad : public Page {
     virtual bool canSetDefault();
     virtual void setDefault();
 
-    virtual void getKeypadText(char *text);
+    virtual void getKeypadText(char *text, size_t count);
     Value getKeypadTextValue();
 
     void insertChar(char c);
@@ -204,8 +204,8 @@ public:
     void switchToKilo();
     void switchToMega();
 
-    void getKeypadText(char *text);
-    bool getText(char *text, int count);
+    void getKeypadText(char *text, size_t count);
+    bool getText(char *text, size_t count);
 
     void key(char ch);
     void space();

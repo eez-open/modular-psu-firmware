@@ -371,7 +371,7 @@ bool download(const char *filePath, bool truncate, const void *buffer, size_t si
             }
 			return false;
 		}
-        strcpy(g_downloadFilePath, filePath);
+        stringCopy(g_downloadFilePath, sizeof(g_downloadFilePath), filePath);
         g_downloadedFileOffset = 0;
 	}
 

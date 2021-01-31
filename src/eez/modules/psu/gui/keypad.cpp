@@ -130,7 +130,7 @@ void Keypad::init(AppContext *appContext, const char *label_) {
     m_isPassword = false;
 
     if (label_) {
-        strcpy(m_label, label_);
+        stringCopy(m_label, sizeof(m_label), label_);
     } else {
         m_label[0] = 0;
     }
@@ -138,17 +138,19 @@ void Keypad::init(AppContext *appContext, const char *label_) {
 
 Value Keypad::getKeypadTextValue() {
     char *text = &m_stateText[getCurrentStateBufferIndex()][0];
-    getKeypadText(text);
+    getKeypadText(text, sizeof(m_stateText[0]));
     return Value(text);
 }
 
-void Keypad::getKeypadText(char *text) {
+void Keypad::getKeypadText(char *text, size_t count) {
     // text
     char *textPtr = text;
 
     if (*m_label) {
-        strcpy(textPtr, m_label);
-        textPtr += strlen(m_label);
+        stringCopy(textPtr, count, m_label);
+		auto len = strlen(m_label);
+        textPtr += len;
+		count -= len;
     }
 
     if (m_isPassword) {
@@ -175,7 +177,7 @@ void Keypad::getKeypadText(char *text) {
             *textPtr = 0;
         }
     } else {
-        strcpy(textPtr, m_keypadText);
+        stringCopy(textPtr, count, m_keypadText);
     }
 }
 
@@ -191,7 +193,7 @@ void Keypad::start(AppContext *appContext, const char *label, const char *text, 
     m_isPassword = isPassword_;
 
     if (text) {
-        strcpy(m_keypadText, text);
+        stringCopy(m_keypadText, sizeof(m_keypadText), text);
         m_cursorPosition = strlen(m_keypadText);
     } else {
         m_keypadText[0] = 0;
@@ -494,16 +496,16 @@ void NumericKeypad::appendEditUnit(char *text, size_t maxTextLength) {
     stringAppendString(text, maxTextLength, getUnitName(m_options.editValueUnit));
 }
 
-void NumericKeypad::getKeypadText(char *text) {
+void NumericKeypad::getKeypadText(char *text, size_t count) {
     if (*m_label) {
-        strcpy(text, m_label);
+        stringCopy(text, count, m_label);
         text += strlen(m_label);
     }
 
     getText(text, 16);
 }
 
-bool NumericKeypad::getText(char *text, int count) {
+bool NumericKeypad::getText(char *text, size_t count) {
     if (m_state == START) {
         if (m_appContext->getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
             edit_mode::getCurrentValue().toText(text, count);
@@ -513,7 +515,7 @@ bool NumericKeypad::getText(char *text, int count) {
         return false;
     }
 
-    strcpy(text, m_keypadText);
+    stringCopy(text, count, m_keypadText);
 
     appendEditUnit(text, count);
 
@@ -919,7 +921,7 @@ void NumericKeypad::sign() {
             }
         } else {
             if (m_keypadText[0] == '-') {
-                strcpy(m_keypadText, m_keypadText + 1);
+                stringCopy(m_keypadText, sizeof(m_keypadText), m_keypadText + 1);
                 if (m_cursorPosition > 0) {
                     m_cursorPosition--;
                 }

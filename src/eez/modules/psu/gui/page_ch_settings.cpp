@@ -722,7 +722,7 @@ void ChSettingsListsPage::edit() {
         options.flags.dotButtonEnabled = true;
 
         char label[64];
-        strcpy(label, "[");
+        stringCopy(label, sizeof(label), "[");
         if (dataId == DATA_ID_CHANNEL_LIST_DWELL) {
             char dwell[64];
             min.toText(dwell, sizeof(dwell));
@@ -1099,7 +1099,7 @@ void ChSettingsListsPage::showFileMenu() {
 
 void ChSettingsListsPage::onImportListFileSelected(const char *listFilePath) {
     auto *page = (ChSettingsListsPage *)getActivePage();
-    strcpy(page->m_listFilePath, listFilePath);
+    stringCopy(page->m_listFilePath, sizeof(page->m_listFilePath), listFilePath);
 
     showProgressPageWithoutAbort("Import list...");
 
@@ -1149,7 +1149,7 @@ void ChSettingsListsPage::fileImport() {
 
 void ChSettingsListsPage::onExportListFileSelected(const char *listFilePath) {
     auto *page = (ChSettingsListsPage *)getActivePage();
-    strcpy(page->m_listFilePath, listFilePath);
+    stringCopy(page->m_listFilePath, sizeof(page->m_listFilePath), listFilePath);
     
     showProgressPageWithoutAbort("Exporting list...");
 

@@ -53,7 +53,7 @@ namespace scpi {
 
 scpi_result_t scpi_cmd_systemCapabilityQ(scpi_t *context) {
     char text[sizeof(STR_SYST_CAP)];
-    strcpy(text, STR_SYST_CAP);
+    stringCopy(text, sizeof(text), STR_SYST_CAP);
     SCPI_ResultText(context, text);
 
     return SCPI_RES_OK;
