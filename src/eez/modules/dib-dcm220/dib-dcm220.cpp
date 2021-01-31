@@ -381,6 +381,7 @@ public:
 
     void initChannels() override {
         if (enabled && !synchronized) {
+            testResult = TEST_CONNECTING;            
             if (bp3c::comm::masterSynchro(slotIndex)) {
                 //DebugTrace("DCM220 slot #%d firmware version %d.%d\n", slotIndex + 1, (int)firmwareMajorVersion, (int)firmwareMinorVersion);
                 synchronized = true;

@@ -473,6 +473,7 @@ public:
 
     void initChannels() override {
         if (enabled && !synchronized) {
+            testResult = TEST_CONNECTING;            
            if (bp3c::comm::masterSynchro(slotIndex)) {
                synchronized = true;
                lastTransferTickCount = millis();

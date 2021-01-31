@@ -3494,13 +3494,15 @@
                     "type": "Text",
                     "style": {
                       "inheritFrom": "default_S_left",
-                      "font": "Oswald14"
+                      "font": "Oswald14",
+                      "activeBackgroundColor": "Background",
+                      "blink": true
                     },
                     "left": 0,
                     "top": 0,
                     "width": 90,
                     "height": 30,
-                    "text": " "
+                    "text": "..."
                   },
                   {
                     "type": "Text",
@@ -3628,16 +3630,27 @@
                       "text": "OK"
                     },
                     {
-                      "type": "Text",
+                      "type": "Container",
                       "style": {
-                        "inheritFrom": "default_S_left",
-                        "font": "Oswald14"
+                        "inheritFrom": "default"
                       },
                       "left": 0,
                       "top": 0,
                       "width": 90,
                       "height": 30,
-                      "text": " "
+                      "widgets": [
+                        {
+                          "type": "Progress",
+                          "style": {
+                            "inheritFrom": "progress"
+                          },
+                          "data": "async_progress",
+                          "left": 0,
+                          "top": 13,
+                          "width": 45,
+                          "height": 4
+                        }
+                      ]
                     },
                     {
                       "type": "Text",
