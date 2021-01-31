@@ -762,18 +762,16 @@ void scaleToFit(Recording &recording) {
 }
 
 bool openFile(const char *filePath, int *err) {
+    g_state = STATE_LOADING;
+    g_loadingStartTickCount = millis();
+
+    strcpy(g_filePath, filePath);
+    memset(&g_recording, 0, sizeof(Recording));
+
     if (!isLowPriorityThread()) {
-        g_state = STATE_LOADING;
-        g_loadingStartTickCount = millis();
-
-        strcpy(g_filePath, filePath);
-        memset(&g_recording, 0, sizeof(Recording));
-
         sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_SHOW_FILE);
         return true;
     }
-
-    g_state = STATE_LOADING;
 
     File file;
     if (file.open(filePath != nullptr ? filePath : g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {

@@ -159,6 +159,9 @@ def discharge_cap():
   global channel
   setU(channel, 0.0)
   setI(channel, 0.1) # Must be >= 10mA otherwise Downprogrammer is off.
+  ovp = scpi("SOUR1:VOLT:PROT:STAT?")
+  if ovp:
+    scpi("SOUR1:VOLT:PROT:STAT OFF")
   scpi("DISP:WINDOW:TEXT \"Discharging...\"")
   scpi("OUTP 1")
   sleep_ms(1000)
@@ -167,6 +170,8 @@ def discharge_cap():
   scpi("DISP:WINDOW:TEXT:CLEAR")
   setI(channel, 0.1)
   scpi("OUTP 0")
+  if ovp:
+    scpi("SOUR1:VOLT:PROT:STAT ON")
   
 def show_main_dialog():
   global have_data
@@ -230,6 +235,10 @@ def main():
         elif action == "view_dlog":
           scpi("DISP:WINDOW:DLOG \"/Recordings/ReformCap.dlog\"")
         elif action == "start_reform":
+          scpi('OUTP:PROT:CLE CH1')
+          scpi('OUTP:PROT:CLE CH2')
+          scpi("INST CH1")
+          scpi('OUTP:DPROG ON')
           discharge_cap()
           scpi('DISP:DIALog:DATA "run_state", INT, 1')
           scpi('DISP:DIALog:DATA "data_viewable", INT, 1')  

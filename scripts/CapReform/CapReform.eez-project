@@ -153,8 +153,8 @@
                 "style": {
                   "inheritFrom": "default_S"
                 },
-                "left": 27,
-                "top": 16,
+                "left": 24,
+                "top": 8,
                 "width": 186,
                 "height": 32,
                 "text": "Capacitor Max Voltage:"
@@ -164,8 +164,8 @@
                 "style": {
                   "inheritFrom": "default_S"
                 },
-                "left": 85,
-                "top": 48,
+                "left": 82,
+                "top": 44,
                 "width": 128,
                 "height": 32,
                 "text": "Charge current:"
@@ -175,7 +175,7 @@
                 "style": {
                   "inheritFrom": "default_S"
                 },
-                "left": 103,
+                "left": 100,
                 "top": 80,
                 "width": 109,
                 "height": 32,
@@ -188,8 +188,8 @@
                 },
                 "data": "cap_max_volt",
                 "action": "input_cap_max_volt",
-                "left": 213,
-                "top": 16,
+                "left": 210,
+                "top": 8,
                 "width": 122,
                 "height": 32,
                 "displayOption": 0
@@ -201,8 +201,8 @@
                 },
                 "data": "charge_current",
                 "action": "input_charge_current",
-                "left": 213,
-                "top": 48,
+                "left": 210,
+                "top": 44,
                 "width": 122,
                 "height": 32,
                 "displayOption": 0
@@ -214,7 +214,7 @@
                 },
                 "data": "reform_time",
                 "action": "input_reform_time",
-                "left": 213,
+                "left": 210,
                 "top": 80,
                 "width": 122,
                 "height": 32,
@@ -479,9 +479,9 @@
               "inheritFrom": "default"
             },
             "data": "Vmon",
-            "left": 12,
+            "left": 0,
             "top": 12,
-            "width": 110,
+            "width": 134,
             "height": 32,
             "displayOption": 0
           },
@@ -491,9 +491,9 @@
               "inheritFrom": "default"
             },
             "data": "Imon",
-            "left": 12,
+            "left": 0,
             "top": 56,
-            "width": 110,
+            "width": 134,
             "height": 32,
             "displayOption": 0
           }
