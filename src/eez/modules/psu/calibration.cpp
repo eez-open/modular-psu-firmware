@@ -386,9 +386,9 @@ void CalibrationEditor::doStart() {
     m_enabled = true;
 
     if (channel) {
-        channel_dispatcher::setOvpState(channel, 0);
-        channel_dispatcher::setOcpState(channel, 0);
-        channel_dispatcher::setOppState(channel, 0);
+        channel_dispatcher::setOvpState(*channel, 0);
+        channel_dispatcher::setOcpState(*channel, 0);
+        channel_dispatcher::setOppState(*channel, 0);
 
         channel->calibrationEnable(false);
         channel_dispatcher::outputEnable(*channel, true);
