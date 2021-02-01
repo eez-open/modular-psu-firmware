@@ -24675,7 +24675,7 @@
                   "inheritFrom": "edit_value_S_left"
                 },
                 "left": 12,
-                "top": 14,
+                "top": 8,
                 "width": 58,
                 "height": 28,
                 "text": "Theme:"
@@ -24688,7 +24688,7 @@
                 "data": "selected_theme",
                 "action": "select_theme",
                 "left": 71,
-                "top": 14,
+                "top": 8,
                 "width": 141,
                 "height": 28,
                 "text": ""
@@ -24696,10 +24696,23 @@
               {
                 "type": "Text",
                 "style": {
+                  "inheritFrom": "option_toggle_L_center",
+                  "font": "Oswald14"
+                },
+                "action": "show_labels_and_colors",
+                "left": 12,
+                "top": 40,
+                "width": 200,
+                "height": 28,
+                "text": "Labels & Colors"
+              },
+              {
+                "type": "Text",
+                "style": {
                   "inheritFrom": "edit_value_S_left"
                 },
                 "left": 12,
-                "top": 50,
+                "top": 72,
                 "width": 123,
                 "height": 28,
                 "text": "Anim. duration:"
@@ -24711,8 +24724,8 @@
                 },
                 "data": "animations_duration",
                 "action": "edit_animations_duration",
-                "left": 135,
-                "top": 50,
+                "left": 134,
+                "top": 72,
                 "width": 77,
                 "height": 28,
                 "displayOption": 0
@@ -24724,7 +24737,7 @@
                 },
                 "action": "show_sys_settings_screen_calibration",
                 "left": 12,
-                "top": 92,
+                "top": 104,
                 "width": 200,
                 "height": 28,
                 "text": "Touchscreen calibration"
@@ -24736,8 +24749,8 @@
                 },
                 "action": "turn_display_off",
                 "left": 12,
-                "top": 128,
-                "width": 122,
+                "top": 136,
+                "width": 118,
                 "height": 28,
                 "text": "Turn disp. off"
               },
@@ -24747,201 +24760,227 @@
                   "inheritFrom": "edit_value_active_S_center"
                 },
                 "action": "show_display_test_page",
-                "left": 140,
-                "top": 128,
-                "width": 71,
+                "left": 134,
+                "top": 136,
+                "width": 77,
                 "height": 28,
                 "text": "Test"
               },
               {
-                "type": "Text",
+                "type": "Container",
                 "style": {
-                  "inheritFrom": "edit_value_S_left"
+                  "inheritFrom": "default"
                 },
                 "left": 232,
                 "top": 14,
-                "width": 140,
+                "width": 222,
                 "height": 28,
-                "text": "Brightness:"
+                "name": "Brightness",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 140,
+                    "height": 28,
+                    "text": "Brightness:"
+                  },
+                  {
+                    "type": "UpDown",
+                    "style": {
+                      "inheritFrom": "edit_value_S_centered"
+                    },
+                    "data": "sys_display_brightness",
+                    "action": "",
+                    "left": 140,
+                    "top": 0,
+                    "width": 82,
+                    "height": 28,
+                    "buttonsStyle": {
+                      "inheritFrom": "edit_S",
+                      "padding": 0
+                    },
+                    "downButtonText": "\\u008F",
+                    "upButtonText": "\\u0090"
+                  }
+                ]
               },
               {
-                "type": "UpDown",
-                "style": {
-                  "inheritFrom": "edit_value_S_centered"
-                },
-                "data": "sys_display_brightness",
-                "action": "",
-                "left": 372,
-                "top": 14,
-                "width": 82,
-                "height": 28,
-                "buttonsStyle": {
-                  "inheritFrom": "edit_S",
-                  "padding": 0
-                },
-                "downButtonText": "\\u008F",
-                "upButtonText": "\\u0090"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_S_left"
-                },
-                "left": 232,
-                "top": 55,
-                "width": 140,
-                "height": 28,
-                "text": "Lightness:"
-              },
-              {
-                "type": "UpDown",
-                "style": {
-                  "inheritFrom": "edit_value_S_centered"
-                },
-                "data": "sys_display_background_luminosity_step",
-                "action": "",
-                "left": 372,
-                "top": 55,
-                "width": 82,
-                "height": 28,
-                "buttonsStyle": {
-                  "inheritFrom": "edit_S",
-                  "padding": 0
-                },
-                "downButtonText": "\\u008F",
-                "upButtonText": "\\u0090"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_S_left"
-                },
-                "left": 232,
-                "top": 84,
-                "width": 84,
-                "height": 28,
-                "text": "Backgnd"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_center"
-                },
-                "left": 232,
-                "top": 112,
-                "width": 58,
-                "height": 34,
-                "text": "@",
-                "ignoreLuminocity": true
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_S_left"
-                },
-                "left": 316,
-                "top": 84,
-                "width": 84,
-                "height": 28,
-                "text": "Status"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "button_S"
-                },
-                "left": 316,
-                "top": 112,
-                "width": 29,
-                "height": 34,
-                "text": "@",
-                "ignoreLuminocity": false
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "button_S"
-                },
-                "left": 345,
-                "top": 112,
-                "width": 29,
-                "height": 34,
-                "text": "@",
-                "ignoreLuminocity": true
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_S_left"
-                },
-                "left": 400,
-                "top": 84,
-                "width": 68,
-                "height": 28,
-                "text": "Pop up"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "error_alert_button"
-                },
-                "left": 400,
-                "top": 112,
-                "width": 29,
-                "height": 34,
-                "text": "@"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "error_alert_button"
-                },
-                "left": 429,
-                "top": 112,
-                "width": 29,
-                "height": 34,
-                "text": "@",
-                "ignoreLuminocity": true
-              },
-              {
-                "type": "Rectangle",
+                "type": "Container",
                 "style": {
                   "inheritFrom": "default"
                 },
                 "left": 225,
                 "top": 45,
-                "width": 242,
-                "height": 2
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 225,
-                "top": 154,
-                "width": 242,
-                "height": 2
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 225,
-                "top": 47,
-                "width": 2,
-                "height": 109
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 465,
-                "top": 47,
-                "width": 2,
-                "height": 109
+                "width": 243,
+                "height": 111,
+                "name": "Lightness",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 7,
+                    "top": 10,
+                    "width": 140,
+                    "height": 28,
+                    "text": "Lightness:"
+                  },
+                  {
+                    "type": "UpDown",
+                    "style": {
+                      "inheritFrom": "edit_value_S_centered"
+                    },
+                    "data": "sys_display_background_luminosity_step",
+                    "action": "",
+                    "left": 147,
+                    "top": 10,
+                    "width": 82,
+                    "height": 28,
+                    "buttonsStyle": {
+                      "inheritFrom": "edit_S",
+                      "padding": 0
+                    },
+                    "downButtonText": "\\u008F",
+                    "upButtonText": "\\u0090"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 7,
+                    "top": 39,
+                    "width": 84,
+                    "height": 28,
+                    "text": "Backgnd"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "left": 7,
+                    "top": 67,
+                    "width": 58,
+                    "height": 34,
+                    "text": "@",
+                    "ignoreLuminocity": true
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 91,
+                    "top": 39,
+                    "width": 84,
+                    "height": 28,
+                    "text": "Status"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "button_S"
+                    },
+                    "left": 91,
+                    "top": 67,
+                    "width": 29,
+                    "height": 34,
+                    "text": "@",
+                    "ignoreLuminocity": false
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "button_S"
+                    },
+                    "left": 120,
+                    "top": 67,
+                    "width": 29,
+                    "height": 34,
+                    "text": "@",
+                    "ignoreLuminocity": true
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_S_left"
+                    },
+                    "left": 175,
+                    "top": 39,
+                    "width": 68,
+                    "height": 28,
+                    "text": "Pop up"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "error_alert_button"
+                    },
+                    "left": 175,
+                    "top": 67,
+                    "width": 29,
+                    "height": 34,
+                    "text": "@"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "error_alert_button"
+                    },
+                    "left": 204,
+                    "top": 67,
+                    "width": 29,
+                    "height": 34,
+                    "text": "@",
+                    "ignoreLuminocity": true
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 242,
+                    "height": 2
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 109,
+                    "width": 242,
+                    "height": 2
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 2,
+                    "width": 2,
+                    "height": 109
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 240,
+                    "top": 2,
+                    "width": 2,
+                    "height": 109
+                  }
+                ]
               }
             ]
           },
@@ -28133,19 +28172,6 @@
                   ]
                 },
                 "listType": "vertical"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "option_toggle_L_center",
-                  "font": "Oswald14"
-                },
-                "action": "show_labels_and_colors",
-                "left": 236,
-                "top": 140,
-                "width": 228,
-                "height": 28,
-                "text": "Labels & Colors"
               },
               {
                 "type": "Container",
