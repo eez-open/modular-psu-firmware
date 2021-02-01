@@ -165,11 +165,11 @@ bool TempSensorTemperature::isTestOK() {
     return temp_sensor::sensors[sensorIndex].g_testResult == TEST_OK;
 }
 
-void TempSensorTemperature::tick(uint32_t tick_usec) {
+void TempSensorTemperature::tick(uint32_t tickMs) {
     if (isInstalled() && isTestOK()) {
         measure();
         if (temp_sensor::sensors[sensorIndex].g_testResult == TEST_OK) {
-            protection_check(tick_usec);
+            protection_check(tickMs);
         }
     }
 }
@@ -212,19 +212,19 @@ void TempSensorTemperature::set_otp_reg(bool on) {
     }
 }
 
-void TempSensorTemperature::protection_check(uint32_t tick_usec) {
+void TempSensorTemperature::protection_check(uint32_t tickMs) {
     if (temp_sensor::sensors[sensorIndex].isInstalled()) {
         if (!otp_tripped && prot_conf.state && temperature >= prot_conf.level) {
             float delay = prot_conf.delay;
             if (delay > 0) {
                 if (otp_alarmed) {
-                    if (tick_usec - otp_alarmed_started_tick >= delay * 1000000UL) {
+                    if (tickMs - otp_alarmed_started_tick >= delay * 1000) {
                         otp_alarmed = 0;
                         protection_enter(*this);
                     }
                 } else {
                     otp_alarmed = 1;
-                    otp_alarmed_started_tick = tick_usec;
+                    otp_alarmed_started_tick = tickMs;
                 }
             } else {
                 protection_enter(*this);

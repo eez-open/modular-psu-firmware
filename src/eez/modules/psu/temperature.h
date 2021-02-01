@@ -61,7 +61,7 @@ public:
     const char *getName();
 	bool isInstalled();
 	bool isTestOK();
-	void tick(uint32_t tick_usec);
+	void tick(uint32_t tickMs);
 	Channel *getChannel();
 	float measure();
 	void clearProtection();
@@ -75,7 +75,7 @@ private:
 	bool otp_tripped;
 
 	void set_otp_reg(bool on);
-	void protection_check(uint32_t tick_usec);
+	void protection_check(uint32_t tickMs);
     static void protection_enter(TempSensorTemperature& sensor);
 	void protection_enter();
 };
