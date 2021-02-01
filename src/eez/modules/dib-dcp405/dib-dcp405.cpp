@@ -1109,12 +1109,14 @@ void tickDacRamp() {
 } // namespace dcp405
 
 #if defined(EEZ_PLATFORM_STM32)
+#if CONF_SURVIVE_MODE
 void readIntcapRegisterShortcut(int slotIndex) {
 	dcp405::DcpChannel *channel = (dcp405::DcpChannel *)Channel::getBySlotIndex(slotIndex, 0);
 	if (channel) {
 		channel->ioexp.readIntcapRegister();
 	}
 }
+#endif
 #endif
 
 } // namespace eez
