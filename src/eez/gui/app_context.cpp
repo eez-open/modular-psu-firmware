@@ -301,11 +301,13 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 ////////////////////////////////////////////////////////////////////////////////
 
 void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
-    m_updatePageIndex = i;
-
     mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
 
     if (!isPageFullyCovered(i)) {
+		m_updatePageIndex = i;
+
+		widgetCursor.cursor = -1;
+
         int x;
         int y;
         int width;
@@ -352,9 +354,11 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         }
 		
 		mcu::display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
-	}
 
-    m_updatePageIndex = -1;
+		widgetCursor.nextState();
+
+		m_updatePageIndex = -1;
+	}
 }
 
 bool isRect1FullyCoveredByRect2(int xRect1, int yRect1, int wRect1, int hRect1, int xRect2, int yRect2, int wRect2, int hRect2) {
@@ -401,9 +405,7 @@ void AppContext::updateAppView(WidgetCursor &widgetCursor) {
     }
 
     for (int i = 0; i <= m_pageNavigationStackPointer; i++) {
-        widgetCursor.cursor = -1;
         updatePage(i, widgetCursor);
-        widgetCursor.nextState();
     }
 }
 

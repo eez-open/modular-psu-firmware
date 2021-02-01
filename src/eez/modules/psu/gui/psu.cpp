@@ -548,7 +548,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
             animateSettingsSlideRight(false);
         }
     } else if (previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS) {
-        if (activePageId == PAGE_ID_SYS_INFO) {
+        if (activePageId == PAGE_ID_SYS_SETTINGS_DISPLAY) {
             animateSlideRight();
         }
     }
