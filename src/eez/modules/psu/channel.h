@@ -504,6 +504,10 @@ public:
 
     /// Clear channel protection tripp state.
     void clearProtection(bool clearOTP = true);
+    void clearOvpProtection();
+    void clearOcpProtection();
+    void clearOppProtection();
+    void clearOtpProtection();
 
     /// Disable protection for this channel
     void disableProtection();

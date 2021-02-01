@@ -1428,6 +1428,7 @@ void action_dlog_trigger_select_source() {
 }
 
 void action_show_dlog_params() {
+	selectChannel(nullptr);
     pushPage(PAGE_ID_DLOG_PARAMS);
 }
 

@@ -425,6 +425,26 @@ void action_ch_settings_prot_clear() {
     infoMessage("Cleared!");
 }
 
+void action_ch_settings_ovp_prot_clear() {
+    channel_dispatcher::clearOvpProtection(*g_channel);
+    infoMessage("Cleared!");
+}
+
+void action_ch_settings_ocp_prot_clear() {
+    channel_dispatcher::clearOcpProtection(*g_channel);
+    infoMessage("Cleared!");
+}
+
+void action_ch_settings_opp_prot_clear() {
+    channel_dispatcher::clearOppProtection(*g_channel);
+    infoMessage("Cleared!");
+}
+
+void action_ch_settings_otp_prot_clear() {
+    channel_dispatcher::clearOtpProtection(*g_channel);
+    infoMessage("Cleared!");
+}
+
 void action_ch_settings_prot_toggle_state() {
     ((ChSettingsProtectionSetPage *)getActivePage())->toggleState();
 }

@@ -3379,7 +3379,7 @@
                             "style": {
                               "inheritFrom": "ch_prot_tripped"
                             },
-                            "action": "show_ch_settings",
+                            "action": "",
                             "left": 0,
                             "top": 0,
                             "width": 45,
@@ -3563,7 +3563,7 @@
                             "style": {
                               "inheritFrom": "ch_prot_tripped"
                             },
-                            "action": "show_ch_settings",
+                            "action": "",
                             "left": 0,
                             "top": 0,
                             "width": 45,
@@ -3650,7 +3650,7 @@
                             "style": {
                               "inheritFrom": "ch_prot_tripped"
                             },
-                            "action": "show_ch_settings",
+                            "action": "",
                             "left": 0,
                             "top": 0,
                             "width": 45,
@@ -3961,7 +3961,7 @@
                                       "activeColor": "status_warning",
                                       "activeBackgroundColor": "text_enabled"
                                     },
-                                    "action": "show_ch_settings",
+                                    "action": "",
                                     "left": 0,
                                     "top": 0,
                                     "width": 45,
@@ -4178,7 +4178,7 @@
                                       "activeColor": "status_warning",
                                       "activeBackgroundColor": "text_enabled"
                                     },
-                                    "action": "show_ch_settings",
+                                    "action": "",
                                     "left": 0,
                                     "top": 0,
                                     "width": 45,
@@ -4294,7 +4294,7 @@
                                     "style": {
                                       "inheritFrom": "ch_prot_tripped"
                                     },
-                                    "action": "show_ch_settings",
+                                    "action": "",
                                     "left": 0,
                                     "top": 0,
                                     "width": 45,
@@ -4488,7 +4488,7 @@
                         "style": {
                           "inheritFrom": "ch_prot_tripped"
                         },
-                        "action": "show_ch_settings",
+                        "action": "",
                         "left": 0,
                         "top": 0,
                         "width": 45,
@@ -4637,7 +4637,7 @@
                         "style": {
                           "inheritFrom": "ch_prot_tripped"
                         },
-                        "action": "show_ch_settings",
+                        "action": "",
                         "left": 0,
                         "top": 0,
                         "width": 45,
@@ -4808,7 +4808,7 @@
                         "style": {
                           "inheritFrom": "ch_prot_tripped"
                         },
-                        "action": "show_ch_settings",
+                        "action": "",
                         "left": 0,
                         "top": 0,
                         "width": 48,
@@ -5093,7 +5093,7 @@
                                   "activeColor": "status_warning",
                                   "activeBackgroundColor": "text_enabled"
                                 },
-                                "action": "show_ch_settings",
+                                "action": "",
                                 "left": 0,
                                 "top": 0,
                                 "width": 45,
@@ -5233,7 +5233,7 @@
                                   "activeColor": "status_warning",
                                   "activeBackgroundColor": "text_enabled"
                                 },
-                                "action": "show_ch_settings",
+                                "action": "",
                                 "left": 0,
                                 "top": 0,
                                 "width": 45,
@@ -5345,7 +5345,7 @@
                                 "style": {
                                   "inheritFrom": "ch_prot_tripped"
                                 },
-                                "action": "show_ch_settings",
+                                "action": "",
                                 "left": 0,
                                 "top": 0,
                                 "width": 48,

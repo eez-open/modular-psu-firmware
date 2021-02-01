@@ -1170,6 +1170,15 @@ bool Channel::isTripped() {
 }
 
 void Channel::clearProtection(bool clearOTP) {
+    clearOvpProtection();
+    clearOcpProtection();
+    clearOppProtection();
+    if (clearOTP) {
+        temperature::clearChannelProtection(this);
+    }
+}
+
+void Channel::clearOvpProtection() {
     auto lastErrorEventId = event_queue::getLastErrorEventId();
     auto lastErrorEventChannelIndex = event_queue::getLastErrorEventChannelIndex();
 
@@ -1179,6 +1188,11 @@ void Channel::clearProtection(bool clearOTP) {
     if (lastErrorEventId == event_queue::EVENT_ERROR_CH_OVP_TRIPPED && lastErrorEventChannelIndex == channelIndex) {
         event_queue::markAsRead();
     }
+}
+
+void Channel::clearOcpProtection() {
+    auto lastErrorEventId = event_queue::getLastErrorEventId();
+    auto lastErrorEventChannelIndex = event_queue::getLastErrorEventChannelIndex();
 
     ocp.flags.tripped = 0;
     ocp.flags.alarmed = 0;
@@ -1186,6 +1200,11 @@ void Channel::clearProtection(bool clearOTP) {
     if (lastErrorEventId == event_queue::EVENT_ERROR_CH_OCP_TRIPPED && lastErrorEventChannelIndex == channelIndex) {
         event_queue::markAsRead();
     }
+}
+
+void Channel::clearOppProtection() {
+    auto lastErrorEventId = event_queue::getLastErrorEventId();
+    auto lastErrorEventChannelIndex = event_queue::getLastErrorEventChannelIndex();
 
     opp.flags.tripped = 0;
     opp.flags.alarmed = 0;
@@ -1193,10 +1212,10 @@ void Channel::clearProtection(bool clearOTP) {
     if (lastErrorEventId == event_queue::EVENT_ERROR_CH_OPP_TRIPPED && lastErrorEventChannelIndex == channelIndex) {
         event_queue::markAsRead();
     }
+}
 
-    if (clearOTP) {
-        temperature::clearChannelProtection(this);
-    }
+void Channel::clearOtpProtection() {
+    temperature::clearChannelProtection(this);
 }
 
 void Channel::disableProtection() {

@@ -3139,6 +3139,18 @@
     },
     {
       "name": "select_mcu_revision"
+    },
+    {
+      "name": "ch_settings_ovp_prot_clear"
+    },
+    {
+      "name": "ch_settings_ocp_prot_clear"
+    },
+    {
+      "name": "ch_settings_opp_prot_clear"
+    },
+    {
+      "name": "ch_settings_otp_prot_clear"
     }
   ],
   "gui": {
@@ -10413,7 +10425,9 @@
                   {
                     "type": "Text",
                     "style": {
-                      "inheritFrom": "edit_value_active_S_center"
+                      "inheritFrom": "edit_value_active_S_center",
+                      "color": "status_warning",
+                      "activeBackgroundColor": "status_warning"
                     },
                     "action": "ch_settings_prot_clear",
                     "left": 0,
@@ -11362,9 +11376,11 @@
                         "type": "Text",
                         "style": {
                           "inheritFrom": "edit_value_active_S_center",
-                          "font": "Oswald17"
+                          "font": "Oswald17",
+                          "color": "status_warning",
+                          "activeBackgroundColor": "status_warning"
                         },
-                        "action": "ch_settings_prot_clear",
+                        "action": "ch_settings_ovp_prot_clear",
                         "left": 0,
                         "top": 0,
                         "width": 228,
@@ -12453,9 +12469,11 @@
                     "type": "Text",
                     "style": {
                       "inheritFrom": "edit_value_active_S_center",
-                      "font": "Oswald17"
+                      "font": "Oswald17",
+                      "color": "status_warning",
+                      "activeBackgroundColor": "status_warning"
                     },
-                    "action": "ch_settings_prot_clear",
+                    "action": "ch_settings_ocp_prot_clear",
                     "left": 0,
                     "top": 0,
                     "width": 225,
@@ -13119,9 +13137,11 @@
                     "type": "Text",
                     "style": {
                       "inheritFrom": "edit_value_active_S_center",
-                      "font": "Oswald17"
+                      "font": "Oswald17",
+                      "color": "status_warning",
+                      "activeBackgroundColor": "status_warning"
                     },
-                    "action": "ch_settings_prot_clear",
+                    "action": "ch_settings_opp_prot_clear",
                     "left": 0,
                     "top": 0,
                     "width": 230,
@@ -13615,9 +13635,11 @@
                     "type": "Text",
                     "style": {
                       "inheritFrom": "edit_value_active_S_center",
-                      "font": "Oswald17"
+                      "font": "Oswald17",
+                      "color": "status_warning",
+                      "activeBackgroundColor": "status_warning"
                     },
-                    "action": "ch_settings_prot_clear",
+                    "action": "ch_settings_otp_prot_clear",
                     "left": 0,
                     "top": 0,
                     "width": 215,

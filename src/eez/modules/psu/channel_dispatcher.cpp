@@ -722,6 +722,10 @@ void setVoltageLimit(Channel &channel, float limit) {
 }
 
 void setOvpParameters(Channel &channel, int state, int type, float level, float delay) {
+    if (!state && channel_dispatcher::isOvpTripped(channel)) {
+        clearOvpProtection(channel);
+    }
+
     delay = roundPrec(delay, 0.001f);
 
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
@@ -1073,6 +1077,10 @@ void setCurrentLimit(Channel &channel, float limit) {
 }
 
 void setOcpParameters(Channel &channel, int state, float delay) {
+    if (!state && channel_dispatcher::isOcpTripped(channel)) {
+        clearOcpProtection(channel);
+    }
+
     delay = roundPrec(delay, 0.001f);
 
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
@@ -1204,6 +1212,10 @@ float getOppDefaultLevel(Channel &channel) {
 }
 
 void setOppParameters(Channel &channel, int state, float level, float delay) {
+    if (!state && channel_dispatcher::isOppTripped(channel)) {
+        clearOppProtection(channel);
+    }
+    
     delay = roundPrec(delay, 0.001f);
 
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
@@ -1537,6 +1549,70 @@ void clearProtection(Channel &channel) {
     }
 }
 
+void clearOvpProtection(Channel &channel) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        Channel::get(0).clearOvpProtection();
+        Channel::get(1).clearOvpProtection();
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                trackingChannel.clearOvpProtection();
+            }
+        }
+    } else {
+        channel.clearOvpProtection();
+    }
+}
+
+void clearOcpProtection(Channel &channel) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        Channel::get(0).clearOcpProtection();
+        Channel::get(1).clearOcpProtection();
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                trackingChannel.clearOcpProtection();
+            }
+        }
+    } else {
+        channel.clearOcpProtection();
+    }
+}
+
+void clearOppProtection(Channel &channel) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        Channel::get(0).clearOppProtection();
+        Channel::get(1).clearOppProtection();
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                trackingChannel.clearOppProtection();
+            }
+        }
+    } else {
+        channel.clearOppProtection();
+    }
+}
+
+void clearOtpProtection(Channel &channel) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        Channel::get(0).clearOtpProtection();
+        Channel::get(1).clearOtpProtection();
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled) {
+                trackingChannel.clearOtpProtection();
+            }
+        }
+    } else {
+        channel.clearOtpProtection();
+    }
+}
+
 void disableProtection(Channel &channel) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
         Channel::get(0).disableProtection();
@@ -1634,6 +1710,10 @@ void clearOtpProtection(int sensor) {
 }
 
 void setOtpParameters(Channel &channel, int state, float level, float delay) {
+    if (!state && channel_dispatcher::isOtpTripped(channel)) {
+        clearOtpProtection(channel);
+    }
+    
     delay = roundPrec(delay, 0.001f);
     level = roundPrec(level, 1);
 

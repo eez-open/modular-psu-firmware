@@ -128,6 +128,10 @@ void remoteSensingEnable(Channel &channel, bool enable);
 
 bool isTripped(Channel &channel, int &channelIndex);
 void clearProtection(Channel &channel);
+void clearOvpProtection(Channel &channel);
+void clearOcpProtection(Channel &channel);
+void clearOppProtection(Channel &channel);
+void clearOtpProtection(Channel &channel);
 void disableProtection(Channel &channel);
 
 bool isOvpTripped(Channel &channel);
