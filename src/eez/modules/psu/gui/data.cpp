@@ -1500,7 +1500,12 @@ void data_channel_p_mon(DataOperationEnum operation, Cursor cursor, Value &value
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getUMon(channel) * channel_dispatcher::getIMon(channel), UNIT_WATT);
+        auto iMon = channel_dispatcher::getIMon(channel);
+        if (iMon < channel.params.I_MON_MIN) {
+            value = MakeValue(channel_dispatcher::getUMon(channel) * channel.params.I_MON_MIN, UNIT_WATT, FLOAT_OPTIONS_LESS_THEN);
+        } else {
+            value = MakeValue(channel_dispatcher::getUMon(channel) * iMon, UNIT_WATT);
+        }
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(0, UNIT_WATT);
     } else if (operation == DATA_OPERATION_GET_MAX) {
