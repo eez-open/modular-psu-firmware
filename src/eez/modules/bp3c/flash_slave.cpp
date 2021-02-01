@@ -272,10 +272,13 @@ Exit:
 #endif
 	}
 
+	auto value = Value(g_slotIndex, VALUE_TYPE_SLOT_INFO);
+	char slotInfo[64];
+	value.toText(slotInfo, sizeof(slotInfo));
 	if (success) {
-		psu::event_queue::pushEvent(psu::event_queue::EVENT_INFO_FIRMWARE_UPDATED_ON_SLOT1 + g_slotIndex);
+		InfoTrace("%s firmware updated\n", slotInfo);
 	} else {
-		psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_FIRMWARE_UPDATE_FAILED_ON_SLOT1 + g_slotIndex);
+		ErrorTrace("%s firmware update failed\n", slotInfo);
 	}
 
 	sendMessageToPsu(PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE);

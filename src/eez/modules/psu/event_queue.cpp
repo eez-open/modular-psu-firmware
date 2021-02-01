@@ -307,6 +307,11 @@ void pushTraceMessage(int16_t traceMessageType, const char *message, size_t mess
                 bufferIndex = 0;
 
                 addEventToWriteQueue(traceMessageType, buffer, -1);
+
+                if (traceMessageType == EVENT_ERROR_TRACE) {
+                    g_lastErrorEventId = traceMessageType;
+                    g_lastErrorEventChannelIndex = -1;
+                }
             }
         }
     }
@@ -318,6 +323,10 @@ void pushDebugTrace(const char *message, size_t messageLength) {
 
 void pushInfoTrace(const char *message, size_t messageLength) {
     pushTraceMessage(EVENT_INFO_TRACE, message, messageLength);
+}
+
+void pushErrorTrace(const char *message, size_t messageLength) {
+    pushTraceMessage(EVENT_ERROR_TRACE, message, messageLength);
 }
 
 void markAsRead() {
@@ -420,17 +429,31 @@ static uint32_t getEventDateTime(Event *e) {
 }
 
 static int getEventType(int16_t eventId) {
-    if (eventId == EVENT_DEBUG_TRACE) {
-        return EVENT_TYPE_DEBUG;
-    } else if (eventId >= EVENT_INFO_START_ID || eventId == EVENT_INFO_TRACE) {
+	if (eventId == EVENT_DEBUG_TRACE) {
+		return EVENT_TYPE_DEBUG;
+	}
+	
+	if (eventId == EVENT_INFO_TRACE) {
+		return EVENT_TYPE_INFO;
+	}
+
+	if (eventId == EVENT_ERROR_TRACE) {
+		return EVENT_TYPE_ERROR;
+	}
+	
+	if (eventId >= EVENT_INFO_START_ID) {
         return EVENT_TYPE_INFO;
-    } else if (eventId >= EVENT_WARNING_START_ID) {
-        return EVENT_TYPE_WARNING;
-    } else if (eventId != EVENT_TYPE_NONE) {
-        return EVENT_TYPE_ERROR;
-    } else {
-        return EVENT_TYPE_NONE;
     }
+	
+	if (eventId >= EVENT_WARNING_START_ID) {
+        return EVENT_TYPE_WARNING;
+    } 
+	
+	if (eventId != EVENT_TYPE_NONE) {
+        return EVENT_TYPE_ERROR;
+    } 
+       
+	return EVENT_TYPE_NONE;
 }
 
 static int getEventType(Event *e) {
@@ -540,7 +563,7 @@ static bool writeToLog(QueueEvent *event, uint32_t &logOffset, int &eventType) {
     bool result = bufferedFile.write((const uint8_t *)dateTimeAndEventTypeStr, strlen(dateTimeAndEventTypeStr));
 
     if (result) {
-        if (event->eventId == EVENT_DEBUG_TRACE || event->eventId == EVENT_INFO_TRACE) {
+        if (event->eventId == EVENT_DEBUG_TRACE || event->eventId == EVENT_INFO_TRACE || event->eventId == EVENT_ERROR_TRACE) {
             result = bufferedFile.write((const uint8_t *)event->message, strlen(event->message));
         } else {
             const char *message = getEventMessage(event->eventId);
@@ -767,7 +790,13 @@ static void readEvents(uint32_t fromPosition) {
                             event.dateTime = g_writeQueue[i].dateTime;
                             event.eventType = eventType;
                             if (g_writeQueue[i].channelIndex == -1 || g_writeQueue[i].message) {
-                                stringCopy(event.message, sizeof(event.message), g_writeQueue[i].eventId == EVENT_DEBUG_TRACE || g_writeQueue[i].eventId == EVENT_INFO_TRACE ? g_writeQueue[i].message : getEventMessage(g_writeQueue[i].eventId));
+                                stringCopy(event.message, sizeof(event.message),
+									g_writeQueue[i].eventId == EVENT_DEBUG_TRACE ||
+									g_writeQueue[i].eventId == EVENT_INFO_TRACE ||
+									g_writeQueue[i].eventId == EVENT_ERROR_TRACE ?
+										g_writeQueue[i].message : 
+										getEventMessage(g_writeQueue[i].eventId)
+								);
                             } else {
                                 snprintf(event.message, sizeof(event.message), getEventMessage(g_writeQueue[i].eventId), g_writeQueue[i].channelIndex + 1);
                             }

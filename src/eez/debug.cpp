@@ -49,10 +49,12 @@ void Trace(TraceType traceType, const char *format, ...) {
 
     va_end(args);
 
-    if (traceType == TRACE_TYPE_INFO) {
+    if (traceType == TRACE_TYPE_DEBUG) {
+        event_queue::pushDebugTrace(buffer, strlen(buffer));
+    } else if (traceType == TRACE_TYPE_INFO) {
         event_queue::pushInfoTrace(buffer, strlen(buffer));
     } else {
-        event_queue::pushDebugTrace(buffer, strlen(buffer));
+        event_queue::pushErrorTrace(buffer, strlen(buffer));
     }
 }
 

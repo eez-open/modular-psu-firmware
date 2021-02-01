@@ -5061,7 +5061,7 @@ void data_slot_info(DataOperationEnum operation, Cursor cursor, Value &value) {
 
 void data_slot_info_with_fw_ver(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(cursor | (g_slots[cursor]->firmwareMajorVersion) << 8 | (g_slots[cursor]->firmwareMinorVersion) << 16, VALUE_TYPE_SLOT_INFO_WITH_FW_VER);
+        value = Value(cursor | (g_slots[cursor]->firmwareMajorVersion << 8) | (g_slots[cursor]->firmwareMinorVersion << 16), VALUE_TYPE_SLOT_INFO_WITH_FW_VER);
     }
 }
 

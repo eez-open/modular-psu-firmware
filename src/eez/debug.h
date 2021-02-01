@@ -24,8 +24,9 @@ namespace eez {
 namespace debug {
 
 enum TraceType {
+    TRACE_TYPE_DEBUG,
     TRACE_TYPE_INFO,
-    TRACE_TYPE_DEBUG
+    TRACE_TYPE_ERROR
 };
 
 void Trace(TraceType traceType, const char *format, ...);
@@ -34,6 +35,7 @@ void Trace(TraceType traceType, const char *format, ...);
 } // namespace eez
 
 #define InfoTrace(...) ::eez::debug::Trace(::eez::debug::TRACE_TYPE_INFO, __VA_ARGS__)
+#define ErrorTrace(...) ::eez::debug::Trace(::eez::debug::TRACE_TYPE_ERROR, __VA_ARGS__)
 
 #ifdef DEBUG
 
