@@ -29,6 +29,7 @@ namespace gui {
 class LabelsAndColorsPage : public SetPage {
 public:
     static int g_colorIndex;
+	static uint16_t g_colorDataId;
 
     static const char *getSlotLabel(int slotIndex);
     static const char *getSlotLabelOrDefault(int slotIndex);

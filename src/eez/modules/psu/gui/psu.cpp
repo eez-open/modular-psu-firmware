@@ -2054,14 +2054,14 @@ uint16_t transformColorHook(uint16_t color) {
         if (color) {
             return COLOR_ID_CHANNEL1 + color - 1;
         } else {
-            return COLOR_ID_CHANNEL1;
+            return COLOR_ID_CHANNEL1 + psu::CH_NUM + hmi::g_selectedSlotIndex;
         }
     } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_SLOT_COLOR_TEXT) {
         uint8_t color = LabelsAndColorsPage::getSlotColor(hmi::g_selectedSlotIndex);
         if (color) {
             return COLOR_ID_CHANNEL1_TEXT + color - 1;
         } else {
-            return COLOR_ID_CHANNEL1_TEXT;
+            return COLOR_ID_CHANNEL1_TEXT + psu::CH_NUM + hmi::g_selectedSlotIndex;
         }
     } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_CHANNEL_COLOR) {
         auto &channel = psu::Channel::get(g_channelIndex);

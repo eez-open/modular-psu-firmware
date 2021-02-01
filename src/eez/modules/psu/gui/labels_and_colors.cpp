@@ -62,6 +62,7 @@ ChannelLabelAndColor *getChannelLabelAndColor(int slotIndex, int subchannelIndex
 ////////////////////////////////////////////////////////////////////////////////
 
 int LabelsAndColorsPage::g_colorIndex;
+uint16_t LabelsAndColorsPage::g_colorDataId;
 int LabelsAndColorsPage::g_editSlotIndex;
 int LabelsAndColorsPage::g_editSubchannelIndex;
 
@@ -275,6 +276,12 @@ void data_colors(DataOperationEnum operation, Cursor cursor, Value &value) {
     } 
 }
 
+void data_color_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = (eez::mcu::display::transformColorHook(LabelsAndColorsPage::g_colorDataId) - COLOR_ID_CHANNEL1) == cursor;
+    } 
+}
+
 void data_labels_and_colors_page_slot_title(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = LabelsAndColorsPage::getSlotLabelOrDefault(hmi::g_selectedSlotIndex);
@@ -327,11 +334,13 @@ void action_change_channel_label() {
 
 void action_show_channel_color_picker() {
     selectChannelByCursor();
-    pushPage(PAGE_ID_COLOR_PICKER);
+	LabelsAndColorsPage::g_colorDataId = COLOR_ID_LABELS_AND_COLORS_PAGE_CHANNEL_COLOR;
+	pushPage(PAGE_ID_COLOR_PICKER);
 }
 
 void action_show_slot_color_picker() {
     hmi::selectSlot(getFoundWidgetAtDown().cursor);
+	LabelsAndColorsPage::g_colorDataId = COLOR_ID_LABELS_AND_COLORS_PAGE_SLOT_COLOR;
     pushPage(PAGE_ID_COLOR_PICKER);
 }
 

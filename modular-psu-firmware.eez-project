@@ -2424,6 +2424,11 @@
       "name": "slot_is_2ch_view",
       "type": "boolean",
       "defaultValue": "0"
+    },
+    {
+      "name": "color_is_selected",
+      "type": "boolean",
+      "defaultValue": "0"
     }
   ],
   "actions": [
@@ -36698,16 +36703,55 @@
               "height": 50,
               "widgets": [
                 {
-                  "type": "Rectangle",
+                  "type": "Select",
                   "style": {
-                    "inheritFrom": "default",
-                    "color": "pick_color",
-                    "activeBackgroundColor": "Background"
+                    "inheritFrom": "default"
                   },
+                  "data": "color_is_selected",
                   "left": 0,
                   "top": 0,
                   "width": 69,
-                  "height": 49
+                  "height": 49,
+                  "widgets": [
+                    {
+                      "type": "Rectangle",
+                      "style": {
+                        "inheritFrom": "default",
+                        "color": "pick_color",
+                        "activeBackgroundColor": "Background"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 69,
+                      "height": 49
+                    },
+                    {
+                      "type": "Container",
+                      "style": {
+                        "inheritFrom": "default",
+                        "borderSize": "2",
+                        "borderColor": "Background"
+                      },
+                      "left": 0,
+                      "top": 0,
+                      "width": 69,
+                      "height": 49,
+                      "widgets": [
+                        {
+                          "type": "Rectangle",
+                          "style": {
+                            "inheritFrom": "default",
+                            "color": "pick_color",
+                            "activeBackgroundColor": "Background"
+                          },
+                          "left": 3,
+                          "top": 3,
+                          "width": 63,
+                          "height": 43
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
