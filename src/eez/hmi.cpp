@@ -61,6 +61,14 @@ uint32_t getInactivityPeriodMs() {
     }
 }
 
+uint32_t getTimeOfLastActivity() {
+    if (g_inactivityTimeMaxed) {
+        return millis() - MAX_GUI_OR_ENCODER_INACTIVITY_TIME_MS;
+    } else {
+        return g_timeOfLastActivity;
+    }
+}
+
 void selectSlot(int slotIndex) {
     g_selectedSlotIndex = slotIndex;
     if (!Channel::getBySlotIndex(slotIndex)) {

@@ -57,7 +57,6 @@ struct List {
 };
 
    
-static uint32_t g_lastAutoSaveTime;
 static bool g_freeze;
 static Parameters g_profilesCache[NUM_PROFILE_LOCATIONS];
 static List g_listsProfile0[CH_MAX];
@@ -98,9 +97,13 @@ void init() {
 
 void tick() {
 #if !CONF_SURVIVE_MODE
+    static uint32_t g_lastAutoSaveTime;
+    static uint32_t g_timeOfLastHmiActivity;
     auto tick = millis();
-    if (tick - g_lastAutoSaveTime > CONF_AUTO_SAVE_TIMEOUT_MS) {
+    auto timeOfLastHmiActivity = hmi::getTimeOfLastActivity();
+    if (tick - g_lastAutoSaveTime > CONF_AUTO_SAVE_TIMEOUT_MS || timeOfLastHmiActivity != g_timeOfLastHmiActivity) {
         g_lastAutoSaveTime = tick;
+        g_timeOfLastHmiActivity = timeOfLastHmiActivity;
 #endif
         if (isTickSaveAllowed() && isAutoSaveAllowed() && isProfile0Dirty() && sd_card::isMounted(nullptr, nullptr)) {
             saveStateToProfile0(true);
