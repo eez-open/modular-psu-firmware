@@ -765,7 +765,10 @@ bool openFile(const char *filePath, int *err) {
     g_state = STATE_LOADING;
     g_loadingStartTickCount = millis();
 
-    stringCopy(g_filePath, sizeof(g_filePath), filePath);
+	if (filePath) {
+		stringCopy(g_filePath, sizeof(g_filePath), filePath);
+	}
+
     memset(&g_recording, 0, sizeof(Recording));
 
     if (!isLowPriorityThread()) {
@@ -929,6 +932,10 @@ public:
     void set() {
         gui::popPage();
 
+        memcpy(&dlog_record::g_parameters, &DlogParamsPage::g_parameters, sizeof(DlogParamsPage::g_parameters));
+    }
+
+    void start() {
         char filePath[MAX_PATH_LENGTH + 1];
 
         int slotIndex = getModuleLocalRecordingSlotIndex();
@@ -1019,7 +1026,10 @@ public:
             return;
         }
 
+        gui::popPage();
+
         memcpy(&dlog_record::g_parameters, &DlogParamsPage::g_parameters, sizeof(DlogParamsPage::g_parameters));
+
         stringCopy(dlog_record::g_parameters.filePath, sizeof(dlog_record::g_parameters.filePath), filePath);
 
         dlog_record::toggleStart();
@@ -1400,7 +1410,11 @@ void action_dlog_item_toggle() {
 }
 
 void action_dlog_toggle() {
-    toggleStop();
+    if (psu::gui::isPageOnStack(PAGE_ID_DLOG_PARAMS)) {
+        g_dlogParamsPage.start();
+    } else {
+        toggleStop();
+    }
 }
 
 void data_dlog_trigger_source(DataOperationEnum operation, Cursor cursor, Value &value) {

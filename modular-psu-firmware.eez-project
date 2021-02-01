@@ -33920,7 +33920,7 @@
                 "data": "",
                 "left": 40,
                 "top": 0,
-                "width": 284,
+                "width": 208,
                 "height": 32,
                 "text": "Log settings"
               },
@@ -33930,7 +33930,7 @@
                   "inheritFrom": "default"
                 },
                 "data": "dlog_start_enabled",
-                "left": 324,
+                "left": 248,
                 "top": 0,
                 "width": 115,
                 "height": 32,
@@ -33958,7 +33958,7 @@
                       "color": "Action color",
                       "activeBackgroundColor": "Action color"
                     },
-                    "action": "set",
+                    "action": "dlog_toggle",
                     "left": 0,
                     "top": 0,
                     "width": 115,
@@ -33968,43 +33968,87 @@
                 ]
               },
               {
+                "type": "Rectangle",
+                "style": {
+                  "inheritFrom": "status_bgnd"
+                },
+                "left": 363,
+                "top": 0,
+                "width": 35,
+                "height": 32,
+                "invertColors": true
+              },
+              {
                 "type": "Select",
                 "style": {
                   "inheritFrom": "default"
                 },
                 "data": "set_page_dirty",
-                "left": 439,
+                "left": 398,
                 "top": 0,
-                "width": 41,
+                "width": 82,
                 "height": 32,
                 "widgets": [
                   {
-                    "type": "Rectangle",
+                    "type": "Container",
                     "style": {
-                      "inheritFrom": "status_bgnd",
-                      "color": "status_line_text",
-                      "backgroundColor": "status_line_background",
-                      "activeColor": "status_line_background",
-                      "activeBackgroundColor": "status_line_text"
+                      "inheritFrom": "default"
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 41,
+                    "width": 82,
                     "height": 32,
-                    "invertColors": true
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "status_bgnd"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 82,
+                        "height": 32,
+                        "invertColors": true
+                      }
+                    ]
                   },
                   {
-                    "type": "Text",
+                    "type": "Container",
                     "style": {
-                      "inheritFrom": "status_bgnd",
-                      "font": "Heydings14"
+                      "inheritFrom": "default"
                     },
-                    "action": "discard",
                     "left": 0,
                     "top": 0,
-                    "width": 41,
+                    "width": 82,
                     "height": 32,
-                    "text": "X"
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14"
+                        },
+                        "action": "set",
+                        "left": 0,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "_"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "status_bgnd",
+                          "font": "Heydings14"
+                        },
+                        "action": "discard",
+                        "left": 41,
+                        "top": 0,
+                        "width": 41,
+                        "height": 32,
+                        "text": "X"
+                      }
+                    ]
                   }
                 ]
               }
