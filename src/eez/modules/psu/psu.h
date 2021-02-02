@@ -42,6 +42,9 @@
 namespace eez {
 
 extern TestResult g_masterTestResult;
+extern uint8_t g_numMasterErrors;
+static const size_t MASTER_ERROR_MESSAGE_SIZE = 100;
+extern char g_masterErrorMessage[MASTER_ERROR_MESSAGE_SIZE];
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 char *getConfFilePath(const char *file_name);

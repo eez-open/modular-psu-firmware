@@ -98,6 +98,8 @@ namespace eez {
 using namespace scpi;
 
 TestResult g_masterTestResult;
+uint8_t g_numMasterErrors;
+char g_masterErrorMessage[MASTER_ERROR_MESSAGE_SIZE];
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 

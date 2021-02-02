@@ -2429,6 +2429,11 @@
       "name": "color_is_selected",
       "type": "boolean",
       "defaultValue": "0"
+    },
+    {
+      "name": "master_error_message",
+      "type": "string",
+      "defaultValue": "FAN, RTC, DateTime, EEPROM, SD card, ETH, TEMP, BATT, BP3C"
     }
   ],
   "actions": [
@@ -3430,7 +3435,7 @@
             },
             "left": 104,
             "top": 144,
-            "width": 336,
+            "width": 372,
             "height": 30,
             "widgets": [
               {
@@ -3468,7 +3473,7 @@
                 "data": "master_test_result",
                 "left": 246,
                 "top": 0,
-                "width": 90,
+                "width": 126,
                 "height": 30,
                 "widgets": [
                   {
@@ -3479,7 +3484,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 90,
+                    "width": 126,
                     "height": 30,
                     "text": " "
                   },
@@ -3489,11 +3494,12 @@
                       "inheritFrom": "default_S_left_warning",
                       "font": "Oswald14"
                     },
+                    "data": "master_error_message",
                     "left": 0,
                     "top": 0,
-                    "width": 90,
+                    "width": 126,
                     "height": 30,
-                    "text": "Failed"
+                    "text": ""
                   },
                   {
                     "type": "Text",
@@ -3503,7 +3509,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 90,
+                    "width": 126,
                     "height": 30,
                     "text": "OK"
                   },
@@ -3517,7 +3523,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 90,
+                    "width": 126,
                     "height": 30,
                     "text": "..."
                   },
@@ -3529,7 +3535,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 90,
+                    "width": 126,
                     "height": 30,
                     "text": " "
                   },
@@ -3541,7 +3547,7 @@
                     },
                     "left": 0,
                     "top": 0,
-                    "width": 90,
+                    "width": 126,
                     "height": 30,
                     "text": "Warning"
                   }

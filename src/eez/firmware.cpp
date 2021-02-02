@@ -306,32 +306,67 @@ void boot() {
 }
 
 bool testMaster() {
-    bool result = true;
+	g_numMasterErrors = 0;
+    g_masterErrorMessage[0] = 0;
 
 #if OPTION_FAN
-    result &= aux_ps::fan::test();
+    if (!aux_ps::fan::test()) {
+        g_numMasterErrors++;
+        stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", FAN" : "FAN");
+    }
 #endif
 
-    result &= psu::rtc::test();
-    result &= psu::datetime::test();
-    result &= mcu::eeprom::test();
+    if (!psu::rtc::test()) {
+        g_numMasterErrors++;
+        stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", RTC" : "RTC");
+    }
 
-    result &= psu::sd_card::test();
+    if (!psu::datetime::test()) {
+        g_numMasterErrors++;
+        stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", DateTime" : "DateTime");
+    }
+
+    if (!mcu::eeprom::test()) {
+        g_numMasterErrors++;
+        stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", EEPROM" : "EEPROM");
+    }
+
+    if (!psu::sd_card::test()) {
+        g_numMasterErrors++;
+        stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", SD card" : "SD card");
+    }
 
 #if OPTION_ETHERNET
-    result &= psu::ethernet::test();
+    if (!psu::ethernet::test()) {
+        g_numMasterErrors++;
+        stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", ETH" : "ETH");
+    }
 #endif
 
-    result &= psu::temperature::test();
+    if (!psu::temperature::test()) {
+        g_numMasterErrors++;
+        stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", TEMP" : "TEMP");
+    }
 
-    result &= mcu::battery::test();
+    if (!mcu::battery::test()) {
+        g_numMasterErrors++;
+        stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", BATT" : "BATT");
+    }
 
     // test BP3c
-    result &= bp3c::io_exp::test();
+    if (!bp3c::io_exp::test()) {
+        g_numMasterErrors++;
+        stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", BP3C" : "BP3C");
+    }
 
-    g_masterTestResult = result ? TEST_OK : TEST_FAILED;
+	if (g_numMasterErrors > 0) {
+		ErrorTrace("MCU errors: %s\n", g_masterErrorMessage);
+		g_masterTestResult = TEST_FAILED;
+		return false;
+	}
 
-    return result;
+	g_masterTestResult = TEST_OK;
+    return true;
 }
 
 bool doTest() {

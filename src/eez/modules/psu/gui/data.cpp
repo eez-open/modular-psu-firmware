@@ -5046,6 +5046,12 @@ void data_master_test_result(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
+void data_master_error_message(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = g_masterErrorMessage;
+    }
+}
+
 void data_slots(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 3;
