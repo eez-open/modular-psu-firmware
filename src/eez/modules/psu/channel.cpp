@@ -1000,12 +1000,19 @@ void Channel::doRemoteProgrammingEnable(bool enable) {
     	channel_dispatcher::setVoltage(*this, u.min);
     	channel_dispatcher::setOvpLevel(*this, channel_dispatcher::getUMaxOvpLevel(*this));
     	channel_dispatcher::setOvpState(*this, 1);
+
+        channel_dispatcher::setPowerLimit(*this, channel_dispatcher::getPowerMaxLimit(*this));
     } else {
     	if (channel_dispatcher::getULimit(*this) > channel_dispatcher::getUMaxOvpLimit(*this)) {
     		channel_dispatcher::setVoltageLimit(*this, channel_dispatcher::getUMaxOvpLimit(*this));
     	}
+
     	if (channel_dispatcher::getUProtectionLevel(*this) > channel_dispatcher::getUMaxOvpLevel(*this)) {
     		channel_dispatcher::setOvpLevel(*this, channel_dispatcher::getUMaxOvpLevel(*this));
+    	}
+
+    	if (channel_dispatcher::getPowerLimit(*this) > channel_dispatcher::getPowerMaxLimit(*this)) {
+    		channel_dispatcher::setPowerLimit(*this, channel_dispatcher::getPowerMaxLimit(*this));
     	}
     }
 

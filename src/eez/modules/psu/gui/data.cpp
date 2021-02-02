@@ -87,6 +87,8 @@ using namespace eez::psu::gui;
 extern uint32_t g_RCC_CSR;
 #endif
 
+static const char *RPROG_LABEL = "RP";
+
 namespace eez {
 namespace gui {
 
@@ -1277,7 +1279,11 @@ void data_channel_u_set(DataOperationEnum operation, Cursor cursor, Value &value
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
-        value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
+        if (channel.isRemoteProgrammingEnabled()) {
+            value = RPROG_LABEL;
+        } else {
+            value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
+        }
     } else {
         data_channel_u_edit(operation, cursor, value);
     }
@@ -1347,7 +1353,11 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
-            value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
+            if (channel.isRemoteProgrammingEnabled()) {
+                value = RPROG_LABEL;
+            } else {
+                value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
+            }
         }
     } else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
         value = MakeValue(channel_dispatcher::getUSet(channel), UNIT_VOLT);
@@ -2360,15 +2370,19 @@ void data_channel_protection_ovp_limit(DataOperationEnum operation, Cursor curso
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
-        ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
-        if (page) {
-            value = page->limit;
+        if (channel.isRemoteProgrammingEnabled()) {
+            value = RPROG_LABEL;
         } else {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
-                value = g_focusEditValue;
+            ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
+            if (page) {
+                value = page->limit;
             } else {
-                value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
+                bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT;
+                if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                    value = g_focusEditValue;
+                } else {
+                    value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
+                }
             }
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
@@ -2549,15 +2563,19 @@ void data_channel_protection_opp_limit(DataOperationEnum operation, Cursor curso
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
-        ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
-        if (page) {
-            value = page->limit;
+        if (channel.isRemoteProgrammingEnabled()) {
+            value = RPROG_LABEL;
         } else {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
-                value = g_focusEditValue;
+            ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
+            if (page) {
+                value = page->limit;
             } else {
-                value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
+                bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT;
+                if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                    value = g_focusEditValue;
+                } else {
+                    value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
+                }
             }
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
@@ -2734,7 +2752,7 @@ void data_channel_rprog_status(DataOperationEnum operation, Cursor cursor, Value
     if (operation == DATA_OPERATION_GET) {
 		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = (int)channel.flags.rprogEnabled;
+        value = channel.isRemoteProgrammingEnabled();
     }
 }
 

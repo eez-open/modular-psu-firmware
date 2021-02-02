@@ -13173,17 +13173,41 @@
                 "text": "Limit:"
               },
               {
-                "type": "DisplayData",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "edit_value_active_M_center"
+                  "inheritFrom": "default"
                 },
-                "data": "channel_protection_opp_limit",
-                "action": "ch_settings_prot_edit_limit",
+                "data": "channel_rprog_status",
                 "left": 119,
                 "top": 36,
                 "width": 95,
                 "height": 32,
-                "displayOption": 0
+                "widgets": [
+                  {
+                    "type": "DisplayData",
+                    "style": {
+                      "inheritFrom": "edit_value_active_M_center"
+                    },
+                    "data": "channel_protection_opp_limit",
+                    "action": "ch_settings_prot_edit_limit",
+                    "left": 0,
+                    "top": 0,
+                    "width": 95,
+                    "height": 32,
+                    "displayOption": 0
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_M_left"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 95,
+                    "height": 32,
+                    "text": "RProg"
+                  }
+                ]
               },
               {
                 "type": "Text",

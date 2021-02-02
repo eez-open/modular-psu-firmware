@@ -658,7 +658,11 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
             return file_manager::isSelectFileActionEnabled(widgetCursor.cursor);
         }
 
-        if (widget->action == ACTION_ID_EDIT || widget->action == ACTION_ID_EDIT_NO_FOCUS) {
+        if (
+            widget->action == ACTION_ID_EDIT ||
+            widget->action == ACTION_ID_EDIT_NO_FOCUS ||
+            widget->action == ACTION_ID_CH_SETTINGS_PROT_EDIT_LIMIT
+        ) {
             if (widgetCursor.widget->data == DATA_ID_CALIBRATION_POINT_MEASURED_VALUE) {
                 auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
                 return page->canEditMeasuredValue();
@@ -2337,6 +2341,8 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
             return STYLE_ID_ENCODER_CURSOR_14_DISABLED;
         } else if (styleId == STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED) {
             return STYLE_ID_ENCODER_CURSOR_14_RIGHT_DISABLED;
+        } else if (styleId == STYLE_ID_EDIT_VALUE_ACTIVE_M_CENTER) {
+            return STYLE_ID_DEFAULT_M_LEFT;
         }
     }
     return styleId;

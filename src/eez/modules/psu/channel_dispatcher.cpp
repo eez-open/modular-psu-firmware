@@ -2249,6 +2249,17 @@ bool isEditEnabled(const WidgetCursor &widgetCursor) {
         if (getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED) {
             return false;
         }
+    } else if (
+        widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT ||
+        widgetCursor.widget->data == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT
+    ) {
+		using namespace psu::gui;
+		auto cursor = widgetCursor.cursor;
+		int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+        auto &channel = Channel::get(iChannel);
+        if (channel.flags.rprogEnabled) {
+            return false;
+        }
     }
 
     return true;
