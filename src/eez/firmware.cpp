@@ -303,6 +303,10 @@ void boot() {
         psu::event_queue::pushEvent(psu::event_queue::EVENT_ERROR_WATCHDOG_RESET);
     }
 #endif
+
+    if (g_numMasterErrors > 0) {
+		ErrorTrace("MCU errors: %s\n", g_masterErrorMessage);
+    }
 }
 
 bool testMaster() {
@@ -360,7 +364,6 @@ bool testMaster() {
     }
 
 	if (g_numMasterErrors > 0) {
-		ErrorTrace("MCU errors: %s\n", g_masterErrorMessage);
 		g_masterTestResult = TEST_FAILED;
 		return false;
 	}
