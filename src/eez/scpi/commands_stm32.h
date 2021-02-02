@@ -71,6 +71,8 @@
     SCPI_COMMAND("INSTrument:DISPlay:TRACe:SWAP", scpi_cmd_instrumentDisplayTraceSwap) \
     SCPI_COMMAND("INSTrument:DISPlay:TRACe#", scpi_cmd_instrumentDisplayTrace) \
     SCPI_COMMAND("INSTrument:DISPlay:TRACe#?", scpi_cmd_instrumentDisplayTraceQ) \
+    SCPI_COMMAND("INSTrument:DISPlay:SCALe#", scpi_cmd_instrumentDisplayScale) \
+    SCPI_COMMAND("INSTrument:DISPlay:SCALe#?", scpi_cmd_instrumentDisplayScaleQ) \
     SCPI_COMMAND("INSTrument:DISPlay:YT:RATE", scpi_cmd_instrumentDisplayYtRate) \
     SCPI_COMMAND("INSTrument:DISPlay:YT:RATE?", scpi_cmd_instrumentDisplayYtRateQ) \
     SCPI_COMMAND("INSTrument:NSELect", scpi_cmd_instrumentNselect) \

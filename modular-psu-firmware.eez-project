@@ -61971,6 +61971,46 @@
             }
           },
           {
+            "name": "INSTrument:DISPlay:SCALe<n>",
+            "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_disp_trac",
+            "parameters": [
+              {
+                "name": "value",
+                "type": [
+                  {
+                    "type": "nr2"
+                  },
+                  {
+                    "type": "discrete",
+                    "enumeration": "ValueDisplayScale"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "INSTrument:DISPlay:SCALe<n>?",
+            "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_disp_trac",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                },
+                {
+                  "type": "discrete",
+                  "enumeration": "ValueDisplayScale"
+                }
+              ]
+            }
+          },
+          {
             "name": "INSTrument:DISPlay:YT:RATE",
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_disp_yt_rate",
             "parameters": [
@@ -70920,6 +70960,23 @@
           {
             "name": "OPEN",
             "value": "2"
+          }
+        ]
+      },
+      {
+        "name": "ValueDisplayScale",
+        "members": [
+          {
+            "name": "MAXimum",
+            "value": "1"
+          },
+          {
+            "name": "LIMit",
+            "value": "2"
+          },
+          {
+            "name": "AUTO",
+            "value": "3"
           }
         ]
       }

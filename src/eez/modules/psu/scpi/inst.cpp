@@ -20,6 +20,10 @@
 
 #include <stdio.h>
 
+#if OPTION_DISPLAY
+#include <eez/gui/gui.h>
+#endif
+
 #include <eez/modules/psu/calibration.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/profile.h>
@@ -48,6 +52,13 @@ scpi_choice_def_t traceValueChoice[] = {
     { "VOLTage", DISPLAY_VALUE_VOLTAGE },
     { "CURRent", DISPLAY_VALUE_CURRENT },
     { "POWer", DISPLAY_VALUE_POWER },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_choice_def_t displayValueScaleChoice[] = {
+    { "MAXimum", DISPLAY_VALUE_SCALE_MAXIMUM },
+    { "LIMit", DISPLAY_VALUE_SCALE_LIMIT },
+    { "AUTO", DISPLAY_VALUE_SCALE_AUTO },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
@@ -230,6 +241,83 @@ scpi_result_t scpi_cmd_instrumentDisplayTraceQ(scpi_t *context) {
     }
 
     SCPI_ResultText(context, result);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_instrumentDisplayScale(scpi_t *context) {
+    Channel *channel = getSelectedPowerChannel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t displayValueIndex;
+    SCPI_CommandNumbers(context, &displayValueIndex, 1, 1);
+    if (displayValueIndex < 1 || displayValueIndex > 2) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+        return SCPI_RES_ERR;
+    }
+	displayValueIndex--;
+
+    scpi_parameter_t parameter;
+    if (!SCPI_Parameter(context, &parameter, true)) {
+        return SCPI_RES_ERR;
+    }
+
+	DisplayValue displayValues[2];
+	displayValues[0] = channel->displayValues[0];
+	displayValues[1] = channel->displayValues[1];
+
+    if (SCPI_ParamIsNumber(&parameter, true)) {
+        float range;
+        if (!SCPI_ParamToFloat(context, &parameter, &range)) {
+            return SCPI_RES_ERR;
+        }
+        
+        displayValues[displayValueIndex].scale = DISPLAY_VALUE_SCALE_CUSTOM;
+        displayValues[displayValueIndex].range = range;
+    } else {
+        int32_t scale;
+        if (!SCPI_ParamToChoice(context, &parameter, displayValueScaleChoice, &scale)) {
+            return SCPI_RES_ERR;
+        }
+        displayValues[displayValueIndex].scale = (DisplayValueScale)scale;
+    }
+
+    channel_dispatcher::setDisplayViewSettings(*channel, displayValues, channel->ytViewRate);
+
+#if OPTION_DISPLAY
+	gui::refreshScreen();
+#endif
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_instrumentDisplayScaleQ(scpi_t *context) {
+    Channel *channel = getSelectedPowerChannel(context);
+    if (!channel) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t displayValueIndex;
+    SCPI_CommandNumbers(context, &displayValueIndex, 1, 1);
+    if (displayValueIndex < 1 || displayValueIndex > 2) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
+        return SCPI_RES_ERR;
+    }
+	displayValueIndex--;
+
+    auto scale = channel->displayValues[displayValueIndex].scale;
+
+    if (scale == DISPLAY_VALUE_SCALE_MAXIMUM) {
+        SCPI_ResultText(context, "MAX");
+    } else if (scale == DISPLAY_VALUE_SCALE_LIMIT) {
+        SCPI_ResultText(context, "LIM");
+    } else if (scale == DISPLAY_VALUE_SCALE_AUTO) {
+        SCPI_ResultText(context, "AUTO");
+    } else {
+        SCPI_ResultFloat(context, channel->displayValues[displayValueIndex].range);
+    }
 
     return SCPI_RES_OK;
 }
