@@ -623,13 +623,13 @@ float getUMax(int slotIndex, int subchannelIndex) {
 
 float getUMaxOvpLimit(const Channel &channel) {
     if (channel.flags.rprogEnabled) {
-        return getUMax(channel) + 0.5f;    
+        return getUMax(channel) + 0.05f;    
     }
     return getUMax(channel);
 }
 
 float getUMaxOvpLevel(const Channel &channel) {
-    return getUMax(channel) + 0.5f;
+    return getUMax(channel) + 0.05f;
 }
 
 float getUProtectionLevel(const Channel &channel) {

@@ -2276,7 +2276,7 @@ void data_channel_protection_ovp_type(DataOperationEnum operation, Cursor cursor
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        if (channel.params.features & CH_FEATURE_HW_OVP) {
+        if ((channel.params.features & CH_FEATURE_HW_OVP) && !channel.flags.rprogEnabled) {
             ChSettingsProtectionSetPage *page = (ChSettingsProtectionSetPage *)getPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
             if (page) {
                 value = page->type ? 0 : 1;

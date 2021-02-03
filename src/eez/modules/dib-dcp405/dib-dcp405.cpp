@@ -63,10 +63,6 @@ using namespace psu;
 
 namespace dcp405 {
 
-bool isHwOvpEnabled(Channel &channel) {
-	return channel.prot_conf.flags.u_state && channel.prot_conf.flags.u_type;
-}
-
 struct DcpChannel : public Channel {
 	AnalogDigitalConverter adc;
 	DigitalAnalogConverter dac;
@@ -365,7 +361,7 @@ struct DcpChannel : public Channel {
 
 		// HW OVP handling
 		if (ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE)) {
-			if (!fallingEdge && isHwOvpEnabled(*this) && !ioexp.testBit(IOExpander::IO_BIT_OUT_OVP_ENABLE)) {
+			if (!fallingEdge && isHwOvpEnabled() && !ioexp.testBit(IOExpander::IO_BIT_OUT_OVP_ENABLE)) {
 				if (dac.isOverHwOvpThreshold()) {
 					// activate HW OVP
 					prot_conf.flags.u_hwOvpDeactivated = 0;
@@ -373,7 +369,7 @@ struct DcpChannel : public Channel {
 				} else {
 					prot_conf.flags.u_hwOvpDeactivated = 1;
 				}
-			} else if ((fallingEdge || !isHwOvpEnabled(*this)) && ioexp.testBit(IOExpander::IO_BIT_OUT_OVP_ENABLE)) {
+			} else if ((fallingEdge || !isHwOvpEnabled()) && ioexp.testBit(IOExpander::IO_BIT_OUT_OVP_ENABLE)) {
 				// deactivate HW OVP
 				prot_conf.flags.u_hwOvpDeactivated = fallingEdge ? 0 : 1;
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
@@ -518,7 +514,7 @@ struct DcpChannel : public Channel {
 
 			// OVP
 			if (tasks & OUTPUT_ENABLE_TASK_OVP) {
-				if (isHwOvpEnabled(*this)) {
+				if (isHwOvpEnabled()) {
 					if (dac.isOverHwOvpThreshold()) {
 						// OVP has to be enabled after OE activation
 						prot_conf.flags.u_hwOvpDeactivated = 0;
@@ -543,7 +539,7 @@ struct DcpChannel : public Channel {
 		} else {
 			// OVP
 			if (tasks & OUTPUT_ENABLE_TASK_OVP) {
-				if (isHwOvpEnabled(*this)) {
+				if (isHwOvpEnabled()) {
 					// OVP has to be disabled before OE deactivation
 					prot_conf.flags.u_hwOvpDeactivated = 1;
 					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
@@ -649,13 +645,13 @@ struct DcpChannel : public Channel {
 				fallingEdge = true;
 				fallingEdgePreviousUMonAdc = u.mon_adc;
 				fallingEdgeTimeout = millis() + (belowThreshold ? CONF_FALLING_EDGE_SW_OVP_DELAY_MS : CONF_FALLING_EDGE_HW_OVP_DELAY_MS);
-				if (isHwOvpEnabled(*this)) {
+				if (isHwOvpEnabled()) {
 					// deactivate HW OVP
 					prot_conf.flags.u_hwOvpDeactivated = 0; // this flag should be 0 while fallingEdge is true
 					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
 				}
 			} else if (belowThreshold) {
-				if (isHwOvpEnabled(*this)) {
+				if (isHwOvpEnabled()) {
 					// deactivate HW OVP
 					prot_conf.flags.u_hwOvpDeactivated = 1;
 					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
@@ -837,7 +833,7 @@ struct DcpChannel : public Channel {
 		uint8_t intcap = ioexp.readIntcapRegister();
 		// DebugTrace("CH%d INTCAP 0x%02X\n", (int)(channelIndex + 1), (int)intcap);
 		if (!(intcap & (1 << IOExpander::R2B5_IO_BIT_IN_OVP_FAULT))) {
-			if (isOutputEnabled() && isHwOvpEnabled(*this)) {
+			if (isOutputEnabled() && isHwOvpEnabled()) {
 				protectionEnter(ovp, true);
 			}
 		} else if (!(intcap & (1 << IOExpander::IO_BIT_IN_PWRGOOD))) {

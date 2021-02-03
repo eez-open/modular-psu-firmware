@@ -383,7 +383,7 @@ void Channel::protectionEnter(ProtectionValue &cpv, bool hwOvp) {
 }
 
 float Channel::getSwOvpProtectionLevel() {
-    if (prot_conf.flags.u_type) {
+    if (prot_conf.flags.u_type && !flags.rprogEnabled) {
     	const float CONF_MIN_SW_OVP_PROTECTION_LEVEL = 0.35f; // 350 mV
         return MAX(channel_dispatcher::getUSet(*this) * 1.03f, CONF_MIN_SW_OVP_PROTECTION_LEVEL); // 3%
     }
@@ -401,7 +401,7 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
     float delay;
 
     if (IS_OVP_VALUE(this, cpv)) {
-        state = (flags.rprogEnabled || prot_conf.flags.u_state) && !((params.features & CH_FEATURE_HW_OVP) && prot_conf.flags.u_type && !prot_conf.flags.u_hwOvpDeactivated);
+        state = (flags.rprogEnabled || prot_conf.flags.u_state) && !((params.features & CH_FEATURE_HW_OVP) && (prot_conf.flags.u_type && !flags.rprogEnabled) && !prot_conf.flags.u_hwOvpDeactivated);
         condition = checkSwOvpCondition();
         delay = prot_conf.u_delay;
         delay -= PROT_DELAY_CORRECTION;
