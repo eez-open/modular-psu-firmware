@@ -166,13 +166,8 @@ bool additionalCheckForCouplingType(CouplingType couplingType, int *err) {
         return false;
     }
 
-    if (!ch1.isCalibrationEnabled()) {
-    	ch1.calibrationEnable(true);
-    }
-
-    if (!ch2.isCalibrationEnabled()) {
-    	ch2.calibrationEnable(true);
-    }
+    ch1.calibrationEnableNoEvent(true);
+    ch2.calibrationEnableNoEvent(true);
 
     return true;
 }
