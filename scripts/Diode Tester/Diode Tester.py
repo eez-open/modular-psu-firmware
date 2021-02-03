@@ -43,6 +43,8 @@ def start():
 
     scpi("DISP:DIALog:CLOSe")
 
+    dlogStopped = False
+
     uStep = U_step
     uBreakdown = None
     try:
@@ -102,8 +104,12 @@ def start():
             iMon = getI(ch)
             #iMon = scpi("MEAS:CURR?")
 
-            dlogTraceData(iMon)
-            #scpi("DLOG:TRACE:DATA " + scpi("MEAS:CURR?"))
+            try:
+                dlogTraceData(iMon)
+                #scpi("DLOG:TRACE:DATA " + scpi("MEAS:CURR?"))
+            except:
+                dlogStopped = True
+                break
 
             mode = getOutputMode(ch)
             #mode = scpi("OUTP:MODE?")
@@ -122,10 +128,13 @@ def start():
         scpi("*RCL 10")
         scpi("MEM:STAT:FREEze OFF")
 
-    if uBreakdown != None:
-        scpi('DISP:INPUT? "Breakdown voltage is ' + str(round(uBreakdown, 2)) + 'V", MENU, BUTTON, "Close"')
+    if dlogStopped:
+        scpi('DISP:INPUT? "DLOG stopped, breakdown voltage not found", MENU, BUTTON, "Close"')
     else:
-        scpi('DISP:INPUT? "Breakdown voltage not found", MENU, BUTTON, "Close"')    
+        if uBreakdown != None:
+            scpi('DISP:INPUT? "Breakdown voltage is ' + "{:.2f}".format(uBreakdown) + 'V", MENU, BUTTON, "Close"')
+        else:
+            scpi('DISP:INPUT? "Breakdown voltage not found", MENU, BUTTON, "Close"')    
 
 scpi("DISP:DIALog:OPEN \"/Scripts/Diode Tester.res\"")
 update_U_step()

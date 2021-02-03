@@ -177,7 +177,11 @@ def start_BJT(cgnd):
                 t = ticks_add(t, TIME_OFF_MS)
                 sleep_ms(ticks_diff(t, ticks_ms()))
 
-        dlogTraceData(iMonValues)
+        try:
+            dlogTraceData(iMonValues)
+        except:
+            error('DLOG stopped')
+            break
 
 def start_MOSFET(cgnd):
     global deviceName, Uds_max, Id_max
@@ -278,7 +282,11 @@ def start_MOSFET(cgnd):
                 t = ticks_add(t, TIME_OFF_MS)
                 sleep_ms(ticks_diff(t, ticks_ms()))
 
-        dlogTraceData(iMonValues)
+        try:
+            dlogTraceData(iMonValues)
+        except:
+            error('DLOG stopped')
+            break
 
 ch1Model = scpi("SYSTem:CHANnel:MODel? ch1")
 ch2Model = scpi("SYSTem:CHANnel:MODel? ch2")

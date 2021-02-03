@@ -112,7 +112,10 @@ def start_reform():
 
       # Not time critical
       ###################
-      dlogTraceData(uMon,iMon)
+      try:
+        dlogTraceData(uMon,iMon)
+      except:
+        break
       
       # Done with loop?
       if nowtime > (starttime + reform_time * 1000):
