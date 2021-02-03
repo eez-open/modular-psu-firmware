@@ -2336,7 +2336,7 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
             }
             return STYLE_ID_BAR_GRAPH_P_DEFAULT;
         }
-    } else if (!g_psuAppContext.isWidgetActionEnabled(widgetCursor)) {
+    } else if (widgetCursor.widget->action != ACTION_ID_NONE && !g_psuAppContext.isWidgetActionEnabled(widgetCursor)) {
         if (styleId == STYLE_ID_ENCODER_CURSOR_14_ENABLED) {
             return STYLE_ID_ENCODER_CURSOR_14_DISABLED;
         } else if (styleId == STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED) {

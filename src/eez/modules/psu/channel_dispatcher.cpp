@@ -167,17 +167,11 @@ bool additionalCheckForCouplingType(CouplingType couplingType, int *err) {
     }
 
     if (!ch1.isCalibrationEnabled()) {
-        if (err) {
-            *err = SCPI_ERROR_CH1_CALIBRATION_NOT_ENABLED;
-        }
-        return false;
+    	ch1.calibrationEnable(true);
     }
 
     if (!ch2.isCalibrationEnabled()) {
-        if (err) {
-            *err = SCPI_ERROR_CH2_CALIBRATION_NOT_ENABLED;
-        }
-        return false;
+    	ch2.calibrationEnable(true);
     }
 
     return true;

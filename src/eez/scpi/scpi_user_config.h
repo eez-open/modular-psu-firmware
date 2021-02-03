@@ -140,6 +140,7 @@ extern "C" {
     X(SCPI_ERROR_CANNOT_SET_LIST_VALUE,                      314, "Cannot set list value")                        \
 	X(SCPI_ERROR_CANNOT_LOAD_EMPTY_PROFILE,                  400, "Cannot load empty profile")                    \
     X(SCPI_ERROR_PROFILE_MODULE_MISMATCH,                    401, "Module mismatch in profile")                   \
+	X(SCPI_ERROR_RECALL_FROM_PROFILE,                        402, "Recall from profile not possible")             \
 	X(SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM,                   410, "No FAT file system on mass media")             \
     X(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF,           500, "Down-programmer on CH1 switched off")          \
     X(SCPI_ERROR_CH2_DOWN_PROGRAMMER_SWITCHED_OFF,           501, "Down-programmer on CH2 switched off")          \

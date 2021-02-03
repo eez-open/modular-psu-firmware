@@ -816,9 +816,8 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
 
     trigger::abort();
 
-    int setCouplingTypeErr;
-    if (!channel_dispatcher::setCouplingType((channel_dispatcher::CouplingType)profile.flags.couplingType, &setCouplingTypeErr)) {
-        event_queue::pushEvent(setCouplingTypeErr);
+    if (!channel_dispatcher::setCouplingType((channel_dispatcher::CouplingType)profile.flags.couplingType, err)) {
+        return false;
     }
 
     mismatch = repositionChannelsInProfileToMatchCurrentChannelConfiguration(profile, lists);

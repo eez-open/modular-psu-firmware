@@ -1007,7 +1007,7 @@ bool autoRecall(int recallOptions) {
 				return true;
 			}
 			if (err != SCPI_ERROR_FILE_NOT_FOUND) {
-				generateError(err);
+				generateError(SCPI_ERROR_RECALL_FROM_PROFILE);
 			}
 		}
 	}
