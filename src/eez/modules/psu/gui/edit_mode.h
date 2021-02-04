@@ -20,6 +20,13 @@
 
 namespace eez {
 namespace psu {
+
+namespace profile {
+    struct Parameters;
+    class WriteContext;
+    class ReadContext;
+}
+
 namespace gui {
 
 namespace edit_mode {
@@ -78,9 +85,47 @@ void onTouchUp();
 
 void switchToNextStepIndex();
 
-bool hasEncoderStepValue();
-Value getCurrentEncoderStepValue();
-void showCurrentEncoderMode();
+extern EncoderMode g_frequencyEncoderMode;
+extern EncoderMode g_smallFrequencyEncoderMode;
+extern EncoderMode g_dutyEncoderMode;
+
+extern EncoderMode g_protectionDelayEncoderMode;
+extern EncoderMode g_rampAndDelayDurationEncoderMode;
+extern EncoderMode g_otpLevelEncoderMode;
+
+extern EncoderMode g_listVoltageEncoderMode;
+extern EncoderMode g_listCurrentEncoderMode;
+extern EncoderMode g_listDwellEncoderMode;
+
+extern EncoderMode g_dcpVoltageEncoderMode;
+extern EncoderMode g_dcpCurrentEncoderMode;
+extern EncoderMode g_dcpPowerEncoderMode;
+
+extern EncoderMode g_dcmVoltageEncoderMode;
+extern EncoderMode g_dcmCurrentEncoderMode;
+extern EncoderMode g_dcmPowerEncoderMode;
+
+extern EncoderMode g_recordingEncoderMode;
+extern EncoderMode g_visibleValueDivEncoderMode;
+extern EncoderMode g_visibleValueOffsetEncoderMode;
+extern EncoderMode g_xAxisOffsetEncoderMode;
+extern EncoderMode g_xAxisDivEncoderMode;
+
+extern EncoderMode g_smx46DacEncoderMode;
+
+extern EncoderMode g_mio168NplcEncoderMode;
+extern EncoderMode g_mio168AinVoltageEncoderMode;
+extern EncoderMode g_mio168AinCurrentEncoderMode;
+extern EncoderMode g_mio168AoutVoltageEncoderMode;
+extern EncoderMode g_mio168AoutCurrentEncoderMode;
+
+float getEncoderStepValue();
+void switchToNextEncoderMode();
+
+void getProfileParameters(profile::Parameters &profileParams);
+void setProfileParameters(const profile::Parameters &profileParams);
+bool writeProfileProperties(profile::WriteContext &ctx, const profile::Parameters &profileParams);
+bool readProfileProperties(profile::ReadContext &ctx, profile::Parameters &profileParams);
 
 } // namespace edit_mode_step
 

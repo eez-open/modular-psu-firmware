@@ -72,19 +72,6 @@ void enableAcceleration(bool enable, float range, float step) {
     g_step = step;
 }
 
-EncoderMode getEncoderMode() {
-    return (EncoderMode)psu::persist_conf::devConf.encoderMode;
-}
-
-void switchEncoderMode() {
-    EncoderMode encoderMode = getEncoderMode();
-    if (encoderMode == ENCODER_MODE_STEP5) {
-        psu::persist_conf::setEncoderMode(ENCODER_MODE_AUTO);
-    } else {
-        psu::persist_conf::setEncoderMode(encoderMode + 1);
-    }
-}
-
 #if defined(EEZ_PLATFORM_SIMULATOR)
 void write(int counter, bool clicked) {
 	g_counter += getAcceleratedCounter(counter);
@@ -194,7 +181,7 @@ static int getCounter() {
 }
 
 static int getAcceleratedCounter(int increment) {
-    if (increment == 0 || !g_accelerationEnabled || getEncoderMode() != ENCODER_MODE_AUTO) {
+    if (increment == 0 || !g_accelerationEnabled) {
         return increment;
     }
 

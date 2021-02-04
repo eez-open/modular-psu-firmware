@@ -590,6 +590,11 @@ void Module::getVoltageStepValues(int subchannelIndex, StepValues *stepValues, b
     stepValues->encoderSettings.accelerationEnabled = false;
     stepValues->encoderSettings.range = 40.0f;
     stepValues->encoderSettings.step = 0.005f;
+
+    stepValues->encoderSettings.mode = ENCODER_MODE_AUTO;
+}
+
+void Module::setVoltageEncoderMode(int subchannelIndex, EncoderMode encoderMode) {
 }
 
 float Module::getVoltageResolution(int subchannelIndex) {
@@ -648,7 +653,13 @@ void Module::getCurrentStepValues(int subchannelIndex, StepValues *stepValues, b
     stepValues->encoderSettings.accelerationEnabled = false;
     stepValues->encoderSettings.range = 5.0f;
     stepValues->encoderSettings.step = 0.0005f;
+    
+    stepValues->encoderSettings.mode = ENCODER_MODE_AUTO;
 }
+
+void Module::setCurrentEncoderMode(int subchannelIndex, EncoderMode encoderMode) {
+}
+
 
 float Module::getCurrentResolution(int subchannelIndex) {
     return NAN;

@@ -36,19 +36,6 @@ void read(int &counter, bool &clicked);
 
 void enableAcceleration(bool enable, float range = DEFAULT_ENCODER_RANGE, float step = DEFAULT_ENCODER_STEP);
 
-enum EncoderMode {
-    ENCODER_MODE_MIN,
-    ENCODER_MODE_AUTO = ENCODER_MODE_MIN,
-    ENCODER_MODE_STEP1,
-    ENCODER_MODE_STEP2,
-    ENCODER_MODE_STEP3,
-    ENCODER_MODE_STEP4,
-    ENCODER_MODE_STEP5,
-    ENCODER_MODE_MAX = ENCODER_MODE_STEP5
-};
-extern EncoderMode getEncoderMode();
-void switchEncoderMode();
-
 #if defined(EEZ_PLATFORM_SIMULATOR)
 void write(int counter, bool clicked);
 #endif

@@ -346,6 +346,7 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_UNIT,
     DATA_OPERATION_GET_IS_CHANNEL_DATA,
     DATA_OPERATION_GET_ENCODER_STEP_VALUES,
+	DATA_OPERATION_SET_ENCODER_MODE,
     DATA_OPERATION_GET_ENCODER_RANGE_AND_STEP,
     DATA_OPERATION_GET_FLOAT_LIST_LENGTH,
     DATA_OPERATION_GET_FLOAT_LIST,
@@ -421,6 +422,7 @@ bool isChannelData(Cursor cursor, int16_t id);
 void getLabel(Cursor cursor, int16_t id, char *text, int count);
 
 bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues);
+void setEncoderMode(Cursor cursor, int16_t id, EncoderMode encoderMode);
 
 Value get(Cursor cursor, int16_t id);
 const char *isValidValue(Cursor cursor, int16_t id, Value value);

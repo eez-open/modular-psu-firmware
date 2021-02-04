@@ -1108,6 +1108,12 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
                 channel_dispatcher::getCurrentStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
             }
             value = 1;
+        } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+            if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
+                channel_dispatcher::setVoltageEncoderMode(slotIndex, subchannelIndex, (EncoderMode)value.getInt());
+            } else {
+                channel_dispatcher::setCurrentEncoderMode(slotIndex, subchannelIndex, (EncoderMode)value.getInt());
+            }
         } else if (operation == DATA_OPERATION_SET) {
             editPage->setDacValue(value.getFloat());
         }
@@ -1175,6 +1181,12 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
                 channel_dispatcher::getCurrentStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
             }
             value = 1;
+        } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+            if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
+                channel_dispatcher::setVoltageEncoderMode(slotIndex, subchannelIndex, (EncoderMode)value.getInt());
+            } else {
+                channel_dispatcher::setCurrentEncoderMode(slotIndex, subchannelIndex, (EncoderMode)value.getInt());
+            }
         } else if (operation == DATA_OPERATION_SET) {
             editPage->setMeasuredValue(value.getFloat());
         }

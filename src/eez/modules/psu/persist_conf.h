@@ -179,8 +179,8 @@ struct DeviceConfiguration {
     SortFilesOption sortFilesOption;
     int eventQueueFilter;
     ViewFlags viewFlags;
-    uint8_t encoderMode;
-    uint8_t reserved6[43];
+    uint8_t reserved6; // was encoderMode
+    uint8_t reserved7[43];
     uint32_t ntpRefreshFrequency;
 
     // block 8
@@ -336,8 +336,6 @@ void setUserSwitchAction(UserSwitchAction userSwitchAction);
 void setSortFilesOption(SortFilesOption sortFilesOption);
 
 void setEventQueueFilter(int eventQueueFilter);
-
-void setEncoderMode(uint8_t encoderMode);
 
 void setIsInhibitedByUser(int isInhibitedByUser);
 

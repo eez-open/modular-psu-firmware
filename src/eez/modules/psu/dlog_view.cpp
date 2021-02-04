@@ -32,6 +32,7 @@
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/edit_mode.h>
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
 #endif
@@ -1662,7 +1663,11 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
         stepValues->encoderSettings.range = 100.0f * values[0];
         stepValues->encoderSettings.step = values[0];
 
+        stepValues->encoderSettings.mode = edit_mode_step::g_recordingEncoderMode;
+
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+		edit_mode_step::g_recordingEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -1825,8 +1830,12 @@ void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Val
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        guessStepValues(value.getStepValues(), getYAxisUnit(recording, dlogValueIndex));
+        StepValues *stepValues = value.getStepValues();
+        guessStepValues(stepValues, getYAxisUnit(recording, dlogValueIndex));
+        stepValues->encoderSettings.mode = edit_mode_step::g_visibleValueDivEncoderMode;
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+		edit_mode_step::g_visibleValueDivEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -1863,8 +1872,12 @@ void data_dlog_visible_value_offset(DataOperationEnum operation, Cursor cursor, 
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        guessStepValues(value.getStepValues(), getYAxisUnit(recording, dlogValueIndex));
+        StepValues *stepValues = value.getStepValues();
+        guessStepValues(stepValues, getYAxisUnit(recording, dlogValueIndex));
+        stepValues->encoderSettings.mode = edit_mode_step::g_visibleValueOffsetEncoderMode;
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+		edit_mode_step::g_visibleValueOffsetEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -1891,8 +1904,12 @@ void data_dlog_x_axis_offset(DataOperationEnum operation, Cursor cursor, Value &
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        guessStepValues(value.getStepValues(), dlog_view::getXAxisUnit(recording));
+        StepValues *stepValues = value.getStepValues();
+        guessStepValues(stepValues, dlog_view::getXAxisUnit(recording));
+        stepValues->encoderSettings.mode = edit_mode_step::g_xAxisOffsetEncoderMode;
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+		edit_mode_step::g_xAxisOffsetEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -1919,8 +1936,12 @@ void data_dlog_x_axis_div(DataOperationEnum operation, Cursor cursor, Value &val
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        guessStepValues(value.getStepValues(), dlog_view::getXAxisUnit(recording));
+        StepValues *stepValues = value.getStepValues();
+        guessStepValues(stepValues, dlog_view::getXAxisUnit(recording));
+        stepValues->encoderSettings.mode = edit_mode_step::g_xAxisDivEncoderMode;
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+		edit_mode_step::g_xAxisDivEncoderMode = (EncoderMode)value.getInt();
     }
 }
 

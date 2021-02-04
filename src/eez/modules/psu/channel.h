@@ -683,8 +683,11 @@ public:
     virtual void readAllRegisters(uint8_t ioexpRegisters[], uint8_t adcRegisters[]);
 
     virtual void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) = 0;
+    virtual void setVoltageEncoderMode(EncoderMode encoderMode) = 0;
     virtual void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) = 0;
+    virtual void setCurrentEncoderMode(EncoderMode encoderMode) = 0;
     virtual void getPowerStepValues(StepValues *stepValues) = 0;
+    virtual void setPowerEncoderMode(EncoderMode encoderMode) = 0;
 
     virtual bool isPowerLimitExceeded(float u, float i, int *err) = 0;
 

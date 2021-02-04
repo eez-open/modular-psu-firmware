@@ -33,6 +33,7 @@
 #include <eez/modules/psu/sd_card.h>
 
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/edit_mode.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
@@ -762,6 +763,8 @@ static void saveState(Parameters &profile, List *lists) {
     memcpy(profile.ioPinsPwmFrequency, io_pins::g_pwmFrequency, sizeof(profile.ioPinsPwmFrequency));
     memcpy(profile.ioPinsPwmDuty, io_pins::g_pwmDuty, sizeof(profile.ioPinsPwmDuty));
 
+    eez::psu::gui::edit_mode_step::getProfileParameters(profile);
+
     profile.flags.isValid = true;
 }
 
@@ -857,6 +860,8 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
     memcpy(io_pins::g_pwmFrequency, profile.ioPinsPwmFrequency, sizeof(profile.ioPinsPwmFrequency));
     memcpy(io_pins::g_pwmDuty, profile.ioPinsPwmDuty, sizeof(profile.ioPinsPwmDuty));
     io_pins::refresh();
+
+    eez::psu::gui::edit_mode_step::setProfileParameters(profile);
 
     return true;
 }
@@ -1095,6 +1100,10 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
             WRITE_PROPERTY("pwmFrequency", parameters.ioPinsPwmFrequency[i - DOUT1]);
             WRITE_PROPERTY("pwmDuty", parameters.ioPinsPwmDuty[i - DOUT1]);
         }
+    }
+
+    if (!eez::psu::gui::edit_mode_step::writeProfileProperties(ctx, parameters)) {
+        return false;
     }
 
     return true;
@@ -1427,6 +1436,10 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
             READ_FLAG("pwmFrequency", parameters.ioPinsPwmFrequency[ioPinIndex - DOUT1]);
             READ_FLAG("pwmDuty", parameters.ioPinsPwmDuty[ioPinIndex - DOUT1]);
         }
+    }
+
+    if (eez::psu::gui::edit_mode_step::readProfileProperties(ctx, parameters)) {
+        return true;
     }
 
     return false;

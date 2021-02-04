@@ -1376,6 +1376,8 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         channel.getVoltageStepValues(value.getStepValues(), false);
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        channel.setVoltageEncoderMode((EncoderMode)value.getInt());
     } else if (operation == DATA_OPERATION_SET) {
         int err;
         if (!channel.isVoltageWithinRange(value.getFloat())) {
@@ -1490,6 +1492,8 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         channel.getCurrentStepValues(value.getStepValues(), false);
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        channel.setCurrentEncoderMode((EncoderMode)value.getInt());
     } else if (operation == DATA_OPERATION_SET) {
         int err;
         if (!channel.isCurrentWithinRange(value.getFloat())) {
@@ -2331,6 +2335,7 @@ void getProtectionDelayStepValues(StepValues *stepValues) {
     stepValues->encoderSettings.accelerationEnabled = true;
     stepValues->encoderSettings.range = 10.0f * stepValues->values[0];
     stepValues->encoderSettings.step = stepValues->values[0];
+    stepValues->encoderSettings.mode = edit_mode_step::g_protectionDelayEncoderMode;
 }
 
 void data_channel_protection_ovp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2363,6 +2368,8 @@ void data_channel_protection_ovp_delay(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         getProtectionDelayStepValues(value.getStepValues());
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_protectionDelayEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -2400,7 +2407,9 @@ void data_channel_protection_ovp_limit(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         channel.getVoltageStepValues(value.getStepValues(), false);
         value = 1;
-    }
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        channel.setVoltageEncoderMode((EncoderMode)value.getInt());
+    } 
 }
 
 void data_channel_protection_ocp_state(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2442,6 +2451,8 @@ void data_channel_protection_ocp_delay(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         getProtectionDelayStepValues(value.getStepValues());
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_protectionDelayEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -2475,7 +2486,9 @@ void data_channel_protection_ocp_limit(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         channel.getCurrentStepValues(value.getStepValues(), false);
         value = 1;
-    }
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        channel.setCurrentEncoderMode((EncoderMode)value.getInt());
+    } 
 }
 
 void data_channel_protection_ocp_max_current_limit_cause(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2523,7 +2536,9 @@ void data_channel_protection_opp_level(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         channel.getPowerStepValues(value.getStepValues());
         value = 1;
-    }
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        channel.setPowerEncoderMode((EncoderMode)value.getInt());
+    } 
 }
 
 void data_channel_protection_opp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2556,6 +2571,8 @@ void data_channel_protection_opp_delay(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         getProtectionDelayStepValues(value.getStepValues());
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_protectionDelayEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -2593,6 +2610,8 @@ void data_channel_protection_opp_limit(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         channel.getPowerStepValues(value.getStepValues());
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        channel.setPowerEncoderMode((EncoderMode)value.getInt());
     }
 }
 
@@ -2650,8 +2669,11 @@ void data_channel_protection_otp_level(DataOperationEnum operation, Cursor curso
         stepValues->encoderSettings.accelerationEnabled = true;
         stepValues->encoderSettings.range = 10.0f * stepValues->values[0];
         stepValues->encoderSettings.step = stepValues->values[0];
+        stepValues->encoderSettings.mode = edit_mode_step::g_otpLevelEncoderMode;
 
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_otpLevelEncoderMode = (EncoderMode)value.getInt();
     }
 }
     
@@ -2685,6 +2707,8 @@ void data_channel_protection_otp_delay(DataOperationEnum operation, Cursor curso
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         getProtectionDelayStepValues(value.getStepValues());
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_protectionDelayEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -4012,8 +4036,11 @@ void data_channel_list_dwell(DataOperationEnum operation, Cursor cursor, Value &
         stepValues->encoderSettings.accelerationEnabled = true;
         stepValues->encoderSettings.range = 10.0f * stepValues->values[0];
         stepValues->encoderSettings.step = stepValues->values[0];
+        stepValues->encoderSettings.mode = edit_mode_step::g_listDwellEncoderMode;
 
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_listDwellEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -4063,6 +4090,9 @@ void data_channel_list_voltage(DataOperationEnum operation, Cursor cursor, Value
 
         stepValues->encoderSettings.range = g_channel->params.U_MAX;
         stepValues->encoderSettings.step = g_channel->params.U_RESOLUTION;
+        stepValues->encoderSettings.mode = edit_mode_step::g_listVoltageEncoderMode;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_listVoltageEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -4115,6 +4145,9 @@ void data_channel_list_current(DataOperationEnum operation, Cursor cursor, Value
 
         stepValues->encoderSettings.range = g_channel->params.I_MAX;
         stepValues->encoderSettings.step = g_channel->params.I_RESOLUTION;
+        stepValues->encoderSettings.mode = edit_mode_step::g_listCurrentEncoderMode;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_listCurrentEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -4450,7 +4483,11 @@ void data_io_pin_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value
         stepValues->encoderSettings.range = step * 5.0f;
         stepValues->encoderSettings.step = step;
 
+        stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_frequencyEncoderMode;
+
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        eez::psu::gui::edit_mode_step::g_frequencyEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -4497,8 +4534,12 @@ void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &val
         stepValues->encoderSettings.range = 100.0f;
         stepValues->encoderSettings.step = 1.0f;
 
+        stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_dutyEncoderMode;
+
         value = 1;
-    }
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        eez::psu::gui::edit_mode_step::g_dutyEncoderMode = (EncoderMode)value.getInt();
+    } 
 }
 
 void data_ntp_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -5255,6 +5296,8 @@ void getRampAndDelayDurationStepValues(Value &value) {
     stepValues->encoderSettings.range = stepValues->values[0] * 10.0f;
     stepValues->encoderSettings.step = stepValues->values[0];
 
+    stepValues->encoderSettings.mode = edit_mode_step::g_rampAndDelayDurationEncoderMode;
+
     value = 1;
 }
 
@@ -5299,6 +5342,8 @@ void data_channel_voltage_ramp_duration(DataOperationEnum operation, Cursor curs
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         getRampAndDelayDurationStepValues(value);
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_rampAndDelayDurationEncoderMode = (EncoderMode)value.getInt();
     }    
 }
 
@@ -5343,7 +5388,9 @@ void data_channel_current_ramp_duration(DataOperationEnum operation, Cursor curs
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         getRampAndDelayDurationStepValues(value);
-    }    
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_rampAndDelayDurationEncoderMode = (EncoderMode)value.getInt();
+    }
 }
 
 void data_channel_output_delay(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -5387,7 +5434,9 @@ void data_channel_output_delay(DataOperationEnum operation, Cursor cursor, Value
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         getRampAndDelayDurationStepValues(value);
-    }    
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_rampAndDelayDurationEncoderMode = (EncoderMode)value.getInt();
+    }
 }
 
 void data_slot_error_message(DataOperationEnum operation, Cursor cursor, Value &value) {

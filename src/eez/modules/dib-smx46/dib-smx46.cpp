@@ -41,6 +41,7 @@
 #include "eez/modules/psu/gui/animations.h"
 #include "eez/modules/psu/gui/keypad.h"
 #include "eez/modules/psu/gui/labels_and_colors.h"
+#include "eez/modules/psu/gui/edit_mode.h"
 #include "eez/modules/bp3c/comm.h"
 #include "eez/modules/psu/gui/edit_mode.h"
 
@@ -1084,6 +1085,11 @@ public:
             stepValues->encoderSettings.step /= 10.0f;
             stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
         }
+        stepValues->encoderSettings.mode = edit_mode_step::g_smx46DacEncoderMode;
+    }
+    
+    void setVoltageEncoderMode(int subchannelIndex, EncoderMode encoderMode) override {
+        edit_mode_step::g_smx46DacEncoderMode = encoderMode;
     }
     
     float getVoltageResolution(int subchannelIndex) override {
@@ -1438,7 +1444,11 @@ void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &valu
         stepValues->encoderSettings.range = DAC_MAX - DAC_MIN;
         stepValues->encoderSettings.step = stepValues->values[0];
 
+        stepValues->encoderSettings.mode = edit_mode_step::g_smx46DacEncoderMode;
+
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_smx46DacEncoderMode = (EncoderMode)value.getInt();
     } else if (operation == DATA_OPERATION_SET) {
         ((Smx46Module *)g_slots[cursor])->dac1 = roundPrec(value.getFloat(), DAC_RESOLUTION);
     }
@@ -1473,7 +1483,11 @@ void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &valu
         stepValues->encoderSettings.range = DAC_MAX - DAC_MIN;
         stepValues->encoderSettings.step = stepValues->values[0];
 
+        stepValues->encoderSettings.mode = edit_mode_step::g_smx46DacEncoderMode;
+
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        edit_mode_step::g_smx46DacEncoderMode = (EncoderMode)value.getInt();
     } else if (operation == DATA_OPERATION_SET) {
         ((Smx46Module *)g_slots[cursor])->dac2 = roundPrec(value.getFloat(), DAC_RESOLUTION);
     }

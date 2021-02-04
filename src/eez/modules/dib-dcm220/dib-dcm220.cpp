@@ -40,6 +40,7 @@
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/edit_mode.h>
 
 #include <eez/modules/bp3c/comm.h>
 
@@ -282,7 +283,12 @@ struct DcmChannel : public Channel {
             stepValues->encoderSettings.step /= 10.0f;
             stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
         }
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_dcmVoltageEncoderMode;
 	}
+
+    void setVoltageEncoderMode(EncoderMode encoderMode) override {
+		psu::gui::edit_mode_step::g_dcmVoltageEncoderMode = encoderMode;
+    }
     
 	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
         static float values[] = { 0.01f, 0.1f, 0.25f, 0.5f   };
@@ -298,7 +304,12 @@ struct DcmChannel : public Channel {
             stepValues->encoderSettings.range /= 100.0f;
             stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
         }
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_dcmCurrentEncoderMode;
 	}
+
+    void setCurrentEncoderMode(EncoderMode encoderMode) override {
+		psu::gui::edit_mode_step::g_dcmCurrentEncoderMode = encoderMode;
+    }
 
     void getPowerStepValues(StepValues *stepValues) override {
         static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
@@ -309,8 +320,13 @@ struct DcmChannel : public Channel {
 		stepValues->encoderSettings.accelerationEnabled = true;
 		stepValues->encoderSettings.range = params.PTOT;
 		stepValues->encoderSettings.step = params.P_RESOLUTION;
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_dcmPowerEncoderMode;
 	}
 	
+    void setPowerEncoderMode(EncoderMode encoderMode) override {
+		psu::gui::edit_mode_step::g_dcmPowerEncoderMode = encoderMode;
+    }
+    
 	bool isPowerLimitExceeded(float u, float i, int *err) override {
 		float power = u * i;
 		if (power > channel_dispatcher::getPowerLimit(*this)) {

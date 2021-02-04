@@ -29,6 +29,8 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/channel_dispatcher.h>
+#include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/edit_mode.h>
 
 #include <eez/scpi/regs.h>
 
@@ -856,7 +858,12 @@ struct DcpChannel : public Channel {
             stepValues->encoderSettings.step /= 10.0f;
             stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
         }
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_dcpVoltageEncoderMode;
 	}
+
+    void setVoltageEncoderMode(EncoderMode encoderMode) override {
+        psu::gui::edit_mode_step::g_dcpVoltageEncoderMode = encoderMode;
+    }
     
 	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
         static float lowRangeValues[] = { 0.000005f, 0.000025f, 0.0001f, 0.0005f, 0.001f };
@@ -884,6 +891,11 @@ struct DcpChannel : public Channel {
             stepValues->encoderSettings.step /= 10.0f;
             stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
         }
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_dcpCurrentEncoderMode;
+	}
+
+    void setCurrentEncoderMode(EncoderMode encoderMode) override {
+        psu::gui::edit_mode_step::g_dcpCurrentEncoderMode = encoderMode;
     }
 
     void getPowerStepValues(StepValues *stepValues) override {
@@ -895,7 +907,12 @@ struct DcpChannel : public Channel {
 		stepValues->encoderSettings.accelerationEnabled = true;
 		stepValues->encoderSettings.range = params.PTOT;
 		stepValues->encoderSettings.step = params.P_RESOLUTION;
-	}	
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_dcpPowerEncoderMode;
+	}
+	
+    void setPowerEncoderMode(EncoderMode encoderMode) override {
+        psu::gui::edit_mode_step::g_dcpPowerEncoderMode = encoderMode;
+    }
 
 	bool isPowerLimitExceeded(float u, float i, int *err) override {
 		if (u * i > channel_dispatcher::getPowerLimit(*this)) {
@@ -910,7 +927,7 @@ struct DcpChannel : public Channel {
 	float readTemperature() override;
 
 	int getAdvancedOptionsPageId() override {
-		return gui::PAGE_ID_CH_SETTINGS_ADV_OPTIONS;
+		return eez::gui::PAGE_ID_CH_SETTINGS_ADV_OPTIONS;
 	}
 };
 

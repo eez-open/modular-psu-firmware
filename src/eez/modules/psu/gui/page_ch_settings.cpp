@@ -892,22 +892,9 @@ void ChSettingsListsPage::onEncoder(int counter) {
     float min = getMin(cursor, dataId).getFloat();
     float max = getMax(cursor, dataId).getFloat();
 
-    StepValues stepValues;
-    getEncoderStepValues(cursor, dataId, stepValues);
+    float step = edit_mode_step::getEncoderStepValue();
 
-    mcu::encoder::enableAcceleration(stepValues.encoderSettings.accelerationEnabled, stepValues.encoderSettings.range, stepValues.encoderSettings.step);
-
-    float newValue;
-
-    float step;
-
-    if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
-        step = stepValues.encoderSettings.step;
-    } else {
-        step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
-    }
-
-    newValue = value.getFloat() + step * counter;
+    float newValue = value.getFloat() + step * counter;
     newValue = roundPrec(newValue, step);
 
     if (getAllowZero(cursor, dataId) && newValue < value.getFloat() && newValue < min) {

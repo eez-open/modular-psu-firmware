@@ -185,7 +185,6 @@ void initDefaultDevConf() {
     g_defaultDevConf.eventQueueFilter = event_queue::EVENT_TYPE_INFO;
     g_defaultDevConf.viewFlags.dlogViewLegendViewOption = DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK;
     g_defaultDevConf.viewFlags.dlogViewShowLabels = 1;
-    g_defaultDevConf.encoderMode = mcu::encoder::ENCODER_MODE_AUTO;
     g_defaultDevConf.ntpRefreshFrequency = NTP_REFRESH_FREQUENCY_DEF;
 
     // block 8
@@ -1267,10 +1266,6 @@ void setSortFilesOption(SortFilesOption sortFilesOption) {
 
 void setEventQueueFilter(int eventQueueFilter) {
     g_devConf.eventQueueFilter = eventQueueFilter;
-}
-
-void setEncoderMode(uint8_t encoderMode) {
-    g_devConf.encoderMode = encoderMode;
 }
 
 void setIsInhibitedByUser(int isInhibitedByUser) {

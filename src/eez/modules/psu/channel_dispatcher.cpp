@@ -2398,6 +2398,15 @@ void getVoltageStepValues(int slotIndex, int subchannelIndex, StepValues *stepVa
     }
 }
 
+void setVoltageEncoderMode(int slotIndex, int subchannelIndex, EncoderMode encoderMode) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        channel->setVoltageEncoderMode(encoderMode);
+    } else {
+        g_slots[slotIndex]->setVoltageEncoderMode(subchannelIndex, encoderMode);
+    }
+}
+
 float getVoltageResolution(int slotIndex, int subchannelIndex) {
     Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (channel) {
@@ -2429,6 +2438,15 @@ void getCurrentStepValues(int slotIndex, int subchannelIndex, StepValues *stepVa
         channel->getCurrentStepValues(stepValues, calibrationMode);
     } else {
         g_slots[slotIndex]->getCurrentStepValues(subchannelIndex, stepValues, calibrationMode);
+    }
+}
+
+void setCurrentEncoderMode(int slotIndex, int subchannelIndex, EncoderMode encoderMode) {
+    Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (channel) {
+        channel->setCurrentEncoderMode(encoderMode);
+    } else {
+        g_slots[slotIndex]->setCurrentEncoderMode(subchannelIndex, encoderMode);
     }
 }
 

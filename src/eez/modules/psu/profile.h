@@ -64,6 +64,42 @@ enum LoadStatus {
     LOAD_STATUS_LOADED
 };
 
+struct EncoderModes {
+    unsigned frequency: 3;
+    unsigned smallFrequency: 3;
+    unsigned duty: 3;
+
+    unsigned protectionDelay: 3;
+    unsigned rampAndDelayDuration: 3;
+    unsigned otpLevel: 3;
+
+    unsigned listVoltage: 3;
+    unsigned listCurrent: 3;
+    unsigned listDwell: 3;
+
+    unsigned dcpVoltage: 3;
+    unsigned dcpCurrent: 3;
+    unsigned dcpPower: 3;
+
+    unsigned dcmVoltage: 3;
+    unsigned dcmCurrent: 3;
+    unsigned dcmPower: 3;
+
+    unsigned recording: 3;
+    unsigned visibleValueDiv: 3;
+    unsigned visibleValueOffset: 3;
+    unsigned xAxisOffset: 3;
+    unsigned xAxisDiv: 3;
+
+    unsigned smx46Dac: 3;
+
+    unsigned mio168Nplc: 3;
+    unsigned mio168AinVoltage: 3;
+    unsigned mio168AinCurrent: 3;
+    unsigned mio168AoutVoltage: 3;
+    unsigned mio168AoutCurrent: 3;        
+};
+
 /// Profile parameters.
 struct Parameters {
     LoadStatus loadStatus;
@@ -77,6 +113,7 @@ struct Parameters {
     io_pins::IOPin ioPins[NUM_IO_PINS];
     float ioPinsPwmFrequency[NUM_IO_PINS - DOUT1];
     float ioPinsPwmDuty[NUM_IO_PINS - DOUT1];
+    EncoderModes encoderModes;
 };
 
 void init();

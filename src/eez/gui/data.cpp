@@ -616,7 +616,15 @@ void getLabel(Cursor cursor, int16_t id, char *text, int count) {
 bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues) {
     Value value(&stepValues, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_STEP_VALUES, cursor, value);
+    if (stepValues.encoderSettings.mode != ENCODER_MODE_AUTO) {
+        stepValues.encoderSettings.accelerationEnabled = false;
+    }
     return value.getType() == VALUE_TYPE_INT && value.getInt();
+}
+
+void setEncoderMode(Cursor cursor, int16_t id, EncoderMode encoderMode) {
+	Value value(encoderMode, VALUE_TYPE_INT);
+	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_SET_ENCODER_MODE, cursor, value);
 }
 
 Value get(Cursor cursor, int16_t id) {

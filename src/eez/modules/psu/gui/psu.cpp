@@ -1811,20 +1811,9 @@ void onEncoder(int counter, bool clicked) {
             float min = getMin(g_focusCursor, g_focusDataId).getFloat();
             float max = getMax(g_focusCursor, g_focusDataId).getFloat();
             
-            float newValue;
+            float step = edit_mode_step::getEncoderStepValue();
 
-            StepValues stepValues;
-            edit_mode_step::getStepValues(stepValues);
-            mcu::encoder::enableAcceleration(stepValues.encoderSettings.accelerationEnabled, stepValues.encoderSettings.range, stepValues.encoderSettings.step);
-
-            float step;
-            if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
-                step = stepValues.encoderSettings.step;
-            } else {
-                step = edit_mode_step::getCurrentEncoderStepValue().getFloat();
-            }
-
-            newValue = roundPrec(value.getFloat() + counter * step, step);
+            float newValue = roundPrec(value.getFloat() + counter * step, step);
             if (getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
                 newValue = 0;
             } else {

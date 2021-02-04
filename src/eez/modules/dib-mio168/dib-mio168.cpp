@@ -820,6 +820,22 @@ struct AinChannel {
 			stepValues->unit = UNIT_AMPER;
 		}
 	}
+
+    EncoderMode getEncoderMode() {
+        if (getMode() == MEASURE_MODE_VOLTAGE) {
+            return edit_mode_step::g_mio168AinVoltageEncoderMode;
+        } else {
+            return edit_mode_step::g_mio168AinCurrentEncoderMode;
+        }
+    }
+
+    void setEncoderMode(EncoderMode encoderMode) {
+        if (getMode() == MEASURE_MODE_VOLTAGE) {
+			edit_mode_step::g_mio168AinVoltageEncoderMode = encoderMode;
+        } else {
+			edit_mode_step::g_mio168AinCurrentEncoderMode = encoderMode;
+        }
+    }
 };
 
 static EnumItem g_aoutCurrentRangeEnumDefinition[] = {
@@ -1125,6 +1141,22 @@ struct AoutDac7760Channel {
         stepValues->encoderSettings.step = getResolution();
     }
 
+    EncoderMode getEncoderMode() {
+        if (getMode() == SOURCE_MODE_VOLTAGE) {
+            return edit_mode_step::g_mio168AoutVoltageEncoderMode;
+        } else {
+            return edit_mode_step::g_mio168AoutCurrentEncoderMode;
+        }
+    }
+
+    void setEncoderMode(EncoderMode encoderMode) {
+        if (getMode() == SOURCE_MODE_VOLTAGE) {
+			edit_mode_step::g_mio168AoutVoltageEncoderMode = encoderMode;
+        } else {
+			edit_mode_step::g_mio168AoutCurrentEncoderMode = encoderMode;
+        }
+    }
+
     void getDefaultCalibrationPoints(unsigned int &numPoints, float *&points) {
         static float AOUT_POINTS[7][2] = {
             { 0.1f, 4.9f },
@@ -1223,6 +1255,14 @@ struct AoutDac7563Channel {
         stepValues->encoderSettings.accelerationEnabled = true;
         stepValues->encoderSettings.range = AOUT_DAC7563_MAX - AOUT_DAC7563_MIN;
         stepValues->encoderSettings.step = getResolution();
+    }
+
+    EncoderMode getEncoderMode() {
+        return edit_mode_step::g_mio168AoutVoltageEncoderMode;
+    }
+
+    void setEncoderMode(EncoderMode encoderMode) {
+		edit_mode_step::g_mio168AoutVoltageEncoderMode = encoderMode;
     }
 
     void getDefaultCalibrationPoints(unsigned int &numPoints, float *&points) {
@@ -2886,13 +2926,23 @@ public:
     void getVoltageStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getStepValues(stepValues);
+            stepValues->encoderSettings.mode = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getEncoderMode();
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
         	aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].getStepValues(stepValues);
+            stepValues->encoderSettings.mode = aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].getEncoderMode();
         }
 
         if (calibrationMode) {
             stepValues->encoderSettings.step /= 10.0f;
             stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
+        }
+	}
+
+    void setVoltageEncoderMode(int subchannelIndex, EncoderMode encoderMode) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].setEncoderMode(encoderMode);
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].setEncoderMode(encoderMode);
         }
     }
     
@@ -3321,13 +3371,23 @@ public:
                 stepValues->encoderSettings.step /= 10.0f;
                 stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
             }
+            stepValues->encoderSettings.mode = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getEncoderMode();
         } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
 			ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getStepValues(stepValues);
 			if (calibrationMode) {
 				stepValues->encoderSettings.step /= 10.0f;
 				stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
 			}
+            stepValues->encoderSettings.mode = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getEncoderMode();
 		}
+    }
+    
+    void setCurrentEncoderMode(int subchannelIndex, EncoderMode encoderMode) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].setEncoderMode(encoderMode);
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].setEncoderMode(encoderMode);
+        }
     }
     
     float getCurrentResolution(int subchannelIndex) override {
@@ -4422,7 +4482,11 @@ void data_dib_mio168_ain_nplc(DataOperationEnum operation, Cursor cursor, Value 
 
         stepValues->encoderSettings.accelerationEnabled = false;
 
+        stepValues->encoderSettings.mode = edit_mode_step::g_mio168NplcEncoderMode;
+
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+		edit_mode_step::g_mio168NplcEncoderMode = (EncoderMode)value.getInt();
     } else if (operation == DATA_OPERATION_SET) {
         if (g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE) {
             g_ainConfigurationPage.m_voltageNPLC = value.getFloat();
@@ -4596,12 +4660,22 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Valu
         if (aoutChannelIndex < 2) {
             auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
             channel.getStepValues(stepValues);
+            stepValues->encoderSettings.mode = channel.getEncoderMode();
         } else {
             auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7563Channels[aoutChannelIndex - 2];
             channel.getStepValues(stepValues);
+            stepValues->encoderSettings.mode = channel.getEncoderMode();
         }
 
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        if (aoutChannelIndex < 2) {
+            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
+            channel.setEncoderMode((EncoderMode)value.getInt());
+        } else {
+            auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7563Channels[aoutChannelIndex - 2];
+            channel.setEncoderMode((EncoderMode)value.getInt());
+        }
     } else if (operation == DATA_OPERATION_SET) {
         if (aoutChannelIndex < 2) {
             auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
@@ -4821,7 +4895,11 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, Cursor cursor, Value 
         stepValues->encoderSettings.range = step * 5.0f;
         stepValues->encoderSettings.step = step;
 
+        stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_frequencyEncoderMode;
+
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        eez::psu::gui::edit_mode_step::g_frequencyEncoderMode = (EncoderMode)value.getInt();
     } else if (operation == DATA_OPERATION_SET) {
         ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_freq = value.getFloat();
     }
@@ -4861,7 +4939,11 @@ void data_dib_mio168_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
         stepValues->encoderSettings.range = 100.0f;
         stepValues->encoderSettings.step = 1.0f;
 
+        stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_dutyEncoderMode;
+
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        eez::psu::gui::edit_mode_step::g_dutyEncoderMode = (EncoderMode)value.getInt();
     } else if (operation == DATA_OPERATION_SET) {
         ((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_duty = value.getFloat();
     } 

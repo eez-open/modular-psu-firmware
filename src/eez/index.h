@@ -140,6 +140,17 @@ struct CalibrationConfiguration {
     char calibrationRemark[CALIBRATION_REMARK_MAX_LENGTH + 1];
 };
 
+enum EncoderMode {
+    ENCODER_MODE_MIN,
+    ENCODER_MODE_AUTO = ENCODER_MODE_MIN,
+    ENCODER_MODE_STEP1,
+    ENCODER_MODE_STEP2,
+    ENCODER_MODE_STEP3,
+    ENCODER_MODE_STEP4,
+    ENCODER_MODE_STEP5,
+    ENCODER_MODE_MAX = ENCODER_MODE_STEP5
+};
+
 struct StepValues {
     int count;
     const float *values;
@@ -148,6 +159,7 @@ struct StepValues {
         bool accelerationEnabled;
         float range;
         float step;
+        EncoderMode mode;
     } encoderSettings;
 };
 
@@ -334,6 +346,7 @@ struct Module {
     virtual bool setVoltage(int subchannelIndex, float value, int *err);
     virtual bool getMeasuredVoltage(int subchannelIndex, float &value, int *err);
     virtual void getVoltageStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode);
+    virtual void setVoltageEncoderMode(int subchannelIndex, EncoderMode encoderMode);
     virtual float getVoltageResolution(int subchannelIndex);
     virtual float getVoltageMinValue(int subchannelIndex);
     virtual float getVoltageMaxValue(int subchannelIndex);
@@ -346,6 +359,7 @@ struct Module {
     virtual bool setCurrent(int subchannelIndex, float value, int *err);
     virtual bool getMeasuredCurrent(int subchannelIndex, float &value, int *err);
     virtual void getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode);
+    virtual void setCurrentEncoderMode(int subchannelIndex, EncoderMode encoderMode);
     virtual float getCurrentResolution(int subchannelIndex);
     virtual float getCurrentMinValue(int subchannelIndex);
     virtual float getCurrentMaxValue(int subchannelIndex);

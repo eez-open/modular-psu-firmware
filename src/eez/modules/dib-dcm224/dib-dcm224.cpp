@@ -313,7 +313,12 @@ struct DcmChannel : public Channel {
             stepValues->encoderSettings.step /= 10.0f;
             stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
         }
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_dcmVoltageEncoderMode;
 	}
+
+    void setVoltageEncoderMode(EncoderMode encoderMode) override {
+        psu::gui::edit_mode_step::g_dcmVoltageEncoderMode = encoderMode;
+    }
     
 	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
         static float values[] = { 0.01f, 0.1f, 0.25f, 0.5f };
@@ -329,7 +334,12 @@ struct DcmChannel : public Channel {
             stepValues->encoderSettings.step /= 10.0f;
             stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
         }
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_dcmCurrentEncoderMode;
 	}
+
+    void setCurrentEncoderMode(EncoderMode encoderMode) override {
+        psu::gui::edit_mode_step::g_dcmCurrentEncoderMode = encoderMode;
+    }
 
     void getPowerStepValues(StepValues *stepValues) override {
         static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
@@ -340,8 +350,13 @@ struct DcmChannel : public Channel {
 		stepValues->encoderSettings.accelerationEnabled = true;
 		stepValues->encoderSettings.range = params.PTOT;
 		stepValues->encoderSettings.step = params.P_RESOLUTION;
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_dcmPowerEncoderMode;
 	}
 	
+    void setPowerEncoderMode(EncoderMode encoderMode) override {
+        psu::gui::edit_mode_step::g_dcmPowerEncoderMode = encoderMode;
+    }
+
 	bool isPowerLimitExceeded(float u, float i, int *err) override {
 		float power = u * i;
 		if (power > channel_dispatcher::getPowerLimit(*this)) {
@@ -1196,7 +1211,11 @@ void data_dib_dcm224_pwm_frequency(DataOperationEnum operation, Cursor cursor, V
         stepValues->encoderSettings.range = step * 5.0f;
         stepValues->encoderSettings.step = step;
 
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_smallFrequencyEncoderMode;
+
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        psu::gui::edit_mode_step::g_smallFrequencyEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -1247,7 +1266,11 @@ void data_dib_dcm224_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
         stepValues->encoderSettings.range = 100.0f;
         stepValues->encoderSettings.step = 1.0f;
 
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_dutyEncoderMode;
+
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        psu::gui::edit_mode_step::g_dutyEncoderMode = (EncoderMode)value.getInt();
     }
 }
 
@@ -1305,7 +1328,11 @@ void data_dib_dcm224_counterphase_frequency(DataOperationEnum operation, Cursor 
         stepValues->encoderSettings.range = step * 5.0f;
         stepValues->encoderSettings.step = step;
 
+        stepValues->encoderSettings.mode = psu::gui::edit_mode_step::g_frequencyEncoderMode;
+
         value = 1;
+    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        psu::gui::edit_mode_step::g_frequencyEncoderMode = (EncoderMode)value.getInt();
     }
 }
 

@@ -31,6 +31,7 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/dlog_record.h>
+#include <eez/modules/psu/profile.h>
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/edit_mode.h>
@@ -363,24 +364,47 @@ void onTouchMove() {
 void onTouchUp() {
 }
 
-bool hasEncoderStepValue() {
-    auto encoderMode = mcu::encoder::getEncoderMode();
-    if (encoderMode == mcu::encoder::ENCODER_MODE_AUTO) {
-        return true;
-    }
+////////////////////////////////////////////////////////////////////////////////
 
+EncoderMode g_frequencyEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_smallFrequencyEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_dutyEncoderMode = ENCODER_MODE_AUTO;
+
+EncoderMode g_protectionDelayEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_rampAndDelayDurationEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_otpLevelEncoderMode = ENCODER_MODE_AUTO;
+
+EncoderMode g_listVoltageEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_listCurrentEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_listDwellEncoderMode = ENCODER_MODE_AUTO;
+
+EncoderMode g_dcpVoltageEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_dcpCurrentEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_dcpPowerEncoderMode = ENCODER_MODE_AUTO;
+
+EncoderMode g_dcmVoltageEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_dcmCurrentEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_dcmPowerEncoderMode = ENCODER_MODE_AUTO;
+
+EncoderMode g_recordingEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_visibleValueDivEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_visibleValueOffsetEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_xAxisOffsetEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_xAxisDivEncoderMode = ENCODER_MODE_AUTO;
+
+EncoderMode g_smx46DacEncoderMode = ENCODER_MODE_AUTO;
+
+EncoderMode g_mio168NplcEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_mio168AinVoltageEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_mio168AinCurrentEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_mio168AoutVoltageEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_mio168AoutCurrentEncoderMode = ENCODER_MODE_AUTO;
+
+static Value getCurrentEncoderStepValue() {
     StepValues stepValues;
     getStepValues(stepValues);
 
-    int index = encoderMode - mcu::encoder::ENCODER_MODE_STEP1;
-    return index < stepValues.count;
-}
-
-Value getCurrentEncoderStepValue() {
-    StepValues stepValues;
-    getStepValues(stepValues);
-
-    int stepValueIndex = mcu::encoder::getEncoderMode() - mcu::encoder::ENCODER_MODE_STEP1;
+    int stepValueIndex = stepValues.encoderSettings.mode - ENCODER_MODE_STEP1;
     if (stepValueIndex >= stepValues.count) {
         stepValueIndex = stepValues.count - 1;
     }
@@ -388,14 +412,200 @@ Value getCurrentEncoderStepValue() {
     return Value(stepValues.values[stepValueIndex], stepValues.unit);
 }
 
-void showCurrentEncoderMode() {
-#if OPTION_ENCODER
-    if (mcu::encoder::getEncoderMode() == mcu::encoder::ENCODER_MODE_AUTO) {
-        infoMessage("Auto");
-    } else {
-        infoMessage(getCurrentEncoderStepValue());
+float getEncoderStepValue() {
+    StepValues stepValues;
+    edit_mode_step::getStepValues(stepValues);
+
+	if (stepValues.encoderSettings.mode == ENCODER_MODE_AUTO) {
+		mcu::encoder::enableAcceleration(stepValues.encoderSettings.accelerationEnabled, stepValues.encoderSettings.range, stepValues.encoderSettings.step);
+	} else {
+		mcu::encoder::enableAcceleration(false);
+	}
+
+    if (stepValues.encoderSettings.mode == ENCODER_MODE_AUTO) {
+        return stepValues.encoderSettings.step;
     }
-#endif
+
+	return edit_mode_step::getCurrentEncoderStepValue().getFloat();
+}
+
+void switchToNextEncoderMode() {
+    if (psu::gui::isEncoderEnabledInActivePage() || getActivePageId() == PAGE_ID_CH_SETTINGS_LISTS) {
+		StepValues stepValues;
+		getStepValues(stepValues);
+
+		EncoderMode encoderMode = (EncoderMode)(stepValues.encoderSettings.mode + 1);
+		if (encoderMode - ENCODER_MODE_STEP1 >= stepValues.count) {
+			encoderMode = ENCODER_MODE_AUTO;
+		}
+
+		ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
+		if (page) {
+			setEncoderMode(g_channel->channelIndex, page->getDataIdAtCursor(), encoderMode);
+		} else {
+			setEncoderMode(getFocusCursor(), g_focusDataId, encoderMode);
+		}
+
+		if (encoderMode == ENCODER_MODE_AUTO) {
+			infoMessage("Auto");
+		} else {
+			infoMessage(getCurrentEncoderStepValue());
+		}
+	}
+}
+
+void getProfileParameters(profile::Parameters &parameters) {
+    parameters.encoderModes.frequency = g_frequencyEncoderMode;
+    parameters.encoderModes.smallFrequency = g_smallFrequencyEncoderMode;
+    parameters.encoderModes.duty = g_dutyEncoderMode;
+
+    parameters.encoderModes.protectionDelay = g_protectionDelayEncoderMode;
+    parameters.encoderModes.rampAndDelayDuration = g_rampAndDelayDurationEncoderMode;
+    parameters.encoderModes.otpLevel = g_otpLevelEncoderMode;
+
+    parameters.encoderModes.listVoltage = g_listVoltageEncoderMode;
+    parameters.encoderModes.listCurrent = g_listCurrentEncoderMode;
+    parameters.encoderModes.listDwell = g_listDwellEncoderMode;
+
+    parameters.encoderModes.dcpVoltage = g_dcpVoltageEncoderMode;
+    parameters.encoderModes.dcpCurrent = g_dcpCurrentEncoderMode;
+    parameters.encoderModes.dcpPower = g_dcpPowerEncoderMode;
+
+    parameters.encoderModes.dcmVoltage = g_dcmVoltageEncoderMode;
+    parameters.encoderModes.dcmCurrent = g_dcmCurrentEncoderMode;
+    parameters.encoderModes.dcmPower = g_dcmPowerEncoderMode;
+
+    parameters.encoderModes.recording = g_recordingEncoderMode;
+    parameters.encoderModes.visibleValueDiv = g_visibleValueDivEncoderMode;
+    parameters.encoderModes.visibleValueOffset = g_visibleValueOffsetEncoderMode;
+    parameters.encoderModes.xAxisOffset = g_xAxisOffsetEncoderMode;
+    parameters.encoderModes.xAxisDiv = g_xAxisDivEncoderMode;
+
+    parameters.encoderModes.smx46Dac = g_smx46DacEncoderMode;
+
+    parameters.encoderModes.mio168Nplc = g_mio168NplcEncoderMode;
+    parameters.encoderModes.mio168AinVoltage = g_mio168AinVoltageEncoderMode;
+    parameters.encoderModes.mio168AinCurrent = g_mio168AinCurrentEncoderMode;
+    parameters.encoderModes.mio168AoutVoltage = g_mio168AoutVoltageEncoderMode;
+    parameters.encoderModes.mio168AoutCurrent = g_mio168AoutCurrentEncoderMode;
+}
+
+void setProfileParameters(const profile::Parameters &parameters) {
+    g_frequencyEncoderMode = (EncoderMode)parameters.encoderModes.frequency;
+    g_smallFrequencyEncoderMode = (EncoderMode)parameters.encoderModes.smallFrequency;
+    g_dutyEncoderMode = (EncoderMode)parameters.encoderModes.duty;
+
+    g_protectionDelayEncoderMode = (EncoderMode)parameters.encoderModes.protectionDelay;
+    g_rampAndDelayDurationEncoderMode = (EncoderMode)parameters.encoderModes.rampAndDelayDuration;
+    g_otpLevelEncoderMode = (EncoderMode)parameters.encoderModes.otpLevel;
+
+    g_listVoltageEncoderMode = (EncoderMode)parameters.encoderModes.listVoltage;
+    g_listCurrentEncoderMode = (EncoderMode)parameters.encoderModes.listCurrent;
+    g_listDwellEncoderMode = (EncoderMode)parameters.encoderModes.listDwell;
+
+    g_dcpVoltageEncoderMode = (EncoderMode)parameters.encoderModes.dcpVoltage;
+    g_dcpCurrentEncoderMode = (EncoderMode)parameters.encoderModes.dcpCurrent;
+    g_dcpPowerEncoderMode = (EncoderMode)parameters.encoderModes.dcpPower;
+
+    g_dcmVoltageEncoderMode = (EncoderMode)parameters.encoderModes.dcmVoltage;
+    g_dcmCurrentEncoderMode = (EncoderMode)parameters.encoderModes.dcmCurrent;
+    g_dcmPowerEncoderMode = (EncoderMode)parameters.encoderModes.dcmPower;
+
+    g_recordingEncoderMode = (EncoderMode)parameters.encoderModes.recording;
+    g_visibleValueDivEncoderMode = (EncoderMode)parameters.encoderModes.visibleValueDiv;
+    g_visibleValueOffsetEncoderMode = (EncoderMode)parameters.encoderModes.visibleValueOffset;
+    g_xAxisOffsetEncoderMode = (EncoderMode)parameters.encoderModes.xAxisOffset;
+    g_xAxisDivEncoderMode = (EncoderMode)parameters.encoderModes.xAxisDiv;
+
+    g_smx46DacEncoderMode = (EncoderMode)parameters.encoderModes.smx46Dac;
+
+    g_mio168NplcEncoderMode = (EncoderMode)parameters.encoderModes.mio168Nplc;
+    g_mio168AinVoltageEncoderMode = (EncoderMode)parameters.encoderModes.mio168AinVoltage;
+    g_mio168AinCurrentEncoderMode = (EncoderMode)parameters.encoderModes.mio168AinCurrent;
+    g_mio168AoutVoltageEncoderMode = (EncoderMode)parameters.encoderModes.mio168AoutVoltage;
+    g_mio168AoutCurrentEncoderMode = (EncoderMode)parameters.encoderModes.mio168AoutCurrent;
+}
+
+bool writeProfileProperties(profile::WriteContext &ctx, const profile::Parameters &parameters) {
+    ctx.group("encoderModes");
+
+    if (parameters.encoderModes.frequency) WRITE_PROPERTY("frequency", parameters.encoderModes.frequency);
+    if (parameters.encoderModes.smallFrequency) WRITE_PROPERTY("smallFrequency", parameters.encoderModes.smallFrequency);
+    if (parameters.encoderModes.duty) WRITE_PROPERTY("duty", parameters.encoderModes.duty);
+
+    if (parameters.encoderModes.protectionDelay) WRITE_PROPERTY("protectionDelay", parameters.encoderModes.protectionDelay);
+    if (parameters.encoderModes.rampAndDelayDuration) WRITE_PROPERTY("rampAndDelayDuration", parameters.encoderModes.rampAndDelayDuration);
+    if (parameters.encoderModes.otpLevel) WRITE_PROPERTY("otpLevel", parameters.encoderModes.otpLevel);
+
+    if (parameters.encoderModes.listVoltage) WRITE_PROPERTY("listVoltage", parameters.encoderModes.listVoltage);
+    if (parameters.encoderModes.listCurrent) WRITE_PROPERTY("listCurrent", parameters.encoderModes.listCurrent);
+    if (parameters.encoderModes.listDwell) WRITE_PROPERTY("listDwell", parameters.encoderModes.listDwell);
+
+    if (parameters.encoderModes.dcpVoltage) WRITE_PROPERTY("dcpVoltage", parameters.encoderModes.dcpVoltage);
+    if (parameters.encoderModes.dcpCurrent) WRITE_PROPERTY("dcpCurrent", parameters.encoderModes.dcpCurrent);
+    if (parameters.encoderModes.dcpPower) WRITE_PROPERTY("dcpPower", parameters.encoderModes.dcpPower);
+
+    if (parameters.encoderModes.dcmVoltage) WRITE_PROPERTY("dcmVoltage", parameters.encoderModes.dcmVoltage);
+    if (parameters.encoderModes.dcmCurrent) WRITE_PROPERTY("dcmCurrent", parameters.encoderModes.dcmCurrent);
+    if (parameters.encoderModes.dcmPower) WRITE_PROPERTY("dcmPower", parameters.encoderModes.dcmPower);
+
+    if (parameters.encoderModes.recording) WRITE_PROPERTY("recording", parameters.encoderModes.recording);
+    if (parameters.encoderModes.visibleValueDiv) WRITE_PROPERTY("visibleValueDiv", parameters.encoderModes.visibleValueDiv);
+    if (parameters.encoderModes.visibleValueOffset) WRITE_PROPERTY("visibleValueOffset", parameters.encoderModes.visibleValueOffset);
+    if (parameters.encoderModes.xAxisOffset) WRITE_PROPERTY("xAxisOffset", parameters.encoderModes.xAxisOffset);
+    if (parameters.encoderModes.xAxisDiv) WRITE_PROPERTY("xAxisDiv", parameters.encoderModes.xAxisDiv);
+
+    if (parameters.encoderModes.smx46Dac) WRITE_PROPERTY("smx46Dac", parameters.encoderModes.smx46Dac);
+
+    if (parameters.encoderModes.mio168Nplc) WRITE_PROPERTY("mio168Nplc", parameters.encoderModes.mio168Nplc);
+    if (parameters.encoderModes.mio168AinVoltage) WRITE_PROPERTY("mio168AinVoltage", parameters.encoderModes.mio168AinVoltage);
+    if (parameters.encoderModes.mio168AinCurrent) WRITE_PROPERTY("mio168AinCurrent", parameters.encoderModes.mio168AinCurrent);
+    if (parameters.encoderModes.mio168AoutVoltage) WRITE_PROPERTY("mio168AoutVoltage", parameters.encoderModes.mio168AoutVoltage);
+    if (parameters.encoderModes.mio168AoutCurrent) WRITE_PROPERTY("mio168AoutCurrent", parameters.encoderModes.mio168AoutCurrent);
+
+    return true;
+}
+
+bool readProfileProperties(profile::ReadContext &ctx, profile::Parameters &parameters) {
+    if (!ctx.matchGroup("encoderModes")) {
+        return false;
+    }
+
+    READ_FLAG("frequency", parameters.encoderModes.frequency);
+    READ_FLAG("smallFrequency", parameters.encoderModes.smallFrequency);
+    READ_FLAG("duty", parameters.encoderModes.duty);
+
+    READ_FLAG("protectionDelay", parameters.encoderModes.protectionDelay);
+    READ_FLAG("rampAndDelayDuration", parameters.encoderModes.rampAndDelayDuration);
+    READ_FLAG("otpLevel", parameters.encoderModes.otpLevel);
+
+    READ_FLAG("listVoltage", parameters.encoderModes.listVoltage);
+    READ_FLAG("listCurrent", parameters.encoderModes.listCurrent);
+    READ_FLAG("listDwell", parameters.encoderModes.listDwell);
+
+    READ_FLAG("dcpVoltage", parameters.encoderModes.dcpVoltage);
+    READ_FLAG("dcpCurrent", parameters.encoderModes.dcpCurrent);
+    READ_FLAG("dcpPower", parameters.encoderModes.dcpPower);
+
+    READ_FLAG("dcmVoltage", parameters.encoderModes.dcmVoltage);
+    READ_FLAG("dcmCurrent", parameters.encoderModes.dcmCurrent);
+    READ_FLAG("dcmPower", parameters.encoderModes.dcmPower);
+
+    READ_FLAG("recording", parameters.encoderModes.recording);
+    READ_FLAG("visibleValueDiv", parameters.encoderModes.visibleValueDiv);
+    READ_FLAG("visibleValueOffset", parameters.encoderModes.visibleValueOffset);
+    READ_FLAG("xAxisOffset", parameters.encoderModes.xAxisOffset);
+    READ_FLAG("xAxisDiv", parameters.encoderModes.xAxisDiv);
+
+    READ_FLAG("smx46Dac", parameters.encoderModes.smx46Dac);
+
+    READ_FLAG("mio168Nplc", parameters.encoderModes.mio168Nplc);
+    READ_FLAG("mio168AinVoltage", parameters.encoderModes.mio168AinVoltage);
+    READ_FLAG("mio168AinCurrent", parameters.encoderModes.mio168AinCurrent);
+    READ_FLAG("mio168AoutVoltage", parameters.encoderModes.mio168AoutVoltage);
+    READ_FLAG("mio168AoutCurrent", parameters.encoderModes.mio168AoutCurrent);
+
+    return false;
 }
 
 } // namespace edit_mode_step
