@@ -80,8 +80,11 @@ static const uint8_t BL_SPI_SOF = 0x5A;
 static const uint8_t ACK = 0x79;
 static const uint8_t NACK = 0x1F;
 
-static const uint32_t SYNC_TIMEOUT = 30000;
+static const uint32_t SYNC_TIMEOUT = 5000;
 static const uint32_t CMD_TIMEOUT = 100;
+
+static const uint32_t SPI_EEPROM_ERASE_TIMEOUT = 15000;
+static const uint32_t SPI_ACK_TIMEOUT = 1000;
 
 #define phuart (g_mcuRevision >= MCU_REVISION_R3B3 ? &huart4 : &huart7)
 
@@ -178,7 +181,7 @@ void enterBootloaderMode(int slotIndex) {
 		channel_dispatcher::setVoltage(channel, 40);
 		channel_dispatcher::setCurrent(channel, 3.5);
 		channel_dispatcher::outputEnable(channel, true);
-
+		
 		osDelay(100);
 	}
 }
@@ -193,6 +196,10 @@ void uploadHexFile() {
 	    size_t totalSize = 0;
 		HexRecord hexRecord;
 		uint32_t addressUpperBits = 0;
+
+#if OPTION_DISPLAY
+		psu::gui::showAsyncOperationInProgress("Erasing..");
+#endif
 
 		for (int ntry = 1; !eraseAll(g_slotIndex); ntry++) {
 			DebugTrace("Failed to erase all!\n");
@@ -211,7 +218,7 @@ void uploadHexFile() {
 
 #if OPTION_DISPLAY
 		psu::gui::hideAsyncOperationInProgress();
-    	psu::gui::showProgressPageWithoutAbort("Downloading firmware...");
+    	psu::gui::showProgressPageWithoutAbort("Writing...");
 		psu::gui::updateProgressPage(0, 0);
 
 	    totalSize = file.size();
@@ -325,28 +332,32 @@ void sendDataNoCRC(uint8_t data) {
 
 #endif
 
-bool waitForAck(int slotIndex) {
+bool waitForAck(int slotIndex, uint32_t timeout = SPI_ACK_TIMEOUT) {
 #if defined(EEZ_PLATFORM_STM32)
 	uint32_t startTime = HAL_GetTick();
   	do {
 		uint8_t txData = 0;
 		uint8_t rxData;
 
+    	taskENTER_CRITICAL();
 		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, &txData, 1);
 		spi::deselect(slotIndex);
 
 		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
-		spi::transfer1(slotIndex, &txData, &rxData);
+		spi::transfer(slotIndex, &txData, &rxData, 1);
 		spi::deselect(slotIndex);
+		taskEXIT_CRITICAL();
 
     	if (rxData == ACK) {
 			// received ACK
 			txData = ACK;
 
+			taskENTER_CRITICAL();
 			spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 			spi::transmit(slotIndex, &txData, 1);
 			spi::deselect(slotIndex);
+			taskEXIT_CRITICAL();
 
       		return true;
     	}
@@ -355,7 +366,7 @@ bool waitForAck(int slotIndex) {
       		// Received NACK
       		return false;
     	}
-	} while (HAL_GetTick() - startTime < SYNC_TIMEOUT);
+	} while (HAL_GetTick() - startTime < timeout);
 #endif
     return false;
 }
@@ -367,11 +378,19 @@ bool syncWithSlave(int slotIndex) {
 
 		txData = BL_SPI_SOF;
 
-		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
-		spi::transmit(slotIndex, &txData, 1);
-		spi::deselect(slotIndex);
+		for (int ntry = 0; ntry < 5; ntry++) {
+			taskENTER_CRITICAL();
+			spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
+			spi::transmit(slotIndex, &txData, 1);
+			spi::deselect(slotIndex);
+			taskEXIT_CRITICAL();
 
-		return waitForAck(slotIndex);
+			if (waitForAck(slotIndex)) {
+				return true;
+			}
+		}
+
+		return false;
 	} else {
 		uint32_t startTime = HAL_GetTick();
 		do {
@@ -404,19 +423,27 @@ bool eraseAll(int slotIndex) {
 		txData[1] = CMD_EXTENDED_ERASE;
 		txData[2] = CRC_MASK ^ CMD_EXTENDED_ERASE;
 
+		taskENTER_CRITICAL();
 		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, txData, 3);
 		spi::deselect(slotIndex);
+		taskEXIT_CRITICAL();
 
 		if (!waitForAck(slotIndex)) {
 			return false;
 		}
 
+#if OPTION_DISPLAY
+		psu::gui::showAsyncOperationInProgress("Erasing...");
+#endif
+
+		taskENTER_CRITICAL();
 		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, buffer, 3);
 		spi::deselect(slotIndex);
+		taskEXIT_CRITICAL();
 
-		return waitForAck(slotIndex);
+		return waitForAck(slotIndex, SPI_EEPROM_ERASE_TIMEOUT);
 	} else {
 		taskENTER_CRITICAL();
 
@@ -473,27 +500,33 @@ bool writeMemory(int slotIndex, uint32_t address, const uint8_t *buffer, uint32_
 		txData[1] = CMD_WRITE_MEMORY;
 		txData[2] = CRC_MASK ^ CMD_WRITE_MEMORY;
 
+		taskENTER_CRITICAL();
 		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, txData, 3);
 		spi::deselect(slotIndex);
+		taskEXIT_CRITICAL();
 
 		if (!waitForAck(slotIndex)) {
 			return false;
 		}
 
+		taskENTER_CRITICAL();
 		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, addressAndCrc, 5);
 		spi::deselect(slotIndex);
+		taskEXIT_CRITICAL();
 
 		if (!waitForAck(slotIndex)) {
 			return false;
 		}
 
+		taskENTER_CRITICAL();
 		spi::select(slotIndex, spi::CHIP_SLAVE_MCU_NO_CRC);
 		spi::transmit(slotIndex, &numBytes, 1);
 		spi::transmit(slotIndex, (uint8_t *)buffer, bufferSize);
 		spi::transmit(slotIndex, &crc, 1);
 		spi::deselect(slotIndex);
+		taskEXIT_CRITICAL();
 
 		return waitForAck(slotIndex);
 	} else {
