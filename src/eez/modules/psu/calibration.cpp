@@ -378,7 +378,6 @@ void CalibrationEditor::doStart() {
         channel_dispatcher::setCurrent(m_slotIndex, m_subchannelIndex, channel_dispatcher::getCurrentMinValue(m_slotIndex, m_subchannelIndex), nullptr);
     }
 
-    profile::saveToLocation(10);
     profile::setFreezeState(true);
 
     selectCurrentRange(0);
@@ -445,13 +444,16 @@ void CalibrationEditor::stop() {
         channel->setOperBits(OPER_ISUM_CALI, false);
     }
 
-    profile::recallFromLocation(10);
     profile::setFreezeState(false);
 
     if (channel) {
         if (channel->isCalibrationExists()) {
             channel->calibrationEnable(true);
         }
+
+        channel_dispatcher::outputEnable(*channel, false);
+        channel_dispatcher::setVoltage(*channel, channel->u.min);
+        channel_dispatcher::setCurrent(*channel, channel->i.min);
     } else {
         if (g_slots[m_slotIndex]->isVoltageCalibrationExists(m_subchannelIndex)) {
             g_slots[m_slotIndex]->enableVoltageCalibration(m_subchannelIndex, true);
@@ -462,6 +464,10 @@ void CalibrationEditor::stop() {
         }
 
         g_slots[m_slotIndex]->stopChannelCalibration(m_subchannelIndex);
+
+        g_slots[m_slotIndex]->outputEnable(m_subchannelIndex, false, nullptr);
+        channel_dispatcher::setVoltage(m_slotIndex, m_subchannelIndex, channel_dispatcher::getVoltageMinValue(m_slotIndex, m_subchannelIndex), nullptr);
+        channel_dispatcher::setCurrent(m_slotIndex, m_subchannelIndex, channel_dispatcher::getCurrentMinValue(m_slotIndex, m_subchannelIndex), nullptr);
     }
 }
 
