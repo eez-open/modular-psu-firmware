@@ -84,11 +84,12 @@ static const uint32_t SYNC_TIMEOUT = 5000;
 static const uint32_t CMD_TIMEOUT = 100;
 
 static const uint32_t SPI_EEPROM_ERASE_TIMEOUT = 15000;
-static const uint32_t SPI_ACK_TIMEOUT = 1000;
 
 #define phuart (g_mcuRevision >= MCU_REVISION_R3B3 ? &huart4 : &huart7)
 
 #endif
+
+static const uint32_t SPI_ACK_TIMEOUT = 1000;
 
 void enterBootloaderMode(int slotIndex);
 bool syncWithSlave(int slotIndex);
