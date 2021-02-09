@@ -80,7 +80,7 @@ static const uint8_t BL_SPI_SOF = 0x5A;
 static const uint8_t ACK = 0x79;
 static const uint8_t NACK = 0x1F;
 
-static const uint32_t SYNC_TIMEOUT = 5000;
+static const uint32_t SYNC_TIMEOUT = 10000;
 static const uint32_t CMD_TIMEOUT = 100;
 
 static const uint32_t SPI_EEPROM_ERASE_TIMEOUT = 15000;
