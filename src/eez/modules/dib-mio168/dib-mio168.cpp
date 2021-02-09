@@ -714,7 +714,7 @@ struct AinChannel {
 					return 240.0f;
 				}
 			} else {
-				return -48.0E-3f;
+				return 48.0E-3f;
 			}
 		} else {
 			if (m_mode == MEASURE_MODE_VOLTAGE) {
