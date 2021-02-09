@@ -2176,6 +2176,11 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
         }
     }
 
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_COPY_CHANNEL_TO_CHANNEL, (srcChannelIndex << 8) | dstChannelIndex);
+        return nullptr;
+    }
+
     channel_dispatcher::outputEnable(dstChannel, false);
 
     channel_dispatcher::setVoltage(dstChannel, srcChannel.getUSet());

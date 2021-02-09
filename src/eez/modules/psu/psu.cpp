@@ -809,6 +809,8 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         persist_conf::saveSerialNo(param);
     } else if (type == PSU_MESSAGE_MODULE_RESYNC) {
         g_slots[param]->resync();
+    } else if (type == PSU_MESSAGE_COPY_CHANNEL_TO_CHANNEL) {
+        channel_dispatcher::copyChannelToChannel(param >> 8, param & 0xFF);
     } else if (calibration::onHighPriorityThreadMessage(type, param)) {
         // handled
     } else if (type >= PSU_MESSAGE_MODULE_SPECIFIC) {
