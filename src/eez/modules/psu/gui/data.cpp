@@ -419,7 +419,7 @@ bool compare_LESS_THEN_MIN_FLOAT_value(const Value &a, const Value &b) {
 
 void LESS_THEN_MIN_FLOAT_value_to_text(const Value &value, char *text, int count) {
     char valueText[64];
-    MakeValue(value.getFloat(), (Unit)value.getUnit()).toText(valueText, sizeof(text));
+    MakeValue(value.getFloat(), (Unit)value.getUnit()).toText(valueText, sizeof(valueText));
     snprintf(text, count, "Value is less then %s", valueText);
 }
 
@@ -429,7 +429,7 @@ bool compare_GREATER_THEN_MAX_FLOAT_value(const Value &a, const Value &b) {
 
 void GREATER_THEN_MAX_FLOAT_value_to_text(const Value &value, char *text, int count) {
     char valueText[64];
-    MakeValue(value.getFloat(), (Unit)value.getUnit()).toText(valueText, sizeof(text));
+    MakeValue(value.getFloat(), (Unit)value.getUnit()).toText(valueText, sizeof(valueText));
     snprintf(text, count, "Value is greater then %s", valueText);
 }
 

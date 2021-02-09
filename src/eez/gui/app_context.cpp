@@ -301,9 +301,14 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 ////////////////////////////////////////////////////////////////////////////////
 
 void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
-    mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
-
     if (!isPageFullyCovered(i)) {
+        if (m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex == -1) {
+            m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = mcu::display::allocBuffer();
+            widgetCursor.previousState = nullptr;
+        }
+
+		mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
+
 		m_updatePageIndex = i;
 
 		widgetCursor.cursor = -1;
@@ -358,7 +363,9 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 		widgetCursor.nextState();
 
 		m_updatePageIndex = -1;
-	}
+	} else {
+        m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = -1;
+    }
 }
 
 bool isRect1FullyCoveredByRect2(int xRect1, int yRect1, int wRect1, int hRect1, int xRect2, int yRect2, int wRect2, int hRect2) {
