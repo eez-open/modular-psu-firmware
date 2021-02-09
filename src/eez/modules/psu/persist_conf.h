@@ -352,6 +352,7 @@ int getPowerLineFrequency();
 void setPowerLineFrequency(int powerLineFrequency);
 
 void setMcuRevision(int mcuRevision);
+void clearMcuRevision();
 
 ////////////////////////////////////////////////////////////////////////////////
 

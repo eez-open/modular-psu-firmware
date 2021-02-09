@@ -133,6 +133,10 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             g_supervisorWatchdogEnabled = enable;
         } 
 #endif
+        else if (cmd == 33) {
+            persist_conf::clearMcuRevision();
+            restart();
+        }
         else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;

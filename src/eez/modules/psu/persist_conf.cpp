@@ -1309,6 +1309,11 @@ void setMcuRevision(int mcuRevision) {
     g_devConf.mcuRevision = mcuRevision;
 }
 
+void clearMcuRevision() {
+    g_devConf.mcuRevisionTag = 0;
+    g_devConf.mcuRevision = 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 ModuleConfiguration g_moduleConf[NUM_SLOTS];
