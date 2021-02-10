@@ -1718,18 +1718,16 @@ void data_slot_micro_view(DataOperationEnum operation, Cursor cursor, Value &val
 void data_channel_display_value1(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == DATA_OPERATION_GET) {
-        if (operation == DATA_OPERATION_GET) {
-            if (channel.displayValues[0].type == DISPLAY_VALUE_VOLTAGE) {
-                data_channel_u_mon(operation, cursor, value);
-            } else if (channel.displayValues[0].type == DISPLAY_VALUE_CURRENT) {
-                data_channel_i_mon(operation, cursor, value);
-            } else if (channel.displayValues[0].type == DISPLAY_VALUE_POWER) {
-                data_channel_p_mon(operation, cursor, value);
-            }
-        }
-    } else if (operation == DATA_OPERATION_GET_DISPLAY_VALUE_RANGE) {
+    if (operation == DATA_OPERATION_GET_DISPLAY_VALUE_RANGE) {
         value = Value(channel.displayValues[0].getRange(&channel), channel.displayValues[0].getUnit());
+    } else {
+        if (channel.displayValues[0].type == DISPLAY_VALUE_VOLTAGE) {
+            data_channel_u_mon(operation, cursor, value);
+        } else if (channel.displayValues[0].type == DISPLAY_VALUE_CURRENT) {
+            data_channel_i_mon(operation, cursor, value);
+        } else if (channel.displayValues[0].type == DISPLAY_VALUE_POWER) {
+            data_channel_p_mon(operation, cursor, value);
+        }
     }
 }
 
@@ -1768,7 +1766,9 @@ void data_channel_display_value1_limit(DataOperationEnum operation, Cursor curso
 void data_channel_display_value2(DataOperationEnum operation, Cursor cursor, Value &value) {
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
-    if (operation == DATA_OPERATION_GET) {
+    if (operation == DATA_OPERATION_GET_DISPLAY_VALUE_RANGE) {
+        value = Value(channel.displayValues[1].getRange(&channel), channel.displayValues[1].getUnit());
+    } else {
         if (channel.displayValues[1].type == DISPLAY_VALUE_VOLTAGE) {
             data_channel_u_mon(operation, cursor, value);
         } else if (channel.displayValues[1].type == DISPLAY_VALUE_CURRENT) {
@@ -1776,8 +1776,6 @@ void data_channel_display_value2(DataOperationEnum operation, Cursor cursor, Val
         } else if (channel.displayValues[1].type == DISPLAY_VALUE_POWER) {
             data_channel_p_mon(operation, cursor, value);
         }
-    } else if (operation == DATA_OPERATION_GET_DISPLAY_VALUE_RANGE) {
-        value = Value(channel.displayValues[1].getRange(&channel), channel.displayValues[1].getUnit());
     }
 }
 
