@@ -69034,12 +69034,13 @@
             "name": "SYSTem:LFRequency",
             "parameters": [
               {
-                "name": "mode",
+                "name": "frequency",
                 "type": [
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "description": "50 or 60 (Hz)"
               }
             ],
             "response": {
