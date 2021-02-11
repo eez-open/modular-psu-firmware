@@ -357,12 +357,19 @@ void loadBlock() {
 
 void stateManagment() {
     auto isExecuting = dlog_record::isExecuting();
-    if (!isExecuting && g_wasExecuting && g_showLatest && psu::gui::isPageOnStack(PAGE_ID_DLOG_VIEW)) {
-        if (psu::gui::isPageOnStack(getExternalAssetsFirstPageId())) {
-            psu::gui::removePageFromStack(PAGE_ID_DLOG_VIEW);
-            return;
+    if (!isExecuting && g_wasExecuting) {
+        if (psu::gui::isPageOnStack(PAGE_ID_DLOG_VIEW)) {
+            if (psu::gui::isPageOnStack(getExternalAssetsFirstPageId())) {
+                psu::gui::removePageFromStack(PAGE_ID_DLOG_VIEW);
+            } else {
+                openFile(dlog_record::getLatestFilePath());
+            }
         } else {
-            openFile(dlog_record::getLatestFilePath());
+            if (psu::gui::isPageOnStack(getExternalAssetsFirstPageId())) {
+            } else {
+                gui::showPage(PAGE_ID_DLOG_VIEW);
+                openFile(dlog_record::getLatestFilePath());
+            }
         }
     }
     g_wasExecuting = isExecuting;
@@ -877,7 +884,13 @@ Recording &getRecording() {
 }
 
 float roundValue(float value) {
-    return roundPrec(value, powf(10.0f, floorf(log10f(fabs(value)))) / 1000.0f);
+	float prec;
+	if (value < 1E-5f) {
+		prec = 1E-5f;
+	} else {
+		prec = powf(10.0f, floorf(log10f(fabs(value)))) / 1000.0f;
+	}
+    return roundPrec(value, prec);
 }
 
 void uploadFile() {

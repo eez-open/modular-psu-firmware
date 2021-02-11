@@ -684,11 +684,13 @@ void MenuWithButtonsPage::refresh(const WidgetCursor &widgetCursor2) {
         widgetCursor.widget = &m_containerRectangleWidget.common;
         widgetCursor.x = x + m_containerRectangleWidget.common.x;
         widgetCursor.y = y + m_containerRectangleWidget.common.y;
+        widgetCursor.currentState->flags.active = 0;
         RECTANGLE_draw(widgetCursor);
 
         widgetCursor.widget = &m_messageTextWidget.common;
         widgetCursor.x = x + m_messageTextWidget.common.x;
         widgetCursor.y = y + m_messageTextWidget.common.y;
+        widgetCursor.currentState->flags.active = 0;
         TEXT_draw(widgetCursor);
     }
 
