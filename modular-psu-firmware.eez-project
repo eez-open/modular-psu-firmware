@@ -3049,9 +3049,6 @@
       "name": "dlog_view_select_legend_view_option"
     },
     {
-      "name": "set_focus"
-    },
-    {
       "name": "select_channel_calibration_value_type"
     },
     {
@@ -3518,7 +3515,7 @@
                     "style": {
                       "inheritFrom": "default_S_left",
                       "font": "Oswald14",
-                      "activeBackgroundColor": "Background",
+                      "activeBackgroundColor": "background",
                       "blink": true
                     },
                     "left": 0,
@@ -6335,10 +6332,10 @@
             "height": 208,
             "selectedStyle": {
               "inheritFrom": "default_S",
-              "color": "Background",
+              "color": "background",
               "backgroundColor": "text_regular",
               "activeColor": "text_regular",
-              "activeBackgroundColor": "Background"
+              "activeBackgroundColor": "background"
             }
           },
           {
@@ -7299,10 +7296,10 @@
             "type": "Text",
             "style": {
               "inheritFrom": "yes_no_button",
-              "color": "text_enabled",
+              "color": "action_color",
               "backgroundColor": "popup_background_warning",
               "activeColor": "popup_background_warning",
-              "activeBackgroundColor": "text_enabled"
+              "activeBackgroundColor": "action_color"
             },
             "action": "no",
             "left": 167,
@@ -7340,10 +7337,10 @@
             "type": "Text",
             "style": {
               "inheritFrom": "yes_no_button",
-              "color": "text_enabled",
+              "color": "action_color",
               "backgroundColor": "popup_background_warning",
               "activeColor": "popup_background_warning",
-              "activeBackgroundColor": "text_enabled"
+              "activeBackgroundColor": "action_color"
             },
             "action": "yes",
             "left": 125,
@@ -7356,10 +7353,10 @@
             "type": "Text",
             "style": {
               "inheritFrom": "yes_no_button",
-              "color": "text_enabled",
+              "color": "action_color",
               "backgroundColor": "popup_background_warning",
               "activeColor": "popup_background_warning",
-              "activeBackgroundColor": "text_enabled"
+              "activeBackgroundColor": "action_color"
             },
             "action": "no",
             "left": 187,
@@ -7520,10 +7517,10 @@
             "type": "Text",
             "style": {
               "inheritFrom": "yes_no_button",
-              "color": "text_enabled",
+              "color": "action_color",
               "backgroundColor": "popup_background_warning",
               "activeColor": "popup_background_warning",
-              "activeBackgroundColor": "text_enabled"
+              "activeBackgroundColor": "action_color"
             },
             "action": "yes",
             "left": 68,
@@ -7536,10 +7533,10 @@
             "type": "Text",
             "style": {
               "inheritFrom": "yes_no_button",
-              "color": "text_enabled",
+              "color": "action_color",
               "backgroundColor": "popup_background_warning",
               "activeColor": "popup_background_warning",
-              "activeBackgroundColor": "text_enabled"
+              "activeBackgroundColor": "action_color"
             },
             "action": "no",
             "left": 182,
@@ -7581,10 +7578,10 @@
             "type": "Text",
             "style": {
               "inheritFrom": "yes_no_button",
-              "color": "text_enabled",
+              "color": "action_color",
               "backgroundColor": "popup_background_info",
               "activeColor": "popup_background_info",
-              "activeBackgroundColor": "text_enabled"
+              "activeBackgroundColor": "action_color"
             },
             "action": "yes",
             "left": 90,
@@ -7597,10 +7594,10 @@
             "type": "Text",
             "style": {
               "inheritFrom": "yes_no_button",
-              "color": "text_enabled",
+              "color": "action_color",
               "backgroundColor": "popup_background_info",
               "activeColor": "popup_background_info",
-              "activeBackgroundColor": "text_enabled"
+              "activeBackgroundColor": "action_color"
             },
             "action": "no",
             "left": 190,
@@ -7753,8 +7750,8 @@
             "type": "Text",
             "style": {
               "inheritFrom": "async_operation_action",
-              "color": "text_enabled",
-              "activeBackgroundColor": "text_enabled"
+              "color": "action_color",
+              "activeBackgroundColor": "action_color"
             },
             "action": "cancel",
             "left": 70,
@@ -25992,8 +25989,8 @@
                     "style": {
                       "inheritFrom": "default",
                       "font": "Oswald17",
-                      "backgroundColor": "Background",
-                      "activeColor": "Background",
+                      "backgroundColor": "background",
+                      "activeColor": "background",
                       "padding": "0 0 0 6"
                     },
                     "action": "",
@@ -26120,8 +26117,8 @@
                       "inheritFrom": "default",
                       "font": "Oswald17",
                       "alignHorizontal": "center",
-                      "backgroundColor": "Background",
-                      "activeColor": "Background",
+                      "backgroundColor": "background",
+                      "activeColor": "background",
                       "padding": "0 0 0 6"
                     },
                     "action": "",
@@ -26248,8 +26245,8 @@
                       "inheritFrom": "default",
                       "font": "Oswald17",
                       "alignHorizontal": "center",
-                      "backgroundColor": "Background",
-                      "activeColor": "Background",
+                      "backgroundColor": "background",
+                      "activeColor": "background",
                       "padding": "0 0 0 6"
                     },
                     "action": "",
@@ -28645,8 +28642,8 @@
               "type": "Container",
               "style": {
                 "inheritFrom": "default",
-                "color": "Background",
-                "activeBackgroundColor": "Background"
+                "color": "background",
+                "activeBackgroundColor": "background"
               },
               "action": "show_user_profile_settings",
               "left": 0,
@@ -32829,8 +32826,8 @@
                                 "style": {
                                   "inheritFrom": "overlay",
                                   "color": "yt_graph_y1",
-                                  "backgroundColor": "Background",
-                                  "activeColor": "Background",
+                                  "backgroundColor": "background",
+                                  "activeColor": "background",
                                   "activeBackgroundColor": "yt_graph_y1"
                                 },
                                 "data": "dlog_visible_value_label",
@@ -32861,7 +32858,7 @@
                                   "inheritFrom": "encoder_cursor_14_enabled",
                                   "color": "overlay_background",
                                   "activeBackgroundColor": "overlay_background",
-                                  "focusBackgroundColor": "Action color"
+                                  "focusBackgroundColor": "action_color"
                                 },
                                 "data": "dlog_visible_value_offset",
                                 "action": "edit",
@@ -32891,7 +32888,7 @@
                                   "inheritFrom": "encoder_cursor_14_enabled",
                                   "color": "overlay_background",
                                   "activeBackgroundColor": "overlay_background",
-                                  "focusBackgroundColor": "Action color"
+                                  "focusBackgroundColor": "action_color"
                                 },
                                 "data": "dlog_visible_value_div",
                                 "action": "edit",
@@ -32916,34 +32913,20 @@
                                 "text": "Cursor:"
                               },
                               {
-                                "type": "Container",
+                                "type": "DisplayData",
                                 "style": {
-                                  "inheritFrom": "default"
+                                  "inheritFrom": "encoder_cursor_14_enabled",
+                                  "color": "overlay_background",
+                                  "activeBackgroundColor": "overlay_background",
+                                  "focusBackgroundColor": "action_color"
                                 },
-                                "data": "recording",
-                                "action": "set_focus",
+                                "data": "dlog_visible_value_cursor",
+                                "action": "",
                                 "left": 402,
                                 "top": 0,
                                 "width": 78,
                                 "height": 32,
-                                "widgets": [
-                                  {
-                                    "type": "DisplayData",
-                                    "style": {
-                                      "inheritFrom": "encoder_cursor_14_enabled",
-                                      "color": "overlay_background",
-                                      "activeBackgroundColor": "overlay_background",
-                                      "focusBackgroundColor": "Action color"
-                                    },
-                                    "data": "dlog_visible_value_cursor",
-                                    "action": "",
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 78,
-                                    "height": 32,
-                                    "displayOption": 0
-                                  }
-                                ]
+                                "displayOption": 0
                               }
                             ]
                           },
@@ -33102,7 +33085,7 @@
                                     "inheritFrom": "encoder_cursor_14_enabled",
                                     "color": "overlay_background",
                                     "activeBackgroundColor": "overlay_background",
-                                    "focusBackgroundColor": "Action color"
+                                    "focusBackgroundColor": "action_color"
                                   },
                                   "data": "dlog_visible_value_offset",
                                   "action": "",
@@ -33132,7 +33115,7 @@
                                     "inheritFrom": "encoder_cursor_14_enabled",
                                     "color": "overlay_background",
                                     "activeBackgroundColor": "overlay_background",
-                                    "focusBackgroundColor": "Action color"
+                                    "focusBackgroundColor": "action_color"
                                   },
                                   "data": "dlog_visible_value_div",
                                   "action": "",
@@ -33245,8 +33228,8 @@
                               "inheritFrom": "overlay",
                               "alignHorizontal": "left",
                               "color": "yt_graph_y1",
-                              "backgroundColor": "Background",
-                              "activeColor": "Background",
+                              "backgroundColor": "background",
+                              "activeColor": "background",
                               "activeBackgroundColor": "yt_graph_y1"
                             },
                             "data": "dlog_visible_value_label",
@@ -33263,7 +33246,7 @@
                               "inheritFrom": "encoder_cursor_14_enabled",
                               "color": "overlay_background",
                               "activeBackgroundColor": "overlay_background",
-                              "focusBackgroundColor": "Action color"
+                              "focusBackgroundColor": "action_color"
                             },
                             "data": "dlog_visible_value_offset",
                             "action": "edit",
@@ -33279,7 +33262,7 @@
                               "inheritFrom": "encoder_cursor_14_enabled",
                               "color": "overlay_background",
                               "activeBackgroundColor": "overlay_background",
-                              "focusBackgroundColor": "Action color"
+                              "focusBackgroundColor": "action_color"
                             },
                             "data": "dlog_visible_value_div",
                             "action": "edit",
@@ -33390,7 +33373,7 @@
                 "style": {
                   "inheritFrom": "default",
                   "activeColor": "text_regular",
-                  "activeBackgroundColor": "Background"
+                  "activeBackgroundColor": "background"
                 },
                 "data": "file_manager_opened_image",
                 "action": "show_previous_page",
@@ -33406,7 +33389,7 @@
                   "font": "Oswald17",
                   "color": "status_warning",
                   "activeColor": "status_warning",
-                  "activeBackgroundColor": "Background"
+                  "activeBackgroundColor": "background"
                 },
                 "action": "show_previous_page",
                 "left": 0,
@@ -34038,8 +34021,8 @@
                     "style": {
                       "inheritFrom": "status_bgnd",
                       "font": "Oswald17",
-                      "color": "Action color",
-                      "activeBackgroundColor": "Action color"
+                      "color": "action_color",
+                      "activeBackgroundColor": "action_color"
                     },
                     "action": "dlog_toggle",
                     "left": 0,
@@ -34218,8 +34201,8 @@
             "type": "Container",
             "style": {
               "inheritFrom": "default",
-              "color": "Action color",
-              "activeBackgroundColor": "Action color"
+              "color": "action_color",
+              "activeBackgroundColor": "action_color"
             },
             "action": "dlog_view_toggle_labels",
             "left": 145,
@@ -34232,8 +34215,8 @@
                 "type": "Select",
                 "style": {
                   "inheritFrom": "default",
-                  "color": "Action color",
-                  "activeBackgroundColor": "Action color"
+                  "color": "action_color",
+                  "activeBackgroundColor": "action_color"
                 },
                 "data": "dlog_view_show_labels",
                 "left": 0,
@@ -34247,8 +34230,8 @@
                       "inheritFrom": "default",
                       "font": "Oswald14",
                       "alignHorizontal": "left",
-                      "color": "Action color",
-                      "activeBackgroundColor": "Action color",
+                      "color": "action_color",
+                      "activeBackgroundColor": "action_color",
                       "padding": "0 0 0 2"
                     },
                     "left": 0,
@@ -34261,8 +34244,8 @@
                     "type": "Text",
                     "style": {
                       "inheritFrom": "default_S",
-                      "color": "Action color",
-                      "activeBackgroundColor": "Action color"
+                      "color": "action_color",
+                      "activeBackgroundColor": "action_color"
                     },
                     "left": 0,
                     "top": 0,
@@ -34277,10 +34260,10 @@
                 "style": {
                   "inheritFrom": "overlay",
                   "alignHorizontal": "left",
-                  "color": "Action color",
-                  "backgroundColor": "Background",
-                  "activeColor": "Background",
-                  "activeBackgroundColor": "Action color"
+                  "color": "action_color",
+                  "backgroundColor": "background",
+                  "activeColor": "background",
+                  "activeBackgroundColor": "action_color"
                 },
                 "data": "",
                 "left": 26,
@@ -34406,8 +34389,8 @@
                 "style": {
                   "inheritFrom": "default",
                   "font": "Heydings14",
-                  "color": "Action color",
-                  "activeBackgroundColor": "Action color",
+                  "color": "action_color",
+                  "activeBackgroundColor": "action_color",
                   "padding": "0 0 0 4"
                 },
                 "action": "file_manager_go_to_parent",
@@ -34841,8 +34824,8 @@
                 "style": {
                   "inheritFrom": "default",
                   "font": "Heydings14",
-                  "color": "Action color",
-                  "activeBackgroundColor": "Action color",
+                  "color": "action_color",
+                  "activeBackgroundColor": "action_color",
                   "padding": "0 0 0 4"
                 },
                 "action": "file_manager_go_to_parent",
@@ -35295,8 +35278,8 @@
                         "style": {
                           "inheritFrom": "status_title",
                           "alignHorizontal": "center",
-                          "color": "Action color",
-                          "activeBackgroundColor": "Action color"
+                          "color": "action_color",
+                          "activeBackgroundColor": "action_color"
                         },
                         "action": "file_manager_new_file",
                         "left": 225,
@@ -36724,7 +36707,7 @@
               "type": "Container",
               "style": {
                 "inheritFrom": "default",
-                "activeBackgroundColor": "Background"
+                "activeBackgroundColor": "background"
               },
               "action": "pick_color",
               "left": 0,
@@ -36748,7 +36731,7 @@
                       "style": {
                         "inheritFrom": "default",
                         "color": "pick_color",
-                        "activeBackgroundColor": "Background"
+                        "activeBackgroundColor": "background"
                       },
                       "left": 0,
                       "top": 0,
@@ -36760,7 +36743,7 @@
                       "style": {
                         "inheritFrom": "default",
                         "borderSize": "2",
-                        "borderColor": "Background"
+                        "borderColor": "background"
                       },
                       "left": 0,
                       "top": 0,
@@ -36772,7 +36755,7 @@
                           "style": {
                             "inheritFrom": "default",
                             "color": "pick_color",
-                            "activeBackgroundColor": "Background"
+                            "activeBackgroundColor": "background"
                           },
                           "left": 3,
                           "top": 3,
@@ -36931,9 +36914,9 @@
         "alignHorizontal": "center",
         "alignVertical": "top",
         "color": "bar_graph_text",
-        "backgroundColor": "Background",
+        "backgroundColor": "background",
         "activeColor": "bar_graph_text_inside",
-        "activeBackgroundColor": "Background",
+        "activeBackgroundColor": "background",
         "padding": 0
       },
       {
@@ -36976,8 +36959,8 @@
         "inheritFrom": "",
         "font": "Oswald24",
         "color": "text_regular",
-        "backgroundColor": "Background",
-        "activeColor": "Background",
+        "backgroundColor": "background",
+        "activeColor": "background",
         "activeBackgroundColor": "text_regular",
         "borderColor": "#D3D3D3",
         "padding": "0"
@@ -37010,10 +36993,10 @@
         "description": "",
         "inheritFrom": "default",
         "font": "Oswald24",
-        "color": "Background",
+        "color": "background",
         "backgroundColor": "text_regular",
         "activeColor": "text_regular",
-        "activeBackgroundColor": "Background",
+        "activeBackgroundColor": "background",
         "padding": 0
       },
       {
@@ -37070,8 +37053,8 @@
         "name": "edit_S",
         "inheritFrom": "default",
         "font": "Oswald14",
-        "color": "Action color",
-        "activeBackgroundColor": "Action color",
+        "color": "action_color",
+        "activeBackgroundColor": "action_color",
         "padding": 0
       },
       {
@@ -37081,10 +37064,10 @@
         "font": "Oswald14",
         "alignHorizontal": "left",
         "alignVertical": "center",
-        "color": "Action color",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "Action color",
+        "activeBackgroundColor": "action_color",
         "borderSize": "0",
         "padding": "0 0 0 2"
       },
@@ -37093,10 +37076,10 @@
         "name": "edit_value_active_S_center",
         "inheritFrom": "default",
         "font": "Oswald14",
-        "color": "Action color",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "Action color"
+        "activeBackgroundColor": "action_color"
       },
       {
         "id": 18,
@@ -37131,8 +37114,8 @@
         "name": "error_alert_button",
         "inheritFrom": "error_alert",
         "alwaysBuild": true,
-        "color": "text_enabled",
-        "activeBackgroundColor": "text_enabled"
+        "color": "action_color",
+        "activeBackgroundColor": "action_color"
       },
       {
         "name": "event_error",
@@ -37188,8 +37171,8 @@
       {
         "name": "yes_no_button",
         "inheritFrom": "yes_no",
-        "color": "text_enabled",
-        "activeBackgroundColor": "text_enabled",
+        "color": "action_color",
+        "activeBackgroundColor": "action_color",
         "padding": 0
       },
       {
@@ -37198,10 +37181,10 @@
         "font": "Oswald24",
         "alignHorizontal": "center",
         "alignVertical": "center",
-        "color": "text_enabled",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "text_enabled"
+        "activeBackgroundColor": "action_color"
       },
       {
         "name": "key_disabled",
@@ -37305,10 +37288,10 @@
         "font": "Oswald14",
         "alignHorizontal": "center",
         "alignVertical": "center",
-        "color": "Action color",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "Action color",
+        "activeBackgroundColor": "action_color",
         "borderSize": 0,
         "borderColor": "#D3D3D3",
         "padding": 0
@@ -37326,10 +37309,10 @@
         "font": "Oswald17",
         "alignHorizontal": "center",
         "alignVertical": "center",
-        "color": "Action color",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "Action color",
+        "activeBackgroundColor": "action_color",
         "borderSize": 0,
         "borderColor": "#D3D3D3",
         "padding": 0
@@ -37349,10 +37332,10 @@
         "font": "WebHostingHub24",
         "alignHorizontal": "center",
         "alignVertical": "center",
-        "color": "text_enabled",
+        "color": "action_color",
         "backgroundColor": "status_line_background",
         "activeColor": "status_line_background",
-        "activeBackgroundColor": "text_enabled",
+        "activeBackgroundColor": "action_color",
         "borderSize": 0,
         "padding": 0
       },
@@ -37362,8 +37345,8 @@
         "font": "WebHostingHub24",
         "alignHorizontal": "center",
         "alignVertical": "center",
-        "color": "text_enabled",
-        "activeBackgroundColor": "text_enabled",
+        "color": "action_color",
+        "activeBackgroundColor": "action_color",
         "borderSize": 0,
         "padding": 0
       },
@@ -37612,8 +37595,8 @@
         "name": "display_off",
         "inheritFrom": "default",
         "color": "text_regular",
-        "backgroundColor": "Background",
-        "activeColor": "Background",
+        "backgroundColor": "background",
+        "activeColor": "background",
         "activeBackgroundColor": "text_regular",
         "padding": 0
       },
@@ -37622,8 +37605,8 @@
         "inheritFrom": "display_off",
         "font": "Oswald14",
         "color": "text_regular",
-        "backgroundColor": "Background",
-        "activeColor": "Background",
+        "backgroundColor": "background",
+        "activeColor": "background",
         "activeBackgroundColor": "text_regular",
         "padding": 0
       },
@@ -37683,21 +37666,21 @@
       {
         "name": "button_bgnd",
         "inheritFrom": "default_S",
-        "color": "text_enabled",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "text_enabled"
+        "activeBackgroundColor": "action_color"
       },
       {
         "name": "encoder_cursor_enabled",
         "inheritFrom": "default",
         "font": "Oswald14",
-        "color": "text_enabled",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "text_enabled",
+        "activeBackgroundColor": "action_color",
         "focusColor": "text_enable_background",
-        "focusBackgroundColor": "text_enabled",
+        "focusBackgroundColor": "action_color",
         "borderColor": "#000000"
       },
       {
@@ -37739,10 +37722,10 @@
         "name": "ch_prot_off",
         "inheritFrom": "default",
         "font": "Oswald14",
-        "color": "text_enabled",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "text_enabled"
+        "activeBackgroundColor": "action_color"
       },
       {
         "name": "info_alert",
@@ -37786,10 +37769,10 @@
         "alwaysBuild": true,
         "font": "Oswald17",
         "alignVertical": "bottom",
-        "color": "text_enabled",
+        "color": "action_color",
         "backgroundColor": "popup_background_info",
         "activeColor": "popup_background_info",
-        "activeBackgroundColor": "text_enabled",
+        "activeBackgroundColor": "action_color",
         "padding": "0 4",
         "margin": "0"
       },
@@ -37797,19 +37780,19 @@
         "name": "ch_prot_on",
         "inheritFrom": "default",
         "font": "Oswald14",
-        "color": "text_enabled",
+        "color": "action_color",
         "backgroundColor": "status_ok",
         "activeColor": "status_ok",
-        "activeBackgroundColor": "text_enabled"
+        "activeBackgroundColor": "action_color"
       },
       {
         "name": "ch_prot_tripped",
         "inheritFrom": "default",
         "font": "Oswald14",
-        "color": "text_enabled",
+        "color": "action_color",
         "backgroundColor": "status_warning",
         "activeColor": "status_warning",
-        "activeBackgroundColor": "text_enabled"
+        "activeBackgroundColor": "action_color"
       },
       {
         "name": "channel_off_button_20",
@@ -37834,10 +37817,10 @@
         "name": "trigger_button",
         "inheritFrom": "default",
         "font": "Oswald20",
-        "color": "Action color",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "Action color"
+        "activeBackgroundColor": "action_color"
       },
       {
         "name": "trigger_button_14",
@@ -37861,10 +37844,10 @@
         "font": "Oswald17",
         "alignHorizontal": "left",
         "alignVertical": "center",
-        "color": "Action color",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "Action color",
+        "activeBackgroundColor": "action_color",
         "borderSize": "0",
         "padding": "0 0 0 4"
       },
@@ -37894,8 +37877,8 @@
         "alignHorizontal": "center",
         "alignVertical": "center",
         "color": "text_regular",
-        "backgroundColor": "Background",
-        "activeColor": "Background",
+        "backgroundColor": "background",
+        "activeColor": "background",
         "activeBackgroundColor": "text_regular",
         "borderSize": 0,
         "padding": 0
@@ -37907,10 +37890,10 @@
         "font": "Oswald17",
         "alignHorizontal": "center",
         "alignVertical": "center",
-        "color": "Action color",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "Action color",
+        "activeBackgroundColor": "action_color",
         "borderSize": "0",
         "padding": "0"
       },
@@ -37920,10 +37903,10 @@
         "font": "Oswald24",
         "alignHorizontal": "center",
         "alignVertical": "center",
-        "color": "Action color",
+        "color": "action_color",
         "backgroundColor": "text_enable_background",
         "activeColor": "text_enable_background",
-        "activeBackgroundColor": "Action color"
+        "activeBackgroundColor": "action_color"
       },
       {
         "id": 2,
@@ -38088,8 +38071,8 @@
         "name": "status_action",
         "inheritFrom": "status_title",
         "alignHorizontal": "center",
-        "color": "Action color",
-        "activeBackgroundColor": "Action color"
+        "color": "action_color",
+        "activeBackgroundColor": "action_color"
       },
       {
         "name": "edit_value_S_centered_status_line",
@@ -38099,13 +38082,13 @@
         "activeColor": "status_line_background",
         "activeBackgroundColor": "status_line_text",
         "focusColor": "text_enable_background",
-        "focusBackgroundColor": "Action color"
+        "focusBackgroundColor": "action_color"
       },
       {
         "name": "status_line_small_title",
         "inheritFrom": "edit_value_S_centered_status_line",
         "font": "RobotoCondensed-Regular",
-        "focusBackgroundColor": "Action color"
+        "focusBackgroundColor": "action_color"
       },
       {
         "name": "progress",
@@ -59971,13 +59954,13 @@
     ],
     "colors": [
       {
-        "name": "Background"
+        "name": "background"
       },
       {
         "name": "text_regular"
       },
       {
-        "name": "text_enabled"
+        "name": "action_color"
       },
       {
         "name": "text_selected"
@@ -60032,9 +60015,6 @@
       },
       {
         "name": "bar_graph_set_line"
-      },
-      {
-        "name": "Action color"
       },
       {
         "name": "popup_background_regular"
@@ -60277,7 +60257,7 @@
         "colors": [
           "#1b4fd9",
           "#ffffff",
-          "#ffffff",
+          "#ffff7f",
           "#5080ff",
           "#4c72da",
           "#404040",
@@ -60296,7 +60276,6 @@
           "#404040",
           "#202020",
           "#7a7a7a",
-          "#ffff00",
           "#359ebd",
           "#55f2e6",
           "#f78000",
@@ -60401,7 +60380,6 @@
           "#202020",
           "#202020",
           "#808080",
-          "#181e8a",
           "#f0ef31",
           "#1f7bc3",
           "#d28602",
@@ -60506,7 +60484,6 @@
           "#d0d0d0",
           "#202020",
           "#808080",
-          "#ffff00",
           "#2b32b2",
           "#b7a6f6",
           "#a32d82",

@@ -2837,12 +2837,7 @@
                                   {
                                     "type": "Text",
                                     "style": {
-                                      "inheritFrom": "default",
-                                      "font": "Oswald14",
-                                      "color": "text_enabled",
-                                      "backgroundColor": "text_enable_background",
-                                      "activeColor": "text_enable_background",
-                                      "activeBackgroundColor": "text_enabled"
+                                      "inheritFrom": "ch_prot_off"
                                     },
                                     "action": "",
                                     "left": 0,
@@ -2854,12 +2849,7 @@
                                   {
                                     "type": "Text",
                                     "style": {
-                                      "inheritFrom": "default",
-                                      "font": "Oswald14",
-                                      "color": "text_enabled",
-                                      "backgroundColor": "status_ok",
-                                      "activeColor": "status_ok",
-                                      "activeBackgroundColor": "text_enabled"
+                                      "inheritFrom": "ch_prot_on"
                                     },
                                     "action": "",
                                     "left": 0,
@@ -2871,12 +2861,7 @@
                                   {
                                     "type": "Text",
                                     "style": {
-                                      "inheritFrom": "default",
-                                      "font": "Oswald14",
-                                      "color": "text_enabled",
-                                      "backgroundColor": "status_warning",
-                                      "activeColor": "status_warning",
-                                      "activeBackgroundColor": "text_enabled"
+                                      "inheritFrom": "ch_prot_tripped"
                                     },
                                     "action": "",
                                     "left": 0,
@@ -3028,12 +3013,7 @@
                                   {
                                     "type": "Text",
                                     "style": {
-                                      "inheritFrom": "default",
-                                      "font": "Oswald14",
-                                      "color": "text_enabled",
-                                      "backgroundColor": "text_enable_background",
-                                      "activeColor": "text_enable_background",
-                                      "activeBackgroundColor": "text_enabled"
+                                      "inheritFrom": "ch_prot_off"
                                     },
                                     "action": "",
                                     "left": 0,
@@ -3045,12 +3025,7 @@
                                   {
                                     "type": "Text",
                                     "style": {
-                                      "inheritFrom": "default",
-                                      "font": "Oswald14",
-                                      "color": "text_enabled",
-                                      "backgroundColor": "status_ok",
-                                      "activeColor": "status_ok",
-                                      "activeBackgroundColor": "text_enabled"
+                                      "inheritFrom": "ch_prot_on"
                                     },
                                     "action": "",
                                     "left": 0,
@@ -3062,12 +3037,7 @@
                                   {
                                     "type": "Text",
                                     "style": {
-                                      "inheritFrom": "default",
-                                      "font": "Oswald14",
-                                      "color": "text_enabled",
-                                      "backgroundColor": "status_warning",
-                                      "activeColor": "status_warning",
-                                      "activeBackgroundColor": "text_enabled"
+                                      "inheritFrom": "ch_prot_tripped"
                                     },
                                     "action": "",
                                     "left": 0,
@@ -3917,12 +3887,7 @@
                               {
                                 "type": "Text",
                                 "style": {
-                                  "inheritFrom": "default",
-                                  "font": "Oswald14",
-                                  "color": "text_enabled",
-                                  "backgroundColor": "text_enable_background",
-                                  "activeColor": "text_enable_background",
-                                  "activeBackgroundColor": "text_enabled"
+                                  "inheritFrom": "ch_prot_off"
                                 },
                                 "action": "",
                                 "left": 0,
@@ -3934,12 +3899,7 @@
                               {
                                 "type": "Text",
                                 "style": {
-                                  "inheritFrom": "default",
-                                  "font": "Oswald14",
-                                  "color": "text_enabled",
-                                  "backgroundColor": "status_ok",
-                                  "activeColor": "status_ok",
-                                  "activeBackgroundColor": "text_enabled"
+                                  "inheritFrom": "ch_prot_on"
                                 },
                                 "action": "",
                                 "left": 0,
@@ -3951,12 +3911,7 @@
                               {
                                 "type": "Text",
                                 "style": {
-                                  "inheritFrom": "default",
-                                  "font": "Oswald14",
-                                  "color": "text_enabled",
-                                  "backgroundColor": "status_warning",
-                                  "activeColor": "status_warning",
-                                  "activeBackgroundColor": "text_enabled"
+                                  "inheritFrom": "ch_prot_tripped"
                                 },
                                 "action": "",
                                 "left": 0,
@@ -4031,12 +3986,7 @@
                               {
                                 "type": "Text",
                                 "style": {
-                                  "inheritFrom": "default",
-                                  "font": "Oswald14",
-                                  "color": "text_enabled",
-                                  "backgroundColor": "text_enable_background",
-                                  "activeColor": "text_enable_background",
-                                  "activeBackgroundColor": "text_enabled"
+                                  "inheritFrom": "ch_prot_off"
                                 },
                                 "action": "",
                                 "left": 0,
@@ -4048,12 +3998,7 @@
                               {
                                 "type": "Text",
                                 "style": {
-                                  "inheritFrom": "default",
-                                  "font": "Oswald14",
-                                  "color": "text_enabled",
-                                  "backgroundColor": "status_ok",
-                                  "activeColor": "status_ok",
-                                  "activeBackgroundColor": "text_enabled"
+                                  "inheritFrom": "ch_prot_on"
                                 },
                                 "action": "",
                                 "left": 0,
@@ -4065,12 +4010,7 @@
                               {
                                 "type": "Text",
                                 "style": {
-                                  "inheritFrom": "default",
-                                  "font": "Oswald14",
-                                  "color": "text_enabled",
-                                  "backgroundColor": "status_warning",
-                                  "activeColor": "status_warning",
-                                  "activeBackgroundColor": "text_enabled"
+                                  "inheritFrom": "ch_prot_tripped"
                                 },
                                 "action": "",
                                 "left": 0,

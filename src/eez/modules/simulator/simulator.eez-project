@@ -263,7 +263,7 @@
           {
             "type": "AppView",
             "style": {
-              "inheritFrom": "home",
+              "inheritFrom": "default",
               "backgroundColor": "#ffffff",
               "activeColor": "#ffffff"
             },
