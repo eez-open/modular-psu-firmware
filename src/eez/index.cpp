@@ -248,7 +248,8 @@ void Module::setLabel(const char *value, int length) {
     if (length > (int)SLOT_LABEL_MAX_LENGTH) {
         length = SLOT_LABEL_MAX_LENGTH;
     }
-    stringCopy(label, length, value);
+	strncpy(label, value, length);
+	label[SLOT_LABEL_MAX_LENGTH] = 0;
 }
 
 uint8_t Module::getColor() {
