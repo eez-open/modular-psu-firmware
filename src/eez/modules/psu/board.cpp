@@ -30,11 +30,14 @@ namespace board {
 
 void powerUp() {
 #if defined(EEZ_PLATFORM_STM32)    
+    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);    
 
     HAL_GPIO_WritePin(PWR_SSTART_GPIO_Port, PWR_SSTART_Pin, GPIO_PIN_SET);
     delay(700);
     HAL_GPIO_WritePin(MCU_REV_GPIO(PWR_DIRECT_GPIO_Port), MCU_REV_GPIO(PWR_DIRECT_Pin), GPIO_PIN_SET);
-    
+
+    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);    
+
     delay(100);
     HAL_GPIO_WritePin(PWR_SSTART_GPIO_Port, PWR_SSTART_Pin, GPIO_PIN_RESET);
 

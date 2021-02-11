@@ -839,6 +839,7 @@ bool measureAllAdcValuesOnChannel(int channelIndex) {
 
 void initChannels() {
     for (int i = 0; i < NUM_SLOTS; ++i) {
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
     	g_slots[i]->initChannels();
     }    
 }
@@ -1032,18 +1033,25 @@ bool powerUp() {
     gui::showWelcomePage();
 #endif
 
+    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
     // turn power on
     board::powerUp();
     g_powerIsUp = true;
 
+    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
     bp3c::io_exp::hardResetModules();
-    
+
+    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+
     psuReset();
 
 #if !CONF_SURVIVE_MODE
     ontime::g_mcuCounter.start();
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
         if (g_slots[slotIndex]->moduleType != MODULE_TYPE_NONE) {
+            WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
             ontime::g_moduleCounters[slotIndex].start();
         }
     }
@@ -1051,7 +1059,6 @@ bool powerUp() {
 
     // init channels
     initChannels();
-    uint32_t initTime = millis();
 
     bool testSuccess = true;
 
@@ -1061,19 +1068,6 @@ bool powerUp() {
 
     // test channels
     testSuccess &= testChannels();
-
-    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
-    int32_t diff = millis() - initTime;
-    static const int32_t CONF_INIT_TIME = 1000;
-    if (diff < CONF_INIT_TIME) {
-        uint32_t d = CONF_INIT_TIME - diff;
-        if (d > 500) {
-            delay(500);
-            d -= 500;
-            WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
-        }
-        delay(d);
-    }
 
     // turn on Power On (PON) bit of ESE register
     reg_set_esr_bits(ESR_PON);
