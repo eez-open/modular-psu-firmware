@@ -274,7 +274,7 @@ scpi_result_t scpi_cmd_instrumentDisplayScale(scpi_t *context) {
             return SCPI_RES_ERR;
         }
 
-        if (range < 0 || range > displayValues[displayValueIndex].getMaxRange()) {
+        if (range < 0 || range > displayValues[displayValueIndex].getMaxRange(channel)) {
             SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
             return SCPI_RES_ERR;
         }
