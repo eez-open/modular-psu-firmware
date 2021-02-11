@@ -490,9 +490,7 @@
                       "font": "Oswald17",
                       "alignHorizontal": "left",
                       "color": "text_enable_background",
-                      "backgroundColor": "Action color",
-                      "activeColor": "Action color",
-                      "activeBackgroundColor": "text_enable_background",
+                      "backgroundColor": "action_color",
                       "borderSize": "0",
                       "borderRadius": 0,
                       "borderColor": "text_regular",
@@ -820,9 +818,7 @@
                       "font": "Oswald17",
                       "alignHorizontal": "left",
                       "color": "text_enable_background",
-                      "backgroundColor": "Action color",
-                      "activeColor": "Action color",
-                      "activeBackgroundColor": "text_enable_background",
+                      "backgroundColor": "action_color",
                       "borderSize": "0",
                       "borderRadius": 0,
                       "borderColor": "text_regular",
@@ -1280,9 +1276,7 @@
                       "font": "Oswald17",
                       "alignHorizontal": "left",
                       "color": "text_enable_background",
-                      "backgroundColor": "Action color",
-                      "activeColor": "Action color",
-                      "activeBackgroundColor": "text_enable_background",
+                      "backgroundColor": "action_color",
                       "borderSize": "0",
                       "borderRadius": 0,
                       "borderColor": "text_regular",
@@ -1762,8 +1756,8 @@
                               "type": "Rectangle",
                               "style": {
                                 "inheritFrom": "default",
-                                "color": "Action color",
-                                "activeBackgroundColor": "Action color",
+                                "color": "action_color",
+                                "activeBackgroundColor": "action_color",
                                 "borderSize": "0",
                                 "borderRadius": 7
                               },
@@ -1791,7 +1785,7 @@
                                 "color": "Background",
                                 "borderSize": "1",
                                 "borderRadius": 8,
-                                "borderColor": "Action color"
+                                "borderColor": "action_color"
                               },
                               "left": 25,
                               "top": 13,
@@ -1849,8 +1843,8 @@
                       "type": "Text",
                       "style": {
                         "inheritFrom": "default_S_right_condensed",
-                        "color": "Action color",
-                        "activeBackgroundColor": "Action color"
+                        "color": "action_color",
+                        "activeBackgroundColor": "action_color"
                       },
                       "data": "y_label",
                       "action": "edit_y_label",
@@ -1890,8 +1884,8 @@
                       "style": {
                         "inheritFrom": "default_S_right_condensed",
                         "alignHorizontal": "center",
-                        "color": "Action color",
-                        "activeBackgroundColor": "Action color"
+                        "color": "action_color",
+                        "activeBackgroundColor": "action_color"
                       },
                       "data": "x_label",
                       "action": "edit_x_label",
