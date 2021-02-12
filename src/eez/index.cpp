@@ -958,16 +958,25 @@ bool setModuleSerialInfo(uint8_t slotIndex, const char *serialStr, size_t serial
 
     uint32_t idw0;
     if (!hexStringToNumber(serialStr, idw0, err)) {
+        if (err) {
+            *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+        }
         return false;
     }
 
     uint32_t idw1;
     if (!hexStringToNumber(serialStr + 8, idw1, err)) {
+        if (err) {
+            *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+        }
         return false;
     }
 
     uint32_t idw2;
     if (!hexStringToNumber(serialStr + 16, idw2, err)) {
+        if (err) {
+            *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+        }
         return false;
     }
 

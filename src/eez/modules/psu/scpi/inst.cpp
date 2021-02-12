@@ -56,9 +56,9 @@ scpi_choice_def_t traceValueChoice[] = {
 };
 
 scpi_choice_def_t displayValueScaleChoice[] = {
-    { "MAXimum", DISPLAY_VALUE_SCALE_MAXIMUM },
-    { "LIMit", DISPLAY_VALUE_SCALE_LIMIT },
     { "AUTO", DISPLAY_VALUE_SCALE_AUTO },
+    { "LIMit", DISPLAY_VALUE_SCALE_LIMIT },
+    { "MAXimum", DISPLAY_VALUE_SCALE_MAXIMUM },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 

@@ -60887,19 +60887,17 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               },
               {
                 "name": "level",
                 "type": [
                   {
                     "type": "nr2"
-                  },
-                  {
-                    "type": "discrete",
-                    "enumeration": "Level"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -60960,7 +60958,7 @@
           },
           {
             "name": "CALibration:CURRent:MEASure?",
-            "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_volt",
+            "helpLink": "",
             "parameters": [],
             "response": {
               "type": [
@@ -61091,19 +61089,17 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               },
               {
                 "name": "level",
                 "type": [
                   {
                     "type": "nr2"
-                  },
-                  {
-                    "type": "discrete",
-                    "enumeration": "Level"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -61138,7 +61134,7 @@
           },
           {
             "name": "CALibration:VOLTage:MEASure?",
-            "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_volt",
+            "helpLink": "",
             "parameters": [],
             "response": {
               "type": [
@@ -61907,8 +61903,7 @@
                 "name": "mode",
                 "type": [
                   {
-                    "type": "discrete",
-                    "enumeration": "Mode2"
+                    "type": "channel-list"
                   }
                 ],
                 "isOptional": false
@@ -61978,7 +61973,7 @@
             }
           },
           {
-            "name": "INSTrument:DISPlay:SCALe<n>",
+            "name": "INSTrument:DISPlay:SCALe[<n>]",
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_disp_trac",
             "parameters": [
               {
@@ -62002,7 +61997,7 @@
             }
           },
           {
-            "name": "INSTrument:DISPlay:SCALe<n>?",
+            "name": "INSTrument:DISPlay:SCALe[<n>]?",
             "helpLink": "EEZ BB3 SCPI reference 5.8 - INSTrument.html#inst_disp_trac",
             "parameters": [],
             "response": {
@@ -63593,7 +63588,7 @@
         "commands": [
           {
             "name": "SENSe:FUNCtion[:ON]",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "function",
@@ -63626,7 +63621,7 @@
           },
           {
             "name": "SENSe:FUNCtion[:ON]?",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "channel",
@@ -63649,7 +63644,7 @@
             }
           },
           {
-            "name": "[SENSe]:CURRent[:DC]:RANGe",
+            "name": "SENSe:CURRent[:DC]:RANGe",
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_curr_rang",
             "parameters": [
               {
@@ -63683,7 +63678,7 @@
             }
           },
           {
-            "name": "[SENSe]:CURRent[:DC]:RANGe?",
+            "name": "SENSe:CURRent[:DC]:RANGe?",
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_curr_rang",
             "parameters": [
               {
@@ -63693,7 +63688,8 @@
                     "type": "discrete",
                     "enumeration": "Channel"
                   }
-                ]
+                ],
+                "isOptional": true
               }
             ],
             "response": {
@@ -63705,8 +63701,8 @@
             }
           },
           {
-            "name": "[SENSe]:VOLTage[:DC]:RANGe",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "name": "SENSe:VOLTage[:DC]:RANGe",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "range",
@@ -63737,8 +63733,8 @@
             }
           },
           {
-            "name": "[SENSe]:VOLTage[:DC]:RANGe?",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "name": "SENSe:VOLTage[:DC]:RANGe?",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "channel",
@@ -63761,7 +63757,7 @@
           },
           {
             "name": "SENSe:CURRent[:DC]:NPLCycles",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "cycles",
@@ -63793,7 +63789,7 @@
           },
           {
             "name": "SENSe:CURRent[:DC]:NPLCycles?",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "channel",
@@ -63816,7 +63812,7 @@
           },
           {
             "name": "SENSe:CURRent[:DC]:APERture?",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "channel",
@@ -63839,7 +63835,7 @@
           },
           {
             "name": "SENSe:VOLTage[:DC]:NPLCycles",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "cycles",
@@ -63871,7 +63867,7 @@
           },
           {
             "name": "SENSe:VOLTage[:DC]:NPLCycles?",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "channel",
@@ -63894,7 +63890,7 @@
           },
           {
             "name": "SENSe:VOLTage[:DC]:APERture?",
-            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_volt",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "channel",
@@ -64082,7 +64078,7 @@
           },
           {
             "name": "SENSe:DLOG:FUNCtion:DIGital[:INPut]",
-            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_func_volt",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "pin",
@@ -64121,7 +64117,7 @@
           },
           {
             "name": "SENSe:DLOG:FUNCtion:DIGital[:INPut]?",
-            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_func_volt",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "pin",
@@ -64632,6 +64628,7 @@
           },
           {
             "name": "SENSe:DLOG:CLEar",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_cle",
             "parameters": [],
             "response": {
               "type": [
@@ -66051,7 +66048,7 @@
           },
           {
             "name": "SOURce:PWM:STATe",
-            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_prot",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "enable",
@@ -66073,7 +66070,7 @@
           },
           {
             "name": "SOURce:PWM:STATe?",
-            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_prot",
+            "helpLink": "",
             "parameters": [],
             "response": {
               "type": [
@@ -66085,7 +66082,7 @@
           },
           {
             "name": "SOURce:PWM:DUTY",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_dig_outp_pwm_duty",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "duty",
@@ -66105,7 +66102,7 @@
           },
           {
             "name": "SOURce:PWM:DUTY?",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_dig_outp_pwm_duty",
+            "helpLink": "",
             "parameters": [],
             "response": {
               "type": [
@@ -66117,7 +66114,7 @@
           },
           {
             "name": "SOURce:PWM:FREQuency",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_dig_outp_pwm_freq",
+            "helpLink": "",
             "parameters": [
               {
                 "name": "frequency",
@@ -66137,7 +66134,7 @@
           },
           {
             "name": "SOURce:PWM:FREQuency?",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_dig_outp_pwm_freq",
+            "helpLink": "",
             "parameters": [],
             "response": {
               "type": [
@@ -66613,7 +66610,7 @@
           },
           {
             "name": "SYSTem:CHANnel:COLor",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_col",
             "parameters": [
               {
                 "name": "channel",
@@ -66626,12 +66623,13 @@
                 "isOptional": false
               },
               {
-                "name": "color_index",
+                "name": "color",
                 "type": [
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -66644,7 +66642,7 @@
           },
           {
             "name": "SYSTem:CHANnel:COLor?",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_col",
             "parameters": [
               {
                 "name": "channel",
@@ -66654,7 +66652,7 @@
                     "enumeration": "Channel"
                   }
                 ],
-                "isOptional": false
+                "isOptional": true
               }
             ],
             "response": {
@@ -66782,7 +66780,7 @@
           },
           {
             "name": "SYSTem:CHANnel:LABel",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_lab",
             "parameters": [
               {
                 "name": "channel",
@@ -66800,7 +66798,8 @@
                   {
                     "type": "quoted-string"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -66882,7 +66881,7 @@
           },
           {
             "name": "SYSTem:CHANnel:PIN:LABel",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_pin_lab",
             "parameters": [
               {
                 "name": "channel",
@@ -66900,7 +66899,8 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               },
               {
                 "name": "label",
@@ -66908,7 +66908,8 @@
                   {
                     "type": "quoted-string"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -66921,7 +66922,7 @@
           },
           {
             "name": "SYSTem:CHANnel:PIN:LABel?",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_mod",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_chan_pin_lab",
             "parameters": [
               {
                 "name": "channel",
@@ -66939,7 +66940,8 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -68401,23 +68403,25 @@
           },
           {
             "name": "SYSTem:SLOT:COLor",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_coun",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_col",
             "parameters": [
               {
-                "name": "slot_index",
+                "name": "slot",
                 "type": [
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               },
               {
-                "name": "color_index",
+                "name": "color",
                 "type": [
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -68430,15 +68434,16 @@
           },
           {
             "name": "SYSTem:SLOT:COLor?",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_coun",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_col",
             "parameters": [
               {
-                "name": "slot_index",
+                "name": "slot",
                 "type": [
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": true
               }
             ],
             "response": {
@@ -68451,15 +68456,16 @@
           },
           {
             "name": "SYSTem:SLOT:FIRMware?",
-            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_firm",
             "parameters": [
               {
-                "name": "slot_index",
+                "name": "slot",
                 "type": [
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -68472,15 +68478,16 @@
           },
           {
             "name": "SYSTem:SLOT:LABel",
-            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_lab",
             "parameters": [
               {
-                "name": "slot_index",
+                "name": "slot",
                 "type": [
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               },
               {
                 "name": "label",
@@ -68488,7 +68495,8 @@
                   {
                     "type": "quoted-string"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -68501,15 +68509,16 @@
           },
           {
             "name": "SYSTem:SLOT:LABel?",
-            "helpLink": "EEZ BB3 SCPI reference 5.16 - SYSTem.html#syst_cpu_mod",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_lab",
             "parameters": [
               {
-                "name": "slot_index",
+                "name": "slot",
                 "type": [
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -68544,6 +68553,7 @@
           },
           {
             "name": "SYSTem:SLOT:SNO",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_slot_sno",
             "parameters": [
               {
                 "name": "slot",
@@ -68551,7 +68561,8 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               },
               {
                 "name": "sno",
@@ -68559,7 +68570,8 @@
                   {
                     "type": "quoted-string"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -69009,6 +69021,7 @@
           },
           {
             "name": "SYSTem:LFRequency",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_lfr",
             "parameters": [
               {
                 "name": "frequency",
@@ -69017,7 +69030,7 @@
                     "type": "nr1"
                   }
                 ],
-                "description": "50 or 60 (Hz)"
+                "isOptional": false
               }
             ],
             "response": {
@@ -69028,6 +69041,7 @@
           },
           {
             "name": "SYSTem:LFRequency?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_lfr",
             "parameters": [],
             "response": {
               "type": [
@@ -70975,7 +70989,7 @@
         "name": "ValueDisplayScale",
         "members": [
           {
-            "name": "MAXimum",
+            "name": "AUTO",
             "value": "1"
           },
           {
@@ -70983,7 +70997,7 @@
             "value": "2"
           },
           {
-            "name": "AUTO",
+            "name": "MAXimum",
             "value": "3"
           }
         ]
@@ -71185,16 +71199,16 @@
       "image": "images\\bb3_front_panel.png",
       "extensionName": "eez_bb3",
       "idn": "Envox,EEZ BB3 (STM32)",
-      "idfName": "EEZ BB3 R2B4",
-      "idfShortName": "BB3-R2B4",
-      "idfFirmwareVersion": "1.4",
+      "idfName": "EEZ BB3 STM32",
+      "idfShortName": "EEZ-BB3-STM32",
+      "idfFirmwareVersion": "1.6",
       "idfGuid": "687b6dee-2093-4c36-afb7-cfc7ea2bf262",
-      "idfRevisionNumber": "1.4.0",
+      "idfRevisionNumber": "1.6.0",
       "idfDescription": "EEZ Bench box 3-module T&M chassis",
-      "idfSupportedModels": "BB3 R2B4",
+      "idfSupportedModels": "EEZ-BB3-STM32",
       "idfRevisionComments": "Initial version",
       "idfAuthor": "Envox",
-      "sdlFriendlyName": "EEZ BB3 R2B4"
+      "sdlFriendlyName": "EEZ BB3 STM32"
     },
     {
       "name": "EEZ Bench Box 3 Simulator",
@@ -71206,12 +71220,12 @@
       "extensionName": "eez_bb3_simulator",
       "idn": "Envox,EEZ BB3 (Simulator)",
       "idfName": "EEZ BB3 Simulator",
-      "idfShortName": "BB3-simulator",
-      "idfFirmwareVersion": "1.4",
+      "idfShortName": "EEZ-BB3-SIM",
+      "idfFirmwareVersion": "1.6",
       "idfGuid": "7cab6860-e593-4ba2-ee68-57fe84460fa4",
-      "idfRevisionNumber": "1.4.0",
+      "idfRevisionNumber": "1.6.0",
       "idfDescription": "EEZ Bench box 3-module T&M chassis firmware simulator",
-      "idfSupportedModels": "BB3 R2B4",
+      "idfSupportedModels": "EEZ-BB3-SIM",
       "idfRevisionComments": "Initial version",
       "idfAuthor": "Envox",
       "sdlFriendlyName": "EEZ BB3 Simulator"

@@ -146,10 +146,10 @@
     SCPI_COMMAND("ROUTe:LABel:CHANnel?", scpi_cmd_routeLabelChannelQ) \
     SCPI_COMMAND("SENSe:FUNCtion[:ON]", scpi_cmd_senseFunctionOn) \
     SCPI_COMMAND("SENSe:FUNCtion[:ON]?", scpi_cmd_senseFunctionOnQ) \
-    SCPI_COMMAND("[SENSe]:CURRent[:DC]:RANGe", scpi_cmd_senseCurrentDcRange) \
-    SCPI_COMMAND("[SENSe]:CURRent[:DC]:RANGe?", scpi_cmd_senseCurrentDcRangeQ) \
-    SCPI_COMMAND("[SENSe]:VOLTage[:DC]:RANGe", scpi_cmd_senseVoltageDcRange) \
-    SCPI_COMMAND("[SENSe]:VOLTage[:DC]:RANGe?", scpi_cmd_senseVoltageDcRangeQ) \
+    SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe", scpi_cmd_senseCurrentDcRange) \
+    SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe?", scpi_cmd_senseCurrentDcRangeQ) \
+    SCPI_COMMAND("SENSe:VOLTage[:DC]:RANGe", scpi_cmd_senseVoltageDcRange) \
+    SCPI_COMMAND("SENSe:VOLTage[:DC]:RANGe?", scpi_cmd_senseVoltageDcRangeQ) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:NPLCycles", scpi_cmd_senseCurrentDcNplcycles) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:NPLCycles?", scpi_cmd_senseCurrentDcNplcyclesQ) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:APERture?", scpi_cmd_senseCurrentDcApertureQ) \
