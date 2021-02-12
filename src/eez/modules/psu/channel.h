@@ -638,7 +638,7 @@ public:
     virtual void onPowerDown();
 
     /// Reset the channel to default values.
-    virtual void reset();
+    virtual void reset(bool resetLabelAndColor = true);
 
     /// Test the channel.
     virtual bool test() = 0;

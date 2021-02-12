@@ -207,8 +207,8 @@ struct DcpChannel : public Channel {
 		ioexp.testResult = TEST_FAILED;
 	}
 
-	void reset() override {
-		Channel::reset();
+	void reset(bool resetLabelAndColor) override {
+		Channel::reset(resetLabelAndColor);
 
 		uSet = 0;
 #if CONF_SURVIVE_MODE		

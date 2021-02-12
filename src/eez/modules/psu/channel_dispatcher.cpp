@@ -264,7 +264,7 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
         if (g_couplingType == COUPLING_TYPE_PARALLEL || g_couplingType == COUPLING_TYPE_SERIES) {
             for (int i = 0; i < 2; ++i) {
                 Channel &channel = Channel::get(i);
-                channel.reset();
+                channel.reset(false /* do not reset label and color */);
             }
         }
     }

@@ -444,7 +444,7 @@ void Channel::onPowerDown() {
     flags.powerOk = 0;
 }
 
-void Channel::reset() {
+void Channel::reset(bool resetLabelAndColor) {
     flags.outputEnabled = 0;
     flags.senseEnabled = 0;
     flags.rprogEnabled = 0;
@@ -525,8 +525,10 @@ void Channel::reset() {
 
     outputDelayDuration = 0;
 
-    *label = 0;
-    color = 0;
+    if (resetLabelAndColor) {
+        *label = 0;
+        color = 0;
+    }
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     simulator.setLoadEnabled(false);
