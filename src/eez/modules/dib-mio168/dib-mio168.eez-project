@@ -609,8 +609,8 @@
                             "inheritFrom": "default",
                             "font": "Oswald12",
                             "alignVertical": "center",
-                            "color": "Action color",
-                            "activeBackgroundColor": "Action color"
+                            "color": "action_color",
+                            "activeBackgroundColor": "action_color"
                           },
                           "data": "dout_no",
                           "action": "dout_toggle_state",
@@ -638,8 +638,8 @@
                             "inheritFrom": "default_inverse",
                             "font": "Oswald12",
                             "alignVertical": "center",
-                            "backgroundColor": "Action color",
-                            "activeColor": "Action color",
+                            "backgroundColor": "action_color",
+                            "activeColor": "action_color",
                             "padding": "0"
                           },
                           "data": "dout_no",
@@ -1050,8 +1050,8 @@
                             "inheritFrom": "default",
                             "font": "Oswald12",
                             "alignVertical": "center",
-                            "color": "Action color",
-                            "activeBackgroundColor": "Action color"
+                            "color": "action_color",
+                            "activeBackgroundColor": "action_color"
                           },
                           "data": "dout_no",
                           "action": "dout_toggle_state",
@@ -1079,8 +1079,8 @@
                             "inheritFrom": "default_inverse",
                             "font": "Oswald12",
                             "alignVertical": "center",
-                            "backgroundColor": "Action color",
-                            "activeColor": "Action color",
+                            "backgroundColor": "action_color",
+                            "activeColor": "action_color",
                             "padding": "0"
                           },
                           "data": "dout_no",
@@ -1599,8 +1599,8 @@
                                     "inheritFrom": "default",
                                     "font": "Oswald12",
                                     "alignVertical": "center",
-                                    "color": "Action color",
-                                    "activeBackgroundColor": "Action color"
+                                    "color": "action_color",
+                                    "activeBackgroundColor": "action_color"
                                   },
                                   "data": "dout_no",
                                   "action": "dout_toggle_state",
@@ -1628,8 +1628,8 @@
                                     "inheritFrom": "default_inverse",
                                     "font": "Oswald12",
                                     "alignVertical": "center",
-                                    "backgroundColor": "Action color",
-                                    "activeColor": "Action color"
+                                    "backgroundColor": "action_color",
+                                    "activeColor": "action_color"
                                   },
                                   "data": "dout_no",
                                   "action": "dout_toggle_state",
@@ -2130,7 +2130,7 @@
                                 "activeColor": "text_enable_background",
                                 "borderSize": "1",
                                 "borderRadius": 4,
-                                "borderColor": "Action color"
+                                "borderColor": "action_color"
                               },
                               "data": "ain_mode_and_range",
                               "action": "ain_select_mode_and_range",
@@ -4026,8 +4026,8 @@
                 "style": {
                   "inheritFrom": "encoder_cursor_14_enabled",
                   "font": "Oswald17",
-                  "color": "Action color",
-                  "activeBackgroundColor": "Action color"
+                  "color": "action_color",
+                  "activeBackgroundColor": "action_color"
                 },
                 "action": "show_calibration",
                 "left": 0,
@@ -4395,8 +4395,8 @@
                 "style": {
                   "inheritFrom": "encoder_cursor_14_enabled",
                   "font": "Oswald17",
-                  "color": "Action color",
-                  "activeBackgroundColor": "Action color"
+                  "color": "action_color",
+                  "activeBackgroundColor": "action_color"
                 },
                 "action": "show_calibration",
                 "left": 0,
@@ -4576,8 +4576,8 @@
                 "style": {
                   "inheritFrom": "encoder_cursor_14_enabled",
                   "font": "Oswald17",
-                  "color": "Action color",
-                  "activeBackgroundColor": "Action color"
+                  "color": "action_color",
+                  "activeBackgroundColor": "action_color"
                 },
                 "action": "show_calibration",
                 "left": 0,

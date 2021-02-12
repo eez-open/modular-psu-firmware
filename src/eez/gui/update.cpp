@@ -28,6 +28,7 @@ namespace gui {
 static uint8_t g_stateBuffer[2][CONF_MAX_STATE_SIZE];
 static WidgetState *g_previousState;
 static WidgetState *g_currentState;
+static bool g_refreshScreen;
 
 int getCurrentStateBufferIndex() {
     return (uint8_t *)g_currentState == &g_stateBuffer[0][0] ? 0 : 1;
@@ -38,10 +39,15 @@ uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor) {
 }
 
 void refreshScreen() {
-    g_currentState = 0;
+    g_refreshScreen = true;
 }
 
 void updateScreen() {
+    if (g_refreshScreen) {
+        g_refreshScreen = false;
+        g_currentState = 0;
+    }
+
     g_isActiveWidget = false;
     g_previousState = g_currentState;
     g_currentState = (WidgetState *)(&g_stateBuffer[getCurrentStateBufferIndex() == 0 ? 1 : 0][0]);

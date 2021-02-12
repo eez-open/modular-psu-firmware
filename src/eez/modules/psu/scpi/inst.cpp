@@ -273,6 +273,11 @@ scpi_result_t scpi_cmd_instrumentDisplayScale(scpi_t *context) {
         if (!SCPI_ParamToFloat(context, &parameter, &range)) {
             return SCPI_RES_ERR;
         }
+
+        if (range < 0 || range > displayValues[displayValueIndex].getMaxRange(channel)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+            return SCPI_RES_ERR;
+        }
         
         displayValues[displayValueIndex].scale = DISPLAY_VALUE_SCALE_CUSTOM;
         displayValues[displayValueIndex].range = range;

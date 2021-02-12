@@ -221,10 +221,11 @@ void ChSettingsAdvViewPage::onDisplayValueRangeSet(float value) {
 	if (
 		page->displayValues[page->displayValueIndex].scale == DISPLAY_VALUE_SCALE_CUSTOM &&
 		(
-			page->displayValues[page->displayValueIndex].range <= 0 ||
+			page->displayValues[page->displayValueIndex].range < 0 ||
 			page->displayValues[page->displayValueIndex].range > page->displayValues[page->displayValueIndex].getMaxRange(g_channel)
-			)
-		) {
+		)
+	)
+    {
 		page->displayValues[page->displayValueIndex].range = page->displayValues[page->displayValueIndex].getMaxRange(g_channel);
 	}
 }
