@@ -13,12 +13,14 @@ Currently supported modules:
 
 * [DCP405](https://github.com/eez-open/modular-psu/tree/master/dcp405) 0 - 40 V / 5 A programmable power source
 * [DCM220](https://github.com/eez-open/modular-psu/tree/master/dcm220) dual 1 - 20 V / 4 A auxiliary power source
+* [DCM224](https://github.com/eez-open/dib-dcm224) dual 1 - 24 V / 4.9 A auxiliary power source
 
 Under development:
 
 * [MIO168](https://github.com/eez-open/dib-mio168) mixed I/O module
 * [PREL6](https://github.com/eez-open/dib-prel6) 6 power relays module
-* [SMX46](https://github.com/eez-open/dib-smx46) 4 x 6 programmable switch matrix 
+* [SMX46](https://github.com/eez-open/dib-smx46) 4 x 6 programmable switch matrix
+* [MUX14D](https://github.com/eez-open/dib-mux14d) dual 7:1 reed relay 2-wire multiplexer
 
 ---
 
