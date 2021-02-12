@@ -1812,16 +1812,14 @@ void data_channel_display_value2_limit(DataOperationEnum operation, Cursor curso
 }
 
 void data_channel_display_value3(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
-        Channel &channel = Channel::get(iChannel);
-        if (channel.displayValues[0].type != DISPLAY_VALUE_VOLTAGE && channel.displayValues[1].type != DISPLAY_VALUE_VOLTAGE) {
-            data_channel_u_mon(operation, cursor, value);
-        } else if (channel.displayValues[0].type != DISPLAY_VALUE_CURRENT && channel.displayValues[1].type != DISPLAY_VALUE_CURRENT) {
-            data_channel_i_mon(operation, cursor, value);
-        } else {
-            data_channel_p_mon(operation, cursor, value);
-        }
+    int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+    Channel &channel = Channel::get(iChannel);
+    if (channel.displayValues[0].type != DISPLAY_VALUE_VOLTAGE && channel.displayValues[1].type != DISPLAY_VALUE_VOLTAGE) {
+        data_channel_u_mon(operation, cursor, value);
+    } else if (channel.displayValues[0].type != DISPLAY_VALUE_CURRENT && channel.displayValues[1].type != DISPLAY_VALUE_CURRENT) {
+        data_channel_i_mon(operation, cursor, value);
+    } else {
+        data_channel_p_mon(operation, cursor, value);
     }
 }
 
