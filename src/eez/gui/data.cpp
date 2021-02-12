@@ -172,7 +172,8 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
 
     if (!isNaN(floatValue)) {
         if ((value.getOptions() & FLOAT_OPTIONS_LESS_THEN) != 0) {
-            stringAppendString(text, count, "< "); 
+            stringAppendString(text, count, "< ");
+			appendDotZero = false;
         }
 
         if (fixedDecimals) {
