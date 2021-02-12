@@ -1338,6 +1338,26 @@ void changeTemperatureTripDelay(int iChannel) {
         minDelay, maxDelay, defaultDelay, onSetTemperatureTripDelay);
 }
 
+void show_ovp_settings(int iChannel) {
+	selectChannel(&Channel::get(iChannel));
+	pushPage(PAGE_ID_CH_SETTINGS_PROT_OVP);
+}
+
+void show_ocp_settings(int iChannel) {
+	selectChannel(&Channel::get(iChannel));
+	pushPage(PAGE_ID_CH_SETTINGS_PROT_OCP);
+}
+
+void show_opp_settings(int iChannel) {
+	selectChannel(&Channel::get(iChannel));
+	pushPage(PAGE_ID_CH_SETTINGS_PROT_OPP);
+}
+
+void show_otp_settings(int iChannel) {
+	selectChannel(&Channel::get(iChannel));
+	pushPage(PAGE_ID_CH_SETTINGS_PROT_OTP);
+}
+
 void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)()) {
     if (value.getType() == VALUE_TYPE_SCPI_ERROR) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
@@ -1367,7 +1387,36 @@ void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)()) {
                 return;
             }
         }
-    }
+	} else if (value.getType() == VALUE_TYPE_EVENT_MESSAGE) {
+		if (value.getFirstInt16() == event_queue::EVENT_ERROR_CH_OVP_TRIPPED) {
+			if (ok_callback) {
+				ok_callback();
+			}
+			errorMessageWithAction(value, show_ovp_settings, "OVP Settings", value.getSecondInt16());
+			return;
+
+		} else if (value.getFirstInt16() == event_queue::EVENT_ERROR_CH_OCP_TRIPPED) {
+			if (ok_callback) {
+				ok_callback();
+			}
+			errorMessageWithAction(value, show_ocp_settings, "OCP Settings", value.getSecondInt16());
+			return;
+
+		} else if (value.getFirstInt16() == event_queue::EVENT_ERROR_CH_OPP_TRIPPED) {
+			if (ok_callback) {
+				ok_callback();
+			}
+			errorMessageWithAction(value, show_opp_settings, "OPP Settings", value.getSecondInt16());
+			return;
+
+		} else if (value.getFirstInt16() == event_queue::EVENT_ERROR_CH_OTP_TRIPPED) {
+			if (ok_callback) {
+				ok_callback();
+			}
+			errorMessageWithAction(value, show_otp_settings, "OTP Settings", value.getSecondInt16());
+			return;
+		}
+	}
 
     if (ok_callback) {
         ok_callback();
