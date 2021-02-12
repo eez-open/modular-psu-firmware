@@ -241,7 +241,12 @@ const char *Module::getDefaultLabel() {
     return moduleName;
 }
 
-void Module::setLabel(const char *value, int length) {
+eez_err_t Module::getLabel(const char *&label) {
+    label = this->label;
+    return SCPI_RES_OK;
+}
+
+eez_err_t Module::setLabel(const char *value, int length) {
     if (length == -1) {
         length = strlen(value);
     }
@@ -249,14 +254,21 @@ void Module::setLabel(const char *value, int length) {
         length = SLOT_LABEL_MAX_LENGTH;
     }
 	stringCopy(label, length + 1, value);
+    return SCPI_RES_OK;
 }
 
 uint8_t Module::getColor() {
     return color;
 }
 
-void Module::setColor(uint8_t value) {
+eez_err_t Module::getColor(uint8_t &color) {
+    color = this->color;
+    return SCPI_RES_OK;
+}
+
+eez_err_t Module::setColor(uint8_t value) {
     color = value;
+    return SCPI_RES_OK;
 }
 
 size_t Module::getChannelLabelMaxLength(int subchannelIndex) {

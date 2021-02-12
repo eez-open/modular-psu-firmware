@@ -78,6 +78,11 @@ public:
     float getProfileISet(uint8_t *buffer) override;
     bool testAutoRecallValuesMatch(uint8_t *bufferRecall, uint8_t *bufferDefault) override;
 
+    eez_err_t getLabel(const char *&label) override;
+    eez_err_t setLabel(const char *label, int length = -1) override;
+    eez_err_t getColor(uint8_t &color) override;
+    eez_err_t setColor(uint8_t color) override;
+
     size_t getChannelLabelMaxLength(int subchannelIndex) override;
     const char *getChannelLabel(int subchannelIndex) override;
     const char *getDefaultChannelLabel(int subchannelIndex) override;

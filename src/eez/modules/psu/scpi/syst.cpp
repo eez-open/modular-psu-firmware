@@ -2086,7 +2086,11 @@ scpi_result_t scpi_cmd_systemSlotLabel(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    module->setLabel(label, labelLength);
+    auto err = module->setLabel(label, labelLength);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
 
 #if OPTION_DISPLAY
     refreshScreen();
@@ -2101,8 +2105,18 @@ scpi_result_t scpi_cmd_systemSlotLabelQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    const char *label = module->getLabelOrDefault();
-    SCPI_ResultText(context, label);
+    const char *label;
+    auto err = module->getLabel(label);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    if (*label) {
+        SCPI_ResultText(context, label);
+    } else {
+        SCPI_ResultText(context, module->getDefaultLabel());
+    }
 
     return SCPI_RES_OK;
 }
@@ -2131,7 +2145,11 @@ scpi_result_t scpi_cmd_systemSlotColor(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    module->setColor(color);
+    auto err = module->setColor(color);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
 
 #if OPTION_DISPLAY
     refreshScreen();
@@ -2146,7 +2164,14 @@ scpi_result_t scpi_cmd_systemSlotColorQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultUInt8(context, module->getColor());
+    uint8_t color;
+    auto err = module->getColor(color);
+    if (err != SCPI_RES_OK) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt8(context, color);
 
     return SCPI_RES_OK;
 }

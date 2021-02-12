@@ -263,12 +263,14 @@ struct Module {
     virtual bool isValidSubchannelIndex(int subchannelIndex);
     virtual int getSubchannelIndexFromRelativeChannelIndex(int relativeChannelIndex);
 
-    const char * getLabel();
+    const char *getLabel();
     const char *getDefaultLabel();
     const char *getLabelOrDefault() {return *label ? label : getDefaultLabel(); }
-    void setLabel(const char *label, int length = -1);
+    virtual eez_err_t getLabel(const char *&label);
+    virtual eez_err_t setLabel(const char *label, int length = -1);
     uint8_t getColor();
-    void setColor(uint8_t color);
+    virtual eez_err_t getColor(uint8_t &color);
+    virtual eez_err_t setColor(uint8_t color);
 
     virtual size_t getChannelLabelMaxLength(int subchannelIndex);
     virtual const char *getChannelLabel(int subchannelIndex);

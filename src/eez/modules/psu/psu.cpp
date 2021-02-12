@@ -628,6 +628,22 @@ bool PsuModule::testAutoRecallValuesMatch(uint8_t *bufferRecall, uint8_t *buffer
         recallParameters->i_set == defaultParameters->i_set;
 }
 
+eez_err_t PsuModule::getLabel(const char *&label) {
+    return SCPI_ERROR_HARDWARE_MISSING;
+}
+
+eez_err_t PsuModule::setLabel(const char *label, int length) {
+    return SCPI_ERROR_HARDWARE_MISSING;
+}
+
+eez_err_t PsuModule::getColor(uint8_t &color) {
+    return SCPI_ERROR_HARDWARE_MISSING;
+}
+
+eez_err_t PsuModule::setColor(uint8_t color) {
+    return SCPI_ERROR_HARDWARE_MISSING;
+}
+
 size_t PsuModule::getChannelLabelMaxLength(int subchannelIndex) {
     return Channel::CHANNEL_LABEL_MAX_LENGTH;
 }
