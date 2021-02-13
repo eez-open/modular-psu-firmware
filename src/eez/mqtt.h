@@ -44,7 +44,7 @@ extern ConnectionState g_connectionState;
     
 void tick();
 void reconnect();
-void pushEvent(int16_t eventId);
+void pushEvent(int16_t eventId, int8_t channelIndex);
 
 } // mqtt
 } // eez

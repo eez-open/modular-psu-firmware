@@ -259,7 +259,7 @@ void pushEvent(int16_t eventId, int channelIndex) {
     addEventToWriteQueue(eventId, nullptr, channelIndex);
 
 #if OPTION_ETHERNET
-    eez::mcu::ethernet::pushEvent(eventId);
+    eez::mcu::ethernet::pushEvent(eventId, (int8_t)channelIndex);
 #endif
 
     if (getEventType(eventId) == EVENT_TYPE_ERROR) {

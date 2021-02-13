@@ -124,7 +124,10 @@ static uint32_t g_fanStatusTick;
 
 static const size_t EVENT_QUEUE_SIZE = 10;
 struct {
-    int16_t buffer[EVENT_QUEUE_SIZE];
+    struct {
+        int16_t eventId;
+        int8_t channelIndex;
+    } buffer[EVENT_QUEUE_SIZE];
     int head;
     int tail;
     bool full;
@@ -453,12 +456,16 @@ bool publish(const char *pubTopic, float value, bool retain) {
     return publish(topic, payload, retain);
 }
 
-bool publishEvent(int16_t eventId, bool retain) {
+bool publishEvent(int16_t eventId, bool retain, int8_t channelIndex) {
     char topic[MAX_PUB_TOPIC_LENGTH + 1];
     snprintf(topic, sizeof(topic), PUB_TOPIC_SYSTEM_EVENT, persist_conf::devConf.ethernetHostName);
 
+    char format[MAX_PAYLOAD_LENGTH + 1];
+    snprintf(format, MAX_PAYLOAD_LENGTH, "[%d, \"%s\", \"%s\"]", (int)eventId, event_queue::getEventTypeName(eventId), event_queue::getEventMessage(eventId));
+    format[MAX_PAYLOAD_LENGTH] = 0;
+
     char payload[MAX_PAYLOAD_LENGTH + 1];
-    snprintf(payload, MAX_PAYLOAD_LENGTH, "[%d, \"%s\", \"%s\"]", (int)eventId, event_queue::getEventTypeName(eventId), event_queue::getEventMessage(eventId));
+    snprintf(payload, MAX_PAYLOAD_LENGTH, format, (int)(channelIndex + 1));
     payload[MAX_PAYLOAD_LENGTH] = 0;
 
     return publish(topic, payload, retain);
@@ -538,8 +545,8 @@ const char *getClientId() {
     return g_clientId;
 }
 
-bool peekEvent(int16_t &eventId);
-bool getEvent(int16_t &eventId);
+bool peekEvent(int16_t &eventId, int8_t &channelIndex);
+bool getEvent(int16_t &eventId, int8_t &channelIndex);
 
 void setState(ConnectionState connectionState) {
     if (connectionState == CONNECTION_STATE_CONNECTED) {
@@ -621,9 +628,10 @@ void tick() {
 
         // publish events from event view
         int16_t eventId;
-        if (peekEvent(eventId)) {
-            if (publishEvent(eventId, true)) {
-                getEvent(eventId);
+        int8_t channelIndex;
+        if (peekEvent(eventId, channelIndex)) {
+            if (publishEvent(eventId, true, channelIndex)) {
+                getEvent(eventId, channelIndex);
                 if (g_publishing) {
                     return;
                 }
@@ -969,12 +977,13 @@ void reconnect() {
     }
 }
 
-void pushEvent(int16_t eventId) {
-    if (g_connectionState == CONNECTION_STATE_CONNECTED && publishEvent(eventId, true)) {
+void pushEvent(int16_t eventId, int8_t channelIndex) {
+    if (g_connectionState == CONNECTION_STATE_CONNECTED && publishEvent(eventId, true, channelIndex)) {
         return;
     }
 
-    g_eventQueue.buffer[g_eventQueue.head] = eventId;
+    g_eventQueue.buffer[g_eventQueue.head].eventId = eventId;
+	g_eventQueue.buffer[g_eventQueue.head].channelIndex = channelIndex;
 
     // advance
     if (g_eventQueue.full) {
@@ -984,18 +993,20 @@ void pushEvent(int16_t eventId) {
     g_eventQueue.full = g_eventQueue.head == g_eventQueue.tail;
 }
 
-bool peekEvent(int16_t &eventId) {
+bool peekEvent(int16_t &eventId, int8_t &channelIndex) {
     if (g_eventQueue.full || g_eventQueue.tail != g_eventQueue.head) {
-        eventId = g_eventQueue.buffer[g_eventQueue.tail];
+        eventId = g_eventQueue.buffer[g_eventQueue.tail].eventId;
+        channelIndex = g_eventQueue.buffer[g_eventQueue.tail].channelIndex;
         return true;
     }
 
     return false;
 }
 
-bool getEvent(int16_t &eventId) {
+bool getEvent(int16_t &eventId, int8_t &channelIndex) {
     if (g_eventQueue.full || g_eventQueue.tail != g_eventQueue.head) {
-        eventId = g_eventQueue.buffer[g_eventQueue.tail];
+        eventId = g_eventQueue.buffer[g_eventQueue.tail].eventId;
+        channelIndex = g_eventQueue.buffer[g_eventQueue.tail].channelIndex;
         g_eventQueue.tail = (g_eventQueue.tail + 1) % EVENT_QUEUE_SIZE;
         g_eventQueue.full = false;
         return true;

@@ -694,7 +694,9 @@ void mainLoop(const void *) {
         if (event.status == osEventMessage) {
             uint8_t eventType = event.value.v & 0xFF;
             if (eventType == QUEUE_MESSAGE_PUSH_EVENT) {
-                mqtt::pushEvent((int16_t)(event.value.v >> 8));
+                int16_t eventId = event.value.v >> 16;
+				int8_t channelIndex = (event.value.v >> 8) & 0xFF;
+                mqtt::pushEvent(eventId, channelIndex);
             } else if (eventType == QUEUE_MESSAGE_NTP_STATE_TRANSITION) {
                 ntp::stateTransition(event.value.v >> 8);
             } else {
@@ -850,9 +852,9 @@ void disconnectClient() {
 #endif    
 }
 
-void pushEvent(int16_t eventId) {
+void pushEvent(int16_t eventId, int8_t channelIndex) {
     if (!g_shutdownInProgress) {
-        osMessagePut(g_ethernetMessageQueueId, ((uint32_t)(uint16_t)eventId << 8) | QUEUE_MESSAGE_PUSH_EVENT, 0);
+        osMessagePut(g_ethernetMessageQueueId, ((uint32_t)(uint16_t)eventId << 16) | ((uint32_t)(uint8_t)channelIndex << 8) | QUEUE_MESSAGE_PUSH_EVENT, channelIndex);
     }
 }
 
