@@ -18,6 +18,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
@@ -92,7 +93,9 @@ void boot() {
     assert((uint32_t)(MEMORY_END - MEMORY_BEGIN) <= MEMORY_SIZE);
 
     psu::serial::initScpi();
+#if OPTION_ETHERNET
     psu::ethernet::initScpi();
+#endif
 
     psu::event_queue::init();
 
@@ -142,7 +145,11 @@ void boot() {
     if (psu::persist_conf::devConf.mcuRevisionTag == MCU_REVISION_TAG && psu::persist_conf::devConf.mcuRevision != 0) {
         g_mcuRevision = psu::persist_conf::devConf.mcuRevision;
     } else {
+#ifdef __EMSCRIPTEN__
+        g_mcuRevision = MCU_REVISION_R3B3;
+#else        
         g_mcuRevision = psu::gui::askMcuRevision();
+#endif
     }
 
 #if defined(EEZ_PLATFORM_STM32)

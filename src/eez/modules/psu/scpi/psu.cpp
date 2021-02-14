@@ -17,7 +17,8 @@
  */
 
 #include <stdio.h>
-#ifdef EEZ_PLATFORM_SIMULATOR_UNIX
+
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
 #include <bsd/string.h>
 #endif
 
@@ -168,6 +169,25 @@ OutputBufferWriter::OutputBufferWriter(char *buffer, size_t maxBufferSize, size_
     , m_writeFunc(writeFunc)
 {
 }
+
+#if defined(__EMSCRIPTEN__)
+char *strnstr(const char *haystack, const char *needle, size_t len) {
+    size_t needle_len = strnlen(needle, len);
+
+    if (needle_len == 0) {
+        return (char *)haystack;
+    }
+
+    for (int i = 0; i <= (int)(len - needle_len); i++) {
+        if (haystack[0] == needle[0] && strncmp(haystack, needle, needle_len) == 0) {
+            return (char *)haystack;
+        }
+        haystack++;
+    }
+
+    return NULL;
+}
+#endif
 
 size_t OutputBufferWriter::write(const char *data, size_t len) {
 	if (len == 0) {
