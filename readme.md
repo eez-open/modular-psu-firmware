@@ -28,7 +28,9 @@ _For EEZ H24005 firmware visit [psu-firmware](https://github.com/eez-open/psu-fi
 
 ## Build
 
-### Linux
+### Firmware Simulator
+
+#### Linux
 
 ```
 sudo apt-get update
@@ -40,7 +42,7 @@ cmake ../..
 make
 ```
 
-### Emscripten
+#### Emscripten
 
 [Download and install Emscripten](https://emscripten.org/docs/getting_started/downloads.html)
 
@@ -53,7 +55,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=../../cmake/Emscripten.cmake -DCMAKE_BUILD_TYPE=Deb
 make
 ```
 
-### Windows
+#### Windows
 
 Install [Visual Studio Community 2017](https://visualstudio.microsoft.com/downloads/) and [CMake](https://cmake.org/install/).
 
