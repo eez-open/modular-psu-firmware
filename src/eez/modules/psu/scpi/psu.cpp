@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
+#if defined(EEZ_PLATFORM_SIMULATOR_UNIX) && !defined(__EMSCRIPTEN__)
 #include <bsd/string.h>
 #endif
 

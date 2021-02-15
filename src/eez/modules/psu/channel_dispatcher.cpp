@@ -2218,6 +2218,11 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
     channel_dispatcher::setTriggerVoltage(dstChannel, srcChannel.u.triggerLevel);
     channel_dispatcher::setTriggerCurrent(dstChannel, srcChannel.i.triggerLevel);
 
+    channel_dispatcher::setVoltageRampDuration(dstChannel, srcChannel.u.rampDuration);
+    channel_dispatcher::setCurrentRampDuration(dstChannel, srcChannel.i.rampDuration);
+
+    channel_dispatcher::setOutputDelayDuration(dstChannel, srcChannel.outputDelayDuration);
+
     channel_dispatcher::setListCount(dstChannel, list::getListCount(srcChannel));
 
     channel_dispatcher::setCurrentRangeSelectionMode(dstChannel, (CurrentRangeSelectionMode)srcChannel.flags.currentRangeSelectionMode);
