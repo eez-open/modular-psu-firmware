@@ -510,6 +510,12 @@ void ChSettingsTriggerPage::pageAlloc() {
     outputDelayDuration = outputDelayDurationOrig = g_channel->outputDelayDuration;
 }
 
+void ChSettingsTriggerPage::pageWillAppear() {
+	if (!getDirty()) {
+		pageAlloc();
+	}
+}
+
 int ChSettingsTriggerPage::getDirty() {
     return 
         triggerMode != triggerModeOrig ||

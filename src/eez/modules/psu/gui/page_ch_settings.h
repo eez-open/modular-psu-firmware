@@ -158,10 +158,11 @@ class ChSettingsOtpProtectionPage : public ChSettingsProtectionSetPage {
 
 class ChSettingsTriggerPage : public SetPage {
 public:
-    void pageAlloc();
+    void pageAlloc() override;
+    void pageWillAppear() override;
 
-    int getDirty();
-    void set();
+    int getDirty() override;
+    void set() override;
 
     TriggerMode triggerMode;
 
