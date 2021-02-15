@@ -203,10 +203,9 @@ void highPriorityThreadOneIter() {
 
 #if defined(EEZ_PLATFORM_STM32)
     g_lastTickCountMs = millis();
+	g_debugVarDiff = g_lastTickCountMs - g_debugVarTick;
+	g_debugVarTick = g_lastTickCountMs;
 #endif
-
-    g_debugVarDiff = g_lastTickCountMs - g_debugVarTick;
-    g_debugVarTick = g_lastTickCountMs;
 
     psu::tick();
 }

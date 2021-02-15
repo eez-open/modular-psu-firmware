@@ -1438,10 +1438,10 @@ public:
 
     uint16_t ainFaultStatus;
     bool isFaultP(int subchannelIndex) {
-        return (ainFaultStatus & (1 << (8 + subchannelIndex - AIN_1_SUBCHANNEL_INDEX))) != 0;
+        return (ainFaultStatus & (1 << (8 + subchannelIndex))) != 0;
     }
     bool isFaultN(int subchannelIndex) {
-        return (ainFaultStatus & (1 << (subchannelIndex - AIN_1_SUBCHANNEL_INDEX))) != 0;
+        return (ainFaultStatus & (1 << (subchannelIndex))) != 0;
     }
 
     uint8_t calibrationChannelMode;
@@ -4295,6 +4295,22 @@ void action_dib_mio168_change_dout_label() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool isDlogActiveOnAinChannel(int slotIndex, int ainChannelIndex) {
+    if (dlog_record::isIdle()) {
+        return false;
+    }
+
+    auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+    auto &channel = mio168Module->ainChannels[ainChannelIndex];
+    Unit unit = channel.getUnit();
+
+    eez::DlogResourceType resourceType = unit == UNIT_VOLT ?
+		DLOG_RESOURCE_TYPE_U : DLOG_RESOURCE_TYPE_I;
+
+    return dlog_record::g_recording.parameters.isDlogItemEnabled(slotIndex,
+        AIN_1_SUBCHANNEL_INDEX + ainChannelIndex, resourceType);
+}
+
 void data_dib_mio168_ain_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 4;
@@ -4305,37 +4321,27 @@ void data_dib_mio168_ain_channels(DataOperationEnum operation, Cursor cursor, Va
 
 void data_dib_mio168_ain_label(DataOperationEnum operation, Cursor cursor, Value &value) {
 	int slotIndex = cursor / 4;
-	int subchannelIndex = cursor % 4;
+	int ainChannelIndex = cursor % 4;
 	
 	if (operation == DATA_OPERATION_GET) {
         if (isPageOnStack(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS)) {
-            const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, AIN_1_SUBCHANNEL_INDEX + subchannelIndex);
+            const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, AIN_1_SUBCHANNEL_INDEX + ainChannelIndex);
             if (*label) {
                 value = label;
             } else {
-                value = g_slots[slotIndex]->getDefaultChannelLabel(AIN_1_SUBCHANNEL_INDEX + subchannelIndex);
+                value = g_slots[slotIndex]->getDefaultChannelLabel(AIN_1_SUBCHANNEL_INDEX + ainChannelIndex);
             }            
         } else {
-            int ainChannelIndex;
             AinConfigurationPage *page = (AinConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AIN_CONFIGURATION);
             if (page) {
 				slotIndex = hmi::g_selectedSlotIndex;
                 ainChannelIndex = page->g_selectedChannelIndex - AIN_1_SUBCHANNEL_INDEX;
-            } else {
-                ainChannelIndex = subchannelIndex;
             }
 
             value = getChannelLabel(slotIndex, AIN_1_SUBCHANNEL_INDEX + ainChannelIndex);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-		if (
-            !dlog_record::isIdle() &&
-            dlog_record::g_recording.parameters.isDlogItemEnabled(
-                slotIndex,
-                AIN_1_SUBCHANNEL_INDEX + subchannelIndex,
-                DLOG_RESOURCE_TYPE_U
-            )
-        ) {
+		if (isDlogActiveOnAinChannel(slotIndex, ainChannelIndex)) {
 			value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
 		}
 	}
@@ -4345,7 +4351,6 @@ void data_dib_mio168_ain_label_label(DataOperationEnum operation, Cursor cursor,
     if (operation == DATA_OPERATION_GET) {
         static const char *g_inLabelLabels[4] = { "AIN1 label:", "AIN2 label:", "AIN3 label:", "AIN4 label:" };
         value = g_inLabelLabels[cursor % 4];
-
     }
 }
 
@@ -4363,14 +4368,7 @@ void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value
             FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(unit == UNIT_MILLI_AMPER ? numFixedDecimals - 3 : numFixedDecimals)
         );
 	} else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-		if (
-            !dlog_record::isIdle() &&
-            dlog_record::g_recording.parameters.isDlogItemEnabled(
-                slotIndex,
-                AIN_1_SUBCHANNEL_INDEX + ainChannelIndex,
-                DLOG_RESOURCE_TYPE_U
-            )
-        ) {
+		if (isDlogActiveOnAinChannel(slotIndex, ainChannelIndex)) {
 			value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
 		}
 	}
@@ -4378,27 +4376,20 @@ void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value
 
 void data_dib_mio168_ain_fault_status(DataOperationEnum operation, Cursor cursor, Value &value) {
 	int slotIndex = cursor / 4;
-	int subchannelIndex = AIN_1_SUBCHANNEL_INDEX + cursor % 4;
+	int ainChannelIndex = cursor % 4;
 	if (operation == DATA_OPERATION_GET) {
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
-        if (mio168Module->isFaultP(subchannelIndex) && mio168Module->isFaultN(subchannelIndex)) {
+        if (mio168Module->isFaultP(ainChannelIndex) && mio168Module->isFaultN(ainChannelIndex)) {
             value = "PN";
-        } else if (mio168Module->isFaultP(subchannelIndex)) {
+        } else if (mio168Module->isFaultP(ainChannelIndex)) {
             value = "P";
-        } else if (mio168Module->isFaultN(subchannelIndex)) {
+        } else if (mio168Module->isFaultN(ainChannelIndex)) {
             value = "N";
         } else {
             value = "";
         }
 	} else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-		if (
-            !dlog_record::isIdle() &&
-            dlog_record::g_recording.parameters.isDlogItemEnabled(
-                slotIndex,
-				subchannelIndex,
-                DLOG_RESOURCE_TYPE_U
-            )
-        ) {
+		if (isDlogActiveOnAinChannel(slotIndex, ainChannelIndex)) {
 			value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
 		}
 	}
@@ -4507,14 +4498,26 @@ void data_dib_mio168_ain_aperture(DataOperationEnum operation, Cursor cursor, Va
     }
 }
 
-void data_dib_mio168_ain_mode_and_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_is_dlog_active(DataOperationEnum operation, Cursor cursor, Value &value) {
+	int slotIndex = cursor / 4;
+	int ainChannelIndex = cursor % 4;
 	if (operation == DATA_OPERATION_GET) {
-        int slotIndex = cursor / 4;
-        int subchannelIndex = AIN_1_SUBCHANNEL_INDEX + cursor % 4;
+        value = isDlogActiveOnAinChannel(slotIndex, ainChannelIndex);
+	}
+}
+
+void data_dib_mio168_ain_mode_and_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+    int slotIndex = cursor / 4;
+    int ainChannelIndex = cursor % 4;
+	if (operation == DATA_OPERATION_GET) {
 		value = getWidgetLabel(
-            AinChannel::getModeRangeEnumDefinition(slotIndex, subchannelIndex), 
-            AinConfigurationPage::getModeRange(slotIndex, subchannelIndex)
+            AinChannel::getModeRangeEnumDefinition(slotIndex, AIN_1_SUBCHANNEL_INDEX + ainChannelIndex), 
+            AinConfigurationPage::getModeRange(slotIndex, AIN_1_SUBCHANNEL_INDEX + ainChannelIndex)
         );
+	} else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
+		if (isDlogActiveOnAinChannel(slotIndex, ainChannelIndex)) {
+			value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
+		}
 	}
 }
 

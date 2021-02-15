@@ -293,6 +293,11 @@ static void initRecordingStart() {
     g_recording.xAxisOffset = 0.0f;
     g_recording.xAxisDiv = g_recording.pageSize * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
 
+    for (int8_t dlogItemIndex = 0; dlogItemIndex < g_recording.parameters.numDlogItems; ++dlogItemIndex) {
+        auto &dlogItem = g_recording.parameters.dlogItems[dlogItemIndex];
+        dlogItem.resourceType = g_slots[dlogItem.slotIndex]->getDlogResourceType(dlogItem.subchannelIndex, dlogItem.resourceIndex);
+    }
+
     if (!g_traceInitiated) {
         dlog_view::initAxis(g_recording);
     }
