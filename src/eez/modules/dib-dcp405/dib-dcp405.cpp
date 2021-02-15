@@ -95,6 +95,8 @@ struct DcpChannel : public Channel {
 
     bool valueBalancing = false;
 
+	bool spiIrq = false;
+
     DcpChannel(uint8_t slotIndex, uint8_t channelIndex, uint8_t subchannelIndex)
         : Channel(slotIndex, channelIndex, subchannelIndex)
     {
@@ -274,6 +276,11 @@ struct DcpChannel : public Channel {
 	void tickSpecific() override {
 		if (isDacTesting()) {
 			return;
+		}
+
+		if (spiIrq) {
+			spiIrq = false;
+			onSpiIrq();
 		}
 
 		ioexp.tick();
@@ -969,7 +976,7 @@ public:
 #if defined(EEZ_PLATFORM_STM32)
 	void onSpiIrq() {
 		auto dcpChannel = (DcpChannel *)Channel::getBySlotIndex(slotIndex);
-		dcpChannel->onSpiIrq();
+		dcpChannel->spiIrq = true;
 	}
 #endif
 
