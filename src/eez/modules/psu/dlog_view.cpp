@@ -492,7 +492,7 @@ float getDuration(Recording &recording) {
         return (recording.numSamples - 1) * recording.parameters.xAxis.step;
     }
 
-    return (recording.size - 1) * recording.parameters.xAxis.step;
+    return recording.size > 0 ? (recording.size - 1) * recording.parameters.xAxis.step : 0;
 }
 
 void getLabel(Recording& recording, int valueIndex, char *text, int count) {
@@ -1139,8 +1139,13 @@ public:
         psu::gui::pushSelectFromEnumPage(ENUM_DEFINITION_TRIGGER_SOURCE, g_parameters.triggerSource, 0, onSelectTriggerSource);
     }
 
+    static bool isModuleLocalRecording() {
+        // TODO not supported for now
+        return false;
+    }
+
 	static int getModuleLocalRecordingSlotIndex() {
-		if (g_parameters.period < dlog_view::PERIOD_MIN) {
+		if (isModuleLocalRecording()) {
 			if (g_parameters.numDlogItems > 0) {
 				return g_parameters.dlogItems[0].slotIndex;
 			}
@@ -2038,7 +2043,9 @@ void data_dlog_preview_overlay(DataOperationEnum operation, Cursor cursor, Value
     if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
         value = Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
-        overlay.state = dlog_record::isExecuting() && dlog_record::isModuleLocalRecording() ? 1 : 0;
+        overlay.state = dlog_record::isExecuting() && (
+                dlog_record::isModuleLocalRecording() || dlog_record::isModuleControlledRecording()
+            ) ? 1 : 0;
         
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
         overlay.width = widgetCursor.widget->w;

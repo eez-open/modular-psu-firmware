@@ -122,6 +122,7 @@ enum Command {
 
     COMMAND_DLOG_RECORDING_START = 0x7d3f9f28,
     COMMAND_DLOG_RECORDING_STOP = 0x7de480a1,
+    COMMAND_DLOG_RECORDING_DATA = 0x1ddc8028,
 
     COMMAND_DISK_DRIVE_INITIALIZE = 0x0f8066f8,
     COMMAND_DISK_DRIVE_STATUS = 0x457f0700,
@@ -204,7 +205,8 @@ struct Request {
 
         struct {
             uint32_t sector;
-            uint8_t buffer[512];
+            uint16_t reserved;
+            uint8_t buffer[1024];
         } diskDriveWrite;
 
         struct {
@@ -238,6 +240,16 @@ struct Response {
         struct {
             uint8_t result; // 1 - success, 0 - failure
         } setParams;
+
+        struct {
+            float conversionFactors[4];
+        } dlogRecordingStart;
+
+        struct {
+            uint32_t recordIndex;
+            uint16_t numRecords;
+            uint8_t buffer[1024];
+        } dlogRecordingData;
 
         struct {
             uint8_t result;
@@ -1373,6 +1385,7 @@ public:
 
     static const CommandDef dlogRecordingStart_command;
     static const CommandDef dlogRecordingStop_command;
+    static const CommandDef dlogRecordingData_command;
 
     static const CommandDef diskDriveInitialize_command;
     static const CommandDef diskDriveStatus_command;
@@ -1451,6 +1464,8 @@ public:
     const CommandDef *nextDlogCommand = nullptr;
     DlogRecordingStart nextDlogRecordingStart;
     DlogRecordingStart dlogRecordingStart;
+    float dlogDataConversionFactors[4];
+    uint32_t dlogDataRecordIndex = 0;
 
     uint8_t selectedPage = 0;
 
@@ -1477,11 +1492,6 @@ public:
 
         memset(input, 0, sizeof(input));
         memset(output, 0, sizeof(output));
-
-        //dlog.period = 0;
-        //dlog.duration = 0;
-        //dlog.resources = 0;
-        //*dlog.filePath = 0;
     }
 
     Module *createModule() override {
@@ -1660,6 +1670,11 @@ public:
 
     void Command_DlogRecordingStart_Done(Response &response, bool isSuccess) {
         if (isSuccess) {
+            auto &dlogRecordingData = response.dlogRecordingStart;
+            dlogDataConversionFactors[0] = dlogRecordingData.conversionFactors[0];
+            dlogDataConversionFactors[1] = dlogRecordingData.conversionFactors[1];
+            dlogDataConversionFactors[2] = dlogRecordingData.conversionFactors[2];
+            dlogDataConversionFactors[3] = dlogRecordingData.conversionFactors[3];
         }
     }
 
@@ -1667,6 +1682,48 @@ public:
 
     void Command_DlogRecordingStop_Done(Response &response, bool isSuccess) {
         if (isSuccess) {
+        }
+    }
+
+    ////////////////////////////////////////
+
+    void Command_DlogRecordingData_OnResponse(Response &response) {
+        if (isModuleControlledRecordingExecuting()) {
+            auto &dlogRecordingData = response.dlogRecordingData;
+
+            while (dlogDataRecordIndex < dlogRecordingData.recordIndex) {
+                float values[4] = { NAN, NAN, NAN, NAN };
+                dlog_record::log(values);
+                dlogDataRecordIndex++;
+            }
+
+            uint8_t *rx = dlogRecordingData.buffer;
+
+            uint32_t end = dlogRecordingData.recordIndex + dlogRecordingData.numRecords;
+
+            bool is24Bit = dlog_record::g_parameters.period >= 1.0f / 16000;
+
+            while (dlogDataRecordIndex < end) {
+                float values[4];
+
+                if (is24Bit) {
+                    for (int j = 0; j < 4; j++) {
+                        int32_t adcValue = ((int32_t)((rx[0] << 24) | (rx[1] << 16) | (rx[2] << 8))) >> 8;
+                        values[j] = float(dlogDataConversionFactors[j] * adcValue / (1 << 23));
+                        rx += 3;
+                    }
+                } else {
+                    for (int j = 0; j < 4; j++) {
+                        int32_t adcValue = int16_t((rx[0] << 8) | rx[1]);
+                        values[j] = float(dlogDataConversionFactors[j] * adcValue / (1 << 15));
+                        rx += 2;
+                    }
+                }
+
+                dlog_record::log(values);
+
+                dlogDataRecordIndex++;
+            }
         }
     }
 
@@ -1685,7 +1742,6 @@ public:
 #endif
     }
 
-
     ////////////////////////////////////////
 
     void Command_DiskDriveStatus_Done(Response &response, bool isSuccess) {
@@ -1699,7 +1755,6 @@ public:
         osThreadYield();
 #endif
     }
-
 
     ////////////////////////////////////////
 
@@ -1719,7 +1774,6 @@ public:
         osThreadYield();
 #endif
     }
-
 
     ////////////////////////////////////////
 
@@ -1767,13 +1821,21 @@ public:
 			uint32_t dlogPeriodMs = (uint32_t)(dlog_record::g_recording.parameters.period * 1000);
 			if (dlogPeriodMs < REFRESH_TIME_MS) {
 				if (dlog_record::isModuleAtSlotRecording(slotIndex)) {
-					return dlogPeriodMs;
+                    if (!dlog_record::isModuleControlledRecording()) {
+					    return dlogPeriodMs;
+                    }
 				}
 			}
 		}
 
 		return REFRESH_TIME_MS;
 	}
+
+    bool isModuleControlledRecordingExecuting() {
+		return dlog_record::isExecuting() &&
+			dlog_record::isModuleAtSlotRecording(slotIndex) &&
+			dlog_record::isModuleControlledRecording();
+    }
 
     void executeCommand(const CommandDef *command) {
         currentCommand = command;
@@ -1848,6 +1910,11 @@ public:
     	if (event == EVENT_DMA_TRANSFER_COMPLETED) {
             numCrcErrors = 0;
             numTransferErrors = 0;
+
+            Response &response = *(Response *)input;
+            if (response.command == (0x8000 | COMMAND_DLOG_RECORDING_DATA)) {
+                Command_DlogRecordingData_OnResponse(response);
+            }
     	}
  
         if (state == STATE_WAIT_SLAVE_READY_BEFORE_REQUEST) {
@@ -1920,7 +1987,7 @@ public:
         }
     }
 
-    void tick() override {
+    void pumpCurrentCommand() {
         if (currentCommand) {
             if (!synchronized && currentCommand->command != COMMAND_GET_INFO) {
                 doCommandDone(false);
@@ -1970,6 +2037,23 @@ public:
                         response->getInfo.afeVersion = 1;
                     } else if (currentCommand->command == COMMAND_GET_STATE) {
                         response->getState.flags |= GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT;
+                    } else if (currentCommand->command == COMMAND_DLOG_RECORDING_START) {
+                        response->dlogRecordingStart.conversionFactors[0] = 2.4f;
+                        response->dlogRecordingStart.conversionFactors[1] = 4.8f;
+                        response->dlogRecordingStart.conversionFactors[2] = 48.0f;
+                        response->dlogRecordingStart.conversionFactors[3] = 240.0f;
+                    } else {
+                        if (
+                            currentCommand->command == COMMAND_DLOG_RECORDING_DATA ||
+                            (state == STATE_WAIT_DMA_TRANSFER_COMPLETED_FOR_REQUEST && isModuleControlledRecordingExecuting())
+                        ) {
+                            response->command = 0x8000 | COMMAND_DLOG_RECORDING_DATA;
+                            response->dlogRecordingData.recordIndex = dlogDataRecordIndex;
+                            response->dlogRecordingData.numRecords = 8;
+							for (int i = 0; i < 3 * 4 * response->dlogRecordingData.numRecords; i++) {
+                                response->dlogRecordingData.buffer[i] = rand() % 255;
+                            }
+                        }
                     }
 
                     stateTransition(EVENT_DMA_TRANSFER_COMPLETED);
@@ -1981,7 +2065,11 @@ public:
                     stateTransition(EVENT_TIMEOUT);
                 }
             }
-        } else {
+        } 
+    }
+
+    void pumpNextCommand() {
+        if (!currentCommand) {
             if (!synchronized) {
                 if (nextDlogCommand) {
                     executeCommand(nextDlogCommand);
@@ -2014,10 +2102,20 @@ public:
                     fillSetParams(params);
                     if (memcmp(&params, &lastTransferredParams, sizeof(SetParams)) != 0) {
                         executeCommand(&setParams_command);
+                    } else {
+                        if (isModuleControlledRecordingExecuting()) {
+                            executeCommand(&dlogRecordingData_command);
+                        }
                     }
                 }
             }
         }
+    }
+
+    void tick() override {
+        pumpCurrentCommand();
+        pumpNextCommand();
+        pumpCurrentCommand();
     }
 
     void onSpiIrq() {
@@ -3492,11 +3590,16 @@ public:
         if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
             return 0.00001f; // 10 us
         }
+
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            return 1.0f / 64000; // 64 KSPS
+        }
+
         return Module::getDlogResourceMinPeriod(subchannelIndex, resourceIndex);
     }
 
     void onStartDlog() override {
-        if (dlog_record::isModuleLocalRecording()) {
+        if (dlog_record::isModuleControlledRecording()) {
            uint32_t resources = 0;
 
            for (int i = 0; i < dlog_record::g_recording.parameters.numDlogItems; i++) {
@@ -3535,6 +3638,8 @@ public:
                 }
 
                 nextDlogCommand = &dlogRecordingStart_command;
+                
+                dlogDataRecordIndex = 0;
             }
         }
     }
@@ -3629,6 +3734,12 @@ const Mio168Module::CommandDef Mio168Module::dlogRecordingStop_command = {
 	COMMAND_DLOG_RECORDING_STOP,
 	nullptr,
 	&Mio168Module::Command_DlogRecordingStop_Done
+};
+
+const Mio168Module::CommandDef Mio168Module::dlogRecordingData_command = {
+	COMMAND_DLOG_RECORDING_DATA,
+	nullptr,
+    nullptr
 };
 
 const Mio168Module::CommandDef Mio168Module::diskDriveInitialize_command = {

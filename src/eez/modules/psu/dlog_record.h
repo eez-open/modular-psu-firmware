@@ -46,6 +46,7 @@ inline bool isTraceExecuting() { return g_state == STATE_EXECUTING && g_traceIni
 inline bool isInStateTransition() { return g_inStateTransition; }
 
 bool isModuleLocalRecording();
+bool isModuleControlledRecording();
 int getModuleLocalRecordingSlotIndex();
 bool isModuleAtSlotRecording(int slotIndex);
 double getCurrentTime();

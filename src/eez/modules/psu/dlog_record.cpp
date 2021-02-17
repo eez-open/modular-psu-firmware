@@ -39,6 +39,8 @@
 
 #include <eez/memory.h>
 
+volatile static uint32_t g_debugVarBufferDiff;
+
 namespace eez {
 
 using namespace scpi;
@@ -46,14 +48,12 @@ using namespace scpi;
 namespace psu {
 namespace dlog_record {
 
-#define CHUNK_SIZE 4096
+#define CHUNK_SIZE (64 * 1024)
 
 #define CONF_DLOG_SYNC_FILE_TIME_MS 10000
 
 #define CONF_WRITE_TIMEOUT_MS 1000
 #define CONF_WRITE_FLUSH_TIMEOUT_MS 10000
-
-#define MODULE_LOCAL_RECORDING_PREVIEW_PERIOD dlog_view::PERIOD_MIN
 
 enum Event {
     EVENT_INITIATE,
@@ -134,7 +134,7 @@ static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
 ////////////////////////////////////////////////////////////////////////////////
 
 static int fileTruncate() {
-    File file;
+	File file;
     if (!file.open(g_parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
         event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_OPEN_ERROR);
         // TODO replace with more specific error
@@ -158,12 +158,13 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
     buffer = nullptr;
     bufferSize = 0;
 
-#if defined(EEZ_PLATFORM_STM32)
-    taskENTER_CRITICAL();
-#endif
+// #if defined(EEZ_PLATFORM_STM32)
+//     taskENTER_CRITICAL();
+// #endif
     int32_t timeDiff = millis() - g_lastSavedBufferTickCount;
     uint32_t alignedBufferIndex = (g_writer.getBufferIndex() / 4) * 4;
     uint32_t indexDiff = alignedBufferIndex - g_lastSavedBufferIndex;
+    g_debugVarBufferDiff = indexDiff;
     if (indexDiff > 0 && (flush || timeDiff >= CONF_DLOG_SYNC_FILE_TIME_MS || indexDiff >= CHUNK_SIZE)) {
         bufferSize = MIN(indexDiff, CHUNK_SIZE);
         buffer = g_saveBuffer;
@@ -173,9 +174,9 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
         if (i <= 0) {
             i = 0;
         } else {
-#if defined(EEZ_PLATFORM_STM32)
-            taskEXIT_CRITICAL();
-#endif
+// #if defined(EEZ_PLATFORM_STM32)
+//             taskEXIT_CRITICAL();
+// #endif
             abortAfterBufferOverflowError();
             return false;
         }
@@ -194,9 +195,9 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
             }
         } 
     }
-#if defined(EEZ_PLATFORM_STM32)
-    taskEXIT_CRITICAL();
-#endif
+// #if defined(EEZ_PLATFORM_STM32)
+//     taskEXIT_CRITICAL();
+// #endif
 
     return true;
 }
@@ -283,8 +284,8 @@ static void initRecordingStart() {
 
     memcpy(&g_recording.parameters, &g_parameters, sizeof(dlog_view::Parameters));
 
-    if (isModuleLocalRecording()) {
-        g_recording.parameters.period = MODULE_LOCAL_RECORDING_PREVIEW_PERIOD;
+    if (isModuleLocalRecording() || isModuleControlledRecording()) {
+        g_recording.parameters.period = dlog_view::PERIOD_MIN;
     }
 
     g_recording.size = 0;
@@ -306,10 +307,6 @@ static void initRecordingStart() {
     dlog_view::calcColumnIndexes(g_recording);
 
     g_recording.getValue = getValue;
-
-    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        g_slots[slotIndex]->onStartDlog();
-    }
 
     g_writer.reset();
 }
@@ -362,35 +359,12 @@ static void log() {
         return;
     }
 
-    if (g_currentTime >= g_nextTime) {
-        while (1) {
-            g_nextTime = ++g_iSample * g_recording.parameters.period;
-            if (g_currentTime < g_nextTime || g_nextTime > g_recording.parameters.duration) {
-                break;
-            }
+    if (isModuleControlledRecording()) {
+        // data is logged by module
+        return;
+    }
 
-            // we missed a sample, write NAN's
-            for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
-                auto &dlogItem = g_recording.parameters.dlogItems[i];
-                if (
-                    dlogItem.resourceType == DLOG_RESOURCE_TYPE_U ||
-                    dlogItem.resourceType == DLOG_RESOURCE_TYPE_I ||
-                    dlogItem.resourceType == DLOG_RESOURCE_TYPE_P
-                ) {
-                    g_writer.writeFloat(NAN);
-                } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
-                    if (g_writer.getBitMask() == 0) {
-                        g_writer.writeBit(0); // mark as invalid sample
-                    }
-                    g_writer.writeBit(0);
-                }
-            }
-
-            g_writer.flushBits();
-
-            ++g_recording.size;
-        }
-
+    while (g_currentTime >= g_nextTime) {
         // write sample
         for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
             auto &dlogItem = g_recording.parameters.dlogItems[i];
@@ -419,11 +393,14 @@ static void log() {
         }
 
         g_writer.flushBits();
-        
+
         ++g_recording.size;
 
+        g_nextTime = ++g_iSample * g_recording.parameters.period;
+        
         if (g_nextTime > g_recording.parameters.duration) {
             stateTransition(EVENT_FINISH);
+            break;
         }
     }
 }
@@ -458,7 +435,13 @@ static int doStartImmediately() {
 
     if (!isModuleLocalRecording()) {
         g_writer.writeFileHeaderAndMetaFields(g_recording.parameters);
+        fileWrite(true);
     }
+
+    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+        g_slots[slotIndex]->onStartDlog();
+    }
+
     g_recording.dataOffset = g_writer.getDataOffset();
 
     g_lastSavedBufferTickCount = millis();
@@ -522,6 +505,11 @@ static void doFinish(bool afterError) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool isModuleLocalRecording() {
+    // TODO not supported for now
+    return false;
+}
+
+bool isModuleControlledRecording() {
     return !g_traceInitiated && g_parameters.period < dlog_view::PERIOD_MIN;
 }
 

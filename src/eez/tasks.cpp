@@ -55,9 +55,6 @@
 #include <eez/libs/sd_fat/sd_fat.h>
 #include <eez/libs/image/jpeg.h>
 
-volatile uint32_t g_debugVarTick;
-volatile uint32_t g_debugVarDiff;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -203,8 +200,6 @@ void highPriorityThreadOneIter() {
 
 #if defined(EEZ_PLATFORM_STM32)
     g_lastTickCountMs = millis();
-	g_debugVarDiff = g_lastTickCountMs - g_debugVarTick;
-	g_debugVarTick = g_lastTickCountMs;
 #endif
 
     psu::tick();

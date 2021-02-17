@@ -58,7 +58,7 @@ namespace eez {
 namespace psu {
 namespace dlog_view {
 
-static const float PERIOD_MIN = 0.002f;
+static const float PERIOD_MIN = 0.001f;
 static const float PERIOD_MAX = 120.0f;
 static const float PERIOD_DEFAULT = 0.02f;
 
