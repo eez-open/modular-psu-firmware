@@ -361,6 +361,9 @@ static void log() {
 
     if (isModuleControlledRecording()) {
         // data is logged by module
+        if (g_currentTime >= g_recording.parameters.duration) {
+            stateTransition(EVENT_FINISH);
+        }
         return;
     }
 

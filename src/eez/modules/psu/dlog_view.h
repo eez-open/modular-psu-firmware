@@ -168,7 +168,6 @@ Unit getYAxisUnit(Recording& recording, int dlogValueIndex);
 uint32_t getPosition(Recording& recording);
 void changeXAxisOffset(Recording &recording, float xAxisOffset);
 void changeXAxisDiv(Recording &recording, float xAxisDiv);
-float getDuration(Recording &recording);
 void getLabel(Recording& recording, int valueIndex, char *text, int count);
 
 void autoScale(Recording &recording);

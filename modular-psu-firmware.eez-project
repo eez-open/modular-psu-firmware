@@ -1683,6 +1683,11 @@
       "defaultValue": "100ms"
     },
     {
+      "name": "dlog_period_spec",
+      "type": "float",
+      "defaultValue": "100ms"
+    },
+    {
       "name": "dlog_duration",
       "type": "float",
       "defaultValue": "1h"
@@ -2434,6 +2439,11 @@
       "name": "master_error_message",
       "type": "string",
       "defaultValue": "FAN, RTC, DateTime, EEPROM, SD card, ETH, TEMP, BATT, BP3C"
+    },
+    {
+      "name": "dlog_period_has_predefined_values",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -3158,6 +3168,9 @@
     },
     {
       "name": "ch_settings_otp_prot_clear"
+    },
+    {
+      "name": "dlog_period_select_predefined_value"
     }
   ],
   "gui": {
@@ -33854,54 +33867,167 @@
                 ]
               },
               {
-                "type": "Text",
+                "type": "Select",
                 "style": {
-                  "inheritFrom": "edit_value_S_left"
+                  "inheritFrom": "default"
                 },
+                "data": "dlog_period_has_predefined_values",
                 "left": 250,
                 "top": 0,
-                "width": 111,
-                "height": 30,
-                "text": "Period:"
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_center",
-                  "padding": "0 5"
-                },
-                "data": "dlog_period",
-                "action": "dlog_edit_period",
-                "left": 250,
-                "top": 30,
-                "width": 111,
-                "height": 32,
-                "displayOption": 0
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_S_left"
-                },
-                "left": 365,
-                "top": 0,
-                "width": 111,
-                "height": 30,
-                "text": "Duration:"
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_center",
-                  "padding": "0 5"
-                },
-                "data": "dlog_duration",
-                "action": "dlog_edit_duration",
-                "left": 365,
-                "top": 30,
-                "width": 111,
-                "height": 32,
-                "displayOption": 0
+                "width": 226,
+                "height": 62,
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 226,
+                    "height": 62,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_S_left"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 111,
+                        "height": 30,
+                        "text": "Period:"
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center",
+                          "padding": "0 5"
+                        },
+                        "data": "dlog_period",
+                        "action": "dlog_edit_period",
+                        "left": 0,
+                        "top": 30,
+                        "width": 111,
+                        "height": 32,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_S_left"
+                        },
+                        "left": 115,
+                        "top": 0,
+                        "width": 111,
+                        "height": 30,
+                        "text": "Duration:"
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center",
+                          "padding": "0 5"
+                        },
+                        "data": "dlog_duration",
+                        "action": "dlog_edit_duration",
+                        "left": 115,
+                        "top": 30,
+                        "width": 111,
+                        "height": 32,
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 0,
+                    "width": 226,
+                    "height": 62,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_S_left"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 94,
+                        "height": 30,
+                        "text": "Period:"
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center",
+                          "padding": "0 5"
+                        },
+                        "data": "dlog_period_spec",
+                        "action": "dlog_edit_period",
+                        "left": 0,
+                        "top": 30,
+                        "width": 94,
+                        "height": 32,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "Rectangle",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 94,
+                        "top": 31,
+                        "width": 1,
+                        "height": 30,
+                        "invertColors": false
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_M_center",
+                          "font": "Heydings14",
+                          "padding": "0"
+                        },
+                        "data": "",
+                        "action": "dlog_period_select_predefined_value",
+                        "left": 95,
+                        "top": 30,
+                        "width": 32,
+                        "height": 32,
+                        "text": "\\u008c"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_S_left"
+                        },
+                        "left": 132,
+                        "top": 0,
+                        "width": 94,
+                        "height": 30,
+                        "text": "Duration:"
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center",
+                          "padding": "0 5"
+                        },
+                        "data": "dlog_duration",
+                        "action": "dlog_edit_duration",
+                        "left": 132,
+                        "top": 30,
+                        "width": 94,
+                        "height": 32,
+                        "displayOption": 0
+                      }
+                    ]
+                  }
+                ]
               },
               {
                 "type": "Text",
@@ -56833,6 +56959,24 @@
               "width": 8,
               "height": 8,
               "pixelArray": "001e8fc9c68f1e001ec6cfcfcfcfc61e8fcfcfcfcfcfcf8fc6cfcfcfcfcfcfc9c9cfcfcfcfcfcfc992cfcfcfcfcfcf9224c6cfcfcfcfc624002492c9c9922400"
+            },
+            "source": {
+              "filePath": "fonts\\webhostinghub-glyphs.ttf",
+              "size": 6,
+              "encoding": 63078
+            }
+          },
+          {
+            "encoding": 140,
+            "x": 0,
+            "y": 5,
+            "width": 12,
+            "height": 10,
+            "dx": 12,
+            "glyphBitmap": {
+              "width": 12,
+              "height": 10,
+              "pixelArray": "0000000000000000000000000000000000000000000000000000540b000000000b5400000054a8880b00000b88a85400000b89a8880b0b88a8890b0000000b89a88888a8890b00000000000b89a8a8890b000000000000000b89890b0000000000000000000b0b0000000000000000000000000000000000"
             },
             "source": {
               "filePath": "fonts\\webhostinghub-glyphs.ttf",

@@ -424,6 +424,14 @@ float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     return blockElement->min;
 }
 
+static float getDuration(Recording &recording) {
+	if (&recording == &g_recording) {
+		return (recording.numSamples - 1) * recording.parameters.xAxis.step;
+	}
+
+	return recording.size > 0 ? (recording.size - 1) * dlog_record::g_parameters.period : 0;
+}
+
 void adjustXAxisOffset(Recording &recording) {
     auto duration = getDuration(recording);
     if (recording.xAxisOffset + recording.pageSize * recording.parameters.period > duration) {
@@ -485,14 +493,6 @@ void changeXAxisDiv(Recording &recording, float xAxisDiv) {
 
         invalidateAllBlocks();
     }
-}
-
-float getDuration(Recording &recording) {
-    if (&recording == &g_recording) {
-        return (recording.numSamples - 1) * recording.parameters.xAxis.step;
-    }
-
-    return recording.size > 0 ? (recording.size - 1) * recording.parameters.xAxis.step : 0;
 }
 
 void getLabel(Recording& recording, int valueIndex, char *text, int count) {
@@ -1241,6 +1241,25 @@ void data_dlog_toggle_state(DataOperationEnum operation, Cursor cursor, Value &v
     }
 }
 
+static EnumItem g_predefinedDlogPeriodsEnumDefinition[] = {
+    { 0, "2 KSPS (24-bit)", "2 KSPS" },
+    { 1, "4 KSPS (24-bit)", "4 KSPS" },
+    { 2, "8 KSPS (24-bit)", "8 KSPS" },
+    { 3, "16 KSPS (24-bit)", "16 KSPS" },
+    { 4, "32 KSPS (16-bit)", "32 KSPS" },
+    { 5, "64 KSPS (16-bit)", "64 KSPS" },
+    { 0, 0 }
+};
+
+float g_predefinedDlogPeriods[] = {
+    1.0f / 2000,
+    1.0f / 4000,
+    1.0f / 8000,
+    1.0f / 16000,
+    1.0f / 32000,
+    1.0f / 64000
+};
+
 void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(DlogParamsPage::g_parameters.period, UNIT_SECOND);
@@ -1253,6 +1272,30 @@ void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) 
     } else if (operation == DATA_OPERATION_SET) {
         DlogParamsPage::setPeriod(value.getFloat());
     }
+}
+
+void data_dlog_period_spec(DataOperationEnum operation, Cursor cursor, Value &value) {
+	data_dlog_period(operation, cursor, value);
+    if (operation == DATA_OPERATION_GET) {
+        for (size_t i = 0; i < sizeof(g_predefinedDlogPeriods) / sizeof(float); i++) {
+            if (DlogParamsPage::g_parameters.period == g_predefinedDlogPeriods[i]) {
+                value = g_predefinedDlogPeriodsEnumDefinition[i].widgetLabel;
+            }
+        }
+    }
+}
+
+void data_dlog_period_has_predefined_values(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = DlogParamsPage::g_minPeriod < PERIOD_MIN;
+    }
+}
+
+void action_dlog_period_select_predefined_value() {
+    pushSelectFromEnumPage(g_predefinedDlogPeriodsEnumDefinition, 0, nullptr, [] (uint16_t value) {
+        DlogParamsPage::setPeriod(g_predefinedDlogPeriods[value]);
+        popPage();
+    }, true, false);
 }
 
 void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value) {
