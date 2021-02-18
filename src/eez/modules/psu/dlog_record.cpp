@@ -39,7 +39,7 @@
 
 #include <eez/memory.h>
 
-volatile static uint32_t g_debugVarBufferDiff;
+volatile extern uint32_t g_debugVarBufferDiff;
 
 namespace eez {
 
@@ -133,8 +133,9 @@ static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static File file;
+
 static int fileTruncate() {
-	File file;
     if (!file.open(g_parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
         event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_OPEN_ERROR);
         // TODO replace with more specific error
@@ -142,7 +143,7 @@ static int fileTruncate() {
     }
 
     bool result = file.truncate(0);
-    file.close();
+    // file.close();
     if (!result) {
         event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_TRUNCATE_ERROR);
         // TODO replace with more specific error
@@ -227,29 +228,29 @@ void fileWrite(bool flush) {
 
         int err = 0;
 
-        File file;
-        if (file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-            if (file.seek(g_lastSavedBufferIndex)) {
+        // File file;
+        // if (file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+        //     if (file.seek(g_lastSavedBufferIndex)) {
                 size_t written = file.write(buffer, bufferSize);
 
                 if (written != bufferSize) {
                     err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
                 }
 
-                if (!file.close()) {
-                    err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
-                }
+                // if (!file.close()) {
+                //     err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
+                // }
 
                 if (!err) {
                     g_lastSavedBufferIndex += bufferSize;
                     g_lastSavedBufferTickCount = millis();
                 }
-            } else {
-                err = event_queue::EVENT_ERROR_DLOG_SEEK_ERROR;
-            }
-        } else {
-            err = event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR;
-        }
+        //     } else {
+        //         err = event_queue::EVENT_ERROR_DLOG_SEEK_ERROR;
+        //     }
+        // } else {
+        //     err = event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR;
+        // }
 
         if (err) {
             //DebugTrace("write error\n");
@@ -496,6 +497,8 @@ static void doFinish(bool afterError) {
             onSdCardFileChangeHook(g_parameters.filePath);
         }
     }
+
+    file.close();
 
     resetFilePath();
 
