@@ -1692,8 +1692,7 @@ public:
             auto &dlogRecordingData = response.dlogRecordingData;
 
             while (dlogDataRecordIndex < dlogRecordingData.recordIndex) {
-                float values[4] = { NAN, NAN, NAN, NAN };
-                dlog_record::log(values);
+                dlog_record::logInvalid();
                 dlogDataRecordIndex++;
             }
 
@@ -1702,25 +1701,41 @@ public:
             uint32_t end = dlogRecordingData.recordIndex + dlogRecordingData.numRecords;
 
             bool is24Bit = dlog_record::g_parameters.period >= 1.0f / 16000;
+            
+            uint32_t logAin[4] = {
+                dlogRecordingStart.resources & (1 << (16 + 0)),
+                dlogRecordingStart.resources & (1 << (16 + 1)),
+                dlogRecordingStart.resources & (1 << (16 + 2)),
+                dlogRecordingStart.resources & (1 << (16 + 3))
+            };
 
             while (dlogDataRecordIndex < end) {
                 float values[4];
 
+                int i = 0;
+
                 if (is24Bit) {
                     for (int j = 0; j < 4; j++) {
-                        int32_t adcValue = ((int32_t)((rx[0] << 24) | (rx[1] << 16) | (rx[2] << 8))) >> 8;
-                        values[j] = float(dlogDataConversionFactors[j] * adcValue / (1 << 23));
+                        if (logAin[j]) {
+                            int32_t adcValue = ((int32_t)((rx[0] << 24) | (rx[1] << 16) | (rx[2] << 8))) >> 8;
+                            values[i++] = float(dlogDataConversionFactors[j] * adcValue / (1 << 23));
+                        }
                         rx += 3;
                     }
                 } else {
                     for (int j = 0; j < 4; j++) {
-                        int32_t adcValue = int16_t((rx[0] << 8) | rx[1]);
-                        values[j] = float(dlogDataConversionFactors[j] * adcValue / (1 << 15));
+                        if (logAin[j]) {
+                            int32_t adcValue = int16_t((rx[0] << 8) | rx[1]);
+                            values[i++] = float(dlogDataConversionFactors[j] * adcValue / (1 << 15));
+                        }
                         rx += 2;
                     }
                 }
+                
+                uint32_t bits = rx[0] | (rx[1] << 8);
+                rx += 2;
 
-                dlog_record::log(values);
+                dlog_record::log(values, bits);
 
                 dlogDataRecordIndex++;
             }
@@ -2036,6 +2051,7 @@ public:
                         response->getInfo.idw2 = 0;
                         response->getInfo.afeVersion = 1;
                     } else if (currentCommand->command == COMMAND_GET_STATE) {
+						memset(&response->getState, 0, sizeof(response->getState));
                         response->getState.flags |= GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT;
                     } else if (currentCommand->command == COMMAND_DLOG_RECORDING_START) {
                         response->dlogRecordingStart.conversionFactors[0] = 2.4f;
@@ -2048,10 +2064,35 @@ public:
                             (state == STATE_WAIT_DMA_TRANSFER_COMPLETED_FOR_REQUEST && isModuleControlledRecordingExecuting())
                         ) {
                             response->command = 0x8000 | COMMAND_DLOG_RECORDING_DATA;
+
+                            bool is24Bit = dlog_record::g_parameters.period >= 1.0f / 16000;
+
                             response->dlogRecordingData.recordIndex = dlogDataRecordIndex;
-                            response->dlogRecordingData.numRecords = 8;
-							for (int i = 0; i < 3 * 4 * response->dlogRecordingData.numRecords; i++) {
-                                response->dlogRecordingData.buffer[i] = rand() % 255;
+                            response->dlogRecordingData.numRecords = (uint16_t)roundf(1.0f / dlog_record::g_parameters.period / 1000);
+
+                            int32_t ain[4];
+                            ain[0] = 0x7FFFFFFF / 5;
+							ain[1] = 0x7FFFFFFF / 5 * 2;
+							ain[2] = 0x7FFFFFFF / 5 * 3;
+							ain[3] = 0x7FFFFFFF / 5 * 4;
+
+                            uint8_t *p = response->dlogRecordingData.buffer;
+
+                            for (int i = 0; i < response->dlogRecordingData.numRecords; i++) {
+                                if (is24Bit) {
+									for (int j = 0; j < 4; j++) {
+										*p++ = (ain[j] >> 24) & 0xFF;
+										*p++ = (ain[j] >> 16) & 0xFF;
+										*p++ = (ain[j] >>  8) & 0xFF;
+									}
+								} else {
+									for (int j = 0; j < 4; j++) {
+										*p++ = (ain[j] >> 24) & 0xFF;
+										*p++ = (ain[j] >> 16) & 0xFF;
+									}
+								}
+                                *p++ = 0x55;
+                                *p++ = 0xAA;
                             }
                         }
                     }

@@ -70,7 +70,8 @@ void abortAfterMassStorageError();
 void reset();
 
 void tick();
-void log(float *values);
+void log(float *values, uint32_t bits = 0);
+void logInvalid();
 
 void fileWrite(bool flush = false);
 void stateTransition(int event, int *perr = nullptr);

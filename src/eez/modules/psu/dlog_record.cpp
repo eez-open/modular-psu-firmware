@@ -755,11 +755,40 @@ void tick() {
     }
 }
 
-void log(float *values) {
+void log(float *values, uint32_t bits) {
     if (g_state == STATE_EXECUTING) {
         for (int yAxisIndex = 0; yAxisIndex < g_recording.parameters.numYAxes; yAxisIndex++) {
-			g_writer.writeFloat(values[yAxisIndex]);
+            if (g_recording.parameters.yAxes[yAxisIndex].unit == UNIT_BIT) {
+                if (g_writer.getBitMask() == 0) {
+                    g_writer.writeBit(1); // mark as valid sample
+                }                    
+                if (bits & (1 << g_recording.parameters.yAxes[yAxisIndex].channelIndex)) {
+                    g_writer.writeBit(1);
+                } else {
+                    g_writer.writeBit(0);
+                }
+            } else {
+			    g_writer.writeFloat(*values++);
+            }
         }
+        g_writer.flushBits();
+        ++g_recording.size;
+    }
+}
+
+void logInvalid() {
+    if (g_state == STATE_EXECUTING) {
+        for (int yAxisIndex = 0; yAxisIndex < g_recording.parameters.numYAxes; yAxisIndex++) {
+            if (g_recording.parameters.yAxes[yAxisIndex].unit == UNIT_BIT) {
+                if (g_writer.getBitMask() == 0) {
+                    g_writer.writeBit(0); // mark as invalid sample
+                }                    
+                g_writer.writeBit(0);
+            } else {
+			    g_writer.writeFloat(NAN);
+            }
+        }
+        g_writer.flushBits();
         ++g_recording.size;
     }
 }

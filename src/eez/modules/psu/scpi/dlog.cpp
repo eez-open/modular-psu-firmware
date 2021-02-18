@@ -264,7 +264,7 @@ scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
         period = (float)param.content.value;
     }
 
-    dlog_record::g_parameters.period = period;
+    dlog_record::g_parameters.setPeriod(period);
 
     return SCPI_RES_OK;
 }

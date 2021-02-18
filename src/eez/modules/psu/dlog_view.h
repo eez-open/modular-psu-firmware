@@ -92,12 +92,21 @@ struct Parameters : public dlog_file::Parameters {
     DlogItem dlogItems[dlog_file::MAX_NUM_OF_Y_AXES];
     int numDlogItems = 0;
 
+    bool isDlogItemAvailable(int slotIndex, int subchannelIndex, int resourceIndex);
+    bool isDlogItemAvailable(int slotIndex, int subchannelIndex, DlogResourceType resourceType);
+
     eez_err_t enableDlogItem(int slotIndex, int subchannelIndex, int resourceIndex, bool enable);
     eez_err_t enableDlogItem(int slotIndex, int subchannelIndex, DlogResourceType resourceType, bool enable);
     bool isDlogItemEnabled(int slotIndex, int subchannelIndex, int resourceIndex);
     bool isDlogItemEnabled(int slotIndex, int subchannelIndex, DlogResourceType resourceType);
 
     trigger::Source triggerSource = trigger::SOURCE_IMMEDIATE;
+
+	static float getResourceMinPeriod(int slotIndex, int subchannelIndex, int resourceIndex);
+
+	// returns the number of items that are disabled
+	// because period is below min. period
+	unsigned setPeriod(float value);
 
 private:
     bool findDlogItemIndex(int slotIndex, int subchannelIndex, int resourceIndex, int &dlogItemIndex);
