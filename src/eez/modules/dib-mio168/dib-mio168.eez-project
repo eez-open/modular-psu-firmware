@@ -1,4 +1,5 @@
 {
+  "isReadOnly": false,
   "settings": {
     "general": {
       "namespace": "dib_mio168",
@@ -145,6 +146,11 @@
       "name": "ain_range_is_available",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "ain_is_dlog_active",
+      "type": "boolean",
+      "defaultValue": "0"
     },
     {
       "name": "ain_mode_and_range",
@@ -1716,18 +1722,59 @@
                               "displayOption": 0
                             },
                             {
-                              "type": "Text",
+                              "type": "Select",
                               "style": {
-                                "inheritFrom": "edit_value_active_M_center",
-                                "font": "Oswald14"
+                                "inheritFrom": "default"
                               },
-                              "data": "ain_mode_and_range",
-                              "action": "ain_select_mode_and_range",
+                              "data": "ain_is_dlog_active",
                               "left": 94,
                               "top": 0,
                               "width": 65,
                               "height": 34,
-                              "text": ""
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_M_center",
+                                    "font": "Oswald14"
+                                  },
+                                  "data": "ain_mode_and_range",
+                                  "action": "ain_select_mode_and_range",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 65,
+                                  "height": 34,
+                                  "text": ""
+                                },
+                                {
+                                  "type": "Container",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "backgroundColor": "data_logging",
+                                    "activeColor": "data_logging"
+                                  },
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 65,
+                                  "height": 34,
+                                  "widgets": [
+                                    {
+                                      "type": "DisplayData",
+                                      "style": {
+                                        "inheritFrom": "default",
+                                        "font": "Oswald14",
+                                        "borderSize": "1"
+                                      },
+                                      "data": "ain_mode_and_range",
+                                      "left": 2,
+                                      "top": 2,
+                                      "width": 61,
+                                      "height": 30,
+                                      "displayOption": 0
+                                    }
+                                  ]
+                                }
+                              ]
                             }
                           ]
                         }
@@ -2117,28 +2164,86 @@
                               "action": "",
                               "left": 188,
                               "top": 40,
-                              "width": 47,
+                              "width": 48,
                               "height": 44,
                               "displayOption": 0
                             },
                             {
-                              "type": "Text",
+                              "type": "Select",
                               "style": {
-                                "inheritFrom": "edit_value_active_M_center",
-                                "font": "Oswald14",
-                                "backgroundColor": "text_enable_background",
-                                "activeColor": "text_enable_background",
-                                "borderSize": "1",
-                                "borderRadius": 4,
-                                "borderColor": "action_color"
+                                "inheritFrom": "default"
                               },
-                              "data": "ain_mode_and_range",
-                              "action": "ain_select_mode_and_range",
-                              "left": 146,
-                              "top": 3,
-                              "width": 87,
-                              "height": 34,
-                              "text": ""
+                              "data": "ain_is_dlog_active",
+                              "left": 143,
+                              "top": 0,
+                              "width": 93,
+                              "height": 40,
+                              "widgets": [
+                                {
+                                  "type": "Container",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "backgroundColor": "text_enable_background",
+                                    "activeColor": "text_enable_background"
+                                  },
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 93,
+                                  "height": 40,
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "edit_value_active_M_center",
+                                        "font": "Oswald14",
+                                        "backgroundColor": "text_enable_background",
+                                        "activeColor": "text_enable_background",
+                                        "borderSize": "1",
+                                        "borderRadius": 4,
+                                        "borderColor": "action_color"
+                                      },
+                                      "data": "ain_mode_and_range",
+                                      "action": "ain_select_mode_and_range",
+                                      "left": 3,
+                                      "top": 3,
+                                      "width": 87,
+                                      "height": 34,
+                                      "text": ""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Container",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "backgroundColor": "data_logging",
+                                    "activeColor": "data_logging"
+                                  },
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 93,
+                                  "height": 40,
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "mon_value_14_center",
+                                        "backgroundColor": "data_logging",
+                                        "activeColor": "data_logging",
+                                        "borderSize": "1",
+                                        "borderRadius": 4
+                                      },
+                                      "data": "ain_mode_and_range",
+                                      "action": "",
+                                      "left": 3,
+                                      "top": 3,
+                                      "width": 87,
+                                      "height": 34,
+                                      "text": ""
+                                    }
+                                  ]
+                                }
+                              ]
                             }
                           ]
                         }

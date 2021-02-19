@@ -51,7 +51,9 @@
 #include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/sd_card.h>
 
- ////////////////////////////////////////////////////////////////////////////////
+volatile uint32_t g_debugVarBufferDiff;
+
+////////////////////////////////////////////////////////////////////////////////
 
 #if !defined(__EMSCRIPTEN__)
 
@@ -208,11 +210,11 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         }
 #endif
 
-        if (g_isBooted) {
-            sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 0);
-        } else {
+        // if (g_isBooted) {
+        //     sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 0);
+        // } else {
             g_slots[0]->onSpiIrq();
-        }
+        // }
     } else if (GPIO_Pin == SPI4_IRQ_Pin) {
 #if CONF_SURVIVE_MODE
         if (g_slots[1]->moduleType == MODULE_TYPE_DCP405) {
@@ -220,11 +222,11 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         }
 #endif
 
-        if (g_isBooted) {
-            sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 1);
-        } else {
+        // if (g_isBooted) {
+        //     sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 1);
+        // } else {
             g_slots[1]->onSpiIrq();
-        }
+        // }
     } else if (GPIO_Pin == SPI5_IRQ_Pin) {
 #if CONF_SURVIVE_MODE
         if (g_slots[2]->moduleType == MODULE_TYPE_DCP405) {
@@ -232,11 +234,11 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         }
 #endif
 
-        if (g_isBooted) {
-            sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 2);
-        } else {
+        // if (g_isBooted) {
+        //     sendMessageToPsu(PSU_MESSAGE_SPI_IRQ, 2);
+        // } else {
             g_slots[2]->onSpiIrq();
-        }
+        // }
     } else if (g_mcuRevision < MCU_REVISION_R3B3 && GPIO_Pin == R2B4_SD_DETECT_Pin) {
         eez::psu::sd_card::onSdDetectInterrupt();
     } else if (GPIO_Pin == ENC_A_Pin || GPIO_Pin == ENC_B_Pin) {

@@ -85,6 +85,34 @@ static bool g_wasExecuting;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool Parameters::isDlogItemAvailable(int slotIndex, int subchannelIndex, int resourceIndex) {
+    if (numDlogItems >= dlog_file::MAX_NUM_OF_Y_AXES) {
+        return false;
+    }
+
+    if (getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex) > period) {
+        return false;
+    }
+
+    if (period < PERIOD_MIN) {
+        if (numDlogItems > 0 && dlogItems[0].slotIndex != slotIndex) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Parameters::isDlogItemAvailable(int slotIndex, int subchannelIndex, DlogResourceType resourceType) {
+    int numResources = g_slots[slotIndex]->getNumDlogResources(subchannelIndex);
+    for (int resourceIndex = 0; resourceIndex < numResources; resourceIndex++) {
+        if (g_slots[slotIndex]->getDlogResourceType(subchannelIndex, resourceIndex) == resourceType) {
+            return isDlogItemAvailable(slotIndex, subchannelIndex, resourceIndex);
+        }
+    }
+    return false;
+}
+
 eez_err_t Parameters::enableDlogItem(int slotIndex, int subchannelIndex, int resourceIndex, bool enable) {
 	int dlogItemIndex;
     bool enabled = findDlogItemIndex(slotIndex, subchannelIndex, resourceIndex, dlogItemIndex);
@@ -98,6 +126,10 @@ eez_err_t Parameters::enableDlogItem(int slotIndex, int subchannelIndex, int res
 			if (resourceIndex >= numResources) {
 				return SCPI_ERROR_HARDWARE_MISSING;
 			}
+
+            if (!isDlogItemAvailable(slotIndex, subchannelIndex, resourceIndex)) {
+                return SCPI_ERROR_HARDWARE_MISSING;
+            }
 
             if (dlogItemIndex < numDlogItems) {
                 for (int i = numDlogItems - 1; i >= dlogItemIndex; i--) {
@@ -206,6 +238,37 @@ bool Parameters::findDlogItemIndex(int slotIndex, int subchannelIndex, DlogResou
         }
     }
     return false;
+}
+
+float Parameters::getResourceMinPeriod(int slotIndex, int subchannelIndex, int resourceIndex) {
+	float minPeriod = g_slots[slotIndex]->getDlogResourceMinPeriod(subchannelIndex, resourceIndex);
+	if (isNaN(minPeriod)) {
+		return PERIOD_MIN;
+	}
+	return minPeriod;
+}
+
+unsigned Parameters::setPeriod(float value) {
+	period = value;
+
+	int numDisabled = 0;
+
+	for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+		int numSubchannels = g_slots[slotIndex]->getNumSubchannels();
+		for (int subchannelIndex = 0; subchannelIndex < numSubchannels; subchannelIndex++) {
+			int numResources = g_slots[slotIndex]->getNumDlogResources(subchannelIndex);
+			for (int resourceIndex = 0; resourceIndex < numResources; resourceIndex++) {
+				if (isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex)) {
+					if (!isDlogItemAvailable(slotIndex, subchannelIndex, resourceIndex)) {
+						enableDlogItem(slotIndex, subchannelIndex, resourceIndex, false);
+						numDisabled++;
+					}
+				}
+			}
+		}
+	}
+
+	return numDisabled;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -424,6 +487,14 @@ float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     return blockElement->min;
 }
 
+static float getDuration(Recording &recording) {
+	if (&recording == &g_recording) {
+		return (recording.numSamples - 1) * recording.parameters.xAxis.step;
+	}
+
+	return recording.size > 0 ? (recording.size - 1) * dlog_record::g_parameters.period : 0;
+}
+
 void adjustXAxisOffset(Recording &recording) {
     auto duration = getDuration(recording);
     if (recording.xAxisOffset + recording.pageSize * recording.parameters.period > duration) {
@@ -485,14 +556,6 @@ void changeXAxisDiv(Recording &recording, float xAxisDiv) {
 
         invalidateAllBlocks();
     }
-}
-
-float getDuration(Recording &recording) {
-    if (&recording == &g_recording) {
-        return (recording.numSamples - 1) * recording.parameters.xAxis.step;
-    }
-
-    return (recording.size - 1) * recording.parameters.xAxis.step;
 }
 
 void getLabel(Recording& recording, int valueIndex, char *text, int count) {
@@ -602,7 +665,7 @@ void initDlogValues(Recording &recording) {
 
             float div = (rangeMax - rangeMin) / NUM_VERT_DIVISIONS;
             recording.dlogValues[yAxisIndex].div = div;
-            recording.dlogValues[yAxisIndex].offset = -div * NUM_VERT_DIVISIONS / 2;
+            recording.dlogValues[yAxisIndex].offset = -rangeMin - div * NUM_VERT_DIVISIONS / 2;
         }
     }
 
@@ -620,14 +683,14 @@ void calcColumnIndexes(Recording &recording) {
     for (int yAxisIndex = 0; yAxisIndex < recording.parameters.numYAxes; yAxisIndex++) {
         auto &yAxis = recording.parameters.yAxes[yAxisIndex];
         
-        recording.columnFloatIndexes[yAxisIndex] = columnIndex;
-        
         if (yAxis.unit == UNIT_BIT) {
             if (bitMask == 0) {
                 bitMask = 0x4000;
             } else {
                 bitMask >>= 1;
             }
+
+            recording.columnFloatIndexes[yAxisIndex] = columnIndex;
 
             if (bitMask == 1) {
                 columnIndex++;
@@ -638,6 +701,8 @@ void calcColumnIndexes(Recording &recording) {
                 columnIndex++;
                 bitMask = 0;
             }
+
+            recording.columnFloatIndexes[yAxisIndex] = columnIndex;
 
             columnIndex++;
         }
@@ -733,7 +798,7 @@ void autoScale(Recording &recording) {
             dlogValueParams.offset = dlogValueParams.div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions);
         } else {
             dlogValueParams.div = (rangeMax - rangeMin) / numDivisions;
-            dlogValueParams.offset = dlogValueParams.div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions);
+            dlogValueParams.offset = -rangeMin + dlogValueParams.div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions);
         }
     }
 }
@@ -765,7 +830,7 @@ void scaleToFit(Recording &recording) {
         DlogValueParams &dlogValueParams = recording.dlogValues[dlogValueIndex];
         float numDivisions = 1.0f * NUM_VERT_DIVISIONS;
         dlogValueParams.div = (totalMax - totalMin) / numDivisions;
-        dlogValueParams.offset = - dlogValueParams.div * NUM_VERT_DIVISIONS / 2;
+        dlogValueParams.offset = -totalMin - dlogValueParams.div * NUM_VERT_DIVISIONS / 2;
     }
 }
 
@@ -1099,33 +1164,12 @@ public:
     }
 
 	static float getResourceMinPeriod(int slotIndex, int subchannelIndex, int resourceIndex) {
-		float minPeriod = g_slots[slotIndex]->getDlogResourceMinPeriod(subchannelIndex, resourceIndex);
-		if (isNaN(minPeriod)) {
-			return PERIOD_MIN;
-		}
-		return minPeriod;
+		return Parameters::getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex);
 	}
 
 	static void setPeriod(float value) {
 		g_parameters.period = value;
-
-		int numUnchecked = 0;
-
-		for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-			int numSubchannels = g_slots[slotIndex]->getNumSubchannels();
-			for (int subchannelIndex = 0; subchannelIndex < numSubchannels; subchannelIndex++) {
-				int numResources = g_slots[slotIndex]->getNumDlogResources(subchannelIndex);
-				for (int resourceIndex = 0; resourceIndex < numResources; resourceIndex++) {
-					if (g_parameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex)) {
-						if (getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex) - g_parameters.period >= 1E-6) {
-							g_parameters.enableDlogItem(slotIndex, subchannelIndex, resourceIndex, false);
-							numUnchecked++;
-						}
-					}
-				}
-			}
-		}
-
+		int numUnchecked = g_parameters.setPeriod(value);
 		if (numUnchecked > 0) {
 			psu::gui::infoMessage("Some resources unchecked.");
 		}
@@ -1139,8 +1183,13 @@ public:
         psu::gui::pushSelectFromEnumPage(ENUM_DEFINITION_TRIGGER_SOURCE, g_parameters.triggerSource, 0, onSelectTriggerSource);
     }
 
+    static bool isModuleLocalRecording() {
+        // TODO not supported for now
+        return false;
+    }
+
 	static int getModuleLocalRecordingSlotIndex() {
-		if (g_parameters.period < dlog_view::PERIOD_MIN) {
+		if (isModuleLocalRecording()) {
 			if (g_parameters.numDlogItems > 0) {
 				return g_parameters.dlogItems[0].slotIndex;
 			}
@@ -1236,6 +1285,25 @@ void data_dlog_toggle_state(DataOperationEnum operation, Cursor cursor, Value &v
     }
 }
 
+static EnumItem g_predefinedDlogPeriodsEnumDefinition[] = {
+    { 0, "2 KSPS (24-bit)", "2 KSPS" },
+    { 1, "4 KSPS (24-bit)", "4 KSPS" },
+    { 2, "8 KSPS (24-bit)", "8 KSPS" },
+    { 3, "16 KSPS (24-bit)", "16 KSPS" },
+    { 4, "32 KSPS (16-bit)", "32 KSPS" },
+    { 5, "64 KSPS (16-bit)", "64 KSPS" },
+    { 0, 0 }
+};
+
+float g_predefinedDlogPeriods[] = {
+    1.0f / 2000,
+    1.0f / 4000,
+    1.0f / 8000,
+    1.0f / 16000,
+    1.0f / 32000,
+    1.0f / 64000
+};
+
 void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(DlogParamsPage::g_parameters.period, UNIT_SECOND);
@@ -1248,6 +1316,30 @@ void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) 
     } else if (operation == DATA_OPERATION_SET) {
         DlogParamsPage::setPeriod(value.getFloat());
     }
+}
+
+void data_dlog_period_spec(DataOperationEnum operation, Cursor cursor, Value &value) {
+	data_dlog_period(operation, cursor, value);
+    if (operation == DATA_OPERATION_GET) {
+        for (size_t i = 0; i < sizeof(g_predefinedDlogPeriods) / sizeof(float); i++) {
+            if (DlogParamsPage::g_parameters.period == g_predefinedDlogPeriods[i]) {
+                value = g_predefinedDlogPeriodsEnumDefinition[i].widgetLabel;
+            }
+        }
+    }
+}
+
+void data_dlog_period_has_predefined_values(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = DlogParamsPage::g_minPeriod < PERIOD_MIN;
+    }
+}
+
+void action_dlog_period_select_predefined_value() {
+    pushSelectFromEnumPage(g_predefinedDlogPeriodsEnumDefinition, 0, nullptr, [] (uint16_t value) {
+		popPage();
+		DlogParamsPage::setPeriod(g_predefinedDlogPeriods[value]);
+    }, true, false);
 }
 
 void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -1351,16 +1443,7 @@ void data_dlog_item_is_available(DataOperationEnum operation, Cursor cursor, Val
         int subchannelIndex;
         int resourceIndex;
         if (DlogParamsPage::findResource(cursor, slotIndex, subchannelIndex, resourceIndex)) {
-            bool enabled = DlogParamsPage::g_parameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex);
-            if (!enabled && (
-				DlogParamsPage::g_parameters.numDlogItems >= dlog_file::MAX_NUM_OF_Y_AXES || 
-				DlogParamsPage::getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex)
-					> DlogParamsPage::g_parameters.period
-			)) {
-                value = 0;
-            } else {
-                value = 1;
-            }
+            value = DlogParamsPage::g_parameters.isDlogItemAvailable(slotIndex, subchannelIndex, resourceIndex);
         } else {
             value = 0;
         }
@@ -2038,7 +2121,9 @@ void data_dlog_preview_overlay(DataOperationEnum operation, Cursor cursor, Value
     if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
         value = Value(&overlay, VALUE_TYPE_POINTER);
     } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
-        overlay.state = dlog_record::isExecuting() && dlog_record::isModuleLocalRecording() ? 1 : 0;
+        overlay.state = dlog_record::isExecuting() && (
+                dlog_record::isModuleLocalRecording() || dlog_record::isModuleControlledRecording()
+            ) ? 1 : 0;
         
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
         overlay.width = widgetCursor.widget->w;

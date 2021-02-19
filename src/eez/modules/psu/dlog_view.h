@@ -58,7 +58,7 @@ namespace eez {
 namespace psu {
 namespace dlog_view {
 
-static const float PERIOD_MIN = 0.002f;
+static const float PERIOD_MIN = 0.001f;
 static const float PERIOD_MAX = 120.0f;
 static const float PERIOD_DEFAULT = 0.02f;
 
@@ -92,12 +92,21 @@ struct Parameters : public dlog_file::Parameters {
     DlogItem dlogItems[dlog_file::MAX_NUM_OF_Y_AXES];
     int numDlogItems = 0;
 
+    bool isDlogItemAvailable(int slotIndex, int subchannelIndex, int resourceIndex);
+    bool isDlogItemAvailable(int slotIndex, int subchannelIndex, DlogResourceType resourceType);
+
     eez_err_t enableDlogItem(int slotIndex, int subchannelIndex, int resourceIndex, bool enable);
     eez_err_t enableDlogItem(int slotIndex, int subchannelIndex, DlogResourceType resourceType, bool enable);
     bool isDlogItemEnabled(int slotIndex, int subchannelIndex, int resourceIndex);
     bool isDlogItemEnabled(int slotIndex, int subchannelIndex, DlogResourceType resourceType);
 
     trigger::Source triggerSource = trigger::SOURCE_IMMEDIATE;
+
+	static float getResourceMinPeriod(int slotIndex, int subchannelIndex, int resourceIndex);
+
+	// returns the number of items that are disabled
+	// because period is below min. period
+	unsigned setPeriod(float value);
 
 private:
     bool findDlogItemIndex(int slotIndex, int subchannelIndex, int resourceIndex, int &dlogItemIndex);
@@ -168,7 +177,6 @@ Unit getYAxisUnit(Recording& recording, int dlogValueIndex);
 uint32_t getPosition(Recording& recording);
 void changeXAxisOffset(Recording &recording, float xAxisOffset);
 void changeXAxisDiv(Recording &recording, float xAxisDiv);
-float getDuration(Recording &recording);
 void getLabel(Recording& recording, int valueIndex, char *text, int count);
 
 void autoScale(Recording &recording);

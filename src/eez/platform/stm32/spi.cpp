@@ -304,11 +304,11 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 
 	deselect(slotIndex);
 
-    if (g_isBooted) {
-	    sendMessageToPsu(PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED, slotIndex | (TRANSFER_STATUS_OK << 8));
-    } else {
+    // if (g_isBooted) {
+	//     sendMessageToPsu(PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED, slotIndex | (TRANSFER_STATUS_OK << 8));
+    // } else {
         g_slots[slotIndex]->onSpiDmaTransferCompleted(TRANSFER_STATUS_OK);
-    }
+    // }
 }
 
 void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
@@ -328,17 +328,17 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
 	deselect(slotIndex);
 
 	if (handle[slotIndex]->ErrorCode == HAL_SPI_ERROR_CRC) {
-        if (g_isBooted) {
-            sendMessageToPsu(PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED, slotIndex | (TRANSFER_STATUS_CRC_ERROR << 8));
-        } else {
+        // if (g_isBooted) {
+        //     sendMessageToPsu(PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED, slotIndex | (TRANSFER_STATUS_CRC_ERROR << 8));
+        // } else {
             g_slots[slotIndex]->onSpiDmaTransferCompleted(TRANSFER_STATUS_CRC_ERROR);
-        }
+        // }
 	} else {
-        if (g_isBooted) {
-            sendMessageToPsu(PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED, slotIndex | (TRANSFER_STATUS_ERROR << 8));
-        } else {
+        // if (g_isBooted) {
+        //     sendMessageToPsu(PSU_MESSAGE_SPI_DMA_TRANSFER_COMPLETED, slotIndex | (TRANSFER_STATUS_ERROR << 8));
+        // } else {
             g_slots[slotIndex]->onSpiDmaTransferCompleted(TRANSFER_STATUS_ERROR);
-        }
+        // }
 	}
 }
 

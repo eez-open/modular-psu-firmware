@@ -582,23 +582,23 @@ public:
 
     void onSpiIrq() {
         spiReady = true;
-		if (g_isBooted) {
-			stateTransition(EVENT_SLAVE_READY);
-		}
+		// if (g_isBooted) {
+		// 	stateTransition(EVENT_SLAVE_READY);
+		// }
     }
 
     void onSpiDmaTransferCompleted(int status) override {
-         if (g_isBooted) {
-             if (status == bp3c::comm::TRANSFER_STATUS_OK) {
-                 stateTransition(EVENT_DMA_TRANSFER_COMPLETED);
-             } else {
-                 reportDmaTransferFailed(status);
-                 stateTransition(EVENT_DMA_TRANSFER_FAILED);
-             }
-         } else {
+        //  if (g_isBooted) {
+        //      if (status == bp3c::comm::TRANSFER_STATUS_OK) {
+        //          stateTransition(EVENT_DMA_TRANSFER_COMPLETED);
+        //      } else {
+        //          reportDmaTransferFailed(status);
+        //          stateTransition(EVENT_DMA_TRANSFER_FAILED);
+        //      }
+        //  } else {
              spiDmaTransferCompleted = true;
              spiDmaTransferStatus = status;
-         }
+        //  }
     }
 
     void onPowerDown() override {

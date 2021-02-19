@@ -255,7 +255,7 @@ size_t File::read(void *buf, uint32_t size) {
 }
 
 size_t File::write(const void *buf, size_t size) {
-	static const uint32_t CHUNK_SIZE = 512;
+	static const uint32_t CHUNK_SIZE = 64 * 1024;
 
     UINT bwTotal = 0;
 
