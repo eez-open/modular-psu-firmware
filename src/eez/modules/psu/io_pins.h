@@ -20,6 +20,8 @@
 
 static const uint8_t EXT_TRIG1 = 0;
 static const uint8_t EXT_TRIG2 = 1;
+static const uint8_t DIN1 = 0;
+static const uint8_t DIN2 = 1;
 static const uint8_t DOUT1 = 2;
 static const uint8_t DOUT2 = 3;
 static const uint8_t NUM_IO_PINS = 4;
@@ -43,7 +45,8 @@ enum Function {
     FUNCTION_SYSTRIG,
     FUNCTION_TOUTPUT,
     FUNCTION_PWM,
-    FUNCTION_DLOGTRIG
+    FUNCTION_DLOGTRIG,
+    FUNCTION_UART
 };
 
 struct IOPin {

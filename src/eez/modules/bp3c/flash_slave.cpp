@@ -20,10 +20,10 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
+#include <eez/uart.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
-#include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -85,11 +85,9 @@ static const uint32_t CMD_TIMEOUT = 100;
 
 static const uint32_t SPI_EEPROM_ERASE_TIMEOUT = 15000;
 
-#define phuart (g_mcuRevision >= MCU_REVISION_R3B3 ? &huart4 : &huart7)
-
 #endif
 
-static const uint32_t SPI_ACK_TIMEOUT = 1000;
+static const uint32_t SPI_ACK_TIMEOUT = 10000;
 
 void enterBootloaderMode(int slotIndex);
 bool syncWithSlave(int slotIndex);
@@ -164,11 +162,7 @@ void enterBootloaderMode(int slotIndex) {
 
     osDelay(25);
 
-	if (g_mcuRevision >= MCU_REVISION_R3B3) {
-    	MX_UART4_Init();
-	} else {
-    	MX_UART7_Init();
-	}
+	uart::refresh();
 
 #endif // EEZ_PLATFORM_STM32
 
@@ -307,10 +301,7 @@ void leaveBootloaderMode() {
 
     psu::profile::recallFromLocation(10);
 
-#if defined(EEZ_PLATFORM_STM32)
-    HAL_UART_DeInit(phuart);
-    psu::io_pins::refresh();
-#endif
+	uart::refresh();
 
     g_ate = 0;
 }
@@ -320,15 +311,15 @@ void leaveBootloaderMode() {
 void sendDataAndCRC(uint8_t data) {
 	uint8_t sendData[1];
 	sendData[0] = data;
-	HAL_UART_Transmit(phuart, sendData, 1, 20);
+	uart::transmit(sendData, 1, 20);
 	sendData[0] = CRC_MASK ^ data;
-	HAL_UART_Transmit(phuart, sendData, 1, 20);
+	uart::transmit(sendData, 1, 20);
 }
 
 void sendDataNoCRC(uint8_t data) {
 	uint8_t sendData[1];
 	sendData[0] = data;
-	HAL_UART_Transmit(phuart, sendData, 1, 20);
+	uart::transmit(sendData, 1, 20);
 }
 
 #endif
@@ -398,7 +389,7 @@ bool syncWithSlave(int slotIndex) {
 			taskENTER_CRITICAL();
 			sendDataNoCRC(ENTER_BOOTLOADER);
 			uint8_t rxData[1];
-			HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, 100);
+			auto result = uart::receive(rxData, 1, 100);
 			taskEXIT_CRITICAL();
 			if (result == HAL_OK && rxData[0] == ACK) {
 				return true;
@@ -451,15 +442,15 @@ bool eraseAll(int slotIndex) {
 		sendDataAndCRC(CMD_EXTENDED_ERASE);
 
 		uint8_t rxData[1];
-		HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+		auto result = uart::receive(rxData, 1, CMD_TIMEOUT);
 		if (result != HAL_OK || rxData[0] != ACK) {
 			taskEXIT_CRITICAL();
 			return false;
 		}
 
-		HAL_UART_Transmit(phuart, buffer, 3, 20);
+		uart::transmit(buffer, 3, 20);
 
-		result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+		result = uart::receive(rxData, 1, CMD_TIMEOUT);
 		if (result != HAL_OK || rxData[0] != ACK) {
 			taskEXIT_CRITICAL();
 			return false;
@@ -529,32 +520,36 @@ bool writeMemory(int slotIndex, uint32_t address, const uint8_t *buffer, uint32_
 		spi::deselect(slotIndex);
 		taskEXIT_CRITICAL();
 
-		return waitForAck(slotIndex);
+		if (!waitForAck(slotIndex)) {
+			return false;
+		}
+
+		return true;
 	} else {
 		taskENTER_CRITICAL();
 
 		sendDataAndCRC(CMD_WRITE_MEMORY);
 
 		uint8_t rxData[1];
-		HAL_StatusTypeDef result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+		auto result = uart::receive(rxData, 1, CMD_TIMEOUT);
 		if (result != HAL_OK || rxData[0] != ACK) {
 			taskEXIT_CRITICAL();
 			return false;
 		}
 
-		HAL_UART_Transmit(phuart, addressAndCrc, 5, 20);
+		uart::transmit(addressAndCrc, 5, 20);
 
-		result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+		result = uart::receive(rxData, 1, CMD_TIMEOUT);
 		if (result != HAL_OK || rxData[0] != ACK) {
 			taskEXIT_CRITICAL();
 			return false;
 		}
 
-		HAL_UART_Transmit(phuart, &numBytes, 1, 20);
-		HAL_UART_Transmit(phuart, (uint8_t *)buffer, bufferSize, 20);
-		HAL_UART_Transmit(phuart, &crc, 1, 20);
+		uart::transmit(&numBytes, 1, 20);
+		uart::transmit((uint8_t *)buffer, bufferSize, 20);
+		uart::transmit(&crc, 1, 20);
 
-		result = HAL_UART_Receive(phuart, rxData, 1, CMD_TIMEOUT);
+		result = uart::receive(rxData, 1, CMD_TIMEOUT);
 		if (result != HAL_OK || rxData[0] != ACK) {
 			taskEXIT_CRITICAL();
 			return false;

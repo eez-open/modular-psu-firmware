@@ -18,6 +18,7 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
+#include <eez/uart.h>
 #include <eez/usb.h>
 
 #include <eez/modules/psu/psu.h>
@@ -1535,6 +1536,7 @@ static scpi_choice_def_t functionChoice[] = { { "NONE", io_pins::FUNCTION_NONE }
                                               { "TOUTput", io_pins::FUNCTION_TOUTPUT },
                                               { "PWM", io_pins::FUNCTION_PWM },
                                               { "DLOGtrig", io_pins::FUNCTION_DLOGTRIG },
+                                              { "UART", io_pins::FUNCTION_UART },
                                               SCPI_CHOICE_LIST_END };
 
 scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
@@ -1552,7 +1554,19 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
 
     pin--;
 
-    if (pin < 2) {
+    if (pin == DIN1) {
+        if (
+            function != io_pins::FUNCTION_NONE &&
+            function != io_pins::FUNCTION_INPUT &&
+            function != io_pins::FUNCTION_INHIBIT &&
+            function != io_pins::FUNCTION_SYSTRIG &&
+            function != io_pins::FUNCTION_DLOGTRIG &&
+            function != io_pins::FUNCTION_UART
+        ) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+    } else if (pin == DIN2) {
         if (
             function != io_pins::FUNCTION_NONE &&
             function != io_pins::FUNCTION_INPUT &&
@@ -1563,14 +1577,26 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
         }
-    } else {
+    } else if (pin == DOUT1) {
+        if (
+            function != io_pins::FUNCTION_NONE &&
+            function != io_pins::FUNCTION_INPUT &&
+            function != io_pins::FUNCTION_INHIBIT &&
+            function != io_pins::FUNCTION_SYSTRIG &&
+            function != io_pins::FUNCTION_DLOGTRIG &&
+            function != io_pins::FUNCTION_UART
+        ) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+            return SCPI_RES_ERR;
+        }
+    }else {
         if (
             function != io_pins::FUNCTION_NONE &&
             function != io_pins::FUNCTION_OUTPUT &&
             function != io_pins::FUNCTION_FAULT &&
             function != io_pins::FUNCTION_ON_COUPLE &&
             function != io_pins::FUNCTION_TOUTPUT &&
-            !(pin == DOUT2 && function == io_pins::FUNCTION_PWM)
+            function != io_pins::FUNCTION_PWM
         ) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
             return SCPI_RES_ERR;
@@ -2348,6 +2374,19 @@ scpi_result_t scpi_cmd_systemLfrequency(scpi_t *context) {
 
 scpi_result_t scpi_cmd_systemLfrequencyQ(scpi_t *context) {
 	SCPI_ResultUInt32(context, persist_conf::getPowerLineFrequency());
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUartTransmit(scpi_t *context) {
+    const char *uartStr;
+    size_t uartStrLen;
+    if (!SCPI_ParamCharacters(context, &uartStr, &uartStrLen, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    uart::transmit((uint8_t *)uartStr, (uint16_t)uartStrLen, 100);
+    uart::transmit((uint8_t *)"\r\n", 2, 100);
+
 	return SCPI_RES_OK;
 }
 

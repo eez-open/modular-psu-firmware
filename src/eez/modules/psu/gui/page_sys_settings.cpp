@@ -847,24 +847,52 @@ void SysSettingsIOPinsPage::togglePolarity() {
 
 void SysSettingsIOPinsPage::onFunctionSet(uint16_t value) {
     popPage();
-    SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getActivePage();
-    page->m_function[page->pinNumber] = (io_pins::Function)value;
-    if (value == io_pins::FUNCTION_SYSTRIG) {
-        int otherPin = page->pinNumber == 0 ? 1 : 0;
-        if (page->m_function[otherPin] == io_pins::FUNCTION_SYSTRIG) {
-            page->m_function[otherPin] = io_pins::FUNCTION_NONE;
+
+	SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getActivePage();
+
+    auto pin = page->pinNumber;
+    auto function = (io_pins::Function)value;
+
+    if (page->m_function[pin] != function) {
+		using namespace io_pins;
+
+        if (pin == DIN1 && page->m_function[DIN1] == FUNCTION_UART) {
+            page->m_function[DOUT1] = FUNCTION_NONE;
+        }
+
+        if (pin == DOUT1 && page->m_function[DOUT1] == FUNCTION_UART) {
+            page->m_function[DIN1] = FUNCTION_NONE;
+        }
+
+        page->m_function[pin] = function;
+        
+        if (pin == DIN1 && function == FUNCTION_UART) {
+            page->m_function[DOUT1] = FUNCTION_UART;
+        }
+
+        if (pin == DOUT1 && function == FUNCTION_UART) {
+            page->m_function[DIN1] = FUNCTION_UART;
+        }
+        
+        if (value == io_pins::FUNCTION_SYSTRIG) {
+            int otherPin = pin == DIN1 ? DIN2 : DIN1;
+            if (page->m_function[otherPin] == io_pins::FUNCTION_SYSTRIG) {
+                page->m_function[otherPin] = io_pins::FUNCTION_NONE;
+            }
         }
     }
 }
 
 void SysSettingsIOPinsPage::selectFunction() {
     pinNumber = getFoundWidgetAtDown().cursor;
-    if (pinNumber < DOUT1) {
-        pushSelectFromEnumPage(ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION, m_function[pinNumber], 0, onFunctionSet);
-    } else if (pinNumber == DOUT2) {
-        pushSelectFromEnumPage(ENUM_DEFINITION_IO_PINS_OUTPUT2_FUNCTION, m_function[pinNumber], 0, onFunctionSet);
+    if (pinNumber == DIN1) {
+        pushSelectFromEnumPage(ENUM_DEFINITION_IO_PINS_INPUT1_FUNCTION, m_function[pinNumber], 0, onFunctionSet);
+    } else if (pinNumber == DIN2) {
+		pushSelectFromEnumPage(ENUM_DEFINITION_IO_PINS_INPUT2_FUNCTION, m_function[pinNumber], 0, onFunctionSet);
+	} else if (pinNumber == DOUT1) {
+        pushSelectFromEnumPage(ENUM_DEFINITION_IO_PINS_OUTPUT1_FUNCTION, m_function[pinNumber], 0, onFunctionSet);
     } else {
-        pushSelectFromEnumPage(ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION, m_function[pinNumber], 0, onFunctionSet);
+        pushSelectFromEnumPage(ENUM_DEFINITION_IO_PINS_OUTPUT2_FUNCTION, m_function[pinNumber], 0, onFunctionSet);
     }
 }
 

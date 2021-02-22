@@ -26,6 +26,7 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
+#include <eez/uart.h>
 
 #include <eez/modules/psu/psu.h>
 
@@ -38,9 +39,7 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/dlog_record.h>
 
-#if defined EEZ_PLATFORM_STM32
 #include <eez/modules/bp3c/flash_slave.h>
-#endif
 
 namespace eez {
 namespace psu {
@@ -145,16 +144,17 @@ uint8_t isOutputEnabled() {
 
 void initInputPin(int pin) {
 #if defined EEZ_PLATFORM_STM32
-    if (!bp3c::flash_slave::g_bootloaderMode || pin != 0) {
-        GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-
+    if (!bp3c::flash_slave::g_bootloaderMode || pin != DIN1) {
         const IOPin &ioPin = g_ioPins[pin];
+        if (ioPin.function != FUNCTION_UART) {
+            GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-        GPIO_InitStruct.Pin = pin == 0 ? MCU_REV_GPIO(UART_RX_DIN1_Pin) : DIN2_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-        GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-        HAL_GPIO_Init(pin == 0 ? MCU_REV_GPIO(UART_RX_DIN1_GPIO_Port) : DIN2_GPIO_Port, &GPIO_InitStruct);
+            GPIO_InitStruct.Pin = pin == 0 ? MCU_REV_GPIO(UART_RX_DIN1_Pin) : DIN2_Pin;
+            GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+            GPIO_InitStruct.Pull = ioPin.polarity == io_pins::POLARITY_POSITIVE ? GPIO_PULLDOWN : GPIO_PULLUP;
+            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+            HAL_GPIO_Init(pin == 0 ? MCU_REV_GPIO(UART_RX_DIN1_GPIO_Port) : DIN2_GPIO_Port, &GPIO_InitStruct);
+        }
     }
 #endif
 }
@@ -258,20 +258,23 @@ void updatePwmFrequency(int pin) {
 }
 
 void initOutputPin(int pin) {
+    const IOPin &ioPin = g_ioPins[pin];
+
     if (pin == DOUT1) {
 #if defined EEZ_PLATFORM_STM32
         if (!bp3c::flash_slave::g_bootloaderMode) {
-            // Configure DOUT1 GPIO pin
-	        GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-            GPIO_InitStruct.Pin = MCU_REV_GPIO(UART_TX_DOUT1_Pin);
-            GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-            GPIO_InitStruct.Pull = GPIO_NOPULL;
-            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-            HAL_GPIO_Init(MCU_REV_GPIO(UART_TX_DOUT1_GPIO_Port), &GPIO_InitStruct);
+            if (ioPin.function != FUNCTION_UART) {
+                // Configure DOUT1 GPIO pin
+                GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+                GPIO_InitStruct.Pin = MCU_REV_GPIO(UART_TX_DOUT1_Pin);
+                GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+                GPIO_InitStruct.Pull = GPIO_NOPULL;
+                GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+                HAL_GPIO_Init(MCU_REV_GPIO(UART_TX_DOUT1_GPIO_Port), &GPIO_InitStruct);
+            }
         }
 #endif
     } else if (pin == DOUT2) {
-        const IOPin &ioPin = g_ioPins[pin];
         if (ioPin.function == io_pins::FUNCTION_PWM) {
             updatePwmFrequency(pin);
         } else {
@@ -418,6 +421,8 @@ void refresh() {
             }
         }
     }
+
+    uart::refresh();
 }
 
 bool getIsInhibitedByUser() {
@@ -438,46 +443,64 @@ void setPinPolarity(int pin, unsigned polarity) {
 }
 
 void setPinFunction(int pin, unsigned function) {
-    g_ioPins[pin].function = function;
+    if (g_ioPins[pin].function != function) {
+        if (pin == DIN1 && g_ioPins[DIN1].function == FUNCTION_UART) {
+            g_ioPins[DOUT1].function = FUNCTION_NONE;
+        }
 
-    if (pin == 0 || pin == 1) {
-        int otherPin = pin == 0 ? 1 : 0;
+        if (pin == DOUT1 && g_ioPins[DOUT1].function == FUNCTION_UART) {
+            g_ioPins[DIN1].function = FUNCTION_NONE;
+        }
 
-        if (function == io_pins::FUNCTION_SYSTRIG) {
-            if (g_ioPins[otherPin].function == io_pins::FUNCTION_SYSTRIG) {
-                g_ioPins[otherPin].function = io_pins::FUNCTION_NONE;
-            }
+        g_ioPins[pin].function = function;
 
-            trigger::Source triggerSource = pin == 0 ? trigger::SOURCE_PIN1 : trigger::SOURCE_PIN2;
+        if (pin == DIN1 && function == FUNCTION_UART) {
+            g_ioPins[DOUT1].function = FUNCTION_UART;
+        }
 
-            if (dlog_record::g_parameters.triggerSource == triggerSource) {
-                dlog_record::setTriggerSource(trigger::SOURCE_IMMEDIATE);
-            }
+        if (pin == DOUT1 && function == FUNCTION_UART) {
+            g_ioPins[DIN1].function = FUNCTION_UART;
+        }
 
-            if (trigger::g_triggerSource != triggerSource) {
-                trigger::setSource(triggerSource);
-            }
-        } else if (function == io_pins::FUNCTION_DLOGTRIG) {
-            if (g_ioPins[otherPin].function == io_pins::FUNCTION_DLOGTRIG) {
-                g_ioPins[otherPin].function = io_pins::FUNCTION_NONE;
-            }
+        if (pin == DIN1 || pin == DIN2) {
+            int otherPin = pin == DIN1 ? DIN2 : DIN1;
 
-            trigger::Source triggerSource = pin == 0 ? trigger::SOURCE_PIN1 : trigger::SOURCE_PIN2;
+            if (function == io_pins::FUNCTION_SYSTRIG) {
+                if (g_ioPins[otherPin].function == io_pins::FUNCTION_SYSTRIG) {
+                    g_ioPins[otherPin].function = io_pins::FUNCTION_NONE;
+                }
 
-            if (trigger::g_triggerSource == triggerSource) {
-                trigger::setSource(trigger::SOURCE_IMMEDIATE);
-            }
+                trigger::Source triggerSource = pin == 0 ? trigger::SOURCE_PIN1 : trigger::SOURCE_PIN2;
 
-            if (dlog_record::g_parameters.triggerSource != triggerSource) {
-                dlog_record::setTriggerSource(triggerSource);
-            }
-        } else {
-            if ((pin == 0 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN1) || (pin == 1 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN2)) {
-                dlog_record::setTriggerSource(trigger::SOURCE_IMMEDIATE);
-            }
+                if (dlog_record::g_parameters.triggerSource == triggerSource) {
+                    dlog_record::setTriggerSource(trigger::SOURCE_IMMEDIATE);
+                }
 
-            if ((pin == 0 && trigger::g_triggerSource == trigger::SOURCE_PIN1) || (pin == 1 && trigger::g_triggerSource == trigger::SOURCE_PIN2)) {
-                trigger::setSource(trigger::SOURCE_IMMEDIATE);
+                if (trigger::g_triggerSource != triggerSource) {
+                    trigger::setSource(triggerSource);
+                }
+            } else if (function == io_pins::FUNCTION_DLOGTRIG) {
+                if (g_ioPins[otherPin].function == io_pins::FUNCTION_DLOGTRIG) {
+                    g_ioPins[otherPin].function = io_pins::FUNCTION_NONE;
+                }
+
+                trigger::Source triggerSource = pin == 0 ? trigger::SOURCE_PIN1 : trigger::SOURCE_PIN2;
+
+                if (trigger::g_triggerSource == triggerSource) {
+                    trigger::setSource(trigger::SOURCE_IMMEDIATE);
+                }
+
+                if (dlog_record::g_parameters.triggerSource != triggerSource) {
+                    dlog_record::setTriggerSource(triggerSource);
+                }
+            } else {
+                if ((pin == 0 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN1) || (pin == 1 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN2)) {
+                    dlog_record::setTriggerSource(trigger::SOURCE_IMMEDIATE);
+                }
+
+                if ((pin == 0 && trigger::g_triggerSource == trigger::SOURCE_PIN1) || (pin == 1 && trigger::g_triggerSource == trigger::SOURCE_PIN2)) {
+                    trigger::setSource(trigger::SOURCE_IMMEDIATE);
+                }
             }
         }
     }

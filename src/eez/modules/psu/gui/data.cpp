@@ -156,7 +156,26 @@ EnumItem g_enumDefinition_IO_PINS_POLARITY[] = {
     { 0, 0 }
 };
 
-EnumItem g_enumDefinition_IO_PINS_INPUT_FUNCTION[] = {
+EnumItem g_enumDefinition_IO_PINS_INPUT1_FUNCTION[] = {
+    { io_pins::FUNCTION_NONE, "None" },
+    { io_pins::FUNCTION_INPUT, "Input" },
+    { io_pins::FUNCTION_INHIBIT, "Inhibit" },
+    { io_pins::FUNCTION_SYSTRIG, "System trigger", "SysTrig" },
+    { io_pins::FUNCTION_UART, "UART" },
+    { 0, 0 }
+};
+
+EnumItem g_enumDefinition_IO_PINS_INPUT1_FUNCTION_WITH_DLOG_TRIGGER[] = {
+    { io_pins::FUNCTION_NONE, "None" },
+    { io_pins::FUNCTION_INPUT, "Input" },
+    { io_pins::FUNCTION_INHIBIT, "Inhibit" },
+    { io_pins::FUNCTION_SYSTRIG, "System trigger", "SysTrig" },
+    { io_pins::FUNCTION_UART, "UART" },
+    { io_pins::FUNCTION_DLOGTRIG, "DLOG trigger", "DlogTrig" },
+    { 0, 0 }
+};
+
+EnumItem g_enumDefinition_IO_PINS_INPUT2_FUNCTION[] = {
     { io_pins::FUNCTION_NONE, "None" },
     { io_pins::FUNCTION_INPUT, "Input" },
     { io_pins::FUNCTION_INHIBIT, "Inhibit" },
@@ -164,7 +183,7 @@ EnumItem g_enumDefinition_IO_PINS_INPUT_FUNCTION[] = {
     { 0, 0 }
 };
 
-EnumItem g_enumDefinition_IO_PINS_INPUT_FUNCTION_WITH_DLOG_TRIGGER[] = {
+EnumItem g_enumDefinition_IO_PINS_INPUT2_FUNCTION_WITH_DLOG_TRIGGER[] = {
     { io_pins::FUNCTION_NONE, "None" },
     { io_pins::FUNCTION_INPUT, "Input" },
     { io_pins::FUNCTION_INHIBIT, "Inhibit" },
@@ -173,12 +192,13 @@ EnumItem g_enumDefinition_IO_PINS_INPUT_FUNCTION_WITH_DLOG_TRIGGER[] = {
     { 0, 0 }
 };
 
-EnumItem g_enumDefinition_IO_PINS_OUTPUT_FUNCTION[] = {
+EnumItem g_enumDefinition_IO_PINS_OUTPUT1_FUNCTION[] = {
     { io_pins::FUNCTION_NONE, "None" },
     { io_pins::FUNCTION_OUTPUT, "Output" },
     { io_pins::FUNCTION_FAULT, "Fault" },
     { io_pins::FUNCTION_ON_COUPLE, "Channel ON couple", "ONcoup" },
     { io_pins::FUNCTION_TOUTPUT, "Trigger output", "Toutput" },
+    { io_pins::FUNCTION_UART, "UART" },
     { 0, 0 }
 };
 
@@ -4390,12 +4410,14 @@ void data_io_pin_function_name(DataOperationEnum operation, Cursor cursor, Value
     if (operation == DATA_OPERATION_GET) {
         SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
         if (page) {
-            if (cursor < DOUT1) {
-                value = MakeEnumDefinitionValue(page->m_function[cursor], ENUM_DEFINITION_IO_PINS_INPUT_FUNCTION_WITH_DLOG_TRIGGER);
-            } else if (cursor == DOUT2) {
+            if (cursor == DIN1) {
+                value = MakeEnumDefinitionValue(page->m_function[cursor], ENUM_DEFINITION_IO_PINS_INPUT1_FUNCTION_WITH_DLOG_TRIGGER);
+            } else if (cursor == DIN2) {
+				value = MakeEnumDefinitionValue(page->m_function[cursor], ENUM_DEFINITION_IO_PINS_INPUT2_FUNCTION_WITH_DLOG_TRIGGER);
+			} else if (cursor == DOUT1) {
+				value = MakeEnumDefinitionValue(page->m_function[cursor], ENUM_DEFINITION_IO_PINS_OUTPUT1_FUNCTION);
+			} else {
                 value = MakeEnumDefinitionValue(page->m_function[cursor], ENUM_DEFINITION_IO_PINS_OUTPUT2_FUNCTION);
-            } else {
-                value = MakeEnumDefinitionValue(page->m_function[cursor], ENUM_DEFINITION_IO_PINS_OUTPUT_FUNCTION);
             }
         }
     }

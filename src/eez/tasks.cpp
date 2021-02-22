@@ -26,6 +26,7 @@
 #include <eez/mp.h>
 #include <eez/sound.h>
 #include <eez/hmi.h>
+#include <eez/uart.h>
 #include <eez/usb.h>
 #include <eez/fs_driver.h>
 
@@ -286,7 +287,9 @@ void lowPriorityThreadOneIter() {
 #endif  
         else if (type < MP_LAST_MESSAGE_TYPE) {
             mp::onQueueMessage(type, param);
-        } else {
+        }
+
+        else {
             if (type == THREAD_MESSAGE_SAVE_LIST) {
                 int err;
                 if (!list::saveList(param, &g_listFilePath[param][0], &err)) {
@@ -497,6 +500,8 @@ void lowPriorityThreadOneIter() {
     eez::hmi::tick();
 
     usb::tick();
+
+    uart::tick();
 
     return;
 }

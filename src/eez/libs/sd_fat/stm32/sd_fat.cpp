@@ -24,6 +24,7 @@
 #include <scpi/scpi.h>
 
 #include <eez/debug.h>
+#include <eez/memory.h>
 #include <eez/util.h>
 #include <eez/libs/sd_fat/sd_fat.h>
 
@@ -261,24 +262,29 @@ size_t File::write(const void *buf, size_t size) {
 
 	size_t unalignedLength = ((uint32_t)buf) & 3;
 	if (unalignedLength > 0) {
-        unalignedLength = MIN(4 - unalignedLength, size);
-		uint8_t unalignedBuffer[4] __attribute__((aligned));
-		for (size_t i = 0; i < unalignedLength; i++) {
-			unalignedBuffer[i] = ((uint8_t *)buf)[i];
-		}
+        // unalignedLength = MIN(4 - unalignedLength, size);
+		// uint8_t unalignedBuffer[4] __attribute__((aligned));
+		// for (size_t i = 0; i < unalignedLength; i++) {
+		// 	unalignedBuffer[i] = ((uint8_t *)buf)[i];
+		// }
 
-		UINT bw;
-		auto result = f_write(&m_file, unalignedBuffer, unalignedLength, &bw);
-        CHECK_ERROR("File::write 1", result);
-		if (result != FR_OK) {
-			return 0;
-		}
+		// UINT bw;
+		// auto result = f_write(&m_file, unalignedBuffer, unalignedLength, &bw);
+        // CHECK_ERROR("File::write 1", result);
+		// if (result != FR_OK) {
+		// 	return 0;
+		// }
 
-		bwTotal += bw;
+		// bwTotal += bw;
 
-        if (bw < unalignedLength) {
-            return bwTotal;
-        }        
+        // if (bw < unalignedLength) {
+        //     return bwTotal;
+        // }        
+        
+        void *alignedBuf = VRAM_BUFFER1_START_ADDRESS;
+        memcpy(alignedBuf, buf, size);
+        buf = alignedBuf;
+
 	}
 
 	while (bwTotal < size) {

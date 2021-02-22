@@ -110,6 +110,7 @@ set(src_eez
     src/eez/sound.cpp
     src/eez/system.cpp
     src/eez/tasks.cpp
+    src/eez/uart.cpp
     src/eez/unit.cpp
     src/eez/usb.cpp
     src/eez/util.cpp
@@ -131,6 +132,7 @@ set(header_eez
     src/eez/sound.h
     src/eez/system.h
     src/eez/tasks.h
+    src/eez/uart.h
     src/eez/unit.h
     src/eez/usb.h
     src/eez/util.h
