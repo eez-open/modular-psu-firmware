@@ -25,7 +25,8 @@ namespace eez {
 
 // order of units should not be changed since it is used in DLOG files
 enum Unit {
-    UNIT_UNKNOWN,
+    UNIT_UNKNOWN = 255,
+    UNIT_NONE = 0,
     UNIT_VOLT,
     UNIT_MILLI_VOLT,
     UNIT_AMPER,
@@ -51,8 +52,7 @@ enum Unit {
     UNIT_MICRO_FARAD,
     UNIT_NANO_FARAD,
     UNIT_PICO_FARAD,
-    UNIT_MINUTE,
-    UNIT_BIT,
+    UNIT_MINUTE
 };
 
 extern const char *g_unitNames[];

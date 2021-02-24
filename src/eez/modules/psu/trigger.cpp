@@ -116,7 +116,7 @@ bool isSeqInitiated(Source source) {
 }
 
 bool isDlogInitiated(Source source) {
-    return dlog_record::g_parameters.triggerSource == source && dlog_record::isInitiated();
+    return dlog_record::g_recordingParameters.triggerSource == source && dlog_record::isInitiated();
 
 }
 

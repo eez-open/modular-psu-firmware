@@ -242,10 +242,6 @@ struct Response {
         } setParams;
 
         struct {
-            float conversionFactors[4];
-        } dlogRecordingStart;
-
-        struct {
             uint32_t recordIndex;
             uint16_t numRecords;
             uint8_t buffer[1024];
@@ -274,6 +270,40 @@ struct Response {
         } diskDriveIoctl;
 	};
 };
+
+inline double getAinConversionFactor(uint8_t channelIndex, uint8_t mode, uint8_t range) {
+	if (channelIndex < 2) {
+		if (mode == MEASURE_MODE_VOLTAGE) {
+			if (range == 0) {
+				return 2.4; // +/- 2.4 V
+			}
+            if (range == 1) {
+				return 48.0; // +/- 48 V
+			}
+			return 240.0; // +/- 240 V
+		}
+        if (mode == MEASURE_MODE_CURRENT) {
+			return 0.048; // +/- 48 mV ( = 2.4 V / 50 Ohm)
+		}
+	} else {
+		if (mode == MEASURE_MODE_VOLTAGE) {
+			if (range == 0) {
+				return 2.4; // +/- 2.4 V
+			}
+			return 12.0; // +/- 12 V
+		}
+        if (mode == MEASURE_MODE_CURRENT) {
+			if (range == 0) {
+				return 0.024 * 50.0 / 39.0; // +/- 24 mA (rsense is 39 ohm (was 50 ohm), PGA is 2)
+			}
+            if (range == 1) {
+				return 1.2 * 0.5 / 0.33; // +/- 1.2 A (rsense 0.33 ohm (was 0.5 ohm), PGA is 4)
+			}
+            return 20.0; // +/- 10 A (rsense is 0.01 ohm, PGA is 12 => 2.4 / 0.01 / 16 = 20 A)
+		}
+	}
+    return 0;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1464,7 +1494,6 @@ public:
     const CommandDef *nextDlogCommand = nullptr;
     DlogRecordingStart nextDlogRecordingStart;
     DlogRecordingStart dlogRecordingStart;
-    float dlogDataConversionFactors[4];
     uint32_t dlogDataRecordIndex = 0;
 
     uint8_t selectedPage = 0;
@@ -1668,16 +1697,6 @@ public:
         memcpy(&request.dlogRecordingStart, &dlogRecordingStart, sizeof(dlogRecordingStart));
     }
 
-    void Command_DlogRecordingStart_Done(Response &response, bool isSuccess) {
-        if (isSuccess) {
-            auto &dlogRecordingData = response.dlogRecordingStart;
-            dlogDataConversionFactors[0] = dlogRecordingData.conversionFactors[0];
-            dlogDataConversionFactors[1] = dlogRecordingData.conversionFactors[1];
-            dlogDataConversionFactors[2] = dlogRecordingData.conversionFactors[2];
-            dlogDataConversionFactors[3] = dlogRecordingData.conversionFactors[3];
-        }
-    }
-
     ////////////////////////////////////////
 
     void Command_DlogRecordingStop_Done(Response &response, bool isSuccess) {
@@ -1700,7 +1719,7 @@ public:
 
             uint32_t end = dlogRecordingData.recordIndex + dlogRecordingData.numRecords;
 
-            bool is24Bit = dlog_record::g_parameters.period >= 1.0f / 16000;
+            bool is24Bit = dlog_record::g_recordingParameters.period >= 1.0f / 16000;
             
             uint32_t logAin[4] = {
                 dlogRecordingStart.resources & (1 << (16 + 0)),
@@ -1709,35 +1728,49 @@ public:
                 dlogRecordingStart.resources & (1 << (16 + 3))
             };
 
-            while (dlogDataRecordIndex < end) {
-                float values[4];
+            uint8_t values[4 * 3];
 
-                int i = 0;
+            if (is24Bit) {
+                while (dlogDataRecordIndex < end) {
+                    uint8_t *p = values;
 
-                if (is24Bit) {
                     for (int j = 0; j < 4; j++) {
                         if (logAin[j]) {
-                            int32_t adcValue = ((int32_t)((rx[0] << 24) | (rx[1] << 16) | (rx[2] << 8))) >> 8;
-                            values[i++] = float(dlogDataConversionFactors[j] * adcValue / (1 << 23));
+                            *p++ = *rx++;
+                            *p++ = *rx++;
+                            *p++ = *rx++;
+                        } else {
+                            rx += 3;
                         }
-                        rx += 3;
                     }
-                } else {
-                    for (int j = 0; j < 4; j++) {
-                        if (logAin[j]) {
-                            int32_t adcValue = int16_t((rx[0] << 8) | rx[1]);
-                            values[i++] = float(dlogDataConversionFactors[j] * adcValue / (1 << 15));
-                        }
-                        rx += 2;
-                    }
+
+                    uint32_t bits = rx[0] | (rx[1] << 8);
+                    rx += 2;
+
+                    dlog_record::logInt24(values, bits);
+                    
+                    dlogDataRecordIndex++;
                 }
-                
-                uint32_t bits = rx[0] | (rx[1] << 8);
-                rx += 2;
+            } else {
+                while (dlogDataRecordIndex < end) {
+                    uint8_t *p = values;
 
-                dlog_record::log(values, bits);
+                    for (int j = 0; j < 4; j++) {
+                        if (logAin[j]) {
+                            *p++ = *rx++;
+                            *p++ = *rx++;
+                        } else {
+                            rx += 2;
+                        }
+                    }
 
-                dlogDataRecordIndex++;
+                    uint32_t bits = rx[0] | (rx[1] << 8);
+                    rx += 2;
+
+                    dlog_record::logInt16(values, bits);
+                    
+                    dlogDataRecordIndex++;
+                }
             }
         }
     }
@@ -1833,7 +1866,7 @@ public:
 
 	uint32_t getRefreshTimeMs() {
 		if (dlog_record::isExecuting()) {
-			uint32_t dlogPeriodMs = (uint32_t)(dlog_record::g_recording.parameters.period * 1000);
+			uint32_t dlogPeriodMs = (uint32_t)(dlog_record::g_activeRecording.parameters.period * 1000);
 			if (dlogPeriodMs < REFRESH_TIME_MS) {
 				if (dlog_record::isModuleAtSlotRecording(slotIndex)) {
                     if (!dlog_record::isModuleControlledRecording()) {
@@ -2053,11 +2086,6 @@ public:
                     } else if (currentCommand->command == COMMAND_GET_STATE) {
 						memset(&response->getState, 0, sizeof(response->getState));
                         response->getState.flags |= GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT;
-                    } else if (currentCommand->command == COMMAND_DLOG_RECORDING_START) {
-                        response->dlogRecordingStart.conversionFactors[0] = 2.4f;
-                        response->dlogRecordingStart.conversionFactors[1] = 4.8f;
-                        response->dlogRecordingStart.conversionFactors[2] = 48.0f;
-                        response->dlogRecordingStart.conversionFactors[3] = 240.0f;
                     } else {
                         if (
                             currentCommand->command == COMMAND_DLOG_RECORDING_DATA ||
@@ -2065,10 +2093,10 @@ public:
                         ) {
                             response->command = 0x8000 | COMMAND_DLOG_RECORDING_DATA;
 
-                            bool is24Bit = dlog_record::g_parameters.period >= 1.0f / 16000;
+                            bool is24Bit = dlog_record::g_recordingParameters.period >= 1.0f / 16000;
 
                             response->dlogRecordingData.recordIndex = dlogDataRecordIndex;
-                            response->dlogRecordingData.numRecords = (uint16_t)roundf(1.0f / dlog_record::g_parameters.period / 1000);
+                            response->dlogRecordingData.numRecords = (uint16_t)roundf(1.0f / dlog_record::g_recordingParameters.period / 1000);
 
                             int32_t ain[4];
                             ain[0] = 0x7FFFFFFF / 5;
@@ -2128,11 +2156,15 @@ public:
                     nextDlogCommand = nullptr;
                 } else if (diskOperationStatus == DISK_OPERATION_NOT_FINISHED) {
                     executeCommand(diskOperationParams.command);
-                } else if (tickCountMs - lastTransferTime >= TIMEOUT_UNTIL_OUT_OF_SYNC_MS) {
+                }
+#ifdef EEZ_PLATFORM_STM32
+				else if (tickCountMs - lastTransferTime >= TIMEOUT_UNTIL_OUT_OF_SYNC_MS) {
                     event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
                     synchronized = false;
                     testResult = TEST_FAILED;
-                } else if (tickCountMs - lastRefreshTime >= getRefreshTimeMs()) {
+                }
+#endif
+				else if (tickCountMs - lastRefreshTime >= getRefreshTimeMs()) {
                     refreshStartTime = tickCountMs;
                     executeCommand(&getState_command);
                 } else if (forceTransferSetParams) {
@@ -3611,6 +3643,46 @@ public:
         return DLOG_RESOURCE_TYPE_NONE;
 	}
     
+    dlog_file::DataType getDlogResourceDataType(int subchannelIndex, int resourceIndex) override {
+        if (subchannelIndex == DIN_SUBCHANNEL_INDEX || subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            return dlog_file::DATA_TYPE_BIT;
+        }
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            if (dlog_record::g_recordingParameters.period < 1.0f / 16000) {
+                return dlog_file::DATA_TYPE_INT16_BE;
+            }
+            if (dlog_record::g_recordingParameters.period < 1.0f / 1000) {
+                return dlog_file::DATA_TYPE_INT24_BE;
+            }
+        }
+        return dlog_file::DATA_TYPE_FLOAT;
+    }
+
+    double getDlogResourceTransformScale(int subchannelIndex, int resourceIndex) override {
+        if (
+            subchannelIndex >= AIN_1_SUBCHANNEL_INDEX &&
+            subchannelIndex <= AIN_4_SUBCHANNEL_INDEX &&
+            dlog_record::g_recordingParameters.period < 1.0f / 1000
+        ) {
+            auto ainChannelIndex = subchannelIndex - AIN_1_SUBCHANNEL_INDEX;
+            auto &ainChannel = ainChannels[ainChannelIndex];
+            auto mode = ainChannel.getMode();
+            double f = getAinConversionFactor(
+                ainChannelIndex,
+                mode,
+                mode == MEASURE_MODE_VOLTAGE ?
+                    ainChannel.getVoltageRange() : ainChannel.getCurrentRange()
+            );
+            if (dlog_record::g_recordingParameters.period < 1.0f / 16000) {
+                // 16 bit
+                return f / (1 << 15);
+            }
+            // 24 bit
+            return f / (1 << 23);
+        }
+        return 1.0f;
+    }
+
 	const char *getDlogResourceLabel(int subchannelIndex, int resourceIndex) override {
         if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
             return getPinLabelOrDefault(subchannelIndex, resourceIndex);
@@ -3643,8 +3715,8 @@ public:
         if (dlog_record::isModuleControlledRecording()) {
            uint32_t resources = 0;
 
-           for (int i = 0; i < dlog_record::g_recording.parameters.numDlogItems; i++) {
-               auto &dlogItem = dlog_record::g_recording.parameters.dlogItems[i];
+           for (int i = 0; i < dlog_record::g_activeRecording.parameters.numDlogItems; i++) {
+               auto &dlogItem = dlog_record::g_activeRecording.parameters.dlogItems[i];
                if (dlogItem.slotIndex == slotIndex) {
                    if (dlogItem.subchannelIndex == DIN_SUBCHANNEL_INDEX) {
                        resources |= 1 << dlogItem.resourceIndex;
@@ -3660,11 +3732,11 @@ public:
            }
 
             if (resources != 0) {
-                nextDlogRecordingStart.duration = dlog_record::g_parameters.duration;
-                nextDlogRecordingStart.period = dlog_record::g_parameters.period;
+                nextDlogRecordingStart.duration = dlog_record::g_recordingParameters.duration;
+                nextDlogRecordingStart.period = dlog_record::g_recordingParameters.period;
                 nextDlogRecordingStart.resources = resources;
 
-                stringCopy(nextDlogRecordingStart.filePath, MAX_PATH_LENGTH, dlog_record::g_parameters.filePath + 2 /* skip drive part */);
+                stringCopy(nextDlogRecordingStart.filePath, MAX_PATH_LENGTH, dlog_record::g_recordingParameters.filePath + 2 /* skip drive part */);
 
                 for (int i = 0; i < 8; i++) {
                     stringCopy(nextDlogRecordingStart.dinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), CHANNEL_LABEL_MAX_LENGTH + 1, getDlogResourceLabel(DIN_SUBCHANNEL_INDEX, i));
@@ -3768,7 +3840,7 @@ const Mio168Module::CommandDef Mio168Module::setParams_command = {
 const Mio168Module::CommandDef Mio168Module::dlogRecordingStart_command = {
 	COMMAND_DLOG_RECORDING_START,
 	&Mio168Module::Command_DlogRecordingStart_FillRequest,
-	&Mio168Module::Command_DlogRecordingStart_Done
+	nullptr
 };
 
 const Mio168Module::CommandDef Mio168Module::dlogRecordingStop_command = {
@@ -4255,7 +4327,7 @@ void data_dib_mio168_din_no(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 8 + 1;
     } else if (operation == DATA_OPERATION_GET_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(cursor / 8, DIN_SUBCHANNEL_INDEX, (DlogResourceType)(DLOG_RESOURCE_TYPE_DIN0 + cursor % 8))) {
+        if (!dlog_record::isIdle() && dlog_record::g_activeRecording.parameters.isDlogItemEnabled(cursor / 8, DIN_SUBCHANNEL_INDEX, (DlogResourceType)(DLOG_RESOURCE_TYPE_DIN0 + cursor % 8))) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     }
@@ -4459,7 +4531,7 @@ bool isDlogActiveOnAinChannel(int slotIndex, int ainChannelIndex) {
     eez::DlogResourceType resourceType = unit == UNIT_VOLT ?
 		DLOG_RESOURCE_TYPE_U : DLOG_RESOURCE_TYPE_I;
 
-    return dlog_record::g_recording.parameters.isDlogItemEnabled(slotIndex,
+    return dlog_record::g_activeRecording.parameters.isDlogItemEnabled(slotIndex,
         AIN_1_SUBCHANNEL_INDEX + ainChannelIndex, resourceType);
 }
 

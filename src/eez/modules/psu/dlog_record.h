@@ -25,8 +25,8 @@ namespace eez {
 namespace psu {
 namespace dlog_record {
 
-extern dlog_view::Parameters g_parameters;
-extern dlog_view::Recording g_recording;
+extern dlog_view::Parameters g_recordingParameters;
+extern dlog_view::Recording g_activeRecording;
 
 enum State {
     STATE_IDLE,
@@ -70,7 +70,9 @@ void abortAfterMassStorageError();
 void reset();
 
 void tick();
-void log(float *values, uint32_t bits = 0);
+void log(float *values);
+void logInt16(uint8_t *values, uint32_t bits = 0);
+void logInt24(uint8_t *values, uint32_t bits = 0);
 void logInvalid();
 
 void fileWrite(bool flush = false);

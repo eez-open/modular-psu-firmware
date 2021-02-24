@@ -31,6 +31,10 @@ static const uint32_t MAGIC2 = 0x474F4C44;
 
 void Parameters::initYAxis(int yAxisIndex) {
 	memcpy(&yAxes[yAxisIndex], &yAxis, sizeof(yAxis));
+	yAxes[yAxisIndex].unit = UNIT_UNKNOWN;
+	yAxes[yAxisIndex].dataType = DATA_TYPE_FLOAT;
+	yAxes[yAxisIndex].transformOffset = 0;
+	yAxes[yAxisIndex].transformScale = 1.0f;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,9 +70,15 @@ void Writer::writeFileHeaderAndMetaFields(const Parameters &parameters) {
     // meta fields
     writeStringField(FIELD_ID_COMMENT, parameters.comment);
 
+	writeUint32Field(FIELD_ID_START_TIME, parameters.startTime);
+	writeDoubleField(FIELD_ID_DURATION, parameters.finalDuration);
+	m_finalDurationFieldOffset = m_bufferIndex - 8;
+
+	writeUint8Field(FIELD_ID_DATA_CONTAINS_SAMPLE_VALIDITY_BIT, parameters.dataContainsSampleValidityBit ? 1 : 0);
+
     writeUint8Field(FIELD_ID_X_UNIT, parameters.xAxis.unit);
     writeFloatField(FIELD_ID_X_STEP, parameters.xAxis.step);
-    writeUint8Field(FIELD_ID_X_SCALE, parameters.xAxis.scale);
+    writeUint8Field(FIELD_ID_X_SCALE_TYPE, parameters.xAxis.scaleType);
     writeFloatField(FIELD_ID_X_RANGE_MIN, parameters.xAxis.range.min);
     writeFloatField(FIELD_ID_X_RANGE_MAX, parameters.xAxis.range.max);
     writeStringField(FIELD_ID_X_LABEL, parameters.xAxis.label);
@@ -80,15 +90,22 @@ void Writer::writeFileHeaderAndMetaFields(const Parameters &parameters) {
 
     if (parameters.yAxis.unit != UNIT_UNKNOWN) {
         writeUint8FieldWithIndex(FIELD_ID_Y_UNIT, parameters.yAxis.unit, 0);
+		writeUint8FieldWithIndex(FIELD_ID_Y_DATA_TYPE, parameters.yAxis.dataType, 0);
         writeFloatFieldWithIndex(FIELD_ID_Y_RANGE_MIN, parameters.yAxis.range.min, 0);
         writeFloatFieldWithIndex(FIELD_ID_Y_RANGE_MAX, parameters.yAxis.range.max, 0);
         writeStringFieldWithIndex(FIELD_ID_Y_LABEL, parameters.yAxis.label, 0);
         writeUint8FieldWithIndex(FIELD_ID_Y_CHANNEL_INDEX, 0, 0);
+		writeDoubleFieldWithIndex(FIELD_ID_Y_TRANSFORM_OFFSET, parameters.yAxis.transformOffset, 0);
+		writeDoubleFieldWithIndex(FIELD_ID_Y_TRANSFORM_SCALE, parameters.yAxis.transformScale, 0);
     }
 
     for (uint8_t yAxisIndex = 0; yAxisIndex < parameters.numYAxes; yAxisIndex++) {
         if (parameters.yAxis.unit == UNIT_UNKNOWN || parameters.yAxes[yAxisIndex].unit != parameters.yAxis.unit) {
             writeUint8FieldWithIndex(FIELD_ID_Y_UNIT, parameters.yAxes[yAxisIndex].unit, yAxisIndex + 1);
+        }
+
+        if (parameters.yAxis.unit == UNIT_UNKNOWN || parameters.yAxes[yAxisIndex].dataType != parameters.yAxis.dataType) {
+            writeUint8FieldWithIndex(FIELD_ID_Y_DATA_TYPE, parameters.yAxes[yAxisIndex].dataType, yAxisIndex + 1);
         }
 
         if (parameters.yAxis.unit == UNIT_UNKNOWN || parameters.yAxes[yAxisIndex].range.min != parameters.yAxis.range.min) {
@@ -103,15 +120,25 @@ void Writer::writeFileHeaderAndMetaFields(const Parameters &parameters) {
             writeStringFieldWithIndex(FIELD_ID_Y_LABEL, parameters.yAxes[yAxisIndex].label, yAxisIndex + 1);
         }
 
-        if (parameters.yAxis.unit == UNIT_UNKNOWN || (parameters.yAxes[yAxisIndex].channelIndex >= 0 && (uint8_t)parameters.yAxes[yAxisIndex].channelIndex < MAX_NUM_OF_CHANNELS)) {
-            writeUint8FieldWithIndex(FIELD_ID_Y_CHANNEL_INDEX, parameters.yAxes[yAxisIndex].channelIndex + 1, yAxisIndex + 1);
-            if (parameters.yAxes[yAxisIndex].channelIndex >= 0 && parameters.yAxes[yAxisIndex].unit != UNIT_BIT) {
-                writeChannelFields[parameters.yAxes[yAxisIndex].channelIndex] = true;
-            }
+		writeUint8FieldWithIndex(FIELD_ID_Y_CHANNEL_INDEX, parameters.yAxes[yAxisIndex].channelIndex + 1, yAxisIndex + 1);
+		if (
+			parameters.yAxes[yAxisIndex].channelIndex >= 0 && 
+			parameters.yAxes[yAxisIndex].channelIndex < MAX_NUM_OF_CHANNELS && 
+			parameters.yAxes[yAxisIndex].dataType == DATA_TYPE_FLOAT
+		) {
+			writeChannelFields[parameters.yAxes[yAxisIndex].channelIndex] = true;
+		}
+
+        if (parameters.yAxis.unit == UNIT_UNKNOWN || parameters.yAxes[yAxisIndex].transformOffset != parameters.yAxis.transformOffset) {
+            writeDoubleFieldWithIndex(FIELD_ID_Y_TRANSFORM_OFFSET, parameters.yAxes[yAxisIndex].transformOffset, yAxisIndex + 1);
+        }
+
+        if (parameters.yAxis.unit == UNIT_UNKNOWN || parameters.yAxes[yAxisIndex].transformScale != parameters.yAxis.transformScale) {
+            writeDoubleFieldWithIndex(FIELD_ID_Y_TRANSFORM_SCALE, parameters.yAxes[yAxisIndex].transformScale, yAxisIndex + 1);
         }
     }
 
-    writeUint8Field(FIELD_ID_Y_SCALE, parameters.yAxisScale);
+    writeUint8Field(FIELD_ID_Y_SCALE_TYPE, parameters.yAxisScaleType);
 
     for (uint8_t channelIndex = 0; channelIndex < MAX_NUM_OF_CHANNELS; channelIndex++) {
         if (writeChannelFields[channelIndex]) {
@@ -130,32 +157,9 @@ void Writer::writeFileHeaderAndMetaFields(const Parameters &parameters) {
     m_bufferIndex = m_dataOffset;
 }
 
-void Writer::writeUint8(uint8_t value) {
-    *(m_buffer + (m_bufferIndex % m_bufferSize)) = value;
-    m_bufferIndex++;
-    m_fileLength++;
-}
-
-void Writer::writeUint16(uint16_t value) {
-    writeUint8(value & 0xFF);
-    writeUint8((value >> 8) & 0xFF);
-}
-
-void Writer::writeUint32(uint32_t value) {
-    writeUint8(value & 0xFF);
-    writeUint8((value >> 8) & 0xFF);
-    writeUint8((value >> 16) & 0xFF);
-    writeUint8(value >> 24);
-}
-
-void Writer::writeFloat(float value) {
-    flushBits();
-    writeUint32(*((uint32_t *)&value));
-}
-
 void Writer::writeBit(int bit) {
     if (m_bitMask == 0) {
-        m_bitMask = 0x8000;
+        m_bitMask = 0x80;
     } else {
         m_bitMask >>= 1;
     }
@@ -167,6 +171,80 @@ void Writer::writeBit(int bit) {
     if (m_bitMask == 1) {
         flushBits();
     }
+}
+
+void Writer::writeUint8(uint8_t value) {
+    *(m_buffer + (m_bufferIndex % m_bufferSize)) = value;
+    m_bufferIndex++;
+    m_fileLength++;
+}
+
+void Writer::writeUint16(uint16_t value) {
+	auto p = (uint8_t *)&value;
+	writeUint8(*p++);
+	writeUint8(*p);
+}
+
+void Writer::writeUint32(uint32_t value) {
+	auto p = (uint8_t *)&value;
+	writeUint8(*p++);
+	writeUint8(*p++);
+	writeUint8(*p++);
+	writeUint8(*p);
+}
+
+void Writer::writeUint64(uint64_t value) {
+	auto p = (uint8_t *)&value;
+    writeUint8(*p++);
+    writeUint8(*p++);
+    writeUint8(*p++);
+    writeUint8(*p++);
+	writeUint8(*p++);
+	writeUint8(*p++);
+	writeUint8(*p++);
+	writeUint8(*p);
+}
+
+void Writer::writeFloat(float value) {
+	auto p = (uint8_t *)&value;
+    writeUint8(*p++);
+    writeUint8(*p++);
+	writeUint8(*p++);
+	writeUint8(*p);
+}
+
+void Writer::writeDouble(double value) {
+	auto p = (uint8_t *)&value;
+    writeUint8(*p++);
+    writeUint8(*p++);
+    writeUint8(*p++);
+    writeUint8(*p++);
+	writeUint8(*p++);
+	writeUint8(*p++);
+	writeUint8(*p++);
+	writeUint8(*p);
+}
+
+void Writer::writeInt16(uint8_t *value) {
+	if (value) {
+		writeUint8(*value++);
+		writeUint8(*value);
+	} else {
+		writeUint8(0);
+		writeUint8(0);
+	}
+}
+
+void Writer::writeInt24(uint8_t *value) {
+	if (value) {
+		writeUint8(*value++);
+		writeUint8(*value++);
+		writeUint8(*value);
+	} else {
+		writeUint8(0);
+		writeUint8(0);
+		writeUint8(0);
+	}
 }
 
 void Writer::writeUint8Field(uint8_t id, uint8_t value) {
@@ -195,6 +273,12 @@ void Writer::writeUint16FieldWithIndex(uint8_t id, uint16_t value, uint8_t index
     writeUint16(value);
 }
 
+void Writer::writeUint32Field(uint8_t id, uint16_t value) {
+	writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint32_t));
+	writeUint8(id);
+	writeUint32(value);
+}
+
 void Writer::writeFloatField(uint8_t id, float value) {
     writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(float));
     writeUint8(id);
@@ -206,6 +290,19 @@ void Writer::writeFloatFieldWithIndex(uint8_t id, float value, uint8_t index) {
     writeUint8(id);
     writeUint8(index);
     writeFloat(value);
+}
+
+void Writer::writeDoubleField(uint8_t id, double value) {
+    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(double));
+    writeUint8(id);
+    writeDouble(value);
+}
+
+void Writer::writeDoubleFieldWithIndex(uint8_t id, double value, uint8_t index) {
+    writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t) + sizeof(double));
+    writeUint8(id);
+    writeUint8(index);
+    writeDouble(value);
 }
 
 void Writer::writeStringField(uint8_t id, const char *str) {
@@ -227,7 +324,7 @@ void Writer::writeStringFieldWithIndex(uint8_t id, const char *str, uint8_t inde
 
 void Writer::flushBits() {
     if (m_bitMask != 0) {
-        writeUint32(m_bits);
+        writeUint8(m_bits);
         m_bits = 0;
         m_bitMask = 0;
     }
@@ -258,7 +355,7 @@ bool Reader::readFileHeaderAndMetaFields(Parameters &parameters, uint32_t &heade
 		m_columns = readUint32();
 		parameters.period = readFloat();
 		parameters.duration = readFloat();
-		readUint32(); // startTime
+		parameters.startTime = readUint32();
 
 		return true;
 	} else {
@@ -278,6 +375,11 @@ bool Reader::readFileHeaderAndMetaFields(Parameters &parameters, uint32_t &heade
 
 bool Reader::readRemainingFileHeaderAndMetaFields(Parameters &parameters) {
 	bool invalidHeader = false;
+
+	// defaults
+	parameters.startTime = 0;
+	parameters.finalDuration = 0;
+	parameters.dataContainsSampleValidityBit = 0;
 
 	while (!invalidHeader && m_offset < m_dataOffset) {
 		uint16_t fieldLength = readUint16();
@@ -304,14 +406,23 @@ bool Reader::readRemainingFileHeaderAndMetaFields(Parameters &parameters) {
 			}
 			parameters.comment[MAX_COMMENT_LENGTH] = 0;
 		}
+		else if (fieldId == FIELD_ID_START_TIME) {
+			parameters.startTime = readUint32();
+		}
+		else if (fieldId == FIELD_ID_DURATION) {
+			parameters.finalDuration = readDouble();
+		}
+		else if (fieldId == FIELD_ID_DATA_CONTAINS_SAMPLE_VALIDITY_BIT) {
+			parameters.dataContainsSampleValidityBit = readUint8();
+		}
 		else if (fieldId == FIELD_ID_X_UNIT) {
 			parameters.xAxis.unit = (Unit)readUint8();
 		}
 		else if (fieldId == FIELD_ID_X_STEP) {
 			parameters.xAxis.step = readFloat();
 		}
-		else if (fieldId == FIELD_ID_X_SCALE) {
-			parameters.xAxis.scale = (Scale)readUint8();
+		else if (fieldId == FIELD_ID_X_SCALE_TYPE) {
+			parameters.xAxis.scaleType = (ScaleType)readUint8();
 		}
 		else if (fieldId == FIELD_ID_X_RANGE_MIN) {
 			parameters.xAxis.range.min = readFloat();
@@ -329,7 +440,7 @@ bool Reader::readRemainingFileHeaderAndMetaFields(Parameters &parameters) {
 			}
 			parameters.xAxis.label[MAX_LABEL_LENGTH] = 0;
 		}
-		else if (fieldId >= FIELD_ID_Y_UNIT && fieldId <= FIELD_ID_Y_CHANNEL_INDEX) {
+		else if (fieldId >= FIELD_ID_Y_UNIT && fieldId < FIELD_ID_Y_LAST_FIELD) {
 			int8_t yAxisIndex = (int8_t)readUint8();
 			if (yAxisIndex > MAX_NUM_OF_Y_AXES) {
 				invalidHeader = true;
@@ -348,6 +459,9 @@ bool Reader::readRemainingFileHeaderAndMetaFields(Parameters &parameters) {
 
 			if (fieldId == FIELD_ID_Y_UNIT) {
 				destYAxis.unit = (Unit)readUint8();
+			}
+			else if (fieldId == FIELD_ID_Y_DATA_TYPE) {
+				destYAxis.dataType = (DataType)readUint8();
 			}
 			else if (fieldId == FIELD_ID_Y_RANGE_MIN) {
 				destYAxis.range.min = readFloat();
@@ -368,13 +482,19 @@ bool Reader::readRemainingFileHeaderAndMetaFields(Parameters &parameters) {
 			else if (fieldId == FIELD_ID_Y_CHANNEL_INDEX) {
 				destYAxis.channelIndex = (int16_t)(readUint8()) - 1;
 			}
+			else if (fieldId == FIELD_ID_Y_TRANSFORM_OFFSET) {
+				destYAxis.transformOffset = readDouble();
+			}
+			else if (fieldId == FIELD_ID_Y_TRANSFORM_SCALE) {
+				destYAxis.transformScale = readDouble();
+			}
 			else {
 				// unknown field, skip
 				m_offset += fieldDataLength;
 			}
 		}
-		else if (fieldId == FIELD_ID_Y_SCALE) {
-			parameters.yAxisScale = (Scale)readUint8();
+		else if (fieldId == FIELD_ID_Y_SCALE_TYPE) {
+			parameters.yAxisScaleType = (ScaleType)readUint8();
 		}
 		else if (fieldId == FIELD_ID_CHANNEL_MODULE_TYPE) {
 			uint8_t channelIndex = readUint8(); // channel index
@@ -423,6 +543,24 @@ uint32_t Reader::readUint32() {
 float Reader::readFloat() {
 	uint32_t value = readUint32();
 	return *((float *)&value);
+}
+
+double Reader::readDouble() {
+	double result;
+	uint8_t *p = (uint8_t *)&result;
+	uint8_t *q = m_buffer + m_offset;
+	m_offset += 8;
+
+	*p++ = *q++;
+	*p++ = *q++;
+	*p++ = *q++;
+	*p++ = *q++;
+	*p++ = *q++;
+	*p++ = *q++;
+	*p++ = *q++;
+	*p = *q;
+
+	return result;
 }
 
 } // namespace dlog_file

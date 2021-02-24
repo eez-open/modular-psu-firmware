@@ -57,7 +57,8 @@ static State g_state;
 static uint32_t g_loadingStartTickCount;
 bool g_showLatest = true;
 char g_filePath[MAX_PATH_LENGTH + 1];
-Recording g_recording;
+static Recording g_dlogFile;
+static uint32_t g_refreshCounter;
 
 struct CacheBlock {
     unsigned valid: 1;
@@ -290,12 +291,12 @@ State getState() {
     return g_state;
 }
 
-inline BlockElement *getCacheBlock(unsigned blockIndex) {
+static inline BlockElement *getCacheBlock(unsigned blockIndex) {
     return (BlockElement *)(FILE_VIEW_BUFFER + NUM_BLOCKS * sizeof(CacheBlock) + blockIndex * BLOCK_SIZE);
 }
 
-inline unsigned getNumElementsPerRow() {
-    return MIN(g_recording.parameters.numYAxes, MAX_NUM_OF_Y_VALUES);
+static inline unsigned getNumElementsPerRow() {
+    return MIN(g_dlogFile.parameters.numYAxes, MAX_NUM_OF_Y_VALUES);
 }
 
 void invalidateAllBlocks() {
@@ -310,9 +311,40 @@ void invalidateAllBlocks() {
     }
 }
 
+bool isValidSample(Recording &recording, uint8_t *rowData) {
+	return !recording.parameters.dataContainsSampleValidityBit|| rowData[0] & 0x80;
+}
+
+float getSample(Recording &recording, uint8_t *rowData, unsigned columnIndex) {
+    float value;
+    auto &yAxis = recording.parameters.yAxes[columnIndex];
+    auto dataType = yAxis.dataType;
+    uint32_t columnDataIndex = recording.columnDataIndexes[columnIndex];
+    auto columnData = rowData + columnDataIndex;
+    if (dataType == dlog_file::DATA_TYPE_BIT) {
+        value = *columnData & recording.columnBitMask[columnIndex] ? 1.0f : 0.0f;
+    } else if (dataType == dlog_file::DATA_TYPE_INT16_BE) {
+        auto iValue = int16_t((columnData[0] << 8) | columnData[1]);
+        value = float(yAxis.transformOffset + yAxis.transformScale * iValue);
+    } else if (dataType == dlog_file::DATA_TYPE_INT24_BE) {
+        auto iValue = ((int32_t)((columnData[0] << 24) | (columnData[1] << 16) | (columnData[2] << 8))) >> 8;
+        value = float(yAxis.transformOffset + yAxis.transformScale * iValue);
+    } else if (yAxis.dataType == dlog_file::DATA_TYPE_FLOAT) {
+        uint8_t *p = (uint8_t *)&value;
+        *p++ = *columnData++;
+        *p++ = *columnData++;
+        *p++ = *columnData++;
+        *p = *columnData;
+    } else {
+        assert(false);
+        value = NAN;
+    }
+    return value;
+}
+
 void loadBlock() {
     static const int NUM_VALUES_ROWS = 16;
-    float values[18 * NUM_VALUES_ROWS];
+    uint8_t values[dlog_file::MAX_NUM_OF_Y_AXES * NUM_VALUES_ROWS * sizeof(double)];
 
     auto numSamplesPerValue = (unsigned)round(g_loadScale);
     if (numSamplesPerValue > 0) {
@@ -327,15 +359,10 @@ void loadBlock() {
             uint32_t i = g_cacheBlocks[g_blockIndexToLoad].loadedValues;
             while (i < NUM_ELEMENTS_PER_BLOCKS) {
                 auto offset = (uint32_t)roundf(
-                    (g_blockIndexToLoad * NUM_ELEMENTS_PER_BLOCKS + i) / numElementsPerRow
-                        * g_loadScale * g_recording.numFloatsPerRow
-                );
+						(g_blockIndexToLoad * NUM_ELEMENTS_PER_BLOCKS + i) / numElementsPerRow * g_loadScale
+					) * g_dlogFile.numBytesPerRow;
 
-                offset = g_recording.numFloatsPerRow * (
-                    (offset + g_recording.numFloatsPerRow - 1) / g_recording.numFloatsPerRow
-                );
-
-                size_t filePosition = g_recording.dataOffset + offset * sizeof(float);
+                size_t filePosition = g_dlogFile.dataOffset + offset;
                 if (!file.seek(filePosition)) {
                     i = NUM_ELEMENTS_PER_BLOCKS;
                     goto closeFile;
@@ -355,7 +382,8 @@ void loadBlock() {
                         }
 
                         // read up to NUM_VALUES_ROWS
-                        uint32_t bytesToRead = MIN(NUM_VALUES_ROWS, numSamplesPerValue - j) * g_recording.numFloatsPerRow * sizeof(float);
+                        uint32_t bytesToRead = MIN(NUM_VALUES_ROWS, numSamplesPerValue - j) * g_dlogFile.numBytesPerRow;
+                        assert(bytesToRead <= sizeof(values));
                         uint32_t bytesRead = file.read(values, bytesToRead);
                         if (bytesToRead != bytesRead) {
                             i = NUM_ELEMENTS_PER_BLOCKS;
@@ -365,40 +393,29 @@ void loadBlock() {
                         totalBytesRead += bytesRead;
                     }
 
-					unsigned valuesOffset = valuesRow * g_recording.numFloatsPerRow;
+					unsigned valuesOffset = valuesRow * g_dlogFile.numBytesPerRow;
+					uint8_t *rowData = values + valuesOffset;
 
-                    uint32_t bitMask = 0;
-                    uint32_t bits = 0;
-                    uint32_t m = 0;
-
-                    for (unsigned k = 0; k < numElementsPerRow; k++) {
-                        BlockElement *blockElement = blockElements + i++;
-
-                        float value;
-
-                        auto &yAxis = g_recording.parameters.yAxes[k];
-                        if (yAxis.unit == UNIT_BIT) {
-                            if (bitMask == 0) {
-                                bits = *(uint32_t *)&values[valuesOffset + m++];
-                                bitMask = 0x4000;
-                            } else {
-                                bitMask >>= 1;
-                            }
-
-                            value = bits & 0x8000 ? ((bits & bitMask) ? 1.0f : 0.0f) : NAN;
-                        } else {
-                            bitMask = 0;
-                            value = values[valuesOffset + m++];
-                        }
-
-                        if (j == 0) {
-                            blockElement->min = blockElement->max = value;
-                        } else if (value < blockElement->min) {
-                            blockElement->min = value;
-                        } else if (value > blockElement->max) {
-                            blockElement->max = value;
-                        }
-                    }
+					if (isValidSample(g_dlogFile, rowData)) {
+						for (unsigned columnIndex = 0; columnIndex < numElementsPerRow; columnIndex++) {
+							float value = getSample(g_dlogFile, rowData, columnIndex);
+							BlockElement *blockElement = blockElements + i++;
+							if (j == 0) {
+								blockElement->min = blockElement->max = value;
+							} else if (value < blockElement->min) {
+								blockElement->min = value;
+							} else if (value > blockElement->max) {
+								blockElement->max = value;
+							}
+						}
+					} else {
+						for (unsigned columnIndex = 0; columnIndex < numElementsPerRow; columnIndex++) {
+							BlockElement *blockElement = blockElements + i++;
+							if (j == 0) {
+								blockElement->min = blockElement->max = NAN;
+							}
+						}
+					}
                 }
 
                 if (totalBytesRead > NUM_ELEMENTS_PER_BLOCKS * sizeof(BlockElement)) {
@@ -438,12 +455,12 @@ void stateManagment() {
     g_wasExecuting = isExecuting;
 
     if (g_refreshed) {
-        ++g_recording.refreshCounter;
+        ++g_refreshCounter;
         g_refreshed = false;
     }
 }
 
-float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
+static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
     uint32_t blockElementAddress = (rowIndex * getNumElementsPerRow() + columnIndex) * sizeof(BlockElement);
 
     uint32_t blockIndex = blockElementAddress / BLOCK_SIZE;
@@ -468,7 +485,7 @@ float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
         g_isLoading = true;
         g_interruptLoading = false;
         g_blockIndexToLoad = blockIndex;
-        g_loadScale = g_recording.xAxisDiv / g_recording.xAxisDivMin;
+        g_loadScale = g_dlogFile.xAxisDiv / g_dlogFile.xAxisDivMin;
 
         sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_LOAD_BLOCK);
     }
@@ -477,8 +494,8 @@ float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
 
     BlockElement *blockElement = blockElements + blockElementIndex;
 
-    if (g_recording.parameters.yAxisScale == dlog_file::SCALE_LOGARITHMIC) {
-        float logOffset = 1 - g_recording.parameters.yAxes[columnIndex].range.min;
+    if (g_dlogFile.parameters.yAxisScaleType == dlog_file::SCALE_LOGARITHMIC) {
+        float logOffset = 1 - g_dlogFile.parameters.yAxes[columnIndex].range.min;
         *max = log10f(logOffset + blockElement->max);
         return log10f(logOffset + blockElement->min);
     }
@@ -488,11 +505,11 @@ float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
 }
 
 static float getDuration(Recording &recording) {
-	if (&recording == &g_recording) {
+	if (&recording == &g_dlogFile) {
 		return (recording.numSamples - 1) * recording.parameters.xAxis.step;
 	}
 
-	return recording.size > 0 ? (recording.size - 1) * dlog_record::g_parameters.period : 0;
+	return recording.size > 0 ? (recording.size - 1) * dlog_record::g_recordingParameters.period : 0;
 }
 
 void adjustXAxisOffset(Recording &recording) {
@@ -505,16 +522,16 @@ void adjustXAxisOffset(Recording &recording) {
     }
 }
 
-Unit getXAxisUnit(Recording& recording) {
-    return recording.parameters.xAxis.scale == dlog_file::SCALE_LINEAR ? recording.parameters.xAxis.unit : UNIT_UNKNOWN;
+static Unit getXAxisUnit(Recording& recording) {
+    return recording.parameters.xAxis.scaleType == dlog_file::SCALE_LINEAR ? recording.parameters.xAxis.unit : UNIT_UNKNOWN;
 }
 
-Unit getYAxisUnit(Recording& recording, int dlogValueIndex) {
-    return recording.parameters.yAxisScale == dlog_file::SCALE_LINEAR ? recording.parameters.yAxes[dlogValueIndex].unit : UNIT_UNKNOWN;
+static Unit getYAxisUnit(Recording& recording, int dlogValueIndex) {
+    return recording.parameters.yAxisScaleType == dlog_file::SCALE_LINEAR ? recording.parameters.yAxes[dlogValueIndex].unit : UNIT_UNKNOWN;
 }
 
-uint32_t getPosition(Recording& recording) {
-    if (&recording == &dlog_record::g_recording) {
+static uint32_t getPosition(Recording& recording) {
+    if (&recording == &dlog_record::g_activeRecording) {
         return recording.size > recording.pageSize ? recording.size - recording.pageSize : 0;
     } else {
         float position = recording.xAxisOffset / recording.parameters.period;
@@ -528,8 +545,8 @@ uint32_t getPosition(Recording& recording) {
     }
 }
 
-void changeXAxisOffset(Recording &recording, float xAxisOffset) {
-    if (&g_recording == &recording) {
+static void changeXAxisOffset(Recording &recording, float xAxisOffset) {
+    if (&g_dlogFile == &recording) {
         float newXAxisOffset = xAxisOffset;
         if (newXAxisOffset != recording.xAxisOffset) {
             recording.xAxisOffset = newXAxisOffset;
@@ -540,7 +557,7 @@ void changeXAxisOffset(Recording &recording, float xAxisOffset) {
     }
 }
 
-void changeXAxisDiv(Recording &recording, float xAxisDiv) {
+static void changeXAxisDiv(Recording &recording, float xAxisDiv) {
     if (recording.xAxisDiv != xAxisDiv) {
         recording.xAxisDiv = xAxisDiv;
 
@@ -577,69 +594,12 @@ void getLabel(Recording& recording, int valueIndex, char *text, int count) {
     }
 }
 
-void initAxis(Recording &recording) {
-    recording.parameters.xAxis.unit = UNIT_SECOND;
-    recording.parameters.xAxis.step = recording.parameters.period;
-    recording.parameters.xAxis.range.min = 0;
-    recording.parameters.xAxis.range.max = recording.parameters.duration;
-
-    for (int8_t dlogItemIndex = 0; dlogItemIndex < recording.parameters.numDlogItems; ++dlogItemIndex) {
-        auto &dlogItem = recording.parameters.dlogItems[dlogItemIndex];
-        auto &yAxis = recording.parameters.yAxes[dlogItemIndex];
-        if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
-            yAxis.unit = UNIT_VOLT;
-            if (dlogItem.slotIndex != 255) {
-                yAxis.range.min = channel_dispatcher::getUMin(dlogItem.slotIndex, dlogItem.subchannelIndex);
-                yAxis.range.max = channel_dispatcher::getUMax(dlogItem.slotIndex, dlogItem.subchannelIndex);
-                Channel *channel = Channel::getBySlotIndex(dlogItem.slotIndex, dlogItem.subchannelIndex);
-                yAxis.channelIndex = channel ? channel->channelIndex : -1;
-            } else {
-                yAxis.range.min = 0;
-                yAxis.range.max = 40.0f;
-                yAxis.channelIndex = dlogItem.subchannelIndex;
-            }
-        } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_I) {
-            yAxis.unit = UNIT_AMPER;
-            if (dlogItem.slotIndex != 255) {
-                yAxis.range.min = channel_dispatcher::getIMin(dlogItem.slotIndex, dlogItem.subchannelIndex);
-                yAxis.range.max = channel_dispatcher::getIMaxLimit(dlogItem.slotIndex, dlogItem.subchannelIndex);
-                Channel *channel = Channel::getBySlotIndex(dlogItem.slotIndex, dlogItem.subchannelIndex);
-                yAxis.channelIndex = channel ? channel->channelIndex : -1;
-            } else {
-                yAxis.range.min = 0;
-                yAxis.range.max = 5.0f;
-                yAxis.channelIndex = dlogItem.subchannelIndex;
-            }
-        } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_P) {
-            yAxis.unit = UNIT_WATT;
-            if (dlogItem.slotIndex != 255) {
-                Channel *channel = Channel::getBySlotIndex(dlogItem.slotIndex, dlogItem.subchannelIndex);
-                yAxis.range.min = channel_dispatcher::getPowerMinLimit(*channel);
-                yAxis.range.max = channel_dispatcher::getPowerMaxLimit(*channel);
-                yAxis.channelIndex = channel->channelIndex;
-            } else {
-                yAxis.range.min = 0;
-                yAxis.range.max = 200.0f;
-                yAxis.channelIndex = dlogItem.subchannelIndex;
-            }
-        } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
-            yAxis.unit = UNIT_BIT;
-            yAxis.range.min = 0;
-            yAxis.range.max = 1;
-            yAxis.channelIndex = dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0;
-        }
-        stringCopy(yAxis.label, sizeof(yAxis.label), g_slots[dlogItem.slotIndex]->getDlogResourceLabel(dlogItem.subchannelIndex, dlogItem.resourceIndex));
-    }
-
-    recording.parameters.numYAxes = recording.parameters.numDlogItems;
-}
-
 void initDlogValues(Recording &recording) {
     uint8_t yAxisIndex;
 
     int numBitValues = 0;
     for (yAxisIndex = 0; yAxisIndex < MIN(recording.parameters.numYAxes, MAX_NUM_OF_Y_VALUES); yAxisIndex++) {
-        if (recording.parameters.yAxes[yAxisIndex].unit == UNIT_BIT) {
+        if (recording.parameters.yAxes[yAxisIndex].dataType == dlog_file::DATA_TYPE_BIT) {
             numBitValues++;
         }
     }
@@ -652,12 +612,12 @@ void initDlogValues(Recording &recording) {
         float rangeMin = recording.parameters.yAxes[yAxisIndex].range.min;
         float rangeMax = recording.parameters.yAxes[yAxisIndex].range.max;
 
-        if (recording.parameters.yAxes[yAxisIndex].unit == UNIT_BIT) {
+        if (recording.parameters.yAxes[yAxisIndex].dataType == dlog_file::DATA_TYPE_BIT) {
             float numDivisions = 1.0f * NUM_VERT_DIVISIONS / numBitValues;
             recording.dlogValues[yAxisIndex].div = 1.1f / numDivisions;
             recording.dlogValues[yAxisIndex].offset = recording.dlogValues[yAxisIndex].div * (NUM_VERT_DIVISIONS / 2 - (bitValueIndex++ + 1) * numDivisions);
         } else {
-            if (recording.parameters.yAxisScale == dlog_file::SCALE_LOGARITHMIC) {
+            if (recording.parameters.yAxisScaleType == dlog_file::SCALE_LOGARITHMIC) {
                 float logOffset = 1 - rangeMin;
                 rangeMin = 0;
                 rangeMax = log10f(logOffset + rangeMax);
@@ -677,45 +637,58 @@ void initDlogValues(Recording &recording) {
 }
 
 void calcColumnIndexes(Recording &recording) {
-    uint32_t columnIndex = 0;
+    uint32_t columnDataIndex = 0;
     uint32_t bitMask = 0;
+
+    if (recording.parameters.dataContainsSampleValidityBit) {
+        bitMask = 0x80;
+    }
 
     for (int yAxisIndex = 0; yAxisIndex < recording.parameters.numYAxes; yAxisIndex++) {
         auto &yAxis = recording.parameters.yAxes[yAxisIndex];
         
-        if (yAxis.unit == UNIT_BIT) {
+        if (yAxis.dataType == dlog_file::DATA_TYPE_BIT) {
             if (bitMask == 0) {
-                bitMask = 0x4000;
+                bitMask = 0x80;
             } else {
                 bitMask >>= 1;
             }
 
-            recording.columnFloatIndexes[yAxisIndex] = columnIndex;
+            recording.columnDataIndexes[yAxisIndex] = columnDataIndex;
+            recording.columnBitMask[yAxisIndex] = bitMask;
 
             if (bitMask == 1) {
-                columnIndex++;
+                columnDataIndex += 1;
                 bitMask = 0;
             }
         } else {
             if (bitMask != 0) {
-                columnIndex++;
+                columnDataIndex += 1;
                 bitMask = 0;
             }
 
-            recording.columnFloatIndexes[yAxisIndex] = columnIndex;
+            recording.columnDataIndexes[yAxisIndex] = columnDataIndex;
 
-            columnIndex++;
+            if (yAxis.dataType == dlog_file::DATA_TYPE_INT16_BE) {
+                columnDataIndex += 2;
+            } else if (yAxis.dataType == dlog_file::DATA_TYPE_INT24_BE) {
+                columnDataIndex += 3;
+            } else if (yAxis.dataType == dlog_file::DATA_TYPE_FLOAT) {
+                columnDataIndex += 4;
+            } else {
+                assert(false);
+            }
         }
     }
 
     if (bitMask != 0) {
-        columnIndex++;
+        columnDataIndex += 1;
     }
 
-    recording.numFloatsPerRow = columnIndex;
+    recording.numBytesPerRow = columnDataIndex;
 }
 
-int getNumVisibleDlogValues(const Recording &recording) {
+static int getNumVisibleDlogValues(const Recording &recording) {
     int count = 0;
     for (int dlogValueIndex = 0; dlogValueIndex < MAX_NUM_OF_Y_VALUES; dlogValueIndex++) {
         if (recording.dlogValues[dlogValueIndex].isVisible) {
@@ -738,7 +711,7 @@ int getDlogValueIndex(Recording &recording, int visibleDlogValueIndex) {
     return -1;
 }
 
-int getVisibleDlogValueIndex(Recording &recording, int fromDlogValueIndex) {
+static int getVisibleDlogValueIndex(Recording &recording, int fromDlogValueIndex) {
     int visibleDlogValueIndex = 0;
     for (int dlogValueIndex = 0; dlogValueIndex < MAX_NUM_OF_Y_VALUES; dlogValueIndex++) {
         if (dlogValueIndex == fromDlogValueIndex) {
@@ -751,7 +724,7 @@ int getVisibleDlogValueIndex(Recording &recording, int fromDlogValueIndex) {
     return -1;
 }
 
-DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex) {
+static DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex) {
     int dlogValueIndex = getDlogValueIndex(recording, visibleDlogValueIndex);
     if (dlogValueIndex != -1) {
         return &recording.dlogValues[dlogValueIndex];
@@ -775,7 +748,7 @@ bool isMulipleValuesOverlayHeuristic(Recording &recording) {
     return false;
 }
 
-void autoScale(Recording &recording) {
+static void autoScale(Recording &recording) {
     auto numVisibleDlogValues = getNumVisibleDlogValues(recording);
 
     for (auto visibleDlogValueIndex = 0; visibleDlogValueIndex < numVisibleDlogValues; visibleDlogValueIndex++) {
@@ -787,13 +760,13 @@ void autoScale(Recording &recording) {
         float rangeMin = recording.parameters.yAxes[dlogValueIndex].range.min;
         float rangeMax = recording.parameters.yAxes[dlogValueIndex].range.max;
 
-        if (recording.parameters.yAxisScale == dlog_file::SCALE_LOGARITHMIC) {
+        if (recording.parameters.yAxisScaleType == dlog_file::SCALE_LOGARITHMIC) {
             float logOffset = 1 - rangeMin;
             rangeMin = 0;
             rangeMax = log10f(logOffset + rangeMax);
         }
 
-        if (recording.parameters.yAxes[dlogValueIndex].unit == UNIT_BIT) {
+        if (recording.parameters.yAxes[dlogValueIndex].dataType == dlog_file::DATA_TYPE_BIT) {
             dlogValueParams.div = 1.1f / numDivisions;
             dlogValueParams.offset = dlogValueParams.div * (NUM_VERT_DIVISIONS / 2 - (visibleDlogValueIndex + 1) * numDivisions);
         } else {
@@ -803,7 +776,7 @@ void autoScale(Recording &recording) {
     }
 }
 
-void scaleToFit(Recording &recording) {
+static void scaleToFit(Recording &recording) {
     auto numVisibleDlogValues = getNumVisibleDlogValues(recording);
     auto startPosition = getPosition(recording);
 
@@ -842,7 +815,7 @@ bool openFile(const char *filePath, int *err) {
 		stringCopy(g_filePath, sizeof(g_filePath), filePath);
 	}
 
-    memset(&g_recording, 0, sizeof(Recording));
+    memset(&g_dlogFile, 0, sizeof(Recording));
 
     if (!isLowPriorityThread()) {
         sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_SHOW_FILE);
@@ -857,26 +830,62 @@ bool openFile(const char *filePath, int *err) {
 			dlog_file::Reader reader(buffer);
 		
 			uint32_t headerRemaining;
-			bool result = reader.readFileHeaderAndMetaFields(g_recording.parameters, headerRemaining);
+			bool result = reader.readFileHeaderAndMetaFields(g_dlogFile.parameters, headerRemaining);
 			if (result) {
 				if (reader.getVersion() == dlog_file::VERSION1) {
 					uint32_t columns = reader.getColumns();
 
 					for (int channelIndex = 0; channelIndex < CH_MAX; ++channelIndex) {
 						if (columns & (1 << (4 * channelIndex))) {
-							g_recording.parameters.enableDlogItem(255, channelIndex, 0, true);
+							g_dlogFile.parameters.enableDlogItem(255, channelIndex, 0, true);
 						}
 
 						if (columns & (2 << (4 * channelIndex))) {
-							g_recording.parameters.enableDlogItem(255, channelIndex, 1, true);
+							g_dlogFile.parameters.enableDlogItem(255, channelIndex, 1, true);
 						}
 
 						if (columns & (4 << (4 * channelIndex))) {
-							g_recording.parameters.enableDlogItem(255, channelIndex, 2, true);
+							g_dlogFile.parameters.enableDlogItem(255, channelIndex, 2, true);
 						}
 					}
 
-					initAxis(g_recording);
+                    auto initAxis = [] () {
+                        Recording &recording = g_dlogFile;
+
+                        recording.parameters.xAxis.unit = UNIT_SECOND;
+                        recording.parameters.xAxis.step = recording.parameters.period;
+                        recording.parameters.xAxis.range.min = 0;
+                        recording.parameters.xAxis.range.max = recording.parameters.duration;
+
+                        for (int8_t dlogItemIndex = 0; dlogItemIndex < recording.parameters.numDlogItems; ++dlogItemIndex) {
+                            auto &dlogItem = recording.parameters.dlogItems[dlogItemIndex];
+                            auto &yAxis = recording.parameters.yAxes[dlogItemIndex];
+                            if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
+                                yAxis.unit = UNIT_VOLT;
+                                yAxis.dataType = dlog_file::DATA_TYPE_FLOAT;
+                                yAxis.range.min = 0;
+                                yAxis.range.max = 40.0f;
+                                yAxis.channelIndex = dlogItem.subchannelIndex;
+                            } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_I) {
+                                yAxis.unit = UNIT_AMPER;
+                                yAxis.dataType = dlog_file::DATA_TYPE_FLOAT;
+                                yAxis.range.min = 0;
+                                yAxis.range.max = 5.0f;
+                                yAxis.channelIndex = dlogItem.subchannelIndex;
+                            } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_P) {
+                                yAxis.unit = UNIT_WATT;
+                                yAxis.dataType = dlog_file::DATA_TYPE_FLOAT;
+                                yAxis.range.min = 0;
+                                yAxis.range.max = 200.0f;
+                                yAxis.channelIndex = dlogItem.subchannelIndex;
+                            }
+							*yAxis.label = 0;
+                        }
+
+                        recording.parameters.numYAxes = recording.parameters.numDlogItems;
+					};
+
+					initAxis();
 				}
 				else {
 					if (headerRemaining > 0) {
@@ -887,34 +896,34 @@ bool openFile(const char *filePath, int *err) {
 					}
 
 					if (result)	{
-						result = reader.readRemainingFileHeaderAndMetaFields(g_recording.parameters);
+						result = reader.readRemainingFileHeaderAndMetaFields(g_dlogFile.parameters);
 					}
 				}
 
 				if (result) {
-					g_recording.dataOffset = reader.getDataOffset();
+					g_dlogFile.dataOffset = reader.getDataOffset();
 
-					initDlogValues(g_recording);
-					calcColumnIndexes(g_recording);
+					initDlogValues(g_dlogFile);
+					calcColumnIndexes(g_dlogFile);
 
-					g_recording.pageSize = VIEW_WIDTH;
+					g_dlogFile.pageSize = VIEW_WIDTH;
 
-					g_recording.numSamples = (file.size() - g_recording.dataOffset) / (g_recording.numFloatsPerRow * sizeof(float));
-					g_recording.xAxisDivMin = g_recording.pageSize * g_recording.parameters.period / NUM_HORZ_DIVISIONS;
-					g_recording.xAxisDivMax = MAX(g_recording.numSamples, g_recording.pageSize) * g_recording.parameters.period / NUM_HORZ_DIVISIONS;
+					g_dlogFile.numSamples = (file.size() - g_dlogFile.dataOffset) / g_dlogFile.numBytesPerRow;
+					g_dlogFile.xAxisDivMin = g_dlogFile.pageSize * g_dlogFile.parameters.period / NUM_HORZ_DIVISIONS;
+					g_dlogFile.xAxisDivMax = MAX(g_dlogFile.numSamples, g_dlogFile.pageSize) * g_dlogFile.parameters.period / NUM_HORZ_DIVISIONS;
 
-					g_recording.size = g_recording.numSamples;
+					g_dlogFile.size = g_dlogFile.numSamples;
 
-					g_recording.xAxisOffset = 0.0f;
-					g_recording.xAxisDiv = g_recording.xAxisDivMin;
+					g_dlogFile.xAxisOffset = 0.0f;
+					g_dlogFile.xAxisDiv = g_dlogFile.xAxisDivMin;
 
-					g_recording.cursorOffset = VIEW_WIDTH / 2;
+					g_dlogFile.cursorOffset = VIEW_WIDTH / 2;
 
-					g_recording.getValue = getValue;
+					g_dlogFile.getValue = getValue;
 					g_isLoading = false;
 
-					if (isMulipleValuesOverlayHeuristic(g_recording)) {
-						autoScale(g_recording);
+					if (isMulipleValuesOverlayHeuristic(g_dlogFile)) {
+						autoScale(g_dlogFile);
 					}
 
 					g_state = STATE_READY;
@@ -945,7 +954,7 @@ bool openFile(const char *filePath, int *err) {
 }
 
 Recording &getRecording() {
-    return g_showLatest && g_wasExecuting ? dlog_record::g_recording : g_recording;
+    return g_showLatest && g_wasExecuting ? dlog_record::g_activeRecording : g_dlogFile;
 }
 
 float roundValue(float value) {
@@ -998,8 +1007,8 @@ public:
     void pageAlloc() {
         g_numDlogResources = countDlogResources();
 
-        memcpy(&g_parameters, &dlog_record::g_parameters, sizeof(Parameters));
-        memcpy(&g_parametersOrig, &dlog_record::g_parameters, sizeof(Parameters));
+        memcpy(&g_parameters, &dlog_record::g_recordingParameters, sizeof(Parameters));
+        memcpy(&g_parametersOrig, &dlog_record::g_recordingParameters, sizeof(Parameters));
 
 		g_minPeriod = getMinPeriod();
     }
@@ -1011,7 +1020,7 @@ public:
     void set() {
         gui::popPage();
 
-        memcpy(&dlog_record::g_parameters, &DlogParamsPage::g_parameters, sizeof(DlogParamsPage::g_parameters));
+        memcpy(&dlog_record::g_recordingParameters, &DlogParamsPage::g_parameters, sizeof(DlogParamsPage::g_parameters));
     }
 
     void start() {
@@ -1107,9 +1116,9 @@ public:
 
         gui::popPage();
 
-        memcpy(&dlog_record::g_parameters, &DlogParamsPage::g_parameters, sizeof(DlogParamsPage::g_parameters));
+        memcpy(&dlog_record::g_recordingParameters, &DlogParamsPage::g_parameters, sizeof(DlogParamsPage::g_parameters));
 
-        stringCopy(dlog_record::g_parameters.filePath, sizeof(dlog_record::g_parameters.filePath), filePath);
+        stringCopy(dlog_record::g_recordingParameters.filePath, sizeof(dlog_record::g_recordingParameters.filePath), filePath);
 
         dlog_record::toggleStart();
     }
@@ -1277,7 +1286,7 @@ void data_dlog_toggle_state(DataOperationEnum operation, Cursor cursor, Value &v
             value = 0;
         } else if (dlog_record::isExecuting()) {
             value = 1;
-        } else if (dlog_record::isInitiated() && dlog_record::g_parameters.triggerSource == trigger::SOURCE_MANUAL) {
+        } else if (dlog_record::isInitiated() && dlog_record::g_recordingParameters.triggerSource == trigger::SOURCE_MANUAL) {
             value = 2;
         } else {
             value = 3;
@@ -1587,7 +1596,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     auto &recording = dlog_view::getRecording();
 
     if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
-        value = Value(recording.refreshCounter, VALUE_TYPE_UINT32);
+        value = Value(g_refreshCounter, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC) {
         value = recording.getValue;
     } else if (operation == DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE) {
@@ -1641,7 +1650,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
         value = Value(recording.parameters.period, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE) {
-        value = &recording != &dlog_record::g_recording;
+        value = &recording != &dlog_record::g_activeRecording;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET) {
         value = Value(recording.cursorOffset, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_TOUCH_DRAG) {
@@ -1716,7 +1725,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
         }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE) {
         float xValue = (dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period;
-        if (recording.parameters.xAxis.scale == dlog_file::SCALE_LOGARITHMIC) {
+        if (recording.parameters.xAxis.scaleType == dlog_file::SCALE_LOGARITHMIC) {
             xValue = powf(10, recording.parameters.xAxis.range.min + xValue);
         }
         value = Value(roundPrec(xValue, 0.001f), recording.parameters.xAxis.unit);
@@ -2047,7 +2056,7 @@ void data_dlog_x_axis_max_value(DataOperationEnum operation, Cursor cursor, Valu
 
         float maxValue = dlog_view::getDuration(recording);
 
-        if (recording.parameters.xAxis.scale == dlog_file::SCALE_LOGARITHMIC) {
+        if (recording.parameters.xAxis.scaleType == dlog_file::SCALE_LOGARITHMIC) {
             maxValue = powf(10, recording.parameters.xAxis.range.min + maxValue);
         }
 
@@ -2076,7 +2085,7 @@ void data_dlog_visible_value_cursor(DataOperationEnum operation, Cursor cursor, 
         float max;
         float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex, &max);
         float cursorValue = (min + max) / 2;
-        if (recording.parameters.yAxisScale == dlog_file::SCALE_LOGARITHMIC) {
+        if (recording.parameters.yAxisScaleType == dlog_file::SCALE_LOGARITHMIC) {
             float logOffset = 1 - recording.parameters.yAxes[dlogValueIndex].range.min;
             cursorValue = powf(10, cursorValue) - logOffset;
         }

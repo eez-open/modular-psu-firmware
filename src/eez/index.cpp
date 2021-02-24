@@ -785,6 +785,18 @@ DlogResourceType Module::getDlogResourceType(int subchannelIndex, int resourceIn
     return DLOG_RESOURCE_TYPE_NONE;
 }
 
+dlog_file::DataType Module::getDlogResourceDataType(int subchannelIndex, int resourceIndex) {
+    return dlog_file::DATA_TYPE_FLOAT;
+}
+
+double Module::getDlogResourceTransformOffset(int subchannelIndex, int resourceIndex) {
+    return 1.0;
+}
+
+double Module::getDlogResourceTransformScale(int subchannelIndex, int resourceIndex) {
+    return 1.0;
+}
+
 const char *Module::getDlogResourceLabel(int subchannelIndex, int resourceIndex) {
     return "";
 }

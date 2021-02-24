@@ -169,11 +169,11 @@ mp_obj_t modeez_dlogTraceData(size_t n_args, const mp_obj_t *args) {
         mp_obj_get_array(args[0], &n_args, (mp_obj_t **)&args);
     }
 
-    if (n_args < dlog_record::g_recording.parameters.numYAxes) {
+    if (n_args < dlog_record::g_activeRecording.parameters.numYAxes) {
         mp_raise_ValueError("Too few values");
     }
 
-    if (n_args > dlog_record::g_recording.parameters.numYAxes) {
+    if (n_args > dlog_record::g_activeRecording.parameters.numYAxes) {
         mp_raise_ValueError("Too many values");
     }
 

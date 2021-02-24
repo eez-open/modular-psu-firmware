@@ -54,7 +54,9 @@ size_t uartWrite(const char *data, size_t len) {
 	g_messageAvailable = true;
 	if (g_initialized) {
         //g_txCplt = false;
+#ifdef EEZ_PLATFORM_STM32
 		HAL_UART_Transmit(PHUART, (uint8_t *)data, (uint16_t)len, 10);
+#endif
 //        while (!g_txCplt) {
 //            osDelay(1);
 //        }

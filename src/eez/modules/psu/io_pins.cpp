@@ -472,7 +472,7 @@ void setPinFunction(int pin, unsigned function) {
 
                 trigger::Source triggerSource = pin == 0 ? trigger::SOURCE_PIN1 : trigger::SOURCE_PIN2;
 
-                if (dlog_record::g_parameters.triggerSource == triggerSource) {
+                if (dlog_record::g_recordingParameters.triggerSource == triggerSource) {
                     dlog_record::setTriggerSource(trigger::SOURCE_IMMEDIATE);
                 }
 
@@ -490,15 +490,21 @@ void setPinFunction(int pin, unsigned function) {
                     trigger::setSource(trigger::SOURCE_IMMEDIATE);
                 }
 
-                if (dlog_record::g_parameters.triggerSource != triggerSource) {
+                if (dlog_record::g_recordingParameters.triggerSource != triggerSource) {
                     dlog_record::setTriggerSource(triggerSource);
                 }
             } else {
-                if ((pin == 0 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN1) || (pin == 1 && dlog_record::g_parameters.triggerSource == trigger::SOURCE_PIN2)) {
+                if (
+					(pin == 0 && dlog_record::g_recordingParameters.triggerSource == trigger::SOURCE_PIN1) ||
+					(pin == 1 && dlog_record::g_recordingParameters.triggerSource == trigger::SOURCE_PIN2)
+				) {
                     dlog_record::setTriggerSource(trigger::SOURCE_IMMEDIATE);
                 }
 
-                if ((pin == 0 && trigger::g_triggerSource == trigger::SOURCE_PIN1) || (pin == 1 && trigger::g_triggerSource == trigger::SOURCE_PIN2)) {
+                if (
+					(pin == 0 && trigger::g_triggerSource == trigger::SOURCE_PIN1) || 
+					(pin == 1 && trigger::g_triggerSource == trigger::SOURCE_PIN2)
+				) {
                     trigger::setSource(trigger::SOURCE_IMMEDIATE);
                 }
             }

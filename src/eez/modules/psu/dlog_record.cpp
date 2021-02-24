@@ -17,6 +17,7 @@
 */
 
 #include <math.h>
+#include <assert.h>
 
 #include <eez/index.h>
 #include <eez/sound.h>
@@ -69,15 +70,13 @@ enum Event {
     EVENT_RESET
 };
 
-dlog_view::Parameters g_parameters;
+dlog_view::Parameters g_recordingParameters;
 
-trigger::Source g_triggerSource = trigger::SOURCE_IMMEDIATE;
-
-dlog_view::Recording g_recording; 
+dlog_view::Recording g_activeRecording; 
 
 State g_state = STATE_IDLE;
 bool g_inStateTransition;
-int g_stateTransitionError;
+static int g_stateTransitionError;
 
 // This variable is true if data logging is initiated
 // with the SCPI command `INITiate:DLOG:TRACe`.
@@ -98,32 +97,15 @@ static uint32_t g_numSamples;
 ////////////////////////////////////////////////////////////////////////////////
 
 static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
-	auto p = DLOG_RECORD_BUFFER + (
-			g_recording.dataOffset + (
-				rowIndex * g_recording.numFloatsPerRow
-				+ g_recording.columnFloatIndexes[columnIndex]
-			) * 4
+	auto rowData = DLOG_RECORD_BUFFER + (g_activeRecording.dataOffset + 
+            rowIndex * g_activeRecording.numBytesPerRow
 		) % DLOG_RECORD_BUFFER_SIZE;
 
-    float value;
+	float value = dlog_view::isValidSample(g_activeRecording, rowData) ?
+		dlog_view::getSample(g_activeRecording, rowData, columnIndex) : NAN;
 
-    if (g_recording.parameters.yAxes[columnIndex].unit == UNIT_BIT) {
-        auto intValue = *(uint32_t*)p;
-        if (intValue & 0x8000) {
-            if (intValue & (0x4000 >> g_recording.parameters.yAxes[columnIndex].channelIndex)) {
-                value = 1.0f;
-            } else {
-                value = 0.0f;
-            }
-        } else {
-            value = NAN;
-        }
-	} else {
-		value = *(float *)p;
-	}
-
-    if (g_recording.parameters.yAxisScale == dlog_file::SCALE_LOGARITHMIC) {
-        float logOffset = 1 - g_recording.parameters.yAxes[columnIndex].range.min;
+    if (g_activeRecording.parameters.yAxisScaleType == dlog_file::SCALE_LOGARITHMIC) {
+        float logOffset = 1 - g_activeRecording.parameters.yAxes[columnIndex].range.min;
         value = log10f(logOffset + value);
     }
 
@@ -136,7 +118,7 @@ static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
 static File file;
 
 static int fileTruncate() {
-    if (!file.open(g_parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+    if (!file.open(g_recordingParameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
         event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_OPEN_ERROR);
         // TODO replace with more specific error
         return SCPI_ERROR_MASS_STORAGE_ERROR;
@@ -163,8 +145,7 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
 //     taskENTER_CRITICAL();
 // #endif
     int32_t timeDiff = millis() - g_lastSavedBufferTickCount;
-    uint32_t alignedBufferIndex = (g_writer.getBufferIndex() / 4) * 4;
-    uint32_t indexDiff = alignedBufferIndex - g_lastSavedBufferIndex;
+    uint32_t indexDiff = g_writer.getBufferIndex() - g_lastSavedBufferIndex;
     g_debugVarBufferDiff = indexDiff;
     if (indexDiff > 0 && (flush || timeDiff >= CONF_DLOG_SYNC_FILE_TIME_MS || indexDiff >= CHUNK_SIZE)) {
         bufferSize = MIN(indexDiff, CHUNK_SIZE);
@@ -229,7 +210,7 @@ void fileWrite(bool flush) {
         int err = 0;
 
         // File file;
-        // if (file.open(g_recording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+        // if (file.open(g_activeRecording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
         //     if (file.seek(g_lastSavedBufferIndex)) {
                 size_t written = file.write(buffer, bufferSize);
 
@@ -267,49 +248,12 @@ static void flushData() {
 
 	g_writer.flushBits();
 
-    uint32_t timeout = millis() + CONF_WRITE_FLUSH_TIMEOUT_MS;
+	uint32_t timeout = millis() + CONF_WRITE_FLUSH_TIMEOUT_MS;
     while (g_lastSavedBufferIndex < g_writer.getBufferIndex() && millis() < timeout) {
-        fileWrite(true);
+		fileWrite(true);
     }
 
     //DebugTrace("flush after: %d\n", g_bufferIndex - g_lastSavedBufferIndex);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-static void initRecordingStart() {
-    g_countingStarted = false;
-    g_currentTime = 0;
-    g_nextTime = 0;
-    g_lastSavedBufferIndex = 0;
-
-    memcpy(&g_recording.parameters, &g_parameters, sizeof(dlog_view::Parameters));
-
-    if (isModuleLocalRecording() || isModuleControlledRecording()) {
-        g_recording.parameters.period = dlog_view::PERIOD_MIN;
-    }
-
-    g_recording.size = 0;
-    g_recording.pageSize = 480;
-
-    g_recording.xAxisOffset = 0.0f;
-    g_recording.xAxisDiv = g_recording.pageSize * g_recording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
-
-    for (int8_t dlogItemIndex = 0; dlogItemIndex < g_recording.parameters.numDlogItems; ++dlogItemIndex) {
-        auto &dlogItem = g_recording.parameters.dlogItems[dlogItemIndex];
-        dlogItem.resourceType = g_slots[dlogItem.slotIndex]->getDlogResourceType(dlogItem.subchannelIndex, dlogItem.resourceIndex);
-    }
-
-    if (!g_traceInitiated) {
-        dlog_view::initAxis(g_recording);
-    }
-
-    dlog_view::initDlogValues(g_recording);
-    dlog_view::calcColumnIndexes(g_recording);
-
-    g_recording.getValue = getValue;
-
-    g_writer.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -362,30 +306,33 @@ static void log() {
 
     if (isModuleControlledRecording()) {
         // data is logged by module
-        if (g_currentTime >= g_recording.parameters.duration) {
+        if (g_currentTime >= g_activeRecording.parameters.duration) {
             stateTransition(EVENT_FINISH);
         }
         return;
     }
 
     while (g_currentTime >= g_nextTime) {
+        if (g_activeRecording.parameters.dataContainsSampleValidityBit) {
+            g_writer.writeBit(1); // mark as valid sample
+        }
+
         // write sample
-        for (int i = 0; i < g_recording.parameters.numDlogItems; i++) {
-            auto &dlogItem = g_recording.parameters.dlogItems[i];
+        for (int i = 0; i < g_activeRecording.parameters.numDlogItems; i++) {
+            auto &dlogItem = g_activeRecording.parameters.dlogItems[i];
             if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
+                g_writer.flushBits();
                 g_writer.writeFloat(channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
             } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_I) {
+                g_writer.flushBits();
                 g_writer.writeFloat(channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex));
             } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_P)  {
+                g_writer.flushBits();
                 g_writer.writeFloat(
                     channel_dispatcher::getUMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex) *
                     channel_dispatcher::getIMonLast(dlogItem.slotIndex, dlogItem.subchannelIndex)
                 );
-            } else  if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
-                if (g_writer.getBitMask() == 0) {
-                    g_writer.writeBit(1); // mark as valid sample
-                }                    
-
+            } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
                 uint8_t data;
                 channel_dispatcher::getDigitalInputData(dlogItem.slotIndex, dlogItem.subchannelIndex, data, nullptr);
                 if (data & (1 << (dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0))) {
@@ -398,11 +345,11 @@ static void log() {
 
         g_writer.flushBits();
 
-        ++g_recording.size;
+        ++g_activeRecording.size;
 
-        g_nextTime = ++g_iSample * g_recording.parameters.period;
+        g_nextTime = ++g_iSample * g_activeRecording.parameters.period;
         
-        if (g_nextTime > g_recording.parameters.duration) {
+        if (g_nextTime > g_activeRecording.parameters.duration) {
             stateTransition(EVENT_FINISH);
             break;
         }
@@ -412,7 +359,7 @@ static void log() {
 static int doStartImmediately() {
     int err;
 
-    err = checkDlogParameters(g_parameters, false, g_traceInitiated);
+    err = checkDlogParameters(g_recordingParameters, false, g_traceInitiated);
     if (err != SCPI_RES_OK) {
         return err;
     }
@@ -424,21 +371,108 @@ static int doStartImmediately() {
         }
     }
 
-    initRecordingStart();
+    g_countingStarted = false;
+    g_currentTime = 0;
+    g_nextTime = 0;
+    g_lastSavedBufferIndex = 0;
+
+    memcpy(&g_activeRecording.parameters, &g_recordingParameters, sizeof(dlog_view::Parameters));
+
+    if (isModuleLocalRecording() || isModuleControlledRecording()) {
+        g_activeRecording.parameters.period = dlog_view::PERIOD_MIN;
+    }
+
+    g_activeRecording.size = 0;
+    g_activeRecording.pageSize = 480;
+
+    g_activeRecording.xAxisOffset = 0.0f;
+    g_activeRecording.xAxisDiv = g_activeRecording.pageSize * g_activeRecording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
+
+    for (int8_t dlogItemIndex = 0; dlogItemIndex < g_activeRecording.parameters.numDlogItems; ++dlogItemIndex) {
+        auto &dlogItem = g_activeRecording.parameters.dlogItems[dlogItemIndex];
+        dlogItem.resourceType = g_slots[dlogItem.slotIndex]->getDlogResourceType(dlogItem.subchannelIndex, dlogItem.resourceIndex);
+    }
+
+    if (!g_traceInitiated) {
+        g_activeRecording.parameters.xAxis.unit = UNIT_SECOND;
+        g_activeRecording.parameters.xAxis.step = g_activeRecording.parameters.period;
+        g_activeRecording.parameters.xAxis.range.min = 0;
+        g_activeRecording.parameters.xAxis.range.max = g_activeRecording.parameters.duration;
+
+        for (int8_t dlogItemIndex = 0; dlogItemIndex < g_activeRecording.parameters.numDlogItems; ++dlogItemIndex) {
+            auto &dlogItem = g_activeRecording.parameters.dlogItems[dlogItemIndex];
+            auto &yAxis = g_activeRecording.parameters.yAxes[dlogItemIndex];
+
+            yAxis.dataType = g_slots[dlogItem.slotIndex]->getDlogResourceDataType(dlogItem.subchannelIndex, dlogItem.resourceIndex);
+            yAxis.transformOffset = g_slots[dlogItem.slotIndex]->getDlogResourceTransformOffset(dlogItem.subchannelIndex, dlogItem.resourceIndex);
+			yAxis.transformScale = g_slots[dlogItem.slotIndex]->getDlogResourceTransformScale(dlogItem.subchannelIndex, dlogItem.resourceIndex);
+
+            if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_U) {
+                yAxis.unit = UNIT_VOLT;
+                yAxis.range.min = channel_dispatcher::getUMin(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                yAxis.range.max = channel_dispatcher::getUMax(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                Channel *channel = Channel::getBySlotIndex(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                yAxis.channelIndex = channel ? channel->channelIndex : -1;
+            } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_I) {
+                yAxis.unit = UNIT_AMPER;
+                yAxis.range.min = channel_dispatcher::getIMin(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                yAxis.range.max = channel_dispatcher::getIMaxLimit(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                Channel *channel = Channel::getBySlotIndex(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                yAxis.channelIndex = channel ? channel->channelIndex : -1;
+            } else if (dlogItem.resourceType == DLOG_RESOURCE_TYPE_P) {
+                yAxis.unit = UNIT_WATT;
+                Channel *channel = Channel::getBySlotIndex(dlogItem.slotIndex, dlogItem.subchannelIndex);
+                yAxis.range.min = channel_dispatcher::getPowerMinLimit(*channel);
+                yAxis.range.max = channel_dispatcher::getPowerMaxLimit(*channel);
+                yAxis.channelIndex = channel->channelIndex;
+            } else if (dlogItem.resourceType >= DLOG_RESOURCE_TYPE_DIN0 && dlogItem.resourceType <= DLOG_RESOURCE_TYPE_DIN7) {
+                yAxis.unit = UNIT_NONE;
+                yAxis.range.min = 0;
+                yAxis.range.max = 1;
+                yAxis.channelIndex = dlogItem.resourceType - DLOG_RESOURCE_TYPE_DIN0;
+            }
+
+            stringCopy(yAxis.label, sizeof(yAxis.label), g_slots[dlogItem.slotIndex]->getDlogResourceLabel(dlogItem.subchannelIndex, dlogItem.resourceIndex));
+        }
+
+        g_activeRecording.parameters.numYAxes = g_activeRecording.parameters.numDlogItems;
+    }
+
+    dlog_view::initDlogValues(g_activeRecording);
+
+    // do we need dataContainsSampleValidityBit?
+    g_activeRecording.parameters.dataContainsSampleValidityBit = false;
+    for (int yAxisIndex = 0; yAxisIndex < g_activeRecording.parameters.numYAxes; yAxisIndex++) {
+        auto &yAxis = g_activeRecording.parameters.yAxes[yAxisIndex];
+        if (yAxis.dataType != dlog_file::DATA_TYPE_FLOAT) {
+            // yes!
+            g_activeRecording.parameters.dataContainsSampleValidityBit = true;
+            break;
+        }
+    }
+
+    dlog_view::calcColumnIndexes(g_activeRecording);
+
+    g_activeRecording.getValue = getValue;
+
+    g_writer.reset();
 
 	for (uint8_t channelIndex = 0; channelIndex < dlog_file::MAX_NUM_OF_CHANNELS; channelIndex++) {
         if (channelIndex < CH_NUM) {
 		    Channel &channel = Channel::get(channelIndex);
-		    g_parameters.channels[channelIndex].moduleType = g_slots[channel.slotIndex]->moduleType;
-		    g_parameters.channels[channelIndex].moduleRevision = g_slots[channel.slotIndex]->moduleRevision;
+			g_recordingParameters.channels[channelIndex].moduleType = g_slots[channel.slotIndex]->moduleType;
+			g_recordingParameters.channels[channelIndex].moduleRevision = g_slots[channel.slotIndex]->moduleRevision;
         } else {
-		    g_parameters.channels[channelIndex].moduleType = 0;
-		    g_parameters.channels[channelIndex].moduleRevision = 0;
+			g_recordingParameters.channels[channelIndex].moduleType = 0;
+			g_recordingParameters.channels[channelIndex].moduleRevision = 0;
         }
 	}
 
+    g_activeRecording.parameters.startTime = datetime::now();
+    g_activeRecording.parameters.finalDuration = 0;
+
     if (!isModuleLocalRecording()) {
-        g_writer.writeFileHeaderAndMetaFields(g_recording.parameters);
+        g_writer.writeFileHeaderAndMetaFields(g_activeRecording.parameters);
         fileWrite(true);
     }
 
@@ -446,7 +480,7 @@ static int doStartImmediately() {
         g_slots[slotIndex]->onStartDlog();
     }
 
-    g_recording.dataOffset = g_writer.getDataOffset();
+    g_activeRecording.dataOffset = g_writer.getDataOffset();
 
     g_lastSavedBufferTickCount = millis();
 
@@ -460,17 +494,17 @@ static int doInitiate(bool traceInitiated) {
 
     g_traceInitiated = traceInitiated;
 
-    if (g_parameters.triggerSource == trigger::SOURCE_IMMEDIATE) {
+    if (g_recordingParameters.triggerSource == trigger::SOURCE_IMMEDIATE) {
         err = doStartImmediately();
     } else {
-        err = checkDlogParameters(g_parameters, false, g_traceInitiated);
+        err = checkDlogParameters(g_recordingParameters, false, g_traceInitiated);
         if (err == SCPI_RES_OK) {
             setState(STATE_INITIATED);
         }
     }
 
     if (err != SCPI_RES_OK) {
-        g_parameters.filePath[0] = 0;
+		g_recordingParameters.filePath[0] = 0;
         g_traceInitiated = false;
     }
 
@@ -478,14 +512,18 @@ static int doInitiate(bool traceInitiated) {
 }
 
 static void resetAllParameters() {
-    memset(&g_parameters, 0, sizeof(g_parameters));
-    g_parameters.period = dlog_view::PERIOD_DEFAULT;
-    g_parameters.duration = dlog_view::DURATION_DEFAULT;
+    memset(&g_recordingParameters, 0, sizeof(g_recordingParameters));
+    g_recordingParameters.yAxis.unit = UNIT_UNKNOWN;
+    g_recordingParameters.yAxis.dataType = dlog_file::DATA_TYPE_FLOAT;
+	g_recordingParameters.yAxis.transformOffset = 0;
+	g_recordingParameters.yAxis.transformScale = 1.0;
+	g_recordingParameters.period = dlog_view::PERIOD_DEFAULT;
+	g_recordingParameters.duration = dlog_view::DURATION_DEFAULT;
     setTriggerSource(trigger::SOURCE_IMMEDIATE);
 }
 
 static void resetFilePath() {
-    *g_parameters.filePath = 0;
+    *g_recordingParameters.filePath = 0;
 }
 
 static void doFinish(bool afterError) {
@@ -494,9 +532,14 @@ static void doFinish(bool afterError) {
     if (!afterError) {
         if (!isModuleLocalRecording()) {        
             flushData();
-            onSdCardFileChangeHook(g_parameters.filePath);
+            onSdCardFileChangeHook(g_recordingParameters.filePath);
         }
     }
+
+    // write final duration
+	g_activeRecording.parameters.finalDuration = g_currentTime;
+	file.seek(g_writer.getFinishTimeFieldOffset());
+	file.write(&g_activeRecording.parameters.finalDuration, 8);
 
     file.close();
 
@@ -516,21 +559,21 @@ bool isModuleLocalRecording() {
 }
 
 bool isModuleControlledRecording() {
-    return !g_traceInitiated && g_parameters.period < dlog_view::PERIOD_MIN;
+    return !g_traceInitiated && g_recordingParameters.period < dlog_view::PERIOD_MIN;
 }
 
 int getModuleLocalRecordingSlotIndex() {
     if (isModuleLocalRecording()) {
-        if (g_parameters.numDlogItems > 0) {
-            return g_parameters.dlogItems[0].slotIndex;
+        if (g_recordingParameters.numDlogItems > 0) {
+            return g_recordingParameters.dlogItems[0].slotIndex;
         }
     }
     return -1;
 }
 
 bool isModuleAtSlotRecording(int slotIndex) {
-	for (int i = 0; i < g_parameters.numDlogItems; i++) {
-		if (g_parameters.dlogItems[i].slotIndex == slotIndex) {
+	for (int i = 0; i < g_recordingParameters.numDlogItems; i++) {
+		if (g_recordingParameters.dlogItems[i].slotIndex == slotIndex) {
 			return true;
 		}
 	}
@@ -538,7 +581,7 @@ bool isModuleAtSlotRecording(int slotIndex) {
 }
 
 double getCurrentTime() {
-    return isModuleLocalRecording() ? (g_numSamples - 1) * g_parameters.period * 1.0 : g_currentTime;
+    return isModuleLocalRecording() ? (g_numSamples - 1) * g_recordingParameters.period * 1.0 : g_currentTime;
 }
 
 uint32_t getFileLength() {
@@ -556,7 +599,7 @@ void setNumSamples(uint32_t numSamples) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void setTriggerSource(trigger::Source source) {
-    g_parameters.triggerSource = source;
+	g_recordingParameters.triggerSource = source;
 
     if (source == trigger::SOURCE_PIN1) {
         if (io_pins::g_ioPins[0].function != io_pins::FUNCTION_DLOGTRIG) {
@@ -668,7 +711,7 @@ void stateTransition(int event, int* perr) {
     } else if (g_state == STATE_EXECUTING) {
         if (event == EVENT_TOGGLE_STOP || event == EVENT_FINISH || event == EVENT_ABORT || event == EVENT_RESET) {
             doFinish(false);
-            err = SCPI_RES_OK;
+			err = SCPI_RES_OK;
         } else if (event == EVENT_TOGGLE_START) {
             err = SCPI_RES_OK;
         } else if (event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR) {
@@ -750,53 +793,103 @@ void reset() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void tick() {
-    if (g_state == STATE_EXECUTING && g_nextTime <= g_recording.parameters.duration && !g_inStateTransition) {
+    if (g_state == STATE_EXECUTING && g_nextTime <= g_activeRecording.parameters.duration && !g_inStateTransition) {
         log();
     }
 }
 
-void log(float *values, uint32_t bits) {
+void log(float *values) {
     if (g_state == STATE_EXECUTING) {
-        for (int yAxisIndex = 0; yAxisIndex < g_recording.parameters.numYAxes; yAxisIndex++) {
-            if (g_recording.parameters.yAxes[yAxisIndex].unit == UNIT_BIT) {
-                if (g_writer.getBitMask() == 0) {
-                    g_writer.writeBit(1); // mark as valid sample
-                }                    
-                if (bits & (1 << g_recording.parameters.yAxes[yAxisIndex].channelIndex)) {
+        for (int yAxisIndex = 0; yAxisIndex < g_activeRecording.parameters.numYAxes; yAxisIndex++) {
+            g_writer.writeFloat(*values++);
+        }
+        ++g_activeRecording.size;
+    }
+}
+
+void logInt16(uint8_t *values, uint32_t bits) {
+    if (g_state == STATE_EXECUTING) {
+        g_writer.writeBit(1); // mark as valid sample
+
+        for (int yAxisIndex = 0; yAxisIndex < g_activeRecording.parameters.numYAxes; yAxisIndex++) {
+            if (g_activeRecording.parameters.yAxes[yAxisIndex].dataType == dlog_file::DATA_TYPE_BIT) {
+                if (bits & (1 << g_activeRecording.parameters.yAxes[yAxisIndex].channelIndex)) {
                     g_writer.writeBit(1);
                 } else {
                     g_writer.writeBit(0);
                 }
             } else {
-			    g_writer.writeFloat(*values++);
+                g_writer.flushBits();
+			    g_writer.writeInt16(values);
+                values += 2;
             }
         }
+
         g_writer.flushBits();
-        ++g_recording.size;
+
+        ++g_activeRecording.size;
+    }
+}
+
+void logInt24(uint8_t *values, uint32_t bits) {
+    if (g_state == STATE_EXECUTING) {
+        g_writer.writeBit(1); // mark as valid sample
+
+        for (int yAxisIndex = 0; yAxisIndex < g_activeRecording.parameters.numYAxes; yAxisIndex++) {
+            if (g_activeRecording.parameters.yAxes[yAxisIndex].dataType == dlog_file::DATA_TYPE_BIT) {
+                if (bits & (1 << g_activeRecording.parameters.yAxes[yAxisIndex].channelIndex)) {
+                    g_writer.writeBit(1);
+                } else {
+                    g_writer.writeBit(0);
+                }
+            } else {
+                g_writer.flushBits();
+			    g_writer.writeInt24(values);
+                values += 3;
+            }
+        }
+
+        g_writer.flushBits();
+
+        ++g_activeRecording.size;
     }
 }
 
 void logInvalid() {
     if (g_state == STATE_EXECUTING) {
-        for (int yAxisIndex = 0; yAxisIndex < g_recording.parameters.numYAxes; yAxisIndex++) {
-            if (g_recording.parameters.yAxes[yAxisIndex].unit == UNIT_BIT) {
-                if (g_writer.getBitMask() == 0) {
-                    g_writer.writeBit(0); // mark as invalid sample
-                }                    
+        if (g_activeRecording.parameters.dataContainsSampleValidityBit) {
+            g_writer.writeBit(0); // mark as invalid sample
+        }
+
+        for (int yAxisIndex = 0; yAxisIndex < g_activeRecording.parameters.numYAxes; yAxisIndex++) {
+            auto dataType = g_activeRecording.parameters.yAxes[yAxisIndex].dataType;
+            
+            if (dataType == dlog_file::DATA_TYPE_BIT) {
                 g_writer.writeBit(0);
             } else {
-			    g_writer.writeFloat(NAN);
+                g_writer.flushBits();
+
+                if (dataType == dlog_file::DATA_TYPE_INT16_BE) {
+                    g_writer.writeUint16(0);
+                } else if (dataType == dlog_file::DATA_TYPE_INT24_BE) {
+                    g_writer.writeInt24(0);
+                } else if (dataType == dlog_file::DATA_TYPE_FLOAT) {
+                    g_writer.writeFloat(NAN);
+                } else {
+                    assert(false);
+                }
             }
         }
+
         g_writer.flushBits();
-        ++g_recording.size;
+        ++g_activeRecording.size;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 const char *getLatestFilePath() {
-    return g_recording.parameters.filePath[0] != 0 ? g_recording.parameters.filePath : nullptr;
+    return g_activeRecording.parameters.filePath[0] != 0 ? g_activeRecording.parameters.filePath : nullptr;
 }
 
 } // namespace dlog_record

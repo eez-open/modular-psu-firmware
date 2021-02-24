@@ -58,6 +58,8 @@ namespace eez {
 namespace psu {
 namespace dlog_view {
 
+////////////////////////////////////////////////////////////////////////////////
+
 static const float PERIOD_MIN = 0.001f;
 static const float PERIOD_MAX = 120.0f;
 static const float PERIOD_DEFAULT = 0.02f;
@@ -71,6 +73,8 @@ static const int VIEW_HEIGHT = 240;
 
 static const int NUM_HORZ_DIVISIONS = 12;
 static const int NUM_VERT_DIVISIONS = 6;
+
+////////////////////////////////////////////////////////////////////////////////
 
 enum State {
     STATE_STARTING,
@@ -134,8 +138,6 @@ struct Recording {
 
     float (*getValue)(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
-    uint32_t refreshCounter;
-
     uint32_t numSamples;
     float xAxisDivMin;
     float xAxisDivMax;
@@ -144,16 +146,24 @@ struct Recording {
 
     uint8_t selectedVisibleValueIndex;
 
-    uint32_t columnFloatIndexes[dlog_file::MAX_NUM_OF_Y_AXES];
-    uint32_t numFloatsPerRow;
+    uint32_t columnDataIndexes[dlog_file::MAX_NUM_OF_Y_AXES];
+    uint8_t columnBitMask[dlog_file::MAX_NUM_OF_Y_AXES];
+    uint32_t numBytesPerRow;
 };
 
+////////////////////////////////////////////////////////////////////////////////
+
 extern bool g_showLatest;
+
+////////////////////////////////////////////////////////////////////////////////
 
 // open dlog file for viewing
 bool openFile(const char *filePath, int *err = nullptr);
 
 extern State getState();
+
+bool isValidSample(Recording &recording, uint8_t *rowData);
+float getSample(Recording &recording, uint8_t *rowData, unsigned columnIndex);
 
 // this is called from the thread that owns SD card
 void loadBlock();
@@ -163,28 +173,20 @@ void stateManagment();
 
 Recording &getRecording();
 
-void initAxis(Recording &recording);
 void initDlogValues(Recording &recording);
 void calcColumnIndexes(Recording &g_recording);
-int getNumVisibleDlogValues(const Recording &recording);
 int getDlogValueIndex(Recording &recording, int visibleDlogValueIndex);
-int getVisibleDlogValueIndex(Recording &recording, int dlogValueIndex);
-DlogValueParams *getVisibleDlogValueParams(Recording &recording, int visibleDlogValueIndex);
 bool isMulipleValuesOverlayHeuristic(Recording &recording);
-Unit getXAxisUnit(Recording& recording);
-Unit getYAxisUnit(Recording& recording, int dlogValueIndex);
 
-uint32_t getPosition(Recording& recording);
-void changeXAxisOffset(Recording &recording, float xAxisOffset);
-void changeXAxisDiv(Recording &recording, float xAxisDiv);
 void getLabel(Recording& recording, int valueIndex, char *text, int count);
-
-void autoScale(Recording &recording);
-void scaleToFit(Recording &recording);
 
 void uploadFile();
 
 eez::gui::SetPage *getParamsPage();
+
+float getSample(Recording &recording, uint8_t *rowData, unsigned columnIndex);
+
+////////////////////////////////////////////////////////////////////////////////
 
 } // namespace dlog_view
 } // namespace psu

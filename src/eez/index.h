@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <eez/dlog_file.h>
 #include <eez/firmware.h>
 #include <eez/unit.h>
 
@@ -388,6 +389,9 @@ struct Module {
 
     virtual int getNumDlogResources(int subchannelIndex);
     virtual DlogResourceType getDlogResourceType(int subchannelIndex, int resourceIndex);
+    virtual dlog_file::DataType getDlogResourceDataType(int subchannelIndex, int resourceIndex);
+    virtual double getDlogResourceTransformOffset(int subchannelIndex, int resourceIndex);
+    virtual double getDlogResourceTransformScale(int subchannelIndex, int resourceIndex);
     virtual const char *getDlogResourceLabel(int subchannelIndex, int resourceIndex);
     virtual float getDlogResourceMinPeriod(int subchannelIndex, int resourceIndex);
     virtual void onStartDlog();

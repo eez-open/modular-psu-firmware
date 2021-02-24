@@ -1325,7 +1325,7 @@ void data_channel_u_mon(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_U)) {
+        if (!dlog_record::isIdle() && dlog_record::g_activeRecording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_U)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -1349,7 +1349,7 @@ void data_channel_u_mon_dac(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getUMonDac(channel), UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_U)) {
+        if (!dlog_record::isIdle() && dlog_record::g_activeRecording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_U)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     }
@@ -1445,7 +1445,7 @@ void data_channel_i_mon(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_I)) {
+        if (!dlog_record::isIdle() && dlog_record::g_activeRecording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_I)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -1469,7 +1469,7 @@ void data_channel_i_mon_dac(DataOperationEnum operation, Cursor cursor, Value &v
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(channel_dispatcher::getIMonDac(channel), UNIT_AMPER);
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_I)) {
+        if (!dlog_record::isIdle() && dlog_record::g_activeRecording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_I)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } 
@@ -1553,7 +1553,7 @@ void data_channel_p_mon(DataOperationEnum operation, Cursor cursor, Value &value
             value = Value(COLOR_ID_STATUS_WARNING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-        if (!dlog_record::isIdle() && dlog_record::g_recording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_P)) {
+        if (!dlog_record::isIdle() && dlog_record::g_activeRecording.parameters.isDlogItemEnabled(channel.slotIndex, channel.subchannelIndex, DLOG_RESOURCE_TYPE_P)) {
             value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
@@ -4889,7 +4889,7 @@ void data_nondrag_overlay(DataOperationEnum operation, Cursor cursor, Value &val
 void data_is_show_live_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
-        value = &recording == &dlog_record::g_recording;
+        value = &recording == &dlog_record::g_activeRecording;
     }
 }
 

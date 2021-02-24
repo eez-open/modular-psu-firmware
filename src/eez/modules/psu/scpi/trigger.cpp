@@ -191,7 +191,7 @@ scpi_result_t scpi_cmd_triggerDlogSource(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_triggerDlogSourceQ(scpi_t *context) {
-    resultChoiceName(context, sourceChoice, dlog_record::g_parameters.triggerSource);
+    resultChoiceName(context, sourceChoice, dlog_record::g_recordingParameters.triggerSource);
     return SCPI_RES_OK;
 }
 
