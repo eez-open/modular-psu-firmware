@@ -394,6 +394,7 @@ struct Module {
     virtual double getDlogResourceTransformScale(int subchannelIndex, int resourceIndex);
     virtual const char *getDlogResourceLabel(int subchannelIndex, int resourceIndex);
     virtual float getDlogResourceMinPeriod(int subchannelIndex, int resourceIndex);
+    virtual bool isDlogPeriodAllowed(int subchannelIndex, int resourceIndex, float period);
     virtual void onStartDlog();
     virtual void onStopDlog();
 

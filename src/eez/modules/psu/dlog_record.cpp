@@ -807,6 +807,25 @@ void log(float *values) {
     }
 }
 
+void log(uint32_t bits) {
+    if (g_state == STATE_EXECUTING) {
+        g_writer.writeBit(1); // mark as valid sample
+
+        for (int yAxisIndex = 0; yAxisIndex < g_activeRecording.parameters.numYAxes; yAxisIndex++) {
+            assert (g_activeRecording.parameters.yAxes[yAxisIndex].dataType == dlog_file::DATA_TYPE_BIT);
+            if (bits & (1 << g_activeRecording.parameters.yAxes[yAxisIndex].channelIndex)) {
+                g_writer.writeBit(1);
+            } else {
+                g_writer.writeBit(0);
+            }
+        }
+
+        g_writer.flushBits();
+
+        ++g_activeRecording.size;
+    }
+}
+
 void logInt16(uint8_t *values, uint32_t bits) {
     if (g_state == STATE_EXECUTING) {
         g_writer.writeBit(1); // mark as valid sample

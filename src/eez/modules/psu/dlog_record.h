@@ -71,8 +71,9 @@ void reset();
 
 void tick();
 void log(float *values);
-void logInt16(uint8_t *values, uint32_t bits = 0);
-void logInt24(uint8_t *values, uint32_t bits = 0);
+void log(uint32_t bits);
+void logInt16(uint8_t *values, uint32_t bits);
+void logInt24(uint8_t *values, uint32_t bits);
 void logInvalid();
 
 void fileWrite(bool flush = false);

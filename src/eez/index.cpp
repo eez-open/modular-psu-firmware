@@ -805,6 +805,10 @@ float Module::getDlogResourceMinPeriod(int subchannelIndex, int resourceIndex) {
     return NAN;
 }
 
+bool Module::isDlogPeriodAllowed(int subchannelIndex, int resourceIndex, float period) {
+    return true;
+}
+
 void Module::onStartDlog() {
 }
 

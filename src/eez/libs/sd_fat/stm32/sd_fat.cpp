@@ -256,35 +256,32 @@ size_t File::read(void *buf, uint32_t size) {
 }
 
 size_t File::write(const void *buf, size_t size) {
-	static const uint32_t CHUNK_SIZE = 64 * 1024;
+	uint32_t CHUNK_SIZE = 64 * 1024;
 
     UINT bwTotal = 0;
 
 	size_t unalignedLength = ((uint32_t)buf) & 3;
 	if (unalignedLength > 0) {
-        // unalignedLength = MIN(4 - unalignedLength, size);
-		// uint8_t unalignedBuffer[4] __attribute__((aligned));
-		// for (size_t i = 0; i < unalignedLength; i++) {
-		// 	unalignedBuffer[i] = ((uint8_t *)buf)[i];
-		// }
+        CHUNK_SIZE = 512;
 
-		// UINT bw;
-		// auto result = f_write(&m_file, unalignedBuffer, unalignedLength, &bw);
-        // CHECK_ERROR("File::write 1", result);
-		// if (result != FR_OK) {
-		// 	return 0;
-		// }
+        unalignedLength = MIN(4 - unalignedLength, size);
+		uint8_t unalignedBuffer[4] __attribute__((aligned));
+		for (size_t i = 0; i < unalignedLength; i++) {
+			unalignedBuffer[i] = ((uint8_t *)buf)[i];
+		}
 
-		// bwTotal += bw;
+		UINT bw;
+		auto result = f_write(&m_file, unalignedBuffer, unalignedLength, &bw);
+        CHECK_ERROR("File::write 1", result);
+		if (result != FR_OK) {
+			return 0;
+		}
 
-        // if (bw < unalignedLength) {
-        //     return bwTotal;
-        // }        
-        
-        void *alignedBuf = VRAM_BUFFER1_START_ADDRESS;
-        memcpy(alignedBuf, buf, size);
-        buf = alignedBuf;
+		bwTotal += bw;
 
+        if (bw < unalignedLength) {
+            return bwTotal;
+        }        
 	}
 
 	while (bwTotal < size) {

@@ -56,6 +56,8 @@
 
 #include <scpi/scpi.h>
 
+volatile uint32_t g_debugVarLogInvalid;
+
 using namespace eez::psu;
 using namespace eez::psu::gui;
 using namespace eez::gui;
@@ -1695,6 +1697,7 @@ public:
 
     void Command_DlogRecordingStart_FillRequest(Request &request) {
         memcpy(&request.dlogRecordingStart, &dlogRecordingStart, sizeof(dlogRecordingStart));
+        g_debugVarLogInvalid = 0;
     }
 
     ////////////////////////////////////////
@@ -1711,65 +1714,92 @@ public:
             auto &dlogRecordingData = response.dlogRecordingData;
 
             while (dlogDataRecordIndex < dlogRecordingData.recordIndex) {
+            	g_debugVarLogInvalid++;
                 dlog_record::logInvalid();
                 dlogDataRecordIndex++;
             }
 
             uint8_t *rx = dlogRecordingData.buffer;
-
             uint32_t end = dlogRecordingData.recordIndex + dlogRecordingData.numRecords;
 
-            bool is24Bit = dlog_record::g_recordingParameters.period >= 1.0f / 16000;
-            
-            uint32_t logAin[4] = {
-                dlogRecordingStart.resources & (1 << (16 + 0)),
-                dlogRecordingStart.resources & (1 << (16 + 1)),
-                dlogRecordingStart.resources & (1 << (16 + 2)),
-                dlogRecordingStart.resources & (1 << (16 + 3))
-            };
+            auto dinResources = dlogRecordingStart.resources;
+            auto doutResources = dlogRecordingStart.resources >> 8;
+            auto ainResources = dlogRecordingStart.resources >> 16;
 
-            uint8_t values[4 * 3];
+            if (ainResources) {
+                bool is24Bit = dlog_record::g_recordingParameters.period >= 1.0f / 16000;
+                
+                uint32_t logAin[4] = {
+                    ainResources & (1 << 0),
+                    ainResources & (1 << 1),
+                    ainResources & (1 << 2),
+                    ainResources & (1 << 3)
+                };
 
-            if (is24Bit) {
-                while (dlogDataRecordIndex < end) {
-                    uint8_t *p = values;
+                uint8_t values[4 * 3];
 
-                    for (int j = 0; j < 4; j++) {
-                        if (logAin[j]) {
-                            *p++ = *rx++;
-                            *p++ = *rx++;
-                            *p++ = *rx++;
-                        } else {
-                            rx += 3;
+                if (is24Bit) {
+                    while (dlogDataRecordIndex < end) {
+                        uint8_t *p = values;
+
+                        for (int j = 0; j < 4; j++) {
+                            if (logAin[j]) {
+                                *p++ = *rx++;
+                                *p++ = *rx++;
+                                *p++ = *rx++;
+                            } else {
+                                rx += 3;
+                            }
                         }
+
+                        uint32_t bits = rx[0] | (rx[1] << 8);
+                        rx += 2;
+
+                        dlog_record::logInt24(values, bits);
+                        
+                        dlogDataRecordIndex++;
                     }
+                } else {
+                    while (dlogDataRecordIndex < end) {
+                        uint8_t *p = values;
 
-                    uint32_t bits = rx[0] | (rx[1] << 8);
-                    rx += 2;
+                        for (int j = 0; j < 4; j++) {
+                            if (logAin[j]) {
+                                *p++ = *rx++;
+                                *p++ = *rx++;
+                            } else {
+                                rx += 2;
+                            }
+                        }
 
-                    dlog_record::logInt24(values, bits);
-                    
-                    dlogDataRecordIndex++;
+                        uint32_t bits = rx[0] | (rx[1] << 8);
+                        rx += 2;
+
+                        dlog_record::logInt16(values, bits);
+                        
+                        dlogDataRecordIndex++;
+                    }
                 }
             } else {
-                while (dlogDataRecordIndex < end) {
-                    uint8_t *p = values;
-
-                    for (int j = 0; j < 4; j++) {
-                        if (logAin[j]) {
-                            *p++ = *rx++;
-                            *p++ = *rx++;
-                        } else {
-                            rx += 2;
-                        }
+                if (dinResources && doutResources) {
+                    while (dlogDataRecordIndex < end) {
+                        uint32_t bits = rx[0] | (rx[1] << 8);
+                        rx += 2;
+                        dlog_record::log(bits);
+                        dlogDataRecordIndex++;
                     }
-
-                    uint32_t bits = rx[0] | (rx[1] << 8);
-                    rx += 2;
-
-                    dlog_record::logInt16(values, bits);
-                    
-                    dlogDataRecordIndex++;
+                } else if (dinResources) {
+                    while (dlogDataRecordIndex < end) {
+                        uint32_t bits = *rx++;
+                        dlog_record::log(bits);
+                        dlogDataRecordIndex++;
+                    }
+                } else {
+                    while (dlogDataRecordIndex < end) {
+                        uint32_t bits = *rx++ << 8;
+                        dlog_record::log(bits);
+                        dlogDataRecordIndex++;
+                    }
                 }
             }
         }
@@ -3701,7 +3731,7 @@ public:
 
     float getDlogResourceMinPeriod(int subchannelIndex, int resourceIndex) override {
         if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
-            return 0.00001f; // 10 us
+            return 0.000001f; // 1 us
         }
 
         if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
@@ -3709,6 +3739,15 @@ public:
         }
 
         return Module::getDlogResourceMinPeriod(subchannelIndex, resourceIndex);
+    }
+
+    bool isDlogPeriodAllowed(int subchannelIndex, int resourceIndex, float period) override {
+        if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            return period == 1.0f / 64000 || period == 1.0f / 32000 || period == 1.0f / 16000 ||
+                period == 1.0f / 8000 || period == 1.0f / 4000 || period == 1.0f / 2000 || period >= 1.0f / 1000;
+        }
+
+        return Module::isDlogPeriodAllowed(subchannelIndex, resourceIndex, period);
     }
 
     void onStartDlog() override {

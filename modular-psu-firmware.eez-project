@@ -34436,15 +34436,18 @@
             "height": 32,
             "widgets": [
               {
-                "type": "Rectangle",
+                "type": "Text",
                 "style": {
-                  "inheritFrom": "default"
+                  "inheritFrom": "edit_value_active_S_center",
+                  "color": "text_regular",
+                  "activeBackgroundColor": "text_regular"
                 },
+                "action": "",
                 "left": 0,
                 "top": 0,
                 "width": 125,
                 "height": 32,
-                "invertColors": true
+                "text": "\\u00a7 Upload"
               },
               {
                 "type": "Text",

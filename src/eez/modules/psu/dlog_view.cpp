@@ -95,7 +95,13 @@ bool Parameters::isDlogItemAvailable(int slotIndex, int subchannelIndex, int res
         return false;
     }
 
+    // If period is less then PERIOD_MIN (in which case, logging is controlled by the module)
+    // then do not allow logging from different modules.
     if (period < PERIOD_MIN) {
+        if (!g_slots[slotIndex]->isDlogPeriodAllowed(subchannelIndex, resourceIndex, period)) {
+            return false;
+        }
+
         if (numDlogItems > 0 && dlogItems[0].slotIndex != slotIndex) {
             return false;
         }
@@ -928,6 +934,10 @@ bool openFile(const char *filePath, int *err) {
 
 					g_state = STATE_READY;
 					invalidateAllBlocks();
+
+					DebugTrace("Duration: %f\n", (float)g_dlogFile.parameters.finalDuration);
+					DebugTrace("No. samples: %d\n", g_dlogFile.numSamples);
+					DebugTrace("Sample rate: %f\n", (float)(g_dlogFile.numSamples / g_dlogFile.parameters.finalDuration));
 				}
 			}
         }
