@@ -302,8 +302,8 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 
 void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
     if (!isPageFullyCovered(i)) {
-        if (m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex == -1) {
-            m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = mcu::display::allocBuffer();
+        if (m_pageNavigationStack[i].displayBufferIndex == -1) {
+            m_pageNavigationStack[i].displayBufferIndex = mcu::display::allocBuffer();
             widgetCursor.previousState = nullptr;
         }
 
@@ -364,7 +364,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
 		m_updatePageIndex = -1;
 	} else {
-        m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = -1;
+        m_pageNavigationStack[i].displayBufferIndex = -1;
     }
 }
 

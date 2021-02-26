@@ -544,6 +544,9 @@ void endBuffersDrawing() {
     if (isDirty()) {
         for (int i = 0; i < g_numBuffersToDraw; i++) {
             int bufferIndex = g_bufferToDrawIndexes[i];
+			if (bufferIndex == -1) {
+				continue;
+			}
             Buffer &buffer = g_buffers[bufferIndex];
 
             int sx = buffer.x;
