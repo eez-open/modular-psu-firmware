@@ -582,10 +582,12 @@ DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 OnTouchFunctionType YT_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (ytDataGetGraphUpdateMethod(widgetCursor.cursor, widgetCursor.widget->data) == YT_GRAPH_UPDATE_METHOD_STATIC) {
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-            TouchDrag touchDrag;
-            touchDrag.type = touchEvent.type;
-            touchDrag.x = touchEvent.x - widgetCursor.x;
-            touchDrag.y = touchEvent.y - widgetCursor.y;
+			TouchDrag touchDrag = {
+				widgetCursor,
+				touchEvent.type,
+				touchEvent.x - widgetCursor.x,
+				touchEvent.y - widgetCursor.y
+			};
             ytDataTouchDrag(widgetCursor.cursor, widgetCursor.widget->data, &touchDrag);
         }
     } else {

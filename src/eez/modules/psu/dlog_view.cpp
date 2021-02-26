@@ -515,7 +515,7 @@ static float getDuration(Recording &recording) {
 		return (recording.numSamples - 1) * recording.parameters.xAxis.step;
 	}
 
-	return recording.size > 0 ? (recording.size - 1) * dlog_record::g_recordingParameters.period : 0;
+	return recording.size > 0 ? (recording.size - 1) * recording.parameters.xAxis.step : 0;
 }
 
 void adjustXAxisOffset(Recording &recording) {
@@ -937,7 +937,7 @@ bool openFile(const char *filePath, int *err) {
 
 					DebugTrace("Duration: %f\n", (float)g_dlogFile.parameters.finalDuration);
 					DebugTrace("No. samples: %d\n", g_dlogFile.numSamples);
-					DebugTrace("Sample rate: %f\n", (float)(g_dlogFile.numSamples / g_dlogFile.parameters.finalDuration));
+					DebugTrace("Sample rate: %f\n", (float)((g_dlogFile.numSamples - 1) / g_dlogFile.parameters.finalDuration));
 				}
 			}
         }
@@ -1666,9 +1666,22 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_YT_DATA_TOUCH_DRAG) {
         TouchDrag *touchDrag = (TouchDrag *)value.getVoidPointer();
         
-        static float valueAtTouchDown;
-        static int xAtTouchDown;
-        static int yAtTouchDown;
+		static union {
+			struct {
+				float valueAtTouchDown;
+				int yAtTouchDown;
+			} y;
+			struct {
+				float valueAtTouchDown;
+				int xAtTouchDown;
+			} x;
+			struct {
+				bool dragCursor;
+				int offset;
+				int dragStartX;
+				uint32_t dragStartPosition;
+			} cursor;
+		} g_dragState;
         
         if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET) {
             dlog_view::DlogValueParams *dlogValueParams = dlog_view::getVisibleDlogValueParams(recording,
@@ -1676,10 +1689,10 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
                 ? recording.selectedVisibleValueIndex : g_focusCursor);
 
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
-                valueAtTouchDown = dlogValueParams->offset;
-                yAtTouchDown = touchDrag->y;
+				g_dragState.y.valueAtTouchDown = dlogValueParams->offset;
+				g_dragState.y.yAtTouchDown = touchDrag->y;
             } else {
-                float newOffset = valueAtTouchDown + dlogValueParams->div * (yAtTouchDown - touchDrag->y) * dlog_view::NUM_VERT_DIVISIONS / dlog_view::VIEW_HEIGHT;
+                float newOffset = g_dragState.y.valueAtTouchDown + dlogValueParams->div * (g_dragState.y.yAtTouchDown - touchDrag->y) * dlog_view::NUM_VERT_DIVISIONS / dlog_view::VIEW_HEIGHT;
 
                 float min = getMin(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_OFFSET).getFloat();
                 float max = getMax(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_OFFSET).getFloat();
@@ -1694,17 +1707,17 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
                 ? recording.selectedVisibleValueIndex : g_focusCursor);
 
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
-                valueAtTouchDown = dlogValueParams->div;
+				g_dragState.y.valueAtTouchDown = dlogValueParams->div;
 
                 //uint32_t position = ytDataGetPosition(cursor, DATA_ID_RECORDING);
                 //Value::YtDataGetValueFunctionPointer ytDataGetValue = ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
                 //for (int i = position + touchDrag->x - 10; i < position + touchDrag->x + 10; )
 
-                yAtTouchDown = touchDrag->y;
+				g_dragState.y.yAtTouchDown = touchDrag->y;
             } else {
-                float scale = 1.0f * (dlog_view::VIEW_HEIGHT - yAtTouchDown) / (dlog_view::VIEW_HEIGHT - touchDrag->y);
+                float scale = 1.0f * (dlog_view::VIEW_HEIGHT - g_dragState.y.yAtTouchDown) / (dlog_view::VIEW_HEIGHT - touchDrag->y);
 
-                float newDiv = valueAtTouchDown * scale;
+                float newDiv = g_dragState.y.valueAtTouchDown * scale;
 
                 float min = getMin(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_DIV).getFloat();
                 float max = getMax(g_focusCursor, DATA_ID_DLOG_VISIBLE_VALUE_DIV).getFloat();
@@ -1716,12 +1729,12 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
             }
         } else if (g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV) {
             if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
-                valueAtTouchDown = recording.xAxisDiv;
-                xAtTouchDown = touchDrag->x;
+				g_dragState.x.valueAtTouchDown = recording.xAxisDiv;
+				g_dragState.x.xAtTouchDown = touchDrag->x;
             } else {
-                float scale = 1.0f * (dlog_view::VIEW_WIDTH - touchDrag->x) / (dlog_view::VIEW_WIDTH - xAtTouchDown);
+                float scale = 1.0f * (dlog_view::VIEW_WIDTH - touchDrag->x) / (dlog_view::VIEW_WIDTH - g_dragState.x.xAtTouchDown);
 
-                float newDiv = valueAtTouchDown * scale;
+                float newDiv = g_dragState.x.valueAtTouchDown * scale;
 
                 float min = getMin(g_focusCursor, DATA_ID_DLOG_X_AXIS_DIV).getFloat();
                 float max = getMax(g_focusCursor, DATA_ID_DLOG_X_AXIS_DIV).getFloat();
@@ -1731,7 +1744,26 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
                 dlog_view::changeXAxisDiv(recording, newDiv);
             }
         } else {
-            recording.cursorOffset = MIN(dlog_view::VIEW_WIDTH - 1, MAX(touchDrag->x, 0));
+			if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
+				g_dragState.cursor.offset = recording.cursorOffset - touchDrag->x;
+				g_dragState.cursor.dragCursor = (abs((long)g_dragState.cursor.offset) < 30) && (touchDrag->y > (touchDrag->widgetCursor.widget->h - 60));
+				g_dragState.cursor.dragStartX = touchDrag->x;
+				g_dragState.cursor.dragStartPosition = dlog_view::getPosition(recording);
+			}
+
+			if (g_dragState.cursor.dragCursor) {
+				recording.cursorOffset = MIN(dlog_view::VIEW_WIDTH - 1, MAX(touchDrag->x + g_dragState.cursor.offset, 0));
+			} else {
+				int32_t newPosition = g_dragState.cursor.dragStartPosition + (g_dragState.cursor.dragStartX - touchDrag->x);
+				if (newPosition < 0) {
+					newPosition = 0;
+				} else {
+					if (newPosition + recording.pageSize > recording.size) {
+						newPosition = recording.size - recording.pageSize;
+					}
+				}
+				dlog_view::changeXAxisOffset(recording, newPosition * recording.parameters.period);
+			}
         }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE) {
         float xValue = (dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period;

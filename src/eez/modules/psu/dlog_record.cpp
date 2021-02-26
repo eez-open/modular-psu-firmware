@@ -286,7 +286,6 @@ static void log() {
         g_iSample = 0;
         g_countingStarted = true;
         g_lastTickCountMs = tickCountMs;
-        return;
     }
 	
     g_millis += tickCountMs - g_lastTickCountMs;
@@ -378,9 +377,9 @@ static int doStartImmediately() {
 
     memcpy(&g_activeRecording.parameters, &g_recordingParameters, sizeof(dlog_view::Parameters));
 
-    if (isModuleLocalRecording() || isModuleControlledRecording()) {
-        g_activeRecording.parameters.period = dlog_view::PERIOD_MIN;
-    }
+    //if (isModuleLocalRecording() || isModuleControlledRecording()) {
+    //    g_activeRecording.parameters.period = dlog_view::PERIOD_MIN;
+    //}
 
     g_activeRecording.size = 0;
     g_activeRecording.pageSize = 480;

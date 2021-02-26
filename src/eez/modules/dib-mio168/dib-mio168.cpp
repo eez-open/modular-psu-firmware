@@ -1713,6 +1713,12 @@ public:
         if (isModuleControlledRecordingExecuting()) {
             auto &dlogRecordingData = response.dlogRecordingData;
 
+            if (dlogRecordingData.numRecords == 0xFFFF) {
+            	// buffer overflow
+            	dlog_record::abortAfterBufferOverflowError();
+            	return;
+            }
+
             while (dlogDataRecordIndex < dlogRecordingData.recordIndex) {
             	g_debugVarLogInvalid++;
                 dlog_record::logInvalid();
@@ -2128,23 +2134,26 @@ public:
                             response->dlogRecordingData.recordIndex = dlogDataRecordIndex;
                             response->dlogRecordingData.numRecords = (uint16_t)roundf(1.0f / dlog_record::g_recordingParameters.period / 1000);
 
-                            int32_t ain[4];
-                            ain[0] = 0x7FFFFFFF / 5;
-							ain[1] = 0x7FFFFFFF / 5 * 2;
-							ain[2] = 0x7FFFFFFF / 5 * 3;
-							ain[3] = 0x7FFFFFFF / 5 * 4;
+							static int32_t ain[4] = {
+								ain[0] = 0x7FFFFFFF / 5,
+								ain[1] = 0x7FFFFFFF / 5 * 2,
+								ain[2] = 0x7FFFFFFF / 5 * 3,
+								ain[3] = 0x7FFFFFFF / 5 * 4
+							};
 
                             uint8_t *p = response->dlogRecordingData.buffer;
 
                             for (int i = 0; i < response->dlogRecordingData.numRecords; i++) {
                                 if (is24Bit) {
 									for (int j = 0; j < 4; j++) {
+										ain[j] -= 10000;
 										*p++ = (ain[j] >> 24) & 0xFF;
 										*p++ = (ain[j] >> 16) & 0xFF;
 										*p++ = (ain[j] >>  8) & 0xFF;
 									}
 								} else {
 									for (int j = 0; j < 4; j++) {
+										ain[j] -= 10000;
 										*p++ = (ain[j] >> 24) & 0xFF;
 										*p++ = (ain[j] >> 16) & 0xFF;
 									}

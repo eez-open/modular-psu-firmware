@@ -58,6 +58,9 @@ enum Unit {
 extern const char *g_unitNames[];
 
 inline const char *getUnitName(Unit unit) {
+	if (unit == UNIT_UNKNOWN) {
+		return "";
+	}
     return g_unitNames[unit];
 }
 

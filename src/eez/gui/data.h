@@ -472,6 +472,7 @@ uint32_t ytDataGetCursorOffset(Cursor cursor, int16_t id);
 Value ytDataGetCursorXValue(Cursor cursor, int16_t id);
 
 struct TouchDrag {
+	const WidgetCursor &widgetCursor;
     EventType type;
     int x;
     int y;
