@@ -212,6 +212,7 @@ void PsuAppContext::stateManagment() {
     if (activePageId == PAGE_ID_WELCOME || activePageId == PAGE_ID_STANDBY || activePageId == PAGE_ID_ENTERING_STANDBY) {
         if (!isTouchCalibrated()) {
             // touch screen is not calibrated
+            sound::playBeep(true);
             showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
         } else {
             showPage(getMainPageId());
