@@ -133,7 +133,7 @@ standard names. */
 #define xPortSysTickHandler SysTick_Handler
 
 /* USER CODE BEGIN Defines */
-#define configUSE_NEWLIB_REENTRANT 0
+#define configUSE_NEWLIB_REENTRANT 1
 /* USER CODE END Defines */
 
 #endif /* FREERTOS_CONFIG_H */
