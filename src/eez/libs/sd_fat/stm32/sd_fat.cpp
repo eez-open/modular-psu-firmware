@@ -209,12 +209,13 @@ int File::read() {
 }
 
 size_t File::read(void *buf, uint32_t size) {
-    static const uint32_t CHUNK_SIZE = 512;
+    uint32_t CHUNK_SIZE = 512; // unfortunately, it doesn't work when CHUNK_SIZE is > 512
 
     UINT brTotal = 0;
 
 	size_t unalignedLength = ((uint32_t)buf) & 3;
 	if (unalignedLength > 0) {
+		CHUNK_SIZE = 512;
     	unalignedLength = MIN(4 - unalignedLength, size);
 		uint8_t unalignedBuffer[4] __attribute__((aligned));
         UINT br;

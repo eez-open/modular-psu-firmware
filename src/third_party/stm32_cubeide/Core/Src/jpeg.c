@@ -30,11 +30,21 @@ JPEG_HandleTypeDef hjpeg;
 void MX_JPEG_Init(void)
 {
 
+  /* USER CODE BEGIN JPEG_Init 0 */
+
+  /* USER CODE END JPEG_Init 0 */
+
+  /* USER CODE BEGIN JPEG_Init 1 */
+
+  /* USER CODE END JPEG_Init 1 */
   hjpeg.Instance = JPEG;
   if (HAL_JPEG_Init(&hjpeg) != HAL_OK)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN JPEG_Init 2 */
+
+  /* USER CODE END JPEG_Init 2 */
 
 }
 

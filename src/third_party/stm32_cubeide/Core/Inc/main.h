@@ -29,7 +29,6 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f7xx_hal.h"
-#include "stm32f7xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -123,7 +122,6 @@ void Error_Handler(void);
 #define SPI4_IRQ_EXTI_IRQn EXTI9_5_IRQn
 #define ENC_SW_Pin GPIO_PIN_4
 #define ENC_SW_GPIO_Port GPIOI
-
 /* USER CODE BEGIN Private defines */
 #define R2B4_SPI4_CSA_Pin GPIO_PIN_3
 #define R2B4_SPI4_CSA_GPIO_Port GPIOE

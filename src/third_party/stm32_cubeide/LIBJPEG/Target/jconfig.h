@@ -37,8 +37,8 @@
 #define NO_GETENV
 #undef  USE_MSDOS_MEMMGR
 #undef  USE_MAC_MEMMGR
-/*Enabling 'USE_HEAP_MEM' disables the use of 'temp files' from 'backing-store management' : refer to 'jmemsys.h' for details.
-Moreover, this porting version does not proposed validated 'temp files' support : it is recommended to keep this macro 'defined'.*/
+/*Enabling USE_HEAP_MEM disables the use of temp files from backing-store management : refer to jmemsys.h for details.
+Moreover, this porting version does not proposed validated temp files support : it is recommended to keep this macro defined.*/
 #define USE_HEAP_MEM
 #define MAX_ALLOC_CHUNK  0x10000 /* 64kB */
 

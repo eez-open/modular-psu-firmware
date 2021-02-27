@@ -944,9 +944,9 @@ bool openFile(const char *filePath, int *err) {
 					g_state = STATE_READY;
 					invalidateAllBlocks();
 
-					DebugTrace("Duration: %f\n", (float)g_dlogFile.parameters.finalDuration);
-					DebugTrace("No. samples: %d\n", g_dlogFile.numSamples);
-					DebugTrace("Sample rate: %f\n", (float)((g_dlogFile.numSamples - 1) / g_dlogFile.parameters.finalDuration));
+					// DebugTrace("Duration: %f\n", (float)g_dlogFile.parameters.finalDuration);
+					// DebugTrace("No. samples: %d\n", g_dlogFile.numSamples);
+					// DebugTrace("Sample rate: %f\n", (float)((g_dlogFile.numSamples - 1) / g_dlogFile.parameters.finalDuration));
 				}
 			}
         }
