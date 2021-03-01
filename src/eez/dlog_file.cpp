@@ -148,6 +148,12 @@ void Writer::writeFileHeaderAndMetaFields(const Parameters &parameters) {
         }
     }
 
+	writeUint32Field(FILE_ID_TEXT_INDEX_FILE_OFFSET, 0);
+	m_textIndexFileOffset = m_bufferIndex - 4;
+	
+	writeUint32Field(FILE_ID_TEXT_FILE_OFFSET, 0);
+	m_textFileOffset = m_bufferIndex - 4;
+
     writeUint16(0); // end of meta fields section
 
     // write beginning of data offset
@@ -510,6 +516,12 @@ bool Reader::readRemainingFileHeaderAndMetaFields(Parameters &parameters) {
 				parameters.channels[channelIndex].moduleRevision = moduleRevision;
 			}			
 		}
+		else if (fieldId == FILE_ID_TEXT_INDEX_FILE_OFFSET) {
+			parameters.textIndexFileOffset = readUint32();
+		} 
+		else if (fieldId == FILE_ID_TEXT_FILE_OFFSET) {
+			parameters.textFileOffset = readUint32();
+		} 
 		else {
 			// unknown field, skip
 			m_offset += fieldDataLength;

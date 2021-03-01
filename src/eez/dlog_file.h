@@ -93,7 +93,10 @@ enum Fields {
     FIELD_ID_Y_LAST_FIELD,
 
     FIELD_ID_CHANNEL_MODULE_TYPE = 50,
-    FIELD_ID_CHANNEL_MODULE_REVISION = 51
+    FIELD_ID_CHANNEL_MODULE_REVISION = 51,
+
+    FILE_ID_TEXT_INDEX_FILE_OFFSET = 60,
+    FILE_ID_TEXT_FILE_OFFSET = 61,
 };
 
 enum DataType {
@@ -178,6 +181,9 @@ struct Parameters {
     float period;
     float duration;
 
+	uint32_t textIndexFileOffset;
+	uint32_t textFileOffset;
+
     void initYAxis(int yAxisIndex);
 };
 
@@ -206,6 +212,8 @@ public:
     uint32_t getBufferIndex() { return m_bufferIndex; }
     uint32_t getDataOffset() { return m_dataOffset; }
     uint32_t getFinishTimeFieldOffset() { return m_finalDurationFieldOffset; }
+    uint32_t getTextIndexFileOffset() { return m_textIndexFileOffset; };
+    uint32_t getTextFileOffset() { return m_textFileOffset; };
     uint32_t getFileLength() { return m_fileLength; }
     uint32_t getBitMask() { return m_bitMask; }
 
@@ -218,6 +226,8 @@ private:
     uint8_t m_bits = 0;
     uint32_t m_dataOffset = 0;
     uint32_t m_finalDurationFieldOffset = 0;
+    uint32_t m_textIndexFileOffset = 0;
+    uint32_t m_textFileOffset = 0;
 
     void writeUint8Field(uint8_t id, uint8_t value);
     void writeUint8FieldWithIndex(uint8_t id, uint8_t value, uint8_t index);

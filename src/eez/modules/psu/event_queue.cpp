@@ -84,7 +84,18 @@ static QueueEvent g_writeQueue[WRITE_QUEUE_MAX_SIZE];
 static uint8_t g_writeQueueHead = 0;
 static uint8_t g_writeQueueTail = 0;
 static bool g_writeQueueFull;
+
+#if defined(EEZ_PLATFORM_STM32)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wparentheses"
+#endif
+
 osMutexId(g_writeQueueMutexId);
+
+#if defined(EEZ_PLATFORM_STM32)
+#pragma GCC diagnostic pop
+#endif
+
 osMutexDef(g_writeQueueMutex);
 
 ////////////////////////////////////////////////////////////////////////////////

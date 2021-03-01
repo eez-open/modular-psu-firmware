@@ -384,7 +384,11 @@ void onChannelCopyDestinationSelected(uint16_t value) {
     popPage();
     const char *err = channel_dispatcher::copyChannelToChannel(g_channel->channelIndex, value);
     if (err) {
-        errorMessage("Copying is not possible!", err);
+        char message[100];
+        stringCopy(message, sizeof(message), "Copying is not possible!");
+        stringAppendString(message, sizeof(message), "\n");
+        stringAppendString(message, sizeof(message), err);
+        errorMessage(message);
     }
 }
 

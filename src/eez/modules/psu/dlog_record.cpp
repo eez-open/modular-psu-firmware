@@ -115,22 +115,19 @@ static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static File file;
+static File g_file;
+static bool g_textFileOpened;
+static File g_fileText;
+static File g_fileTextIndex;
 
-static int fileTruncate() {
-    if (!file.open(g_recordingParameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+static int fileOpen() {
+    if (!g_file.open(g_recordingParameters.filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
         event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_FILE_OPEN_ERROR);
         // TODO replace with more specific error
         return SCPI_ERROR_MASS_STORAGE_ERROR;
     }
 
-    bool result = file.truncate(0);
-    // file.close();
-    if (!result) {
-        event_queue::pushEvent(event_queue::EVENT_ERROR_DLOG_TRUNCATE_ERROR);
-        // TODO replace with more specific error
-        return SCPI_ERROR_MASS_STORAGE_ERROR;
-    }
+    g_textFileOpened = false;
 
     return SCPI_RES_OK;
 }
@@ -209,16 +206,16 @@ void fileWrite(bool flush) {
 
         int err = 0;
 
-        // File file;
-        // if (file.open(g_activeRecording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-        //     if (file.seek(g_lastSavedBufferIndex)) {
-                size_t written = file.write(buffer, bufferSize);
+        // File g_file;
+        // if (g_file.open(g_activeRecording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
+        //     if (g_file.seek(g_lastSavedBufferIndex)) {
+                size_t written = g_file.write(buffer, bufferSize);
 
                 if (written != bufferSize) {
                     err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
                 }
 
-                // if (!file.close()) {
+                // if (!g_file.close()) {
                 //     err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
                 // }
 
@@ -364,7 +361,7 @@ static int doStartImmediately() {
     }
 
     if (!isModuleLocalRecording()) {
-        err = fileTruncate();
+        err = fileOpen();
         if (err != SCPI_RES_OK) {
             return err;
         }
@@ -525,6 +522,8 @@ static void resetFilePath() {
     *g_recordingParameters.filePath = 0;
 }
 
+static void finalizeLogText();
+
 static void doFinish(bool afterError) {
     setState(STATE_IDLE);
 
@@ -537,10 +536,14 @@ static void doFinish(bool afterError) {
 
     // write final duration
 	g_activeRecording.parameters.finalDuration = g_currentTime;
-	file.seek(g_writer.getFinishTimeFieldOffset());
-	file.write(&g_activeRecording.parameters.finalDuration, 8);
+	g_file.seek(g_writer.getFinishTimeFieldOffset());
+	g_file.write(&g_activeRecording.parameters.finalDuration, 8);
 
-    file.close();
+    if (g_textFileOpened) {
+        finalizeLogText();
+    }
+
+    g_file.close();
 
     resetFilePath();
 
@@ -902,6 +905,98 @@ void logInvalid() {
         g_writer.flushBits();
         ++g_activeRecording.size;
     }
+}
+
+void logText(const char *text, size_t textLen) {
+    if (isModuleLocalRecording()) {
+        // TODO report error
+        return;
+    }
+
+    if (g_state == STATE_EXECUTING) {
+        if (!g_textFileOpened) {
+            char filePath[MAX_PATH_LENGTH];
+
+			stringCopy(filePath, MAX_PATH_LENGTH, g_recordingParameters.filePath);
+			stringAppendString(filePath, MAX_PATH_LENGTH, ".dlogi");
+			if (!g_fileTextIndex.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
+				// TODO report error
+				return;
+			}
+			
+			stringCopy(filePath, MAX_PATH_LENGTH, g_recordingParameters.filePath);
+            stringAppendString(filePath, MAX_PATH_LENGTH, ".dlogt");
+            if (!g_fileText.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
+                // TODO report error
+                return;
+            }
+
+
+            g_textFileOpened = true;
+        }
+
+        uint32_t sampleIndex = g_activeRecording.size;
+        g_fileTextIndex.write(&sampleIndex, sizeof(sampleIndex));
+
+        uint32_t textIndex = g_fileText.size();
+        g_fileTextIndex.write(&textIndex, sizeof(textIndex));
+
+        g_fileText.write(text, textLen);
+    }
+}
+
+static void finalizeLogText() {
+	char filePath[MAX_PATH_LENGTH];
+	
+	// append text index file to the end of dlog file
+	g_file.seek(g_writer.getTextIndexFileOffset());
+    uint32_t textIndexFileOffset = g_file.size();
+	g_file.write(&textIndexFileOffset, sizeof(textIndexFileOffset));
+
+	g_fileTextIndex.close();
+	stringCopy(filePath, MAX_PATH_LENGTH, g_recordingParameters.filePath);
+	stringAppendString(filePath, MAX_PATH_LENGTH, ".dlogi");
+
+	if (!g_fileTextIndex.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+		// TODO report error
+		return;
+	}
+
+    uint32_t fileSize = g_fileTextIndex.size();
+    g_file.seek(textIndexFileOffset);
+    for (uint32_t i = 0; i < fileSize; i += CHUNK_SIZE) {
+        uint32_t n = MIN(CHUNK_SIZE, fileSize - i);
+		g_fileTextIndex.read(DLOG_RECORD_BUFFER, n);
+        g_file.write(DLOG_RECORD_BUFFER, n);
+    }
+
+    g_fileTextIndex.close();
+    sd_card::deleteFile(filePath, nullptr);
+
+    // append text file to the end of dlog file
+	g_file.seek(g_writer.getTextFileOffset());
+    uint32_t textFileOffset = g_file.size();
+	g_file.write(&textFileOffset, sizeof(textFileOffset));
+
+	g_fileText.close();
+	stringCopy(filePath, MAX_PATH_LENGTH, g_recordingParameters.filePath);
+	stringAppendString(filePath, MAX_PATH_LENGTH, ".dlogt");
+
+	if (!g_fileText.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+		// TODO report error
+		return;
+	}
+
+    fileSize = g_fileText.size();
+	g_file.seek(textFileOffset);
+    for (uint32_t i = 0; i < fileSize; i += CHUNK_SIZE) {
+        uint32_t n = MIN(CHUNK_SIZE, fileSize - i);
+		g_fileText.read(DLOG_RECORD_BUFFER, n);
+        g_file.write(DLOG_RECORD_BUFFER, n);
+    }
+
+	g_fileText.close();
+    sd_card::deleteFile(filePath, nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

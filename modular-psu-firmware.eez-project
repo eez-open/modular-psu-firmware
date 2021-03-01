@@ -64774,6 +64774,26 @@
             }
           },
           {
+            "name": "SENSe:DLOG:TRACe:BOOKmark",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_trac_data",
+            "parameters": [
+              {
+                "name": "bookmark_text",
+                "type": [
+                  {
+                    "type": "quoted-string"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
             "name": "SENSe:DLOG:CLEar",
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_cle",
             "parameters": [],

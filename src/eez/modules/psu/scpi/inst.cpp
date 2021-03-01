@@ -474,7 +474,7 @@ void dumpCatalog(scpi_t *context, bool dumpIndex) {
 
     if (CH_NUM > 0) {
         for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-            char channelStr[10];
+            char channelStr[20];
             snprintf(channelStr, sizeof(channelStr), "CH%d", channelIndex + 1);
             SCPI_ResultText(context, channelStr);
             if (dumpIndex) {
@@ -489,7 +489,7 @@ void dumpCatalog(scpi_t *context, bool dumpIndex) {
         for (int relativeChannelIndex = module->numPowerChannels; relativeChannelIndex < module->numPowerChannels + module->numOtherChannels; relativeChannelIndex++) {
             int subchannelIndex = module->getSubchannelIndexFromRelativeChannelIndex(relativeChannelIndex);
 
-            char channelStr[10];
+            char channelStr[20];
             snprintf(channelStr, sizeof(channelStr), "(@%d%02d)", slotIndex + 1, subchannelIndex + 1);
             SCPI_ResultText(context, channelStr);
             if (dumpIndex) {

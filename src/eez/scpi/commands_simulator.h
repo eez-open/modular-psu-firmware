@@ -193,6 +193,7 @@
     SCPI_COMMAND("SENSe:DLOG:TRACe:Y#[:RANGe]:MIN", scpi_cmd_senseDlogTraceYRangeMin) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:Y#[:RANGe]:MIN?", scpi_cmd_senseDlogTraceYRangeMinQ) \
     SCPI_COMMAND("SENSe:DLOG:TRACe[:DATA]", scpi_cmd_senseDlogTraceData) \
+    SCPI_COMMAND("SENSe:DLOG:TRACe:BOOKmark", scpi_cmd_senseDlogTraceBookmark) \
     SCPI_COMMAND("SENSe:DLOG:CLEar", scpi_cmd_senseDlogClear) \
     SCPI_COMMAND("[SOURce#]:CURRent:LIMit[:POSitive][:IMMediate][:AMPLitude]", scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitude) \
     SCPI_COMMAND("[SOURce#]:CURRent:LIMit[:POSitive][:IMMediate][:AMPLitude]?", scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitudeQ) \

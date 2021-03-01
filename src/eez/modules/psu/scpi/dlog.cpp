@@ -872,6 +872,22 @@ scpi_result_t scpi_cmd_senseDlogClear(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_senseDlogTraceBookmark(scpi_t *context) {
+    if (!dlog_record::isExecuting()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        return SCPI_RES_ERR;
+    }
+
+    const char *text;
+    size_t textLen;
+    if (!SCPI_ParamCharacters(context, &text, &textLen, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    dlog_record::logText(text, textLen);
+
+    return SCPI_RES_OK;
+}
 
 } // namespace scpi
 } // namespace psu

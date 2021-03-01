@@ -923,7 +923,14 @@ bool openFile(const char *filePath, int *err) {
 
 					g_dlogFile.pageSize = VIEW_WIDTH;
 
-					g_dlogFile.numSamples = (file.size() - g_dlogFile.dataOffset) / g_dlogFile.numBytesPerRow;
+					g_dlogFile.numSamples = (
+                            (
+                                g_dlogFile.parameters.textIndexFileOffset ? 
+                                    g_dlogFile.parameters.textIndexFileOffset : 
+                                    file.size()
+                            ) - g_dlogFile.dataOffset
+                        ) / g_dlogFile.numBytesPerRow;
+
 					g_dlogFile.xAxisDivMin = g_dlogFile.pageSize * g_dlogFile.parameters.period / NUM_HORZ_DIVISIONS;
 					g_dlogFile.xAxisDivMax = MAX(g_dlogFile.numSamples, g_dlogFile.pageSize) * g_dlogFile.parameters.period / NUM_HORZ_DIVISIONS;
 
