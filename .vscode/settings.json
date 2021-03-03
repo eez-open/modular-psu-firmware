@@ -19,7 +19,8 @@
         "utility": "cpp",
         "xmemory0": "cpp",
         "initializer_list": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "xlocnum": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": true

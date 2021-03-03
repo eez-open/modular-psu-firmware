@@ -391,6 +391,9 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC,
     DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD,
     DATA_OPERATION_YT_DATA_GET_PERIOD,
+	DATA_OPERATION_YT_DATA_GET_VISIBLE_BOOKMARKS,
+	DATA_OPERATION_YT_DATA_GET_BOOKMARK_POSITION,
+	DATA_OPERATION_YT_DATA_GET_SELECTED_BOOKMARK_INDEX,
     DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE,
     DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET,
     DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE,
@@ -467,6 +470,13 @@ void ytDataGetLabel(Cursor cursor, int16_t id, uint8_t valueIndex, char *text, i
 Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(Cursor cursor, int16_t id);
 uint8_t ytDataGetGraphUpdateMethod(Cursor cursor, int16_t id);
 float ytDataGetPeriod(Cursor cursor, int16_t id);
+struct BookmarksSlice {
+	uint32_t start;
+	uint32_t end;
+};
+void ytDataGetVisibleBookmarks(Cursor cursor, int16_t id, BookmarksSlice &bookmarks);
+uint32_t ytDataGetBookmarkPosition(Cursor cursor, int16_t id, uint32_t bookmarkIndex);
+uint32_t ytDataGetSelectedBookmarkIndex(Cursor cursor, int16_t id);
 bool ytDataIsCursorVisible(Cursor cursor, int16_t id);
 uint32_t ytDataGetCursorOffset(Cursor cursor, int16_t id);
 Value ytDataGetCursorXValue(Cursor cursor, int16_t id);

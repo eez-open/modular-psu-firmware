@@ -257,7 +257,13 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
             g_foundWidget = widgetCursor;
             g_distanceToFoundWidget = INT_MAX;
         } else {
-            if (!g_foundWidget || distance <= g_distanceToFoundWidget || g_foundWidget.widget->type == WIDGET_TYPE_APP_VIEW) {
+            if (
+				!g_foundWidget || 
+				distance <= g_distanceToFoundWidget || 
+				g_foundWidget.widget->type == WIDGET_TYPE_APP_VIEW ||
+				g_foundWidget.widget->type == WIDGET_TYPE_LIST ||
+				g_foundWidget.widget->type == WIDGET_TYPE_GRID
+			) {
                 g_foundWidget = widgetCursor;
                 g_distanceToFoundWidget = distance;
 

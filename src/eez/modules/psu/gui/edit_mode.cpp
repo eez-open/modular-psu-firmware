@@ -291,6 +291,8 @@ void setStepIndex(int value) {
 }
 
 void getStepValues(StepValues &stepValues) {
+	stepValues.count = 0;
+
     ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
     if (page) {
         getEncoderStepValues(g_channel->channelIndex, page->getDataIdAtCursor(), stepValues);
@@ -400,16 +402,24 @@ EncoderMode g_mio168AinCurrentEncoderMode = ENCODER_MODE_AUTO;
 EncoderMode g_mio168AoutVoltageEncoderMode = ENCODER_MODE_AUTO;
 EncoderMode g_mio168AoutCurrentEncoderMode = ENCODER_MODE_AUTO;
 
+EncoderMode g_scrollBarEncoderMode = ENCODER_MODE_AUTO;
+
 static Value getCurrentEncoderStepValue() {
     StepValues stepValues;
     getStepValues(stepValues);
 
+	if (stepValues.count == 0) {
+		return Value();
+	}
+
     int stepValueIndex = stepValues.encoderSettings.mode - ENCODER_MODE_STEP1;
-    if (stepValueIndex >= stepValues.count) {
+	if (stepValueIndex < 0) {
+		stepValueIndex = 0;
+	} else if (stepValueIndex >= stepValues.count) {
         stepValueIndex = stepValues.count - 1;
     }
 
-    return Value(stepValues.values[stepValueIndex], stepValues.unit);
+	return Value(stepValues.values[stepValueIndex], stepValues.unit);
 }
 
 float getEncoderStepValue() {
@@ -488,6 +498,8 @@ void getProfileParameters(profile::Parameters &parameters) {
     parameters.encoderModes.mio168AinCurrent = g_mio168AinCurrentEncoderMode;
     parameters.encoderModes.mio168AoutVoltage = g_mio168AoutVoltageEncoderMode;
     parameters.encoderModes.mio168AoutCurrent = g_mio168AoutCurrentEncoderMode;
+
+    parameters.encoderModes.scrollBar = g_scrollBarEncoderMode;
 }
 
 void setProfileParameters(const profile::Parameters &parameters) {
@@ -524,6 +536,8 @@ void setProfileParameters(const profile::Parameters &parameters) {
     g_mio168AinCurrentEncoderMode = (EncoderMode)parameters.encoderModes.mio168AinCurrent;
     g_mio168AoutVoltageEncoderMode = (EncoderMode)parameters.encoderModes.mio168AoutVoltage;
     g_mio168AoutCurrentEncoderMode = (EncoderMode)parameters.encoderModes.mio168AoutCurrent;
+
+    g_scrollBarEncoderMode = (EncoderMode)parameters.encoderModes.scrollBar;
 }
 
 bool writeProfileProperties(profile::WriteContext &ctx, const profile::Parameters &parameters) {
@@ -562,6 +576,8 @@ bool writeProfileProperties(profile::WriteContext &ctx, const profile::Parameter
     if (parameters.encoderModes.mio168AinCurrent) WRITE_PROPERTY("mio168AinCurrent", parameters.encoderModes.mio168AinCurrent);
     if (parameters.encoderModes.mio168AoutVoltage) WRITE_PROPERTY("mio168AoutVoltage", parameters.encoderModes.mio168AoutVoltage);
     if (parameters.encoderModes.mio168AoutCurrent) WRITE_PROPERTY("mio168AoutCurrent", parameters.encoderModes.mio168AoutCurrent);
+
+    if (parameters.encoderModes.scrollBar) WRITE_PROPERTY("scrollBar", parameters.encoderModes.scrollBar);
 
     return true;
 }
@@ -604,6 +620,8 @@ bool readProfileProperties(profile::ReadContext &ctx, profile::Parameters &param
     READ_FLAG("mio168AinCurrent", parameters.encoderModes.mio168AinCurrent);
     READ_FLAG("mio168AoutVoltage", parameters.encoderModes.mio168AoutVoltage);
     READ_FLAG("mio168AoutCurrent", parameters.encoderModes.mio168AoutCurrent);
+
+    READ_FLAG("scrollBar", parameters.encoderModes.scrollBar);
 
     return false;
 }

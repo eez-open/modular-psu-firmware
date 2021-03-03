@@ -71,13 +71,14 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
         uint16_t overrideColor = widgetCursor.currentState->flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
         uint16_t overrideBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : style->background_color;
         uint16_t overrideActiveColor =  widgetCursor.currentState->flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
+        uint16_t overrideActiveBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : style->active_background_color;
 
         bool ignoreLuminosity = (textWidget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
         if (text && text[0]) {
             drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                 style, widgetCursor.currentState->flags.active,
                 widgetCursor.currentState->flags.blinking,
-                ignoreLuminosity, &overrideColor, &overrideBackgroundColor, nullptr, nullptr);
+                ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
         } else if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
                 if (widgetCursor.currentState->data.getOptions() & STRING_OPTIONS_FILE_ELLIPSIS) {
@@ -90,7 +91,7 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
                             widgetCursor.y, (int)widget->w, (int)widget->h, style,
                             widgetCursor.currentState->flags.active,
                             widgetCursor.currentState->flags.blinking,
-                            ignoreLuminosity, &overrideColor, &overrideBackgroundColor, nullptr, nullptr);
+                            ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
 
                     } else {
                         char text[MAX_TEXT_LEN + 1];
@@ -126,7 +127,7 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
                             widgetCursor.y, (int)widget->w, (int)widget->h, style,
                             widgetCursor.currentState->flags.active,
                             widgetCursor.currentState->flags.blinking,
-                            ignoreLuminosity, &overrideColor, &overrideBackgroundColor, nullptr, nullptr);
+                            ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
                     }
 
                 } else {
@@ -135,7 +136,7 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
                         widgetCursor.y, (int)widget->w, (int)widget->h, style,
                         widgetCursor.currentState->flags.active,
                         widgetCursor.currentState->flags.blinking,
-                        ignoreLuminosity, &overrideColor, &overrideBackgroundColor, nullptr, nullptr);
+                        ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
                 }
             } else {
                 char text[MAX_TEXT_LEN + 1];
@@ -143,7 +144,7 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
                 drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                     style, widgetCursor.currentState->flags.active,
                     widgetCursor.currentState->flags.blinking,
-                    ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, nullptr,
+                    ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,
                     widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT);
             }
         }

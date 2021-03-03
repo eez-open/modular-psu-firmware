@@ -75,7 +75,7 @@ void log(uint32_t bits);
 void logInt16(uint8_t *values, uint32_t bits);
 void logInt24(uint8_t *values, uint32_t bits);
 void logInvalid();
-void logText(const char *text, size_t textLen);
+void logBookmark(const char *text, size_t textLen);
 
 void fileWrite(bool flush = false);
 void stateTransition(int event, int *perr = nullptr);

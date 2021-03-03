@@ -97,7 +97,9 @@ struct EncoderModes {
     unsigned mio168AinVoltage: 3;
     unsigned mio168AinCurrent: 3;
     unsigned mio168AoutVoltage: 3;
-    unsigned mio168AoutCurrent: 3;        
+    unsigned mio168AoutCurrent: 3;
+
+    unsigned scrollBar: 3;    
 };
 
 /// Profile parameters.

@@ -68,11 +68,7 @@ static const float DURATION_MIN = 1.0f;
 static const float DURATION_MAX = 86400000.0f;
 static const float DURATION_DEFAULT = 60.0f;
 
-static const int VIEW_WIDTH = 480;
-static const int VIEW_HEIGHT = 240;
-
-static const int NUM_HORZ_DIVISIONS = 12;
-static const int NUM_VERT_DIVISIONS = 6;
+static const uint32_t WIDTH_PER_DIVISION = 40;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -129,7 +125,6 @@ struct Recording {
     DlogValueParams dlogValues[MAX_NUM_OF_Y_VALUES];
 
     uint32_t size;
-    uint32_t pageSize;
 
     float xAxisOffset;
     float xAxisDiv;

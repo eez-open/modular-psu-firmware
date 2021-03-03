@@ -119,6 +119,8 @@ extern EncoderMode g_mio168AinCurrentEncoderMode;
 extern EncoderMode g_mio168AoutVoltageEncoderMode;
 extern EncoderMode g_mio168AoutCurrentEncoderMode;
 
+extern EncoderMode g_scrollBarEncoderMode;
+
 float getEncoderStepValue();
 void switchToNextEncoderMode();
 

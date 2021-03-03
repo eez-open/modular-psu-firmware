@@ -32,6 +32,7 @@
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ethernet.h>
@@ -74,8 +75,14 @@ struct BlockElement {
 static uint8_t *g_rowDataStart = FILE_VIEW_BUFFER;
 static const uint32_t ROW_VALUES_BUFFER_SIZE = 65536;
 
-static CacheBlock *g_cacheBlocks = (CacheBlock *)(FILE_VIEW_BUFFER + ROW_VALUES_BUFFER_SIZE);
-static const uint32_t CACHE_BLOCKS_BUFFER_SIZE = FILE_VIEW_BUFFER_SIZE - ROW_VALUES_BUFFER_SIZE;
+static uint8_t *g_bookmarksDataStart = g_rowDataStart + ROW_VALUES_BUFFER_SIZE;
+static const uint32_t BOOKMARKS_DATA_SIZE = 65536;
+static dlog_file::Bookmarks *g_bookmarks;
+static uint32_t g_selectedBookmarkIndex = -1;
+static uint32_t g_bookmarksScrollPosition = 0;
+
+static CacheBlock *g_cacheBlocks = (CacheBlock *)(g_bookmarksDataStart + BOOKMARKS_DATA_SIZE);
+static const uint32_t CACHE_BLOCKS_BUFFER_SIZE = FILE_VIEW_BUFFER_SIZE - ROW_VALUES_BUFFER_SIZE - BOOKMARKS_DATA_SIZE;
 
 static uint32_t NUM_ELEMENTS_PER_BLOCKS;
 static uint32_t BLOCK_SIZE;
@@ -87,6 +94,18 @@ static uint32_t g_blockIndexToLoad;
 static float g_loadScale;
 static bool g_refreshed;
 static bool g_wasExecuting;
+
+bool g_drawerIsOpen;
+static enum {
+	TAB_OPTIONS,
+	TAB_BOOKMARKS
+} g_selectedTab = TAB_OPTIONS;
+
+static int VIEW_WIDTH = 480;
+static int VIEW_HEIGHT = 240;
+
+static int NUM_HORZ_DIVISIONS = 12;
+static int NUM_VERT_DIVISIONS = 6;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -529,8 +548,8 @@ static float getDuration(Recording &recording) {
 
 void adjustXAxisOffset(Recording &recording) {
     auto duration = getDuration(recording);
-    if (recording.xAxisOffset + recording.pageSize * recording.parameters.period > duration) {
-        recording.xAxisOffset = duration - recording.pageSize * recording.parameters.period;
+    if (recording.xAxisOffset + VIEW_WIDTH * recording.parameters.period > duration) {
+        recording.xAxisOffset = duration - VIEW_WIDTH * recording.parameters.period;
     }
     if (recording.xAxisOffset < 0) {
         recording.xAxisOffset = 0;
@@ -547,13 +566,13 @@ static Unit getYAxisUnit(Recording& recording, int dlogValueIndex) {
 
 static uint32_t getPosition(Recording& recording) {
     if (&recording == &dlog_record::g_activeRecording) {
-        return recording.size > recording.pageSize ? recording.size - recording.pageSize : 0;
+        return recording.size > (uint32_t)VIEW_WIDTH ? recording.size - VIEW_WIDTH : 0;
     } else {
         float position = recording.xAxisOffset / recording.parameters.period;
         if (position < 0) {
             return 0;
-        } else if (position > recording.size - recording.pageSize) {
-            return recording.size - recording.pageSize;
+        } else if (position > recording.size - VIEW_WIDTH) {
+            return recording.size - VIEW_WIDTH;
         } else {
             return (uint32_t)roundf(position);
         }
@@ -574,6 +593,8 @@ static void changeXAxisOffset(Recording &recording, float xAxisOffset) {
 
 static void changeXAxisDiv(Recording &recording, float xAxisDiv) {
     if (recording.xAxisDiv != xAxisDiv) {
+		float xValueBefore = recording.xAxisOffset + recording.cursorOffset * recording.parameters.period;
+
         recording.xAxisDiv = xAxisDiv;
 
         if (recording.xAxisDiv == recording.xAxisDivMin) {
@@ -583,6 +604,8 @@ static void changeXAxisDiv(Recording &recording, float xAxisDiv) {
             recording.parameters.period = recording.parameters.xAxis.step * recording.xAxisDiv / recording.xAxisDivMin;
             recording.size = (uint32_t)round(recording.numSamples * recording.xAxisDivMin / recording.xAxisDiv);
         }
+
+		recording.xAxisOffset = xValueBefore - recording.cursorOffset * recording.parameters.period;
         
         adjustXAxisOffset(recording);
 
@@ -798,7 +821,7 @@ static void scaleToFit(Recording &recording) {
     float totalMin = FLT_MAX;
     float totalMax = -FLT_MAX;
 
-    for (auto position = startPosition; position < startPosition + recording.pageSize; position++) {
+    for (auto position = startPosition; position < startPosition + VIEW_WIDTH; position++) {
         for (auto visibleDlogValueIndex = 0; visibleDlogValueIndex < numVisibleDlogValues; visibleDlogValueIndex++) {
             int dlogValueIndex = getDlogValueIndex(recording, visibleDlogValueIndex);
 
@@ -832,6 +855,10 @@ bool openFile(const char *filePath, int *err) {
 
     memset(&g_dlogFile, 0, sizeof(Recording));
 
+	g_bookmarks = 0;
+	g_selectedBookmarkIndex = -1;
+    g_bookmarksScrollPosition = 0;
+
     if (!isLowPriorityThread()) {
         sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_SHOW_FILE);
         return true;
@@ -839,7 +866,7 @@ bool openFile(const char *filePath, int *err) {
 
     File file;
     if (file.open(filePath != nullptr ? filePath : g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        uint8_t * buffer = FILE_VIEW_BUFFER;
+        uint8_t *buffer = FILE_VIEW_BUFFER;
         uint32_t read = file.read(buffer, dlog_file::DLOG_VERSION1_HEADER_SIZE);
         if (read == dlog_file::DLOG_VERSION1_HEADER_SIZE) {
 			dlog_file::Reader reader(buffer);
@@ -909,8 +936,7 @@ bool openFile(const char *filePath, int *err) {
 							result = false;
 						}
 					}
-
-					if (result)	{
+					if (result) {
 						result = reader.readRemainingFileHeaderAndMetaFields(g_dlogFile.parameters);
 					}
 				}
@@ -921,18 +947,27 @@ bool openFile(const char *filePath, int *err) {
 					initDlogValues(g_dlogFile);
 					calcColumnIndexes(g_dlogFile);
 
-					g_dlogFile.pageSize = VIEW_WIDTH;
+					if (g_dlogFile.parameters.dataSize > 0) {
+						auto offset = g_dlogFile.dataOffset + g_dlogFile.parameters.dataSize * g_dlogFile.numBytesPerRow;
+						auto dataLength = file.size();
+						uint32_t bookmarksLength = dataLength - offset;
+						if (bookmarksLength > ROW_VALUES_BUFFER_SIZE) {
+							// TODO report that there is not enough room to store all the bookmarks
+							bookmarksLength = ROW_VALUES_BUFFER_SIZE;
+						}
+						file.seek(offset);
+						uint32_t read = file.read(buffer, bookmarksLength);
+						if (read == bookmarksLength) {
+							g_bookmarks = reader.readBookmarks(bookmarksLength, g_bookmarksDataStart, BOOKMARKS_DATA_SIZE);
+						}
+					}
 
-					g_dlogFile.numSamples = (
-                            (
-                                g_dlogFile.parameters.textIndexFileOffset ? 
-                                    g_dlogFile.parameters.textIndexFileOffset : 
-                                    file.size()
-                            ) - g_dlogFile.dataOffset
-                        ) / g_dlogFile.numBytesPerRow;
+					g_dlogFile.numSamples = g_dlogFile.parameters.dataSize ?
+						g_dlogFile.parameters.dataSize :
+						(file.size() - g_dlogFile.dataOffset) / g_dlogFile.numBytesPerRow;
 
-					g_dlogFile.xAxisDivMin = g_dlogFile.pageSize * g_dlogFile.parameters.period / NUM_HORZ_DIVISIONS;
-					g_dlogFile.xAxisDivMax = MAX(g_dlogFile.numSamples, g_dlogFile.pageSize) * g_dlogFile.parameters.period / NUM_HORZ_DIVISIONS;
+					g_dlogFile.xAxisDivMin = VIEW_WIDTH * g_dlogFile.parameters.period / NUM_HORZ_DIVISIONS;
+					g_dlogFile.xAxisDivMax = MAX(g_dlogFile.numSamples, (uint32_t)VIEW_WIDTH) * g_dlogFile.parameters.period / NUM_HORZ_DIVISIONS;
 
 					g_dlogFile.size = g_dlogFile.numSamples;
 
@@ -981,6 +1016,10 @@ bool openFile(const char *filePath, int *err) {
 
 Recording &getRecording() {
     return g_showLatest && g_wasExecuting ? dlog_record::g_activeRecording : g_dlogFile;
+}
+
+dlog_file::Bookmarks *getBookmarks() {
+	return g_showLatest && g_wasExecuting ? nullptr : g_bookmarks;
 }
 
 float roundValue(float value) {
@@ -1584,8 +1623,41 @@ void action_show_dlog_view() {
     showPage(PAGE_ID_DLOG_VIEW);
 }
 
-void action_dlog_view_show_overlay_options() {
-    pushPage(PAGE_ID_DLOG_VIEW_OVERLAY_OPTIONS);
+void data_dlog_view_is_drawer_open(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = g_drawerIsOpen;
+	}
+}
+
+void action_dlog_view_toggle_drawer() {
+	if (g_drawerIsOpen) {
+		g_drawerIsOpen = false;
+		animateRightDrawerClose();
+
+		VIEW_WIDTH = 480;
+	} else {
+		g_drawerIsOpen = true;
+		animateRightDrawerOpen();
+
+		VIEW_WIDTH = 320;
+	}
+
+    NUM_HORZ_DIVISIONS = VIEW_WIDTH / WIDTH_PER_DIVISION;
+
+	auto &recording = getRecording();
+    if (&recording == &g_dlogFile) {
+        g_dlogFile.xAxisDivMin = VIEW_WIDTH * g_dlogFile.parameters.xAxis.step / NUM_HORZ_DIVISIONS;
+        g_dlogFile.xAxisDivMax = MAX(g_dlogFile.numSamples, (uint32_t)VIEW_WIDTH) * g_dlogFile.parameters.xAxis.step / NUM_HORZ_DIVISIONS;
+        if (g_dlogFile.xAxisDiv < g_dlogFile.xAxisDivMin) {
+            changeXAxisDiv(g_dlogFile, g_dlogFile.xAxisDivMin);
+        } else if (g_dlogFile.xAxisDiv > g_dlogFile.xAxisDivMax) {
+            changeXAxisDiv(g_dlogFile, g_dlogFile.xAxisDivMax);
+        }
+    }
+
+	if (recording.cursorOffset >= (uint32_t)VIEW_WIDTH - 1) {
+		recording.cursorOffset = VIEW_WIDTH - 1;
+	}
 }
 
 void onSelectDlogViewLegendViewOption(uint16_t value) {
@@ -1643,13 +1715,13 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
         if (newPosition < 0) {
             newPosition = 0;
         } else {
-            if (newPosition + recording.pageSize > recording.size) {
-                newPosition = recording.size - recording.pageSize;
+            if (newPosition + (uint32_t)VIEW_WIDTH > recording.size) {
+                newPosition = recording.size - VIEW_WIDTH;
             }
         }
         dlog_view::changeXAxisOffset(recording, newPosition * recording.parameters.period);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
-        value = Value(recording.pageSize, VALUE_TYPE_UINT32);
+        value = Value(VIEW_WIDTH, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_STYLE) {
         uint8_t dlogValueIndex = value.getUInt8();
         uint8_t visibleDlogValueIndex = dlog_view::getVisibleDlogValueIndex(recording, dlogValueIndex);
@@ -1675,7 +1747,38 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
         value = YT_GRAPH_UPDATE_METHOD_STATIC;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
         value = Value(recording.parameters.period, UNIT_SECOND);
-    } else if (operation == DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE) {
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_VISIBLE_BOOKMARKS) {
+		dlog_file::Bookmarks *bookmarks = getBookmarks();
+		if (bookmarks && bookmarks->count > 0) {
+			float xStart = dlog_view::getPosition(recording) * recording.parameters.period;
+			float xEnd = (dlog_view::getPosition(recording) + VIEW_WIDTH) * recording.parameters.period;
+			auto bookmarksSlice = (BookmarksSlice *)value.getVoidPointer();
+			for (uint32_t bookmarkIndex = 0; bookmarkIndex < bookmarks->count; bookmarkIndex++) {
+                auto bookmark = bookmarks->list + bookmarkIndex;
+				float xValue = bookmark->position * recording.parameters.xAxis.step;
+				if (xValue >= xStart) {
+					if (xValue < xEnd) {
+						if (bookmarksSlice->start == bookmarksSlice->end) {
+							bookmarksSlice->start = bookmarkIndex;
+						}
+						bookmarksSlice->end = bookmarkIndex + 1;
+					} else {
+						break;
+					}
+				}
+            }
+		}
+	} else if (operation == DATA_OPERATION_YT_DATA_GET_BOOKMARK_POSITION) {
+		uint32_t bookmarkIndex = value.getUInt32();
+		dlog_file::Bookmarks *bookmarks = getBookmarks();
+		if (bookmarks && bookmarkIndex < bookmarks->count) {
+			auto bookmark = bookmarks->list + bookmarkIndex;
+			float xValue = bookmark->position * recording.parameters.xAxis.step;
+			value = Value((uint32_t)round(xValue / recording.parameters.period), VALUE_TYPE_UINT32);
+		}
+	} else if (operation == DATA_OPERATION_YT_DATA_GET_SELECTED_BOOKMARK_INDEX) {
+		value = Value(g_selectedBookmarkIndex, VALUE_TYPE_UINT32);
+	} else if (operation == DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE) {
         value = &recording != &dlog_record::g_activeRecording;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET) {
         value = Value(recording.cursorOffset, VALUE_TYPE_UINT32);
@@ -1751,8 +1854,8 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
 				int32_t newPosition = g_dragState.xOffset.dragStartPosition + (g_dragState.xOffset.dragStartX - touchDrag->x);
 				if (newPosition < 0) {
 					newPosition = 0;
-				} else if (newPosition + recording.pageSize > recording.size) {
-					newPosition = recording.size - recording.pageSize;
+				} else if (newPosition + (uint32_t)VIEW_WIDTH > recording.size) {
+					newPosition = recording.size - VIEW_WIDTH;
 				}
 				dlog_view::changeXAxisOffset(recording, newPosition * recording.parameters.period);
 	        } else if (g_dragState.dragObject == DRAG_X_DIV) {
@@ -2054,7 +2157,7 @@ void data_dlog_x_axis_offset(DataOperationEnum operation, Cursor cursor, Value &
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = Value(recording.parameters.xAxis.range.min, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = Value(recording.parameters.xAxis.range.max - recording.pageSize * recording.parameters.period, dlog_view::getXAxisUnit(recording));
+        value = Value(recording.parameters.xAxis.range.max - VIEW_WIDTH * recording.parameters.period, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_SET) {
         dlog_view::changeXAxisOffset(recording, value.getFloat());
     } else if (operation == DATA_OPERATION_GET_NAME) {
@@ -2198,6 +2301,163 @@ void data_dlog_preview_overlay(DataOperationEnum operation, Cursor cursor, Value
 
         value = Value(&overlay, VALUE_TYPE_POINTER);
     }
+}
+
+void data_dlog_view_selected_tab(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = g_selectedTab;
+	}
+}
+
+static const uint32_t BOOKMARKS_PER_PAGE = 8;
+
+void action_dlog_view_select_bookmarks_tab() {
+	g_selectedTab = TAB_BOOKMARKS;
+
+	auto bookmarks = getBookmarks();
+	if (bookmarks && bookmarks->count > BOOKMARKS_PER_PAGE) {
+		setFocusCursor(Cursor(-1), DATA_ID_DLOG_BOOKMARKS);
+	}
+}
+
+void action_dlog_view_select_options_tab() {
+	g_selectedTab = TAB_OPTIONS;
+}
+
+void data_dlog_bookmarks_is_scrollbar_visible(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		auto bookmarks = getBookmarks();
+        value = bookmarks && bookmarks->count > BOOKMARKS_PER_PAGE;
+    }
+}
+
+void data_dlog_bookmarks(DataOperationEnum operation, Cursor cursor, Value &value) {
+    auto bookmarks = getBookmarks();
+	if (operation == DATA_OPERATION_COUNT) {
+		value = (int)(bookmarks ? bookmarks->count : 0);
+	} else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
+        value = Value(bookmarks ? bookmarks->count : 0, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
+        value = Value(g_bookmarksScrollPosition, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
+		if (value.getUInt32() + BOOKMARKS_PER_PAGE > bookmarks->count) {
+			g_bookmarksScrollPosition = bookmarks->count - BOOKMARKS_PER_PAGE;
+		} else {
+			g_bookmarksScrollPosition = value.getUInt32();
+		}
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
+        value = Value(BOOKMARKS_PER_PAGE, VALUE_TYPE_UINT32);
+	} else if (operation == DATA_OPERATION_GET) {
+		value = MakeValue(1.0f * g_bookmarksScrollPosition, UNIT_NONE);
+	} else if (operation == DATA_OPERATION_GET_MIN) {
+		value = MakeValue(0, UNIT_NONE);
+	} else if (operation == DATA_OPERATION_GET_MAX) {
+		value = MakeValue(1.0f * (bookmarks->count - BOOKMARKS_PER_PAGE), UNIT_NONE);
+	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+ 		auto stepValues = value.getStepValues();
+
+		static float values[] = { 1.0f, 5.0f, 10.0f, 20.0f };
+
+		stepValues->values = values;
+		stepValues->count = sizeof(values) / sizeof(float);
+		stepValues->unit = UNIT_NONE;
+
+		stepValues->encoderSettings.accelerationEnabled = true;
+		stepValues->encoderSettings.range = 10.0f * stepValues->values[0];
+		stepValues->encoderSettings.step = stepValues->values[0];
+		stepValues->encoderSettings.mode = edit_mode_step::g_scrollBarEncoderMode;
+
+		value = 1;
+	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+        psu::gui::edit_mode_step::g_scrollBarEncoderMode = (EncoderMode)value.getInt();
+    } else if (operation == DATA_OPERATION_SET) {
+		uint32_t position = (uint32_t)value.getFloat();
+		if (position + BOOKMARKS_PER_PAGE > bookmarks->count) {
+			g_bookmarksScrollPosition = bookmarks->count - BOOKMARKS_PER_PAGE;
+		} else {
+			g_bookmarksScrollPosition = position;
+		}
+	}
+}
+
+void data_dlog_bookmark_x_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		auto bookmarks = getBookmarks();
+		if (bookmarks && (uint32_t)cursor < bookmarks->count) {
+			auto &recording = dlog_view::getRecording();
+			value = Value(bookmarks->list[cursor].position * recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
+		}
+	}
+}
+
+void data_dlog_bookmark_text(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		auto bookmarks = getBookmarks();
+		if (bookmarks && (uint32_t)cursor < bookmarks->count) {
+			value = bookmarks->list[cursor].text;
+		}
+	}
+}
+
+void data_dlog_bookmark_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		auto bookmarks = getBookmarks();
+		if (bookmarks) {
+			value = (uint32_t)cursor == g_selectedBookmarkIndex;
+		}
+	}
+}
+
+void action_dlog_view_select_bookmark() {
+	g_selectedBookmarkIndex = getFoundWidgetAtDown().cursor;
+
+    auto bookmarks = getBookmarks();
+
+    auto cursorOffset = bookmarks->list[g_selectedBookmarkIndex].position * g_dlogFile.parameters.xAxis.step / g_dlogFile.parameters.period - dlog_view::getPosition(g_dlogFile);
+	if (cursorOffset < 0 || cursorOffset >= (uint32_t)VIEW_WIDTH) {
+		cursorOffset = VIEW_WIDTH / 2.0f;
+    }
+
+    g_dlogFile.xAxisOffset = bookmarks->list[g_selectedBookmarkIndex].position * g_dlogFile.parameters.xAxis.step - cursorOffset * g_dlogFile.parameters.period;
+    adjustXAxisOffset(g_dlogFile);
+
+    g_dlogFile.cursorOffset = (uint32_t)roundf(cursorOffset);
+
+	if (bookmarks && bookmarks->count > BOOKMARKS_PER_PAGE) {
+		setFocusCursor(Cursor(-1), DATA_ID_DLOG_BOOKMARKS);
+	}
+}
+
+void data_dlog_view_is_zoom_in_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		if (&getRecording() == &g_dlogFile) {
+			value = g_dlogFile.xAxisDiv > g_dlogFile.xAxisDivMin;
+		} else {
+			value = 0;
+		}
+	}
+}
+
+void action_dlog_view_zoom_in() {
+	if (&getRecording() == &g_dlogFile) {
+		changeXAxisDiv(g_dlogFile, MAX(g_dlogFile.xAxisDiv / 2, g_dlogFile.xAxisDivMin));
+	}
+}
+
+void data_dlog_view_is_zoom_out_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		if (&getRecording() == &g_dlogFile) {
+			value = g_dlogFile.xAxisDiv < g_dlogFile.xAxisDivMax;
+		} else {
+			value = 0;
+		}
+	}
+}
+
+void action_dlog_view_zoom_out() {
+	if (&getRecording() == &g_dlogFile) {
+		changeXAxisDiv(g_dlogFile, MIN(g_dlogFile.xAxisDiv * 2, g_dlogFile.xAxisDivMax));
+	}
 }
 
 } // namespace gui

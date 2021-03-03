@@ -884,7 +884,7 @@ scpi_result_t scpi_cmd_senseDlogTraceBookmark(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    dlog_record::logText(text, textLen);
+    dlog_record::logBookmark(text, textLen);
 
     return SCPI_RES_OK;
 }

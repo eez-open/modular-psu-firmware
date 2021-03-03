@@ -398,6 +398,27 @@ void animateFadeOutFadeIn(const Rect &rect) {
     animateRects(&g_psuAppContext, BUFFER_NEW, i, 2 * psu::persist_conf::devConf.animationsDuration);
 }
 
+static const Rect g_rightDrawerClosed = { 480, 0, 160, 272 };
+static const Rect g_rightDrawerOpened = { 320, 0, 160, 272 };
+
+void animateRightDrawerOpen() {
+	int i = 0;
+
+	g_animRects[i++] = { BUFFER_NEW, g_rightDrawerClosed, g_rightDrawerOpened, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+	animateRects(&g_psuAppContext, BUFFER_OLD, i);
+    g_animationState.easingRects = remapCubic;
+}
+
+void animateRightDrawerClose() {
+	int i = 0;
+
+	g_animRects[i++] = { BUFFER_OLD, g_rightDrawerOpened, g_rightDrawerClosed, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+
+	animateRects(&g_psuAppContext, BUFFER_NEW, i);
+    g_animationState.easingRects = remapCubic;
+}
+
 } // namespace gui
 } // namespace psu
 } // namespace eez

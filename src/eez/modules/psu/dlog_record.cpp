@@ -116,9 +116,8 @@ static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
 ////////////////////////////////////////////////////////////////////////////////
 
 static File g_file;
-static bool g_textFileOpened;
-static File g_fileText;
-static File g_fileTextIndex;
+static bool g_bookmarksFileOpened;
+static File g_bookmarksFile;
 
 static int fileOpen() {
     if (!g_file.open(g_recordingParameters.filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
@@ -127,7 +126,7 @@ static int fileOpen() {
         return SCPI_ERROR_MASS_STORAGE_ERROR;
     }
 
-    g_textFileOpened = false;
+    g_bookmarksFileOpened = false;
 
     return SCPI_RES_OK;
 }
@@ -379,10 +378,9 @@ static int doStartImmediately() {
     //}
 
     g_activeRecording.size = 0;
-    g_activeRecording.pageSize = 480;
 
     g_activeRecording.xAxisOffset = 0.0f;
-    g_activeRecording.xAxisDiv = g_activeRecording.pageSize * g_activeRecording.parameters.period / dlog_view::NUM_HORZ_DIVISIONS;
+    g_activeRecording.xAxisDiv = g_activeRecording.parameters.period * dlog_view::WIDTH_PER_DIVISION;
 
     for (int8_t dlogItemIndex = 0; dlogItemIndex < g_activeRecording.parameters.numDlogItems; ++dlogItemIndex) {
         auto &dlogItem = g_activeRecording.parameters.dlogItems[dlogItemIndex];
@@ -522,7 +520,7 @@ static void resetFilePath() {
     *g_recordingParameters.filePath = 0;
 }
 
-static void finalizeLogText();
+static void finalizeBookmarks();
 
 static void doFinish(bool afterError) {
     setState(STATE_IDLE);
@@ -539,8 +537,12 @@ static void doFinish(bool afterError) {
 	g_file.seek(g_writer.getFinishTimeFieldOffset());
 	g_file.write(&g_activeRecording.parameters.finalDuration, 8);
 
-    if (g_textFileOpened) {
-        finalizeLogText();
+    // write data size
+	g_file.seek(g_writer.getDataSizeFieldOffset());
+	g_file.write(&g_activeRecording.size, 4);
+
+    if (g_bookmarksFileOpened) {
+        finalizeBookmarks();
     }
 
     g_file.close();
@@ -907,95 +909,74 @@ void logInvalid() {
     }
 }
 
-void logText(const char *text, size_t textLen) {
+void logBookmark(const char *text, size_t textLen) {
     if (isModuleLocalRecording()) {
         // TODO report error
         return;
     }
 
     if (g_state == STATE_EXECUTING) {
-        if (!g_textFileOpened) {
+        if (!g_bookmarksFileOpened) {
             char filePath[MAX_PATH_LENGTH];
 
 			stringCopy(filePath, MAX_PATH_LENGTH, g_recordingParameters.filePath);
-			stringAppendString(filePath, MAX_PATH_LENGTH, ".dlogi");
-			if (!g_fileTextIndex.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
+			stringAppendString(filePath, MAX_PATH_LENGTH, ".dlog-bookmarks");
+			if (!g_bookmarksFile.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
 				// TODO report error
 				return;
 			}
 			
-			stringCopy(filePath, MAX_PATH_LENGTH, g_recordingParameters.filePath);
-            stringAppendString(filePath, MAX_PATH_LENGTH, ".dlogt");
-            if (!g_fileText.open(filePath, FILE_CREATE_ALWAYS | FILE_WRITE)) {
-                // TODO report error
-                return;
-            }
-
-
-            g_textFileOpened = true;
+            g_bookmarksFileOpened = true;
         }
 
-        uint32_t sampleIndex = g_activeRecording.size;
-        g_fileTextIndex.write(&sampleIndex, sizeof(sampleIndex));
+        uint8_t buffer[7];
 
-        uint32_t textIndex = g_fileText.size();
-        g_fileTextIndex.write(&textIndex, sizeof(textIndex));
+        uint16_t length = (uint16_t)(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint32_t) + textLen);
+        auto p = (uint8_t *)&length;
+        buffer[0] = p[0];
+        buffer[1] = p[1];
+        
+        buffer[2] = dlog_file::FIELD_ID_BOOKMARK;
 
-        g_fileText.write(text, textLen);
+        p = (uint8_t *)&g_activeRecording.size;
+        buffer[3] = p[0];
+        buffer[4] = p[1];
+        buffer[5] = p[2];
+        buffer[6] = p[3];
+
+        g_bookmarksFile.write(buffer, sizeof(buffer));
+
+        g_bookmarksFile.write(text, textLen);
+
+		g_bookmarksFile.sync();
     }
 }
 
-static void finalizeLogText() {
+static void finalizeBookmarks() {
+	// append bookmarks file to the end of dlog file
+	g_bookmarksFile.close();
+
 	char filePath[MAX_PATH_LENGTH];
-	
-	// append text index file to the end of dlog file
-	g_file.seek(g_writer.getTextIndexFileOffset());
-    uint32_t textIndexFileOffset = g_file.size();
-	g_file.write(&textIndexFileOffset, sizeof(textIndexFileOffset));
 
-	g_fileTextIndex.close();
 	stringCopy(filePath, MAX_PATH_LENGTH, g_recordingParameters.filePath);
-	stringAppendString(filePath, MAX_PATH_LENGTH, ".dlogi");
+	stringAppendString(filePath, MAX_PATH_LENGTH, ".dlog-bookmarks");
 
-	if (!g_fileTextIndex.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+	if (!g_bookmarksFile.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
 		// TODO report error
 		return;
 	}
 
-    uint32_t fileSize = g_fileTextIndex.size();
-    g_file.seek(textIndexFileOffset);
+    uint32_t fileSize = g_bookmarksFile.size();
+
+    g_file.seek(g_writer.getDataOffset() + g_activeRecording.size * g_activeRecording.numBytesPerRow);
+
     for (uint32_t i = 0; i < fileSize; i += CHUNK_SIZE) {
         uint32_t n = MIN(CHUNK_SIZE, fileSize - i);
-		g_fileTextIndex.read(DLOG_RECORD_BUFFER, n);
+		g_bookmarksFile.read(DLOG_RECORD_BUFFER, n);
         g_file.write(DLOG_RECORD_BUFFER, n);
     }
 
-    g_fileTextIndex.close();
-    sd_card::deleteFile(filePath, nullptr);
-
-    // append text file to the end of dlog file
-	g_file.seek(g_writer.getTextFileOffset());
-    uint32_t textFileOffset = g_file.size();
-	g_file.write(&textFileOffset, sizeof(textFileOffset));
-
-	g_fileText.close();
-	stringCopy(filePath, MAX_PATH_LENGTH, g_recordingParameters.filePath);
-	stringAppendString(filePath, MAX_PATH_LENGTH, ".dlogt");
-
-	if (!g_fileText.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-		// TODO report error
-		return;
-	}
-
-    fileSize = g_fileText.size();
-	g_file.seek(textFileOffset);
-    for (uint32_t i = 0; i < fileSize; i += CHUNK_SIZE) {
-        uint32_t n = MIN(CHUNK_SIZE, fileSize - i);
-		g_fileText.read(DLOG_RECORD_BUFFER, n);
-        g_file.write(DLOG_RECORD_BUFFER, n);
-    }
-
-	g_fileText.close();
+    g_bookmarksFile.close();
     sd_card::deleteFile(filePath, nullptr);
 }
 

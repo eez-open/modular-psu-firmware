@@ -2444,6 +2444,51 @@
       "name": "dlog_period_has_predefined_values",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "dlog_view_selected_tab",
+      "type": "enum",
+      "enumItems": "[\"Options\", \"Bookmarks\"]"
+    },
+    {
+      "name": "dlog_bookmarks",
+      "type": "list",
+      "defaultValue": "[\n  { \"dlog_bookmark_x_value\": \"1 s\", \"dlog_bookmark_text\": \"Bookmark 1\" },\n  { \"dlog_bookmark_x_value\": \"2 s\", \"dlog_bookmark_text\": \"Bookmark 2\" },\n  { \"dlog_bookmark_x_value\": \"3 s\", \"dlog_bookmark_text\": \"Bookmark 3\" },\n  { \"dlog_bookmark_x_value\": \"4 s\", \"dlog_bookmark_text\": \"Bookmark 4\" },\n  { \"dlog_bookmark_x_value\": \"5 s\", \"dlog_bookmark_text\": \"Bookmark 5\" },\n  { \"dlog_bookmark_x_value\": \"6 s\", \"dlog_bookmark_text\": \"Bookmark 6\" },\n  { \"dlog_bookmark_x_value\": \"7 s\", \"dlog_bookmark_text\": \"Bookmark 7\" },\n  { \"dlog_bookmark_x_value\": \"8 s\", \"dlog_bookmark_text\": \"Bookmark 8\" }\n]"
+    },
+    {
+      "name": "dlog_bookmark_x_value",
+      "type": "float",
+      "defaultValue": "0"
+    },
+    {
+      "name": "dlog_bookmark_text",
+      "type": "string",
+      "defaultValue": "Bookmark 1"
+    },
+    {
+      "name": "dlog_bookmark_is_selected",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
+      "name": "dlog_view_is_drawer_open",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "dlog_view_is_zoom_in_enabled",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "dlog_view_is_zoom_out_enabled",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
+      "name": "dlog_bookmarks_is_scrollbar_visible",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -2957,7 +3002,7 @@
       "name": "dlog_edit_file_name"
     },
     {
-      "name": "dlog_view_show_overlay_options"
+      "name": "dlog_view_toggle_drawer"
     },
     {
       "name": "file_manager_sort_by"
@@ -3171,6 +3216,21 @@
     },
     {
       "name": "dlog_period_select_predefined_value"
+    },
+    {
+      "name": "dlog_view_select_bookmarks_tab"
+    },
+    {
+      "name": "dlog_view_select_options_tab"
+    },
+    {
+      "name": "dlog_view_select_bookmark"
+    },
+    {
+      "name": "dlog_view_zoom_in"
+    },
+    {
+      "name": "dlog_view_zoom_out"
     }
   ],
   "gui": {
@@ -32354,322 +32414,77 @@
                 "height": 272,
                 "widgets": [
                   {
-                    "type": "Container",
+                    "type": "Select",
                     "style": {
                       "inheritFrom": "default"
                     },
+                    "data": "dlog_view_is_drawer_open",
                     "left": 0,
-                    "top": 240,
+                    "top": 0,
                     "width": 480,
-                    "height": 32,
-                    "name": "Status line",
+                    "height": 272,
                     "widgets": [
                       {
-                        "type": "Select",
+                        "type": "Container",
                         "style": {
                           "inheritFrom": "default"
                         },
-                        "data": "is_single_page_on_stack",
                         "left": 0,
                         "top": 0,
-                        "width": 40,
-                        "height": 32,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "status_bgnd",
-                              "font": "Heydings14",
-                              "alignVertical": "center",
-                              "color": "status_line_text",
-                              "backgroundColor": "status_line_background",
-                              "activeColor": "status_line_background",
-                              "activeBackgroundColor": "status_line_text"
-                            },
-                            "action": "show_previous_page",
-                            "left": 0,
-                            "top": 0,
-                            "width": 40,
-                            "height": 32,
-                            "text": "E"
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "status_icon_enabled"
-                            },
-                            "action": "show_main_page",
-                            "left": 0,
-                            "top": 0,
-                            "width": 40,
-                            "height": 32,
-                            "text": "H"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Select",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "data": "is_show_live_recording",
-                        "left": 40,
-                        "top": 0,
-                        "width": 400,
-                        "height": 32,
+                        "width": 480,
+                        "height": 272,
                         "widgets": [
                           {
                             "type": "Container",
                             "style": {
                               "inheritFrom": "default"
                             },
-                            "data": "",
-                            "action": "",
                             "left": 0,
-                            "top": 0,
-                            "width": 400,
+                            "top": 240,
+                            "width": 480,
                             "height": 32,
+                            "name": "Status line",
                             "widgets": [
                               {
-                                "type": "Container",
+                                "type": "Select",
                                 "style": {
                                   "inheritFrom": "default"
                                 },
-                                "data": "dlog_x_axis_offset",
-                                "action": "edit",
-                                "left": 0,
-                                "top": 0,
-                                "width": 80,
-                                "height": 32,
-                                "widgets": [
-                                  {
-                                    "type": "Text",
-                                    "style": {
-                                      "inheritFrom": "status_line_small_title"
-                                    },
-                                    "data": "dlog_x_axis_offset",
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 80,
-                                    "height": 14,
-                                    "text": "Offset"
-                                  },
-                                  {
-                                    "type": "DisplayData",
-                                    "style": {
-                                      "inheritFrom": "edit_value_S_centered_status_line"
-                                    },
-                                    "data": "dlog_x_axis_offset",
-                                    "action": "",
-                                    "left": 0,
-                                    "top": 14,
-                                    "width": 80,
-                                    "height": 18,
-                                    "displayOption": 0
-                                  }
-                                ]
-                              },
-                              {
-                                "type": "Container",
-                                "style": {
-                                  "inheritFrom": "default"
-                                },
-                                "data": "dlog_x_axis_div",
-                                "action": "edit",
-                                "left": 80,
-                                "top": 0,
-                                "width": 80,
-                                "height": 32,
-                                "widgets": [
-                                  {
-                                    "type": "Text",
-                                    "style": {
-                                      "inheritFrom": "status_line_small_title"
-                                    },
-                                    "data": "dlog_x_axis_div",
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 80,
-                                    "height": 14,
-                                    "text": "Div"
-                                  },
-                                  {
-                                    "type": "DisplayData",
-                                    "style": {
-                                      "inheritFrom": "edit_value_S_centered_status_line"
-                                    },
-                                    "data": "dlog_x_axis_div",
-                                    "action": "",
-                                    "left": 0,
-                                    "top": 14,
-                                    "width": 80,
-                                    "height": 18,
-                                    "displayOption": 0
-                                  }
-                                ]
-                              },
-                              {
-                                "type": "Text",
-                                "style": {
-                                  "inheritFrom": "status_line_small_title"
-                                },
-                                "data": "dlog_x_axis_max_value_label",
-                                "left": 160,
-                                "top": 0,
-                                "width": 80,
-                                "height": 14,
-                                "text": ""
-                              },
-                              {
-                                "type": "Text",
-                                "style": {
-                                  "inheritFrom": "edit_value_S_centered_status_line"
-                                },
-                                "data": "dlog_x_axis_max_value",
-                                "left": 160,
-                                "top": 14,
-                                "width": 80,
-                                "height": 18,
-                                "text": ""
-                              },
-                              {
-                                "type": "ScrollBar",
-                                "style": {
-                                  "inheritFrom": "scrollbar_track"
-                                },
-                                "data": "recording",
-                                "left": 240,
-                                "top": 0,
-                                "width": 160,
-                                "height": 32,
-                                "thumbStyle": {
-                                  "inheritFrom": "scrollbar_thumb"
-                                },
-                                "buttonsStyle": {
-                                  "inheritFrom": "scrollbar_button"
-                                },
-                                "leftButtonText": "\\u0025",
-                                "rightButtonText": "\\u0026"
-                              }
-                            ]
-                          },
-                          {
-                            "type": "Container",
-                            "style": {
-                              "inheritFrom": "default"
-                            },
-                            "left": 0,
-                            "top": 0,
-                            "width": 400,
-                            "height": 32,
-                            "widgets": [
-                              {
-                                "type": "Text",
-                                "style": {
-                                  "inheritFrom": "dlog_record_button"
-                                },
-                                "action": "dlog_toggle",
+                                "data": "is_single_page_on_stack",
                                 "left": 0,
                                 "top": 0,
                                 "width": 40,
                                 "height": 32,
-                                "text": "\\u0023"
-                              },
-                              {
-                                "type": "Select",
-                                "style": {
-                                  "inheritFrom": "default",
-                                  "color": "status_line_text",
-                                  "backgroundColor": "status_line_background",
-                                  "activeColor": "status_line_background",
-                                  "activeBackgroundColor": "status_line_text"
-                                },
-                                "data": "dlog_state",
-                                "left": 40,
-                                "top": 0,
-                                "width": 200,
-                                "height": 32,
                                 "widgets": [
                                   {
-                                    "type": "Rectangle",
+                                    "type": "Text",
                                     "style": {
-                                      "inheritFrom": "default",
+                                      "inheritFrom": "status_bgnd",
+                                      "font": "Heydings14",
+                                      "alignVertical": "center",
                                       "color": "status_line_text",
                                       "backgroundColor": "status_line_background",
                                       "activeColor": "status_line_background",
                                       "activeBackgroundColor": "status_line_text"
                                     },
+                                    "action": "show_previous_page",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 200,
+                                    "width": 40,
                                     "height": 32,
-                                    "invertColors": true
+                                    "text": "E"
                                   },
                                   {
                                     "type": "Text",
                                     "style": {
-                                      "inheritFrom": "edit_value_S_left",
-                                      "alignHorizontal": "left",
-                                      "color": "status_line_text",
-                                      "backgroundColor": "status_line_background",
-                                      "activeColor": "status_line_background",
-                                      "activeBackgroundColor": "status_line_text"
+                                      "inheritFrom": "status_icon_enabled"
                                     },
+                                    "action": "show_main_page",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 200,
+                                    "width": 40,
                                     "height": 32,
-                                    "text": "Dlog trigger waiting"
-                                  },
-                                  {
-                                    "type": "Container",
-                                    "style": {
-                                      "inheritFrom": "default",
-                                      "color": "status_line_text",
-                                      "backgroundColor": "status_line_background",
-                                      "activeColor": "status_line_background",
-                                      "activeBackgroundColor": "status_line_text"
-                                    },
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 200,
-                                    "height": 32,
-                                    "widgets": [
-                                      {
-                                        "type": "DisplayData",
-                                        "style": {
-                                          "inheritFrom": "edit_value_S_left",
-                                          "alignHorizontal": "left",
-                                          "color": "status_line_text",
-                                          "backgroundColor": "status_line_background",
-                                          "activeColor": "status_line_background",
-                                          "activeBackgroundColor": "status_line_text"
-                                        },
-                                        "data": "dlog_x_axis_max_value",
-                                        "left": 0,
-                                        "top": 0,
-                                        "width": 100,
-                                        "height": 32,
-                                        "displayOption": 0
-                                      },
-                                      {
-                                        "type": "DisplayData",
-                                        "style": {
-                                          "inheritFrom": "edit_value_S_left",
-                                          "alignHorizontal": "left",
-                                          "color": "status_line_text",
-                                          "backgroundColor": "status_line_background",
-                                          "activeColor": "status_line_background",
-                                          "activeBackgroundColor": "status_line_text"
-                                        },
-                                        "data": "dlog_file_length",
-                                        "left": 100,
-                                        "top": 0,
-                                        "width": 100,
-                                        "height": 32,
-                                        "displayOption": 0
-                                      }
-                                    ]
+                                    "text": "H"
                                   }
                                 ]
                               },
@@ -32678,26 +32493,146 @@
                                 "style": {
                                   "inheritFrom": "default"
                                 },
-                                "data": "script_is_started",
-                                "left": 240,
+                                "data": "is_show_live_recording",
+                                "left": 40,
                                 "top": 0,
-                                "width": 160,
+                                "width": 400,
                                 "height": 32,
                                 "widgets": [
                                   {
-                                    "type": "Rectangle",
+                                    "type": "Container",
                                     "style": {
-                                      "inheritFrom": "default",
-                                      "color": "status_line_text",
-                                      "backgroundColor": "status_line_background",
-                                      "activeColor": "status_line_background",
-                                      "activeBackgroundColor": "status_line_text"
+                                      "inheritFrom": "default"
                                     },
+                                    "data": "",
+                                    "action": "",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 160,
+                                    "width": 400,
                                     "height": 32,
-                                    "invertColors": true
+                                    "widgets": [
+                                      {
+                                        "type": "Container",
+                                        "style": {
+                                          "inheritFrom": "default"
+                                        },
+                                        "data": "dlog_x_axis_offset",
+                                        "action": "edit",
+                                        "left": 0,
+                                        "top": 0,
+                                        "width": 80,
+                                        "height": 32,
+                                        "widgets": [
+                                          {
+                                            "type": "Text",
+                                            "style": {
+                                              "inheritFrom": "status_line_small_title"
+                                            },
+                                            "data": "dlog_x_axis_offset",
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 80,
+                                            "height": 14,
+                                            "text": "Offset"
+                                          },
+                                          {
+                                            "type": "DisplayData",
+                                            "style": {
+                                              "inheritFrom": "edit_value_S_centered_status_line"
+                                            },
+                                            "data": "dlog_x_axis_offset",
+                                            "action": "",
+                                            "left": 0,
+                                            "top": 14,
+                                            "width": 80,
+                                            "height": 18,
+                                            "displayOption": 0
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Container",
+                                        "style": {
+                                          "inheritFrom": "default"
+                                        },
+                                        "data": "dlog_x_axis_div",
+                                        "action": "edit",
+                                        "left": 80,
+                                        "top": 0,
+                                        "width": 80,
+                                        "height": 32,
+                                        "widgets": [
+                                          {
+                                            "type": "Text",
+                                            "style": {
+                                              "inheritFrom": "status_line_small_title"
+                                            },
+                                            "data": "dlog_x_axis_div",
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 80,
+                                            "height": 14,
+                                            "text": "Div"
+                                          },
+                                          {
+                                            "type": "DisplayData",
+                                            "style": {
+                                              "inheritFrom": "edit_value_S_centered_status_line"
+                                            },
+                                            "data": "dlog_x_axis_div",
+                                            "action": "",
+                                            "left": 0,
+                                            "top": 14,
+                                            "width": 80,
+                                            "height": 18,
+                                            "displayOption": 0
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "status_line_small_title"
+                                        },
+                                        "data": "dlog_x_axis_max_value_label",
+                                        "left": 160,
+                                        "top": 0,
+                                        "width": 80,
+                                        "height": 14,
+                                        "text": ""
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "edit_value_S_centered_status_line"
+                                        },
+                                        "data": "dlog_x_axis_max_value",
+                                        "left": 160,
+                                        "top": 14,
+                                        "width": 80,
+                                        "height": 18,
+                                        "text": ""
+                                      },
+                                      {
+                                        "type": "ScrollBar",
+                                        "style": {
+                                          "inheritFrom": "scrollbar_track"
+                                        },
+                                        "data": "recording",
+                                        "left": 240,
+                                        "top": 0,
+                                        "width": 160,
+                                        "height": 32,
+                                        "thumbStyle": {
+                                          "inheritFrom": "scrollbar_thumb"
+                                        },
+                                        "buttonsStyle": {
+                                          "inheritFrom": "scrollbar_button"
+                                        },
+                                        "leftButtonText": "\\u0025",
+                                        "rightButtonText": "\\u0026"
+                                      }
+                                    ]
                                   },
                                   {
                                     "type": "Container",
@@ -32706,113 +32641,426 @@
                                     },
                                     "left": 0,
                                     "top": 0,
-                                    "width": 160,
+                                    "width": 400,
+                                    "height": 32,
+                                    "widgets": [
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "dlog_record_button"
+                                        },
+                                        "action": "dlog_toggle",
+                                        "left": 0,
+                                        "top": 0,
+                                        "width": 40,
+                                        "height": 32,
+                                        "text": "\\u0023"
+                                      },
+                                      {
+                                        "type": "Select",
+                                        "style": {
+                                          "inheritFrom": "default",
+                                          "color": "status_line_text",
+                                          "backgroundColor": "status_line_background",
+                                          "activeColor": "status_line_background",
+                                          "activeBackgroundColor": "status_line_text"
+                                        },
+                                        "data": "dlog_state",
+                                        "left": 40,
+                                        "top": 0,
+                                        "width": 200,
+                                        "height": 32,
+                                        "widgets": [
+                                          {
+                                            "type": "Rectangle",
+                                            "style": {
+                                              "inheritFrom": "default",
+                                              "color": "status_line_text",
+                                              "backgroundColor": "status_line_background",
+                                              "activeColor": "status_line_background",
+                                              "activeBackgroundColor": "status_line_text"
+                                            },
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 200,
+                                            "height": 32,
+                                            "invertColors": true
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "style": {
+                                              "inheritFrom": "edit_value_S_left",
+                                              "alignHorizontal": "left",
+                                              "color": "status_line_text",
+                                              "backgroundColor": "status_line_background",
+                                              "activeColor": "status_line_background",
+                                              "activeBackgroundColor": "status_line_text"
+                                            },
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 200,
+                                            "height": 32,
+                                            "text": "Dlog trigger waiting"
+                                          },
+                                          {
+                                            "type": "Container",
+                                            "style": {
+                                              "inheritFrom": "default",
+                                              "color": "status_line_text",
+                                              "backgroundColor": "status_line_background",
+                                              "activeColor": "status_line_background",
+                                              "activeBackgroundColor": "status_line_text"
+                                            },
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 200,
+                                            "height": 32,
+                                            "widgets": [
+                                              {
+                                                "type": "DisplayData",
+                                                "style": {
+                                                  "inheritFrom": "edit_value_S_left",
+                                                  "alignHorizontal": "left",
+                                                  "color": "status_line_text",
+                                                  "backgroundColor": "status_line_background",
+                                                  "activeColor": "status_line_background",
+                                                  "activeBackgroundColor": "status_line_text"
+                                                },
+                                                "data": "dlog_x_axis_max_value",
+                                                "left": 0,
+                                                "top": 0,
+                                                "width": 100,
+                                                "height": 32,
+                                                "displayOption": 0
+                                              },
+                                              {
+                                                "type": "DisplayData",
+                                                "style": {
+                                                  "inheritFrom": "edit_value_S_left",
+                                                  "alignHorizontal": "left",
+                                                  "color": "status_line_text",
+                                                  "backgroundColor": "status_line_background",
+                                                  "activeColor": "status_line_background",
+                                                  "activeBackgroundColor": "status_line_text"
+                                                },
+                                                "data": "dlog_file_length",
+                                                "left": 100,
+                                                "top": 0,
+                                                "width": 100,
+                                                "height": 32,
+                                                "displayOption": 0
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Select",
+                                        "style": {
+                                          "inheritFrom": "default"
+                                        },
+                                        "data": "script_is_started",
+                                        "left": 240,
+                                        "top": 0,
+                                        "width": 160,
+                                        "height": 32,
+                                        "widgets": [
+                                          {
+                                            "type": "Rectangle",
+                                            "style": {
+                                              "inheritFrom": "default",
+                                              "color": "status_line_text",
+                                              "backgroundColor": "status_line_background",
+                                              "activeColor": "status_line_background",
+                                              "activeBackgroundColor": "status_line_text"
+                                            },
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 160,
+                                            "height": 32,
+                                            "invertColors": true
+                                          },
+                                          {
+                                            "type": "Container",
+                                            "style": {
+                                              "inheritFrom": "default"
+                                            },
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 160,
+                                            "height": 32,
+                                            "widgets": [
+                                              {
+                                                "type": "Text",
+                                                "style": {
+                                                  "inheritFrom": "overlay",
+                                                  "font": "Heydings14",
+                                                  "color": "status_line_text",
+                                                  "backgroundColor": "status_line_background",
+                                                  "activeColor": "status_line_background",
+                                                  "activeBackgroundColor": "status_line_text"
+                                                },
+                                                "left": 0,
+                                                "top": 0,
+                                                "width": 32,
+                                                "height": 32,
+                                                "text": "\\u007d"
+                                              },
+                                              {
+                                                "type": "Text",
+                                                "style": {
+                                                  "inheritFrom": "overlay",
+                                                  "alignHorizontal": "left",
+                                                  "color": "status_line_text",
+                                                  "backgroundColor": "status_line_background",
+                                                  "activeColor": "status_line_background",
+                                                  "activeBackgroundColor": "status_line_text"
+                                                },
+                                                "data": "script_info",
+                                                "left": 32,
+                                                "top": 0,
+                                                "width": 128,
+                                                "height": 32,
+                                                "text": ""
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Text",
+                                "style": {
+                                  "inheritFrom": "status_bgnd",
+                                  "font": "Heydings14"
+                                },
+                                "action": "dlog_view_toggle_drawer",
+                                "left": 440,
+                                "top": 0,
+                                "width": 40,
+                                "height": 32,
+                                "text": "\\u0020"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Select",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "data": "dlog_view_legend_view_option",
+                            "left": 0,
+                            "top": 0,
+                            "width": 480,
+                            "height": 240,
+                            "widgets": [
+                              {
+                                "type": "YTGraph",
+                                "style": {
+                                  "inheritFrom": "yt_graph"
+                                },
+                                "data": "recording",
+                                "action": "edit",
+                                "left": 0,
+                                "top": 0,
+                                "width": 480,
+                                "height": 240,
+                                "y1Style": {
+                                  "inheritFrom": "default"
+                                },
+                                "y2Data": "recording",
+                                "y2Style": {
+                                  "inheritFrom": "default"
+                                }
+                              },
+                              {
+                                "type": "YTGraph",
+                                "style": {
+                                  "inheritFrom": "yt_graph"
+                                },
+                                "data": "recording",
+                                "action": "edit",
+                                "left": 0,
+                                "top": 0,
+                                "width": 480,
+                                "height": 240,
+                                "y1Style": {
+                                  "inheritFrom": "default"
+                                },
+                                "y2Data": "recording",
+                                "y2Style": {
+                                  "inheritFrom": "default"
+                                }
+                              },
+                              {
+                                "type": "Container",
+                                "style": {
+                                  "inheritFrom": "default"
+                                },
+                                "left": 0,
+                                "top": 0,
+                                "width": 480,
+                                "height": 240,
+                                "widgets": [
+                                  {
+                                    "type": "Container",
+                                    "style": {
+                                      "inheritFrom": "default"
+                                    },
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 480,
                                     "height": 32,
                                     "widgets": [
                                       {
                                         "type": "Text",
                                         "style": {
                                           "inheritFrom": "overlay",
-                                          "font": "Heydings14",
-                                          "color": "status_line_text",
-                                          "backgroundColor": "status_line_background",
-                                          "activeColor": "status_line_background",
-                                          "activeBackgroundColor": "status_line_text"
+                                          "color": "yt_graph_y1",
+                                          "backgroundColor": "background",
+                                          "activeColor": "background",
+                                          "activeBackgroundColor": "yt_graph_y1"
                                         },
+                                        "data": "dlog_visible_value_label",
+                                        "action": "dlog_view_select_visible_value",
                                         "left": 0,
                                         "top": 0,
-                                        "width": 32,
+                                        "width": 78,
                                         "height": 32,
-                                        "text": "\\u007d"
+                                        "text": ""
                                       },
                                       {
                                         "type": "Text",
                                         "style": {
-                                          "inheritFrom": "overlay",
-                                          "alignHorizontal": "left",
-                                          "color": "status_line_text",
-                                          "backgroundColor": "status_line_background",
-                                          "activeColor": "status_line_background",
-                                          "activeBackgroundColor": "status_line_text"
+                                          "inheritFrom": "default_S",
+                                          "alignHorizontal": "right",
+                                          "padding": "0 4 0 0"
                                         },
-                                        "data": "script_info",
-                                        "left": 32,
+                                        "data": "",
+                                        "left": 78,
                                         "top": 0,
-                                        "width": 128,
+                                        "width": 56,
                                         "height": 32,
-                                        "text": ""
+                                        "text": "Offset:"
+                                      },
+                                      {
+                                        "type": "DisplayData",
+                                        "style": {
+                                          "inheritFrom": "encoder_cursor_14_enabled",
+                                          "color": "overlay_background",
+                                          "activeBackgroundColor": "overlay_background",
+                                          "focusBackgroundColor": "action_color"
+                                        },
+                                        "data": "dlog_visible_value_offset",
+                                        "action": "edit",
+                                        "left": 134,
+                                        "top": 0,
+                                        "width": 78,
+                                        "height": 32,
+                                        "displayOption": 0
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "default_S",
+                                          "alignHorizontal": "right",
+                                          "padding": "0 4 0 0"
+                                        },
+                                        "data": "",
+                                        "left": 212,
+                                        "top": 0,
+                                        "width": 46,
+                                        "height": 32,
+                                        "text": "Div:"
+                                      },
+                                      {
+                                        "type": "DisplayData",
+                                        "style": {
+                                          "inheritFrom": "encoder_cursor_14_enabled",
+                                          "color": "overlay_background",
+                                          "activeBackgroundColor": "overlay_background",
+                                          "focusBackgroundColor": "action_color"
+                                        },
+                                        "data": "dlog_visible_value_div",
+                                        "action": "edit",
+                                        "left": 258,
+                                        "top": 0,
+                                        "width": 78,
+                                        "height": 32,
+                                        "displayOption": 0
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "default_S",
+                                          "alignHorizontal": "right",
+                                          "padding": "0 4 0 0"
+                                        },
+                                        "data": "",
+                                        "left": 336,
+                                        "top": 0,
+                                        "width": 66,
+                                        "height": 32,
+                                        "text": "Cursor:"
+                                      },
+                                      {
+                                        "type": "DisplayData",
+                                        "style": {
+                                          "inheritFrom": "encoder_cursor_14_enabled",
+                                          "color": "overlay_background",
+                                          "activeBackgroundColor": "overlay_background",
+                                          "focusBackgroundColor": "action_color"
+                                        },
+                                        "data": "dlog_visible_value_cursor",
+                                        "action": "",
+                                        "left": 402,
+                                        "top": 0,
+                                        "width": 78,
+                                        "height": 32,
+                                        "displayOption": 0
                                       }
                                     ]
+                                  },
+                                  {
+                                    "type": "Rectangle",
+                                    "style": {
+                                      "inheritFrom": "default",
+                                      "color": "status_line_background",
+                                      "activeBackgroundColor": "status_line_background"
+                                    },
+                                    "left": 0,
+                                    "top": 32,
+                                    "width": 480,
+                                    "height": 1,
+                                    "invertColors": false
+                                  },
+                                  {
+                                    "type": "YTGraph",
+                                    "style": {
+                                      "inheritFrom": "yt_graph"
+                                    },
+                                    "data": "recording",
+                                    "action": "edit",
+                                    "left": 0,
+                                    "top": 33,
+                                    "width": 480,
+                                    "height": 207,
+                                    "y1Style": {
+                                      "inheritFrom": "default"
+                                    },
+                                    "y2Data": "recording",
+                                    "y2Style": {
+                                      "inheritFrom": "default"
+                                    }
                                   }
                                 ]
                               }
                             ]
                           }
                         ]
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "status_bgnd",
-                          "font": "Heydings14"
-                        },
-                        "action": "dlog_view_show_overlay_options",
-                        "left": 440,
-                        "top": 0,
-                        "width": 40,
-                        "height": 32,
-                        "text": "\\u0020"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "dlog_view_legend_view_option",
-                    "left": 0,
-                    "top": 0,
-                    "width": 480,
-                    "height": 240,
-                    "widgets": [
-                      {
-                        "type": "YTGraph",
-                        "style": {
-                          "inheritFrom": "yt_graph"
-                        },
-                        "data": "recording",
-                        "action": "edit",
-                        "left": 0,
-                        "top": 0,
-                        "width": 480,
-                        "height": 240,
-                        "y1Style": {
-                          "inheritFrom": "default"
-                        },
-                        "y2Data": "recording",
-                        "y2Style": {
-                          "inheritFrom": "default"
-                        }
-                      },
-                      {
-                        "type": "YTGraph",
-                        "style": {
-                          "inheritFrom": "yt_graph"
-                        },
-                        "data": "recording",
-                        "action": "edit",
-                        "left": 0,
-                        "top": 0,
-                        "width": 480,
-                        "height": 240,
-                        "y1Style": {
-                          "inheritFrom": "default"
-                        },
-                        "y2Data": "recording",
-                        "y2Style": {
-                          "inheritFrom": "default"
-                        }
                       },
                       {
                         "type": "Container",
@@ -32822,7 +33070,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 480,
-                        "height": 240,
+                        "height": 272,
                         "widgets": [
                           {
                             "type": "Container",
@@ -32830,150 +33078,598 @@
                               "inheritFrom": "default"
                             },
                             "left": 0,
-                            "top": 0,
-                            "width": 480,
+                            "top": 240,
+                            "width": 320,
                             "height": 32,
+                            "name": "Status line",
                             "widgets": [
                               {
-                                "type": "Text",
+                                "type": "Select",
                                 "style": {
-                                  "inheritFrom": "overlay",
-                                  "color": "yt_graph_y1",
-                                  "backgroundColor": "background",
-                                  "activeColor": "background",
-                                  "activeBackgroundColor": "yt_graph_y1"
+                                  "inheritFrom": "default"
                                 },
-                                "data": "dlog_visible_value_label",
-                                "action": "dlog_view_select_visible_value",
+                                "data": "is_single_page_on_stack",
                                 "left": 0,
                                 "top": 0,
-                                "width": 78,
+                                "width": 40,
                                 "height": 32,
-                                "text": ""
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "style": {
+                                      "inheritFrom": "status_bgnd",
+                                      "font": "Heydings14",
+                                      "alignVertical": "center",
+                                      "color": "status_line_text",
+                                      "backgroundColor": "status_line_background",
+                                      "activeColor": "status_line_background",
+                                      "activeBackgroundColor": "status_line_text"
+                                    },
+                                    "action": "show_previous_page",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 40,
+                                    "height": 32,
+                                    "text": "E"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "style": {
+                                      "inheritFrom": "status_icon_enabled"
+                                    },
+                                    "action": "show_main_page",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 40,
+                                    "height": 32,
+                                    "text": "H"
+                                  }
+                                ]
                               },
                               {
-                                "type": "Text",
+                                "type": "Select",
                                 "style": {
-                                  "inheritFrom": "default_S",
-                                  "alignHorizontal": "right",
-                                  "padding": "0 4 0 0"
+                                  "inheritFrom": "default"
                                 },
-                                "data": "",
-                                "left": 78,
+                                "data": "is_show_live_recording",
+                                "left": 40,
                                 "top": 0,
-                                "width": 56,
+                                "width": 280,
                                 "height": 32,
-                                "text": "Offset:"
-                              },
-                              {
-                                "type": "DisplayData",
-                                "style": {
-                                  "inheritFrom": "encoder_cursor_14_enabled",
-                                  "color": "overlay_background",
-                                  "activeBackgroundColor": "overlay_background",
-                                  "focusBackgroundColor": "action_color"
-                                },
-                                "data": "dlog_visible_value_offset",
-                                "action": "edit",
-                                "left": 134,
-                                "top": 0,
-                                "width": 78,
-                                "height": 32,
-                                "displayOption": 0
-                              },
-                              {
-                                "type": "Text",
-                                "style": {
-                                  "inheritFrom": "default_S",
-                                  "alignHorizontal": "right",
-                                  "padding": "0 4 0 0"
-                                },
-                                "data": "",
-                                "left": 212,
-                                "top": 0,
-                                "width": 46,
-                                "height": 32,
-                                "text": "Div:"
-                              },
-                              {
-                                "type": "DisplayData",
-                                "style": {
-                                  "inheritFrom": "encoder_cursor_14_enabled",
-                                  "color": "overlay_background",
-                                  "activeBackgroundColor": "overlay_background",
-                                  "focusBackgroundColor": "action_color"
-                                },
-                                "data": "dlog_visible_value_div",
-                                "action": "edit",
-                                "left": 258,
-                                "top": 0,
-                                "width": 78,
-                                "height": 32,
-                                "displayOption": 0
-                              },
-                              {
-                                "type": "Text",
-                                "style": {
-                                  "inheritFrom": "default_S",
-                                  "alignHorizontal": "right",
-                                  "padding": "0 4 0 0"
-                                },
-                                "data": "",
-                                "left": 336,
-                                "top": 0,
-                                "width": 66,
-                                "height": 32,
-                                "text": "Cursor:"
-                              },
-                              {
-                                "type": "DisplayData",
-                                "style": {
-                                  "inheritFrom": "encoder_cursor_14_enabled",
-                                  "color": "overlay_background",
-                                  "activeBackgroundColor": "overlay_background",
-                                  "focusBackgroundColor": "action_color"
-                                },
-                                "data": "dlog_visible_value_cursor",
-                                "action": "",
-                                "left": 402,
-                                "top": 0,
-                                "width": 78,
-                                "height": 32,
-                                "displayOption": 0
+                                "widgets": [
+                                  {
+                                    "type": "Container",
+                                    "style": {
+                                      "inheritFrom": "default"
+                                    },
+                                    "data": "",
+                                    "action": "",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 280,
+                                    "height": 32,
+                                    "widgets": [
+                                      {
+                                        "type": "Container",
+                                        "style": {
+                                          "inheritFrom": "default"
+                                        },
+                                        "data": "dlog_x_axis_offset",
+                                        "action": "edit",
+                                        "left": 0,
+                                        "top": 0,
+                                        "width": 80,
+                                        "height": 32,
+                                        "widgets": [
+                                          {
+                                            "type": "Text",
+                                            "style": {
+                                              "inheritFrom": "status_line_small_title"
+                                            },
+                                            "data": "dlog_x_axis_offset",
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 80,
+                                            "height": 14,
+                                            "text": "Offset"
+                                          },
+                                          {
+                                            "type": "DisplayData",
+                                            "style": {
+                                              "inheritFrom": "edit_value_S_centered_status_line"
+                                            },
+                                            "data": "dlog_x_axis_offset",
+                                            "action": "",
+                                            "left": 0,
+                                            "top": 14,
+                                            "width": 80,
+                                            "height": 18,
+                                            "displayOption": 0
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Container",
+                                        "style": {
+                                          "inheritFrom": "default"
+                                        },
+                                        "data": "dlog_x_axis_div",
+                                        "action": "edit",
+                                        "left": 80,
+                                        "top": 0,
+                                        "width": 80,
+                                        "height": 32,
+                                        "widgets": [
+                                          {
+                                            "type": "Text",
+                                            "style": {
+                                              "inheritFrom": "status_line_small_title"
+                                            },
+                                            "data": "dlog_x_axis_div",
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 80,
+                                            "height": 14,
+                                            "text": "Div"
+                                          },
+                                          {
+                                            "type": "DisplayData",
+                                            "style": {
+                                              "inheritFrom": "edit_value_S_centered_status_line"
+                                            },
+                                            "data": "dlog_x_axis_div",
+                                            "action": "",
+                                            "left": 0,
+                                            "top": 14,
+                                            "width": 80,
+                                            "height": 18,
+                                            "displayOption": 0
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "status_line_small_title"
+                                        },
+                                        "data": "dlog_x_axis_max_value_label",
+                                        "left": 160,
+                                        "top": 0,
+                                        "width": 80,
+                                        "height": 14,
+                                        "text": ""
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "edit_value_S_centered_status_line"
+                                        },
+                                        "data": "dlog_x_axis_max_value",
+                                        "left": 160,
+                                        "top": 14,
+                                        "width": 80,
+                                        "height": 18,
+                                        "text": ""
+                                      },
+                                      {
+                                        "type": "Rectangle",
+                                        "style": {
+                                          "inheritFrom": "edit_value_S_centered_status_line"
+                                        },
+                                        "left": 240,
+                                        "top": 0,
+                                        "width": 40,
+                                        "height": 32,
+                                        "invertColors": true
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "Container",
+                                    "style": {
+                                      "inheritFrom": "default"
+                                    },
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 280,
+                                    "height": 32,
+                                    "widgets": [
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "dlog_record_button"
+                                        },
+                                        "action": "dlog_toggle",
+                                        "left": 0,
+                                        "top": 0,
+                                        "width": 40,
+                                        "height": 32,
+                                        "text": "\\u0023"
+                                      },
+                                      {
+                                        "type": "Select",
+                                        "style": {
+                                          "inheritFrom": "default",
+                                          "color": "status_line_text",
+                                          "backgroundColor": "status_line_background",
+                                          "activeColor": "status_line_background",
+                                          "activeBackgroundColor": "status_line_text"
+                                        },
+                                        "data": "dlog_state",
+                                        "left": 40,
+                                        "top": 0,
+                                        "width": 200,
+                                        "height": 32,
+                                        "widgets": [
+                                          {
+                                            "type": "Rectangle",
+                                            "style": {
+                                              "inheritFrom": "default",
+                                              "color": "status_line_text",
+                                              "backgroundColor": "status_line_background",
+                                              "activeColor": "status_line_background",
+                                              "activeBackgroundColor": "status_line_text"
+                                            },
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 200,
+                                            "height": 32,
+                                            "invertColors": true
+                                          },
+                                          {
+                                            "type": "Text",
+                                            "style": {
+                                              "inheritFrom": "edit_value_S_left",
+                                              "alignHorizontal": "left",
+                                              "color": "status_line_text",
+                                              "backgroundColor": "status_line_background",
+                                              "activeColor": "status_line_background",
+                                              "activeBackgroundColor": "status_line_text"
+                                            },
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 200,
+                                            "height": 32,
+                                            "text": "Dlog trigger waiting"
+                                          },
+                                          {
+                                            "type": "Container",
+                                            "style": {
+                                              "inheritFrom": "default",
+                                              "color": "status_line_text",
+                                              "backgroundColor": "status_line_background",
+                                              "activeColor": "status_line_background",
+                                              "activeBackgroundColor": "status_line_text"
+                                            },
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 200,
+                                            "height": 32,
+                                            "widgets": [
+                                              {
+                                                "type": "DisplayData",
+                                                "style": {
+                                                  "inheritFrom": "edit_value_S_left",
+                                                  "alignHorizontal": "left",
+                                                  "color": "status_line_text",
+                                                  "backgroundColor": "status_line_background",
+                                                  "activeColor": "status_line_background",
+                                                  "activeBackgroundColor": "status_line_text"
+                                                },
+                                                "data": "dlog_x_axis_max_value",
+                                                "left": 0,
+                                                "top": 0,
+                                                "width": 100,
+                                                "height": 32,
+                                                "displayOption": 0
+                                              },
+                                              {
+                                                "type": "DisplayData",
+                                                "style": {
+                                                  "inheritFrom": "edit_value_S_left",
+                                                  "alignHorizontal": "left",
+                                                  "color": "status_line_text",
+                                                  "backgroundColor": "status_line_background",
+                                                  "activeColor": "status_line_background",
+                                                  "activeBackgroundColor": "status_line_text"
+                                                },
+                                                "data": "dlog_file_length",
+                                                "left": 100,
+                                                "top": 0,
+                                                "width": 100,
+                                                "height": 32,
+                                                "displayOption": 0
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "Select",
+                                        "style": {
+                                          "inheritFrom": "default"
+                                        },
+                                        "data": "script_is_started",
+                                        "left": 240,
+                                        "top": 0,
+                                        "width": 40,
+                                        "height": 32,
+                                        "widgets": [
+                                          {
+                                            "type": "Rectangle",
+                                            "style": {
+                                              "inheritFrom": "default",
+                                              "color": "status_line_text",
+                                              "backgroundColor": "status_line_background",
+                                              "activeColor": "status_line_background",
+                                              "activeBackgroundColor": "status_line_text"
+                                            },
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 40,
+                                            "height": 32,
+                                            "invertColors": true
+                                          },
+                                          {
+                                            "type": "Container",
+                                            "style": {
+                                              "inheritFrom": "default"
+                                            },
+                                            "left": 0,
+                                            "top": 0,
+                                            "width": 40,
+                                            "height": 32,
+                                            "widgets": [
+                                              {
+                                                "type": "Text",
+                                                "style": {
+                                                  "inheritFrom": "overlay",
+                                                  "font": "Heydings14",
+                                                  "color": "status_line_text",
+                                                  "backgroundColor": "status_line_background",
+                                                  "activeColor": "status_line_background",
+                                                  "activeBackgroundColor": "status_line_text"
+                                                },
+                                                "left": 0,
+                                                "top": 0,
+                                                "width": 40,
+                                                "height": 32,
+                                                "text": "\\u007d"
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
                               }
                             ]
                           },
                           {
-                            "type": "Rectangle",
+                            "type": "Select",
                             "style": {
-                              "inheritFrom": "default",
-                              "color": "status_line_background",
-                              "activeBackgroundColor": "status_line_background"
+                              "inheritFrom": "default"
                             },
+                            "data": "dlog_view_legend_view_option",
                             "left": 0,
-                            "top": 32,
-                            "width": 480,
-                            "height": 1,
-                            "invertColors": false
+                            "top": 0,
+                            "width": 320,
+                            "height": 240,
+                            "widgets": [
+                              {
+                                "type": "YTGraph",
+                                "style": {
+                                  "inheritFrom": "yt_graph"
+                                },
+                                "data": "recording",
+                                "action": "edit",
+                                "left": 0,
+                                "top": 0,
+                                "width": 320,
+                                "height": 240,
+                                "y1Style": {
+                                  "inheritFrom": "default"
+                                },
+                                "y2Data": "recording",
+                                "y2Style": {
+                                  "inheritFrom": "default"
+                                }
+                              },
+                              {
+                                "type": "YTGraph",
+                                "style": {
+                                  "inheritFrom": "yt_graph"
+                                },
+                                "data": "recording",
+                                "action": "edit",
+                                "left": 0,
+                                "top": 0,
+                                "width": 320,
+                                "height": 240,
+                                "y1Style": {
+                                  "inheritFrom": "default"
+                                },
+                                "y2Data": "recording",
+                                "y2Style": {
+                                  "inheritFrom": "default"
+                                }
+                              },
+                              {
+                                "type": "Container",
+                                "style": {
+                                  "inheritFrom": "default"
+                                },
+                                "left": 0,
+                                "top": 0,
+                                "width": 320,
+                                "height": 240,
+                                "widgets": [
+                                  {
+                                    "type": "Container",
+                                    "style": {
+                                      "inheritFrom": "default"
+                                    },
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 320,
+                                    "height": 32,
+                                    "widgets": [
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "overlay",
+                                          "color": "yt_graph_y1",
+                                          "backgroundColor": "background",
+                                          "activeColor": "background",
+                                          "activeBackgroundColor": "yt_graph_y1"
+                                        },
+                                        "data": "dlog_visible_value_label",
+                                        "action": "dlog_view_select_visible_value",
+                                        "left": 0,
+                                        "top": 0,
+                                        "width": 73,
+                                        "height": 32,
+                                        "text": ""
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "default_S",
+                                          "font": "Oswald12",
+                                          "alignHorizontal": "center"
+                                        },
+                                        "data": "",
+                                        "left": 73,
+                                        "top": 0,
+                                        "width": 10,
+                                        "height": 32,
+                                        "text": "O"
+                                      },
+                                      {
+                                        "type": "DisplayData",
+                                        "style": {
+                                          "inheritFrom": "encoder_cursor_14_enabled",
+                                          "color": "overlay_background",
+                                          "activeBackgroundColor": "overlay_background",
+                                          "focusBackgroundColor": "action_color"
+                                        },
+                                        "data": "dlog_visible_value_offset",
+                                        "action": "edit",
+                                        "left": 83,
+                                        "top": 0,
+                                        "width": 72,
+                                        "height": 32,
+                                        "displayOption": 0
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "default_S",
+                                          "font": "Oswald12",
+                                          "padding": "0"
+                                        },
+                                        "data": "",
+                                        "left": 155,
+                                        "top": 0,
+                                        "width": 10,
+                                        "height": 32,
+                                        "text": "D"
+                                      },
+                                      {
+                                        "type": "DisplayData",
+                                        "style": {
+                                          "inheritFrom": "encoder_cursor_14_enabled",
+                                          "color": "overlay_background",
+                                          "activeBackgroundColor": "overlay_background",
+                                          "focusBackgroundColor": "action_color"
+                                        },
+                                        "data": "dlog_visible_value_div",
+                                        "action": "edit",
+                                        "left": 165,
+                                        "top": 0,
+                                        "width": 72,
+                                        "height": 32,
+                                        "displayOption": 0
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "style": {
+                                          "inheritFrom": "default_S",
+                                          "font": "Oswald12",
+                                          "padding": "0"
+                                        },
+                                        "data": "",
+                                        "left": 237,
+                                        "top": 0,
+                                        "width": 11,
+                                        "height": 32,
+                                        "text": "C"
+                                      },
+                                      {
+                                        "type": "DisplayData",
+                                        "style": {
+                                          "inheritFrom": "encoder_cursor_14_enabled",
+                                          "color": "overlay_background",
+                                          "activeBackgroundColor": "overlay_background",
+                                          "focusBackgroundColor": "action_color"
+                                        },
+                                        "data": "dlog_visible_value_cursor",
+                                        "action": "",
+                                        "left": 248,
+                                        "top": 0,
+                                        "width": 72,
+                                        "height": 32,
+                                        "displayOption": 0
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "Rectangle",
+                                    "style": {
+                                      "inheritFrom": "default",
+                                      "color": "status_line_background",
+                                      "activeBackgroundColor": "status_line_background"
+                                    },
+                                    "left": 0,
+                                    "top": 32,
+                                    "width": 320,
+                                    "height": 1,
+                                    "invertColors": false
+                                  },
+                                  {
+                                    "type": "YTGraph",
+                                    "style": {
+                                      "inheritFrom": "yt_graph"
+                                    },
+                                    "data": "recording",
+                                    "action": "edit",
+                                    "left": 0,
+                                    "top": 33,
+                                    "width": 320,
+                                    "height": 207,
+                                    "y1Style": {
+                                      "inheritFrom": "default"
+                                    },
+                                    "y2Data": "recording",
+                                    "y2Style": {
+                                      "inheritFrom": "default"
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
                           },
                           {
-                            "type": "YTGraph",
+                            "type": "LayoutView",
                             "style": {
-                              "inheritFrom": "yt_graph"
-                            },
-                            "data": "recording",
-                            "action": "edit",
-                            "left": 0,
-                            "top": 33,
-                            "width": 480,
-                            "height": 207,
-                            "y1Style": {
                               "inheritFrom": "default"
                             },
-                            "y2Data": "recording",
-                            "y2Style": {
-                              "inheritFrom": "default"
-                            }
+                            "left": 320,
+                            "top": 0,
+                            "width": 160,
+                            "height": 272,
+                            "layout": "dlog_view_drawer"
                           }
                         ]
                       }
@@ -33344,7 +34040,7 @@
         "height": 272
       },
       {
-        "name": "image_view",
+        "name": "dlog_view_drawer",
         "style": "default",
         "widgets": [
           {
@@ -33352,11 +34048,11 @@
             "style": {
               "inheritFrom": "default"
             },
-            "data": "file_manager_image_open_state",
+            "data": "dlog_view_selected_tab",
             "left": 0,
             "top": 0,
-            "width": 480,
-            "height": 272,
+            "width": 160,
+            "height": 32,
             "widgets": [
               {
                 "type": "Container",
@@ -33365,58 +34061,700 @@
                 },
                 "left": 0,
                 "top": 0,
-                "width": 480,
-                "height": 272,
+                "width": 160,
+                "height": 32,
                 "widgets": [
                   {
-                    "type": "Progress",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "progress"
+                      "inheritFrom": "default",
+                      "font": "Heydings14",
+                      "alignVertical": "top",
+                      "color": "background",
+                      "backgroundColor": "text_regular",
+                      "activeColor": "text_regular",
+                      "activeBackgroundColor": "background",
+                      "padding": "4 0 0 0"
                     },
-                    "data": "file_manager_image_open_progress",
-                    "left": 140,
-                    "top": 132,
-                    "width": 200,
-                    "height": 4
+                    "action": "dlog_view_select_options_tab",
+                    "left": 0,
+                    "top": 0,
+                    "width": 40,
+                    "height": 32,
+                    "text": "\\u0030"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Heydings14",
+                      "alignVertical": "top",
+                      "padding": "3 0 0 0"
+                    },
+                    "action": "dlog_view_select_bookmarks_tab",
+                    "left": 40,
+                    "top": 0,
+                    "width": 40,
+                    "height": 30,
+                    "text": "\\u0042"
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 40,
+                    "top": 30,
+                    "width": 120,
+                    "height": 2
                   }
                 ]
               },
               {
-                "type": "Bitmap",
+                "type": "Container",
                 "style": {
-                  "inheritFrom": "default",
-                  "activeColor": "text_regular",
-                  "activeBackgroundColor": "background"
+                  "inheritFrom": "default"
                 },
-                "data": "file_manager_opened_image",
-                "action": "show_previous_page",
                 "left": 0,
                 "top": 0,
-                "width": 480,
-                "height": 272
+                "width": 160,
+                "height": 32,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Heydings14",
+                      "alignVertical": "top",
+                      "padding": "4 0 0 0"
+                    },
+                    "action": "dlog_view_select_options_tab",
+                    "left": 0,
+                    "top": 0,
+                    "width": 40,
+                    "height": 30,
+                    "text": "\\u0030"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Heydings14",
+                      "alignVertical": "top",
+                      "color": "background",
+                      "backgroundColor": "text_regular",
+                      "activeColor": "text_regular",
+                      "activeBackgroundColor": "background",
+                      "padding": "3 0 0 0"
+                    },
+                    "action": "dlog_view_select_bookmarks_tab",
+                    "left": 40,
+                    "top": 0,
+                    "width": 40,
+                    "height": 32,
+                    "text": "\\u0042"
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 0,
+                    "top": 30,
+                    "width": 40,
+                    "height": 2
+                  },
+                  {
+                    "type": "Rectangle",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "left": 80,
+                    "top": 30,
+                    "width": 80,
+                    "height": 2
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Select",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "data": "dlog_view_selected_tab",
+            "left": 0,
+            "top": 32,
+            "width": 160,
+            "height": 208,
+            "widgets": [
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 160,
+                "height": 208,
+                "name": "options",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "data": "dlog_view_legend_view_option",
+                    "action": "",
+                    "left": 17,
+                    "top": 16,
+                    "width": 65,
+                    "height": 32,
+                    "text": "Legend:"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "dlog_view_legend_view_option",
+                    "action": "dlog_view_select_legend_view_option",
+                    "left": 82,
+                    "top": 16,
+                    "width": 60,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center"
+                        },
+                        "data": "dlog_view_legend_view_option",
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": "Hidden"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center"
+                        },
+                        "data": "dlog_view_legend_view_option",
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": "Float"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center"
+                        },
+                        "data": "dlog_view_legend_view_option",
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": "Dock"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "action_color",
+                      "activeBackgroundColor": "action_color"
+                    },
+                    "action": "dlog_view_toggle_labels",
+                    "left": 17,
+                    "top": 52,
+                    "width": 125,
+                    "height": 32,
+                    "name": "show labels",
+                    "widgets": [
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default",
+                          "color": "action_color",
+                          "activeBackgroundColor": "action_color"
+                        },
+                        "data": "dlog_view_show_labels",
+                        "left": 0,
+                        "top": 0,
+                        "width": 26,
+                        "height": 32,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "default",
+                              "font": "Oswald14",
+                              "alignHorizontal": "left",
+                              "color": "action_color",
+                              "activeBackgroundColor": "action_color",
+                              "padding": "0 0 0 2"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 26,
+                            "height": 32,
+                            "text": "\\u00a0"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "default_S",
+                              "color": "action_color",
+                              "activeBackgroundColor": "action_color"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 26,
+                            "height": 32,
+                            "text": "\\u009F"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "overlay",
+                          "alignHorizontal": "left",
+                          "color": "action_color",
+                          "backgroundColor": "background",
+                          "activeColor": "background",
+                          "activeBackgroundColor": "action_color"
+                        },
+                        "data": "",
+                        "left": 26,
+                        "top": 0,
+                        "width": 98,
+                        "height": 32,
+                        "text": "Show labels"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "dlog_auto_scale",
+                    "left": 17,
+                    "top": 88,
+                    "width": 125,
+                    "height": 32,
+                    "text": "Auto Scale"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "dlog_scale_to_fit",
+                    "left": 17,
+                    "top": 124,
+                    "width": 125,
+                    "height": 32,
+                    "text": "Scale to fit"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "file_manager_upload_file_enabled",
+                    "left": 17,
+                    "top": 160,
+                    "width": 125,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center",
+                          "color": "text_regular",
+                          "activeBackgroundColor": "text_regular"
+                        },
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 125,
+                        "height": 32,
+                        "text": "\\u00a7 Upload"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center"
+                        },
+                        "action": "dlog_upload",
+                        "left": 0,
+                        "top": 0,
+                        "width": 125,
+                        "height": 32,
+                        "text": "\\u00a7 Upload"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 160,
+                "height": 208,
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "dlog_bookmarks_is_scrollbar_visible",
+                    "left": 0,
+                    "top": 0,
+                    "width": 160,
+                    "height": 208,
+                    "widgets": [
+                      {
+                        "type": "List",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "dlog_bookmarks",
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 160,
+                        "height": 208,
+                        "itemWidget": {
+                          "type": "Select",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "data": "dlog_bookmark_is_selected",
+                          "action": "dlog_view_select_bookmark",
+                          "left": 0,
+                          "top": 0,
+                          "width": 160,
+                          "height": 26,
+                          "widgets": [
+                            {
+                              "type": "Container",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 0,
+                              "top": 0,
+                              "width": 160,
+                              "height": 26,
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "font": "RobotoCondensed-Regular"
+                                  },
+                                  "data": "dlog_bookmark_x_value",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 64,
+                                  "height": 26,
+                                  "text": ""
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "font": "RobotoCondensed-Regular"
+                                  },
+                                  "data": "dlog_bookmark_text",
+                                  "left": 64,
+                                  "top": 0,
+                                  "width": 96,
+                                  "height": 26,
+                                  "text": ""
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Container",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 0,
+                              "top": 0,
+                              "width": 160,
+                              "height": 26,
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "font": "RobotoCondensed-Regular",
+                                    "color": "text_regular",
+                                    "backgroundColor": "selected_bookmark",
+                                    "activeColor": "selected_bookmark",
+                                    "activeBackgroundColor": "text_regular"
+                                  },
+                                  "data": "dlog_bookmark_x_value",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 64,
+                                  "height": 26,
+                                  "text": ""
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "font": "RobotoCondensed-Regular",
+                                    "color": "text_regular",
+                                    "backgroundColor": "selected_bookmark",
+                                    "activeColor": "selected_bookmark",
+                                    "activeBackgroundColor": "text_regular"
+                                  },
+                                  "data": "dlog_bookmark_text",
+                                  "left": 64,
+                                  "top": 0,
+                                  "width": 96,
+                                  "height": 26,
+                                  "text": ""
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "listType": "vertical",
+                        "gap": 0
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 160,
+                        "height": 208,
+                        "widgets": [
+                          {
+                            "type": "List",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "data": "dlog_bookmarks",
+                            "action": "edit",
+                            "left": 0,
+                            "top": 0,
+                            "width": 128,
+                            "height": 208,
+                            "itemWidget": {
+                              "type": "Select",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "data": "dlog_bookmark_is_selected",
+                              "action": "dlog_view_select_bookmark",
+                              "left": 0,
+                              "top": 0,
+                              "width": 128,
+                              "height": 26,
+                              "widgets": [
+                                {
+                                  "type": "Container",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 128,
+                                  "height": 26,
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default",
+                                        "font": "RobotoCondensed-Regular"
+                                      },
+                                      "data": "dlog_bookmark_x_value",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 48,
+                                      "height": 26,
+                                      "text": ""
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default",
+                                        "font": "RobotoCondensed-Regular"
+                                      },
+                                      "data": "dlog_bookmark_text",
+                                      "left": 48,
+                                      "top": 0,
+                                      "width": 80,
+                                      "height": 26,
+                                      "text": ""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Container",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 128,
+                                  "height": 26,
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default",
+                                        "font": "RobotoCondensed-Regular",
+                                        "color": "text_regular",
+                                        "backgroundColor": "selected_bookmark",
+                                        "activeColor": "selected_bookmark",
+                                        "activeBackgroundColor": "text_regular"
+                                      },
+                                      "data": "dlog_bookmark_x_value",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 48,
+                                      "height": 26,
+                                      "text": ""
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default",
+                                        "font": "RobotoCondensed-Regular",
+                                        "color": "text_regular",
+                                        "backgroundColor": "selected_bookmark",
+                                        "activeColor": "selected_bookmark",
+                                        "activeBackgroundColor": "text_regular"
+                                      },
+                                      "data": "dlog_bookmark_text",
+                                      "left": 48,
+                                      "top": 0,
+                                      "width": 80,
+                                      "height": 26,
+                                      "text": ""
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "listType": "vertical",
+                            "gap": 0
+                          },
+                          {
+                            "type": "ScrollBar",
+                            "style": {
+                              "inheritFrom": "default_inverse"
+                            },
+                            "data": "dlog_bookmarks",
+                            "left": 128,
+                            "top": 0,
+                            "width": 32,
+                            "height": 208,
+                            "thumbStyle": {
+                              "inheritFrom": "scrollbar_thumb"
+                            },
+                            "buttonsStyle": {
+                              "inheritFrom": "scrollbar_button"
+                            },
+                            "leftButtonText": "\\u0083",
+                            "rightButtonText": "\\u0084"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 240,
+            "width": 160,
+            "height": 32,
+            "widgets": [
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "font": "Oswald14"
+                },
+                "action": "dlog_view_zoom_in",
+                "left": 0,
+                "top": 0,
+                "width": 40,
+                "height": 32,
+                "text": "\\u00b8",
+                "enabled": "dlog_view_is_zoom_in_enabled",
+                "disabledStyle": {
+                  "inheritFrom": "edit_value_S_centered"
+                }
+              },
+              {
+                "type": "Button",
+                "style": {
+                  "inheritFrom": "edit_value_active_S_center",
+                  "font": "Oswald14"
+                },
+                "action": "dlog_view_zoom_out",
+                "left": 44,
+                "top": 0,
+                "width": 32,
+                "height": 32,
+                "text": "\\u00b9",
+                "enabled": "dlog_view_is_zoom_out_enabled",
+                "disabledStyle": {
+                  "inheritFrom": "edit_value_S_centered"
+                }
               },
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "default",
-                  "font": "Oswald17",
-                  "color": "status_warning",
-                  "activeColor": "status_warning",
-                  "activeBackgroundColor": "background"
+                  "inheritFrom": "edit_value_active_S_center",
+                  "font": "Heydings14",
+                  "alignVertical": "top"
                 },
-                "action": "show_previous_page",
-                "left": 0,
+                "action": "dlog_view_toggle_drawer",
+                "left": 120,
                 "top": 0,
-                "width": 480,
-                "height": 272,
-                "text": "Failed to load image!"
+                "width": 40,
+                "height": 32,
+                "text": "\\u0088"
               }
             ]
           }
         ],
+        "closePageIfTouchedOutside": true,
         "left": 0,
         "top": 0,
-        "width": 480,
+        "width": 160,
         "height": 272
       },
       {
@@ -34254,233 +35592,80 @@
         "dataContextOverrides": "{\n    \"dlog_items\": [\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"101\",\n            \"dlog_item_label\": \"DCP405 #1 U\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"101\",\n            \"dlog_item_label\": \"DCP405 #1 I\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"101\",\n            \"dlog_item_label\": \"DCP405 #1 P\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"201\",\n            \"dlog_item_label\": \"DCP405 #2 U\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"201\",\n            \"dlog_item_label\": \"DCP405 #2 I\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"201\",\n            \"dlog_item_label\": \"DCP405 #2 P\"\n        }\n    ]\n}"
       },
       {
-        "name": "dlog_view_overlay_options",
+        "name": "image_view",
         "style": "default",
         "widgets": [
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default_S"
-            },
-            "data": "dlog_view_legend_view_option",
-            "action": "",
-            "left": 10,
-            "top": 10,
-            "width": 65,
-            "height": 32,
-            "text": "Legend:"
-          },
           {
             "type": "Select",
             "style": {
               "inheritFrom": "default"
             },
-            "data": "dlog_view_legend_view_option",
-            "action": "dlog_view_select_legend_view_option",
-            "left": 75,
-            "top": 10,
-            "width": 60,
-            "height": 32,
+            "data": "file_manager_image_open_state",
+            "left": 0,
+            "top": 0,
+            "width": 480,
+            "height": 272,
             "widgets": [
               {
-                "type": "Text",
+                "type": "Container",
                 "style": {
-                  "inheritFrom": "edit_value_active_S_center"
+                  "inheritFrom": "default"
                 },
-                "data": "dlog_view_legend_view_option",
-                "action": "",
                 "left": 0,
                 "top": 0,
-                "width": 60,
-                "height": 32,
-                "text": "Hidden"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_center"
-                },
-                "data": "dlog_view_legend_view_option",
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 60,
-                "height": 32,
-                "text": "Float"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_center"
-                },
-                "data": "dlog_view_legend_view_option",
-                "action": "",
-                "left": 0,
-                "top": 0,
-                "width": 60,
-                "height": 32,
-                "text": "Dock"
-              }
-            ]
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default",
-              "color": "action_color",
-              "activeBackgroundColor": "action_color"
-            },
-            "action": "dlog_view_toggle_labels",
-            "left": 145,
-            "top": 10,
-            "width": 125,
-            "height": 32,
-            "name": "show labels",
-            "widgets": [
-              {
-                "type": "Select",
-                "style": {
-                  "inheritFrom": "default",
-                  "color": "action_color",
-                  "activeBackgroundColor": "action_color"
-                },
-                "data": "dlog_view_show_labels",
-                "left": 0,
-                "top": 0,
-                "width": 26,
-                "height": 32,
+                "width": 480,
+                "height": 272,
                 "widgets": [
                   {
-                    "type": "Text",
+                    "type": "Progress",
                     "style": {
-                      "inheritFrom": "default",
-                      "font": "Oswald14",
-                      "alignHorizontal": "left",
-                      "color": "action_color",
-                      "activeBackgroundColor": "action_color",
-                      "padding": "0 0 0 2"
+                      "inheritFrom": "progress"
                     },
-                    "left": 0,
-                    "top": 0,
-                    "width": 26,
-                    "height": 32,
-                    "text": "\\u00a0"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "default_S",
-                      "color": "action_color",
-                      "activeBackgroundColor": "action_color"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 26,
-                    "height": 32,
-                    "text": "\\u009F"
+                    "data": "file_manager_image_open_progress",
+                    "left": 140,
+                    "top": 132,
+                    "width": 200,
+                    "height": 4
                   }
                 ]
               },
               {
-                "type": "Text",
+                "type": "Bitmap",
                 "style": {
-                  "inheritFrom": "overlay",
-                  "alignHorizontal": "left",
-                  "color": "action_color",
-                  "backgroundColor": "background",
-                  "activeColor": "background",
-                  "activeBackgroundColor": "action_color"
+                  "inheritFrom": "default",
+                  "activeColor": "text_regular",
+                  "activeBackgroundColor": "background"
                 },
-                "data": "",
-                "left": 26,
-                "top": 0,
-                "width": 98,
-                "height": 32,
-                "text": "Show labels"
-              }
-            ]
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "edit_value_active_S_center"
-            },
-            "action": "dlog_auto_scale",
-            "left": 10,
-            "top": 52,
-            "width": 125,
-            "height": 32,
-            "text": "Auto Scale"
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "edit_value_active_S_center"
-            },
-            "action": "dlog_scale_to_fit",
-            "left": 144,
-            "top": 52,
-            "width": 125,
-            "height": 32,
-            "text": "Scale to fit"
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "file_manager_upload_file_enabled",
-            "left": 10,
-            "top": 92,
-            "width": 125,
-            "height": 32,
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_center",
-                  "color": "text_regular",
-                  "activeBackgroundColor": "text_regular"
-                },
-                "action": "",
+                "data": "file_manager_opened_image",
+                "action": "show_previous_page",
                 "left": 0,
                 "top": 0,
-                "width": 125,
-                "height": 32,
-                "text": "\\u00a7 Upload"
+                "width": 480,
+                "height": 272
               },
               {
                 "type": "Text",
                 "style": {
-                  "inheritFrom": "edit_value_active_S_center"
+                  "inheritFrom": "default",
+                  "font": "Oswald17",
+                  "color": "status_warning",
+                  "activeColor": "status_warning",
+                  "activeBackgroundColor": "background"
                 },
-                "action": "dlog_upload",
+                "action": "show_previous_page",
                 "left": 0,
                 "top": 0,
-                "width": 125,
-                "height": 32,
-                "text": "\\u00a7 Upload"
+                "width": 480,
+                "height": 272,
+                "text": "Failed to load image!"
               }
             ]
-          },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "edit_value_active_S_center"
-            },
-            "action": "show_previous_page",
-            "left": 145,
-            "top": 92,
-            "width": 125,
-            "height": 32,
-            "text": "\\u00a8 Close"
           }
         ],
-        "closePageIfTouchedOutside": true,
-        "left": 100,
-        "top": 52,
-        "width": 280,
-        "height": 136
+        "left": 0,
+        "top": 0,
+        "width": 480,
+        "height": 272
       },
       {
         "name": "file_manager",
@@ -60396,6 +61581,12 @@
       },
       {
         "name": "labels_and_colors_page_channel_color_text"
+      },
+      {
+        "name": "bookmark"
+      },
+      {
+        "name": "selected_bookmark"
       }
     ],
     "themes": [
@@ -60500,7 +61691,9 @@
           "#d4c36b",
           "#404040",
           "#9fdd9a",
-          "#404040"
+          "#404040",
+          "#1e596b",
+          "#359ebd"
         ]
       },
       {
@@ -60604,7 +61797,9 @@
           "#d4c36b",
           "#000000",
           "#9fdd9a",
-          "#000000"
+          "#000000",
+          "#80800a",
+          "#f0ef31"
         ]
       },
       {
@@ -60708,7 +61903,9 @@
           "#d4c36b",
           "#000000",
           "#9fdd9a",
-          "#000000"
+          "#000000",
+          "#0000ff",
+          "#8080ff"
         ]
       }
     ]

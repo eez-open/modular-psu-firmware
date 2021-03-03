@@ -1,3 +1,4 @@
+
 /*
 * EEZ PSU Firmware
 * Copyright (C) 2020-present, Envox d.o.o.
@@ -74,6 +75,8 @@ enum Fields {
     // Default is 0.
     FIELD_ID_DATA_CONTAINS_SAMPLE_VALIDITY_BIT = 4,
 
+    FIELD_ID_DATA_SIZE = 5, // number of data rows
+
     FIELD_ID_X_UNIT = 10,
     FIELD_ID_X_STEP = 11,
     FIELD_ID_X_RANGE_MIN = 12,
@@ -95,8 +98,7 @@ enum Fields {
     FIELD_ID_CHANNEL_MODULE_TYPE = 50,
     FIELD_ID_CHANNEL_MODULE_REVISION = 51,
 
-    FILE_ID_TEXT_INDEX_FILE_OFFSET = 60,
-    FILE_ID_TEXT_FILE_OFFSET = 61,
+    FIELD_ID_BOOKMARK = 62,
 };
 
 enum DataType {
@@ -181,10 +183,19 @@ struct Parameters {
     float period;
     float duration;
 
-	uint32_t textIndexFileOffset;
-	uint32_t textFileOffset;
+	uint32_t dataSize;
 
     void initYAxis(int yAxisIndex);
+};
+
+struct Bookmark {
+	uint32_t position;
+	const char *text;
+};
+
+struct Bookmarks {
+	uint32_t count;
+	Bookmark list[];
 };
 
 struct Writer {
@@ -212,8 +223,7 @@ public:
     uint32_t getBufferIndex() { return m_bufferIndex; }
     uint32_t getDataOffset() { return m_dataOffset; }
     uint32_t getFinishTimeFieldOffset() { return m_finalDurationFieldOffset; }
-    uint32_t getTextIndexFileOffset() { return m_textIndexFileOffset; };
-    uint32_t getTextFileOffset() { return m_textFileOffset; };
+    uint32_t getDataSizeFieldOffset() { return m_dataSizeFieldOffset; };
     uint32_t getFileLength() { return m_fileLength; }
     uint32_t getBitMask() { return m_bitMask; }
 
@@ -226,8 +236,7 @@ private:
     uint8_t m_bits = 0;
     uint32_t m_dataOffset = 0;
     uint32_t m_finalDurationFieldOffset = 0;
-    uint32_t m_textIndexFileOffset = 0;
-    uint32_t m_textFileOffset = 0;
+    uint32_t m_dataSizeFieldOffset = 0;
 
     void writeUint8Field(uint8_t id, uint8_t value);
     void writeUint8FieldWithIndex(uint8_t id, uint8_t value, uint8_t index);
@@ -248,6 +257,7 @@ public:
 
     bool readFileHeaderAndMetaFields(Parameters &parameters, uint32_t &headerRemaining);
     bool readRemainingFileHeaderAndMetaFields(Parameters &parameters); // call this only in case of VERSION2
+	Bookmarks *readBookmarks(size_t srcBufferSize, uint8_t *destBuffer, size_t destBufferSize);
 
     uint16_t getVersion() { return m_version; }
     uint32_t getDataOffset() { return m_dataOffset; }

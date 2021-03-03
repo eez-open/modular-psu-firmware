@@ -40,6 +40,8 @@ void animateSlideRightWithoutHeader();
 void animateFadeOutFadeIn();
 void animateFadeOutFadeInWorkingArea();
 void animateFadeOutFadeIn(const Rect &rect);
+void animateRightDrawerOpen();
+void animateRightDrawerClose();
 
 } // namespace gui
 } // namespace psu
