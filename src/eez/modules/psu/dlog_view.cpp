@@ -95,8 +95,8 @@ static uint32_t g_bookmarksScrollPosition = 0;
 static uint32_t g_loadedBookmarksScrollPosition = 0;
 uint8_t *g_visibleBookmarksBuffer = g_bookmarksDataStart + BOOKMARKS_DATA_SIZE;
 uint8_t *g_visibleBookmarks;
-float g_visibleBookmarksPositionStart;
-float g_visibleBookmarksPositionEnd;
+uint32_t g_visibleBookmarksPositionStart;
+uint32_t g_visibleBookmarksPositionEnd;
 
 static CacheBlock *g_cacheBlocks = (CacheBlock *)(g_visibleBookmarksBuffer + 2 * 480);
 static const uint32_t CACHE_BLOCKS_BUFFER_SIZE = FILE_VIEW_BUFFER_SIZE - ROW_VALUES_BUFFER_SIZE - BOOKMARKS_DATA_SIZE;
@@ -482,7 +482,7 @@ void loadBlock() {
 
 static uint32_t getPosition(Recording& recording);
 static void adjustXAxisOffset(Recording &recording);
-static void loadVisibleBookmarks(float positionStart, float positionEnd);
+static void loadVisibleBookmarks(uint32_t positionStart, uint32_t positionEnd);
 
 void tick() {
     if (g_bookmarksScrollPosition != g_loadedBookmarksScrollPosition) {
@@ -490,8 +490,8 @@ void tick() {
     }
 
     auto &recording = dlog_view::getRecording();
-    auto positionStart = recording.xAxisOffset / recording.parameters.xAxis.step;
-    auto positionEnd = positionStart + VIEW_WIDTH * recording.parameters.period / recording.parameters.xAxis.step;
+    auto positionStart = (uint32_t)floorf(recording.xAxisOffset / recording.parameters.xAxis.step);
+    auto positionEnd = (uint32_t)ceilf(positionStart + VIEW_WIDTH * recording.parameters.period / recording.parameters.xAxis.step);
     if (positionStart != g_visibleBookmarksPositionStart || positionEnd != g_visibleBookmarksPositionEnd) {
         loadVisibleBookmarks(positionStart, positionEnd);
     }
@@ -621,7 +621,8 @@ static void changeXAxisOffset(Recording &recording, float xAxisOffset) {
 
 static void changeXAxisDiv(Recording &recording, float xAxisDiv) {
     if (recording.xAxisDiv != xAxisDiv) {
-		float xValueBefore = recording.xAxisOffset + recording.cursorOffset * recording.parameters.period;
+        auto periodBefore = recording.parameters.period;
+		auto cursorOffsetBefore = recording.cursorOffset;
 
         recording.xAxisDiv = xAxisDiv;
 
@@ -633,12 +634,25 @@ static void changeXAxisDiv(Recording &recording, float xAxisDiv) {
             recording.size = (uint32_t)round(recording.numSamples * recording.xAxisDivMin / recording.xAxisDiv);
         }
 
-		recording.xAxisOffset = xValueBefore - recording.cursorOffset * recording.parameters.period;
+        recording.cursorOffset *= recording.parameters.period / periodBefore;
+
+		recording.xAxisOffset += cursorOffsetBefore - recording.cursorOffset;
         
         adjustXAxisOffset(recording);
 
         invalidateAllBlocks();
     }
+}
+
+uint32_t getCursorPosition(Recording &recording) {
+    int32_t cursorPosition = (int32_t)roundf(recording.cursorOffset / recording.parameters.period);
+    if (cursorPosition < 0) {
+        return 0;
+    }
+    if (cursorPosition > VIEW_WIDTH - 1) {
+        return VIEW_WIDTH - 1;
+    }
+    return (uint32_t)cursorPosition;
 }
 
 void getLabel(Recording& recording, int valueIndex, char *text, int count) {
@@ -963,7 +977,7 @@ void loadBookmarks() {
     file.close();
 }
 
-void loadVisibleBookmarks(float positionStart, float positionEnd) {
+void loadVisibleBookmarks(uint32_t positionStart, uint32_t positionEnd) {
 	auto &recording = getRecording();
 
     File file;
@@ -990,6 +1004,7 @@ void loadVisibleBookmarks(float positionStart, float positionEnd) {
 			file.close();
 			return;
 		}
+
 		uint32_t position;
 		if (file.read(&position, sizeof(uint32_t)) != sizeof(uint32_t)) {
 			// TODO report error
@@ -1174,7 +1189,7 @@ bool openFile(const char *filePath, int *err) {
 					g_dlogFile.xAxisOffset = 0.0f;
 					g_dlogFile.xAxisDiv = g_dlogFile.xAxisDivMin;
 
-					g_dlogFile.cursorOffset = VIEW_WIDTH / 2;
+					g_dlogFile.cursorOffset = VIEW_WIDTH * g_dlogFile.parameters.period / 2;
 
 					g_dlogFile.getValue = getValue;
 					g_isLoading = false;
@@ -1853,8 +1868,8 @@ void action_dlog_view_toggle_drawer() {
         }
     }
 
-	if (recording.cursorOffset >= (uint32_t)VIEW_WIDTH - 1) {
-		recording.cursorOffset = VIEW_WIDTH - 1;
+	if (recording.cursorOffset >= (VIEW_WIDTH - 1) * recording.parameters.period) {
+		recording.cursorOffset = (VIEW_WIDTH - 1) * recording.parameters.period;
 	}
 }
 
@@ -1946,11 +1961,15 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
         value = Value(recording.parameters.period, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_BOOKMARKS) {
-        value = Value(g_visibleBookmarks, VALUE_TYPE_POINTER);
+        auto positionStart = (uint32_t)floorf(recording.xAxisOffset / recording.parameters.xAxis.step);
+        auto positionEnd = (uint32_t)ceilf(positionStart + VIEW_WIDTH * recording.parameters.period / recording.parameters.xAxis.step);
+        if (positionStart == g_visibleBookmarksPositionStart && positionEnd == g_visibleBookmarksPositionEnd) {
+        	value = Value(g_visibleBookmarks, VALUE_TYPE_POINTER);
+        }
 	} else if (operation == DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE) {
         value = &recording != &dlog_record::g_activeRecording;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET) {
-        value = Value(recording.cursorOffset, VALUE_TYPE_UINT32);
+        value = Value(getCursorPosition(recording), VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_TOUCH_DRAG) {
 		enum DragObject {
 			DRAG_CURSOR,
@@ -1966,7 +1985,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
 			union {
 				struct {
 					bool dragCursor;
-					int offset;
+					int position;
 				} cursor;
 
 				struct {
@@ -1993,8 +2012,8 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
             ? recording.selectedVisibleValueIndex : g_focusCursor);
 
 		if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
-			g_dragState.cursor.offset = recording.cursorOffset - touchDrag->x;
-			g_dragState.cursor.dragCursor = (abs((long)g_dragState.cursor.offset) < 30) && (touchDrag->y > (touchDrag->widgetCursor.widget->h - 60));
+			g_dragState.cursor.position = getCursorPosition(recording) - touchDrag->x;
+			g_dragState.cursor.dragCursor = (abs((long)g_dragState.cursor.position) < 30) && (touchDrag->y > (touchDrag->widgetCursor.widget->h - 60));
 			if (g_dragState.cursor.dragCursor) {
 				g_dragState.dragObject = DRAG_CURSOR;
 			} else {
@@ -2018,7 +2037,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
 			}
 		} else {
 			if (g_dragState.dragObject == DRAG_CURSOR) {
-				recording.cursorOffset = MIN(dlog_view::VIEW_WIDTH - 1, MAX(touchDrag->x + g_dragState.cursor.offset, 0));
+				recording.cursorOffset = MIN(dlog_view::VIEW_WIDTH - 1, MAX(touchDrag->x + g_dragState.cursor.position, 0)) * recording.parameters.period;
 			} else if (g_dragState.dragObject == DRAG_X_OFFSET) {
 				int32_t newPosition = g_dragState.xOffset.dragStartPosition + (g_dragState.xOffset.dragStartX - touchDrag->x);
 				if (newPosition < 0) {
@@ -2051,13 +2070,13 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
 	        }
 		}
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE) {
-        float xValue = (dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period;
+        float xValue = dlog_view::getPosition(recording) * recording.parameters.period + recording.cursorOffset;
         if (recording.parameters.xAxis.scaleType == dlog_file::SCALE_LOGARITHMIC) {
             xValue = powf(10, recording.parameters.xAxis.range.min + xValue);
         }
         value = Value(roundPrec(xValue, 0.001f), recording.parameters.xAxis.unit);
     } else if (operation == DATA_OPERATION_GET) {
-        value = Value((dlog_view::getPosition(recording) + recording.cursorOffset) * recording.parameters.period, dlog_view::getXAxisUnit(recording));
+        value = Value(dlog_view::getPosition(recording) * recording.parameters.period + recording.cursorOffset, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = Value(0.0f, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MAX) {
@@ -2065,15 +2084,15 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_GET_DEF) {
         value = Value((recording.parameters.xAxis.range.max - recording.parameters.xAxis.range.min) / 2, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_SET) {
-        float cursorOffset = value.getFloat() / recording.parameters.period - dlog_view::getPosition(recording);
-        if (cursorOffset < 0.0f) {
-            dlog_view::changeXAxisOffset(recording, recording.xAxisOffset + cursorOffset * recording.parameters.period);
+        float cursorPosition = value.getFloat() / recording.parameters.period - dlog_view::getPosition(recording);
+        if (cursorPosition < 0.0f) {
+            dlog_view::changeXAxisOffset(recording, recording.xAxisOffset + cursorPosition * recording.parameters.period);
             recording.cursorOffset = 0;
-        } else if (cursorOffset > dlog_view::VIEW_WIDTH - 1) {
-            dlog_view::changeXAxisOffset(recording, recording.xAxisOffset + (cursorOffset - (dlog_view::VIEW_WIDTH - 1)) * recording.parameters.period);
-            recording.cursorOffset = dlog_view::VIEW_WIDTH - 1;
+        } else if (cursorPosition > dlog_view::VIEW_WIDTH - 1) {
+            dlog_view::changeXAxisOffset(recording, recording.xAxisOffset + (cursorPosition - (dlog_view::VIEW_WIDTH - 1)) * recording.parameters.period);
+            recording.cursorOffset = (dlog_view::VIEW_WIDTH - 1) * recording.parameters.period;
         } else {
-            recording.cursorOffset = (uint32_t)roundf(cursorOffset);
+            recording.cursorOffset = cursorPosition * recording.parameters.period;
         }
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static const int COUNT = 4;
@@ -2410,7 +2429,7 @@ void data_dlog_visible_value_cursor(DataOperationEnum operation, Cursor cursor, 
             ? recording.selectedVisibleValueIndex : cursor);
         auto ytDataGetValue = ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
         float max;
-        float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset, dlogValueIndex, &max);
+        float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset / recording.parameters.period, dlogValueIndex, &max);
         float cursorValue = (min + max) / 2;
         if (recording.parameters.yAxisScaleType == dlog_file::SCALE_LOGARITHMIC) {
             float logOffset = 1 - recording.parameters.yAxes[dlogValueIndex].range.min;
@@ -2568,15 +2587,15 @@ void action_dlog_view_select_bookmark() {
 		// position cursor at the bookmark position
 		auto bookmarkIndex = g_selectedBookmarkIndex - g_bookmarksScrollPosition;
 
-		auto cursorOffset = g_bookmarks[bookmarkIndex].position * g_dlogFile.parameters.xAxis.step / g_dlogFile.parameters.period - getPosition(g_dlogFile);
-		if (cursorOffset < 0 || cursorOffset >= (uint32_t)VIEW_WIDTH) {
-			cursorOffset = VIEW_WIDTH / 2.0f;
-		}
+		auto cursorPosition = g_bookmarks[bookmarkIndex].position * g_dlogFile.parameters.xAxis.step / g_dlogFile.parameters.period - getPosition(g_dlogFile);
+		if (cursorPosition < 0 || cursorPosition >= (uint32_t)VIEW_WIDTH) {
+			cursorPosition = VIEW_WIDTH / 2.0f;
 
-		g_dlogFile.xAxisOffset = g_bookmarks[bookmarkIndex].position * g_dlogFile.parameters.xAxis.step - cursorOffset * g_dlogFile.parameters.period;
-		adjustXAxisOffset(g_dlogFile);
+            g_dlogFile.xAxisOffset = g_bookmarks[bookmarkIndex].position * g_dlogFile.parameters.xAxis.step - cursorPosition * g_dlogFile.parameters.period;
+            adjustXAxisOffset(g_dlogFile);
+        }
 
-		g_dlogFile.cursorOffset = (uint32_t)roundf(cursorOffset);
+        g_dlogFile.cursorOffset = cursorPosition * g_dlogFile.parameters.period;
 	}
 
 	setFocusCursor(Cursor(-1), DATA_ID_DLOG_BOOKMARKS);

@@ -129,7 +129,7 @@ struct Recording {
     float xAxisOffset;
     float xAxisDiv;
 
-    uint32_t cursorOffset;
+    float cursorOffset;
 
     float (*getValue)(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
