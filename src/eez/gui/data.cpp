@@ -851,23 +851,13 @@ float ytDataGetPeriod(Cursor cursor, int16_t id) {
     return value.getFloat();
 }
 
-void ytDataGetVisibleBookmarks(Cursor cursor, int16_t id, BookmarksSlice &bookmarksSlice) {
-	bookmarksSlice.start = 0;
-	bookmarksSlice.end = 0;
-	Value value(&bookmarksSlice, VALUE_TYPE_POINTER);
-	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_VISIBLE_BOOKMARKS, cursor, value);
-}
-
-uint32_t ytDataGetBookmarkPosition(Cursor cursor, int16_t id, uint32_t bookmarkIndex) {
-	Value value(bookmarkIndex, VALUE_TYPE_UINT32);
-	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_BOOKMARK_POSITION, cursor, value);
-	return value.getUInt32();
-}
-
-uint32_t ytDataGetSelectedBookmarkIndex(Cursor cursor, int16_t id) {
+uint8_t *ytDataGetBookmarks(Cursor cursor, int16_t id) {
 	Value value;
-	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_SELECTED_BOOKMARK_INDEX, cursor, value);
-	return value.getUInt32();
+	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_BOOKMARKS, cursor, value);
+    if (value.getType() == VALUE_TYPE_POINTER) {
+        return (uint8_t *)value.getVoidPointer();
+    }
+    return nullptr;
 }
 
 bool ytDataIsCursorVisible(Cursor cursor, int16_t id) {

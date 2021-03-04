@@ -20,7 +20,8 @@
         "xmemory0": "cpp",
         "initializer_list": "cpp",
         "queue": "cpp",
-        "xlocnum": "cpp"
+        "xlocnum": "cpp",
+        "istream": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": true

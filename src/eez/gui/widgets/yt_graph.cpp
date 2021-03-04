@@ -41,12 +41,12 @@ struct YTGraphWidgetState {
     uint32_t historyValuePosition;
     uint8_t ytGraphUpdateMethod;
     uint32_t cursorPosition;
+    uint8_t *bookmarks;
     bool showLabels;
     int8_t selectedValueIndex;
     bool valueIsVisible[MAX_NUM_OF_Y_VALUES];
     float valueDiv[MAX_NUM_OF_Y_VALUES];
     float valueOffset[MAX_NUM_OF_Y_VALUES];
-	uint32_t selectedBookmarkIndex;
 };
 
 FixPointersFunctionType YT_GRAPH_fixPointers = nullptr;
@@ -246,6 +246,7 @@ struct YTGraphStaticDrawHelper {
     int yMax;
 
     uint32_t cursorPosition;
+    uint8_t *bookmarks;
 
     Value::YtDataGetValueFunctionPointer ytDataGetValue;
 
@@ -440,17 +441,17 @@ struct YTGraphStaticDrawHelper {
         }
 
 		// draw bookmarks
-		BookmarksSlice bookmarksSlice;
-		ytDataGetVisibleBookmarks(widgetCursor.cursor, widgetCursor.widget->data, bookmarksSlice);
-		uint32_t selectedBookmarkIndex = ytDataGetSelectedBookmarkIndex(widgetCursor.cursor, widgetCursor.widget->data);
-		for (uint32_t bookmarkIndex = bookmarksSlice.start; bookmarkIndex < bookmarksSlice.end; bookmarkIndex++) {
-			if (bookmarkIndex == selectedBookmarkIndex) {
-				display::setColor(COLOR_ID_SELECTED_BOOKMARK);
-			} else {
-				display::setColor(COLOR_ID_BOOKMARK);
+		if (bookmarks) {
+			for (int x = 0; x < widget->w; x++) {
+				if (bookmarks[x]) {
+					if (bookmarks[x] == 2) {
+						display::setColor(COLOR_ID_SELECTED_BOOKMARK);
+					} else {
+						display::setColor(COLOR_ID_BOOKMARK);
+					}
+					display::drawVLine(startX + x, widgetCursor.y, widget->h - 1);
+				}
 			}
-			uint32_t bookmarkPosition = ytDataGetBookmarkPosition(widgetCursor.cursor, widgetCursor.widget->data, bookmarkIndex);
-			display::drawVLine(startX + bookmarkPosition - currentHistoryValuePosition, widgetCursor.y, widget->h - 1);
 		}
 
         // draw cursor
@@ -513,7 +514,7 @@ DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     currentState->historyValuePosition = ytDataGetPosition(widgetCursor.cursor, widget->data);
     currentState->ytGraphUpdateMethod = ytDataGetGraphUpdateMethod(widgetCursor.cursor, widget->data);
     currentState->cursorPosition = currentState->historyValuePosition + ytDataGetCursorOffset(widgetCursor.cursor, widget->data);
-	currentState->selectedBookmarkIndex = ytDataGetSelectedBookmarkIndex(widgetCursor.cursor, widget->data);
+    currentState->bookmarks = ytDataGetBookmarks(widgetCursor.cursor, widget->data);
 
     bool visibleValuesChanged = false;
 
@@ -552,12 +553,18 @@ DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
         currentState->selectedValueIndex != previousState->selectedValueIndex ||
         visibleValuesChanged || 
         previousHistoryValuePosition != currentState->historyValuePosition || 
-        (!previousState || previousState->numHistoryValues != currentState->numHistoryValues || previousState->cursorPosition != currentState->cursorPosition || previousState->selectedBookmarkIndex != currentState->selectedBookmarkIndex)
+        (
+            !previousState ||
+            previousState->numHistoryValues != currentState->numHistoryValues ||
+            previousState->cursorPosition != currentState->cursorPosition ||
+            previousState->bookmarks != currentState->bookmarks
+        )
     ) {
         if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
             YTGraphStaticDrawHelper drawHelper(widgetCursor);
 
             drawHelper.cursorPosition = currentState->cursorPosition;
+            drawHelper.bookmarks = currentState->bookmarks;
             drawHelper.drawStatic(previousHistoryValuePosition, currentState->historyValuePosition, currentState->numHistoryValues, graphWidth, currentState->showLabels, currentState->selectedValueIndex);
         } else {
             const Style* style = getStyle(widget->style);

@@ -79,6 +79,9 @@ void Writer::writeFileHeaderAndMetaFields(const Parameters &parameters) {
 	writeUint32Field(FIELD_ID_DATA_SIZE, 0);
 	m_dataSizeFieldOffset = m_bufferIndex - 4;
 
+	writeUint32Field(FIELD_ID_BOOKMARKS_SIZE, 0);
+	m_bookmarksSizeFieldOffset = m_bufferIndex - 4;
+
     writeUint8Field(FIELD_ID_X_UNIT, parameters.xAxis.unit);
     writeFloatField(FIELD_ID_X_STEP, parameters.xAxis.step);
     writeUint8Field(FIELD_ID_X_SCALE_TYPE, parameters.xAxis.scaleType);
@@ -421,6 +424,9 @@ bool Reader::readRemainingFileHeaderAndMetaFields(Parameters &parameters) {
 		else if (fieldId == FIELD_ID_DATA_SIZE) {
 			parameters.dataSize = readUint32();
 		} 
+		else if (fieldId == FIELD_ID_BOOKMARKS_SIZE) {
+			parameters.bookmarksSize = readUint32();
+		} 
 		else if (fieldId == FIELD_ID_X_UNIT) {
 			parameters.xAxis.unit = (Unit)readUint8();
 		}
@@ -526,57 +532,6 @@ bool Reader::readRemainingFileHeaderAndMetaFields(Parameters &parameters) {
 	parameters.duration = parameters.xAxis.range.max - parameters.xAxis.range.min;
 
 	return !invalidHeader;
-}
-
-Bookmarks *Reader::readBookmarks(size_t srcBufferSize, uint8_t *destBuffer, size_t destBufferSize) {
-	auto bookmarks = (Bookmarks *)destBuffer;
-	auto bookmark = bookmarks->list;
-	uint8_t *texts = destBuffer + destBufferSize;
-
-	bookmarks->count = 0;
-
-	m_offset = 0;
-	while (m_offset < srcBufferSize) {
-		uint16_t fieldLength = readUint16();
-		if (fieldLength == 0) {
-			break;
-		}
-
-		if (m_offset - sizeof(uint16_t) + fieldLength > srcBufferSize) {
-			break;
-		}
-
-		uint8_t fieldId = readUint8();
-
-		uint16_t fieldDataLength = fieldLength - sizeof(uint16_t) - sizeof(uint8_t);
-
-		if (fieldId == FIELD_ID_BOOKMARK) {
-			texts -= fieldDataLength + 1;
-			if ((uint8_t *)(bookmark + 1) > texts) {
-				// TODO report that there is not enough room to store all the bookmarks
-				break;
-			}
-
-			bookmark->position = readUint32();
-			bookmark->text = (const char *)texts;
-
-			fieldDataLength -= 4;
-
-			auto p = texts;
-			for (int i = 0; i < fieldDataLength; i++) {
-				*p++ = readUint8();
-			}
-			*p = 0;
-
-			bookmarks->count++;
-			bookmark++;
-		} else {
-			// unknown field, skip
-			m_offset += fieldDataLength;
-		}
-	}
-
-	return bookmarks;
 }
 
 uint8_t Reader::readUint8() {

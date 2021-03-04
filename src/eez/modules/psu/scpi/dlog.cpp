@@ -884,6 +884,11 @@ scpi_result_t scpi_cmd_senseDlogTraceBookmark(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
+    if (textLen > dlog_file::MAX_BOOKMARK_TEXT_LEN) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CHARACTER_DATA_TOO_LONG);
+        return SCPI_RES_ERR;
+    }
+
     dlog_record::logBookmark(text, textLen);
 
     return SCPI_RES_OK;

@@ -18,6 +18,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <float.h>
 #include <assert.h>
 
@@ -54,6 +55,12 @@ namespace dlog_view {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static int VIEW_WIDTH = 480;
+static int VIEW_HEIGHT = 240;
+
+static int NUM_HORZ_DIVISIONS = 12;
+static int NUM_VERT_DIVISIONS = 6;
+
 static State g_state;
 static uint32_t g_loadingStartTickCount;
 bool g_showLatest = true;
@@ -76,12 +83,22 @@ static uint8_t *g_rowDataStart = FILE_VIEW_BUFFER;
 static const uint32_t ROW_VALUES_BUFFER_SIZE = 65536;
 
 static uint8_t *g_bookmarksDataStart = g_rowDataStart + ROW_VALUES_BUFFER_SIZE;
-static const uint32_t BOOKMARKS_DATA_SIZE = 65536;
-static dlog_file::Bookmarks *g_bookmarks;
+struct Bookmark {
+	uint32_t position;
+	const char *text;
+};
+static Bookmark *g_bookmarks = (Bookmark *)g_bookmarksDataStart;
+static const uint32_t BOOKMARKS_PER_PAGE = 8;
+static const uint32_t BOOKMARKS_DATA_SIZE = 2 * (BOOKMARKS_PER_PAGE * (sizeof(Bookmark) + dlog_file::MAX_BOOKMARK_TEXT_LEN + 1));
 static uint32_t g_selectedBookmarkIndex = -1;
 static uint32_t g_bookmarksScrollPosition = 0;
+static uint32_t g_loadedBookmarksScrollPosition = 0;
+uint8_t *g_visibleBookmarksBuffer = g_bookmarksDataStart + BOOKMARKS_DATA_SIZE;
+uint8_t *g_visibleBookmarks;
+float g_visibleBookmarksPositionStart;
+float g_visibleBookmarksPositionEnd;
 
-static CacheBlock *g_cacheBlocks = (CacheBlock *)(g_bookmarksDataStart + BOOKMARKS_DATA_SIZE);
+static CacheBlock *g_cacheBlocks = (CacheBlock *)(g_visibleBookmarksBuffer + 2 * 480);
 static const uint32_t CACHE_BLOCKS_BUFFER_SIZE = FILE_VIEW_BUFFER_SIZE - ROW_VALUES_BUFFER_SIZE - BOOKMARKS_DATA_SIZE;
 
 static uint32_t NUM_ELEMENTS_PER_BLOCKS;
@@ -100,12 +117,6 @@ static enum {
 	TAB_OPTIONS,
 	TAB_BOOKMARKS
 } g_selectedTab = TAB_OPTIONS;
-
-static int VIEW_WIDTH = 480;
-static int VIEW_HEIGHT = 240;
-
-static int NUM_HORZ_DIVISIONS = 12;
-static int NUM_VERT_DIVISIONS = 6;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -469,6 +480,23 @@ void loadBlock() {
     g_refreshed = true;
 }
 
+static uint32_t getPosition(Recording& recording);
+static void adjustXAxisOffset(Recording &recording);
+static void loadVisibleBookmarks(float positionStart, float positionEnd);
+
+void tick() {
+    if (g_bookmarksScrollPosition != g_loadedBookmarksScrollPosition) {
+        loadBookmarks();
+    }
+
+    auto &recording = dlog_view::getRecording();
+    auto positionStart = recording.xAxisOffset / recording.parameters.xAxis.step;
+    auto positionEnd = positionStart + VIEW_WIDTH * recording.parameters.period / recording.parameters.xAxis.step;
+    if (positionStart != g_visibleBookmarksPositionStart || positionEnd != g_visibleBookmarksPositionEnd) {
+        loadVisibleBookmarks(positionStart, positionEnd);
+    }
+}
+
 void stateManagment() {
     auto isExecuting = dlog_record::isExecuting();
     if (!isExecuting && g_wasExecuting) {
@@ -546,7 +574,7 @@ static float getDuration(Recording &recording) {
 	return recording.size > 0 ? (recording.size - 1) * recording.parameters.xAxis.step : 0;
 }
 
-void adjustXAxisOffset(Recording &recording) {
+static void adjustXAxisOffset(Recording &recording) {
     auto duration = getDuration(recording);
     if (recording.xAxisOffset + VIEW_WIDTH * recording.parameters.period > duration) {
         recording.xAxisOffset = duration - VIEW_WIDTH * recording.parameters.period;
@@ -845,6 +873,182 @@ static void scaleToFit(Recording &recording) {
     }
 }
 
+void setBookmarksScrollPosition(uint32_t scrollPosition) {
+	auto &recording = getRecording();
+
+	if (scrollPosition + BOOKMARKS_PER_PAGE > recording.parameters.bookmarksSize) {
+		scrollPosition = recording.parameters.bookmarksSize - BOOKMARKS_PER_PAGE;
+	}
+
+    g_bookmarksScrollPosition = scrollPosition;
+}
+
+void loadBookmarks() {
+	auto &recording = getRecording();
+
+    auto scrollPosition = g_bookmarksScrollPosition;
+	auto bookmarks = g_bookmarks == (Bookmark *)g_bookmarksDataStart ? (Bookmark *)(g_bookmarksDataStart + BOOKMARKS_DATA_SIZE / 2) : (Bookmark *)g_bookmarksDataStart;
+
+	int n = MIN(recording.parameters.bookmarksSize - scrollPosition, BOOKMARKS_PER_PAGE);
+
+	if (n <= 0) {
+		return;
+	}
+
+    File file;
+    if (!file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+        // TODO report error
+        return;
+    }
+
+    uint32_t bookmarksIndexOffset = recording.dataOffset + recording.parameters.dataSize * recording.numBytesPerRow;
+
+    if (!file.seek(bookmarksIndexOffset + scrollPosition * dlog_file::NUM_BYTES_PER_BOOKMARK_IN_INDEX)) {
+        // TODO report error
+    	file.close();
+    	return;
+    }
+
+    uint8_t buffer[(BOOKMARKS_PER_PAGE + 1) * dlog_file::NUM_BYTES_PER_BOOKMARK_IN_INDEX];
+    if (file.read(buffer, (n + 1) * dlog_file::NUM_BYTES_PER_BOOKMARK_IN_INDEX) != (n + 1) * dlog_file::NUM_BYTES_PER_BOOKMARK_IN_INDEX) {
+        // TODO report error
+    	file.close();
+    	return;
+    }
+
+    auto text = (char *)(bookmarks + BOOKMARKS_PER_PAGE);
+
+	uint32_t bookmarksTextOffset = bookmarksIndexOffset + (recording.parameters.bookmarksSize + 1) * dlog_file::NUM_BYTES_PER_BOOKMARK_IN_INDEX;
+	
+	uint8_t textLen[BOOKMARKS_PER_PAGE];
+	uint32_t previous_textOffset = 0;
+    for (int i = 0; i <= n; i++) {
+		uint32_t textOffset = ((uint32_t *)(buffer + i * dlog_file::NUM_BYTES_PER_BOOKMARK_IN_INDEX))[1];
+		if (i == 0) {
+			bookmarksTextOffset += textOffset;
+		} else {
+			textLen[i - 1] = textOffset - previous_textOffset;
+			text += textLen[i - 1] + 1;
+		}
+
+		if (i < n) {
+			bookmarks[i].position = ((uint32_t *)(buffer + i * dlog_file::NUM_BYTES_PER_BOOKMARK_IN_INDEX))[0];
+			bookmarks[i].text = text;
+		}
+
+		previous_textOffset = textOffset;
+	}
+
+    if (!file.seek(bookmarksTextOffset)) {
+        // TODO report error
+    	file.close();
+    	return;
+    }
+
+    text = (char *)(bookmarks + BOOKMARKS_PER_PAGE);
+
+    for (int i = 0; i < n; i++) {
+        if (file.read(text, textLen[i]) != textLen[i]) {
+            // TODO report error
+        	file.close();
+        	return;
+        }
+		text[textLen[i]] = 0;
+        text += textLen[i] + 1;
+    }
+
+    g_loadedBookmarksScrollPosition = scrollPosition;
+	g_bookmarks = bookmarks;
+
+    file.close();
+}
+
+void loadVisibleBookmarks(float positionStart, float positionEnd) {
+	auto &recording = getRecording();
+
+    File file;
+    if (!file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+        // TODO report error
+        return;
+    }
+
+    uint32_t bookmarksIndexOffset = recording.dataOffset + recording.parameters.dataSize * recording.numBytesPerRow;
+
+    if (!file.seek(bookmarksIndexOffset)) {
+        // TODO report error
+    	file.close();
+    	return;
+    }
+
+	uint32_t a = 0;
+	uint32_t b = recording.parameters.bookmarksSize - 1;
+	while (a < b) {
+		uint32_t c = (a + b) / 2;
+
+		if (!file.seek(bookmarksIndexOffset + c * dlog_file::NUM_BYTES_PER_BOOKMARK_IN_INDEX)) {
+			// TODO report error
+			file.close();
+			return;
+		}
+		uint32_t position;
+		if (file.read(&position, sizeof(uint32_t)) != sizeof(uint32_t)) {
+			// TODO report error
+			file.close();
+			return;
+		}
+
+		if (position < positionStart) {
+			if (a == c) {
+				break;
+			}
+			a = c;
+		} else {
+			if (b == c) {
+				break;
+			}
+			b = c;
+		}
+	}
+
+	uint8_t *visibleBookmarks = g_visibleBookmarks == g_visibleBookmarksBuffer ? g_visibleBookmarksBuffer + 480 : g_visibleBookmarksBuffer;
+
+	for (int i = 0; i < VIEW_WIDTH; i++) {
+		visibleBookmarks[i] = 0;
+	}
+
+	for (; a < recording.parameters.bookmarksSize; a++) {
+		if (!file.seek(bookmarksIndexOffset + a * dlog_file::NUM_BYTES_PER_BOOKMARK_IN_INDEX)) {
+			// TODO report error
+			file.close();
+			return;
+		}
+		uint32_t position;
+		if (file.read(&position, sizeof(uint32_t)) != sizeof(uint32_t)) {
+			// TODO report error
+			file.close();
+			return;
+		}
+		
+		if (position >= positionEnd) {
+			break;
+		}
+
+		auto i = (int)roundf((position - positionStart) * recording.parameters.xAxis.step / recording.parameters.period);
+
+        if (i >= 0 && i < 480) {
+            if (visibleBookmarks[i] != 2) {
+				visibleBookmarks[i] = a == g_selectedBookmarkIndex ? 2 : 1;
+            }
+        }
+	}
+
+	g_visibleBookmarks = visibleBookmarks;
+    g_visibleBookmarksPositionStart = positionStart;
+    g_visibleBookmarksPositionEnd = positionEnd;
+
+    file.close();
+}
+
 bool openFile(const char *filePath, int *err) {
     g_state = STATE_LOADING;
     g_loadingStartTickCount = millis();
@@ -853,11 +1057,22 @@ bool openFile(const char *filePath, int *err) {
 		stringCopy(g_filePath, sizeof(g_filePath), filePath);
 	}
 
+#if defined(EEZ_PLATFORM_STM32)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
     memset(&g_dlogFile, 0, sizeof(Recording));
 
-	g_bookmarks = 0;
+#if defined(EEZ_PLATFORM_STM32)
+#pragma GCC diagnostic pop
+#endif
+
 	g_selectedBookmarkIndex = -1;
     g_bookmarksScrollPosition = 0;
+	g_visibleBookmarks = 0;
+	g_visibleBookmarksPositionStart = 0;
+	g_visibleBookmarksPositionEnd = 0;
 
     if (!isLowPriorityThread()) {
         sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_SHOW_FILE);
@@ -865,7 +1080,7 @@ bool openFile(const char *filePath, int *err) {
     }
 
     File file;
-    if (file.open(filePath != nullptr ? filePath : g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+    if (file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
         uint8_t *buffer = FILE_VIEW_BUFFER;
         uint32_t read = file.read(buffer, dlog_file::DLOG_VERSION1_HEADER_SIZE);
         if (read == dlog_file::DLOG_VERSION1_HEADER_SIZE) {
@@ -947,21 +1162,6 @@ bool openFile(const char *filePath, int *err) {
 					initDlogValues(g_dlogFile);
 					calcColumnIndexes(g_dlogFile);
 
-					if (g_dlogFile.parameters.dataSize > 0) {
-						auto offset = g_dlogFile.dataOffset + g_dlogFile.parameters.dataSize * g_dlogFile.numBytesPerRow;
-						auto dataLength = file.size();
-						uint32_t bookmarksLength = dataLength - offset;
-						if (bookmarksLength > ROW_VALUES_BUFFER_SIZE) {
-							// TODO report that there is not enough room to store all the bookmarks
-							bookmarksLength = ROW_VALUES_BUFFER_SIZE;
-						}
-						file.seek(offset);
-						uint32_t read = file.read(buffer, bookmarksLength);
-						if (read == bookmarksLength) {
-							g_bookmarks = reader.readBookmarks(bookmarksLength, g_bookmarksDataStart, BOOKMARKS_DATA_SIZE);
-						}
-					}
-
 					g_dlogFile.numSamples = g_dlogFile.parameters.dataSize ?
 						g_dlogFile.parameters.dataSize :
 						(file.size() - g_dlogFile.dataOffset) / g_dlogFile.numBytesPerRow;
@@ -1007,7 +1207,9 @@ bool openFile(const char *filePath, int *err) {
 
     file.close();
 
-    if (g_state != STATE_READY) {
+    if (g_state == STATE_READY) {
+        loadBookmarks();
+    } else {
         g_state = STATE_ERROR;
     }
 
@@ -1016,10 +1218,6 @@ bool openFile(const char *filePath, int *err) {
 
 Recording &getRecording() {
     return g_showLatest && g_wasExecuting ? dlog_record::g_activeRecording : g_dlogFile;
-}
-
-dlog_file::Bookmarks *getBookmarks() {
-	return g_showLatest && g_wasExecuting ? nullptr : g_bookmarks;
 }
 
 float roundValue(float value) {
@@ -1747,37 +1945,8 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
         value = YT_GRAPH_UPDATE_METHOD_STATIC;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
         value = Value(recording.parameters.period, UNIT_SECOND);
-    } else if (operation == DATA_OPERATION_YT_DATA_GET_VISIBLE_BOOKMARKS) {
-		dlog_file::Bookmarks *bookmarks = getBookmarks();
-		if (bookmarks && bookmarks->count > 0) {
-			float xStart = dlog_view::getPosition(recording) * recording.parameters.period;
-			float xEnd = (dlog_view::getPosition(recording) + VIEW_WIDTH) * recording.parameters.period;
-			auto bookmarksSlice = (BookmarksSlice *)value.getVoidPointer();
-			for (uint32_t bookmarkIndex = 0; bookmarkIndex < bookmarks->count; bookmarkIndex++) {
-                auto bookmark = bookmarks->list + bookmarkIndex;
-				float xValue = bookmark->position * recording.parameters.xAxis.step;
-				if (xValue >= xStart) {
-					if (xValue < xEnd) {
-						if (bookmarksSlice->start == bookmarksSlice->end) {
-							bookmarksSlice->start = bookmarkIndex;
-						}
-						bookmarksSlice->end = bookmarkIndex + 1;
-					} else {
-						break;
-					}
-				}
-            }
-		}
-	} else if (operation == DATA_OPERATION_YT_DATA_GET_BOOKMARK_POSITION) {
-		uint32_t bookmarkIndex = value.getUInt32();
-		dlog_file::Bookmarks *bookmarks = getBookmarks();
-		if (bookmarks && bookmarkIndex < bookmarks->count) {
-			auto bookmark = bookmarks->list + bookmarkIndex;
-			float xValue = bookmark->position * recording.parameters.xAxis.step;
-			value = Value((uint32_t)round(xValue / recording.parameters.period), VALUE_TYPE_UINT32);
-		}
-	} else if (operation == DATA_OPERATION_YT_DATA_GET_SELECTED_BOOKMARK_INDEX) {
-		value = Value(g_selectedBookmarkIndex, VALUE_TYPE_UINT32);
+    } else if (operation == DATA_OPERATION_YT_DATA_GET_BOOKMARKS) {
+        value = Value(g_visibleBookmarks, VALUE_TYPE_POINTER);
 	} else if (operation == DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE) {
         value = &recording != &dlog_record::g_activeRecording;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET) {
@@ -2309,13 +2478,10 @@ void data_dlog_view_selected_tab(DataOperationEnum operation, Cursor cursor, Val
 	}
 }
 
-static const uint32_t BOOKMARKS_PER_PAGE = 8;
-
 void action_dlog_view_select_bookmarks_tab() {
 	g_selectedTab = TAB_BOOKMARKS;
 
-	auto bookmarks = getBookmarks();
-	if (bookmarks && bookmarks->count > BOOKMARKS_PER_PAGE) {
+	if (getRecording().parameters.bookmarksSize > BOOKMARKS_PER_PAGE) {
 		setFocusCursor(Cursor(-1), DATA_ID_DLOG_BOOKMARKS);
 	}
 }
@@ -2326,25 +2492,20 @@ void action_dlog_view_select_options_tab() {
 
 void data_dlog_bookmarks_is_scrollbar_visible(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-		auto bookmarks = getBookmarks();
-        value = bookmarks && bookmarks->count > BOOKMARKS_PER_PAGE;
+        value = getRecording().parameters.bookmarksSize > BOOKMARKS_PER_PAGE;
     }
 }
 
 void data_dlog_bookmarks(DataOperationEnum operation, Cursor cursor, Value &value) {
-    auto bookmarks = getBookmarks();
+	auto bookmarksSize = getRecording().parameters.bookmarksSize;
 	if (operation == DATA_OPERATION_COUNT) {
-		value = (int)(bookmarks ? bookmarks->count : 0);
+		value = (int)(bookmarksSize);
 	} else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
-        value = Value(bookmarks ? bookmarks->count : 0, VALUE_TYPE_UINT32);
+        value = Value(bookmarksSize, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION) {
         value = Value(g_bookmarksScrollPosition, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_SET_POSITION) {
-		if (value.getUInt32() + BOOKMARKS_PER_PAGE > bookmarks->count) {
-			g_bookmarksScrollPosition = bookmarks->count - BOOKMARKS_PER_PAGE;
-		} else {
-			g_bookmarksScrollPosition = value.getUInt32();
-		}
+		setBookmarksScrollPosition(value.getUInt32());
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
         value = Value(BOOKMARKS_PER_PAGE, VALUE_TYPE_UINT32);
 	} else if (operation == DATA_OPERATION_GET) {
@@ -2352,80 +2513,73 @@ void data_dlog_bookmarks(DataOperationEnum operation, Cursor cursor, Value &valu
 	} else if (operation == DATA_OPERATION_GET_MIN) {
 		value = MakeValue(0, UNIT_NONE);
 	} else if (operation == DATA_OPERATION_GET_MAX) {
-		value = MakeValue(1.0f * (bookmarks->count - BOOKMARKS_PER_PAGE), UNIT_NONE);
+		value = MakeValue(1.0f * (bookmarksSize - BOOKMARKS_PER_PAGE), UNIT_NONE);
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
  		auto stepValues = value.getStepValues();
 
-		static float values[] = { 1.0f, 5.0f, 10.0f, 20.0f };
+		static float values[] = { 1.0f, 1.0f * BOOKMARKS_PER_PAGE, 2.0f * BOOKMARKS_PER_PAGE, 5.0f * BOOKMARKS_PER_PAGE, 10.0f * BOOKMARKS_PER_PAGE };
 
 		stepValues->values = values;
 		stepValues->count = sizeof(values) / sizeof(float);
 		stepValues->unit = UNIT_NONE;
 
 		stepValues->encoderSettings.accelerationEnabled = true;
-		stepValues->encoderSettings.range = 10.0f * stepValues->values[0];
-		stepValues->encoderSettings.step = stepValues->values[0];
+		stepValues->encoderSettings.range = 10.0f * BOOKMARKS_PER_PAGE;
+		stepValues->encoderSettings.step = 1.0f;
 		stepValues->encoderSettings.mode = edit_mode_step::g_scrollBarEncoderMode;
 
 		value = 1;
 	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         psu::gui::edit_mode_step::g_scrollBarEncoderMode = (EncoderMode)value.getInt();
     } else if (operation == DATA_OPERATION_SET) {
-		uint32_t position = (uint32_t)value.getFloat();
-		if (position + BOOKMARKS_PER_PAGE > bookmarks->count) {
-			g_bookmarksScrollPosition = bookmarks->count - BOOKMARKS_PER_PAGE;
-		} else {
-			g_bookmarksScrollPosition = position;
-		}
+		setBookmarksScrollPosition((uint32_t)value.getFloat());
 	}
 }
 
 void data_dlog_bookmark_x_value(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-		auto bookmarks = getBookmarks();
-		if (bookmarks && (uint32_t)cursor < bookmarks->count) {
-			auto &recording = dlog_view::getRecording();
-			value = Value(bookmarks->list[cursor].position * recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
+		auto i = cursor - g_bookmarksScrollPosition;
+		if (i >= 0 && i < BOOKMARKS_PER_PAGE) {
+			auto &recording = getRecording();
+			value = Value(g_bookmarks[i].position * recording.parameters.xAxis.step, dlog_view::getXAxisUnit(recording));
 		}
 	}
 }
 
 void data_dlog_bookmark_text(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-		auto bookmarks = getBookmarks();
-		if (bookmarks && (uint32_t)cursor < bookmarks->count) {
-			value = bookmarks->list[cursor].text;
+		auto i = cursor - g_bookmarksScrollPosition;
+		if (i >= 0 && i < BOOKMARKS_PER_PAGE) {
+			value = g_bookmarks[i].text;
 		}
 	}
 }
 
 void data_dlog_bookmark_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-		auto bookmarks = getBookmarks();
-		if (bookmarks) {
-			value = (uint32_t)cursor == g_selectedBookmarkIndex;
-		}
+		value = (uint32_t)cursor == g_selectedBookmarkIndex;
 	}
 }
 
 void action_dlog_view_select_bookmark() {
 	g_selectedBookmarkIndex = getFoundWidgetAtDown().cursor;
 
-    auto bookmarks = getBookmarks();
+	if (g_bookmarksScrollPosition == g_loadedBookmarksScrollPosition && g_selectedBookmarkIndex >= g_bookmarksScrollPosition && g_selectedBookmarkIndex < g_bookmarksScrollPosition + BOOKMARKS_PER_PAGE) {
+		// position cursor at the bookmark position
+		auto bookmarkIndex = g_selectedBookmarkIndex - g_bookmarksScrollPosition;
 
-    auto cursorOffset = bookmarks->list[g_selectedBookmarkIndex].position * g_dlogFile.parameters.xAxis.step / g_dlogFile.parameters.period - dlog_view::getPosition(g_dlogFile);
-	if (cursorOffset < 0 || cursorOffset >= (uint32_t)VIEW_WIDTH) {
-		cursorOffset = VIEW_WIDTH / 2.0f;
-    }
+		auto cursorOffset = g_bookmarks[bookmarkIndex].position * g_dlogFile.parameters.xAxis.step / g_dlogFile.parameters.period - getPosition(g_dlogFile);
+		if (cursorOffset < 0 || cursorOffset >= (uint32_t)VIEW_WIDTH) {
+			cursorOffset = VIEW_WIDTH / 2.0f;
+		}
 
-    g_dlogFile.xAxisOffset = bookmarks->list[g_selectedBookmarkIndex].position * g_dlogFile.parameters.xAxis.step - cursorOffset * g_dlogFile.parameters.period;
-    adjustXAxisOffset(g_dlogFile);
+		g_dlogFile.xAxisOffset = g_bookmarks[bookmarkIndex].position * g_dlogFile.parameters.xAxis.step - cursorOffset * g_dlogFile.parameters.period;
+		adjustXAxisOffset(g_dlogFile);
 
-    g_dlogFile.cursorOffset = (uint32_t)roundf(cursorOffset);
-
-	if (bookmarks && bookmarks->count > BOOKMARKS_PER_PAGE) {
-		setFocusCursor(Cursor(-1), DATA_ID_DLOG_BOOKMARKS);
+		g_dlogFile.cursorOffset = (uint32_t)roundf(cursorOffset);
 	}
+
+	setFocusCursor(Cursor(-1), DATA_ID_DLOG_BOOKMARKS);
 }
 
 void data_dlog_view_is_zoom_in_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {

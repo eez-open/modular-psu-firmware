@@ -309,6 +309,8 @@ void lowPriorityThreadOneIter() {
                 dlog_view::openFile(nullptr);
             } else if (type == THREAD_MESSAGE_DLOG_LOAD_BLOCK) {
                 dlog_view::loadBlock();
+            } else if (type == THREAD_MESSAGE_DLOG_LOAD_BOOKMARKS) {
+                dlog_view::loadBookmarks();
             } else if (type == THREAD_MESSAGE_ABORT_DOWNLOADING) {
                 psu::scpi::abortDownloading();
             } else if (type == THREAD_MESSAGE_SCREENSHOT) {
@@ -502,6 +504,8 @@ void lowPriorityThreadOneIter() {
     usb::tick();
 
     uart::tick();
+
+    dlog_view::tick();
 
     return;
 }

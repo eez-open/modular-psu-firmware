@@ -163,6 +163,12 @@ float getSample(Recording &recording, uint8_t *rowData, unsigned columnIndex);
 // this is called from the thread that owns SD card
 void loadBlock();
 
+// this is called from the thread that owns SD card
+void loadBookmarks();
+
+// this is called from the thread that owns SD card
+void tick();
+
 // this should be called during GUI state managment phase
 void stateManagment();
 
