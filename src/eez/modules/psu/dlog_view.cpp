@@ -114,13 +114,18 @@ static bool g_wasExecuting;
 
 bool g_drawerIsOpen;
 static enum {
-	TAB_OPTIONS,
-	TAB_BOOKMARKS
-} g_selectedTab = TAB_OPTIONS;
+    TAB_Y_VALUES,
+	TAB_BOOKMARKS,
+	TAB_OPTIONS
+} g_selectedTab = TAB_Y_VALUES;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Parameters::isDlogItemAvailable(int slotIndex, int subchannelIndex, int resourceIndex) {
+	if (isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex)) {
+		return true;
+	}
+
     if (numDlogItems >= dlog_file::MAX_NUM_OF_Y_AXES) {
         return false;
     }
@@ -336,7 +341,7 @@ static inline BlockElement *getCacheBlock(unsigned blockIndex) {
 }
 
 static inline unsigned getNumElementsPerRow() {
-    return MIN(g_dlogFile.parameters.numYAxes, MAX_NUM_OF_Y_VALUES);
+    return MIN(g_dlogFile.parameters.numYAxes, dlog_file::MAX_NUM_OF_Y_AXES);
 }
 
 void invalidateAllBlocks() {
@@ -687,7 +692,7 @@ void initDlogValues(Recording &recording) {
     int bitValueIndex = 0;
 
     for (yAxisIndex = 0; yAxisIndex < MIN(recording.parameters.numYAxes, MAX_NUM_OF_Y_VALUES); yAxisIndex++) {
-        recording.dlogValues[yAxisIndex].isVisible = true;
+        recording.dlogValues[yAxisIndex].yAxisIndex = yAxisIndex;
 
         float rangeMin = recording.parameters.yAxes[yAxisIndex].range.min;
         float rangeMax = recording.parameters.yAxes[yAxisIndex].range.max;
@@ -710,7 +715,7 @@ void initDlogValues(Recording &recording) {
     }
 
     for (; yAxisIndex < MAX_NUM_OF_Y_VALUES; yAxisIndex++) {
-        recording.dlogValues[yAxisIndex].isVisible = false;
+        recording.dlogValues[yAxisIndex].yAxisIndex = -1;
     }
 
     recording.selectedVisibleValueIndex = 0;
@@ -771,7 +776,7 @@ void calcColumnIndexes(Recording &recording) {
 static int getNumVisibleDlogValues(const Recording &recording) {
     int count = 0;
     for (int dlogValueIndex = 0; dlogValueIndex < MAX_NUM_OF_Y_VALUES; dlogValueIndex++) {
-        if (recording.dlogValues[dlogValueIndex].isVisible) {
+        if (recording.dlogValues[dlogValueIndex].yAxisIndex != -1) {
             count++;
         }
     }
@@ -781,7 +786,7 @@ static int getNumVisibleDlogValues(const Recording &recording) {
 int getDlogValueIndex(Recording &recording, int visibleDlogValueIndex) {
     int i = 0;
     for (int dlogValueIndex = 0; dlogValueIndex < MAX_NUM_OF_Y_VALUES; dlogValueIndex++) {
-        if (recording.dlogValues[dlogValueIndex].isVisible) {
+        if (recording.dlogValues[dlogValueIndex].yAxisIndex != -1) {
             if (i == visibleDlogValueIndex) {
                 return dlogValueIndex;
             }
@@ -797,7 +802,7 @@ static int getVisibleDlogValueIndex(Recording &recording, int fromDlogValueIndex
         if (dlogValueIndex == fromDlogValueIndex) {
             return visibleDlogValueIndex;
         }
-        if (recording.dlogValues[dlogValueIndex].isVisible) {
+        if (recording.dlogValues[dlogValueIndex].yAxisIndex != -1) {
             ++visibleDlogValueIndex;
         }
     }
@@ -1911,7 +1916,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC) {
         value = recording.getValue;
     } else if (operation == DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE) {
-        value = Value(recording.dlogValues[value.getUInt8()].isVisible);
+        value = Value(recording.dlogValues[value.getUInt8()].yAxisIndex != -1);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SHOW_LABELS) {
         value = persist_conf::devConf.viewFlags.dlogViewShowLabels ? 1 : 0;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SELECTED_VALUE_INDEX) {
@@ -2497,6 +2502,10 @@ void data_dlog_view_selected_tab(DataOperationEnum operation, Cursor cursor, Val
 	}
 }
 
+void action_dlog_view_select_y_values_tab() {
+	g_selectedTab = TAB_Y_VALUES;
+}
+
 void action_dlog_view_select_bookmarks_tab() {
 	g_selectedTab = TAB_BOOKMARKS;
 
@@ -2631,6 +2640,36 @@ void action_dlog_view_zoom_out() {
 	if (&getRecording() == &g_dlogFile) {
 		changeXAxisDiv(g_dlogFile, MIN(g_dlogFile.xAxisDiv * 2, g_dlogFile.xAxisDivMax));
 	}
+}
+
+void data_dlog_y_values_is_scrollbar_visible(DataOperationEnum operation, Cursor cursor, Value &value) {
+	value = 1;
+}
+
+void data_dlog_y_values(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dlog_y_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dlog_y_value_is_checked(DataOperationEnum operation, Cursor cursor, Value &value) {
+	value = 1;
+}
+
+void data_dlog_y_value_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+	value = 1;
+}
+
+void data_dlog_y_value_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dlog_y_value_div(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void data_dlog_y_value_cursor(DataOperationEnum operation, Cursor cursor, Value &value) {
+}
+
+void action_dlog_view_select_y_value() {
 }
 
 } // namespace gui

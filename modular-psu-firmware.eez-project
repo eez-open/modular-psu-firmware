@@ -2448,7 +2448,8 @@
     {
       "name": "dlog_view_selected_tab",
       "type": "enum",
-      "enumItems": "[\"Options\", \"Bookmarks\"]"
+      "enumItems": "[\"Y values\", \"Bookmarks\", \"Options\"]",
+      "defaultValue": "0"
     },
     {
       "name": "dlog_bookmarks",
@@ -2489,6 +2490,43 @@
       "name": "dlog_bookmarks_is_scrollbar_visible",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "dlog_y_values_is_scrollbar_visible",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "dlog_y_values",
+      "type": "list",
+      "defaultValue": "[\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #1 U\", \"dlog_bookmark_y_value_is_checked\": 1 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #1 I\", \"dlog_bookmark_y_value_is_checked\": 1 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #2 U\", \"dlog_bookmark_y_value_is_checked\": 0 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #2 I\", \"dlog_bookmark_y_value_is_checked\": 0 }\n]"
+    },
+    {
+      "name": "dlog_y_value_label",
+      "type": "string",
+      "defaultValue": "DCP405 #1 U"
+    },
+    {
+      "name": "dlog_y_value_is_checked",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "dlog_y_value_is_selected",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
+      "name": "dlog_y_value_offset",
+      "defaultValue": "5.000 V"
+    },
+    {
+      "name": "dlog_y_value_div",
+      "defaultValue": "2.000 V"
+    },
+    {
+      "name": "dlog_y_value_cursor",
+      "defaultValue": "3.000 V"
     }
   ],
   "actions": [
@@ -3231,6 +3269,12 @@
     },
     {
       "name": "dlog_view_zoom_out"
+    },
+    {
+      "name": "dlog_view_select_y_values_tab"
+    },
+    {
+      "name": "dlog_view_select_y_value"
     }
   ],
   "gui": {
@@ -34052,7 +34096,7 @@
             "left": 0,
             "top": 0,
             "width": 160,
-            "height": 32,
+            "height": 30,
             "widgets": [
               {
                 "type": "Container",
@@ -34062,7 +34106,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 160,
-                "height": 32,
+                "height": 30,
                 "widgets": [
                   {
                     "type": "Text",
@@ -34074,14 +34118,14 @@
                       "backgroundColor": "text_regular",
                       "activeColor": "text_regular",
                       "activeBackgroundColor": "background",
-                      "padding": "4 0 0 0"
+                      "padding": "3 0 0 0"
                     },
-                    "action": "dlog_view_select_options_tab",
+                    "action": "dlog_view_select_y_values_tab",
                     "left": 0,
                     "top": 0,
                     "width": 40,
-                    "height": 32,
-                    "text": "\\u0030"
+                    "height": 30,
+                    "text": "\\u0085"
                   },
                   {
                     "type": "Text",
@@ -34099,14 +34143,23 @@
                     "text": "\\u0042"
                   },
                   {
-                    "type": "Rectangle",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "default",
+                      "font": "Heydings14",
+                      "alignVertical": "top",
+                      "color": "text_regular",
+                      "backgroundColor": "background",
+                      "activeColor": "background",
+                      "activeBackgroundColor": "text_regular",
+                      "padding": "4 0 0 0"
                     },
-                    "left": 40,
-                    "top": 30,
-                    "width": 120,
-                    "height": 2
+                    "action": "dlog_view_select_options_tab",
+                    "left": 80,
+                    "top": 0,
+                    "width": 40,
+                    "height": 30,
+                    "text": "\\u0030"
                   }
                 ]
               },
@@ -34118,7 +34171,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 160,
-                "height": 32,
+                "height": 30,
                 "widgets": [
                   {
                     "type": "Text",
@@ -34126,14 +34179,18 @@
                       "inheritFrom": "default",
                       "font": "Heydings14",
                       "alignVertical": "top",
-                      "padding": "4 0 0 0"
+                      "color": "text_regular",
+                      "backgroundColor": "background",
+                      "activeColor": "background",
+                      "activeBackgroundColor": "text_regular",
+                      "padding": "3 0 0 0"
                     },
-                    "action": "dlog_view_select_options_tab",
+                    "action": "dlog_view_select_y_values_tab",
                     "left": 0,
                     "top": 0,
                     "width": 40,
                     "height": 30,
-                    "text": "\\u0030"
+                    "text": "\\u0085"
                   },
                   {
                     "type": "Text",
@@ -34151,32 +34208,110 @@
                     "left": 40,
                     "top": 0,
                     "width": 40,
-                    "height": 32,
+                    "height": 30,
                     "text": "\\u0042"
                   },
                   {
-                    "type": "Rectangle",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "default",
+                      "font": "Heydings14",
+                      "alignVertical": "top",
+                      "color": "text_regular",
+                      "backgroundColor": "background",
+                      "activeColor": "background",
+                      "activeBackgroundColor": "text_regular",
+                      "padding": "4 0 0 0"
                     },
-                    "left": 0,
-                    "top": 30,
+                    "action": "dlog_view_select_options_tab",
+                    "left": 80,
+                    "top": 0,
                     "width": 40,
-                    "height": 2
+                    "height": 30,
+                    "text": "\\u0030"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 160,
+                "height": 30,
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Heydings14",
+                      "alignVertical": "top",
+                      "color": "text_regular",
+                      "backgroundColor": "background",
+                      "activeColor": "background",
+                      "activeBackgroundColor": "text_regular",
+                      "padding": "3 0 0 0"
+                    },
+                    "action": "dlog_view_select_y_values_tab",
+                    "left": 0,
+                    "top": 0,
+                    "width": 40,
+                    "height": 30,
+                    "text": "\\u0085"
                   },
                   {
-                    "type": "Rectangle",
+                    "type": "Text",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "default",
+                      "font": "Heydings14",
+                      "alignVertical": "top",
+                      "color": "text_regular",
+                      "backgroundColor": "background",
+                      "activeColor": "background",
+                      "activeBackgroundColor": "text_regular",
+                      "padding": "3 0 0 0"
                     },
+                    "action": "dlog_view_select_bookmarks_tab",
+                    "left": 40,
+                    "top": 0,
+                    "width": 40,
+                    "height": 30,
+                    "text": "\\u0042"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "Heydings14",
+                      "alignVertical": "top",
+                      "color": "background",
+                      "backgroundColor": "text_regular",
+                      "activeColor": "text_regular",
+                      "activeBackgroundColor": "background",
+                      "padding": "4 0 0 0"
+                    },
+                    "action": "dlog_view_select_options_tab",
                     "left": 80,
-                    "top": 30,
-                    "width": 80,
-                    "height": 2
+                    "top": 0,
+                    "width": 40,
+                    "height": 30,
+                    "text": "\\u0030"
                   }
                 ]
               }
             ]
+          },
+          {
+            "type": "Rectangle",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "left": 0,
+            "top": 30,
+            "width": 158,
+            "height": 2
           },
           {
             "type": "Select",
@@ -34198,211 +34333,504 @@
                 "top": 0,
                 "width": 160,
                 "height": 208,
-                "name": "options",
                 "widgets": [
                   {
-                    "type": "Text",
+                    "type": "Select",
                     "style": {
-                      "inheritFrom": "default_S"
+                      "inheritFrom": "default"
                     },
-                    "data": "dlog_view_legend_view_option",
-                    "action": "",
-                    "left": 17,
-                    "top": 16,
-                    "width": 65,
-                    "height": 32,
-                    "text": "Legend:"
+                    "data": "dlog_y_values_is_scrollbar_visible",
+                    "left": 0,
+                    "top": 0,
+                    "width": 160,
+                    "height": 104,
+                    "widgets": [
+                      {
+                        "type": "List",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "data": "dlog_y_values",
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 160,
+                        "height": 104,
+                        "itemWidget": {
+                          "type": "Select",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "data": "dlog_y_value_is_selected",
+                          "action": "dlog_view_select_y_value",
+                          "left": 0,
+                          "top": 0,
+                          "width": 160,
+                          "height": 26,
+                          "widgets": [
+                            {
+                              "type": "Container",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 0,
+                              "top": 0,
+                              "width": 160,
+                              "height": 26,
+                              "widgets": [
+                                {
+                                  "type": "Select",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "data": "dlog_y_value_is_checked",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 36,
+                                  "height": 26,
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default_S"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 26,
+                                      "text": "\\u00a0"
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default_S"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 26,
+                                      "text": "\\u009F"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "font": "Oswald12",
+                                    "alignHorizontal": "left"
+                                  },
+                                  "data": "dlog_y_value_label",
+                                  "left": 36,
+                                  "top": 0,
+                                  "width": 124,
+                                  "height": 26,
+                                  "text": ""
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Container",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "left": 0,
+                              "top": 0,
+                              "width": 160,
+                              "height": 26,
+                              "widgets": [
+                                {
+                                  "type": "Select",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "data": "dlog_y_value_is_checked",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 36,
+                                  "height": 26,
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default_S",
+                                        "backgroundColor": "selected_bookmark",
+                                        "activeColor": "selected_bookmark"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 26,
+                                      "text": "\\u00a0"
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default_S",
+                                        "backgroundColor": "selected_bookmark",
+                                        "activeColor": "selected_bookmark"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 26,
+                                      "text": "\\u009F"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Text",
+                                  "style": {
+                                    "inheritFrom": "default",
+                                    "font": "Oswald12",
+                                    "alignHorizontal": "left",
+                                    "color": "text_regular",
+                                    "backgroundColor": "selected_bookmark",
+                                    "activeColor": "selected_bookmark",
+                                    "activeBackgroundColor": "text_regular"
+                                  },
+                                  "data": "dlog_y_value_label",
+                                  "left": 36,
+                                  "top": 0,
+                                  "width": 124,
+                                  "height": 26,
+                                  "text": ""
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "listType": "vertical",
+                        "gap": 0
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 160,
+                        "height": 104,
+                        "widgets": [
+                          {
+                            "type": "List",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "data": "dlog_y_values",
+                            "action": "edit",
+                            "left": 0,
+                            "top": 0,
+                            "width": 128,
+                            "height": 104,
+                            "itemWidget": {
+                              "type": "Select",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "data": "dlog_y_value_is_selected",
+                              "action": "dlog_view_select_y_value",
+                              "left": 0,
+                              "top": 0,
+                              "width": 128,
+                              "height": 26,
+                              "widgets": [
+                                {
+                                  "type": "Container",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 128,
+                                  "height": 26,
+                                  "widgets": [
+                                    {
+                                      "type": "Select",
+                                      "style": {
+                                        "inheritFrom": "default"
+                                      },
+                                      "data": "dlog_y_value_is_checked",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 26,
+                                      "widgets": [
+                                        {
+                                          "type": "Text",
+                                          "style": {
+                                            "inheritFrom": "default_S"
+                                          },
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 36,
+                                          "height": 26,
+                                          "text": "\\u00a0"
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "style": {
+                                            "inheritFrom": "default_S"
+                                          },
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 36,
+                                          "height": 26,
+                                          "text": "\\u009F"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default",
+                                        "font": "Oswald12",
+                                        "alignHorizontal": "left"
+                                      },
+                                      "data": "dlog_y_value_label",
+                                      "left": 36,
+                                      "top": 0,
+                                      "width": 92,
+                                      "height": 26,
+                                      "text": ""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Container",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 128,
+                                  "height": 26,
+                                  "widgets": [
+                                    {
+                                      "type": "Select",
+                                      "style": {
+                                        "inheritFrom": "default"
+                                      },
+                                      "data": "dlog_y_value_is_checked",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 26,
+                                      "widgets": [
+                                        {
+                                          "type": "Text",
+                                          "style": {
+                                            "inheritFrom": "default_S",
+                                            "backgroundColor": "selected_bookmark",
+                                            "activeColor": "selected_bookmark"
+                                          },
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 36,
+                                          "height": 26,
+                                          "text": "\\u00a0"
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "style": {
+                                            "inheritFrom": "default_S",
+                                            "backgroundColor": "selected_bookmark",
+                                            "activeColor": "selected_bookmark"
+                                          },
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 36,
+                                          "height": 26,
+                                          "text": "\\u009F"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default",
+                                        "font": "Oswald12",
+                                        "alignHorizontal": "left",
+                                        "color": "text_regular",
+                                        "backgroundColor": "selected_bookmark",
+                                        "activeColor": "selected_bookmark",
+                                        "activeBackgroundColor": "text_regular"
+                                      },
+                                      "data": "dlog_y_value_label",
+                                      "left": 36,
+                                      "top": 0,
+                                      "width": 92,
+                                      "height": 26,
+                                      "text": ""
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "listType": "vertical",
+                            "gap": 0
+                          },
+                          {
+                            "type": "ScrollBar",
+                            "style": {
+                              "inheritFrom": "default_inverse"
+                            },
+                            "data": "dlog_y_values",
+                            "left": 128,
+                            "top": 0,
+                            "width": 32,
+                            "height": 104,
+                            "thumbStyle": {
+                              "inheritFrom": "scrollbar_thumb"
+                            },
+                            "buttonsStyle": {
+                              "inheritFrom": "scrollbar_button"
+                            },
+                            "leftButtonText": "\\u0083",
+                            "rightButtonText": "\\u0084"
+                          }
+                        ]
+                      }
+                    ]
                   },
                   {
                     "type": "Select",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "dlog_view_legend_view_option",
-                    "action": "dlog_view_select_legend_view_option",
-                    "left": 82,
-                    "top": 16,
-                    "width": 60,
-                    "height": 32,
+                    "data": "dlog_y_value_is_selected",
+                    "left": 0,
+                    "top": 104,
+                    "width": 160,
+                    "height": 104,
                     "widgets": [
                       {
-                        "type": "Text",
+                        "type": "Rectangle",
                         "style": {
-                          "inheritFrom": "edit_value_active_S_center"
+                          "inheritFrom": "default"
                         },
-                        "data": "dlog_view_legend_view_option",
-                        "action": "",
                         "left": 0,
                         "top": 0,
-                        "width": 60,
-                        "height": 32,
-                        "text": "Hidden"
+                        "width": 160,
+                        "height": 104,
+                        "invertColors": true
                       },
                       {
-                        "type": "Text",
+                        "type": "Container",
                         "style": {
-                          "inheritFrom": "edit_value_active_S_center"
+                          "inheritFrom": "default"
                         },
-                        "data": "dlog_view_legend_view_option",
-                        "action": "",
                         "left": 0,
                         "top": 0,
-                        "width": 60,
-                        "height": 32,
-                        "text": "Float"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_active_S_center"
-                        },
-                        "data": "dlog_view_legend_view_option",
-                        "action": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 60,
-                        "height": 32,
-                        "text": "Dock"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Container",
-                    "style": {
-                      "inheritFrom": "default",
-                      "color": "action_color",
-                      "activeBackgroundColor": "action_color"
-                    },
-                    "action": "dlog_view_toggle_labels",
-                    "left": 17,
-                    "top": 52,
-                    "width": 125,
-                    "height": 32,
-                    "name": "show labels",
-                    "widgets": [
-                      {
-                        "type": "Select",
-                        "style": {
-                          "inheritFrom": "default",
-                          "color": "action_color",
-                          "activeBackgroundColor": "action_color"
-                        },
-                        "data": "dlog_view_show_labels",
-                        "left": 0,
-                        "top": 0,
-                        "width": 26,
-                        "height": 32,
+                        "width": 160,
+                        "height": 104,
                         "widgets": [
                           {
                             "type": "Text",
                             "style": {
-                              "inheritFrom": "default",
-                              "font": "Oswald14",
+                              "inheritFrom": "overlay",
+                              "font": "Oswald12",
                               "alignHorizontal": "left",
-                              "color": "action_color",
-                              "activeBackgroundColor": "action_color",
-                              "padding": "0 0 0 2"
+                              "color": "text_regular",
+                              "backgroundColor": "background",
+                              "activeColor": "background",
+                              "activeBackgroundColor": "text_regular",
+                              "padding": "0 0 0 4"
                             },
+                            "data": "",
                             "left": 0,
-                            "top": 0,
-                            "width": 26,
-                            "height": 32,
-                            "text": "\\u00a0"
+                            "top": 8,
+                            "width": 62,
+                            "height": 28,
+                            "text": "Offset:"
+                          },
+                          {
+                            "type": "DisplayData",
+                            "style": {
+                              "inheritFrom": "encoder_cursor_14_enabled",
+                              "font": "Oswald12",
+                              "focusBackgroundColor": "action_color"
+                            },
+                            "data": "dlog_y_value_offset",
+                            "action": "edit",
+                            "left": 62,
+                            "top": 8,
+                            "width": 97,
+                            "height": 27,
+                            "displayOption": 0
                           },
                           {
                             "type": "Text",
                             "style": {
-                              "inheritFrom": "default_S",
-                              "color": "action_color",
-                              "activeBackgroundColor": "action_color"
+                              "inheritFrom": "overlay",
+                              "font": "Oswald12",
+                              "alignHorizontal": "left",
+                              "color": "text_regular",
+                              "backgroundColor": "background",
+                              "activeColor": "background",
+                              "activeBackgroundColor": "text_regular",
+                              "padding": "0 0 0 4"
                             },
+                            "data": "",
                             "left": 0,
-                            "top": 0,
-                            "width": 26,
-                            "height": 32,
-                            "text": "\\u009F"
+                            "top": 37,
+                            "width": 62,
+                            "height": 28,
+                            "text": "Div:"
+                          },
+                          {
+                            "type": "DisplayData",
+                            "style": {
+                              "inheritFrom": "encoder_cursor_14_enabled",
+                              "font": "Oswald12",
+                              "focusBackgroundColor": "action_color"
+                            },
+                            "data": "dlog_y_value_div",
+                            "action": "edit",
+                            "left": 62,
+                            "top": 38,
+                            "width": 97,
+                            "height": 27,
+                            "displayOption": 0
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "overlay",
+                              "font": "Oswald12",
+                              "alignHorizontal": "left",
+                              "color": "text_regular",
+                              "backgroundColor": "background",
+                              "activeColor": "background",
+                              "activeBackgroundColor": "text_regular",
+                              "padding": "0 0 0 4"
+                            },
+                            "data": "",
+                            "left": 0,
+                            "top": 67,
+                            "width": 62,
+                            "height": 28,
+                            "text": "Cursor:"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "overlay",
+                              "font": "Oswald12",
+                              "color": "text_regular",
+                              "backgroundColor": "background",
+                              "activeColor": "background",
+                              "activeBackgroundColor": "text_regular"
+                            },
+                            "data": "dlog_y_value_cursor",
+                            "left": 62,
+                            "top": 67,
+                            "width": 97,
+                            "height": 27,
+                            "text": ""
                           }
                         ]
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "overlay",
-                          "alignHorizontal": "left",
-                          "color": "action_color",
-                          "backgroundColor": "background",
-                          "activeColor": "background",
-                          "activeBackgroundColor": "action_color"
-                        },
-                        "data": "",
-                        "left": 26,
-                        "top": 0,
-                        "width": 98,
-                        "height": 32,
-                        "text": "Show labels"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center"
-                    },
-                    "action": "dlog_auto_scale",
-                    "left": 17,
-                    "top": 88,
-                    "width": 125,
-                    "height": 32,
-                    "text": "Auto Scale"
-                  },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "edit_value_active_S_center"
-                    },
-                    "action": "dlog_scale_to_fit",
-                    "left": 17,
-                    "top": 124,
-                    "width": 125,
-                    "height": 32,
-                    "text": "Scale to fit"
-                  },
-                  {
-                    "type": "Select",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "data": "file_manager_upload_file_enabled",
-                    "left": 17,
-                    "top": 160,
-                    "width": 125,
-                    "height": 32,
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_active_S_center",
-                          "color": "text_regular",
-                          "activeBackgroundColor": "text_regular"
-                        },
-                        "action": "",
-                        "left": 0,
-                        "top": 0,
-                        "width": 125,
-                        "height": 32,
-                        "text": "\\u00a7 Upload"
-                      },
-                      {
-                        "type": "Text",
-                        "style": {
-                          "inheritFrom": "edit_value_active_S_center"
-                        },
-                        "action": "dlog_upload",
-                        "left": 0,
-                        "top": 0,
-                        "width": 125,
-                        "height": 32,
-                        "text": "\\u00a7 Upload"
                       }
                     ]
                   }
@@ -34683,6 +35111,225 @@
                             "rightButtonText": "\\u0084"
                           }
                         ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "left": 0,
+                "top": 0,
+                "width": 160,
+                "height": 208,
+                "name": "options",
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "default_S"
+                    },
+                    "data": "dlog_view_legend_view_option",
+                    "action": "",
+                    "left": 17,
+                    "top": 16,
+                    "width": 65,
+                    "height": 32,
+                    "text": "Legend:"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "dlog_view_legend_view_option",
+                    "action": "dlog_view_select_legend_view_option",
+                    "left": 82,
+                    "top": 16,
+                    "width": 60,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center"
+                        },
+                        "data": "dlog_view_legend_view_option",
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": "Hidden"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center"
+                        },
+                        "data": "dlog_view_legend_view_option",
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": "Float"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center"
+                        },
+                        "data": "dlog_view_legend_view_option",
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 60,
+                        "height": 32,
+                        "text": "Dock"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "style": {
+                      "inheritFrom": "default",
+                      "color": "action_color",
+                      "activeBackgroundColor": "action_color"
+                    },
+                    "action": "dlog_view_toggle_labels",
+                    "left": 17,
+                    "top": 52,
+                    "width": 125,
+                    "height": 32,
+                    "name": "show labels",
+                    "widgets": [
+                      {
+                        "type": "Select",
+                        "style": {
+                          "inheritFrom": "default",
+                          "color": "action_color",
+                          "activeBackgroundColor": "action_color"
+                        },
+                        "data": "dlog_view_show_labels",
+                        "left": 0,
+                        "top": 0,
+                        "width": 26,
+                        "height": 32,
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "default",
+                              "font": "Oswald14",
+                              "alignHorizontal": "left",
+                              "color": "action_color",
+                              "activeBackgroundColor": "action_color",
+                              "padding": "0 0 0 2"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 26,
+                            "height": 32,
+                            "text": "\\u00a0"
+                          },
+                          {
+                            "type": "Text",
+                            "style": {
+                              "inheritFrom": "default_S",
+                              "color": "action_color",
+                              "activeBackgroundColor": "action_color"
+                            },
+                            "left": 0,
+                            "top": 0,
+                            "width": 26,
+                            "height": 32,
+                            "text": "\\u009F"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "overlay",
+                          "alignHorizontal": "left",
+                          "color": "action_color",
+                          "backgroundColor": "background",
+                          "activeColor": "background",
+                          "activeBackgroundColor": "action_color"
+                        },
+                        "data": "",
+                        "left": 26,
+                        "top": 0,
+                        "width": 98,
+                        "height": 32,
+                        "text": "Show labels"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "dlog_auto_scale",
+                    "left": 17,
+                    "top": 88,
+                    "width": 125,
+                    "height": 32,
+                    "text": "Auto Scale"
+                  },
+                  {
+                    "type": "Text",
+                    "style": {
+                      "inheritFrom": "edit_value_active_S_center"
+                    },
+                    "action": "dlog_scale_to_fit",
+                    "left": 17,
+                    "top": 124,
+                    "width": 125,
+                    "height": 32,
+                    "text": "Scale to fit"
+                  },
+                  {
+                    "type": "Select",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "data": "file_manager_upload_file_enabled",
+                    "left": 17,
+                    "top": 160,
+                    "width": 125,
+                    "height": 32,
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center",
+                          "color": "text_regular",
+                          "activeBackgroundColor": "text_regular"
+                        },
+                        "action": "",
+                        "left": 0,
+                        "top": 0,
+                        "width": 125,
+                        "height": 32,
+                        "text": "\\u00a7 Upload"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center"
+                        },
+                        "action": "dlog_upload",
+                        "left": 0,
+                        "top": 0,
+                        "width": 125,
+                        "height": 32,
+                        "text": "\\u00a7 Upload"
                       }
                     ]
                   }

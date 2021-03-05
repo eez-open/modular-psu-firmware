@@ -114,7 +114,7 @@ private:
 };
 
 struct DlogValueParams {
-    bool isVisible;
+    int yAxisIndex;
     float offset;
     float div;
 };
@@ -122,7 +122,7 @@ struct DlogValueParams {
 struct Recording {
     Parameters parameters;
 
-    DlogValueParams dlogValues[MAX_NUM_OF_Y_VALUES];
+    DlogValueParams dlogValues[MAX_NUM_OF_Y_VALUES]; // these are visible y-axis graphs
 
     uint32_t size;
 
