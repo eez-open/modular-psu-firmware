@@ -90,18 +90,11 @@ void setPosition(const WidgetCursor &widgetCursor, int position) {
 }
 
 void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTrack, int minThumbWidth, int &xThumb, int &widthThumb) {
-    double x = 1.0 * position * wTrack / size;
-    double width = 1.0 * pageSize * wTrack / size;
-
-    if (width < minThumbWidth) {
-        x -=  1.0 * (minThumbWidth - width) * position / size;
-        width = minThumbWidth;
+    widthThumb = (int)round(1.0 * pageSize * wTrack / size);
+    if (widthThumb < minThumbWidth) {
+		widthThumb = minThumbWidth;
     }
-
-    xThumb = (int)round(x);
-    widthThumb = (int)round(width + x - xThumb);
-
-    xThumb += xTrack;
+    xThumb = xTrack + (int)round(remap(position, 0, 0, size - pageSize, wTrack - widthThumb));
 }
 
 DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {

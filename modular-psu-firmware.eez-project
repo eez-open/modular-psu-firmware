@@ -2517,6 +2517,11 @@
       "defaultValue": "0"
     },
     {
+      "name": "dlog_y_value_is_enabled",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
       "name": "dlog_y_value_offset",
       "defaultValue": "5.000 V"
     },
@@ -3275,6 +3280,9 @@
     },
     {
       "name": "dlog_view_select_y_value"
+    },
+    {
+      "name": "dlog_view_toggle_y_value_visible"
     }
   ],
   "gui": {
@@ -34369,171 +34377,14 @@
                           "height": 26,
                           "widgets": [
                             {
-                              "type": "Container",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "left": 0,
-                              "top": 0,
-                              "width": 160,
-                              "height": 26,
-                              "widgets": [
-                                {
-                                  "type": "Select",
-                                  "style": {
-                                    "inheritFrom": "default"
-                                  },
-                                  "data": "dlog_y_value_is_checked",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 36,
-                                  "height": 26,
-                                  "widgets": [
-                                    {
-                                      "type": "Text",
-                                      "style": {
-                                        "inheritFrom": "default_S"
-                                      },
-                                      "left": 0,
-                                      "top": 0,
-                                      "width": 36,
-                                      "height": 26,
-                                      "text": "\\u00a0"
-                                    },
-                                    {
-                                      "type": "Text",
-                                      "style": {
-                                        "inheritFrom": "default_S"
-                                      },
-                                      "left": 0,
-                                      "top": 0,
-                                      "width": 36,
-                                      "height": 26,
-                                      "text": "\\u009F"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "Text",
-                                  "style": {
-                                    "inheritFrom": "default",
-                                    "font": "Oswald12",
-                                    "alignHorizontal": "left"
-                                  },
-                                  "data": "dlog_y_value_label",
-                                  "left": 36,
-                                  "top": 0,
-                                  "width": 124,
-                                  "height": 26,
-                                  "text": ""
-                                }
-                              ]
-                            },
-                            {
-                              "type": "Container",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "left": 0,
-                              "top": 0,
-                              "width": 160,
-                              "height": 26,
-                              "widgets": [
-                                {
-                                  "type": "Select",
-                                  "style": {
-                                    "inheritFrom": "default"
-                                  },
-                                  "data": "dlog_y_value_is_checked",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 36,
-                                  "height": 26,
-                                  "widgets": [
-                                    {
-                                      "type": "Text",
-                                      "style": {
-                                        "inheritFrom": "default_S",
-                                        "backgroundColor": "selected_bookmark",
-                                        "activeColor": "selected_bookmark"
-                                      },
-                                      "left": 0,
-                                      "top": 0,
-                                      "width": 36,
-                                      "height": 26,
-                                      "text": "\\u00a0"
-                                    },
-                                    {
-                                      "type": "Text",
-                                      "style": {
-                                        "inheritFrom": "default_S",
-                                        "backgroundColor": "selected_bookmark",
-                                        "activeColor": "selected_bookmark"
-                                      },
-                                      "left": 0,
-                                      "top": 0,
-                                      "width": 36,
-                                      "height": 26,
-                                      "text": "\\u009F"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "Text",
-                                  "style": {
-                                    "inheritFrom": "default",
-                                    "font": "Oswald12",
-                                    "alignHorizontal": "left",
-                                    "color": "text_regular",
-                                    "backgroundColor": "selected_bookmark",
-                                    "activeColor": "selected_bookmark",
-                                    "activeBackgroundColor": "text_regular"
-                                  },
-                                  "data": "dlog_y_value_label",
-                                  "left": 36,
-                                  "top": 0,
-                                  "width": 124,
-                                  "height": 26,
-                                  "text": ""
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        "listType": "vertical",
-                        "gap": 0
-                      },
-                      {
-                        "type": "Container",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "left": 0,
-                        "top": 0,
-                        "width": 160,
-                        "height": 104,
-                        "widgets": [
-                          {
-                            "type": "List",
-                            "style": {
-                              "inheritFrom": "default"
-                            },
-                            "data": "dlog_y_values",
-                            "action": "edit",
-                            "left": 0,
-                            "top": 0,
-                            "width": 128,
-                            "height": 104,
-                            "itemWidget": {
                               "type": "Select",
                               "style": {
                                 "inheritFrom": "default"
                               },
-                              "data": "dlog_y_value_is_selected",
-                              "action": "dlog_view_select_y_value",
+                              "data": "dlog_y_value_is_enabled",
                               "left": 0,
                               "top": 0,
-                              "width": 128,
+                              "width": 160,
                               "height": 26,
                               "widgets": [
                                 {
@@ -34543,7 +34394,48 @@
                                   },
                                   "left": 0,
                                   "top": 0,
-                                  "width": 128,
+                                  "width": 160,
+                                  "height": 26,
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default_S",
+                                        "color": "text_disabled",
+                                        "activeBackgroundColor": "text_disabled"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 26,
+                                      "text": "\\u00a0"
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default",
+                                        "font": "Oswald12",
+                                        "alignHorizontal": "left",
+                                        "color": "text_disabled",
+                                        "activeBackgroundColor": "text_disabled"
+                                      },
+                                      "data": "dlog_y_value_label",
+                                      "left": 36,
+                                      "top": 0,
+                                      "width": 124,
+                                      "height": 26,
+                                      "text": ""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Container",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 160,
                                   "height": 26,
                                   "widgets": [
                                     {
@@ -34552,6 +34444,7 @@
                                         "inheritFrom": "default"
                                       },
                                       "data": "dlog_y_value_is_checked",
+                                      "action": "dlog_view_toggle_y_value_visible",
                                       "left": 0,
                                       "top": 0,
                                       "width": 36,
@@ -34591,7 +34484,65 @@
                                       "data": "dlog_y_value_label",
                                       "left": 36,
                                       "top": 0,
-                                      "width": 92,
+                                      "width": 124,
+                                      "height": 26,
+                                      "text": ""
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Select",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "data": "dlog_y_value_is_enabled",
+                              "left": 0,
+                              "top": 0,
+                              "width": 160,
+                              "height": 26,
+                              "widgets": [
+                                {
+                                  "type": "Container",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 160,
+                                  "height": 26,
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default_S",
+                                        "color": "text_disabled",
+                                        "backgroundColor": "selected_bookmark",
+                                        "activeColor": "selected_bookmark",
+                                        "activeBackgroundColor": "text_disabled"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 36,
+                                      "height": 26,
+                                      "text": "\\u00a0"
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "style": {
+                                        "inheritFrom": "default",
+                                        "font": "Oswald12",
+                                        "alignHorizontal": "left",
+                                        "color": "text_disabled",
+                                        "backgroundColor": "selected_bookmark",
+                                        "activeColor": "selected_bookmark",
+                                        "activeBackgroundColor": "text_disabled"
+                                      },
+                                      "data": "dlog_y_value_label",
+                                      "left": 36,
+                                      "top": 0,
+                                      "width": 124,
                                       "height": 26,
                                       "text": ""
                                     }
@@ -34604,7 +34555,7 @@
                                   },
                                   "left": 0,
                                   "top": 0,
-                                  "width": 128,
+                                  "width": 160,
                                   "height": 26,
                                   "widgets": [
                                     {
@@ -34613,6 +34564,7 @@
                                         "inheritFrom": "default"
                                       },
                                       "data": "dlog_y_value_is_checked",
+                                      "action": "dlog_view_toggle_y_value_visible",
                                       "left": 0,
                                       "top": 0,
                                       "width": 36,
@@ -34660,9 +34612,293 @@
                                       "data": "dlog_y_value_label",
                                       "left": 36,
                                       "top": 0,
-                                      "width": 92,
+                                      "width": 124,
                                       "height": 26,
                                       "text": ""
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "listType": "vertical",
+                        "gap": 0
+                      },
+                      {
+                        "type": "Container",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "left": 0,
+                        "top": 0,
+                        "width": 160,
+                        "height": 104,
+                        "widgets": [
+                          {
+                            "type": "List",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "data": "dlog_y_values",
+                            "action": "edit",
+                            "left": 0,
+                            "top": 0,
+                            "width": 128,
+                            "height": 104,
+                            "itemWidget": {
+                              "type": "Select",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "data": "dlog_y_value_is_selected",
+                              "action": "dlog_view_select_y_value",
+                              "left": 0,
+                              "top": 0,
+                              "width": 128,
+                              "height": 26,
+                              "widgets": [
+                                {
+                                  "type": "Select",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "data": "dlog_y_value_is_enabled",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 128,
+                                  "height": 26,
+                                  "widgets": [
+                                    {
+                                      "type": "Container",
+                                      "style": {
+                                        "inheritFrom": "default"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 128,
+                                      "height": 26,
+                                      "widgets": [
+                                        {
+                                          "type": "Text",
+                                          "style": {
+                                            "inheritFrom": "default_S",
+                                            "color": "text_disabled",
+                                            "activeBackgroundColor": "text_disabled"
+                                          },
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 36,
+                                          "height": 26,
+                                          "text": "\\u00a0"
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "style": {
+                                            "inheritFrom": "default",
+                                            "font": "Oswald12",
+                                            "alignHorizontal": "left",
+                                            "color": "text_disabled",
+                                            "activeBackgroundColor": "text_disabled"
+                                          },
+                                          "data": "dlog_y_value_label",
+                                          "left": 36,
+                                          "top": 0,
+                                          "width": 92,
+                                          "height": 26,
+                                          "text": ""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Container",
+                                      "style": {
+                                        "inheritFrom": "default"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 128,
+                                      "height": 26,
+                                      "widgets": [
+                                        {
+                                          "type": "Select",
+                                          "style": {
+                                            "inheritFrom": "default"
+                                          },
+                                          "data": "dlog_y_value_is_checked",
+                                          "action": "dlog_view_toggle_y_value_visible",
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 36,
+                                          "height": 26,
+                                          "widgets": [
+                                            {
+                                              "type": "Text",
+                                              "style": {
+                                                "inheritFrom": "default_S"
+                                              },
+                                              "left": 0,
+                                              "top": 0,
+                                              "width": 36,
+                                              "height": 26,
+                                              "text": "\\u00a0"
+                                            },
+                                            {
+                                              "type": "Text",
+                                              "style": {
+                                                "inheritFrom": "default_S"
+                                              },
+                                              "left": 0,
+                                              "top": 0,
+                                              "width": 36,
+                                              "height": 26,
+                                              "text": "\\u009F"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "style": {
+                                            "inheritFrom": "default",
+                                            "font": "Oswald12",
+                                            "alignHorizontal": "left"
+                                          },
+                                          "data": "dlog_y_value_label",
+                                          "left": 36,
+                                          "top": 0,
+                                          "width": 92,
+                                          "height": 26,
+                                          "text": ""
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Select",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "data": "dlog_y_value_is_enabled",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 128,
+                                  "height": 26,
+                                  "widgets": [
+                                    {
+                                      "type": "Container",
+                                      "style": {
+                                        "inheritFrom": "default"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 128,
+                                      "height": 26,
+                                      "widgets": [
+                                        {
+                                          "type": "Text",
+                                          "style": {
+                                            "inheritFrom": "default_S",
+                                            "color": "text_disabled",
+                                            "backgroundColor": "selected_bookmark",
+                                            "activeColor": "selected_bookmark",
+                                            "activeBackgroundColor": "text_disabled"
+                                          },
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 36,
+                                          "height": 26,
+                                          "text": "\\u00a0"
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "style": {
+                                            "inheritFrom": "default",
+                                            "font": "Oswald12",
+                                            "alignHorizontal": "left",
+                                            "color": "text_disabled",
+                                            "backgroundColor": "selected_bookmark",
+                                            "activeColor": "selected_bookmark",
+                                            "activeBackgroundColor": "text_disabled"
+                                          },
+                                          "data": "dlog_y_value_label",
+                                          "left": 36,
+                                          "top": 0,
+                                          "width": 92,
+                                          "height": 26,
+                                          "text": ""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Container",
+                                      "style": {
+                                        "inheritFrom": "default"
+                                      },
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 128,
+                                      "height": 26,
+                                      "widgets": [
+                                        {
+                                          "type": "Select",
+                                          "style": {
+                                            "inheritFrom": "default"
+                                          },
+                                          "data": "dlog_y_value_is_checked",
+                                          "action": "dlog_view_toggle_y_value_visible",
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 36,
+                                          "height": 26,
+                                          "widgets": [
+                                            {
+                                              "type": "Text",
+                                              "style": {
+                                                "inheritFrom": "default_S",
+                                                "backgroundColor": "selected_bookmark",
+                                                "activeColor": "selected_bookmark"
+                                              },
+                                              "left": 0,
+                                              "top": 0,
+                                              "width": 36,
+                                              "height": 26,
+                                              "text": "\\u00a0"
+                                            },
+                                            {
+                                              "type": "Text",
+                                              "style": {
+                                                "inheritFrom": "default_S",
+                                                "backgroundColor": "selected_bookmark",
+                                                "activeColor": "selected_bookmark"
+                                              },
+                                              "left": 0,
+                                              "top": 0,
+                                              "width": 36,
+                                              "height": 26,
+                                              "text": "\\u009F"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "style": {
+                                            "inheritFrom": "default",
+                                            "font": "Oswald12",
+                                            "alignHorizontal": "left",
+                                            "color": "text_regular",
+                                            "backgroundColor": "selected_bookmark",
+                                            "activeColor": "selected_bookmark",
+                                            "activeBackgroundColor": "text_regular"
+                                          },
+                                          "data": "dlog_y_value_label",
+                                          "left": 36,
+                                          "top": 0,
+                                          "width": 92,
+                                          "height": 26,
+                                          "text": ""
+                                        }
+                                      ]
                                     }
                                   ]
                                 }
@@ -34695,142 +34931,118 @@
                     ]
                   },
                   {
-                    "type": "Select",
+                    "type": "Container",
                     "style": {
                       "inheritFrom": "default"
                     },
-                    "data": "dlog_y_value_is_selected",
                     "left": 0,
                     "top": 104,
                     "width": 160,
                     "height": 104,
                     "widgets": [
                       {
-                        "type": "Rectangle",
+                        "type": "Text",
                         "style": {
-                          "inheritFrom": "default"
+                          "inheritFrom": "overlay",
+                          "font": "Oswald12",
+                          "alignHorizontal": "left",
+                          "color": "text_regular",
+                          "backgroundColor": "background",
+                          "activeColor": "background",
+                          "activeBackgroundColor": "text_regular",
+                          "padding": "0 0 0 4"
                         },
+                        "data": "",
                         "left": 0,
-                        "top": 0,
-                        "width": 160,
-                        "height": 104,
-                        "invertColors": true
+                        "top": 8,
+                        "width": 62,
+                        "height": 28,
+                        "text": "Offset:"
                       },
                       {
-                        "type": "Container",
+                        "type": "DisplayData",
                         "style": {
-                          "inheritFrom": "default"
+                          "inheritFrom": "encoder_cursor_14_enabled",
+                          "font": "Oswald12",
+                          "focusBackgroundColor": "action_color"
                         },
+                        "data": "dlog_y_value_offset",
+                        "action": "edit",
+                        "left": 62,
+                        "top": 8,
+                        "width": 97,
+                        "height": 27,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "overlay",
+                          "font": "Oswald12",
+                          "alignHorizontal": "left",
+                          "color": "text_regular",
+                          "backgroundColor": "background",
+                          "activeColor": "background",
+                          "activeBackgroundColor": "text_regular",
+                          "padding": "0 0 0 4"
+                        },
+                        "data": "",
                         "left": 0,
-                        "top": 0,
-                        "width": 160,
-                        "height": 104,
-                        "widgets": [
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "overlay",
-                              "font": "Oswald12",
-                              "alignHorizontal": "left",
-                              "color": "text_regular",
-                              "backgroundColor": "background",
-                              "activeColor": "background",
-                              "activeBackgroundColor": "text_regular",
-                              "padding": "0 0 0 4"
-                            },
-                            "data": "",
-                            "left": 0,
-                            "top": 8,
-                            "width": 62,
-                            "height": 28,
-                            "text": "Offset:"
-                          },
-                          {
-                            "type": "DisplayData",
-                            "style": {
-                              "inheritFrom": "encoder_cursor_14_enabled",
-                              "font": "Oswald12",
-                              "focusBackgroundColor": "action_color"
-                            },
-                            "data": "dlog_y_value_offset",
-                            "action": "edit",
-                            "left": 62,
-                            "top": 8,
-                            "width": 97,
-                            "height": 27,
-                            "displayOption": 0
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "overlay",
-                              "font": "Oswald12",
-                              "alignHorizontal": "left",
-                              "color": "text_regular",
-                              "backgroundColor": "background",
-                              "activeColor": "background",
-                              "activeBackgroundColor": "text_regular",
-                              "padding": "0 0 0 4"
-                            },
-                            "data": "",
-                            "left": 0,
-                            "top": 37,
-                            "width": 62,
-                            "height": 28,
-                            "text": "Div:"
-                          },
-                          {
-                            "type": "DisplayData",
-                            "style": {
-                              "inheritFrom": "encoder_cursor_14_enabled",
-                              "font": "Oswald12",
-                              "focusBackgroundColor": "action_color"
-                            },
-                            "data": "dlog_y_value_div",
-                            "action": "edit",
-                            "left": 62,
-                            "top": 38,
-                            "width": 97,
-                            "height": 27,
-                            "displayOption": 0
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "overlay",
-                              "font": "Oswald12",
-                              "alignHorizontal": "left",
-                              "color": "text_regular",
-                              "backgroundColor": "background",
-                              "activeColor": "background",
-                              "activeBackgroundColor": "text_regular",
-                              "padding": "0 0 0 4"
-                            },
-                            "data": "",
-                            "left": 0,
-                            "top": 67,
-                            "width": 62,
-                            "height": 28,
-                            "text": "Cursor:"
-                          },
-                          {
-                            "type": "Text",
-                            "style": {
-                              "inheritFrom": "overlay",
-                              "font": "Oswald12",
-                              "color": "text_regular",
-                              "backgroundColor": "background",
-                              "activeColor": "background",
-                              "activeBackgroundColor": "text_regular"
-                            },
-                            "data": "dlog_y_value_cursor",
-                            "left": 62,
-                            "top": 67,
-                            "width": 97,
-                            "height": 27,
-                            "text": ""
-                          }
-                        ]
+                        "top": 37,
+                        "width": 62,
+                        "height": 28,
+                        "text": "Div:"
+                      },
+                      {
+                        "type": "DisplayData",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled",
+                          "font": "Oswald12",
+                          "focusBackgroundColor": "action_color"
+                        },
+                        "data": "dlog_y_value_div",
+                        "action": "edit",
+                        "left": 62,
+                        "top": 38,
+                        "width": 97,
+                        "height": 27,
+                        "displayOption": 0
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "overlay",
+                          "font": "Oswald12",
+                          "alignHorizontal": "left",
+                          "color": "text_regular",
+                          "backgroundColor": "background",
+                          "activeColor": "background",
+                          "activeBackgroundColor": "text_regular",
+                          "padding": "0 0 0 4"
+                        },
+                        "data": "",
+                        "left": 0,
+                        "top": 67,
+                        "width": 62,
+                        "height": 28,
+                        "text": "Cursor:"
+                      },
+                      {
+                        "type": "Text",
+                        "style": {
+                          "inheritFrom": "overlay",
+                          "font": "Oswald12",
+                          "color": "text_regular",
+                          "backgroundColor": "background",
+                          "activeColor": "background",
+                          "activeBackgroundColor": "text_regular"
+                        },
+                        "data": "dlog_y_value_cursor",
+                        "left": 62,
+                        "top": 67,
+                        "width": 97,
+                        "height": 27,
+                        "text": ""
                       }
                     ]
                   }
