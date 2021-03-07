@@ -2196,13 +2196,13 @@ public:
                 } else if (diskOperationStatus == DISK_OPERATION_NOT_FINISHED) {
                     executeCommand(diskOperationParams.command);
                 }
-#ifdef EEZ_PLATFORM_STM32
 				else if (tickCountMs - lastTransferTime >= TIMEOUT_UNTIL_OUT_OF_SYNC_MS) {
+#ifdef EEZ_PLATFORM_STM32
                     event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
                     synchronized = false;
                     testResult = TEST_FAILED;
-                }
 #endif
+                }
 				else if (tickCountMs - lastRefreshTime >= getRefreshTimeMs()) {
                     refreshStartTime = tickCountMs;
                     executeCommand(&getState_command);

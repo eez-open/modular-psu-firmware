@@ -519,10 +519,13 @@ public:
             if (synchronized) {
             	uint32_t tickCountMs = millis();
                 if (tickCountMs - lastTransferTime >= TIMEOUT_UNTIL_OUT_OF_SYNC_MS) {
+#ifdef EEZ_PLATFORM_STM32                
                     event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
                     synchronized = false;
                     testResult = TEST_FAILED;
-                } else if (tickCountMs - lastRefreshTime >= getRefreshTimeMs()) {
+#endif
+                } 
+                else if (tickCountMs - lastRefreshTime >= getRefreshTimeMs()) {
                     refreshStartTime = tickCountMs;
                     executeCommand(&getState_command);
                 } else if (forceTransferSetParams) {
