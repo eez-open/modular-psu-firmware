@@ -2499,7 +2499,7 @@
     {
       "name": "dlog_y_values",
       "type": "list",
-      "defaultValue": "[\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #1 U\", \"dlog_bookmark_y_value_is_checked\": 1 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #1 I\", \"dlog_bookmark_y_value_is_checked\": 1 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #2 U\", \"dlog_bookmark_y_value_is_checked\": 0 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #2 I\", \"dlog_bookmark_y_value_is_checked\": 0 }\n]"
+      "defaultValue": "[\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #1 U\", \"dlog_bookmark_y_value_is_checked\": 1 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #1 I\", \"dlog_bookmark_y_value_is_checked\": 1 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #2 U\", \"dlog_bookmark_y_value_is_checked\": 0 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #2 I\", \"dlog_bookmark_y_value_is_checked\": 0 },\n  { \"dlog_bookmark_y_value_label\": \"DCP224 #3 U\", \"dlog_bookmark_y_value_is_checked\": 1 }\n]"
     },
     {
       "name": "dlog_y_value_label",
@@ -3283,6 +3283,9 @@
     },
     {
       "name": "dlog_view_toggle_y_value_visible"
+    },
+    {
+      "name": "scroll"
     }
   ],
   "gui": {
@@ -33499,218 +33502,23 @@
                             ]
                           },
                           {
-                            "type": "Select",
+                            "type": "YTGraph",
                             "style": {
-                              "inheritFrom": "default"
+                              "inheritFrom": "yt_graph"
                             },
-                            "data": "dlog_view_legend_view_option",
+                            "data": "recording",
+                            "action": "edit",
                             "left": 0,
                             "top": 0,
                             "width": 320,
                             "height": 240,
-                            "widgets": [
-                              {
-                                "type": "YTGraph",
-                                "style": {
-                                  "inheritFrom": "yt_graph"
-                                },
-                                "data": "recording",
-                                "action": "edit",
-                                "left": 0,
-                                "top": 0,
-                                "width": 320,
-                                "height": 240,
-                                "y1Style": {
-                                  "inheritFrom": "default"
-                                },
-                                "y2Data": "recording",
-                                "y2Style": {
-                                  "inheritFrom": "default"
-                                }
-                              },
-                              {
-                                "type": "YTGraph",
-                                "style": {
-                                  "inheritFrom": "yt_graph"
-                                },
-                                "data": "recording",
-                                "action": "edit",
-                                "left": 0,
-                                "top": 0,
-                                "width": 320,
-                                "height": 240,
-                                "y1Style": {
-                                  "inheritFrom": "default"
-                                },
-                                "y2Data": "recording",
-                                "y2Style": {
-                                  "inheritFrom": "default"
-                                }
-                              },
-                              {
-                                "type": "Container",
-                                "style": {
-                                  "inheritFrom": "default"
-                                },
-                                "left": 0,
-                                "top": 0,
-                                "width": 320,
-                                "height": 240,
-                                "widgets": [
-                                  {
-                                    "type": "Container",
-                                    "style": {
-                                      "inheritFrom": "default"
-                                    },
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 320,
-                                    "height": 32,
-                                    "widgets": [
-                                      {
-                                        "type": "Text",
-                                        "style": {
-                                          "inheritFrom": "overlay",
-                                          "color": "yt_graph_y1",
-                                          "backgroundColor": "background",
-                                          "activeColor": "background",
-                                          "activeBackgroundColor": "yt_graph_y1"
-                                        },
-                                        "data": "dlog_visible_value_label",
-                                        "action": "dlog_view_select_visible_value",
-                                        "left": 0,
-                                        "top": 0,
-                                        "width": 73,
-                                        "height": 32,
-                                        "text": ""
-                                      },
-                                      {
-                                        "type": "Text",
-                                        "style": {
-                                          "inheritFrom": "default_S",
-                                          "font": "Oswald12",
-                                          "alignHorizontal": "center"
-                                        },
-                                        "data": "",
-                                        "left": 73,
-                                        "top": 0,
-                                        "width": 10,
-                                        "height": 32,
-                                        "text": "O"
-                                      },
-                                      {
-                                        "type": "DisplayData",
-                                        "style": {
-                                          "inheritFrom": "encoder_cursor_14_enabled",
-                                          "color": "overlay_background",
-                                          "activeBackgroundColor": "overlay_background",
-                                          "focusBackgroundColor": "action_color"
-                                        },
-                                        "data": "dlog_visible_value_offset",
-                                        "action": "edit",
-                                        "left": 83,
-                                        "top": 0,
-                                        "width": 72,
-                                        "height": 32,
-                                        "displayOption": 0
-                                      },
-                                      {
-                                        "type": "Text",
-                                        "style": {
-                                          "inheritFrom": "default_S",
-                                          "font": "Oswald12",
-                                          "padding": "0"
-                                        },
-                                        "data": "",
-                                        "left": 155,
-                                        "top": 0,
-                                        "width": 10,
-                                        "height": 32,
-                                        "text": "D"
-                                      },
-                                      {
-                                        "type": "DisplayData",
-                                        "style": {
-                                          "inheritFrom": "encoder_cursor_14_enabled",
-                                          "color": "overlay_background",
-                                          "activeBackgroundColor": "overlay_background",
-                                          "focusBackgroundColor": "action_color"
-                                        },
-                                        "data": "dlog_visible_value_div",
-                                        "action": "edit",
-                                        "left": 165,
-                                        "top": 0,
-                                        "width": 72,
-                                        "height": 32,
-                                        "displayOption": 0
-                                      },
-                                      {
-                                        "type": "Text",
-                                        "style": {
-                                          "inheritFrom": "default_S",
-                                          "font": "Oswald12",
-                                          "padding": "0"
-                                        },
-                                        "data": "",
-                                        "left": 237,
-                                        "top": 0,
-                                        "width": 11,
-                                        "height": 32,
-                                        "text": "C"
-                                      },
-                                      {
-                                        "type": "DisplayData",
-                                        "style": {
-                                          "inheritFrom": "encoder_cursor_14_enabled",
-                                          "color": "overlay_background",
-                                          "activeBackgroundColor": "overlay_background",
-                                          "focusBackgroundColor": "action_color"
-                                        },
-                                        "data": "dlog_visible_value_cursor",
-                                        "action": "",
-                                        "left": 248,
-                                        "top": 0,
-                                        "width": 72,
-                                        "height": 32,
-                                        "displayOption": 0
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "type": "Rectangle",
-                                    "style": {
-                                      "inheritFrom": "default",
-                                      "color": "status_line_background",
-                                      "activeBackgroundColor": "status_line_background"
-                                    },
-                                    "left": 0,
-                                    "top": 32,
-                                    "width": 320,
-                                    "height": 1,
-                                    "invertColors": false
-                                  },
-                                  {
-                                    "type": "YTGraph",
-                                    "style": {
-                                      "inheritFrom": "yt_graph"
-                                    },
-                                    "data": "recording",
-                                    "action": "edit",
-                                    "left": 0,
-                                    "top": 33,
-                                    "width": 320,
-                                    "height": 207,
-                                    "y1Style": {
-                                      "inheritFrom": "default"
-                                    },
-                                    "y2Data": "recording",
-                                    "y2Style": {
-                                      "inheritFrom": "default"
-                                    }
-                                  }
-                                ]
-                              }
-                            ]
+                            "y1Style": {
+                              "inheritFrom": "default"
+                            },
+                            "y2Data": "recording",
+                            "y2Style": {
+                              "inheritFrom": "default"
+                            }
                           },
                           {
                             "type": "LayoutView",
@@ -34318,7 +34126,7 @@
             },
             "left": 0,
             "top": 30,
-            "width": 158,
+            "width": 160,
             "height": 2
           },
           {
@@ -34351,7 +34159,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 160,
-                    "height": 104,
+                    "height": 130,
                     "widgets": [
                       {
                         "type": "List",
@@ -34363,7 +34171,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 160,
-                        "height": 104,
+                        "height": 130,
                         "itemWidget": {
                           "type": "Select",
                           "style": {
@@ -34633,7 +34441,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 160,
-                        "height": 104,
+                        "height": 130,
                         "widgets": [
                           {
                             "type": "List",
@@ -34641,11 +34449,11 @@
                               "inheritFrom": "default"
                             },
                             "data": "dlog_y_values",
-                            "action": "edit",
+                            "action": "",
                             "left": 0,
                             "top": 0,
                             "width": 128,
-                            "height": 104,
+                            "height": 130,
                             "itemWidget": {
                               "type": "Select",
                               "style": {
@@ -34913,15 +34721,20 @@
                               "inheritFrom": "default_inverse"
                             },
                             "data": "dlog_y_values",
+                            "action": "scroll",
                             "left": 128,
                             "top": 0,
                             "width": 32,
-                            "height": 104,
+                            "height": 130,
                             "thumbStyle": {
                               "inheritFrom": "scrollbar_thumb"
                             },
                             "buttonsStyle": {
-                              "inheritFrom": "scrollbar_button"
+                              "inheritFrom": "scrollbar_button",
+                              "color": "scrollbar_button",
+                              "backgroundColor": "scrollbar_track",
+                              "activeColor": "scrollbar_track",
+                              "activeBackgroundColor": "scrollbar_button"
                             },
                             "leftButtonText": "\\u0083",
                             "rightButtonText": "\\u0084"
@@ -34936,9 +34749,9 @@
                       "inheritFrom": "default"
                     },
                     "left": 0,
-                    "top": 104,
+                    "top": 130,
                     "width": 160,
-                    "height": 104,
+                    "height": 78,
                     "widgets": [
                       {
                         "type": "Text",
@@ -34954,9 +34767,9 @@
                         },
                         "data": "",
                         "left": 0,
-                        "top": 8,
+                        "top": 0,
                         "width": 62,
-                        "height": 28,
+                        "height": 26,
                         "text": "Offset:"
                       },
                       {
@@ -34969,8 +34782,8 @@
                         "data": "dlog_y_value_offset",
                         "action": "edit",
                         "left": 62,
-                        "top": 8,
-                        "width": 97,
+                        "top": 0,
+                        "width": 98,
                         "height": 27,
                         "displayOption": 0
                       },
@@ -34988,9 +34801,9 @@
                         },
                         "data": "",
                         "left": 0,
-                        "top": 37,
+                        "top": 26,
                         "width": 62,
-                        "height": 28,
+                        "height": 26,
                         "text": "Div:"
                       },
                       {
@@ -35003,8 +34816,8 @@
                         "data": "dlog_y_value_div",
                         "action": "edit",
                         "left": 62,
-                        "top": 38,
-                        "width": 97,
+                        "top": 28,
+                        "width": 98,
                         "height": 27,
                         "displayOption": 0
                       },
@@ -35022,9 +34835,9 @@
                         },
                         "data": "",
                         "left": 0,
-                        "top": 67,
+                        "top": 52,
                         "width": 62,
-                        "height": 28,
+                        "height": 26,
                         "text": "Cursor:"
                       },
                       {
@@ -35039,9 +34852,9 @@
                         },
                         "data": "dlog_y_value_cursor",
                         "left": 62,
-                        "top": 67,
-                        "width": 97,
-                        "height": 27,
+                        "top": 55,
+                        "width": 98,
+                        "height": 23,
                         "text": ""
                       }
                     ]
@@ -35197,7 +35010,7 @@
                               "inheritFrom": "default"
                             },
                             "data": "dlog_bookmarks",
-                            "action": "edit",
+                            "action": "",
                             "left": 0,
                             "top": 0,
                             "width": 128,
@@ -35309,6 +35122,7 @@
                               "inheritFrom": "default_inverse"
                             },
                             "data": "dlog_bookmarks",
+                            "action": "scroll",
                             "left": 128,
                             "top": 0,
                             "width": 32,

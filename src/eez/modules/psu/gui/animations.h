@@ -22,6 +22,8 @@ namespace eez {
 namespace psu {
 namespace gui {
 
+extern const Rect g_workingAreaRect;
+
 void animateFromDefaultViewToMaxView(int iMax, bool isFullScreenView);
 void animateFromMaxViewToDefaultView(int iMax, bool isFullScreenView);
 void animateFromMinViewToMaxView(int maxSlotIndexBefore, bool isFullScreenView);
@@ -40,8 +42,6 @@ void animateSlideRightWithoutHeader();
 void animateFadeOutFadeIn();
 void animateFadeOutFadeInWorkingArea();
 void animateFadeOutFadeIn(const Rect &rect);
-void animateRightDrawerOpen();
-void animateRightDrawerClose();
 
 } // namespace gui
 } // namespace psu

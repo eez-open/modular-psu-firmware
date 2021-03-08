@@ -139,7 +139,7 @@ struct Recording {
 
     uint32_t dataOffset;
 
-    uint8_t selectedVisibleValueIndex;
+    uint8_t selectedValueIndex;
 
     uint32_t columnDataIndexes[dlog_file::MAX_NUM_OF_Y_AXES];
     uint8_t columnBitMask[dlog_file::MAX_NUM_OF_Y_AXES];

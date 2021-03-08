@@ -26,6 +26,7 @@
 #include <eez/keyboard.h>
 
 #include <eez/gui/gui.h>
+#include <eez/modules/psu/gui/psu.h>
 
 using namespace eez::mcu;
 
@@ -103,6 +104,7 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(ScrollBarWidgetState);
     widgetCursor.currentState->flags.active = g_selectedWidget == widgetCursor;
+    widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
 
     auto currentState = (ScrollBarWidgetState *)widgetCursor.currentState;
     auto previousState = (ScrollBarWidgetState *)widgetCursor.previousState;
@@ -115,6 +117,7 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
     bool refresh =
         !widgetCursor.previousState ||
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
+        widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
         previousState->size != currentState->size ||
         previousState->position != currentState->position ||
         previousState->pageSize != currentState->pageSize ||
@@ -177,6 +180,13 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
                 isHorizontal ? buttonSize : (int)widget->w, 
                 isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
                 currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
+
+            if (widgetCursor.currentState->flags.focused && widget->action == ACTION_ID_SCROLL) {
+				const Style *style = getStyle(widgetCursor.widget->style);
+                display::setColor(style->focus_color);
+                display::drawRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
+                display::drawRect(widgetCursor.x + 1, widgetCursor.y + 1, widgetCursor.x + widget->w - 2, widgetCursor.y + widget->h - 2);
+            }
         } else {
             // scroll bar is hidden
             const Style *trackStyle = getStyle(widget->style);
@@ -266,6 +276,10 @@ OnTouchFunctionType SCROLL_BAR_onTouch = [](const WidgetCursor &widgetCursor, Ev
             g_selectedWidget = 0;
             g_segment = SCROLL_BAR_WIDGET_SEGMENT_NONE;
         }
+
+		if (widget->action == ACTION_ID_SCROLL) {
+			psu::gui::setFocusCursor(widgetCursor.cursor, widget->data);
+		}
     }
 };
 

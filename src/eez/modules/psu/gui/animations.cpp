@@ -27,7 +27,6 @@
 
 static const Rect g_displayRect = { 0, 0, 480, 272 };
 
-static const Rect g_workingAreaRect = { 0, 0, 480, 240 };
 static const Rect g_workingAreaRectTop = { 0, -240, 480, 240 };
 //static const Rect g_workingAreaRectBottom = { 0, 240, 480, 240 };
 static const Rect g_workingAreaRectLeft = { -480, 0, 480, 240 };
@@ -93,6 +92,8 @@ static const Rect g_settingsRectNoChannels = { 0, 0, 480, 240 };
 namespace eez {
 namespace psu {
 namespace gui {
+
+const Rect g_workingAreaRect = { 0, 0, 480, 240 };
 
 void animateFromDefaultViewToMaxView(int iMax, bool isFullScreenView) {
     int iMin1 = iMax == 0 ? 1 : 0;

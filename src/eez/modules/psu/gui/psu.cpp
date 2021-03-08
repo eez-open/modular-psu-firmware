@@ -661,6 +661,7 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
 
         if (
             widget->action == ACTION_ID_EDIT ||
+            widget->action == ACTION_ID_SCROLL ||
             widget->action == ACTION_ID_EDIT_NO_FOCUS ||
             widget->action == ACTION_ID_CH_SETTINGS_PROT_EDIT_LIMIT
         ) {
@@ -1450,21 +1451,24 @@ static bool g_isEncoderEnabledInActivePage;
 uint32_t g_focusEditValueChangedTime;
 
 static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
-    return g_psuAppContext.isWidgetActionEnabled(widgetCursor) && widgetCursor.widget->action == ACTION_ID_EDIT;
+    return g_psuAppContext.isWidgetActionEnabled(widgetCursor) && (widgetCursor.widget->action == ACTION_ID_EDIT || widgetCursor.widget->action == ACTION_ID_SCROLL);
 }
 
 static bool g_focusCursorIsEnabled;
+static int16_t g_focusCursorAction;
 
 void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_focusCursor == widgetCursor.cursor && g_focusDataId == widgetCursor.widget->data) {
             g_focusCursorIsEnabled = true;
+            g_focusCursorAction = widgetCursor.widget->action;
         }
     }
 }
 
 bool isEnabledFocusCursor(Cursor cursor, int16_t dataId) {
     g_focusCursorIsEnabled = false;
+    g_focusCursorAction = ACTION_ID_NONE;
     enumWidgets(&g_psuAppContext, isEnabledFocusCursorStep);
     return g_focusCursorIsEnabled;
 }
@@ -1848,6 +1852,12 @@ void onEncoder(int counter, bool clicked) {
         if (!isEnabledFocusCursor(g_focusCursor, g_focusDataId)) {
             moveToNextFocusCursor();
         }
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+        if (g_focusCursorAction == ACTION_ID_SCROLL) {
+            counter = -counter;
+        }
+#endif
 
         bool encoderEnabled = isEncoderEnabledInActivePage();
         if (encoderEnabled) {
@@ -2390,9 +2400,8 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL) {
         auto &recording = psu::dlog_view::getRecording();
-        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording,
-            !psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) || psu::persist_conf::devConf.viewFlags.dlogViewLegendViewOption == psu::persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
-            ? recording.selectedVisibleValueIndex : widgetCursor.cursor);
+        int dlogValueIndex = !psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) || psu::persist_conf::devConf.viewFlags.dlogViewLegendViewOption == psu::persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+            ? recording.selectedValueIndex : psu::dlog_view::getDlogValueIndex(recording, widgetCursor.cursor);
         style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->color;
@@ -2401,9 +2410,8 @@ uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *s
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style) {
     if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && widgetCursor.widget->data == DATA_ID_DLOG_VISIBLE_VALUE_LABEL) {
         auto &recording = psu::dlog_view::getRecording();
-        int dlogValueIndex = psu::dlog_view::getDlogValueIndex(recording,
-            !psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) || psu::persist_conf::devConf.viewFlags.dlogViewLegendViewOption == psu::persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
-            ? recording.selectedVisibleValueIndex : widgetCursor.cursor);
+        int dlogValueIndex = !psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) || psu::persist_conf::devConf.viewFlags.dlogViewLegendViewOption == psu::persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
+            ? recording.selectedValueIndex : psu::dlog_view::getDlogValueIndex(recording, widgetCursor.cursor);
         style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->active_color;
