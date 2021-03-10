@@ -256,7 +256,7 @@ void refresh() {
     } else {
         if (bp3c::flash_slave::g_bootloaderMode || psu::io_pins::g_ioPins[DIN1].function == psu::io_pins::FUNCTION_UART) {
             if (g_mcuRevision >= MCU_REVISION_R3B3) {
-#ifdef EEZ_PLATFORM_STM32            
+#ifdef EEZ_PLATFORM_STM32
                 MX_UART4_Init();
 #endif
             } else {
@@ -271,7 +271,9 @@ void refresh() {
     if (g_initialized) {
     	if (bp3c::flash_slave::g_bootloaderMode) {
         	if (g_dmaStarted) {
-        		HAL_UART_DMAStop(PHUART);
+#ifdef EEZ_PLATFORM_STM32
+				HAL_UART_DMAStop(PHUART);
+#endif
         		g_dmaStarted = false;
         	}
     	} else {
@@ -281,7 +283,9 @@ void refresh() {
                 g_inputBuffer.reset();
 
             	g_RxXferCount = sizeof(g_buffer);
-            	HAL_UART_Receive_DMA(PHUART, g_buffer, sizeof(g_buffer));
+#ifdef EEZ_PLATFORM_STM32
+				HAL_UART_Receive_DMA(PHUART, g_buffer, sizeof(g_buffer));
+#endif
         		g_dmaStarted = true;
         	}
     	}
