@@ -43,6 +43,7 @@ namespace uart {
 static bool g_initialized = false;
 static bool g_scpiInitialized;
 
+static bool g_dmaStarted;
 static uint8_t g_buffer[128];
 static volatile uint32_t g_RxXferCount;
 // static bool g_rxCplt = true;
@@ -243,13 +244,11 @@ void tick() {
 void refresh() {
     if (g_initialized) {
         if (!bp3c::flash_slave::g_bootloaderMode && psu::io_pins::g_ioPins[DIN1].function != psu::io_pins::FUNCTION_UART) {
-//        	if (!g_rxCplt) {
-//        		g_rxCplt = true;
-//        		HAL_UART_AbortReceive_IT(PHUART);
-//        	}
-        	HAL_UART_DMAStop(PHUART);
-
 #ifdef EEZ_PLATFORM_STM32
+        	if (g_dmaStarted) {
+        		HAL_UART_DMAStop(PHUART);
+        		g_dmaStarted = false;
+        	}
             HAL_UART_DeInit(PHUART);
 #endif
             g_initialized = false;
@@ -266,15 +265,26 @@ void refresh() {
 #endif
             }
             g_initialized = true;
+        }
+    }
 
+    if (g_initialized) {
+    	if (bp3c::flash_slave::g_bootloaderMode) {
+        	if (g_dmaStarted) {
+        		HAL_UART_DMAStop(PHUART);
+        		g_dmaStarted = false;
+        	}
+    	} else {
             initScpi();
 
-            g_inputBuffer.reset();
-            if (!bp3c::flash_slave::g_bootloaderMode) {
+            if (!g_dmaStarted) {
+                g_inputBuffer.reset();
+
             	g_RxXferCount = sizeof(g_buffer);
             	HAL_UART_Receive_DMA(PHUART, g_buffer, sizeof(g_buffer));
-            }
-        }
+        		g_dmaStarted = true;
+        	}
+    	}
     }
 }
 
