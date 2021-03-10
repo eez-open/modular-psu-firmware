@@ -115,8 +115,8 @@ private:
 
 struct DlogValueParams {
     int isVisible;
-    float offset;
-    float div;
+    double offset;
+    double div;
 };
 
 struct Recording {
@@ -126,16 +126,16 @@ struct Recording {
 
     uint32_t size;
 
-    float xAxisOffset;
-    float xAxisDiv;
+    double xAxisOffset;
+    double xAxisDiv;
 
-    float cursorOffset;
+    double cursorOffset;
 
     float (*getValue)(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
     uint32_t numSamples;
-    float xAxisDivMin;
-    float xAxisDivMax;
+    double xAxisDivMin;
+    double xAxisDivMax;
 
     uint32_t dataOffset;
 

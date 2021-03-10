@@ -381,8 +381,8 @@ static int doStartImmediately() {
 
     g_activeRecording.size = 0;
 
-    g_activeRecording.xAxisOffset = 0.0f;
-    g_activeRecording.xAxisDiv = g_activeRecording.parameters.period * dlog_view::WIDTH_PER_DIVISION;
+    g_activeRecording.xAxisOffset = 0.0;
+    g_activeRecording.xAxisDiv = 1.0 * g_activeRecording.parameters.period * dlog_view::WIDTH_PER_DIVISION;
 
     for (int8_t dlogItemIndex = 0; dlogItemIndex < g_activeRecording.parameters.numDlogItems; ++dlogItemIndex) {
         auto &dlogItem = g_activeRecording.parameters.dlogItems[dlogItemIndex];

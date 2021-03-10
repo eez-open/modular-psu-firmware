@@ -32915,7 +32915,8 @@
                               {
                                 "type": "YTGraph",
                                 "style": {
-                                  "inheritFrom": "yt_graph"
+                                  "inheritFrom": "yt_graph",
+                                  "font": "Oswald12"
                                 },
                                 "data": "recording",
                                 "action": "edit",
@@ -32934,7 +32935,8 @@
                               {
                                 "type": "YTGraph",
                                 "style": {
-                                  "inheritFrom": "yt_graph"
+                                  "inheritFrom": "yt_graph",
+                                  "font": "Oswald12"
                                 },
                                 "data": "recording",
                                 "action": "edit",
@@ -33095,7 +33097,8 @@
                                   {
                                     "type": "YTGraph",
                                     "style": {
-                                      "inheritFrom": "yt_graph"
+                                      "inheritFrom": "yt_graph",
+                                      "font": "Oswald12"
                                     },
                                     "data": "recording",
                                     "action": "edit",
@@ -33504,7 +33507,8 @@
                           {
                             "type": "YTGraph",
                             "style": {
-                              "inheritFrom": "yt_graph"
+                              "inheritFrom": "yt_graph",
+                              "font": "Oswald12"
                             },
                             "data": "recording",
                             "action": "edit",

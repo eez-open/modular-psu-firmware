@@ -459,20 +459,26 @@ struct YTGraphStaticDrawHelper {
             display::setColor(style->color);
             display::drawVLine(startX + cursorPosition - currentHistoryValuePosition, widgetCursor.y, widget->h - 1);
 
-            int timeTextWidth = 75;
-            int timeTextHeight = 22;
-            const int PADDING = 0;
-            int xTimeText = widgetCursor.x + cursorPosition - currentHistoryValuePosition - timeTextWidth / 2;
-            if (xTimeText < widgetCursor.x + PADDING) {
-                xTimeText = widgetCursor.x + PADDING;
-            } else if (xTimeText + timeTextWidth > widgetCursor.x + widgetCursor.widget->w - PADDING) {
-                xTimeText = widgetCursor.x + widgetCursor.widget->w - PADDING - timeTextWidth;
-            }
-            int yTimeText = widgetCursor.y + widgetCursor.widget->h - timeTextHeight - PADDING;
-
             char text[64];
             ytDataGetCursorXValue(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
-            drawText(text, -1, xTimeText, yTimeText, timeTextWidth, timeTextHeight, style, widgetCursor.currentState->flags.focused, false, false, nullptr, nullptr, nullptr, nullptr);
+
+            font::Font font = styleGetFont(style);
+            int MIN_CURSOR_TEXT_WIDTH = 80;
+            int cursorTextWidth = MAX(display::measureStr(text, -1, font), MIN_CURSOR_TEXT_WIDTH);
+            int cursorTextHeight = font.getHeight();
+            const int PADDING = 0;
+            int xCursorText = widgetCursor.x + cursorPosition - currentHistoryValuePosition - cursorTextWidth / 2;
+            if (xCursorText < widgetCursor.x + PADDING) {
+                xCursorText = widgetCursor.x + PADDING;
+            } else if (xCursorText + cursorTextWidth > widgetCursor.x + widgetCursor.widget->w - PADDING) {
+                xCursorText = widgetCursor.x + widgetCursor.widget->w - PADDING - cursorTextWidth;
+            }
+            int yCursorText = widgetCursor.y + widgetCursor.widget->h - cursorTextHeight - PADDING;
+
+            drawText(text, -1,
+                xCursorText, yCursorText, cursorTextWidth, cursorTextHeight,
+                style, widgetCursor.currentState->flags.focused, false, false, nullptr, nullptr, nullptr, nullptr
+            );
         }
 
         // draw labels
