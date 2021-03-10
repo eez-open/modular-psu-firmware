@@ -116,7 +116,7 @@ struct DeviceConfiguration {
 
     // block 4
     uint8_t startOfBlock4; // was serialBaud
-    uint8_t reserved3; // was serialParity
+    uint8_t uartMode;
     
     uint32_t ethernetIpAddress;
     uint32_t ethernetDns;
@@ -353,6 +353,8 @@ void setPowerLineFrequency(int powerLineFrequency);
 
 void setMcuRevision(int mcuRevision);
 void clearMcuRevision();
+
+void setUartMode(uint8_t uartMode);
 
 ////////////////////////////////////////////////////////////////////////////////
 

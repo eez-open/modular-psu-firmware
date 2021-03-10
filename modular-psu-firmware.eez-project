@@ -69645,6 +69645,59 @@
             }
           },
           {
+            "name": "SYSTem:COMMunicate:UART:RECeive?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_usb_mode",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr3"
+                },
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:UART:MODE",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_usb_mode",
+            "parameters": [
+              {
+                "name": "mode",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "UartMode"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "nr3"
+                },
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:UART:MODE?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_usb_mode",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "UartMode"
+                }
+              ]
+            }
+          },
+          {
             "name": "SYSTem:CPU:FIRMware?",
             "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_cpu_firm",
             "parameters": [],
@@ -72861,6 +72914,9 @@
           {
             "name": "TOUT",
             "value": ""
+          },
+          {
+            "name": "UART"
           }
         ]
       },
@@ -73062,6 +73118,19 @@
           {
             "name": "MAXimum",
             "value": "3"
+          }
+        ]
+      },
+      {
+        "name": "UartMode",
+        "members": [
+          {
+            "name": "PASS",
+            "value": "0"
+          },
+          {
+            "name": "SCPI",
+            "value": "1"
           }
         ]
       }

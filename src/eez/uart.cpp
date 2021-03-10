@@ -33,6 +33,8 @@ using namespace eez::scpi;
 using namespace eez::psu;
 using namespace eez::psu::scpi;
 
+static const size_t CONF_UART_INPUT_BUFFER_SIZE = 256;
+
 namespace eez {
 namespace uart {
 
@@ -40,31 +42,114 @@ namespace uart {
 
 static bool g_initialized = false;
 static bool g_scpiInitialized;
-// static uint8_t g_buffer[128];
-// static uint16_t g_RxXferCount;
+
+static uint8_t g_buffer[128];
+static volatile uint32_t g_RxXferCount;
 // static bool g_rxCplt = true;
-// static bool g_txCplt = true;
+static volatile uint32_t g_rxState = 0;
+
+////////////////////////////////////////////////////////////////////////////////
+
+class CircularBuffer {
+public:
+	explicit CircularBuffer(uint8_t *buffer, size_t bufferSize)
+		: m_buffer(buffer), m_bufferSize(bufferSize)
+	{
+	}
+
+	void reset() {
+#ifdef EEZ_PLATFORM_STM32
+		taskENTER_CRITICAL();
+#endif
+		m_head = m_tail;
+		m_full = false;
+
+#ifdef EEZ_PLATFORM_STM32
+		taskEXIT_CRITICAL();
+#endif
+	}
+
+	bool isEmpty() const {
+		return !m_full && m_head == m_tail;
+	}
+
+	bool isFull() const {
+		return m_full;
+	}
+
+	size_t getSize() const {
+		if (m_full) {
+			return m_bufferSize;
+		}
+		if(m_head >= m_tail) {
+			return m_head - m_tail;
+		}
+		return m_bufferSize + m_head - m_tail;
+	}
+
+	void put(uint8_t item) {
+		m_buffer[m_head] = item;
+
+		if (m_full) {
+			m_tail = (m_tail + 1) % m_bufferSize;
+		}
+
+		m_head = (m_head + 1) % m_bufferSize;
+
+		m_full = m_head == m_tail;
+	}
+
+	uint8_t get() {
+#ifdef EEZ_PLATFORM_STM32
+		taskENTER_CRITICAL();
+#endif
+
+		if (isEmpty()) {
+#ifdef EEZ_PLATFORM_STM32
+			taskEXIT_CRITICAL();
+#endif
+			return 0;
+		}
+
+		uint8_t val = m_buffer[m_tail];
+		m_full = false;
+		m_tail = (m_tail + 1) % m_bufferSize;
+
+#ifdef EEZ_PLATFORM_STM32
+		taskEXIT_CRITICAL();
+#endif
+		return val;
+	}
+
+private:
+	uint8_t *m_buffer;
+	const size_t m_bufferSize;
+	size_t m_head = 0;
+	size_t m_tail = 0;
+	bool m_full = false;
+};
+
+static uint8_t g_inputBufferMemory[CONF_UART_INPUT_BUFFER_SIZE];
+CircularBuffer g_inputBuffer(g_inputBufferMemory, sizeof(g_inputBufferMemory));
 
 ////////////////////////////////////////////////////////////////////////////////
 
 static const size_t OUTPUT_BUFFER_MAX_SIZE = 1024;
 static char g_outputBuffer[OUTPUT_BUFFER_MAX_SIZE];
 
-size_t uartWrite(const char *data, size_t len) {
+static size_t uartOutputBufferWriteFunc(const char *data, size_t len) {
 	g_messageAvailable = true;
 	if (g_initialized) {
-        //g_txCplt = false;
 #ifdef EEZ_PLATFORM_STM32
 		HAL_UART_Transmit(PHUART, (uint8_t *)data, (uint16_t)len, 10);
 #endif
-//        while (!g_txCplt) {
-//            osDelay(1);
-//        }
 	}
     return len;
 }
 
-static OutputBufferWriter g_outputBufferWriter(&g_outputBuffer[0], OUTPUT_BUFFER_MAX_SIZE, uartWrite);
+static OutputBufferWriter g_outputBufferWriter(
+    &g_outputBuffer[0], OUTPUT_BUFFER_MAX_SIZE, uartOutputBufferWriteFunc
+);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -122,38 +207,47 @@ scpi_t g_scpiContext;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void tick() {
-#ifdef EEZ_PLATFORM_STM32
-//	if (g_rxCplt == true) {
-//		if (g_initialized && !bp3c::flash_slave::g_bootloaderMode) {
-//			g_rxCplt = false;
-//			g_RxXferCount = sizeof(g_buffer);
-//			HAL_UART_Receive_IT(PHUART, g_buffer, sizeof(g_buffer));
-//		}
-//	} else {
-//		auto RxXferCount = PHUART->RxXferCount;
-//	    if (RxXferCount < g_RxXferCount) {
-//	        input(g_scpiContext, (const char *)g_buffer + sizeof(g_buffer) - g_RxXferCount, g_RxXferCount - RxXferCount);
-//	        g_RxXferCount = RxXferCount;
-//	    }
-//	}
+static void flushRxBuffer(uint16_t RxXferCount) {
+	if (RxXferCount < g_RxXferCount) {
+		auto n = g_RxXferCount - RxXferCount;
+		auto p = g_buffer + sizeof(g_buffer) - g_RxXferCount;
+		for (uint32_t i = 0; i < n; i++) {
+			g_inputBuffer.put(p[i]);
+		}
 
-    uint8_t buffer[128];
-	HAL_UART_Receive(PHUART, buffer, sizeof(buffer), 1);
-	auto RxXferCount = PHUART->RxXferCount;
-	if (RxXferCount < sizeof(buffer)) {
-		input(g_scpiContext, (const char *)buffer, sizeof(buffer) - RxXferCount);
+		g_RxXferCount = RxXferCount;
 	}
+}
+
+void tick() {
+	if (g_initialized && !bp3c::flash_slave::g_bootloaderMode) {
+#ifdef EEZ_PLATFORM_STM32
+		taskENTER_CRITICAL();
+		flushRxBuffer(PHUART->hdmarx->Instance->NDTR);
+	    taskEXIT_CRITICAL();
 #endif
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+	    flushRxBuffer(g_RxXferCount);
+#endif
+
+		if (persist_conf::devConf.uartMode == UART_MODE_SCPI) {
+			while (!g_inputBuffer.isEmpty()) {
+				auto ch = (char)g_inputBuffer.get();
+				input(g_scpiContext, &ch, 1);
+			}
+		}
+	}
 }
 
 void refresh() {
     if (g_initialized) {
         if (!bp3c::flash_slave::g_bootloaderMode && psu::io_pins::g_ioPins[DIN1].function != psu::io_pins::FUNCTION_UART) {
-        	// if (!g_rxCplt) {
-        	// 	g_rxCplt = true;
-        	// 	HAL_UART_AbortReceive_IT(PHUART);
-        	// }
+//        	if (!g_rxCplt) {
+//        		g_rxCplt = true;
+//        		HAL_UART_AbortReceive_IT(PHUART);
+//        	}
+        	HAL_UART_DMAStop(PHUART);
 
 #ifdef EEZ_PLATFORM_STM32
             HAL_UART_DeInit(PHUART);
@@ -174,6 +268,12 @@ void refresh() {
             g_initialized = true;
 
             initScpi();
+
+            g_inputBuffer.reset();
+            if (!bp3c::flash_slave::g_bootloaderMode) {
+            	g_RxXferCount = sizeof(g_buffer);
+            	HAL_UART_Receive_DMA(PHUART, g_buffer, sizeof(g_buffer));
+            }
         }
     }
 }
@@ -192,18 +292,45 @@ HAL_StatusTypeDef transmit(uint8_t *data, uint16_t size, uint32_t timeout) {
 #endif
 }
 
-HAL_StatusTypeDef receive(uint8_t *data, uint16_t size, uint32_t timeout) {
+HAL_StatusTypeDef receive(uint8_t *data, uint16_t size, uint32_t timeout, uint16_t *nreceived) {
+    if (nreceived) {
+        *nreceived = 0;
+    }
+
     if (!g_initialized) {
         return HAL_ERROR;
     }
 
 #ifdef EEZ_PLATFORM_STM32
-    return HAL_UART_Receive(PHUART, data, size, timeout);
+    auto result = HAL_UART_Receive(PHUART, data, size, timeout);
+    if (result == HAL_OK || result == HAL_TIMEOUT) {
+    	*nreceived = size - PHUART->RxXferCount;
+    }
+    return result;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
     return HAL_ERROR;
 #endif
+}
+
+bool receiveFromBuffer(uint8_t *data, uint16_t size, uint16_t &n, int *err) {
+	if (!g_initialized || bp3c::flash_slave::g_bootloaderMode || persist_conf::devConf.uartMode == UART_MODE_SCPI) {
+		if (*err) {
+			*err = SCPI_ERROR_EXECUTION_ERROR;
+		}
+		return false;
+	}
+
+	for (n = 0; !g_inputBuffer.isEmpty() && n < size; n++) {
+		data[n] = g_inputBuffer.get();
+	}
+
+	return true;
+}
+
+void resetInputBuffer() {
+	g_inputBuffer.reset();
 }
 
 void initScpi() {
@@ -218,23 +345,31 @@ void initScpi() {
 
 #ifdef EEZ_PLATFORM_STM32
 
-// extern "C" void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-//     if (huart == PHUART) {
-// 		eez::uart::g_rxCplt = true;
-//     }
-// }
+extern "C" void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
+	using namespace eez::uart;
+	if (huart == PHUART) {
+		g_rxState = 1;
 
-// extern "C" void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-//     if (huart == PHUART) {
-// 		eez::uart::g_txCplt = true;
-//     }
-// }
+		flushRxBuffer(sizeof(g_buffer) / 2);
+   }
+}
 
-// extern "C" void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
-//     if (huart == PHUART) {
-//         eez::uart::g_rxCplt = true;
-//         eez::uart::g_txCplt = true;
-//     }
-// }
+extern "C" void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	using namespace eez::uart;
+	if (huart == PHUART) {
+		g_rxState = 2;
+
+		flushRxBuffer(0);
+
+		g_RxXferCount = sizeof(g_buffer);
+   }
+}
+
+extern "C" void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+	using namespace eez::uart;
+	if (huart == PHUART) {
+		g_rxState = 3;
+	}
+}
 
 #endif

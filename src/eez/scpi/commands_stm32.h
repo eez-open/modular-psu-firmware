@@ -350,6 +350,9 @@
     SCPI_COMMAND("SYSTem:COMMunicate:USB:MODE", scpi_cmd_systemCommunicateUsbMode) \
     SCPI_COMMAND("SYSTem:COMMunicate:USB:MODE?", scpi_cmd_systemCommunicateUsbModeQ) \
     SCPI_COMMAND("SYSTem:COMMunicate:UART:TRANsmit", scpi_cmd_systemCommunicateUartTransmit) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:RECeive?", scpi_cmd_systemCommunicateUartReceiveQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:MODE", scpi_cmd_systemCommunicateUartMode) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:MODE?", scpi_cmd_systemCommunicateUartModeQ) \
     SCPI_COMMAND("SYSTem:CPU:FIRMware?", scpi_cmd_systemCpuFirmwareQ) \
     SCPI_COMMAND("SYSTem:CPU:INFOrmation:ONTime:LAST?", scpi_cmd_systemCpuInformationOntimeLastQ) \
     SCPI_COMMAND("SYSTem:CPU:INFOrmation:ONTime:TOTal?", scpi_cmd_systemCpuInformationOntimeTotalQ) \

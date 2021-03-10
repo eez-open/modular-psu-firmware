@@ -199,7 +199,6 @@ void uploadHexFile() {
 		for (int ntry = 1; !eraseAll(g_slotIndex); ntry++) {
 			DebugTrace("Failed to erase all!\n");
 			if (ntry == 5) {
-				//goto Exit;
 				break;
 			}
 			osDelay(10);
@@ -219,8 +218,6 @@ void uploadHexFile() {
 
 	    totalSize = file.size();
 #endif
-
-	    //eofReached = true;
 
 		while (!eofReached && readHexRecord(bufferedFile, hexRecord)) {
 			size_t currentPosition = file.tell();

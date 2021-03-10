@@ -1314,6 +1314,10 @@ void clearMcuRevision() {
     g_devConf.mcuRevision = 0;
 }
 
+void setUartMode(uint8_t uartMode) {
+    g_devConf.uartMode = uartMode;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 ModuleConfiguration g_moduleConf[NUM_SLOTS];

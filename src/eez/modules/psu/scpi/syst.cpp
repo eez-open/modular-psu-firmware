@@ -2385,8 +2385,46 @@ scpi_result_t scpi_cmd_systemCommunicateUartTransmit(scpi_t *context) {
     }
 
     uart::transmit((uint8_t *)uartStr, (uint16_t)uartStrLen, 100);
-    uart::transmit((uint8_t *)"\r\n", 2, 100);
+    uart::transmit((uint8_t *)"\n", 1, 100);
 
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUartReceiveQ(scpi_t *context) {
+    char text[100];
+	uint16_t n;
+    int err;
+	if (!uart::receiveFromBuffer((uint8_t *)text, sizeof(text) - 1, n, &err)) {
+        SCPI_ErrorPush(context, err);
+		return SCPI_RES_ERR;
+	}
+
+	text[n] = 0;
+
+    SCPI_ResultText(context, text);
+	return SCPI_RES_OK;
+}
+
+static scpi_choice_def_t g_uartModeChoice[] = {
+    { "BUFFer", uart::UART_MODE_BUFFER },
+    { "SCPI", uart::UART_MODE_SCPI },
+    SCPI_CHOICE_LIST_END
+};
+
+scpi_result_t scpi_cmd_systemCommunicateUartMode(scpi_t *context) {
+    int32_t uartMode;
+    if (!SCPI_ParamChoice(context, g_uartModeChoice, &uartMode, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    persist_conf::setUartMode((uint8_t)uartMode);
+    uart::resetInputBuffer();
+    
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUartModeQ(scpi_t *context) {
+    resultChoiceName(context, g_uartModeChoice, persist_conf::devConf.uartMode);
 	return SCPI_RES_OK;
 }
 

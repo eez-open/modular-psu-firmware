@@ -43,10 +43,17 @@ void tick();
 void refresh();
 
 HAL_StatusTypeDef transmit(uint8_t *data, uint16_t size, uint32_t timeout);
-HAL_StatusTypeDef receive(uint8_t *data, uint16_t size, uint32_t timeout);
+HAL_StatusTypeDef receive(uint8_t *data, uint16_t size, uint32_t timeout, uint16_t *nreceived = nullptr);
+bool receiveFromBuffer(uint8_t *data, uint16_t size, uint16_t &n, int *err);
+void resetInputBuffer();
 
 void initScpi();
 void onQueueMessage(uint32_t type, uint32_t param);
+
+enum UartMode {
+	UART_MODE_BUFFER,
+	UART_MODE_SCPI,
+};
 
 } // uart
 } // eez
