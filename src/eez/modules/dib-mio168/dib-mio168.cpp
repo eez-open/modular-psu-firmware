@@ -3740,11 +3740,11 @@ public:
 
     float getDlogResourceMinPeriod(int subchannelIndex, int resourceIndex) override {
         if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
-            return 0.000001f; // 1 us
+            return 0.00001f; // 10 us
         }
 
         if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
-            return 1.0f / 64000; // 64 KSPS
+            return 1.0f / 32000; // 32 KSPS
         }
 
         return Module::getDlogResourceMinPeriod(subchannelIndex, resourceIndex);
@@ -3752,7 +3752,7 @@ public:
 
     bool isDlogPeriodAllowed(int subchannelIndex, int resourceIndex, float period) override {
         if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
-            return period == 1.0f / 64000 || period == 1.0f / 32000 || period == 1.0f / 16000 ||
+            return period == 1.0f / 32000 || period == 1.0f / 16000 ||
                 period == 1.0f / 8000 || period == 1.0f / 4000 || period == 1.0f / 2000 || period >= 1.0f / 1000;
         }
 

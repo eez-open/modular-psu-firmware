@@ -1634,7 +1634,6 @@ static EnumItem g_predefinedDlogPeriodsEnumDefinition[] = {
     { 2, "8 KSPS (24-bit)", "8 KSPS" },
     { 3, "16 KSPS (24-bit)", "16 KSPS" },
     { 4, "32 KSPS (16-bit)", "32 KSPS" },
-    { 5, "64 KSPS (16-bit)", "64 KSPS" },
     { 0, 0 }
 };
 
@@ -1643,8 +1642,7 @@ float g_predefinedDlogPeriods[] = {
     1.0f / 4000,
     1.0f / 8000,
     1.0f / 16000,
-    1.0f / 32000,
-    1.0f / 64000
+    1.0f / 32000
 };
 
 void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) {

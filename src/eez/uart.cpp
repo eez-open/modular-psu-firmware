@@ -46,8 +46,6 @@ static bool g_scpiInitialized;
 static bool g_dmaStarted;
 static uint8_t g_buffer[128];
 static volatile uint32_t g_RxXferCount;
-// static bool g_rxCplt = true;
-static volatile uint32_t g_rxState = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -362,8 +360,6 @@ void initScpi() {
 extern "C" void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
 	using namespace eez::uart;
 	if (huart == PHUART) {
-		g_rxState = 1;
-
 		flushRxBuffer(sizeof(g_buffer) / 2);
    }
 }
@@ -371,8 +367,6 @@ extern "C" void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
 extern "C" void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	using namespace eez::uart;
 	if (huart == PHUART) {
-		g_rxState = 2;
-
 		flushRxBuffer(0);
 
 		g_RxXferCount = sizeof(g_buffer);
@@ -382,7 +376,6 @@ extern "C" void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 extern "C" void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
 	using namespace eez::uart;
 	if (huart == PHUART) {
-		g_rxState = 3;
 	}
 }
 
