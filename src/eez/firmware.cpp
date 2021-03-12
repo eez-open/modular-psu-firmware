@@ -150,6 +150,8 @@ void boot() {
 #ifdef __EMSCRIPTEN__
         g_mcuRevision = MCU_REVISION_R3B3;
 #else
+
+#if defined(EEZ_PLATFORM_STM32)
         GPIO_InitTypeDef GPIO_InitStruct = {0};
 
         HAL_GPIO_WritePin(LCD_BRIGHTNESS_GPIO_Port, LCD_BRIGHTNESS_Pin, GPIO_PIN_SET);
@@ -165,6 +167,7 @@ void boot() {
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
         HAL_GPIO_Init(R2B4_LCD_BRIGHTNESS_GPIO_Port, &GPIO_InitStruct);
+#endif
 
         g_mcuRevision = psu::gui::askMcuRevision();
 #endif

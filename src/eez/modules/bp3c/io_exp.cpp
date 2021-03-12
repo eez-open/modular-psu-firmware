@@ -95,6 +95,7 @@ HAL_StatusTypeDef read(uint8_t reg, uint8_t *pValue) {
 }
 #endif
 
+#if defined(EEZ_PLATFORM_STM32)
 bool doTest() {
 #if EEZ_BP3C_REVISION_R1B1
 	// all 4 pins are output (bit 0, 1, 2 and 3 should be set to 0)
@@ -119,6 +120,7 @@ bool doTest() {
 
 	return false;
 }
+#endif
 
 void init() {
 #if defined(EEZ_PLATFORM_STM32)
