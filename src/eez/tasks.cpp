@@ -307,8 +307,6 @@ void lowPriorityThreadOneIter() {
                 dlog_record::stateTransition(param);
             } else if (type == THREAD_MESSAGE_DLOG_SHOW_FILE) {
                 dlog_view::openFile(nullptr);
-            } else if (type == THREAD_MESSAGE_DLOG_LOAD_BLOCK) {
-                dlog_view::loadBlock();
             } else if (type == THREAD_MESSAGE_DLOG_LOAD_BOOKMARKS) {
                 dlog_view::loadBookmarks();
             } else if (type == THREAD_MESSAGE_ABORT_DOWNLOADING) {

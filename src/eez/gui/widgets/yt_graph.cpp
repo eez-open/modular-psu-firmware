@@ -429,6 +429,16 @@ struct YTGraphStaticDrawHelper {
             display::drawHLine(widgetCursor.x, widgetCursor.y + y * widget->h / vertDivisions, widget->w - 1);
         }
 
+		// draw bookmarks
+		if (bookmarks) {
+			for (int x = 0; x < widget->w; x++) {
+				if (bookmarks[x]) {
+					display::setColor(COLOR_ID_BOOKMARK);
+					display::drawVLine(startX + x, widgetCursor.y, widget->h - 1);
+				}
+			}
+		}
+
         // draw graphs
         for (m_valueIndex = 0; m_valueIndex < MAX_NUM_OF_Y_VALUES; m_valueIndex++) {
             if (m_valueIndex != selectedValueIndex) {
@@ -440,48 +450,34 @@ struct YTGraphStaticDrawHelper {
             drawGraph(currentHistoryValuePosition, startX, endX, vertDivisions);
         }
 
-		// draw bookmarks
-		if (bookmarks) {
-			for (int x = 0; x < widget->w; x++) {
-				if (bookmarks[x]) {
-					if (bookmarks[x] == 2) {
-						display::setColor(COLOR_ID_SELECTED_BOOKMARK);
-					} else {
-						display::setColor(COLOR_ID_BOOKMARK);
-					}
-					display::drawVLine(startX + x, widgetCursor.y, widget->h - 1);
-				}
+		// draw cursor
+		if (ytDataIsCursorVisible(widgetCursor.cursor, widgetCursor.widget->data)) {
+			display::setColor(style->color);
+			display::drawVLine(startX + cursorPosition - currentHistoryValuePosition, widgetCursor.y, widget->h - 1);
+
+			char text[64];
+			ytDataGetCursorXValue(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
+
+			font::Font font = styleGetFont(style);
+			int MIN_CURSOR_TEXT_WIDTH = 80;
+			int cursorTextWidth = MAX(display::measureStr(text, -1, font), MIN_CURSOR_TEXT_WIDTH);
+			int cursorTextHeight = font.getHeight();
+			const int PADDING = 0;
+			int xCursorText = widgetCursor.x + cursorPosition - currentHistoryValuePosition - cursorTextWidth / 2;
+			if (xCursorText < widgetCursor.x + PADDING) {
+				xCursorText = widgetCursor.x + PADDING;
+			} else if (xCursorText + cursorTextWidth > widgetCursor.x + widgetCursor.widget->w - PADDING) {
+				xCursorText = widgetCursor.x + widgetCursor.widget->w - PADDING - cursorTextWidth;
 			}
+			int yCursorText = widgetCursor.y + widgetCursor.widget->h - cursorTextHeight - PADDING;
+
+			drawText(text, -1,
+				xCursorText, yCursorText, cursorTextWidth, cursorTextHeight,
+				style, widgetCursor.currentState->flags.focused, false, false, nullptr, nullptr, nullptr, nullptr
+			);
 		}
-
-        // draw cursor
-        if (ytDataIsCursorVisible(widgetCursor.cursor, widgetCursor.widget->data)) {
-            display::setColor(style->color);
-            display::drawVLine(startX + cursorPosition - currentHistoryValuePosition, widgetCursor.y, widget->h - 1);
-
-            char text[64];
-            ytDataGetCursorXValue(widgetCursor.cursor, widgetCursor.widget->data).toText(text, sizeof(text));
-
-            font::Font font = styleGetFont(style);
-            int MIN_CURSOR_TEXT_WIDTH = 80;
-            int cursorTextWidth = MAX(display::measureStr(text, -1, font), MIN_CURSOR_TEXT_WIDTH);
-            int cursorTextHeight = font.getHeight();
-            const int PADDING = 0;
-            int xCursorText = widgetCursor.x + cursorPosition - currentHistoryValuePosition - cursorTextWidth / 2;
-            if (xCursorText < widgetCursor.x + PADDING) {
-                xCursorText = widgetCursor.x + PADDING;
-            } else if (xCursorText + cursorTextWidth > widgetCursor.x + widgetCursor.widget->w - PADDING) {
-                xCursorText = widgetCursor.x + widgetCursor.widget->w - PADDING - cursorTextWidth;
-            }
-            int yCursorText = widgetCursor.y + widgetCursor.widget->h - cursorTextHeight - PADDING;
-
-            drawText(text, -1,
-                xCursorText, yCursorText, cursorTextWidth, cursorTextHeight,
-                style, widgetCursor.currentState->flags.focused, false, false, nullptr, nullptr, nullptr, nullptr
-            );
-        }
-
-        // draw labels
+		
+		// draw labels
         if (showLabels) {
             font::Font font = styleGetFont(style);
             int labelHeight = font.getHeight();

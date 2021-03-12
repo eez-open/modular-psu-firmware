@@ -68,17 +68,6 @@ char g_filePath[MAX_PATH_LENGTH + 1];
 static Recording g_dlogFile;
 static uint32_t g_refreshCounter;
 
-struct CacheBlock {
-    unsigned valid: 1;
-    uint32_t loadedValues;
-    uint32_t blockIndex;
-};
-
-struct BlockElement {
-    float min;
-    float max;
-};
-
 static uint8_t *g_rowDataStart = FILE_VIEW_BUFFER;
 static const uint32_t ROW_VALUES_BUFFER_SIZE = 65536;
 
@@ -95,22 +84,21 @@ static uint32_t g_bookmarksScrollPosition = 0;
 static uint32_t g_loadedBookmarksScrollPosition = 0;
 uint8_t *g_visibleBookmarksBuffer = g_bookmarksDataStart + BOOKMARKS_DATA_SIZE;
 uint8_t *g_visibleBookmarks;
-uint32_t g_visibleBookmarksPositionStart;
-uint32_t g_visibleBookmarksPositionEnd;
 uint32_t *g_visibleBookmarkIndexesBuffer = (uint32_t *)(g_visibleBookmarksBuffer + 2 * 480);
 uint32_t *g_visibleBookmarkIndexes;
 
-static CacheBlock *g_cacheBlocks = (CacheBlock *)(g_visibleBookmarkIndexesBuffer + 2 * 480);
-static const uint32_t CACHE_BLOCKS_BUFFER_SIZE = FILE_VIEW_BUFFER_SIZE - ROW_VALUES_BUFFER_SIZE - BOOKMARKS_DATA_SIZE;
-
-static uint32_t NUM_ELEMENTS_PER_BLOCKS;
-static uint32_t BLOCK_SIZE;
-static uint32_t NUM_BLOCKS;
+struct BlockElement {
+    float min;
+    float max;
+};
+static BlockElement *g_blockElements = (BlockElement *)(g_visibleBookmarkIndexesBuffer + 2 * 480);
+static uint32_t g_rowIndexStart;
+static uint32_t g_rowIndexEnd;
+static double g_loadScale;
+static uint32_t g_loadedRowIndex;
+static void loadBlockElements();
 
 static bool g_isLoading;
-static bool g_interruptLoading;
-static uint32_t g_cacheBlockIndexToLoad;
-static double g_loadScale;
 static bool g_refreshed;
 static bool g_wasExecuting;
 
@@ -136,15 +124,39 @@ static void loadVisibleBookmarks(uint32_t positionStart, uint32_t positionEnd);
 ////////////////////////////////////////////////////////////////////////////////
 
 void tick() {
-	if (g_bookmarksScrollPosition != g_loadedBookmarksScrollPosition) {
-		loadBookmarks();
-	}
+	if (g_state == STATE_READY) {
+		uint32_t rowIndexStart = dlog_view::getPosition(getRecording());
+		uint32_t rowIndexEnd = rowIndexStart + VIEW_WIDTH;
+		if (rowIndexStart > 0) {
+			rowIndexStart = rowIndexStart - 1;
+		}
+		auto loadScale = g_dlogFile.xAxisDiv / g_dlogFile.xAxisDivMin;
 
-	auto &recording = dlog_view::getRecording();
-	auto positionStart = (uint32_t)floorf(recording.xAxisOffset / recording.parameters.xAxis.step);
-	auto positionEnd = (uint32_t)ceilf(positionStart + VIEW_WIDTH * recording.parameters.period / recording.parameters.xAxis.step);
-	if (positionStart != g_visibleBookmarksPositionStart || positionEnd != g_visibleBookmarksPositionEnd) {
-		loadVisibleBookmarks(positionStart, positionEnd);
+		uint32_t numRows = rowIndexEnd - rowIndexStart;
+
+		if (rowIndexStart != g_rowIndexStart || rowIndexEnd != g_rowIndexEnd || loadScale != g_loadScale) {
+			uint32_t n = numRows * g_dlogFile.parameters.numYAxes;
+			for (unsigned i = 0; i < n; i++) {
+				g_blockElements[i].min = NAN;
+				g_blockElements[i].max = NAN;
+			}
+			g_rowIndexStart = rowIndexStart;
+			g_rowIndexEnd = rowIndexEnd;
+			g_loadScale = loadScale;
+			g_loadedRowIndex = 0;
+
+			auto positionStart = (uint32_t)floorf(rowIndexStart * loadScale);
+			auto positionEnd = (uint32_t)ceilf(rowIndexEnd * loadScale);
+			loadVisibleBookmarks(positionStart, positionEnd);
+		}
+
+		if (g_loadedRowIndex < numRows) {
+			loadBlockElements();
+		}
+
+		if (g_bookmarksScrollPosition != g_loadedBookmarksScrollPosition) {
+			loadBookmarks();
+		}
 	}
 }
 
@@ -189,30 +201,6 @@ void stateManagment() {
 		g_refreshed = false;
 	}
 }
-static inline BlockElement *getCacheBlock(unsigned blockIndex) {
-    return (BlockElement *)((uint8_t *)g_cacheBlocks + NUM_BLOCKS * sizeof(CacheBlock) + blockIndex * BLOCK_SIZE);
-}
-
-static inline unsigned getNumElementsPerRow() {
-    return MIN(g_dlogFile.parameters.numYAxes, dlog_file::MAX_NUM_OF_Y_AXES);
-}
-
-void invalidateAllBlocks() {
-    g_interruptLoading = true;
-
-    while (g_isLoading) {
-        osDelay(1);
-    }
-
-    NUM_ELEMENTS_PER_BLOCKS = 480 * getNumElementsPerRow();
-    BLOCK_SIZE = NUM_ELEMENTS_PER_BLOCKS * sizeof(BlockElement);
-    NUM_BLOCKS = CACHE_BLOCKS_BUFFER_SIZE / (sizeof(CacheBlock) + BLOCK_SIZE);
-
-    for (unsigned blockIndex = 0; blockIndex < NUM_BLOCKS; blockIndex++) {
-        g_cacheBlocks[blockIndex].valid = false;
-        g_cacheBlocks[blockIndex].loadedValues = 0;
-    }
-}
 
 bool isValidSample(Recording &recording, uint8_t *rowData) {
 	return !recording.parameters.dataContainsSampleValidityBit|| rowData[0] & 0x80;
@@ -245,141 +233,96 @@ float getSample(Recording &recording, uint8_t *rowData, unsigned columnIndex) {
     return value;
 }
 
-void loadBlock() {
-    auto numSamplesPerValue = (unsigned)round(g_loadScale);
-    if (numSamplesPerValue > 0) {
-        File file;
-        if (file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-            auto numElementsPerRow = getNumElementsPerRow();
+static void loadBlockElements() {
+	File file;
+	if (!file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+		return;
+	}
 
-            BlockElement *blockElements = getCacheBlock(g_cacheBlockIndexToLoad);
+	auto numSamplesPerValue = (unsigned)round(g_loadScale);
 
-            uint32_t totalBytesRead = 0;
+	uint32_t startTime = millis();
 
-			auto blockOffset = g_loadScale * g_cacheBlocks[g_cacheBlockIndexToLoad].blockIndex * 480;
+	auto filePosition = g_dlogFile.dataOffset + (uint32_t)round(g_rowIndexStart * g_loadScale) * g_dlogFile.numBytesPerRow;
+	uint8_t *rowDataStart = g_rowDataStart;
+	uint8_t *rowDataEnd = g_rowDataStart;
 
-            uint32_t i = g_cacheBlocks[g_cacheBlockIndexToLoad].loadedValues;
-            while (i < NUM_ELEMENTS_PER_BLOCKS) {
-				auto offset = (uint32_t)round(blockOffset + g_loadScale * i / numElementsPerRow) * g_dlogFile.numBytesPerRow;
+	uint32_t n = g_rowIndexEnd - g_rowIndexStart;
+	while (g_loadedRowIndex < n) {
+		BlockElement *blockElementStart = g_blockElements + g_loadedRowIndex * g_dlogFile.parameters.numYAxes;
 
-                size_t filePosition = g_dlogFile.dataOffset + offset;
-                if (!file.seek(filePosition)) {
-                    i = NUM_ELEMENTS_PER_BLOCKS;
-                    goto closeFile;
-                }
+		for (unsigned sampleIndex = 0; sampleIndex < numSamplesPerValue; sampleIndex++) {
+			if (rowDataStart >= rowDataEnd) {
+				if (!file.seek(filePosition)) {
+					goto Exit;
+				}
 
-                unsigned iStart = i;
+				uint32_t bytesToRead = ((numSamplesPerValue - sampleIndex) + (n - (g_loadedRowIndex + 1)) * numSamplesPerValue) * g_dlogFile.numBytesPerRow;
+				if (bytesToRead > ROW_VALUES_BUFFER_SIZE) {
+					bytesToRead = ROW_VALUES_BUFFER_SIZE;
+				}
 
-                const uint32_t NUM_VALUES_ROWS = ROW_VALUES_BUFFER_SIZE / g_dlogFile.numBytesPerRow;
+				uint32_t bytesRead = file.read(g_rowDataStart, bytesToRead);
+				if (bytesRead != bytesToRead) {
+					goto Exit;
+				}
+				rowDataStart = g_rowDataStart;
+				rowDataEnd = rowDataStart + bytesToRead;
+			}
 
-                uint8_t *rowData = g_rowDataStart;
-                uint32_t rowDataLength = 0;
-
-                for (unsigned j = 0; j < numSamplesPerValue; j++) {
-                    i = iStart;
-
-                    if (rowDataLength == 0) {
-                        if (g_interruptLoading) {
-                            i = NUM_ELEMENTS_PER_BLOCKS;
-                            goto closeFile;
-                        }
-
-                        // read up to NUM_VALUES_ROWS
-                        uint32_t bytesToRead = MIN(NUM_VALUES_ROWS, numSamplesPerValue - j) * g_dlogFile.numBytesPerRow;
-                        uint32_t bytesRead = file.read(g_rowDataStart, bytesToRead);
-                        if (bytesToRead != bytesRead) {
-                            i = NUM_ELEMENTS_PER_BLOCKS;
-                            goto closeFile;
-                        }
-
-						rowData = g_rowDataStart;
-						rowDataLength = bytesRead;
-                        totalBytesRead += bytesRead;
+            if (isValidSample(g_dlogFile, rowDataStart)) {
+				BlockElement *blockElement = blockElementStart;
+				
+				for (uint32_t columnIndex = 0; columnIndex < g_dlogFile.parameters.numYAxes; columnIndex++, blockElement++) {
+                    float value = getSample(g_dlogFile, rowDataStart, columnIndex);
+                    if (sampleIndex == 0) {
+                        blockElement->min = blockElement->max = value;
+                    } else if (value < blockElement->min) {
+                        blockElement->min = value;
+                    } else if (value > blockElement->max) {
+                        blockElement->max = value;
                     }
-
-					if (isValidSample(g_dlogFile, rowData)) {
-						for (unsigned columnIndex = 0; columnIndex < numElementsPerRow; columnIndex++) {
-							float value = getSample(g_dlogFile, rowData, columnIndex);
-							BlockElement *blockElement = blockElements + i++;
-							if (j == 0) {
-								blockElement->min = blockElement->max = value;
-							} else if (value < blockElement->min) {
-								blockElement->min = value;
-							} else if (value > blockElement->max) {
-								blockElement->max = value;
-							}
-						}
-					} else {
-						for (unsigned columnIndex = 0; columnIndex < numElementsPerRow; columnIndex++) {
-							BlockElement *blockElement = blockElements + i++;
-							if (j == 0) {
-								blockElement->min = blockElement->max = NAN;
-							}
-						}
-					}
-
-                    rowData += g_dlogFile.numBytesPerRow;
-					rowDataLength -= g_dlogFile.numBytesPerRow;
                 }
-
-                if (totalBytesRead > NUM_ELEMENTS_PER_BLOCKS * sizeof(BlockElement)) {
-                    break;
-                }
-
-                g_refreshed = true;
             }
 
-        closeFile:
-            g_cacheBlocks[g_cacheBlockIndexToLoad].loadedValues = i;
-            file.close();
-        }
-    }
+			rowDataStart += g_dlogFile.numBytesPerRow;
+			filePosition += g_dlogFile.numBytesPerRow;
+		}
 
-    g_isLoading = false;
-    g_refreshed = true;
+		g_loadedRowIndex++;
+		g_refreshed = true;
+
+		if (millis() - startTime > 50) {
+		    break;
+		}
+
+		auto nextFilePosition = g_dlogFile.dataOffset + (uint32_t)round((g_rowIndexStart + g_loadedRowIndex) * g_loadScale) * g_dlogFile.numBytesPerRow;
+		auto diff = nextFilePosition - filePosition;
+		rowDataStart += diff;
+		filePosition = nextFilePosition;
+	}
+
+Exit:
+	file.close();
 }
 
 static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
-    uint32_t blockElementAddress = (rowIndex * getNumElementsPerRow() + columnIndex) * sizeof(BlockElement);
+	if (rowIndex >= g_rowIndexStart && rowIndex < g_rowIndexEnd) {
+		BlockElement *blockElement = g_blockElements + (rowIndex - g_rowIndexStart) * g_dlogFile.parameters.numYAxes + columnIndex;
 
-	uint32_t blockIndex = blockElementAddress / BLOCK_SIZE;
-	
-	uint32_t cacheBlockIndex = blockIndex % NUM_BLOCKS;
-    
-	BlockElement *blockElements = getCacheBlock(cacheBlockIndex);
+		if (g_dlogFile.parameters.yAxisScaleType == dlog_file::SCALE_LOGARITHMIC) {
+			float logOffset = 1 - g_dlogFile.parameters.yAxes[columnIndex].range.min;
+			*max = log10f(logOffset + blockElement->max);
+			return log10f(logOffset + blockElement->min);
+		}
 
-    if (!g_cacheBlocks[cacheBlockIndex].valid || g_cacheBlocks[cacheBlockIndex].blockIndex != blockIndex) {
-        for (unsigned i = 0; i < NUM_ELEMENTS_PER_BLOCKS; i++) {
-            blockElements[i].min = NAN;
-            blockElements[i].max = NAN;
-        }
+		*max = blockElement->max;
+		return blockElement->min;
 
-        g_cacheBlocks[cacheBlockIndex].valid = 1;
-        g_cacheBlocks[cacheBlockIndex].loadedValues = 0;
-        g_cacheBlocks[cacheBlockIndex].blockIndex = blockIndex;
-    }
-
-    if (g_cacheBlocks[cacheBlockIndex].loadedValues < NUM_ELEMENTS_PER_BLOCKS && !g_isLoading) {
-        g_isLoading = true;
-        g_interruptLoading = false;
-        g_cacheBlockIndexToLoad = cacheBlockIndex;
-        g_loadScale = g_dlogFile.xAxisDiv / g_dlogFile.xAxisDivMin;
-
-        sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_LOAD_BLOCK);
-    }
-
-    uint32_t blockElementIndex = (blockElementAddress % BLOCK_SIZE) / sizeof(BlockElement);
-
-    BlockElement *blockElement = blockElements + blockElementIndex;
-
-    if (g_dlogFile.parameters.yAxisScaleType == dlog_file::SCALE_LOGARITHMIC) {
-        float logOffset = 1 - g_dlogFile.parameters.yAxes[columnIndex].range.min;
-        *max = log10f(logOffset + blockElement->max);
-        return log10f(logOffset + blockElement->min);
-    }
-
-    *max = blockElement->max;
-    return blockElement->min;
+	} else {
+		*max = NAN;
+		return NAN;
+	}
 }
 
 static float getDuration(Recording &recording) {
@@ -455,8 +398,6 @@ static void changeXAxisDiv(Recording &recording, double xAxisDiv) {
 		recording.xAxisOffset += cursorOffsetBefore - recording.cursorOffset;
         
         adjustXAxisOffset(recording);
-
-        invalidateAllBlocks();
     }
 }
 
@@ -869,16 +810,12 @@ void loadVisibleBookmarks(uint32_t positionStart, uint32_t positionEnd) {
 		auto i = (int)roundf((position - positionStart) * recording.parameters.xAxis.step / recording.parameters.period);
 
         if (i >= 0 && i < 480) {
-            if (visibleBookmarks[i] != 2) {
-				visibleBookmarks[i] = a == g_selectedBookmarkIndex ? 2 : 1;
-                visibleBookmarkIndexes[i] = a;
-            }
+			visibleBookmarks[i] = 1;
+            visibleBookmarkIndexes[i] = a;
         }
 	}
 
 	g_visibleBookmarks = visibleBookmarks;
-    g_visibleBookmarksPositionStart = positionStart;
-    g_visibleBookmarksPositionEnd = positionEnd;
     g_visibleBookmarkIndexes = visibleBookmarkIndexes;
 
     file.close();
@@ -940,8 +877,6 @@ bool openFile(const char *filePath, int *err) {
 	g_selectedBookmarkIndex = -1;
     g_bookmarksScrollPosition = 0;
 	g_visibleBookmarks = 0;
-	g_visibleBookmarksPositionStart = 0;
-	g_visibleBookmarksPositionEnd = 0;
 
     if (!isLowPriorityThread()) {
         sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_SHOW_FILE);
@@ -1053,7 +988,6 @@ bool openFile(const char *filePath, int *err) {
 					}
 
 					g_state = STATE_READY;
-					invalidateAllBlocks();
 
 					// DebugTrace("Duration: %f\n", (float)g_dlogFile.parameters.finalDuration);
 					// DebugTrace("No. samples: %d\n", g_dlogFile.numSamples);
@@ -1077,6 +1011,10 @@ bool openFile(const char *filePath, int *err) {
     file.close();
 
     if (g_state == STATE_READY) {
+		g_rowIndexStart = 0;
+		g_rowIndexEnd = 0;
+		g_loadScale = 1.0;
+
         loadBookmarks();
     } else {
         g_state = STATE_ERROR;
@@ -2105,11 +2043,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
         value = Value(recording.parameters.period, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_BOOKMARKS) {
-        auto positionStart = (uint32_t)floor(recording.xAxisOffset / recording.parameters.xAxis.step);
-        auto positionEnd = (uint32_t)ceil(positionStart + VIEW_WIDTH * recording.parameters.period / recording.parameters.xAxis.step);
-        if (positionStart == g_visibleBookmarksPositionStart && positionEnd == g_visibleBookmarksPositionEnd) {
-        	value = Value(g_visibleBookmarks, VALUE_TYPE_POINTER);
-        }
+        value = Value(g_visibleBookmarks, VALUE_TYPE_POINTER);
 	} else if (operation == DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE) {
         value = &recording != &dlog_record::g_activeRecording;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET) {
