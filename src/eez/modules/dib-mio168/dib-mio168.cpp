@@ -56,8 +56,6 @@
 
 #include <scpi/scpi.h>
 
-volatile uint32_t g_debugVarLogInvalid;
-
 using namespace eez::psu;
 using namespace eez::psu::gui;
 using namespace eez::gui;
@@ -1697,7 +1695,6 @@ public:
 
     void Command_DlogRecordingStart_FillRequest(Request &request) {
         memcpy(&request.dlogRecordingStart, &dlogRecordingStart, sizeof(dlogRecordingStart));
-        g_debugVarLogInvalid = 0;
     }
 
     ////////////////////////////////////////
@@ -1720,7 +1717,6 @@ public:
             }
 
             while (dlogDataRecordIndex < dlogRecordingData.recordIndex) {
-            	g_debugVarLogInvalid++;
                 dlog_record::logInvalid();
                 dlogDataRecordIndex++;
             }

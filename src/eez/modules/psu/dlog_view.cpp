@@ -69,9 +69,9 @@ static Recording g_dlogFile;
 static uint32_t g_refreshCounter;
 
 static uint8_t *g_rowDataStart = FILE_VIEW_BUFFER;
-static const uint32_t ROW_VALUES_BUFFER_SIZE = 65536;
+static const uint32_t ROW_DATA_BUFFER_SIZE = 65536;
 
-static uint8_t *g_bookmarksDataStart = g_rowDataStart + ROW_VALUES_BUFFER_SIZE;
+static uint8_t *g_bookmarksDataStart = g_rowDataStart + ROW_DATA_BUFFER_SIZE;
 struct Bookmark {
 	uint32_t position;
 	const char *text;
@@ -97,6 +97,11 @@ static uint32_t g_rowIndexEnd;
 static double g_loadScale;
 static uint32_t g_loadedRowIndex;
 static void loadBlockElements();
+
+static bool g_fileIsOpen;
+File g_file;
+uint32_t g_cacheRowIndexStart;
+uint32_t g_cacheRowIndexEnd;
 
 static bool g_isLoading;
 static bool g_refreshed;
@@ -125,39 +130,43 @@ static void loadVisibleBookmarks(uint32_t positionStart, uint32_t positionEnd);
 
 void tick() {
 	if (g_state == STATE_READY) {
-		uint32_t rowIndexStart = dlog_view::getPosition(getRecording());
-		uint32_t rowIndexEnd = rowIndexStart + VIEW_WIDTH;
-		if (rowIndexStart > 0) {
-			rowIndexStart = rowIndexStart - 1;
-		}
-		auto loadScale = g_dlogFile.xAxisDiv / g_dlogFile.xAxisDivMin;
-
-		uint32_t numRows = rowIndexEnd - rowIndexStart;
-
-		if (rowIndexStart != g_rowIndexStart || rowIndexEnd != g_rowIndexEnd || loadScale != g_loadScale) {
-			uint32_t n = numRows * g_dlogFile.parameters.numYAxes;
-			for (unsigned i = 0; i < n; i++) {
-				g_blockElements[i].min = NAN;
-				g_blockElements[i].max = NAN;
-			}
-			g_rowIndexStart = rowIndexStart;
-			g_rowIndexEnd = rowIndexEnd;
-			g_loadScale = loadScale;
-			g_loadedRowIndex = 0;
-
-			auto positionStart = (uint32_t)floorf(rowIndexStart * loadScale);
-			auto positionEnd = (uint32_t)ceilf(rowIndexEnd * loadScale);
-			loadVisibleBookmarks(positionStart, positionEnd);
-		}
-
-		if (g_loadedRowIndex < numRows) {
-			loadBlockElements();
-		}
+        loadSamples();
 
 		if (g_bookmarksScrollPosition != g_loadedBookmarksScrollPosition) {
 			loadBookmarks();
 		}
 	}
+}
+
+void loadSamples() {
+    uint32_t rowIndexStart = dlog_view::getPosition(getRecording());
+    uint32_t rowIndexEnd = rowIndexStart + VIEW_WIDTH;
+    if (rowIndexStart > 0) {
+        rowIndexStart = rowIndexStart - 1;
+    }
+    auto loadScale = g_dlogFile.xAxisDiv / g_dlogFile.xAxisDivMin;
+
+    uint32_t numRows = rowIndexEnd - rowIndexStart;
+
+    if (rowIndexStart != g_rowIndexStart || rowIndexEnd != g_rowIndexEnd || loadScale != g_loadScale) {
+        uint32_t n = numRows * g_dlogFile.parameters.numYAxes;
+        for (unsigned i = 0; i < n; i++) {
+            g_blockElements[i].min = NAN;
+            g_blockElements[i].max = NAN;
+        }
+        g_rowIndexStart = rowIndexStart;
+        g_rowIndexEnd = rowIndexEnd;
+        g_loadScale = loadScale;
+        g_loadedRowIndex = 0;
+
+        auto positionStart = (uint32_t)floorf(rowIndexStart * loadScale);
+        auto positionEnd = (uint32_t)ceilf(rowIndexEnd * loadScale);
+        loadVisibleBookmarks(positionStart, positionEnd);
+    }
+
+    if (g_loadedRowIndex < numRows) {
+        loadBlockElements();
+    }
 }
 
 State getState() {
@@ -202,80 +211,105 @@ void stateManagment() {
 	}
 }
 
+#define IS_VALID_SAMPLE(recording, rowData) !recording.parameters.dataContainsSampleValidityBit || *rowData & 0x80
+
 bool isValidSample(Recording &recording, uint8_t *rowData) {
-	return !recording.parameters.dataContainsSampleValidityBit|| rowData[0] & 0x80;
+	return IS_VALID_SAMPLE(recording, rowData);
 }
 
+#define GET_SAMPLE(recording, rowData, columnIndex) \
+    float value; \
+	auto &yAxis = recording.parameters.yAxes[columnIndex]; \
+	auto dataType = yAxis.dataType; \
+	uint32_t columnDataIndex = recording.columnDataIndexes[columnIndex]; \
+	auto columnData = rowData + columnDataIndex; \
+	if (dataType == dlog_file::DATA_TYPE_BIT) { \
+		value = *columnData & recording.columnBitMask[columnIndex] ? 1.0f : 0.0f; \
+	} else if (dataType == dlog_file::DATA_TYPE_INT16_BE) { \
+		auto iValue = int16_t((columnData[0] << 8) | columnData[1]); \
+		value = float(yAxis.transformOffset + yAxis.transformScale * iValue); \
+	} else if (dataType == dlog_file::DATA_TYPE_INT24_BE) { \
+		auto iValue = ((int32_t)((columnData[0] << 24) | (columnData[1] << 16) | (columnData[2] << 8))) >> 8; \
+		value = float(yAxis.transformOffset + yAxis.transformScale * iValue); \
+	} else if (yAxis.dataType == dlog_file::DATA_TYPE_FLOAT) { \
+		uint8_t *p = (uint8_t *)&value; \
+		*p++ = *columnData++; \
+		*p++ = *columnData++; \
+		*p++ = *columnData++; \
+		*p = *columnData; \
+	} else { \
+		assert(false); \
+		value = NAN; \
+	} \
+
 float getSample(Recording &recording, uint8_t *rowData, unsigned columnIndex) {
-    float value;
-    auto &yAxis = recording.parameters.yAxes[columnIndex];
-    auto dataType = yAxis.dataType;
-    uint32_t columnDataIndex = recording.columnDataIndexes[columnIndex];
-    auto columnData = rowData + columnDataIndex;
-    if (dataType == dlog_file::DATA_TYPE_BIT) {
-        value = *columnData & recording.columnBitMask[columnIndex] ? 1.0f : 0.0f;
-    } else if (dataType == dlog_file::DATA_TYPE_INT16_BE) {
-        auto iValue = int16_t((columnData[0] << 8) | columnData[1]);
-        value = float(yAxis.transformOffset + yAxis.transformScale * iValue);
-    } else if (dataType == dlog_file::DATA_TYPE_INT24_BE) {
-        auto iValue = ((int32_t)((columnData[0] << 24) | (columnData[1] << 16) | (columnData[2] << 8))) >> 8;
-        value = float(yAxis.transformOffset + yAxis.transformScale * iValue);
-    } else if (yAxis.dataType == dlog_file::DATA_TYPE_FLOAT) {
-        uint8_t *p = (uint8_t *)&value;
-        *p++ = *columnData++;
-        *p++ = *columnData++;
-        *p++ = *columnData++;
-        *p = *columnData;
-    } else {
-        assert(false);
-        value = NAN;
-    }
-    return value;
+	GET_SAMPLE(recording, rowData, columnIndex);
+	return value;
+}
+
+static uint8_t *readMoreSamples(uint32_t rowIndex) {
+	if (!g_fileIsOpen) {
+		if (!g_file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
+			return nullptr;
+		}
+		g_fileIsOpen = true;
+	}
+
+    auto filePosition = g_dlogFile.dataOffset + rowIndex * g_dlogFile.numBytesPerRow;
+
+	if (!g_file.seek(filePosition)) {
+		return nullptr;
+	}
+	
+	auto numSamplesPerValue = (unsigned)round(g_loadScale);
+    auto remaining = g_file.size() - filePosition;
+    auto maxRequiredPerView = (g_rowIndexEnd - g_rowIndexStart) * numSamplesPerValue * g_dlogFile.numBytesPerRow;
+	uint32_t bytesToRead = MIN(MIN(ROW_DATA_BUFFER_SIZE, remaining), maxRequiredPerView);
+    bytesToRead = (bytesToRead / g_dlogFile.numBytesPerRow) * g_dlogFile.numBytesPerRow;
+
+	uint32_t bytesRead = g_file.read(g_rowDataStart, bytesToRead);
+	if (bytesRead != bytesToRead) {
+		return nullptr;
+	}
+
+	g_cacheRowIndexStart = rowIndex;
+	g_cacheRowIndexEnd = rowIndex + bytesRead / g_dlogFile.numBytesPerRow;
+
+	return g_rowDataStart;
 }
 
 static void loadBlockElements() {
-	File file;
-	if (!file.open(g_filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-		return;
-	}
-
-	auto numSamplesPerValue = (unsigned)round(g_loadScale);
+	auto numSamplesPerBlock = (unsigned)round(g_loadScale);
 
 	uint32_t startTime = millis();
 
-	auto filePosition = g_dlogFile.dataOffset + (uint32_t)round(g_rowIndexStart * g_loadScale) * g_dlogFile.numBytesPerRow;
-	uint8_t *rowDataStart = g_rowDataStart;
-	uint8_t *rowDataEnd = g_rowDataStart;
+	if (g_loadedRowIndex == 0) {
+		g_cacheRowIndexStart = 0;
+		g_cacheRowIndexEnd = 0;
+	}
 
 	uint32_t n = g_rowIndexEnd - g_rowIndexStart;
 	while (g_loadedRowIndex < n) {
 		BlockElement *blockElementStart = g_blockElements + g_loadedRowIndex * g_dlogFile.parameters.numYAxes;
 
-		for (unsigned sampleIndex = 0; sampleIndex < numSamplesPerValue; sampleIndex++) {
-			if (rowDataStart >= rowDataEnd) {
-				if (!file.seek(filePosition)) {
+		auto rowIndex = (uint32_t)round((g_rowIndexStart + g_loadedRowIndex) * g_loadScale);
+
+        uint8_t *rowData = g_rowDataStart + (rowIndex - g_cacheRowIndexStart) * g_dlogFile.numBytesPerRow;
+
+		for (unsigned blockSampleIndex = 0; blockSampleIndex < numSamplesPerBlock; blockSampleIndex++) {
+			if (rowIndex < g_cacheRowIndexStart || rowIndex >= g_cacheRowIndexEnd) {
+				rowData = readMoreSamples(rowIndex);
+				if (!rowData) {
 					goto Exit;
 				}
-
-				uint32_t bytesToRead = ((numSamplesPerValue - sampleIndex) + (n - (g_loadedRowIndex + 1)) * numSamplesPerValue) * g_dlogFile.numBytesPerRow;
-				if (bytesToRead > ROW_VALUES_BUFFER_SIZE) {
-					bytesToRead = ROW_VALUES_BUFFER_SIZE;
-				}
-
-				uint32_t bytesRead = file.read(g_rowDataStart, bytesToRead);
-				if (bytesRead != bytesToRead) {
-					goto Exit;
-				}
-				rowDataStart = g_rowDataStart;
-				rowDataEnd = rowDataStart + bytesToRead;
 			}
 
-            if (isValidSample(g_dlogFile, rowDataStart)) {
+            if (IS_VALID_SAMPLE(g_dlogFile, rowData)) {
 				BlockElement *blockElement = blockElementStart;
 				
 				for (uint32_t columnIndex = 0; columnIndex < g_dlogFile.parameters.numYAxes; columnIndex++, blockElement++) {
-                    float value = getSample(g_dlogFile, rowDataStart, columnIndex);
-                    if (sampleIndex == 0) {
+					GET_SAMPLE(g_dlogFile, rowData, columnIndex);
+                    if (blockSampleIndex == 0) {
                         blockElement->min = blockElement->max = value;
                     } else if (value < blockElement->min) {
                         blockElement->min = value;
@@ -285,25 +319,23 @@ static void loadBlockElements() {
                 }
             }
 
-			rowDataStart += g_dlogFile.numBytesPerRow;
-			filePosition += g_dlogFile.numBytesPerRow;
+			rowIndex++;
+            rowData += g_dlogFile.numBytesPerRow;
 		}
 
 		g_loadedRowIndex++;
 		g_refreshed = true;
 
 		if (millis() - startTime > 50) {
-		    break;
+			break;
 		}
-
-		auto nextFilePosition = g_dlogFile.dataOffset + (uint32_t)round((g_rowIndexStart + g_loadedRowIndex) * g_loadScale) * g_dlogFile.numBytesPerRow;
-		auto diff = nextFilePosition - filePosition;
-		rowDataStart += diff;
-		filePosition = nextFilePosition;
 	}
 
 Exit:
-	file.close();
+	if (g_fileIsOpen) {
+		g_file.close();
+		g_fileIsOpen = false;
+	}
 }
 
 static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
@@ -341,6 +373,7 @@ static void adjustXAxisOffset(Recording &recording) {
     if (recording.xAxisOffset < 0) {
         recording.xAxisOffset = 0;
     }
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_DLOG_LOAD_SAMPLES);
 }
 
 static Unit getXAxisUnit(Recording& recording) {

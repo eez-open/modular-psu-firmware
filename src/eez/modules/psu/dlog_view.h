@@ -157,6 +157,7 @@ bool openFile(const char *filePath, int *err = nullptr);
 
 extern State getState();
 
+void loadSamples();
 bool isValidSample(Recording &recording, uint8_t *rowData);
 float getSample(Recording &recording, uint8_t *rowData, unsigned columnIndex);
 

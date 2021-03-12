@@ -40,8 +40,6 @@
 
 #include <eez/memory.h>
 
-volatile extern uint32_t g_debugVarBufferDiff;
-
 namespace eez {
 
 using namespace scpi;
@@ -143,7 +141,6 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
 // #endif
     int32_t timeDiff = millis() - g_lastSavedBufferTickCount;
     uint32_t indexDiff = g_writer.getBufferIndex() - g_lastSavedBufferIndex;
-    g_debugVarBufferDiff = indexDiff;
     if (indexDiff > 0 && (flush || timeDiff >= CONF_DLOG_SYNC_FILE_TIME_MS || indexDiff >= CHUNK_SIZE)) {
         bufferSize = MIN(indexDiff, CHUNK_SIZE);
         buffer = g_saveBuffer;

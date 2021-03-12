@@ -51,8 +51,6 @@
 #include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/sd_card.h>
 
-volatile uint32_t g_debugVarBufferDiff;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 #if !defined(__EMSCRIPTEN__)
