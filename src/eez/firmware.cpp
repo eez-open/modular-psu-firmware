@@ -76,6 +76,8 @@ int g_mcuRevision;
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" void SystemClock_Config_R2B4();
 extern "C" void MX_GPIO_Init_R2B4();
+extern "C" void MX_TIM12_Init();
+extern "C" void MX_TIM4_Init();
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -147,7 +149,23 @@ void boot() {
     } else {
 #ifdef __EMSCRIPTEN__
         g_mcuRevision = MCU_REVISION_R3B3;
-#else        
+#else
+        GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+        HAL_GPIO_WritePin(LCD_BRIGHTNESS_GPIO_Port, LCD_BRIGHTNESS_Pin, GPIO_PIN_SET);
+        GPIO_InitStruct.Pin = LCD_BRIGHTNESS_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+        HAL_GPIO_Init(LCD_BRIGHTNESS_GPIO_Port, &GPIO_InitStruct);
+
+        HAL_GPIO_WritePin(R2B4_LCD_BRIGHTNESS_GPIO_Port, R2B4_LCD_BRIGHTNESS_Pin, GPIO_PIN_SET);
+        GPIO_InitStruct.Pin = R2B4_LCD_BRIGHTNESS_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+        HAL_GPIO_Init(R2B4_LCD_BRIGHTNESS_GPIO_Port, &GPIO_InitStruct);
+
         g_mcuRevision = psu::gui::askMcuRevision();
 #endif
     }
@@ -156,7 +174,12 @@ void boot() {
     if (g_mcuRevision < MCU_REVISION_R3B3) {
         SystemClock_Config_R2B4();
         MX_GPIO_Init_R2B4();
+        MX_TIM12_Init();
+    } else {
+        MX_TIM4_Init();
     }
+    mcu::display::turnOff();
+    mcu::display::turnOn();
 #endif
 
     psu::sd_card::init();

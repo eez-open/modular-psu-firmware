@@ -49,9 +49,9 @@ static void doWatchdogRefresh() {
 #else
 		if (g_mcuRevision != MCU_REVISION_R2B4 && g_supervisorWatchdogEnabled) {
 #endif
-			HAL_GPIO_WritePin(SPI5_CSC_GPIO_Port, SPI5_CSC_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(WDG_GPIO_Port, WDG_Pin, GPIO_PIN_SET);
 			eez::delayMicroseconds(1);
-			HAL_GPIO_WritePin(SPI5_CSC_GPIO_Port, SPI5_CSC_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(WDG_GPIO_Port, WDG_Pin, GPIO_PIN_RESET);
 		}
 
 		g_watchdogLastTime = currentTime;
