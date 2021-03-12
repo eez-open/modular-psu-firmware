@@ -60,22 +60,20 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define SPI4_CSB_Pin GPIO_PIN_3
 #define SPI4_CSB_GPIO_Port GPIOE
-#define SPI4_CSA_Pin GPIO_PIN_4
-#define SPI4_CSA_GPIO_Port GPIOE
-#define SPI5_CSC_Pin GPIO_PIN_8
-#define SPI5_CSC_GPIO_Port GPIOI
+#define SPI4_NSS_Pin GPIO_PIN_4
+#define SPI4_NSS_GPIO_Port GPIOE
+#define WDG_Pin GPIO_PIN_8
+#define WDG_GPIO_Port GPIOI
 #define DIN2_Pin GPIO_PIN_13
 #define DIN2_GPIO_Port GPIOC
-#define SPI5_CSA_Pin GPIO_PIN_6
-#define SPI5_CSA_GPIO_Port GPIOF
+#define SPI5_NSS_Pin GPIO_PIN_6
+#define SPI5_NSS_GPIO_Port GPIOF
 #define NFAULT_Pin GPIO_PIN_2
 #define NFAULT_GPIO_Port GPIOB
-#define TFT_BRIGHTNESS_Pin GPIO_PIN_15
-#define TFT_BRIGHTNESS_GPIO_Port GPIOB
 #define SPI2_CSB_Pin GPIO_PIN_11
 #define SPI2_CSB_GPIO_Port GPIOD
-#define PWR_DIRECT_Pin GPIO_PIN_12
-#define PWR_DIRECT_GPIO_Port GPIOD
+#define LCD_BRIGHTNESS_Pin GPIO_PIN_12
+#define LCD_BRIGHTNESS_GPIO_Port GPIOD
 #define OE_SYNC_Pin GPIO_PIN_13
 #define OE_SYNC_GPIO_Port GPIOD
 #define PWR_SSTART_Pin GPIO_PIN_3
@@ -104,18 +102,18 @@ void Error_Handler(void);
 #define USB_OTG_FS_OC_GPIO_Port GPIOD
 #define USB_OTG_FS_PSO_Pin GPIO_PIN_5
 #define USB_OTG_FS_PSO_GPIO_Port GPIOD
-#define SD_DETECT_Pin GPIO_PIN_6
-#define SD_DETECT_GPIO_Port GPIOD
+#define PWR_DIRECT_Pin GPIO_PIN_6
+#define PWR_DIRECT_GPIO_Port GPIOD
 #define IRQ_TOUCH_Pin GPIO_PIN_7
 #define IRQ_TOUCH_GPIO_Port GPIOD
 #define USER_SW_Pin GPIO_PIN_9
 #define USER_SW_GPIO_Port GPIOG
 #define SPI5_CSB_Pin GPIO_PIN_13
 #define SPI5_CSB_GPIO_Port GPIOG
-#define SPI4_CSC_Pin GPIO_PIN_14
-#define SPI4_CSC_GPIO_Port GPIOG
-#define SPI2_CSA_Pin GPIO_PIN_4
-#define SPI2_CSA_GPIO_Port GPIOB
+#define SD_DETECT_Pin GPIO_PIN_14
+#define SD_DETECT_GPIO_Port GPIOG
+#define SPI2_NSS_Pin GPIO_PIN_4
+#define SPI2_NSS_GPIO_Port GPIOB
 #define DOUT2_Pin GPIO_PIN_5
 #define DOUT2_GPIO_Port GPIOB
 #define SPI4_IRQ_Pin GPIO_PIN_9
@@ -123,24 +121,25 @@ void Error_Handler(void);
 #define SPI4_IRQ_EXTI_IRQn EXTI9_5_IRQn
 #define ENC_SW_Pin GPIO_PIN_4
 #define ENC_SW_GPIO_Port GPIOI
-
 /* USER CODE BEGIN Private defines */
-#define R2B4_SPI4_CSA_Pin GPIO_PIN_3
-#define R2B4_SPI4_CSA_GPIO_Port GPIOE
+#define R2B4_SPI4_NSS_Pin GPIO_PIN_3
+#define R2B4_SPI4_NSS_GPIO_Port GPIOE
 #define R2B4_SPI4_CSB_Pin GPIO_PIN_4
 #define R2B4_SPI4_CSB_GPIO_Port GPIOE
 #define R2B4_UART_RX_DIN1_Pin GPIO_PIN_6
 #define R2B4_UART_RX_DIN1_GPIO_Port GPIOF
-#define R2B4_SPI2_CSA_Pin GPIO_PIN_12
-#define R2B4_SPI2_CSA_GPIO_Port GPIOD
+#define R2B4_SPI2_NSS_Pin GPIO_PIN_12
+#define R2B4_SPI2_NSS_GPIO_Port GPIOD
 #define R2B4_PWR_DIRECT_Pin GPIO_PIN_2
 #define R2B4_PWR_DIRECT_GPIO_Port GPIOG
 #define R2B4_SD_DETECT_Pin GPIO_PIN_11
 #define R2B4_SD_DETECT_GPIO_Port GPIOC
-#define R2B4_SPI5_CSA_Pin GPIO_PIN_14
-#define R2B4_SPI5_CSA_GPIO_Port GPIOG
+#define R2B4_SPI5_NSS_Pin GPIO_PIN_14
+#define R2B4_SPI5_NSS_GPIO_Port GPIOG
 #define R2B4_UART_TX_DOUT1_Pin GPIO_PIN_4
 #define R2B4_UART_TX_DOUT1_GPIO_Port GPIOB
+#define R2B4_LCD_BRIGHTNESS_Pin GPIO_PIN_15
+#define R2B4_LCD_BRIGHTNESS_GPIO_Port GPIOB
 
 #define MCU_REV_GPIO(X) (g_mcuRevision >= MCU_REVISION_R3B3 ? X : R2B4_##X)
 /* USER CODE END Private defines */

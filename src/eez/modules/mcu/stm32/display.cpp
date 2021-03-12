@@ -378,6 +378,17 @@ static void setAddress(void *buffer) {
 	hltdc.Instance->SRCR = LTDC_SRCR_IMR;
 }
 
+TIM_HandleTypeDef *getTimer() {
+    if (!g_mcuRevision) {
+        return nullptr;
+    }
+    return g_mcuRevision >= MCU_REVISION_R3B3 ? &htim4 : &htim12;
+}
+
+uint32_t getTimerChannel() {
+    return g_mcuRevision >= MCU_REVISION_R3B3 ? TIM_CHANNEL_1 : TIM_CHANNEL_2;
+}
+
 void turnOn() {
     if (g_displayState != ON && g_displayState != TURNING_ON) {
         __HAL_RCC_DMA2D_CLK_ENABLE();
@@ -401,8 +412,10 @@ void turnOn() {
         setAddress(g_buffer);
 
         // backlight on, minimal brightness
-        HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
-        __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, 0);
+        if (getTimer()) {
+            HAL_TIM_PWM_Start(getTimer(), getTimerChannel());
+            __HAL_TIM_SET_COMPARE(getTimer(), getTimerChannel(), 0);
+        }
 
         g_displayState = TURNING_ON;
         g_displayStateTransitionStartTime = millis();
@@ -422,8 +435,10 @@ bool isOn() {
 
 void updateBrightness() {
 	if (g_displayState == ON) {
-		uint32_t max = __HAL_TIM_GET_AUTORELOAD(&htim12);
-		__HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, psu::persist_conf::devConf.displayBrightness * max / 20);
+        if (getTimer()) {
+		    uint32_t max = __HAL_TIM_GET_AUTORELOAD(getTimer());
+		    __HAL_TIM_SET_COMPARE(getTimer(), getTimerChannel(), psu::persist_conf::devConf.displayBrightness * max / 20);
+        }
 	}
 }
 
@@ -476,27 +491,38 @@ void sync() {
         if (diff >= CONF_TURN_ON_OFF_ANIMATION_DURATION) {
             __HAL_RCC_DMA2D_CLK_DISABLE();
 
-            // backlight off
-            HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_2);
+            if (getTimer()) {
+                // backlight off
+                HAL_TIM_PWM_Stop(getTimer(), getTimerChannel());
+            }
 
             g_displayState = OFF;
         } else {
-            uint32_t max = __HAL_TIM_GET_AUTORELOAD(&htim12);
-            max = psu::persist_conf::devConf.displayBrightness * max / 20;
-            __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, (uint32_t)remap(1.0f * (CONF_TURN_ON_OFF_ANIMATION_DURATION - diff) / CONF_TURN_ON_OFF_ANIMATION_DURATION, 0.0f, 0.0f, 1.0f, 1.0f * max));
+            if (getTimer()) {            
+                uint32_t max = __HAL_TIM_GET_AUTORELOAD(getTimer());
+                max = psu::persist_conf::devConf.displayBrightness * max / 20;
+                __HAL_TIM_SET_COMPARE(getTimer(), getTimerChannel(), (uint32_t)remap(1.0f * (CONF_TURN_ON_OFF_ANIMATION_DURATION - diff) / CONF_TURN_ON_OFF_ANIMATION_DURATION, 0.0f, 0.0f, 1.0f, 1.0f * max));
+            }
         }
         return;
     }
 
     if (g_displayState == TURNING_ON) {
-        uint32_t max = __HAL_TIM_GET_AUTORELOAD(&htim12);
+        uint32_t max = 0;
+        if (getTimer()) {
+            max = __HAL_TIM_GET_AUTORELOAD(getTimer());
+        }
         max = psu::persist_conf::devConf.displayBrightness * max / 20;
         int32_t diff = millis() - g_displayStateTransitionStartTime;
         if (diff >= CONF_TURN_ON_OFF_ANIMATION_DURATION) {
             g_displayState = ON;
-            __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, max);
+            if (getTimer()) {
+                __HAL_TIM_SET_COMPARE(getTimer(), getTimerChannel(), max);
+            }
         } else {
-            __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, (uint32_t)remapQuad(1.0f * diff / CONF_TURN_ON_OFF_ANIMATION_DURATION, 0.0f, 0.0f, 1.0f, 1.0f * max));
+            if (getTimer()) {
+                __HAL_TIM_SET_COMPARE(getTimer(), getTimerChannel(), (uint32_t)remapQuad(1.0f * diff / CONF_TURN_ON_OFF_ANIMATION_DURATION, 0.0f, 0.0f, 1.0f, 1.0f * max));
+            }
         }
     }
 

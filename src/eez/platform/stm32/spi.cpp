@@ -33,14 +33,14 @@ namespace spi {
 
 SPI_HandleTypeDef *handle[] = { &hspi2, &hspi4, &hspi5 };
 
-static GPIO_TypeDef *SPI_CSA_GPIO_Port[] = { SPI2_CSA_GPIO_Port, SPI4_CSA_GPIO_Port, SPI5_CSA_GPIO_Port };
+static GPIO_TypeDef *SPI_CSA_GPIO_Port[] = { SPI2_NSS_GPIO_Port, SPI4_NSS_GPIO_Port, SPI5_NSS_GPIO_Port };
 static GPIO_TypeDef *SPI_CSB_GPIO_Port[] = { SPI2_CSB_GPIO_Port, SPI4_CSB_GPIO_Port, SPI5_CSB_GPIO_Port };
-static const uint16_t SPI_CSA_Pin[] = { SPI2_CSA_Pin, SPI4_CSA_Pin, SPI5_CSA_Pin };
+static const uint16_t SPI_CSA_Pin[] = { SPI2_NSS_Pin, SPI4_NSS_Pin, SPI5_NSS_Pin };
 static const uint16_t SPI_CSB_Pin[] = { SPI2_CSB_Pin, SPI4_CSB_Pin, SPI5_CSB_Pin };
 
-static GPIO_TypeDef *R2B4_SPI_CSA_GPIO_Port[] = { R2B4_SPI2_CSA_GPIO_Port, R2B4_SPI4_CSA_GPIO_Port, R2B4_SPI5_CSA_GPIO_Port };
+static GPIO_TypeDef *R2B4_SPI_CSA_GPIO_Port[] = { R2B4_SPI2_NSS_GPIO_Port, R2B4_SPI4_NSS_GPIO_Port, R2B4_SPI5_NSS_GPIO_Port };
 static GPIO_TypeDef *R2B4_SPI_CSB_GPIO_Port[] = { SPI2_CSB_GPIO_Port, R2B4_SPI4_CSB_GPIO_Port, SPI5_CSB_GPIO_Port };
-static const uint16_t R2B4_SPI_CSA_Pin[] = { R2B4_SPI2_CSA_Pin, R2B4_SPI4_CSA_Pin, R2B4_SPI5_CSA_Pin };
+static const uint16_t R2B4_SPI_CSA_Pin[] = { R2B4_SPI2_NSS_Pin, R2B4_SPI4_NSS_Pin, R2B4_SPI5_NSS_Pin };
 static const uint16_t R2B4_SPI_CSB_Pin[] = { SPI2_CSB_Pin, R2B4_SPI4_CSB_Pin, SPI5_CSB_Pin };
 
 static int g_chip[] = { -1, -1, -1 };

@@ -45,7 +45,9 @@
 
 #if EEZ_BP3C_REVISION_R3B1
 // https://www.ti.com/lit/ds/symlink/tca9534.pdf
-#define IOEXP_ADDRESS 0x40 // 0 1 0 0 A2 A1 A0 R/W'
+#define IOEXP_ADDRESS1 0x70
+#define IOEXP_ADDRESS2 0x40 // 0 1 0 0 A2 A1 A0 R/W'
+static uint16_t IOEXP_ADDRESS = IOEXP_ADDRESS1;
 #endif
 
 #define REG_INPUT_PORT         0x00
@@ -93,10 +95,7 @@ HAL_StatusTypeDef read(uint8_t reg, uint8_t *pValue) {
 }
 #endif
 
-void init() {
-#if defined(EEZ_PLATFORM_STM32)
-	g_testResult = TEST_FAILED;
-
+bool doTest() {
 #if EEZ_BP3C_REVISION_R1B1
 	// all 4 pins are output (bit 0, 1, 2 and 3 should be set to 0)
 	uint8_t configValue = 0b11110000;
@@ -114,7 +113,22 @@ void init() {
 			// all good
 			g_testResult = TEST_OK;
 			hardResetModules();
+			return true;
 		}
+	}
+
+	return false;
+}
+
+void init() {
+#if defined(EEZ_PLATFORM_STM32)
+	g_testResult = TEST_FAILED;
+
+	if (!doTest()) {
+#if EEZ_BP3C_REVISION_R3B1
+		IOEXP_ADDRESS = IOEXP_ADDRESS2;
+		doTest();
+#endif
 	}
 
 	if (g_testResult == TEST_FAILED) {
