@@ -2,6 +2,7 @@
   "settings": {
     "general": {
       "projectVersion": "v2",
+      "projectType": "master",
       "scpiDocFolder": "docs\\SCPI reference guide\\Commands",
       "imports": [
         {
@@ -2499,7 +2500,7 @@
     {
       "name": "dlog_y_values",
       "type": "list",
-      "defaultValue": "[\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #1 U\", \"dlog_bookmark_y_value_is_checked\": 1 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #1 I\", \"dlog_bookmark_y_value_is_checked\": 1 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #2 U\", \"dlog_bookmark_y_value_is_checked\": 0 },\n  { \"dlog_bookmark_y_value_label\": \"DCP405 #2 I\", \"dlog_bookmark_y_value_is_checked\": 0 },\n  { \"dlog_bookmark_y_value_label\": \"DCP224 #3 U\", \"dlog_bookmark_y_value_is_checked\": 1 }\n]"
+      "defaultValue": "[\n  { \"dlog_y_value_label\": \"DCP405 #1 U\", \"dlog_y_value_is_checked\": 1 },\n  { \"dlog_y_value_label\": \"DCP405 #1 I\", \"dlog_y_value_is_checked\": 1 },\n  { \"dlog_y_value_label\": \"DCP405 #2 U\", \"dlog_y_value_is_checked\": 0 },\n  { \"dlog_y_value_label\": \"DCP405 #2 I\", \"dlog_y_value_is_checked\": 0 },\n  { \"dlog_y_value_label\": \"DCP224 #3 U\", \"dlog_y_value_is_checked\": 1 }\n]"
     },
     {
       "name": "dlog_y_value_label",
@@ -3448,7 +3449,8 @@
         "top": 0,
         "width": 480,
         "height": 272,
-        "dataContextOverrides": "{\n    \"slots\": [\n        {\n            \"slot_index\": \"Slot #1:\",\n            \"slot_info_with_fw_ver\": \"DCP405 R3B3\"\n        },\n        {\n            \"slot_index\": \"Slot #2:\",\n            \"slot_info_with_fw_ver\": \"SMX46 R1B2 v0.7\"\n        },\n        {\n            \"slot_index\": \"Slot #3:\",\n            \"slot_info_with_fw_ver\": \"MIO168 R1B2 ---\"\n        }\n    ]\n}"
+        "dataContextOverrides": "{\n    \"slots\": [\n        {\n            \"slot_index\": \"Slot #1:\",\n            \"slot_info_with_fw_ver\": \"DCP405 R3B3\"\n        },\n        {\n            \"slot_index\": \"Slot #2:\",\n            \"slot_info_with_fw_ver\": \"SMX46 R1B2 v0.7\"\n        },\n        {\n            \"slot_index\": \"Slot #3:\",\n            \"slot_info_with_fw_ver\": \"MIO168 R1B2 ---\"\n        }\n    ]\n}",
+        "connectionLines": []
       },
       {
         "name": "welcome",
@@ -3895,7 +3897,8 @@
         "top": 0,
         "width": 480,
         "height": 272,
-        "dataContextOverrides": "{\n    \"slots\": [\n        {\n            \"slot_index\": \"Slot #1:\",\n            \"slot_info_with_fw_ver\": \"DCP405 R3B3\"\n        },\n        {\n            \"slot_index\": \"Slot #2:\",\n            \"slot_info_with_fw_ver\": \"SMX46 R1B2 v0.7\"\n        },\n        {\n            \"slot_index\": \"Slot #3:\",\n            \"slot_info_with_fw_ver\": \"MIO168 R1B2 ---\"\n        }\n    ]\n}"
+        "dataContextOverrides": "{\n    \"slots\": [\n        {\n            \"slot_index\": \"Slot #1:\",\n            \"slot_info_with_fw_ver\": \"DCP405 R3B3\"\n        },\n        {\n            \"slot_index\": \"Slot #2:\",\n            \"slot_info_with_fw_ver\": \"SMX46 R1B2 v0.7\"\n        },\n        {\n            \"slot_index\": \"Slot #3:\",\n            \"slot_info_with_fw_ver\": \"MIO168 R1B2 ---\"\n        }\n    ]\n}",
+        "connectionLines": []
       },
       {
         "name": "welcome_800x480",
@@ -4328,7 +4331,8 @@
         "top": 0,
         "width": 800,
         "height": 480,
-        "dataContextOverrides": "{\n    \"slots\": [\n        {\n            \"slot_index\": \"Slot #1:\",\n            \"slot_info_with_fw_ver\": \"DCP405 R3B3\"\n        },\n        {\n            \"slot_index\": \"Slot #2:\",\n            \"slot_info_with_fw_ver\": \"SMX46 R1B2 v0.7\"\n        },\n        {\n            \"slot_index\": \"Slot #3:\",\n            \"slot_info_with_fw_ver\": \"MIO168 R1B2 ---\"\n        }\n    ]\n}"
+        "dataContextOverrides": "{\n    \"slots\": [\n        {\n            \"slot_index\": \"Slot #1:\",\n            \"slot_info_with_fw_ver\": \"DCP405 R3B3\"\n        },\n        {\n            \"slot_index\": \"Slot #2:\",\n            \"slot_info_with_fw_ver\": \"SMX46 R1B2 v0.7\"\n        },\n        {\n            \"slot_index\": \"Slot #3:\",\n            \"slot_info_with_fw_ver\": \"MIO168 R1B2 ---\"\n        }\n    ]\n}",
+        "connectionLines": []
       },
       {
         "name": "touch_calibration_intro",
@@ -4394,7 +4398,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "touch_calibration",
@@ -4522,7 +4527,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "touch_calibration_yes_no",
@@ -4569,7 +4575,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "touch_calibration_yes_no_cancel",
@@ -4628,7 +4635,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "main",
@@ -6055,7 +6063,8 @@
         "top": 0,
         "width": 480,
         "height": 272,
-        "dataContextOverrides": "{\n    \"channels_is_max_view\": 0\n}"
+        "dataContextOverrides": "{\n    \"channels_is_max_view\": 0\n}",
+        "connectionLines": []
       },
       {
         "name": "edit_mode_keypad",
@@ -6428,7 +6437,8 @@
         "left": 80,
         "top": 16,
         "width": 324,
-        "height": 240
+        "height": 240,
+        "connectionLines": []
       },
       {
         "name": "edit_mode_step",
@@ -6790,7 +6800,8 @@
         "left": 80,
         "top": 16,
         "width": 324,
-        "height": 240
+        "height": 240,
+        "connectionLines": []
       },
       {
         "name": "edit_mode_step_help",
@@ -6879,7 +6890,8 @@
         "left": 80,
         "top": 16,
         "width": 324,
-        "height": 240
+        "height": 240,
+        "connectionLines": []
       },
       {
         "name": "edit_mode_slider",
@@ -7298,7 +7310,8 @@
         "left": 80,
         "top": 16,
         "width": 324,
-        "height": 240
+        "height": 240,
+        "connectionLines": []
       },
       {
         "name": "edit_mode_slider_help",
@@ -7387,7 +7400,8 @@
         "left": 80,
         "top": 16,
         "width": 324,
-        "height": 240
+        "height": 240,
+        "connectionLines": []
       },
       {
         "name": "yes_no",
@@ -7440,7 +7454,8 @@
         "left": 80,
         "top": 92,
         "width": 320,
-        "height": 88
+        "height": 88,
+        "connectionLines": []
       },
       {
         "name": "yes_no_L",
@@ -7498,7 +7513,8 @@
         "top": 92,
         "width": 360,
         "height": 88,
-        "dataContextOverrides": "{\n    \"alert_message\": \"Trigger is active. Re-initiate trigger?\"\n}"
+        "dataContextOverrides": "{\n    \"alert_message\": \"Trigger is active. Re-initiate trigger?\"\n}",
+        "connectionLines": []
       },
       {
         "name": "are_you_sure_with_message",
@@ -7557,7 +7573,8 @@
         "left": 80,
         "top": 80,
         "width": 320,
-        "height": 112
+        "height": 112,
+        "connectionLines": []
       },
       {
         "name": "yes_no_later",
@@ -7616,7 +7633,8 @@
         "left": 60,
         "top": 92,
         "width": 360,
-        "height": 88
+        "height": 88,
+        "connectionLines": []
       },
       {
         "name": "yes_no_flash_slave",
@@ -7677,7 +7695,8 @@
         "left": 65,
         "top": 78,
         "width": 350,
-        "height": 116
+        "height": 116,
+        "connectionLines": []
       },
       {
         "name": "info_restart",
@@ -7738,7 +7757,8 @@
         "left": 50,
         "top": 92,
         "width": 380,
-        "height": 88
+        "height": 88,
+        "connectionLines": []
       },
       {
         "name": "text_message",
@@ -7761,7 +7781,8 @@
         "left": 75,
         "top": 92,
         "width": 330,
-        "height": 88
+        "height": 88,
+        "connectionLines": []
       },
       {
         "name": "async_operation_in_progress",
@@ -7843,7 +7864,8 @@
         "left": 100,
         "top": 92,
         "width": 280,
-        "height": 88
+        "height": 88,
+        "connectionLines": []
       },
       {
         "name": "progress",
@@ -7892,7 +7914,8 @@
         "left": 120,
         "top": 74,
         "width": 240,
-        "height": 124
+        "height": 124,
+        "connectionLines": []
       },
       {
         "name": "progress_without_abort",
@@ -7927,7 +7950,8 @@
         "left": 120,
         "top": 94,
         "width": 240,
-        "height": 84
+        "height": 84,
+        "connectionLines": []
       },
       {
         "name": "event_queue",
@@ -8493,7 +8517,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "keypad",
@@ -9934,7 +9959,8 @@
         "left": 30,
         "top": 11,
         "width": 420,
-        "height": 250
+        "height": 250,
+        "connectionLines": []
       },
       {
         "name": "numeric_keypad",
@@ -10259,7 +10285,8 @@
         "left": 120,
         "top": 16,
         "width": 240,
-        "height": 240
+        "height": 240,
+        "connectionLines": []
       },
       {
         "name": "slot_settings",
@@ -10464,7 +10491,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings",
@@ -11409,7 +11437,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_prot_ovp",
@@ -12431,7 +12460,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_prot_ocp",
@@ -13101,7 +13131,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_prot_opp",
@@ -13748,7 +13779,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_prot_otp",
@@ -14406,7 +14438,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_trigger",
@@ -14938,7 +14971,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_lists",
@@ -15532,7 +15566,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_lists_insert_menu",
@@ -15576,7 +15611,8 @@
         "left": 130,
         "top": 148,
         "width": 220,
-        "height": 92
+        "height": 92,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_lists_file_menu",
@@ -15620,7 +15656,8 @@
         "left": 268,
         "top": 148,
         "width": 108,
-        "height": 92
+        "height": 92,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_lists_delete_menu",
@@ -15703,7 +15740,8 @@
         "left": 119,
         "top": 88,
         "width": 324,
-        "height": 152
+        "height": 152,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_calibration",
@@ -16135,7 +16173,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_calibration_edit",
@@ -16994,7 +17033,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_calibration_view",
@@ -17364,7 +17404,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_adv_options",
@@ -17921,7 +17962,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_adv_ranges",
@@ -18226,7 +18268,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "ch_settings_adv_view",
@@ -18686,7 +18729,8 @@
         "top": 0,
         "width": 480,
         "height": 272,
-        "dataContextOverrides": "{\n    \"channel_display_view_settings_display_values\": [\n        {\n        },\n        {\n            \"channel_display_view_settings_display_value_label\": \"Display value #2:\",\n            \"channel_display_view_settings_display_value\": \"Current (A)\",\n            \"channel_display_view_settings_range\": \"2 A\"\n        }\n    ]\n}"
+        "dataContextOverrides": "{\n    \"channel_display_view_settings_display_values\": [\n        {\n        },\n        {\n            \"channel_display_view_settings_display_value_label\": \"Display value #2:\",\n            \"channel_display_view_settings_display_value\": \"Current (A)\",\n            \"channel_display_view_settings_range\": \"2 A\"\n        }\n    ]\n}",
+        "connectionLines": []
       },
       {
         "name": "ch_settings_info",
@@ -19271,7 +19315,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings",
@@ -19657,7 +19702,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_temperature",
@@ -20294,7 +20340,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_protections",
@@ -20658,7 +20705,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_trigger",
@@ -20916,7 +20964,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_io",
@@ -21419,7 +21468,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_date_time",
@@ -22365,7 +22415,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_encoder",
@@ -22698,7 +22749,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_usb",
@@ -23170,7 +23222,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_ethernet",
@@ -23811,7 +23864,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_mqtt",
@@ -24494,7 +24548,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_ethernet_static",
@@ -24754,7 +24809,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_screen_calibration",
@@ -24833,7 +24889,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_display",
@@ -25218,7 +25275,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_display_test",
@@ -25289,7 +25347,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_sound",
@@ -25459,7 +25518,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_tracking",
@@ -26001,7 +26061,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_coupling",
@@ -26848,7 +26909,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_ramp_and_delay",
@@ -27725,7 +27787,8 @@
         "top": 0,
         "width": 480,
         "height": 272,
-        "dataContextOverrides": "{\n    \"ramp_and_delay_list\": [\n        {\n            \"channel_short_title_without_tracking_icon\": \"#1\",\n            \"channel_u_trigger_value\": \"10 V\",\n            \"channel_voltage_ramp\": \"100 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"0 s\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#2\",\n            \"channel_u_trigger_value\": \"12 V\",\n            \"channel_voltage_ramp\": \"200 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"50 ms\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#3\",\n            \"channel_u_trigger_value\": \"15 V\",\n            \"channel_voltage_ramp\": \"300 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"100 ms\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#4\",\n            \"channel_u_trigger_value\": \"18 V\",\n            \"channel_voltage_ramp\": \"2 s\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"1 s\"\n        }\n    ]\n}"
+        "dataContextOverrides": "{\n    \"ramp_and_delay_list\": [\n        {\n            \"channel_short_title_without_tracking_icon\": \"#1\",\n            \"channel_u_trigger_value\": \"10 V\",\n            \"channel_voltage_ramp\": \"100 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"0 s\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#2\",\n            \"channel_u_trigger_value\": \"12 V\",\n            \"channel_voltage_ramp\": \"200 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"50 ms\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#3\",\n            \"channel_u_trigger_value\": \"15 V\",\n            \"channel_voltage_ramp\": \"300 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"100 ms\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#4\",\n            \"channel_u_trigger_value\": \"18 V\",\n            \"channel_voltage_ramp\": \"2 s\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"1 s\"\n        }\n    ]\n}",
+        "connectionLines": []
       },
       {
         "name": "sys_info",
@@ -28469,7 +28532,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "sys_settings_labels_and_colors",
@@ -28642,7 +28706,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "user_profiles",
@@ -28848,7 +28913,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "user_profile_settings",
@@ -29183,7 +29249,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "user_profile_0_settings",
@@ -29350,7 +29417,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "profile_basic_info",
@@ -29471,7 +29539,8 @@
         "top": 0,
         "width": 376,
         "height": 132,
-        "dataContextOverrides": "{\n    \"channels\": [\n        {\n            \"channel_short_label\": \"Ch1:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"INH\",\n            \"profile_channel_u_set\": \"33.33V\",\n            \"profile_channel_i_set\": \"3.1234A\"\n        },\n        {\n            \"channel_short_label\": \"Ch2:\",\n            \"profile_channel_output_state\": 1\n        },\n        {\n            \"channel_short_label\": \"Ch3:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        },\n        {\n            \"channel_short_label\": \"Ch4:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        },\n        {\n            \"channel_short_label\": \"Ch5:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        },\n        {\n            \"channel_short_label\": \"Ch6:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        }\n    ]\n}"
+        "dataContextOverrides": "{\n    \"channels\": [\n        {\n            \"channel_short_label\": \"Ch1:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"INH\",\n            \"profile_channel_u_set\": \"33.33V\",\n            \"profile_channel_i_set\": \"3.1234A\"\n        },\n        {\n            \"channel_short_label\": \"Ch2:\",\n            \"profile_channel_output_state\": 1\n        },\n        {\n            \"channel_short_label\": \"Ch3:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        },\n        {\n            \"channel_short_label\": \"Ch4:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        },\n        {\n            \"channel_short_label\": \"Ch5:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        },\n        {\n            \"channel_short_label\": \"Ch6:\",\n            \"profile_channel_output_state\": 0,\n            \"channel_off_label\": \"OFF\"\n        }\n    ]\n}",
+        "connectionLines": []
       },
       {
         "name": "stand_by_menu",
@@ -29703,7 +29772,8 @@
         "left": 70,
         "top": 35,
         "width": 340,
-        "height": 202
+        "height": 202,
+        "connectionLines": []
       },
       {
         "name": "entering_standby",
@@ -29736,7 +29806,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "standby",
@@ -29769,7 +29840,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "saving",
@@ -29791,7 +29863,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "shutdown",
@@ -29813,7 +29886,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "display_off",
@@ -29846,7 +29920,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "minimized_channels",
@@ -29895,7 +29970,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 72
+        "height": 72,
+        "connectionLines": []
       },
       {
         "name": "slot_def_vert",
@@ -30007,7 +30083,8 @@
         "top": 0,
         "width": 480,
         "height": 240,
-        "dataContextOverrides": ""
+        "dataContextOverrides": "",
+        "connectionLines": []
       },
       {
         "name": "slot_def_vert_view_with_border",
@@ -30112,7 +30189,8 @@
         "left": 0,
         "top": 0,
         "width": 158,
-        "height": 238
+        "height": 238,
+        "connectionLines": []
       },
       {
         "name": "slot_def_vert_view_with_border_2col",
@@ -30218,7 +30296,8 @@
         "top": 0,
         "width": 238,
         "height": 238,
-        "dataContextOverrides": "{\n    \"slot_default_view\": \"dib_dcp405::slot_def_1ch_num_on_2col\"\n}"
+        "dataContextOverrides": "{\n    \"slot_default_view\": \"dib_dcp405::slot_def_1ch_num_on_2col\"\n}",
+        "connectionLines": []
       },
       {
         "name": "slot_def_vert_title",
@@ -30296,7 +30375,8 @@
         "left": 0,
         "top": 0,
         "width": 154,
-        "height": 32
+        "height": 32,
+        "connectionLines": []
       },
       {
         "name": "slot_def_vert_title_2col",
@@ -30374,7 +30454,8 @@
         "left": 0,
         "top": 0,
         "width": 234,
-        "height": 32
+        "height": 32,
+        "connectionLines": []
       },
       {
         "name": "slot_def_vert_error",
@@ -30488,7 +30569,8 @@
         "left": 0,
         "top": 0,
         "width": 154,
-        "height": 236
+        "height": 236,
+        "connectionLines": []
       },
       {
         "name": "slot_def_vert_error_2col",
@@ -30602,7 +30684,8 @@
         "left": 0,
         "top": 0,
         "width": 234,
-        "height": 236
+        "height": 236,
+        "connectionLines": []
       },
       {
         "name": "slot_def_vert_not_installed",
@@ -30634,7 +30717,8 @@
         "left": 0,
         "top": 0,
         "width": 154,
-        "height": 236
+        "height": 236,
+        "connectionLines": []
       },
       {
         "name": "slot_def_vert_not_installed_2col",
@@ -30666,7 +30750,8 @@
         "left": 0,
         "top": 0,
         "width": 234,
-        "height": 236
+        "height": 236,
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz",
@@ -30778,7 +30863,8 @@
         "top": 0,
         "width": 480,
         "height": 240,
-        "dataContextOverrides": ""
+        "dataContextOverrides": "",
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz_view_with_border",
@@ -30884,7 +30970,8 @@
         "top": 0,
         "width": 480,
         "height": 78,
-        "dataContextOverrides": "{\n    \"slot_default_view\": \"dib_dcp405::slot_def_1ch_hbar_on\"\n}"
+        "dataContextOverrides": "{\n    \"slot_default_view\": \"dib_dcp405::slot_def_1ch_hbar_on\"\n}",
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz_view_with_border_2col",
@@ -30990,7 +31077,8 @@
         "top": 0,
         "width": 480,
         "height": 118,
-        "dataContextOverrides": "{\n    \"slot_default_view\": \"dib_dcp405::lot_def_1ch_hbar_on_2col\"\n}"
+        "dataContextOverrides": "{\n    \"slot_default_view\": \"dib_dcp405::lot_def_1ch_hbar_on_2col\"\n}",
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz_title",
@@ -31071,7 +31159,8 @@
         "left": 0,
         "top": 0,
         "width": 52,
-        "height": 74
+        "height": 74,
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz_title_2col",
@@ -31152,7 +31241,8 @@
         "left": 0,
         "top": 0,
         "width": 52,
-        "height": 114
+        "height": 114,
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz_error",
@@ -31259,7 +31349,8 @@
         "left": 0,
         "top": 0,
         "width": 478,
-        "height": 74
+        "height": 74,
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz_error_2col",
@@ -31376,7 +31467,8 @@
         "left": 0,
         "top": 0,
         "width": 478,
-        "height": 114
+        "height": 114,
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz_not_installed",
@@ -31408,7 +31500,8 @@
         "left": 0,
         "top": 0,
         "width": 478,
-        "height": 74
+        "height": 74,
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz_not_installed_2col",
@@ -31440,7 +31533,8 @@
         "left": 0,
         "top": 0,
         "width": 478,
-        "height": 114
+        "height": 114,
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz_empty",
@@ -31466,7 +31560,8 @@
         "left": 0,
         "top": 0,
         "width": 478,
-        "height": 74
+        "height": 74,
+        "connectionLines": []
       },
       {
         "name": "slot_def_horz_empty_2col",
@@ -31492,7 +31587,8 @@
         "left": 0,
         "top": 0,
         "width": 478,
-        "height": 114
+        "height": 114,
+        "connectionLines": []
       },
       {
         "name": "slot_max_with_border",
@@ -31597,7 +31693,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 166
+        "height": 166,
+        "connectionLines": []
       },
       {
         "name": "slot_max_error",
@@ -31725,7 +31822,8 @@
         "left": 0,
         "top": 0,
         "width": 476,
-        "height": 164
+        "height": 164,
+        "connectionLines": []
       },
       {
         "name": "slot_max_not_installed",
@@ -31771,7 +31869,8 @@
         "left": 0,
         "top": 0,
         "width": 476,
-        "height": 164
+        "height": 164,
+        "connectionLines": []
       },
       {
         "name": "slot_min_with_border",
@@ -31876,7 +31975,8 @@
         "left": 0,
         "top": 0,
         "width": 239,
-        "height": 70
+        "height": 70,
+        "connectionLines": []
       },
       {
         "name": "slot_min_error",
@@ -31929,7 +32029,8 @@
         "left": 0,
         "top": 0,
         "width": 235,
-        "height": 68
+        "height": 68,
+        "connectionLines": []
       },
       {
         "name": "slot_min_not_installed",
@@ -31976,7 +32077,8 @@
         "left": 0,
         "top": 0,
         "width": 235,
-        "height": 68
+        "height": 68,
+        "connectionLines": []
       },
       {
         "name": "slot_micro_with_border",
@@ -32081,7 +32183,8 @@
         "left": 0,
         "top": 0,
         "width": 158,
-        "height": 70
+        "height": 70,
+        "connectionLines": []
       },
       {
         "name": "slot_micro_error",
@@ -32117,7 +32220,8 @@
         "left": 0,
         "top": 0,
         "width": 154,
-        "height": 68
+        "height": 68,
+        "connectionLines": []
       },
       {
         "name": "slot_micro_not_installed",
@@ -32149,7 +32253,8 @@
         "left": 0,
         "top": 0,
         "width": 154,
-        "height": 68
+        "height": 68,
+        "connectionLines": []
       },
       {
         "name": "dlog_view",
@@ -33901,7 +34006,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "dlog_view_drawer",
@@ -35432,7 +35538,8 @@
         "left": 0,
         "top": 0,
         "width": 160,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "dlog_params",
@@ -36266,7 +36373,8 @@
         "top": 0,
         "width": 480,
         "height": 272,
-        "dataContextOverrides": "{\n    \"dlog_items\": [\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"101\",\n            \"dlog_item_label\": \"DCP405 #1 U\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"101\",\n            \"dlog_item_label\": \"DCP405 #1 I\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"101\",\n            \"dlog_item_label\": \"DCP405 #1 P\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"201\",\n            \"dlog_item_label\": \"DCP405 #2 U\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"201\",\n            \"dlog_item_label\": \"DCP405 #2 I\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"201\",\n            \"dlog_item_label\": \"DCP405 #2 P\"\n        }\n    ]\n}"
+        "dataContextOverrides": "{\n    \"dlog_items\": [\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"101\",\n            \"dlog_item_label\": \"DCP405 #1 U\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"101\",\n            \"dlog_item_label\": \"DCP405 #1 I\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"101\",\n            \"dlog_item_label\": \"DCP405 #1 P\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"201\",\n            \"dlog_item_label\": \"DCP405 #2 U\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"201\",\n            \"dlog_item_label\": \"DCP405 #2 I\"\n        },\n        {\n            \"dlog_item_status\": \"1\",\n            \"dlog_item_channel\": \"201\",\n            \"dlog_item_label\": \"DCP405 #2 P\"\n        }\n    ]\n}",
+        "connectionLines": []
       },
       {
         "name": "image_view",
@@ -36342,7 +36450,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "file_manager",
@@ -36777,7 +36886,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "file_browser",
@@ -37350,7 +37460,8 @@
         "top": 17,
         "width": 460,
         "height": 238,
-        "dataContextOverrides": "{\n    \"file_manager_files\": [{}, {}, {}, {}, {}]\n}"
+        "dataContextOverrides": "{\n    \"file_manager_files\": [{}, {}, {}, {}, {}]\n}",
+        "connectionLines": []
       },
       {
         "name": "file_menu",
@@ -37426,7 +37537,8 @@
         "left": 154,
         "top": 56,
         "width": 140,
-        "height": 164
+        "height": 164,
+        "connectionLines": []
       },
       {
         "name": "file_manager_details_view",
@@ -37600,7 +37712,8 @@
         "left": 0,
         "top": 0,
         "width": 440,
-        "height": 204
+        "height": 204,
+        "connectionLines": []
       },
       {
         "name": "file_manager_scripts_view",
@@ -37831,7 +37944,8 @@
         "top": 0,
         "width": 440,
         "height": 204,
-        "dataContextOverrides": "{\n    \"file_manager_files\": [\n        {\n            \"file_manager_file_icon\": \"\\u007d\",\n            \"file_manager_file_name\": \"diode-tester\",\n            \"file_manager_file_description\": \"Diode breakdown voltage measurement\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u007d\",\n            \"file_manager_file_name\": \"curve-tracer (N-type)\",\n            \"file_manager_file_description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nisi lectus, condimentum consectetur sem sed, lacinia venenatis ligula.\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u007d\",\n            \"file_manager_file_name\": \"transfer-curve (NPN)\"\n        }\n    ]\n}"
+        "dataContextOverrides": "{\n    \"file_manager_files\": [\n        {\n            \"file_manager_file_icon\": \"\\u007d\",\n            \"file_manager_file_name\": \"diode-tester\",\n            \"file_manager_file_description\": \"Diode breakdown voltage measurement\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u007d\",\n            \"file_manager_file_name\": \"curve-tracer (N-type)\",\n            \"file_manager_file_description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nisi lectus, condimentum consectetur sem sed, lacinia venenatis ligula.\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u007d\",\n            \"file_manager_file_name\": \"transfer-curve (NPN)\"\n        }\n    ]\n}",
+        "connectionLines": []
       },
       {
         "name": "file_manager_scripts_alter_view",
@@ -38061,7 +38175,8 @@
         "top": 0,
         "width": 440,
         "height": 204,
-        "dataContextOverrides": "{\n    \"file_manager_files\": [\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"diode-tester\",\n            \"file_manager_file_description\": \"Diode breakdown voltage measurement\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"curve-tracer (N-type)\",\n            \"file_manager_file_description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nisi lectus, condimentum consectetur sem sed, lacinia venenatis ligula.\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"transfer-curve (NPN)\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"transfer-curve (NPN)\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"transfer-curve (NPN)\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"transfer-curve (NPN)\"\n        }\n    ]\n}"
+        "dataContextOverrides": "{\n    \"file_manager_files\": [\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"diode-tester\",\n            \"file_manager_file_description\": \"Diode breakdown voltage measurement\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"curve-tracer (N-type)\",\n            \"file_manager_file_description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nisi lectus, condimentum consectetur sem sed, lacinia venenatis ligula.\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"transfer-curve (NPN)\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"transfer-curve (NPN)\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"transfer-curve (NPN)\"\n        },\n        {\n            \"file_manager_file_icon\": \"\\u0094\",\n            \"file_manager_file_name\": \"transfer-curve (NPN)\"\n        }\n    ]\n}",
+        "connectionLines": []
       },
       {
         "name": "file_manager_large_icons_view",
@@ -38176,7 +38291,8 @@
         "left": 0,
         "top": 0,
         "width": 440,
-        "height": 204
+        "height": 204,
+        "connectionLines": []
       },
       {
         "name": "touch_test",
@@ -38465,7 +38581,8 @@
         "left": 0,
         "top": 0,
         "width": 480,
-        "height": 272
+        "height": 272,
+        "connectionLines": []
       },
       {
         "name": "focus_value_overlay",
@@ -38517,7 +38634,8 @@
         "left": 0,
         "top": 0,
         "width": 110,
-        "height": 40
+        "height": 40,
+        "connectionLines": []
       },
       {
         "name": "ovp_type",
@@ -38586,7 +38704,8 @@
         "left": 0,
         "top": 0,
         "width": 45,
-        "height": 32
+        "height": 32,
+        "connectionLines": []
       },
       {
         "name": "slot_labels_and_colors",
@@ -38679,7 +38798,8 @@
         "left": 0,
         "top": 0,
         "width": 158,
-        "height": 238
+        "height": 238,
+        "connectionLines": []
       },
       {
         "name": "color_picker",
@@ -38838,7 +38958,8 @@
         "left": 30,
         "top": 20,
         "width": 420,
-        "height": 232
+        "height": 232,
+        "connectionLines": []
       }
     ],
     "styles": [
@@ -62270,7 +62391,7 @@
       {
         "name": "Legacy",
         "colors": [
-          "#1b4fd9",
+          "#0C2982",
           "#ffffff",
           "#ffff7f",
           "#5080ff",
