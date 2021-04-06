@@ -1580,10 +1580,9 @@ scpi_result_t scpi_cmd_systemDigitalPinFunction(scpi_t *context) {
     } else if (pin == DOUT1) {
         if (
             function != io_pins::FUNCTION_NONE &&
-            function != io_pins::FUNCTION_INPUT &&
-            function != io_pins::FUNCTION_INHIBIT &&
-            function != io_pins::FUNCTION_SYSTRIG &&
-            function != io_pins::FUNCTION_DLOGTRIG &&
+            function != io_pins::FUNCTION_OUTPUT &&
+            function != io_pins::FUNCTION_FAULT &&
+            function != io_pins::FUNCTION_ON_COUPLE &&
             function != io_pins::FUNCTION_UART
         ) {
             SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
