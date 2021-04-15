@@ -86,6 +86,31 @@ void startEmscripten();
 
 #if defined(EEZ_PLATFORM_STM32)
 uint32_t g_RCC_CSR;
+
+#if CONF_SURVIVE_MODE
+#if defined(EEZ_PLATFORM_STM32)
+void disableDebugPins() {
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+
+    /*Configure GPIO pin : PA13 PA14 */
+    GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_14;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /*Configure GPIO pin : PB3 */
+    GPIO_InitStruct.Pin = GPIO_PIN_3;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_14, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);  
+}
+#endif
+#endif
+
 #endif
 
 int main(int argc, char **argv) {
@@ -108,6 +133,11 @@ int main(int argc, char **argv) {
     HAL_Init();
     SystemClock_Config();
     MX_GPIO_Init();
+
+#if CONF_SURVIVE_MODE
+    disableDebugPins();
+#endif
+
     MX_DMA_Init();
     MX_CRC_Init();
     MX_DAC_Init();

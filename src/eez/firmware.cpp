@@ -173,6 +173,9 @@ void boot() {
 #endif
     }
 
+    psu::sd_card::init();
+#endif
+
 #if defined(EEZ_PLATFORM_STM32)
     if (g_mcuRevision < MCU_REVISION_R3B3) {
         SystemClock_Config_R2B4();
@@ -183,9 +186,6 @@ void boot() {
     }
     mcu::display::turnOff();
     mcu::display::turnOn();
-#endif
-
-    psu::sd_card::init();
 #endif
 
     int numInstalledModules = 0;
