@@ -521,6 +521,16 @@ set(header_eez_modules_dib_prel6
 list (APPEND header_files ${header_eez_modules_dib_prel6})
 source_group("eez\\modules\\dib-prel6" FILES ${src_eez_modules_dib_prel6} ${header_eez_modules_dib_prel6})
 
+set(src_eez_modules_dib_mux14d
+    src/eez/modules/dib-mux14d/dib-mux14d.cpp
+) 
+list (APPEND src_files ${src_eez_modules_dib_mux14d})
+set(header_eez_modules_dib_mux14d
+    src/eez/modules/dib-mux14d/dib-mux14d.h
+) 
+list (APPEND header_files ${header_eez_modules_dib_mux14d})
+source_group("eez\\modules\\dib-mux14d" FILES ${src_eez_modules_dib_mux14d} ${header_eez_modules_dib_mux14d})
+
 set(src_eez_modules_dib_smx46
     src/eez/modules/dib-smx46/dib-smx46.cpp
 ) 

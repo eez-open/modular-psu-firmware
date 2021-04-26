@@ -4,9 +4,6 @@ from utime import ticks_ms, ticks_add, ticks_diff, sleep_ms
 from eez import scpi, setU, getOutputMode, getI
 
 MODEL_NONE = 0
-MODEL_DCP405  = 1
-MODEL_DCM220  = 2
-MODEL_DCM224  = 3
 
 MODELS = [
     { "name": "None",    "id": 0,   "r": 0, "b": 0  },
@@ -16,6 +13,7 @@ MODELS = [
     { "name": "MIO168",  "id": 168, "r": 1, "b": 2  },
     { "name": "PREL6",   "id": 6,   "r": 1, "b": 2  },
     { "name": "SMX46",   "id": 46,  "r": 1, "b": 2  },
+    { "name": "MUX14D",  "id": 14,  "r": 1, "b": 2  },
 ]
 
 slots = [

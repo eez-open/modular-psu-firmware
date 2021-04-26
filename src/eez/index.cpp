@@ -33,6 +33,7 @@
 #include <eez/modules/dib-mio168/dib-mio168.h>
 #include <eez/modules/dib-prel6/dib-prel6.h>
 #include <eez/modules/dib-smx46/dib-smx46.h>
+#include <eez/modules/dib-mux14d/dib-mux14d.h>
 
 #include <eez/gui/gui.h>
 #include <eez/modules/psu/psu.h>
@@ -909,7 +910,8 @@ static Module *g_modules[] = {
     dcm224::g_module,
     dib_mio168::g_module,
     dib_prel6::g_module,
-    dib_smx46::g_module
+    dib_smx46::g_module,
+    dib_mux14d::g_module
 };
 
 Module *g_slots[NUM_SLOTS] = { &noneModule, &noneModule, &noneModule };

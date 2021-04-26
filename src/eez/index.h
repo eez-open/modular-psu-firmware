@@ -47,6 +47,7 @@ static const uint16_t MODULE_TYPE_DCM224 = 224;
 static const uint16_t MODULE_TYPE_DIB_MIO168 = 168;
 static const uint16_t MODULE_TYPE_DIB_PREL6 = 6;
 static const uint16_t MODULE_TYPE_DIB_SMX46 = 46;
+static const uint16_t MODULE_TYPE_DIB_MUX14D = 14;
 
 enum SlotViewType {
     SLOT_VIEW_TYPE_DEFAULT,

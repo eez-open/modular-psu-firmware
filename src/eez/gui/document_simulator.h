@@ -552,7 +552,13 @@ enum DataEnum {
     DATA_ID_DIB_DCM224_SLOT_MICRO_2CH_VIEW = 550,
     DATA_ID_DIB_DCM224_SLOT_2CH_CH1_INDEX = 551,
     DATA_ID_DIB_DCM224_SLOT_2CH_CH2_INDEX = 552,
-    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_VIEW = 553
+    DATA_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_VIEW = 553,
+    DATA_ID_DIB_MUX14D_RELAYS = 554,
+    DATA_ID_DIB_MUX14D_RELAY_IS_ON = 555,
+    DATA_ID_DIB_MUX14D_RELAY_LABEL = 556,
+    DATA_ID_DIB_MUX14D_RELAY_CYCLES = 557,
+    DATA_ID_DIB_MUX14D_RELAY_LABEL_LABEL = 558,
+    DATA_ID_DIB_MUX14D_IS_RELAY_1_OR_6 = 559
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -1109,6 +1115,12 @@ void data_dib_dcm224_slot_micro_2ch_view(DataOperationEnum operation, Cursor cur
 void data_dib_dcm224_slot_2ch_ch1_index(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_dcm224_slot_2ch_ch2_index(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_dcm224_slot_max_2ch_min_view(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_relays(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_relay_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_relay_label_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_is_relay_1_or_6(DataOperationEnum operation, Cursor cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
@@ -1408,7 +1420,10 @@ enum ActionsEnum {
     ACTION_ID_FRONT_PANEL_SELECT_SLOT3 = 290,
     ACTION_ID_SIMULATOR_LOAD = 291,
     ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_COUNTERPHASE_DITHERING = 292,
-    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_PWM_ENABLED = 293
+    ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_PWM_ENABLED = 293,
+    ACTION_ID_DIB_MUX14D_TOGGLE_RELAY = 294,
+    ACTION_ID_DIB_MUX14D_SHOW_RELAY_LABELS = 295,
+    ACTION_ID_DIB_MUX14D_CHANGE_RELAY_LABEL = 296
 };
 
 void action_channel_toggle_output();
@@ -1704,6 +1719,9 @@ void action_front_panel_select_slot3();
 void action_simulator_load();
 void action_dib_dcm224_ch_settings_adv_toggle_counterphase_dithering();
 void action_dib_dcm224_ch_settings_adv_toggle_pwm_enabled();
+void action_dib_mux14d_toggle_relay();
+void action_dib_mux14d_show_relay_labels();
+void action_dib_mux14d_change_relay_label();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1744,7 +1762,8 @@ enum BitmapsEnum {
     BITMAP_ID_DIB_DCP405_SIMULATOR_FRONT_PANEL_MASK = 18,
     BITMAP_ID_DIB_DCM220_SIMULATOR_FRONT_PANEL_MASK = 19,
     BITMAP_ID_FRONT_PANEL = 20,
-    BITMAP_ID_DIB_DCM224_SIMULATOR_FRONT_PANEL_MASK = 21
+    BITMAP_ID_DIB_DCM224_SIMULATOR_FRONT_PANEL_MASK = 21,
+    BITMAP_ID_DIB_MUX14D_SIMULATOR_FRONT_PANEL_MASK = 22
 };
 
 enum StylesEnum {
@@ -2509,7 +2528,16 @@ enum PagesEnum {
     PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH_ON = 282,
     PAGE_ID_DIB_DCM224_SLOT_MICRO_2CH_OFF = 283,
     PAGE_ID_DIB_DCM224_LABELS_AND_COLORS = 284,
-    PAGE_ID_DIB_DCM224_LABELS_AND_COLORS_CH = 285
+    PAGE_ID_DIB_DCM224_LABELS_AND_COLORS_CH = 285,
+    PAGE_ID_DIB_MUX14D_SIMULATOR_FRONT_PANEL_MASK = 286,
+    PAGE_ID_DIB_MUX14D_SLOT_VIEW_DEF = 287,
+    PAGE_ID_DIB_MUX14D_SLOT_VIEW_DEF_2COL = 288,
+    PAGE_ID_DIB_MUX14D_SLOT_VIEW_MAX = 289,
+    PAGE_ID_DIB_MUX14D_SLOT_VIEW_MIN = 290,
+    PAGE_ID_DIB_MUX14D_SLOT_VIEW_MICRO = 291,
+    PAGE_ID_DIB_MUX14D_SETTINGS = 292,
+    PAGE_ID_DIB_MUX14D_LABELS_AND_COLORS = 293,
+    PAGE_ID_DIB_MUX14D_CHANNEL_LABELS = 294
 };
 
-extern const uint8_t assets[551722];
+extern const uint8_t assets[582050];

@@ -90,6 +90,10 @@ int getSlotView(int slotIndex, Cursor cursor) {
         return PAGE_ID_DIB_SMX46_SIMULATOR_FRONT_PANEL_MASK;
     }
 
+    if (slot.moduleType == MODULE_TYPE_DIB_MUX14D) {
+        return PAGE_ID_DIB_MUX14D_SIMULATOR_FRONT_PANEL_MASK;
+    }
+
     return PAGE_ID_FRONT_PANEL_EMPTY_SLOT;
 }
 
