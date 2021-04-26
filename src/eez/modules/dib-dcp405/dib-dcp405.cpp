@@ -183,7 +183,7 @@ struct DcpChannel : public Channel {
 		params.VOLTAGE_GND_OFFSET = 0.86f;
 		params.CURRENT_GND_OFFSET = 0.11f;
 
-		params.CALIBRATION_DATA_TOLERANCE_PERCENT = 10.0f;
+		params.CALIBRATION_DATA_TOLERANCE_PERCENT = 15.0f;
 
 		params.CALIBRATION_MID_TOLERANCE_PERCENT = 1.0f;
 
