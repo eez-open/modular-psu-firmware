@@ -166,6 +166,13 @@
                     "https://github.com/eez-open/modular-psu-firmware/raw/5fead6d465e88740df33f1d2fe998b068e4c8fdf/scripts/Module%20Initialization/Module%20Initialization.py",
                     "https://github.com/eez-open/modular-psu-firmware/raw/5fead6d465e88740df33f1d2fe998b068e4c8fdf/scripts/Module%20Initialization/Module%20Initialization.res"
                 ]
+            },
+            {
+                "version": "1.3",
+                "files": [
+                    "https://github.com/eez-open/modular-psu-firmware/raw/ff53f82eb9883a2bfbfe12b26e87f11ed8dcccf8/scripts/Module%20Initialization/Module%20Initialization.py",
+                    "https://github.com/eez-open/modular-psu-firmware/raw/ff53f82eb9883a2bfbfe12b26e87f11ed8dcccf8/scripts/Module%20Initialization/Module%20Initialization.res"
+                ]
             }
         ]
     },
