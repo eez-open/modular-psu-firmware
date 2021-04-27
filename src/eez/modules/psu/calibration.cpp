@@ -389,7 +389,7 @@ void CalibrationEditor::doStart() {
         channel_dispatcher::setOcpState(*channel, 0);
         channel_dispatcher::setOppState(*channel, 0);
 
-        channel->calibrationEnable(false);
+        channel_dispatcher::calibrationEnable(*channel, false);
         channel_dispatcher::outputEnable(*channel, true);
         channel->setOperBits(OPER_ISUM_CALI, true);
 
@@ -448,7 +448,7 @@ void CalibrationEditor::stop() {
 
     if (channel) {
         if (channel->isCalibrationExists()) {
-            channel->calibrationEnable(true);
+            channel_dispatcher::calibrationEnable(*channel, true);
         }
 
         channel_dispatcher::outputEnable(*channel, false);
@@ -773,7 +773,7 @@ bool clear(int slotIndex, int subchannelIndex, int *err) {
     clearCalibrationConf(&calConf);
 
     if (channel) {
-        channel->calibrationEnable(false);
+        channel_dispatcher::calibrationEnable(*channel, false);
 
 		memcpy(&channel->cal_conf, &calConf, sizeof(CalibrationConfiguration));
     } else {

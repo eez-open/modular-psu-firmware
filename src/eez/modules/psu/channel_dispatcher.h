@@ -124,6 +124,8 @@ bool outputEnable(int numChannels, uint8_t *channels, bool enable, int *err);
 void disableOutputForAllChannels();
 void disableOutputForAllTrackingChannels();
 
+void calibrationEnable(Channel &channel, bool enable);
+
 void remoteSensingEnable(Channel &channel, bool enable);
 
 bool isTripped(Channel &channel, int &channelIndex);

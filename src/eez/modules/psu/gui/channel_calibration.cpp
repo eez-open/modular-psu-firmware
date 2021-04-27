@@ -959,7 +959,8 @@ void data_channel_calibration_state(DataOperationEnum operation, Cursor cursor, 
             Channel &channel = Channel::get(iChannel);
             value = channel.isCalibrationEnabled();
         } else {
-            value = g_slots[hmi::g_selectedSlotIndex]->isVoltageCalibrationEnabled(hmi::g_selectedSubchannelIndex);
+            value = g_slots[hmi::g_selectedSlotIndex]->isVoltageCalibrationEnabled(hmi::g_selectedSubchannelIndex) ||
+            		g_slots[hmi::g_selectedSlotIndex]->isCurrentCalibrationEnabled(hmi::g_selectedSubchannelIndex);
         }
     }
 }

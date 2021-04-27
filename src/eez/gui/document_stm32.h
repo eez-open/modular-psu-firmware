@@ -2479,4 +2479,4 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_CHANNEL_LABELS = 282
 };
 
-extern const uint8_t assets[343664];
+extern const uint8_t assets[343572];

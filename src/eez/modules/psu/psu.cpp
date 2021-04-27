@@ -809,6 +809,9 @@ void onThreadMessage(uint8_t type, uint32_t param) {
     } else if (type == PSU_MESSAGE_SET_CURRENT_RANGE_SELECTION_MODE) {
     	Channel &channel = Channel::get((param >> 8) & 0xFF);
         channel_dispatcher::setCurrentRangeSelectionMode(channel, (CurrentRangeSelectionMode)(param & 0xFF));
+    } else if (type == PSU_MESSAGE_CALIBRATION_ENABLE) {
+    	Channel &channel = Channel::get((param >> 8) & 0xFF);
+        channel_dispatcher::calibrationEnable(channel, param & 0xFF);
     } else if (type == PSU_MESSAGE_REMOTE_SENSING_EANBLE) {
     	Channel &channel = Channel::get((param >> 8) & 0xFF);
         channel_dispatcher::remoteSensingEnable(channel, param & 0xFF);

@@ -532,7 +532,7 @@ struct AinChannel {
     
 	char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
 
-    CalConf calConf[9];
+    CalConf calConf[5];
     bool ongoingCal = false;
 
 	AinChannel(int subchannelIndex) : m_subchannelIndex(subchannelIndex) {
@@ -837,9 +837,9 @@ struct AinChannel {
             }
         } else {
             if (m_mode == SOURCE_MODE_VOLTAGE) {
-                return 4 + m_voltageRange;
+                return m_voltageRange;
             } else {
-                return 6 + m_currentRange;
+                return 2 + m_currentRange;
             }
         }
     }
@@ -861,6 +861,10 @@ struct AinChannel {
 			stepValues->count = sizeof(AMPER_ENCODER_STEP_VALUES_CAL) / sizeof(float);
 			stepValues->unit = UNIT_AMPER;
 		}
+
+		stepValues->encoderSettings.accelerationEnabled = true;
+		stepValues->encoderSettings.range = getMaxValue() - getMinValue();
+		stepValues->encoderSettings.step = getResolution();
 	}
 
     EncoderMode getEncoderMode() {
@@ -1556,6 +1560,13 @@ public:
 			}
 
             forceTransferSetParams = true;
+        }
+
+        if (synchronized) {
+			for (int otherChannelIndex = 0; otherChannelIndex < numOtherChannels; otherChannelIndex++) {
+				int subchannelIndex = numPowerChannels + otherChannelIndex;
+				g_slots[slotIndex]->loadChannelCalibration(subchannelIndex, nullptr);
+			}
         }
     }
 
@@ -3136,11 +3147,9 @@ public:
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
         	aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].getStepValues(stepValues);
             stepValues->encoderSettings.mode = aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].getEncoderMode();
-        }
-
-        if (calibrationMode) {
-            stepValues->encoderSettings.step /= 10.0f;
-            stepValues->encoderSettings.range = stepValues->encoderSettings.step * 10.0f;
+        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+        	ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getStepValues(stepValues);
+            stepValues->encoderSettings.mode = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getEncoderMode();
         }
 	}
 
@@ -3232,28 +3241,28 @@ public:
     bool loadChannelCalibration(int subchannelIndex, int *err) override {
         assert(sizeof(CalConf) <= 64);
 
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            for (int i = 0; i < 7; i++) {
-                CalConf *calConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf[i];
-                if (!persist_conf::loadChannelCalibrationConfiguration(slotIndex, (subchannelIndex - AOUT_1_SUBCHANNEL_INDEX) * 7 + i, &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
-                    calConf->clear();
-                }
-            }
-        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            CalConf *calConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
-            if (!persist_conf::loadChannelCalibrationConfiguration(slotIndex, 2 * 7 + (subchannelIndex - AOUT_3_SUBCHANNEL_INDEX), &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
-                calConf->clear();
-            }
-        } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
-            for (int i = 0; i < 9; i++) {
-                CalConf *calConf = &ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].calConf[i];
-                if (!persist_conf::loadChannelCalibrationConfiguration(slotIndex, 2 * 7 + 2 + (subchannelIndex - AIN_1_SUBCHANNEL_INDEX) * 9 + i, &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
-                    calConf->clear();
-                }
-            }
-        } else {
+        auto afeCheck = persist_conf::getAfeVersion(slotIndex) == afeVersion;
 
-        }
+		if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+			for (int i = 0; i < 7; i++) {
+				CalConf *calConf = &aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].calConf[i];
+				if (!afeCheck || !persist_conf::loadChannelCalibrationConfiguration(slotIndex, (subchannelIndex - AOUT_1_SUBCHANNEL_INDEX) * 7 + i, &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
+					calConf->clear();
+				}
+			}
+		} else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+			CalConf *calConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
+			if (!afeCheck || !persist_conf::loadChannelCalibrationConfiguration(slotIndex, 2 * 7 + (subchannelIndex - AOUT_3_SUBCHANNEL_INDEX), &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
+				calConf->clear();
+			}
+		} else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			for (int i = 0; i < 5; i++) {
+				CalConf *calConf = &ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].calConf[i];
+				if (!afeCheck || !persist_conf::loadChannelCalibrationConfiguration(slotIndex, 2 * 7 + 2 + (subchannelIndex - AIN_1_SUBCHANNEL_INDEX) * 5 + i, &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
+					calConf->clear();
+				}
+			}
+		}
 
         return true;
     }
@@ -3272,11 +3281,17 @@ public:
         } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
             int ainChannelIndex = subchannelIndex - AIN_1_SUBCHANNEL_INDEX;
             calConf = &ainChannels[ainChannelIndex].getCalConf();
-            calConfIndex = 2 * 7 + 2 + ainChannelIndex * 9 + ainChannels[ainChannelIndex].getCalConfIndex();
+            calConfIndex = 2 * 7 + 2 + ainChannelIndex * 5 + ainChannels[ainChannelIndex].getCalConfIndex();
         }
 
         if (calConf) {
-            return persist_conf::saveChannelCalibrationConfiguration(slotIndex, calConfIndex, &calConf->header, sizeof(CalConf), CalConf::VERSION);
+            auto result = persist_conf::saveChannelCalibrationConfiguration(slotIndex, calConfIndex, &calConf->header, sizeof(CalConf), CalConf::VERSION);
+            if (result) {
+                if (persist_conf::getAfeVersion(slotIndex) != afeVersion) {
+                    persist_conf::setAfeVersion(slotIndex, afeVersion);
+                }
+            }
+            return result;
         }
 
         if (err) {

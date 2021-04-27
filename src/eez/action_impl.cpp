@@ -410,9 +410,12 @@ void action_ch_settings_copy() {
 
 void action_ch_settings_calibration_toggle_enable() {
     if (g_channel) {
-        g_channel->calibrationEnable(!g_channel->isCalibrationEnabled());
+        channel_dispatcher::calibrationEnable(*g_channel, !g_channel->isCalibrationEnabled());
     } else {
-        bool enable = !g_slots[hmi::g_selectedSlotIndex]->isVoltageCalibrationEnabled(hmi::g_selectedSubchannelIndex);
+        bool enable = !(
+            g_slots[hmi::g_selectedSlotIndex]->isVoltageCalibrationEnabled(hmi::g_selectedSubchannelIndex) || 
+            g_slots[hmi::g_selectedSlotIndex]->isCurrentCalibrationEnabled(hmi::g_selectedSubchannelIndex)
+        );
         g_slots[hmi::g_selectedSlotIndex]->enableVoltageCalibration(hmi::g_selectedSubchannelIndex, enable);
         g_slots[hmi::g_selectedSlotIndex]->enableCurrentCalibration(hmi::g_selectedSubchannelIndex, enable);
     }

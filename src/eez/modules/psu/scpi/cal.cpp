@@ -431,7 +431,7 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
             return SCPI_RES_ERR;
         }
 
-        channel->calibrationEnable(calibrationEnabled);
+        channel_dispatcher::calibrationEnable(*channel, calibrationEnabled);
     } else {
         auto enabled = g_slots[slotAndSubchannelIndex->slotIndex]->isCurrentCalibrationEnabled(slotAndSubchannelIndex->subchannelIndex) ||
             g_slots[slotAndSubchannelIndex->slotIndex]->isVoltageCalibrationEnabled(slotAndSubchannelIndex->subchannelIndex);

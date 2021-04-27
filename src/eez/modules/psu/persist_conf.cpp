@@ -424,14 +424,6 @@ void initChannels() {
         auto &channel = Channel::get(i);
         loadChannelCalibrationConfiguration(channel.slotIndex, channel.subchannelIndex, channel.cal_conf);
     }
-
-    for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        Module *module = g_slots[slotIndex];
-        for (int otherChannelIndex = 0; otherChannelIndex < module->numOtherChannels; otherChannelIndex++) {
-            int subchannelIndex = module->numPowerChannels + otherChannelIndex;
-            g_slots[slotIndex]->loadChannelCalibration(subchannelIndex, nullptr);
-        }
-    }
 }
 
 bool saveAll(bool force) {
@@ -1440,6 +1432,17 @@ void saveCalibrationEnabledFlag(int slotIndex, int subchannelIndex, bool enabled
     } else {
         moduleConf.chCalEnabled &= ~(1 << subchannelIndex);
     }
+    saveModuleConf(slotIndex);
+}
+
+uint8_t getAfeVersion(int slotIndex) {
+    ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
+    return moduleConf.afeVersion;
+}
+
+void setAfeVersion(int slotIndex, uint8_t afeVersion) {
+    ModuleConfiguration &moduleConf = g_moduleConf[slotIndex];
+    moduleConf.afeVersion = afeVersion;
     saveModuleConf(slotIndex);
 }
 

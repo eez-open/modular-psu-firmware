@@ -176,6 +176,27 @@
               "text": "e"
             }
           ]
+        },
+        {
+          "type": "Text",
+          "left": 63,
+          "top": 77,
+          "width": 32,
+          "height": 23,
+          "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+          "data": "relay_label",
+          "style": {
+            "inheritFrom": "option_toggle_L_center",
+            "font": "Oswald17",
+            "alignHorizontal": "left",
+            "color": "text_enable_background",
+            "backgroundColor": "action_color",
+            "borderSize": "0",
+            "borderRadius": 0,
+            "borderColor": "text_regular",
+            "padding": "0 0 0 2"
+          },
+          "text": "\\u00be"
         }
       ],
       "connectionLines": [],
@@ -541,6 +562,24 @@
               ]
             }
           ]
+        },
+        {
+          "type": "MultilineText",
+          "left": 244,
+          "top": 182,
+          "width": 228,
+          "height": 50,
+          "wireID": "611957d3-4b65-42ab-c926-45cd54f4b817",
+          "action": "channel_update_firmware",
+          "style": {
+            "inheritFrom": "edit_value_active_S_center",
+            "alignHorizontal": "left",
+            "alignVertical": "top",
+            "padding": "13"
+          },
+          "text": "\\u00bb Firmware update",
+          "firstLineIndent": 0,
+          "hangingIndent": 24
         }
       ],
       "connectionLines": [],

@@ -360,7 +360,10 @@ void setUartMode(uint8_t uartMode);
 
 struct ModuleConfiguration {
     BlockHeader header;
-    uint8_t chCalEnabled;
+    union {
+        uint8_t chCalEnabled;
+        uint8_t afeVersion;
+    };
 };
 
 extern ModuleConfiguration g_moduleConf[NUM_SLOTS];
@@ -373,6 +376,9 @@ bool saveModuleConf(int slotIndex);
 
 bool isChannelCalibrationEnabled(int slotIndex, int subchannelIndex);
 void saveCalibrationEnabledFlag(int slotIndex, int subchannelIndex, bool enabled);
+
+uint8_t getAfeVersion(int slotIndex);
+void setAfeVersion(int slotIndex, uint8_t afeVersion);
 
 bool loadChannelCalibrationConfiguration(int slotIndex, int subchannelIndex, BlockHeader *calConf, uint32_t calConfSize, int version);
 void loadChannelCalibrationConfiguration(int slotIndex, int subchannelIndex, CalibrationConfiguration &calConf);

@@ -1462,6 +1462,14 @@ void disableOutputForAllTrackingChannels() {
     syncOutputEnable();
 }
 
+void calibrationEnable(Channel &channel, bool enable) {
+    if (!isPsuThread()) {
+        sendMessageToPsu(PSU_MESSAGE_CALIBRATION_ENABLE, (channel.channelIndex << 8) | (enable ? 1 : 0));
+    } else {
+        channel.calibrationEnable(enable);
+    }
+}
+
 void remoteSensingEnable(Channel &channel, bool enable) {
     if (!isPsuThread()) {
         sendMessageToPsu(PSU_MESSAGE_REMOTE_SENSING_EANBLE, (channel.channelIndex << 8) | (enable ? 1 : 0));
@@ -2520,6 +2528,7 @@ bool getSourcePwmDuty(int slotIndex, int subchannelIndex, float &duty, int *err)
 bool setSourcePwmDuty(int slotIndex, int subchannelIndex, float duty, int *err) {
 	return g_slots[slotIndex]->setSourcePwmDuty(subchannelIndex, duty, err);
 }
+
 
 } // namespace channel_dispatcher
 } // namespace psu
