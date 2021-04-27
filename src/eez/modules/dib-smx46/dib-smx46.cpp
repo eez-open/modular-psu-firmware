@@ -278,6 +278,13 @@ public:
 
             forceTransferSetParams = true;
         }
+
+        if (synchronized) {
+			for (int otherChannelIndex = 0; otherChannelIndex < numOtherChannels; otherChannelIndex++) {
+				int subchannelIndex = numPowerChannels + otherChannelIndex;
+				g_slots[slotIndex]->loadChannelCalibration(subchannelIndex, nullptr);
+			}
+        }
     }
 
     ////////////////////////////////////////
