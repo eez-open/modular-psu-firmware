@@ -58,7 +58,7 @@ enum Mux14DLowPriorityThreadMessage {
 
 static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
 
-static const int NUM_RELAYS = 6;
+static const int NUM_RELAYS = 8;
 
 static const uint32_t MIN_TO_MS = 60L * 1000L;
 
@@ -78,7 +78,9 @@ enum Command {
 };
 
 struct SetParams {
-	uint8_t relayStates;
+	uint8_t p1RelayStates;
+	uint8_t p2RelayStates;
+	uint8_t extRelayState;
 };
 
 struct Request {
@@ -169,17 +171,28 @@ public:
     uint32_t lastRefreshTime;
     int retry;
 
-    uint8_t relayStates = 0;
+    uint8_t p1RelayStates = 0;
+	uint8_t p2RelayStates = 0;
+	
+	uint8_t extRelayState = 0;
 
     static const size_t RELAY_LABEL_MAX_LENGTH = 10;
-    char relayLabels[NUM_RELAYS][RELAY_LABEL_MAX_LENGTH + 1];
+    char p1RelayLabels[NUM_RELAYS][RELAY_LABEL_MAX_LENGTH + 1];
+	char p2RelayLabels[NUM_RELAYS][RELAY_LABEL_MAX_LENGTH + 1];
 
     // relay cycles counting    
-    uint32_t relayCycles[NUM_RELAYS];
-    uint32_t lastWrittenRelayCycles[NUM_RELAYS];
-    Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
+    uint32_t p1RelayCycles[NUM_RELAYS];
+    uint32_t lastWrittenP1RelayCycles[NUM_RELAYS];
 
-    Mux14DModule() {
+	uint32_t p2RelayCycles[NUM_RELAYS];
+	uint32_t lastWrittenP2RelayCycles[NUM_RELAYS];
+
+	uint32_t extRelayCycles;
+	uint32_t lastWrittenExtRelayCycles;
+
+	Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
+
+	Mux14DModule() {
         assert(sizeof(Request) <= BUFFER_SIZE);
         assert(sizeof(Response) <= BUFFER_SIZE);
 
@@ -282,7 +295,9 @@ public:
 
 	void fillSetParams(SetParams &params) {
 		memset(&params, 0, sizeof(SetParams));
-        params.relayStates = powerDown ? 0 : relayStates;
+        params.p1RelayStates = powerDown ? 0 : p1RelayStates;
+		params.p2RelayStates = powerDown ? 0 : p2RelayStates;
+		params.extRelayState = powerDown ? 0 : extRelayState;
 	}
 
     void Command_SetParams_FillRequest(Request &request) {
@@ -295,7 +310,7 @@ public:
             if (data.result) {
                 SetParams &params = ((Request *)output)->setParams;
 
-                updateRelayCycles(lastTransferredParams.relayStates, params.relayStates);
+                updateRelayCycles(lastTransferredParams, params);
 
                 memcpy(&lastTransferredParams, &params, sizeof(SetParams));
             }
@@ -612,31 +627,58 @@ public:
     }
 
     struct ProfileParameters : public Module::ProfileParameters {
-        uint8_t relayStates;
-        char relayLabels[NUM_RELAYS][RELAY_LABEL_MAX_LENGTH + 1];
-    };
+        uint8_t p1RelayStates;
+        char p1RelayLabels[NUM_RELAYS][RELAY_LABEL_MAX_LENGTH + 1];
+	
+		uint8_t p2RelayStates;
+		char p2RelayLabels[NUM_RELAYS][RELAY_LABEL_MAX_LENGTH + 1];
+
+		uint8_t extRelayState;
+	};
 
     void resetProfileToDefaults(uint8_t *buffer) override {
         Module::resetProfileToDefaults(buffer);
-        auto parameters = (ProfileParameters *)buffer;
-        parameters->relayStates = relayStates;
-        memset(parameters->relayLabels, 0, sizeof(relayLabels));
-    }
+
+		auto parameters = (ProfileParameters *)buffer;
+
+		parameters->p1RelayStates = p1RelayStates;
+        memset(parameters->p1RelayLabels, 0, sizeof(p1RelayLabels));
+
+		parameters->p2RelayStates = p2RelayStates;
+		memset(parameters->p2RelayLabels, 0, sizeof(p2RelayLabels));
+
+		parameters->extRelayState = extRelayState;
+	}
 
     void getProfileParameters(uint8_t *buffer) override {
         Module::getProfileParameters(buffer);
-        assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
-        auto parameters = (ProfileParameters *)buffer;
-        parameters->relayStates = relayStates;
-        memcpy(parameters->relayLabels, relayLabels, sizeof(relayLabels));
-    }
+
+		assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
+        
+		auto parameters = (ProfileParameters *)buffer;
+        
+		parameters->p1RelayStates = p1RelayStates;
+        memcpy(parameters->p1RelayLabels, p1RelayLabels, sizeof(p1RelayLabels));
+
+		parameters->p2RelayStates = p2RelayStates;
+		memcpy(parameters->p2RelayLabels, p2RelayLabels, sizeof(p2RelayLabels));
+
+		parameters->extRelayState = extRelayState;
+	}
     
     void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) override {
         Module::setProfileParameters(buffer, mismatch, recallOptions);
-        auto parameters = (ProfileParameters *)buffer;
-        relayStates = parameters->relayStates;
-        memcpy(relayLabels, parameters->relayLabels, sizeof(relayLabels));
-    }
+        
+		auto parameters = (ProfileParameters *)buffer;
+        
+		p1RelayStates = parameters->p1RelayStates;
+        memcpy(p1RelayLabels, parameters->p1RelayLabels, sizeof(p1RelayLabels));
+
+		p2RelayStates = parameters->p2RelayStates;
+		memcpy(p2RelayLabels, parameters->p2RelayLabels, sizeof(p2RelayLabels));
+
+		extRelayState = parameters->extRelayState;
+	}
     
     bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) override {
         if (!Module::writeProfileProperties(ctx, buffer)) {
@@ -644,15 +686,25 @@ public:
         }
         auto parameters = (const ProfileParameters *)buffer;
 
-        WRITE_PROPERTY("relayStates", parameters->relayStates);
+        WRITE_PROPERTY("p1RelayStates", parameters->p1RelayStates);
 
         for (int i = 0; i < NUM_RELAYS; i++) {
             char propName[16];
-            snprintf(propName, sizeof(propName), "channelLabel%d", i+1);
-            WRITE_PROPERTY(propName, parameters->relayLabels[i]);
+            snprintf(propName, sizeof(propName), "p1ChannelLabel%d", i+1);
+            WRITE_PROPERTY(propName, parameters->p1RelayLabels[i]);
         }
 
-        return true;
+		WRITE_PROPERTY("p2RelayStates", parameters->p2RelayStates);
+
+		for (int i = 0; i < NUM_RELAYS; i++) {
+			char propName[16];
+			snprintf(propName, sizeof(propName), "p2ChannelLabel%d", i + 1);
+			WRITE_PROPERTY(propName, parameters->p2RelayLabels[i]);
+		}
+		
+		WRITE_PROPERTY("extRelayState", parameters->extRelayState);
+
+		return true;
     }
     
     bool readProfileProperties(psu::profile::ReadContext &ctx, uint8_t *buffer) override {
@@ -661,22 +713,38 @@ public:
         }
         auto parameters = (ProfileParameters *)buffer;
         
-        READ_PROPERTY("relayStates", parameters->relayStates);
+        READ_PROPERTY("p1RelayStates", parameters->p1RelayStates);
 		
         for (int i = 0; i < NUM_RELAYS; i++) {
             char propName[16];
-            snprintf(propName, sizeof(propName), "channelLabel%d", i+1);
-            READ_STRING_PROPERTY(propName, parameters->relayLabels[i], RELAY_LABEL_MAX_LENGTH);
+            snprintf(propName, sizeof(propName), "p1ChannelLabel%d", i+1);
+            READ_STRING_PROPERTY(propName, parameters->p1RelayLabels[i], RELAY_LABEL_MAX_LENGTH);
         }
 
-        return false;
+		READ_PROPERTY("p2RelayStates", parameters->p2RelayStates);
+
+		for (int i = 0; i < NUM_RELAYS; i++) {
+			char propName[16];
+			snprintf(propName, sizeof(propName), "p2ChannelLabel%d", i + 1);
+			READ_STRING_PROPERTY(propName, parameters->p2RelayLabels[i], RELAY_LABEL_MAX_LENGTH);
+		}
+
+		READ_PROPERTY("extRelayState", parameters->extRelayState);
+		
+		return false;
     }
 
     void resetConfiguration() {
         Module::resetConfiguration();
-        relayStates = 0;
-        memset(relayLabels, 0, sizeof(relayLabels));
-    }
+
+		p1RelayStates = 0;
+        memset(p1RelayLabels, 0, sizeof(p1RelayLabels));
+
+		p2RelayStates = 0;
+		memset(p2RelayLabels, 0, sizeof(p2RelayLabels));
+
+		extRelayState = 0;
+	}
 
     size_t getChannelLabelMaxLength(int subchannelIndex) override {
         return RELAY_LABEL_MAX_LENGTH;
@@ -687,7 +755,8 @@ public:
             return SCPI_ERROR_HARDWARE_MISSING;
         } 
         
-        label = relayLabels[subchannelIndex];
+		// TODO
+        label = p1RelayLabels[subchannelIndex];
         return SCPI_RES_OK;
     }
 
@@ -702,12 +771,14 @@ public:
 
     const char *getDefaultChannelLabel(int subchannelIndex) override {
         static const char *g_relayLabels[NUM_RELAYS] = {
-            "Relay #1",
-            "Relay #2",
-            "Relay #3",
-            "Relay #4",
-            "Relay #5",
-            "Relay #6"
+            "P1.1",
+            "P1.2",
+            "P1.3",
+            "P1.4",
+            "P1.5",
+            "P1.6",
+			"P1.7",
+			"P1.C"
         };
 
 		return g_relayLabels[subchannelIndex];
@@ -733,27 +804,73 @@ public:
             length = RELAY_LABEL_MAX_LENGTH;
         }
 
-        stringCopy(relayLabels[subchannelIndex], length + 1, label);
+		// TODO
+        stringCopy(p1RelayLabels[subchannelIndex], length + 1, label);
 
         return SCPI_RES_OK;
     }
 
+    bool isValidSubchannelIndex(int subchannelIndex) override {
+        subchannelIndex++;
+        return subchannelIndex == 1 || subchannelIndex == 2 || subchannelIndex == 3 ||
+            (subchannelIndex >= 11 && subchannelIndex <= 17) ||
+            (subchannelIndex >= 21 && subchannelIndex <= 27);
+    }
+
+    int getSubchannelIndexFromRelativeChannelIndex(int relativeChannelIndex) override {
+        int subchannelIndex;
+        if (relativeChannelIndex == 0) {
+            subchannelIndex = 1; // P1 "activation" ralay, i.e. P1_C
+        } else if (relativeChannelIndex == 1) {
+            subchannelIndex = 2; // P2 "activation" ralay, i.e. P2_C
+        } else if (relativeChannelIndex == 2) {
+            subchannelIndex = 3; // EXT relay
+        } else if (relativeChannelIndex >= 3 && relativeChannelIndex < 10) {
+            subchannelIndex = 11 + (relativeChannelIndex - 3); // P1_1 : P1_7
+        } else {
+            subchannelIndex = 21 + (relativeChannelIndex - 10); // P2_1 : P2_7
+        }
+        return subchannelIndex - 1;
+    }
+
     bool isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err) override {
-        if (subchannelIndex < 0 || subchannelIndex > 5) {
-            if (err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
-            }
-            return false;
+        subchannelIndex++;
+
+        if (subchannelIndex == 1) {
+            isRouteOpen = p1RelayStates & (1 << 7) ? false : true;
+            return true;
         }
 
-        isRouteOpen = relayStates & (1 << subchannelIndex) ? false : true;
-        return true;
+        if (subchannelIndex == 2) {
+            isRouteOpen = p2RelayStates & (1 << 7) ? false : true;
+            return true;
+        }
+
+        if (subchannelIndex == 3) {
+            isRouteOpen = extRelayState ? false : true;
+            return true;
+        }
+
+        if (subchannelIndex >= 11 && subchannelIndex <= 17) {
+            isRouteOpen = p1RelayStates & (1 << (subchannelIndex - 11)) ? false : true;
+            return true;
+        }
+
+        if (subchannelIndex >= 21 && subchannelIndex <= 27) {
+            isRouteOpen = p2RelayStates & (1 << (subchannelIndex - 21)) ? false : true;
+            return true;
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+        }
+        return false;
     }
 
     bool routeOpen(ChannelList channelList, int *err) override {
         for (int i = 0; i < channelList.numChannels; i++) {
 			int subchannelIndex = channelList.channels[i].subchannelIndex;
-            if (subchannelIndex < 0 || subchannelIndex > 5) {
+            if (!isValidSubchannelIndex(subchannelIndex)) {
                 if (err) {
                     *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
                 }
@@ -763,7 +880,20 @@ public:
 
         for (int i = 0; i < channelList.numChannels; i++) {
 			int subchannelIndex = channelList.channels[i].subchannelIndex;
-			relayStates &= ~(1 << subchannelIndex);
+
+            subchannelIndex++;
+
+            if (subchannelIndex == 1) {
+                p1RelayStates &= ~(1 << 7);
+            } else if (subchannelIndex == 2) {
+                p2RelayStates &= ~(1 << 7);
+            } else if (subchannelIndex == 3) {
+                extRelayState = 0;
+            } else if (subchannelIndex >= 11 && subchannelIndex <= 17) {
+			    p1RelayStates &= ~(1 << (subchannelIndex - 11));
+            } else if (subchannelIndex >= 21 && subchannelIndex <= 27) {
+			    p2RelayStates &= ~(1 << (subchannelIndex - 21));
+            }            
         }
 
         return true;
@@ -772,7 +902,7 @@ public:
     bool routeClose(ChannelList channelList, int *err) override {
         for (int i = 0; i < channelList.numChannels; i++) {
 			int subchannelIndex = channelList.channels[i].subchannelIndex;
-            if (subchannelIndex < 0 || subchannelIndex > 5) {
+            if (!isValidSubchannelIndex(subchannelIndex)) {
                 if (err) {
                     *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
                 }
@@ -782,7 +912,20 @@ public:
 
         for (int i = 0; i < channelList.numChannels; i++) {
 			int subchannelIndex = channelList.channels[i].subchannelIndex;
-			relayStates |= (1 << subchannelIndex);
+
+            subchannelIndex++;
+
+            if (subchannelIndex == 1) {
+                p1RelayStates |= 1 << 7;
+            } else if (subchannelIndex == 2) {
+                p2RelayStates |= 1 << 7;
+            } else if (subchannelIndex == 3) {
+                extRelayState = 1;
+            } else if (subchannelIndex >= 11 && subchannelIndex <= 17) {
+			    p1RelayStates |= 1 << (subchannelIndex - 11);
+            } else if (subchannelIndex >= 21 && subchannelIndex <= 27) {
+			    p2RelayStates |= 1 << (subchannelIndex - 21);
+            }            
         }
 
         return true;
@@ -795,37 +938,92 @@ public:
     }
 
     bool getRelayCycles(int subchannelIndex, uint32_t &relayCycles, int *err) override {
-        if (subchannelIndex < 0 || subchannelIndex >= NUM_RELAYS) {
+        if (!isValidSubchannelIndex(subchannelIndex)) {
             if (err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
             return false;
         }
 
-		relayCycles = this->relayCycles[subchannelIndex];
+        subchannelIndex++;
+
+        if (subchannelIndex == 1) {
+		    relayCycles = p1RelayCycles[7];
+        } else if (subchannelIndex == 2) {
+		    relayCycles = p2RelayCycles[7];
+        } else if (subchannelIndex == 3) {
+		    relayCycles = extRelayCycles;
+        } else if (subchannelIndex >= 11 && subchannelIndex <= 17) {
+		    relayCycles = p1RelayCycles[subchannelIndex - 11];
+        } else if (subchannelIndex >= 21 && subchannelIndex <= 27) {
+		    relayCycles = p1RelayCycles[subchannelIndex - 21];
+        }
 
         return true;
     }
 
-    void updateRelayCycles(uint8_t oldRelayStates, uint8_t newRelayStates) {
+    void updateRelayCycles(SetParams oldParams, SetParams &newParams) {
         for (int i = 0; i < NUM_RELAYS; i++) {
-            if (!(oldRelayStates & (1 << i)) && (newRelayStates & (1 << i))) {
-                relayCycles[i]++;
+            if (!(oldParams.p1RelayStates & (1 << i)) && (newParams.p1RelayStates & (1 << i))) {
+                p1RelayCycles[i]++;
+            }
+		
+			if (!(oldParams.p2RelayStates & (1 << i)) && (newParams.p2RelayStates & (1 << i))) {
+				p2RelayCycles[i]++;
+			}
+		}
+
+		if (!oldParams.extRelayState && newParams.extRelayState) {
+			extRelayCycles++;
+		}
+	}
+
+    void loadRelayCylces() {
+        for (int relativeChannelIndex = 0; relativeChannelIndex < 1 + 2 * NUM_RELAYS; relativeChannelIndex++) {
+            auto relayCycles = persist_conf::readCounter(slotIndex, relativeChannelIndex);
+
+			int subchannelIndex = getSubchannelIndexFromRelativeChannelIndex(relativeChannelIndex);
+            subchannelIndex++;
+
+            if (subchannelIndex == 1) {
+                p1RelayCycles[7] = relayCycles;
+            } else if (subchannelIndex == 2) {
+                p2RelayCycles[7] = relayCycles;
+            } else if (subchannelIndex == 3) {
+                extRelayCycles = relayCycles;
+            } else if (subchannelIndex >= 11 && subchannelIndex <= 17) {
+                p1RelayCycles[subchannelIndex - 11] = relayCycles;
+            } else if (subchannelIndex >= 21 && subchannelIndex <= 27) {
+                p2RelayCycles[subchannelIndex - 21] = relayCycles;
             }
         }
     }
 
-    void loadRelayCylces() {
-        for (int i = 0; i < NUM_RELAYS; i++) {
-            relayCycles[i] = lastWrittenRelayCycles[i] = persist_conf::readCounter(slotIndex, i);
-        }
-    }
-
     void saveRelayCycles() {
-        for (int i = 0; i < NUM_RELAYS; i++) {
-            if (relayCycles[i] != lastWrittenRelayCycles[i]) {
-                persist_conf::writeCounter(slotIndex, i, relayCycles[i]);
-                lastWrittenRelayCycles[i] = relayCycles[i];
+        for (int relativeChannelIndex = 0; relativeChannelIndex < 1 + 2 * NUM_RELAYS; relativeChannelIndex++) {
+			int subchannelIndex = getSubchannelIndexFromRelativeChannelIndex(relativeChannelIndex);
+            subchannelIndex++;
+
+            if (subchannelIndex == 1) {
+                if (p1RelayCycles[7] != lastWrittenP1RelayCycles[7]) {
+                    persist_conf::writeCounter(slotIndex, relativeChannelIndex, p1RelayCycles[7]);
+                }
+            } else if (subchannelIndex == 2) {
+                if (p2RelayCycles[7] != lastWrittenP2RelayCycles[7]) {
+                    persist_conf::writeCounter(slotIndex, relativeChannelIndex, p2RelayCycles[7]);
+                }
+            } else if (subchannelIndex == 3) {
+                if (extRelayCycles != lastWrittenExtRelayCycles) {
+                    persist_conf::writeCounter(slotIndex, relativeChannelIndex, extRelayCycles);
+                }
+            } else if (subchannelIndex >= 11 && subchannelIndex <= 17) {
+                if (p1RelayCycles[subchannelIndex - 11] != lastWrittenP1RelayCycles[subchannelIndex - 11]) {
+                    persist_conf::writeCounter(slotIndex, relativeChannelIndex, p1RelayCycles[subchannelIndex - 11]);
+                }
+            } else if (subchannelIndex >= 21 && subchannelIndex <= 27) {
+                if (p2RelayCycles[subchannelIndex - 21] != lastWrittenP2RelayCycles[subchannelIndex - 21]) {
+                    persist_conf::writeCounter(slotIndex, relativeChannelIndex, p2RelayCycles[subchannelIndex - 21]);
+                }
             }
         }
     }
@@ -862,7 +1060,7 @@ namespace gui {
 
 using namespace dib_mux14d;
 
-void data_dib_mux14d_relays(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p1_relays(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = NUM_RELAYS;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -870,22 +1068,22 @@ void data_dib_mux14d_relays(DataOperationEnum operation, Cursor cursor, Value &v
     } 
 }
 
-void data_dib_mux14d_is_relay_1_or_6(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int subchannelIndex = cursor % NUM_RELAYS;
-        value = subchannelIndex == 0 || subchannelIndex == 5;
-    }
+void data_dib_mux14d_p1_relay_is_first(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int subchannelIndex = cursor % NUM_RELAYS;
+		value = subchannelIndex == 0;
+	}
 }
 
-void data_dib_mux14d_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p1_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_RELAYS;
         int subchannelIndex = cursor % NUM_RELAYS;
-        value = ((Mux14DModule *)g_slots[slotIndex])->relayStates & (1 << subchannelIndex) ? 1 : 0;
+        value = ((Mux14DModule *)g_slots[slotIndex])->p1RelayStates & (1 << subchannelIndex) ? 1 : 0;
     }
 }
 
-void data_dib_mux14d_relay_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p1_relay_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_RELAYS;
         int subchannelIndex = cursor % NUM_RELAYS;
@@ -902,45 +1100,87 @@ void data_dib_mux14d_relay_label(DataOperationEnum operation, Cursor cursor, Val
     }
 }
 
-void data_dib_mux14d_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p1_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = cursor / NUM_RELAYS;
 		int subchannelIndex = cursor % NUM_RELAYS;
-		value = Value(((Mux14DModule *)g_slots[slotIndex])->relayCycles[subchannelIndex], VALUE_TYPE_UINT32);
+		value = Value(((Mux14DModule *)g_slots[slotIndex])->p1RelayCycles[subchannelIndex], VALUE_TYPE_UINT32);
 	}
 }
 
-void action_dib_mux14d_toggle_relay() {
-    int cursor = getFoundWidgetAtDown().cursor;
-    int slotIndex = cursor / NUM_RELAYS;
-    int subchannelIndex = cursor % NUM_RELAYS;
-    ((Mux14DModule *)g_slots[slotIndex])->relayStates ^= 1 << subchannelIndex;
+void action_dib_mux14d_toggle_p1_relay() {
+	int cursor = getFoundWidgetAtDown().cursor;
+	int slotIndex = cursor / NUM_RELAYS;
+	int subchannelIndex = cursor % NUM_RELAYS;
+	((Mux14DModule *)g_slots[slotIndex])->p1RelayStates ^= 1 << subchannelIndex;
 }
 
-void action_dib_mux14d_show_relay_labels() {
-    hmi::selectSlot(getFoundWidgetAtDown().cursor);
-    pushPage(PAGE_ID_DIB_MUX14D_CHANNEL_LABELS);
+void data_dib_mux14d_p2_relays(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_COUNT) {
+		value = NUM_RELAYS;
+	} else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+		value = hmi::g_selectedSlotIndex * NUM_RELAYS + value.getInt();
+	}
 }
 
-void data_dib_mux14d_relay_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        static const char *g_relayLabelLabels[NUM_RELAYS] = {
-            "Relay #1 label:",
-            "Relay #2 label:",
-            "Relay #3 label:",
-            "Relay #4 label:",
-            "Relay #5 label:",
-            "Relay #6 label:"
-        };
-        value = g_relayLabelLabels[cursor % NUM_RELAYS];
-    }
+void data_dib_mux14d_p2_relay_is_first(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int subchannelIndex = cursor % NUM_RELAYS;
+		value = subchannelIndex == 0;
+	}
 }
 
-void action_dib_mux14d_change_relay_label() {
-    int cursor = getFoundWidgetAtDown().cursor;
-    int slotIndex = cursor / NUM_RELAYS;
-    int subchannelIndex = cursor % NUM_RELAYS;
-    LabelsAndColorsPage::editChannelLabel(slotIndex, subchannelIndex);
+void data_dib_mux14d_p2_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex = cursor / NUM_RELAYS;
+		int subchannelIndex = cursor % NUM_RELAYS;
+		value = ((Mux14DModule *)g_slots[slotIndex])->p2RelayStates & (1 << subchannelIndex) ? 1 : 0;
+	}
+}
+
+void data_dib_mux14d_p2_relay_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex = cursor / NUM_RELAYS;
+		int subchannelIndex = cursor % NUM_RELAYS;
+		if (isPageOnStack(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS)) {
+			const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, subchannelIndex);
+			if (*label) {
+				value = label;
+			} else {
+				value = g_slots[slotIndex]->getDefaultChannelLabel(subchannelIndex);
+			}
+		} else {
+			value = ((Mux14DModule *)g_slots[slotIndex])->getRelayLabelOrDefault(subchannelIndex);
+		}
+	}
+}
+
+void data_dib_mux14d_p2_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex = cursor / NUM_RELAYS;
+		int subchannelIndex = cursor % NUM_RELAYS;
+		value = Value(((Mux14DModule *)g_slots[slotIndex])->p2RelayCycles[subchannelIndex], VALUE_TYPE_UINT32);
+	}
+}
+
+void action_dib_mux14d_toggle_p2_relay() {
+	int cursor = getFoundWidgetAtDown().cursor;
+	int slotIndex = cursor / NUM_RELAYS;
+	int subchannelIndex = cursor % NUM_RELAYS;
+	((Mux14DModule *)g_slots[slotIndex])->p2RelayStates ^= 1 << subchannelIndex;
+}
+
+void data_dib_mux14d_ext_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex = cursor / NUM_RELAYS;
+		value = ((Mux14DModule *)g_slots[slotIndex])->extRelayState ? 1 : 0;
+	}
+}
+
+void action_dib_mux14d_toggle_ext_relay() {
+	int cursor = getFoundWidgetAtDown().cursor;
+	int slotIndex = cursor / NUM_RELAYS;
+	((Mux14DModule *)g_slots[slotIndex])->extRelayState = !((Mux14DModule *)g_slots[slotIndex])->extRelayState;
 }
 
 } // namespace dib_mux14d

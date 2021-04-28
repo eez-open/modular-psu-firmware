@@ -338,10 +338,6 @@ struct CalConf {
     float offsetAndScale(float value) {
         return state.calEnabled ? remap(value, points[0].calValue, points[0].uncalValue, points[1].calValue, points[1].uncalValue) : value;
     }
-
-    float scale(float value) {
-        return state.calEnabled ? (value * (points[1].uncalValue - points[0].uncalValue) / (points[1].calValue - points[0].calValue)) : value;
-    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -783,7 +779,7 @@ struct AinChannel {
     }
 
 	float getValue() {
-		return roundPrec(ongoingCal ? m_value : calConf[getCalConfIndex()].scale(m_value), getResolution());
+		return roundPrec(ongoingCal ? m_value : calConf[getCalConfIndex()].offsetAndScale(m_value), getResolution());
 	}
 
 	static uint8_t getCurrentRangeMaxValue(int subchannelIndex) {

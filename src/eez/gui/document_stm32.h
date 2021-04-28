@@ -545,12 +545,17 @@ enum DataEnum {
     DATA_ID_DIB_DCM224_SLOT_2CH_CH1_INDEX = 543,
     DATA_ID_DIB_DCM224_SLOT_2CH_CH2_INDEX = 544,
     DATA_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_VIEW = 545,
-    DATA_ID_DIB_MUX14D_RELAYS = 546,
-    DATA_ID_DIB_MUX14D_RELAY_IS_ON = 547,
-    DATA_ID_DIB_MUX14D_RELAY_LABEL = 548,
-    DATA_ID_DIB_MUX14D_RELAY_CYCLES = 549,
-    DATA_ID_DIB_MUX14D_RELAY_LABEL_LABEL = 550,
-    DATA_ID_DIB_MUX14D_IS_RELAY_1_OR_6 = 551
+    DATA_ID_DIB_MUX14D_P1_RELAYS = 546,
+    DATA_ID_DIB_MUX14D_P1_RELAY_LABEL = 547,
+    DATA_ID_DIB_MUX14D_P1_RELAY_IS_FIRST = 548,
+    DATA_ID_DIB_MUX14D_P1_RELAY_IS_ON = 549,
+    DATA_ID_DIB_MUX14D_P1_RELAY_CYCLES = 550,
+    DATA_ID_DIB_MUX14D_P2_RELAYS = 551,
+    DATA_ID_DIB_MUX14D_P2_RELAY_LABEL = 552,
+    DATA_ID_DIB_MUX14D_P2_RELAY_IS_FIRST = 553,
+    DATA_ID_DIB_MUX14D_P2_RELAY_IS_ON = 554,
+    DATA_ID_DIB_MUX14D_P2_RELAY_CYCLES = 555,
+    DATA_ID_DIB_MUX14D_EXT_RELAY_IS_ON = 556
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -1099,12 +1104,17 @@ void data_dib_dcm224_slot_micro_2ch_view(DataOperationEnum operation, Cursor cur
 void data_dib_dcm224_slot_2ch_ch1_index(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_dcm224_slot_2ch_ch2_index(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_dcm224_slot_max_2ch_min_view(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_dib_mux14d_relays(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_dib_mux14d_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_dib_mux14d_relay_label(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_dib_mux14d_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_dib_mux14d_relay_label_label(DataOperationEnum operation, Cursor cursor, Value &value);
-void data_dib_mux14d_is_relay_1_or_6(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p1_relays(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p1_relay_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p1_relay_is_first(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p1_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p1_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p2_relays(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p2_relay_label(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p2_relay_is_first(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p2_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p2_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_ext_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
@@ -1401,9 +1411,9 @@ enum ActionsEnum {
     ACTION_ID_DIB_SMX46_CHANGE_SUBCHANNEL_LABEL = 287,
     ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_COUNTERPHASE_DITHERING = 288,
     ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_PWM_ENABLED = 289,
-    ACTION_ID_DIB_MUX14D_TOGGLE_RELAY = 290,
-    ACTION_ID_DIB_MUX14D_SHOW_RELAY_LABELS = 291,
-    ACTION_ID_DIB_MUX14D_CHANGE_RELAY_LABEL = 292
+    ACTION_ID_DIB_MUX14D_TOGGLE_P1_RELAY = 290,
+    ACTION_ID_DIB_MUX14D_TOGGLE_P2_RELAY = 291,
+    ACTION_ID_DIB_MUX14D_TOGGLE_EXT_RELAY = 292
 };
 
 void action_channel_toggle_output();
@@ -1695,9 +1705,9 @@ void action_dib_smx46_edit_x_label();
 void action_dib_smx46_change_subchannel_label();
 void action_dib_dcm224_ch_settings_adv_toggle_counterphase_dithering();
 void action_dib_dcm224_ch_settings_adv_toggle_pwm_enabled();
-void action_dib_mux14d_toggle_relay();
-void action_dib_mux14d_show_relay_labels();
-void action_dib_mux14d_change_relay_label();
+void action_dib_mux14d_toggle_p1_relay();
+void action_dib_mux14d_toggle_p2_relay();
+void action_dib_mux14d_toggle_ext_relay();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -2080,7 +2090,11 @@ enum StylesEnum {
     STYLE_ID_MON_VALUE_14_RIGHT = 342,
     STYLE_ID_CHANNEL_OFF_BUTTON_14 = 343,
     STYLE_ID_MON_VALUE_24_RIGHT = 344,
-    STYLE_ID_INLINE345 = 345
+    STYLE_ID_INLINE345 = 345,
+    STYLE_ID_INLINE346 = 346,
+    STYLE_ID_INLINE347 = 347,
+    STYLE_ID_INLINE348 = 348,
+    STYLE_ID_INLINE349 = 349
 };
 
 enum ThemesEnum {
@@ -2479,4 +2493,4 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_CHANNEL_LABELS = 282
 };
 
-extern const uint8_t assets[343572];
+extern const uint8_t assets[345214];
