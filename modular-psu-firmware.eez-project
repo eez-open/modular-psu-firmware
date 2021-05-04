@@ -39515,21 +39515,42 @@
               }
             },
             {
-              "type": "Text",
+              "type": "Container",
               "left": 0,
               "top": 0,
               "width": 480,
               "height": 240,
-              "wireID": "ee2ec6bf-1ffa-4bc9-c27c-87fdb152062f",
-              "action": "show_previous_page",
+              "wireID": "f2426aa8-c9cc-4bc3-998b-a6fc6d22cfbf",
               "style": {
-                "inheritFrom": "default",
-                "font": "Oswald17",
-                "color": "status_warning",
-                "activeColor": "status_warning",
-                "activeBackgroundColor": "background"
+                "inheritFrom": "default"
               },
-              "text": "Pinout image not found on the SD card!"
+              "widgets": [
+                {
+                  "type": "TextWidget",
+                  "left": 0,
+                  "top": 88,
+                  "width": 480,
+                  "height": 32,
+                  "wireID": "79096a86-daad-419a-b50f-4852c05209e2",
+                  "style": {
+                    "inheritFrom": "default_M_warning"
+                  },
+                  "text": "Pinout image not found on the SD card!"
+                },
+                {
+                  "type": "TextWidget",
+                  "left": 0,
+                  "top": 120,
+                  "width": 480,
+                  "height": 32,
+                  "wireID": "b0467d96-9d6b-4083-cb09-2bca3b1150a9",
+                  "style": {
+                    "inheritFrom": "default_M",
+                    "font": "Oswald14"
+                  },
+                  "text": "Use EEZ Studio to upload pinout images."
+                }
+              ]
             }
           ]
         },
