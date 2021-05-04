@@ -769,20 +769,23 @@ public:
         return true;
     }
     
-    bool routeClose(ChannelList channelList, int *err) override {
-        for (int i = 0; i < channelList.numChannels; i++) {
-			int subchannelIndex = channelList.channels[i].subchannelIndex;
-            if (subchannelIndex < 0 || subchannelIndex > 5) {
-                if (err) {
-                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
-                }
-                return false;
+    bool routeCloseExclusive(ChannelList channelList, int *err) override {
+        if (channelList.numChannels != 1) {
+            if (err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
+            return false;            
         }
 
-        for (int i = 0; i < channelList.numChannels; i++) {
-			int subchannelIndex = channelList.channels[i].subchannelIndex;
-			relayStates |= (1 << subchannelIndex);
+        int subchannelIndex = channelList.channels[0].subchannelIndex + 1;
+
+        if (subchannelIndex >= 1 && subchannelIndex <= NUM_RELAYS) {
+			relayStates = (1 << (subchannelIndex - 1));
+        } else {
+            if (err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
         }
 
         return true;

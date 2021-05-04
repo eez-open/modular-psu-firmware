@@ -2399,6 +2399,21 @@ bool routeClose(ChannelList channelList, int *err) {
     return g_slots[slotIndex]->routeClose(channelList, err);
 }
 
+bool routeCloseExclusive(ChannelList channelList, int *err) {
+    int slotIndex = channelList.channels[0].slotIndex;
+
+    for (int i = 1; i < channelList.numChannels; i++) {
+        if (channelList.channels[i].slotIndex != slotIndex) {
+            if (err) {
+                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+            }
+            return false;
+        }
+    }
+
+    return g_slots[slotIndex]->routeCloseExclusive(channelList, err);
+}
+
 bool getVoltage(int slotIndex, int subchannelIndex, float &value, int *err) {
     return g_slots[slotIndex]->getVoltage(subchannelIndex, value, err);
 }

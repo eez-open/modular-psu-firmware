@@ -33,7 +33,7 @@
     {
       "name": "p1_relays",
       "type": "list",
-      "defaultValue": "[\n    { \"p1_relay_label\": \"P1.1\", \"p1_relay_is_first\": true, \"p1_relay_is_on\": true, \"p1_relay_cycles\": 99999 },\n    { \"p1_relay_label\": \"P1.2\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": true, \"p1_relay_cycles\": 23 },\n    { \"p1_relay_label\": \"P1.3\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": false, \"p1_relay_cycles\": 11 },\n    { \"p1_relay_label\": \"P1.4\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": true, \"p1_relay_cycles\": 5 },\n    { \"p1_relay_label\": \"P1.5\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": false, \"p1_relay_cycles\": 3 },\n    { \"p1_relay_label\": \"P1.6\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": false, \"p1_relay_cycles\": 1 },\n    { \"p1_relay_label\": \"P1.7\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": false, \"p1_relay_cycles\": 1 },\n    { \"p1_relay_label\": \"P1.C\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": true, \"p1_relay_cycles\": 1 }\n]"
+      "defaultValue": "[\n    { \"p1_relay_label\": \"P1.1\", \"p1_relay_is_first\": true, \"p1_relay_is_on\": true, \"p1_relay_cycles\": 99999 },\n    { \"p1_relay_label\": \"P1.2\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": true, \"p1_relay_cycles\": 23 },\n    { \"p1_relay_label\": \"P1.3\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": false, \"p1_relay_cycles\": 11 },\n    { \"p1_relay_label\": \"P1.4\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": true, \"p1_relay_cycles\": 5 },\n    { \"p1_relay_label\": \"P1.5\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": false, \"p1_relay_cycles\": 3 },\n    { \"p1_relay_label\": \"P1.6\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": false, \"p1_relay_cycles\": 1 },\n    { \"p1_relay_label\": \"P1.7\", \"p1_relay_is_first\": false, \"p1_relay_is_on\": false, \"p1_relay_cycles\": 1 }\n]"
     },
     {
       "name": "p1_relay_label",
@@ -56,9 +56,14 @@
       "defaultValue": "42"
     },
     {
+      "name": "p1_relay_label_label",
+      "type": "string",
+      "defaultValue": "Relay #1 label:"
+    },
+    {
       "name": "p2_relays",
       "type": "list",
-      "defaultValue": "[\n    { \"p2_relay_label\": \"P2.1\", \"p2_relay_is_first\": true, \"p2_relay_is_on\": false, \"p2_relay_cycles\": 42 },\n    { \"p2_relay_label\": \"P2.2\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": false, \"p2_relay_cycles\": 11 },\n    { \"p2_relay_label\": \"P2.3\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": false, \"p2_relay_cycles\": 5 },\n    { \"p2_relay_label\": \"P2.4\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": true, \"p2_relay_cycles\": 2 },\n    { \"p2_relay_label\": \"P2.5\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": true, \"p2_relay_cycles\": 2 },\n    { \"p2_relay_label\": \"P2.6\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": true, \"p2_relay_cycles\": 2 },\n    { \"p2_relay_label\": \"P2.7\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": false, \"p2_relay_cycles\": 1 },\n    { \"p2_relay_label\": \"P2.C\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": true, \"p2_relay_cycles\": 1 }\n]"
+      "defaultValue": "[\n    { \"p2_relay_label\": \"P2.1\", \"p2_relay_is_first\": true, \"p2_relay_is_on\": false, \"p2_relay_cycles\": 42 },\n    { \"p2_relay_label\": \"P2.2\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": false, \"p2_relay_cycles\": 11 },\n    { \"p2_relay_label\": \"P2.3\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": false, \"p2_relay_cycles\": 5 },\n    { \"p2_relay_label\": \"P2.4\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": true, \"p2_relay_cycles\": 2 },\n    { \"p2_relay_label\": \"P2.5\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": true, \"p2_relay_cycles\": 2 },\n    { \"p2_relay_label\": \"P2.6\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": true, \"p2_relay_cycles\": 2 },\n    { \"p2_relay_label\": \"P2.7\", \"p2_relay_is_first\": false, \"p2_relay_is_on\": false, \"p2_relay_cycles\": 1 }\n]"
     },
     {
       "name": "p2_relay_label",
@@ -81,9 +86,44 @@
       "defaultValue": "42"
     },
     {
+      "name": "p2_relay_label_label",
+      "type": "string",
+      "defaultValue": "Relay #1 label:"
+    },
+    {
       "name": "ext_relay_is_on",
       "type": "boolean",
       "defaultValue": "0"
+    },
+    {
+      "name": "ext_relay_cycles",
+      "type": "integer",
+      "defaultValue": "42"
+    },
+    {
+      "name": "adib1_relay_is_on",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
+      "name": "adib1_relay_cycles",
+      "type": "integer",
+      "defaultValue": "43"
+    },
+    {
+      "name": "adib2_relay_is_on",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
+      "name": "adib2_relay_cycles",
+      "type": "integer",
+      "defaultValue": "44"
+    },
+    {
+      "name": "cj_temp",
+      "type": "float",
+      "defaultValue": "23 oC"
     }
   ],
   "actions": [
@@ -95,7 +135,17 @@
     {
       "components": [],
       "connectionLines": [],
+      "name": "change_p1_relay_label"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
       "name": "toggle_p2_relay"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "change_p2_relay_label"
     },
     {
       "components": [],
@@ -105,7 +155,17 @@
     {
       "components": [],
       "connectionLines": [],
-      "name": "toggle_relays"
+      "name": "toggle_adib1_relay"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "toggle_adib2_relay"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "show_relay_labels"
     }
   ],
   "pages": [
@@ -162,7 +222,6 @@
           "style": {
             "inheritFrom": "default"
           },
-          "name": "Header",
           "widgets": [
             {
               "type": "Text",
@@ -210,407 +269,530 @@
           ]
         },
         {
-          "type": "Container",
+          "type": "ListWidget",
           "left": 0,
           "top": 32,
-          "width": 154,
-          "height": 204,
-          "wireID": "c764a8f7-c591-4f0d-cce7-2daca8921817",
-          "action": "toggle_relays",
+          "width": 77,
+          "height": 161,
+          "wireID": "0aed51fb-9e53-4883-9871-141371a17565",
+          "data": "p1_relays",
           "style": {
             "inheritFrom": "default"
           },
-          "name": "Body",
-          "widgets": [
-            {
-              "type": "ListWidget",
-              "left": 0,
-              "top": 0,
-              "width": 77,
-              "height": 184,
-              "wireID": "0aed51fb-9e53-4883-9871-141371a17565",
-              "data": "p1_relays",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "itemWidget": {
-                "type": "Container",
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 77,
+            "height": 23,
+            "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+            "action": "",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Select",
                 "left": 0,
                 "top": 0,
-                "width": 77,
+                "width": 8,
                 "height": 23,
-                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
+                "data": "p1_relay_is_first",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008f"
+                  },
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008e"
+                  }
+                ]
+              },
+              {
+                "type": "Select",
+                "left": 8,
+                "top": 0,
+                "width": 30,
+                "height": 23,
+                "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                "data": "p1_relay_is_on",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008c"
+                  },
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008d"
+                  }
+                ]
+              },
+              {
+                "type": "Text",
+                "left": 38,
+                "top": 0,
+                "width": 39,
+                "height": 22,
+                "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                "data": "p1_relay_label",
                 "action": "toggle_p1_relay",
                 "style": {
-                  "inheritFrom": "default"
+                  "inheritFrom": "default_S_left_condensed",
+                  "color": "action_color",
+                  "backgroundColor": "text_enable_background",
+                  "activeColor": "text_enable_background",
+                  "activeBackgroundColor": "action_color",
+                  "padding": "0 0 0 2"
                 },
-                "widgets": [
-                  {
-                    "type": "Select",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
-                    "data": "p1_relay_is_first",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 8,
-                        "height": 23,
-                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "alignVertical": "top",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c5"
-                      },
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 8,
-                        "height": 23,
-                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "alignVertical": "top",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c4"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Select",
-                    "left": 8,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
-                    "data": "p1_relay_is_on",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 30,
-                        "height": 23,
-                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c2"
-                      },
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 30,
-                        "height": 23,
-                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c3"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Text",
-                    "left": 38,
-                    "top": 0,
-                    "width": 39,
-                    "height": 22,
-                    "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
-                    "data": "p1_relay_label",
-                    "style": {
-                      "inheritFrom": "default_S_left_condensed",
-                      "padding": "0 0 0 2"
-                    },
-                    "text": ""
-                  }
-                ]
-              },
-              "listType": "vertical",
-              "gap": 0
+                "text": ""
+              }
+            ]
+          },
+          "listType": "vertical",
+          "gap": 0
+        },
+        {
+          "type": "ListWidget",
+          "left": 77,
+          "top": 32,
+          "width": 77,
+          "height": 161,
+          "wireID": "f00ac182-94a2-4d7d-b831-1a6cbdc292dd",
+          "data": "p2_relays",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 77,
+            "height": 23,
+            "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+            "action": "",
+            "style": {
+              "inheritFrom": "default"
             },
-            {
-              "type": "ListWidget",
-              "left": 77,
-              "top": 0,
-              "width": 77,
-              "height": 184,
-              "wireID": "f00ac182-94a2-4d7d-b831-1a6cbdc292dd",
-              "data": "p2_relays",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "itemWidget": {
-                "type": "Container",
+            "widgets": [
+              {
+                "type": "Select",
                 "left": 0,
                 "top": 0,
-                "width": 77,
+                "width": 8,
                 "height": 23,
-                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
-                "action": "toggle_p2_relay",
+                "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
+                "data": "p2_relay_is_first",
                 "style": {
                   "inheritFrom": "default"
                 },
                 "widgets": [
                   {
-                    "type": "Select",
+                    "type": "Text",
                     "left": 0,
                     "top": 0,
                     "width": 8,
                     "height": 23,
-                    "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
-                    "data": "p2_relay_is_first",
+                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                    "data": "",
                     "style": {
-                      "inheritFrom": "default"
+                      "inheritFrom": "image"
                     },
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 8,
-                        "height": 23,
-                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "alignVertical": "top",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c5"
-                      },
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 8,
-                        "height": 23,
-                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "alignVertical": "top",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c4"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Select",
-                    "left": 8,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
-                    "data": "p2_relay_is_on",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 30,
-                        "height": 23,
-                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c2"
-                      },
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 30,
-                        "height": 23,
-                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c3"
-                      }
-                    ]
+                    "text": "\\u008f"
                   },
                   {
                     "type": "Text",
-                    "left": 38,
+                    "left": 0,
                     "top": 0,
-                    "width": 39,
-                    "height": 22,
-                    "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
-                    "data": "p2_relay_label",
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                    "data": "",
                     "style": {
-                      "inheritFrom": "default_S_left_condensed",
-                      "padding": "0 0 0 2"
+                      "inheritFrom": "image"
                     },
-                    "text": ""
+                    "text": "\\u008e"
                   }
                 ]
               },
-              "listType": "vertical",
-              "gap": 0
+              {
+                "type": "Select",
+                "left": 8,
+                "top": 0,
+                "width": 30,
+                "height": 23,
+                "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                "data": "p2_relay_is_on",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008c"
+                  },
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008d"
+                  }
+                ]
+              },
+              {
+                "type": "Text",
+                "left": 38,
+                "top": 0,
+                "width": 39,
+                "height": 22,
+                "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                "data": "p2_relay_label",
+                "action": "toggle_p2_relay",
+                "style": {
+                  "inheritFrom": "default_S_left_condensed",
+                  "color": "action_color",
+                  "backgroundColor": "text_enable_background",
+                  "activeColor": "text_enable_background",
+                  "activeBackgroundColor": "action_color",
+                  "padding": "0 0 0 2"
+                },
+                "text": ""
+              }
+            ]
+          },
+          "listType": "vertical",
+          "gap": 0
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 193,
+          "width": 77,
+          "height": 23,
+          "wireID": "cb44f5d5-2e2d-4cc1-822e-ee22c2fb0c4c",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "ADIB1",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 8,
+              "height": 23,
+              "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
+              "data": "",
+              "style": {
+                "inheritFrom": "image"
+              },
+              "text": "\\u008f"
             },
             {
-              "type": "Container",
-              "left": 0,
-              "top": 184,
-              "width": 115,
-              "height": 20,
-              "wireID": "121c449d-87d4-419b-eb27-82cc516781ee",
-              "action": "toggle_ext_relay",
+              "type": "Select",
+              "left": 8,
+              "top": 0,
+              "width": 30,
+              "height": 23,
+              "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
+              "data": "adib1_relay_is_on",
               "style": {
                 "inheritFrom": "default"
               },
-              "name": "ext relay",
               "widgets": [
                 {
                   "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 51,
-                  "height": 20,
-                  "wireID": "41cf1c17-642b-43f7-ac9e-6b36bc989bed",
+                  "width": 30,
+                  "height": 23,
+                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
                   "data": "",
                   "style": {
-                    "inheritFrom": "option_toggle_L_center",
-                    "font": "Oswald17",
-                    "alignHorizontal": "left",
-                    "backgroundColor": "background",
-                    "activeColor": "background"
+                    "inheritFrom": "image"
                   },
-                  "text": "\\u00c6"
+                  "text": "\\u008c"
                 },
                 {
-                  "type": "Select",
-                  "left": 51,
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 30,
+                  "height": 23,
+                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u008d"
+                }
+              ]
+            },
+            {
+              "type": "Text",
+              "left": 38,
+              "top": 0,
+              "width": 39,
+              "height": 22,
+              "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+              "data": "",
+              "action": "toggle_adib1_relay",
+              "style": {
+                "inheritFrom": "default_S_left_condensed",
+                "color": "action_color",
+                "backgroundColor": "text_enable_background",
+                "activeColor": "text_enable_background",
+                "activeBackgroundColor": "action_color",
+                "padding": "0 0 0 2"
+              },
+              "text": "ADIB1"
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 216,
+          "width": 124,
+          "height": 20,
+          "wireID": "121c449d-87d4-419b-eb27-82cc516781ee",
+          "action": "",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "ext relay",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 51,
+              "height": 20,
+              "wireID": "41cf1c17-642b-43f7-ac9e-6b36bc989bed",
+              "data": "",
+              "style": {
+                "inheritFrom": "image"
+              },
+              "text": "\\u0090"
+            },
+            {
+              "type": "Select",
+              "left": 51,
+              "top": 0,
+              "width": 28,
+              "height": 20,
+              "wireID": "07d0d256-f5cb-450a-b63d-cb5cfcc5357e",
+              "data": "ext_relay_is_on",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
                   "top": 0,
                   "width": 28,
                   "height": 20,
-                  "wireID": "07d0d256-f5cb-450a-b63d-cb5cfcc5357e",
-                  "data": "ext_relay_is_on",
+                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                  "data": "",
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "image",
+                    "padding": "1 0 0 0"
                   },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 28,
-                      "height": 20,
-                      "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                      "data": "",
-                      "style": {
-                        "inheritFrom": "option_toggle_L_center",
-                        "font": "Oswald17",
-                        "alignHorizontal": "left",
-                        "backgroundColor": "background",
-                        "activeColor": "background"
-                      },
-                      "text": "\\u00c2"
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 28,
-                      "height": 20,
-                      "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                      "data": "",
-                      "style": {
-                        "inheritFrom": "option_toggle_L_center",
-                        "font": "Oswald17",
-                        "backgroundColor": "background",
-                        "activeColor": "background"
-                      },
-                      "text": "\\u00c3"
-                    }
-                  ]
+                  "text": "\\u008c"
                 },
                 {
                   "type": "Text",
-                  "left": 79,
+                  "left": 0,
                   "top": 0,
-                  "width": 6,
+                  "width": 28,
                   "height": 20,
-                  "wireID": "52dd2d67-12b1-4a20-ecdb-bdfa60ee4e33",
+                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
                   "data": "",
                   "style": {
-                    "inheritFrom": "option_toggle_L_center",
-                    "font": "Oswald17",
-                    "alignHorizontal": "left",
-                    "backgroundColor": "background",
-                    "activeColor": "background"
+                    "inheritFrom": "image",
+                    "padding": "1 0 0 0"
                   },
-                  "text": "\\u00c7"
-                },
-                {
-                  "type": "Text",
-                  "left": 85,
-                  "top": 0,
-                  "width": 30,
-                  "height": 20,
-                  "wireID": "967a30ec-79a3-48b7-e056-0fcd4885c416",
-                  "data": "",
-                  "style": {
-                    "inheritFrom": "default_S_left_condensed",
-                    "padding": "0 0 0 2"
-                  },
-                  "text": "EXT"
+                  "text": "\\u008d"
                 }
               ]
+            },
+            {
+              "type": "Text",
+              "left": 79,
+              "top": 0,
+              "width": 6,
+              "height": 20,
+              "wireID": "52dd2d67-12b1-4a20-ecdb-bdfa60ee4e33",
+              "data": "",
+              "style": {
+                "inheritFrom": "image"
+              },
+              "text": "\\u0091"
+            },
+            {
+              "type": "Text",
+              "left": 85,
+              "top": 0,
+              "width": 39,
+              "height": 20,
+              "wireID": "967a30ec-79a3-48b7-e056-0fcd4885c416",
+              "data": "",
+              "action": "toggle_ext_relay",
+              "style": {
+                "inheritFrom": "default_S_left_condensed",
+                "alignHorizontal": "center",
+                "color": "action_color",
+                "backgroundColor": "text_enable_background",
+                "activeColor": "text_enable_background",
+                "activeBackgroundColor": "action_color"
+              },
+              "text": "EXT"
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 77,
+          "top": 193,
+          "width": 77,
+          "height": 23,
+          "wireID": "143360bb-2de7-4575-ca14-79e43b850426",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "ADIB1",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 8,
+              "height": 23,
+              "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
+              "data": "",
+              "style": {
+                "inheritFrom": "image"
+              },
+              "text": "\\u008f"
+            },
+            {
+              "type": "Select",
+              "left": 8,
+              "top": 0,
+              "width": 30,
+              "height": 23,
+              "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
+              "data": "adib2_relay_is_on",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 30,
+                  "height": 23,
+                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u008c"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 30,
+                  "height": 23,
+                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u008d"
+                }
+              ]
+            },
+            {
+              "type": "Text",
+              "left": 38,
+              "top": 0,
+              "width": 39,
+              "height": 22,
+              "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+              "data": "",
+              "action": "toggle_adib2_relay",
+              "style": {
+                "inheritFrom": "default_S_left_condensed",
+                "color": "action_color",
+                "backgroundColor": "text_enable_background",
+                "activeColor": "text_enable_background",
+                "activeBackgroundColor": "action_color",
+                "padding": "0 0 0 2"
+              },
+              "text": "ADIB2"
             }
           ]
         }
@@ -636,7 +818,6 @@
           "style": {
             "inheritFrom": "default"
           },
-          "name": "Header",
           "widgets": [
             {
               "type": "Text",
@@ -684,407 +865,530 @@
           ]
         },
         {
-          "type": "Container",
-          "left": 38,
+          "type": "ListWidget",
+          "left": 40,
           "top": 32,
-          "width": 154,
-          "height": 204,
-          "wireID": "1d469953-4b7e-4ee3-ace4-a33956c61d67",
-          "action": "toggle_relays",
+          "width": 77,
+          "height": 161,
+          "wireID": "8dffee70-7ea1-4b0f-cf2b-8fb66403575d",
+          "data": "p1_relays",
           "style": {
             "inheritFrom": "default"
           },
-          "name": "Body",
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 77,
+            "height": 23,
+            "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+            "action": "",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Select",
+                "left": 0,
+                "top": 0,
+                "width": 8,
+                "height": 23,
+                "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
+                "data": "p1_relay_is_first",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008f"
+                  },
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008e"
+                  }
+                ]
+              },
+              {
+                "type": "Select",
+                "left": 8,
+                "top": 0,
+                "width": 30,
+                "height": 23,
+                "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                "data": "p1_relay_is_on",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008c"
+                  },
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008d"
+                  }
+                ]
+              },
+              {
+                "type": "Text",
+                "left": 38,
+                "top": 0,
+                "width": 39,
+                "height": 22,
+                "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                "data": "p1_relay_label",
+                "action": "toggle_p1_relay",
+                "style": {
+                  "inheritFrom": "default_S_left_condensed",
+                  "color": "action_color",
+                  "backgroundColor": "text_enable_background",
+                  "activeColor": "text_enable_background",
+                  "activeBackgroundColor": "action_color",
+                  "padding": "0 0 0 2"
+                },
+                "text": ""
+              }
+            ]
+          },
+          "listType": "vertical",
+          "gap": 0
+        },
+        {
+          "type": "ListWidget",
+          "left": 117,
+          "top": 32,
+          "width": 77,
+          "height": 161,
+          "wireID": "70881278-27bd-44ce-e00c-cd986f211261",
+          "data": "p2_relays",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 77,
+            "height": 23,
+            "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+            "action": "",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Select",
+                "left": 0,
+                "top": 0,
+                "width": 8,
+                "height": 23,
+                "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
+                "data": "p2_relay_is_first",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008f"
+                  },
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008e"
+                  }
+                ]
+              },
+              {
+                "type": "Select",
+                "left": 8,
+                "top": 0,
+                "width": 30,
+                "height": 23,
+                "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                "data": "p2_relay_is_on",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008c"
+                  },
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                    "data": "",
+                    "style": {
+                      "inheritFrom": "image"
+                    },
+                    "text": "\\u008d"
+                  }
+                ]
+              },
+              {
+                "type": "Text",
+                "left": 38,
+                "top": 0,
+                "width": 39,
+                "height": 22,
+                "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                "data": "p2_relay_label",
+                "action": "toggle_p2_relay",
+                "style": {
+                  "inheritFrom": "default_S_left_condensed",
+                  "color": "action_color",
+                  "backgroundColor": "text_enable_background",
+                  "activeColor": "text_enable_background",
+                  "activeBackgroundColor": "action_color",
+                  "padding": "0 0 0 2"
+                },
+                "text": ""
+              }
+            ]
+          },
+          "listType": "vertical",
+          "gap": 0
+        },
+        {
+          "type": "Container",
+          "left": 40,
+          "top": 193,
+          "width": 77,
+          "height": 23,
+          "wireID": "1281b982-bcd8-4ab9-cafb-7b2c1ce2c995",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "ADIB1",
           "widgets": [
             {
-              "type": "ListWidget",
+              "type": "Text",
               "left": 0,
               "top": 0,
-              "width": 77,
-              "height": 184,
-              "wireID": "c85c9127-23b4-4e0e-90da-8f60eccc520f",
-              "data": "p1_relays",
+              "width": 8,
+              "height": 23,
+              "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
+              "data": "",
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "image"
               },
-              "itemWidget": {
-                "type": "Container",
-                "left": 0,
-                "top": 0,
-                "width": 77,
-                "height": 23,
-                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
-                "action": "",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "widgets": [
-                  {
-                    "type": "Select",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
-                    "data": "p1_relay_is_first",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 8,
-                        "height": 23,
-                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "alignVertical": "top",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c5"
-                      },
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 8,
-                        "height": 23,
-                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "alignVertical": "top",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c4"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Select",
-                    "left": 8,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
-                    "data": "p1_relay_is_on",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 30,
-                        "height": 23,
-                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c2"
-                      },
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 30,
-                        "height": 23,
-                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c3"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Text",
-                    "left": 38,
-                    "top": 0,
-                    "width": 39,
-                    "height": 22,
-                    "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
-                    "data": "p1_relay_label",
-                    "style": {
-                      "inheritFrom": "default_S_left_condensed",
-                      "padding": "0 0 0 2"
-                    },
-                    "text": ""
-                  }
-                ]
-              },
-              "listType": "vertical",
-              "gap": 0
+              "text": "\\u008f"
             },
             {
-              "type": "ListWidget",
-              "left": 77,
+              "type": "Select",
+              "left": 8,
               "top": 0,
-              "width": 77,
-              "height": 184,
-              "wireID": "4540b7b3-34cb-4849-c633-4d009fa6df3f",
-              "data": "p2_relays",
+              "width": 30,
+              "height": 23,
+              "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
+              "data": "adib1_relay_is_on",
               "style": {
                 "inheritFrom": "default"
               },
-              "itemWidget": {
-                "type": "Container",
-                "left": 0,
-                "top": 0,
-                "width": 77,
-                "height": 23,
-                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
-                "action": "",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "widgets": [
-                  {
-                    "type": "Select",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
-                    "data": "p2_relay_is_first",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 8,
-                        "height": 23,
-                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "alignVertical": "top",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c5"
-                      },
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 8,
-                        "height": 23,
-                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "alignVertical": "top",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c4"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Select",
-                    "left": 8,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
-                    "data": "p2_relay_is_on",
-                    "style": {
-                      "inheritFrom": "default"
-                    },
-                    "widgets": [
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 30,
-                        "height": 23,
-                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c2"
-                      },
-                      {
-                        "type": "Text",
-                        "left": 0,
-                        "top": 0,
-                        "width": 30,
-                        "height": 23,
-                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                        "data": "",
-                        "style": {
-                          "inheritFrom": "option_toggle_L_center",
-                          "font": "Oswald17",
-                          "alignHorizontal": "left",
-                          "backgroundColor": "background",
-                          "activeColor": "background"
-                        },
-                        "text": "\\u00c3"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Text",
-                    "left": 38,
-                    "top": 0,
-                    "width": 39,
-                    "height": 22,
-                    "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
-                    "data": "p2_relay_label",
-                    "style": {
-                      "inheritFrom": "default_S_left_condensed",
-                      "padding": "0 0 0 2"
-                    },
-                    "text": ""
-                  }
-                ]
-              },
-              "listType": "vertical",
-              "gap": 0
-            },
-            {
-              "type": "Container",
-              "left": 0,
-              "top": 184,
-              "width": 115,
-              "height": 20,
-              "wireID": "5151dff3-46a7-46a1-d4c4-480dc3da4e1b",
-              "action": "",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "name": "ext relay",
               "widgets": [
                 {
                   "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 51,
-                  "height": 20,
-                  "wireID": "41cf1c17-642b-43f7-ac9e-6b36bc989bed",
+                  "width": 30,
+                  "height": 23,
+                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
                   "data": "",
                   "style": {
-                    "inheritFrom": "option_toggle_L_center",
-                    "font": "Oswald17",
-                    "alignHorizontal": "left",
-                    "backgroundColor": "background",
-                    "activeColor": "background"
+                    "inheritFrom": "image"
                   },
-                  "text": "\\u00c6"
+                  "text": "\\u008c"
                 },
                 {
-                  "type": "Select",
-                  "left": 51,
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 30,
+                  "height": 23,
+                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u008d"
+                }
+              ]
+            },
+            {
+              "type": "Text",
+              "left": 38,
+              "top": 0,
+              "width": 39,
+              "height": 22,
+              "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+              "data": "",
+              "action": "toggle_adib1_relay",
+              "style": {
+                "inheritFrom": "default_S_left_condensed",
+                "color": "action_color",
+                "backgroundColor": "text_enable_background",
+                "activeColor": "text_enable_background",
+                "activeBackgroundColor": "action_color",
+                "padding": "0 0 0 2"
+              },
+              "text": "ADIB1"
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 40,
+          "top": 216,
+          "width": 124,
+          "height": 20,
+          "wireID": "53db0016-be49-4208-a828-71a9ef0065ab",
+          "action": "",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "ext relay",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 51,
+              "height": 20,
+              "wireID": "41cf1c17-642b-43f7-ac9e-6b36bc989bed",
+              "data": "",
+              "style": {
+                "inheritFrom": "image"
+              },
+              "text": "\\u0090"
+            },
+            {
+              "type": "Select",
+              "left": 51,
+              "top": 0,
+              "width": 28,
+              "height": 20,
+              "wireID": "07d0d256-f5cb-450a-b63d-cb5cfcc5357e",
+              "data": "ext_relay_is_on",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
                   "top": 0,
                   "width": 28,
                   "height": 20,
-                  "wireID": "07d0d256-f5cb-450a-b63d-cb5cfcc5357e",
-                  "data": "ext_relay_is_on",
+                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                  "data": "",
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "image",
+                    "padding": "1 0 0 0"
                   },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 28,
-                      "height": 20,
-                      "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                      "data": "",
-                      "style": {
-                        "inheritFrom": "option_toggle_L_center",
-                        "font": "Oswald17",
-                        "alignHorizontal": "left",
-                        "backgroundColor": "background",
-                        "activeColor": "background"
-                      },
-                      "text": "\\u00c2"
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 28,
-                      "height": 20,
-                      "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                      "data": "",
-                      "style": {
-                        "inheritFrom": "option_toggle_L_center",
-                        "font": "Oswald17",
-                        "backgroundColor": "background",
-                        "activeColor": "background"
-                      },
-                      "text": "\\u00c3"
-                    }
-                  ]
+                  "text": "\\u008c"
                 },
                 {
                   "type": "Text",
-                  "left": 79,
+                  "left": 0,
                   "top": 0,
-                  "width": 6,
+                  "width": 28,
                   "height": 20,
-                  "wireID": "52dd2d67-12b1-4a20-ecdb-bdfa60ee4e33",
+                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
                   "data": "",
                   "style": {
-                    "inheritFrom": "option_toggle_L_center",
-                    "font": "Oswald17",
-                    "alignHorizontal": "left",
-                    "backgroundColor": "background",
-                    "activeColor": "background"
+                    "inheritFrom": "image",
+                    "padding": "1 0 0 0"
                   },
-                  "text": "\\u00c7"
-                },
-                {
-                  "type": "Text",
-                  "left": 85,
-                  "top": 0,
-                  "width": 30,
-                  "height": 20,
-                  "wireID": "967a30ec-79a3-48b7-e056-0fcd4885c416",
-                  "data": "",
-                  "style": {
-                    "inheritFrom": "default_S_left_condensed",
-                    "padding": "0 0 0 2"
-                  },
-                  "text": "EXT"
+                  "text": "\\u008d"
                 }
               ]
+            },
+            {
+              "type": "Text",
+              "left": 79,
+              "top": 0,
+              "width": 6,
+              "height": 20,
+              "wireID": "52dd2d67-12b1-4a20-ecdb-bdfa60ee4e33",
+              "data": "",
+              "style": {
+                "inheritFrom": "image"
+              },
+              "text": "\\u0091"
+            },
+            {
+              "type": "Text",
+              "left": 85,
+              "top": 0,
+              "width": 39,
+              "height": 20,
+              "wireID": "967a30ec-79a3-48b7-e056-0fcd4885c416",
+              "data": "",
+              "action": "toggle_ext_relay",
+              "style": {
+                "inheritFrom": "default_S_left_condensed",
+                "alignHorizontal": "center",
+                "color": "action_color",
+                "backgroundColor": "text_enable_background",
+                "activeColor": "text_enable_background",
+                "activeBackgroundColor": "action_color"
+              },
+              "text": "EXT"
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 117,
+          "top": 193,
+          "width": 77,
+          "height": 23,
+          "wireID": "7cf132a1-918e-48c9-a714-5e65388c67e2",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "ADIB1",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 8,
+              "height": 23,
+              "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
+              "data": "",
+              "style": {
+                "inheritFrom": "image"
+              },
+              "text": "\\u008f"
+            },
+            {
+              "type": "Select",
+              "left": 8,
+              "top": 0,
+              "width": 30,
+              "height": 23,
+              "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
+              "data": "adib2_relay_is_on",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 30,
+                  "height": 23,
+                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u008c"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 30,
+                  "height": 23,
+                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u008d"
+                }
+              ]
+            },
+            {
+              "type": "Text",
+              "left": 38,
+              "top": 0,
+              "width": 39,
+              "height": 22,
+              "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+              "data": "",
+              "action": "toggle_adib2_relay",
+              "style": {
+                "inheritFrom": "default_S_left_condensed",
+                "color": "action_color",
+                "backgroundColor": "text_enable_background",
+                "activeColor": "text_enable_background",
+                "activeBackgroundColor": "action_color",
+                "padding": "0 0 0 2"
+              },
+              "text": "ADIB2"
             }
           ]
         }
@@ -1104,18 +1408,19 @@
           "type": "Container",
           "left": 0,
           "top": 0,
-          "width": 476,
+          "width": 480,
           "height": 32,
           "wireID": "126e1b75-c71f-414f-9ff0-c87db64e87a3",
           "style": {
             "inheritFrom": "default"
           },
+          "name": "Header",
           "widgets": [
             {
               "type": "Text",
               "left": 0,
               "top": 0,
-              "width": 376,
+              "width": 380,
               "height": 32,
               "wireID": "99619a66-bd73-45a8-9608-29dd500a40af",
               "data": "slot_title_max",
@@ -1129,7 +1434,7 @@
             },
             {
               "type": "Text",
-              "left": 376,
+              "left": 380,
               "top": 0,
               "width": 50,
               "height": 32,
@@ -1143,7 +1448,7 @@
             },
             {
               "type": "Text",
-              "left": 426,
+              "left": 430,
               "top": 0,
               "width": 50,
               "height": 32,
@@ -1156,14 +1461,879 @@
               "text": "E"
             }
           ]
+        },
+        {
+          "type": "Container",
+          "left": 2,
+          "top": 34,
+          "width": 476,
+          "height": 204,
+          "wireID": "014be820-6cf1-4702-9f0a-1558e76af28e",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Body",
+          "widgets": [
+            {
+              "type": "ListWidget",
+              "left": 0,
+              "top": 0,
+              "width": 476,
+              "height": 66,
+              "wireID": "b26575ae-ca9e-4ab9-f47c-7e6f6161f4cc",
+              "data": "p1_relays",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 68,
+                "height": 66,
+                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 66,
+                    "height": 28,
+                    "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                    "data": "p1_relay_label",
+                    "action": "toggle_p1_relay",
+                    "style": {
+                      "inheritFrom": "default_S_left_condensed",
+                      "alignHorizontal": "center",
+                      "color": "action_color",
+                      "backgroundColor": "text_enable_background",
+                      "activeColor": "text_enable_background",
+                      "activeBackgroundColor": "action_color",
+                      "padding": "0 0 0 2"
+                    },
+                    "text": ""
+                  },
+                  {
+                    "type": "Select",
+                    "left": 25,
+                    "top": 30,
+                    "width": 17,
+                    "height": 36,
+                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                    "data": "p1_relay_is_on",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "images"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 17,
+                        "height": 36,
+                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u0080"
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 17,
+                        "height": 36,
+                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u0081"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "listType": "horizontal",
+              "gap": 0
+            },
+            {
+              "type": "Container",
+              "left": 34,
+              "top": 66,
+              "width": 416,
+              "height": 8,
+              "wireID": "b6534baf-0a79-4438-e726-4355ab24333b",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "name": "P1 line",
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "0f14dd5c-d020-46c3-855f-5420e309bab6",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 8,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "93fcf4b0-389f-48da-9e4a-aee2de69a177",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 68,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "387c77bb-da0f-4ac1-f37d-23982ecdd623",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 76,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "2b686e8b-22ed-4733-b1ee-8bb6dcca89f8",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 136,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "2ea0ccb4-65b6-46c9-8b56-269d7fde231d",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 144,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "2b686e8b-22ed-4733-b1ee-8bb6dcca89f8",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 204,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "2ea0ccb4-65b6-46c9-8b56-269d7fde231d",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 212,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "2b686e8b-22ed-4733-b1ee-8bb6dcca89f8",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 272,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "2ea0ccb4-65b6-46c9-8b56-269d7fde231d",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 280,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "2b686e8b-22ed-4733-b1ee-8bb6dcca89f8",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 305,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "33c1b2cc-8bcb-417c-ad00-8adfc0b51237",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 340,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "2ea0ccb4-65b6-46c9-8b56-269d7fde231d",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 348,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "2b686e8b-22ed-4733-b1ee-8bb6dcca89f8",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 408,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "c9f3b3a8-cd3f-4730-eab0-d83fce03b28b",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0086"
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 26,
+              "top": 74,
+              "width": 109,
+              "height": 56,
+              "wireID": "b944a694-f7f2-47a5-e27b-6798a2227199",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "name": "EXT",
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 12,
+                  "top": 0,
+                  "width": 2,
+                  "height": 10,
+                  "wireID": "9e60bed7-3dc4-4d2e-cd5d-ce3ddf8def4c",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0088"
+                },
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 10,
+                  "width": 17,
+                  "height": 36,
+                  "wireID": "a4eeb724-3aca-4966-8834-311c8aa8e1fa",
+                  "data": "ext_relay_is_on",
+                  "style": {
+                    "inheritFrom": "default",
+                    "font": "images"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 17,
+                      "height": 36,
+                      "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image"
+                      },
+                      "text": "\\u0080"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 17,
+                      "height": 36,
+                      "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image"
+                      },
+                      "text": "\\u0081"
+                    }
+                  ]
+                },
+                {
+                  "type": "Text",
+                  "left": 12,
+                  "top": 46,
+                  "width": 2,
+                  "height": 10,
+                  "wireID": "b23ef112-ff5b-4033-8f5c-6ff007a512af",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0088"
+                },
+                {
+                  "type": "Text",
+                  "left": 25,
+                  "top": 14,
+                  "width": 66,
+                  "height": 28,
+                  "wireID": "0653c25d-009b-41d4-9423-8775c40f3039",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "action_color",
+                    "backgroundColor": "text_enable_background",
+                    "activeColor": "text_enable_background",
+                    "activeBackgroundColor": "action_color",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "EXT"
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 152,
+              "top": 76,
+              "width": 179,
+              "height": 52,
+              "wireID": "6ac55cbb-2067-4052-86e8-754106f5e211",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "name": "CJ Temp",
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 31,
+                  "height": 52,
+                  "wireID": "b23ef112-ff5b-4033-8f5c-6ff007a512af",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0089"
+                },
+                {
+                  "type": "TextWidget",
+                  "left": 31,
+                  "top": 10,
+                  "width": 74,
+                  "height": 32,
+                  "wireID": "6b7d3075-4efd-4f58-9c43-7aa9dd115b04",
+                  "style": {
+                    "inheritFrom": "default_S"
+                  },
+                  "text": "CJ Temp:"
+                },
+                {
+                  "type": "TextWidget",
+                  "left": 105,
+                  "top": 10,
+                  "width": 74,
+                  "height": 32,
+                  "wireID": "04b8cdd1-fbb9-436c-e64f-d21ffa0118ea",
+                  "data": "cj_temp",
+                  "style": {
+                    "inheritFrom": "default_S",
+                    "alignHorizontal": "left"
+                  },
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "type": "Select",
+              "left": 342,
+              "top": 74,
+              "width": 65,
+              "height": 25,
+              "wireID": "728d50d7-11a0-4a62-ecd0-c9e83fad2611",
+              "data": "adib1_relay_is_on",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 65,
+                  "height": 25,
+                  "wireID": "d36fef22-becc-47b0-a422-cbdea3676502",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u008a"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 65,
+                  "height": 25,
+                  "wireID": "ea93121d-655a-4ccd-c1f5-db19fdff7be7",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0096"
+                }
+              ]
+            },
+            {
+              "type": "Select",
+              "left": 342,
+              "top": 105,
+              "width": 65,
+              "height": 25,
+              "wireID": "c4cfdfa6-69b4-4cc5-dc6b-893bbaa4f91f",
+              "data": "adib2_relay_is_on",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 65,
+                  "height": 25,
+                  "wireID": "fb11dac9-1ef2-4260-c884-c4bd46b66809",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u008b"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 65,
+                  "height": 25,
+                  "wireID": "33dafc8b-e689-4246-de71-c7ccabf674ba",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0097"
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 34,
+              "top": 130,
+              "width": 416,
+              "height": 8,
+              "wireID": "73740f27-10f7-472d-9c1c-6d2fbed8d99e",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "name": "P2 line",
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "0f14dd5c-d020-46c3-855f-5420e309bab6",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 8,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "93fcf4b0-389f-48da-9e4a-aee2de69a177",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 68,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "387c77bb-da0f-4ac1-f37d-23982ecdd623",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 76,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "2b686e8b-22ed-4733-b1ee-8bb6dcca89f8",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 136,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "2ea0ccb4-65b6-46c9-8b56-269d7fde231d",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 144,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "2b686e8b-22ed-4733-b1ee-8bb6dcca89f8",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 204,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "2ea0ccb4-65b6-46c9-8b56-269d7fde231d",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 212,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "2b686e8b-22ed-4733-b1ee-8bb6dcca89f8",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 272,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "2ea0ccb4-65b6-46c9-8b56-269d7fde231d",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 280,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "2b686e8b-22ed-4733-b1ee-8bb6dcca89f8",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 340,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "2ea0ccb4-65b6-46c9-8b56-269d7fde231d",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                },
+                {
+                  "type": "Text",
+                  "left": 348,
+                  "top": 0,
+                  "width": 60,
+                  "height": 8,
+                  "wireID": "2b686e8b-22ed-4733-b1ee-8bb6dcca89f8",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0085"
+                },
+                {
+                  "type": "Text",
+                  "left": 408,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "c9f3b3a8-cd3f-4730-eab0-d83fce03b28b",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0087"
+                },
+                {
+                  "type": "Text",
+                  "left": 305,
+                  "top": 0,
+                  "width": 8,
+                  "height": 8,
+                  "wireID": "94ead4b2-9276-4e33-d05c-05c752957a7d",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0084"
+                }
+              ]
+            },
+            {
+              "type": "ListWidget",
+              "left": 0,
+              "top": 138,
+              "width": 476,
+              "height": 66,
+              "wireID": "936c969d-adeb-4861-d33d-734726d6cb46",
+              "data": "p2_relays",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 68,
+                "height": 66,
+                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "left": 25,
+                    "top": 0,
+                    "width": 17,
+                    "height": 36,
+                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                    "data": "p2_relay_is_on",
+                    "style": {
+                      "inheritFrom": "default",
+                      "font": "images"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 17,
+                        "height": 36,
+                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u0082"
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 17,
+                        "height": 36,
+                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u0083"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 38,
+                    "width": 66,
+                    "height": 28,
+                    "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                    "data": "p2_relay_label",
+                    "action": "toggle_p2_relay",
+                    "style": {
+                      "inheritFrom": "default_S_left_condensed",
+                      "alignHorizontal": "center",
+                      "color": "action_color",
+                      "backgroundColor": "text_enable_background",
+                      "activeColor": "text_enable_background",
+                      "activeBackgroundColor": "action_color",
+                      "padding": "0 0 0 2"
+                    },
+                    "text": ""
+                  }
+                ]
+              },
+              "listType": "horizontal",
+              "gap": 0
+            },
+            {
+              "type": "Text",
+              "left": 409,
+              "top": 73,
+              "width": 66,
+              "height": 28,
+              "wireID": "03b6a02b-532a-4678-b0ee-c6d0a03acb5e",
+              "data": "",
+              "action": "toggle_adib1_relay",
+              "style": {
+                "inheritFrom": "default_S_left_condensed",
+                "alignHorizontal": "center",
+                "color": "action_color",
+                "backgroundColor": "text_enable_background",
+                "activeColor": "text_enable_background",
+                "activeBackgroundColor": "action_color",
+                "padding": "0 0 0 2"
+              },
+              "text": "ADIB1"
+            },
+            {
+              "type": "Text",
+              "left": 409,
+              "top": 103,
+              "width": 66,
+              "height": 28,
+              "wireID": "69c6cbff-8406-47e5-8d44-0d5f7c405708",
+              "data": "",
+              "action": "toggle_adib2_relay",
+              "style": {
+                "inheritFrom": "default_S_left_condensed",
+                "alignHorizontal": "center",
+                "color": "action_color",
+                "backgroundColor": "text_enable_background",
+                "activeColor": "text_enable_background",
+                "activeBackgroundColor": "action_color",
+                "padding": "0 0 0 2"
+              },
+              "text": "ADIB2"
+            }
+          ]
         }
       ],
       "connectionLines": [],
       "name": "slot_view_max",
       "left": 0,
       "top": 0,
-      "width": 476,
-      "height": 164,
+      "width": 480,
+      "height": 240,
       "dataContextOverrides": "{\"slot_title_max\": \"MUX14D\"}"
     },
     {
@@ -1386,16 +2556,397 @@
           ]
         },
         {
+          "type": "Text",
+          "left": 182,
+          "top": 0,
+          "width": 116,
+          "height": 22,
+          "wireID": "ee710941-1fb6-478a-f22d-9d23b6f98ce4",
+          "style": {
+            "inheritFrom": "default",
+            "font": "Oswald14",
+            "alignHorizontal": "left"
+          },
+          "text": "\\u00bc Relay cycles"
+        },
+        {
+          "type": "Rectangle",
+          "left": 0,
+          "top": 11,
+          "width": 180,
+          "height": 2,
+          "wireID": "d2ae73f7-dc91-4d29-9edd-fff324ef0337",
+          "style": {
+            "inheritFrom": "default"
+          }
+        },
+        {
+          "type": "Rectangle",
+          "left": 298,
+          "top": 11,
+          "width": 173,
+          "height": 2,
+          "wireID": "b85547d8-d1b0-48dd-a211-c752ec47baea",
+          "style": {
+            "inheritFrom": "default"
+          }
+        },
+        {
+          "type": "Rectangle",
+          "left": 469,
+          "top": 13,
+          "width": 2,
+          "height": 157,
+          "wireID": "a398c3e8-c071-4499-c025-7cc9b81e83ea",
+          "style": {
+            "inheritFrom": "default"
+          }
+        },
+        {
+          "type": "Rectangle",
+          "left": 286,
+          "top": 170,
+          "width": 185,
+          "height": 2,
+          "wireID": "4a8767b8-1289-41e7-ac7e-896f7afb6f3e",
+          "style": {
+            "inheritFrom": "default"
+          }
+        },
+        {
+          "type": "Rectangle",
+          "left": 284,
+          "top": 170,
+          "width": 2,
+          "height": 60,
+          "wireID": "43e9f113-73e4-487e-d09c-8bc7a7986cd6",
+          "style": {
+            "inheritFrom": "default"
+          }
+        },
+        {
+          "type": "Rectangle",
+          "left": 2,
+          "top": 230,
+          "width": 284,
+          "height": 2,
+          "wireID": "5c464c88-51af-4fcf-f6fd-ba8480080968",
+          "style": {
+            "inheritFrom": "default"
+          }
+        },
+        {
+          "type": "Rectangle",
+          "left": 0,
+          "top": 13,
+          "width": 2,
+          "height": 219,
+          "wireID": "03f32d62-466d-43ff-8bab-8b229cc5f044",
+          "style": {
+            "inheritFrom": "default"
+          }
+        },
+        {
+          "type": "List",
+          "left": 2,
+          "top": 26,
+          "width": 141,
+          "height": 204,
+          "wireID": "1023a7e6-21af-4c83-da37-92477f9cecb1",
+          "data": "p1_relays",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 141,
+            "height": 29,
+            "wireID": "3fd50688-5167-408d-b59b-43b4e7e57100",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Text",
+                "left": 0,
+                "top": 0,
+                "width": 76,
+                "height": 29,
+                "wireID": "6c68082e-fbec-4add-806f-50c232066ae2",
+                "data": "p1_relay_label",
+                "style": {
+                  "inheritFrom": "default_M",
+                  "font": "Oswald14"
+                },
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "left": 76,
+                "top": 0,
+                "width": 13,
+                "height": 29,
+                "wireID": "00c6fe27-6bf7-4c97-b967-78d871abcbc4",
+                "data": "",
+                "style": {
+                  "inheritFrom": "default_M",
+                  "font": "Oswald14",
+                  "alignHorizontal": "left"
+                },
+                "text": ":"
+              },
+              {
+                "type": "Text",
+                "left": 89,
+                "top": 0,
+                "width": 52,
+                "height": 29,
+                "wireID": "2526727d-818b-4303-b439-90df8d703aee",
+                "data": "p1_relay_cycles",
+                "style": {
+                  "inheritFrom": "default_M",
+                  "font": "Oswald14",
+                  "alignHorizontal": "left"
+                },
+                "text": ""
+              }
+            ]
+          },
+          "listType": "vertical",
+          "gap": 0
+        },
+        {
+          "type": "List",
+          "left": 141,
+          "top": 26,
+          "width": 141,
+          "height": 204,
+          "wireID": "6086c2f5-d1b0-4680-86fc-02a66bdd17cb",
+          "data": "p2_relays",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 141,
+            "height": 29,
+            "wireID": "3fd50688-5167-408d-b59b-43b4e7e57100",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Text",
+                "left": 0,
+                "top": 0,
+                "width": 76,
+                "height": 29,
+                "wireID": "6c68082e-fbec-4add-806f-50c232066ae2",
+                "data": "p2_relay_label",
+                "style": {
+                  "inheritFrom": "default_M",
+                  "font": "Oswald14"
+                },
+                "text": ""
+              },
+              {
+                "type": "Text",
+                "left": 76,
+                "top": 0,
+                "width": 13,
+                "height": 29,
+                "wireID": "00c6fe27-6bf7-4c97-b967-78d871abcbc4",
+                "data": "",
+                "style": {
+                  "inheritFrom": "default_M",
+                  "font": "Oswald14",
+                  "alignHorizontal": "left"
+                },
+                "text": ":"
+              },
+              {
+                "type": "Text",
+                "left": 89,
+                "top": 0,
+                "width": 52,
+                "height": 29,
+                "wireID": "2526727d-818b-4303-b439-90df8d703aee",
+                "data": "p2_relay_cycles",
+                "style": {
+                  "inheritFrom": "default_M",
+                  "font": "Oswald14",
+                  "alignHorizontal": "left"
+                },
+                "text": ""
+              }
+            ]
+          },
+          "listType": "vertical",
+          "gap": 0
+        },
+        {
+          "type": "Container",
+          "left": 317,
+          "top": 49,
+          "width": 141,
+          "height": 87,
+          "wireID": "b9f029ed-91ec-4a9e-ac9a-849f034237af",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 76,
+              "height": 29,
+              "wireID": "7a44082c-6e2a-4710-f5e2-dc7af2bcd83f",
+              "data": "p1_relay_label",
+              "style": {
+                "inheritFrom": "default_M",
+                "font": "Oswald14",
+                "alignHorizontal": "center"
+              },
+              "text": "EXT"
+            },
+            {
+              "type": "Text",
+              "left": 76,
+              "top": 0,
+              "width": 13,
+              "height": 29,
+              "wireID": "0a2c9cb7-8769-4148-b2e3-ee9322f24dd1",
+              "data": "",
+              "style": {
+                "inheritFrom": "default_M",
+                "font": "Oswald14",
+                "alignHorizontal": "left"
+              },
+              "text": ":"
+            },
+            {
+              "type": "Text",
+              "left": 89,
+              "top": 0,
+              "width": 52,
+              "height": 29,
+              "wireID": "1891e965-6eb8-4b10-9eb1-1ae3fd202eae",
+              "data": "ext_relay_cycles",
+              "style": {
+                "inheritFrom": "default_M",
+                "font": "Oswald14",
+                "alignHorizontal": "left"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 29,
+              "width": 76,
+              "height": 29,
+              "wireID": "8e345315-c2a6-4f4d-f5af-f6cfb58a0bef",
+              "data": "p1_relay_label",
+              "style": {
+                "inheritFrom": "default_M",
+                "font": "Oswald14",
+                "alignHorizontal": "center"
+              },
+              "text": "ADIB1"
+            },
+            {
+              "type": "Text",
+              "left": 76,
+              "top": 29,
+              "width": 13,
+              "height": 29,
+              "wireID": "0a2c9cb7-8769-4148-b2e3-ee9322f24dd1",
+              "data": "",
+              "style": {
+                "inheritFrom": "default_M",
+                "font": "Oswald14",
+                "alignHorizontal": "left"
+              },
+              "text": ":"
+            },
+            {
+              "type": "Text",
+              "left": 89,
+              "top": 29,
+              "width": 52,
+              "height": 29,
+              "wireID": "6f9e525c-639a-4b97-b8d7-1b1d096888eb",
+              "data": "adib1_relay_cycles",
+              "style": {
+                "inheritFrom": "default_M",
+                "font": "Oswald14",
+                "alignHorizontal": "left"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 58,
+              "width": 76,
+              "height": 29,
+              "wireID": "413a05e7-ff5c-4452-ccee-0907eb313670",
+              "data": "p1_relay_label",
+              "style": {
+                "inheritFrom": "default_M",
+                "font": "Oswald14",
+                "alignHorizontal": "center"
+              },
+              "text": "ADIB2"
+            },
+            {
+              "type": "Text",
+              "left": 76,
+              "top": 58,
+              "width": 13,
+              "height": 29,
+              "wireID": "0a2c9cb7-8769-4148-b2e3-ee9322f24dd1",
+              "data": "",
+              "style": {
+                "inheritFrom": "default_M",
+                "font": "Oswald14",
+                "alignHorizontal": "left"
+              },
+              "text": ":"
+            },
+            {
+              "type": "Text",
+              "left": 89,
+              "top": 58,
+              "width": 52,
+              "height": 29,
+              "wireID": "aba0597c-246a-46bc-8998-199fedfdd1f1",
+              "data": "adib2_relay_cycles",
+              "style": {
+                "inheritFrom": "default_M",
+                "font": "Oswald14",
+                "alignHorizontal": "left"
+              },
+              "text": ""
+            }
+          ]
+        },
+        {
           "type": "MultilineText",
-          "left": 244,
+          "left": 296,
           "top": 182,
-          "width": 228,
+          "width": 175,
           "height": 50,
           "wireID": "611957d3-4b65-42ab-c926-45cd54f4b817",
           "action": "channel_update_firmware",
           "style": {
             "inheritFrom": "edit_value_active_S_center",
-            "alignHorizontal": "left",
+            "alignHorizontal": "center",
             "alignVertical": "top",
             "padding": "13"
           },
@@ -1415,7 +2966,99 @@
       "dataContextOverrides": ""
     },
     {
-      "components": [],
+      "components": [
+        {
+          "type": "Text",
+          "left": 0,
+          "top": 0,
+          "width": 158,
+          "height": 32,
+          "wireID": "f5847175-2e68-4744-e797-8a0908d84726",
+          "data": "labels_and_colors_page_slot_title",
+          "style": {
+            "inheritFrom": "labels_and_colors_slot"
+          },
+          "text": ""
+        },
+        {
+          "type": "Text",
+          "left": 9,
+          "top": 40,
+          "width": 142,
+          "height": 32,
+          "wireID": "d4a6f59b-4df1-4bf7-9fb2-b8dacaa44d7c",
+          "action": "change_slot_label",
+          "style": {
+            "inheritFrom": "option_toggle_L_center",
+            "font": "Oswald14"
+          },
+          "text": "Change label"
+        },
+        {
+          "type": "Text",
+          "left": 9,
+          "top": 78,
+          "width": 142,
+          "height": 32,
+          "wireID": "d2be0d69-2654-45ea-84ee-c02d87088fca",
+          "action": "show_slot_color_picker",
+          "style": {
+            "inheritFrom": "option_toggle_L_center",
+            "font": "Oswald14"
+          },
+          "text": "Pick color"
+        },
+        {
+          "type": "Text",
+          "left": 9,
+          "top": 116,
+          "width": 142,
+          "height": 32,
+          "wireID": "85d977b3-2bbd-4a66-89fb-e46e13b4875c",
+          "action": "show_relay_labels",
+          "style": {
+            "inheritFrom": "option_toggle_L_center",
+            "font": "Oswald14"
+          },
+          "text": "Relay labels"
+        },
+        {
+          "type": "Rectangle",
+          "left": 0,
+          "top": 32,
+          "width": 2,
+          "height": 206,
+          "wireID": "6b3ef53f-f410-4a0d-8e94-111f278f64b0",
+          "style": {
+            "inheritFrom": "labels_and_colors_slot"
+          },
+          "invertColors": true
+        },
+        {
+          "type": "Rectangle",
+          "left": 156,
+          "top": 32,
+          "width": 2,
+          "height": 206,
+          "wireID": "b75bcc81-6254-4abf-b7e5-7a9028dfbb46",
+          "style": {
+            "inheritFrom": "labels_and_colors_slot"
+          },
+          "invertColors": true
+        },
+        {
+          "type": "Rectangle",
+          "left": 2,
+          "top": 236,
+          "width": 154,
+          "height": 2,
+          "wireID": "7f6f10fe-a8ce-4ee2-c232-b75017b9c0d5",
+          "style": {
+            "inheritFrom": "labels_and_colors_slot"
+          },
+          "invertColors": true
+        }
+      ],
       "connectionLines": [],
       "name": "labels_and_colors",
       "left": 0,
@@ -1425,6 +3068,133 @@
     },
     {
       "components": [
+        {
+          "type": "Container",
+          "left": 10,
+          "top": 10,
+          "width": 460,
+          "height": 220,
+          "wireID": "2e258b95-fd42-4bcc-feea-f455eb5811a8",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "List",
+              "left": 0,
+              "top": 0,
+              "width": 230,
+              "height": 216,
+              "wireID": "79c916b1-c576-4bad-fe4e-1c64f782902f",
+              "data": "p1_relays",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 230,
+                "height": 31,
+                "wireID": "e39284ff-4d62-4950-a67a-3a23428abb42",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 120,
+                    "height": 31,
+                    "wireID": "c065a342-c017-4961-bd7e-445ea5a29cd7",
+                    "data": "p1_relay_label_label",
+                    "style": {
+                      "inheritFrom": "default_M",
+                      "font": "Oswald14",
+                      "alignHorizontal": "left"
+                    },
+                    "text": ""
+                  },
+                  {
+                    "type": "Text",
+                    "left": 120,
+                    "top": 0,
+                    "width": 106,
+                    "height": 30,
+                    "wireID": "bcc0f224-6244-49c8-d176-49efa680dadc",
+                    "data": "p1_relay_label",
+                    "action": "change_p1_relay_label",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald14"
+                    },
+                    "text": ""
+                  }
+                ]
+              },
+              "listType": "vertical",
+              "gap": 0
+            },
+            {
+              "type": "List",
+              "left": 230,
+              "top": 0,
+              "width": 230,
+              "height": 216,
+              "wireID": "e833bdc0-715d-49be-c510-843f6dc3fb41",
+              "data": "p2_relays",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 230,
+                "height": 31,
+                "wireID": "e39284ff-4d62-4950-a67a-3a23428abb42",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Text",
+                    "left": 0,
+                    "top": 0,
+                    "width": 120,
+                    "height": 31,
+                    "wireID": "c065a342-c017-4961-bd7e-445ea5a29cd7",
+                    "data": "p2_relay_label_label",
+                    "style": {
+                      "inheritFrom": "default_M",
+                      "font": "Oswald14",
+                      "alignHorizontal": "left"
+                    },
+                    "text": ""
+                  },
+                  {
+                    "type": "Text",
+                    "left": 120,
+                    "top": 0,
+                    "width": 106,
+                    "height": 30,
+                    "wireID": "bcc0f224-6244-49c8-d176-49efa680dadc",
+                    "data": "p2_relay_label",
+                    "action": "change_p2_relay_label",
+                    "style": {
+                      "inheritFrom": "option_toggle_L_center",
+                      "font": "Oswald14"
+                    },
+                    "text": ""
+                  }
+                ]
+              },
+              "listType": "vertical",
+              "gap": 0
+            }
+          ]
+        },
         {
           "type": "Container",
           "left": 0,
@@ -1489,8 +3259,440 @@
       "dataContextOverrides": ""
     }
   ],
-  "styles": [],
-  "fonts": [],
+  "styles": [
+    {
+      "name": "image",
+      "inheritFrom": "default",
+      "font": "images",
+      "alignHorizontal": "left",
+      "alignVertical": "top",
+      "backgroundColor": "background",
+      "activeColor": "background"
+    }
+  ],
+  "fonts": [
+    {
+      "name": "images",
+      "source": {
+        "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+        "size": 20
+      },
+      "bpp": 8,
+      "height": 52,
+      "ascent": 52,
+      "descent": 0,
+      "glyphs": [
+        {
+          "encoding": 128,
+          "x": 0,
+          "y": 16,
+          "width": 17,
+          "height": 36,
+          "dx": 17,
+          "glyphBitmap": {
+            "width": 17,
+            "height": 36,
+            "pixelArray": "000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000001573afaf71130000000000000000000016a4afafafafa21300000000000000000076af7c14167faf71000000000000000000a2af11000015af9d000000000000000001a4af0c000011afa00000000000000000007aaf720a0b76af76186f080000000000001aa8afadaeafa71887af64000000000000001d80a9a87e1a0021acaf2c000000000000000004020000000059af990800000000000000000000000000048caf63000000000000000000000000000021acaf2c000000000000000000000000000059af990800000000000000000000000000048caf62000000000000000000000000000021acaf2c000000000000000000000000000059af990900000000000000000000000000048eaf62000000000000000000000000000021adaf2b00000000000000000000000000005aaf960600000000000000000000000000048eaf62000402000000000000000000000021adaf8ca9a87f1c0000000000000000000067afafadaeafa7180000000000000000007caf7a080a75af76000000000000000001a4af0c000011afa0000000000000000000a1af11000015af9d00000000000000000075af7d161780af7000000000000000000015a3afafafafa213000000000000000000001472afaf6f1200000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 129,
+          "x": 0,
+          "y": 16,
+          "width": 17,
+          "height": 36,
+          "dx": 17,
+          "glyphBitmap": {
+            "width": 17,
+            "height": 36,
+            "pixelArray": "000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000001573afaf71130000000000000000000016a4afafafafa21300000000000000000076af7c14167faf71000000000000005988a3af11000015af9d0000000000000081afa8af0c000011afa0000000000000005baf97af720a0b76af760000000000000035af89a8afadaeafa718000000000000000eafa71f80a9a87e1a00000000000000000099af20000402000000000000000000000073af4600000000000000000000000000004daf6b000000000000000000000000000027af92000000000000000000000000000006abaf0b00000000000000000000000000008baf2e000000000000000000000000000065af5400000000000000000000000000003faf7a000000000000000000000000000019afa0000000000000000000000000000001a2af1600000000000000000000000000007daf3c000000000000000000000000000057af63020000000000000000000000000046afafa87f1c000000000000000000001caaafaeadafa8180000000000000000007baf72090a76af76000000000000000001a4af0c000011afa0000000000000000000a1af11000015af9d00000000000000000075af7d151680af7000000000000000000015a4afafafafa213000000000000000000001471afaf6f1200000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 130,
+          "x": 0,
+          "y": 16,
+          "width": 17,
+          "height": 36,
+          "dx": 17,
+          "glyphBitmap": {
+            "width": 17,
+            "height": 36,
+            "pixelArray": "000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000001c84afaf8219000000000000000000001da9afafafafa81a00000000000000000087af8e1e2090af83000000000000000000a7af1700001dafa5000000000000000001a9af12000017afa70000000000000000008daf8b0c0d87af880000000000000000007bafafaeafafab2200000000000000002dafb099acab8f260000000000000000049baf76000403000000000000000000006eafa0090000000000000000000000002dafb039000000000000000000000000049baf76000000000000000000000000006dafa20b0000000000000000000000002daeb03a000000000000000000000000049aaf76000000000000000000000000006dafa20c0000000000000000000000002daeb03a000000000000000000000000049aaf77000000000000000000000000006dafa20c0000000000000000000000002daeb03a0000000000000000040300000095af78000000000000002890acab8e240022820a00000000000024abafaeafafab220000000000000000008baf840d0e88af88000000000000000001a9af12000017afa7000000000000000000a8af1700001dafa500000000000000000088af8d1c1f8faf830000000000000000001ea9afafafafa81a000000000000000000001d85afaf831a00000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 131,
+          "x": 0,
+          "y": 16,
+          "width": 17,
+          "height": 36,
+          "dx": 17,
+          "glyphBitmap": {
+            "width": 17,
+            "height": 36,
+            "pixelArray": "000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000001c84afaf8219000000000000000000001da9afafafafa81a00000000000000000087af8e1d1f90af83000000000000000000a7af1700001dafa5000000000000000001a9af12000017afa70000000000000000008caf840b0d88af8800000000000000000026adafafaeafac220000000000000000000059afb0ab8f2600000000000000000000006baf7603000000000000000000000000008eaf4e0000000000000000000000000001a8af1e0000000000000000000000000022afa7000000000000000000000000000052af8b000000000000000000000000000079af68000000000000000000000000000098af3d0000000000000000000000000007adb00e0000000000000000000000000035af9d000000000000000000000000000061af7e000000000000000000000000000085af590000000000000000000000000000a2af2c0004030000000000000000000015afab2b90acab8e24000000000000000046af97abafaeafafab22000000000000006fafa1af840d0e88af880000000000000091afacaf12000017afa7000000000000006d96a9af1700001dafa500000000000000000088af8d1c1f8faf830000000000000000001ea9afafafafa81a000000000000000000001d85afaf831a00000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 132,
+          "x": 0,
+          "y": 44,
+          "width": 8,
+          "height": 8,
+          "dx": 8,
+          "glyphBitmap": {
+            "width": 8,
+            "height": 8,
+            "pixelArray": "002890acab8e240024abafaeafafab228bafb0afafb0af88a9afafafafafafa7a8afafafafafafa588afb0afafb0af831ea9afafafafa81a001d85afaf831a00"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 133,
+          "x": 0,
+          "y": 47,
+          "width": 60,
+          "height": 2,
+          "dx": 60,
+          "glyphBitmap": {
+            "width": 60,
+            "height": 2,
+            "pixelArray": "afafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafaf"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 134,
+          "x": 0,
+          "y": 44,
+          "width": 8,
+          "height": 8,
+          "dx": 8,
+          "glyphBitmap": {
+            "width": 8,
+            "height": 8,
+            "pixelArray": "000000b2b2000000000000b1b1000000000000b1b1000000b2b1b1b1af000000b2b1afafb1000000000000000000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 135,
+          "x": 0,
+          "y": 44,
+          "width": 8,
+          "height": 8,
+          "dx": 8,
+          "glyphBitmap": {
+            "width": 8,
+            "height": 8,
+            "pixelArray": "000000000000000000000000000000000000000000000000b2b1afafb1000000b2b1b1b1af000000000000b1b1000000000000b1b1000000000000b2b2000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 136,
+          "x": 0,
+          "y": 42,
+          "width": 2,
+          "height": 10,
+          "dx": 2,
+          "glyphBitmap": {
+            "width": 2,
+            "height": 10,
+            "pixelArray": "b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 137,
+          "x": 0,
+          "y": 0,
+          "width": 31,
+          "height": 52,
+          "dx": 31,
+          "glyphBitmap": {
+            "width": 31,
+            "height": 52,
+            "pixelArray": "000000000000000000083939393939393939393939393939393939393939130000000000000000001cafafafafafafafafafafafafafafafafafafafaf3900000000000000000023afa97878787878787878787878787878787878782700000000000000000017af9a0000000000000000000000000000000000000000000000000000000017af9a0000000000000000000000000000000000000000000000000000000017af9a0000000000000000000000000000000000000000000000000000000017af9a0000000000000000000000000000000000000000000000000000000017af9a0000000000000000000000000000000000000000000000000000000e39afa0230600000000000000000000000000000000000000000000044688afafafafafa8782d000000000000000000000000000000000000002995afafaa897c7f92afafaf7c100000000000000000000000000000000041abaf953d08000000001355a5af9b1f000000000000000000000000000033aeaf620400000000000000001187af9d1200000000000000000000000012a6af5600000000000000000000000484af8300000000000000000000000069af7a010000000000000000000000000fa1af37000000000000000000000cadad1a00000000000000000000000000004aaf860000000000000000000041af7f00000000000000000000000000000008a9af1100000000000000000069af4e0000000000000000000000000000000080af360000000000000000007aaf370000000000000000000000000000000069af4800000000000000000082af2f0000000000000000000000000000000060af5100000000000000000072af3f0000000000000000000000000000000072af3f0000000000000000005aaf620000000000000000000000000000000095af2700000000000000000027af9a02000002295d7989857350190000001fafa1020000000000000000000297af44013a96afafafafafafafaf7d200077af6500000000000000000000003dafa37dafaf996039282c4170a6afad6dafa8100000000000000000000000017fafafa646040000000000000e65afafaf4a0000000000000000000000000078afafa33b010000000000000959aeafaf4100000000000000000000000037afa888afaf8f542c1c1f3464a0afaf79afa60e000000000000000000000192af4a02469eafafafafafafafaf892a007daf600000000000000000000023af9d030000063669869692805c2501000025af9e0100000000000000000057af670000000000000000000000000000000099af2500000000000000000070af410000000000000000000000000000000073af3f00000000000000000081af300000000000000000000000000000000062af4f0000000000000000007baf360000000000000000000000000000000069af4900000000000000000069af4b000000000000000000000000000000007eaf3700000000000000000044af7c00000000000000000000000000000006a8af120000000000000000000eaeab16000000000000000000000000000044af8a00000000000000000000006faf74000000000000000000000000000b9daf3d000000000000000000000016a9af4b0000000000000000000000027caf8a010000000000000000000000003cafaf550100000000000000000a7dafa21700000000000000000000000000004caeaf8b3102000000000a489fafa12700000000000000000000000000000000339eafafa37d707085abafaf8816000000000000000000000000000000000000085394afafafafafae843900000000000000000000000000000000000000000000001a46afa0300e00000000000000000000000000000000000000000000000000001aaf97000000000000000000000000000000000000000000000000000000001aaf97000000000000000000000000000000000000000000000000000000001aaf97000000000000000000000000000000000000000000000000000000001aaf97000000000000000000000000000000000000000000000000000000001aaf970000000000000000000000000000000000000000000000000000000026afa8787878787878787878787878787878787878270000000000000000001eafafafafafafafafafafafafafafafafafafafaf3900000000000000000008393939393939393939393939393939393939393913"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 138,
+          "x": 0,
+          "y": 27,
+          "width": 65,
+          "height": 25,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 65,
+            "height": 25,
+            "pixelArray": "a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000003425000000000000000000000000000000000000000000000000a4af0e00000000000000000000000000000000000000000000000000000000000000000000025aaf9b0c0000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000c7fafae59020000000000000000000000000000000000000000000000a4af0e00000000000000000000000000000000000000000000000000000000000000002299afa33100000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000041a9af8e170000000000000000000000000000000000000000000000000000a4af0e00000000000000000000000000000000000000000000000000000000000665afaf7006000000000000000000000000000000000000000000000000000000a4af0e00000000000000000000000000000000000000000000000000000000148aafab460000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000002da0af9c25000000000000000000000000000000000000000000000000000000000000a4af0e000000000000000000000000000000000000000000000000000153aeaf7e0c00000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000a77afaf5e020000000000000000000000000000000000000000000000000000000000000000a4af0e00000000000000000000000000000000000000366163391d94afa63800000000000000000000013a65603400000000000000000000000000000000000000a4af0e00000000000000000000000000000000000479afafafafaeaf8f18000000000000000000000883afafafaf75020000000000000000000000000000000000a4af0e000000000000000000000000000000000055afa1514fa3af9208000000000000000000000063af9c4d53a3af4f00000000000000000000000000000000008088716f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6fa5af2c000023af9b000000000000000000000000a1af1e000032afa36f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f3da4afafafafafafafafafafafafafafafafafafafafaf09000002adae040000000000000000000008afa90100000eafafafafafafafafafafafafafafafafafaf613d4343434343434343434343434343434343434398af4600003eaf9200000000000000000000000098af3800004caf954343434343434343434343434343434325000000000000000000000000000000000000000039afaf7d7aaeaf4100000000000000000000000046afad797fafaf3400000000000000000000000000000000000000000000000000000000000000000000000000004daaafafab53000000000000000000000000000158adafafa8490000000000000000000000000000000000000000000000000000000000000000000000000000000010363810000000000000000000000000000000001339350f00000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 139,
+          "x": 0,
+          "y": 27,
+          "width": 65,
+          "height": 25,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 65,
+            "height": 25,
+            "pixelArray": "00000000000000000000000000000000000000000000000000000000000000000000000000002ca0830400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000151adaf810b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a76afaf5e02000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c92afa63a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000037a6af951d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000045eafaf7309000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e82afad530000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000299eaf9e29000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000046acaf86120000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e333510066eafaf6903000000000000000000001136320c000000000000000000000000000000000000000000000000000000000000000000000000000000004aa9afafac9fafa83c000000000000000000000156acafafa846000000000000000000000000000000000000000000000000000000000000000000000000000037afaf807db0af9f1d000000000000000000000045afae7b82afaf3200000000000000000000000000000000003b3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f97af48000041af9200000000000000000000000097af3a00004eaf923f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3fa4afafafafafafafafafafafafafafafafafafafafaf08000004adae040000000000000000000008afa90100000eafafafafafafafafafafafafafafafafafafaf8188737272727272727272727272727272727272a5af2b000023af9b000000000000000000000000a2af1c000031afa37272727272727272727272727272727272a4af0e000000000000000000000000000000000056afa04f4c9daf5e00000000000000000000000065af9b4a51a2af510000000000000000000000000000000000a4af0e0000000000000000000000000000000000037bafafafaf81060000000000000000000000000985afafafaf77020000000000000000000000000000000000a4af0e000000000000000000000000000000000000003865673c010000000000000000000000000000023e67633600000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 140,
+          "x": 0,
+          "y": 29,
+          "width": 30,
+          "height": 23,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 30,
+            "height": 23,
+            "pixelArray": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000218813000000000000000000000000000000000000000000000000000040a9a42b000000000000000000000000000000000000000000000000045eaf8f190000000000000000000000000000000000000000000000001488af72080000000000000000000000000000000000000000000000002ca0ad530000000000000000000000000000000000000000000000000046ad9d280000000000000000000000000000000000000000000000000876af85100000000000000000000000000000000000000000000000001b92af650300000000000000000000000000000000000000000000000037a6a73b0000000000000000000000000000000000000000044f86895961af951e00000000000000000020758f7623000000000000006eab8b86abac740800000000000000000023a69f7c9fa72600000000293fac60000050ab2f00000000000000000000799d1200109c8829292918afafae27000017ab4b00000000000000000000967600000080afafafaf643d53ac54000044ab33000000000000000000007f980a000a99913d3d3d2200007aaa7975a88804000000000000000000002daa966c94aa300000000000000861979b690b0000000000000000000000003186a287320000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 141,
+          "x": 0,
+          "y": 29,
+          "width": 30,
+          "height": 21,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 30,
+            "height": 21,
+            "pixelArray": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000133a65887700000000000000000000020e00000000000000011c3f6286a8afafaf9c6900000000000000000151a6af9c36001336597ca3afafaf9f7c595b9eafa6500100000000000045af896098afa6afafafa07c593510000023ad97608aaf4500000000293f918f020010ac9d5b3714000000000000006ca7100002909029292918afafa8690000008e8300000000000000000000838e00000069a8afafaf643d538b980a001cab650000000000000000000066ab1c000a998a3d3d3d22000035af9b78a6a8170000000000000000000018a8a5789caf3400000000000000388ea683220000000000000000000000002284a68e370000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 142,
+          "x": 0,
+          "y": 27,
+          "width": 8,
+          "height": 23,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 8,
+            "height": 23,
+            "pixelArray": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000182929290000000065afafaf0000000065af3d3d0000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af0000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 143,
+          "x": 0,
+          "y": 29,
+          "width": 8,
+          "height": 23,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 8,
+            "height": 23,
+            "pixelArray": "0000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000002ba0af5e0200000ca4afafaf6100002aafafafafaf00000ea9afafaf7300000039a7af70060000000065af00000000000065af00000000000065af00000000000065af00000000000065af00000000000065af0000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 144,
+          "x": 0,
+          "y": 32,
+          "width": 51,
+          "height": 20,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 51,
+            "height": 20,
+            "pixelArray": "0000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065af0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000068af0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0000000090afafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafaf00000000436c585858585858585858585858585858585858585858585858585858585858585858585858585858585858585858000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 145,
+          "x": 0,
+          "y": 32,
+          "width": 6,
+          "height": 20,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 6,
+            "height": 20,
+            "pixelArray": "000065af0000000065af0000000065af0000000065af0000000065af0000000065af0000000065af0000000065af0000000065af0000000065af0000000065af0000000065af0000000065af0000000065af00000e0e69af0000afafafaf000058586c7b0000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 146,
+          "x": 0,
+          "y": 16,
+          "width": 17,
+          "height": 36,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 17,
+            "height": 36,
+            "pixelArray": "000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000001573afaf71130000000000000000000016a4afafafafa21300000000000000000076af7c14167faf71000000000000000000a2af11000015af9d000000000000000001a4af0c000011afa00000000000000000007aaf720a0b76af76186f080000000000001aa8afadaeafa71887af64000000000000001d80a9a87e1a0021acaf2c000000000000000004020000000059af990800000000000000000000000000048caf63000000000000000000000000000021acaf2c000000000000000000000000000059af990800000000000000000000000000048caf62000000000000000000000000000021acaf2c000000000000000000000000000059af990900000000000000000000000000048eaf62000000000000000000000000000021adaf2b00000000000000000000000000005aaf960600000000000000000000000000048eaf62000402000000000000000000000021adaf8ca9a87f1c0000000000000000000067afafadaeafa7180000000000000000007caf7a080a75af76000000000000000001a4af0c000011afa0000000000000000000a1af11000015af9d00000000000000000075af7d161780af7000000000000000000015a3afafafafa213000000000000000000001472afaf6f1200000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 147,
+          "x": 0,
+          "y": 16,
+          "width": 17,
+          "height": 36,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 17,
+            "height": 36,
+            "pixelArray": "000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000001573afaf71130000000000000000000016a4afafafafa21300000000000000000076af7c14167faf71000000000000005988a3af11000015af9d0000000000000081afa8af0c000011afa0000000000000005baf97af720a0b76af760000000000000035af89a8afadaeafa718000000000000000eafa71f80a9a87e1a00000000000000000099af20000402000000000000000000000073af4600000000000000000000000000004daf6b000000000000000000000000000027af92000000000000000000000000000006abaf0b00000000000000000000000000008baf2e000000000000000000000000000065af5400000000000000000000000000003faf7a000000000000000000000000000019afa0000000000000000000000000000001a2af1600000000000000000000000000007daf3c000000000000000000000000000057af63020000000000000000000000000046afafa87f1c000000000000000000001caaafaeadafa8180000000000000000007baf72090a76af76000000000000000001a4af0c000011afa0000000000000000000a1af11000015af9d00000000000000000075af7d151680af7000000000000000000015a4afafafafa213000000000000000000001471afaf6f1200000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000000000000000000000000002afae000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 148,
+          "x": 0,
+          "y": 16,
+          "width": 17,
+          "height": 36,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 17,
+            "height": 36,
+            "pixelArray": "000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000001c84afaf8219000000000000000000001da9afafafafa81a00000000000000000087af8e1e2090af83000000000000000000a7af1700001dafa5000000000000000001a9af12000017afa70000000000000000008daf8b0c0d87af880000000000000000007bafafaeafafab2200000000000000002dafb099acab8f260000000000000000049baf76000403000000000000000000006eafa0090000000000000000000000002dafb039000000000000000000000000049baf76000000000000000000000000006dafa20b0000000000000000000000002daeb03a000000000000000000000000049aaf76000000000000000000000000006dafa20c0000000000000000000000002daeb03a000000000000000000000000049aaf77000000000000000000000000006dafa20c0000000000000000000000002daeb03a0000000000000000040300000095af78000000000000002890acab8e240022820a00000000000024abafaeafafab220000000000000000008baf840d0e88af88000000000000000001a9af12000017afa7000000000000000000a8af1700001dafa500000000000000000088af8d1c1f8faf830000000000000000001ea9afafafafa81a000000000000000000001d85afaf831a00000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 149,
+          "x": 0,
+          "y": 16,
+          "width": 17,
+          "height": 36,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 17,
+            "height": 36,
+            "pixelArray": "000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000001c84afaf8219000000000000000000001da9afafafafa81a00000000000000000087af8e1d1f90af83000000000000000000a7af1700001dafa5000000000000000001a9af12000017afa70000000000000000008caf840b0d88af8800000000000000000026adafafaeafac220000000000000000000059afb0ab8f2600000000000000000000006baf7603000000000000000000000000008eaf4e0000000000000000000000000001a8af1e0000000000000000000000000022afa7000000000000000000000000000052af8b000000000000000000000000000079af68000000000000000000000000000098af3d0000000000000000000000000007adb00e0000000000000000000000000035af9d000000000000000000000000000061af7e000000000000000000000000000085af590000000000000000000000000000a2af2c0004030000000000000000000015afab2b90acab8e24000000000000000046af97abafaeafafab22000000000000006fafa1af840d0e88af880000000000000091afacaf12000017afa7000000000000006d96a9af1700001dafa500000000000000000088af8d1c1f8faf830000000000000000001ea9afafafafa81a000000000000000000001d85afaf831a00000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000000000000000000000000002afaf000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 150,
+          "x": 0,
+          "y": 27,
+          "width": 65,
+          "height": 25,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 65,
+            "height": 25,
+            "pixelArray": "a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e000000000000000000000000000000000000000000000000000000000000000000000000000429537d4f0000000000000000000000000000000000000000a4af0e000000000000000000000000000000000000000000000000000000000000000000092a5381aaafafaf810000000000000000000000000000000000000000a4af0e00000000000000000000000000000000000000366163390100000000000b305e88acafafafaf9985836b3400000000000000000000000000000000000000a4af0e00000000000000000000000000000000000479afafafaf7f06123a658cafafafafae93693a1583afafafaf75020000000000000000000000000000000000a4af0e000000000000000000000000000000000055afa1514f9eafa6afafafafa9835a300900000063af9c4d53a3af4f00000000000000000000000000000000008088716f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6fa5af2c000023afafa78159300600000000000000a1af1e000032afa36f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f3da4afafafafafafafafafafafafafafafafafafafafaf09000002adaf040000000000000000000008afa90100000eafafafafafafafafafafafafafafafafafaf613d4343434343434343434343434343434343434398af4600003eaf9200000000000000000000000098af3800004caf954343434343434343434343434343434325000000000000000000000000000000000000000039afaf7d7aaeaf4100000000000000000000000046afad797fafaf3400000000000000000000000000000000000000000000000000000000000000000000000000004daaafafab53000000000000000000000000000158adafafa8490000000000000000000000000000000000000000000000000000000000000000000000000000000010363810000000000000000000000000000000001339350f00000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 151,
+          "x": 0,
+          "y": 27,
+          "width": 65,
+          "height": 18,
+          "dx": 70,
+          "glyphBitmap": {
+            "width": 65,
+            "height": 18,
+            "pixelArray": "000000000000000000000000000000000000000000000000000000000000000000000000000000000002234d3300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004234d76a4afaf760000000000000000000000000000000000000000000000000000000000000000000000000000000000001a57591e000000000000000b335c87abafafafaf9b9073180000000000000000000000000000000000000000000000000000000000000000000000000000000074afafafaf7c000010365e88adafafafaf99694387afafafaf7000000000000000000000000000000000000000000000000000000000000000000000000000005dafafa3a1afaf9395afafafafac885e350c00006fafafa0a4afaf5500000000000000000000000000000000003b3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3fabaf72000068afafafa8885e3006000000000000acaf60000079afa83f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f23a4afafafafafafafafafafafafafafafafafafafafaf10000007afaf29040000000000000000000fafaf0200001aafafafafafafafafafafafafafafafafafaf618188737272727272727272727272727272727272aeaf4b00003eafad000000000000000000000000afaf33000054afad727272727272727272727272727272723fa4af0e000000000000000000000000000000000082afae7b77aeaf8900000000000000000000000091afad747cafaf7c0000000000000000000000000000000000a4af0e000000000000000000000000000000000006a0afafafafa30b00000000000000000000000011a5afafafaf9d040000000000000000000000000000000000a4af0e000000000000000000000000000000000000005e9192630200000000000000000000000000000366918e5b00000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        }
+      ]
+    }
+  ],
   "bitmaps": [
     {
       "name": "simulator_front_panel_mask",

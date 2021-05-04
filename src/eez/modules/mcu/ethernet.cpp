@@ -94,7 +94,12 @@ osThreadDef(g_ethernetTask, mainLoop, osPriorityNormal, 0, 1024);
 #pragma GCC diagnostic pop
 #endif
 
+#if defined(EEZ_PLATFORM_STM32)
 osMessageQDef(g_ethernetMessageQueue, 20, uint32_t);
+#endif
+#if defined(EEZ_PLATFORM_SIMULATOR)
+osMessageQDef(g_ethernetMessageQueue, 100, uint32_t);
+#endif
 osMessageQId g_ethernetMessageQueueId;
 
 static osThreadId g_ethernetTaskHandle;

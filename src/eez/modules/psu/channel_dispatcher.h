@@ -228,6 +228,7 @@ bool setMeasureVoltageNPLC(int slotIndex, int subchannelIndex, float nplc, int *
 bool isRouteOpen(int slotIndex, int subchannelIndex, int *err);
 bool routeOpen(ChannelList channelList, int *err);
 bool routeClose(ChannelList channelList, int *err);
+bool routeCloseExclusive(ChannelList channelList, int *err);
 
 bool getVoltage(int slotIndex, int subchannelIndex, float &value, int *err);
 bool setVoltage(int slotIndex, int subchannelIndex, float value, int *err);

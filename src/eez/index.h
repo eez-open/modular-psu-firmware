@@ -332,6 +332,7 @@ struct Module {
     virtual bool isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err);
     virtual bool routeOpen(ChannelList channelList, int *err);
     virtual bool routeClose(ChannelList channelList, int *err);
+    virtual bool routeCloseExclusive(ChannelList channelList, int *err);
 
     virtual bool getSwitchMatrixNumRows(int &numRows, int *err);
     virtual bool getSwitchMatrixNumColumns(int &numColumns, int *err);

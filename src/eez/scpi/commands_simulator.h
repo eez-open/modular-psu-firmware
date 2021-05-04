@@ -135,6 +135,7 @@
     SCPI_COMMAND("OUTPut:DELay:DURation", scpi_cmd_outputDelayDuration) \
     SCPI_COMMAND("OUTPut:DELay:DURation?", scpi_cmd_outputDelayDurationQ) \
     SCPI_COMMAND("ROUTe:CLOSe", scpi_cmd_routeClose) \
+    SCPI_COMMAND("ROUTe:CLOSe:EXCLusive", scpi_cmd_routeCloseExclusive) \
     SCPI_COMMAND("ROUTe:CLOSe?", scpi_cmd_routeCloseQ) \
     SCPI_COMMAND("ROUTe:OPEN", scpi_cmd_routeOpen) \
     SCPI_COMMAND("ROUTe:OPEN?", scpi_cmd_routeOpenQ) \

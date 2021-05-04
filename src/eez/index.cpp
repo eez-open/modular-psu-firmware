@@ -511,6 +511,13 @@ bool Module::routeClose(ChannelList channelList, int *err) {
     return false;
 }
 
+bool Module::routeCloseExclusive(ChannelList channelList, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;
+}
+
 bool Module::getSwitchMatrixNumRows(int &numRows, int *err) {
     if (err) {
         *err = SCPI_ERROR_HARDWARE_MISSING;

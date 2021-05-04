@@ -81,6 +81,9 @@ bool DigitalAnalogConverter::test(IOExpander &ioexp, AnalogDigitalConverter &adc
     auto &channel = Channel::get(channelIndex);
 
     channel.calibrationEnableNoEvent(false);
+    channel.setCurrentRangeSelectionMode(CURRENT_RANGE_SELECTION_USE_BOTH);
+    channel.setCurrentRange(CURRENT_RANGE_HIGH);
+    channel.setCurrentLimit(5.0f);
 
     // set U on DAC and check it on ADC
     float uSet = channel.u.max / 2;

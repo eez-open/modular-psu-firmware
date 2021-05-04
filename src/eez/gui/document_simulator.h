@@ -558,12 +558,20 @@ enum DataEnum {
     DATA_ID_DIB_MUX14D_P1_RELAY_IS_FIRST = 556,
     DATA_ID_DIB_MUX14D_P1_RELAY_IS_ON = 557,
     DATA_ID_DIB_MUX14D_P1_RELAY_CYCLES = 558,
-    DATA_ID_DIB_MUX14D_P2_RELAYS = 559,
-    DATA_ID_DIB_MUX14D_P2_RELAY_LABEL = 560,
-    DATA_ID_DIB_MUX14D_P2_RELAY_IS_FIRST = 561,
-    DATA_ID_DIB_MUX14D_P2_RELAY_IS_ON = 562,
-    DATA_ID_DIB_MUX14D_P2_RELAY_CYCLES = 563,
-    DATA_ID_DIB_MUX14D_EXT_RELAY_IS_ON = 564
+    DATA_ID_DIB_MUX14D_P1_RELAY_LABEL_LABEL = 559,
+    DATA_ID_DIB_MUX14D_P2_RELAYS = 560,
+    DATA_ID_DIB_MUX14D_P2_RELAY_LABEL = 561,
+    DATA_ID_DIB_MUX14D_P2_RELAY_IS_FIRST = 562,
+    DATA_ID_DIB_MUX14D_P2_RELAY_IS_ON = 563,
+    DATA_ID_DIB_MUX14D_P2_RELAY_CYCLES = 564,
+    DATA_ID_DIB_MUX14D_P2_RELAY_LABEL_LABEL = 565,
+    DATA_ID_DIB_MUX14D_EXT_RELAY_IS_ON = 566,
+    DATA_ID_DIB_MUX14D_EXT_RELAY_CYCLES = 567,
+    DATA_ID_DIB_MUX14D_ADIB1_RELAY_IS_ON = 568,
+    DATA_ID_DIB_MUX14D_ADIB1_RELAY_CYCLES = 569,
+    DATA_ID_DIB_MUX14D_ADIB2_RELAY_IS_ON = 570,
+    DATA_ID_DIB_MUX14D_ADIB2_RELAY_CYCLES = 571,
+    DATA_ID_DIB_MUX14D_CJ_TEMP = 572
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -1125,12 +1133,20 @@ void data_dib_mux14d_p1_relay_label(DataOperationEnum operation, Cursor cursor, 
 void data_dib_mux14d_p1_relay_is_first(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mux14d_p1_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mux14d_p1_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p1_relay_label_label(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mux14d_p2_relays(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mux14d_p2_relay_label(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mux14d_p2_relay_is_first(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mux14d_p2_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mux14d_p2_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_p2_relay_label_label(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mux14d_ext_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_ext_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_adib1_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_adib1_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_adib2_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_adib2_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_cj_temp(DataOperationEnum operation, Cursor cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
@@ -1432,8 +1448,13 @@ enum ActionsEnum {
     ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_COUNTERPHASE_DITHERING = 292,
     ACTION_ID_DIB_DCM224_CH_SETTINGS_ADV_TOGGLE_PWM_ENABLED = 293,
     ACTION_ID_DIB_MUX14D_TOGGLE_P1_RELAY = 294,
-    ACTION_ID_DIB_MUX14D_TOGGLE_P2_RELAY = 295,
-    ACTION_ID_DIB_MUX14D_TOGGLE_EXT_RELAY = 296
+    ACTION_ID_DIB_MUX14D_CHANGE_P1_RELAY_LABEL = 295,
+    ACTION_ID_DIB_MUX14D_TOGGLE_P2_RELAY = 296,
+    ACTION_ID_DIB_MUX14D_CHANGE_P2_RELAY_LABEL = 297,
+    ACTION_ID_DIB_MUX14D_TOGGLE_EXT_RELAY = 298,
+    ACTION_ID_DIB_MUX14D_TOGGLE_ADIB1_RELAY = 299,
+    ACTION_ID_DIB_MUX14D_TOGGLE_ADIB2_RELAY = 300,
+    ACTION_ID_DIB_MUX14D_SHOW_RELAY_LABELS = 301
 };
 
 void action_channel_toggle_output();
@@ -1730,8 +1751,13 @@ void action_simulator_load();
 void action_dib_dcm224_ch_settings_adv_toggle_counterphase_dithering();
 void action_dib_dcm224_ch_settings_adv_toggle_pwm_enabled();
 void action_dib_mux14d_toggle_p1_relay();
+void action_dib_mux14d_change_p1_relay_label();
 void action_dib_mux14d_toggle_p2_relay();
+void action_dib_mux14d_change_p2_relay_label();
 void action_dib_mux14d_toggle_ext_relay();
+void action_dib_mux14d_toggle_adib1_relay();
+void action_dib_mux14d_toggle_adib2_relay();
+void action_dib_mux14d_show_relay_labels();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -1747,7 +1773,8 @@ enum FontsEnum {
     FONT_ID_OSWALD20 = 8,
     FONT_ID_OSWALD48 = 9,
     FONT_ID_WEB_HOSTING_HUB24 = 10,
-    FONT_ID_OSWALD38 = 11
+    FONT_ID_OSWALD38 = 11,
+    FONT_ID_DIB_MUX14D_IMAGES = 12
 };
 
 enum BitmapsEnum {
@@ -2140,10 +2167,13 @@ enum StylesEnum {
     STYLE_ID_INLINE360 = 360,
     STYLE_ID_INLINE361 = 361,
     STYLE_ID_INLINE362 = 362,
-    STYLE_ID_INLINE363 = 363,
+    STYLE_ID_DIB_MUX14D_IMAGE = 363,
     STYLE_ID_INLINE364 = 364,
     STYLE_ID_INLINE365 = 365,
-    STYLE_ID_INLINE366 = 366
+    STYLE_ID_INLINE366 = 366,
+    STYLE_ID_INLINE367 = 367,
+    STYLE_ID_INLINE368 = 368,
+    STYLE_ID_INLINE369 = 369
 };
 
 enum ThemesEnum {
@@ -2554,4 +2584,4 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_CHANNEL_LABELS = 294
 };
 
-extern const uint8_t assets[583631];
+extern const uint8_t assets[588804];

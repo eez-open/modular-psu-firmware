@@ -87,9 +87,9 @@ scpi_result_t SCPI_Control(scpi_t *context, scpi_ctrl_name_t ctrl, scpi_reg_val_
 }
 
 scpi_result_t SCPI_Reset(scpi_t *context) {
-    char errorOutputBuffer[256];
+    //char errorOutputBuffer[256];
     //stringCopy(errorOutputBuffer, sizeof(errorOutputBuffer), "**Reset\r\n");
-    g_outputBufferWriter.write(errorOutputBuffer, strlen(errorOutputBuffer));
+    //g_outputBufferWriter.write(errorOutputBuffer, strlen(errorOutputBuffer));
 
     return reset() ? SCPI_RES_OK : SCPI_RES_ERR;
 }
