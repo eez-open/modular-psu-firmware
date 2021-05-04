@@ -414,6 +414,8 @@ struct Module {
 
     virtual bool getSourcePwmDuty(int subchannelIndex, float &duty, int *err);
     virtual bool setSourcePwmDuty(int subchannelIndex, float duty, int *err);
+
+    virtual const char *getPinoutFile();
 };
 
 static const int NUM_SLOTS = 3;

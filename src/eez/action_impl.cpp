@@ -1312,6 +1312,16 @@ void action_select_ac_mains() {
     page->powerLineFrequency = page->powerLineFrequency == 50 ? 60 : 50;
 }
 
+void action_show_pinout() {
+    const char *fileName = g_slots[hmi::g_selectedSlotIndex]->getPinoutFile();
+    if (fileName) {
+        char filePath[MAX_PATH_LENGTH + 1];
+        stringCopy(filePath, MAX_PATH_LENGTH + 1, "/Docs/");
+		stringAppendString(filePath, MAX_PATH_LENGTH + 1, fileName);
+        file_manager::openImageFile(filePath, PAGE_ID_PINOUT);
+    }
+}
+
 } // namespace gui
 } // namespace eez
 

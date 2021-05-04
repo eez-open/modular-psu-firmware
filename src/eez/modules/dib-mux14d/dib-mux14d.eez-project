@@ -166,6 +166,11 @@
       "components": [],
       "connectionLines": [],
       "name": "show_relay_labels"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "show_info"
     }
   ],
   "pages": [
@@ -2461,7 +2466,7 @@
               "type": "Text",
               "left": 40,
               "top": 0,
-              "width": 96,
+              "width": 120,
               "height": 32,
               "wireID": "b979de26-078b-46d2-cf8c-4cb9942f337e",
               "data": "slot_title_settings",
@@ -2472,9 +2477,9 @@
             },
             {
               "type": "Text",
-              "left": 136,
+              "left": 160,
               "top": 0,
-              "width": 238,
+              "width": 214,
               "height": 32,
               "wireID": "4cbfd09c-1ccb-4ec3-e4ca-56e862a7eb90",
               "data": "",
@@ -2596,7 +2601,7 @@
           "left": 469,
           "top": 13,
           "width": 2,
-          "height": 157,
+          "height": 109,
           "wireID": "a398c3e8-c071-4499-c025-7cc9b81e83ea",
           "style": {
             "inheritFrom": "default"
@@ -2604,9 +2609,9 @@
         },
         {
           "type": "Rectangle",
-          "left": 286,
-          "top": 170,
-          "width": 185,
+          "left": 290,
+          "top": 120,
+          "width": 179,
           "height": 2,
           "wireID": "4a8767b8-1289-41e7-ac7e-896f7afb6f3e",
           "style": {
@@ -2615,10 +2620,10 @@
         },
         {
           "type": "Rectangle",
-          "left": 284,
-          "top": 170,
+          "left": 288,
+          "top": 120,
           "width": 2,
-          "height": 60,
+          "height": 112,
           "wireID": "43e9f113-73e4-487e-d09c-8bc7a7986cd6",
           "style": {
             "inheritFrom": "default"
@@ -2628,7 +2633,7 @@
           "type": "Rectangle",
           "left": 2,
           "top": 230,
-          "width": 284,
+          "width": 286,
           "height": 2,
           "wireID": "5c464c88-51af-4fcf-f6fd-ba8480080968",
           "style": {
@@ -2790,8 +2795,8 @@
         },
         {
           "type": "Container",
-          "left": 317,
-          "top": 49,
+          "left": 318,
+          "top": 23,
           "width": 141,
           "height": 87,
           "wireID": "b9f029ed-91ec-4a9e-ac9a-849f034237af",
@@ -2951,6 +2956,24 @@
             "padding": "13"
           },
           "text": "\\u00bb Firmware update",
+          "firstLineIndent": 0,
+          "hangingIndent": 24
+        },
+        {
+          "type": "MultilineText",
+          "left": 296,
+          "top": 128,
+          "width": 175,
+          "height": 50,
+          "wireID": "9df84518-8460-4d88-a176-3493d9aed1b1",
+          "action": "show_info",
+          "style": {
+            "inheritFrom": "edit_value_active_S_center",
+            "alignHorizontal": "left",
+            "alignVertical": "top",
+            "padding": "13"
+          },
+          "text": "\\u0080 Info",
           "firstLineIndent": 0,
           "hangingIndent": 24
         }
@@ -3252,6 +3275,235 @@
       ],
       "connectionLines": [],
       "name": "channel_labels",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272,
+      "dataContextOverrides": ""
+    },
+    {
+      "components": [
+        {
+          "type": "Container",
+          "left": 4,
+          "top": 4,
+          "width": 472,
+          "height": 232,
+          "wireID": "07475789-3675-49bb-b0ae-5d0b8e500a8b",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 137,
+              "height": 32,
+              "wireID": "3af57f72-37aa-429b-ec5e-258e87b743fa",
+              "style": {
+                "inheritFrom": "default_M_left"
+              },
+              "text": "Model:"
+            },
+            {
+              "type": "DisplayData",
+              "left": 137,
+              "top": 0,
+              "width": 332,
+              "height": 32,
+              "wireID": "65f5267e-e5ee-4993-9133-21216367ef2c",
+              "data": "slot_info",
+              "style": {
+                "inheritFrom": "value_M_left"
+              },
+              "displayOption": 0
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 36,
+              "width": 137,
+              "height": 32,
+              "wireID": "b26ba057-68b3-4c52-8bef-011f675e2211",
+              "style": {
+                "inheritFrom": "default_M_left"
+              },
+              "text": "Brand:"
+            },
+            {
+              "type": "Text",
+              "left": 137,
+              "top": 36,
+              "width": 332,
+              "height": 32,
+              "wireID": "4bac8254-c4ab-4696-d3cd-11608dbf7e11",
+              "data": "channel_info_brand",
+              "style": {
+                "inheritFrom": "value_M_left"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 72,
+              "width": 137,
+              "height": 32,
+              "wireID": "6812d560-6f01-4852-c047-2dd35c9ca8ac",
+              "style": {
+                "inheritFrom": "default_M_left"
+              },
+              "text": "Serial No.:"
+            },
+            {
+              "type": "Text",
+              "left": 137,
+              "top": 72,
+              "width": 332,
+              "height": 32,
+              "wireID": "80eef7ff-1f07-4679-9ca1-da69238b0053",
+              "data": "slot_serial_info",
+              "style": {
+                "inheritFrom": "value_M_left"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 108,
+              "width": 137,
+              "height": 32,
+              "wireID": "9f0eb4b7-120d-40b8-8411-e95067aa8af3",
+              "style": {
+                "inheritFrom": "default_M_left"
+              },
+              "text": "Total On time:"
+            },
+            {
+              "type": "DisplayData",
+              "left": 137,
+              "top": 108,
+              "width": 176,
+              "height": 32,
+              "wireID": "2707d000-d155-490b-87e4-9a0e2b335d96",
+              "data": "channel_on_time_total",
+              "style": {
+                "inheritFrom": "value_M_left"
+              },
+              "displayOption": 0
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 144,
+              "width": 137,
+              "height": 32,
+              "wireID": "11a31fb1-490e-41ab-8712-549c1f384403",
+              "style": {
+                "inheritFrom": "edit_value_M_left"
+              },
+              "text": "Last On time:"
+            },
+            {
+              "type": "DisplayData",
+              "left": 137,
+              "top": 144,
+              "width": 176,
+              "height": 32,
+              "wireID": "98946df1-95e8-4aea-e38b-7da39c34b81f",
+              "data": "channel_on_time_last",
+              "style": {
+                "inheritFrom": "value_M_left"
+              },
+              "displayOption": 0
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 240,
+          "width": 480,
+          "height": 32,
+          "wireID": "3a746677-4e7f-4cf4-a1b0-0c528b1dadbb",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Status line",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 41,
+              "height": 32,
+              "wireID": "4061a008-2665-4383-d81a-dde15f2b2005",
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "status_bgnd",
+                "font": "Heydings14",
+                "alignVertical": "center",
+                "color": "status_line_text",
+                "backgroundColor": "status_line_background",
+                "activeColor": "status_line_background",
+                "activeBackgroundColor": "status_line_text"
+              },
+              "text": "E"
+            },
+            {
+              "type": "Text",
+              "left": 40,
+              "top": 0,
+              "width": 120,
+              "height": 32,
+              "wireID": "9d95947f-46b0-4258-b2fb-cb75dc7e97f8",
+              "data": "slot_title_settings",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 160,
+              "top": 0,
+              "width": 320,
+              "height": 32,
+              "wireID": "cccbbaa0-035d-4e4a-bca5-a2497ae561ec",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "text": "Information"
+            }
+          ]
+        },
+        {
+          "type": "MultilineText",
+          "left": 354,
+          "top": 180,
+          "width": 114,
+          "height": 48,
+          "wireID": "6b975fcd-34e2-4624-d70b-042bcb8c3b06",
+          "action": "show_pinout",
+          "style": {
+            "inheritFrom": "edit_value_active_S_center",
+            "alignHorizontal": "center",
+            "alignVertical": "center",
+            "borderSize": "0",
+            "borderRadius": 0,
+            "padding": "3"
+          },
+          "text": "\\u00be Pinout",
+          "firstLineIndent": 0,
+          "hangingIndent": 24
+        }
+      ],
+      "connectionLines": [],
+      "name": "info",
+      "description": "Retrieve channel's informations such as how long channel output is active, sensor temperature, self-test result and calibration status (CAL:STAT command). \"Calib. params:\" can be ON, OFF, Uncalibrated, Corrupted. Selecting this option when it's uncalibrated or calibration data is corrupted will lead to Calibration wizard.",
+      "style": "default",
       "left": 0,
       "top": 0,
       "width": 480,

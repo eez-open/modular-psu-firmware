@@ -801,14 +801,9 @@ void openFile() {
         psu::dlog_view::openFile(filePath);
         pushPage(gui::PAGE_ID_DLOG_VIEW);
     } else if (fileItem->type == FILE_TYPE_IMAGE) {
-        g_imageLoadStartTime = millis();
-        g_imageLoadFailed = false;
-        g_openedImage.pixels = nullptr;
-
-        pushPage(gui::PAGE_ID_IMAGE_VIEW);
-
-        using namespace scpi;
-        sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE);
+        char filePath[MAX_PATH_LENGTH + 1];
+		makeAbsolutePath(fileItem->name, filePath);
+        openImageFile(filePath, gui::PAGE_ID_IMAGE_VIEW);
     } else if (fileItem->type == FILE_TYPE_MICROPYTHON) {
         mp::startScript(filePath);
     } else if (fileItem->type == FILE_TYPE_OTHER) {
@@ -818,15 +813,20 @@ void openFile() {
     }
 }
 
+static char g_imageFilePath[MAX_PATH_LENGTH + 1];
+
+void openImageFile(const char *filePath, int pageId) {
+    stringCopy(g_imageFilePath, MAX_PATH_LENGTH + 1, filePath);
+    g_imageLoadStartTime = millis();
+    g_imageLoadFailed = false;
+    g_openedImage.pixels = nullptr;
+    pushPage(pageId);
+    sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE);
+}
+
 void openImageFile() {
-    auto fileItem = getFileItem(g_selectedFileIndex);
-    if (fileItem) {
-        char filePath[MAX_PATH_LENGTH + 1];
-        if (makeAbsolutePath(fileItem->name, filePath)) {
-            if (!imageDecode(filePath, &g_openedImage)) {
-                g_imageLoadFailed = true;
-            }
-        }
+    if (!imageDecode(g_imageFilePath, &g_openedImage)) {
+        g_imageLoadFailed = true;
     }
 }
 

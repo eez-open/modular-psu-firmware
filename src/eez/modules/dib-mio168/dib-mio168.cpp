@@ -3870,6 +3870,19 @@ public:
         executeDiskDriveOperation();
         return diskOperationParams.result;
     }
+
+	const char *getPinoutFile() override {
+		if (afeVersion == 0) {
+			return "mio168_no_afe_pinout.jpg";
+		} else if (afeVersion == 1) {
+			return "mio168_afe1_pinout.jpg";
+		} else if (afeVersion == 1) {
+			return "mio168_afe2_pinout.jpg";
+		} else if (afeVersion == 1) {
+			return "mio168_afe3_pinout.jpg";
+		}
+		return nullptr;
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////

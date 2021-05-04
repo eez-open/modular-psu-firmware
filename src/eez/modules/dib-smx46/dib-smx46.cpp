@@ -1264,6 +1264,10 @@ public:
             }
         }
     }
+
+	const char *getPinoutFile() override {
+		return "smx46_pinout.jpg";
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////

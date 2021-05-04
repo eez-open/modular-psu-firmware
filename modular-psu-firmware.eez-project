@@ -3784,6 +3784,11 @@
       "components": [],
       "connectionLines": [],
       "name": "scroll"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "show_pinout"
     }
   ],
   "pages": [
@@ -12301,10 +12306,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "44408138-0ee5-426f-f188-1e9eedd7e92b",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -12313,9 +12318,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 77,
+                      "left": 161,
                       "top": 0,
-                      "width": 297,
+                      "width": 213,
                       "height": 32,
                       "wireID": "fa8e7c9d-648b-4871-a453-62811788b7cf",
                       "style": {
@@ -13377,10 +13382,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "e519a7fc-13bc-4676-b628-8f43681757ac",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -13389,9 +13394,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 77,
+                      "left": 161,
                       "top": 0,
-                      "width": 321,
+                      "width": 237,
                       "height": 32,
                       "wireID": "82c03b9b-7cc8-4c64-e561-676130fa1c8b",
                       "style": {
@@ -14100,10 +14105,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "801f4946-49a5-44ba-a826-4d68809d955a",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -14112,9 +14117,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 77,
+                      "left": 161,
                       "top": 0,
-                      "width": 321,
+                      "width": 237,
                       "height": 32,
                       "wireID": "7f8bfa87-7933-434d-f042-3bbf338c48b1",
                       "style": {
@@ -14798,10 +14803,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "1f89edf0-1244-4978-8f8d-003baf753904",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -14810,9 +14815,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 77,
+                      "left": 161,
                       "top": 0,
-                      "width": 321,
+                      "width": 237,
                       "height": 32,
                       "wireID": "00c2bf28-90d8-4880-f231-1cb05bc9f92c",
                       "style": {
@@ -15372,7 +15377,7 @@
                             "type": "Text",
                             "left": 0,
                             "top": 0,
-                            "width": 45,
+                            "width": 120,
                             "height": 27,
                             "wireID": "eeeab587-4f9b-4279-8343-65b3025c9933",
                             "data": "channel_short_label",
@@ -15507,10 +15512,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "6a0a0933-31f3-4826-fad1-b31f95974af2",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -15519,9 +15524,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 77,
+                      "left": 161,
                       "top": 0,
-                      "width": 321,
+                      "width": 237,
                       "height": 32,
                       "wireID": "ac2edee9-eda3-4042-c889-edce6b581b7e",
                       "style": {
@@ -16095,10 +16100,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "c4c7c0b8-2060-4d86-cc98-8c17299bdfce",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -16107,9 +16112,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 77,
+                      "left": 161,
                       "top": 0,
-                      "width": 321,
+                      "width": 237,
                       "height": 32,
                       "wireID": "dbe5de48-1c13-4ef9-db2b-ee9415f32a03",
                       "style": {
@@ -17466,7 +17471,7 @@
                       "type": "Text",
                       "left": 40,
                       "top": 0,
-                      "width": 93,
+                      "width": 120,
                       "height": 32,
                       "wireID": "df06bcde-6fd3-401b-fd32-0faae9255837",
                       "data": "slot_title_settings",
@@ -17477,9 +17482,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 133,
+                      "left": 160,
                       "top": 0,
-                      "width": 347,
+                      "width": 320,
                       "height": 32,
                       "wireID": "44f78ab4-a1ec-4609-9587-a49061d50097",
                       "data": "",
@@ -17540,10 +17545,10 @@
                           "type": "Text",
                           "left": 41,
                           "top": 0,
-                          "width": 36,
+                          "width": 120,
                           "height": 32,
                           "wireID": "f4330e57-a805-455b-ad6a-aeda10bed733",
-                          "data": "channel_short_label",
+                          "data": "slot_title_settings",
                           "style": {
                             "inheritFrom": "channel1",
                             "alignHorizontal": "left"
@@ -17552,9 +17557,9 @@
                         },
                         {
                           "type": "Text",
-                          "left": 77,
+                          "left": 161,
                           "top": 0,
-                          "width": 403,
+                          "width": 319,
                           "height": 32,
                           "wireID": "9196545d-7515-47a4-e5c1-e0cd7a090145",
                           "style": {
@@ -18292,7 +18297,7 @@
                       "type": "Text",
                       "left": 40,
                       "top": 0,
-                      "width": 93,
+                      "width": 116,
                       "height": 32,
                       "wireID": "27170a0e-2675-4d7e-a15d-e1fb712207c9",
                       "data": "slot_title_settings",
@@ -18303,9 +18308,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 133,
+                      "left": 156,
                       "top": 0,
-                      "width": 107,
+                      "width": 83,
                       "height": 32,
                       "wireID": "919b06f9-472a-4ced-a500-7667af004d5e",
                       "data": "",
@@ -18442,10 +18447,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 116,
                       "height": 32,
                       "wireID": "c0407e80-d4e5-4d01-912f-437744c4c55d",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -18454,9 +18459,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 78,
+                      "left": 157,
                       "top": 0,
-                      "width": 162,
+                      "width": 82,
                       "height": 32,
                       "wireID": "173aa647-7e94-4d7d-905f-823cd94d34ce",
                       "style": {
@@ -18824,7 +18829,7 @@
                       "type": "Text",
                       "left": 40,
                       "top": 0,
-                      "width": 93,
+                      "width": 120,
                       "height": 32,
                       "wireID": "53f520ee-5d41-4ce4-e77e-7c7c58b92358",
                       "data": "slot_title_settings",
@@ -18835,16 +18840,16 @@
                     },
                     {
                       "type": "Text",
-                      "left": 133,
+                      "left": 160,
                       "top": 0,
-                      "width": 153,
+                      "width": 126,
                       "height": 32,
                       "wireID": "91380cad-c57a-4ef3-9f63-1b467b68a6ea",
                       "data": "",
                       "style": {
                         "inheritFrom": "status_title"
                       },
-                      "text": "Calibration points"
+                      "text": "Cal. points"
                     },
                     {
                       "type": "Text",
@@ -18908,10 +18913,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "184a4500-0f60-4641-b46f-2de28ece2383",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -18920,16 +18925,16 @@
                     },
                     {
                       "type": "Text",
-                      "left": 78,
+                      "left": 161,
                       "top": 0,
-                      "width": 162,
+                      "width": 79,
                       "height": 32,
                       "wireID": "eaea6477-5f10-400d-903d-9f98776c41ba",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
                       },
-                      "text": "Calibration points"
+                      "text": "Cal. points"
                     },
                     {
                       "type": "Text",
@@ -19468,10 +19473,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "e5bc9650-a269-4bd0-b8a2-1ecfc44df85c",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -19480,9 +19485,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 77,
+                      "left": 161,
                       "top": 0,
-                      "width": 403,
+                      "width": 319,
                       "height": 32,
                       "wireID": "a3b4154e-cd91-4b83-ce36-fa6c4b1c5c94",
                       "style": {
@@ -19797,10 +19802,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "b634a914-c61b-4135-9aa2-a74710bfe3f8",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -19809,9 +19814,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 77,
+                      "left": 161,
                       "top": 0,
-                      "width": 403,
+                      "width": 319,
                       "height": 32,
                       "wireID": "7fc18ecf-fd93-433f-fcd5-5e6dd6670702",
                       "style": {
@@ -20132,10 +20137,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "9fc34320-e415-407c-cade-9dbcf959c756",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -20144,9 +20149,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 77,
+                      "left": 161,
                       "top": 0,
-                      "width": 321,
+                      "width": 237,
                       "height": 32,
                       "wireID": "8efbfdee-ec8e-4cb4-d70b-b86c6531a3e6",
                       "style": {
@@ -20926,10 +20931,10 @@
                       "type": "Text",
                       "left": 41,
                       "top": 0,
-                      "width": 36,
+                      "width": 120,
                       "height": 32,
                       "wireID": "04c68a74-9aee-4eff-9699-e771bbc8fbda",
-                      "data": "channel_short_label",
+                      "data": "slot_title_settings",
                       "style": {
                         "inheritFrom": "channel1",
                         "alignHorizontal": "left"
@@ -20938,9 +20943,9 @@
                     },
                     {
                       "type": "Text",
-                      "left": 77,
+                      "left": 161,
                       "top": 0,
-                      "width": 403,
+                      "width": 319,
                       "height": 32,
                       "wireID": "4c5b4180-458b-4b21-8913-b70783495869",
                       "style": {
@@ -21024,6 +21029,26 @@
               ]
             }
           ]
+        },
+        {
+          "type": "MultilineText",
+          "left": 354,
+          "top": 180,
+          "width": 114,
+          "height": 48,
+          "wireID": "0e202cf6-e49d-4069-8fb7-89b1871969d3",
+          "action": "show_pinout",
+          "style": {
+            "inheritFrom": "edit_value_active_S_center",
+            "alignHorizontal": "center",
+            "alignVertical": "center",
+            "borderSize": "0",
+            "borderRadius": 0,
+            "padding": "3"
+          },
+          "text": "\\u00be Pinout",
+          "firstLineIndent": 0,
+          "hangingIndent": 24
         }
       ],
       "connectionLines": [],
@@ -39441,6 +39466,146 @@
           "type": "Select",
           "left": 0,
           "top": 0,
+          "width": 480,
+          "height": 240,
+          "wireID": "63d812fe-4ee5-471d-cf2e-8661232407af",
+          "data": "file_manager_image_open_state",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 240,
+              "wireID": "4b0873c8-09b2-4dfe-a4f2-e1c8bdc35a14",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Progress",
+                  "left": 140,
+                  "top": 118,
+                  "width": 200,
+                  "height": 4,
+                  "wireID": "e187625d-e6f2-4c8e-88a1-0a8aaab5cec5",
+                  "data": "file_manager_image_open_progress",
+                  "style": {
+                    "inheritFrom": "progress"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "Bitmap",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 240,
+              "wireID": "d7272cba-d9c1-4e0b-91b3-c218d32539df",
+              "data": "file_manager_opened_image",
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "default",
+                "activeColor": "text_regular",
+                "activeBackgroundColor": "background"
+              }
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 240,
+              "wireID": "ee2ec6bf-1ffa-4bc9-c27c-87fdb152062f",
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "default",
+                "font": "Oswald17",
+                "color": "status_warning",
+                "activeColor": "status_warning",
+                "activeBackgroundColor": "background"
+              },
+              "text": "Pinout image not found on the SD card!"
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 240,
+          "width": 480,
+          "height": 32,
+          "wireID": "581850a4-eb72-4b2c-f77a-ab5e0e153f4d",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Status line",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 41,
+              "height": 32,
+              "wireID": "4061a008-2665-4383-d81a-dde15f2b2005",
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "status_bgnd",
+                "font": "Heydings14",
+                "alignVertical": "center",
+                "color": "status_line_text",
+                "backgroundColor": "status_line_background",
+                "activeColor": "status_line_background",
+                "activeBackgroundColor": "status_line_text"
+              },
+              "text": "E"
+            },
+            {
+              "type": "Text",
+              "left": 40,
+              "top": 0,
+              "width": 120,
+              "height": 32,
+              "wireID": "9d95947f-46b0-4258-b2fb-cb75dc7e97f8",
+              "data": "slot_title_settings",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 160,
+              "top": 0,
+              "width": 320,
+              "height": 32,
+              "wireID": "cccbbaa0-035d-4e4a-bca5-a2497ae561ec",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "text": "Pinout"
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "name": "pinout",
+      "style": "default",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272
+    },
+    {
+      "components": [
+        {
+          "type": "Select",
+          "left": 0,
+          "top": 0,
           "width": 36,
           "height": 36,
           "wireID": "15093800-80a5-42e1-ccff-52552b30b1a7",
@@ -48004,6 +48169,24 @@
             "width": 7,
             "height": 11,
             "pixelArray": "00005ffcaa0000000060ffac000011186fffb41817acfffffffffff4acfffffffffff4030463ffae0404000060ffac00000000020403000011181818181817acfffffffffff4acfffffffffff4"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 190,
+          "x": 0,
+          "y": -4,
+          "width": 24,
+          "height": 24,
+          "dx": 24,
+          "glyphBitmap": {
+            "width": 24,
+            "height": 24,
+            "pixelArray": "6bf2ffffff2500006efffffffffffffffffffffffffff269f2ffffffff2500006efffffffffffffffffffffffffffff1ffffffffff2500006efffffffffffffffffffffffffffffffffffffffa1c000060ffffffffffffb4584f8af6fffffffffffffff83b0000000082ffffffff810000000037f7ffffffffffff8f0036c5ab1102222222220212acc535008dffffffffffff5100c5ffff7b0000000000007cffffc4004fffffffffffff5f00abffff6100000000000062ffffa9005bffffffffffffb500117b610212666666661002627a1000b4ffffffffffffff7e01000012bcffffffffb80e0000027effffffffffffffffffd9a0a8ecffffffffffffeea69bdaffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffec9f98d2ffffffffffffffffffffffffffffffffffffffba1100000177fffffffffffffffffffffffffff5736666661202647b1100b0fffffffffffffffffffffff541000000000063ffffaa0059fffffffffffffffffffff5410000000000007cffffc40050fffffffffffffffffff5410000000322220211aac4340091fffffffffffffffff54100000003a5ffff7d000000003bf8fffffffffffffff54100000003a4ffffffffb35e5193f9fffffffffffffff54200000003a2fffffffffffffffffffffffffffff2fff54100000003a3fffffffffffffffffffffffffffff169e74100000003a2fffffffffffffffffffffffffffff167"
           },
           "source": {
             "filePath": "fonts\\Oswald-Medium.ttf",

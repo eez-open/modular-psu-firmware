@@ -1083,7 +1083,11 @@ public:
     int getLabelsAndColorsPageId() override {
         return PAGE_ID_DIB_DCP405_LABELS_AND_COLORS;
     }
-};
+
+	const char *getPinoutFile() override {
+		return "dcp405_pinout.jpg";
+	}
+ };
 
 static DcpModule g_dcpModule;
 Module *g_module = &g_dcpModule;

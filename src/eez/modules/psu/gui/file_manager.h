@@ -69,6 +69,7 @@ void renameFile();
 bool isDeleteFileEnabled();
 void deleteFile();
 
+void openImageFile(const char *filePath, int pageId);
 void openImageFile();
 void openBitFile();
 

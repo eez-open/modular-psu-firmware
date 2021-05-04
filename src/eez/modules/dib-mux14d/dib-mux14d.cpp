@@ -1123,6 +1123,10 @@ public:
             }
         }
     }
+
+	const char *getPinoutFile() override {
+		return "mux14d_pinout.jpg";
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1377,6 +1381,10 @@ void data_dib_mux14d_cj_temp(DataOperationEnum operation, Cursor cursor, Value &
 void action_dib_mux14d_show_relay_labels() {
     hmi::selectSlot(getFoundWidgetAtDown().cursor);
     pushPage(PAGE_ID_DIB_MUX14D_CHANNEL_LABELS);
+}
+
+void action_dib_mux14d_show_info() {
+    pushPage(PAGE_ID_DIB_PREL6_INFO);
 }
 
 } // namespace dib_mux14d

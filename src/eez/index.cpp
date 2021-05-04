@@ -885,6 +885,10 @@ bool Module::setSourcePwmDuty(int subchannelIndex, float duty, int *err) {
     return false;
 }
 
+const char *Module::getPinoutFile() {
+    return nullptr;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct NoneModule : public Module {

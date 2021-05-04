@@ -786,6 +786,10 @@ public:
 
 		return true;
 	}
+
+	const char *getPinoutFile() override {
+		return "dcm224_pinout.jpg";
+	}
 };
 
 void DcmChannel::onPowerDown() {

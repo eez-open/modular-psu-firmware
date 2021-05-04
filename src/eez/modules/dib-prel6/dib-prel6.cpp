@@ -832,6 +832,10 @@ public:
             }
         }
     }
+
+	const char *getPinoutFile() override {
+		return "prel6_pinout.jpg";
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -944,6 +948,10 @@ void action_dib_prel6_change_relay_label() {
     int slotIndex = cursor / NUM_RELAYS;
     int subchannelIndex = cursor % NUM_RELAYS;
     LabelsAndColorsPage::editChannelLabel(slotIndex, subchannelIndex);
+}
+
+void action_dib_prel6_show_info() {
+    pushPage(PAGE_ID_DIB_PREL6_INFO);
 }
 
 } // namespace gui

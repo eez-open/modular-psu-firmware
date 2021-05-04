@@ -593,6 +593,10 @@ public:
     int getLabelsAndColorsPageId() override {
         return PAGE_ID_DIB_DCM220_LABELS_AND_COLORS;
     }
+
+	const char *getPinoutFile() override {
+		return "dcm220_pinout.jpg";
+	}
 };
 
 void DcmChannel::onPowerDown() {
