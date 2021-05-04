@@ -79,6 +79,22 @@ scpi_result_t scpi_cmd_routeClose(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_routeCloseExclusive(scpi_t *context) {
+    ChannelList channelList;
+    param_channels(context, channelList);
+    if (channelList.numChannels != 1) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::routeCloseExclusive(channelList, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
 scpi_result_t scpi_cmd_routeCloseQ(scpi_t *context) {
     ChannelList channelList;
     param_channels(context, channelList);
