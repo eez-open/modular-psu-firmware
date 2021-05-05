@@ -619,7 +619,7 @@ public:
     void resetProfileToDefaults(uint8_t *buffer) override {
         Module::resetProfileToDefaults(buffer);
         auto parameters = (ProfileParameters *)buffer;
-        parameters->relayStates = relayStates;
+        parameters->relayStates = 0;
         memset(parameters->relayLabels, 0, sizeof(relayLabels));
     }
 

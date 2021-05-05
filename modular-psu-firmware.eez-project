@@ -67129,6 +67129,26 @@
                 }
               ]
             }
+          },
+          {
+            "name": "MEASure:TEMPerature?",
+            "parameters": [
+              {
+                "name": "channels",
+                "type": [
+                  {
+                    "type": "channel-list"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
           }
         ]
       },

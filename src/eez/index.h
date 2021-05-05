@@ -416,6 +416,11 @@ struct Module {
     virtual bool setSourcePwmDuty(int subchannelIndex, float duty, int *err);
 
     virtual const char *getPinoutFile();
+
+	virtual bool measureTemperature(int subbchannelIndex, float &temperature, int *err);
+
+    virtual bool isCopyToAvailable();
+    virtual void copyTo(int slotIndex);
 };
 
 static const int NUM_SLOTS = 3;

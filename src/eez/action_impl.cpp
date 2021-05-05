@@ -382,25 +382,52 @@ void action_edit_calibration_password() {
 
 void onChannelCopyDestinationSelected(uint16_t value) {
     popPage();
-    const char *err = channel_dispatcher::copyChannelToChannel(g_channel->channelIndex, value);
-    if (err) {
-        char message[100];
-        stringCopy(message, sizeof(message), "Copying is not possible!");
-        stringAppendString(message, sizeof(message), "\n");
-        stringAppendString(message, sizeof(message), err);
-        errorMessage(message);
+
+    if (g_channel) {
+        const char *err = channel_dispatcher::copyChannelToChannel(g_channel->channelIndex, value);
+        if (err) {
+            char message[100];
+            stringCopy(message, sizeof(message), "Copying is not possible!");
+            stringAppendString(message, sizeof(message), "\n");
+            stringAppendString(message, sizeof(message), err);
+            errorMessage(message);
+        }
+    } else {
+        g_slots[hmi::g_selectedSlotIndex]->copyTo(value);
     }
 }
 
 void channelsEnumDefinition(DataOperationEnum operation, Cursor cursor, Value &value) {
-    int channelIndex = cursor < g_channel->channelIndex ? cursor : cursor + 1;
+    if (g_channel) {
+        int channelIndex = cursor < g_channel->channelIndex ? cursor : cursor + 1;
 
-    if (operation == DATA_OPERATION_GET_VALUE) {
-        value = (uint8_t)channelIndex;
-    } else if (operation == DATA_OPERATION_GET_LABEL) {
-		if (channelIndex < CH_NUM) {
-			value = Value(channelIndex, VALUE_TYPE_CHANNEL_SHORT_LABEL_WITHOUT_COLUMN);
-		}
+        if (operation == DATA_OPERATION_GET_VALUE) {
+            value = (uint8_t)channelIndex;
+        } else if (operation == DATA_OPERATION_GET_LABEL) {
+            if (channelIndex < CH_NUM) {
+                value = Value(channelIndex, VALUE_TYPE_CHANNEL_TITLE);
+            }
+        }
+    } else {
+        int slotIndex;
+        for (slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+            if (g_slots[slotIndex]->moduleType == g_slots[hmi::g_selectedSlotIndex]->moduleType) {
+                if (slotIndex != hmi::g_selectedSlotIndex) {
+                    if (cursor == 0) {
+                        break;
+                    }
+					cursor--;
+                }
+            }
+        }
+
+        if (operation == DATA_OPERATION_GET_VALUE) {
+            value = (uint8_t)slotIndex;
+        } else if (operation == DATA_OPERATION_GET_LABEL) {
+            if (slotIndex < NUM_SLOTS) {
+                value = Value(slotIndex, VALUE_TYPE_SLOT_TITLE);
+            }
+        }
     }
 }
 

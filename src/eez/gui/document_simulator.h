@@ -571,7 +571,8 @@ enum DataEnum {
     DATA_ID_DIB_MUX14D_ADIB1_RELAY_CYCLES = 569,
     DATA_ID_DIB_MUX14D_ADIB2_RELAY_IS_ON = 570,
     DATA_ID_DIB_MUX14D_ADIB2_RELAY_CYCLES = 571,
-    DATA_ID_DIB_MUX14D_CJ_TEMP = 572
+    DATA_ID_DIB_MUX14D_CJ_TEMP = 572,
+    DATA_ID_DIB_MUX14D_MULTIPLE_CONNECTIONS = 573
 };
 
 void data_none(DataOperationEnum operation, Cursor cursor, Value &value);
@@ -1147,6 +1148,7 @@ void data_dib_mux14d_adib1_relay_cycles(DataOperationEnum operation, Cursor curs
 void data_dib_mux14d_adib2_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mux14d_adib2_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value);
 void data_dib_mux14d_cj_temp(DataOperationEnum operation, Cursor cursor, Value &value);
+void data_dib_mux14d_multiple_connections(DataOperationEnum operation, Cursor cursor, Value &value);
 
 typedef void (*DataOperationsFunction)(DataOperationEnum operation, Cursor cursor, Value &value);
 
@@ -1457,7 +1459,9 @@ enum ActionsEnum {
     ACTION_ID_DIB_MUX14D_TOGGLE_ADIB1_RELAY = 301,
     ACTION_ID_DIB_MUX14D_TOGGLE_ADIB2_RELAY = 302,
     ACTION_ID_DIB_MUX14D_SHOW_RELAY_LABELS = 303,
-    ACTION_ID_DIB_MUX14D_SHOW_INFO = 304
+    ACTION_ID_DIB_MUX14D_SHOW_INFO = 304,
+    ACTION_ID_DIB_MUX14D_SHOW_RELAY_CYCLES = 305,
+    ACTION_ID_DIB_MUX14D_TOGGLE_MULTIPLE_CONNECTIONS = 306
 };
 
 void action_channel_toggle_output();
@@ -1764,6 +1768,8 @@ void action_dib_mux14d_toggle_adib1_relay();
 void action_dib_mux14d_toggle_adib2_relay();
 void action_dib_mux14d_show_relay_labels();
 void action_dib_mux14d_show_info();
+void action_dib_mux14d_show_relay_cycles();
+void action_dib_mux14d_toggle_multiple_connections();
 
 extern ActionExecFunc g_actionExecFunctions[];
 
@@ -2591,7 +2597,8 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_SETTINGS = 294,
     PAGE_ID_DIB_MUX14D_LABELS_AND_COLORS = 295,
     PAGE_ID_DIB_MUX14D_CHANNEL_LABELS = 296,
-    PAGE_ID_DIB_MUX14D_INFO = 297
+    PAGE_ID_DIB_MUX14D_INFO = 297,
+    PAGE_ID_DIB_MUX14D_RELAY_CYCLES = 298
 };
 
-extern const uint8_t assets[590005];
+extern const uint8_t assets[590329];

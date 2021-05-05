@@ -915,6 +915,16 @@ void SLOT_INFO_WITH_FW_VER_value_to_text(const Value &value, char *text, int cou
     }
 }
 
+bool compare_SLOT_TITLE_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void SLOT_TITLE_value_to_text(const Value &value, char *text, int count) {
+    int slotIndex = value.getInt() & 0xFF;
+    auto &slot = *g_slots[slotIndex];
+    snprintf(text, count, "%s #%d", slot.getLabelOrDefault(), slotIndex + 1);
+}
+
 bool compare_SLOT_TITLE_DEF_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -960,9 +970,15 @@ bool compare_SLOT_TITLE_SETTINGS_value(const Value &a, const Value &b) {
 }
 
 void SLOT_TITLE_SETTINGS_value_to_text(const Value &value, char *text, int count) {
-    int slotIndex = value.getInt();
-    auto &slot = *g_slots[slotIndex];
-    snprintf(text, count, "%s #%d:", slot.getLabelOrDefault(), slotIndex + 1);
+    int slotIndex = value.getInt() & 0xFF;
+    int channelIndex = value.getInt() >> 8;
+    if (channelIndex != -1) {
+        Channel &channel = Channel::get(channelIndex);
+        snprintf(text, count, "%s:", channel.getLabelOrDefault());
+    } else {
+        auto &slot = *g_slots[slotIndex];
+        snprintf(text, count, "%s #%d:", slot.getLabelOrDefault(), slotIndex + 1);
+    }
 }
 
 bool compare_MASTER_INFO_value(const Value &a, const Value &b) {
@@ -2961,7 +2977,11 @@ void data_is_coupling_type_split_rails(DataOperationEnum operation, Cursor curso
 
 void data_channel_copy_available(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = CH_NUM >= 2 ? 1 : 0;
+        if (g_channel) {
+            value = CH_NUM >= 2 ? 1 : 0;
+        } else {
+            value = g_slots[hmi::g_selectedSlotIndex]->isCopyToAvailable();
+        }
     }
 }
 
@@ -5186,7 +5206,7 @@ void data_slot_title_micro(DataOperationEnum operation, Cursor cursor, Value &va
 
 void data_slot_title_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_SETTINGS);
+        value = Value((g_channelIndex << 8) | hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_SETTINGS);
     }
 }
 

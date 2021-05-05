@@ -3872,14 +3872,14 @@ public:
     }
 
 	const char *getPinoutFile() override {
-		if (afeVersion == 0) {
-			return "mio168_no_afe_pinout.jpg";
-		} else if (afeVersion == 1) {
+		if (afeVersion == 1) {
 			return "mio168_afe1_pinout.jpg";
-		} else if (afeVersion == 1) {
+		} else if (afeVersion == 2) {
 			return "mio168_afe2_pinout.jpg";
-		} else if (afeVersion == 1) {
+		} else if (afeVersion == 3) {
 			return "mio168_afe3_pinout.jpg";
+		} else if (afeVersion == 4) {
+			return "mio168_no_afe_pinout.jpg";
 		}
 		return nullptr;
 	}

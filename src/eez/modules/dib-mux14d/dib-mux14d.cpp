@@ -173,6 +173,8 @@ public:
     uint32_t lastRefreshTime;
     int retry;
 
+	bool multipleConnections = true;
+
 	uint8_t adib1RelayState = 0;
 	uint8_t adib2RelayState = 0;
 	uint8_t extRelayState = 0;
@@ -534,7 +536,9 @@ public:
                         response->getInfo.idw0 = 0;
                         response->getInfo.idw1 = 0;
                         response->getInfo.idw2 = 0;
-                    }
+					} else if (currentCommand->command == COMMAND_GET_STATE) {
+						response->getState.cjTemp = 23.0f;
+					}
 
                     stateTransition(EVENT_DMA_TRANSFER_COMPLETED);
                     #endif
@@ -641,6 +645,8 @@ public:
     }
 
     struct ProfileParameters : public Module::ProfileParameters {
+        bool multipleConnections;
+
         uint8_t p1RelayStates;
         char p1RelayLabels[NUM_RELAYS][RELAY_LABEL_MAX_LENGTH + 1];
 	
@@ -658,16 +664,18 @@ public:
 
 		auto parameters = (ProfileParameters *)buffer;
 
-		parameters->p1RelayStates = p1RelayStates;
+        parameters->multipleConnections = true;
+
+		parameters->p1RelayStates = 0;
         memset(parameters->p1RelayLabels, 0, sizeof(p1RelayLabels));
 
-		parameters->p2RelayStates = p2RelayStates;
+		parameters->p2RelayStates = 0;
 		memset(parameters->p2RelayLabels, 0, sizeof(p2RelayLabels));
 
-        parameters->adib1RelayState = adib1RelayState;
-        parameters->adib2RelayState = adib2RelayState;
+        parameters->adib1RelayState = 0;
+        parameters->adib2RelayState = 0;
 
-		parameters->extRelayState = extRelayState;
+		parameters->extRelayState = 0;
 	}
 
     void getProfileParameters(uint8_t *buffer) override {
@@ -676,6 +684,8 @@ public:
 		assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
         
 		auto parameters = (ProfileParameters *)buffer;
+
+        parameters->multipleConnections = multipleConnections;
         
 		parameters->p1RelayStates = p1RelayStates;
         memcpy(parameters->p1RelayLabels, p1RelayLabels, sizeof(p1RelayLabels));
@@ -693,6 +703,8 @@ public:
         Module::setProfileParameters(buffer, mismatch, recallOptions);
         
 		auto parameters = (ProfileParameters *)buffer;
+
+        multipleConnections = parameters->multipleConnections;
         
 		p1RelayStates = parameters->p1RelayStates;
         memcpy(p1RelayLabels, parameters->p1RelayLabels, sizeof(p1RelayLabels));
@@ -711,6 +723,8 @@ public:
             return false;
         }
         auto parameters = (const ProfileParameters *)buffer;
+
+        WRITE_PROPERTY("multipleConnections", parameters->multipleConnections);
 
         WRITE_PROPERTY("p1RelayStates", parameters->p1RelayStates);
 
@@ -742,6 +756,8 @@ public:
         }
         auto parameters = (ProfileParameters *)buffer;
         
+        READ_PROPERTY("multipleConnections", parameters->multipleConnections);
+
         READ_PROPERTY("p1RelayStates", parameters->p1RelayStates);
 		
         for (int i = 0; i < NUM_RELAYS; i++) {
@@ -768,6 +784,8 @@ public:
 
     void resetConfiguration() {
         Module::resetConfiguration();
+
+        multipleConnections = true;
 
 		p1RelayStates = 0;
         memset(p1RelayLabels, 0, sizeof(p1RelayLabels));
@@ -877,9 +895,13 @@ public:
 
     bool isValidSubchannelIndex(int subchannelIndex) override {
         subchannelIndex++;
-        return subchannelIndex == 1 || subchannelIndex == 2 || subchannelIndex == 3 ||
+        return 
+			subchannelIndex == 1 || 
+			subchannelIndex == 2 || 
+			subchannelIndex == 3 ||
             (subchannelIndex >= 11 && subchannelIndex <= 17) ||
-            (subchannelIndex >= 21 && subchannelIndex <= 27);
+            (subchannelIndex >= 21 && subchannelIndex <= 27) || 
+			subchannelIndex == 31;
     }
 
     int getSubchannelIndexFromRelativeChannelIndex(int relativeChannelIndex) override {
@@ -892,9 +914,11 @@ public:
             subchannelIndex = 3; // EXT relay
         } else if (relativeChannelIndex >= 3 && relativeChannelIndex < 10) {
             subchannelIndex = 11 + (relativeChannelIndex - 3); // P1_1 : P1_7
-        } else {
+        } else if (relativeChannelIndex >= 10 && relativeChannelIndex < 17) {
             subchannelIndex = 21 + (relativeChannelIndex - 10); // P2_1 : P2_7
-        }
+		} else {
+			subchannelIndex = 31;
+		}
         return subchannelIndex - 1;
     }
 
@@ -1007,8 +1031,14 @@ public:
         int subchannelIndex = channelList.channels[0].subchannelIndex + 1;
         if (subchannelIndex >= 11 && subchannelIndex <= 17) {
             p1RelayStates = 1 << (subchannelIndex - 11);
+            if (extRelayState) {
+                p2RelayStates = 0;
+            }
         } else if (subchannelIndex >= 21 && subchannelIndex <= 27) {
             p2RelayStates = 1 << (subchannelIndex - 21);
+            if (extRelayState) {
+                p1RelayStates = 0;
+            }
         } else {
             if (err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
@@ -1017,6 +1047,36 @@ public:
         }
 
         return true;
+    }
+
+    void toggleP1Relay(int relayIndex) {
+        if (multipleConnections) {
+			if (p1RelayStates & (1 << relayIndex)) {
+				p1RelayStates &= ~(1 << relayIndex);
+			} else {
+				p1RelayStates = 1 << relayIndex;
+				if (extRelayState) {
+					p2RelayStates = 0;
+				}
+			}
+        } else {
+            p1RelayStates ^= 1 << relayIndex;
+        }
+    }
+
+	void toggleP2Relay(int relayIndex) {
+        if (multipleConnections) {
+			if (p2RelayStates & (1 << relayIndex)) {
+				p2RelayStates &= ~(1 << relayIndex);
+			} else {
+				p2RelayStates = 1 << relayIndex;
+				if (extRelayState) {
+					p1RelayStates = 0;
+				}
+			}
+        } else {
+            p2RelayStates ^= 1 << relayIndex;
+        }
     }
 
     void onLowPriorityThreadMessage(uint8_t type, uint32_t param) override {
@@ -1127,6 +1187,39 @@ public:
 	const char *getPinoutFile() override {
 		return "mux14d_pinout.jpg";
 	}
+
+	bool measureTemperature(int subbchannelIndex, float &temperature, int *err) override {
+		subbchannelIndex++;
+
+		if (subbchannelIndex != 31) {
+			*err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+			return false;
+		}
+
+		temperature = cjTemp;
+		return true;
+	}
+
+    bool isCopyToAvailable() override {
+        int n = 0;
+        for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+            if (g_slots[slotIndex]->moduleType == MODULE_TYPE_DIB_MUX14D) {
+                n++;
+            }
+        }
+        return n > 1;
+    }
+
+    void copyTo(int slotIndex) override {
+        auto otherModule = (Mux14DModule *)g_slots[slotIndex];
+
+        otherModule->multipleConnections = multipleConnections;
+        otherModule->p1RelayStates = p1RelayStates;
+        otherModule->p2RelayStates = p2RelayStates;
+        otherModule->adib1RelayState = adib1RelayState;
+        otherModule->adib2RelayState = adib2RelayState;
+        otherModule->extRelayState = extRelayState;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1234,7 +1327,7 @@ void action_dib_mux14d_toggle_p1_relay() {
 	int cursor = getFoundWidgetAtDown().cursor;
 	int slotIndex = cursor / NUM_RELAYS;
 	int subchannelIndex = cursor % NUM_RELAYS;
-	((Mux14DModule *)g_slots[slotIndex])->p1RelayStates ^= 1 << subchannelIndex;
+	((Mux14DModule *)g_slots[slotIndex])->toggleP1Relay(subchannelIndex);;
 }
 
 void data_dib_mux14d_p2_relays(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -1311,7 +1404,8 @@ void action_dib_mux14d_toggle_p2_relay() {
 	int cursor = getFoundWidgetAtDown().cursor;
 	int slotIndex = cursor / NUM_RELAYS;
 	int subchannelIndex = cursor % NUM_RELAYS;
-	((Mux14DModule *)g_slots[slotIndex])->p2RelayStates ^= 1 << subchannelIndex;
+    
+	((Mux14DModule *)g_slots[slotIndex])->toggleP2Relay(subchannelIndex);
 }
 
 void data_dib_mux14d_adib1_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -1385,6 +1479,22 @@ void action_dib_mux14d_show_relay_labels() {
 
 void action_dib_mux14d_show_info() {
     pushPage(PAGE_ID_DIB_PREL6_INFO);
+}
+
+void action_dib_mux14d_show_relay_cycles() {
+    pushPage(PAGE_ID_DIB_MUX14D_RELAY_CYCLES);
+}
+
+void data_dib_mux14d_multiple_connections(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex = hmi::g_selectedSlotIndex;
+		value = ((Mux14DModule *)g_slots[slotIndex])->multipleConnections;
+	}
+}
+
+void action_dib_mux14d_toggle_multiple_connections() {
+	((Mux14DModule *)g_slots[hmi::g_selectedSlotIndex])->multipleConnections =
+		!((Mux14DModule *)g_slots[hmi::g_selectedSlotIndex])->multipleConnections;
 }
 
 } // namespace dib_mux14d

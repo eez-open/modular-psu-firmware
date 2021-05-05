@@ -110,6 +110,29 @@ scpi_result_t scpi_cmd_measureDigitalByteQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_measureTemperatureQ(scpi_t *context) {
+	ChannelList channelList;
+	param_channels(context, channelList);
+	if (channelList.numChannels == 0) {
+		return SCPI_RES_ERR;
+	}
+
+	for (int i = 0; i < channelList.numChannels; i++) {
+		float temperature;
+		int err;
+		if (!g_slots[channelList.channels[i].slotIndex]->measureTemperature(channelList.channels[i].subchannelIndex, temperature, &err)) {
+			SCPI_ErrorPush(context, err);
+			return SCPI_RES_ERR;
+		}
+
+		char buffer[256] = { 0 };
+		stringAppendFloat(buffer, sizeof(buffer), temperature);
+		SCPI_ResultCharacters(context, buffer, strlen(buffer));
+	}
+
+	return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

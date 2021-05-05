@@ -889,6 +889,20 @@ const char *Module::getPinoutFile() {
     return nullptr;
 }
 
+bool Module::measureTemperature(int subbchannelIndex, float &temperature, int *err) {
+	if (err) {
+		*err = SCPI_ERROR_HARDWARE_MISSING;
+	}
+	return false;
+}
+
+bool Module::isCopyToAvailable() {
+    return false;
+}
+
+void Module::copyTo(int slotIndex) {
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct NoneModule : public Module {
