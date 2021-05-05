@@ -580,9 +580,9 @@ public:
 
     void animatePageAppearance(int previousPageId, int activePageId) override {
         if (previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS && activePageId == PAGE_ID_DIB_PREL6_CHANNEL_LABELS) {
-            psu::gui::animateSettingsSlideLeft(true);
+            psu::gui::animateSlideLeft();
         } else if (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS) {
-            psu::gui::animateSettingsSlideRight(true);
+            psu::gui::animateSlideRight();
         }
     }
 
@@ -596,11 +596,8 @@ public:
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
             return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MAX;
         }
-        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-            return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MIN;
-        }
-        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-        return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MICRO;
+        assert(slotViewType == SLOT_VIEW_TYPE_MIN);
+        return gui::PAGE_ID_DIB_PREL6_SLOT_VIEW_MIN;
     }
 
     int getSlotSettingsPageId() override {
@@ -769,6 +766,25 @@ public:
         return true;
     }
     
+    bool routeClose(ChannelList channelList, int *err) override {
+        for (int i = 0; i < channelList.numChannels; i++) {
+			int subchannelIndex = channelList.channels[i].subchannelIndex;
+            if (subchannelIndex < 0 || subchannelIndex > 5) {
+                if (err) {
+                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                }
+                return false;
+            }
+        }
+
+        for (int i = 0; i < channelList.numChannels; i++) {
+			int subchannelIndex = channelList.channels[i].subchannelIndex;
+			relayStates |= (1 << subchannelIndex);
+        }
+
+        return true;
+    }
+
     bool routeCloseExclusive(ChannelList channelList, int *err) override {
         if (channelList.numChannels != 1) {
             if (err) {

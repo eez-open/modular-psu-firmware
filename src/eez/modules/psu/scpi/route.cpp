@@ -300,16 +300,6 @@ scpi_result_t scpi_cmd_routeLabelColumnQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_routeLabelChannel(scpi_t *context) {
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-}
-
-scpi_result_t scpi_cmd_routeLabelChannelQ(scpi_t *context) {
-    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
-    return SCPI_RES_ERR;
-}
-
 } // namespace scpi
 } // namespace psu
 } // namespace eez

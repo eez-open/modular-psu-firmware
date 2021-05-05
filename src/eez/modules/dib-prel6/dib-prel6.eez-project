@@ -753,10 +753,10 @@
         },
         {
           "type": "Grid",
-          "left": 5,
-          "top": 35,
+          "left": 3,
+          "top": 39,
           "width": 462,
-          "height": 120,
+          "height": 160,
           "wireID": "a9057fbe-798b-4f57-a0e0-4392bc2d7d52",
           "data": "relays",
           "style": {
@@ -767,7 +767,7 @@
             "left": 0,
             "top": 0,
             "width": 154,
-            "height": 60,
+            "height": 80,
             "wireID": "c47b9576-1322-4629-b7d4-04482a5d6be1",
             "style": {
               "inheritFrom": "default"
@@ -775,8 +775,8 @@
             "widgets": [
               {
                 "type": "Select",
-                "left": 6,
-                "top": 8,
+                "left": 8,
+                "top": 30,
                 "width": 146,
                 "height": 50,
                 "wireID": "ebbd12ea-d597-4191-8c74-7832da7fc57b",
@@ -973,7 +973,7 @@
       "left": 0,
       "top": 0,
       "width": 476,
-      "height": 164,
+      "height": 240,
       "dataContextOverrides": "{\"slot_title_max\": \"PREL6\"}"
     },
     {
@@ -1030,45 +1030,6 @@
       "width": 235,
       "height": 68,
       "dataContextOverrides": "{\"slot_title_min\": \"PREL6\"}"
-    },
-    {
-      "components": [
-        {
-          "type": "Container",
-          "left": 0,
-          "top": 0,
-          "width": 154,
-          "height": 24,
-          "wireID": "82f76ceb-e046-4fc2-8c1c-6ebbf9176930",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 154,
-              "height": 24,
-              "wireID": "67c9a165-0582-49ef-cb30-c33dbf36fa8c",
-              "data": "slot_title_micro",
-              "style": {
-                "inheritFrom": "channel1",
-                "alignHorizontal": "left",
-                "padding": "0 5"
-              },
-              "text": ""
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_view_micro",
-      "left": 0,
-      "top": 0,
-      "width": 154,
-      "height": 68,
-      "dataContextOverrides": "{\"slot_title_micro\": \"PREL6\"}"
     },
     {
       "components": [

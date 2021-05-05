@@ -645,11 +645,8 @@ public:
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
             return PAGE_ID_DIB_SMX46_SLOT_VIEW_MAX;
         }
-        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-            return PAGE_ID_DIB_SMX46_SLOT_VIEW_MIN;
-        }
-        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-        return PAGE_ID_DIB_SMX46_SLOT_VIEW_MICRO;
+        assert(slotViewType == SLOT_VIEW_TYPE_MIN);
+        return PAGE_ID_DIB_SMX46_SLOT_VIEW_MIN;
     }
 
     struct ProfileParameters : public Module::ProfileParameters {

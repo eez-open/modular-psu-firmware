@@ -2569,44 +2569,6 @@
     {
       "components": [
         {
-          "type": "Container",
-          "left": 0,
-          "top": 0,
-          "width": 154,
-          "height": 24,
-          "wireID": "d492c037-e079-4d8b-91a1-10f9f6c8e3f9",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 154,
-              "height": 24,
-              "wireID": "12dd523c-5cd2-4947-faa1-9d70bc7c6d04",
-              "data": "slot_title_micro",
-              "style": {
-                "inheritFrom": "channel1",
-                "alignHorizontal": "left",
-                "padding": "0 5"
-              },
-              "text": ""
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_view_micro",
-      "left": 0,
-      "top": 0,
-      "width": 154,
-      "height": 68
-    },
-    {
-      "components": [
-        {
           "type": "Text",
           "left": 0,
           "top": 0,

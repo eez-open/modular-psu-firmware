@@ -955,16 +955,6 @@ void SLOT_TITLE_MIN_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%s", slot.getLabelOrDefault());
 }
 
-bool compare_SLOT_TITLE_MICRO_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
-}
-
-void SLOT_TITLE_MICRO_value_to_text(const Value &value, char *text, int count) {
-    int slotIndex = value.getInt();
-    auto &slot = *g_slots[slotIndex];
-    snprintf(text, count, "%s", slot.getLabelOrDefault());
-}
-
 bool compare_SLOT_TITLE_SETTINGS_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -1244,12 +1234,8 @@ int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
             return PAGE_ID_SLOT_MAX_ERROR;
         }
 
-        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-            return PAGE_ID_SLOT_MIN_ERROR;
-        }
-
-        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-        return PAGE_ID_SLOT_MICRO_ERROR;
+        assert(slotViewType == SLOT_VIEW_TYPE_MIN);
+        return PAGE_ID_SLOT_MIN_ERROR;
     }
 }
 
@@ -1743,12 +1729,6 @@ void data_slot_max_view(DataOperationEnum operation, Cursor cursor, Value &value
 void data_slot_min_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getSlotView(SLOT_VIEW_TYPE_MIN, hmi::g_selectedSlotIndex, cursor);
-    }
-}
-
-void data_slot_micro_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = getSlotView(SLOT_VIEW_TYPE_MICRO, hmi::g_selectedSlotIndex, cursor);
     }
 }
 
@@ -5195,12 +5175,6 @@ void data_slot_title_max(DataOperationEnum operation, Cursor cursor, Value &valu
 void data_slot_title_min(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_MIN);
-    }
-}
-
-void data_slot_title_micro(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_MICRO);
     }
 }
 

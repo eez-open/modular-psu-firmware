@@ -986,7 +986,7 @@
           "left": 44,
           "top": 36,
           "width": 240,
-          "height": 112,
+          "height": 180,
           "wireID": "16a44956-5f86-41ae-cc55-37e17aef2bb9",
           "data": "routes",
           "action": "show_configure_routes",
@@ -998,7 +998,7 @@
             "left": 0,
             "top": 0,
             "width": 40,
-            "height": 28,
+            "height": 45,
             "wireID": "5f96cfca-0b3b-4471-f488-d9cda98d944a",
             "action": "",
             "style": {
@@ -1010,7 +1010,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 40,
-                "height": 28,
+                "height": 45,
                 "wireID": "261d92f6-e99c-4c0a-c812-26ad55445e06",
                 "data": "route_open",
                 "style": {
@@ -1022,7 +1022,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 40,
-                    "height": 28,
+                    "height": 45,
                     "wireID": "53af3deb-b6fb-4793-ad32-d5e58ad36beb",
                     "style": {
                       "inheritFrom": "default"
@@ -1033,7 +1033,7 @@
                         "left": 19,
                         "top": 0,
                         "width": 2,
-                        "height": 28,
+                        "height": 45,
                         "wireID": "63ccda80-8d97-4364-8caf-de34ee925d60",
                         "style": {
                           "inheritFrom": "default"
@@ -1042,7 +1042,7 @@
                       {
                         "type": "Rectangle",
                         "left": 0,
-                        "top": 13,
+                        "top": 22,
                         "width": 40,
                         "height": 2,
                         "wireID": "81daf594-5420-44e3-c6a2-3691da915150",
@@ -1053,7 +1053,7 @@
                       {
                         "type": "Rectangle",
                         "left": 14,
-                        "top": 8,
+                        "top": 17,
                         "width": 12,
                         "height": 12,
                         "wireID": "30c99088-a25e-4bfe-f111-e17feb06dbe2",
@@ -1070,7 +1070,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 40,
-                    "height": 28,
+                    "height": 45,
                     "wireID": "461934ec-9672-490b-90da-0e3862fb4791",
                     "style": {
                       "inheritFrom": "default"
@@ -1078,25 +1078,10 @@
                     "widgets": [
                       {
                         "type": "Rectangle",
-                        "left": 13,
-                        "top": 7,
-                        "width": 14,
-                        "height": 14,
-                        "wireID": "53e2526f-e513-4a2a-cc43-a168a53897e9",
-                        "style": {
-                          "inheritFrom": "default",
-                          "color": "Background",
-                          "borderSize": "1",
-                          "borderRadius": 5,
-                          "borderColor": "text_disabled"
-                        }
-                      },
-                      {
-                        "type": "Rectangle",
                         "left": 19,
                         "top": 0,
                         "width": 2,
-                        "height": 28,
+                        "height": 45,
                         "wireID": "420a5676-5213-4c79-d1f4-1b67017575b1",
                         "style": {
                           "inheritFrom": "default"
@@ -1105,7 +1090,7 @@
                       {
                         "type": "Rectangle",
                         "left": 0,
-                        "top": 13,
+                        "top": 22,
                         "width": 40,
                         "height": 2,
                         "wireID": "f68868be-5bf7-4616-a3cd-59386fe0dafd",
@@ -1163,7 +1148,7 @@
         {
           "type": "List",
           "left": 44,
-          "top": 148,
+          "top": 220,
           "width": 240,
           "height": 16,
           "wireID": "6cf2ce8c-3657-4378-9a7b-60f0810edc06",
@@ -1413,7 +1398,7 @@
       "left": 0,
       "top": 0,
       "width": 476,
-      "height": 164,
+      "height": 240,
       "dataContextOverrides": "{\"slot_title_max\": \"SMX46\"}"
     },
     {
@@ -1510,73 +1495,6 @@
       "width": 235,
       "height": 68,
       "dataContextOverrides": "{\"slot_title_min\": \"SMX46\"}"
-    },
-    {
-      "components": [
-        {
-          "type": "Container",
-          "left": 0,
-          "top": 0,
-          "width": 154,
-          "height": 24,
-          "wireID": "28cd25a1-4e0d-477d-aa2d-9f6bca418035",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 154,
-              "height": 24,
-              "wireID": "55062abf-de1b-4330-beaa-29709250ec29",
-              "data": "slot_title_micro",
-              "style": {
-                "inheritFrom": "channel1",
-                "alignHorizontal": "left",
-                "padding": "0 5"
-              },
-              "text": ""
-            }
-          ]
-        },
-        {
-          "type": "DisplayData",
-          "left": 0,
-          "top": 24,
-          "width": 51,
-          "height": 21,
-          "wireID": "7e53708b-da84-41a3-fa6b-65436ce3e98b",
-          "data": "dac1",
-          "action": "",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_enabled"
-          },
-          "displayOption": 0
-        },
-        {
-          "type": "DisplayData",
-          "left": 0,
-          "top": 47,
-          "width": 51,
-          "height": 21,
-          "wireID": "d62747b0-01ba-45f6-d1be-a1ece376826b",
-          "data": "dac2",
-          "action": "",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_enabled"
-          },
-          "displayOption": 0
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_view_micro",
-      "left": 0,
-      "top": 0,
-      "width": 154,
-      "height": 68,
-      "dataContextOverrides": "{\"slot_title_micro\": \"SMX46\"}"
     },
     {
       "components": [

@@ -270,11 +270,6 @@
       "defaultValue": "3"
     },
     {
-      "name": "slot_micro_view",
-      "type": "string",
-      "defaultValue": "dib_dcp405::slot_micro_1ch_on"
-    },
-    {
       "name": "channel_display_value1",
       "type": "float",
       "defaultValue": "25.00V",
@@ -2181,11 +2176,6 @@
     },
     {
       "name": "slot_title_min",
-      "type": "string",
-      "defaultValue": "MIO168"
-    },
-    {
-      "name": "slot_title_micro",
       "type": "string",
       "defaultValue": "MIO168"
     },
@@ -21067,7 +21057,7 @@
           "left": 0,
           "top": 0,
           "width": 480,
-          "height": 168,
+          "height": 240,
           "wireID": "02c2e310-d747-4ba5-a2d3-595d11d228ad",
           "style": {
             "inheritFrom": "default",
@@ -21078,7 +21068,7 @@
             {
               "type": "MultilineText",
               "left": 3,
-              "top": 0,
+              "top": 3,
               "width": 114,
               "height": 54,
               "wireID": "1bd5bbb4-64e7-419e-d2e8-4547a4a64fe3",
@@ -21093,7 +21083,7 @@
             {
               "type": "MultilineText",
               "left": 123,
-              "top": 0,
+              "top": 3,
               "width": 114,
               "height": 54,
               "wireID": "d3b8a9ff-8a24-4430-a9ca-902a6aa7cc73",
@@ -21108,7 +21098,7 @@
             {
               "type": "MultilineText",
               "left": 243,
-              "top": 0,
+              "top": 3,
               "width": 114,
               "height": 54,
               "wireID": "a388597d-856a-409c-d869-022b024919a7",
@@ -21123,7 +21113,7 @@
             {
               "type": "MultilineText",
               "left": 363,
-              "top": 0,
+              "top": 3,
               "width": 114,
               "height": 54,
               "wireID": "c02c71d7-b29a-4c2e-f621-331a1f5b74b1",
@@ -21138,7 +21128,7 @@
             {
               "type": "MultilineText",
               "left": 3,
-              "top": 56,
+              "top": 63,
               "width": 114,
               "height": 54,
               "wireID": "dad5f942-7610-4b5f-8780-3ae26e6baad0",
@@ -21153,7 +21143,7 @@
             {
               "type": "MultilineText",
               "left": 123,
-              "top": 56,
+              "top": 63,
               "width": 114,
               "height": 54,
               "wireID": "e824c60c-4018-46bb-b767-c595efbdb15f",
@@ -21168,7 +21158,7 @@
             {
               "type": "Select",
               "left": 243,
-              "top": 56,
+              "top": 63,
               "width": 114,
               "height": 54,
               "wireID": "e7ae7636-e5fc-4d9e-88fe-d35e19727bbe",
@@ -21196,7 +21186,7 @@
                   "width": 114,
                   "height": 54,
                   "wireID": "7d207801-1851-4168-f380-998217697250",
-                  "data": "ethernet_and_mqtt_status",
+                  "data": "ethernet_status",
                   "style": {
                     "inheritFrom": "default"
                   },
@@ -21301,8 +21291,8 @@
             },
             {
               "type": "MultilineText",
-              "left": 363,
-              "top": 56,
+              "left": 3,
+              "top": 183,
               "width": 114,
               "height": 54,
               "wireID": "ebfd439d-72c8-418e-fc94-6f6294ceebbe",
@@ -21318,7 +21308,7 @@
             {
               "type": "MultilineText",
               "left": 3,
-              "top": 112,
+              "top": 123,
               "width": 114,
               "height": 54,
               "wireID": "9709ac36-0396-466d-d29e-4f5e6d95af6b",
@@ -21327,14 +21317,14 @@
               "style": {
                 "inheritFrom": "icon_and_text_S"
               },
-              "text": "\\u0093 Encoder & User sw",
+              "text": "\\u0093 Encoder & user switch",
               "firstLineIndent": 0,
               "hangingIndent": 24
             },
             {
               "type": "MultilineText",
               "left": 123,
-              "top": 112,
+              "top": 123,
               "width": 114,
               "height": 54,
               "wireID": "e3d4f00e-c22c-43d3-baa7-9b7a7398062f",
@@ -21348,8 +21338,8 @@
             },
             {
               "type": "MultilineText",
-              "left": 243,
-              "top": 112,
+              "left": 363,
+              "top": 123,
               "width": 114,
               "height": 54,
               "wireID": "66c6f9b7-49bb-45e3-8891-127a1fa23fc6",
@@ -21363,8 +21353,8 @@
             },
             {
               "type": "Select",
-              "left": 363,
-              "top": 112,
+              "left": 123,
+              "top": 183,
               "width": 114,
               "height": 54,
               "wireID": "16479890-a194-46b4-ed2e-67499973e519",
@@ -21409,20 +21399,70 @@
                   "hangingIndent": 24
                 }
               ]
+            },
+            {
+              "type": "Select",
+              "left": 363,
+              "top": 63,
+              "width": 114,
+              "height": 54,
+              "wireID": "b3f94ff1-7230-49ed-a77e-41a007347102",
+              "data": "mqtt_in_error",
+              "action": "show_sys_settings_mqtt",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "MultilineText",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "5ac787c8-ae19-4834-c272-116043b4f274",
+                  "action": "",
+                  "style": {
+                    "inheritFrom": "icon_and_text_S"
+                  },
+                  "text": "\\u00bf MQTT",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                },
+                {
+                  "type": "MultilineText",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "09b7f5d2-ca75-44f2-9a9a-722fb86f77f1",
+                  "action": "",
+                  "style": {
+                    "inheritFrom": "icon_and_text_S",
+                    "color": "status_warning",
+                    "activeBackgroundColor": "status_warning"
+                  },
+                  "text": "\\u009a MQTT",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                }
+              ]
+            },
+            {
+              "type": "MultilineText",
+              "left": 243,
+              "top": 123,
+              "width": 114,
+              "height": 54,
+              "wireID": "dfb1f440-e16b-4137-b7d2-df320ed1079f",
+              "action": "show_labels_and_colors",
+              "style": {
+                "inheritFrom": "icon_and_text_S"
+              },
+              "text": "\\u00c0 Labels & colors",
+              "firstLineIndent": 0,
+              "hangingIndent": 24
             }
           ]
-        },
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "fac5e6e2-c344-4eac-9fb4-3ed02dd35aba",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "minimized_channels"
         },
         {
           "type": "Container",
@@ -21481,7 +21521,7 @@
           "left": 0,
           "top": 0,
           "width": 480,
-          "height": 168,
+          "height": 240,
           "wireID": "bb168461-8a61-411e-9cfa-2800f537466c",
           "style": {
             "inheritFrom": "default"
@@ -21493,7 +21533,7 @@
               "left": 8,
               "top": 8,
               "width": 235,
-              "height": 140,
+              "height": 224,
               "wireID": "185540e1-8d46-4afd-a44b-3a2cd5de25a4",
               "style": {
                 "inheritFrom": "default"
@@ -21572,7 +21612,7 @@
                 {
                   "type": "Text",
                   "left": 0,
-                  "top": 36,
+                  "top": 40,
                   "width": 119,
                   "height": 32,
                   "wireID": "810b3f25-5e0d-465d-ebbd-9e97376e672f",
@@ -21584,7 +21624,7 @@
                 {
                   "type": "Select",
                   "left": 140,
-                  "top": 36,
+                  "top": 40,
                   "width": 95,
                   "height": 32,
                   "wireID": "7f030b7c-1a03-4edf-e682-8c75512722d3",
@@ -21624,7 +21664,7 @@
                 {
                   "type": "Text",
                   "left": 0,
-                  "top": 72,
+                  "top": 80,
                   "width": 119,
                   "height": 32,
                   "wireID": "75260520-7bba-476d-f9a9-a9a0800aaccd",
@@ -21636,7 +21676,7 @@
                 {
                   "type": "DisplayData",
                   "left": 140,
-                  "top": 72,
+                  "top": 80,
                   "width": 95,
                   "height": 32,
                   "wireID": "75fecc56-a53d-4397-f614-73459c7c0691",
@@ -21650,7 +21690,7 @@
                 {
                   "type": "Text",
                   "left": 0,
-                  "top": 108,
+                  "top": 120,
                   "width": 119,
                   "height": 32,
                   "wireID": "73177b11-3cbd-4dac-a7e9-f1bfb992a171",
@@ -21662,7 +21702,7 @@
                 {
                   "type": "DisplayData",
                   "left": 140,
-                  "top": 108,
+                  "top": 120,
                   "width": 95,
                   "height": 32,
                   "wireID": "b8c47961-e7f7-47df-b66e-6d1c3f641c99",
@@ -21672,33 +21712,33 @@
                     "inheritFrom": "edit_value_active_M_center"
                   },
                   "displayOption": 0
+                },
+                {
+                  "type": "Button",
+                  "left": 49.5,
+                  "top": 160,
+                  "width": 136,
+                  "height": 38,
+                  "wireID": "76cb448e-1756-4e1c-bd14-772c05fb8ff4",
+                  "data": "",
+                  "action": "sys_settings_protections_aux_otp_clear",
+                  "style": {
+                    "inheritFrom": "button_M"
+                  },
+                  "text": "Clear Trip",
+                  "enabled": "sys_temp_aux_otp_is_tripped",
+                  "disabledStyle": {
+                    "inheritFrom": "button_M_disabled"
+                  }
                 }
               ]
             },
             {
-              "type": "Button",
-              "left": 294,
-              "top": 125,
-              "width": 136,
-              "height": 38,
-              "wireID": "76cb448e-1756-4e1c-bd14-772c05fb8ff4",
-              "data": "",
-              "action": "sys_settings_protections_aux_otp_clear",
-              "style": {
-                "inheritFrom": "button_M"
-              },
-              "text": "Clear Trip",
-              "enabled": "sys_temp_aux_otp_is_tripped",
-              "disabledStyle": {
-                "inheritFrom": "button_M_disabled"
-              }
-            },
-            {
               "type": "Rectangle",
               "left": 249,
-              "top": 0,
+              "top": 8,
               "width": 2,
-              "height": 118,
+              "height": 224,
               "wireID": "db69cd80-1e0e-4bc4-c971-86b778ff6f8d",
               "style": {
                 "inheritFrom": "default"
@@ -21709,7 +21749,7 @@
               "left": 256,
               "top": 8,
               "width": 214,
-              "height": 104,
+              "height": 224,
               "wireID": "f28e93ad-a4ee-490a-a3cc-1b3df3a58e32",
               "data": "sys_info_fan_status",
               "style": {
@@ -21721,7 +21761,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 214,
-                  "height": 104,
+                  "height": 224,
                   "wireID": "e51a03ed-2951-407f-dc39-f7a49081a232",
                   "style": {
                     "inheritFrom": "default"
@@ -21761,7 +21801,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 214,
-                  "height": 104,
+                  "height": 224,
                   "wireID": "8967de65-0689-4922-bf70-4b4bd9ef5b08",
                   "style": {
                     "inheritFrom": "default"
@@ -21770,7 +21810,7 @@
                     {
                       "type": "Text",
                       "left": 0,
-                      "top": 36,
+                      "top": 40,
                       "width": 105,
                       "height": 32,
                       "wireID": "6dfee157-6977-40c7-d208-4791ea9d0b5a",
@@ -21848,7 +21888,7 @@
                     {
                       "type": "Select",
                       "left": 0,
-                      "top": 72,
+                      "top": 80,
                       "width": 214,
                       "height": 32,
                       "wireID": "65ac0196-7250-4371-8df2-487a33f857dc",
@@ -21917,7 +21957,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 214,
-                  "height": 104,
+                  "height": 224,
                   "wireID": "ba11b755-8bcf-49ff-dbd7-86882d58c367",
                   "style": {
                     "inheritFrom": "default"
@@ -21957,7 +21997,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 214,
-                  "height": 104,
+                  "height": 224,
                   "wireID": "eb17253c-c2b2-472e-d9d1-01a45ce6b904",
                   "style": {
                     "inheritFrom": "default"
@@ -21992,31 +22032,8 @@
                   ]
                 }
               ]
-            },
-            {
-              "type": "Rectangle",
-              "left": 249,
-              "top": 118,
-              "width": 230,
-              "height": 2,
-              "wireID": "1456fad0-8d3f-4995-cf56-9cddb8e08dd8",
-              "style": {
-                "inheritFrom": "default"
-              }
             }
           ]
-        },
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "30e7478c-1d3e-4fa8-b47c-e502c73262f4",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "minimized_channels"
         },
         {
           "type": "Container",
@@ -22168,8 +22185,8 @@
           "type": "Container",
           "left": 0,
           "top": 0,
-          "width": 259,
-          "height": 168,
+          "width": 480,
+          "height": 240,
           "wireID": "5431a83f-b1f0-425f-9fbc-a56223966425",
           "style": {
             "inheritFrom": "default"
@@ -22246,7 +22263,7 @@
             {
               "type": "Container",
               "left": 10,
-              "top": 60,
+              "top": 71,
               "width": 236,
               "height": 56,
               "wireID": "3a4c858f-203d-4443-dd91-a8ada1117348",
@@ -22313,7 +22330,7 @@
             {
               "type": "Select",
               "left": 10,
-              "top": 115,
+              "top": 137,
               "width": 236,
               "height": 50,
               "wireID": "dae6890f-e321-4fdf-931d-47edb63a8525",
@@ -22459,16 +22476,39 @@
           ]
         },
         {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "2ea622f8-22c6-4e05-ca7f-e358249bc04e",
+          "type": "MultilineText",
+          "left": 273,
+          "top": 5,
+          "width": 189,
+          "height": 50,
+          "wireID": "c1af6621-4661-471f-f5b1-1bf10ce6292a",
+          "data": "",
+          "action": "edit_system_password",
           "style": {
-            "inheritFrom": "default"
+            "inheritFrom": "icon_and_text_S",
+            "alignVertical": "center",
+            "padding": "3 3 3 12"
           },
-          "layout": "minimized_channels"
+          "text": "\\u008c Change password",
+          "firstLineIndent": 0,
+          "hangingIndent": 24
+        },
+        {
+          "type": "MultilineText",
+          "left": 273,
+          "top": 71,
+          "width": 189,
+          "height": 50,
+          "wireID": "2f42849a-2a97-47c6-c975-3e91c4795081",
+          "data": "",
+          "action": "edit_calibration_password",
+          "style": {
+            "inheritFrom": "icon_and_text_S",
+            "padding": "2 2 2 12"
+          },
+          "text": "\\u008c Change calibration password",
+          "firstLineIndent": 0,
+          "hangingIndent": 24
         },
         {
           "type": "Container",
@@ -22509,41 +22549,6 @@
               "text": "System protection settings"
             }
           ]
-        },
-        {
-          "type": "MultilineText",
-          "left": 273,
-          "top": 5,
-          "width": 189,
-          "height": 50,
-          "wireID": "c1af6621-4661-471f-f5b1-1bf10ce6292a",
-          "data": "",
-          "action": "edit_system_password",
-          "style": {
-            "inheritFrom": "icon_and_text_S",
-            "alignVertical": "center",
-            "padding": "3 3 3 12"
-          },
-          "text": "\\u008c Change password",
-          "firstLineIndent": 0,
-          "hangingIndent": 24
-        },
-        {
-          "type": "MultilineText",
-          "left": 273,
-          "top": 60,
-          "width": 189,
-          "height": 50,
-          "wireID": "2f42849a-2a97-47c6-c975-3e91c4795081",
-          "data": "",
-          "action": "edit_calibration_password",
-          "style": {
-            "inheritFrom": "icon_and_text_S",
-            "padding": "2 2 2 12"
-          },
-          "text": "\\u008c Change calibration password",
-          "firstLineIndent": 0,
-          "hangingIndent": 24
         }
       ],
       "connectionLines": [],
@@ -22562,7 +22567,7 @@
           "left": 0,
           "top": 0,
           "width": 480,
-          "height": 168,
+          "height": 240,
           "wireID": "85782c0a-1061-4e19-b238-6357cfaae286",
           "style": {
             "inheritFrom": "default"
@@ -22574,7 +22579,7 @@
               "left": 10,
               "top": 10,
               "width": 68,
-              "height": 32,
+              "height": 40,
               "wireID": "7b01b063-9eab-41b9-8b07-bcee6d9a8216",
               "style": {
                 "inheritFrom": "edit_value_M_left"
@@ -22586,7 +22591,7 @@
               "left": 89,
               "top": 10,
               "width": 113,
-              "height": 32,
+              "height": 40,
               "wireID": "cdefbd5e-318d-478c-9416-d90e2181052c",
               "data": "trigger_source",
               "action": "trigger_select_source",
@@ -22598,9 +22603,9 @@
             {
               "type": "Text",
               "left": 10,
-              "top": 46,
+              "top": 62,
               "width": 68,
-              "height": 32,
+              "height": 40,
               "wireID": "a538f361-52b0-4a1c-84ae-0b43ef5de640",
               "style": {
                 "inheritFrom": "edit_value_M_left"
@@ -22610,9 +22615,9 @@
             {
               "type": "Text",
               "left": 89,
-              "top": 46,
+              "top": 62,
               "width": 67,
-              "height": 32,
+              "height": 40,
               "wireID": "6911ab0a-fc89-4d58-f3de-c3d56d69af8f",
               "data": "trigger_delay",
               "action": "trigger_edit_delay",
@@ -22624,9 +22629,9 @@
             {
               "type": "Text",
               "left": 10,
-              "top": 82,
+              "top": 114,
               "width": 202,
-              "height": 32,
+              "height": 40,
               "wireID": "20c31371-59f7-4416-be12-e455c1dfd285",
               "style": {
                 "inheritFrom": "edit_value_M_left"
@@ -22636,9 +22641,9 @@
             {
               "type": "Select",
               "left": 212,
-              "top": 82,
+              "top": 114,
               "width": 71,
-              "height": 32,
+              "height": 40,
               "wireID": "3ef3ab14-04bf-4629-dda2-36092ca7c19e",
               "data": "trigger_initiate_continuously",
               "style": {
@@ -22650,7 +22655,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 71,
-                  "height": 32,
+                  "height": 40,
                   "wireID": "67ca2d55-757d-46bd-e4d1-9db57a8baed5",
                   "data": "",
                   "action": "trigger_toggle_initiate_continuously",
@@ -22664,7 +22669,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 71,
-                  "height": 32,
+                  "height": 40,
                   "wireID": "e96d3c06-5fd6-4091-f447-52faa09d1f05",
                   "data": "",
                   "action": "trigger_toggle_initiate_continuously",
@@ -22676,18 +22681,6 @@
               ]
             }
           ]
-        },
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "61df7951-0110-4555-fc0b-64bdfc6e3476",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "minimized_channels"
         },
         {
           "type": "Container",
@@ -22838,9 +22831,9 @@
         {
           "type": "Container",
           "left": 0,
-          "top": 0,
-          "width": 480,
-          "height": 168,
+          "top": 10,
+          "width": 469,
+          "height": 213,
           "wireID": "3ca904ca-0ef1-4e60-c05e-d219fd311575",
           "style": {
             "inheritFrom": "default"
@@ -22852,7 +22845,7 @@
               "left": 10,
               "top": 13,
               "width": 71,
-              "height": 28,
+              "height": 40,
               "wireID": "ed57ffbd-92fc-4cf8-a1b9-a2654a0ffe40",
               "style": {
                 "inheritFrom": "edit_value_S_left"
@@ -22864,7 +22857,7 @@
               "left": 81,
               "top": 13,
               "width": 95,
-              "height": 28,
+              "height": 40,
               "wireID": "5766dedc-85e3-4cc6-b3bb-b788640c621a",
               "style": {
                 "inheritFrom": "edit_value_S_centered"
@@ -22876,7 +22869,7 @@
               "left": 178,
               "top": 13,
               "width": 95,
-              "height": 28,
+              "height": 40,
               "wireID": "a24f45bf-d43b-4fab-bf28-677bd7b125b4",
               "style": {
                 "inheritFrom": "edit_value_S_centered"
@@ -22888,7 +22881,7 @@
               "left": 275,
               "top": 13,
               "width": 95,
-              "height": 28,
+              "height": 40,
               "wireID": "bc15d93e-49ae-4a94-aee9-3ec3562d683f",
               "style": {
                 "inheritFrom": "edit_value_S_centered"
@@ -22900,7 +22893,7 @@
               "left": 372,
               "top": 13,
               "width": 95,
-              "height": 28,
+              "height": 40,
               "wireID": "1228e821-9261-417e-b27c-d44a30e7ca98",
               "style": {
                 "inheritFrom": "edit_value_S_centered"
@@ -22910,9 +22903,9 @@
             {
               "type": "Text",
               "left": 10,
-              "top": 41,
+              "top": 53,
               "width": 71,
-              "height": 28,
+              "height": 40,
               "wireID": "e5cf599b-fbc7-4ce9-a90c-1728a2478166",
               "style": {
                 "inheritFrom": "edit_value_S_left"
@@ -22922,9 +22915,9 @@
             {
               "type": "Text",
               "left": 10,
-              "top": 71,
+              "top": 91,
               "width": 71,
-              "height": 28,
+              "height": 40,
               "wireID": "83522da5-1095-4ea4-b7d7-8f687c4c2252",
               "style": {
                 "inheritFrom": "edit_value_S_left"
@@ -22934,9 +22927,9 @@
             {
               "type": "Text",
               "left": 10,
-              "top": 101,
+              "top": 131,
               "width": 71,
-              "height": 28,
+              "height": 40,
               "wireID": "3d7d3bf7-1240-4824-e607-d2cdd138bdeb",
               "style": {
                 "inheritFrom": "edit_value_S_left"
@@ -22946,9 +22939,9 @@
             {
               "type": "Text",
               "left": 10,
-              "top": 131,
+              "top": 171,
               "width": 71,
-              "height": 28,
+              "height": 40,
               "wireID": "26c0655b-cff5-4531-dd94-5bd32d8b5b07",
               "style": {
                 "inheritFrom": "edit_value_S_left"
@@ -22958,9 +22951,9 @@
             {
               "type": "List",
               "left": 81,
-              "top": 41,
+              "top": 53,
               "width": 388,
-              "height": 120,
+              "height": 160,
               "wireID": "71083d81-cbbd-455e-f9a8-b46ff8a45edb",
               "data": "io_pins",
               "style": {
@@ -22971,7 +22964,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 97,
-                "height": 118,
+                "height": 160,
                 "wireID": "89dc1111-db87-4305-9191-729b9f22da5d",
                 "style": {
                   "inheritFrom": "default"
@@ -22982,7 +22975,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 97,
-                    "height": 28,
+                    "height": 40,
                     "wireID": "7fc65925-1a02-4fe2-a2bc-e581ac4cb743",
                     "data": "io_pin_number",
                     "style": {
@@ -22993,9 +22986,9 @@
                   {
                     "type": "Text",
                     "left": 0,
-                    "top": 30,
+                    "top": 40,
                     "width": 95,
-                    "height": 28,
+                    "height": 38,
                     "wireID": "8965dfae-5409-4b6e-b2ca-6cf96bd892dd",
                     "data": "io_pin_function_name",
                     "action": "io_pin_select_function",
@@ -23007,9 +23000,9 @@
                   {
                     "type": "Select",
                     "left": 0,
-                    "top": 60,
+                    "top": 80,
                     "width": 95,
-                    "height": 58,
+                    "height": 80,
                     "wireID": "85de1b31-0f5a-4a72-ae59-c49961976a29",
                     "data": "io_pin_function",
                     "style": {
@@ -23021,7 +23014,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 95,
-                        "height": 58,
+                        "height": 80,
                         "wireID": "df82eea1-8d51-4bc9-fabd-a92d746ef427",
                         "style": {
                           "inheritFrom": "default"
@@ -23032,7 +23025,7 @@
                             "left": 0,
                             "top": 0,
                             "width": 22,
-                            "height": 28,
+                            "height": 38,
                             "wireID": "e9fcd5b4-ea62-49b4-bbd2-234c2f464845",
                             "style": {
                               "inheritFrom": "edit_value_S_centered"
@@ -23044,7 +23037,7 @@
                             "left": 22,
                             "top": 0,
                             "width": 73,
-                            "height": 28,
+                            "height": 38,
                             "wireID": "fa10b449-ad67-4551-8a58-eae1397560ac",
                             "data": "io_pin_pwm_frequency",
                             "action": "edit",
@@ -23056,9 +23049,9 @@
                           {
                             "type": "Text",
                             "left": 0,
-                            "top": 30,
+                            "top": 40,
                             "width": 22,
-                            "height": 28,
+                            "height": 40,
                             "wireID": "10749d32-d3d7-41c6-d785-2810556e1376",
                             "style": {
                               "inheritFrom": "edit_value_S_left"
@@ -23068,9 +23061,9 @@
                           {
                             "type": "DisplayData",
                             "left": 22,
-                            "top": 30,
+                            "top": 40,
                             "width": 73,
-                            "height": 28,
+                            "height": 40,
                             "wireID": "cce60617-205b-458e-b623-62331adcfe1e",
                             "data": "io_pin_pwm_duty",
                             "action": "edit",
@@ -23086,7 +23079,7 @@
                         "left": 0,
                         "top": 0,
                         "width": 95,
-                        "height": 58,
+                        "height": 80,
                         "wireID": "201d7e55-1bb1-41b1-ccba-ac3b056051fa",
                         "style": {
                           "inheritFrom": "default"
@@ -23097,7 +23090,7 @@
                             "left": 0,
                             "top": 0,
                             "width": 95,
-                            "height": 28,
+                            "height": 40,
                             "wireID": "2955e59d-4767-409d-a6df-bc14eda2d11d",
                             "data": "io_pin_polarity",
                             "style": {
@@ -23109,7 +23102,7 @@
                                 "left": 0,
                                 "top": 0,
                                 "width": 95,
-                                "height": 28,
+                                "height": 40,
                                 "wireID": "ce20a70f-13dd-4343-e7a9-5c69459d424e",
                                 "action": "io_pin_toggle_polarity",
                                 "style": {
@@ -23122,7 +23115,7 @@
                                 "left": 0,
                                 "top": 0,
                                 "width": 95,
-                                "height": 28,
+                                "height": 40,
                                 "wireID": "3cdb1ba8-e993-4050-8286-8c5433da75cf",
                                 "action": "io_pin_toggle_polarity",
                                 "style": {
@@ -23135,9 +23128,9 @@
                           {
                             "type": "Select",
                             "left": 0,
-                            "top": 30,
+                            "top": 40,
                             "width": 95,
-                            "height": 28,
+                            "height": 40,
                             "wireID": "aac09b24-1181-4da8-c177-df32b52c63c6",
                             "data": "io_pin_state",
                             "style": {
@@ -23149,7 +23142,7 @@
                                 "left": 0,
                                 "top": 0,
                                 "width": 95,
-                                "height": 28,
+                                "height": 40,
                                 "wireID": "e229099d-1e61-4d3c-ddf1-b48bca9227de",
                                 "action": "",
                                 "style": {
@@ -23162,7 +23155,7 @@
                                 "left": 0,
                                 "top": 0,
                                 "width": 95,
-                                "height": 28,
+                                "height": 40,
                                 "wireID": "5635d9e0-a001-48f5-ad88-38d7a8199744",
                                 "action": "",
                                 "style": {
@@ -23175,7 +23168,7 @@
                                 "left": 0,
                                 "top": 0,
                                 "width": 95,
-                                "height": 28,
+                                "height": 40,
                                 "wireID": "442c5e31-1e50-4abe-84b2-eac7461bd9ae",
                                 "action": "io_pin_toggle_state",
                                 "style": {
@@ -23188,7 +23181,7 @@
                                 "left": 0,
                                 "top": 0,
                                 "width": 95,
-                                "height": 28,
+                                "height": 40,
                                 "wireID": "9c2c7c59-97a1-4488-f12a-f33df870f8bd",
                                 "action": "io_pin_toggle_state",
                                 "style": {
@@ -23201,7 +23194,7 @@
                                 "left": 0,
                                 "top": 0,
                                 "width": 95,
-                                "height": 28,
+                                "height": 40,
                                 "wireID": "2504243a-7f22-4a2e-ba7b-1106a37db959",
                                 "action": "",
                                 "style": {
@@ -23220,18 +23213,6 @@
               "listType": "horizontal"
             }
           ]
-        },
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "682ddcba-8481-4bd2-a35c-eaea2bedd27a",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "minimized_channels"
         },
         {
           "type": "Container",
@@ -24764,7 +24745,7 @@
           "left": 10,
           "top": 10,
           "width": 58,
-          "height": 32,
+          "height": 40,
           "wireID": "0c749e98-f09b-4f23-b9bb-5608dbf526a7",
           "style": {
             "inheritFrom": "edit_value_S_left",
@@ -24777,7 +24758,7 @@
           "left": 87,
           "top": 10,
           "width": 120,
-          "height": 32,
+          "height": 40,
           "wireID": "436de399-195e-4e2c-bcc8-d39b226141da",
           "data": "usb_mode",
           "action": "select_usb_mode",
@@ -24790,7 +24771,7 @@
               "left": 0,
               "top": 0,
               "width": 120,
-              "height": 32,
+              "height": 40,
               "wireID": "c9bba939-d31f-4b9f-eff9-b38ea36f977f",
               "data": "",
               "action": "",
@@ -24805,7 +24786,7 @@
               "left": 0,
               "top": 0,
               "width": 120,
-              "height": 32,
+              "height": 40,
               "wireID": "5af0aa06-24a0-423a-bbb0-05b0129adcbe",
               "data": "",
               "action": "",
@@ -24820,7 +24801,7 @@
               "left": 0,
               "top": 0,
               "width": 120,
-              "height": 32,
+              "height": 40,
               "wireID": "92cc9783-480f-4440-fbf4-64ace5df97d6",
               "data": "",
               "action": "",
@@ -24835,7 +24816,7 @@
               "left": 0,
               "top": 0,
               "width": 120,
-              "height": 32,
+              "height": 40,
               "wireID": "6354f465-b386-4735-9d24-42b893170f14",
               "data": "",
               "action": "",
@@ -24850,9 +24831,9 @@
         {
           "type": "Select",
           "left": 10,
-          "top": 50,
+          "top": 62,
           "width": 460,
-          "height": 116,
+          "height": 166,
           "wireID": "8835f8ce-c6eb-412c-9bf8-e69a050cee30",
           "data": "usb_current_mode",
           "style": {
@@ -24864,7 +24845,7 @@
               "left": 0,
               "top": 0,
               "width": 460,
-              "height": 116,
+              "height": 166,
               "wireID": "d501326e-548e-4028-a966-3723c1f73531",
               "style": {
                 "inheritFrom": "default"
@@ -24876,7 +24857,7 @@
               "left": 0,
               "top": 0,
               "width": 460,
-              "height": 116,
+              "height": 166,
               "wireID": "432d9d80-7321-4dad-b3de-10ca6a3f174c",
               "style": {
                 "inheritFrom": "default"
@@ -24887,7 +24868,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 58,
-                  "height": 32,
+                  "height": 40,
                   "wireID": "fa8c7439-f17e-4980-fa20-a8e68d596694",
                   "style": {
                     "inheritFrom": "edit_value_S_left",
@@ -24900,7 +24881,7 @@
                   "left": 77,
                   "top": 0,
                   "width": 220,
-                  "height": 32,
+                  "height": 40,
                   "wireID": "e4e20b9a-8876-4537-c14f-4f1b3bbe04af",
                   "data": "usb_device_class",
                   "action": "select_usb_device_class",
@@ -24913,7 +24894,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 220,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "9e4fa8ed-799a-4d6f-bcda-1a794bb099e0",
                       "data": "",
                       "action": "",
@@ -24928,7 +24909,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 220,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "d1ac6da3-56fd-410c-c1e3-fc9bcdb68cfa",
                       "data": "",
                       "action": "",
@@ -24943,9 +24924,9 @@
                 {
                   "type": "Select",
                   "left": 0,
-                  "top": 40,
+                  "top": 52,
                   "width": 435,
-                  "height": 64,
+                  "height": 114,
                   "wireID": "671076c6-cfad-4502-a828-468d9ec4349b",
                   "data": "usb_device_class",
                   "style": {
@@ -24957,7 +24938,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 435,
-                      "height": 64,
+                      "height": 114,
                       "wireID": "7d40661b-4d38-4e9b-ea43-cd4357d6da18",
                       "style": {
                         "inheritFrom": "default"
@@ -24968,7 +24949,7 @@
                           "left": 77,
                           "top": 0,
                           "width": 72,
-                          "height": 28,
+                          "height": 40,
                           "wireID": "0cd7013e-8465-4a14-9f17-99587aba3b8e",
                           "style": {
                             "inheritFrom": "edit_value_S_left",
@@ -24981,7 +24962,7 @@
                           "left": 149,
                           "top": 0,
                           "width": 82,
-                          "height": 28,
+                          "height": 40,
                           "wireID": "4e290f3b-4fbe-43aa-b3ad-bce6d781a09d",
                           "style": {
                             "inheritFrom": "value_M_left"
@@ -24990,35 +24971,10 @@
                         },
                         {
                           "type": "Text",
-                          "left": 77,
-                          "top": 36,
-                          "width": 72,
-                          "height": 28,
-                          "wireID": "4189c870-ffec-43a0-d355-2c2bf5951f73",
-                          "style": {
-                            "inheritFrom": "edit_value_S_left",
-                            "font": "Oswald17"
-                          },
-                          "text": "Parity:"
-                        },
-                        {
-                          "type": "Text",
-                          "left": 149,
-                          "top": 36,
-                          "width": 82,
-                          "height": 28,
-                          "wireID": "ee152fdb-d91d-4745-afb7-38fb60cdee75",
-                          "style": {
-                            "inheritFrom": "value_M_left"
-                          },
-                          "text": "None"
-                        },
-                        {
-                          "type": "Text",
                           "left": 231,
                           "top": 0,
                           "width": 100,
-                          "height": 28,
+                          "height": 40,
                           "wireID": "f8267451-71b7-4d1f-a355-1ef7dff5edca",
                           "style": {
                             "inheritFrom": "edit_value_S_left",
@@ -25031,7 +24987,7 @@
                           "left": 331,
                           "top": 0,
                           "width": 60,
-                          "height": 28,
+                          "height": 40,
                           "wireID": "6b42c926-ceb8-414a-b267-4bbc865950cd",
                           "style": {
                             "inheritFrom": "value_M_left"
@@ -25040,10 +24996,35 @@
                         },
                         {
                           "type": "Text",
+                          "left": 77,
+                          "top": 40,
+                          "width": 72,
+                          "height": 40,
+                          "wireID": "4189c870-ffec-43a0-d355-2c2bf5951f73",
+                          "style": {
+                            "inheritFrom": "edit_value_S_left",
+                            "font": "Oswald17"
+                          },
+                          "text": "Parity:"
+                        },
+                        {
+                          "type": "Text",
+                          "left": 149,
+                          "top": 40,
+                          "width": 82,
+                          "height": 40,
+                          "wireID": "ee152fdb-d91d-4745-afb7-38fb60cdee75",
+                          "style": {
+                            "inheritFrom": "value_M_left"
+                          },
+                          "text": "None"
+                        },
+                        {
+                          "type": "Text",
                           "left": 231,
-                          "top": 36,
+                          "top": 40,
                           "width": 100,
-                          "height": 28,
+                          "height": 40,
                           "wireID": "7836a0f3-a230-445f-890c-fc87b16ceaed",
                           "style": {
                             "inheritFrom": "edit_value_S_left",
@@ -25054,9 +25035,9 @@
                         {
                           "type": "Text",
                           "left": 331,
-                          "top": 36,
+                          "top": 40,
                           "width": 60,
-                          "height": 28,
+                          "height": 40,
                           "wireID": "e6a2a45e-2b2e-4c3f-f8ff-aa3bd01ffc7b",
                           "style": {
                             "inheritFrom": "value_M_left"
@@ -25070,7 +25051,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 435,
-                      "height": 64,
+                      "height": 114,
                       "wireID": "0e5758d3-87e1-4bb1-83f3-35a7e03ebdec",
                       "data": "has_multiple_disk_drives",
                       "style": {
@@ -25082,7 +25063,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 435,
-                          "height": 64,
+                          "height": 114,
                           "wireID": "5d69a434-c5d4-4ef4-cd78-8ba5952832f3",
                           "style": {
                             "inheritFrom": "default"
@@ -25094,7 +25075,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 435,
-                          "height": 64,
+                          "height": 114,
                           "wireID": "8f2d7f38-a01b-4683-85ab-06246048cbc9",
                           "style": {
                             "inheritFrom": "default"
@@ -25105,7 +25086,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 68,
-                              "height": 32,
+                              "height": 40,
                               "wireID": "ba46bd82-40b2-472c-9e1b-3ee397b58baa",
                               "style": {
                                 "inheritFrom": "edit_value_S_left",
@@ -25118,7 +25099,7 @@
                               "left": 77,
                               "top": 0,
                               "width": 220,
-                              "height": 32,
+                              "height": 40,
                               "wireID": "d54dff68-f942-4654-ca80-62c37eb55ce2",
                               "data": "selected_mass_storage_device",
                               "action": "select_mass_storage_device",
@@ -25141,7 +25122,7 @@
               "left": 0,
               "top": 0,
               "width": 460,
-              "height": 116,
+              "height": 166,
               "wireID": "19454b6d-ec72-494b-ee2f-33b1a623c092",
               "style": {
                 "inheritFrom": "default"
@@ -25152,7 +25133,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 58,
-                  "height": 32,
+                  "height": 40,
                   "wireID": "f5a83408-fad0-4490-92f8-41a6dd82f2c9",
                   "style": {
                     "inheritFrom": "edit_value_S_left",
@@ -25165,7 +25146,7 @@
                   "left": 70,
                   "top": 0,
                   "width": 58,
-                  "height": 32,
+                  "height": 40,
                   "wireID": "1f30a1b2-4762-4334-cb29-4e543f640316",
                   "style": {
                     "inheritFrom": "edit_value_S_left",
@@ -25176,9 +25157,9 @@
                 {
                   "type": "MultilineText",
                   "left": 0,
-                  "top": 32,
+                  "top": 40,
                   "width": 460,
-                  "height": 84,
+                  "height": 126,
                   "wireID": "54858bca-64c6-4ac1-a393-2c9d75bb8c4a",
                   "data": "usb_keyboard_state",
                   "style": {
@@ -25196,7 +25177,7 @@
               "left": 0,
               "top": 0,
               "width": 460,
-              "height": 116,
+              "height": 166,
               "wireID": "6072b534-f0f1-42e3-d26a-e0de2f0f3769",
               "style": {
                 "inheritFrom": "default"
@@ -25204,18 +25185,6 @@
               "widgets": []
             }
           ]
-        },
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "979fcdad-401c-4c67-8d40-ccf5a05e5182",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "minimized_channels"
         },
         {
           "type": "Container",
@@ -25274,7 +25243,7 @@
           "left": 10,
           "top": 10,
           "width": 460,
-          "height": 158,
+          "height": 219,
           "wireID": "276cac94-506a-435a-e177-72eaf037155c",
           "style": {
             "inheritFrom": "default"
@@ -25286,7 +25255,7 @@
               "left": 0,
               "top": 0,
               "width": 460,
-              "height": 158,
+              "height": 219,
               "wireID": "36515fe4-afdd-41d0-c993-cf3c191561a9",
               "data": "ethernet_enabled",
               "style": {
@@ -25298,7 +25267,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 460,
-                  "height": 158,
+                  "height": 219,
                   "wireID": "fd54e2b2-e378-44ee-9205-11b7954bb4a2",
                   "style": {
                     "inheritFrom": "default"
@@ -25309,7 +25278,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 180,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "956cf3ec-dad1-4d25-d778-a0d5b355469e",
                       "action": "ethernet_toggle",
                       "style": {
@@ -25324,7 +25293,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 460,
-                  "height": 158,
+                  "height": 219,
                   "wireID": "2bb56906-aab2-4d00-8a0d-1772104b410e",
                   "style": {
                     "inheritFrom": "default"
@@ -25335,7 +25304,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 180,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "1270b721-0118-4864-ef02-1d41511e6b4b",
                       "action": "ethernet_toggle",
                       "style": {
@@ -25348,7 +25317,7 @@
                       "left": 186,
                       "top": 0,
                       "width": 274,
-                      "height": 26,
+                      "height": 40,
                       "wireID": "40b1c093-33e8-491d-b9b7-7cedab56f27d",
                       "data": "ethernet_status",
                       "style": {
@@ -25360,7 +25329,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "dea812cc-4371-4a8a-f5c8-b5914d65accf",
                           "style": {
                             "inheritFrom": "default"
@@ -25372,7 +25341,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "22153763-bc2a-4759-e4c1-20acbe87c71e",
                           "style": {
                             "inheritFrom": "default"
@@ -25383,7 +25352,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "d2c04ea9-6fdc-476d-d819-2751f10b1fa9",
                               "action": "",
                               "style": {
@@ -25401,7 +25370,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "c6673f0f-0135-43ec-c29c-ba9153eebd14",
                           "style": {
                             "inheritFrom": "default"
@@ -25413,7 +25382,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "d4af06b7-c532-468e-c7dd-c53fa87ff163",
                           "style": {
                             "inheritFrom": "default"
@@ -25424,7 +25393,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "45ccc998-78d1-40fa-c8dd-44a764a0f1ff",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -25442,7 +25411,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "73f781a5-aeb6-4155-f4f2-e1cd16f0bea8",
                           "style": {
                             "inheritFrom": "default"
@@ -25453,7 +25422,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "c5ae127b-5af2-4b6f-d5c4-2b9619526edc",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -25470,7 +25439,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "298cb476-504d-4dc1-9a84-5c7d16114172",
                           "style": {
                             "inheritFrom": "default"
@@ -25481,7 +25450,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "014198ed-36c9-4f78-e8a7-1d6f8deceb18",
                               "action": "",
                               "style": {
@@ -25499,9 +25468,9 @@
                     {
                       "type": "Container",
                       "left": 0,
-                      "top": 40,
+                      "top": 48,
                       "width": 167,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "2abbd839-ea12-426a-e58c-f7ef3fe36a57",
                       "style": {
                         "inheritFrom": "default"
@@ -25513,7 +25482,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 71,
-                          "height": 32,
+                          "height": 40,
                           "wireID": "8c943b7d-6541-409a-a704-9be90edb1143",
                           "style": {
                             "inheritFrom": "edit_value_M_left"
@@ -25525,7 +25494,7 @@
                           "left": 107,
                           "top": 0,
                           "width": 60,
-                          "height": 32,
+                          "height": 40,
                           "wireID": "e5ba76e3-6013-4e3c-cd05-12033563dbcf",
                           "data": "ethernet_dhcp",
                           "style": {
@@ -25537,7 +25506,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 60,
-                              "height": 32,
+                              "height": 40,
                               "wireID": "5e73c060-c182-4673-d0c9-5d941609cbe8",
                               "data": "",
                               "action": "ethernet_toggle_dhcp",
@@ -25551,7 +25520,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 60,
-                              "height": 32,
+                              "height": 40,
                               "wireID": "4ee412bf-d9b1-49dc-fe4c-725202221d2e",
                               "data": "",
                               "action": "ethernet_toggle_dhcp",
@@ -25567,9 +25536,9 @@
                     {
                       "type": "Container",
                       "left": 186,
-                      "top": 40,
+                      "top": 48,
                       "width": 274,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "74e89925-8dfc-4e74-8f9f-180aabdf6f4d",
                       "style": {
                         "inheritFrom": "default"
@@ -25581,7 +25550,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 71,
-                          "height": 32,
+                          "height": 40,
                           "wireID": "ef213d70-0bf2-4c4c-e69b-f988b19b6840",
                           "style": {
                             "inheritFrom": "edit_value_M_left"
@@ -25593,7 +25562,7 @@
                           "left": 71,
                           "top": 0,
                           "width": 203,
-                          "height": 32,
+                          "height": 40,
                           "wireID": "c9371817-ec6a-46c0-9ac1-0c159dda8f95",
                           "data": "ethernet_mac",
                           "action": "ethernet_edit_mac_address",
@@ -25608,9 +25577,9 @@
                     {
                       "type": "Container",
                       "left": 0,
-                      "top": 78,
+                      "top": 96,
                       "width": 274,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "62584dce-2b0a-49aa-f398-8791a50b8fd6",
                       "style": {
                         "inheritFrom": "default"
@@ -25622,7 +25591,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 107,
-                          "height": 32,
+                          "height": 40,
                           "wireID": "1599d4a5-217c-4616-81cb-a1c591307c2c",
                           "style": {
                             "inheritFrom": "edit_value_M_left"
@@ -25634,7 +25603,7 @@
                           "left": 107,
                           "top": 0,
                           "width": 164,
-                          "height": 32,
+                          "height": 40,
                           "wireID": "00527e10-c49f-4e4a-f6cc-df00f96d208a",
                           "data": "ethernet_dhcp",
                           "style": {
@@ -25646,7 +25615,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 164,
-                              "height": 32,
+                              "height": 40,
                               "wireID": "781e0257-c4ff-4020-c113-033f156c2883",
                               "data": "ethernet_ip_address",
                               "action": "ethernet_edit_static_address",
@@ -25661,7 +25630,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 164,
-                              "height": 32,
+                              "height": 40,
                               "wireID": "38bff0d6-12af-4bcf-bbab-7396f7b9a04c",
                               "data": "ethernet_ip_address",
                               "style": {
@@ -25676,9 +25645,9 @@
                     {
                       "type": "Container",
                       "left": 293,
-                      "top": 78,
+                      "top": 96,
                       "width": 167,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "6326ce31-7fe2-4024-baa5-f64124e0258f",
                       "style": {
                         "inheritFrom": "default"
@@ -25690,7 +25659,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 100,
-                          "height": 32,
+                          "height": 40,
                           "wireID": "91d791cc-d3bc-4edc-ec3c-aeeec12f64be",
                           "style": {
                             "inheritFrom": "edit_value_M_left"
@@ -25702,7 +25671,7 @@
                           "left": 107,
                           "top": 0,
                           "width": 60,
-                          "height": 32,
+                          "height": 40,
                           "wireID": "a70f3af4-5b67-47d6-b414-cb04e4336cb3",
                           "data": "ethernet_scpi_port",
                           "action": "ethernet_edit_scpi_port",
@@ -25716,9 +25685,9 @@
                     {
                       "type": "Container",
                       "left": 0,
-                      "top": 116,
+                      "top": 144,
                       "width": 330,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "fc2a46fa-4fca-4dda-a342-b2ff0b578d15",
                       "style": {
                         "inheritFrom": "default"
@@ -25730,7 +25699,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 107,
-                          "height": 32,
+                          "height": 40,
                           "wireID": "c104f700-a514-4649-902d-42830bbcb624",
                           "style": {
                             "inheritFrom": "edit_value_M_left"
@@ -25742,7 +25711,7 @@
                           "left": 107,
                           "top": 0,
                           "width": 222,
-                          "height": 32,
+                          "height": 40,
                           "wireID": "601e6b5d-77d4-42ca-b1fe-f7a1fc75e0fa",
                           "data": "ethernet_host_name",
                           "action": "ethernet_edit_host_name",
@@ -25753,66 +25722,12 @@
                           "displayOption": 0
                         }
                       ]
-                    },
-                    {
-                      "type": "Select",
-                      "left": 337,
-                      "top": 116,
-                      "width": 123,
-                      "height": 32,
-                      "wireID": "b3f94ff1-7230-49ed-a77e-41a007347102",
-                      "data": "mqtt_in_error",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "widgets": [
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 123,
-                          "height": 32,
-                          "wireID": "03d44542-a64d-4a9a-9883-ef49b22eae42",
-                          "action": "show_sys_settings_mqtt",
-                          "style": {
-                            "inheritFrom": "edit_value_active_M_center"
-                          },
-                          "text": "MQTT"
-                        },
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 123,
-                          "height": 32,
-                          "wireID": "9ad5d679-154c-4b13-b0e9-3fab4065b0b5",
-                          "action": "show_sys_settings_mqtt",
-                          "style": {
-                            "inheritFrom": "edit_value_active_M_center",
-                            "color": "status_warning",
-                            "activeBackgroundColor": "status_warning"
-                          },
-                          "text": "MQTT"
-                        }
-                      ]
                     }
                   ]
                 }
               ]
             }
           ]
-        },
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "224ad5eb-0159-4cec-99a8-9af7a3f5ac8c",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "minimized_channels"
         },
         {
           "type": "Container",
@@ -25965,7 +25880,7 @@
           "left": 10,
           "top": 10,
           "width": 460,
-          "height": 158,
+          "height": 220,
           "wireID": "3a4076f3-17f8-4053-92b8-aa6e8ed93eb9",
           "style": {
             "inheritFrom": "default"
@@ -25977,7 +25892,7 @@
               "left": 0,
               "top": 0,
               "width": 460,
-              "height": 158,
+              "height": 220,
               "wireID": "28782f15-a558-44ba-b034-37c5aa7bcede",
               "data": "mqtt_enabled",
               "style": {
@@ -25989,7 +25904,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 460,
-                  "height": 158,
+                  "height": 220,
                   "wireID": "b1fce703-d5b1-42e6-948e-1d45b4a61a2c",
                   "style": {
                     "inheritFrom": "default"
@@ -26000,7 +25915,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 180,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "159fe208-8618-45c0-f5df-38e3968bdd26",
                       "action": "mqtt_toggle",
                       "style": {
@@ -26015,7 +25930,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 460,
-                  "height": 158,
+                  "height": 220,
                   "wireID": "39fa437d-172d-431e-f7c0-01b81cf701f8",
                   "style": {
                     "inheritFrom": "default"
@@ -26026,7 +25941,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 180,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "7be32935-a36f-4643-a710-530034f4b712",
                       "action": "mqtt_toggle",
                       "style": {
@@ -26039,7 +25954,7 @@
                       "left": 186,
                       "top": 0,
                       "width": 274,
-                      "height": 26,
+                      "height": 40,
                       "wireID": "4523785e-1873-4598-e264-18c78fad5770",
                       "data": "mqtt_connection_state",
                       "style": {
@@ -26051,7 +25966,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "bdb3147f-9dd6-49cf-b253-ddc0d2bfe982",
                           "style": {
                             "inheritFrom": "default"
@@ -26062,7 +25977,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "1bee71ae-d438-4dc9-f7e0-5aeb8b8e28c3",
                               "action": "",
                               "style": {
@@ -26080,7 +25995,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "381eb266-2fd5-4ca8-9f14-6524975a31fa",
                           "style": {
                             "inheritFrom": "default"
@@ -26091,7 +26006,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "8f7b8381-6727-4922-b79c-346db2dacf9d",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26109,7 +26024,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "23f6546c-7d39-4844-ab42-fa85221ff47a",
                           "style": {
                             "inheritFrom": "default"
@@ -26120,7 +26035,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "4cba1cb6-0f68-4412-b2e0-7915ee154897",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26138,7 +26053,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "f91d8712-9945-49af-ff7f-992fde4292ca",
                           "style": {
                             "inheritFrom": "default"
@@ -26149,7 +26064,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "53cc956d-7fa8-48c8-a6d5-c2a649978f92",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26167,7 +26082,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "95fe1f72-78cb-4405-f0a1-9b936b13ce50",
                           "style": {
                             "inheritFrom": "default"
@@ -26178,7 +26093,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "b3425ed1-f037-46cf-e3da-6c9cd02d0ae6",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26196,7 +26111,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "eacf8b8e-c48e-4f9c-f0d8-4680f35a88a2",
                           "style": {
                             "inheritFrom": "default"
@@ -26207,7 +26122,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "63a8caa3-c002-4778-821b-e24004a30e70",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26225,7 +26140,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "df0bc89e-5359-45ec-b1ff-0c6520c04c19",
                           "style": {
                             "inheritFrom": "default"
@@ -26236,7 +26151,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "dda7dca5-cf6a-4fd5-fe84-92aa0c13194d",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26254,7 +26169,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "e4ac2470-efe6-45ec-de5e-401e4e40b886",
                           "style": {
                             "inheritFrom": "default"
@@ -26265,7 +26180,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "fbc2cddf-c47c-4f10-f38b-7b48e5832a83",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26283,7 +26198,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "0a7e909d-b874-4202-db52-31c5ba2c2b3f",
                           "style": {
                             "inheritFrom": "default"
@@ -26294,7 +26209,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "17772d5b-6b6b-4e94-da80-5e810816448f",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26312,7 +26227,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "4ab4cb78-9cd3-49bc-e374-83480babd631",
                           "style": {
                             "inheritFrom": "default"
@@ -26323,7 +26238,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "1d4b98f4-6bb0-4031-b13f-ad9a8b3e1fb2",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26341,7 +26256,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "f998ecd3-e369-45f3-bfc9-f3c329d13173",
                           "style": {
                             "inheritFrom": "default"
@@ -26352,7 +26267,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "37953677-e153-4ed5-c50b-bb70e1898b55",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26370,7 +26285,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 274,
-                          "height": 26,
+                          "height": 40,
                           "wireID": "426a6b2b-3acd-48bf-b464-fea7dcc40b45",
                           "style": {
                             "inheritFrom": "default"
@@ -26381,7 +26296,7 @@
                               "left": 0,
                               "top": 0,
                               "width": 274,
-                              "height": 26,
+                              "height": 40,
                               "wireID": "4a36a9e5-77aa-41e1-9ce8-d94105e77fb8",
                               "style": {
                                 "inheritFrom": "event_info",
@@ -26399,9 +26314,9 @@
                     {
                       "type": "Text",
                       "left": 0,
-                      "top": 40,
+                      "top": 48,
                       "width": 107,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "6efd1875-e50c-4005-f5d0-82ea8d7776d0",
                       "style": {
                         "inheritFrom": "edit_value_M_left"
@@ -26411,9 +26326,9 @@
                     {
                       "type": "DisplayData",
                       "left": 54,
-                      "top": 40,
+                      "top": 48,
                       "width": 225,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "dd33183e-2493-4a5d-9521-0e9bce67abf3",
                       "data": "mqtt_host",
                       "action": "mqtt_edit_host",
@@ -26426,9 +26341,9 @@
                     {
                       "type": "Text",
                       "left": 289,
-                      "top": 40,
+                      "top": 48,
                       "width": 71,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "46b47eff-b075-46b2-ee0c-e0a4382c4660",
                       "style": {
                         "inheritFrom": "edit_value_M_left"
@@ -26438,9 +26353,9 @@
                     {
                       "type": "DisplayData",
                       "left": 360,
-                      "top": 40,
+                      "top": 48,
                       "width": 100,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "096160d4-e3de-48d2-b9f1-ee73b11f9faa",
                       "data": "mqtt_port",
                       "action": "mqtt_edit_port",
@@ -26453,9 +26368,9 @@
                     {
                       "type": "Text",
                       "left": 0,
-                      "top": 80,
+                      "top": 96,
                       "width": 102,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "740a4da8-a3c7-424b-f7da-03cbd2c51a1b",
                       "style": {
                         "inheritFrom": "edit_value_M_left"
@@ -26465,9 +26380,9 @@
                     {
                       "type": "DisplayData",
                       "left": 102,
-                      "top": 80,
+                      "top": 96,
                       "width": 177,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "06e16cf7-dc61-415a-bf95-3c9a171b41c5",
                       "data": "mqtt_username",
                       "action": "mqtt_edit_username",
@@ -26480,9 +26395,9 @@
                     {
                       "type": "Text",
                       "left": 0,
-                      "top": 120,
+                      "top": 144,
                       "width": 102,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "47748b99-397d-482e-b910-8d110677dd00",
                       "style": {
                         "inheritFrom": "edit_value_M_left"
@@ -26492,9 +26407,9 @@
                     {
                       "type": "DisplayData",
                       "left": 102,
-                      "top": 120,
+                      "top": 144,
                       "width": 177,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "8273e187-5cad-4714-bf43-537a8b727cd5",
                       "data": "mqtt_password",
                       "action": "mqtt_edit_password",
@@ -26507,9 +26422,9 @@
                     {
                       "type": "Text",
                       "left": 289,
-                      "top": 120,
+                      "top": 144,
                       "width": 71,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "34c984b8-f488-46f5-cce4-7c7262e33e93",
                       "style": {
                         "inheritFrom": "edit_value_M_left"
@@ -26519,9 +26434,9 @@
                     {
                       "type": "DisplayData",
                       "left": 360,
-                      "top": 120,
+                      "top": 144,
                       "width": 100,
-                      "height": 32,
+                      "height": 40,
                       "wireID": "10b76d35-1be7-41a5-8669-0d0fbf95dedf",
                       "data": "mqtt_period",
                       "action": "mqtt_edit_period",
@@ -26536,18 +26451,6 @@
               ]
             }
           ]
-        },
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "d1c59121-7dba-437a-972b-241b06602384",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "minimized_channels"
         },
         {
           "type": "Container",
@@ -26700,7 +26603,7 @@
           "left": 0,
           "top": 0,
           "width": 480,
-          "height": 168,
+          "height": 240,
           "wireID": "b21c4192-1552-4f37-f059-2baf405371d2",
           "style": {
             "inheritFrom": "default"
@@ -26711,8 +26614,8 @@
               "type": "Text",
               "left": 15,
               "top": 12,
-              "width": 140,
-              "height": 32,
+              "width": 150,
+              "height": 40,
               "wireID": "c2a676a7-b391-4391-dacd-2a40586dd6dd",
               "style": {
                 "inheritFrom": "edit_value_M_left"
@@ -26724,7 +26627,7 @@
               "left": 165,
               "top": 12,
               "width": 170,
-              "height": 32,
+              "height": 40,
               "wireID": "1d75cc09-35fb-43b2-f40b-4765b293cde8",
               "data": "ethernet_ip_address",
               "action": "ethernet_edit_ip_address",
@@ -26737,9 +26640,9 @@
             {
               "type": "Text",
               "left": 15,
-              "top": 48,
-              "width": 140,
-              "height": 32,
+              "top": 60,
+              "width": 150,
+              "height": 40,
               "wireID": "c0bd9b66-327e-433a-9902-2a9a6ecafb11",
               "style": {
                 "inheritFrom": "edit_value_M_left"
@@ -26749,9 +26652,9 @@
             {
               "type": "Text",
               "left": 165,
-              "top": 48,
+              "top": 60,
               "width": 170,
-              "height": 32,
+              "height": 40,
               "wireID": "98cd8fa8-f111-4892-8cca-cb452bb270cf",
               "data": "ethernet_dns",
               "action": "ethernet_edit_dns",
@@ -26764,9 +26667,9 @@
             {
               "type": "Text",
               "left": 15,
-              "top": 84,
-              "width": 140,
-              "height": 32,
+              "top": 108,
+              "width": 150,
+              "height": 40,
               "wireID": "c09fc5f0-3028-4f58-ccab-e1a3aeb57f6c",
               "style": {
                 "inheritFrom": "edit_value_M_left"
@@ -26776,9 +26679,9 @@
             {
               "type": "Text",
               "left": 165,
-              "top": 84,
+              "top": 108,
               "width": 170,
-              "height": 32,
+              "height": 40,
               "wireID": "0689b3d1-9d18-4919-c5df-6c347ff8eadd",
               "data": "ethernet_gateway",
               "action": "ethernet_edit_gateway",
@@ -26791,9 +26694,9 @@
             {
               "type": "Text",
               "left": 15,
-              "top": 120,
-              "width": 155,
-              "height": 32,
+              "top": 156,
+              "width": 150,
+              "height": 40,
               "wireID": "23de9f0b-3b68-42cf-fbc9-15a72a3719b8",
               "style": {
                 "inheritFrom": "edit_value_M_left"
@@ -26803,9 +26706,9 @@
             {
               "type": "Text",
               "left": 165,
-              "top": 120,
+              "top": 156,
               "width": 170,
-              "height": 32,
+              "height": 40,
               "wireID": "b2f28e36-5040-4cfd-b81a-f1d841311654",
               "data": "ethernet_subnet_mask",
               "action": "ethernet_edit_subnet_mask",
@@ -26816,18 +26719,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "c04f51fc-bb48-4e57-d21e-1646a869a2e5",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "minimized_channels"
         },
         {
           "type": "Container",
@@ -27066,7 +26957,7 @@
           "left": 0,
           "top": 0,
           "width": 480,
-          "height": 168,
+          "height": 240,
           "wireID": "b455aecb-3800-4b87-c572-82643f705bd8",
           "style": {
             "inheritFrom": "default"
@@ -27078,7 +26969,7 @@
               "left": 12,
               "top": 8,
               "width": 58,
-              "height": 28,
+              "height": 40,
               "wireID": "ddb6dabc-8bc8-49fd-b16d-61f909718237",
               "style": {
                 "inheritFrom": "edit_value_S_left"
@@ -27090,7 +26981,7 @@
               "left": 71,
               "top": 8,
               "width": 141,
-              "height": 28,
+              "height": 40,
               "wireID": "ba3d9f9a-0dcc-4759-a637-b895b466797d",
               "data": "selected_theme",
               "action": "select_theme",
@@ -27102,23 +26993,9 @@
             {
               "type": "Text",
               "left": 12,
-              "top": 40,
-              "width": 200,
-              "height": 28,
-              "wireID": "6fa905f9-8029-41af-c258-07b25396e016",
-              "action": "show_labels_and_colors",
-              "style": {
-                "inheritFrom": "option_toggle_L_center",
-                "font": "Oswald14"
-              },
-              "text": "Labels & Colors"
-            },
-            {
-              "type": "Text",
-              "left": 12,
-              "top": 72,
-              "width": 123,
-              "height": 28,
+              "top": 56,
+              "width": 122,
+              "height": 40,
               "wireID": "e1abfe65-9ae9-420e-f553-04cdb995274f",
               "style": {
                 "inheritFrom": "edit_value_S_left"
@@ -27128,9 +27005,9 @@
             {
               "type": "DisplayData",
               "left": 134,
-              "top": 72,
-              "width": 77,
-              "height": 28,
+              "top": 56,
+              "width": 78,
+              "height": 40,
               "wireID": "7e5ac7da-7c53-44eb-836d-4a77b4b4b38e",
               "data": "animations_duration",
               "action": "edit_animations_duration",
@@ -27144,7 +27021,7 @@
               "left": 12,
               "top": 104,
               "width": 200,
-              "height": 28,
+              "height": 40,
               "wireID": "9460d35f-2f47-4301-e035-b47061a7b7e4",
               "action": "show_sys_settings_screen_calibration",
               "style": {
@@ -27155,9 +27032,9 @@
             {
               "type": "Text",
               "left": 12,
-              "top": 136,
-              "width": 118,
-              "height": 28,
+              "top": 152,
+              "width": 115,
+              "height": 40,
               "wireID": "ea6b3072-3f48-4b86-bf96-b8e5c3172dca",
               "action": "turn_display_off",
               "style": {
@@ -27168,9 +27045,9 @@
             {
               "type": "Text",
               "left": 134,
-              "top": 136,
-              "width": 77,
-              "height": 28,
+              "top": 152,
+              "width": 78,
+              "height": 40,
               "wireID": "625a6a92-fe9a-4f6e-fad9-28855d5c7c6a",
               "action": "show_display_test_page",
               "style": {
@@ -27181,9 +27058,9 @@
             {
               "type": "Container",
               "left": 232,
-              "top": 14,
-              "width": 222,
-              "height": 28,
+              "top": 8,
+              "width": 242,
+              "height": 40,
               "wireID": "8d7c97a2-9d60-46db-bfbc-b3e682512757",
               "style": {
                 "inheritFrom": "default"
@@ -27192,10 +27069,10 @@
               "widgets": [
                 {
                   "type": "Text",
-                  "left": 0,
+                  "left": 7,
                   "top": 0,
                   "width": 140,
-                  "height": 28,
+                  "height": 40,
                   "wireID": "5ee232e9-4000-496c-d971-4b2da0a7dffe",
                   "style": {
                     "inheritFrom": "edit_value_S_left"
@@ -27204,10 +27081,10 @@
                 },
                 {
                   "type": "UpDown",
-                  "left": 140,
+                  "left": 147,
                   "top": 0,
                   "width": 82,
-                  "height": 28,
+                  "height": 40,
                   "wireID": "ebf36d03-4587-40bb-aa6d-3f67603024d9",
                   "data": "sys_display_brightness",
                   "action": "",
@@ -27225,10 +27102,10 @@
             },
             {
               "type": "Container",
-              "left": 225,
-              "top": 45,
+              "left": 232,
+              "top": 56,
               "width": 243,
-              "height": 111,
+              "height": 136,
               "wireID": "c7c924e5-3787-48f7-f5ae-903b5c41d000",
               "style": {
                 "inheritFrom": "default"
@@ -27240,7 +27117,7 @@
                   "left": 7,
                   "top": 10,
                   "width": 140,
-                  "height": 28,
+                  "height": 40,
                   "wireID": "2e1ba324-5e2a-49ff-f4d2-289ba74e5ed0",
                   "style": {
                     "inheritFrom": "edit_value_S_left"
@@ -27252,7 +27129,7 @@
                   "left": 147,
                   "top": 10,
                   "width": 82,
-                  "height": 28,
+                  "height": 40,
                   "wireID": "a82f0f26-de97-428e-a3d8-e621348223b0",
                   "data": "sys_display_background_luminosity_step",
                   "action": "",
@@ -27269,9 +27146,9 @@
                 {
                   "type": "Text",
                   "left": 7,
-                  "top": 39,
-                  "width": 84,
-                  "height": 28,
+                  "top": 48,
+                  "width": 66,
+                  "height": 40,
                   "wireID": "9e8b486e-cbae-4b94-9c34-0410e933bdf3",
                   "style": {
                     "inheritFrom": "edit_value_S_left"
@@ -27280,10 +27157,10 @@
                 },
                 {
                   "type": "Text",
-                  "left": 7,
-                  "top": 67,
+                  "left": 10,
+                  "top": 88,
                   "width": 58,
-                  "height": 34,
+                  "height": 38,
                   "wireID": "9977824b-c97f-4fa3-bfd8-5fa42769f528",
                   "style": {
                     "inheritFrom": "edit_value_active_S_center"
@@ -27294,21 +27171,22 @@
                 {
                   "type": "Text",
                   "left": 91,
-                  "top": 39,
-                  "width": 84,
-                  "height": 28,
+                  "top": 48,
+                  "width": 60,
+                  "height": 40,
                   "wireID": "751c7669-7338-469c-da49-8a248afe5fd6",
                   "style": {
-                    "inheritFrom": "edit_value_S_left"
+                    "inheritFrom": "edit_value_S_left",
+                    "alignHorizontal": "center"
                   },
                   "text": "Status"
                 },
                 {
                   "type": "Text",
-                  "left": 91,
-                  "top": 67,
+                  "left": 93,
+                  "top": 88,
                   "width": 29,
-                  "height": 34,
+                  "height": 38,
                   "wireID": "524ca1fc-6516-4b54-e149-d830989b57ed",
                   "style": {
                     "inheritFrom": "button_S"
@@ -27318,10 +27196,10 @@
                 },
                 {
                   "type": "Text",
-                  "left": 120,
-                  "top": 67,
+                  "left": 122,
+                  "top": 88,
                   "width": 29,
-                  "height": 34,
+                  "height": 38,
                   "wireID": "4bfb39c6-a056-4b79-ec9d-b9d25d2ae6b2",
                   "style": {
                     "inheritFrom": "button_S"
@@ -27331,22 +27209,23 @@
                 },
                 {
                   "type": "Text",
-                  "left": 175,
-                  "top": 39,
-                  "width": 68,
-                  "height": 28,
+                  "left": 173,
+                  "top": 48,
+                  "width": 60,
+                  "height": 40,
                   "wireID": "3798f4c8-329b-437b-978e-b3fb497c3b79",
                   "style": {
-                    "inheritFrom": "edit_value_S_left"
+                    "inheritFrom": "edit_value_S_left",
+                    "alignHorizontal": "center"
                   },
                   "text": "Pop up"
                 },
                 {
                   "type": "Text",
                   "left": 175,
-                  "top": 67,
+                  "top": 88,
                   "width": 29,
-                  "height": 34,
+                  "height": 38,
                   "wireID": "64d752b3-2dc7-41b9-9c87-8adbd4e62168",
                   "style": {
                     "inheritFrom": "error_alert_button"
@@ -27356,9 +27235,9 @@
                 {
                   "type": "Text",
                   "left": 204,
-                  "top": 67,
+                  "top": 88,
                   "width": 29,
-                  "height": 34,
+                  "height": 38,
                   "wireID": "eea4c937-b751-4b25-c598-0967a3f33d6e",
                   "style": {
                     "inheritFrom": "error_alert_button"
@@ -27370,7 +27249,7 @@
                   "type": "Rectangle",
                   "left": 0,
                   "top": 0,
-                  "width": 242,
+                  "width": 243,
                   "height": 2,
                   "wireID": "ac906ddd-2c2f-4e4b-f592-c23d2e7a7341",
                   "style": {
@@ -27380,8 +27259,8 @@
                 {
                   "type": "Rectangle",
                   "left": 0,
-                  "top": 109,
-                  "width": 242,
+                  "top": 134,
+                  "width": 243,
                   "height": 2,
                   "wireID": "b295e65f-357c-49a0-adc7-6718bdb0e41f",
                   "style": {
@@ -27393,7 +27272,7 @@
                   "left": 0,
                   "top": 2,
                   "width": 2,
-                  "height": 109,
+                  "height": 132,
                   "wireID": "cf6aca75-dc82-441f-840c-55d19952f97a",
                   "style": {
                     "inheritFrom": "default"
@@ -27401,10 +27280,10 @@
                 },
                 {
                   "type": "Rectangle",
-                  "left": 240,
+                  "left": 241,
                   "top": 2,
                   "width": 2,
-                  "height": 109,
+                  "height": 132,
                   "wireID": "ed0afdbc-0a82-46d5-fedd-682df909cbf6",
                   "style": {
                     "inheritFrom": "default"
@@ -27413,18 +27292,6 @@
               ]
             }
           ]
-        },
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "2aff1b0f-d436-4c3a-89b2-ea945024d433",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "minimized_channels"
         },
         {
           "type": "Container",
@@ -27560,7 +27427,7 @@
           "left": 0,
           "top": 0,
           "width": 480,
-          "height": 168,
+          "height": 240,
           "wireID": "9b9469d4-4bf6-42fa-a726-6fceb10db685",
           "style": {
             "inheritFrom": "default"
@@ -27570,9 +27437,9 @@
             {
               "type": "Text",
               "left": 8,
-              "top": 8,
-              "width": 122,
-              "height": 32,
+              "top": 10,
+              "width": 128,
+              "height": 40,
               "wireID": "0a9a4c5b-60ba-435c-c61e-6bf6a942b1bb",
               "style": {
                 "inheritFrom": "edit_value_M_left",
@@ -27582,10 +27449,10 @@
             },
             {
               "type": "Select",
-              "left": 130,
-              "top": 8,
+              "left": 136,
+              "top": 10,
               "width": 74,
-              "height": 32,
+              "height": 40,
               "wireID": "95a15350-f764-4721-ca7a-a2492bbf8393",
               "data": "sys_sound_is_enabled",
               "style": {
@@ -27597,7 +27464,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 74,
-                  "height": 32,
+                  "height": 40,
                   "wireID": "570ed40c-fcac-4fc5-ff60-9d15d27b5ce7",
                   "action": "sys_settings_sound_toggle",
                   "style": {
@@ -27610,7 +27477,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 74,
-                  "height": 32,
+                  "height": 40,
                   "wireID": "ab4ed28a-1f79-4767-cc77-926c62850358",
                   "action": "sys_settings_sound_toggle",
                   "style": {
@@ -27623,9 +27490,9 @@
             {
               "type": "Text",
               "left": 8,
-              "top": 46,
-              "width": 122,
-              "height": 32,
+              "top": 62,
+              "width": 128,
+              "height": 40,
               "wireID": "fb3ea5b1-7214-4b0a-928f-7e5c99420ad1",
               "style": {
                 "inheritFrom": "edit_value_M_left",
@@ -27635,10 +27502,10 @@
             },
             {
               "type": "Select",
-              "left": 130,
-              "top": 46,
+              "left": 136,
+              "top": 62,
               "width": 74,
-              "height": 32,
+              "height": 40,
               "wireID": "20de5371-d73a-4446-c082-617a211c2545",
               "data": "sys_sound_is_click_enabled",
               "style": {
@@ -27650,7 +27517,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 74,
-                  "height": 32,
+                  "height": 40,
                   "wireID": "fb64f973-3a89-4e0e-8ca3-97d391ba4398",
                   "action": "sys_settings_sound_toggle_click",
                   "style": {
@@ -27663,7 +27530,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 74,
-                  "height": 32,
+                  "height": 40,
                   "wireID": "7c3d900a-8ab4-4ba5-bbe6-df6a0aa9d551",
                   "action": "sys_settings_sound_toggle_click",
                   "style": {
@@ -27674,18 +27541,6 @@
               ]
             }
           ]
-        },
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 168,
-          "width": 480,
-          "height": 72,
-          "wireID": "35618790-e1c3-401c-d4b1-07d319abd609",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "minimized_channels"
         },
         {
           "type": "Container",
@@ -32475,59 +32330,6 @@
     {
       "components": [
         {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 0,
-          "width": 158,
-          "height": 70,
-          "wireID": "39b81a30-4ea2-4699-c367-73e716a6b043",
-          "data": "",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_micro_with_border",
-          "context": "slot1_channel_index"
-        },
-        {
-          "type": "LayoutView",
-          "left": 161,
-          "top": 0,
-          "width": 158,
-          "height": 70,
-          "wireID": "7165c05d-8124-4792-b38f-f6829697f64d",
-          "data": "",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_micro_with_border",
-          "context": "slot2_channel_index"
-        },
-        {
-          "type": "LayoutView",
-          "left": 322,
-          "top": 0,
-          "width": 158,
-          "height": 70,
-          "wireID": "403fb6a2-5f75-4af0-8cc5-a673bdb3d572",
-          "data": "",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_micro_with_border",
-          "context": "slot3_channel_index"
-        }
-      ],
-      "connectionLines": [],
-      "name": "minimized_channels",
-      "style": "default",
-      "left": 0,
-      "top": 0,
-      "width": 480,
-      "height": 72
-    },
-    {
-      "components": [
-        {
           "type": "Select",
           "left": 0,
           "top": 0,
@@ -34775,194 +34577,6 @@
       "left": 0,
       "top": 0,
       "width": 235,
-      "height": 68
-    },
-    {
-      "components": [
-        {
-          "type": "Select",
-          "left": 0,
-          "top": 0,
-          "width": 158,
-          "height": 70,
-          "wireID": "e8ed31d0-3316-4923-a644-c9b60c80cafb",
-          "data": "slot_is_2ch_view",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Container",
-              "left": 0,
-              "top": 0,
-              "width": 158,
-              "height": 70,
-              "wireID": "59e09c72-74f3-42a0-fde7-fa42f9a81d5d",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "LayoutView",
-                  "left": 2,
-                  "top": 0,
-                  "width": 154,
-                  "height": 68,
-                  "wireID": "aad68e60-1942-47da-f0e7-a429d32e4e11",
-                  "data": "slot_micro_view",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "layout": "",
-                  "context": ""
-                },
-                {
-                  "type": "Rectangle",
-                  "left": 0,
-                  "top": 0,
-                  "width": 2,
-                  "height": 70,
-                  "wireID": "d8697930-d9ca-41ad-c47f-9642169419f8",
-                  "style": {
-                    "inheritFrom": "default",
-                    "color": "channel1"
-                  }
-                },
-                {
-                  "type": "Rectangle",
-                  "left": 156,
-                  "top": 0,
-                  "width": 2,
-                  "height": 70,
-                  "wireID": "7eb70a4e-883a-465e-e945-951f50121009",
-                  "style": {
-                    "inheritFrom": "default",
-                    "color": "channel1"
-                  }
-                },
-                {
-                  "type": "Rectangle",
-                  "left": 2,
-                  "top": 68,
-                  "width": 154,
-                  "height": 2,
-                  "wireID": "1100d268-6656-4f8d-862f-314c1f0c5b3b",
-                  "style": {
-                    "inheritFrom": "default",
-                    "color": "channel1"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "Container",
-              "left": 0,
-              "top": 0,
-              "width": 158,
-              "height": 70,
-              "wireID": "5013d7a2-a427-4036-8741-1fa9273f79c0",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "LayoutView",
-                  "left": 0,
-                  "top": 0,
-                  "width": 158,
-                  "height": 70,
-                  "wireID": "e83dffb5-5cc3-411e-a4e7-f56c2ba42f1f",
-                  "data": "slot_micro_view",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "layout": "",
-                  "context": ""
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_micro_with_border",
-      "left": 0,
-      "top": 0,
-      "width": 158,
-      "height": 70
-    },
-    {
-      "components": [
-        {
-          "type": "Text",
-          "left": 0,
-          "top": 0,
-          "width": 154,
-          "height": 24,
-          "wireID": "1e19c322-c630-4d16-a619-f6992b20f269",
-          "data": "slot_title_micro",
-          "style": {
-            "inheritFrom": "channel1"
-          },
-          "text": ""
-        },
-        {
-          "type": "Text",
-          "left": 0,
-          "top": 24,
-          "width": 154,
-          "height": 44,
-          "wireID": "1288a620-2ead-476d-ff13-2838104c27ed",
-          "data": "slot_error_message",
-          "style": {
-            "inheritFrom": "default",
-            "font": "Oswald17",
-            "color": "status_warning",
-            "activeBackgroundColor": "status_warning"
-          },
-          "text": ""
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_micro_error",
-      "left": 0,
-      "top": 0,
-      "width": 154,
-      "height": 68
-    },
-    {
-      "components": [
-        {
-          "type": "Rectangle",
-          "left": 0,
-          "top": 0,
-          "width": 154,
-          "height": 24,
-          "wireID": "2e7e0c3c-1080-4baa-eaf9-12d0ad34d8fd",
-          "style": {
-            "inheritFrom": "channel1"
-          },
-          "invertColors": true
-        },
-        {
-          "type": "Text",
-          "left": 0,
-          "top": 24,
-          "width": 154,
-          "height": 44,
-          "wireID": "669ea351-63e0-46fe-820c-c9b3690de22e",
-          "style": {
-            "inheritFrom": "default",
-            "font": "Oswald20"
-          },
-          "text": "Not installed"
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_micro_not_installed",
-      "left": 0,
-      "top": 0,
-      "width": 154,
       "height": 68
     },
     {
@@ -48208,6 +47822,42 @@
             "width": 24,
             "height": 24,
             "pixelArray": "6bf2ffffff2500006efffffffffffffffffffffffffff269f2ffffffff2500006efffffffffffffffffffffffffffff1ffffffffff2500006efffffffffffffffffffffffffffffffffffffffa1c000060ffffffffffffb4584f8af6fffffffffffffff83b0000000082ffffffff810000000037f7ffffffffffff8f0036c5ab1102222222220212acc535008dffffffffffff5100c5ffff7b0000000000007cffffc4004fffffffffffff5f00abffff6100000000000062ffffa9005bffffffffffffb500117b610212666666661002627a1000b4ffffffffffffff7e01000012bcffffffffb80e0000027effffffffffffffffffd9a0a8ecffffffffffffeea69bdaffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffec9f98d2ffffffffffffffffffffffffffffffffffffffba1100000177fffffffffffffffffffffffffff5736666661202647b1100b0fffffffffffffffffffffff541000000000063ffffaa0059fffffffffffffffffffff5410000000000007cffffc40050fffffffffffffffffff5410000000322220211aac4340091fffffffffffffffff54100000003a5ffff7d000000003bf8fffffffffffffff54100000003a4ffffffffb35e5193f9fffffffffffffff54200000003a2fffffffffffffffffffffffffffff2fff54100000003a3fffffffffffffffffffffffffffff169e74100000003a2fffffffffffffffffffffffffffff167"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 191,
+          "x": 0,
+          "y": -3,
+          "width": 20,
+          "height": 20,
+          "dx": 20,
+          "glyphBitmap": {
+            "width": 20,
+            "height": 20,
+            "pixelArray": "81bcbcbcbcbcbcaa5a0a010101025fbbbcbcbc80c3d5d5d5d5d5d5d5d5c35d0400000046ccd5d5c316233a5f8fc7d5d5d5d5d5af2a0000002dc5d5c3010000000005429bd5d5d5d5d0580000002ac9c3010000000000000030a7d5d5d5d5770100003bc1abae936a30020000000262d1d5d5d57c00000053c4d5d5d5d5ba610a00000035c6d5d5d566000001c4d5d5d5d5d5d5bf4500000027c5d5d5d33b0001486084bcd5d5d5d5d57e0400002fced5d5c00f01010000013599d5d5d5d59505000055d5d5d57e0101000000000042c4d5d5d58801000097d5d5d2217a6e3f060000001cb7d5d5d55900001ed0d5d584c4d5d5c35e0300001ac1d5d5cb18000082d5d5c2c4d5d5d5d59f0e000038d4d5d581000026d5d5c4c4d5d5d5d5d5a506000089d5d5cf120000aed5c4c3d5d5d5d5d5d572000023d4d5d55900006fd5c3c3d5d5d5d5d5d5cf150000a7d5d59600003dd5c3c3d5d5d5d5d5d5d56000006cd5d5c3000018d5c3c4d5d5d5d5d5d5d595000046d5d5d40c0003d1c48ecacac9c9c9cacaa5000031c9caca1a0000bc8e"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 192,
+          "x": 0,
+          "y": -3,
+          "width": 20,
+          "height": 20,
+          "dx": 20,
+          "glyphBitmap": {
+            "width": 20,
+            "height": 20,
+            "pixelArray": "000046bbf2ffffffffe7360000000000000000000076feffffffffffffffee35000000000000000043fdfe8e2510101015b7ffee3400000000000000b9ff8e00000000000009b8ffee33000000000000f2ff24000059c7d68d0b09b9ffed330000000000ffff0d005afeffffffb40109bbffec3200000000ffff0d00cbff8c4df5ff27000abbffec30000000ffff0d00ddff4104e0ff3900000abcffec300000ffff100099ffeed9ffea0a0000000bbdffeb2f00ecffab0511c4ffffee4300000000000bbfffea2b3ff3ffab050236450e000000000000000bbfffb70040f4ffa90500000000000000000000004affd9000041f4ffa80400000000000000000030ebff9400000042f5ffa704000000000000002febffbd0b0000000043f5ffa60400000000002feaffbe0b00000000000044f5ffa5040000002eeaffbf0b000000000000000045f6ffa403002de9ffc00b0000000000000000000046f6ffa339e9ffc10c00000000000000000000000047f6ffffffc20d000000000000000000000000000043d6f3a40d000000000000"
           },
           "source": {
             "filePath": "fonts\\Oswald-Medium.ttf",
@@ -68445,57 +68095,6 @@
                 {
                   "type": "quoted-string"
                 }
-              ]
-            }
-          },
-          {
-            "name": "ROUTe:LABel:CHANnel",
-            "helpLink": "EEZ BB3 SCPI reference 5.13 - ROUTe.html#rout_lab_chan",
-            "parameters": [
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": false
-              },
-              {
-                "name": "label",
-                "type": [
-                  {
-                    "type": "quoted-string"
-                  }
-                ],
-                "isOptional": false
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "ROUTe:LABel:CHANnel?",
-            "helpLink": "EEZ BB3 SCPI reference 5.13 - ROUTe.html#rout_lab_chan",
-            "parameters": [
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": false
-              }
-            ],
-            "response": {
-              "type": [
-                {}
               ]
             }
           }

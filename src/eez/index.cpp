@@ -121,12 +121,8 @@ int Module::getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
         return PAGE_ID_SLOT_MAX_NOT_INSTALLED;
     }
 
-    if (slotViewType == SLOT_VIEW_TYPE_MIN) {
+    assert(slotViewType == SLOT_VIEW_TYPE_MIN);
     return PAGE_ID_SLOT_MIN_NOT_INSTALLED;
-    }
-
-    assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-    return PAGE_ID_SLOT_MICRO_NOT_INSTALLED;
 }
 
 int Module::getSlotSettingsPageId() {

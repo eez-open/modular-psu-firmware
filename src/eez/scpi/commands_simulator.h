@@ -144,8 +144,6 @@
     SCPI_COMMAND("ROUTe:LABel:ROW?", scpi_cmd_routeLabelRowQ) \
     SCPI_COMMAND("ROUTe:LABel:COLumn", scpi_cmd_routeLabelColumn) \
     SCPI_COMMAND("ROUTe:LABel:COLumn?", scpi_cmd_routeLabelColumnQ) \
-    SCPI_COMMAND("ROUTe:LABel:CHANnel", scpi_cmd_routeLabelChannel) \
-    SCPI_COMMAND("ROUTe:LABel:CHANnel?", scpi_cmd_routeLabelChannelQ) \
     SCPI_COMMAND("SENSe:FUNCtion[:ON]", scpi_cmd_senseFunctionOn) \
     SCPI_COMMAND("SENSe:FUNCtion[:ON]?", scpi_cmd_senseFunctionOnQ) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe", scpi_cmd_senseCurrentDcRange) \

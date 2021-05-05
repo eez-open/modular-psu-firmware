@@ -2277,13 +2277,13 @@ public:
             (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_DIN_CHANNEL_LABELS) ||
             (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_DOUT_CHANNEL_LABELS)
         ) {
-            psu::gui::animateSettingsSlideLeft(true);
+            psu::gui::animateSlideLeft();
         } else if (
             (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS) ||
             (previousPageId == PAGE_ID_DIB_MIO168_DIN_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS) ||
             (previousPageId == PAGE_ID_DIB_MIO168_DOUT_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS)
         ) {
-            psu::gui::animateSettingsSlideRight(true);
+            psu::gui::animateSlideRight();
         }
     }
 
@@ -2297,11 +2297,8 @@ public:
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
             return PAGE_ID_DIB_MIO168_SLOT_VIEW_MAX;
         }
-        if (slotViewType == SLOT_VIEW_TYPE_MIN) {
-            return PAGE_ID_DIB_MIO168_SLOT_VIEW_MIN;
-        }
-        assert(slotViewType == SLOT_VIEW_TYPE_MICRO);
-        return PAGE_ID_DIB_MIO168_SLOT_VIEW_MICRO;
+        assert(slotViewType == SLOT_VIEW_TYPE_MIN);
+        return PAGE_ID_DIB_MIO168_SLOT_VIEW_MIN;
     }
 
     int getSlotSettingsPageId() override {

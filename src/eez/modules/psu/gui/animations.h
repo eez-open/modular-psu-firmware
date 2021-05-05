@@ -27,12 +27,7 @@ extern const Rect g_workingAreaRect;
 void animateFromDefaultViewToMaxView(int iMax, bool isFullScreenView);
 void animateFromMaxViewToDefaultView(int iMax, bool isFullScreenView);
 void animateFromMinViewToMaxView(int maxSlotIndexBefore, bool isFullScreenView);
-void animateFromMicroViewToMaxView();
 
-void animateShowSysSettings();
-void animateHideSysSettings();
-void animateSettingsSlideLeft(bool noChannels);
-void animateSettingsSlideRight(bool noChannels);
 void animateSlideUp();
 void animateSlideDown();
 void animateSlideLeft();

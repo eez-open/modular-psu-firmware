@@ -2416,45 +2416,6 @@
         {
           "type": "Container",
           "left": 0,
-          "top": 0,
-          "width": 154,
-          "height": 24,
-          "wireID": "a9c9b99c-259e-49ce-ad96-605213964c5d",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 154,
-              "height": 24,
-              "wireID": "132a9d5b-b22f-4d1f-e16a-7745ed0b7436",
-              "data": "slot_title_micro",
-              "style": {
-                "inheritFrom": "channel1",
-                "alignHorizontal": "left",
-                "padding": "0 5"
-              },
-              "text": ""
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_view_micro",
-      "left": 0,
-      "top": 0,
-      "width": 154,
-      "height": 68,
-      "dataContextOverrides": "{\"slot_title_micro\": \"MUX14D\"}"
-    },
-    {
-      "components": [
-        {
-          "type": "Container",
-          "left": 0,
           "top": 240,
           "width": 480,
           "height": 32,

@@ -76,12 +76,6 @@ static const Rect g_minRects[] = {
     { 240, 168, 240, 72 }
 };
 
-static const Rect g_microRects[] = {
-    {   0, 168, 160, 72 },
-    { 160, 168, 160, 72 },
-    { 320, 168, 160, 72 }
-};
-
 static const Rect g_settingsRect = { 0, 0, 480, 168 };
 static const Rect g_settingsRectTop = { 0, -168, 480, 168 };
 static const Rect g_settingsRectLeft = { -480, 0, 480, 240 };
@@ -219,96 +213,6 @@ void animateFromMinViewToMaxView(int maxSlotIndexBefore, bool isFullScreenView) 
     }
 
     animateRects(&g_psuAppContext, BUFFER_OLD, i);
-}
-
-void animateFromMicroViewToMaxView() {
-    int iMax = hmi::g_selectedSlotIndex;
-    int iMin1 = iMax == 0 ? 1 : 0;
-    int iMin2 = iMax == 2 ? 1 : 2;
-
-    int i = 0;
-
-    g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    g_animRects[i++] = { BUFFER_OLD, g_microRects[iMin1], g_minRects[0], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_OLD, g_microRects[iMin2], g_minRects[1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_OLD, g_microRects[iMax], g_maxRect, 0, OPACITY_FADE_OUT, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
-
-    g_animRects[i++] = { BUFFER_NEW, g_microRects[iMin1], g_minRects[0], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_microRects[iMin2], g_minRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_microRects[iMax], g_maxRect, 0, OPACITY_FADE_IN, POSITION_BOTTOM};
-    
-    animateRects(&g_psuAppContext, BUFFER_OLD, i);
-}
-
-void animateShowSysSettings() {
-    auto g_defRects = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || 
-        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR ? g_vertDefRects : g_horzDefRects;
-
-    int i = 0;
-
-    g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    g_animRects[i++] = { BUFFER_OLD, g_defRects[0], g_microRects[0], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_OLD, g_defRects[1], g_microRects[1], 0, OPACITY_FADE_OUT, POSITION_TOP };
-    g_animRects[i++] = { BUFFER_OLD, g_defRects[2], g_microRects[2], 0, OPACITY_FADE_OUT, POSITION_TOP_RIGHT };
-
-    g_animRects[i++] = { BUFFER_NEW, g_defRects[0], g_microRects[0], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_defRects[1], g_microRects[1], 0, OPACITY_FADE_IN, POSITION_TOP };
-    g_animRects[i++] = { BUFFER_NEW, g_defRects[2], g_microRects[2], 0, OPACITY_FADE_IN, POSITION_TOP_RIGHT };
-
-    g_animRects[i++] = { BUFFER_NEW, g_settingsRectTop, g_settingsRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    g_animRects[i++] = { BUFFER_NEW, g_statusLineRectBottom, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    animateRects(&g_psuAppContext, BUFFER_OLD, i);
-}
-
-void animateHideSysSettings() {
-    auto g_defRects = psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC ||
-        psu::persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR ? g_vertDefRects : g_horzDefRects;
-
-    int i = 0;
-
-    g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    g_animRects[i++] = { BUFFER_OLD, g_microRects[0], g_defRects[0], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_OLD, g_microRects[1], g_defRects[1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_OLD, g_microRects[2], g_defRects[2], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-
-    g_animRects[i++] = { BUFFER_NEW, g_microRects[0], g_defRects[0], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_microRects[1], g_defRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_microRects[2], g_defRects[2], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-
-    g_animRects[i++] = { BUFFER_OLD, g_settingsRect, g_settingsRectTop, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectBottom, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    animateRects(&g_psuAppContext, BUFFER_NEW, i);
-}
-
-void animateSettingsSlideLeft(bool noChannels) {
-    int i = 0;
-
-    g_animRects[i++] = { BUFFER_OLD, noChannels ? g_settingsRectNoChannels : g_settingsRect, g_settingsRectLeft, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_settingsRectRight, noChannels ? g_settingsRectNoChannels : g_settingsRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectLeft, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_statusLineRectRight, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    animateRects(&g_psuAppContext, BUFFER_NEW, i);
-}
-
-void animateSettingsSlideRight(bool noChannels) {
-    int i = 0;
-
-    g_animRects[i++] = { BUFFER_OLD, noChannels ? g_settingsRectNoChannels : g_settingsRect, g_settingsRectRight, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_settingsRectLeft, noChannels ? g_settingsRectNoChannels : g_settingsRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    g_animRects[i++] = { BUFFER_OLD, g_statusLineRect, g_statusLineRectRight, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_statusLineRectLeft, g_statusLineRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    animateRects(&g_psuAppContext, BUFFER_NEW, i);
 }
 
 void animateSlideUp() {
