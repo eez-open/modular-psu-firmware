@@ -22,7 +22,6 @@
 			.cmd_code_Start { text-align: left; margin-top: 1.99mm; font-family: "Courier New"; }
 			.cmd_code_single { text-align: left; margin-top: 1.99mm; margin-bottom: 1.99mm; font-family: "Courier New"; }
 			.table_header { text-align: center; }
-			.backtick { font-family: "Courier New"; font-size: 10.0pt; font-weight: normal; font-style: normal; background-color: #dddddd; }
 			
 			/* Footnotes & endnotes */
 			#webpub_footnotes_divider { clear: both; margin-top: 2em; width: 25%; border-top: 1px solid black; }
@@ -42,7 +41,7 @@
 		<p class="Heading_1">7. <a name="__RefHeading__5776_1776152697"></a>Error messages<a name="__RefHeading__5776_1776152697"></a></p>
 		<p>The system-defined error/event numbers are chosen on an enumerated (“1 of N”) basis. The SCPI-defined error/event numbers and the &lt;error/event_description&gt; portions of the full queue item are listed here. The first error/event described in each class (for example, -100, -200, -300, -400) is a “generic” error.</p>
 		<p class="Heading_2">7.1. <a name="command_err"></a>Command Error [-199, -100]</p>
-		<p>An &lt;error/event number&gt; in the range [-199, -100] indicates that a syntax error has been detected by the BB3’s SCPI command parser. The occurrence of an error in this class cause the command error bit (CME, bit 5) in the Standard Event Status Register (see <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-registers-and-queues.html#std_even_stat_reg"><span style="text-decoration: underline;">Section 3.1</span></a>) to be set.</p>
+		<p>An &lt;error/event number&gt; in the range [-199, -100] indicates that a syntax error has been detected by the BB3’s SCPI command parser. The occurrence of an error in this class cause the command error bit (CME, bit 5) in the Standard Event Status Register (see <a href="https://www.envox.eu/eez-bench-box-3/bb3-scpi-reference-manual/3-registers-and-queues/#std_even_stat_reg"><span style="text-decoration: underline;">Section 3.1</span></a>) to be set.</p>
 		<p>&#160;</p>
 		<table style="border-collapse: collapse; background: transparent; width: 170mm;">
 			<tr style="background: transparent;">
@@ -181,7 +180,7 @@
 			</tr>
 		</table>
 		<p class="Heading_2">7.2. <a name="exec_err"></a>Execution Error [-299, -200]</p>
-		<p>An &lt;error/event number&gt; in the range [-299, -200] indicates an error has been detected by the BB3’s execution control block. The occurrence of any error in this class sets the execution error bit (EXE, bit 4) in the Standard Event Status Register (see <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-registers-and-queues.html#std_even_stat_reg"><span style="text-decoration: underline;">Section 3.1</span></a>). One of the following events has occurred:</p>
+		<p>An &lt;error/event number&gt; in the range [-299, -200] indicates an error has been detected by the BB3’s execution control block. The occurrence of any error in this class sets the execution error bit (EXE, bit 4) in the Standard Event Status Register (see <a href="https://www.envox.eu/eez-bench-box-3/bb3-scpi-reference-manual/3-registers-and-queues/#std_even_stat_reg"><span style="text-decoration: underline;">Section 3.1</span></a>). One of the following events has occurred:</p>
 		<ul>
 			<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">A &lt;PROGRAM DATA&gt; element following a header was evaluated by the BB3 as outside of its legal input range, or as otherwise inconsistent with the BB3’s capabilities.</li>
 			<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">A valid program message could not be properly executed.  Probably due to some BB3 condition.</li>
@@ -260,7 +259,7 @@
 					<p class="cmd_code">-240,&quot;Hardware error&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>Command or query could not be executed because failure is detected during power-up self-test. Use the <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-common-command-reference.html#tst"><span style="text-decoration: underline;">*TST?</span></a> command to query self-test results. See also <a href="#self-test_err_msg"><span style="text-decoration: underline;">Section 7.3.1</span></a></p>
+					<p>Command or query could not be executed because failure is detected during power-up self-test. Use the <a href="https://www.envox.eu/eez-bench-box-3/bb3-scpi-reference-manual/4-common-command-reference#tst"><span style="text-decoration: underline;">*TST?</span></a> command to query self-test results. See also <a href="#self-test_err_msg"><span style="text-decoration: underline;">Section 7.3.1</span></a></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -420,7 +419,7 @@
 			</tr>
 		</table>
 		<p class="Heading_2">7.3. <a name="device_err"></a>Device-Specific Error [-399, -300], [1, 32767] </p>
-		<p>An &lt;error/event number&gt; in the range [-399, -300] or [1, 32767] indicates that the BB3 has detected an error which is not a command error, a query error, or an execution error.  Most likely, some BB3 operations did not properly complete, possibly due to an abnormal hardware or firmware condition. These codes are also used for self-test response errors. The occurrence of any error in this class sets the device-specific error bit (DDE, bit 3) in the Standard Event Status Register (see <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-registers-and-queues.html#std_even_stat_reg"><span style="text-decoration: underline;">Section 3.1</span></a>). </p>
+		<p>An &lt;error/event number&gt; in the range [-399, -300] or [1, 32767] indicates that the BB3 has detected an error which is not a command error, a query error, or an execution error.  Most likely, some BB3 operations did not properly complete, possibly due to an abnormal hardware or firmware condition. These codes are also used for self-test response errors. The occurrence of any error in this class sets the device-specific error bit (DDE, bit 3) in the Standard Event Status Register (see <a href="https://www.envox.eu/eez-bench-box-3/bb3-scpi-reference-manual/3-registers-and-queues/#std_even_stat_reg"><span style="text-decoration: underline;">Section 3.1</span></a>). </p>
 		<p>&#160;</p>
 		<p>Events that generate device-specific errors do not generate command errors, execution errors, or query errors; see the other error definitions in this section.</p>
 		<p>&#160;</p>
@@ -757,42 +756,42 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
-					<p class="cmd_code">500,&quot;Down-programmer on CH1 switched off&quot;</p>
+					<p class="cmd_code">500,<a name="__DdeLink__3468_662586657"></a>&quot;Sink power limit exceeded on CH1&quot;<a name="__DdeLink__3468_662586657"></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
-					<p>The down programmer has been switched off because a negative output power (<span class="backtick">DP_NEG_LEV</span>) has been measured on Channel 1 that has lasted more then <span class="backtick">DP_NEG_DELAY</span> seconds.</p>
+					<p>The power output of Channel 1 is turned off because the sink power limit has been exceeded. </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
-					<p class="cmd_code">501,&quot;Down-programmer on CH2 switched off&quot;</p>
+					<p class="cmd_code">501,&quot;Sink power limit exceeded on CH2&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>The down programmer has been switched off because a negative output power (<span class="backtick">DP_NEG_LEV</span>) has been measured on Channel 2 that has lasted more then <span class="backtick">DP_NEG_DELAY</span> seconds.</p>
+					<p>The power output of Channel 2 is turned off because the sink power limit has been exceeded. </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
-					<p class="cmd_code">502,&quot;Down-programmer on CH3 switched off&quot;</p>
+					<p class="cmd_code">502,&quot;Sink power limit exceeded on CH3&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
-					<p>The down programmer has been switched off because a negative output power (<span class="backtick">DP_NEG_LEV</span>) has been measured on Channel 3 that has lasted more then <span class="backtick">DP_NEG_DELAY</span> seconds.</p>
+					<p>The power output of Channel 3 is turned off because the sink power limit has been exceeded. </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
-					<p class="cmd_code">503,&quot;Down-programmer on CH4 switched off&quot;</p>
+					<p class="cmd_code">503,&quot;Sink power limit exceeded on CH4&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>The down programmer has been switched off because a negative output power (<span class="backtick">DP_NEG_LEV</span>) has been measured on Channel 4 that has lasted more then <span class="backtick">DP_NEG_DELAY</span> seconds.</p>
+					<p>The power output of Channel 4 is turned off because the sink power limit has been exceeded. </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
-					<p class="cmd_code">504,&quot;Down-programmer on CH5 switched off&quot;</p>
+					<p class="cmd_code">504,&quot;Sink power limit exceeded on CH5&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
-					<p>The down programmer has been switched off because a negative output power (<span class="backtick">DP_NEG_LEV</span>) has been measured on Channel 5 that has lasted more then <span class="backtick">DP_NEG_DELAY</span> seconds.</p>
+					<p>The power output of Channel 5 is turned off because the sink power limit has been exceeded. </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -848,7 +847,7 @@
 					<p class="cmd_code">616,&quot;SLOT1 EEPROM save failed&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>The non-volatile memory (an EEPROM) on the periperal module inserted into slot #1 is damaged or not responsive.</p>
+					<p>The non-volatile memory (an EEPROM) on the peripheral module inserted into slot #1 is damaged or not responsive.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -856,7 +855,7 @@
 					<p class="cmd_code">617,&quot;SLOT2 EEPROM save failed&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
-					<p>The non-volatile memory (an EEPROM) on the periperal module inserted into slot #2 is damaged or not responsive.</p>
+					<p>The non-volatile memory (an EEPROM) on the peripheral module inserted into slot #2 is damaged or not responsive.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -864,12 +863,44 @@
 					<p class="cmd_code">618,&quot;SLOT3 EEPROM save failed&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
-					<p>The non-volatile memory (an EEPROM) on the periperal module inserted into slot #3 is damaged or not responsive.</p>
+					<p>The non-volatile memory (an EEPROM) on the peripheral module inserted into slot #3 is damaged or not responsive.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
+					<p class="cmd_code">730,&quot;CH1 is not calibrated&quot;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
+					<p>Cannot complete coupling in series or parallel because Channel 1 is not calibrated</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p class="cmd_code">731,&quot;CH2 is not calibrated&quot;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+					<p>Cannot complete coupling in series or parallel because Channel 2 is not calibrated</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 38%;">
+					<p class="cmd_code">741,&quot;CH1 calibration is not enabled&quot;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background-color: #e6e6ff; width: 62%;">
+					<p>Cannot complete coupling in series or parallel because calibration for Channel 1 is not enabled</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p class="cmd_code">742,&quot;CH2 calibration is not enabled&quot;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+					<p>Cannot complete coupling in series or parallel because calibration for Channel 2 is not enabled</p>
 				</td>
 			</tr>
 		</table>
 		<p class="Heading_3">7.3.1. <a name="__RefHeading__10051_1925441995"></a><a name="self-test_err_msg"></a>Self-Test Error Messages<a name="__RefHeading__10051_1925441995"></a></p>
-		<p>During power-up, the BB3 will start self-test sequences when communication with all SPI devices that is marked as installed will be established. The scope of the self-test depends on device capability and it could vary from simply reading device registers, and waiting for expected responses to more complex operations such as setting DAC registers and reading back those values using the ADC (if ADC test passed). Every test failure will be announced by an error beep, and one error message per failed test will be inserted into the error queue. The device-specific error bit (DDE, bit 3) in the Standard Event Status Register (see <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-registers-and-queues.html#std_even_stat_reg"><span style="text-decoration: underline;">Section 3.1</span></a>) will also be set.</p>
+		<p>During power-up, the BB3 will start self-test sequences when communication with all SPI devices that is marked as installed will be established. The scope of the self-test depends on device capability and it could vary from simply reading device registers, and waiting for expected responses to more complex operations such as setting DAC registers and reading back those values using the ADC (if ADC test passed). Every test failure will be announced by an error beep, and one error message per failed test will be inserted into the error queue. The device-specific error bit (DDE, bit 3) in the Standard Event Status Register (see <a href="https://www.envox.eu/eez-bench-box-3/bb3-scpi-reference-manual/3-registers-and-queues/#std_even_stat_reg"><span style="text-decoration: underline;">Section 3.1</span></a>) will also be set.</p>
 		<p>&#160;</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
