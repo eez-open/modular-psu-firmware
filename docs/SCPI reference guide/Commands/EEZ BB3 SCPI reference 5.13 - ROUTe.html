@@ -16,6 +16,8 @@
 			p { text-align: justify; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; text-indent: 0; background: transparent; font-family: "Arial"; font-size: 10.5pt; font-weight: normal; font-style: normal; }
 			li { text-align: justify; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; text-indent: 0; background: transparent; font-family: "Arial"; font-size: 10.5pt; font-weight: normal; font-style: normal; }
 			.cmd_code { text-align: left; font-family: "Courier New"; }
+			.cmd_code_End { text-align: left; margin-bottom: 1.99mm; font-family: "Courier New"; }
+			.cmd_code_Start { text-align: left; margin-top: 1.99mm; font-family: "Courier New"; }
 			.cmd_code_single { text-align: left; margin-top: 1.99mm; margin-bottom: 1.99mm; font-family: "Courier New"; }
 			.cmd_root { text-align: left; color: #0066cc; }
 			.note { font-style: italic; }
@@ -67,7 +69,15 @@
 					<p class="scpi1"><a href="#rout_clos"><span style="text-decoration: underline;">:CLOSe {&lt;chanlist&gt;</span></a>}</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 51%;">
-					<p>Closes (turns on) specified relay matrix channels </p>
+					<p>Closes (turns on) specified relay channels </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
+					<p class="scpi2"><a href="#rout_clos_excl"><span style="text-decoration: underline;">:EXCLusive {&lt;chanlist&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 51%;">
+					<p>Closes exclusively specified relay channel</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -76,14 +86,6 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 51%;">
 					<p>&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="scpi2"><a href="#rout_lab_chan"><span style="text-decoration: underline;">:CHANnel {&lt;channel&gt;}, {&lt;label&gt;}</span></a></p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 51%;">
-					<p>Sets relay channel label</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -107,7 +109,7 @@
 					<p class="scpi1"><a href="#rout_open"><span style="text-decoration: underline;">:OPEN {&lt;chanlist&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 51%;">
-					<p>Opens (turns off) specified relay matrix channels </p>
+					<p>Opens (turns off) specified relay channels </p>
 				</td>
 			</tr>
 		</table>
@@ -127,7 +129,7 @@
 					<p class="Default_nt2">Modules</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405" style="background-color: #99ffcc;">&#160;SMX&#160;</span><span class="DCP405" style="background-color: #9999ff;"> PREL&#160;</span></p>
+					<p><span class="DCP405" style="background-color: #99ffcc;">&#160;SMX&#160;</span><span class="DCP405" style="background-color: #9999ff;"> PREL&#160;</span><span class="DCP405" style="background-color: #ff66cc;">&#160;MUX&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -135,7 +137,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command closes (turns it on) the relay matrix channels specified by &lt;chanlist&gt;. &lt;chanlist&gt; has the form (@<span style="font-style: italic;">nrc</span>) where <span style="font-style: italic;">n</span> is the module slot number, <span style="font-style: italic;">r</span> is the channel row number and <span style="font-style: italic;">c</span> is the column number. </p>
+					<p>This command closes (turns it on) the relay channels specified by &lt;chanlist&gt;. The &lt;chanlist&gt; on the SMX module has the form (@<span style="font-style: italic;">nrc</span>) where <span style="font-style: italic;">n</span> is the module slot number, <span style="font-style: italic;">r</span> is the channel row number and <span style="font-style: italic;">c</span> is the column number. On other modules &lt;chanlist&gt; has a form (@<span style="font-style: italic;">nxx</span>) where <span style="font-style: italic;">n</span> is the module slot number, and xx is channel number.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -163,7 +165,7 @@
 					<p style="text-align: center;">ChannelList</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 29%;">
-					<p style="text-align: center;">SMX: (@n03) and (@n11) to (@n46), PREL: (@n01) to (@n06) where n is the slot number</p>
+					<p style="text-align: center;">SMX: (@n03) and (@n11) to (@n46), PREL: (@n01) to (@n06), MUX: (@n01) to  (@n03), (@n11) to (@n17) and (@n21) to (@n27) where n is the slot number</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
 					<p style="text-align: center;">–</p>
@@ -182,11 +184,11 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Close (activate) four crosspoints (X1Y1, X2Y1, X3Y1, X4Y1) at once on the SMX46 inserted into slot 1:</p>
+					<p>Closing (activating) four crosspoints (X1Y1, X2Y1, X3Y1, X4Y1) at once on the SMX46 inserted into slot 1:</p>
 					<p class="cmd_code_single">ROUT:CLOS (@111,112,113,114)</p>
-					<p>Close all crosspoints in row 3 (X3Y1 to X3Y6) at once on the SMX46 inserted into slot 1:</p>
+					<p>Closing all crosspoints in row 3 (X3Y1 to X3Y6) at once on the SMX46 inserted into slot 1:</p>
 					<p class="cmd_code_single">ROUT:CLOS (@113:163)</p>
-					<p>Close power relay on SMX46 inserted in slot 2:</p>
+					<p>Closing power relay on SMX46 inserted in slot 2:</p>
 					<p class="cmd_code_single">ROUT:CLOS (@203)</p>
 				</td>
 			</tr>
@@ -208,15 +210,14 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.13.2. <a name="rout_lab_chan"></a>ROUTe:LABel:CHANnel</p>
+		<p class="Heading_3">5.13.2. <a name="rout_clos_excl"></a>ROUTe:CLOSe:EXCLusive</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">ROUTe:LABel:CHANnel {&lt;channel&gt;}, {&lt;label&gt;}</p>
-					<p class="cmd_root">ROUTe:LABel:CHANnel? {&lt;channel&gt;}</p>
+					<p class="cmd_root">ROUTe:CLOSe:EXCLusive {&lt;chanlist&gt;}</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -224,7 +225,7 @@
 					<p class="Default_nt2">Modules</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405" style="background-color: #9999ff;"> PREL&#160;</span></p>
+					<p><span class="DCP405" style="background-color: #9999ff;"> PREL&#160;</span><span class="DCP405" style="background-color: #ff66cc;">&#160;MUX&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -232,7 +233,9 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Use this command to define the channel label specified by &lt;channel&gt;.</p>
+					<p>Use this command to close relay channel specified by &lt;chanlist&gt; and open all currently closed channels on the destionation module. &lt;chanlist&gt; has the form (@<span style="font-style: italic;">nxx</span>) where <span style="font-style: italic;">n</span> is the module slot number, and xx is channel number. </p>
+					<p>&#160;</p>
+					<p class="note">If the EXT channel (@n03) is closed on the MUX module, then the scope of this command is extended to another multiplexer (P2). </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -254,41 +257,16 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p>&lt;channel&gt;</p>
+					<p>&lt;chanlist&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
-					<p style="text-align: center;">Channel</p>
+					<p style="text-align: center;">ChannelList</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 29%;">
-					<p style="text-align: center;">(@n01) to (@n06) where n is the slot number</p>
+					<p style="text-align: center;">PREL: (@n01) to (@n06), MUX: (@n11) to (@n17) and (@n21) to (@n27) where n is the slot number</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
 					<p style="text-align: center;">–</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p>&#160;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p>&lt;label&gt;</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 19%;">
-					<p style="text-align: center;">Quoted string</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 29%;">
-					<p style="text-align: center;">Max. 10 characters</p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
-					<p style="text-align: center;">–</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Return</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Returns the label of the channel queried as a quoted string.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -296,8 +274,12 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Set label “Heater” for the first channel on the PREL6 inserted into slot 2:</p>
-					<p class="cmd_code_single">ROUT:CHAN:LAB (@201),&quot;Heater&quot;</p>
+					<p>Closing (activating) three channels (@211, @212, @213) at once on the MUX module on slot 2:</p>
+					<p class="cmd_code_single">ROUT:CLOS (@211:213)</p>
+					<p>Channel @214 closes exclusively, which will open three previously closed channels:</p>
+					<p class="cmd_code_Start">ROUT:CLOS:EXCL (@214)</p>
+					<p class="cmd_code_End">ROUT:CLOS? (@211:213)</p>
+					<p class="cmd_code_End">0,0,0</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -315,6 +297,7 @@
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>ROUTe:CLOSe</p>
 					<p>ROUTe:OPEN</p>
+					<p>SYSTem:RELay:CYCLes?</p>
 				</td>
 			</tr>
 		</table>
@@ -342,7 +325,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Use this command to define the column label of the relay matrix specified by &lt;slot&gt; and &lt;column&gt;.</p>
+					<p>Use this command to define the column label of the relay specified by &lt;slot&gt; and &lt;column&gt;.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -464,7 +447,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Use this command to define the column label of the relay matrix specified by &lt;slot&gt; and &lt;row&gt;.</p>
+					<p>Use this command to define the column label of the relay specified by &lt;slot&gt; and &lt;row&gt;.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -578,7 +561,7 @@
 					<p class="Default_nt2">Modules</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405" style="background-color: #99ffcc;">&#160;SMX&#160;</span><span class="DCP405" style="background-color: #9999ff;"> PREL&#160;</span></p>
+					<p><span class="DCP405" style="background-color: #99ffcc;">&#160;SMX&#160;</span><span class="DCP405" style="background-color: #9999ff;"> PREL&#160;</span><span class="DCP405" style="background-color: #ff66cc;">&#160;MUX&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -586,7 +569,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command closes (turns it off) the relay matrix channels specified by &lt;chanlist&gt;. &lt;chanlist&gt; has the form (@<span style="font-style: italic;">nrc</span>) where <span style="font-style: italic;">n</span> is the module slot number, <span style="font-style: italic;">r</span> is the channel row number and <span style="font-style: italic;">c</span> is the column number. </p>
+					<p>This command closes (turns it off) the relay channels specified by &lt;chanlist&gt;. The &lt;chanlist&gt; on the SMX module has the form (@<span style="font-style: italic;">nrc</span>) where <span style="font-style: italic;">n</span> is the module slot number, <span style="font-style: italic;">r</span> is the channel row number and <span style="font-style: italic;">c</span> is the column number. On other modules &lt;chanlist&gt; has a form (@<span style="font-style: italic;">nxx</span>) where <span style="font-style: italic;">n</span> is the module slot number, and xx is channel number.</p>
 					<p>&#160;</p>
 					<p>The *RST command  will open all channels of all modules.</p>
 				</td>
@@ -616,7 +599,7 @@
 					<p style="text-align: center;">ChannelList</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 29%;">
-					<p style="text-align: center;">SMX: (@n03) and (@n11) to (@n46), PREL: (@n01) to (@n06) where n is the slot number</p>
+					<p style="text-align: center;">SMX: (@n03) and (@n11) to (@n46), PREL: (@n01) to (@n06), MUX: (@n01) to  (@n03), (@n11) to (@n17) and (@n21) to (@n27) where n is the slot number</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 18%;">
 					<p style="text-align: center;">–</p>
