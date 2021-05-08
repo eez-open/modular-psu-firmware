@@ -110,7 +110,7 @@ scpi_result_t scpi_cmd_measureDigitalByteQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_measureTemperatureQ(scpi_t *context) {
+scpi_result_t scpi_cmd_measureScalarTemperatureThermistorDcQ(scpi_t *context) {
 	ChannelList channelList;
 	param_channels(context, channelList);
 	if (channelList.numChannels == 0) {

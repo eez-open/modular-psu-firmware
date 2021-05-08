@@ -542,7 +542,7 @@ public:
         }
     }
 
-    void onSpiIrq() {
+    void onSpiIrq() override {
         spiReady = true;
 		// if (g_isBooted) {
 		// 	stateTransition(EVENT_SLAVE_READY);
@@ -579,7 +579,11 @@ public:
     }
 
     void animatePageAppearance(int previousPageId, int activePageId) override {
-        if (previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS && activePageId == PAGE_ID_DIB_PREL6_CHANNEL_LABELS) {
+        if (previousPageId == PAGE_ID_MAIN && activePageId == PAGE_ID_DIB_PREL6_SETTINGS) {
+            psu::gui::animateSlideDown();
+        } else if (previousPageId == PAGE_ID_DIB_PREL6_SETTINGS && activePageId == PAGE_ID_MAIN) {
+            psu::gui::animateSlideUp();
+        } else if (previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS && activePageId == PAGE_ID_DIB_PREL6_CHANNEL_LABELS) {
             psu::gui::animateSlideLeft();
         } else if (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS) {
             psu::gui::animateSlideRight();
@@ -669,7 +673,7 @@ public:
         return false;
     }
 
-    void resetConfiguration() {
+    void resetConfiguration() override {
         Module::resetConfiguration();
         relayStates = 0;
         memset(relayLabels, 0, sizeof(relayLabels));

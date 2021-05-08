@@ -805,7 +805,7 @@ static void readEvents(uint32_t fromPosition) {
                             auto &event = g_events[k];
                             event.dateTime = g_writeQueue[i].dateTime;
                             event.eventType = eventType;
-                            if (g_writeQueue[i].channelIndex == -1 || g_writeQueue[i].message) {
+                            if (g_writeQueue[i].channelIndex == -1 || g_writeQueue[i].message[0]) {
                                 stringCopy(event.message, sizeof(event.message),
 									g_writeQueue[i].eventId == EVENT_DEBUG_TRACE ||
 									g_writeQueue[i].eventId == EVENT_INFO_TRACE ||

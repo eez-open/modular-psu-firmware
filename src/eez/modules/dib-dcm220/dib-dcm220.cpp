@@ -416,7 +416,7 @@ public:
 		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex);
 	}
 
-    void onPowerDown() {
+    void onPowerDown() override {
 #if defined(EEZ_PLATFORM_STM32)
         if (synchronized) {
             transfer();
@@ -567,7 +567,7 @@ public:
     }
 #endif
 
-    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
 
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {

@@ -589,7 +589,7 @@ public:
         }
     }
 
-    void onSpiIrq() {
+    void onSpiIrq() override {
         spiReady = true;
 		// if (g_isBooted) {
 		// 	stateTransition(EVENT_SLAVE_READY);
@@ -628,11 +628,29 @@ public:
     Page *getPageFromId(int pageId) override;
 
     void animatePageAppearance(int previousPageId, int activePageId) override {
-        if (previousPageId == PAGE_ID_MAIN && activePageId == PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES) {
-            animateSlideDown();
-        } else if (previousPageId == PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES && activePageId == PAGE_ID_MAIN) {
-            animateSlideUp();
-        }
+        if (
+			(previousPageId == PAGE_ID_MAIN && activePageId == PAGE_ID_DIB_SMX46_SETTINGS) ||
+			(previousPageId == PAGE_ID_MAIN && activePageId == PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES)
+		) {
+            psu::gui::animateSlideDown();
+        } else if (
+			(previousPageId == PAGE_ID_DIB_SMX46_SETTINGS && activePageId == PAGE_ID_MAIN) ||
+			(previousPageId == PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES && activePageId == PAGE_ID_MAIN)
+		) {
+            psu::gui::animateSlideUp();
+        } else if (
+			(previousPageId == PAGE_ID_DIB_SMX46_SETTINGS && activePageId == PAGE_ID_DIB_SMX46_RELAY_CYCLES) ||
+			(previousPageId == PAGE_ID_DIB_SMX46_SETTINGS && activePageId == PAGE_ID_DIB_SMX46_INFO) ||
+			(previousPageId == PAGE_ID_DIB_SMX46_SETTINGS && activePageId == PAGE_ID_CH_SETTINGS_CALIBRATION)
+		) {
+			psu::gui::animateSlideLeft();
+		} else if (
+			(previousPageId == PAGE_ID_DIB_SMX46_RELAY_CYCLES && activePageId == PAGE_ID_DIB_SMX46_SETTINGS) ||
+			(previousPageId == PAGE_ID_DIB_SMX46_INFO && activePageId == PAGE_ID_DIB_SMX46_SETTINGS) ||
+			(previousPageId == PAGE_ID_CH_SETTINGS_CALIBRATION && activePageId == PAGE_ID_DIB_SMX46_SETTINGS)
+		) {
+			psu::gui::animateSlideRight();
+		}
     }
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
@@ -795,7 +813,7 @@ public:
         return false;
     }
 
-    void resetConfiguration() {
+    void resetConfiguration() override {
         Module::resetConfiguration();
 
         routes = 0;
@@ -1578,7 +1596,13 @@ void action_dib_smx46_toggle_route() {
     int x = i % NUM_COLUMNS;
     int y = i / NUM_COLUMNS;
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
-    page->toggleRoute(x, y);
+    if (page) {
+        page->toggleRoute(x, y);
+    } else {
+		int slotIndex = cursor / (NUM_COLUMNS * NUM_ROWS);
+		auto module = (Smx46Module *)g_slots[slotIndex];
+		module->toggleRoute(x, y);
+    }
 }
 
 void action_dib_smx46_toggle_relay() {
@@ -1588,46 +1612,99 @@ void action_dib_smx46_toggle_relay() {
 }
 
 static char *g_labelPointer;
+static char g_labelDefault[Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
 
 void onSetLabel(char *value) {
     stringCopy(g_labelPointer, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1, value);
     popPage();
 }
 
+void onSetLabelDefault() {
+	stringCopy(g_labelPointer, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH + 1, g_labelDefault);
+	popPage();
+}
+
 void action_dib_smx46_edit_x_label() {
     int cursor = getFoundWidgetAtDown().cursor;
     int i = cursor % NUM_COLUMNS;
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
-    g_labelPointer = &page->columnLabels[i][0];
-    Keypad::startPush("Label: ", g_labelPointer, 1, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH, false, onSetLabel, popPage);
+    if (page) {
+        g_labelPointer = &page->columnLabels[i][0];
+    } else {
+		int slotIndex = cursor / NUM_COLUMNS;
+        auto module = (Smx46Module *)g_slots[slotIndex];
+        g_labelPointer = &module->columnLabels[i][0];
+    }
+
+	g_labelDefault[0] = 'X';
+	g_labelDefault[1] = '1' + i;
+	g_labelDefault[2] = 0;
+
+    Keypad::startPush("Label: ", g_labelPointer, 1, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH, false, onSetLabel, popPage, onSetLabelDefault);
 }
 
 void action_dib_smx46_edit_y_label() {
     int cursor = getFoundWidgetAtDown().cursor;
     int i = cursor % NUM_ROWS;
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
-    g_labelPointer = &page->rowLabels[i][0];
-    Keypad::startPush("Label: ", g_labelPointer, 1, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH, false, onSetLabel, popPage);
+    if (page) {
+        g_labelPointer = &page->rowLabels[i][0];
+    } else {
+		int slotIndex = cursor / NUM_ROWS;
+		auto module = (Smx46Module *)g_slots[slotIndex];
+		g_labelPointer = &module->rowLabels[i][0];
+    }
+	
+	g_labelDefault[0] = 'Y';
+	g_labelDefault[1] = '1' + i;
+	g_labelDefault[2] = 0;
+	
+	Keypad::startPush("Label: ", g_labelPointer, 1, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH, false, onSetLabel, popPage, onSetLabelDefault);
 }
 
 void action_dib_smx46_clear_all_routes() {
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
-    page->routes = 0;
+    if (page) {
+        page->routes = 0;
+    } else {
+		int cursor = getFoundWidgetAtDown().cursor;
+		int slotIndex = cursor;
+		auto module = (Smx46Module *)g_slots[slotIndex];
+		module->routes = 0;
+    }
 }
 
 void action_dib_smx46_clear_all_labels() {
     ConfigureRoutesPage *page = (ConfigureRoutesPage *)getPage(PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES);
 
-    for (int i = 0; i < NUM_COLUMNS; i++) {
-        page->columnLabels[i][0] = 'X';
-        page->columnLabels[i][1] = '1' + i;
-        page->columnLabels[i][2] = 0;
-    }
+    if (page) {
+        for (int i = 0; i < NUM_COLUMNS; i++) {
+            page->columnLabels[i][0] = 'X';
+            page->columnLabels[i][1] = '1' + i;
+            page->columnLabels[i][2] = 0;
+        }
 
-    for (int i = 0; i < NUM_ROWS; i++) {
-        page->rowLabels[i][0] = 'Y';
-        page->rowLabels[i][1] = '1' + i;
-        page->rowLabels[i][2] = 0;
+        for (int i = 0; i < NUM_ROWS; i++) {
+            page->rowLabels[i][0] = 'Y';
+            page->rowLabels[i][1] = '1' + i;
+            page->rowLabels[i][2] = 0;
+        }
+    } else {
+		int cursor = getFoundWidgetAtDown().cursor;
+		int slotIndex = cursor;
+		auto module = (Smx46Module *)g_slots[slotIndex];
+
+        for (int i = 0; i < NUM_COLUMNS; i++) {
+            module->columnLabels[i][0] = 'X';
+            module->columnLabels[i][1] = '1' + i;
+            module->columnLabels[i][2] = 0;
+        }
+
+        for (int i = 0; i < NUM_ROWS; i++) {
+            module->rowLabels[i][0] = 'Y';
+            module->rowLabels[i][1] = '1' + i;
+            module->rowLabels[i][2] = 0;
+        }
     }
 
     refreshScreen();

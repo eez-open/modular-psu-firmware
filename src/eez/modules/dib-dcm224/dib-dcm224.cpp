@@ -507,7 +507,7 @@ public:
 		return new (buffer) DcmChannel(slotIndex, channelIndex, subchannelIndex);
 	}
 
-    void onPowerDown() {
+    void onPowerDown() override {
 #if defined(EEZ_PLATFORM_STM32)
     	if (synchronized) {
     		transfer();
@@ -646,7 +646,7 @@ public:
 
     Page *getPageFromId(int pageId) override;
 
-    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
+    int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
 
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
@@ -685,7 +685,7 @@ public:
     bool writePowerChannelProfileProperties(profile::WriteContext &ctx, const uint8_t *buffer) override;
     bool readPowerChannelProfileProperties(profile::ReadContext &ctx, uint8_t *buffer) override;
 
-    bool getSourcePwmState(int subchannelIndex, bool &enabled, int *err) {
+    bool getSourcePwmState(int subchannelIndex, bool &enabled, int *err) override {
         auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
         if (!channel) {
             if (err) {
@@ -699,7 +699,7 @@ public:
 		return true;
 	}
     
-    bool setSourcePwmState(int subchannelIndex, bool enabled, int *err) {
+    bool setSourcePwmState(int subchannelIndex, bool enabled, int *err) override  {
         auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
         if (!channel) {
             if (err) {
@@ -713,7 +713,7 @@ public:
 		return true;
 	}
 
-    bool getSourcePwmFrequency(int subchannelIndex, float &frequency, int *err) {
+    bool getSourcePwmFrequency(int subchannelIndex, float &frequency, int *err) override  {
         auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
         if (!channel) {
             if (err) {
@@ -727,7 +727,7 @@ public:
 		return true;
 	}
     
-    bool setSourcePwmFrequency(int subchannelIndex, float frequency, int *err) {
+    bool setSourcePwmFrequency(int subchannelIndex, float frequency, int *err) override  {
         auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
         if (!channel) {
             if (err) {
@@ -748,7 +748,7 @@ public:
 		return true;
 	}
 
-    bool getSourcePwmDuty(int subchannelIndex, float &duty, int *err) {
+    bool getSourcePwmDuty(int subchannelIndex, float &duty, int *err) override  {
         auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
         if (!channel) {
             if (err) {
@@ -762,7 +762,7 @@ public:
 		return true;
 	}
     
-    bool setSourcePwmDuty(int subchannelIndex, float duty, int *err) {
+    bool setSourcePwmDuty(int subchannelIndex, float duty, int *err) override  {
         auto channel = (DcmChannel *)Channel::getBySlotIndex(slotIndex, subchannelIndex);
         if (!channel) {
             if (err) {

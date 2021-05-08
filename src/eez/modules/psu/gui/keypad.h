@@ -204,32 +204,32 @@ public:
     void switchToKilo();
     void switchToMega();
 
-    void getKeypadText(char *text, size_t count);
+    void getKeypadText(char *text, size_t count) override;
     bool getText(char *text, size_t count);
 
-    void key(char ch);
-    void space();
+    void key(char ch) override;
+    void space() override;
     void caps();
-    void back();
-    void clear();
-    void sign();
-    void unit();
-    void option1();
-    void option2();
-    void option3();
-    void setMaxValue();
-    void setMinValue();
-    void setDefValue();
-    bool isOkEnabled();
-    void ok();
-    void cancel();
+    void back() override;
+    void clear() override;
+    void sign() override;
+    void unit() override;
+    void option1() override;
+    void option2() override;
+    void option3() override;
+    void setMaxValue() override;
+    void setMinValue() override;
+    void setDefValue() override;
+    bool isOkEnabled() override;
+    void ok() override;
+    void cancel() override;
 
 #if OPTION_ENCODER
-    void onEncoderClicked();
-    void onEncoder(int counter);
+    void onEncoderClicked() override;
+    void onEncoder(int counter) override;
 #endif
 
-    Unit getSwitchToUnit();
+    Unit getSwitchToUnit() override;
 
     virtual int getCursorPostion() override;
 

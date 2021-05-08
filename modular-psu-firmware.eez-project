@@ -47864,6 +47864,24 @@
             "size": 16,
             "encoding": 177
           }
+        },
+        {
+          "encoding": 193,
+          "x": 0,
+          "y": -3,
+          "width": 11,
+          "height": 16,
+          "dx": 11,
+          "glyphBitmap": {
+            "width": 11,
+            "height": 16,
+            "pixelArray": "35465667000e6d8c65000077c4ffff4bfeb2e5ffbd000006fcff9f0a0013e2ff4b0000e5ff0700000092ff650000e9ff070000007fff6f0000efff070000007fff720000f5ff070000007fff750000faff070000007fff790000ffff070000007fff7c0000ffff070000007fff7f0000ffff0700000081ff7f000000000000000085ff7f000000000000000089ff7f00000000000000008dff7f000000000000000090ff7f00000000000000007db26e"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
         }
       ]
     },
@@ -66781,7 +66799,7 @@
             }
           },
           {
-            "name": "MEASure:TEMPerature?",
+            "name": "MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]?",
             "parameters": [
               {
                 "name": "channels",

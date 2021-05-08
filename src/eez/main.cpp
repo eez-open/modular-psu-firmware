@@ -307,18 +307,18 @@ static int g_initialized = false;
 void mountFileSystem() {
     EM_ASM(
         FS.mkdir("/eez_modular_firmware");
-    FS.mount(IDBFS, {}, "/eez_modular_firmware");
+        FS.mount(IDBFS, {}, "/eez_modular_firmware");
 
-    //Module.print("start file sync..");
+        //Module.print("start file sync..");
 
-    //flag to check when data are synchronized
-    Module.syncdone = 0;
+        //flag to check when data are synchronized
+        Module.syncdone = 0;
 
-    FS.syncfs(true, function(err) {
-        assert(!err);
-        //Module.print("end file sync..");
-        Module.syncdone = 1;
-    });
+        FS.syncfs(true, function(err) {
+            assert(!err);
+            //Module.print("end file sync..");
+            Module.syncdone = 1;
+        });
     );
 }
 // clang-format on
