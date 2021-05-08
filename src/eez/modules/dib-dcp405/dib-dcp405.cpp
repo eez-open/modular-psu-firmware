@@ -206,7 +206,7 @@ struct DcpChannel : public Channel {
 		dac.init();
 	}
 
-	void onPowerDown() {
+	void onPowerDown() override {
 		Channel::onPowerDown();
 		ioexp.testResult = TEST_FAILED;
 	}
@@ -992,7 +992,7 @@ public:
 		channel->init();
 	}
 
-	int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) {
+	int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
 		int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
 		Channel &channel = Channel::get(cursor);
 

@@ -1500,8 +1500,6 @@ bool saveChannelCalibration(int slotIndex, int subchannelIndex) {
     return g_slots[slotIndex]->saveChannelCalibration(subchannelIndex, nullptr);
 }
 
-static const uint32_t RELAY_COUNTER_SIZE = 64;
-
 uint32_t readCounter(int slotIndex, int counterIndex) {
     uint32_t buffer[6];
 

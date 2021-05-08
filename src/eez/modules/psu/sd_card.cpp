@@ -649,7 +649,7 @@ bool getInfo(int diskDriveIndex, uint64_t &usedSpace, uint64_t &freeSpace, bool 
 
     usedSpace = g_usedSpace[diskDriveIndex];
     freeSpace = g_freeSpace[diskDriveIndex];
-    return g_result;
+    return g_result[diskDriveIndex];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

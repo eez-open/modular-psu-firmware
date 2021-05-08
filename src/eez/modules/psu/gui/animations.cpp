@@ -38,8 +38,6 @@ static const Rect g_workingAreaRectRightWithoutHeader = { 480, 32, 480, 208 };
 
 static const Rect g_statusLineRect = { 0, 240, 480, 32 };
 static const Rect g_statusLineRectBottom = { 0, 272, 480, 32 };
-static const Rect g_statusLineRectLeft = { -480, 240, 480, 32 };
-static const Rect g_statusLineRectRight = { 480, 240, 480, 32 };
 
 static const Rect g_vertDefRects[] = {
     {   0, 0, 160, 240 },
@@ -75,13 +73,6 @@ static const Rect g_minRects[] = {
     {   0, 168, 240, 72 },
     { 240, 168, 240, 72 }
 };
-
-static const Rect g_settingsRect = { 0, 0, 480, 168 };
-static const Rect g_settingsRectTop = { 0, -168, 480, 168 };
-static const Rect g_settingsRectLeft = { -480, 0, 480, 240 };
-static const Rect g_settingsRectRight = { 480, 0, 480, 240 };
-
-static const Rect g_settingsRectNoChannels = { 0, 0, 480, 240 };
 
 namespace eez {
 namespace psu {

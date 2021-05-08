@@ -145,6 +145,8 @@ enum {
 	POWER_DOWN_TUNE
 };
 
+#if !defined(__EMSCRIPTEN__)
+
 static const float g_clickTune[] = {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     440.0f, 1.0f / 32.0f,
@@ -171,6 +173,8 @@ static const float g_powerDownTune[] = {
     NOTE_G5, 1/5.0f,
     NAN // end!
 };
+
+#endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
 static const int16_t g_shutterSamples[] = {

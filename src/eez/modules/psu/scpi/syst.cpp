@@ -2227,22 +2227,25 @@ scpi_result_t scpi_cmd_systemChannelLabel(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemChannelLabelQ(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
+    ChannelList channelList;
+    param_channels(context, channelList);
+    if (channelList.numChannels == 0) {
         return SCPI_RES_ERR;
     }
 
-    const char *label;
-    auto err = g_slots[slotAndSubchannelIndex.slotIndex]->getChannelLabel(slotAndSubchannelIndex.subchannelIndex, label);
-    if (err != SCPI_RES_OK) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
+    for (int i = 0; i < channelList.numChannels; i++) {
+        const char *label;
+        auto err = g_slots[channelList.channels[i].slotIndex]->getChannelLabel(channelList.channels[i].subchannelIndex, label);
+        if (err != SCPI_RES_OK) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
 
-    if (*label) {
-        SCPI_ResultText(context, label);
-    } else {
-        SCPI_ResultText(context, g_slots[slotAndSubchannelIndex.slotIndex]->getDefaultChannelLabel(slotAndSubchannelIndex.subchannelIndex));
+        if (*label) {
+            SCPI_ResultText(context, label);
+        } else {
+            SCPI_ResultText(context, g_slots[channelList.channels[i].slotIndex]->getDefaultChannelLabel(channelList.channels[i].subchannelIndex));
+        }
     }
 
     return SCPI_RES_OK;

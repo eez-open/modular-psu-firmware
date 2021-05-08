@@ -3570,12 +3570,18 @@
               "top": 0,
               "width": 41,
               "height": 32,
-              "wireID": "b852a2dd-17fe-491a-9613-ad80bf6e742e",
-              "action": "show_main_page",
+              "wireID": "f9fe9a9b-577f-497e-bd2f-fd1c88fbbd3d",
+              "action": "show_previous_page",
               "style": {
-                "inheritFrom": "status_icon_enabled"
+                "inheritFrom": "status_bgnd",
+                "font": "Heydings14",
+                "alignVertical": "center",
+                "color": "status_line_text",
+                "backgroundColor": "status_line_background",
+                "activeColor": "status_line_background",
+                "activeBackgroundColor": "status_line_text"
               },
-              "text": "H"
+              "text": "E"
             },
             {
               "type": "Text",

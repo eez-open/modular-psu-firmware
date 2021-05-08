@@ -320,6 +320,12 @@ void lowPriorityThreadOneIter() {
                     return;
                 }
 
+                if (dlog_record::isExecuting() && dlog_record::g_recordingParameters.period < 1.0f) {
+                    g_screenshotGenerating = false;
+                    psu::gui::infoMessage("Taking a screenshot is not possible during DLOG recording.");
+                    return;
+                }
+
                 sound::playShutter();
 
                 const uint8_t *screenshotPixels = mcu::display::takeScreenshot();

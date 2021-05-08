@@ -84,7 +84,7 @@
     SCPI_COMMAND("MEASure[:SCALar]:POWer[:DC]?", scpi_cmd_measureScalarPowerDcQ) \
     SCPI_COMMAND("MEASure[:SCALar][:VOLTage][:DC]?", scpi_cmd_measureScalarVoltageDcQ) \
     SCPI_COMMAND("MEASure:DIGital[:BYTE]?", scpi_cmd_measureDigitalByteQ) \
-    SCPI_COMMAND("MEASure:TEMPerature?", scpi_cmd_measureTemperatureQ) \
+    SCPI_COMMAND("MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]?", scpi_cmd_measureScalarTemperatureThermistorDcQ) \
     SCPI_COMMAND("MEMory:NSTates?", scpi_cmd_memoryNstatesQ) \
     SCPI_COMMAND("MEMory:STATe:CATalog?", scpi_cmd_memoryStateCatalogQ) \
     SCPI_COMMAND("MEMory:STATe:DELete", scpi_cmd_memoryStateDelete) \
