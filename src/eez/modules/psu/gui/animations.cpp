@@ -270,6 +270,116 @@ void animateSlideRightWithoutHeader() {
 	g_animationState.easingRects = remapInOutQuad;
 }
 
+void animateSlideLeftInDefaultViewVert(int viewIndex) {
+	static const Rect g_defaultViewRectWithoutHeader[3] = {
+		{ 2, 32, 154, 204 },
+		{ 2 + 160, 32, 154, 204 },
+		{ 2 + 320, 32, 154, 204 }
+	};
+
+	static const Rect g_defaultViewRectLeftWithoutHeader[3] = {
+		{ 2 - 154, 32, 154, 204 },
+		{ 2 - 154 + 160, 32, 154, 204 },
+		{ 2 - 154 + 320, 32, 154, 204 }
+	};
+
+	static const Rect g_defaultViewRectRightWithoutHeader[3] = {
+		{ 2 + 154, 32, 154, 204 },
+		{ 2 + 154 + 160, 32, 154, 204 },
+		{ 2 + 154 + 320, 32, 154, 204 }
+	};
+
+	static const Rect g_defaultView2ColRectWithoutHeader[3] = {
+		{ 2, 32, 234, 204 },
+		{ 2 + 240, 32, 234, 204 }
+	};
+
+	static const Rect g_defaultView2ColRectLeftWithoutHeader[3] = {
+		{ 2 - 234, 32, 234, 204 },
+		{ 2 - 234 + 240, 32, 234, 204 }
+	};
+
+	static const Rect g_defaultView2ColRectRightWithoutHeader[3] = {
+		{ 2 + 234, 32, 234, 204 },
+		{ 2 + 234 + 240, 32, 234, 204 }
+	};
+
+	int i = 0;
+
+    if (g_isCol2Mode) {
+        if (g_slotIndexes[0] == viewIndex) {
+            viewIndex = 0;
+        } else {
+            viewIndex = 1;
+        }
+	    g_animRects[i++] = { BUFFER_OLD, g_defaultView2ColRectWithoutHeader[viewIndex], g_defaultView2ColRectLeftWithoutHeader[viewIndex], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    	g_animRects[i++] = { BUFFER_NEW, g_defaultView2ColRectRightWithoutHeader[viewIndex], g_defaultView2ColRectWithoutHeader[viewIndex], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    } else {
+	    g_animRects[i++] = { BUFFER_OLD, g_defaultViewRectWithoutHeader[viewIndex], g_defaultViewRectLeftWithoutHeader[viewIndex], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+	    g_animRects[i++] = { BUFFER_NEW, g_defaultViewRectRightWithoutHeader[viewIndex], g_defaultViewRectWithoutHeader[viewIndex], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+    }
+
+	animateRects(&g_psuAppContext, BUFFER_NEW, i, -1,
+        g_isCol2Mode ? &g_defaultView2ColRectWithoutHeader[viewIndex] : &g_defaultViewRectWithoutHeader[viewIndex]);
+
+	g_animationState.easingRects = remapInOutQuad;
+}
+
+void animateSlideLeftInDefaultViewHorz(int viewIndex) {
+	static const Rect g_defaultViewRectWithoutHeader[3] = {
+		{ 52, 2, 426, 74 },
+		{ 52, 2 + 80, 426, 74 },
+		{ 52, 2 + 160, 426, 74 }
+	};
+
+	static const Rect g_defaultViewRectLeftWithoutHeader[3] = {
+		{ 52 - 426, 2, 426, 74 },
+		{ 52 - 426, 2 + 80, 426, 74 },
+		{ 52 - 426, 2 + 160, 426, 74 }
+	};
+
+	static const Rect g_defaultViewRectRightWithoutHeader[3] = {
+		{ 52 + 426, 2, 426, 74 },
+		{ 52 + 426, 2 + 80, 426, 74 },
+		{ 52 + 426, 2 + 160, 426, 74 }
+	};
+
+	static const Rect g_defaultView2ColRectWithoutHeader[3] = {
+		{ 52, 2, 426, 114 },
+		{ 52, 2 + 120, 426, 114 },
+	};
+
+	static const Rect g_defaultView2ColRectLeftWithoutHeader[3] = {
+		{ 52 - 426, 2, 426, 114 },
+		{ 52 - 426, 2 + 120, 426, 114 },
+	};
+
+	static const Rect g_defaultView2ColRectRightWithoutHeader[3] = {
+		{ 52 + 426, 2, 426, 114 },
+		{ 52 + 426, 2 + 120, 426, 114 },
+	};
+
+	int i = 0;
+
+	if (g_isCol2Mode) {
+		if (g_slotIndexes[0] == viewIndex) {
+			viewIndex = 0;
+		} else {
+			viewIndex = 1;
+		}
+		g_animRects[i++] = { BUFFER_OLD, g_defaultView2ColRectWithoutHeader[viewIndex], g_defaultView2ColRectLeftWithoutHeader[viewIndex], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+		g_animRects[i++] = { BUFFER_NEW, g_defaultView2ColRectRightWithoutHeader[viewIndex], g_defaultView2ColRectWithoutHeader[viewIndex], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+	} else {
+		g_animRects[i++] = { BUFFER_OLD, g_defaultViewRectWithoutHeader[viewIndex], g_defaultViewRectLeftWithoutHeader[viewIndex], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+		g_animRects[i++] = { BUFFER_NEW, g_defaultViewRectRightWithoutHeader[viewIndex], g_defaultViewRectWithoutHeader[viewIndex], 0, OPACITY_SOLID, POSITION_TOP_LEFT };
+	}
+
+	animateRects(&g_psuAppContext, BUFFER_NEW, i, -1,
+		g_isCol2Mode ? &g_defaultView2ColRectWithoutHeader[viewIndex] : &g_defaultViewRectWithoutHeader[viewIndex]);
+
+	g_animationState.easingRects = remapInOutQuad;
+}
+
 void animateFadeOutFadeIn() {
     int i = 0;
     g_animRects[i++] = { BUFFER_SOLID_COLOR, g_displayRect, g_displayRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };

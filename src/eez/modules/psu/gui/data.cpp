@@ -971,6 +971,15 @@ void SLOT_TITLE_SETTINGS_value_to_text(const Value &value, char *text, int count
     }
 }
 
+bool compare_SLOT_SHORT_TITLE_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void SLOT_SHORT_TITLE_value_to_text(const Value &value, char *text, int count) {
+    int slotIndex = value.getInt() & 0xFF;
+    snprintf(text, count, "#%d", slotIndex + 1);
+}
+
 bool compare_MASTER_INFO_value(const Value &a, const Value &b) {
     return true;
 }
@@ -5181,6 +5190,12 @@ void data_slot_title_min(DataOperationEnum operation, Cursor cursor, Value &valu
 void data_slot_title_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value((g_channelIndex << 8) | hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_SETTINGS);
+    }
+}
+
+void data_slot_short_title(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_SHORT_TITLE);
     }
 }
 

@@ -242,6 +242,7 @@
           "style": {
             "inheritFrom": "default"
           },
+          "name": "Header",
           "widgets": [
             {
               "type": "Text",
@@ -289,541 +290,993 @@
           ]
         },
         {
-          "type": "ListWidget",
-          "left": 0,
-          "top": 32,
-          "width": 77,
-          "height": 161,
-          "wireID": "0aed51fb-9e53-4883-9871-141371a17565",
-          "data": "p1_relays",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "itemWidget": {
-            "type": "Container",
-            "left": 0,
-            "top": 0,
-            "width": 77,
-            "height": 23,
-            "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
-            "action": "",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "widgets": [
-              {
-                "type": "Select",
-                "left": 0,
-                "top": 0,
-                "width": 8,
-                "height": 23,
-                "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
-                "data": "p1_relay_is_first",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008f"
-                  },
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008e"
-                  }
-                ]
-              },
-              {
-                "type": "Select",
-                "left": 8,
-                "top": 0,
-                "width": 30,
-                "height": 23,
-                "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
-                "data": "p1_relay_is_on",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008c"
-                  },
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008d"
-                  }
-                ]
-              },
-              {
-                "type": "Text",
-                "left": 38,
-                "top": 0,
-                "width": 39,
-                "height": 22,
-                "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
-                "data": "p1_relay_label",
-                "action": "toggle_p1_relay",
-                "style": {
-                  "inheritFrom": "default_S_left_condensed",
-                  "color": "action_color",
-                  "backgroundColor": "text_enable_background",
-                  "activeColor": "text_enable_background",
-                  "activeBackgroundColor": "action_color",
-                  "padding": "0 0 0 2"
-                },
-                "text": ""
-              }
-            ]
-          },
-          "listType": "vertical",
-          "gap": 0
-        },
-        {
-          "type": "ListWidget",
-          "left": 77,
-          "top": 32,
-          "width": 77,
-          "height": 161,
-          "wireID": "f00ac182-94a2-4d7d-b831-1a6cbdc292dd",
-          "data": "p2_relays",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "itemWidget": {
-            "type": "Container",
-            "left": 0,
-            "top": 0,
-            "width": 77,
-            "height": 23,
-            "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
-            "action": "",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "widgets": [
-              {
-                "type": "Select",
-                "left": 0,
-                "top": 0,
-                "width": 8,
-                "height": 23,
-                "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
-                "data": "p2_relay_is_first",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008f"
-                  },
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008e"
-                  }
-                ]
-              },
-              {
-                "type": "Select",
-                "left": 8,
-                "top": 0,
-                "width": 30,
-                "height": 23,
-                "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
-                "data": "p2_relay_is_on",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008c"
-                  },
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008d"
-                  }
-                ]
-              },
-              {
-                "type": "Text",
-                "left": 38,
-                "top": 0,
-                "width": 39,
-                "height": 22,
-                "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
-                "data": "p2_relay_label",
-                "action": "toggle_p2_relay",
-                "style": {
-                  "inheritFrom": "default_S_left_condensed",
-                  "color": "action_color",
-                  "backgroundColor": "text_enable_background",
-                  "activeColor": "text_enable_background",
-                  "activeBackgroundColor": "action_color",
-                  "padding": "0 0 0 2"
-                },
-                "text": ""
-              }
-            ]
-          },
-          "listType": "vertical",
-          "gap": 0
-        },
-        {
           "type": "Container",
           "left": 0,
-          "top": 193,
-          "width": 77,
-          "height": 23,
-          "wireID": "cb44f5d5-2e2d-4cc1-822e-ee22c2fb0c4c",
+          "top": 32,
+          "width": 154,
+          "height": 204,
+          "wireID": "cc835975-d683-41ea-d6a9-8ff89fadd279",
           "style": {
             "inheritFrom": "default"
           },
-          "name": "ADIB1",
+          "name": "Body",
           "widgets": [
             {
-              "type": "Text",
+              "type": "ListWidget",
               "left": 0,
               "top": 0,
-              "width": 8,
-              "height": 23,
-              "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
-              "data": "",
-              "style": {
-                "inheritFrom": "image"
-              },
-              "text": "\\u008f"
-            },
-            {
-              "type": "Select",
-              "left": 8,
-              "top": 0,
-              "width": 30,
-              "height": 23,
-              "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
-              "data": "adib1_relay_is_on",
+              "width": 77,
+              "height": 161,
+              "wireID": "0aed51fb-9e53-4883-9871-141371a17565",
+              "data": "p1_relays",
               "style": {
                 "inheritFrom": "default"
               },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 77,
+                "height": 23,
+                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "left": 0,
+                    "top": 0,
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
+                    "data": "p1_relay_is_first",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 8,
+                        "height": 23,
+                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008f"
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 8,
+                        "height": 23,
+                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008e"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "left": 8,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                    "data": "p1_relay_is_on",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 30,
+                        "height": 23,
+                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008c"
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 30,
+                        "height": 23,
+                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008d"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "left": 38,
+                    "top": 0,
+                    "width": 39,
+                    "height": 22,
+                    "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                    "data": "p1_relay_label",
+                    "action": "toggle_p1_relay",
+                    "style": {
+                      "inheritFrom": "default_S_left_condensed",
+                      "color": "action_color",
+                      "backgroundColor": "text_enable_background",
+                      "activeColor": "text_enable_background",
+                      "activeBackgroundColor": "action_color",
+                      "padding": "0 0 0 2"
+                    },
+                    "text": ""
+                  }
+                ]
+              },
+              "listType": "vertical",
+              "gap": 0
+            },
+            {
+              "type": "ListWidget",
+              "left": 77,
+              "top": 0,
+              "width": 77,
+              "height": 161,
+              "wireID": "f00ac182-94a2-4d7d-b831-1a6cbdc292dd",
+              "data": "p2_relays",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 77,
+                "height": 23,
+                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "left": 0,
+                    "top": 0,
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
+                    "data": "p2_relay_is_first",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 8,
+                        "height": 23,
+                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008f"
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 8,
+                        "height": 23,
+                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008e"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "left": 8,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                    "data": "p2_relay_is_on",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 30,
+                        "height": 23,
+                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008c"
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 30,
+                        "height": 23,
+                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008d"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "left": 38,
+                    "top": 0,
+                    "width": 39,
+                    "height": 22,
+                    "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                    "data": "p2_relay_label",
+                    "action": "toggle_p2_relay",
+                    "style": {
+                      "inheritFrom": "default_S_left_condensed",
+                      "color": "action_color",
+                      "backgroundColor": "text_enable_background",
+                      "activeColor": "text_enable_background",
+                      "activeBackgroundColor": "action_color",
+                      "padding": "0 0 0 2"
+                    },
+                    "text": ""
+                  }
+                ]
+              },
+              "listType": "vertical",
+              "gap": 0
+            },
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 161,
+              "width": 77,
+              "height": 23,
+              "wireID": "cb44f5d5-2e2d-4cc1-822e-ee22c2fb0c4c",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "name": "ADIB1",
               "widgets": [
                 {
                   "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 30,
+                  "width": 8,
                   "height": 23,
-                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                  "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
                   "data": "",
                   "style": {
                     "inheritFrom": "image"
                   },
-                  "text": "\\u008c"
+                  "text": "\\u008f"
                 },
                 {
-                  "type": "Text",
-                  "left": 0,
+                  "type": "Select",
+                  "left": 8,
                   "top": 0,
                   "width": 30,
                   "height": 23,
-                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                  "data": "",
+                  "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
+                  "data": "adib1_relay_is_on",
                   "style": {
-                    "inheritFrom": "image"
+                    "inheritFrom": "default"
                   },
-                  "text": "\\u008d"
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 30,
+                      "height": 23,
+                      "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image"
+                      },
+                      "text": "\\u008c"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 30,
+                      "height": 23,
+                      "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image"
+                      },
+                      "text": "\\u008d"
+                    }
+                  ]
+                },
+                {
+                  "type": "Text",
+                  "left": 38,
+                  "top": 0,
+                  "width": 39,
+                  "height": 22,
+                  "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+                  "data": "",
+                  "action": "toggle_adib1_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "color": "action_color",
+                    "backgroundColor": "text_enable_background",
+                    "activeColor": "text_enable_background",
+                    "activeBackgroundColor": "action_color",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB1"
                 }
               ]
             },
             {
-              "type": "Text",
-              "left": 38,
-              "top": 0,
-              "width": 39,
-              "height": 22,
-              "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
-              "data": "",
-              "action": "toggle_adib1_relay",
-              "style": {
-                "inheritFrom": "default_S_left_condensed",
-                "color": "action_color",
-                "backgroundColor": "text_enable_background",
-                "activeColor": "text_enable_background",
-                "activeBackgroundColor": "action_color",
-                "padding": "0 0 0 2"
-              },
-              "text": "ADIB1"
-            }
-          ]
-        },
-        {
-          "type": "Container",
-          "left": 0,
-          "top": 216,
-          "width": 124,
-          "height": 20,
-          "wireID": "121c449d-87d4-419b-eb27-82cc516781ee",
-          "action": "",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "name": "ext relay",
-          "widgets": [
-            {
-              "type": "Text",
+              "type": "Container",
               "left": 0,
-              "top": 0,
-              "width": 51,
+              "top": 184,
+              "width": 124,
               "height": 20,
-              "wireID": "41cf1c17-642b-43f7-ac9e-6b36bc989bed",
-              "data": "",
-              "style": {
-                "inheritFrom": "image"
-              },
-              "text": "\\u0090"
-            },
-            {
-              "type": "Select",
-              "left": 51,
-              "top": 0,
-              "width": 28,
-              "height": 20,
-              "wireID": "07d0d256-f5cb-450a-b63d-cb5cfcc5357e",
-              "data": "ext_relay_is_on",
+              "wireID": "121c449d-87d4-419b-eb27-82cc516781ee",
+              "action": "",
               "style": {
                 "inheritFrom": "default"
               },
+              "name": "ext relay",
               "widgets": [
                 {
                   "type": "Text",
                   "left": 0,
+                  "top": 0,
+                  "width": 51,
+                  "height": 20,
+                  "wireID": "41cf1c17-642b-43f7-ac9e-6b36bc989bed",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0090"
+                },
+                {
+                  "type": "Select",
+                  "left": 51,
                   "top": 0,
                   "width": 28,
                   "height": 20,
-                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                  "data": "",
+                  "wireID": "07d0d256-f5cb-450a-b63d-cb5cfcc5357e",
+                  "data": "ext_relay_is_on",
                   "style": {
-                    "inheritFrom": "image",
-                    "padding": "1 0 0 0"
+                    "inheritFrom": "default"
                   },
-                  "text": "\\u008c"
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 28,
+                      "height": 20,
+                      "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image",
+                        "padding": "1 0 0 0"
+                      },
+                      "text": "\\u008c"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 28,
+                      "height": 20,
+                      "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image",
+                        "padding": "1 0 0 0"
+                      },
+                      "text": "\\u008d"
+                    }
+                  ]
                 },
                 {
                   "type": "Text",
-                  "left": 0,
+                  "left": 79,
                   "top": 0,
-                  "width": 28,
+                  "width": 6,
                   "height": 20,
-                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                  "wireID": "52dd2d67-12b1-4a20-ecdb-bdfa60ee4e33",
                   "data": "",
                   "style": {
-                    "inheritFrom": "image",
-                    "padding": "1 0 0 0"
+                    "inheritFrom": "image"
                   },
-                  "text": "\\u008d"
+                  "text": "\\u0091"
+                },
+                {
+                  "type": "Text",
+                  "left": 85,
+                  "top": 0,
+                  "width": 39,
+                  "height": 20,
+                  "wireID": "967a30ec-79a3-48b7-e056-0fcd4885c416",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "action_color",
+                    "backgroundColor": "text_enable_background",
+                    "activeColor": "text_enable_background",
+                    "activeBackgroundColor": "action_color"
+                  },
+                  "text": "EXT"
                 }
               ]
             },
             {
-              "type": "Text",
-              "left": 79,
-              "top": 0,
-              "width": 6,
-              "height": 20,
-              "wireID": "52dd2d67-12b1-4a20-ecdb-bdfa60ee4e33",
-              "data": "",
-              "style": {
-                "inheritFrom": "image"
-              },
-              "text": "\\u0091"
-            },
-            {
-              "type": "Text",
-              "left": 85,
-              "top": 0,
-              "width": 39,
-              "height": 20,
-              "wireID": "967a30ec-79a3-48b7-e056-0fcd4885c416",
-              "data": "",
-              "action": "toggle_ext_relay",
-              "style": {
-                "inheritFrom": "default_S_left_condensed",
-                "alignHorizontal": "center",
-                "color": "action_color",
-                "backgroundColor": "text_enable_background",
-                "activeColor": "text_enable_background",
-                "activeBackgroundColor": "action_color"
-              },
-              "text": "EXT"
-            }
-          ]
-        },
-        {
-          "type": "Container",
-          "left": 77,
-          "top": 193,
-          "width": 77,
-          "height": 23,
-          "wireID": "143360bb-2de7-4575-ca14-79e43b850426",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "name": "ADIB1",
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 8,
+              "type": "Container",
+              "left": 77,
+              "top": 161,
+              "width": 77,
               "height": 23,
-              "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
-              "data": "",
-              "style": {
-                "inheritFrom": "image"
-              },
-              "text": "\\u008f"
-            },
-            {
-              "type": "Select",
-              "left": 8,
-              "top": 0,
-              "width": 30,
-              "height": 23,
-              "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
-              "data": "adib2_relay_is_on",
+              "wireID": "143360bb-2de7-4575-ca14-79e43b850426",
               "style": {
                 "inheritFrom": "default"
               },
+              "name": "ADIB1",
               "widgets": [
                 {
                   "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 30,
+                  "width": 8,
                   "height": 23,
-                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                  "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
                   "data": "",
                   "style": {
                     "inheritFrom": "image"
                   },
-                  "text": "\\u008c"
+                  "text": "\\u008f"
                 },
                 {
-                  "type": "Text",
-                  "left": 0,
+                  "type": "Select",
+                  "left": 8,
                   "top": 0,
                   "width": 30,
                   "height": 23,
-                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                  "data": "",
+                  "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
+                  "data": "adib2_relay_is_on",
                   "style": {
-                    "inheritFrom": "image"
+                    "inheritFrom": "default"
                   },
-                  "text": "\\u008d"
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 30,
+                      "height": 23,
+                      "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image"
+                      },
+                      "text": "\\u008c"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 30,
+                      "height": 23,
+                      "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image"
+                      },
+                      "text": "\\u008d"
+                    }
+                  ]
+                },
+                {
+                  "type": "Text",
+                  "left": 38,
+                  "top": 0,
+                  "width": 39,
+                  "height": 22,
+                  "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+                  "data": "",
+                  "action": "toggle_adib2_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "color": "action_color",
+                    "backgroundColor": "text_enable_background",
+                    "activeColor": "text_enable_background",
+                    "activeBackgroundColor": "action_color",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB2"
                 }
               ]
-            },
-            {
-              "type": "Text",
-              "left": 38,
-              "top": 0,
-              "width": 39,
-              "height": 22,
-              "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
-              "data": "",
-              "action": "toggle_adib2_relay",
-              "style": {
-                "inheritFrom": "default_S_left_condensed",
-                "color": "action_color",
-                "backgroundColor": "text_enable_background",
-                "activeColor": "text_enable_background",
-                "activeBackgroundColor": "action_color",
-                "padding": "0 0 0 2"
-              },
-              "text": "ADIB2"
             }
           ]
         }
       ],
       "connectionLines": [],
-      "name": "slot_view_def",
+      "name": "slot_view_def_vert",
       "style": "default",
       "left": 0,
       "top": 0,
       "width": 154,
       "height": 236,
+      "dataContextOverrides": "{\"slot_title_def\": \"MUX14D\"}"
+    },
+    {
+      "components": [
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 0,
+          "width": 52,
+          "height": 74,
+          "wireID": "b6b5583a-1865-4b2e-f348-b2969ba19f90",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Header",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 28,
+              "height": 37,
+              "wireID": "64588c98-cce9-4807-b959-53c90735f2fa",
+              "data": "slot_short_title",
+              "style": {
+                "inheritFrom": "channel1",
+                "alignHorizontal": "left",
+                "padding": "0 5"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 37,
+              "width": 52,
+              "height": 37,
+              "wireID": "74cad857-c6de-4514-f3da-8a5b7c415381",
+              "action": "show_slot_settings",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14"
+              },
+              "text": "D"
+            },
+            {
+              "type": "Text",
+              "left": 28,
+              "top": 0,
+              "width": 24,
+              "height": 37,
+              "wireID": "56321d7d-5017-46b7-a0ed-d32ba6de7732",
+              "action": "toggle_slot_max_view",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14"
+              },
+              "text": "e"
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 54,
+          "top": 2,
+          "width": 422,
+          "height": 70,
+          "wireID": "be23032b-0a77-47d4-ea6a-2a3074518a07",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Body",
+          "widgets": [
+            {
+              "type": "ListWidget",
+              "left": 0,
+              "top": 0,
+              "width": 329,
+              "height": 34,
+              "wireID": "0aed51fb-9e53-4883-9871-141371a17565",
+              "data": "p1_relays",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 47,
+                "height": 34,
+                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "left": 0,
+                    "top": 0,
+                    "width": 47,
+                    "height": 34,
+                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                    "data": "p1_relay_is_on",
+                    "action": "",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 46,
+                        "height": 34,
+                        "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                        "data": "p1_relay_label",
+                        "action": "toggle_p1_relay",
+                        "style": {
+                          "inheritFrom": "default_S_left_condensed",
+                          "alignHorizontal": "center",
+                          "color": "action_color",
+                          "backgroundColor": "background",
+                          "activeColor": "background",
+                          "activeBackgroundColor": "action_color",
+                          "borderSize": "1",
+                          "padding": "0 0 0 2"
+                        },
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 46,
+                        "height": 34,
+                        "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                        "data": "p1_relay_label",
+                        "action": "toggle_p1_relay",
+                        "style": {
+                          "inheritFrom": "default_S_left_condensed",
+                          "alignHorizontal": "center",
+                          "color": "background",
+                          "backgroundColor": "action_color",
+                          "activeColor": "action_color",
+                          "activeBackgroundColor": "background",
+                          "borderSize": "1",
+                          "padding": "0 0 0 2"
+                        },
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              "listType": "horizontal",
+              "gap": 0
+            },
+            {
+              "type": "ListWidget",
+              "left": 0,
+              "top": 36,
+              "width": 329,
+              "height": 34,
+              "wireID": "f00ac182-94a2-4d7d-b831-1a6cbdc292dd",
+              "data": "p2_relays",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 47,
+                "height": 34,
+                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "left": 0,
+                    "top": 0,
+                    "width": 47,
+                    "height": 34,
+                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                    "data": "p2_relay_is_on",
+                    "action": "",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 46,
+                        "height": 34,
+                        "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                        "data": "p2_relay_label",
+                        "action": "toggle_p2_relay",
+                        "style": {
+                          "inheritFrom": "default_S_left_condensed",
+                          "alignHorizontal": "center",
+                          "color": "action_color",
+                          "backgroundColor": "background",
+                          "activeColor": "background",
+                          "activeBackgroundColor": "action_color",
+                          "borderSize": "1",
+                          "padding": "0 0 0 2"
+                        },
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 46,
+                        "height": 34,
+                        "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                        "data": "p2_relay_label",
+                        "action": "toggle_p2_relay",
+                        "style": {
+                          "inheritFrom": "default_S_left_condensed",
+                          "alignHorizontal": "center",
+                          "color": "background",
+                          "backgroundColor": "action_color",
+                          "activeColor": "action_color",
+                          "activeBackgroundColor": "background",
+                          "borderSize": "1",
+                          "padding": "0 0 0 2"
+                        },
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              "listType": "horizontal",
+              "gap": 0
+            },
+            {
+              "type": "Select",
+              "left": 331,
+              "top": 0,
+              "width": 45,
+              "height": 34,
+              "wireID": "e7de145c-b0e0-43a0-a920-f5b1534346ec",
+              "data": "ext_relay_is_on",
+              "action": "",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 45,
+                  "height": 34,
+                  "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "action_color",
+                    "backgroundColor": "background",
+                    "activeColor": "background",
+                    "activeBackgroundColor": "action_color",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "EXT"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 45,
+                  "height": 34,
+                  "wireID": "10cac080-1955-4be5-9bd9-4a1fb68cb4a4",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "background",
+                    "backgroundColor": "action_color",
+                    "activeColor": "action_color",
+                    "activeBackgroundColor": "background",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "EXT"
+                }
+              ]
+            },
+            {
+              "type": "TextWidget",
+              "left": 331,
+              "top": 36,
+              "width": 45,
+              "height": 34,
+              "wireID": "18b4d889-f19a-4a09-d33d-62134b4d21a1",
+              "data": "cj_temp",
+              "style": {
+                "inheritFrom": "default_S",
+                "font": "RobotoCondensed-Regular"
+              },
+              "text": ""
+            },
+            {
+              "type": "Select",
+              "left": 377,
+              "top": 0,
+              "width": 45,
+              "height": 34,
+              "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
+              "data": "adib1_relay_is_on",
+              "action": "",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 45,
+                  "height": 34,
+                  "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+                  "data": "",
+                  "action": "toggle_adib1_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "action_color",
+                    "backgroundColor": "background",
+                    "activeColor": "background",
+                    "activeBackgroundColor": "action_color",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB1"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 45,
+                  "height": 34,
+                  "wireID": "10cac080-1955-4be5-9bd9-4a1fb68cb4a4",
+                  "data": "",
+                  "action": "toggle_adib1_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "background",
+                    "backgroundColor": "action_color",
+                    "activeColor": "action_color",
+                    "activeBackgroundColor": "background",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB1"
+                }
+              ]
+            },
+            {
+              "type": "Select",
+              "left": 377,
+              "top": 36,
+              "width": 45,
+              "height": 34,
+              "wireID": "bce0570a-dc3c-44af-de44-4170fd5d0ccb",
+              "data": "adib2_relay_is_on",
+              "action": "",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 45,
+                  "height": 34,
+                  "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+                  "data": "",
+                  "action": "toggle_adib2_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "action_color",
+                    "backgroundColor": "background",
+                    "activeColor": "background",
+                    "activeBackgroundColor": "action_color",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB2"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 45,
+                  "height": 34,
+                  "wireID": "10cac080-1955-4be5-9bd9-4a1fb68cb4a4",
+                  "data": "",
+                  "action": "toggle_adib2_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "background",
+                    "backgroundColor": "action_color",
+                    "activeColor": "action_color",
+                    "activeBackgroundColor": "background",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB2"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "name": "slot_view_def_horz",
+      "style": "default",
+      "left": 0,
+      "top": 0,
+      "width": 478,
+      "height": 74,
       "dataContextOverrides": "{\"slot_title_def\": \"MUX14D\"}"
     },
     {
@@ -838,6 +1291,7 @@
           "style": {
             "inheritFrom": "default"
           },
+          "name": "Header",
           "widgets": [
             {
               "type": "Text",
@@ -885,541 +1339,1034 @@
           ]
         },
         {
-          "type": "ListWidget",
-          "left": 40,
-          "top": 32,
-          "width": 77,
-          "height": 161,
-          "wireID": "8dffee70-7ea1-4b0f-cf2b-8fb66403575d",
-          "data": "p1_relays",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "itemWidget": {
-            "type": "Container",
-            "left": 0,
-            "top": 0,
-            "width": 77,
-            "height": 23,
-            "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
-            "action": "",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "widgets": [
-              {
-                "type": "Select",
-                "left": 0,
-                "top": 0,
-                "width": 8,
-                "height": 23,
-                "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
-                "data": "p1_relay_is_first",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008f"
-                  },
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008e"
-                  }
-                ]
-              },
-              {
-                "type": "Select",
-                "left": 8,
-                "top": 0,
-                "width": 30,
-                "height": 23,
-                "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
-                "data": "p1_relay_is_on",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008c"
-                  },
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008d"
-                  }
-                ]
-              },
-              {
-                "type": "Text",
-                "left": 38,
-                "top": 0,
-                "width": 39,
-                "height": 22,
-                "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
-                "data": "p1_relay_label",
-                "action": "toggle_p1_relay",
-                "style": {
-                  "inheritFrom": "default_S_left_condensed",
-                  "color": "action_color",
-                  "backgroundColor": "text_enable_background",
-                  "activeColor": "text_enable_background",
-                  "activeBackgroundColor": "action_color",
-                  "padding": "0 0 0 2"
-                },
-                "text": ""
-              }
-            ]
-          },
-          "listType": "vertical",
-          "gap": 0
-        },
-        {
-          "type": "ListWidget",
-          "left": 117,
-          "top": 32,
-          "width": 77,
-          "height": 161,
-          "wireID": "70881278-27bd-44ce-e00c-cd986f211261",
-          "data": "p2_relays",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "itemWidget": {
-            "type": "Container",
-            "left": 0,
-            "top": 0,
-            "width": 77,
-            "height": 23,
-            "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
-            "action": "",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "widgets": [
-              {
-                "type": "Select",
-                "left": 0,
-                "top": 0,
-                "width": 8,
-                "height": 23,
-                "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
-                "data": "p2_relay_is_first",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008f"
-                  },
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 8,
-                    "height": 23,
-                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008e"
-                  }
-                ]
-              },
-              {
-                "type": "Select",
-                "left": 8,
-                "top": 0,
-                "width": 30,
-                "height": 23,
-                "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
-                "data": "p2_relay_is_on",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "widgets": [
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008c"
-                  },
-                  {
-                    "type": "Text",
-                    "left": 0,
-                    "top": 0,
-                    "width": 30,
-                    "height": 23,
-                    "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                    "data": "",
-                    "style": {
-                      "inheritFrom": "image"
-                    },
-                    "text": "\\u008d"
-                  }
-                ]
-              },
-              {
-                "type": "Text",
-                "left": 38,
-                "top": 0,
-                "width": 39,
-                "height": 22,
-                "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
-                "data": "p2_relay_label",
-                "action": "toggle_p2_relay",
-                "style": {
-                  "inheritFrom": "default_S_left_condensed",
-                  "color": "action_color",
-                  "backgroundColor": "text_enable_background",
-                  "activeColor": "text_enable_background",
-                  "activeBackgroundColor": "action_color",
-                  "padding": "0 0 0 2"
-                },
-                "text": ""
-              }
-            ]
-          },
-          "listType": "vertical",
-          "gap": 0
-        },
-        {
           "type": "Container",
           "left": 40,
-          "top": 193,
-          "width": 77,
-          "height": 23,
-          "wireID": "1281b982-bcd8-4ab9-cafb-7b2c1ce2c995",
+          "top": 32,
+          "width": 154,
+          "height": 204,
+          "wireID": "5b9f35ba-055b-4b5c-845e-fede0d37516c",
           "style": {
             "inheritFrom": "default"
           },
-          "name": "ADIB1",
+          "name": "Body",
           "widgets": [
             {
-              "type": "Text",
+              "type": "ListWidget",
               "left": 0,
               "top": 0,
-              "width": 8,
-              "height": 23,
-              "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
-              "data": "",
-              "style": {
-                "inheritFrom": "image"
-              },
-              "text": "\\u008f"
-            },
-            {
-              "type": "Select",
-              "left": 8,
-              "top": 0,
-              "width": 30,
-              "height": 23,
-              "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
-              "data": "adib1_relay_is_on",
+              "width": 77,
+              "height": 161,
+              "wireID": "8dffee70-7ea1-4b0f-cf2b-8fb66403575d",
+              "data": "p1_relays",
               "style": {
                 "inheritFrom": "default"
               },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 77,
+                "height": 23,
+                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "left": 0,
+                    "top": 0,
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
+                    "data": "p1_relay_is_first",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 8,
+                        "height": 23,
+                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008f"
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 8,
+                        "height": 23,
+                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008e"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "left": 8,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                    "data": "p1_relay_is_on",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 30,
+                        "height": 23,
+                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008c"
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 30,
+                        "height": 23,
+                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008d"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "left": 38,
+                    "top": 0,
+                    "width": 39,
+                    "height": 22,
+                    "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                    "data": "p1_relay_label",
+                    "action": "toggle_p1_relay",
+                    "style": {
+                      "inheritFrom": "default_S_left_condensed",
+                      "color": "action_color",
+                      "backgroundColor": "text_enable_background",
+                      "activeColor": "text_enable_background",
+                      "activeBackgroundColor": "action_color",
+                      "padding": "0 0 0 2"
+                    },
+                    "text": ""
+                  }
+                ]
+              },
+              "listType": "vertical",
+              "gap": 0
+            },
+            {
+              "type": "ListWidget",
+              "left": 77,
+              "top": 0,
+              "width": 77,
+              "height": 161,
+              "wireID": "70881278-27bd-44ce-e00c-cd986f211261",
+              "data": "p2_relays",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 77,
+                "height": 23,
+                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "left": 0,
+                    "top": 0,
+                    "width": 8,
+                    "height": 23,
+                    "wireID": "3031fb3e-383d-4033-a320-d73d2398a28d",
+                    "data": "p2_relay_is_first",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 8,
+                        "height": 23,
+                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008f"
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 8,
+                        "height": 23,
+                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008e"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "left": 8,
+                    "top": 0,
+                    "width": 30,
+                    "height": 23,
+                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                    "data": "p2_relay_is_on",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 30,
+                        "height": 23,
+                        "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008c"
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 30,
+                        "height": 23,
+                        "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                        "data": "",
+                        "style": {
+                          "inheritFrom": "image"
+                        },
+                        "text": "\\u008d"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "left": 38,
+                    "top": 0,
+                    "width": 39,
+                    "height": 22,
+                    "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                    "data": "p2_relay_label",
+                    "action": "toggle_p2_relay",
+                    "style": {
+                      "inheritFrom": "default_S_left_condensed",
+                      "color": "action_color",
+                      "backgroundColor": "text_enable_background",
+                      "activeColor": "text_enable_background",
+                      "activeBackgroundColor": "action_color",
+                      "padding": "0 0 0 2"
+                    },
+                    "text": ""
+                  }
+                ]
+              },
+              "listType": "vertical",
+              "gap": 0
+            },
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 161,
+              "width": 77,
+              "height": 23,
+              "wireID": "1281b982-bcd8-4ab9-cafb-7b2c1ce2c995",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "name": "ADIB1",
               "widgets": [
                 {
                   "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 30,
+                  "width": 8,
                   "height": 23,
-                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                  "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
                   "data": "",
                   "style": {
                     "inheritFrom": "image"
                   },
-                  "text": "\\u008c"
+                  "text": "\\u008f"
                 },
                 {
-                  "type": "Text",
-                  "left": 0,
+                  "type": "Select",
+                  "left": 8,
                   "top": 0,
                   "width": 30,
                   "height": 23,
-                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                  "data": "",
+                  "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
+                  "data": "adib1_relay_is_on",
                   "style": {
-                    "inheritFrom": "image"
+                    "inheritFrom": "default"
                   },
-                  "text": "\\u008d"
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 30,
+                      "height": 23,
+                      "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image"
+                      },
+                      "text": "\\u008c"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 30,
+                      "height": 23,
+                      "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image"
+                      },
+                      "text": "\\u008d"
+                    }
+                  ]
+                },
+                {
+                  "type": "Text",
+                  "left": 38,
+                  "top": 0,
+                  "width": 39,
+                  "height": 22,
+                  "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+                  "data": "",
+                  "action": "toggle_adib1_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "color": "action_color",
+                    "backgroundColor": "text_enable_background",
+                    "activeColor": "text_enable_background",
+                    "activeBackgroundColor": "action_color",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB1"
                 }
               ]
             },
             {
-              "type": "Text",
-              "left": 38,
-              "top": 0,
-              "width": 39,
-              "height": 22,
-              "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
-              "data": "",
-              "action": "toggle_adib1_relay",
-              "style": {
-                "inheritFrom": "default_S_left_condensed",
-                "color": "action_color",
-                "backgroundColor": "text_enable_background",
-                "activeColor": "text_enable_background",
-                "activeBackgroundColor": "action_color",
-                "padding": "0 0 0 2"
-              },
-              "text": "ADIB1"
-            }
-          ]
-        },
-        {
-          "type": "Container",
-          "left": 40,
-          "top": 216,
-          "width": 124,
-          "height": 20,
-          "wireID": "53db0016-be49-4208-a828-71a9ef0065ab",
-          "action": "",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "name": "ext relay",
-          "widgets": [
-            {
-              "type": "Text",
+              "type": "Container",
               "left": 0,
-              "top": 0,
-              "width": 51,
+              "top": 184,
+              "width": 124,
               "height": 20,
-              "wireID": "41cf1c17-642b-43f7-ac9e-6b36bc989bed",
-              "data": "",
-              "style": {
-                "inheritFrom": "image"
-              },
-              "text": "\\u0090"
-            },
-            {
-              "type": "Select",
-              "left": 51,
-              "top": 0,
-              "width": 28,
-              "height": 20,
-              "wireID": "07d0d256-f5cb-450a-b63d-cb5cfcc5357e",
-              "data": "ext_relay_is_on",
+              "wireID": "53db0016-be49-4208-a828-71a9ef0065ab",
+              "action": "",
               "style": {
                 "inheritFrom": "default"
               },
+              "name": "ext relay",
               "widgets": [
                 {
                   "type": "Text",
                   "left": 0,
+                  "top": 0,
+                  "width": 51,
+                  "height": 20,
+                  "wireID": "41cf1c17-642b-43f7-ac9e-6b36bc989bed",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0090"
+                },
+                {
+                  "type": "Select",
+                  "left": 51,
                   "top": 0,
                   "width": 28,
                   "height": 20,
-                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
-                  "data": "",
+                  "wireID": "07d0d256-f5cb-450a-b63d-cb5cfcc5357e",
+                  "data": "ext_relay_is_on",
                   "style": {
-                    "inheritFrom": "image",
-                    "padding": "1 0 0 0"
+                    "inheritFrom": "default"
                   },
-                  "text": "\\u008c"
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 28,
+                      "height": 20,
+                      "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image",
+                        "padding": "1 0 0 0"
+                      },
+                      "text": "\\u008c"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 28,
+                      "height": 20,
+                      "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image",
+                        "padding": "1 0 0 0"
+                      },
+                      "text": "\\u008d"
+                    }
+                  ]
                 },
                 {
                   "type": "Text",
-                  "left": 0,
+                  "left": 79,
                   "top": 0,
-                  "width": 28,
+                  "width": 6,
                   "height": 20,
-                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                  "wireID": "52dd2d67-12b1-4a20-ecdb-bdfa60ee4e33",
                   "data": "",
                   "style": {
-                    "inheritFrom": "image",
-                    "padding": "1 0 0 0"
+                    "inheritFrom": "image"
                   },
-                  "text": "\\u008d"
+                  "text": "\\u0091"
+                },
+                {
+                  "type": "Text",
+                  "left": 85,
+                  "top": 0,
+                  "width": 39,
+                  "height": 20,
+                  "wireID": "967a30ec-79a3-48b7-e056-0fcd4885c416",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "action_color",
+                    "backgroundColor": "text_enable_background",
+                    "activeColor": "text_enable_background",
+                    "activeBackgroundColor": "action_color"
+                  },
+                  "text": "EXT"
                 }
               ]
             },
             {
-              "type": "Text",
-              "left": 79,
-              "top": 0,
-              "width": 6,
-              "height": 20,
-              "wireID": "52dd2d67-12b1-4a20-ecdb-bdfa60ee4e33",
-              "data": "",
-              "style": {
-                "inheritFrom": "image"
-              },
-              "text": "\\u0091"
-            },
-            {
-              "type": "Text",
-              "left": 85,
-              "top": 0,
-              "width": 39,
-              "height": 20,
-              "wireID": "967a30ec-79a3-48b7-e056-0fcd4885c416",
-              "data": "",
-              "action": "toggle_ext_relay",
-              "style": {
-                "inheritFrom": "default_S_left_condensed",
-                "alignHorizontal": "center",
-                "color": "action_color",
-                "backgroundColor": "text_enable_background",
-                "activeColor": "text_enable_background",
-                "activeBackgroundColor": "action_color"
-              },
-              "text": "EXT"
-            }
-          ]
-        },
-        {
-          "type": "Container",
-          "left": 117,
-          "top": 193,
-          "width": 77,
-          "height": 23,
-          "wireID": "7cf132a1-918e-48c9-a714-5e65388c67e2",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "name": "ADIB1",
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 8,
+              "type": "Container",
+              "left": 77,
+              "top": 161,
+              "width": 77,
               "height": 23,
-              "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
-              "data": "",
-              "style": {
-                "inheritFrom": "image"
-              },
-              "text": "\\u008f"
-            },
-            {
-              "type": "Select",
-              "left": 8,
-              "top": 0,
-              "width": 30,
-              "height": 23,
-              "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
-              "data": "adib2_relay_is_on",
+              "wireID": "7cf132a1-918e-48c9-a714-5e65388c67e2",
               "style": {
                 "inheritFrom": "default"
               },
+              "name": "ADIB1",
               "widgets": [
                 {
                   "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 30,
+                  "width": 8,
                   "height": 23,
-                  "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                  "wireID": "f7897357-1cb7-4124-d1e7-78f009de1e5d",
                   "data": "",
                   "style": {
                     "inheritFrom": "image"
                   },
-                  "text": "\\u008c"
+                  "text": "\\u008f"
                 },
                 {
-                  "type": "Text",
-                  "left": 0,
+                  "type": "Select",
+                  "left": 8,
                   "top": 0,
                   "width": 30,
                   "height": 23,
-                  "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
-                  "data": "",
+                  "wireID": "3985f7bc-cbb3-4306-b43e-0118cc8fdc7e",
+                  "data": "adib2_relay_is_on",
                   "style": {
-                    "inheritFrom": "image"
+                    "inheritFrom": "default"
                   },
-                  "text": "\\u008d"
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 30,
+                      "height": 23,
+                      "wireID": "f08df3b3-793c-47fc-dff2-a7d7b71a4132",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image"
+                      },
+                      "text": "\\u008c"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 30,
+                      "height": 23,
+                      "wireID": "87d78e10-0c1f-43c4-c664-d0d3356428f6",
+                      "data": "",
+                      "style": {
+                        "inheritFrom": "image"
+                      },
+                      "text": "\\u008d"
+                    }
+                  ]
+                },
+                {
+                  "type": "Text",
+                  "left": 38,
+                  "top": 0,
+                  "width": 39,
+                  "height": 22,
+                  "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+                  "data": "",
+                  "action": "toggle_adib2_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "color": "action_color",
+                    "backgroundColor": "text_enable_background",
+                    "activeColor": "text_enable_background",
+                    "activeBackgroundColor": "action_color",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB2"
                 }
               ]
-            },
-            {
-              "type": "Text",
-              "left": 38,
-              "top": 0,
-              "width": 39,
-              "height": 22,
-              "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
-              "data": "",
-              "action": "toggle_adib2_relay",
-              "style": {
-                "inheritFrom": "default_S_left_condensed",
-                "color": "action_color",
-                "backgroundColor": "text_enable_background",
-                "activeColor": "text_enable_background",
-                "activeBackgroundColor": "action_color",
-                "padding": "0 0 0 2"
-              },
-              "text": "ADIB2"
             }
           ]
         }
       ],
       "connectionLines": [],
-      "name": "slot_view_def_2col",
+      "name": "slot_view_def_2col_vert",
       "style": "default",
       "left": 0,
       "top": 0,
       "width": 234,
       "height": 236,
+      "dataContextOverrides": "{\"slot_title_def\": \"MUX14D\"}"
+    },
+    {
+      "components": [
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 0,
+          "width": 52,
+          "height": 114,
+          "wireID": "5a1c8d30-1bc1-4ec7-90bb-7d8f3a958e4c",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Header",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 52,
+              "height": 38,
+              "wireID": "701096d5-3c30-431f-9f7b-1c7162b778df",
+              "data": "slot_short_title",
+              "action": "",
+              "style": {
+                "inheritFrom": "channel1",
+                "padding": "3 5"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 38,
+              "width": 52,
+              "height": 38,
+              "wireID": "399301b2-0085-428d-db17-0fb6f5154d21",
+              "action": "show_slot_settings",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14"
+              },
+              "text": "D"
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 76,
+              "width": 52,
+              "height": 38,
+              "wireID": "8dd95ccc-40ea-4e98-8b0c-2725f1c45db7",
+              "action": "toggle_slot_max_view",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14",
+                "alignVertical": "top"
+              },
+              "text": "e"
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 52,
+          "top": 0,
+          "width": 426,
+          "height": 113,
+          "wireID": "6641a81e-5e5e-4492-c8aa-dc9644d65f60",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Body",
+          "widgets": [
+            {
+              "type": "ListWidget",
+              "left": 3,
+              "top": 1,
+              "width": 420,
+              "height": 34,
+              "wireID": "292bfeb5-fca0-4b33-9abe-e09a1cff09c0",
+              "data": "p1_relays",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 60,
+                "height": 34,
+                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "left": 0,
+                    "top": 0,
+                    "width": 59,
+                    "height": 34,
+                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                    "data": "p1_relay_is_on",
+                    "action": "",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 59,
+                        "height": 34,
+                        "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                        "data": "p1_relay_label",
+                        "action": "toggle_p1_relay",
+                        "style": {
+                          "inheritFrom": "default_S_left_condensed",
+                          "alignHorizontal": "center",
+                          "color": "action_color",
+                          "backgroundColor": "background",
+                          "activeColor": "background",
+                          "activeBackgroundColor": "action_color",
+                          "borderSize": "1",
+                          "padding": "0 0 0 2"
+                        },
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 59,
+                        "height": 34,
+                        "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                        "data": "p1_relay_label",
+                        "action": "toggle_p1_relay",
+                        "style": {
+                          "inheritFrom": "default_S_left_condensed",
+                          "alignHorizontal": "center",
+                          "color": "background",
+                          "backgroundColor": "action_color",
+                          "activeColor": "action_color",
+                          "activeBackgroundColor": "background",
+                          "borderSize": "1",
+                          "padding": "0 0 0 2"
+                        },
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              "listType": "horizontal",
+              "gap": 0
+            },
+            {
+              "type": "ListWidget",
+              "left": 3,
+              "top": 79,
+              "width": 420,
+              "height": 34,
+              "wireID": "c042ce55-66a9-40f9-a553-5e4c6ca3698e",
+              "data": "p2_relays",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 60,
+                "height": 34,
+                "wireID": "7e49984f-b60a-4845-bef2-bd0d302ff6e4",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Select",
+                    "left": 0,
+                    "top": 0,
+                    "width": 59,
+                    "height": 34,
+                    "wireID": "0981b24e-efff-44e2-ceb4-531a3f0ed149",
+                    "data": "p2_relay_is_on",
+                    "action": "",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 59,
+                        "height": 34,
+                        "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                        "data": "p2_relay_label",
+                        "action": "toggle_p2_relay",
+                        "style": {
+                          "inheritFrom": "default_S_left_condensed",
+                          "alignHorizontal": "center",
+                          "color": "action_color",
+                          "backgroundColor": "background",
+                          "activeColor": "background",
+                          "activeBackgroundColor": "action_color",
+                          "borderSize": "1",
+                          "padding": "0 0 0 2"
+                        },
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "left": 0,
+                        "top": 0,
+                        "width": 59,
+                        "height": 34,
+                        "wireID": "d8e6855e-10c3-4fc4-f259-2359e5717145",
+                        "data": "p2_relay_label",
+                        "action": "toggle_p2_relay",
+                        "style": {
+                          "inheritFrom": "default_S_left_condensed",
+                          "alignHorizontal": "center",
+                          "color": "background",
+                          "backgroundColor": "action_color",
+                          "activeColor": "action_color",
+                          "activeBackgroundColor": "background",
+                          "borderSize": "1",
+                          "padding": "0 0 0 2"
+                        },
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              "listType": "horizontal",
+              "gap": 0
+            },
+            {
+              "type": "Select",
+              "left": 3,
+              "top": 40,
+              "width": 59,
+              "height": 34,
+              "wireID": "6aefa194-4f8e-434a-b87b-ccaceee5576f",
+              "data": "ext_relay_is_on",
+              "action": "",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 59,
+                  "height": 34,
+                  "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "action_color",
+                    "backgroundColor": "background",
+                    "activeColor": "background",
+                    "activeBackgroundColor": "action_color",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "EXT"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 59,
+                  "height": 34,
+                  "wireID": "10cac080-1955-4be5-9bd9-4a1fb68cb4a4",
+                  "data": "",
+                  "action": "toggle_ext_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "background",
+                    "backgroundColor": "action_color",
+                    "activeColor": "action_color",
+                    "activeBackgroundColor": "background",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "EXT"
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 99,
+              "top": 36,
+              "width": 179,
+              "height": 42,
+              "wireID": "9e70d5ac-f942-4ec1-de13-e288813bf78a",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "name": "CJ Temp",
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 31,
+                  "height": 42,
+                  "wireID": "b23ef112-ff5b-4033-8f5c-6ff007a512af",
+                  "data": "",
+                  "action": "",
+                  "style": {
+                    "inheritFrom": "image"
+                  },
+                  "text": "\\u0098"
+                },
+                {
+                  "type": "TextWidget",
+                  "left": 31,
+                  "top": 5,
+                  "width": 74,
+                  "height": 32,
+                  "wireID": "6b7d3075-4efd-4f58-9c43-7aa9dd115b04",
+                  "style": {
+                    "inheritFrom": "default_S"
+                  },
+                  "text": "CJ Temp:"
+                },
+                {
+                  "type": "TextWidget",
+                  "left": 105,
+                  "top": 5,
+                  "width": 74,
+                  "height": 32,
+                  "wireID": "04b8cdd1-fbb9-436c-e64f-d21ffa0118ea",
+                  "data": "cj_temp",
+                  "style": {
+                    "inheritFrom": "default_S",
+                    "alignHorizontal": "left"
+                  },
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "type": "Select",
+              "left": 303,
+              "top": 40,
+              "width": 59,
+              "height": 34,
+              "wireID": "cec01a76-7342-4e4f-ba95-4380c89f352d",
+              "data": "adib1_relay_is_on",
+              "action": "",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 59,
+                  "height": 34,
+                  "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+                  "data": "",
+                  "action": "toggle_adib1_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "action_color",
+                    "backgroundColor": "background",
+                    "activeColor": "background",
+                    "activeBackgroundColor": "action_color",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB1"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 59,
+                  "height": 34,
+                  "wireID": "10cac080-1955-4be5-9bd9-4a1fb68cb4a4",
+                  "data": "",
+                  "action": "toggle_adib1_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "background",
+                    "backgroundColor": "action_color",
+                    "activeColor": "action_color",
+                    "activeBackgroundColor": "background",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB1"
+                }
+              ]
+            },
+            {
+              "type": "Select",
+              "left": 363,
+              "top": 40,
+              "width": 59,
+              "height": 34,
+              "wireID": "c407f9de-bd90-4832-f4ad-e51c9fc668f0",
+              "data": "adib2_relay_is_on",
+              "action": "",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 59,
+                  "height": 34,
+                  "wireID": "7295c737-7cf1-4083-aebe-c70ad3819158",
+                  "data": "",
+                  "action": "toggle_adib2_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "action_color",
+                    "backgroundColor": "background",
+                    "activeColor": "background",
+                    "activeBackgroundColor": "action_color",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB2"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 59,
+                  "height": 34,
+                  "wireID": "10cac080-1955-4be5-9bd9-4a1fb68cb4a4",
+                  "data": "",
+                  "action": "toggle_adib2_relay",
+                  "style": {
+                    "inheritFrom": "default_S_left_condensed",
+                    "alignHorizontal": "center",
+                    "color": "background",
+                    "backgroundColor": "action_color",
+                    "activeColor": "action_color",
+                    "activeBackgroundColor": "background",
+                    "borderSize": "1",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "ADIB2"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "name": "slot_view_def_2col_horz",
+      "style": "default",
+      "left": 0,
+      "top": 0,
+      "width": 478,
+      "height": 114,
       "dataContextOverrides": "{\"slot_title_def\": \"MUX14D\"}"
     },
     {
@@ -4115,6 +5062,23 @@
             "width": 65,
             "height": 18,
             "pixelArray": "000000000000000000000000000000000000000000000000000000000000000000000000000000000002234d3300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004234d76a4afaf760000000000000000000000000000000000000000000000000000000000000000000000000000000000001a57591e000000000000000b335c87abafafafaf9b9073180000000000000000000000000000000000000000000000000000000000000000000000000000000074afafafaf7c000010365e88adafafafaf99694387afafafaf7000000000000000000000000000000000000000000000000000000000000000000000000000005dafafa3a1afaf9395afafafafac885e350c00006fafafa0a4afaf5500000000000000000000000000000000003b3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3fabaf72000068afafafa8885e3006000000000000acaf60000079afa83f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f23a4afafafafafafafafafafafafafafafafafafafafaf10000007afaf29040000000000000000000fafaf0200001aafafafafafafafafafafafafafafafafafaf618188737272727272727272727272727272727272aeaf4b00003eafad000000000000000000000000afaf33000054afad727272727272727272727272727272723fa4af0e000000000000000000000000000000000082afae7b77aeaf8900000000000000000000000091afad747cafaf7c0000000000000000000000000000000000a4af0e000000000000000000000000000000000006a0afafafafa30b00000000000000000000000011a5afafafaf9d040000000000000000000000000000000000a4af0e000000000000000000000000000000000000005e9192630200000000000000000000000000000366918e5b00000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af0e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a4af000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",
+            "size": 20
+          }
+        },
+        {
+          "encoding": 152,
+          "x": 0,
+          "y": 10,
+          "width": 25,
+          "height": 42,
+          "dx": 25,
+          "glyphBitmap": {
+            "width": 25,
+            "height": 42,
+            "pixelArray": "00000000000000094b505050505050505050505050505050250000000000000017a5a79a9a9a9a9a9a9a9a9a9a9a9a9a9a460000000000000015a47d3333333333333333333333333333170000000000000011a2680000000000000000000000000000000000000000000011a2680000000000000000000000000000000000000000000011a2680000000000000000000000000000000000000000000421a4710b0100000000000000000000000000000000000b44758caca08362230000000000000000000000000000042b8ea29b837379909f9f5e12010000000000000000000006409c905216010000072e76a2751a0100000000000000000230938c2c010000000000000e5ea0680a00000000000000000f739934010000000000000000106aa33400000000000000002ca75c080000000000000000000127907e01000000000000005f97300000000000000000000000036da314000000000000007d851c00000000000000000000000050a02e00000000000000887f15000000000000000000000000439f3a000000000000007f831a0000000000000000000000004ca0300000000000000061962f000004101a1f1d16090100036ba0170000000000000033a456071e4c728c98938262350a218d840100000000000000137e935886a48e6d5d637aa09a686da53d0000000000000000023c9da79b46190d080a112572aba8770e000000000000000002399ca9983f160a06070f216aabaa720d0000000000000000127b965f8aa48765555b739b9d6e72a53b000000000000000030a3580823537993a09b89693a0d248e8100000000000000005e9831000005131d2220190c0100046ea015000000000000007e841b0000000000000000000000004da03000000000000000887f15000000000000000000000000449f39000000000000007d851b0000000000000000000000004fa02f0000000000000061962e0000000000000000000000026ca315000000000000002ea7580700000000000000000000248e810100000000000000107697300100000000000000000e66a33700000000000000000233968826000000000000000a589f6d0b00000000000000000007469f8c4a10000000042570a17b1e0100000000000000000000053194a2977a696d899ea0671501000000000000000000000000000e4e7b90ada1886a2b0000000000000000000000000000000000000828a4721002000000000000000000000000000000000000000013a2660000000000000000000000000000000000000000000013a2660000000000000000000000000000000000000000000013a2660000000000000000000000000000000000000000000017a47c3333333333333333333333333333170000000000000019a5a69a9a9a9a9a9a9a9a9a9a9a9a9a9a4600000000000000094b50505050505050505050505050505025"
           },
           "source": {
             "filePath": "..\\..\\..\\..\\fonts\\Oswald-Medium.ttf",

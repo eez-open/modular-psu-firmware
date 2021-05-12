@@ -617,15 +617,15 @@ public:
         } else if (previousPageId == PAGE_ID_DIB_MUX14D_SETTINGS && activePageId == PAGE_ID_MAIN) {
             psu::gui::animateSlideUp();
         } else if (
-            previousPageId == PAGE_ID_DIB_MUX14D_SETTINGS && activePageId == PAGE_ID_DIB_MUX14D_RELAY_CYCLES ||
-            previousPageId == PAGE_ID_DIB_MUX14D_SETTINGS && activePageId == PAGE_ID_DIB_MUX14D_INFO ||
-            previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS && activePageId == PAGE_ID_DIB_MUX14D_CHANNEL_LABELS
+            (previousPageId == PAGE_ID_DIB_MUX14D_SETTINGS && activePageId == PAGE_ID_DIB_MUX14D_RELAY_CYCLES) ||
+            (previousPageId == PAGE_ID_DIB_MUX14D_SETTINGS && activePageId == PAGE_ID_DIB_MUX14D_INFO) ||
+            (previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS && activePageId == PAGE_ID_DIB_MUX14D_CHANNEL_LABELS)
         ) {
             psu::gui::animateSlideLeft();
         } else if (
-            previousPageId == PAGE_ID_DIB_MUX14D_RELAY_CYCLES && activePageId == PAGE_ID_DIB_MUX14D_SETTINGS ||
-            previousPageId == PAGE_ID_DIB_MUX14D_INFO && activePageId == PAGE_ID_DIB_MUX14D_SETTINGS ||
-            previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS
+            (previousPageId == PAGE_ID_DIB_MUX14D_RELAY_CYCLES && activePageId == PAGE_ID_DIB_MUX14D_SETTINGS) ||
+            (previousPageId == PAGE_ID_DIB_MUX14D_INFO && activePageId == PAGE_ID_DIB_MUX14D_SETTINGS) ||
+            (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS)
         ) {
             psu::gui::animateSlideRight();
 		}
@@ -633,10 +633,10 @@ public:
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_DEF : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
+            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_DEF_VERT : gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_DEF_HORZ;
         }
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_DEF_2COL : gui::PAGE_ID_SLOT_DEF_HORZ_EMPTY;
+            return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_DEF_2COL_VERT : gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_DEF_2COL_HORZ;
         }
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
             return gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_MAX;

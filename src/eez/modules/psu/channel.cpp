@@ -721,9 +721,9 @@ void Channel::addIMonAdcValue(float value) {
         value = remapAdcValue(value, cal_conf.i[flags.currentCurrentRange]);
     }
 
-    if (g_slots[slotIndex]->moduleType == MODULE_TYPE_DCP405 && value < 0 && isCvMode() &&  u.set >= 0.1f) {
-        value = 0;
-    }
+    // if (g_slots[slotIndex]->moduleType == MODULE_TYPE_DCP405 && value < 0 && isCvMode() &&  u.set >= 0.1f) {
+    //     value = 0;
+    // }
 
     i.addMonValue(value, getCurrentResolution());
 }

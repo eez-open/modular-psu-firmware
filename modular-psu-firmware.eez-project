@@ -2185,6 +2185,11 @@
       "defaultValue": "MIO168 #1:"
     },
     {
+      "name": "slot_short_title",
+      "type": "string",
+      "defaultValue": "#1"
+    },
+    {
       "name": "slot_error_message",
       "type": "string",
       "defaultValue": "Error"
@@ -33605,40 +33610,23 @@
           "type": "Text",
           "left": 0,
           "top": 0,
-          "width": 28,
-          "height": 57,
+          "width": 52,
+          "height": 38,
           "wireID": "786f607b-9c98-4972-9963-580b3bb69a49",
           "data": "channel_short_title",
           "action": "",
           "style": {
             "inheritFrom": "channel1",
-            "alignHorizontal": "left",
-            "alignVertical": "top",
             "padding": "3 5"
           },
           "text": ""
         },
         {
-          "type": "Text",
-          "left": 28,
-          "top": 0,
-          "width": 24,
-          "height": 57,
-          "wireID": "b1ca1d29-b547-49e1-b258-05cc0f47f9f5",
-          "action": "toggle_channels_max_view",
-          "style": {
-            "inheritFrom": "channel1",
-            "font": "Heydings14",
-            "alignVertical": "top"
-          },
-          "text": "e"
-        },
-        {
           "type": "Select",
           "left": 0,
-          "top": 57,
+          "top": 38,
           "width": 52,
-          "height": 57,
+          "height": 38,
           "wireID": "991c1eff-3cbf-4adb-e763-b044810da4d9",
           "data": "channel_protection_status",
           "action": "show_ch_settings",
@@ -33651,7 +33639,7 @@
               "left": 0,
               "top": 0,
               "width": 52,
-              "height": 57,
+              "height": 38,
               "wireID": "6bb7f622-072f-43f5-f8cd-ef5062e610b0",
               "action": "",
               "style": {
@@ -33665,7 +33653,7 @@
               "left": 0,
               "top": 0,
               "width": 52,
-              "height": 57,
+              "height": 38,
               "wireID": "727c94c0-d072-4173-9147-cbd485e82a54",
               "action": "",
               "style": {
@@ -33677,6 +33665,21 @@
               "text": "9"
             }
           ]
+        },
+        {
+          "type": "Text",
+          "left": 0,
+          "top": 76,
+          "width": 52,
+          "height": 38,
+          "wireID": "b1ca1d29-b547-49e1-b258-05cc0f47f9f5",
+          "action": "toggle_channels_max_view",
+          "style": {
+            "inheritFrom": "channel1",
+            "font": "Heydings14",
+            "alignVertical": "top"
+          },
+          "text": "e"
         }
       ],
       "connectionLines": [],

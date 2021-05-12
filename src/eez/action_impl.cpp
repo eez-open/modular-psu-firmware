@@ -610,6 +610,7 @@ void action_toggle_channels_max_view() {
 
 void action_toggle_slot_max_view() {
     auto slotIndex = getFoundWidgetAtDown().cursor;
+    hmi::selectSlot(slotIndex);
 
     auto isMaxViewBefore = persist_conf::isMaxView();
     auto wasFullScreenView = isMaxViewBefore && isSlotFullScreenView();
@@ -1208,6 +1209,9 @@ void onSelectFirmware() {
 }
 
 void action_channel_update_firmware() {
+    if (getActivePageId() == PAGE_ID_MAIN) {
+        hmi::selectSlot(getFoundWidgetAtDown().cursor);
+    }
     yesNoDialog(PAGE_ID_YES_NO_FLASH_SLAVE, nullptr, onSelectFirmware, nullptr, nullptr);
 }
 

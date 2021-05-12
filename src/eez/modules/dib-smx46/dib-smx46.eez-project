@@ -560,12 +560,380 @@
         }
       ],
       "connectionLines": [],
-      "name": "slot_view_def",
+      "name": "slot_view_def_vert",
       "style": "default",
       "left": 0,
       "top": 0,
       "width": 154,
       "height": 236,
+      "dataContextOverrides": "{\"slot_title_def\": \"SMX46\"}"
+    },
+    {
+      "components": [
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 0,
+          "width": 52,
+          "height": 74,
+          "wireID": "a23ea9b5-ee56-48bf-98a6-f6c80f3c597b",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 28,
+              "height": 37,
+              "wireID": "64588c98-cce9-4807-b959-53c90735f2fa",
+              "data": "slot_short_title",
+              "style": {
+                "inheritFrom": "channel1",
+                "alignHorizontal": "left",
+                "padding": "0 5"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 37,
+              "width": 52,
+              "height": 37,
+              "wireID": "74cad857-c6de-4514-f3da-8a5b7c415381",
+              "action": "show_slot_settings",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14"
+              },
+              "text": "D"
+            },
+            {
+              "type": "Text",
+              "left": 28,
+              "top": 0,
+              "width": 24,
+              "height": 37,
+              "wireID": "56321d7d-5017-46b7-a0ed-d32ba6de7732",
+              "action": "toggle_slot_max_view",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14"
+              },
+              "text": "e"
+            }
+          ]
+        },
+        {
+          "type": "Grid",
+          "left": 52,
+          "top": 0,
+          "width": 168,
+          "height": 74,
+          "wireID": "9f5f3f36-3421-4d5e-ee5a-ddee933a4634",
+          "data": "routes",
+          "action": "show_configure_routes",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 28,
+            "height": 18,
+            "wireID": "0ae0fc90-6797-4eea-d440-ed023bfaeeb8",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Select",
+                "left": 0,
+                "top": 0,
+                "width": 28,
+                "height": 18,
+                "wireID": "70fa836c-49a1-4c6c-8a55-2eafff85fc9d",
+                "data": "route_open",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 28,
+                    "height": 18,
+                    "wireID": "48b08d41-1ec5-4d45-d8ec-e3349963921d",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "left": 13,
+                        "top": 0,
+                        "width": 1,
+                        "height": 18,
+                        "wireID": "25092e8f-13d8-4408-bbe1-c156da81dc92",
+                        "style": {
+                          "inheritFrom": "default"
+                        }
+                      },
+                      {
+                        "type": "Rectangle",
+                        "left": 0,
+                        "top": 8,
+                        "width": 28,
+                        "height": 1,
+                        "wireID": "41f718ac-8f3f-480a-80c8-83355571b052",
+                        "style": {
+                          "inheritFrom": "default"
+                        }
+                      },
+                      {
+                        "type": "Rectangle",
+                        "left": 9,
+                        "top": 4,
+                        "width": 9,
+                        "height": 9,
+                        "wireID": "fe332f73-c88b-42d7-c8df-deeb3b83e422",
+                        "style": {
+                          "inheritFrom": "default",
+                          "borderSize": "0",
+                          "borderRadius": 4
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 28,
+                    "height": 18,
+                    "wireID": "7d02c1a9-6221-425e-fbd8-0dabced22b48",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "left": 13,
+                        "top": 0,
+                        "width": 1,
+                        "height": 18,
+                        "wireID": "2ce12a91-034d-4af2-9eb9-2a1bdd8f73a5",
+                        "style": {
+                          "inheritFrom": "default"
+                        }
+                      },
+                      {
+                        "type": "Rectangle",
+                        "left": 0,
+                        "top": 8,
+                        "width": 28,
+                        "height": 1,
+                        "wireID": "866adb1c-5bcf-466b-d859-18eef02f4153",
+                        "style": {
+                          "inheritFrom": "default"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "type": "Container",
+          "left": 222,
+          "top": 2,
+          "width": 154,
+          "height": 70,
+          "wireID": "a06ccd6c-19e5-4469-86ae-31d8fc92c701",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "AO",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 51,
+              "height": 34,
+              "wireID": "908bf420-77e7-4ffd-9292-45db17ce24af",
+              "data": "ao1_label",
+              "style": {
+                "inheritFrom": "default_S_left",
+                "alignHorizontal": "center"
+              },
+              "text": ""
+            },
+            {
+              "type": "DisplayData",
+              "left": 52,
+              "top": 0,
+              "width": 102,
+              "height": 34,
+              "wireID": "352eae42-82e8-4f4d-b5ad-98b3c7b5195e",
+              "data": "dac1",
+              "action": "edit",
+              "style": {
+                "inheritFrom": "encoder_cursor_14_enabled"
+              },
+              "displayOption": 0
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 36,
+              "width": 52,
+              "height": 34,
+              "wireID": "d2497ecf-357b-496f-9d25-29007d9beee9",
+              "data": "ao2_label",
+              "style": {
+                "inheritFrom": "default_S_left",
+                "alignHorizontal": "center"
+              },
+              "text": ""
+            },
+            {
+              "type": "DisplayData",
+              "left": 52,
+              "top": 36,
+              "width": 102,
+              "height": 34,
+              "wireID": "13d35f50-64a7-4a54-eadf-d7757fd7333f",
+              "data": "dac2",
+              "action": "edit",
+              "style": {
+                "inheritFrom": "encoder_cursor_14_enabled"
+              },
+              "displayOption": 0
+            }
+          ]
+        },
+        {
+          "type": "Select",
+          "left": 378,
+          "top": 2,
+          "width": 98,
+          "height": 70,
+          "wireID": "a87e04d0-6f97-4d1b-8d34-1c9fb257102f",
+          "data": "relay_on",
+          "action": "toggle_relay",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 98,
+              "height": 70,
+              "wireID": "4a91edcf-9466-4740-8dc1-ca93688d69de",
+              "style": {
+                "inheritFrom": "option_toggle_L_center"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 98,
+                  "height": 30,
+                  "wireID": "7b7b44e6-7e62-4482-c60f-b32f5c7dc85f",
+                  "style": {
+                    "inheritFrom": "option_toggle_L_center",
+                    "font": "Oswald14"
+                  },
+                  "text": "Power relay"
+                },
+                {
+                  "type": "Text",
+                  "left": 35,
+                  "top": 36,
+                  "width": 28,
+                  "height": 28,
+                  "wireID": "30f1c989-46f8-4379-9269-03498e6c0eca",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "option_toggle_L_center",
+                    "font": "Oswald17",
+                    "alignHorizontal": "left",
+                    "borderSize": "0",
+                    "borderRadius": 0,
+                    "borderColor": "text_regular",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "\\u00bf"
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 98,
+              "height": 70,
+              "wireID": "588e3881-99b9-49c5-9e17-4561143badb8",
+              "style": {
+                "inheritFrom": "option_toggle_L_center"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 98,
+                  "height": 30,
+                  "wireID": "c20ca140-41d9-4373-b3a5-3b9bbd321bba",
+                  "style": {
+                    "inheritFrom": "option_toggle_L_center",
+                    "font": "Oswald14"
+                  },
+                  "text": "Power relay"
+                },
+                {
+                  "type": "Text",
+                  "left": 35,
+                  "top": 36,
+                  "width": 28,
+                  "height": 28,
+                  "wireID": "0fbec720-f6bd-4edb-fcb7-973d05f58c57",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "option_toggle_L_center",
+                    "font": "Oswald17",
+                    "alignHorizontal": "left",
+                    "color": "text_enable_background",
+                    "backgroundColor": "action_color",
+                    "borderSize": "0",
+                    "borderRadius": 0,
+                    "borderColor": "text_regular",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "\\u00be"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "name": "slot_view_def_horz",
+      "style": "default",
+      "left": 0,
+      "top": 0,
+      "width": 478,
+      "height": 74,
       "dataContextOverrides": "{\"slot_title_def\": \"SMX46\"}"
     },
     {
@@ -914,12 +1282,381 @@
         }
       ],
       "connectionLines": [],
-      "name": "slot_view_def_2col",
+      "name": "slot_view_def_2col_vert",
       "style": "default",
       "left": 0,
       "top": 0,
       "width": 234,
       "height": 236,
+      "dataContextOverrides": "{\"slot_title_def\": \"SMX46\"}"
+    },
+    {
+      "components": [
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 0,
+          "width": 52,
+          "height": 114,
+          "wireID": "5a1c8d30-1bc1-4ec7-90bb-7d8f3a958e4c",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 52,
+              "height": 38,
+              "wireID": "701096d5-3c30-431f-9f7b-1c7162b778df",
+              "data": "slot_short_title",
+              "action": "",
+              "style": {
+                "inheritFrom": "channel1",
+                "padding": "3 5"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 38,
+              "width": 52,
+              "height": 38,
+              "wireID": "399301b2-0085-428d-db17-0fb6f5154d21",
+              "action": "show_slot_settings",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14"
+              },
+              "text": "D"
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 76,
+              "width": 52,
+              "height": 38,
+              "wireID": "8dd95ccc-40ea-4e98-8b0c-2725f1c45db7",
+              "action": "toggle_slot_max_view",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14",
+                "alignVertical": "top"
+              },
+              "text": "e"
+            }
+          ]
+        },
+        {
+          "type": "Grid",
+          "left": 52,
+          "top": 1,
+          "width": 216,
+          "height": 112,
+          "wireID": "609e59de-8408-4972-d046-0fcd5a889011",
+          "data": "routes",
+          "action": "show_configure_routes",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 36,
+            "height": 28,
+            "wireID": "b262593e-9c9b-442f-9b91-b68a927ba2c4",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Select",
+                "left": 0,
+                "top": 0,
+                "width": 36,
+                "height": 28,
+                "wireID": "d8faa023-3bfe-4401-ea71-2dd69a7b8268",
+                "data": "route_open",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 36,
+                    "height": 28,
+                    "wireID": "61500ef3-232f-468c-a0c8-9709d69b4927",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "left": 17,
+                        "top": 0,
+                        "width": 1,
+                        "height": 28,
+                        "wireID": "19715f1e-389c-4fa5-fa4a-cc0d9499a398",
+                        "style": {
+                          "inheritFrom": "default"
+                        }
+                      },
+                      {
+                        "type": "Rectangle",
+                        "left": 0,
+                        "top": 13,
+                        "width": 36,
+                        "height": 1,
+                        "wireID": "b0443bac-28c4-4df1-bb69-9f2a93a69b05",
+                        "style": {
+                          "inheritFrom": "default"
+                        }
+                      },
+                      {
+                        "type": "Rectangle",
+                        "left": 13,
+                        "top": 9,
+                        "width": 9,
+                        "height": 9,
+                        "wireID": "6d21ad83-c2dc-4035-bf8b-2d3a245ec294",
+                        "style": {
+                          "inheritFrom": "default",
+                          "borderSize": "0",
+                          "borderRadius": 4
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 36,
+                    "height": 28,
+                    "wireID": "14a383c2-2112-4ad1-c4d9-925b4c1e1070",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "left": 17,
+                        "top": 0,
+                        "width": 1,
+                        "height": 28,
+                        "wireID": "c63c3f53-7aa5-47ed-fcb3-7fc2f6632adc",
+                        "style": {
+                          "inheritFrom": "default"
+                        }
+                      },
+                      {
+                        "type": "Rectangle",
+                        "left": 0,
+                        "top": 13,
+                        "width": 36,
+                        "height": 1,
+                        "wireID": "911f4f12-9c57-4475-c085-253970554ada",
+                        "style": {
+                          "inheritFrom": "default"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "type": "Container",
+          "left": 268,
+          "top": 4,
+          "width": 205,
+          "height": 70,
+          "wireID": "4b5e79f7-865d-4f05-e7f4-e51617dd951c",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "AO",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 2,
+              "width": 76,
+              "height": 31,
+              "wireID": "bfac7aa0-074f-4e03-f2ea-719c38465b20",
+              "data": "ao1_label",
+              "style": {
+                "inheritFrom": "default_S_left",
+                "alignHorizontal": "center"
+              },
+              "text": ""
+            },
+            {
+              "type": "DisplayData",
+              "left": 76,
+              "top": 2,
+              "width": 129,
+              "height": 31,
+              "wireID": "aa72532d-b39a-49ba-9b08-fafd44c5e049",
+              "data": "dac1",
+              "action": "edit",
+              "style": {
+                "inheritFrom": "encoder_cursor_14_enabled"
+              },
+              "displayOption": 0
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 38,
+              "width": 76,
+              "height": 31,
+              "wireID": "53f826a3-9d68-4720-bba9-9ab035899e65",
+              "data": "ao2_label",
+              "style": {
+                "inheritFrom": "default_S_left",
+                "alignHorizontal": "center"
+              },
+              "text": ""
+            },
+            {
+              "type": "DisplayData",
+              "left": 76,
+              "top": 38,
+              "width": 129,
+              "height": 31,
+              "wireID": "228a1470-6001-4003-ba1c-0fcd02263d63",
+              "data": "dac2",
+              "action": "edit",
+              "style": {
+                "inheritFrom": "encoder_cursor_14_enabled"
+              },
+              "displayOption": 0
+            }
+          ]
+        },
+        {
+          "type": "Select",
+          "left": 299,
+          "top": 78,
+          "width": 174,
+          "height": 31,
+          "wireID": "1e1e1173-2287-4557-963e-397a27ddf821",
+          "data": "relay_on",
+          "action": "toggle_relay",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 174,
+              "height": 31,
+              "wireID": "c28e3f94-6c16-4e17-c45d-0b61f407df97",
+              "style": {
+                "inheritFrom": "option_toggle_L_center"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 128,
+                  "height": 30,
+                  "wireID": "b11c3e94-6b87-4fa4-dfca-ac01a7458d16",
+                  "style": {
+                    "inheritFrom": "option_toggle_L_center",
+                    "font": "Oswald14"
+                  },
+                  "text": "Power relay:"
+                },
+                {
+                  "type": "Text",
+                  "left": 128,
+                  "top": 1,
+                  "width": 28,
+                  "height": 28,
+                  "wireID": "5eb97672-d094-4acb-8c28-9e6edd6646ff",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "option_toggle_L_center",
+                    "font": "Oswald17",
+                    "alignHorizontal": "left",
+                    "borderSize": "0",
+                    "borderRadius": 0,
+                    "borderColor": "text_regular",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "\\u00bf"
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 174,
+              "height": 31,
+              "wireID": "ac5fd1b2-1134-404f-961e-b1d282fcbc8b",
+              "style": {
+                "inheritFrom": "option_toggle_L_center"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 128,
+                  "height": 30,
+                  "wireID": "d7960587-5dce-4623-d432-53617094e20f",
+                  "style": {
+                    "inheritFrom": "option_toggle_L_center",
+                    "font": "Oswald14"
+                  },
+                  "text": "Power relay:"
+                },
+                {
+                  "type": "Text",
+                  "left": 128,
+                  "top": 1,
+                  "width": 28,
+                  "height": 28,
+                  "wireID": "9c97ec9f-04b3-4acf-a6bf-bdabe812e375",
+                  "data": "",
+                  "style": {
+                    "inheritFrom": "option_toggle_L_center",
+                    "font": "Oswald17",
+                    "alignHorizontal": "left",
+                    "color": "text_enable_background",
+                    "backgroundColor": "action_color",
+                    "borderSize": "0",
+                    "borderRadius": 0,
+                    "borderColor": "text_regular",
+                    "padding": "0 0 0 2"
+                  },
+                  "text": "\\u00be"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "name": "slot_view_def_2col_horz",
+      "style": "default",
+      "left": 0,
+      "top": 0,
+      "width": 478,
+      "height": 114,
       "dataContextOverrides": "{\"slot_title_def\": \"SMX46\"}"
     },
     {

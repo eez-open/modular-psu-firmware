@@ -51,7 +51,8 @@ const char *g_unitNames[] = {
     "nF",
     "pF",
     "minutes",
-    "",
+    "VA",
+    "VAR",
 };
 
 static const int g_scpiUnits[] = {

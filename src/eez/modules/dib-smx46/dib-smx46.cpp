@@ -655,10 +655,10 @@ public:
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            return isDefaultViewVertical() ? PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF : PAGE_ID_SLOT_DEF_HORZ_EMPTY;
+            return isDefaultViewVertical() ? PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF_VERT : PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF_HORZ;
         }
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            return isDefaultViewVertical() ? PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF_2COL : PAGE_ID_SLOT_DEF_HORZ_EMPTY;
+            return isDefaultViewVertical() ? PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF_2COL_VERT : PAGE_ID_DIB_SMX46_SLOT_VIEW_DEF_2COL_HORZ;
         }
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
             return PAGE_ID_DIB_SMX46_SLOT_VIEW_MAX;

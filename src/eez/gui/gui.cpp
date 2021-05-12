@@ -533,15 +533,23 @@ void prepareRect(AppContext *appContext, Rect &rect) {
     }
 }
 
-void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, float duration) {
+void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, float duration, const Rect *clipRect) {
     animate(startBuffer, animateRectsStep, duration);
 
     g_numRects = numRects;
 
-    g_clipRect.x = appContext->rect.x;
-    g_clipRect.y = appContext->rect.y;
-    g_clipRect.w = appContext->rect.w;
-    g_clipRect.h = appContext->rect.h;
+    if (clipRect) {
+        g_clipRect.x = clipRect->x;
+        g_clipRect.y = clipRect->y;
+        g_clipRect.w = clipRect->w;
+        g_clipRect.h = clipRect->h;
+        prepareRect(appContext, g_clipRect);
+    } else {
+        g_clipRect.x = appContext->rect.x;
+        g_clipRect.y = appContext->rect.y;
+        g_clipRect.w = appContext->rect.w;
+        g_clipRect.h = appContext->rect.h;
+    }
 
     for (int i = 0; i < numRects; i++) {
         prepareRect(appContext, g_animRects[i].srcRect);

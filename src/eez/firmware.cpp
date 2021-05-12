@@ -32,10 +32,12 @@
 #include <eez/sound.h>
 #include <eez/memory.h>
 #include <eez/usb.h>
+#include <eez/modules/aux_ps/fan.h>
 
 #include <eez/gui/gui.h>
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/serial_psu.h>
 #include <eez/modules/psu/sd_card.h>
@@ -509,6 +511,9 @@ void shutdown() {
 
     profile::saveIfDirty();
 
+    channel_dispatcher::disableOutputForAllChannels();
+    psu::tick();
+
     if (psu::isPowerUp()) {
     	psu::changePowerState(false);
     }
@@ -554,11 +559,17 @@ void shutdown() {
     } else {
         psu::gui::showShutdownPage();
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
         osDelay(100);
-#endif
 
         g_shutdown = true;
+
+#if defined(EEZ_PLATFORM_STM32)
+        while (1) {
+        	WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+        	psu::tick();
+        	osDelay(1);
+        }
+#endif
     }
 }
 

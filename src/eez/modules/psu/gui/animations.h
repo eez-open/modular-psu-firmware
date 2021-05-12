@@ -34,6 +34,8 @@ void animateSlideLeft();
 void animateSlideRight();
 void animateSlideLeftWithoutHeader();
 void animateSlideRightWithoutHeader();
+void animateSlideLeftInDefaultViewVert(int viewIndex);
+void animateSlideLeftInDefaultViewHorz(int viewIndex);
 void animateFadeOutFadeIn();
 void animateFadeOutFadeInWorkingArea();
 void animateFadeOutFadeIn(const Rect &rect);

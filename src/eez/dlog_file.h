@@ -217,6 +217,7 @@ public:
     uint32_t getBufferIndex() { return m_bufferIndex; }
     uint32_t getDataOffset() { return m_dataOffset; }
     uint32_t getFinishTimeFieldOffset() { return m_finalDurationFieldOffset; }
+    uint32_t getXAxisStepFieldOffset() { return m_xAxisStepFieldOffset; }
     uint32_t getDataSizeFieldOffset() { return m_dataSizeFieldOffset; };
     uint32_t getBookmarksSizeFieldOffset() { return m_bookmarksSizeFieldOffset; };
     uint32_t getFileLength() { return m_fileLength; }
@@ -231,6 +232,7 @@ private:
     uint8_t m_bits = 0;
     uint32_t m_dataOffset = 0;
     uint32_t m_finalDurationFieldOffset = 0;
+    uint32_t m_xAxisStepFieldOffset = 0;
     uint32_t m_dataSizeFieldOffset = 0;
     uint32_t m_bookmarksSizeFieldOffset = 0;
 

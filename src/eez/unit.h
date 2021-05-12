@@ -52,7 +52,9 @@ enum Unit {
     UNIT_MICRO_FARAD,
     UNIT_NANO_FARAD,
     UNIT_PICO_FARAD,
-    UNIT_MINUTE
+    UNIT_MINUTE,
+    UNIT_VOLT_AMPERE,
+    UNIT_VOLT_AMPERE_REACTIVE,
 };
 
 extern const char *g_unitNames[];

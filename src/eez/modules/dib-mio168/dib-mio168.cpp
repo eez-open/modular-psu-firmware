@@ -165,6 +165,10 @@ struct SetParams {
 		uint8_t mode; // enum SourceMode
 		uint8_t range;
         float nplc; // from 0 to 25
+        float p1CalX;
+        float p1CalY;
+        float p2CalX;
+        float p2CalY;
 	} ain[4];
 
     uint8_t powerLineFrequency; // 50 or 60
@@ -245,6 +249,10 @@ struct Response {
             float ainValues[4];
             uint16_t ainFaultStatus;
             uint8_t ainDiagStatus;
+            float activePower;
+            float reactivePower;
+            float voltRMS;
+            float currRMS;
             DlogState dlogState;
         } getState;
 
@@ -926,15 +934,15 @@ public:
         } else if (m_afeVersion == 3) {
             if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
                 if (m_voltageRange == 0) {
-                    return 4; // +/- 50 V
+                    return 3; // +/- 50 V
                 } else {
-                    return 3; // +/- 450 V
+                    return 2; // +/- 450 V
                 }
             } else if (m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
                 if (m_currentRange == 0) {
-                    return 5; // +/- 1 A
+                    return 4; // +/- 1 A
                 } else {
-                    return 4; // +/- 10 A
+                    return 3; // +/- 10 A
                 }
             } else if (m_subchannelIndex == AIN_3_SUBCHANNEL_INDEX) {
                 if (m_mode == MEASURE_MODE_VOLTAGE) {
@@ -1867,6 +1875,13 @@ public:
 
     uint8_t ainDiagStatus;
 
+    float activePower = 0;
+    float reactivePower = 0;
+    float voltRMS = 0;
+    float currRMS = 0;
+    float apparentPower;
+    float powerFactor;
+
     uint8_t calibrationChannelMode;
     uint8_t calibrationChannelCurrentRange;
     uint8_t calibrationChannelVoltageRange;
@@ -1876,7 +1891,8 @@ public:
     DlogRecordingStart dlogRecordingStart;
     uint32_t dlogDataRecordIndex = 0;
 
-    uint8_t selectedPage = 0;
+    uint8_t selectedPageInMaxView = 0;
+	uint8_t selectedPageInDefaultView = 0;
 
 	uint8_t efficiencyFormula = EFFICIENCY_FORMULA_P1_OVER_P2;
 
@@ -2011,6 +2027,12 @@ public:
             }
             ainFaultStatus = data.ainFaultStatus;
             ainDiagStatus = data.ainDiagStatus;
+	        activePower = data.activePower;
+	        reactivePower = data.reactivePower;
+	        voltRMS = data.voltRMS;
+	        currRMS = data.currRMS;
+	        apparentPower = voltRMS * currRMS;
+	        powerFactor = activePower / apparentPower;
 
             if (data.flags & GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT) {
                 if (!fs_driver::isDriverLinked(slotIndex)) {
@@ -2056,6 +2078,18 @@ public:
                 params.ain[i].mode = channel->getMode();
                 params.ain[i].range = channel->getMode() == MEASURE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
                 params.ain[i].nplc = channel->ongoingCal ? 25.0f : (channel->getMode() == MEASURE_MODE_VOLTAGE ? channel->m_voltageNPLC : channel->m_currentNPLC);
+                auto &calConf = channel->calConf[channel->getCalConfIndex()];
+                if (calConf.state.calEnabled) {
+                    params.ain[i].p1CalX = calConf.points[0].calValue;
+                    params.ain[i].p1CalY = calConf.points[0].uncalValue;
+                    params.ain[i].p2CalX = calConf.points[1].calValue;
+                    params.ain[i].p2CalY = calConf.points[1].uncalValue;
+                } else {
+                    params.ain[i].p1CalX = 0;
+                    params.ain[i].p1CalY = 0;
+                    params.ain[i].p2CalX = 1;
+                    params.ain[i].p2CalY = 1;
+                }
             }
 
             params.powerLineFrequency = persist_conf::getPowerLineFrequency();
@@ -2703,10 +2737,10 @@ public:
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
-            return isDefaultViewVertical() ? PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF : PAGE_ID_SLOT_DEF_HORZ_EMPTY;
+            return isDefaultViewVertical() ? PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF_VERT : PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF_HORZ;
         }
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
-            return isDefaultViewVertical() ? PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF_2COL : PAGE_ID_SLOT_DEF_HORZ_EMPTY_2COL;
+            return isDefaultViewVertical() ? PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF_2COL_VERT : PAGE_ID_DIB_MIO168_SLOT_VIEW_DEF_2COL_HORZ;
         }
         if (slotViewType == SLOT_VIEW_TYPE_MAX) {
             return PAGE_ID_DIB_MIO168_SLOT_VIEW_MAX;
@@ -2732,7 +2766,8 @@ public:
         AoutDac7760Channel::ProfileParameters aoutDac7760Channels[2];
         AoutDac7563Channel::ProfileParameters aoutDac7563Channels[2];
         PwmChannel::ProfileParameters pwmChannels[2];
-        uint8_t selectedPage;
+        uint8_t selectedPageInMaxView;
+		uint8_t selectedPageInDefaultView;
 		uint8_t efficiencyFormula;
     };
 
@@ -2756,7 +2791,8 @@ public:
             pwmChannels[i].resetProfileToDefaults(parameters->pwmChannels[i]);
         }
 
-        selectedPage = 0;
+        selectedPageInMaxView = 0;
+		selectedPageInDefaultView = 0;
 		
 		efficiencyFormula = EFFICIENCY_FORMULA_P1_OVER_P2;
     }
@@ -2783,7 +2819,8 @@ public:
             pwmChannels[i].getProfileParameters(parameters->pwmChannels[i]);
         }
 
-        parameters->selectedPage = selectedPage;
+        parameters->selectedPageInMaxView = selectedPageInMaxView;
+		parameters->selectedPageInDefaultView = selectedPageInDefaultView;
 		
 		parameters->efficiencyFormula = efficiencyFormula;
     }
@@ -2808,7 +2845,8 @@ public:
             pwmChannels[i].setProfileParameters(parameters->pwmChannels[i]);
         }
 
-        selectedPage = parameters->selectedPage;
+        selectedPageInMaxView = parameters->selectedPageInMaxView;
+		selectedPageInDefaultView = parameters->selectedPageInDefaultView;
 
 		efficiencyFormula = parameters->efficiencyFormula;
     }
@@ -2847,7 +2885,8 @@ public:
             }
         }
 
-        WRITE_PROPERTY("selectedPage", parameters->selectedPage);
+        WRITE_PROPERTY("selectedPageInMaxView", parameters->selectedPageInMaxView);
+		WRITE_PROPERTY("selectedPageInDefaultView", parameters->selectedPageInDefaultView);
 
 		WRITE_PROPERTY("efficiencyFormula", parameters->efficiencyFormula);
 
@@ -2888,7 +2927,8 @@ public:
             }
         }
 
-        READ_PROPERTY("selectedPage", parameters->selectedPage);
+        READ_PROPERTY("selectedPageInMaxView", parameters->selectedPageInMaxView);
+		READ_PROPERTY("selectedPageInDefaultView", parameters->selectedPageInDefaultView);
 
 		READ_PROPERTY("efficiencyFormula", parameters->efficiencyFormula);
 
@@ -2913,7 +2953,8 @@ public:
             pwmChannels[i].resetConfiguration();
         }
 
-        selectedPage = 0;
+        selectedPageInMaxView = 0;
+		selectedPageInDefaultView = 0;
 
 		efficiencyFormula = EFFICIENCY_FORMULA_P1_OVER_P2;
     }
@@ -5043,16 +5084,10 @@ void action_dib_mio168_din_select_speed() {
 }
 
 void action_dib_mio168_din_show_configuration() {
-    if (getActivePageId() == PAGE_ID_MAIN) {
-        hmi::selectSlot(getFoundWidgetAtDown().cursor);
-    }
     pushPage(PAGE_ID_DIB_MIO168_DIN_CONFIGURATION);
 }
 
 void action_dib_mio168_show_din_channel_labels() {
-    if (getActivePageId() == PAGE_ID_MAIN) {
-        hmi::selectSlot(getFoundWidgetAtDown().cursor);
-    }
     pushPage(PAGE_ID_DIB_MIO168_DIN_CHANNEL_LABELS);
 }
 
@@ -5171,9 +5206,6 @@ void action_dib_mio168_dout_toggle_state() {
 }
 
 void action_dib_mio168_show_dout_channel_labels() {
-    if (getActivePageId() == PAGE_ID_MAIN) {
-        hmi::selectSlot(getFoundWidgetAtDown().cursor);
-    }
     pushPage(PAGE_ID_DIB_MIO168_DOUT_CHANNEL_LABELS);
 }
 
@@ -5596,6 +5628,7 @@ void action_dib_mio168_ain_select_mode_and_range() {
     int cursor = getFoundWidgetAtDown().cursor;
     
     int slotIndex = cursor / 4;
+	hmi::selectSlot(slotIndex);
     int subchannelIndex = AIN_1_SUBCHANNEL_INDEX + cursor % 4;
 
     hmi::selectSlot(slotIndex);
@@ -5625,6 +5658,120 @@ void action_dib_mio168_ain_change_label() {
     int slotIndex = cursor / 4;
     int subchannelIndex = cursor % 4;
     LabelsAndColorsPage::editChannelLabel(slotIndex, AIN_1_SUBCHANNEL_INDEX + subchannelIndex);
+}
+
+void data_dib_mio168_ain_active_power(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			roundPrec(mio168Module->activePower, 1E-4f),
+			UNIT_WATT,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
+		);
+	}
+}
+
+void data_dib_mio168_ain_reactive_power(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			roundPrec(mio168Module->reactivePower, 1E-4f),
+			UNIT_VOLT_AMPERE_REACTIVE,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
+		);
+	}
+}
+
+void data_dib_mio168_ain_volt_rms(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			roundPrec(mio168Module->voltRMS, 1E-4f),
+			UNIT_VOLT,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
+		);
+	}
+}
+
+void data_dib_mio168_ain_curr_rms(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			roundPrec(mio168Module->currRMS, 1E-4f),
+			UNIT_AMPER,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
+		);
+	}
+}
+
+void data_dib_mio168_ain_apparent_power(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			roundPrec(mio168Module->apparentPower, 1E-4f),
+			UNIT_VOLT_AMPERE,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
+		);
+	}
+}
+
+void data_dib_mio168_ain_power_factor(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			roundPrec(mio168Module->powerFactor, 1E-3f),
+			UNIT_NONE,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(3)
+		);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -6057,9 +6204,6 @@ void data_dib_mio168_afe_version(DataOperationEnum operation, Cursor cursor, Val
 }
 
 void action_dib_mio168_show_info() {
-    if (getActivePageId() == PAGE_ID_MAIN) {
-        hmi::selectSlot(getFoundWidgetAtDown().cursor);
-    }
     pushPage(PAGE_ID_DIB_MIO168_INFO);
 }
 
@@ -6102,25 +6246,25 @@ void data_dib_mio168_pager_list(DataOperationEnum operation, Cursor cursor, Valu
 void data_dib_mio168_pager_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		auto module = (Mio168Module *)g_slots[cursor / 6];
-		value = module->selectedPage == cursor % 6 ? 1 : 0;
+		value = module->selectedPageInMaxView == cursor % 6 ? 1 : 0;
 	}
 }
 
 void data_dib_mio168_pager_selected_page(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		auto module = (Mio168Module *)g_slots[cursor];
-		value = module->selectedPage;
+		value = module->selectedPageInMaxView;
 	}
 }
 
 void action_dib_mio168_pager_select_page() {
 	auto cursor = getFoundWidgetAtDown().cursor;
 	auto module = (Mio168Module *)g_slots[cursor / 6];
-    if (cursor % 6 != module->selectedPage) {
-        auto selectedPage = module->selectedPage;
-        module->selectedPage = cursor % 6;
+    if (cursor % 6 != module->selectedPageInMaxView) {
+        auto selectedPage = module->selectedPageInMaxView;
+        module->selectedPageInMaxView = cursor % 6;
 
-        if (module->selectedPage > selectedPage) {
+        if (module->selectedPageInMaxView > selectedPage) {
             animateSlideLeftWithoutHeader();
         } else {
             animateSlideRightWithoutHeader();
@@ -6131,14 +6275,33 @@ void action_dib_mio168_pager_select_page() {
 void data_dib_mio168_is_settings_page_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		auto module = (Mio168Module *)g_slots[cursor];
-		value = module->selectedPage == 6;
+		value = module->selectedPageInMaxView == 6;
 	}
 }
 
 void action_dib_mio168_show_slot_settings_in_max_view() {
-	auto module = (Mio168Module *)g_slots[getFoundWidgetAtDown().cursor];
-    module->selectedPage = 6;
+    auto slotIndex = getFoundWidgetAtDown().cursor;
+    hmi::selectSlot(slotIndex);
+	auto module = (Mio168Module *)g_slots[slotIndex];
+    module->selectedPageInMaxView = 6;
     animateSlideLeftWithoutHeader();
+}
+
+void data_dib_mio168_selected_page_in_default_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		auto module = (Mio168Module *)g_slots[cursor];
+		value = module->selectedPageInDefaultView;
+	}
+}
+
+void action_dib_mio168_select_page_in_default_view() {
+	auto module = (Mio168Module *)g_slots[getFoundWidgetAtDown().cursor];
+	module->selectedPageInDefaultView = (module->selectedPageInDefaultView + 1) % 7;
+	if (isDefaultViewVertical()) {
+		animateSlideLeftInDefaultViewVert(getFoundWidgetAtDown().cursor);
+	} else {
+		animateSlideLeftInDefaultViewHorz(getFoundWidgetAtDown().cursor);
+	}
 }
 
 void data_dib_mio168_is_no_afe(DataOperationEnum operation, Cursor cursor, Value &value) {

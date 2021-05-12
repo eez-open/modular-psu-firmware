@@ -84,6 +84,7 @@ void Writer::writeFileHeaderAndMetaFields(const Parameters &parameters) {
 
     writeUint8Field(FIELD_ID_X_UNIT, parameters.xAxis.unit);
     writeFloatField(FIELD_ID_X_STEP, parameters.xAxis.step);
+	m_xAxisStepFieldOffset = m_bufferIndex - 4;
     writeUint8Field(FIELD_ID_X_SCALE_TYPE, parameters.xAxis.scaleType);
     writeFloatField(FIELD_ID_X_RANGE_MIN, parameters.xAxis.range.min);
     writeFloatField(FIELD_ID_X_RANGE_MAX, parameters.xAxis.range.max);

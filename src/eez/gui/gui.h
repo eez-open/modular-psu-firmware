@@ -149,7 +149,7 @@ extern AnimRect g_animRects[MAX_ANIM_RECTS];
 
 void animateOpen(const Rect &srcRect, const Rect &dstRect);
 void animateClose(const Rect &srcRect, const Rect &dstRect);
-void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, float duration = -1);
+void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, float duration = -1, const Rect *clipRect = nullptr);
 
 float getDefaultAnimationDurationHook();
 

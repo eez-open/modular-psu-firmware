@@ -40,6 +40,12 @@
 
 #include <eez/memory.h>
 
+
+#if defined(EEZ_PLATFORM_STM32)
+extern RTC_HandleTypeDef hrtc;
+volatile uint32_t g_debugVarTickCountMs;
+#endif
+
 namespace eez {
 
 using namespace scpi;
@@ -268,30 +274,49 @@ static void setState(State newState) {
 }
 
 static void log() {
-    uint32_t tickCountMs = millis();
+	static uint32_t g_seconds;
+	static double g_subsecond;
+	static uint32_t g_iSample;
+	static uint32_t g_lastTickCountMs;
 
-    static uint32_t g_seconds;
-    static uint32_t g_millis;
-    static uint32_t g_iSample;
-    static uint32_t g_lastTickCountMs;
+#if defined(EEZ_PLATFORM_STM32)
+    uint32_t tickCountMs = 1024 - 4 * hrtc.Instance->SSR;
+    g_debugVarTickCountMs = tickCountMs;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	uint32_t tickCountMs = millis();
+#endif
 
     if (!g_countingStarted) {
         g_seconds = 0;
-        g_millis = 0;
+        g_subsecond = 0;
         g_iSample = 0;
         g_countingStarted = true;
         g_lastTickCountMs = tickCountMs;
     }
-	
-    g_millis += tickCountMs - g_lastTickCountMs;
-    g_lastTickCountMs = tickCountMs;
 
-    if (g_millis >= 1000) {
+#if defined(EEZ_PLATFORM_STM32)
+	int32_t diff = tickCountMs - g_lastTickCountMs;
+	if (diff < 0) {
+    	diff += 1024;
+    }
+	g_subsecond += diff / 1024.0;
+#endif
+	
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	uint32_t diff = tickCountMs - g_lastTickCountMs;
+	g_subsecond += diff / 1000.0;
+#endif
+
+	g_lastTickCountMs = tickCountMs;
+
+    if (g_subsecond >= 1.0) {
         ++g_seconds;
-        g_millis -= 1000;
+        g_subsecond -= 1.0;
     }
 
-    g_currentTime = g_seconds + g_millis * 1E-3;
+    g_currentTime = g_seconds + g_subsecond;
 
     if (g_traceInitiated) {
         // data is logged with the SCPI command `SENSe:DLOG:TRACe[:DATA]`
@@ -545,6 +570,13 @@ static void doFinish(bool afterError) {
 	g_activeRecording.parameters.finalDuration = g_currentTime;
 	g_file.seek(g_writer.getFinishTimeFieldOffset());
 	g_file.write(&g_activeRecording.parameters.finalDuration, 8);
+
+    if (!g_traceInitiated) {
+        // write X axis step
+	    g_file.seek(g_writer.getXAxisStepFieldOffset());
+        float xAxisStep = g_activeRecording.parameters.finalDuration / g_activeRecording.size;
+	    g_file.write(&xAxisStep, 4);
+    }
 
     // write data size
 	g_file.seek(g_writer.getDataSizeFieldOffset());
@@ -806,13 +838,13 @@ void reset() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void tick() {
-    if (g_state == STATE_EXECUTING && g_nextTime <= g_activeRecording.parameters.duration && !g_inStateTransition) {
+    if (g_state == STATE_EXECUTING && g_nextTime < g_activeRecording.parameters.duration && !g_inStateTransition) {
         log();
     }
 }
 
 void log(float *values) {
-    if (g_state == STATE_EXECUTING) {
+	if (g_state == STATE_EXECUTING && g_nextTime < g_activeRecording.parameters.duration && !g_inStateTransition) {
         for (int yAxisIndex = 0; yAxisIndex < g_activeRecording.parameters.numYAxes; yAxisIndex++) {
             g_writer.writeFloat(*values++);
         }
@@ -821,7 +853,7 @@ void log(float *values) {
 }
 
 void log(uint32_t bits) {
-    if (g_state == STATE_EXECUTING) {
+	if (g_state == STATE_EXECUTING && g_nextTime < g_activeRecording.parameters.duration && !g_inStateTransition) {
         g_writer.writeBit(1); // mark as valid sample
 
         for (int yAxisIndex = 0; yAxisIndex < g_activeRecording.parameters.numYAxes; yAxisIndex++) {
@@ -840,7 +872,7 @@ void log(uint32_t bits) {
 }
 
 void logInt16(uint8_t *values, uint32_t bits) {
-    if (g_state == STATE_EXECUTING) {
+	if (g_state == STATE_EXECUTING && g_nextTime < g_activeRecording.parameters.duration && !g_inStateTransition) {
         g_writer.writeBit(1); // mark as valid sample
 
         for (int yAxisIndex = 0; yAxisIndex < g_activeRecording.parameters.numYAxes; yAxisIndex++) {
@@ -864,7 +896,7 @@ void logInt16(uint8_t *values, uint32_t bits) {
 }
 
 void logInt24(uint8_t *values, uint32_t bits) {
-    if (g_state == STATE_EXECUTING) {
+	if (g_state == STATE_EXECUTING && g_nextTime < g_activeRecording.parameters.duration && !g_inStateTransition) {
         g_writer.writeBit(1); // mark as valid sample
 
         for (int yAxisIndex = 0; yAxisIndex < g_activeRecording.parameters.numYAxes; yAxisIndex++) {
@@ -888,7 +920,7 @@ void logInt24(uint8_t *values, uint32_t bits) {
 }
 
 void logInvalid() {
-    if (g_state == STATE_EXECUTING) {
+	if (g_state == STATE_EXECUTING && g_nextTime < g_activeRecording.parameters.duration && !g_inStateTransition) {
         if (g_activeRecording.parameters.dataContainsSampleValidityBit) {
             g_writer.writeBit(0); // mark as invalid sample
         }
@@ -924,7 +956,7 @@ void logBookmark(const char *text, size_t textLen) {
         return;
     }
 
-    if (g_state == STATE_EXECUTING) {
+    if (g_state == STATE_EXECUTING && g_nextTime < g_activeRecording.parameters.duration && !g_inStateTransition) {
         if (!g_bookmarksFileOpened) {
             char filePath[MAX_PATH_LENGTH];
 
