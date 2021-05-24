@@ -548,7 +548,11 @@ WidgetCursor SelectFromEnumPage::findWidget(int x, int y, bool clicked) {
 
 void SelectFromEnumPage::selectEnumItem() {
     int itemIndex = getFoundWidgetAtDown().widget->data;
-    onSet(getValue(itemIndex));
+	if (onSet) {
+		onSet(getValue(itemIndex));
+	} else {
+		popPage();
+	}
 }
 
 void SelectFromEnumPage::getItemPosition(int itemIndex, int &xItem, int &yItem) {

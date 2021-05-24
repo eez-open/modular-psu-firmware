@@ -35,6 +35,8 @@
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 
+#include <eez/function_generator.h>
+
 #include <eez/libs/sd_fat/sd_fat.h>
 
 #define CONF_AUTO_SAVE_TIMEOUT_MS 60 * 1000
@@ -765,6 +767,8 @@ static void saveState(Parameters &profile, List *lists) {
 
     eez::psu::gui::edit_mode_step::getProfileParameters(profile);
 
+	function_generator::getProfileParameters(profile);
+
     profile.flags.isValid = true;
 }
 
@@ -823,6 +827,8 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
         return false;
     }
 
+    function_generator::setProfileParameters(profile);
+
     mismatch = repositionChannelsInProfileToMatchCurrentChannelConfiguration(profile, lists);
 
     int numTrackingChannels = 0;
@@ -862,6 +868,8 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
     io_pins::refresh();
 
     eez::psu::gui::edit_mode_step::setProfileParameters(profile);
+
+	function_generator::setProfileParameters(profile);
 
     return true;
 }
@@ -1106,6 +1114,10 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
         return false;
     }
 
+	if (!function_generator::writeProfileProperties(ctx, parameters)) {
+		return false;
+	}
+
     return true;
 }
 
@@ -1236,6 +1248,21 @@ bool ReadContext::matchGroup(const char *groupNamePrefix, int &index) {
     char *endptr;
     index = strtol(startptr, &endptr, 10);
     return endptr > startptr;
+}
+
+bool ReadContext::property(const char *name, int &value) {
+	if (strcmp(propertyName, name) != 0) {
+		return false;
+	}
+
+	int temp;
+	if (sd_card::match(file, temp)) {
+		value = temp;
+	} else {
+		result = false;
+	}
+
+	return true;
 }
 
 bool ReadContext::property(const char *name, unsigned int &value) {
@@ -1441,6 +1468,10 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
     if (eez::psu::gui::edit_mode_step::readProfileProperties(ctx, parameters)) {
         return true;
     }
+
+	if (function_generator::readProfileProperties(ctx, parameters)) {
+		return true;
+	}
 
     return false;
 }

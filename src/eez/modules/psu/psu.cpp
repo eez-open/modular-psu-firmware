@@ -735,12 +735,57 @@ DlogResourceType PsuModule::getDlogResourceType(int subchannelIndex, int resourc
     return g_resourceTypes[resourceIndex];
 }
 
+static char g_resourceLabel[20];
+
 const char *PsuModule::getDlogResourceLabel(int subchannelIndex, int resourceIndex) {
     static const char *g_resourceTypeLabels[] = { "U", "I", "P" };
-    static char g_label[20];
     auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    snprintf(g_label, sizeof(g_label), "%s %s", channel->getLabelOrDefault(), g_resourceTypeLabels[resourceIndex]);
-    return g_label;
+    snprintf(g_resourceLabel, sizeof(g_resourceLabel), "%s %s", channel->getLabelOrDefault(), g_resourceTypeLabels[resourceIndex]);
+    return g_resourceLabel;
+}
+
+int PsuModule::getNumFunctionGeneratorResources(int subchannelIndex) {
+    return 2;
+}
+
+FunctionGeneratorResourceType PsuModule::getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex) {
+	return resourceIndex == 0 ? FUNCTION_GENERATOR_RESOURCE_TYPE_U : FUNCTION_GENERATOR_RESOURCE_TYPE_I;
+}
+
+const char *PsuModule::getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) {
+    static const char *g_resourceTypeLabels[] = { "U", "I" };
+    auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    snprintf(g_resourceLabel, sizeof(g_resourceLabel), "%s %s", channel->getLabelOrDefault(), g_resourceTypeLabels[resourceIndex]);
+    return g_resourceLabel;
+}
+
+void PsuModule::getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues) {
+    auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (resourceIndex == 0) {
+        min = channel->params.U_MIN;
+        max = channel->params.U_MAX;
+        if (stepValues) {
+            channel->getVoltageStepValues(stepValues, false);
+        }
+    } else {
+        min = channel->params.I_MIN;
+        max = channel->params.I_MAX;
+        if (stepValues) {
+            channel->getCurrentStepValues(stepValues, false, true);
+        }
+    }
+}
+
+void PsuModule::getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) {
+    min = 0.1f;
+    max = 400.0f;
+
+    if (stepValues) {
+        static float values[] = { 1.0f, 5.0f, 10.0f, 50.0f };
+        stepValues->values = values;
+        stepValues->count = sizeof(values) / sizeof(float);
+        stepValues->unit = UNIT_HERTZ;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

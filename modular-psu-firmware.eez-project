@@ -2337,6 +2337,11 @@
       "defaultValue": "[]"
     },
     {
+      "name": "dlog_items_num_selected",
+      "type": "string",
+      "defaultValue": "18 of 18 selected"
+    },
+    {
       "name": "dlog_item_is_checked",
       "type": "boolean",
       "enumItems": "[\"Disabed\", \"Enabled\", \"Unavailable\"]",
@@ -2356,11 +2361,6 @@
       "name": "dlog_items_scrollbar_enabled",
       "type": "boolean",
       "defaultValue": "1"
-    },
-    {
-      "name": "dlog_items_num_selected",
-      "type": "string",
-      "defaultValue": "18 of 18 selected"
     },
     {
       "name": "dlog_start_enabled",
@@ -2531,6 +2531,105 @@
     {
       "name": "dlog_y_value_cursor",
       "defaultValue": "3.000 V"
+    },
+    {
+      "name": "function_generator_channels",
+      "type": "list",
+      "defaultValue": "[{}, {}, {}, {}]"
+    },
+    {
+      "name": "function_generator_any_channel_selected",
+      "type": "boolean",
+      "enumItems": "[\"Disabed\", \"Enabled\", \"Unavailable\"]",
+      "defaultValue": "1"
+    },
+    {
+      "name": "function_generator_channel",
+      "type": "string",
+      "defaultValue": "101"
+    },
+    {
+      "name": "function_generator_item_label",
+      "type": "string",
+      "defaultValue": "DCP405 #1 U"
+    },
+    {
+      "name": "function_generator_item_is_checked",
+      "type": "boolean",
+      "enumItems": "[\"Disabed\", \"Enabled\", \"Unavailable\"]",
+      "defaultValue": "1"
+    },
+    {
+      "name": "function_generator_is_max_selected",
+      "type": "boolean",
+      "enumItems": "[\"Disabed\", \"Enabled\", \"Unavailable\"]",
+      "defaultValue": "1"
+    },
+    {
+      "name": "function_generator_num_selected",
+      "type": "string",
+      "defaultValue": "18 of 18 selected"
+    },
+    {
+      "name": "function_generator_item_is_selected",
+      "type": "boolean",
+      "enumItems": "[\"Disabed\", \"Enabled\", \"Unavailable\"]",
+      "defaultValue": "0"
+    },
+    {
+      "name": "function_generator_waveform",
+      "type": "enum",
+      "enumItems": "[\n\"None\",\n\"Sine wave\",\n\"Triangle\",\n\"Square wave\",\n\"Pulse\",\n\"Sawtooth\",\n\"Arbitrary\"\n]",
+      "defaultValue": "Sine wave"
+    },
+    {
+      "name": "function_generator_waveform_label",
+      "type": "string",
+      "enumItems": "[\n\"None\",\n\"Sine wave\",\n\"Triangle\",\n\"Square wave\",\n\"Pulse\",\n\"Sawtooth\",\n\"Arbitrary\"\n]",
+      "defaultValue": "Sine wave"
+    },
+    {
+      "name": "function_generator_frequency",
+      "type": "float",
+      "defaultValue": "50 Hz"
+    },
+    {
+      "name": "function_generator_mode",
+      "type": "float",
+      "defaultValue": "50 Hz"
+    },
+    {
+      "name": "function_generator_phase_shift",
+      "type": "float",
+      "defaultValue": "25 DEG"
+    },
+    {
+      "name": "function_generator_amplitude",
+      "type": "float",
+      "defaultValue": "10 V"
+    },
+    {
+      "name": "function_generator_offset",
+      "type": "float",
+      "defaultValue": "5 V"
+    },
+    {
+      "name": "function_generator_pulse_width",
+      "type": "float",
+      "defaultValue": "75 %"
+    },
+    {
+      "name": "function_generator_canvas"
+    },
+    {
+      "name": "function_generator_has_mode_select",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "function_generator_has_pulse_width",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -3784,6 +3883,36 @@
       "components": [],
       "connectionLines": [],
       "name": "show_pinout"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "show_sys_settings_function_generator"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_select_waveform"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_item_toggle_selected"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_item_toggle_checked"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_select_channels"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_mode_select_mode"
     }
   ],
   "pages": [
@@ -21087,8 +21216,8 @@
             },
             {
               "type": "MultilineText",
-              "left": 123,
-              "top": 3,
+              "left": 3,
+              "top": 123,
               "width": 114,
               "height": 54,
               "wireID": "d3b8a9ff-8a24-4430-a9ca-902a6aa7cc73",
@@ -21102,8 +21231,8 @@
             },
             {
               "type": "MultilineText",
-              "left": 243,
-              "top": 3,
+              "left": 123,
+              "top": 63,
               "width": 114,
               "height": 54,
               "wireID": "a388597d-856a-409c-d869-022b024919a7",
@@ -21117,8 +21246,8 @@
             },
             {
               "type": "MultilineText",
-              "left": 363,
-              "top": 3,
+              "left": 243,
+              "top": 63,
               "width": 114,
               "height": 54,
               "wireID": "c02c71d7-b29a-4c2e-f621-331a1f5b74b1",
@@ -21127,6 +21256,21 @@
                 "inheritFrom": "icon_and_text_S"
               },
               "text": "\\u00b5 Ramp & delay",
+              "firstLineIndent": 0,
+              "hangingIndent": 24
+            },
+            {
+              "type": "MultilineText",
+              "left": 363,
+              "top": 63,
+              "width": 114,
+              "height": 54,
+              "wireID": "c7e1a43c-f9ec-41c1-d9bb-cf2dd0cbe0dc",
+              "action": "show_sys_settings_function_generator",
+              "style": {
+                "inheritFrom": "icon_and_text_S"
+              },
+              "text": "\\u00c2 Function generator",
               "firstLineIndent": 0,
               "hangingIndent": 24
             },
@@ -21148,7 +21292,7 @@
             {
               "type": "MultilineText",
               "left": 123,
-              "top": 63,
+              "top": 3,
               "width": 114,
               "height": 54,
               "wireID": "e824c60c-4018-46bb-b767-c595efbdb15f",
@@ -21163,7 +21307,7 @@
             {
               "type": "Select",
               "left": 243,
-              "top": 63,
+              "top": 3,
               "width": 114,
               "height": 54,
               "wireID": "e7ae7636-e5fc-4d9e-88fe-d35e19727bbe",
@@ -21295,6 +21439,53 @@
               ]
             },
             {
+              "type": "Select",
+              "left": 363,
+              "top": 3,
+              "width": 114,
+              "height": 54,
+              "wireID": "b3f94ff1-7230-49ed-a77e-41a007347102",
+              "data": "mqtt_in_error",
+              "action": "show_sys_settings_mqtt",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "MultilineText",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "5ac787c8-ae19-4834-c272-116043b4f274",
+                  "action": "",
+                  "style": {
+                    "inheritFrom": "icon_and_text_S"
+                  },
+                  "text": "\\u00bf MQTT",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                },
+                {
+                  "type": "MultilineText",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "09b7f5d2-ca75-44f2-9a9a-722fb86f77f1",
+                  "action": "",
+                  "style": {
+                    "inheritFrom": "icon_and_text_S",
+                    "color": "status_warning",
+                    "activeBackgroundColor": "status_warning"
+                  },
+                  "text": "\\u009a MQTT",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                }
+              ]
+            },
+            {
               "type": "MultilineText",
               "left": 3,
               "top": 183,
@@ -21312,8 +21503,8 @@
             },
             {
               "type": "MultilineText",
-              "left": 3,
-              "top": 123,
+              "left": 123,
+              "top": 183,
               "width": 114,
               "height": 54,
               "wireID": "9709ac36-0396-466d-d29e-4f5e6d95af6b",
@@ -21358,7 +21549,7 @@
             },
             {
               "type": "Select",
-              "left": 123,
+              "left": 243,
               "top": 183,
               "width": 114,
               "height": 54,
@@ -21400,53 +21591,6 @@
                     "activeBackgroundColor": "status_warning"
                   },
                   "text": "\\u0080 System info",
-                  "firstLineIndent": 0,
-                  "hangingIndent": 24
-                }
-              ]
-            },
-            {
-              "type": "Select",
-              "left": 363,
-              "top": 63,
-              "width": 114,
-              "height": 54,
-              "wireID": "b3f94ff1-7230-49ed-a77e-41a007347102",
-              "data": "mqtt_in_error",
-              "action": "show_sys_settings_mqtt",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "MultilineText",
-                  "left": 0,
-                  "top": 0,
-                  "width": 114,
-                  "height": 54,
-                  "wireID": "5ac787c8-ae19-4834-c272-116043b4f274",
-                  "action": "",
-                  "style": {
-                    "inheritFrom": "icon_and_text_S"
-                  },
-                  "text": "\\u00bf MQTT",
-                  "firstLineIndent": 0,
-                  "hangingIndent": 24
-                },
-                {
-                  "type": "MultilineText",
-                  "left": 0,
-                  "top": 0,
-                  "width": 114,
-                  "height": 54,
-                  "wireID": "09b7f5d2-ca75-44f2-9a9a-722fb86f77f1",
-                  "action": "",
-                  "style": {
-                    "inheritFrom": "icon_and_text_S",
-                    "color": "status_warning",
-                    "activeBackgroundColor": "status_warning"
-                  },
-                  "text": "\\u009a MQTT",
                   "firstLineIndent": 0,
                   "hangingIndent": 24
                 }
@@ -30042,6 +30186,1129 @@
       "components": [
         {
           "type": "Container",
+          "left": 0,
+          "top": 0,
+          "width": 480,
+          "height": 240,
+          "wireID": "f2275a04-3f9f-4f7e-84e0-7c7af309466a",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Content",
+          "widgets": [
+            {
+              "type": "Canvas",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 118,
+              "wireID": "a0e4957e-8028-454a-c38c-392ca72498f8",
+              "data": "function_generator_canvas",
+              "style": {
+                "inheritFrom": "yt_graph"
+              }
+            },
+            {
+              "type": "List",
+              "left": 0,
+              "top": 118,
+              "width": 160,
+              "height": 120,
+              "wireID": "fddb4dfb-f9d8-4508-ff7d-50e9d9b98073",
+              "data": "function_generator_channels",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Select",
+                "left": 0,
+                "top": 0,
+                "width": 160,
+                "height": 30,
+                "wireID": "43d5728e-0de2-4312-c9f5-b1045239245c",
+                "data": "function_generator_item_is_selected",
+                "action": "function_generator_item_toggle_selected",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 160,
+                    "height": 30,
+                    "wireID": "b24eec4b-ea12-4463-9089-1fd066ec8fce",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "left": 0,
+                        "top": 0,
+                        "width": 6,
+                        "height": 30,
+                        "wireID": "6214a122-52fe-4c2e-8066-8c14d6afc80d",
+                        "style": {
+                          "inheritFrom": "channel1"
+                        },
+                        "invertColors": true
+                      },
+                      {
+                        "type": "Text",
+                        "left": 6,
+                        "top": 0,
+                        "width": 36,
+                        "height": 30,
+                        "wireID": "c3ed44c6-5506-4f51-e90c-556698340724",
+                        "data": "function_generator_channel",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "alignHorizontal": "left",
+                          "padding": "0"
+                        },
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "left": 42,
+                        "top": 0,
+                        "width": 118,
+                        "height": 30,
+                        "wireID": "51df7739-d02d-46de-a994-56a23c406cf4",
+                        "data": "function_generator_item_label",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "alignHorizontal": "left",
+                          "padding": "0"
+                        },
+                        "text": ""
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 160,
+                    "height": 30,
+                    "wireID": "6a1418a4-c141-4e84-9f5a-1b67bfaf4150",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Rectangle",
+                        "left": 0,
+                        "top": 0,
+                        "width": 6,
+                        "height": 30,
+                        "wireID": "6214a122-52fe-4c2e-8066-8c14d6afc80d",
+                        "style": {
+                          "inheritFrom": "channel1"
+                        },
+                        "invertColors": true
+                      },
+                      {
+                        "type": "Text",
+                        "left": 6,
+                        "top": 0,
+                        "width": 36,
+                        "height": 30,
+                        "wireID": "c3ed44c6-5506-4f51-e90c-556698340724",
+                        "data": "function_generator_channel",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "alignHorizontal": "left",
+                          "color": "background",
+                          "backgroundColor": "text_regular",
+                          "activeColor": "text_regular",
+                          "activeBackgroundColor": "background",
+                          "padding": "0"
+                        },
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "left": 42,
+                        "top": 0,
+                        "width": 118,
+                        "height": 30,
+                        "wireID": "51df7739-d02d-46de-a994-56a23c406cf4",
+                        "data": "function_generator_item_label",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "alignHorizontal": "left",
+                          "color": "background",
+                          "backgroundColor": "text_regular",
+                          "activeColor": "text_regular",
+                          "activeBackgroundColor": "background",
+                          "padding": "0"
+                        },
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              "listType": "vertical",
+              "gap": 0
+            },
+            {
+              "type": "ScrollBar",
+              "left": 160,
+              "top": 118,
+              "width": 32,
+              "height": 120,
+              "wireID": "8adad318-35ee-4808-9cc2-9e6b7f1d66f7",
+              "data": "function_generator_channels",
+              "action": "scroll",
+              "style": {
+                "inheritFrom": "default_inverse"
+              },
+              "thumbStyle": {
+                "inheritFrom": "scrollbar_thumb"
+              },
+              "buttonsStyle": {
+                "inheritFrom": "scrollbar_button"
+              },
+              "leftButtonText": "\\u0083",
+              "rightButtonText": "\\u0084"
+            },
+            {
+              "type": "Select",
+              "left": 192,
+              "top": 118,
+              "width": 288,
+              "height": 122,
+              "wireID": "1103fe72-188f-4309-e497-dc8146dc9114",
+              "data": "function_generator_any_channel_selected",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 288,
+                  "height": 122,
+                  "wireID": "fc8df9d9-cdd8-4804-c0a7-e684c0154b11",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "invertColors": true
+                },
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 288,
+                  "height": 122,
+                  "wireID": "92f039e6-e4a9-49e9-b3b5-5b459c942454",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 2,
+                      "width": 86,
+                      "height": 30,
+                      "wireID": "6558e91d-5b38-468f-bdcb-3cb8bdd48588",
+                      "style": {
+                        "inheritFrom": "edit_value_M_left",
+                        "font": "Oswald14"
+                      },
+                      "text": "Waveform:"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 94,
+                      "top": 2,
+                      "width": 194,
+                      "height": 30,
+                      "wireID": "8dae9187-d08d-4c27-bd12-237cb78aeac1",
+                      "data": "function_generator_waveform_label",
+                      "action": "function_generator_select_waveform",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center",
+                        "font": "Oswald14"
+                      },
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 34,
+                      "width": 46,
+                      "height": 28,
+                      "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
+                      "style": {
+                        "inheritFrom": "edit_value_S_left"
+                      },
+                      "text": "Frq:"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "left": 46,
+                      "top": 34,
+                      "width": 98,
+                      "height": 28,
+                      "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                      "data": "function_generator_frequency",
+                      "action": "edit",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "padding": "0 5"
+                      },
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "Text",
+                      "left": 144,
+                      "top": 34,
+                      "width": 46,
+                      "height": 28,
+                      "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
+                      "style": {
+                        "inheritFrom": "edit_value_S_left",
+                        "padding": "0 0 0 2"
+                      },
+                      "text": "PSft:"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "left": 190,
+                      "top": 34,
+                      "width": 98,
+                      "height": 28,
+                      "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                      "data": "function_generator_phase_shift",
+                      "action": "edit",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "padding": "0 5"
+                      },
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 64,
+                      "width": 46,
+                      "height": 28,
+                      "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                      "style": {
+                        "inheritFrom": "edit_value_S_left"
+                      },
+                      "text": "Amp:"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "left": 46,
+                      "top": 64,
+                      "width": 98,
+                      "height": 28,
+                      "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                      "data": "function_generator_amplitude",
+                      "action": "edit",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "padding": "0 5"
+                      },
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "Text",
+                      "left": 144,
+                      "top": 64,
+                      "width": 46,
+                      "height": 28,
+                      "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                      "style": {
+                        "inheritFrom": "edit_value_S_left",
+                        "padding": "0 0 0 2"
+                      },
+                      "text": "Ofs:"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "left": 190,
+                      "top": 64,
+                      "width": 98,
+                      "height": 28,
+                      "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                      "data": "function_generator_offset",
+                      "action": "edit",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "padding": "0 5"
+                      },
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "Select",
+                      "left": 0,
+                      "top": 94,
+                      "width": 144,
+                      "height": 28,
+                      "wireID": "3a10a1c6-af20-4974-97b5-318959731ad4",
+                      "data": "function_generator_has_mode_select",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "RectangleWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 144,
+                          "height": 28,
+                          "wireID": "f564df57-b89b-4529-8d83-e128e0af016e",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "invertColors": true
+                        },
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 144,
+                          "height": 28,
+                          "wireID": "b9a0a5d6-6e92-4779-a4cc-4d7173f2da48",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 46,
+                              "height": 28,
+                              "wireID": "a53aeea1-bae6-4f26-e465-a741570c3dab",
+                              "style": {
+                                "inheritFrom": "edit_value_S_left"
+                              },
+                              "text": "Mode:"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 46,
+                              "top": 0,
+                              "width": 98,
+                              "height": 28,
+                              "wireID": "af7e6997-6b6a-4efc-eb60-31ebf6268b91",
+                              "data": "function_generator_mode",
+                              "action": "function_generator_mode_select_mode",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "padding": "0 5"
+                              },
+                              "displayOption": 0
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Select",
+                      "left": 144,
+                      "top": 94,
+                      "width": 144,
+                      "height": 28,
+                      "wireID": "9342d96e-df8e-47bb-8278-e4628954ec72",
+                      "data": "function_generator_has_pulse_width",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "RectangleWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 144,
+                          "height": 28,
+                          "wireID": "8f983108-a5e4-4d30-a312-c2cc9ca0e431",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "invertColors": true
+                        },
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 144,
+                          "height": 28,
+                          "wireID": "86b0a4f5-2e33-44fe-81c0-87c78f2192bb",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 46,
+                              "height": 28,
+                              "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
+                              "style": {
+                                "inheritFrom": "edit_value_S_left",
+                                "padding": "0 0 0 2"
+                              },
+                              "text": "PWdt:"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 46,
+                              "top": 0,
+                              "width": 98,
+                              "height": 28,
+                              "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                              "data": "function_generator_pulse_width",
+                              "action": "edit",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "padding": "0 5"
+                              },
+                              "displayOption": 0
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 240,
+          "width": 480,
+          "height": 32,
+          "wireID": "983e08a6-c973-4cb6-9c6a-448221b7b3c1",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Status line",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 41,
+              "height": 32,
+              "wireID": "bca0eb2f-f370-4bad-9c37-fb08d73ba81e",
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "status_icon_enabled"
+              },
+              "text": "E"
+            },
+            {
+              "type": "Text",
+              "left": 41,
+              "top": 0,
+              "width": 155,
+              "height": 32,
+              "wireID": "88f6c35b-5e6e-45b7-829b-1b84ad14dd87",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "text": "Function Generator"
+            },
+            {
+              "type": "Text",
+              "left": 196,
+              "top": 0,
+              "width": 131,
+              "height": 32,
+              "wireID": "15c34950-febc-4e93-adf6-f9fffbab83c9",
+              "action": "function_generator_select_channels",
+              "style": {
+                "inheritFrom": "status_bgnd",
+                "font": "Oswald14",
+                "color": "action_color",
+                "activeBackgroundColor": "action_color"
+              },
+              "text": "Select channels"
+            },
+            {
+              "type": "RectangleWidget",
+              "left": 327,
+              "top": 0,
+              "width": 71,
+              "height": 32,
+              "wireID": "fc8df9d9-cdd8-4804-c0a7-e684c0154b11",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "invertColors": true
+            },
+            {
+              "type": "Select",
+              "left": 398,
+              "top": 0,
+              "width": 82,
+              "height": 32,
+              "wireID": "9ffde51e-1dde-47f9-a354-58cbe230693d",
+              "data": "set_page_dirty",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 82,
+                  "height": 32,
+                  "wireID": "ab6a755d-fc93-4e11-b752-77435df3451e",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Rectangle",
+                      "left": 0,
+                      "top": 0,
+                      "width": 82,
+                      "height": 32,
+                      "wireID": "acaa4e5a-ca3b-4be2-cab4-23fd5411cd20",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "color": "status_line_text",
+                        "backgroundColor": "status_line_background",
+                        "activeColor": "status_line_background",
+                        "activeBackgroundColor": "status_line_text"
+                      },
+                      "invertColors": true
+                    }
+                  ]
+                },
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 82,
+                  "height": 32,
+                  "wireID": "d51f8e0f-198c-44cd-e239-b8dae9387d45",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 41,
+                      "height": 32,
+                      "wireID": "56ca45ed-bf07-4c3c-95a0-24de2da3c678",
+                      "action": "set",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "font": "Heydings14",
+                        "alignVertical": "center",
+                        "color": "status_line_text",
+                        "backgroundColor": "status_line_background",
+                        "activeColor": "status_line_background",
+                        "activeBackgroundColor": "status_line_text"
+                      },
+                      "text": "_"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 41,
+                      "top": 0,
+                      "width": 41,
+                      "height": 32,
+                      "wireID": "050b7a31-17a3-4f83-85cf-c43b9b9cc39d",
+                      "action": "discard",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "font": "Heydings14",
+                        "alignVertical": "center",
+                        "color": "status_line_text",
+                        "backgroundColor": "status_line_background",
+                        "activeColor": "status_line_background",
+                        "activeBackgroundColor": "status_line_text"
+                      },
+                      "text": "X"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "name": "sys_settings_function_generator",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272,
+      "dataContextOverrides": "{\n    \"ramp_and_delay_list\": [\n        {\n            \"channel_short_title_without_tracking_icon\": \"#1\",\n            \"channel_u_trigger_value\": \"10 V\",\n            \"channel_voltage_ramp\": \"100 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"0 s\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#2\",\n            \"channel_u_trigger_value\": \"12 V\",\n            \"channel_voltage_ramp\": \"200 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"50 ms\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#3\",\n            \"channel_u_trigger_value\": \"15 V\",\n            \"channel_voltage_ramp\": \"300 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"100 ms\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#4\",\n            \"channel_u_trigger_value\": \"18 V\",\n            \"channel_voltage_ramp\": \"2 s\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"1 s\"\n        }\n    ]\n}"
+    },
+    {
+      "components": [
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 0,
+          "width": 480,
+          "height": 239,
+          "wireID": "f2275a04-3f9f-4f7e-84e0-7c7af309466a",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Content",
+          "widgets": [
+            {
+              "type": "List",
+              "left": 0,
+              "top": 0,
+              "width": 448,
+              "height": 238,
+              "wireID": "fddb4dfb-f9d8-4508-ff7d-50e9d9b98073",
+              "data": "function_generator_channels",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Select",
+                "left": 0,
+                "top": 0,
+                "width": 448,
+                "height": 34,
+                "wireID": "36449ebb-4905-447e-de6c-b60483ccadd9",
+                "data": "function_generator_is_max_selected",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 448,
+                    "height": 34,
+                    "wireID": "9234c3ac-b2f7-4a65-d535-2bf11ad54b77",
+                    "action": "function_generator_item_toggle_checked",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Select",
+                        "left": 0,
+                        "top": 0,
+                        "width": 36,
+                        "height": 34,
+                        "wireID": "abc9a112-548e-4d63-adb4-ae68b97c42fe",
+                        "data": "function_generator_item_is_checked",
+                        "action": "",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 36,
+                            "height": 34,
+                            "wireID": "ed9ff35d-849b-4309-b89d-5aee70bd3bcf",
+                            "style": {
+                              "inheritFrom": "default_S"
+                            },
+                            "text": "\\u00a0"
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 36,
+                            "height": 34,
+                            "wireID": "3e72229f-f141-4b48-a43f-e7158b87b15f",
+                            "style": {
+                              "inheritFrom": "default_S"
+                            },
+                            "text": "\\u009F"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Text",
+                        "left": 36,
+                        "top": 0,
+                        "width": 36,
+                        "height": 34,
+                        "wireID": "c3ed44c6-5506-4f51-e90c-556698340724",
+                        "data": "function_generator_channel",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "alignHorizontal": "left",
+                          "padding": "0"
+                        },
+                        "text": ""
+                      },
+                      {
+                        "type": "Text",
+                        "left": 72,
+                        "top": 0,
+                        "width": 376,
+                        "height": 34,
+                        "wireID": "51df7739-d02d-46de-a994-56a23c406cf4",
+                        "data": "function_generator_item_label",
+                        "style": {
+                          "inheritFrom": "default_S_left",
+                          "alignHorizontal": "left",
+                          "padding": "0"
+                        },
+                        "text": ""
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Select",
+                    "left": 0,
+                    "top": 0,
+                    "width": 448,
+                    "height": 34,
+                    "wireID": "f326d8c7-40ea-40e5-8153-48f913943047",
+                    "data": "function_generator_item_is_checked",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Container",
+                        "left": 0,
+                        "top": 0,
+                        "width": 448,
+                        "height": 34,
+                        "wireID": "45f7aa01-8e66-4d3c-91b4-34adac86ce33",
+                        "action": "",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 36,
+                            "height": 34,
+                            "wireID": "ed9ff35d-849b-4309-b89d-5aee70bd3bcf",
+                            "style": {
+                              "inheritFrom": "default_S",
+                              "color": "text_disabled",
+                              "activeBackgroundColor": "text_disabled"
+                            },
+                            "text": "\\u00a0"
+                          },
+                          {
+                            "type": "Text",
+                            "left": 36,
+                            "top": 0,
+                            "width": 36,
+                            "height": 34,
+                            "wireID": "c3ed44c6-5506-4f51-e90c-556698340724",
+                            "data": "function_generator_channel",
+                            "style": {
+                              "inheritFrom": "default_S_left",
+                              "alignHorizontal": "left",
+                              "color": "text_disabled",
+                              "activeBackgroundColor": "text_disabled",
+                              "padding": "0"
+                            },
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "left": 72,
+                            "top": 0,
+                            "width": 376,
+                            "height": 34,
+                            "wireID": "51df7739-d02d-46de-a994-56a23c406cf4",
+                            "data": "function_generator_item_label",
+                            "style": {
+                              "inheritFrom": "default_S_left",
+                              "alignHorizontal": "left",
+                              "color": "text_disabled",
+                              "activeBackgroundColor": "text_disabled",
+                              "padding": "0"
+                            },
+                            "text": ""
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "left": 0,
+                        "top": 0,
+                        "width": 448,
+                        "height": 34,
+                        "wireID": "7384e3c4-549e-48e4-a70d-79d31d5561c2",
+                        "action": "function_generator_item_toggle_checked",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 36,
+                            "height": 34,
+                            "wireID": "3e72229f-f141-4b48-a43f-e7158b87b15f",
+                            "style": {
+                              "inheritFrom": "default_S"
+                            },
+                            "text": "\\u009F"
+                          },
+                          {
+                            "type": "Text",
+                            "left": 36,
+                            "top": 0,
+                            "width": 36,
+                            "height": 34,
+                            "wireID": "c3ed44c6-5506-4f51-e90c-556698340724",
+                            "data": "function_generator_channel",
+                            "style": {
+                              "inheritFrom": "default_S_left",
+                              "alignHorizontal": "left",
+                              "padding": "0"
+                            },
+                            "text": ""
+                          },
+                          {
+                            "type": "Text",
+                            "left": 72,
+                            "top": 0,
+                            "width": 376,
+                            "height": 34,
+                            "wireID": "51df7739-d02d-46de-a994-56a23c406cf4",
+                            "data": "function_generator_item_label",
+                            "style": {
+                              "inheritFrom": "default_S_left",
+                              "alignHorizontal": "left",
+                              "padding": "0"
+                            },
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "listType": "vertical",
+              "gap": 0
+            },
+            {
+              "type": "ScrollBar",
+              "left": 448,
+              "top": 0,
+              "width": 32,
+              "height": 239,
+              "wireID": "8adad318-35ee-4808-9cc2-9e6b7f1d66f7",
+              "data": "function_generator_channels",
+              "style": {
+                "inheritFrom": "default_inverse"
+              },
+              "thumbStyle": {
+                "inheritFrom": "scrollbar_thumb"
+              },
+              "buttonsStyle": {
+                "inheritFrom": "scrollbar_button"
+              },
+              "leftButtonText": "\\u0083",
+              "rightButtonText": "\\u0084"
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 240,
+          "width": 480,
+          "height": 32,
+          "wireID": "15bf5ea6-3ef3-4046-a1bc-46b1a40c10f3",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Status line",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 41,
+              "height": 32,
+              "wireID": "bca0eb2f-f370-4bad-9c37-fb08d73ba81e",
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "status_icon_enabled"
+              },
+              "text": "E"
+            },
+            {
+              "type": "Text",
+              "left": 41,
+              "top": 0,
+              "width": 163,
+              "height": 32,
+              "wireID": "88f6c35b-5e6e-45b7-829b-1b84ad14dd87",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "text": "Select channels"
+            },
+            {
+              "type": "Text",
+              "left": 204,
+              "top": 0,
+              "width": 136,
+              "height": 32,
+              "wireID": "5e940091-ae8d-40d8-b2a2-d3cdc79e1b39",
+              "data": "function_generator_num_selected",
+              "style": {
+                "inheritFrom": "status_title",
+                "alignHorizontal": "right"
+              },
+              "text": ""
+            },
+            {
+              "type": "RectangleWidget",
+              "left": 340,
+              "top": 0,
+              "width": 64,
+              "height": 32,
+              "wireID": "b1b0ff18-928c-4867-cdb5-6e8978b5d8f8",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "invertColors": true
+            },
+            {
+              "type": "Select",
+              "left": 398,
+              "top": 0,
+              "width": 82,
+              "height": 32,
+              "wireID": "9ffde51e-1dde-47f9-a354-58cbe230693d",
+              "data": "set_page_dirty",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 82,
+                  "height": 32,
+                  "wireID": "ab6a755d-fc93-4e11-b752-77435df3451e",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Rectangle",
+                      "left": 0,
+                      "top": 0,
+                      "width": 82,
+                      "height": 32,
+                      "wireID": "acaa4e5a-ca3b-4be2-cab4-23fd5411cd20",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "color": "status_line_text",
+                        "backgroundColor": "status_line_background",
+                        "activeColor": "status_line_background",
+                        "activeBackgroundColor": "status_line_text"
+                      },
+                      "invertColors": true
+                    }
+                  ]
+                },
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 82,
+                  "height": 32,
+                  "wireID": "d51f8e0f-198c-44cd-e239-b8dae9387d45",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 41,
+                      "height": 32,
+                      "wireID": "56ca45ed-bf07-4c3c-95a0-24de2da3c678",
+                      "action": "set",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "font": "Heydings14",
+                        "alignVertical": "center",
+                        "color": "status_line_text",
+                        "backgroundColor": "status_line_background",
+                        "activeColor": "status_line_background",
+                        "activeBackgroundColor": "status_line_text"
+                      },
+                      "text": "_"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 41,
+                      "top": 0,
+                      "width": 41,
+                      "height": 32,
+                      "wireID": "050b7a31-17a3-4f83-85cf-c43b9b9cc39d",
+                      "action": "discard",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "font": "Heydings14",
+                        "alignVertical": "center",
+                        "color": "status_line_text",
+                        "backgroundColor": "status_line_background",
+                        "activeColor": "status_line_background",
+                        "activeBackgroundColor": "status_line_text"
+                      },
+                      "text": "X"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "name": "sys_settings_function_generator_select_channels",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272,
+      "dataContextOverrides": "{\n    \"ramp_and_delay_list\": [\n        {\n            \"channel_short_title_without_tracking_icon\": \"#1\",\n            \"channel_u_trigger_value\": \"10 V\",\n            \"channel_voltage_ramp\": \"100 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"0 s\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#2\",\n            \"channel_u_trigger_value\": \"12 V\",\n            \"channel_voltage_ramp\": \"200 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"50 ms\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#3\",\n            \"channel_u_trigger_value\": \"15 V\",\n            \"channel_voltage_ramp\": \"300 ms\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"100 ms\"\n        },\n        {\n            \"channel_short_title_without_tracking_icon\": \"#4\",\n            \"channel_u_trigger_value\": \"18 V\",\n            \"channel_voltage_ramp\": \"2 s\",\n            \"channel_i_trigger_value\": \"500 mA\",\n            \"channel_output_delay\": \"1 s\"\n        }\n    ]\n}"
+    },
+    {
+      "components": [
+        {
+          "type": "Container",
           "left": 8,
           "top": 8,
           "width": 472,
@@ -35253,7 +36520,7 @@
                                               "width": 100,
                                               "height": 32,
                                               "wireID": "eff80a63-a83b-4b3b-f8f5-07a8e6648209",
-                                              "data": "dlog_x_axis_max_value",
+                                              "data": "dlog_current_time",
                                               "style": {
                                                 "inheritFrom": "edit_value_S_left",
                                                 "alignHorizontal": "left",
@@ -46863,7 +48130,7 @@
         {
           "encoding": 137,
           "x": 3,
-          "y": 0,
+          "y": -2,
           "width": 13,
           "height": 19,
           "dx": 19,
@@ -47043,7 +48310,7 @@
         {
           "encoding": 147,
           "x": 0,
-          "y": 0,
+          "y": -2,
           "width": 19,
           "height": 19,
           "dx": 19,
@@ -47061,7 +48328,7 @@
         {
           "encoding": 148,
           "x": 3,
-          "y": 0,
+          "y": -2,
           "width": 14,
           "height": 19,
           "dx": 19,
@@ -47079,7 +48346,7 @@
         {
           "encoding": 149,
           "x": 0,
-          "y": 0,
+          "y": -2,
           "width": 19,
           "height": 19,
           "dx": 19,
@@ -47133,7 +48400,7 @@
         {
           "encoding": 152,
           "x": 0,
-          "y": 0,
+          "y": -2,
           "width": 19,
           "height": 19,
           "dx": 19,
@@ -47151,7 +48418,7 @@
         {
           "encoding": 153,
           "x": 0,
-          "y": 0,
+          "y": -2,
           "width": 18,
           "height": 20,
           "dx": 19,
@@ -47169,7 +48436,7 @@
         {
           "encoding": 154,
           "x": 0,
-          "y": -1,
+          "y": -3,
           "width": 19,
           "height": 20,
           "dx": 19,
@@ -47187,7 +48454,7 @@
         {
           "encoding": 155,
           "x": 0,
-          "y": 0,
+          "y": -2,
           "width": 19,
           "height": 19,
           "dx": 19,
@@ -47205,7 +48472,7 @@
         {
           "encoding": 156,
           "x": 0,
-          "y": 0,
+          "y": -2,
           "width": 19,
           "height": 19,
           "dx": 19,
@@ -47879,6 +49146,132 @@
             "width": 11,
             "height": 16,
             "pixelArray": "35465667000e6d8c65000077c4ffff4bfeb2e5ffbd000006fcff9f0a0013e2ff4b0000e5ff0700000092ff650000e9ff070000007fff6f0000efff070000007fff720000f5ff070000007fff750000faff070000007fff790000ffff070000007fff7c0000ffff070000007fff7f0000ffff0700000081ff7f000000000000000085ff7f000000000000000089ff7f00000000000000008dff7f000000000000000090ff7f00000000000000007db26e"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 194,
+          "x": 0,
+          "y": -3,
+          "width": 20,
+          "height": 20,
+          "dx": 20,
+          "glyphBitmap": {
+            "width": 20,
+            "height": 20,
+            "pixelArray": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a01000000000000000000000000000000000007e36d000000000000000000000000000000000047fec600000000000000000000000000000000009afefc1e00000000000000000000165f00000003e8b0fc7000000000000000000000a4fc2c00003cfe39c9c400000000000000000038fcfc98000090e10275fb1c12676a6a41142e2fc8cc7df21102e0920022fc6da2fefdfdc7c4fefefc3f17f67034fe430000c9dffc811412061d3a352b0000a2d98bea05000075fedd090000000000000000003afdfc9f00000021f6540000000000000000000001cafe4c000000001000000000000000000000000058df09000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 195,
+          "x": 0,
+          "y": -3,
+          "width": 44,
+          "height": 20,
+          "dx": 44,
+          "glyphBitmap": {
+            "width": 44,
+            "height": 20,
+            "pixelArray": "00000000000000000000011b52705a1f020000000000000000000000000000000000000000000000002a7c1b0000000000000000011a79dbdfdfdfd98614000000000000000000000000000000000000000000000076de87000000000000000133b5deded8d3d7dedda22100000000000000000000000000000000000000000010c1d23f000000000000012ec0dfd7863a183384d4dd9a0d000000000000000000000000000000000000000057d9a21900000000000129adddc14e01000000025ad2dc6803000000000000000000000000000000000000159ed5640300000000001295ddc13e020000000000076ad5bf310100000000000000000000000000000000024cceba1f00000000000267dbd0460100000000000000169bdb890f000000000000000000000000000000001099de7102000000000130c3d56b0500000000000000000036d0c93f0000000000000000000000000000000046d6c71e00000000001291db9918000000000000000000000389de9703000000000000000000000000000010a6dc760500000000024dcfc83801000000000000000000000032c5d83300000000000000000000000000045fd5b52a00000000000faadd76030000000000000000000000000c82dc8e0d0000000000000000000000002cb2d66705000000000149dcbb21000000000000000000000000000134bfc8440200000000000000000000098addac1500000000000fa5d86a060000000000000000000000000000087edd97140000000000000000000255d9d2420000000000014fcfb2270000000000000000000000000000000020ced75e01000000000000000242c4da7d0a00000000001191da6f03000000000000000000000000000000000173dac22c000000000000003cbadda21e00000000000036ccca1d0000000000000000000000000000000000001ea4ddaa2b010000000342c8dfbe29010000000000007ede8801000000000000000000000000000000000000023cc2dec35c1b11358bd0dfc13c0100000000000000bdd23900000000000000000000000000000000000000000246cfdfdcd3d2d7dedfb2360200000000000000002b64120000000000000000000000000000000000000000000239aadcdfdfdfd48a13000000000000000000000001000000000000000000000000000000000000000000000000083a777d561a030000000000000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 196,
+          "x": 0,
+          "y": -3,
+          "width": 44,
+          "height": 20,
+          "dx": 44,
+          "glyphBitmap": {
+            "width": 44,
+            "height": 20,
+            "pixelArray": "0000000000000000000000000000000b6a4d000000000000000000000000000000000000000000000000060000000000000000000000000000000d99ded51b0000000000000000000000000000000000000000000041b42b000000000000000000000000000c9bded4df8001000000000000000000000000000000000000000036cedc5b0000000000000000000000000b9edfb533d1d21f0000000000000000000000000000000000000028cadd780200000000000000000000000b9edfb61a0179df820000000000000000000000000000000000001dc4df820300000000000000000000000ea1dfb315000014d0d222000000000000000000000000000000001abddf8a0400000000000000000000000fa2dfb2150000000075df8500000000000000000000000000000017b2df960800000000000000000000000ea4dfaf17000000000019cbd3220000000000000000000000000011aadfa10d00000000000000000000000fa4dfaf170000000000000074df860000000000000000000000000a9fdfac1400000000000000000000000fa5dfbb1c000000000000000018ccd91d000000000000000000000791dfb618000000000000000000000012a9dfb918000000000000000000006fdf890100000000000000000587dfbe1b000000000000000000000012aadfb61b000000000000000000000015cbd62400000000000000037cddc723000000000000000000000012abdfb31c000000000000000000000000006fdf8a0100000000000173ddcc2e000000000000000000000014aadfb31b00000000000000000000000000000fcfd427000000000162dcd039000000000000000000000013acdfb617000000000000000000000000000000006fdf8d0000000053d9d541000000000000000000000015b1dfb314000000000000000000000000000000000011c8d62900004ad6d84a000000000000000000000000b2dfae17000000000000000000000000000000000000006bdf900040d3d95b01000000000000000000000000dfac18000000000000000000000000000000000000000014c5d958d1dc690100000000000000000000000000ad16000000000000000000000000000000000000000000006edfdfdd7303000000000000000000000000000012000000000000000000000000000000000000000000000016ccdf7e04000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 197,
+          "x": 8,
+          "y": -3,
+          "width": 27,
+          "height": 20,
+          "dx": 44,
+          "glyphBitmap": {
+            "width": 27,
+            "height": 20,
+            "pixelArray": "0000000000000036d8dfdfdfdfdfdfdfdfdfdfbd0c0000000000000000000000000057dec5c1c1c1c1c1c1c1c1ccd4170000000000000000000000000057d621070707070707070754d4170000000000000000000000000057d61a000000000000000050d4170000000000000000000000000057d61a000000000000000050d4170000000000000000000000000057d61a000000000000000050d4170000000000000000000000000057d61a000000000000000050d4170000000000000000000000000057d61a000000000000000053d4170000000000000000000000000057d61a00000000000000005cd4170000000000000000000000000057d61a00000000000000005cd4170000000000000000000000000057d61a00000000000000005cd4170000000000000000000000000057d61a00000000000000005cd4170000000000000000000000000057d61a00000000000000005cd4170000000000000000000000000057d61a00000000000000005cd4170000000000000000000000000057d61a00000000000000005cd4170000000000000000000000000057d61a00000000000000005cd4170000000000000000000000000057d61a00000000000000005cd4170000000000000000000000000057d61a00000000000000005cd4170000000000003f5353535353538ad61a00000000000000005cd86253535353534aa8dfdfdfdfdfdfdfd315000000000000000058dfdfdfdfdfdfdfc4"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 198,
+          "x": 4,
+          "y": -3,
+          "width": 36,
+          "height": 20,
+          "dx": 44,
+          "glyphBitmap": {
+            "width": 36,
+            "height": 20,
+            "pixelArray": "00000000000007739d9d9d9d9d9d9d9d9d9d9d9d9d9c4e00000000003f6f6f6f6f6f6f4e00000000000022dddfdfdfdfdfdfdfdfdfdfdfdfdfdfb00300000000cadfdfdfdfdfdf9c00000000000024dfaa2d2d2d2d2d2d2d2d2d2d2d3bcfb10300000000cdd1554f4f4f4f3800000000000024df9c000000000000000000000019dcb10300000000cdc909000000000000000000000024df9c00000000000000000000001bdfb10300000000cdc909000000000000000000000024df9c00000000000000000000001bdfb10300000009d0c909000000000000000000000024df9c00000000000000000000001bdfb1030000000ad0c909000000000000000000000024df9c00000000000000000000001bdfb1030000000ad0c909000000000000000000000024df9c00000000000000000000001bdfb1030000000ad0c909000000000000000000000024df9c00000000000000000000001bdfb1030000000ad0c909000000000000000000000024df9c00000000000000000000001bdfb1030000000ad0c909000000000000000000000024df9c00000000000000000000001bdfb1030000000ad0c909000000000000000000000024df9c00000000000000000000001bdfb1030000000ad0c909000000000000000000000024df9c00000000000000000000001bdfb1030000000ad0c909000000000000000000000024df9c00000000000000000000001bdfb1030000000ad0c909000000000000000000000024df9c00000000000000000000001bdfaa020000000ad0c909000000000000000000000024df9c00000000000000000000001bdfa3010000000ad0c808000000000000000000000024df9c00000000000000000000001bdfa3010000000ad0c5010000000000323f3f3f3f3f59df9c00000000000000000000001bdfbd6060606065d6c4000000000000acdfdfdfdfdfdfdf9a000000000000000000000018dadfdfdfdfdfdfdfc4000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 199,
+          "x": 4,
+          "y": -3,
+          "width": 35,
+          "height": 20,
+          "dx": 44,
+          "glyphBitmap": {
+            "width": 35,
+            "height": 20,
+            "pixelArray": "0000000000000000000000000000000000000000000000000000000363b8410000000000000000000000000000000000000000000000000000000000000c86dddf65000000000000000000000000000000000000000000000000000000000019a4dfdddf5b000000000000000000000000000000000000000000000000000000002dbcdeaf8adf5a00000000000000000000000000000000000000000000000000000047cfdf920e6ddf5300000000000000000000000000000000000000000000000000046bdfda6e030073df3a0000000000000000000000000000000000000000000000000e8cddd14a02000080df3a00000000000000000000000000000000000000000000001ea9dfc02f0000000080df360000000000000000000000000000000000000000000033c0deaa1a00000000008adf280000000000000000000000000000000000000000004cd2df890c000000000000a0df28000000000000000000000000000000000000000571dfda640300000000000000a0df240000000000000000000000000000000000001194ded044010000000000000001a4df19000000000000000000000000000000000022addfbb2a00000000000000000003aadf180000000000000000000000000000000037c6dea1180000000000000000000003aadf1500000000000000000000000000000154d6df840a000000000000000000000004b0df0b000000000000000000000000000677dfd75d0200000000000000000000000006b7df0b000000000000000000000000139bdec93e010000000000000000000000000006b7d60a000000000000000000000025b4dfb72600000000000000000000000000000008bec40700000000517c7c7c7c7c7dc9de9c150000000000000000000000000000000009c6d37f7c7c7c3a798f8f8f8f8f8f8f6d070000000000000000000000000000000000057c8f8f8f8f8f64"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 200,
+          "x": 3,
+          "y": -3,
+          "width": 37,
+          "height": 20,
+          "dx": 44,
+          "glyphBitmap": {
+            "width": 37,
+            "height": 20,
+            "pixelArray": "0000000000000875bea02900000000000000000000000000000000000000000000000000000000000000028bdfcedfc81800000000000000000000000000000000000000000000000000000000000053deac0d65de93020000000000000000000000000000000000000000000000000000000012c7d4230005aedb300000000000000000000000000000000000000000000000000000000083df680000003ddf940000000000000000000000000000000000000000000000000000001cd6bf0a00000003b8da1600000000000000000000000000000000000000000000000000007bdf5700000000005cdf6a000000355804000000000000000000000000000000000000000ecac80c000000000016d2b5020009c6de3a0000000000000000000000000000000000000056df7500000000000000a3d81e0044dfdf7b00000000000000000000000105000000000000acdb200000000000000068df4e0082dfdfaa00000000000000000000038abd360000000028dda101000000000000002cde8b06bed1c2d407000000160c0000000063dfdfc00c00000075df50000000000000000004cdc52add968cdb25000036d4be1e00001acfce92df56000008c1cc0e0000000000000000008edf9ddf5167df480002a7dedebd14018cde5a1ad8b5010039de8b0000000000000000000048dfdfd0103fdf72002bdaa57bdf9f33d9b706019bdd280086df3c0000000000000000000008b3dd66001bd8990086df47029ddfd2dd3f00004fdf7200cec9060000000000000000000000122c030004c9bf12d1c8050011b2dfa203000013d1b7045f4800000000000000000000000000000000009eda7adf6d0000000a4f150000000099dc25000000000000000000000000000000000000006bdfdbd31a000000000000000000005adf610000000000000000000000000000000000000027dcdf7a000000000000000000000018dea0000000000000000000000000000000000000000163840a000000000000000000000002a797"
           },
           "source": {
             "filePath": "fonts\\Oswald-Medium.ttf",

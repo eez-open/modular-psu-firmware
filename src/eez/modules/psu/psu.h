@@ -103,6 +103,12 @@ public:
     int getNumDlogResources(int subchannelIndex) override;
 	DlogResourceType getDlogResourceType(int subchannelIndex, int resourceIndex) override;
 	const char *getDlogResourceLabel(int subchannelIndex, int resourceIndex) override;
+
+    int getNumFunctionGeneratorResources(int subchannelIndex) override;
+    FunctionGeneratorResourceType getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex) override;
+    const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) override;
+	virtual void getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues) override;
+	virtual void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override;
 };
 
 /// Channel binary flags stored in profile.

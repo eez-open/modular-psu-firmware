@@ -57,6 +57,8 @@
 #include <eez/modules/psu/gui/touch_calibration.h>
 #include <eez/modules/psu/gui/labels_and_colors.h>
 
+#include <eez/function_generator.h>
+
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
@@ -2302,7 +2304,13 @@ Page *getPageFromIdHook(int pageId) {
     case PAGE_ID_DLOG_PARAMS:
         page = psu::dlog_view::getParamsPage();
         break;
-    default :
+    case PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR:
+        page = function_generator::g_pFunctionGeneratorPage;
+        break;
+	case PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR_SELECT_CHANNELS:
+		page = function_generator::g_pFunctionGeneratorSelectChannelsPage;
+		break;
+	default :
         for (int i = 0; i < NUM_SLOTS; i++) {
             page = g_slots[i]->getPageFromId(pageId);
             if (page) {

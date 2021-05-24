@@ -185,6 +185,23 @@ enum DlogResourceType {
     DLOG_RESOURCE_TYPE_DIN7,
 };
 
+enum FunctionGeneratorResourceType {
+    FUNCTION_GENERATOR_RESOURCE_TYPE_NONE,
+
+    FUNCTION_GENERATOR_RESOURCE_TYPE_U,
+    FUNCTION_GENERATOR_RESOURCE_TYPE_I,
+    FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I,
+    
+    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN0,
+    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN1,
+    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN2,
+    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN3,
+    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN4,
+    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN5,
+    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN6,
+    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN7,
+};
+
 struct Module {
     uint16_t moduleType;
     const char *moduleName;
@@ -362,7 +379,7 @@ struct Module {
     virtual bool getCurrent(int subchannelIndex, float &value, int *err);
     virtual bool setCurrent(int subchannelIndex, float value, int *err);
     virtual bool getMeasuredCurrent(int subchannelIndex, float &value, int *err);
-    virtual void getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode);
+    virtual void getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode, bool highRange = false);
     virtual void setCurrentEncoderMode(int subchannelIndex, EncoderMode encoderMode);
     virtual float getCurrentResolution(int subchannelIndex);
     virtual float getCurrentMinValue(int subchannelIndex);
@@ -398,6 +415,12 @@ struct Module {
     virtual bool isDlogPeriodAllowed(int subchannelIndex, int resourceIndex, float period);
     virtual void onStartDlog();
     virtual void onStopDlog();
+
+    virtual int getNumFunctionGeneratorResources(int subchannelIndex);
+    virtual FunctionGeneratorResourceType getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex);
+    virtual const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex);
+	virtual void getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues = nullptr);
+	virtual void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues = nullptr);
 
     virtual int diskDriveInitialize();
     virtual int diskDriveStatus();

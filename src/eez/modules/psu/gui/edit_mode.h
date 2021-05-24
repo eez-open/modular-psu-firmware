@@ -121,6 +121,12 @@ extern EncoderMode g_mio168AoutCurrentEncoderMode;
 
 extern EncoderMode g_scrollBarEncoderMode;
 
+extern EncoderMode g_functionGeneratorFrequencyEncoderMode;
+extern EncoderMode g_functionGeneratorPhaseShiftEncoderMode;
+extern EncoderMode g_functionGeneratorAmplitudeEncoderMode;
+extern EncoderMode g_functionGeneratorOffsetEncoderMode;
+extern EncoderMode g_functionGeneratorPulseWidthEncoderMode;
+
 float getEncoderStepValue();
 void switchToNextEncoderMode();
 

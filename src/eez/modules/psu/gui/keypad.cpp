@@ -704,14 +704,40 @@ Unit NumericKeypad::getSwitchToUnit() {
         return UNIT_MOHM;
     if (m_options.editValueUnit == UNIT_MOHM)
         return UNIT_OHM;
-    if (m_options.editValueUnit == UNIT_HERTZ)
-        return UNIT_KHERTZ;
-    if (m_options.editValueUnit == UNIT_KHERTZ)
-        return UNIT_MHERTZ;
-    if (m_options.editValueUnit == UNIT_MHERTZ)
-        return UNIT_MILLI_HERTZ;
-    if (m_options.editValueUnit == UNIT_MILLI_HERTZ)
+    if (m_options.editValueUnit == UNIT_HERTZ) {
+        if (m_options.max >= 1000.0f) {
+            return UNIT_KHERTZ;
+        } else if (m_options.min < 1.0f) {
+            return UNIT_MILLI_HERTZ;
+        }
         return UNIT_HERTZ;
+    }
+    if (m_options.editValueUnit == UNIT_KHERTZ) {
+        if (m_options.max >= 1000000.0f) {
+            return UNIT_MHERTZ;
+        } else if (m_options.min < 1.0f) {
+            return UNIT_MILLI_HERTZ;
+        } else if (m_options.min < 1000.0f) {
+            return UNIT_HERTZ;
+        }
+        return UNIT_KHERTZ;
+    }
+    if (m_options.editValueUnit == UNIT_MHERTZ) {
+        if (m_options.min < 1.0f) {
+            return UNIT_MILLI_HERTZ;
+        } else if (m_options.min < 1000.0f) {
+            return UNIT_HERTZ;
+        } else if (m_options.min < 1000000.0f) {
+            return UNIT_KHERTZ;
+        }
+        return UNIT_MHERTZ;
+    }
+    if (m_options.editValueUnit == UNIT_MILLI_HERTZ) {
+        if (m_options.max >= 1.0f) {
+            return UNIT_HERTZ;
+        }
+        return UNIT_MILLI_HERTZ;
+    }
     if (m_options.editValueUnit == UNIT_FARAD)
         return UNIT_MILLI_FARAD;
     if (m_options.editValueUnit == UNIT_MILLI_FARAD)

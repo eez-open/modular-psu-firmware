@@ -99,6 +99,7 @@ set(src_eez
     src/eez/dlog_file.cpp
     src/eez/file_type.cpp
     src/eez/fs_driver.cpp
+    src/eez/function_generator.cpp
     src/eez/hmi.cpp
     src/eez/index.cpp
     src/eez/keyboard.cpp
@@ -122,6 +123,7 @@ set(header_eez
     src/eez/dlog_file.h
     src/eez/file_type.h
     src/eez/fs_driver.h
+    src/eez/function_generator.h
     src/eez/hmi.h
     src/eez/index.h
     src/eez/keyboard.h

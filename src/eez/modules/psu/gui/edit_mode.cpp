@@ -404,6 +404,12 @@ EncoderMode g_mio168AoutCurrentEncoderMode = ENCODER_MODE_AUTO;
 
 EncoderMode g_scrollBarEncoderMode = ENCODER_MODE_AUTO;
 
+EncoderMode g_functionGeneratorFrequencyEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_functionGeneratorPhaseShiftEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_functionGeneratorAmplitudeEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_functionGeneratorOffsetEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_functionGeneratorPulseWidthEncoderMode = ENCODER_MODE_AUTO;
+
 static Value getCurrentEncoderStepValue() {
     StepValues stepValues;
     getStepValues(stepValues);
@@ -500,6 +506,12 @@ void getProfileParameters(profile::Parameters &parameters) {
     parameters.encoderModes.mio168AoutCurrent = g_mio168AoutCurrentEncoderMode;
 
     parameters.encoderModes.scrollBar = g_scrollBarEncoderMode;
+
+    parameters.encoderModes.functionGeneratorFrequency = g_functionGeneratorFrequencyEncoderMode;
+    parameters.encoderModes.functionGeneratorPhaseShift = g_functionGeneratorPhaseShiftEncoderMode;
+    parameters.encoderModes.functionGeneratorAmplitude = g_functionGeneratorAmplitudeEncoderMode;
+    parameters.encoderModes.functionGeneratorOffset = g_functionGeneratorOffsetEncoderMode;
+    parameters.encoderModes.functionGeneratorPulseWidth = g_functionGeneratorPulseWidthEncoderMode;
 }
 
 void setProfileParameters(const profile::Parameters &parameters) {
@@ -579,6 +591,12 @@ bool writeProfileProperties(profile::WriteContext &ctx, const profile::Parameter
 
     if (parameters.encoderModes.scrollBar) WRITE_PROPERTY("scrollBar", parameters.encoderModes.scrollBar);
 
+    if (parameters.encoderModes.functionGeneratorFrequency) WRITE_PROPERTY("functionGeneratorFrequency", parameters.encoderModes.functionGeneratorFrequency);
+    if (parameters.encoderModes.functionGeneratorPhaseShift) WRITE_PROPERTY("functionGeneratorPhaseShift", parameters.encoderModes.functionGeneratorPhaseShift);
+    if (parameters.encoderModes.functionGeneratorAmplitude) WRITE_PROPERTY("functionGeneratorAmplitude", parameters.encoderModes.functionGeneratorAmplitude);
+    if (parameters.encoderModes.functionGeneratorOffset) WRITE_PROPERTY("functionGeneratorOffset", parameters.encoderModes.functionGeneratorOffset);
+    if (parameters.encoderModes.functionGeneratorPulseWidth) WRITE_PROPERTY("functionGeneratorPulseWidth", parameters.encoderModes.functionGeneratorPulseWidth);
+
     return true;
 }
 
@@ -622,6 +640,12 @@ bool readProfileProperties(profile::ReadContext &ctx, profile::Parameters &param
     READ_FLAG("mio168AoutCurrent", parameters.encoderModes.mio168AoutCurrent);
 
     READ_FLAG("scrollBar", parameters.encoderModes.scrollBar);
+
+    READ_FLAG("functionGeneratorFrequency", parameters.encoderModes.functionGeneratorFrequency);
+    READ_FLAG("functionGeneratorPhaseShift", parameters.encoderModes.functionGeneratorPhaseShift);
+    READ_FLAG("functionGeneratorAmplitude", parameters.encoderModes.functionGeneratorAmplitude);
+    READ_FLAG("functionGeneratorOffset", parameters.encoderModes.functionGeneratorOffset);
+    READ_FLAG("functionGeneratorPulseWidth", parameters.encoderModes.functionGeneratorPulseWidth);
 
     return false;
 }

@@ -290,7 +290,7 @@ struct DcmChannel : public Channel {
 		psu::gui::edit_mode_step::g_dcmVoltageEncoderMode = encoderMode;
     }
     
-	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
+	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode, bool highRange) override {
         static float values[] = { 0.01f, 0.1f, 0.25f, 0.5f   };
 		static float calibrationModeValues[] = { 0.001f, 0.005f, 0.01f, 0.05f };
         stepValues->values = calibrationMode ? calibrationModeValues : values;
@@ -587,7 +587,7 @@ public:
     }
 
     int getLabelsAndColorsPageId() override {
-        return PAGE_ID_DIB_DCM220_LABELS_AND_COLORS;
+        return getTestResult() == TEST_OK ? PAGE_ID_DIB_DCM220_LABELS_AND_COLORS : PAGE_ID_NONE;
     }
 
 	const char *getPinoutFile() override {

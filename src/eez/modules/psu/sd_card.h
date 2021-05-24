@@ -120,6 +120,7 @@ bool matchUntil(BufferedFileRead &file, char c, char *result, int count = -1);
 void skipUntil(BufferedFileRead &file, const char *str);
 void skipUntilEOL(BufferedFileRead &file);
 bool matchQuotedString(BufferedFileRead &file, char *str, unsigned int strLength);
+bool match(BufferedFileRead &file, int &result);
 bool match(BufferedFileRead &file, unsigned int &result);
 bool match(BufferedFileRead &file, float &result);
 

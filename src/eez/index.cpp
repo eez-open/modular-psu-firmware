@@ -661,7 +661,7 @@ bool Module::getMeasuredCurrent(int subchannelIndex, float &value, int *err) {
     return false;
 }
 
-void Module::getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode) {
+void Module::getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode, bool highRange) {
     stepValues->values = nullptr;
     stepValues->count = 0;
     stepValues->unit = UNIT_AMPER;
@@ -817,6 +817,28 @@ void Module::onStartDlog() {
 }
 
 void Module::onStopDlog() {
+}
+
+int Module::getNumFunctionGeneratorResources(int subchannelIndex) {
+	return 0;
+}
+
+FunctionGeneratorResourceType Module::getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex) {
+	return FUNCTION_GENERATOR_RESOURCE_TYPE_NONE;
+}
+
+const char *Module::getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) {
+	return nullptr;
+}
+
+void Module::getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues) {
+	min = 0;
+	max = 0;
+}
+
+void Module::getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) {
+	min = 0;
+	max = 0;
 }
 
 int Module::diskDriveInitialize() {

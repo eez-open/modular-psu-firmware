@@ -55,6 +55,7 @@ enum Unit {
     UNIT_MINUTE,
     UNIT_VOLT_AMPERE,
     UNIT_VOLT_AMPERE_REACTIVE,
+	UNIT_DEGREE
 };
 
 extern const char *g_unitNames[];

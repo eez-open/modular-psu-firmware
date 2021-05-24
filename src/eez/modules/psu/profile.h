@@ -30,7 +30,7 @@ namespace psu {
 namespace profile {
 
 #define MAX_CHANNEL_PARAMETERS_SIZE 300
-#define MAX_SLOT_PARAMETERS_SIZE 200
+#define MAX_SLOT_PARAMETERS_SIZE 300
 
 /// Channel parameters stored in profile.
 struct ChannelParameters {
@@ -45,7 +45,7 @@ struct SlotParameters {
     uint16_t moduleType;
     uint16_t moduleRevision;
     bool parametersAreValid;
-    uint32_t parameters[MAX_CHANNEL_PARAMETERS_SIZE  / 4];
+    uint32_t parameters[MAX_SLOT_PARAMETERS_SIZE  / 4];
 };
 
 
@@ -100,6 +100,32 @@ struct EncoderModes {
     unsigned mio168AoutCurrent: 3;
 
     unsigned scrollBar: 3;    
+
+	unsigned functionGeneratorFrequency: 3;
+    unsigned functionGeneratorPhaseShift: 3;
+	unsigned functionGeneratorAmplitude: 3;
+	unsigned functionGeneratorOffset: 3;
+	unsigned functionGeneratorPulseWidth: 3;
+};
+
+struct FunctionGeneratorWaveformParameters {
+	uint16_t moduleType;
+	int slotIndex;
+	int subchannelIndex;
+	int resourceIndex;
+	int resourceType;
+	int waveform;
+	float frequency;
+	float phaseShift;
+	float amplitude;
+	float offset;
+	float pulseWidth;
+};
+
+static const int MAX_NUM_WAVEFORMS = 16;
+
+struct FunctionGeneratorParameters {
+	FunctionGeneratorWaveformParameters waveformParameters[MAX_NUM_WAVEFORMS];
 };
 
 /// Profile parameters.
@@ -116,6 +142,7 @@ struct Parameters {
     float ioPinsPwmFrequency[NUM_IO_PINS - DOUT1];
     float ioPinsPwmDuty[NUM_IO_PINS - DOUT1];
     EncoderModes encoderModes;
+    FunctionGeneratorParameters functionGeneratorParameters;
 };
 
 void init();
@@ -198,6 +225,7 @@ public:
     bool matchGroup(const char *groupName);
     bool matchGroup(const char *groupNamePrefix, int &index);
 
+	bool property(const char *name, int &value);
     bool property(const char *name, unsigned int &value);
     bool property(const char *name, uint16_t &value);
     bool property(const char *name, uint8_t &value);

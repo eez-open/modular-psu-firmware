@@ -52,6 +52,8 @@
 #include <eez/modules/bp3c/comm.h>
 #include <eez/modules/bp3c/flash_slave.h>
 
+#include <eez/function_generator.h>
+
 #if defined(EEZ_PLATFORM_SIMULATOR)
 #include <eez/platform/simulator/front_panel.h>
 #endif
@@ -149,10 +151,21 @@ enum Command {
 #define DLOG_STATE_FINISH_RESULT_BUFFER_OVERFLOW 3
 #define DLOG_STATE_FINISH_RESULT_MASS_STORAGE_ERROR 4
 
+using function_generator::Waveform;
+
 struct DlogState {
     uint8_t state; // DLOG_STATE_...
     uint32_t fileLength;
     uint32_t numSamples;
+};
+
+struct WaveformParameters {
+	Waveform waveform;
+	float frequency;
+	float phaseShift;
+	float amplitude;
+	float offset;
+	float pulseWidth;
 };
 
 struct SetParams {
@@ -182,6 +195,8 @@ struct SetParams {
 	struct {
 		float voltage;
 	} aout_dac7563[2];
+
+	WaveformParameters dacWaveformParameters[4];
 
 	struct {
 		float freq;
@@ -303,7 +318,7 @@ inline double getAinConversionFactor(uint8_t afeVersion, uint8_t channelIndex, u
                 return 240.0; // +/- 240 V
             }
             if (mode == MEASURE_MODE_CURRENT) {
-                return 0.048; // +/- 48 mV ( = 2.4 V / 50 Ohm)
+                return 2.4 / 33 / 1; // +/- 48 mV (22 ohm, PGA is 1)
             }
         } else {
             if (mode == MEASURE_MODE_VOLTAGE) {
@@ -314,7 +329,7 @@ inline double getAinConversionFactor(uint8_t afeVersion, uint8_t channelIndex, u
             }
             if (mode == MEASURE_MODE_CURRENT) {
                 if (range == 0) {
-                    return 2.4 / 33 / 2; // +/- 24 mA (33 ohm, PGA is 2)
+                    return 2.4 / 22 / 1; // +/- 48 mA (22 ohm, PGA is 1)
                 }
                 if (range == 1) {
                     return 2.4 / 0.33 / 4; // +/- 1.2 A (0.33 ohm, PGA is 4)
@@ -344,7 +359,7 @@ inline double getAinConversionFactor(uint8_t afeVersion, uint8_t channelIndex, u
                 return 240.0; // +/- 240 V
             }
 
-            return 0.048; // +/- 48 mV
+            return 2.4 / 33 / 1; // +/- 48 mA (33 ohm, PGA is 1)
         } else {
             if (mode == MEASURE_MODE_VOLTAGE) {
                 if (range == 0) {
@@ -354,7 +369,7 @@ inline double getAinConversionFactor(uint8_t afeVersion, uint8_t channelIndex, u
             }
             if (mode == MEASURE_MODE_CURRENT) {
                 if (range == 0) {
-                    return 2.4 / 33 / 2; // +/- 24 mA (33 ohm, PGA is 2)
+                    return 2.4 / 22 / 1; // +/- 48 mA (22 ohm, PGA is 1)
                 }
                 if (range == 1) {
                     return 2.4 / 0.33 / 4; // +/- 1.2 A (0.33 ohm, PGA is 4)
@@ -575,7 +590,7 @@ private:
 	//		AIN1 and AIN2:
 	//			0: +/- 48 mA
 	//		AIN3 and AIN4:
-	//			0: +/- 24 mA
+	//			0: +/- 48 mA
 	//			1: +/- 1.2 A
 	//			2: +/- 10 A
 	//
@@ -588,7 +603,7 @@ private:
 	//		AIN3
 	//			0: +/- 48 mA
 	//		AIN4
-	//			0: +/- 24 mA
+	//			0: +/- 48 mA
 	//			1: +/- 1.2 A
 	//			2: +/- 10 A
 	uint8_t m_currentRange;
@@ -923,7 +938,7 @@ public:
                     }
                 } else {
                     if (m_currentRange == 0) {
-                        return 6; // +/- 24 mA
+                        return 6; // +/- 48 mA
                     } else if (m_currentRange == 1) {
                         return 4; // +/- 1.2 A
                     } else {
@@ -965,7 +980,7 @@ public:
                     }
                 } else {
                     if (m_currentRange == 0) {
-                        return 6; // +/- 24 mA
+                        return 6; // +/- 48 mA
                     } else if (m_currentRange == 1) {
                         return 4; // +/- 1.2 A
                     } else {
@@ -1009,7 +1024,7 @@ public:
                     }
                 } else {
                     if (m_currentRange == 0) {
-                        return 24.0E-3f;
+                        return 48.0E-3f;
                     } else if (m_currentRange == 1) {
                         return 1.2f;
                     } else {
@@ -1051,7 +1066,7 @@ public:
                     }
                 } else {
                     if (m_currentRange == 0) {
-                        return 24.0E-3f;
+                        return 48.0E-3f;
                     } else if (m_currentRange == 1) {
                         return 1.2f;
                     } else {
@@ -1129,7 +1144,7 @@ public:
 		static EnumItem g_afe1Ain34ModeRangeEnumDefinition[] = {
 			{ 0, "\xbd""2.4 V" },
 			{ 1, "\xbd""12 V" },
-			{ 2, "\xbd""24 mA" },
+			{ 2, "\xbd""48 mA" },
             { 3, "\xbd""1.2 A" },
             { 4, "\xbd""10 A" },
 			{ 0, 0 }
@@ -1158,7 +1173,7 @@ public:
 		static EnumItem g_afe3Ain4ModeRangeEnumDefinition[] = {
 			{ 0, "\xbd""2.4 V" },
 			{ 1, "\xbd""12 V" },
-            { 2, "\xbd""24 mA" },
+            { 2, "\xbd""48 mA" },
             { 3, "\xbd""1.2 A" },
             { 4, "\xbd""10 A" },
 			{ 0, 0 }
@@ -1446,6 +1461,10 @@ struct AoutDac7760Channel {
         return ongoingCal ? getValue() : getCalConf().offsetAndScale(getValue());
     }
 
+    float getCalibratedValue(float value) {
+        return getCalConf().offsetAndScale(value);
+    }
+
     Unit getUnit() {
         return getMode() == SOURCE_MODE_VOLTAGE ? UNIT_VOLT : UNIT_AMPER;
     }
@@ -1538,27 +1557,35 @@ struct AoutDac7760Channel {
         }
     }
 
-    void getStepValues(StepValues *stepValues) {
+    void getVoltageStepValues(StepValues *stepValues) {
         if (ongoingCal) {
-            if (getMode() == SOURCE_MODE_VOLTAGE) {
-                stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES_CAL;
-                stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES_CAL) / sizeof(float);
-                stepValues->unit = UNIT_VOLT;
-            } else {
-                stepValues->values = AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES_CAL;
-                stepValues->count = sizeof(AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES_CAL) / sizeof(float);
-                stepValues->unit = UNIT_AMPER;
-            }
+            stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES_CAL;
+            stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES_CAL) / sizeof(float);
+            stepValues->unit = UNIT_VOLT;
         } else {
-            if (getMode() == SOURCE_MODE_VOLTAGE) {
-                stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES;
-                stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES) / sizeof(float);
-                stepValues->unit = UNIT_VOLT;
-            } else {
-                stepValues->values = AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES;
-                stepValues->count = sizeof(AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES) / sizeof(float);
-                stepValues->unit = UNIT_AMPER;
-            }
+            stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES;
+            stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES) / sizeof(float);
+            stepValues->unit = UNIT_VOLT;
+        }
+    }
+
+    void getCurrentStepValues(StepValues *stepValues) {
+        if (ongoingCal) {
+            stepValues->values = AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES_CAL;
+            stepValues->count = sizeof(AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES_CAL) / sizeof(float);
+            stepValues->unit = UNIT_AMPER;
+        } else {
+            stepValues->values = AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES;
+            stepValues->count = sizeof(AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES) / sizeof(float);
+            stepValues->unit = UNIT_AMPER;
+        }
+    }
+
+    void getStepValues(StepValues *stepValues) {
+        if (getMode() == SOURCE_MODE_VOLTAGE) {
+            getVoltageStepValues(stepValues);
+        } else {
+            getCurrentStepValues(stepValues);
         }
 
         stepValues->encoderSettings.accelerationEnabled = true;
@@ -1616,6 +1643,10 @@ struct AoutDac7563Channel {
 
     float getCalibratedValue() {
         return ongoingCal ? m_value : calConf.offsetAndScale(m_value);
+    }
+
+    float getCalibratedValue(float value) {
+        return calConf.offsetAndScale(value);
     }
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
@@ -2068,49 +2099,98 @@ public:
 	void fillSetParams(SetParams &params) {
 		memset(&params, 0, sizeof(SetParams));
 
-            params.dinRanges = dinChannel.m_pinRanges;
-            params.dinSpeeds = dinChannel.m_pinSpeeds;
+        params.dinRanges = dinChannel.m_pinRanges;
+        params.dinSpeeds = dinChannel.m_pinSpeeds;
 
-            params.doutStates = doutChannel.m_pinStates;
+        params.doutStates = doutChannel.m_pinStates;
 
-            for (int i = 0; i < 4; i++) {
-                auto channel = &ainChannels[i];
-                params.ain[i].mode = channel->getMode();
-                params.ain[i].range = channel->getMode() == MEASURE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
-                params.ain[i].nplc = channel->ongoingCal ? 25.0f : (channel->getMode() == MEASURE_MODE_VOLTAGE ? channel->m_voltageNPLC : channel->m_currentNPLC);
-                auto &calConf = channel->calConf[channel->getCalConfIndex()];
-                if (calConf.state.calEnabled) {
-                    params.ain[i].p1CalX = calConf.points[0].calValue;
-                    params.ain[i].p1CalY = calConf.points[0].uncalValue;
-                    params.ain[i].p2CalX = calConf.points[1].calValue;
-                    params.ain[i].p2CalY = calConf.points[1].uncalValue;
+        for (int i = 0; i < 4; i++) {
+            auto channel = &ainChannels[i];
+            params.ain[i].mode = channel->getMode();
+            params.ain[i].range = channel->getMode() == MEASURE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
+            params.ain[i].nplc = channel->ongoingCal ? 25.0f : (channel->getMode() == MEASURE_MODE_VOLTAGE ? channel->m_voltageNPLC : channel->m_currentNPLC);
+            auto &calConf = channel->calConf[channel->getCalConfIndex()];
+            if (calConf.state.calEnabled) {
+                params.ain[i].p1CalX = calConf.points[0].calValue;
+                params.ain[i].p1CalY = calConf.points[0].uncalValue;
+                params.ain[i].p2CalX = calConf.points[1].calValue;
+                params.ain[i].p2CalY = calConf.points[1].uncalValue;
+            } else {
+                params.ain[i].p1CalX = 0;
+                params.ain[i].p1CalY = 0;
+                params.ain[i].p2CalX = 1;
+                params.ain[i].p2CalY = 1;
+            }
+        }
+
+        params.powerLineFrequency = persist_conf::getPowerLineFrequency();
+
+        for (int i = 0; i < 2; i++) {
+            auto channel = &aoutDac7760Channels[i];
+            params.aout_dac7760[i].outputEnabled = !powerDown && channel->m_outputEnabled;
+            params.aout_dac7760[i].outputRange = channel->getMode() == SOURCE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
+            params.aout_dac7760[i].outputValue = channel->getCalibratedValue();
+
+			auto waveformParameters = function_generator::getWaveformParameters(slotIndex, AOUT_1_SUBCHANNEL_INDEX + i, 0);
+			if (!powerDown && !channel->ongoingCal && waveformParameters) {
+                params.aout_dac7760[i].outputEnabled = 1;
+
+				params.dacWaveformParameters[i].waveform = waveformParameters->waveform;
+				params.dacWaveformParameters[i].frequency = waveformParameters->frequency;
+				params.dacWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
+				params.dacWaveformParameters[i].amplitude = channel->getCalibratedValue(waveformParameters->amplitude);
+				params.dacWaveformParameters[i].offset = channel->getCalibratedValue(waveformParameters->offset);
+				params.dacWaveformParameters[i].pulseWidth = waveformParameters->pulseWidth;
+
+                float min = waveformParameters->offset - waveformParameters->amplitude;
+                float max = waveformParameters->offset + waveformParameters->amplitude;
+
+                if (waveformParameters->resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
+                    if (min >= 0 && max <= 5.0f) {
+                        params.aout_dac7760[i].outputRange = 0;
+                    } else if (min >= 0 && max <= 10.0f) {
+                        params.aout_dac7760[i].outputRange = 1;
+                    } else if (min >= -5.0f && max <= 5.0f) {
+                        params.aout_dac7760[i].outputRange = 2;
+                    } else {
+                        params.aout_dac7760[i].outputRange = 3;
+                    }
                 } else {
-                    params.ain[i].p1CalX = 0;
-                    params.ain[i].p1CalY = 0;
-                    params.ain[i].p2CalX = 1;
-                    params.ain[i].p2CalY = 1;
+                    if (min >= 0.004f && max <= 0.02f) {
+                        params.aout_dac7760[i].outputRange = 5;
+                    } else if (min >= 0 && max <= 0.02f) {
+                        params.aout_dac7760[i].outputRange = 6;
+                    } else {
+                        params.aout_dac7760[i].outputRange = 7;
+                    }
                 }
-            }
+			} else {
+				params.dacWaveformParameters[i].waveform = Waveform::WAVEFORM_NONE;
+			}
+        }
 
-            params.powerLineFrequency = persist_conf::getPowerLineFrequency();
+        for (int i = 0; i < 2; i++) {
+            auto channel = &aoutDac7563Channels[i];
+            params.aout_dac7563[i].voltage = powerDown ? 0 : channel->getCalibratedValue();
 
-            for (int i = 0; i < 2; i++) {
-                auto channel = &aoutDac7760Channels[i];
-                params.aout_dac7760[i].outputEnabled = !powerDown && channel->m_outputEnabled;
-                params.aout_dac7760[i].outputRange = channel->getMode() == SOURCE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
-                params.aout_dac7760[i].outputValue = channel->getCalibratedValue();
-            }
+			auto waveformParameters = function_generator::getWaveformParameters(slotIndex, AOUT_3_SUBCHANNEL_INDEX + i, 0);
+			if (!powerDown && !channel->ongoingCal && waveformParameters) {
+				params.dacWaveformParameters[2 + i].waveform = waveformParameters->waveform;
+				params.dacWaveformParameters[2 + i].frequency = waveformParameters->frequency;
+				params.dacWaveformParameters[2 + i].phaseShift = waveformParameters->phaseShift;
+				params.dacWaveformParameters[2 + i].amplitude = channel->getCalibratedValue(waveformParameters->amplitude);
+				params.dacWaveformParameters[2 + i].offset = channel->getCalibratedValue(waveformParameters->offset);
+				params.dacWaveformParameters[2 + i].pulseWidth = waveformParameters->pulseWidth;
+			} else {
+				params.dacWaveformParameters[2 + i].waveform = Waveform::WAVEFORM_NONE;
+			}
+        }
 
-            for (int i = 0; i < 2; i++) {
-                auto channel = &aoutDac7563Channels[i];
-                params.aout_dac7563[i].voltage = powerDown ? 0 : channel->getCalibratedValue();
-            }
-
-            for (int i = 0; i < 2; i++) {
-                auto channel = &pwmChannels[i];
-                params.pwm[i].freq = powerDown ? 0 : channel->m_freq;
-                params.pwm[i].duty = powerDown ? 0 : channel->m_duty;
-            }
+        for (int i = 0; i < 2; i++) {
+            auto channel = &pwmChannels[i];
+            params.pwm[i].freq = powerDown ? 0 : channel->m_freq;
+            params.pwm[i].duty = powerDown ? 0 : channel->m_duty;
+        }
 	}
 
     void Command_SetParams_FillRequest(Request &request) {
@@ -2800,7 +2880,7 @@ public:
     void getProfileParameters(uint8_t *buffer) override {
         Module::getProfileParameters(buffer);
 
-        assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
+        assert(sizeof(ProfileParameters) < MAX_SLOT_PARAMETERS_SIZE);
 
         auto parameters = (ProfileParameters *)buffer;
 
@@ -4090,7 +4170,7 @@ public:
         return true;
     }
 
-    void getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode) override {
+    void getCurrentStepValues(int subchannelIndex, StepValues *stepValues, bool calibrationMode, bool highRange) override {
         if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getStepValues(stepValues);
             if (calibrationMode) {
@@ -4345,6 +4425,72 @@ public:
 
     void onStopDlog() override {
         nextDlogCommand = &dlogRecordingStop_command;
+    }
+
+    int getNumFunctionGeneratorResources(int subchannelIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            return 1;
+        }
+        return 0;
+    }
+
+    FunctionGeneratorResourceType getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            return FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I;
+        }
+        return FUNCTION_GENERATOR_RESOURCE_TYPE_U;
+    }
+
+    const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) override {
+        const char *label = getChannelLabel(subchannelIndex);
+		if (*label) {
+			return label;
+		}
+		return getDefaultChannelLabel(subchannelIndex);
+	}
+
+	void getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+            if (resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
+                min = -10.0f;
+                max = 10.0f;
+                if (stepValues) {
+                    channel.getVoltageStepValues(stepValues);
+                }
+            } else {
+                min = 0.0f;
+                max = 0.024f;
+                if (stepValues) {
+                    channel.getCurrentStepValues(stepValues);
+                }
+            }
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            auto &channel = aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX];
+            min = AOUT_DAC7563_MIN;
+            max = AOUT_DAC7563_MAX;
+            if (stepValues) {
+                channel.getStepValues(stepValues);
+            }
+        } else {
+            return Module::getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, resourceType, min, max, stepValues);
+        }
+    }
+	
+    void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override {
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            min = 0.1f;
+            max = 10000.0f;
+
+            if (stepValues) {
+                static float values[] = { 1.0f, 10.0f, 100.0f, 500.0f };
+                stepValues->values = values;
+                stepValues->count = sizeof(values) / sizeof(float);
+                stepValues->unit = UNIT_HERTZ;
+            }
+        } else {
+            return Module::getFunctionGeneratorFrequencyInfo(subchannelIndex, resourceIndex, min, max, stepValues);
+        }
     }
 
     // These are executed from the low priority thread which is solely in charge of disk operations.
@@ -4611,7 +4757,7 @@ public:
 		};
 
 		static EnumItem g_afe1Ain34CurrentRangeEnumDefinition[] = {
-			{ 0, "\xbd""24 mA" },
+			{ 0, "\xbd""48 mA" },
 			{ 1, "\xbd""1.2 A" },
 			{ 2, "\xbd""10 A" },
 			{ 0, 0 }
@@ -4648,7 +4794,7 @@ public:
 		};
 
 		static EnumItem g_afe3Ain4CurrentRangeEnumDefinition[] = {
-			{ 0, "\xbd""24 mA" },
+			{ 0, "\xbd""48 mA" },
 			{ 1, "\xbd""1.2 A" },
 			{ 2, "\xbd""10 A" },
 			{ 0, 0 }
@@ -5430,9 +5576,14 @@ void data_dib_mio168_ain_has_power_column(DataOperationEnum operation, Cursor cu
 
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
 
-		value =
-			mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[1].getMode() ||
-			mio168Module->ainChannels[2].getMode() != mio168Module->ainChannels[3].getMode();
+		value = 
+            mio168Module->afeVersion == 1 ?
+                (mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[2].getMode() ||
+                mio168Module->ainChannels[1].getMode() != mio168Module->ainChannels[3].getMode()) :
+            mio168Module->afeVersion == 3 ?
+                (mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[1].getMode() ||
+                mio168Module->ainChannels[2].getMode() != mio168Module->ainChannels[3].getMode()) :
+            false;
 	}
 }
 
@@ -5447,7 +5598,12 @@ void data_dib_mio168_ain_has_p1(DataOperationEnum operation, Cursor cursor, Valu
 
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
 
-		value = mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[1].getMode();
+		value = 
+            mio168Module->afeVersion == 1 ?
+                (mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[2].getMode()) :
+            mio168Module->afeVersion == 3 ?
+                (mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[1].getMode()) :
+            false;
 	}
 }
 
@@ -5463,7 +5619,12 @@ void data_dib_mio168_ain_p1(DataOperationEnum operation, Cursor cursor, Value &v
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
 
 		value = MakeValue(
-			roundPrec(mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[1].m_value, 1E-4f),
+			roundPrec(
+                mio168Module->afeVersion == 1 ?
+                    (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[2].m_value) :
+                mio168Module->afeVersion == 3 ?
+                    (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[1].m_value) :
+                NAN, 1E-4f),
 			UNIT_WATT,
 			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
 		);
@@ -5481,7 +5642,12 @@ void data_dib_mio168_ain_has_p2(DataOperationEnum operation, Cursor cursor, Valu
 
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
 
-		value = mio168Module->ainChannels[2].getMode() != mio168Module->ainChannels[3].getMode();
+		value = 
+            mio168Module->afeVersion == 1 ?
+                (mio168Module->ainChannels[1].getMode() != mio168Module->ainChannels[3].getMode()) :
+            mio168Module->afeVersion == 3 ?
+                (mio168Module->ainChannels[2].getMode() != mio168Module->ainChannels[3].getMode()) :
+            false;
 	}
 }
 
@@ -5497,7 +5663,12 @@ void data_dib_mio168_ain_p2(DataOperationEnum operation, Cursor cursor, Value &v
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
 
 		value = MakeValue(
-			roundPrec(mio168Module->ainChannels[2].m_value * mio168Module->ainChannels[3].m_value, 1E-4f),
+			roundPrec(
+                mio168Module->afeVersion == 1 ?
+                    (mio168Module->ainChannels[1].m_value * mio168Module->ainChannels[3].m_value) :
+                mio168Module->afeVersion == 3 ?
+                    (mio168Module->ainChannels[2].m_value * mio168Module->ainChannels[3].m_value) :
+                NAN, 1E-4f),
 			UNIT_WATT,
 			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
 		);
@@ -5516,8 +5687,13 @@ void data_dib_mio168_ain_has_efficiency(DataOperationEnum operation, Cursor curs
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
 
 		value =
-			mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[1].getMode() &&
-			mio168Module->ainChannels[2].getMode() != mio168Module->ainChannels[3].getMode();
+            mio168Module->afeVersion == 1 ?
+                (mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[2].getMode() &&
+                mio168Module->ainChannels[1].getMode() != mio168Module->ainChannels[3].getMode()) :
+            mio168Module->afeVersion == 3 ?
+                (mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[1].getMode() &&
+                mio168Module->ainChannels[2].getMode() != mio168Module->ainChannels[3].getMode()) :
+            false;
 	}
 }
 
@@ -5579,8 +5755,19 @@ void data_dib_mio168_ain_efficiency(DataOperationEnum operation, Cursor cursor, 
 
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
 
-		auto p1 = roundPrec(mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[1].m_value, 1E-4f);
-		auto p2 = roundPrec(mio168Module->ainChannels[2].m_value * mio168Module->ainChannels[3].m_value, 1E-4f);
+		auto p1 = roundPrec(
+            mio168Module->afeVersion == 1 ?
+                (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[2].m_value) :
+            mio168Module->afeVersion == 3 ?
+                (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[1].m_value) :
+            NAN, 1E-4f);
+
+		auto p2 = roundPrec(
+            mio168Module->afeVersion == 1 ?
+                (mio168Module->ainChannels[1].m_value * mio168Module->ainChannels[3].m_value) :
+            mio168Module->afeVersion == 3 ?
+                (mio168Module->ainChannels[2].m_value * mio168Module->ainChannels[3].m_value) :
+            NAN, 1E-4f);
 
 		auto efficiency = roundPrec((mio168Module->efficiencyFormula == EFFICIENCY_FORMULA_P1_OVER_P2 ? p1 / p2 : p2 / p1) * 100.0f, 0.01f);
 
@@ -6074,16 +6261,11 @@ void data_dib_mio168_pwm_label(DataOperationEnum operation, Cursor cursor, Value
 }
 
 void data_dib_mio168_pwm_label_short(DataOperationEnum operation, Cursor cursor, Value &value) {
-	int slotIndex = cursor / 4;
-	int ainChannelIndex = cursor % 4;
-	
 	if (operation == DATA_OPERATION_GET) {
-        value = ((Mio168Module *)g_slots[slotIndex])->getShortChannelLabel(PWM_1_SUBCHANNEL_INDEX + ainChannelIndex);
-    } else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
-		if (isDlogActiveOnAinChannel(slotIndex, ainChannelIndex)) {
-			value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
-		}
-	}
+        int slotIndex = cursor / 2;
+        int pwmChannelIndex = cursor % 2;
+        value = ((Mio168Module *)g_slots[slotIndex])->getShortChannelLabel(PWM_1_SUBCHANNEL_INDEX + pwmChannelIndex);
+    }
 }
 
 void data_dib_mio168_pwm_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {

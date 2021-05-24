@@ -876,12 +876,12 @@ struct DcpChannel : public Channel {
         psu::gui::edit_mode_step::g_dcpVoltageEncoderMode = encoderMode;
     }
     
-	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) override {
+	void getCurrentStepValues(StepValues *stepValues, bool calibrationMode, bool highRange) override {
         static float lowRangeValues[] = { 0.000005f, 0.000025f, 0.0001f, 0.0005f, 0.001f };
 		static float calibrationModeLowRangeValues[] = { 0.000001f, 0.00001f, 0.0001f, 0.0005f, 0.001f };
         static float highRangeValues[] = { 0.0005f, 0.0025f, 0.01f, 0.05f, 0.1f };
 		static float calibrationModeHighRangeValues[] = { 0.0001f, 0.001f, 0.01f, 0.05f, 0.1f };
-		if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
+		if (!highRange && flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_LOW) {
         	stepValues->values = calibrationMode ? calibrationModeLowRangeValues : lowRangeValues;
         	stepValues->count = sizeof(lowRangeValues) / sizeof(float);
 		} else {
@@ -891,7 +891,7 @@ struct DcpChannel : public Channel {
 		stepValues->unit = UNIT_AMPER;
 
 		stepValues->encoderSettings.accelerationEnabled = true;
-		if (flags.currentCurrentRange == 1) {
+		if (!highRange && flags.currentCurrentRange == 1) {
 			stepValues->encoderSettings.range = 0.05f;
 			stepValues->encoderSettings.step = params.I_LOW_RESOLUTION;
 		} else {
@@ -1071,7 +1071,7 @@ public:
 	}
 
     int getLabelsAndColorsPageId() override {
-        return PAGE_ID_DIB_DCP405_LABELS_AND_COLORS;
+        return getTestResult() == TEST_OK ? PAGE_ID_DIB_DCP405_LABELS_AND_COLORS : PAGE_ID_NONE;
     }
 
 	const char *getPinoutFile() override {

@@ -342,6 +342,8 @@ void boot() {
     if (g_numMasterErrors > 0) {
 		ErrorTrace("MCU errors: %s\n", g_masterErrorMessage);
     }
+
+    // DebugTrace("Memory left: %d\n", MEMORY_SIZE - (uint32_t)(MEMORY_END - MEMORY_BEGIN));
 }
 
 bool testMaster() {

@@ -626,7 +626,7 @@ public:
 
     void getProfileParameters(uint8_t *buffer) override {
         Module::getProfileParameters(buffer);
-        assert(sizeof(ProfileParameters) < MAX_CHANNEL_PARAMETERS_SIZE);
+        assert(sizeof(ProfileParameters) < MAX_SLOT_PARAMETERS_SIZE);
         auto parameters = (ProfileParameters *)buffer;
         parameters->relayStates = relayStates;
         memcpy(parameters->relayLabels, relayLabels, sizeof(relayLabels));

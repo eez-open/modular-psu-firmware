@@ -684,7 +684,7 @@ public:
 
     virtual void getVoltageStepValues(StepValues *stepValues, bool calibrationMode) = 0;
     virtual void setVoltageEncoderMode(EncoderMode encoderMode) = 0;
-    virtual void getCurrentStepValues(StepValues *stepValues, bool calibrationMode) = 0;
+    virtual void getCurrentStepValues(StepValues *stepValues, bool calibrationMode, bool highRange = false) = 0;
     virtual void setCurrentEncoderMode(EncoderMode encoderMode) = 0;
     virtual void getPowerStepValues(StepValues *stepValues) = 0;
     virtual void setPowerEncoderMode(EncoderMode encoderMode) = 0;
