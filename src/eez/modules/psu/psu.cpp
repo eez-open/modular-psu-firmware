@@ -51,6 +51,7 @@
 #include <eez/modules/psu/io_pins.h>
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/ramp.h>
+#include <eez/function_generator.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/ontime.h>
 
@@ -177,7 +178,7 @@ extern "C" void PSU_IncTick() {
 
     using namespace eez;
     using namespace eez::psu;
-    if (ramp::isActive() || eez::dcp405::isDacRampActive()) {
+    if (ramp::isActive() || eez::dcp405::isDacRampActive() || function_generator::isActive()) {
         sendMessageToPsu(PSU_MESSAGE_TICK, 0, 0);
     }
 }
@@ -745,11 +746,29 @@ const char *PsuModule::getDlogResourceLabel(int subchannelIndex, int resourceInd
 }
 
 int PsuModule::getNumFunctionGeneratorResources(int subchannelIndex) {
-    return 2;
+	auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+	if (channel->channelIndex == 1 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES)) {
+		return 0;
+	}
+	return 2;
 }
 
 FunctionGeneratorResourceType PsuModule::getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex) {
 	return resourceIndex == 0 ? FUNCTION_GENERATOR_RESOURCE_TYPE_U : FUNCTION_GENERATOR_RESOURCE_TYPE_I;
+}
+
+TriggerMode PsuModule::getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex) {
+    auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    return resourceIndex == 0 ? channel_dispatcher::getVoltageTriggerMode(*channel) : channel_dispatcher::getCurrentTriggerMode(*channel);
+}
+
+void PsuModule::setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode) {
+    auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+    if (resourceIndex == 0) {
+        channel_dispatcher::setVoltageTriggerMode(*channel, triggerMode);
+    } else {
+        channel_dispatcher::setCurrentTriggerMode(*channel, triggerMode);
+    }
 }
 
 const char *PsuModule::getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) {
@@ -762,15 +781,15 @@ const char *PsuModule::getFunctionGeneratorResourceLabel(int subchannelIndex, in
 void PsuModule::getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues) {
     auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
     if (resourceIndex == 0) {
-        min = channel->params.U_MIN;
-        max = channel->params.U_MAX;
+        min = channel_dispatcher::getUMin(*channel);
+        max = channel_dispatcher::getUMax(*channel);
         if (stepValues) {
             channel->getVoltageStepValues(stepValues, false);
         }
     } else {
-        min = channel->params.I_MIN;
-        max = channel->params.I_MAX;
-        if (stepValues) {
+		min = channel_dispatcher::getIMin(*channel);
+		max = channel_dispatcher::getIMax(*channel);
+		if (stepValues) {
             channel->getCurrentStepValues(stepValues, false, true);
         }
     }
@@ -790,6 +809,14 @@ void PsuModule::getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resou
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static void tick0();
+static void tick1();
+static void tick2();
+static void tick3();
+static void tick4();
+
+////////////////////////////////////////////////////////////////////////////////
+
 void init() {
 }
 
@@ -798,8 +825,18 @@ void onThreadMessage(uint8_t type, uint32_t param) {
 #if defined(EEZ_PLATFORM_STM32)
         ramp::tick();
         dcp405::tickDacRamp();
+        function_generator::tick();
+
         if (g_tickCount % 5 == 0) {
-            tick();
+            tick0();
+        } else if (g_tickCount % 5 == 1) {
+            tick1();
+        } else if (g_tickCount % 5 == 2) {
+            tick2();
+        } else if (g_tickCount % 5 == 3) {
+            tick3();
+        } else if (g_tickCount % 5 == 4) {
+            tick4();
         }
 #endif
     } else if (type == PSU_MESSAGE_CHANGE_POWER_STATE) {
@@ -1054,6 +1091,9 @@ bool psuReset() {
     //
     io_pins::reset();
 
+	//
+	function_generator::removeAllChannels();
+
     // SYST:POW ON
     if (powerUp()) {
         Channel::updateAllChannels();
@@ -1299,23 +1339,39 @@ void onProtectionTripped() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void tick() {
+void tick0() {
+    WATCHDOG_RESET(WATCHDOG_HIGH_PRIORITY_THREAD);
+
     for (int i = 0; i < NUM_SLOTS; i++) {
         g_slots[i]->tick();
     }
 
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	ramp::tick();
+	dcp405::tickDacRamp();
+	function_generator::tick();
+#endif
+}
+
+void tick1() {
     trigger::tick();
     list::tick();
-    ramp::tick();
+}
 
+void tick2() {
     for (int i = 0; i < CH_NUM; ++i) {
         Channel::get(i).tick();
     }
+}
 
+void tick3() {
     dlog_record::tick();
     io_pins::tick();
     temperature::tick();
     aux_ps::fan::tick();
+}
+
+void tick4() {
     datetime::tick();
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -1331,6 +1387,14 @@ void tick() {
         g_diagCallback();
         g_diagCallback = NULL;
     }
+}
+
+void tick() {
+    tick0();
+    tick1();
+    tick2();
+    tick3();
+    tick4();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -37,6 +37,7 @@ extern bool g_askMcuRevisionInProgress;
 int askMcuRevision();
 
 void channelToggleOutput();
+void triggerManually();
 
 void selectChannel(Channel *channel);
 void selectChannelByCursor();

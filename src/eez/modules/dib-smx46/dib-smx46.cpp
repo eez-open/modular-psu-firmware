@@ -37,6 +37,7 @@
 #include "eez/modules/psu/profile.h"
 #include "eez/modules/psu/event_queue.h"
 #include "eez/modules/psu/calibration.h"
+#include "eez/modules/psu/trigger.h"
 #include "eez/modules/psu/gui/psu.h"
 #include "eez/modules/psu/gui/animations.h"
 #include "eez/modules/psu/gui/keypad.h"
@@ -44,6 +45,8 @@
 #include "eez/modules/psu/gui/edit_mode.h"
 #include "eez/modules/bp3c/comm.h"
 #include "eez/modules/psu/gui/edit_mode.h"
+
+#include "eez/function_generator.h"
 
 #include "scpi/scpi.h"
 
@@ -62,10 +65,6 @@ enum Smx46LowPriorityThreadMessage {
 
 static const uint16_t MODULE_REVISION_R1B2  = 0x0102;
 
-static const int32_t CONF_TRANSFER_TIMEOUT_MS = 1000;
-
-static const uint32_t BUFFER_SIZE = 20;
-
 static float U_CAL_POINTS[2] = { 1.0f, 9.0f };
 static float DAC_MIN = 0.0f;
 static float DAC_MAX = 10.0f;
@@ -79,11 +78,11 @@ static const uint32_t MIN_TO_MS = 60L * 1000L;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const int NUM_REQUEST_RETRIES = 100;
-static const int MAX_DMA_TRANSFER_ERRORS = 100;
+static const int NUM_REQUEST_RETRIES = 10;
+static const int MAX_DMA_TRANSFER_ERRORS = 10;
 static const uint32_t REFRESH_TIME_MS = 250;
 static const uint32_t TIMEOUT_TIME_MS = 350;
-static const uint32_t TIMEOUT_UNTIL_OUT_OF_SYNC_MS = 10000;
+static const uint32_t TIMEOUT_UNTIL_OUT_OF_SYNC_MS = 1000;
 
 enum Command {
 	COMMAND_NONE       = 0x113B3759,
@@ -92,10 +91,21 @@ enum Command {
     COMMAND_SET_PARAMS = 0x4B723BFF
 };
 
+using function_generator::Waveform;
+
+struct WaveformParameters {
+	Waveform waveform;
+	float frequency;
+	float phaseShift;
+	float amplitude;
+	float offset;
+	float pulseWidth;
+};
+
 struct SetParams {
     uint32_t routes;
-    float dac1;
-    float dac2;
+    float aoutValue[2];
+    WaveformParameters aoutWaveformParameters[2];
     uint8_t relayOn;
 };
 
@@ -131,10 +141,6 @@ struct Response {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define BUFFER_SIZE 20
-
-////////////////////////////////////////////////////////////////////////////////
-
 struct Smx46Module : public Module {
 public:
     TestResult testResult = TEST_NONE;
@@ -143,8 +149,8 @@ public:
     bool synchronized = false;
 
     ////////////////////////////////////////
-    uint32_t input[(BUFFER_SIZE + 3) / 4 + 1];
-    uint32_t output[(BUFFER_SIZE + 3) / 4];
+    uint32_t input[(sizeof(Request) + 3) / 4 + 1];
+    uint32_t output[(sizeof(Request) + 3) / 4];
 
     bool spiReady = false;
     bool spiDmaTransferCompleted = false;
@@ -195,13 +201,14 @@ public:
     char columnLabels[NUM_COLUMNS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
     char rowLabels[NUM_ROWS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
 
-    float dac1;
-    float dac2;
+    float aoutValue[2];
     bool calibrationEnabled[2];
     CalibrationConfiguration calConf[2];
 
     static const size_t CHANNEL_LABEL_MAX_LENGTH = 5;
-    char aoChannelLabels[2][CHANNEL_LABEL_MAX_LENGTH + 1];
+    char aoutLables[2][CHANNEL_LABEL_MAX_LENGTH + 1];
+
+    TriggerMode aoutTriggerMode[2];
 
     bool relayOn;
 
@@ -327,8 +334,23 @@ public:
 
         if (!powerDown) {
             params.routes = routes;
-            params.dac1 = calibrationEnabled[0] && isVoltageCalibrationExists(0) ? calibration::remapValue(dac1, calConf[0].u) : dac1;
-            params.dac2 = calibrationEnabled[1] && isVoltageCalibrationExists(1) ? calibration::remapValue(dac2, calConf[1].u) : dac2;
+
+			for (int i = 0; i < 2; i++) {
+				params.aoutValue[i] = calibrationEnabled[i] && isVoltageCalibrationExists(i) ? calibration::remapValue(aoutValue[i], calConf[i].u) : aoutValue[i];
+
+                auto waveformParameters = function_generator::getWaveformParameters(slotIndex, i, 0);
+                if (!powerDown && waveformParameters && aoutTriggerMode[i] == TRIGGER_MODE_FUNCTION_GENERATOR && function_generator::isActive()) {
+                    params.aoutWaveformParameters[i].waveform = waveformParameters->waveform;
+                    params.aoutWaveformParameters[i].frequency = waveformParameters->frequency;
+                    params.aoutWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
+                    params.aoutWaveformParameters[i].amplitude = calibrationEnabled[i] && isVoltageCalibrationExists(i) ? calibration::remapValue(waveformParameters->amplitude, calConf[i].u) : waveformParameters->amplitude;
+                    params.aoutWaveformParameters[i].offset = calibrationEnabled[i] && isVoltageCalibrationExists(i) ? calibration::remapValue(waveformParameters->offset, calConf[i].u) : waveformParameters->offset;
+                    params.aoutWaveformParameters[i].pulseWidth = waveformParameters->pulseWidth;
+                } else {
+                    params.aoutWaveformParameters[i].waveform = Waveform::WAVEFORM_NONE;
+                }
+            }
+            
             params.relayOn = relayOn ? 1 : 0;
         }
 	}
@@ -372,7 +394,7 @@ public:
 		}
         spiReady = false;
         spiDmaTransferCompleted = false;
-        auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)output, (uint8_t *)input, BUFFER_SIZE);
+        auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)output, (uint8_t *)input, sizeof(Request));
         return status == bp3c::comm::TRANSFER_STATUS_OK;
     }
 
@@ -381,7 +403,7 @@ public:
         request.command = COMMAND_NONE;
         spiReady = false;
         spiDmaTransferCompleted = false;
-        auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)output, (uint8_t *)input, BUFFER_SIZE);
+        auto status = bp3c::comm::transferDMA(slotIndex, (uint8_t *)output, (uint8_t *)input, sizeof(Request));
         return status == bp3c::comm::TRANSFER_STATUS_OK;
     }
 
@@ -641,13 +663,15 @@ public:
         } else if (
 			(previousPageId == PAGE_ID_DIB_SMX46_SETTINGS && activePageId == PAGE_ID_DIB_SMX46_RELAY_CYCLES) ||
 			(previousPageId == PAGE_ID_DIB_SMX46_SETTINGS && activePageId == PAGE_ID_DIB_SMX46_INFO) ||
-			(previousPageId == PAGE_ID_DIB_SMX46_SETTINGS && activePageId == PAGE_ID_CH_SETTINGS_CALIBRATION)
+			(previousPageId == PAGE_ID_DIB_SMX46_AOUT_CONFIGURATION && activePageId == PAGE_ID_CH_SETTINGS_CALIBRATION) ||
+			(previousPageId == PAGE_ID_DIB_SMX46_SETTINGS && activePageId == PAGE_ID_DIB_SMX46_AOUT_CONFIGURATION)
 		) {
 			psu::gui::animateSlideLeft();
 		} else if (
 			(previousPageId == PAGE_ID_DIB_SMX46_RELAY_CYCLES && activePageId == PAGE_ID_DIB_SMX46_SETTINGS) ||
 			(previousPageId == PAGE_ID_DIB_SMX46_INFO && activePageId == PAGE_ID_DIB_SMX46_SETTINGS) ||
-			(previousPageId == PAGE_ID_CH_SETTINGS_CALIBRATION && activePageId == PAGE_ID_DIB_SMX46_SETTINGS)
+			(previousPageId == PAGE_ID_CH_SETTINGS_CALIBRATION && activePageId == PAGE_ID_DIB_SMX46_AOUT_CONFIGURATION) ||
+			(previousPageId == PAGE_ID_DIB_SMX46_AOUT_CONFIGURATION && activePageId == PAGE_ID_DIB_SMX46_SETTINGS)
 		) {
 			psu::gui::animateSlideRight();
 		}
@@ -671,9 +695,9 @@ public:
         unsigned int routes;
         char columnLabels[NUM_COLUMNS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
         char rowLabels[NUM_ROWS][MAX_SWITCH_MATRIX_LABEL_LENGTH + 1];
-        float dac1;
-        float dac2;
-        char aoChannelLabels[2][CHANNEL_LABEL_MAX_LENGTH + 1];
+        float aoutValue[2];
+        char aoutLables[2][CHANNEL_LABEL_MAX_LENGTH + 1];
+        uint8_t aoutTriggerMode[2];
         bool relayOn;
     };
 
@@ -710,11 +734,14 @@ public:
             parameters->rowLabels[i][2] = 0;
         }
 
-        parameters->dac1 = 0.0f;
-        parameters->dac2 = 0.0f;
+        parameters->aoutValue[0] = 0.0f;
+        parameters->aoutValue[1] = 0.0f;
 
-        parameters->aoChannelLabels[0][0] = 0;
-        parameters->aoChannelLabels[1][0] = 0;
+        parameters->aoutLables[0][0] = 0;
+        parameters->aoutLables[1][0] = 0;
+
+        parameters->aoutTriggerMode[0] = TRIGGER_MODE_FIXED;
+        parameters->aoutTriggerMode[1] = TRIGGER_MODE_FIXED;
 
         parameters->relayOn = false;
     }
@@ -729,9 +756,11 @@ public:
         parameters->routes = routes;
         memcpy(&parameters->columnLabels[0][0], &columnLabels[0][0], sizeof(columnLabels));
         memcpy(&parameters->rowLabels[0][0], &rowLabels[0][0], sizeof(rowLabels));
-        parameters->dac1 = dac1;
-        parameters->dac2 = dac2;
-        memcpy(&parameters->aoChannelLabels[0][0], &aoChannelLabels[0][0], sizeof(aoChannelLabels));
+        parameters->aoutValue[0] = aoutValue[0];
+        parameters->aoutValue[1] = aoutValue[1];
+        memcpy(&parameters->aoutLables[0][0], &aoutLables[0][0], sizeof(aoutLables));
+        parameters->aoutTriggerMode[0] = aoutTriggerMode[0];
+        parameters->aoutTriggerMode[1] = aoutTriggerMode[1];
         parameters->relayOn = relayOn;
     }
     
@@ -743,9 +772,11 @@ public:
         routes = parameters->routes;
         memcpy(&columnLabels[0][0], &parameters->columnLabels[0][0], sizeof(columnLabels));
         memcpy(&rowLabels[0][0], &parameters->rowLabels[0][0], sizeof(rowLabels));
-        dac1 = parameters->dac1;
-        dac2 = parameters->dac2;
-        memcpy(&aoChannelLabels[0][0], &parameters->aoChannelLabels[0][0], sizeof(aoChannelLabels));
+		aoutValue[0] = parameters->aoutValue[0];
+		aoutValue[1] = parameters->aoutValue[1];
+        memcpy(&aoutLables[0][0], &parameters->aoutLables[0][0], sizeof(aoutLables));
+        aoutTriggerMode[0] = (TriggerMode)parameters->aoutTriggerMode[0];
+        aoutTriggerMode[1] = (TriggerMode)parameters->aoutTriggerMode[1];
         relayOn = parameters->relayOn;
     }
     
@@ -770,11 +801,14 @@ public:
             WRITE_PROPERTY(propName, parameters->rowLabels[i]);
         }
 
-        WRITE_PROPERTY("dac1", parameters->dac1);
-        WRITE_PROPERTY("dac2", parameters->dac2);
+        WRITE_PROPERTY("aout1Value", parameters->aoutValue[0]);
+        WRITE_PROPERTY("aout2Value", parameters->aoutValue[1]);
 
-        WRITE_PROPERTY("ao1Label", parameters->aoChannelLabels[0]);
-        WRITE_PROPERTY("ao2Label", parameters->aoChannelLabels[1]);
+        WRITE_PROPERTY("aout1Label", parameters->aoutLables[0]);
+        WRITE_PROPERTY("aout2Label", parameters->aoutLables[1]);
+
+        WRITE_PROPERTY("aout1TriggerMode", parameters->aoutTriggerMode[0]);
+        WRITE_PROPERTY("aout2TriggerMode", parameters->aoutTriggerMode[1]);
 
         WRITE_PROPERTY("relayOn", parameters->relayOn);
 
@@ -802,11 +836,14 @@ public:
             READ_STRING_PROPERTY(propName, parameters->rowLabels[i], MAX_SWITCH_MATRIX_LABEL_LENGTH);
         }
 
-        READ_PROPERTY("dac1", parameters->dac1);
-        READ_PROPERTY("dac2", parameters->dac2);
+        READ_PROPERTY("aout1Value", parameters->aoutValue[0]);
+        READ_PROPERTY("aout2Value", parameters->aoutValue[1]);
 
-        READ_STRING_PROPERTY("ao1Label", parameters->aoChannelLabels[0], CHANNEL_LABEL_MAX_LENGTH);
-        READ_STRING_PROPERTY("ao2Label", parameters->aoChannelLabels[1], CHANNEL_LABEL_MAX_LENGTH);
+        READ_STRING_PROPERTY("aout1Label", parameters->aoutLables[0], CHANNEL_LABEL_MAX_LENGTH);
+        READ_STRING_PROPERTY("aout2Label", parameters->aoutLables[1], CHANNEL_LABEL_MAX_LENGTH);
+
+        READ_PROPERTY("aout1TriggerMode", parameters->aoutTriggerMode[0]);
+        READ_PROPERTY("aout2TriggerMode", parameters->aoutTriggerMode[1]);
 
         READ_PROPERTY("relayOn", parameters->relayOn);
 
@@ -830,11 +867,14 @@ public:
             rowLabels[i][2] = 0;
         }
 
-        dac1 = 0.0f;
-        dac2 = 0.0f;
+		aoutValue[0] = 0.0f;
+		aoutValue[1] = 0.0f;
 
-        aoChannelLabels[0][0] = 0;
-        aoChannelLabels[1][0] = 0;
+        aoutLables[0][0] = 0;
+        aoutLables[1][0] = 0;
+
+        aoutTriggerMode[0] = TRIGGER_MODE_FIXED;
+        aoutTriggerMode[1] = TRIGGER_MODE_FIXED;
 
         relayOn = false;
     }
@@ -869,13 +909,8 @@ public:
     }
 
     eez_err_t getChannelLabel(int subchannelIndex, const char *&label) override {
-        if (subchannelIndex == 0) {
-            label = aoChannelLabels[0];
-            return SCPI_RES_OK;
-        } 
-        
-        if (subchannelIndex == 1) {
-            label = aoChannelLabels[1];
+        if (subchannelIndex == 0 || subchannelIndex == 1) {
+            label = aoutLables[subchannelIndex];
             return SCPI_RES_OK;
         }
         
@@ -893,10 +928,10 @@ public:
 
     const char *getDefaultChannelLabel(int subchannelIndex) override {
         if (subchannelIndex == 0) {
-            return "AO1";
+            return "AOUT1";
         } 
         if (subchannelIndex == 1) {
-            return "AO2";
+            return "AOUT2";
         }
         return "";
     }
@@ -910,12 +945,12 @@ public:
         }
 
         if (subchannelIndex == 0) {
-            stringCopy(aoChannelLabels[0], length + 1, label);
+            stringCopy(aoutLables[0], length + 1, label);
             return SCPI_RES_OK;
         }
         
         if (subchannelIndex == 1) {
-            stringCopy(aoChannelLabels[1], length + 1, label);
+            stringCopy(aoutLables[1], length + 1, label);
             return SCPI_RES_OK;
         }
 
@@ -1062,11 +1097,7 @@ public:
             return false;
         }
 
-        if (subchannelIndex == 1) {
-            value = dac1;
-        } else {
-            value = dac2;
-        }
+        value = aoutValue[subchannelIndex - 1];
 
         return true;
     }
@@ -1088,11 +1119,7 @@ public:
             return false;
         }
 
-        if (subchannelIndex == 1) {
-            dac1 = value;
-        } else {
-            dac2 = value;
-        }
+		aoutValue[subchannelIndex - 1] = value;
 
         return true;
     }
@@ -1280,6 +1307,55 @@ public:
         }
     }
 
+    int getNumFunctionGeneratorResources(int subchannelIndex) override {
+        if (subchannelIndex >= 0 && subchannelIndex <= 1) {
+            return 1;
+        }
+        return 0;
+    }
+
+    FunctionGeneratorResourceType getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex) override {
+        return FUNCTION_GENERATOR_RESOURCE_TYPE_U;
+    }
+
+    TriggerMode getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex) override {
+        return aoutTriggerMode[subchannelIndex];
+    }
+
+    void setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode) override {
+        aoutTriggerMode[subchannelIndex] = triggerMode;
+    }
+
+    const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) override {
+        const char *label = getChannelLabel(subchannelIndex);
+		if (*label) {
+			return label;
+		}
+		return getDefaultChannelLabel(subchannelIndex);
+	}
+
+	void getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues) override {
+        min = DAC_MIN;
+        max = DAC_MAX;
+        if (stepValues) {
+            stepValues->values = DAC_ENCODER_STEP_VALUES;
+            stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);
+            stepValues->unit = UNIT_VOLT;
+        }
+    }
+	
+    void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override {
+        min = 0.1f;
+        max = 10000.0f;
+
+        if (stepValues) {
+            static float values[] = { 1.0f, 10.0f, 100.0f, 500.0f };
+            stepValues->values = values;
+            stepValues->count = sizeof(values) / sizeof(float);
+            stepValues->unit = UNIT_HERTZ;
+        }
+    }
+
 	const char *getPinoutFile() override {
 		return "smx46_pinout.jpg";
 	}
@@ -1365,10 +1441,41 @@ private:
 
 static ConfigureRoutesPage g_ConfigureRoutesPage;
 
+////////////////////////////////////////////////////////////////////////////////
+
+class AoutConfigurationPage : public SetPage {
+public:
+	void pageAlloc() {
+	}
+
+	void pageWillAppear() {
+		hmi::g_selectedSlotIndex = g_slotIndex;
+		hmi::g_selectedSubchannelIndex = g_subchannelIndex;
+	}
+
+	int getDirty() {
+		return 0;
+	}
+
+	void set() {
+	}
+
+	static int g_slotIndex;
+	static int g_subchannelIndex;
+};
+
+int AoutConfigurationPage::g_slotIndex;
+int AoutConfigurationPage::g_subchannelIndex;
+static AoutConfigurationPage g_aoutConfigurationPage;
+
+////////////////////////////////////////////////////////////////////////////////
+
 Page *Smx46Module::getPageFromId(int pageId) {
     if (pageId == PAGE_ID_DIB_SMX46_CONFIGURE_ROUTES) {
         return &g_ConfigureRoutesPage;
-    }
+	} else if (pageId == PAGE_ID_DIB_SMX46_AOUT_CONFIGURATION) {
+		return &g_aoutConfigurationPage;
+	}
     return nullptr;
 }
 
@@ -1443,22 +1550,33 @@ void data_dib_smx46_y_label(DataOperationEnum operation, Cursor cursor, Value &v
     }
 }
 
-void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_SMX46_DAC1;
+void data_dib_smx46_aout_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_COUNT) {
+		value = 2;
+	} else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
+		value = hmi::g_selectedSlotIndex * 2 + value.getInt();
+	}
+}
+
+void data_dib_smx46_aout_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+	int slotIndex = cursor / 2;
+	int subchannelIndex = cursor % 2;
+	
+	if (operation == DATA_OPERATION_GET) {
+        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_SMX46_AOUT_VALUE;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
-            value = MakeValue(((Smx46Module *)g_slots[cursor])->dac1, UNIT_VOLT);
+            value = MakeValue(((Smx46Module *)g_slots[slotIndex])->aoutValue[subchannelIndex], UNIT_VOLT);
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(DAC_MIN, UNIT_VOLT);
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(DAC_MAX, UNIT_VOLT);
     }else if (operation == DATA_OPERATION_GET_NAME) {
-        value = ((Smx46Module *)g_slots[cursor])->aoChannelLabels[0];
+        value = ((Smx46Module *)g_slots[slotIndex])->aoutLables[subchannelIndex];
     }  else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
@@ -1478,90 +1596,144 @@ void data_dib_smx46_dac1(DataOperationEnum operation, Cursor cursor, Value &valu
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_smx46DacEncoderMode = (EncoderMode)value.getInt();
     } else if (operation == DATA_OPERATION_SET) {
-        ((Smx46Module *)g_slots[cursor])->dac1 = roundPrec(value.getFloat(), DAC_RESOLUTION);
+        ((Smx46Module *)g_slots[slotIndex])->aoutValue[subchannelIndex] = roundPrec(value.getFloat(), DAC_RESOLUTION);
     }
 }
 
-void data_dib_smx46_dac2(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_aout_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_SMX46_DAC2;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
-            value = g_focusEditValue;
-        } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
-        } else {
-            value = MakeValue(((Smx46Module *)g_slots[cursor])->dac2, UNIT_VOLT);
-        }
-    } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(DAC_MIN, UNIT_VOLT);
-    } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = MakeValue(DAC_MAX, UNIT_VOLT);
-    } else if (operation == DATA_OPERATION_GET_NAME) {
-        value = ((Smx46Module *)g_slots[cursor])->aoChannelLabels[0];
-    } else if (operation == DATA_OPERATION_GET_UNIT) {
-        value = UNIT_VOLT;
-    } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        StepValues *stepValues = value.getStepValues();
+		int slotIndex;
+		int subchannelIndex;
 
-        stepValues->values = DAC_ENCODER_STEP_VALUES;
-        stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);
-        stepValues->unit = UNIT_VOLT;
+		if (cursor != -1) {
+			slotIndex = cursor / 2;
+			subchannelIndex = cursor % 2;
+		} else {
+			if (isPageOnStack(PAGE_ID_DIB_SMX46_AOUT_CONFIGURATION)) {
+				slotIndex = AoutConfigurationPage::g_slotIndex;
+				subchannelIndex = AoutConfigurationPage::g_subchannelIndex;
+			} else {
+				slotIndex = hmi::g_selectedSlotIndex;
+				subchannelIndex = hmi::g_selectedSubchannelIndex;
+			}
+		}
 
-        stepValues->encoderSettings.accelerationEnabled = true;
-        stepValues->encoderSettings.range = DAC_MAX - DAC_MIN;
-        stepValues->encoderSettings.step = stepValues->values[0];
-
-        stepValues->encoderSettings.mode = edit_mode_step::g_smx46DacEncoderMode;
-
-        value = 1;
-    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
-        edit_mode_step::g_smx46DacEncoderMode = (EncoderMode)value.getInt();
-    } else if (operation == DATA_OPERATION_SET) {
-        ((Smx46Module *)g_slots[cursor])->dac2 = roundPrec(value.getFloat(), DAC_RESOLUTION);
+		if (isPageOnStack(PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS)) {
+			const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, subchannelIndex);
+			if (*label) {
+				value = label;
+			} else {
+				value = g_slots[slotIndex]->getDefaultChannelLabel(subchannelIndex);
+			}
+		} else {
+			const char *label = ((Smx46Module *)g_slots[slotIndex])->getChannelLabel(subchannelIndex);
+			if (*label) {
+				value = label;
+			} else {
+				value = ((Smx46Module *)g_slots[slotIndex])->getDefaultChannelLabel(subchannelIndex);
+			}
+		}
     }
 }
 
-void data_dib_smx46_analog_outputs(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_COUNT) {
-        value = 2;
-    } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
-        value = hmi::g_selectedSlotIndex * 2 + value.getInt();
-    } 
+void data_dib_smx46_aout_trigger_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		int subchannelIndex;
+
+		if (cursor != -1) {
+			slotIndex = cursor / 2;
+			subchannelIndex = cursor % 2;
+		} else {
+			if (isPageOnStack(PAGE_ID_DIB_SMX46_AOUT_CONFIGURATION)) {
+				slotIndex = AoutConfigurationPage::g_slotIndex;
+				subchannelIndex = AoutConfigurationPage::g_subchannelIndex;
+			} else {
+				slotIndex = hmi::g_selectedSlotIndex;
+				subchannelIndex = hmi::g_selectedSubchannelIndex;
+			}
+		}
+		
+		value = MakeEnumDefinitionValue(((Smx46Module *)g_slots[slotIndex])->aoutTriggerMode[subchannelIndex], ENUM_DEFINITION_CHANNEL_TRIGGER_MODE);
+	}
 }
 
-void data_dib_smx46_ao_label(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        int slotIndex = cursor / 2;
-        int subchannelIndex = cursor % 2;
-        const char *label = LabelsAndColorsPage::getChannelLabel(slotIndex, subchannelIndex);
-        if (*label) {
-            value = label;
-        } else {
-            value = g_slots[slotIndex]->getDefaultChannelLabel(subchannelIndex);
-        }
+void data_dib_smx46_aout_trigger_is_initiated(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex = cursor / 2;
+		int subchannelIndex = cursor % 2;
+		TriggerMode triggerMode = ((Smx46Module *)g_slots[slotIndex])->aoutTriggerMode[subchannelIndex];
+
+		value = (trigger::isInitiated() || trigger::isTriggered()) && triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR;
+	} else if (operation == DATA_OPERATION_IS_BLINKING) {
+		value = trigger::isInitiated();
+	}
+}
+
+void data_dib_smx46_aout_function_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		int subchannelIndex;
+
+		if (cursor != -1) {
+			slotIndex = cursor / 2;
+			subchannelIndex = cursor % 2;
+		} else {
+			if (isPageOnStack(PAGE_ID_DIB_SMX46_AOUT_CONFIGURATION)) {
+				slotIndex = AoutConfigurationPage::g_slotIndex;
+				subchannelIndex = AoutConfigurationPage::g_subchannelIndex;
+			} else {
+				slotIndex = hmi::g_selectedSlotIndex;
+				subchannelIndex = hmi::g_selectedSubchannelIndex;
+			}
+		}
+
+        auto waveformParameters = function_generator::getWaveformParameters(slotIndex, subchannelIndex, 0);
+		
+		value = function_generator::g_waveformShortLabel[waveformParameters ? waveformParameters->waveform : function_generator::WAVEFORM_NONE];
+	}
+}
+
+void action_dib_smx46_aout_show_configuration() {
+	g_aoutConfigurationPage.g_slotIndex = hmi::g_selectedSlotIndex;
+	g_aoutConfigurationPage.g_subchannelIndex = getFoundWidgetAtDown().cursor % 2;
+	pushPage(PAGE_ID_DIB_SMX46_AOUT_CONFIGURATION);
+}
+
+void action_dib_smx46_aout_show_calibration() {
+	hmi::g_selectedSlotIndex = g_aoutConfigurationPage.g_slotIndex;
+	hmi::g_selectedSubchannelIndex = g_aoutConfigurationPage.g_subchannelIndex;
+	calibration::g_viewer.start(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
+	pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
+}
+
+static void onSetTriggerMode(uint16_t value) {
+	popPage();
+
+	((Smx46Module *)g_slots[g_aoutConfigurationPage.g_slotIndex])->aoutTriggerMode[g_aoutConfigurationPage.g_subchannelIndex] = (TriggerMode)value;
+
+    if (value == TRIGGER_MODE_FUNCTION_GENERATOR) {
+        function_generator::addChannelWaveformParameters(g_aoutConfigurationPage.g_slotIndex, g_aoutConfigurationPage.g_subchannelIndex, 0);
     }
 }
 
-void data_dib_smx46_ao1_label(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        const char *label = ((Smx46Module *)g_slots[cursor])->aoChannelLabels[0];
-        if (*label) {
-            value = label;
-        } else {
-            value = ((Smx46Module *)g_slots[cursor])->getDefaultChannelLabel(0);
-        }
-    }
+void action_dib_smx46_aout_select_trigger_mode() {
+	static EnumItem g_enumDefinitionMio168AoutTriggerMode[] = {
+		{ TRIGGER_MODE_FIXED, "Fixed" },
+		{ TRIGGER_MODE_FUNCTION_GENERATOR, "Function generator" },
+		{ 0, 0 }
+	};
+
+	TriggerMode triggerMode = ((Smx46Module *)g_slots[g_aoutConfigurationPage.g_slotIndex])->aoutTriggerMode[g_aoutConfigurationPage.g_subchannelIndex];
+	pushSelectFromEnumPage(g_enumDefinitionMio168AoutTriggerMode, triggerMode, nullptr, onSetTriggerMode);
 }
 
-void data_dib_smx46_ao2_label(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        const char *label = ((Smx46Module *)g_slots[cursor])->aoChannelLabels[1];
-        if (*label) {
-            value = label;
-        } else {
-            value = ((Smx46Module *)g_slots[cursor])->getDefaultChannelLabel(1);
-        }
-    }
+void action_dib_smx46_aout_show_function() {
+	function_generator::addChannelWaveformParameters(g_aoutConfigurationPage.g_slotIndex, g_aoutConfigurationPage.g_subchannelIndex, 0);
+
+	pushPage(PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR);
+
+	function_generator::selectWaveformParametersForChannel(g_aoutConfigurationPage.g_slotIndex, g_aoutConfigurationPage.g_subchannelIndex, 0);
 }
 
 void data_dib_smx46_relay_on(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -1708,18 +1880,6 @@ void action_dib_smx46_clear_all_labels() {
     }
 
     refreshScreen();
-}
-
-void action_dib_smx46_show_dac1_calibration() {
-    hmi::g_selectedSubchannelIndex = 0;
-    calibration::g_viewer.start(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
-    pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
-}
-
-void action_dib_smx46_show_dac2_calibration() {
-    hmi::g_selectedSubchannelIndex = 1;
-    calibration::g_viewer.start(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
-    pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
 }
 
 void action_dib_smx46_change_subchannel_label() {

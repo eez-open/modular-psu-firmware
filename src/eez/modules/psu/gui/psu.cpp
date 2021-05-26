@@ -391,6 +391,7 @@ bool isSysSettingsSubPage(int pageId) {
         pageId == PAGE_ID_SYS_SETTINGS_ETHERNET ||
         pageId == PAGE_ID_SYS_SETTINGS_TRIGGER ||
         pageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY ||
+        pageId == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR ||
         pageId == PAGE_ID_SYS_SETTINGS_DISPLAY ||
         pageId == PAGE_ID_SYS_SETTINGS_SOUND ||
         pageId == PAGE_ID_SYS_SETTINGS_MQTT ||
@@ -492,7 +493,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
 		} else if (isSysSettingsSubPage(activePageId)) {
             animateSlideLeft();
         }
-    } else if (previousPageId == PAGE_ID_SYS_SETTINGS_TRIGGER || previousPageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY) {
+    } else if (previousPageId == PAGE_ID_SYS_SETTINGS_TRIGGER || previousPageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY || previousPageId == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
         if (activePageId == PAGE_ID_MAIN) {
 			animateSlideUp();
 		} else if (activePageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
@@ -519,7 +520,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
     } else if (previousPageId == PAGE_ID_CH_SETTINGS_TRIGGER) {
         if (activePageId == PAGE_ID_MAIN) {
             animateSlideUp();
-        } else if (activePageId == PAGE_ID_SYS_SETTINGS_TRIGGER || activePageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY) {
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS_TRIGGER || activePageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY || activePageId == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_CH_SETTINGS_LISTS) {
             animateSlideDown();
@@ -2005,6 +2006,14 @@ void doChannelToggleOutput() {
         } else {
             channel_dispatcher::outputEnable(channel, true);
         }
+    }
+}
+
+void triggerManually() {
+    if (trigger::isActive() || trigger::isInitiated() || trigger::isTriggered()) {
+        trigger::abort();
+    } else if (trigger::isIdle()) {
+        channelInitiateTrigger();
     }
 }
 

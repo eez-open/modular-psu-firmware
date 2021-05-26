@@ -24,6 +24,7 @@
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/ramp.h>
+#include <eez/function_generator.h>
 #include <eez/modules/psu/trigger.h>
 #include <eez/scpi/regs.h>
 #include <eez/system.h>
@@ -38,7 +39,6 @@ Source g_triggerSource;
 float g_triggerDelay;
 bool g_triggerContinuousInitializationEnabled;
 
-enum State { STATE_IDLE, STATE_INITIATED, STATE_TRIGGERED, STATE_EXECUTING };
 static State g_state;
 static uint32_t g_triggeredTime;
 
@@ -212,7 +212,7 @@ void setTriggerFinished(Channel &channel) {
 
     onTriggerFinished(channel);
 
-    if (isTriggerFinishedOnAllChannels()) {
+    if (isTriggerFinishedOnAllChannels() && !function_generator::isActive()) {
         triggerFinished();
     }
 }
@@ -263,7 +263,7 @@ int checkTrigger() {
                 if (err) {
                     return err;
                 }
-            } else {
+            } else if (channel.getVoltageTriggerMode() == TRIGGER_MODE_STEP) {
                 if (channel.isVoltageLimitExceeded(channel.u.triggerLevel)) {
                     g_errorChannelIndex = channel.channelIndex;
                     return SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED;
@@ -279,10 +279,15 @@ int checkTrigger() {
                     g_errorChannelIndex = channel.channelIndex;
                     return err;
                 }
+            } else if (channel.getVoltageTriggerMode() == TRIGGER_MODE_FUNCTION_GENERATOR) {
             }
 
             onlyFixed = false;
         }
+    }
+
+    if (function_generator::getNumChannelsInFunctionGeneratorTriggerMode() > 0) {
+        onlyFixed = false;
     }
 
     if (onlyFixed) {
@@ -320,6 +325,8 @@ int startImmediately() {
 void startImmediatelyInPsuThread() {
     bool trackingChannelsStarted = false;
 
+	function_generator::executionStart();
+
     for (int i = 0; i < CH_NUM; ++i) {
         Channel &channel = Channel::get(i);
 
@@ -346,7 +353,8 @@ void startImmediatelyInPsuThread() {
             }
         } else if (channel.getVoltageTriggerMode() == TRIGGER_MODE_STEP) {
             ramp::executionStart(channel);
-
+            channel_dispatcher::outputEnableOnNextSync(channel, channel_dispatcher::getTriggerOutputState(channel));
+        } else if (channel.getVoltageTriggerMode() == TRIGGER_MODE_FUNCTION_GENERATOR) {
             channel_dispatcher::outputEnableOnNextSync(channel, channel_dispatcher::getTriggerOutputState(channel));
         } else {
             setTriggerFinished(channel);
@@ -380,6 +388,10 @@ int enableInitiateContinuous(bool enable) {
     }
 }
 
+State getState() {
+	return g_state;
+}
+
 bool isIdle() {
     return g_state == STATE_IDLE;
 }
@@ -393,7 +405,7 @@ bool isTriggered() {
 }
 
 bool isActive() {
-    return list::isActive() || ramp::isActive();
+    return list::isActive() || ramp::isActive() || function_generator::isActive();
 }
 
 void abort() {
@@ -402,6 +414,7 @@ void abort() {
     } else {
         list::abort();
         ramp::abort();
+        function_generator::abort();
 
         bool sync = false;
         for (int i = 0; i < CH_NUM; ++i) {

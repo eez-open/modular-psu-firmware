@@ -21,7 +21,9 @@
         "initializer_list": "cpp",
         "queue": "cpp",
         "xlocnum": "cpp",
-        "istream": "cpp"
+        "istream": "cpp",
+        "ostream": "cpp",
+        "streambuf": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": true

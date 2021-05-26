@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <eez/index.h>
 #include <eez/mp.h>
 
 #include <eez/modules/psu/psu.h>
@@ -87,7 +88,7 @@ mp_obj_t modeez_setU(mp_obj_t channelIndexObj, mp_obj_t value) {
     }
     Channel &channel = Channel::get(channelIndex);
 
-    if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
+    if (channel_dispatcher::getVoltageTriggerMode(channel) != eez::TRIGGER_MODE_FIXED && !trigger::isIdle()) {
         mp_raise_ValueError("Can not change transient trigger");
     }
 
@@ -128,7 +129,7 @@ mp_obj_t modeez_setI(mp_obj_t channelIndexObj, mp_obj_t value) {
     }
     Channel &channel = Channel::get(channelIndex);
 
-    if (channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED && !trigger::isIdle()) {
+    if (channel_dispatcher::getVoltageTriggerMode(channel) != eez::TRIGGER_MODE_FIXED && !trigger::isIdle()) {
         mp_raise_ValueError("Can not change transient trigger");
     }
 

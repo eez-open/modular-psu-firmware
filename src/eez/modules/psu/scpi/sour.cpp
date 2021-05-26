@@ -875,6 +875,7 @@ static scpi_choice_def_t triggerModeChoice[] = {
     { "FIXed", TRIGGER_MODE_FIXED },
     { "LIST", TRIGGER_MODE_LIST },
     { "STEP", TRIGGER_MODE_STEP },
+    { "FUNCgen", TRIGGER_MODE_FUNCTION_GENERATOR },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 

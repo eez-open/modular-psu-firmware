@@ -117,6 +117,7 @@ EnumItem g_enumDefinition_CHANNEL_TRIGGER_MODE[] = {
     { TRIGGER_MODE_FIXED, "Fixed" },
     { TRIGGER_MODE_LIST, "List" },
     { TRIGGER_MODE_STEP, "Step" },
+    { TRIGGER_MODE_FUNCTION_GENERATOR, "Function generator" },
     { 0, 0 } 
 };
 
@@ -4292,6 +4293,12 @@ void data_trigger_initiate_continuously(DataOperationEnum operation, Cursor curs
         if (page) {
             value = page->m_initiateContinuously;
         }
+    }
+}
+
+void data_trigger_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = trigger::getState();
     }
 }
 

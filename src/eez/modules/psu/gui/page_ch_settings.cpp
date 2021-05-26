@@ -40,6 +40,8 @@
 
 #include <eez/modules/mcu/encoder.h>
 
+#include <eez/function_generator.h>
+
 #include <scpi/scpi.h>
 
 namespace eez {
@@ -538,6 +540,10 @@ void ChSettingsTriggerPage::set() {
     channel_dispatcher::setTriggerCurrent(*g_channel, triggerCurrent);
     channel_dispatcher::setCurrentRampDuration(*g_channel, currentRampDuration);
     channel_dispatcher::setOutputDelayDuration(*g_channel, outputDelayDuration);
+
+	if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+		function_generator::addChannelWaveformParameters(*g_channel);
+	}
 
     pageAlloc();    
 }

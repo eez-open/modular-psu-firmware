@@ -59,7 +59,12 @@
       "type": "string"
     },
     {
-      "name": "dac1",
+      "name": "aout_channels",
+      "type": "list",
+      "defaultValue": "[\n  [{\"aout_value\": \"3.145 V\"}, {\"aout_label\": \"AOUT1\"}, {\"aout_trigger_mode\": 0}, {\"aout_trigger_is_initiated\": 0}],\n  [{\"aout_value\": \"2.223 V\"}, {\"aout_label\": \"AOUT2\"}, {\"aout_trigger_mode\": 0}, {\"aout_trigger_is_initiated\": 0}]\n]"
+    },
+    {
+      "name": "aout_value",
       "description": "",
       "type": "float",
       "defaultValue": "5.00 V",
@@ -67,12 +72,25 @@
       "defaultMaxValue": 40
     },
     {
-      "name": "dac2",
-      "description": "",
-      "type": "float",
-      "defaultValue": "3.00 V",
-      "defaultMinValue": 8,
-      "defaultMaxValue": 40
+      "name": "aout_label",
+      "type": "string",
+      "defaultValue": "AOUT1"
+    },
+    {
+      "name": "aout_trigger_mode",
+      "type": "enum",
+      "enumItems": "[\n\"Fixed\",\n\"List\",\n\"Step\",\n\"Function generator\"\n]",
+      "defaultValue": "Function generator"
+    },
+    {
+      "name": "aout_trigger_is_initiated",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
+      "name": "aout_function_label",
+      "type": "string",
+      "defaultValue": "\\u00c3"
     },
     {
       "name": "relay_on",
@@ -88,26 +106,6 @@
       "name": "power_relay_cycles",
       "type": "integer",
       "defaultValue": "3245"
-    },
-    {
-      "name": "analog_outputs",
-      "type": "list",
-      "defaultValue": "[{\"ao_label\": \"AO1\"}, {\"ao_label\": \"AO2\"}]"
-    },
-    {
-      "name": "ao_label",
-      "type": "string",
-      "defaultValue": "AO1"
-    },
-    {
-      "name": "ao1_label",
-      "type": "string",
-      "defaultValue": "AO1"
-    },
-    {
-      "name": "ao2_label",
-      "type": "string",
-      "defaultValue": "AO2"
     }
   ],
   "actions": [
@@ -139,16 +137,6 @@
     {
       "components": [],
       "connectionLines": [],
-      "name": "show_dac1_calibration"
-    },
-    {
-      "components": [],
-      "connectionLines": [],
-      "name": "show_dac2_calibration"
-    },
-    {
-      "components": [],
-      "connectionLines": [],
       "name": "show_info"
     },
     {
@@ -170,6 +158,26 @@
       "components": [],
       "connectionLines": [],
       "name": "change_subchannel_label"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "aout_show_configuration"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "aout_select_trigger_mode"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "aout_show_function"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "aout_show_calibration"
     }
   ],
   "pages": [
@@ -396,60 +404,204 @@
           }
         },
         {
-          "type": "Text",
+          "type": "ListWidget",
           "left": 0,
           "top": 139,
-          "width": 51,
-          "height": 31,
-          "wireID": "908bf420-77e7-4ffd-9292-45db17ce24af",
-          "data": "ao1_label",
+          "width": 154,
+          "height": 66,
+          "wireID": "aaad4d2b-44ff-4917-b501-4ebf734c3723",
+          "data": "aout_channels",
           "style": {
-            "inheritFrom": "default_S_left",
-            "alignHorizontal": "center"
+            "inheritFrom": "default"
           },
-          "text": ""
-        },
-        {
-          "type": "DisplayData",
-          "left": 52,
-          "top": 139,
-          "width": 102,
-          "height": 31,
-          "wireID": "352eae42-82e8-4f4d-b5ad-98b3c7b5195e",
-          "data": "dac1",
-          "action": "edit",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_enabled"
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 154,
+            "height": 33,
+            "wireID": "54e4198e-4f9b-45c5-bc17-d7811b7b2f63",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Text",
+                "left": 0,
+                "top": 0,
+                "width": 51,
+                "height": 31,
+                "wireID": "908bf420-77e7-4ffd-9292-45db17ce24af",
+                "data": "aout_label",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "alignHorizontal": "center"
+                },
+                "text": ""
+              },
+              {
+                "type": "Select",
+                "left": 52,
+                "top": 0,
+                "width": 102,
+                "height": 31,
+                "wireID": "614e38cd-b777-4e78-e91e-23474d10acbe",
+                "data": "aout_trigger_mode",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 31,
+                    "wireID": "183dcd65-a7c0-4661-fc9e-75bf92d629e0",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 31,
+                        "wireID": "4042f429-61eb-40a1-9f3c-9d70b125b777",
+                        "data": "aout_value",
+                        "action": "edit",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 31,
+                    "wireID": "a638226a-cacf-4342-957e-297163eae53e",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 31,
+                    "wireID": "ae37757e-d9b7-41c0-f47c-f5c675bf1a4f",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 31,
+                    "wireID": "2a9480d9-ffaa-4541-a4da-3897399ec203",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Select",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 31,
+                        "wireID": "122310cc-45f6-459f-a7e7-2ae9db4a58d0",
+                        "data": "trigger_state",
+                        "action": "trigger_manually",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 31,
+                            "wireID": "b64ee877-31af-4fa7-d5b5-7981831a25fb",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Initiate"
+                          },
+                          {
+                            "type": "Button",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 31,
+                            "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
+                            "data": "aout_trigger_is_initiated",
+                            "action": "trigger_generate_manual",
+                            "style": {
+                              "inheritFrom": "trigger_button_14"
+                            },
+                            "text": "\\u00A4 TRG",
+                            "enabled": "trigger_is_manual",
+                            "disabledStyle": {
+                              "inheritFrom": "trigger_button_14",
+                              "color": "text_regular",
+                              "activeBackgroundColor": "text_regular"
+                            }
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 31,
+                            "wireID": "5b6a9502-a339-4040-b26a-7b03509e3ecd",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Abort"
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 31,
+                            "wireID": "a52afc04-11f4-4e4c-a699-baee9850f575",
+                            "data": "aout_function_label",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14",
+                              "blink": true
+                            },
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           },
-          "displayOption": 0
-        },
-        {
-          "type": "Text",
-          "left": 0,
-          "top": 172,
-          "width": 52,
-          "height": 31,
-          "wireID": "d2497ecf-357b-496f-9d25-29007d9beee9",
-          "data": "ao2_label",
-          "style": {
-            "inheritFrom": "default_S_left",
-            "alignHorizontal": "center"
-          },
-          "text": ""
-        },
-        {
-          "type": "DisplayData",
-          "left": 52,
-          "top": 172,
-          "width": 102,
-          "height": 31,
-          "wireID": "13d35f50-64a7-4a54-eadf-d7757fd7333f",
-          "data": "dac2",
-          "action": "edit",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_enabled"
-          },
-          "displayOption": 0
+          "listType": "vertical",
+          "gap": 0
         },
         {
           "type": "Select",
@@ -750,74 +902,204 @@
           }
         },
         {
-          "type": "Container",
+          "type": "ListWidget",
           "left": 222,
           "top": 2,
           "width": 154,
-          "height": 70,
-          "wireID": "a06ccd6c-19e5-4469-86ae-31d8fc92c701",
+          "height": 72,
+          "wireID": "bae5b46d-c4f1-4244-f957-8d738bae52d7",
+          "data": "aout_channels",
           "style": {
             "inheritFrom": "default"
           },
-          "name": "AO",
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 51,
-              "height": 34,
-              "wireID": "908bf420-77e7-4ffd-9292-45db17ce24af",
-              "data": "ao1_label",
-              "style": {
-                "inheritFrom": "default_S_left",
-                "alignHorizontal": "center"
-              },
-              "text": ""
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 154,
+            "height": 36,
+            "wireID": "54e4198e-4f9b-45c5-bc17-d7811b7b2f63",
+            "style": {
+              "inheritFrom": "default"
             },
-            {
-              "type": "DisplayData",
-              "left": 52,
-              "top": 0,
-              "width": 102,
-              "height": 34,
-              "wireID": "352eae42-82e8-4f4d-b5ad-98b3c7b5195e",
-              "data": "dac1",
-              "action": "edit",
-              "style": {
-                "inheritFrom": "encoder_cursor_14_enabled"
+            "widgets": [
+              {
+                "type": "Text",
+                "left": 0,
+                "top": 0,
+                "width": 51,
+                "height": 34,
+                "wireID": "908bf420-77e7-4ffd-9292-45db17ce24af",
+                "data": "aout_label",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "alignHorizontal": "center"
+                },
+                "text": ""
               },
-              "displayOption": 0
-            },
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 36,
-              "width": 52,
-              "height": 34,
-              "wireID": "d2497ecf-357b-496f-9d25-29007d9beee9",
-              "data": "ao2_label",
-              "style": {
-                "inheritFrom": "default_S_left",
-                "alignHorizontal": "center"
-              },
-              "text": ""
-            },
-            {
-              "type": "DisplayData",
-              "left": 52,
-              "top": 36,
-              "width": 102,
-              "height": 34,
-              "wireID": "13d35f50-64a7-4a54-eadf-d7757fd7333f",
-              "data": "dac2",
-              "action": "edit",
-              "style": {
-                "inheritFrom": "encoder_cursor_14_enabled"
-              },
-              "displayOption": 0
-            }
-          ]
+              {
+                "type": "Select",
+                "left": 52,
+                "top": 0,
+                "width": 102,
+                "height": 34,
+                "wireID": "614e38cd-b777-4e78-e91e-23474d10acbe",
+                "data": "aout_trigger_mode",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 34,
+                    "wireID": "183dcd65-a7c0-4661-fc9e-75bf92d629e0",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 34,
+                        "wireID": "4042f429-61eb-40a1-9f3c-9d70b125b777",
+                        "data": "aout_value",
+                        "action": "edit",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 34,
+                    "wireID": "a638226a-cacf-4342-957e-297163eae53e",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 34,
+                    "wireID": "ae37757e-d9b7-41c0-f47c-f5c675bf1a4f",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 34,
+                    "wireID": "2a9480d9-ffaa-4541-a4da-3897399ec203",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Select",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 34,
+                        "wireID": "122310cc-45f6-459f-a7e7-2ae9db4a58d0",
+                        "data": "trigger_state",
+                        "action": "trigger_manually",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 34,
+                            "wireID": "b64ee877-31af-4fa7-d5b5-7981831a25fb",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Initiate"
+                          },
+                          {
+                            "type": "Button",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 34,
+                            "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
+                            "data": "aout_trigger_is_initiated",
+                            "action": "trigger_generate_manual",
+                            "style": {
+                              "inheritFrom": "trigger_button_14"
+                            },
+                            "text": "\\u00A4 TRG",
+                            "enabled": "trigger_is_manual",
+                            "disabledStyle": {
+                              "inheritFrom": "trigger_button_14",
+                              "color": "text_regular",
+                              "activeBackgroundColor": "text_regular"
+                            }
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 34,
+                            "wireID": "5b6a9502-a339-4040-b26a-7b03509e3ecd",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Abort"
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 34,
+                            "wireID": "a52afc04-11f4-4e4c-a699-baee9850f575",
+                            "data": "aout_function_label",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14",
+                              "blink": true
+                            },
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "listType": "vertical",
+          "gap": 0
         },
         {
           "type": "Select",
@@ -1118,65 +1400,209 @@
           }
         },
         {
-          "type": "Text",
-          "left": 0,
-          "top": 139,
-          "width": 76,
-          "height": 31,
-          "wireID": "bfac7aa0-074f-4e03-f2ea-719c38465b20",
-          "data": "ao1_label",
+          "type": "ListWidget",
+          "left": 30,
+          "top": 138,
+          "width": 180,
+          "height": 66,
+          "wireID": "153e2c5c-c028-4d6a-f3fb-9bcf048aa2a1",
+          "data": "aout_channels",
           "style": {
-            "inheritFrom": "default_S_left",
-            "alignHorizontal": "center"
+            "inheritFrom": "default"
           },
-          "text": ""
-        },
-        {
-          "type": "DisplayData",
-          "left": 76,
-          "top": 139,
-          "width": 134,
-          "height": 31,
-          "wireID": "aa72532d-b39a-49ba-9b08-fafd44c5e049",
-          "data": "dac1",
-          "action": "edit",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_enabled"
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 180,
+            "height": 33,
+            "wireID": "54e4198e-4f9b-45c5-bc17-d7811b7b2f63",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Text",
+                "left": 0,
+                "top": 0,
+                "width": 78,
+                "height": 31,
+                "wireID": "908bf420-77e7-4ffd-9292-45db17ce24af",
+                "data": "aout_label",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "alignHorizontal": "center"
+                },
+                "text": ""
+              },
+              {
+                "type": "Select",
+                "left": 78,
+                "top": 0,
+                "width": 102,
+                "height": 31,
+                "wireID": "614e38cd-b777-4e78-e91e-23474d10acbe",
+                "data": "aout_trigger_mode",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 31,
+                    "wireID": "183dcd65-a7c0-4661-fc9e-75bf92d629e0",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 31,
+                        "wireID": "4042f429-61eb-40a1-9f3c-9d70b125b777",
+                        "data": "aout_value",
+                        "action": "edit",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 31,
+                    "wireID": "a638226a-cacf-4342-957e-297163eae53e",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 31,
+                    "wireID": "ae37757e-d9b7-41c0-f47c-f5c675bf1a4f",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 31,
+                    "wireID": "2a9480d9-ffaa-4541-a4da-3897399ec203",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Select",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 31,
+                        "wireID": "122310cc-45f6-459f-a7e7-2ae9db4a58d0",
+                        "data": "trigger_state",
+                        "action": "trigger_manually",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 31,
+                            "wireID": "b64ee877-31af-4fa7-d5b5-7981831a25fb",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Initiate"
+                          },
+                          {
+                            "type": "Button",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 31,
+                            "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
+                            "data": "aout_trigger_is_initiated",
+                            "action": "trigger_generate_manual",
+                            "style": {
+                              "inheritFrom": "trigger_button_14"
+                            },
+                            "text": "\\u00A4 TRG",
+                            "enabled": "trigger_is_manual",
+                            "disabledStyle": {
+                              "inheritFrom": "trigger_button_14",
+                              "color": "text_regular",
+                              "activeBackgroundColor": "text_regular"
+                            }
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 31,
+                            "wireID": "5b6a9502-a339-4040-b26a-7b03509e3ecd",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Abort"
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 31,
+                            "wireID": "a52afc04-11f4-4e4c-a699-baee9850f575",
+                            "data": "aout_function_label",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14",
+                              "blink": true
+                            },
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           },
-          "displayOption": 0
-        },
-        {
-          "type": "Text",
-          "left": 0,
-          "top": 172,
-          "width": 76,
-          "height": 31,
-          "wireID": "53f826a3-9d68-4720-bba9-9ab035899e65",
-          "data": "ao2_label",
-          "style": {
-            "inheritFrom": "default_S_left",
-            "alignHorizontal": "center"
-          },
-          "text": ""
-        },
-        {
-          "type": "DisplayData",
-          "left": 76,
-          "top": 172,
-          "width": 134,
-          "height": 31,
-          "wireID": "228a1470-6001-4003-ba1c-0fcd02263d63",
-          "data": "dac2",
-          "action": "edit",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_enabled"
-          },
-          "displayOption": 0
+          "listType": "vertical",
+          "gap": 0
         },
         {
           "type": "Select",
           "left": 30,
-          "top": 205,
+          "top": 204,
           "width": 180,
           "height": 31,
           "wireID": "1e1e1173-2287-4557-963e-397a27ddf821",
@@ -1473,74 +1899,204 @@
           }
         },
         {
-          "type": "Container",
-          "left": 268,
+          "type": "ListWidget",
+          "left": 299,
           "top": 4,
-          "width": 205,
-          "height": 70,
-          "wireID": "4b5e79f7-865d-4f05-e7f4-e51617dd951c",
+          "width": 174,
+          "height": 74,
+          "wireID": "ebee74c6-230b-4273-f469-ca15692a3806",
+          "data": "aout_channels",
           "style": {
             "inheritFrom": "default"
           },
-          "name": "AO",
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 2,
-              "width": 76,
-              "height": 31,
-              "wireID": "bfac7aa0-074f-4e03-f2ea-719c38465b20",
-              "data": "ao1_label",
-              "style": {
-                "inheritFrom": "default_S_left",
-                "alignHorizontal": "center"
-              },
-              "text": ""
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 154,
+            "height": 37,
+            "wireID": "54e4198e-4f9b-45c5-bc17-d7811b7b2f63",
+            "style": {
+              "inheritFrom": "default"
             },
-            {
-              "type": "DisplayData",
-              "left": 76,
-              "top": 2,
-              "width": 129,
-              "height": 31,
-              "wireID": "aa72532d-b39a-49ba-9b08-fafd44c5e049",
-              "data": "dac1",
-              "action": "edit",
-              "style": {
-                "inheritFrom": "encoder_cursor_14_enabled"
+            "widgets": [
+              {
+                "type": "Text",
+                "left": 0,
+                "top": 0,
+                "width": 51,
+                "height": 33,
+                "wireID": "908bf420-77e7-4ffd-9292-45db17ce24af",
+                "data": "aout_label",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "alignHorizontal": "center"
+                },
+                "text": ""
               },
-              "displayOption": 0
-            },
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 38,
-              "width": 76,
-              "height": 31,
-              "wireID": "53f826a3-9d68-4720-bba9-9ab035899e65",
-              "data": "ao2_label",
-              "style": {
-                "inheritFrom": "default_S_left",
-                "alignHorizontal": "center"
-              },
-              "text": ""
-            },
-            {
-              "type": "DisplayData",
-              "left": 76,
-              "top": 38,
-              "width": 129,
-              "height": 31,
-              "wireID": "228a1470-6001-4003-ba1c-0fcd02263d63",
-              "data": "dac2",
-              "action": "edit",
-              "style": {
-                "inheritFrom": "encoder_cursor_14_enabled"
-              },
-              "displayOption": 0
-            }
-          ]
+              {
+                "type": "Select",
+                "left": 52,
+                "top": 0,
+                "width": 102,
+                "height": 33,
+                "wireID": "614e38cd-b777-4e78-e91e-23474d10acbe",
+                "data": "aout_trigger_mode",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 33,
+                    "wireID": "183dcd65-a7c0-4661-fc9e-75bf92d629e0",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 33,
+                        "wireID": "4042f429-61eb-40a1-9f3c-9d70b125b777",
+                        "data": "aout_value",
+                        "action": "edit",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 33,
+                    "wireID": "a638226a-cacf-4342-957e-297163eae53e",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 33,
+                    "wireID": "ae37757e-d9b7-41c0-f47c-f5c675bf1a4f",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 33,
+                    "wireID": "2a9480d9-ffaa-4541-a4da-3897399ec203",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Select",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 33,
+                        "wireID": "122310cc-45f6-459f-a7e7-2ae9db4a58d0",
+                        "data": "trigger_state",
+                        "action": "trigger_manually",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 33,
+                            "wireID": "b64ee877-31af-4fa7-d5b5-7981831a25fb",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Initiate"
+                          },
+                          {
+                            "type": "Button",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 33,
+                            "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
+                            "data": "aout_trigger_is_initiated",
+                            "action": "trigger_generate_manual",
+                            "style": {
+                              "inheritFrom": "trigger_button_14"
+                            },
+                            "text": "\\u00A4 TRG",
+                            "enabled": "trigger_is_manual",
+                            "disabledStyle": {
+                              "inheritFrom": "trigger_button_14",
+                              "color": "text_regular",
+                              "activeBackgroundColor": "text_regular"
+                            }
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 33,
+                            "wireID": "5b6a9502-a339-4040-b26a-7b03509e3ecd",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Abort"
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 33,
+                            "wireID": "a52afc04-11f4-4e4c-a699-baee9850f575",
+                            "data": "aout_function_label",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14",
+                              "blink": true
+                            },
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "listType": "vertical",
+          "gap": 0
         },
         {
           "type": "Select",
@@ -1973,60 +2529,204 @@
           "text": "Clear labels"
         },
         {
-          "type": "Text",
+          "type": "ListWidget",
           "left": 322,
           "top": 116,
-          "width": 54,
-          "height": 38,
-          "wireID": "8e5f142a-aada-461b-9622-31af1afefc2c",
-          "data": "ao1_label",
+          "width": 154,
+          "height": 82,
+          "wireID": "ac9b830e-464c-48aa-e536-f818eb273afe",
+          "data": "aout_channels",
           "style": {
-            "inheritFrom": "default_S_left",
-            "alignHorizontal": "center"
+            "inheritFrom": "default"
           },
-          "text": ""
-        },
-        {
-          "type": "DisplayData",
-          "left": 376,
-          "top": 117,
-          "width": 100,
-          "height": 38,
-          "wireID": "e5048578-27e6-4099-ad66-02e4bb7fff14",
-          "data": "dac1",
-          "action": "edit",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_enabled"
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 154,
+            "height": 41,
+            "wireID": "54e4198e-4f9b-45c5-bc17-d7811b7b2f63",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Text",
+                "left": 0,
+                "top": 0,
+                "width": 51,
+                "height": 39,
+                "wireID": "908bf420-77e7-4ffd-9292-45db17ce24af",
+                "data": "aout_label",
+                "style": {
+                  "inheritFrom": "default_S_left",
+                  "alignHorizontal": "center"
+                },
+                "text": ""
+              },
+              {
+                "type": "Select",
+                "left": 52,
+                "top": 0,
+                "width": 102,
+                "height": 39,
+                "wireID": "614e38cd-b777-4e78-e91e-23474d10acbe",
+                "data": "aout_trigger_mode",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 39,
+                    "wireID": "183dcd65-a7c0-4661-fc9e-75bf92d629e0",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 39,
+                        "wireID": "4042f429-61eb-40a1-9f3c-9d70b125b777",
+                        "data": "aout_value",
+                        "action": "edit",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 39,
+                    "wireID": "a638226a-cacf-4342-957e-297163eae53e",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 39,
+                    "wireID": "ae37757e-d9b7-41c0-f47c-f5c675bf1a4f",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 39,
+                    "wireID": "2a9480d9-ffaa-4541-a4da-3897399ec203",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Select",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 39,
+                        "wireID": "122310cc-45f6-459f-a7e7-2ae9db4a58d0",
+                        "data": "trigger_state",
+                        "action": "trigger_manually",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 39,
+                            "wireID": "b64ee877-31af-4fa7-d5b5-7981831a25fb",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Initiate"
+                          },
+                          {
+                            "type": "Button",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 39,
+                            "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
+                            "data": "aout_trigger_is_initiated",
+                            "action": "trigger_generate_manual",
+                            "style": {
+                              "inheritFrom": "trigger_button_14"
+                            },
+                            "text": "\\u00A4 TRG",
+                            "enabled": "trigger_is_manual",
+                            "disabledStyle": {
+                              "inheritFrom": "trigger_button_14",
+                              "color": "text_regular",
+                              "activeBackgroundColor": "text_regular"
+                            }
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 39,
+                            "wireID": "5b6a9502-a339-4040-b26a-7b03509e3ecd",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Abort"
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 39,
+                            "wireID": "a52afc04-11f4-4e4c-a699-baee9850f575",
+                            "data": "aout_function_label",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14",
+                              "blink": true
+                            },
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           },
-          "displayOption": 0
-        },
-        {
-          "type": "Text",
-          "left": 322,
-          "top": 157,
-          "width": 54,
-          "height": 38,
-          "wireID": "b07b1723-608e-497f-e9d7-237fa25140c7",
-          "data": "ao2_label",
-          "style": {
-            "inheritFrom": "default_S_left",
-            "alignHorizontal": "center"
-          },
-          "text": ""
-        },
-        {
-          "type": "DisplayData",
-          "left": 376,
-          "top": 157,
-          "width": 100,
-          "height": 38,
-          "wireID": "e1ceb1f6-877e-4a02-fa7e-ad0478daf0ae",
-          "data": "dac2",
-          "action": "edit",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_enabled"
-          },
-          "displayOption": 0
+          "listType": "vertical",
+          "gap": 0
         },
         {
           "type": "Select",
@@ -2193,44 +2893,202 @@
           ]
         },
         {
-          "type": "DisplayData",
-          "left": 157,
-          "top": 24,
-          "width": 78,
-          "height": 21,
-          "wireID": "4961e6a2-f287-42a6-87ec-79c342fbbe1b",
-          "data": "dac1",
-          "action": "",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_enabled"
-          },
-          "displayOption": 0
-        },
-        {
-          "type": "DisplayData",
-          "left": 157,
-          "top": 47,
-          "width": 78,
-          "height": 21,
-          "wireID": "ec470b0d-a09a-4af6-8924-a1d46c89c496",
-          "data": "dac2",
-          "action": "",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_enabled"
-          },
-          "displayOption": 0
-        },
-        {
           "type": "Text",
           "left": 11,
           "top": 31,
-          "width": 68,
+          "width": 69,
           "height": 32,
           "wireID": "2aba87a6-6a96-413c-93d5-4da686dc48c8",
           "style": {
             "inheritFrom": "default_S_left"
           },
           "text": "3 nodes"
+        },
+        {
+          "type": "ListWidget",
+          "left": 80,
+          "top": 24,
+          "width": 154,
+          "height": 44,
+          "wireID": "e861ba34-d113-4770-fc8b-2d93d180e0a2",
+          "data": "aout_channels",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "itemWidget": {
+            "type": "Container",
+            "left": 0,
+            "top": 0,
+            "width": 154,
+            "height": 22,
+            "wireID": "54e4198e-4f9b-45c5-bc17-d7811b7b2f63",
+            "style": {
+              "inheritFrom": "default"
+            },
+            "widgets": [
+              {
+                "type": "Select",
+                "left": 52,
+                "top": 0,
+                "width": 102,
+                "height": 21,
+                "wireID": "614e38cd-b777-4e78-e91e-23474d10acbe",
+                "data": "aout_trigger_mode",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 21,
+                    "wireID": "183dcd65-a7c0-4661-fc9e-75bf92d629e0",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "DisplayData",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 21,
+                        "wireID": "4042f429-61eb-40a1-9f3c-9d70b125b777",
+                        "data": "aout_value",
+                        "action": "edit",
+                        "style": {
+                          "inheritFrom": "encoder_cursor_14_enabled"
+                        },
+                        "displayOption": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 21,
+                    "wireID": "a638226a-cacf-4342-957e-297163eae53e",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 21,
+                    "wireID": "ae37757e-d9b7-41c0-f47c-f5c675bf1a4f",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 102,
+                    "height": 21,
+                    "wireID": "2a9480d9-ffaa-4541-a4da-3897399ec203",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "Select",
+                        "left": 0,
+                        "top": 0,
+                        "width": 102,
+                        "height": 21,
+                        "wireID": "122310cc-45f6-459f-a7e7-2ae9db4a58d0",
+                        "data": "trigger_state",
+                        "action": "trigger_manually",
+                        "style": {
+                          "inheritFrom": "default"
+                        },
+                        "widgets": [
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 21,
+                            "wireID": "b64ee877-31af-4fa7-d5b5-7981831a25fb",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Initiate"
+                          },
+                          {
+                            "type": "Button",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 21,
+                            "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
+                            "data": "aout_trigger_is_initiated",
+                            "action": "trigger_generate_manual",
+                            "style": {
+                              "inheritFrom": "trigger_button_14"
+                            },
+                            "text": "\\u00A4 TRG",
+                            "enabled": "trigger_is_manual",
+                            "disabledStyle": {
+                              "inheritFrom": "trigger_button_14",
+                              "color": "text_regular",
+                              "activeBackgroundColor": "text_regular"
+                            }
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 21,
+                            "wireID": "5b6a9502-a339-4040-b26a-7b03509e3ecd",
+                            "data": "",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14"
+                            },
+                            "text": "Abort"
+                          },
+                          {
+                            "type": "Text",
+                            "left": 0,
+                            "top": 0,
+                            "width": 102,
+                            "height": 21,
+                            "wireID": "a52afc04-11f4-4e4c-a699-baee9850f575",
+                            "data": "aout_function_label",
+                            "action": "",
+                            "style": {
+                              "inheritFrom": "button_S",
+                              "font": "Oswald14",
+                              "blink": true
+                            },
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "listType": "vertical",
+          "gap": 0
         }
       ],
       "connectionLines": [],
@@ -2256,40 +3114,74 @@
           "name": "Settings",
           "widgets": [
             {
-              "type": "MultilineText",
+              "type": "ListWidget",
               "left": 0,
               "top": 0,
               "width": 228,
-              "height": 50,
-              "wireID": "1f69176d-27c2-4274-da0e-e47ab30c0451",
-              "action": "show_dac1_calibration",
+              "height": 116,
+              "wireID": "c12d510d-efb4-4ad9-cd5b-13ecf1ecd0cb",
+              "data": "aout_channels",
               "style": {
-                "inheritFrom": "edit_value_active_S_center",
-                "alignHorizontal": "left",
-                "alignVertical": "top",
-                "padding": "13"
+                "inheritFrom": "default"
               },
-              "text": "\\u0097 AO1 Calibration",
-              "firstLineIndent": 0,
-              "hangingIndent": 24
-            },
-            {
-              "type": "MultilineText",
-              "left": 0,
-              "top": 58,
-              "width": 228,
-              "height": 50,
-              "wireID": "e3fa6d6c-a4a9-450b-f919-d47bb09d6cdb",
-              "action": "show_dac2_calibration",
-              "style": {
-                "inheritFrom": "edit_value_active_S_center",
-                "alignHorizontal": "left",
-                "alignVertical": "top",
-                "padding": "13"
+              "itemWidget": {
+                "type": "Container",
+                "left": 0,
+                "top": 0,
+                "width": 228,
+                "height": 58,
+                "wireID": "f9a2e360-bfec-41d5-fb8a-e550a33faeea",
+                "action": "",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "Container",
+                    "left": 0,
+                    "top": 0,
+                    "width": 228,
+                    "height": 50,
+                    "wireID": "513e0ea0-f0b9-44ea-aaa8-45e91fedbee9",
+                    "action": "aout_show_configuration",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "TextWidget",
+                        "left": 0,
+                        "top": 0,
+                        "width": 45,
+                        "height": 50,
+                        "wireID": "eb331a2f-1287-47b7-91bc-ff1ef7a356e9",
+                        "action": "",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center"
+                        },
+                        "text": "\\u0097"
+                      },
+                      {
+                        "type": "TextWidget",
+                        "left": 45,
+                        "top": 0,
+                        "width": 183,
+                        "height": 50,
+                        "wireID": "03672ef8-d618-40a4-f23f-156862211816",
+                        "data": "aout_label",
+                        "action": "",
+                        "style": {
+                          "inheritFrom": "edit_value_active_S_center",
+                          "alignHorizontal": "left"
+                        },
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
               },
-              "text": "\\u0097 AO2 Calibration",
-              "firstLineIndent": 0,
-              "hangingIndent": 24
+              "listType": "vertical",
+              "gap": 0
             },
             {
               "type": "MultilineText",
@@ -2480,6 +3372,315 @@
       "width": 480,
       "height": 272,
       "dataContextOverrides": "{\n    \"slot_title_settings\": \"SMX46 #3:\"\n}"
+    },
+    {
+      "components": [
+        {
+          "type": "Container",
+          "left": 8,
+          "top": 8,
+          "width": 464,
+          "height": 224,
+          "wireID": "0aecaf77-f9bf-412f-ea5e-7f29d64f0279",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 136,
+              "height": 40,
+              "wireID": "1ef3c2e1-9304-4678-eeb5-468733b0d80b",
+              "style": {
+                "inheritFrom": "edit_value_M_left"
+              },
+              "text": "Trigger mode:"
+            },
+            {
+              "type": "Text",
+              "left": 158,
+              "top": 0,
+              "width": 184,
+              "height": 40,
+              "wireID": "dd2e2272-85c9-4686-a117-f9c78a9785c3",
+              "data": "aout_trigger_mode",
+              "action": "aout_select_trigger_mode",
+              "style": {
+                "inheritFrom": "edit_value_active_M_center"
+              }
+            },
+            {
+              "type": "Select",
+              "left": 0,
+              "top": 48,
+              "width": 260,
+              "height": 88,
+              "wireID": "28f8f53d-37c5-4bf0-b74e-9f7ccb41de54",
+              "data": "aout_trigger_mode",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 260,
+                  "height": 88,
+                  "wireID": "0107588b-93cf-45b7-eb92-974331e12819",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "invertColors": true
+                },
+                {
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 260,
+                  "height": 88,
+                  "wireID": "10d47030-1576-449b-ca2c-57ca3c03919a",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "invertColors": true
+                },
+                {
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 260,
+                  "height": 88,
+                  "wireID": "652c03ee-5248-4089-b889-f1b2ee270d30",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "invertColors": true
+                },
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 260,
+                  "height": 88,
+                  "wireID": "0425d42e-4883-4084-ab33-a01dfab0a446",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 156,
+                      "height": 40,
+                      "wireID": "f78a2381-3acf-4867-c4a7-f8cca9be9e97",
+                      "action": "aout_show_function",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center"
+                      },
+                      "text": "\\u00c2 Edit function"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 48,
+                      "width": 260,
+                      "height": 40,
+                      "wireID": "e977b075-1fb6-49e2-e650-aab354c85dbf",
+                      "action": "trigger_show_general_settings",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center"
+                      },
+                      "text": "\\u009b General trigger settings"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 152,
+              "width": 158,
+              "height": 40,
+              "wireID": "25a7ca2a-59fd-465b-bdd6-ade1fc70aa75",
+              "action": "aout_show_calibration",
+              "style": {
+                "inheritFrom": "encoder_cursor_14_enabled",
+                "font": "Oswald17",
+                "color": "action_color",
+                "activeBackgroundColor": "action_color"
+              },
+              "text": "Calibration"
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 240,
+          "width": 480,
+          "height": 32,
+          "wireID": "91c9d645-9983-4ea7-839f-0595caa43c89",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Status line",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 41,
+              "height": 32,
+              "wireID": "bd0c7165-72fe-454d-d542-9b7857c61661",
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "status_bgnd",
+                "font": "Heydings14",
+                "alignVertical": "center",
+                "color": "status_line_text",
+                "backgroundColor": "status_line_background",
+                "activeColor": "status_line_background",
+                "activeBackgroundColor": "status_line_text"
+              },
+              "text": "E"
+            },
+            {
+              "type": "Text",
+              "left": 40,
+              "top": 0,
+              "width": 120,
+              "height": 32,
+              "wireID": "8bfb8f8b-1d4d-475f-8b66-8d2535d6d48e",
+              "data": "slot_title_settings",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 160,
+              "top": 0,
+              "width": 84,
+              "height": 32,
+              "wireID": "f2624c9f-3c1d-4716-8e52-955be6b2f580",
+              "data": "aout_label",
+              "style": {
+                "inheritFrom": "status_title",
+                "alignHorizontal": "center"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 244,
+              "top": 0,
+              "width": 154,
+              "height": 32,
+              "wireID": "f1989cbd-0167-466e-ca4e-4eadce17e934",
+              "data": "",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "text": "Configuration"
+            },
+            {
+              "type": "Select",
+              "left": 398,
+              "top": 0,
+              "width": 82,
+              "height": 32,
+              "wireID": "dcc9a525-f8ee-4eb8-8ce1-710dee9189f7",
+              "data": "set_page_dirty",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 82,
+                  "height": 32,
+                  "wireID": "9f65e1d9-dc90-4ab0-a715-e18de3c9a715",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Rectangle",
+                      "left": 0,
+                      "top": 0,
+                      "width": 82,
+                      "height": 32,
+                      "wireID": "b58bc6f4-be43-4c88-a4a5-2acc4a5beba4",
+                      "style": {
+                        "inheritFrom": "status_bgnd"
+                      },
+                      "invertColors": true
+                    }
+                  ]
+                },
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 82,
+                  "height": 32,
+                  "wireID": "3e3b665f-4353-4fee-d74e-99917cfbab14",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 41,
+                      "height": 32,
+                      "wireID": "f5e59dd0-e815-40fd-b263-6659471b8c97",
+                      "action": "set",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "font": "Heydings14"
+                      },
+                      "text": "_"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 41,
+                      "top": 0,
+                      "width": 41,
+                      "height": 32,
+                      "wireID": "4ef0c6b2-3b25-499b-bd22-cd60ee379432",
+                      "action": "discard",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "font": "Heydings14"
+                      },
+                      "text": "X"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "name": "aout_configuration",
+      "description": "",
+      "style": "default",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272,
+      "dataContextOverrides": ""
     },
     {
       "components": [
@@ -3433,7 +4634,7 @@
           "width": 62,
           "height": 76,
           "wireID": "d3b27182-1ba3-4337-c8d6-358de9541fc3",
-          "data": "analog_outputs",
+          "data": "aout_channels",
           "style": {
             "inheritFrom": "default"
           },
@@ -3455,7 +4656,7 @@
                 "width": 62,
                 "height": 32,
                 "wireID": "57a5889d-a169-4c30-b39b-eadc3d97c3ae",
-                "data": "ao_label",
+                "data": "aout_label",
                 "action": "change_subchannel_label",
                 "style": {
                   "inheritFrom": "option_toggle_L_center",

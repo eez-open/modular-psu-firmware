@@ -106,6 +106,8 @@ public:
 
     int getNumFunctionGeneratorResources(int subchannelIndex) override;
     FunctionGeneratorResourceType getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex) override;
+    TriggerMode getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex) override;
+    void setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode) override;
     const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) override;
 	virtual void getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues) override;
 	virtual void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override;

@@ -1342,6 +1342,21 @@
                     "font": "Oswald17"
                   },
                   "text": "\\u00b5"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 154,
+                  "height": 64,
+                  "wireID": "b5aea407-dfad-47ce-c86c-4a5f3d1ae1b2",
+                  "data": "",
+                  "action": "show_ch_settings_trigger",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "font": "Oswald17"
+                  },
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -1513,6 +1528,21 @@
                     "font": "Oswald17"
                   },
                   "text": "\\u00b5"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 234,
+                  "height": 64,
+                  "wireID": "56f03d61-2f9a-46e4-ae9e-c3e4cbf8937b",
+                  "data": "",
+                  "action": "show_ch_settings_trigger",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "font": "Oswald17"
+                  },
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -2315,6 +2345,21 @@
                     "font": "Oswald17"
                   },
                   "text": "\\u00b5"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 76,
+                  "height": 74,
+                  "wireID": "ebbf5f3d-6f14-4ce1-da5a-434c2c02f10f",
+                  "data": "",
+                  "action": "show_ch_settings_trigger",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "font": "Oswald17"
+                  },
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -2484,6 +2529,21 @@
                     "font": "Oswald17"
                   },
                   "text": "\\u00b5"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 76,
+                  "height": 114,
+                  "wireID": "910b6b7c-57c0-4289-80c2-1f5d72a98bfb",
+                  "data": "",
+                  "action": "show_ch_settings_trigger",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "font": "Oswald17"
+                  },
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -3776,6 +3836,34 @@
                                       "text": "\\u00b5"
                                     }
                                   ]
+                                },
+                                {
+                                  "type": "ContainerWidget",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 66,
+                                  "wireID": "e2f9c75c-2ba2-4715-b3c9-6a0c67a2390c",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "left": 2,
+                                      "top": 0,
+                                      "width": 44,
+                                      "height": 66,
+                                      "wireID": "d92496fa-e757-4e2a-8266-abb1df76f050",
+                                      "data": "",
+                                      "action": "show_ch_settings_trigger",
+                                      "style": {
+                                        "inheritFrom": "encoder_cursor_14_enabled",
+                                        "font": "Oswald17"
+                                      },
+                                      "text": "\\u00c2"
+                                    }
+                                  ]
                                 }
                               ]
                             },
@@ -3966,6 +4054,21 @@
                                     "font": "Oswald17"
                                   },
                                   "text": "\\u00b5"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 66,
+                                  "wireID": "d92496fa-e757-4e2a-8266-abb1df76f050",
+                                  "data": "",
+                                  "action": "show_ch_settings_trigger",
+                                  "style": {
+                                    "inheritFrom": "encoder_cursor_14_enabled",
+                                    "font": "Oswald17"
+                                  },
+                                  "text": "\\u00c2"
                                 }
                               ]
                             },
@@ -5217,6 +5320,21 @@
                             "font": "Oswald17"
                           },
                           "text": "\\u00b5"
+                        },
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 46,
+                          "height": 132,
+                          "wireID": "83b6278b-2454-4a71-a5e9-38dcc243efe1",
+                          "data": "",
+                          "action": "show_ch_settings_trigger",
+                          "style": {
+                            "inheritFrom": "encoder_cursor_14_enabled",
+                            "font": "Oswald17"
+                          },
+                          "text": "\\u00c2"
                         }
                       ]
                     },
@@ -6123,6 +6241,21 @@
                             "font": "Oswald17"
                           },
                           "text": "\\u00b5"
+                        },
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 66,
+                          "height": 65,
+                          "wireID": "2c75c499-8b73-49f5-ad9b-ceaea6ac76fc",
+                          "data": "",
+                          "action": "show_ch_settings_trigger",
+                          "style": {
+                            "inheritFrom": "encoder_cursor_14_enabled",
+                            "font": "Oswald17"
+                          },
+                          "text": "\\u00c2"
                         }
                       ]
                     },
@@ -6641,6 +6774,34 @@
                             "font": "Oswald17"
                           },
                           "text": "\\u00b5"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Container",
+                      "left": 0,
+                      "top": 0,
+                      "width": 75,
+                      "height": 44,
+                      "wireID": "c69a8e23-2cb1-484c-a7cf-9a5776ea27a1",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 1,
+                          "width": 74,
+                          "height": 42,
+                          "wireID": "6db7d8f9-5dfa-4701-8280-1bcf8df41840",
+                          "data": "",
+                          "action": "show_ch_settings_trigger",
+                          "style": {
+                            "inheritFrom": "encoder_cursor_14_enabled",
+                            "font": "Oswald17"
+                          },
+                          "text": "\\u00c2"
                         }
                       ]
                     }

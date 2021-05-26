@@ -77,6 +77,7 @@ enum Mio168HighPriorityThreadMessage {
     PSU_MESSAGE_DIN_CONFIGURE = PSU_MESSAGE_MODULE_SPECIFIC,
     PSU_MESSAGE_AIN_CONFIGURE,
     PSU_MESSAGE_AOUT_DAC7760_CONFIGURE,
+    PSU_MESSAGE_AOUT_DAC7563_CONFIGURE,
     PSU_MESSAGE_DISK_DRIVE_OPERATION,
 };
 
@@ -173,6 +174,7 @@ struct SetParams {
 	uint8_t dinSpeeds;
 
 	uint8_t doutStates;
+    WaveformParameters doutWaveformParameters[8];
 
 	struct {
 		uint8_t mode; // enum SourceMode
@@ -196,7 +198,7 @@ struct SetParams {
 		float voltage;
 	} aout_dac7563[2];
 
-	WaveformParameters dacWaveformParameters[4];
+	WaveformParameters aoutWaveformParameters[4];
 
 	struct {
 		float freq;
@@ -510,50 +512,85 @@ struct DoutChannel {
     uint8_t m_pinStates = 0;
 
     char m_pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+
+    TriggerMode m_triggerMode[8];
     
     struct ProfileParameters {
         uint8_t pinStates;
         char pinLabels[8 * (CHANNEL_LABEL_MAX_LENGTH + 1)];
+        uint8_t triggerMode[8];
     };
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
         parameters.pinStates = 0;
+        
         memset(parameters.pinLabels, 0, sizeof(m_pinLabels));
+        
+        for (int i = 0; i < 8; i++) {
+            parameters.triggerMode[i] = TRIGGER_MODE_FIXED;
+        }
     }
 
     void getProfileParameters(ProfileParameters &parameters) {
         parameters.pinStates = m_pinStates;
+        
         memcpy(parameters.pinLabels, m_pinLabels, sizeof(m_pinLabels));
+        
+        for (int i = 0; i < 8; i++) {
+            parameters.triggerMode[i] = m_triggerMode[i];
+        }
     }
 
     void setProfileParameters(ProfileParameters &parameters) {
         m_pinStates = parameters.pinStates;
+        
         memcpy(m_pinLabels, parameters.pinLabels, sizeof(m_pinLabels));
+        
+        for (int i = 0; i < 8; i++) {
+            m_triggerMode[i] = (TriggerMode)parameters.triggerMode[i];
+        }
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, ProfileParameters &parameters) {
-        WRITE_PROPERTY("dout_pinStates", parameters.pinStates);
+        WRITE_PROPERTY("dout_pin_states", parameters.pinStates);
+
         for (int i = 0; i < 8; i++) {
             char propName[32];
-            snprintf(propName, sizeof(propName), "dout_pin%dLabel", i);
+
+            snprintf(propName, sizeof(propName), "dout_pin%d_label", i);
             WRITE_PROPERTY(propName, parameters.pinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1));
+
+            snprintf(propName, sizeof(propName), "dout_pin%d_triggerMode", i);
+            WRITE_PROPERTY(propName, parameters.triggerMode[i]);
         }
+
         return true;
     }
 
     bool readProfileProperties(psu::profile::ReadContext &ctx, ProfileParameters &parameters) {
-        READ_PROPERTY("dout_pinStates", parameters.pinStates);
+        READ_PROPERTY("dout_pin_states", parameters.pinStates);
+
         for (int i = 0; i < 8; i++) {
             char propName[32];
-            snprintf(propName, sizeof(propName), "dout_pin%dLabel", i);
+
+            snprintf(propName, sizeof(propName), "dout_pin%d_label", i);
             READ_STRING_PROPERTY(propName, parameters.pinLabels + i * (CHANNEL_LABEL_MAX_LENGTH + 1), CHANNEL_LABEL_MAX_LENGTH);
+
+            snprintf(propName, sizeof(propName), "dout_pin%d_triggerMode", i);
+            READ_PROPERTY(propName, parameters.triggerMode[i]);
         }
+
         return false;
     }
 
    void resetConfiguration() {
         m_pinStates = 0;
+        
         memset(&m_pinLabels, 0, sizeof(m_pinLabels));
+        
+        for (int i = 0; i < 8; i++) {
+            m_triggerMode[i] = TRIGGER_MODE_FIXED;
+        }
     }
 
     uint8_t getDigitalOutputData() {
@@ -1309,6 +1346,8 @@ struct AoutDac7760Channel {
 
     char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
 
+    TriggerMode m_triggerMode;
+
     AoutDac7760Channel() {
         memset(calConf, 0, sizeof(CalConf));
     }
@@ -1321,6 +1360,7 @@ struct AoutDac7760Channel {
         float currentValue;
         float voltageValue;
         char label[CHANNEL_LABEL_MAX_LENGTH + 1];
+        uint8_t triggerMode;
     };
 
     void resetProfileToDefaults(ProfileParameters &parameters) {
@@ -1331,6 +1371,7 @@ struct AoutDac7760Channel {
         parameters.currentValue = 0;
         parameters.voltageValue = 0;
         *parameters.label = 0;
+        parameters.triggerMode = TRIGGER_MODE_FIXED;
     }
 
     void getProfileParameters(ProfileParameters &parameters) {
@@ -1341,6 +1382,7 @@ struct AoutDac7760Channel {
         parameters.currentValue = m_currentValue;
         parameters.voltageValue = m_voltageValue;
         memcpy(parameters.label, m_label, sizeof(m_label));
+        parameters.triggerMode = m_triggerMode;
     }
 
     void setProfileParameters(ProfileParameters &parameters) {
@@ -1351,6 +1393,7 @@ struct AoutDac7760Channel {
         m_currentValue = parameters.currentValue;
         m_voltageValue = parameters.voltageValue;
         memcpy(m_label, parameters.label, sizeof(m_label));
+		m_triggerMode = (TriggerMode)parameters.triggerMode;
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
@@ -1376,6 +1419,9 @@ struct AoutDac7760Channel {
 
         snprintf(propName, sizeof(propName), "aout_dac7760_%d_label", i+1);
         WRITE_PROPERTY(propName, parameters.label);
+
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_triggerMode", i+1);
+        WRITE_PROPERTY(propName, parameters.triggerMode);
 
         return true;
     }
@@ -1404,6 +1450,9 @@ struct AoutDac7760Channel {
         snprintf(propName, sizeof(propName), "aout_dac7760_%d_label", i+1);
         READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
 
+        snprintf(propName, sizeof(propName), "aout_dac7760_%d_triggerMode", i+1);
+        READ_PROPERTY(propName, parameters.triggerMode);
+
         return false;
     }
 
@@ -1415,6 +1464,7 @@ struct AoutDac7760Channel {
         m_currentValue = 0;
         m_voltageValue = 0;
         *m_label = 0;
+        m_triggerMode = TRIGGER_MODE_FIXED;
     }
 
     SourceMode getMode() {
@@ -1632,6 +1682,8 @@ struct AoutDac7563Channel {
 
     char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
 
+    TriggerMode m_triggerMode;
+
     AoutDac7563Channel() {
         memset(&calConf, 0, sizeof(CalConf));
     }
@@ -1639,6 +1691,7 @@ struct AoutDac7563Channel {
     struct ProfileParameters {
         float value;
         char label[CHANNEL_LABEL_MAX_LENGTH + 1];
+        uint8_t triggerMode;
     };
 
     float getCalibratedValue() {
@@ -1652,16 +1705,19 @@ struct AoutDac7563Channel {
     void resetProfileToDefaults(ProfileParameters &parameters) {
         parameters.value = 0;
         *parameters.label = 0;
+        parameters.triggerMode = TRIGGER_MODE_FIXED;
     }
 
     void getProfileParameters(ProfileParameters &parameters) {
         parameters.value = m_value;
         memcpy(parameters.label, m_label, sizeof(m_label));
+        parameters.triggerMode = m_triggerMode;
     }
 
     void setProfileParameters(ProfileParameters &parameters) {
         m_value = parameters.value;
         memcpy(m_label, parameters.label, sizeof(m_label));
+		m_triggerMode = (TriggerMode)parameters.triggerMode;
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
@@ -1672,6 +1728,9 @@ struct AoutDac7563Channel {
 
         snprintf(propName, sizeof(propName), "aout_dac7563_%d_label", i+1);
         WRITE_PROPERTY(propName, parameters.label);
+
+        snprintf(propName, sizeof(propName), "aout_dac7563_%d_triggerMode", i+1);
+        WRITE_PROPERTY(propName, parameters.triggerMode);
 
         return true;
     }
@@ -1685,12 +1744,16 @@ struct AoutDac7563Channel {
         snprintf(propName, sizeof(propName), "aout_dac7563_%d_label", i+1);
         READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
 
+        snprintf(propName, sizeof(propName), "aout_dac7563_%d_triggerMode", i+1);
+        READ_PROPERTY(propName, parameters.triggerMode);
+
         return false;
     }
 
     void resetConfiguration() {
         m_value = 0;
         *m_label = 0;
+        m_triggerMode = TRIGGER_MODE_FIXED;
     }
 
     float getResolution() {
@@ -2104,6 +2167,20 @@ public:
 
         params.doutStates = doutChannel.m_pinStates;
 
+        for (int i = 0; i < 8; i++) {
+			auto waveformParameters = function_generator::getWaveformParameters(slotIndex, DOUT_SUBCHANNEL_INDEX, i);
+			if (!powerDown && waveformParameters && doutChannel.m_triggerMode[i] == TRIGGER_MODE_FUNCTION_GENERATOR && function_generator::isActive()) {
+                params.doutStates &= ~(1 << i);
+
+				params.doutWaveformParameters[i].waveform = waveformParameters->waveform;
+				params.doutWaveformParameters[i].frequency = waveformParameters->frequency;
+				params.doutWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
+				params.doutWaveformParameters[i].pulseWidth = waveformParameters->pulseWidth;
+			} else {
+				params.doutWaveformParameters[i].waveform = Waveform::WAVEFORM_NONE;
+			}
+        }
+
         for (int i = 0; i < 4; i++) {
             auto channel = &ainChannels[i];
             params.ain[i].mode = channel->getMode();
@@ -2132,15 +2209,15 @@ public:
             params.aout_dac7760[i].outputValue = channel->getCalibratedValue();
 
 			auto waveformParameters = function_generator::getWaveformParameters(slotIndex, AOUT_1_SUBCHANNEL_INDEX + i, 0);
-			if (!powerDown && !channel->ongoingCal && waveformParameters) {
+			if (!powerDown && !channel->ongoingCal && waveformParameters && channel->m_triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR && function_generator::isActive()) {
                 params.aout_dac7760[i].outputEnabled = 1;
 
-				params.dacWaveformParameters[i].waveform = waveformParameters->waveform;
-				params.dacWaveformParameters[i].frequency = waveformParameters->frequency;
-				params.dacWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
-				params.dacWaveformParameters[i].amplitude = channel->getCalibratedValue(waveformParameters->amplitude);
-				params.dacWaveformParameters[i].offset = channel->getCalibratedValue(waveformParameters->offset);
-				params.dacWaveformParameters[i].pulseWidth = waveformParameters->pulseWidth;
+				params.aoutWaveformParameters[i].waveform = waveformParameters->waveform;
+				params.aoutWaveformParameters[i].frequency = waveformParameters->frequency;
+				params.aoutWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
+				params.aoutWaveformParameters[i].amplitude = channel->getCalibratedValue(waveformParameters->amplitude);
+				params.aoutWaveformParameters[i].offset = channel->getCalibratedValue(waveformParameters->offset);
+				params.aoutWaveformParameters[i].pulseWidth = waveformParameters->pulseWidth;
 
                 float min = waveformParameters->offset - waveformParameters->amplitude;
                 float max = waveformParameters->offset + waveformParameters->amplitude;
@@ -2165,7 +2242,7 @@ public:
                     }
                 }
 			} else {
-				params.dacWaveformParameters[i].waveform = Waveform::WAVEFORM_NONE;
+				params.aoutWaveformParameters[i].waveform = Waveform::WAVEFORM_NONE;
 			}
         }
 
@@ -2174,15 +2251,15 @@ public:
             params.aout_dac7563[i].voltage = powerDown ? 0 : channel->getCalibratedValue();
 
 			auto waveformParameters = function_generator::getWaveformParameters(slotIndex, AOUT_3_SUBCHANNEL_INDEX + i, 0);
-			if (!powerDown && !channel->ongoingCal && waveformParameters) {
-				params.dacWaveformParameters[2 + i].waveform = waveformParameters->waveform;
-				params.dacWaveformParameters[2 + i].frequency = waveformParameters->frequency;
-				params.dacWaveformParameters[2 + i].phaseShift = waveformParameters->phaseShift;
-				params.dacWaveformParameters[2 + i].amplitude = channel->getCalibratedValue(waveformParameters->amplitude);
-				params.dacWaveformParameters[2 + i].offset = channel->getCalibratedValue(waveformParameters->offset);
-				params.dacWaveformParameters[2 + i].pulseWidth = waveformParameters->pulseWidth;
+			if (!powerDown && !channel->ongoingCal && waveformParameters && channel->m_triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR && function_generator::isActive()) {
+				params.aoutWaveformParameters[2 + i].waveform = waveformParameters->waveform;
+				params.aoutWaveformParameters[2 + i].frequency = waveformParameters->frequency;
+				params.aoutWaveformParameters[2 + i].phaseShift = waveformParameters->phaseShift;
+				params.aoutWaveformParameters[2 + i].amplitude = channel->getCalibratedValue(waveformParameters->amplitude);
+				params.aoutWaveformParameters[2 + i].offset = channel->getCalibratedValue(waveformParameters->offset);
+				params.aoutWaveformParameters[2 + i].pulseWidth = waveformParameters->pulseWidth;
 			} else {
-				params.dacWaveformParameters[2 + i].waveform = Waveform::WAVEFORM_NONE;
+				params.aoutWaveformParameters[2 + i].waveform = Waveform::WAVEFORM_NONE;
 			}
         }
 
@@ -2788,11 +2865,11 @@ public:
             (previousPageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS && activePageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS) ||
             (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_DIN_CHANNEL_LABELS) ||
             (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_DOUT_CHANNEL_LABELS) ||
-			(previousPageId == PAGE_ID_DIB_MIO168_SETTINGS && activePageId == PAGE_ID_DIB_MIO168_DIN_CONFIGURATION) ||
-			(previousPageId == PAGE_ID_DIB_MIO168_SETTINGS && activePageId == PAGE_ID_DIB_MIO168_AIN_CONFIGURATION) ||
-			(previousPageId == PAGE_ID_DIB_MIO168_SETTINGS && activePageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION) ||
-			(previousPageId == PAGE_ID_DIB_MIO168_SETTINGS && activePageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) ||
-			(previousPageId == PAGE_ID_DIB_MIO168_SETTINGS && activePageId == PAGE_ID_DIB_MIO168_INFO) ||
+			((previousPageId == PAGE_ID_DIB_MIO168_SETTINGS || previousPageId == PAGE_ID_MAIN) && activePageId == PAGE_ID_DIB_MIO168_DIN_CONFIGURATION) ||
+			((previousPageId == PAGE_ID_DIB_MIO168_SETTINGS || previousPageId == PAGE_ID_MAIN) && activePageId == PAGE_ID_DIB_MIO168_AIN_CONFIGURATION) ||
+			((previousPageId == PAGE_ID_DIB_MIO168_SETTINGS || previousPageId == PAGE_ID_MAIN) && activePageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION) ||
+			((previousPageId == PAGE_ID_DIB_MIO168_SETTINGS || previousPageId == PAGE_ID_MAIN) && activePageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) ||
+			((previousPageId == PAGE_ID_DIB_MIO168_SETTINGS || previousPageId == PAGE_ID_MAIN) && activePageId == PAGE_ID_DIB_MIO168_INFO) ||
 			(previousPageId == PAGE_ID_DIB_MIO168_AIN_CONFIGURATION && activePageId == PAGE_ID_CH_SETTINGS_CALIBRATION) ||
 			(previousPageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION && activePageId == PAGE_ID_CH_SETTINGS_CALIBRATION) ||
 			(previousPageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION && activePageId == PAGE_ID_CH_SETTINGS_CALIBRATION)
@@ -2802,17 +2879,31 @@ public:
             (previousPageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS && activePageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS) ||
             (previousPageId == PAGE_ID_DIB_MIO168_DIN_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS) ||
             (previousPageId == PAGE_ID_DIB_MIO168_DOUT_CHANNEL_LABELS && activePageId == PAGE_ID_DIB_MIO168_CHANNEL_LABELS) ||
-			(previousPageId == PAGE_ID_DIB_MIO168_DIN_CONFIGURATION && activePageId == PAGE_ID_DIB_MIO168_SETTINGS) ||
-			(previousPageId == PAGE_ID_DIB_MIO168_AIN_CONFIGURATION && activePageId == PAGE_ID_DIB_MIO168_SETTINGS) ||
-			(previousPageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION && activePageId == PAGE_ID_DIB_MIO168_SETTINGS) ||
-			(previousPageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION && activePageId == PAGE_ID_DIB_MIO168_SETTINGS) ||
-			(previousPageId == PAGE_ID_DIB_MIO168_INFO && activePageId == PAGE_ID_DIB_MIO168_SETTINGS) ||
+			(previousPageId == PAGE_ID_DIB_MIO168_DIN_CONFIGURATION && (activePageId == PAGE_ID_DIB_MIO168_SETTINGS || activePageId == PAGE_ID_MAIN)) ||
+			(previousPageId == PAGE_ID_DIB_MIO168_AIN_CONFIGURATION && (activePageId == PAGE_ID_DIB_MIO168_SETTINGS || activePageId == PAGE_ID_MAIN)) ||
+			(previousPageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION && (activePageId == PAGE_ID_DIB_MIO168_SETTINGS || activePageId == PAGE_ID_MAIN)) ||
+			(previousPageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION && (activePageId == PAGE_ID_DIB_MIO168_SETTINGS || activePageId == PAGE_ID_MAIN)) ||
+			(previousPageId == PAGE_ID_DIB_MIO168_INFO && (activePageId == PAGE_ID_DIB_MIO168_SETTINGS || activePageId == PAGE_ID_MAIN)) ||
 			(previousPageId == PAGE_ID_CH_SETTINGS_CALIBRATION && activePageId == PAGE_ID_DIB_MIO168_AIN_CONFIGURATION) ||
 			(previousPageId == PAGE_ID_CH_SETTINGS_CALIBRATION && activePageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION) ||
 			(previousPageId == PAGE_ID_CH_SETTINGS_CALIBRATION && activePageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION)
 		) {
             psu::gui::animateSlideRight();
-        }
+        } else if (
+			(previousPageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION && activePageId == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) ||
+			(previousPageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION && activePageId == PAGE_ID_SYS_SETTINGS_TRIGGER) ||
+			(previousPageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION && activePageId == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) ||
+			(previousPageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION && activePageId == PAGE_ID_SYS_SETTINGS_TRIGGER)
+		) {
+			psu::gui::animateSlideLeft();
+		} else if (
+			(previousPageId == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR && activePageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) ||
+			(previousPageId == PAGE_ID_SYS_SETTINGS_TRIGGER && activePageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) ||
+			(previousPageId == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR && activePageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION) ||
+			(previousPageId == PAGE_ID_SYS_SETTINGS_TRIGGER && activePageId == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION)
+		) {
+			psu::gui::animateSlideRight();
+		}
     }
 
     int getSlotView(SlotViewType slotViewType, int slotIndex, int cursor) override {
@@ -4428,20 +4519,58 @@ public:
     }
 
     int getNumFunctionGeneratorResources(int subchannelIndex) override {
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+			return 8;
+		} else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             return 1;
         }
         return 0;
     }
 
     FunctionGeneratorResourceType getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex) override {
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+        if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            return FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL;
+        } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             return FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I;
         }
         return FUNCTION_GENERATOR_RESOURCE_TYPE_U;
     }
 
+    TriggerMode getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex) override {
+        if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            return doutChannel.m_triggerMode[resourceIndex];
+        } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+            return channel.m_triggerMode;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            auto &channel = aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX];
+            return channel.m_triggerMode;
+        }
+        return TRIGGER_MODE_FIXED;
+    }
+
+    void setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode) override {
+        if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            doutChannel.m_triggerMode[resourceIndex] = triggerMode;
+        } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+            channel.m_triggerMode = triggerMode;
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            auto &channel = aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX];
+            channel.m_triggerMode = triggerMode;
+        }
+    }
+
     const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) override {
+        if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+			const char *label;
+			getChannelPinLabel(subchannelIndex, resourceIndex + 1, label);
+			if (*label) {
+				return label;
+			}
+			return getDefaultChannelPinLabel(subchannelIndex, resourceIndex + 1);
+        }
+        
         const char *label = getChannelLabel(subchannelIndex);
 		if (*label) {
 			return label;
@@ -4450,7 +4579,17 @@ public:
 	}
 
 	void getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues) override {
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+		if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+			min = 0;
+			max = 1.0f;
+
+			if (stepValues) {
+				static float values[] = { 0.001f, 0.05f, 0.1f, 0.2f };
+				stepValues->values = values;
+				stepValues->count = sizeof(values) / sizeof(float);
+				stepValues->unit = UNIT_HERTZ;
+			}
+		} else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
             if (resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
                 min = -10.0f;
@@ -4478,7 +4617,17 @@ public:
     }
 	
     void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override {
-        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+        if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
+            min = 0.1f;
+            max = 1000.0f;
+
+            if (stepValues) {
+                static float values[] = { 1.0f, 10.0f, 100.0f, 500.0f };
+                stepValues->values = values;
+                stepValues->count = sizeof(values) / sizeof(float);
+                stepValues->unit = UNIT_HERTZ;
+            }
+        } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             min = 0.1f;
             max = 10000.0f;
 
@@ -4696,6 +4845,62 @@ static DinConfigurationPage g_dinConfigurationPage;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+class DoutConfigurationPage : public SetPage {
+public:
+    void pageAlloc() {
+        auto module = (Mio168Module *)g_slots[g_slotIndex];
+
+        for (int i = 0; i < 8; i++) {
+            m_triggerMode[i] = m_triggerModeOrig[i] = module->doutChannel.m_triggerMode[i];
+        }
+    }
+
+	void pageWillAppear() {
+		hmi::g_selectedSlotIndex = g_slotIndex;
+
+		if (!getDirty()) {
+			pageAlloc();
+		}
+    }
+
+    int getDirty() {
+		return memcmp(m_triggerMode, m_triggerModeOrig, sizeof(m_triggerModeOrig)) != 0;
+    }
+
+    void apply() {
+        auto module = (Mio168Module *)g_slots[g_slotIndex];
+
+        for (int i = 0; i < 8; i++) {
+            if (m_triggerMode[i] != m_triggerModeOrig[i]) {
+                module->doutChannel.m_triggerMode[i] = m_triggerMode[i];
+                if (m_triggerMode[i] == TRIGGER_MODE_FUNCTION_GENERATOR) {
+                    function_generator::addChannelWaveformParameters(g_slotIndex, DOUT_SUBCHANNEL_INDEX, i);
+                }
+            }
+        }
+    }
+
+    void set() {
+		apply();
+		popPage();
+    }
+
+    static int g_slotIndex;
+    static int g_pin;
+
+    TriggerMode m_triggerMode[8];
+
+private:
+    TriggerMode m_triggerModeOrig[8];
+};
+
+int DoutConfigurationPage::g_slotIndex;
+int DoutConfigurationPage::g_pin;
+
+static DoutConfigurationPage g_doutConfigurationPage;
+
+////////////////////////////////////////////////////////////////////////////////
+
 class AinConfigurationPage : public SetPage {
 public:
     static int g_selectedChannelIndex;
@@ -4724,11 +4929,10 @@ public:
     }
 
     void set() {
-        if (getDirty()) {
-            sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_AIN_CONFIGURE, hmi::g_selectedSlotIndex);
-        }
-
-        popPage();
+		if (getDirty()) {
+			sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_AIN_CONFIGURE, hmi::g_selectedSlotIndex);
+		}
+		popPage();
     }
 
     bool hasMultipleModes() {
@@ -4936,26 +5140,43 @@ public:
     static int g_selectedChannelIndex;
 
     void pageAlloc() {
-        Mio168Module *module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
-        AoutDac7760Channel &channel = module->aoutDac7760Channels[g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+        auto module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
+        auto &channel = module->aoutDac7760Channels[g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX];
 
         m_outputEnabled = m_outputEnabledOrig = channel.m_outputEnabled;
         m_mode = m_modeOrig = channel.m_mode;
         m_currentRange = m_currentRangeOrig = channel.m_currentRange;
         m_voltageRange = m_voltageRangeOrig = channel.m_voltageRange;
+        m_triggerMode = m_triggerModeOrig = channel.m_triggerMode;
     }
+
+	void pageWillAppear() {
+		if (!getDirty()) {
+			pageAlloc();
+		}
+	}
 
     int getDirty() { 
         return m_outputEnabled != m_outputEnabledOrig ||
             m_mode != m_modeOrig ||
-			(m_mode == SOURCE_MODE_VOLTAGE ? m_voltageRange != m_voltageRangeOrig : m_currentRange != m_currentRangeOrig);
+			(m_mode == SOURCE_MODE_VOLTAGE ? m_voltageRange != m_voltageRangeOrig : m_currentRange != m_currentRangeOrig) ||
+			m_triggerMode != m_triggerModeOrig;
     }
 
-    void set() {
-        if (getDirty()) {
-            sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_AOUT_DAC7760_CONFIGURE, hmi::g_selectedSlotIndex);
-        }
+	void apply() {
+		if (getDirty()) {
+			sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_AOUT_DAC7760_CONFIGURE, hmi::g_selectedSlotIndex);
+		}
 
+		m_outputEnabled = m_outputEnabledOrig;
+		m_mode = m_modeOrig;
+		m_currentRange = m_currentRangeOrig;
+		m_voltageRange = m_voltageRangeOrig;
+		m_triggerMode = m_triggerModeOrig;
+	}
+
+    void set() {
+		apply();
         popPage();
     }
 
@@ -4963,6 +5184,7 @@ public:
     uint8_t m_mode;
     uint8_t m_currentRange;
     uint8_t m_voltageRange;
+    TriggerMode m_triggerMode;
 
     static EnumItem *getModeRangeEnumDefinition(int slotIndex, int subchannelIndex) {
 		static EnumItem g_aoutMdeRangeEnumDefinition[] = {
@@ -5034,6 +5256,7 @@ private:
     uint8_t m_modeOrig;
     uint8_t m_currentRangeOrig;
     uint8_t m_voltageRangeOrig;
+	TriggerMode m_triggerModeOrig;
 };
 
 int AoutDac7760ConfigurationPage::g_selectedChannelIndex;
@@ -5046,17 +5269,39 @@ public:
     static int g_selectedChannelIndex;
 
     void pageAlloc() {
+        auto module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
+        auto &channel = module->aoutDac7563Channels[g_selectedChannelIndex - AOUT_3_SUBCHANNEL_INDEX];
+
+        m_triggerMode = m_triggerModeOrig = channel.m_triggerMode;
     }
+
+	void pageWillAppear() {
+		if (!getDirty()) {
+			pageAlloc();
+		}
+	}
 
     int getDirty() { 
-        return false;
+        return m_triggerMode != m_triggerModeOrig;
     }
 
-    void set() {
+	void apply() {
+		if (getDirty()) {
+			sendMessageToPsu((HighPriorityThreadMessage)PSU_MESSAGE_AOUT_DAC7563_CONFIGURE, hmi::g_selectedSlotIndex);
+		}
+
+		m_triggerMode = m_triggerModeOrig;
+	}
+
+	void set() {
+		apply();
         popPage();
     }
 
+	TriggerMode m_triggerMode;
+
 private:
+	TriggerMode m_triggerModeOrig;
 };
 
 int AoutDac7563ConfigurationPage::g_selectedChannelIndex;
@@ -5067,6 +5312,8 @@ static AoutDac7563ConfigurationPage g_aoutDac7563ConfigurationPage;
 Page *Mio168Module::getPageFromId(int pageId) {
     if (pageId == PAGE_ID_DIB_MIO168_DIN_CONFIGURATION) {
         return &g_dinConfigurationPage;
+    } else if (pageId == PAGE_ID_DIB_MIO168_DOUT_CONFIGURATION) {
+        return &g_doutConfigurationPage;
     } else if (pageId == PAGE_ID_DIB_MIO168_AIN_CONFIGURATION) {
         return &g_ainConfigurationPage;
     } else if (pageId == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) {
@@ -5092,19 +5339,31 @@ void Mio168Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
             channel.m_currentNPLC = g_ainConfigurationPage.m_currentNPLC;
 		}
     } else if (type == PSU_MESSAGE_AOUT_DAC7760_CONFIGURE) {
-        AoutDac7760Channel &channel = aoutDac7760Channels[AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+        auto &channel = aoutDac7760Channels[AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX];
         channel.m_outputEnabled = g_aoutDac7760ConfigurationPage.m_outputEnabled;
         channel.m_mode = g_aoutDac7760ConfigurationPage.m_mode;
         channel.m_currentRange = g_aoutDac7760ConfigurationPage.m_currentRange;
         channel.m_voltageRange = g_aoutDac7760ConfigurationPage.m_voltageRange;
+		channel.m_triggerMode = g_aoutDac7760ConfigurationPage.m_triggerMode;
 
         if (channel.getValue() < channel.getMinValue()) {
             channel.setValue(channel.getMinValue());
         } else if (channel.getValue() > channel.getMaxValue()) {
             channel.setValue(channel.getMaxValue());
         }
-    } 
-	else if (type == PSU_MESSAGE_DISK_DRIVE_OPERATION) {
+
+		if (channel.m_triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+			function_generator::addChannelWaveformParameters(slotIndex, AoutDac7760ConfigurationPage::g_selectedChannelIndex, 0);
+		}
+    } else if (type == PSU_MESSAGE_AOUT_DAC7563_CONFIGURE) {
+        auto &channel = aoutDac7563Channels[AoutDac7563ConfigurationPage::g_selectedChannelIndex - AOUT_3_SUBCHANNEL_INDEX];
+
+		channel.m_triggerMode = g_aoutDac7563ConfigurationPage.m_triggerMode;
+
+		if (channel.m_triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+			function_generator::addChannelWaveformParameters(slotIndex, AoutDac7563ConfigurationPage::g_selectedChannelIndex, 0);
+		}
+	} else if (type == PSU_MESSAGE_DISK_DRIVE_OPERATION) {
         tick();
     }
 }
@@ -5230,6 +5489,9 @@ void action_dib_mio168_din_select_speed() {
 }
 
 void action_dib_mio168_din_show_configuration() {
+    if (getActivePageId() == PAGE_ID_MAIN) {
+        hmi::selectSlot(getFoundWidgetAtDown().cursor);
+    }
     pushPage(PAGE_ID_DIB_MIO168_DIN_CONFIGURATION);
 }
 
@@ -5357,6 +5619,98 @@ void action_dib_mio168_show_dout_channel_labels() {
 
 void action_dib_mio168_change_dout_label() {
     editPinLabel(DOUT_SUBCHANNEL_INDEX);
+}
+
+void action_dib_mio168_dout_show_configuration() {
+    if (getActivePageId() == PAGE_ID_MAIN) {
+        hmi::selectSlot(getFoundWidgetAtDown().cursor);
+    }
+    g_doutConfigurationPage.g_slotIndex = hmi::g_selectedSlotIndex;
+    pushPage(PAGE_ID_DIB_MIO168_DOUT_CONFIGURATION);
+}
+
+void data_dib_mio168_dout_trigger_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int pin = cursor % 8;
+
+        TriggerMode triggerMode;
+
+        if (isPageOnStack(PAGE_ID_DIB_MIO168_DOUT_CONFIGURATION)) {
+            triggerMode = g_doutConfigurationPage.m_triggerMode[pin];
+        } else {
+			triggerMode = ((Mio168Module *)g_slots[hmi::g_selectedSlotIndex])->doutChannel.m_triggerMode[pin];
+        }
+
+		value = MakeEnumDefinitionValue(triggerMode, ENUM_DEFINITION_CHANNEL_TRIGGER_MODE);
+	}
+}
+
+void data_dib_mio168_dout_function_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+        int pin = cursor % 8;
+        auto waveformParameters = function_generator::getWaveformParameters(hmi::g_selectedSlotIndex, DOUT_SUBCHANNEL_INDEX, pin);
+		value = function_generator::g_waveformShortLabel[waveformParameters ? waveformParameters->waveform : function_generator::WAVEFORM_NONE];
+	}
+}
+
+void data_dib_mio168_dout_trigger_is_initiated(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int pin = cursor % 8;
+
+        TriggerMode triggerMode;
+
+        if (isPageOnStack(PAGE_ID_DIB_MIO168_DOUT_CONFIGURATION)) {
+            triggerMode = g_doutConfigurationPage.m_triggerMode[pin];
+        } else {
+			triggerMode = ((Mio168Module *)g_slots[hmi::g_selectedSlotIndex])->doutChannel.m_triggerMode[pin];
+        }
+
+		value = (trigger::isInitiated() || trigger::isTriggered()) && triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR;
+	} else if (operation == DATA_OPERATION_IS_BLINKING) {
+		value = trigger::isInitiated();
+	}
+}
+
+static void onSetDoutTriggerMode(uint16_t value) {
+	popPage();
+
+	g_doutConfigurationPage.m_triggerMode[g_doutConfigurationPage.g_pin] = (TriggerMode)value;
+}
+
+void action_dib_mio168_dout_select_trigger_mode() {
+	static EnumItem g_enumDefinitionMio168AoutTriggerMode[] = {
+		{ TRIGGER_MODE_FIXED, "Fixed" },
+		{ TRIGGER_MODE_FUNCTION_GENERATOR, "Function generator" },
+		{ 0, 0 }
+	};
+
+    g_doutConfigurationPage.g_pin = getFoundWidgetAtDown().cursor % 8;
+
+	TriggerMode triggerMode = ((Mio168Module *)g_slots[g_doutConfigurationPage.g_slotIndex])->doutChannel.m_triggerMode[g_doutConfigurationPage.g_pin];
+	pushSelectFromEnumPage(g_enumDefinitionMio168AoutTriggerMode, triggerMode, nullptr, onSetDoutTriggerMode);
+}
+
+void action_dib_mio168_dout_show_function() {
+	int cursor = getFoundWidgetAtDown().cursor;
+	
+	int slotIndex;
+
+	if (getActivePageId() == PAGE_ID_DIB_MIO168_DOUT_CONFIGURATION) {
+		slotIndex = g_doutConfigurationPage.g_slotIndex;
+		if (g_doutConfigurationPage.getDirty()) {
+			g_doutConfigurationPage.apply();
+		}
+	} else {
+		slotIndex = cursor / 8;
+	}
+
+	int pin = cursor % 8;
+
+    function_generator::addChannelWaveformParameters(slotIndex, DOUT_SUBCHANNEL_INDEX, pin);
+
+	pushPage(PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR);
+
+	function_generator::selectWaveformParametersForChannel(slotIndex, DOUT_SUBCHANNEL_INDEX, pin);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5818,7 +6172,6 @@ void action_dib_mio168_ain_select_mode_and_range() {
 	hmi::selectSlot(slotIndex);
     int subchannelIndex = AIN_1_SUBCHANNEL_INDEX + cursor % 4;
 
-    hmi::selectSlot(slotIndex);
     AinConfigurationPage::g_selectedChannelIndex = subchannelIndex;
 
     pushSelectFromEnumPage(
@@ -6232,6 +6585,113 @@ void action_dib_mio168_aout_change_label() {
     LabelsAndColorsPage::editChannelLabel(slotIndex, AOUT_1_SUBCHANNEL_INDEX + subchannelIndex);
 }
 
+void data_dib_mio168_aout_trigger_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+		TriggerMode triggerMode;
+        if (getActivePageId() == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) {
+			triggerMode = g_aoutDac7760ConfigurationPage.m_triggerMode;
+        } else if (getActivePageId() == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION) {
+			triggerMode = g_aoutDac7563ConfigurationPage.m_triggerMode;
+        } else {
+            int slotIndex = cursor / 4;
+            int aoutChannelIndex = cursor % 4;
+            if (aoutChannelIndex < 2) {
+                auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
+				triggerMode = channel.m_triggerMode;
+            } else {
+                auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7563Channels[aoutChannelIndex - 2];
+				triggerMode = channel.m_triggerMode;
+            }
+        }
+		value = MakeEnumDefinitionValue(triggerMode, ENUM_DEFINITION_CHANNEL_TRIGGER_MODE);
+    }
+}
+
+void data_dib_mio168_aout_function_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+        int slotIndex = cursor / 4;
+        int aoutChannelIndex = cursor % 4;
+        auto waveformParameters = function_generator::getWaveformParameters(slotIndex, AOUT_1_SUBCHANNEL_INDEX + aoutChannelIndex, 0);
+		value = function_generator::g_waveformShortLabel[waveformParameters ? waveformParameters->waveform : function_generator::WAVEFORM_NONE];
+	}
+}
+
+void data_dib_mio168_aout_trigger_is_initiated(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		TriggerMode triggerMode;
+
+		int slotIndex = cursor / 4;
+		int aoutChannelIndex = cursor % 4;
+		if (aoutChannelIndex < 2) {
+			auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
+			triggerMode = channel.m_triggerMode;
+		} else {
+			auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7563Channels[aoutChannelIndex - 2];
+			triggerMode = channel.m_triggerMode;
+		}
+
+		value = (trigger::isInitiated() || trigger::isTriggered()) && triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR;
+	} else if (operation == DATA_OPERATION_IS_BLINKING) {
+		value = trigger::isInitiated();
+	}
+}
+
+static void onSetAoutTriggerMode(uint16_t value) {
+	popPage();
+
+    auto triggerMode = (TriggerMode)value;
+    if (getActivePageId() == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) {
+        g_aoutDac7760ConfigurationPage.m_triggerMode = triggerMode;
+    } else {
+        g_aoutDac7563ConfigurationPage.m_triggerMode = triggerMode;
+    }
+}
+
+void action_dib_mio168_aout_select_trigger_mode() {
+    static EnumItem g_enumDefinitionMio168AoutTriggerMode[] = {
+        { TRIGGER_MODE_FIXED, "Fixed" },
+        { TRIGGER_MODE_FUNCTION_GENERATOR, "Function generator" },
+        { 0, 0 } 
+    };
+
+    TriggerMode triggerMode;
+    if (getActivePageId() == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) {
+        triggerMode = g_aoutDac7760ConfigurationPage.m_triggerMode;
+    } else {
+        triggerMode = g_aoutDac7563ConfigurationPage.m_triggerMode;
+    }
+
+	pushSelectFromEnumPage(g_enumDefinitionMio168AoutTriggerMode, triggerMode, nullptr, onSetAoutTriggerMode);
+}
+
+void action_dib_mio168_aout_show_function() {
+	int slotIndex;
+	int subchannelIndex;
+	if (getActivePageId() == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) {
+		slotIndex = hmi::g_selectedSlotIndex;
+		subchannelIndex = g_aoutDac7760ConfigurationPage.g_selectedChannelIndex;
+		if (g_aoutDac7760ConfigurationPage.getDirty()) {
+			g_aoutDac7760ConfigurationPage.apply();
+		}
+	} else if (getActivePageId() == PAGE_ID_DIB_MIO168_AOUT_DAC7563_CONFIGURATION) {
+		slotIndex = hmi::g_selectedSlotIndex;
+		subchannelIndex = g_aoutDac7563ConfigurationPage.g_selectedChannelIndex;
+		if (g_aoutDac7563ConfigurationPage.getDirty()) {
+			g_aoutDac7563ConfigurationPage.apply();
+		}
+	} else {
+		int cursor = getFoundWidgetAtDown().cursor;
+		slotIndex = cursor / 4;
+		subchannelIndex = AOUT_1_SUBCHANNEL_INDEX + cursor % 4;
+	}
+
+    function_generator::addChannelWaveformParameters(slotIndex, subchannelIndex, 0);
+
+	pushPage(PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR);
+
+	function_generator::selectWaveformParametersForChannel(slotIndex, subchannelIndex, 0);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void data_dib_mio168_pwm_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -6386,6 +6846,9 @@ void data_dib_mio168_afe_version(DataOperationEnum operation, Cursor cursor, Val
 }
 
 void action_dib_mio168_show_info() {
+    if (getActivePageId() == PAGE_ID_MAIN) {
+        hmi::selectSlot(getFoundWidgetAtDown().cursor);
+    }
     pushPage(PAGE_ID_DIB_MIO168_INFO);
 }
 

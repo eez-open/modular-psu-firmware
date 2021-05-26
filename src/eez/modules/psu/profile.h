@@ -30,7 +30,7 @@ namespace psu {
 namespace profile {
 
 #define MAX_CHANNEL_PARAMETERS_SIZE 300
-#define MAX_SLOT_PARAMETERS_SIZE 300
+#define MAX_SLOT_PARAMETERS_SIZE 320
 
 /// Channel parameters stored in profile.
 struct ChannelParameters {

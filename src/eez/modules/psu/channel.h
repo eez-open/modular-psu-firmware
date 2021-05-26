@@ -69,8 +69,6 @@ struct DisplayValue {
     float getMaxRange(Channel *channel);
 };
 
-enum TriggerMode { TRIGGER_MODE_FIXED, TRIGGER_MODE_LIST, TRIGGER_MODE_STEP };
-
 enum TriggerOnListStop {
     TRIGGER_ON_LIST_STOP_OUTPUT_OFF,
     TRIGGER_ON_LIST_STOP_SET_TO_FIRST_STEP,

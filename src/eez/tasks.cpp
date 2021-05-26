@@ -43,6 +43,9 @@
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/serial_psu.h>
+#include <eez/modules/psu/ramp.h>
+#include <eez/modules/dib-dcp405/dib-dcp405.h>
+#include <eez/function_generator.h>
 
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/file_manager.h>
@@ -188,6 +191,9 @@ void highPriorityThreadOneIter() {
         if (diffMs == 0) {
             return;
         }
+        if (psu::ramp::isActive() || eez::dcp405::isDacRampActive() || function_generator::isActive()) {
+            return;
+        }
 #endif
     }
 
@@ -196,8 +202,6 @@ void highPriorityThreadOneIter() {
         return;
     }
 #endif
-
-    WATCHDOG_RESET(WATCHDOG_HIGH_PRIORITY_THREAD);
 
 #if defined(EEZ_PLATFORM_STM32)
     g_lastTickCountMs = millis();

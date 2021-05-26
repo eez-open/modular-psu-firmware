@@ -1491,6 +1491,21 @@
                     "font": "Oswald17"
                   },
                   "text": "\\u00b5"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 78,
+                  "height": 84,
+                  "wireID": "800f9647-6ebd-42b2-83ce-4ed889fd1ba0",
+                  "data": "",
+                  "action": "show_ch_settings_trigger",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "font": "Oswald17"
+                  },
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -2011,6 +2026,21 @@
                     "font": "Oswald17"
                   },
                   "text": "\\u00b5"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 118,
+                  "height": 84,
+                  "wireID": "f6b2b8fc-4c53-43cd-9c11-578b2b6908f2",
+                  "data": "",
+                  "action": "show_ch_settings_trigger",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "font": "Oswald17"
+                  },
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -2509,6 +2539,21 @@
                     "font": "Oswald17"
                   },
                   "text": "\\u00b5"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 76,
+                  "height": 74,
+                  "wireID": "354f024d-08ad-4495-e4a3-7f3194b18c84",
+                  "data": "",
+                  "action": "show_ch_settings_trigger",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "font": "Oswald17"
+                  },
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -3007,6 +3052,21 @@
                     "font": "Oswald17"
                   },
                   "text": "\\u00b5"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 76,
+                  "height": 114,
+                  "wireID": "f510419c-1c72-4344-b66a-94eaefb0e4c3",
+                  "data": "",
+                  "action": "show_ch_settings_trigger",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "font": "Oswald17"
+                  },
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -4170,6 +4230,34 @@
                                       "text": "\\u00b5"
                                     }
                                   ]
+                                },
+                                {
+                                  "type": "Container",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 66,
+                                  "wireID": "9d096efd-5ce1-46aa-e67f-7001d9bed989",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "left": 2,
+                                      "top": 0,
+                                      "width": 44,
+                                      "height": 66,
+                                      "wireID": "8eb3e37e-ca87-42fb-9074-626148577e75",
+                                      "data": "",
+                                      "action": "show_ch_settings_trigger",
+                                      "style": {
+                                        "inheritFrom": "encoder_cursor_14_enabled",
+                                        "font": "Oswald17"
+                                      },
+                                      "text": "\\u00c2"
+                                    }
+                                  ]
                                 }
                               ]
                             },
@@ -4360,6 +4448,21 @@
                                     "font": "Oswald17"
                                   },
                                   "text": "\\u00b5"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 66,
+                                  "wireID": "d1d5bcf3-86ae-4a14-9821-2eafbc27cb60",
+                                  "data": "",
+                                  "action": "show_ch_settings_trigger",
+                                  "style": {
+                                    "inheritFrom": "encoder_cursor_14_enabled",
+                                    "font": "Oswald17"
+                                  },
+                                  "text": "\\u00c2"
                                 }
                               ]
                             },
@@ -5344,6 +5447,21 @@
                             "font": "Oswald17"
                           },
                           "text": "\\u00b5"
+                        },
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 46,
+                          "height": 132,
+                          "wireID": "f230cb4c-2983-419b-8fdc-16f4cf25032d",
+                          "data": "",
+                          "action": "show_ch_settings_trigger",
+                          "style": {
+                            "inheritFrom": "encoder_cursor_14_enabled",
+                            "font": "Oswald17"
+                          },
+                          "text": "\\u00c2"
                         }
                       ]
                     },
@@ -6176,6 +6294,34 @@
                       "text": "\\u00b5"
                     }
                   ]
+                },
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 75,
+                  "height": 64,
+                  "wireID": "0730b5f9-dadc-421f-94d6-abae3888c1cf",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 1,
+                      "top": 0,
+                      "width": 73,
+                      "height": 63,
+                      "wireID": "d6893bbd-2caa-43ce-f092-61df36d623e9",
+                      "data": "",
+                      "action": "show_ch_settings_trigger",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "font": "Oswald17"
+                      },
+                      "text": "\\u00c2"
+                    }
+                  ]
                 }
               ]
             },
@@ -6631,6 +6777,21 @@
                             "font": "Oswald17"
                           },
                           "text": "\\u00b5"
+                        },
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 66,
+                          "height": 65,
+                          "wireID": "d046ead5-9b62-4a81-caf8-0d21f22e5bd5",
+                          "data": "",
+                          "action": "show_ch_settings_trigger",
+                          "style": {
+                            "inheritFrom": "encoder_cursor_14_enabled",
+                            "font": "Oswald17"
+                          },
+                          "text": "\\u00c2"
                         }
                       ]
                     },
@@ -7230,6 +7391,34 @@
                             "font": "Oswald17"
                           },
                           "text": "\\u00b5"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Container",
+                      "left": 0,
+                      "top": 0,
+                      "width": 56,
+                      "height": 44,
+                      "wireID": "c76e9f18-7c4c-4e15-e0b9-3f69c66c8464",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 1,
+                          "width": 55,
+                          "height": 42,
+                          "wireID": "1d9cc02b-9c6b-4141-bda5-5ec1071ba978",
+                          "data": "",
+                          "action": "show_ch_settings_trigger",
+                          "style": {
+                            "inheritFrom": "encoder_cursor_14_enabled",
+                            "font": "Oswald17"
+                          },
+                          "text": "\\u00c2"
                         }
                       ]
                     }

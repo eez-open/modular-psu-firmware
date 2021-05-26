@@ -192,14 +192,14 @@ enum FunctionGeneratorResourceType {
     FUNCTION_GENERATOR_RESOURCE_TYPE_I,
     FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I,
     
-    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN0,
-    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN1,
-    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN2,
-    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN3,
-    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN4,
-    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN5,
-    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN6,
-    FUNCTION_GENERATOR_RESOURCE_TYPE_DIN7,
+    FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL,
+};
+
+enum TriggerMode {
+    TRIGGER_MODE_FIXED,
+    TRIGGER_MODE_LIST,
+    TRIGGER_MODE_STEP,
+    TRIGGER_MODE_FUNCTION_GENERATOR,
 };
 
 struct Module {
@@ -418,6 +418,8 @@ struct Module {
 
     virtual int getNumFunctionGeneratorResources(int subchannelIndex);
     virtual FunctionGeneratorResourceType getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex);
+    virtual TriggerMode getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex);
+    virtual void setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode);
     virtual const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex);
 	virtual void getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues = nullptr);
 	virtual void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues = nullptr);

@@ -827,6 +827,13 @@ FunctionGeneratorResourceType Module::getFunctionGeneratorResourceType(int subch
 	return FUNCTION_GENERATOR_RESOURCE_TYPE_NONE;
 }
 
+TriggerMode Module::getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex) {
+    return TRIGGER_MODE_FIXED;
+}
+
+void Module::setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode) {
+}
+
 const char *Module::getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) {
 	return nullptr;
 }

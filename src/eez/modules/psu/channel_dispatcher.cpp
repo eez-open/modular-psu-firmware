@@ -30,6 +30,7 @@
 #include <eez/modules/psu/trigger.h>
 #include <eez/index.h>
 #include <eez/system.h>
+#include <eez/function_generator.h>
 #include <eez/modules/bp3c/io_exp.h>
 
 namespace eez {
@@ -257,6 +258,8 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
             }
         }
 
+        function_generator::removePowerChannels();
+
         if (!additionalCheckForCouplingType(couplingType, &g_setCouplingTypeErr)) {
             return;
         }
@@ -427,6 +430,8 @@ void setTrackingChannels(uint16_t trackingEnabled) {
                     trackingChannel.resetHistory();
                 }
             }
+
+            function_generator::removeOtherTrackingChannels();
         }
     }
 }

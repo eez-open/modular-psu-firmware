@@ -23,6 +23,7 @@
 #include <eez/gui/gui.h>
 
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/channel.h>
 #include <eez/modules/psu/profile.h>
 
 namespace eez {
@@ -30,6 +31,7 @@ namespace function_generator {
 
 enum Waveform {
 	WAVEFORM_NONE,
+	WAVEFORM_DC,
 	WAVEFORM_SINE_WAVE,
 	WAVEFORM_TRIANGLE,
 	WAVEFORM_SQUARE_WAVE,
@@ -56,8 +58,26 @@ void setProfileParameters(const psu::profile::Parameters &profileParams);
 bool writeProfileProperties(psu::profile::WriteContext &ctx, const psu::profile::Parameters &profileParams);
 bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Parameters &profileParams);
 
+void addChannelWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex);
+void addChannelWaveformParameters(psu::Channel &channel);
+
+void removeAllChannels();
+void removePowerChannels();
+void removeOtherTrackingChannels();
+
+void selectWaveformParametersForChannel(int slotIndex, int subchannelIndex, int resourceIndex);
+
+int getNumChannelsInFunctionGeneratorTriggerMode();
+
+bool isActive();
+void executionStart();
+void tick();
+void abort();
+
 extern eez::gui::SetPage *g_pFunctionGeneratorPage;
 extern eez::gui::SetPage *g_pFunctionGeneratorSelectChannelsPage;
+
+extern const char *g_waveformShortLabel[8];
 
 } // namespace function_generator
 } // namespace eez

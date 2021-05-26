@@ -43,7 +43,6 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 extern RTC_HandleTypeDef hrtc;
-volatile uint32_t g_debugVarTickCountMs;
 #endif
 
 namespace eez {
@@ -98,6 +97,8 @@ static dlog_file::Writer g_writer(DLOG_RECORD_BUFFER, DLOG_RECORD_BUFFER_SIZE);
 static uint32_t g_fileLength;
 static uint32_t g_numSamples;
 
+static uint8_t *g_saveBuffer = DLOG_RECORD_SAVE_BUFFER;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static float getValue(uint32_t rowIndex, uint8_t columnIndex, float *max) {
@@ -137,8 +138,6 @@ static int fileOpen() {
 }
 
 bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush) {
-    static uint8_t g_saveBuffer[CHUNK_SIZE];
-
     buffer = nullptr;
     bufferSize = 0;
 
@@ -281,7 +280,6 @@ static void log() {
 
 #if defined(EEZ_PLATFORM_STM32)
     uint32_t tickCountMs = 1024 - 4 * hrtc.Instance->SSR;
-    g_debugVarTickCountMs = tickCountMs;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

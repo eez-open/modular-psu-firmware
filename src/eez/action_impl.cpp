@@ -230,6 +230,10 @@ void action_show_sys_settings() {
     showPage(PAGE_ID_SYS_SETTINGS);
 }
 
+void action_trigger_manually() {
+    triggerManually();
+}
+
 void action_show_sys_settings_trigger() {
     pushPage(PAGE_ID_SYS_SETTINGS_TRIGGER);
 }

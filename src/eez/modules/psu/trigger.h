@@ -51,6 +51,8 @@ float getVoltage(Channel &channel);
 void setCurrent(Channel &channel, float value);
 float getCurrent(Channel &channel);
 
+enum State { STATE_IDLE, STATE_INITIATED, STATE_TRIGGERED, STATE_EXECUTING };
+State getState();
 bool isInitiated(Source source);
 int generateTrigger(Source source, bool checkImmediatelly = true);
 int startImmediately();
