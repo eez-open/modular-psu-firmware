@@ -2410,6 +2410,7 @@ scpi_result_t scpi_cmd_systemCommunicateUartReceiveQ(scpi_t *context) {
 static scpi_choice_def_t g_uartModeChoice[] = {
     { "BUFFer", uart::UART_MODE_BUFFER },
     { "SCPI", uart::UART_MODE_SCPI },
+    { "BOOKmark", uart::UART_MODE_BOOKMARK },
     SCPI_CHOICE_LIST_END
 };
 

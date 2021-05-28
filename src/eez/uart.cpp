@@ -24,6 +24,7 @@
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/io_pins.h>
+#include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/bp3c/flash_slave.h>
 
@@ -235,6 +236,23 @@ void tick() {
 				auto ch = (char)g_inputBuffer.get();
 				input(g_scpiContext, &ch, 1);
 			}
+		} else if (persist_conf::devConf.uartMode == UART_MODE_BOOKMARK) {
+			static char bookmarkText[dlog_file::MAX_BOOKMARK_TEXT_LEN];
+			static unsigned bookmarkTextLen;
+
+			while (!g_inputBuffer.isEmpty()) {
+				auto ch = (char)g_inputBuffer.get();
+				if (ch == '\r' || ch == '\n') {
+					if (bookmarkTextLen > 0) {
+						dlog_record::logBookmark(bookmarkText, bookmarkTextLen);
+						bookmarkTextLen = 0;
+					}
+				} else {
+					if (bookmarkTextLen < dlog_file::MAX_BOOKMARK_TEXT_LEN) {
+						bookmarkText[bookmarkTextLen++] = ch;
+					}
+				}
+			}
 		}
 	}
 }
@@ -327,7 +345,7 @@ HAL_StatusTypeDef receive(uint8_t *data, uint16_t size, uint32_t timeout, uint16
 }
 
 bool receiveFromBuffer(uint8_t *data, uint16_t size, uint16_t &n, int *err) {
-	if (!g_initialized || bp3c::flash_slave::g_bootloaderMode || persist_conf::devConf.uartMode == UART_MODE_SCPI) {
+	if (!g_initialized || bp3c::flash_slave::g_bootloaderMode || persist_conf::devConf.uartMode != UART_MODE_BUFFER) {
 		if (*err) {
 			*err = SCPI_ERROR_EXECUTION_ERROR;
 		}
