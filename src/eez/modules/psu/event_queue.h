@@ -110,6 +110,9 @@ static const int EVENT_TYPE_ERROR = 4;
     EVENT_ERROR(TOO_MANY_LOG_EVENTS, 150, "Too many log events")                                   \
 	EVENT_ERROR(WATCHDOG_RESET, 151, "Watchdog reset")                                             \
     EVENT_ERROR(HIGH_TEMPERATURE, 152, "High temperature")                                         \
+    EVENT_ERROR(SLOT1_FIRMWARE_MISMATCH, 160, "Firmware mismatch on module 1")                     \
+	EVENT_ERROR(SLOT2_FIRMWARE_MISMATCH, 161, "Firmware mismatch on module 2")                     \
+	EVENT_ERROR(SLOT3_FIRMWARE_MISMATCH, 162, "Firmware mismatch on module 3")                     \
     EVENT_WARNING(CH_CALIBRATION_DISABLED, 0, "Ch%d calibration disabled")                         \
     EVENT_WARNING(ETHERNET_NOT_CONNECTED, 20, "Ethernet not connected")                            \
     EVENT_WARNING(AUTO_RECALL_VALUES_MISMATCH, 21, "Auto-recall values mismatch")                  \

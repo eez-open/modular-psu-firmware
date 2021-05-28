@@ -94,6 +94,7 @@ struct Response {
 
     union {
         struct {
+            uint16_t moduleType;
             uint8_t firmwareMajorVersion;
             uint8_t firmwareMinorVersion;
             uint32_t idw0;
@@ -251,16 +252,22 @@ public:
         if (isSuccess) {
             auto &data = response.getInfo;
 
-            firmwareMajorVersion = data.firmwareMajorVersion;
-            firmwareMinorVersion = data.firmwareMinorVersion;
-            idw0 = data.idw0;
-            idw1 = data.idw1;
-            idw2 = data.idw2;
+            if (data.moduleType == MODULE_TYPE_DIB_PREL6) {
+                firmwareMajorVersion = data.firmwareMajorVersion;
+                firmwareMinorVersion = data.firmwareMinorVersion;
+                idw0 = data.idw0;
+                idw1 = data.idw1;
+                idw2 = data.idw2;
 
-			firmwareVersionAcquired = true;
+                firmwareVersionAcquired = true;
 
-            synchronized = true;
-            testResult = TEST_OK;
+                synchronized = true;
+                testResult = TEST_OK;
+            } else {
+                synchronized = false;
+                testResult = TEST_FAILED;
+                event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_FIRMWARE_MISMATCH + slotIndex);
+            }
         } else {
             synchronized = false;
             if (firmwareInstalled) {
