@@ -327,10 +327,12 @@ void pushTraceMessage(int16_t traceMessageType, const char *message, size_t mess
         }
     }
 
+#if !CONF_SURVIVE_MODE
     if (startsWith(message, "wrong thread")) {
         sound::playBeep();
         errorMessage(message);
     }
+#endif
 }
 
 void pushDebugTrace(const char *message, size_t messageLength) {

@@ -418,8 +418,8 @@ struct Module {
 
     virtual int getNumFunctionGeneratorResources(int subchannelIndex);
     virtual FunctionGeneratorResourceType getFunctionGeneratorResourceType(int subchannelIndex, int resourceIndex);
-    virtual TriggerMode getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex);
-    virtual void setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode);
+    virtual bool getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode &triggerMode, int *err);
+    virtual bool setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode, int *err);
     virtual const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex);
 	virtual void getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues = nullptr);
 	virtual void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues = nullptr);

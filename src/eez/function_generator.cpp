@@ -37,6 +37,8 @@
 #include <eez/modules/psu/gui/psu.h>
 #include "eez/modules/psu/gui/edit_mode.h"
 
+#include <eez/modules/psu/scpi/psu.h>
+
 #define M_PI_F ((float)M_PI)
 
 using namespace eez::function_generator;
@@ -550,7 +552,10 @@ void FunctionGeneratorPage::pageAlloc() {
 			FunctionGeneratorPage::g_waveformParameters[i].absoluteResourceIndex,
 			slotIndex, subchannelIndex, resourceIndex);
 
-		g_triggerModes[i] = g_slots[slotIndex]->getFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex);
+		TriggerMode triggerMode;
+		g_slots[slotIndex]->getFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, triggerMode, nullptr);
+
+		g_triggerModes[i] = triggerMode;
 	}
 
 	g_selectedItem = 0;
@@ -566,7 +571,7 @@ void FunctionGeneratorPage::apply() {
 		int subchannelIndex;
 		int resourceIndex;
 		FunctionGeneratorSelectChannelsPage::findResource(i, slotIndex, subchannelIndex, resourceIndex);
-		g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, TRIGGER_MODE_FIXED);
+		g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, TRIGGER_MODE_FIXED, nullptr);
 	}
 
 	for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
@@ -581,8 +586,10 @@ void FunctionGeneratorPage::apply() {
 			FunctionGeneratorPage::g_waveformParameters[i].absoluteResourceIndex,
 			slotIndex, subchannelIndex, resourceIndex);
 
-		g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, g_triggerModes[i]);
+		g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, g_triggerModes[i], nullptr);
 	}
+
+	FunctionGeneratorPage::g_version++;
 }
 
 void FunctionGeneratorPage::drawWaveform(const WidgetCursor &widgetCursor, int i, float T, float min, float max, bool selected, int yOffset) {
@@ -815,7 +822,51 @@ bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Paramet
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void addChannelWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex) {
+bool addChannelWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex, int *err) {
+	g_functionGeneratorPage.pageAlloc();
+
+	g_functionGeneratorSelectChannelsPage.pageAlloc();
+
+	uint64_t selectedChannels = g_functionGeneratorSelectChannelsPage.g_selectedChannels;
+	for (int i = 0; i < FunctionGeneratorSelectChannelsPage::getNumFunctionGeneratorResources(); i++) {
+		int tmpSlotIndex;
+		int tmpSubchannelIndex;
+		int tmpResourceIndex;
+		FunctionGeneratorSelectChannelsPage::findResource(i, tmpSlotIndex, tmpSubchannelIndex, tmpResourceIndex);
+		
+		if (tmpSlotIndex == slotIndex && tmpSubchannelIndex == subchannelIndex && (resourceIndex == -1 || tmpResourceIndex == resourceIndex)) {
+			selectedChannels |= (uint64_t)1 << i;
+		}
+	}
+
+	int numSelectedChannels = 0;
+	for (int i = 0; i < 64; i++) {
+		if (selectedChannels & ((uint64_t)1 << i)) {
+			numSelectedChannels++;
+		}
+	}
+
+	if (numSelectedChannels > MAX_NUM_WAVEFORMS) {
+		if (err) {
+			*err = SCPI_ERROR_OUT_OF_MEMORY_FOR_REQ_OP;
+		}
+		return false;
+	}
+
+	g_functionGeneratorSelectChannelsPage.g_selectedChannels = selectedChannels;
+
+	g_functionGeneratorSelectChannelsPage.apply();
+
+	gui::refreshScreen();
+
+	return true;
+}
+
+void addChannelWaveformParameters(Channel &channel) {
+	addChannelWaveformParameters(channel.slotIndex, channel.subchannelIndex, -1);
+}
+
+void removeChannelWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex) {
 	g_functionGeneratorPage.pageAlloc();
 
 	g_functionGeneratorSelectChannelsPage.pageAlloc();
@@ -826,18 +877,15 @@ void addChannelWaveformParameters(int slotIndex, int subchannelIndex, int resour
 		int tmpResourceIndex;
 		FunctionGeneratorSelectChannelsPage::findResource(i, tmpSlotIndex, tmpSubchannelIndex, tmpResourceIndex);
 		
-		if (tmpSlotIndex == slotIndex && tmpSubchannelIndex == subchannelIndex && (resourceIndex == -1 || tmpResourceIndex == resourceIndex)) {
-			g_functionGeneratorSelectChannelsPage.g_selectedChannels |= (uint64_t)1 << i;
+		if (tmpSlotIndex == slotIndex && tmpSubchannelIndex == subchannelIndex && tmpResourceIndex == resourceIndex) {
+			g_functionGeneratorSelectChannelsPage.g_selectedChannels &= ~((uint64_t)1 << i);
+			break;
 		}
 	}
 
 	g_functionGeneratorSelectChannelsPage.apply();
-
-	g_functionGeneratorPage.apply();
-}
-
-void addChannelWaveformParameters(Channel &channel) {
-	addChannelWaveformParameters(channel.slotIndex, channel.subchannelIndex, -1);
+	
+	gui::refreshScreen();
 }
 
 void removeAllChannels() {
@@ -848,8 +896,6 @@ void removeAllChannels() {
 	g_functionGeneratorSelectChannelsPage.g_selectedChannels = 0;
 
 	g_functionGeneratorSelectChannelsPage.apply();
-
-	g_functionGeneratorPage.apply();
 }
 
 void removePowerChannels() {
@@ -869,8 +915,6 @@ void removePowerChannels() {
 	}
 
 	g_functionGeneratorSelectChannelsPage.apply();
-
-	g_functionGeneratorPage.apply();
 }
 
 void removeOtherTrackingChannels() {
@@ -901,8 +945,6 @@ void removeOtherTrackingChannels() {
 	}
 
 	g_functionGeneratorSelectChannelsPage.apply();
-
-	g_functionGeneratorPage.apply();
 }
 
 void selectWaveformParametersForChannel(int slotIndex, int subchannelIndex, int resourceIndex) {
@@ -928,6 +970,10 @@ void selectWaveformParametersForChannel(int slotIndex, int subchannelIndex, int 
 	}
 }
 
+void selectWaveformParametersForChannel(Channel &channel) {
+	selectWaveformParametersForChannel(channel.slotIndex, channel.subchannelIndex, -1);
+}
+
 int getNumChannelsInFunctionGeneratorTriggerMode() {
 	int count = 0;
 	for (int absoluteResourceIndex = 0; absoluteResourceIndex < FunctionGeneratorSelectChannelsPage::getNumFunctionGeneratorResources(); absoluteResourceIndex++) {
@@ -937,15 +983,303 @@ int getNumChannelsInFunctionGeneratorTriggerMode() {
 		FunctionGeneratorSelectChannelsPage::findResource(
 			absoluteResourceIndex,
 			slotIndex, subchannelIndex, resourceIndex);
-		if (g_slots[slotIndex]->getFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex) == TRIGGER_MODE_FUNCTION_GENERATOR) {
+
+		TriggerMode triggerMode;
+		g_slots[slotIndex]->getFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, triggerMode, nullptr);
+
+		if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
 			count++;
 		}
 	}
 	return count;
 }
 
-void selectWaveformParametersForChannel(Channel &channel) {
-	selectWaveformParametersForChannel(channel.slotIndex, channel.subchannelIndex, -1);
+bool getWaveform(int slotIndex, int subchannelIndex, int resourceIndex, Waveform &waveform, int *err) {
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+	if (!waveformParameters) {
+		if (err) {
+			*err = SCPI_ERROR_QUERY_ERROR;
+		}
+		return false;
+	}
+	waveform = waveformParameters->waveform;
+	return true;
+}
+
+bool setWaveform(int slotIndex, int subchannelIndex, int resourceIndex, Waveform waveform, int *err) {
+	if (!addChannelWaveformParameters(slotIndex, subchannelIndex, resourceIndex, err)) {
+		return false;
+	}
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+	if (waveformParameters->resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		if (waveform != WAVEFORM_SQUARE_WAVE && waveform != WAVEFORM_PULSE) {
+			if (err) {
+				*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+			}
+			return false;
+		}
+	}
+	waveformParameters->waveform = waveform;
+
+	g_functionGeneratorPage.pageAlloc();
+
+	return true;
+}
+
+bool getFrequency(int slotIndex, int subchannelIndex, int resourceIndex, float &frequency, int *err) {
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+	if (!waveformParameters) {
+		if (err) {
+			*err = SCPI_ERROR_QUERY_ERROR;
+		}
+		return false;
+	}
+	frequency = waveformParameters->frequency;
+	return true;
+}
+
+bool setFrequency(int slotIndex, int subchannelIndex, int resourceIndex, float frequency, int *err) {
+	if (!addChannelWaveformParameters(slotIndex, subchannelIndex, resourceIndex, err)) {
+		return false;
+	}
+
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+
+	float min;
+	float max;
+	g_slots[slotIndex]->getFunctionGeneratorFrequencyInfo(subchannelIndex, resourceIndex, min, max);
+
+	if (frequency < min || frequency > max) {
+		if (err) {
+			*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+		}
+		return false;
+	}
+
+	waveformParameters->frequency = frequency;
+	
+	g_functionGeneratorPage.pageAlloc();
+
+	return true;
+}
+
+bool getPhaseShift(int slotIndex, int subchannelIndex, int resourceIndex, float &phaseShift, int *err) {
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+	if (!waveformParameters) {
+		if (err) {
+			*err = SCPI_ERROR_QUERY_ERROR;
+		}
+		return false;
+	}
+	phaseShift = waveformParameters->phaseShift;
+	return true;
+}
+
+bool setPhaseShift(int slotIndex, int subchannelIndex, int resourceIndex, float phaseShift, int *err) {
+	if (!addChannelWaveformParameters(slotIndex, subchannelIndex, resourceIndex, err)) {
+		return false;
+	}
+	
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+	
+	if (phaseShift < 0 || phaseShift > 360.0f) {
+		if (err) {
+			*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+		}
+		return false;
+	}
+
+	waveformParameters->phaseShift = phaseShift;
+
+	g_functionGeneratorPage.pageAlloc();
+	
+	return true;
+}
+
+bool getAmplitude(int slotIndex, int subchannelIndex, int resourceIndex, float &amplitude, int *err) {
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+
+	if (!waveformParameters) {
+		if (err) {
+			*err = SCPI_ERROR_QUERY_ERROR;
+		}
+		return false;
+	}
+
+	if (waveformParameters->resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		if (err) {
+			*err = SCPI_ERROR_QUERY_ERROR;
+		}
+		return false;
+	}
+	
+	amplitude = waveformParameters->amplitude;
+
+	return true;
+}
+
+bool setAmplitude(int slotIndex, int subchannelIndex, int resourceIndex, float amplitude, int *err) {
+	if (!addChannelWaveformParameters(slotIndex, subchannelIndex, resourceIndex, err)) {
+		return false;
+	}
+	
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+	
+	if (waveformParameters->resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		if (err) {
+			*err = SCPI_ERROR_EXECUTION_ERROR;
+		}
+		return false;
+	}
+
+	float min;
+	float max;
+	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters->resourceType, min, max);
+
+	float maxAmplitude = MIN(max - waveformParameters->offset, waveformParameters->offset - min);
+
+	if (amplitude < 0 || amplitude > maxAmplitude) {
+		if (err) {
+			*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+		}
+		return false;
+	}
+	
+	waveformParameters->amplitude = amplitude;
+
+	g_functionGeneratorPage.pageAlloc();
+	
+	return true;
+}
+
+bool getOffset(int slotIndex, int subchannelIndex, int resourceIndex, float &offset, int *err) {
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+
+	if (!waveformParameters) {
+		if (err) {
+			*err = SCPI_ERROR_QUERY_ERROR;
+		}
+		return false;
+	}
+
+	if (waveformParameters->resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		if (err) {
+			*err = SCPI_ERROR_QUERY_ERROR;
+		}
+		return false;
+	}
+
+	offset = waveformParameters->offset;
+
+	return true;
+}
+
+bool setOffset(int slotIndex, int subchannelIndex, int resourceIndex, float offset, int *err) {
+	if (!addChannelWaveformParameters(slotIndex, subchannelIndex, resourceIndex, err)) {
+		return false;
+	}
+	
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+	
+	if (waveformParameters->resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		if (err) {
+			*err = SCPI_ERROR_EXECUTION_ERROR;
+		}
+		return false;
+	}
+
+	float min;
+	float max;
+	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters->resourceType, min, max);
+
+	if (offset < min + waveformParameters->amplitude || offset > max - waveformParameters->amplitude) {
+		if (err) {
+			*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+		}
+		return false;
+	}
+	
+	waveformParameters->offset = offset;
+
+	g_functionGeneratorPage.pageAlloc();
+
+	return true;
+}
+
+bool getPulseWidth(int slotIndex, int subchannelIndex, int resourceIndex, float &pulseWidth, int *err) {
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+	if (!waveformParameters) {
+		if (err) {
+			*err = SCPI_ERROR_QUERY_ERROR;
+		}
+		return false;
+	}
+	pulseWidth = waveformParameters->pulseWidth;
+	return true;
+}
+
+bool setPulseWidth(int slotIndex, int subchannelIndex, int resourceIndex, float pulseWidth, int *err) {
+	if (!addChannelWaveformParameters(slotIndex, subchannelIndex, resourceIndex, err)) {
+		return false;
+	}
+	
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+	
+	if (pulseWidth < 0 || pulseWidth > 100.0f) {
+		if (err) {
+			*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+		}
+		return false;
+	}
+
+	waveformParameters->pulseWidth = pulseWidth;
+
+	g_functionGeneratorPage.pageAlloc();
+	
+	return true;
+}
+
+bool getResourceType(int slotIndex, int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType &resourceType, int *err) {
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+
+	if (!waveformParameters) {
+		if (err) {
+			*err = SCPI_ERROR_QUERY_ERROR;
+		}
+		return false;
+	}
+
+	if (g_slots[slotIndex]->getFunctionGeneratorResourceType(subchannelIndex, resourceIndex) != FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I) {
+		if (err) {
+			*err = SCPI_ERROR_QUERY_ERROR;
+		}
+		return false;
+	}
+
+	resourceType = waveformParameters->resourceType;
+
+	return true;
+}
+
+bool setResourceType(int slotIndex, int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, int *err) {
+	if (!addChannelWaveformParameters(slotIndex, subchannelIndex, resourceIndex, err)) {
+		return false;
+	}
+	
+	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
+	
+	if (g_slots[slotIndex]->getFunctionGeneratorResourceType(subchannelIndex, resourceIndex) != FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I) {
+		if (err) {
+			*err = SCPI_ERROR_EXECUTION_ERROR;
+		}
+		return false;
+	}
+
+	waveformParameters->resourceType = resourceType;
+
+	g_functionGeneratorPage.pageAlloc();
+
+	return true;
 }
 
 bool isActive() {
@@ -968,7 +1302,10 @@ void executionStart() {
 			FunctionGeneratorPage::g_waveformParameters[i].absoluteResourceIndex,
 			slotIndex, subchannelIndex, resourceIndex);
 
-		if (g_slots[slotIndex]->getFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex) == TRIGGER_MODE_FUNCTION_GENERATOR) {
+		TriggerMode triggerMode;
+		g_slots[slotIndex]->getFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, triggerMode, nullptr);
+
+		if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
 			g_active = true;
 			g_functionGeneratorPage.pageAlloc();
 
@@ -981,6 +1318,20 @@ void executionStart() {
 
 void reloadWaveformParameters() {
 	bool trackingChannelsStarted = false;
+
+	for (int i = 0; i < CH_MAX; i++) {
+		g_waveFormFuncU[i] = dcf;
+		g_phiU[i] = 0;
+		g_dphiU[i] = 0;
+		g_amplitudeU[i] = 0;
+		g_offsetU[i] = 0;
+
+		g_waveFormFuncI[i] = dcf;
+		g_phiI[i] = 0;
+		g_dphiI[i] = 0;
+		g_amplitudeI[i] = 0;
+		g_offsetI[i] = 0;
+	}
 
 	for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
 		if (FunctionGeneratorPage::g_waveformParameters[i].absoluteResourceIndex == -1) {
@@ -1014,18 +1365,6 @@ void reloadWaveformParameters() {
 				trackingChannelsStarted = true;
 			}
 
-			g_waveFormFuncU[channel->channelIndex] = dcf;
-			g_phiU[channel->channelIndex] = 0;
-			g_dphiU[channel->channelIndex] = 0;
-			g_amplitudeU[channel->channelIndex] = 0;
-			g_offsetU[channel->channelIndex] = 0;
-
-			g_waveFormFuncI[channel->channelIndex] = dcf;
-			g_phiI[channel->channelIndex] = 0;
-			g_dphiI[channel->channelIndex] = 0;
-			g_amplitudeI[channel->channelIndex] = 0;
-			g_offsetI[channel->channelIndex] = 0;
-
 			auto &waveformParameters = g_waveformParameters[i];
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -1033,14 +1372,14 @@ void reloadWaveformParameters() {
 #endif
 			if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
 				g_waveFormFuncU[channel->channelIndex] = getWaveformFunction(waveformParameters);
-				g_pulseWidthsU[i] = g_pulseWidth;
+				g_pulseWidthsU[channel->channelIndex] = g_pulseWidth;
 				g_phiU[channel->channelIndex] = waveformParameters.phaseShift / 360.0f;
 				g_dphiU[channel->channelIndex] = 2.0f * M_PI_F * waveformParameters.frequency * PERIOD;
 				g_amplitudeU[channel->channelIndex] = waveformParameters.amplitude;
 				g_offsetU[channel->channelIndex] = waveformParameters.offset;
 			} else {
 				g_waveFormFuncI[channel->channelIndex] = getWaveformFunction(waveformParameters);
-				g_pulseWidthsI[i] = g_pulseWidth;
+				g_pulseWidthsI[channel->channelIndex] = g_pulseWidth;
 				g_phiI[channel->channelIndex] = waveformParameters.phaseShift / 360.0f;
 				g_dphiI[channel->channelIndex] = 2.0f * M_PI_F * waveformParameters.frequency * PERIOD;
 				g_amplitudeI[channel->channelIndex] = waveformParameters.amplitude;
@@ -1315,7 +1654,7 @@ void data_function_generator_item_is_selected(DataOperationEnum operation, Curso
 void action_function_generator_item_toggle_selected() {
 	auto resourceIndex = getFoundWidgetAtDown().cursor;
 	FunctionGeneratorPage::g_selectedItem = resourceIndex;
-	FunctionGeneratorPage::g_version++;
+	FunctionGeneratorPage::apply();
 }
 
 void data_function_generator_item_is_checked(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -1353,7 +1692,6 @@ void action_function_generator_item_toggle_checked() {
 			FunctionGeneratorPage::g_triggerModes[index] = TRIGGER_MODE_FUNCTION_GENERATOR;
 		}
 		FunctionGeneratorPage::apply();
-		FunctionGeneratorPage::g_version++;
 	} else if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR_SELECT_CHANNELS) {
 		auto resourceIndex = getFoundWidgetAtDown().cursor;
 		FunctionGeneratorSelectChannelsPage::g_selectedChannels ^= (uint64_t)1 << resourceIndex;
@@ -1444,7 +1782,6 @@ void data_function_generator_frequency(DataOperationEnum operation, Cursor curso
         eez::psu::gui::edit_mode_step::g_functionGeneratorFrequencyEncoderMode = (EncoderMode)value.getInt();
     } else if (operation == DATA_OPERATION_SET) {
         waveformParameters.frequency = value.getFloat();
-		FunctionGeneratorPage::g_version++;
 		FunctionGeneratorPage::apply();
     }
 }
@@ -1492,7 +1829,6 @@ void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cur
 		eez::psu::gui::edit_mode_step::g_functionGeneratorPhaseShiftEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
 		waveformParameters.phaseShift = value.getFloat();
-		FunctionGeneratorPage::g_version++;
 		FunctionGeneratorPage::apply();
 	}
 }
@@ -1550,7 +1886,6 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 		eez::psu::gui::edit_mode_step::g_functionGeneratorAmplitudeEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
 		waveformParameters.amplitude = value.getFloat();
-		FunctionGeneratorPage::g_version++;
 		FunctionGeneratorPage::apply();
 	}
 }
@@ -1607,7 +1942,6 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 		eez::psu::gui::edit_mode_step::g_functionGeneratorOffsetEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
 		waveformParameters.offset = value.getFloat();
-		FunctionGeneratorPage::g_version++;
 		FunctionGeneratorPage::apply();
 	}
 }
@@ -1652,7 +1986,6 @@ void data_function_generator_pulse_width(DataOperationEnum operation, Cursor cur
 		eez::psu::gui::edit_mode_step::g_functionGeneratorPulseWidthEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
 		waveformParameters.pulseWidth = value.getFloat();
-		FunctionGeneratorPage::g_version++;
 		FunctionGeneratorPage::apply();
 	}
 }

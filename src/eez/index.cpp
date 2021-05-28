@@ -827,11 +827,18 @@ FunctionGeneratorResourceType Module::getFunctionGeneratorResourceType(int subch
 	return FUNCTION_GENERATOR_RESOURCE_TYPE_NONE;
 }
 
-TriggerMode Module::getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex) {
-    return TRIGGER_MODE_FIXED;
+bool Module::getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode &triggerMode, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;    
 }
 
-void Module::setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode) {
+bool Module::setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode, int *err) {
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+    return false;    
 }
 
 const char *Module::getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) {

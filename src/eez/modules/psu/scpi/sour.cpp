@@ -25,9 +25,13 @@
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/trigger.h>
 
+#include <eez/function_generator.h>
+
 #define I_STATE 1
 #define P_STATE 2
 #define U_STATE 3
+
+using namespace eez::function_generator;
 
 namespace eez {
 namespace psu {
@@ -871,80 +875,6 @@ scpi_result_t scpi_cmd_sourceVoltageLevelTriggeredAmplitudeQ(scpi_t *context) {
         channel_dispatcher::getUDef(*channel));
 }
 
-static scpi_choice_def_t triggerModeChoice[] = {
-    { "FIXed", TRIGGER_MODE_FIXED },
-    { "LIST", TRIGGER_MODE_LIST },
-    { "STEP", TRIGGER_MODE_STEP },
-    { "FUNCgen", TRIGGER_MODE_FUNCTION_GENERATOR },
-    SCPI_CHOICE_LIST_END /* termination of option list */
-};
-
-scpi_result_t scpi_cmd_sourceCurrentMode(scpi_t *context) {
-    Channel *channel = getPowerChannelFromCommandNumber(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    int32_t triggerMode;
-    if (!SCPI_ParamChoice(context, triggerModeChoice, &triggerMode, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (!trigger::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
-        return SCPI_RES_ERR;
-    }
-
-    channel_dispatcher::setCurrentTriggerMode(*channel, (TriggerMode)triggerMode);
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_sourceCurrentModeQ(scpi_t *context) {
-    Channel *channel = getPowerChannelFromCommandNumber(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    resultChoiceName(context, triggerModeChoice,
-                     channel_dispatcher::getCurrentTriggerMode(*channel));
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_sourceVoltageMode(scpi_t *context) {
-    Channel *channel = getPowerChannelFromCommandNumber(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    int32_t triggerMode;
-    if (!SCPI_ParamChoice(context, triggerModeChoice, &triggerMode, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (!trigger::isIdle()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
-        return SCPI_RES_ERR;
-    }
-
-    channel_dispatcher::setVoltageTriggerMode(*channel, (TriggerMode)triggerMode);
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_sourceVoltageModeQ(scpi_t *context) {
-    Channel *channel = getPowerChannelFromCommandNumber(context);
-    if (!channel) {
-        return SCPI_RES_ERR;
-    }
-
-    resultChoiceName(context, triggerModeChoice,
-                     channel_dispatcher::getVoltageTriggerMode(*channel));
-
-    return SCPI_RES_OK;
-}
-
 scpi_result_t scpi_cmd_sourceListCount(scpi_t *context) {
     Channel *channel = getPowerChannelFromCommandNumber(context);
     if (!channel) {
@@ -1704,6 +1634,1395 @@ scpi_result_t scpi_cmd_sourcePwmDutyQ(scpi_t *context) {
     SCPI_ResultFloat(context, duty);
 
     return SCPI_RES_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static scpi_choice_def_t g_triggerModeChoice[] = {
+    { "FIXed", TRIGGER_MODE_FIXED },
+    { "LIST", TRIGGER_MODE_LIST },
+    { "STEP", TRIGGER_MODE_STEP },
+    { "FUNCgen", TRIGGER_MODE_FUNCTION_GENERATOR },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_sourceVoltageMode(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t triggerMode;
+    if (!SCPI_ParamChoice(context, g_triggerModeChoice, &triggerMode, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (!trigger::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (!channel) {
+		SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+		return SCPI_RES_ERR;
+    }
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!channel_dispatcher::setTriggerMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, (TriggerMode)triggerMode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+        int err;
+		if (!addChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
+	} else {
+        removeChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex);
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageModeQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (!channel) {
+		SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+		return SCPI_RES_ERR;
+    }
+
+    int resourceIndex = 0;
+
+    TriggerMode triggerMode;
+    int err;
+	if (!g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceTriggerMode(slotAndSubchannelIndex.subchannelIndex, resourceIndex, triggerMode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_triggerModeChoice, triggerMode);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentMode(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t triggerMode;
+    if (!SCPI_ParamChoice(context, g_triggerModeChoice, &triggerMode, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (!trigger::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (!channel) {
+		SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+		return SCPI_RES_ERR;
+    }
+
+    int resourceIndex = 1;
+
+    int err;
+    if (!channel_dispatcher::setTriggerMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, (TriggerMode)triggerMode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+        int err;
+		if (!addChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
+	} else {
+        removeChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex);
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentModeQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (!channel) {
+		SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+		return SCPI_RES_ERR;
+    }
+
+    int resourceIndex = 1;
+
+    TriggerMode triggerMode;
+    int err;
+    if (!g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceTriggerMode(slotAndSubchannelIndex.subchannelIndex, resourceIndex, triggerMode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_triggerModeChoice, triggerMode);
+
+    return SCPI_RES_OK;
+}
+
+static scpi_choice_def_t g_triggerModeDigitalOutputChoice[] = {
+    { "FIXed", TRIGGER_MODE_FIXED },
+    { "FUNCgen", TRIGGER_MODE_FUNCTION_GENERATOR },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_sourceMode(scpi_t *context) { 
+	auto &slotAndSubchannelIndex = *getSelectedChannel(context);
+
+    int32_t triggerMode;
+    if (!SCPI_ParamChoice(context, g_triggerModeDigitalOutputChoice, &triggerMode, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (!trigger::isIdle()) {
+        SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+        return SCPI_RES_ERR;
+    }
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!channel_dispatcher::setTriggerMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, (TriggerMode)triggerMode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+        int err;
+		if (!addChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
+	} else {
+        removeChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex);
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceModeQ(scpi_t *context) { 
+	auto &slotAndSubchannelIndex = *getSelectedChannel(context);
+
+    int resourceIndex = 0;
+
+    TriggerMode triggerMode;
+    int err;
+	if (!g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceTriggerMode(slotAndSubchannelIndex.subchannelIndex, resourceIndex, triggerMode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_triggerModeDigitalOutputChoice, triggerMode);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalOutputMode(scpi_t *context) {
+	auto &slotAndSubchannelIndex = *getSelectedChannel(context);
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+	if (pin < 1) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
+
+	int32_t triggerMode;
+	if (!SCPI_ParamChoice(context, g_triggerModeDigitalOutputChoice, &triggerMode, true)) {
+		return SCPI_RES_ERR;
+	}
+
+	if (!trigger::isIdle()) {
+		SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+		return SCPI_RES_ERR;
+	}
+
+	if (g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex.subchannelIndex, 0) != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+		return SCPI_RES_ERR;
+	}
+
+	int resourceIndex = pin - 1;
+
+	int err;
+	if (!channel_dispatcher::setTriggerMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, (TriggerMode)triggerMode, &err)) {
+		SCPI_ErrorPush(context, err);
+		return SCPI_RES_ERR;
+	}
+
+	if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+        int err;
+		if (!addChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, &err)) {
+            SCPI_ErrorPush(context, err);
+            return SCPI_RES_ERR;
+        }
+	} else {
+        removeChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex);
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalOutputModeQ(scpi_t *context) {
+	auto &slotAndSubchannelIndex = *getSelectedChannel(context);
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+	if (pin < 1) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
+
+	if (g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex.subchannelIndex, 0) != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+		return SCPI_RES_ERR;
+	}
+	
+	int resourceIndex = pin - 1;
+
+    TriggerMode triggerMode;
+    int err;
+	if (!g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceTriggerMode(slotAndSubchannelIndex.subchannelIndex, resourceIndex, triggerMode, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_triggerModeDigitalOutputChoice, triggerMode);
+
+    return SCPI_RES_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static scpi_choice_def_t g_waveformChoice[] = {
+    { "DC", WAVEFORM_DC },
+    { "SINe", WAVEFORM_SINE_WAVE },
+    { "TRIangle", WAVEFORM_TRIANGLE },
+    { "SQUare", WAVEFORM_SQUARE_WAVE },
+    { "PULSe", WAVEFORM_PULSE },
+    { "SAWTooth", WAVEFORM_SAWTOOTH },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+static scpi_choice_def_t g_waveformChoiceDigitalOutput[] = {
+    { "SQUare", WAVEFORM_SQUARE_WAVE },
+    { "PULSe", WAVEFORM_PULSE },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_sourceVoltageFunctionShape(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t waveform;
+    if (!SCPI_ParamChoice(context, g_waveformChoice, &waveform, true)) {
+        return SCPI_RES_ERR;
+    }
+
+	if (!trigger::isIdle()) {
+		SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+		return SCPI_RES_ERR;
+	}
+
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (!channel) {
+		SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+		return SCPI_RES_ERR;
+    }
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setWaveform(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, (Waveform)waveform, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageFunctionShapeQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (!channel) {
+		SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+		return SCPI_RES_ERR;
+    }
+
+    int resourceIndex = 0;
+
+    Waveform waveform;
+    int err;
+	if (!getWaveform(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, waveform, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_waveformChoice, waveform);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentFunctionShape(scpi_t *context) { 
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    int32_t waveform;
+    if (!SCPI_ParamChoice(context, g_waveformChoice, &waveform, true)) {
+        return SCPI_RES_ERR;
+    }
+
+	if (!trigger::isIdle()) {
+		SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+		return SCPI_RES_ERR;
+	}
+
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (!channel) {
+		SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+		return SCPI_RES_ERR;
+    }
+
+    int resourceIndex = 1;
+
+    int err;
+    if (!setWaveform(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, (Waveform)waveform, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentFunctionShapeQ(scpi_t *context) {
+    SlotAndSubchannelIndex slotAndSubchannelIndex;
+    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+        return SCPI_RES_ERR;
+    }
+
+    Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+    if (!channel) {
+		SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+		return SCPI_RES_ERR;
+    }
+
+    int resourceIndex = 1;
+
+    Waveform waveform;
+    int err;
+	if (!getWaveform(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, waveform, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_waveformChoice, waveform);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceFunctionShape(scpi_t *context) {
+	auto &slotAndSubchannelIndex = *getSelectedChannel(context);
+
+    int32_t waveform;
+    if (!SCPI_ParamChoice(context, g_waveformChoice, &waveform, true)) {
+        return SCPI_RES_ERR;
+    }
+
+	if (!trigger::isIdle()) {
+		SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setWaveform(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, (Waveform)waveform, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceFunctionShapeQ(scpi_t *context) {
+	auto &slotAndSubchannelIndex = *getSelectedChannel(context);
+
+    int resourceIndex = 0;
+
+    Waveform waveform;
+    int err;
+	if (!getWaveform(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, waveform, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_waveformChoice, waveform);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalOutputFunctionShape(scpi_t *context) {
+	auto &slotAndSubchannelIndex = *getSelectedChannel(context);
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+	if (pin < 1) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
+
+    int32_t waveform;
+    if (!SCPI_ParamChoice(context, g_waveformChoiceDigitalOutput, &waveform, true)) {
+        return SCPI_RES_ERR;
+    }
+
+	if (!trigger::isIdle()) {
+		SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+		return SCPI_RES_ERR;
+	}
+
+	if (g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex.subchannelIndex, 0) != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+		return SCPI_RES_ERR;
+	}
+
+	int resourceIndex = pin - 1;
+
+    int err;
+    if (!setWaveform(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, (Waveform)waveform, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalOutputFunctionShapeQ(scpi_t *context) {
+	auto &slotAndSubchannelIndex = *getSelectedChannel(context);
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+	if (pin < 1) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
+
+	if (g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex.subchannelIndex, 0) != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+		return SCPI_RES_ERR;
+	}
+	
+	int resourceIndex = pin - 1;
+
+    Waveform waveform;
+    int err;
+	if (!getWaveform(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, waveform, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_waveformChoiceDigitalOutput, waveform);
+
+    return SCPI_RES_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+scpi_result_t getSweepParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, float &param, bool powerChannel = false) {
+	if (powerChannel) {
+		if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+			return SCPI_RES_ERR;
+		}
+	} else {
+		slotAndSubchannelIndex = *getSelectedChannel(context);
+	}
+
+	if (!SCPI_ParamFloat(context, &param, true)) {
+		return SCPI_RES_ERR;
+	}
+
+	if (!trigger::isIdle()) {
+		SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+		return SCPI_RES_ERR;
+	}
+
+	if (powerChannel) {
+		Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+		if (!channel) {
+			SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+			return SCPI_RES_ERR;
+		}
+	}
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t getSweepChannel(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, bool powerChannel = true) {
+	if (powerChannel) {
+		if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+			return SCPI_RES_ERR;
+		}
+	} else {
+		slotAndSubchannelIndex = *getSelectedChannel(context);
+	}
+
+	if (powerChannel) {
+		Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex);
+		if (!channel) {
+			SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+			return SCPI_RES_ERR;
+		}
+	}
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t getSweepParamDigital(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, int32_t &pin, float &param) {
+	slotAndSubchannelIndex = *getSelectedChannel(context);
+
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+	if (pin < 1) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
+
+	if (!SCPI_ParamFloat(context, &param, true)) {
+		return SCPI_RES_ERR;
+	}
+
+	if (!trigger::isIdle()) {
+		SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+		return SCPI_RES_ERR;
+	}
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t getSweepChannelDigital(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, int32_t &pin) {
+	slotAndSubchannelIndex = *getSelectedChannel(context);
+
+    if (!SCPI_ParamInt(context, &pin, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+	if (pin < 1) {
+		SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+		return SCPI_RES_ERR;
+	}
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageSweepFrequency(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+	
+    int resourceIndex = 0;
+
+    int err;
+    if (!setFrequency(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageSweepFrequencyQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    float param;
+    int err;
+	if (!getFrequency(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageSweepPhaseshift(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setPhaseShift(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageSweepPhaseshiftQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    float param;
+    int err;
+	if (!getPhaseShift(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageSweepAmplitude(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setAmplitude(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageSweepAmplitudeQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    float param;
+    int err;
+	if (!getAmplitude(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageSweepOffset(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setOffset(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageSweepOffsetQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    float param;
+    int err;
+	if (!getOffset(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageSweepPulsewidth(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setPulseWidth(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceVoltageSweepPulsewidthQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    float param;
+    int err;
+	if (!getPulseWidth(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentSweepFrequency(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 1;
+
+    int err;
+    if (!setFrequency(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentSweepFrequencyQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 1;
+
+    float param;
+    int err;
+	if (!getFrequency(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentSweepPhaseshift(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 1;
+
+    int err;
+    if (!setPhaseShift(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentSweepPhaseshiftQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 1;
+
+    float param;
+    int err;
+	if (!getPhaseShift(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentSweepAmplitude(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 1;
+
+    int err;
+    if (!setAmplitude(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentSweepAmplitudeQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 1;
+
+    float param;
+    int err;
+	if (!getAmplitude(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentSweepOffset(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 1;
+
+    int err;
+    if (!setOffset(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentSweepOffsetQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 1;
+
+    float param;
+    int err;
+	if (!getOffset(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentSweepPulsewidth(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 1;
+
+    int err;
+    if (!setPulseWidth(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceCurrentSweepPulsewidthQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 1;
+
+    float param;
+    int err;
+	if (!getPulseWidth(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceSweepFrequency(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setFrequency(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceSweepFrequencyQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    float param;
+    int err;
+	if (!getFrequency(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceSweepPhaseshift(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setPhaseShift(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+
+}
+
+scpi_result_t scpi_cmd_sourceSweepPhaseshiftQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    float param;
+    int err;
+	if (!getPhaseShift(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceSweepAmplitude(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setAmplitude(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceSweepAmplitudeQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    float param;
+    int err;
+	if (!getAmplitude(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceSweepOffset(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setOffset(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+
+}
+
+scpi_result_t scpi_cmd_sourceSweepOffsetQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    float param;
+    int err;
+	if (!getOffset(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceSweepPulsewidth(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	float param;
+	if (getSweepParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    int err;
+    if (!setPulseWidth(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceSweepPulsewidthQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+	if (getSweepChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+    int resourceIndex = 0;
+
+    float param;
+    int err;
+	if (!getPulseWidth(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalOutputSweepFrequency(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+    int32_t pin;
+	float param;
+	if (getSweepParamDigital(context, slotAndSubchannelIndex, pin, param) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+	if (g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex.subchannelIndex, 0) != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+		return SCPI_RES_ERR;
+	}
+	
+	int resourceIndex = pin - 1;
+
+    int err;
+    if (!setFrequency(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalOutputSweepFrequencyQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+    int32_t pin;
+	if (getSweepChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+	if (g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex.subchannelIndex, 0) != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+		return SCPI_RES_ERR;
+	}
+	
+	int resourceIndex = pin - 1;
+
+    float param;
+    int err;
+	if (!getFrequency(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalOutputSweepPhaseshift(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+    int32_t pin;
+	float param;
+	if (getSweepParamDigital(context, slotAndSubchannelIndex, pin, param) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+	if (g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex.subchannelIndex, 0) != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+		return SCPI_RES_ERR;
+	}
+	
+	int resourceIndex = pin - 1;
+
+    int err;
+    if (!setPhaseShift(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalOutputSweepPhaseshiftQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+    int32_t pin;
+	if (getSweepChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+	if (g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex.subchannelIndex, 0) != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+		return SCPI_RES_ERR;
+	}
+	
+	int resourceIndex = pin - 1;
+
+    float param;
+    int err;
+	if (!getPhaseShift(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalOutputSweepPulsewidth(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+    int32_t pin;
+	float param;
+	if (getSweepParamDigital(context, slotAndSubchannelIndex, pin, param) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+	if (g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex.subchannelIndex, 0) != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+		return SCPI_RES_ERR;
+	}
+	
+	int resourceIndex = pin - 1;
+
+    int err;
+    if (!setPulseWidth(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceDigitalOutputSweepPulsewidthQ(scpi_t *context) {
+	SlotAndSubchannelIndex slotAndSubchannelIndex;
+    int32_t pin;
+	if (getSweepChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
+		return SCPI_RES_ERR;
+	}
+
+	if (g_slots[slotAndSubchannelIndex.slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex.subchannelIndex, 0) != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+		SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+		return SCPI_RES_ERR;
+	}
+	
+	int resourceIndex = pin - 1;
+
+    float param;
+    int err;
+	if (!getPulseWidth(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, param, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultFloat(context, param);
+
+	return SCPI_RES_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static scpi_choice_def_t g_functionGeneratorResourceType[] = {
+    { "VOLTage", FUNCTION_GENERATOR_RESOURCE_TYPE_U },
+    { "CURRent", FUNCTION_GENERATOR_RESOURCE_TYPE_I },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_sourceFunctionMode(scpi_t *context) {
+	auto &slotAndSubchannelIndex = *getSelectedChannel(context);
+	
+    int32_t resourceType;
+    if (!SCPI_ParamChoice(context, g_functionGeneratorResourceType, &resourceType, true)) {
+        return SCPI_RES_ERR;
+    }
+
+	if (!trigger::isIdle()) {
+		SCPI_ErrorPush(context, SCPI_ERROR_CANNOT_CHANGE_TRANSIENT_TRIGGER);
+		return SCPI_RES_ERR;
+	}
+
+	int resourceIndex = 0;
+
+    int err;
+    if (!setResourceType(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, (FunctionGeneratorResourceType)resourceType, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_sourceFunctionModeQ(scpi_t *context) {
+	auto &slotAndSubchannelIndex = *getSelectedChannel(context);
+	
+	int resourceIndex = 0;
+
+    FunctionGeneratorResourceType resourceType;
+    int err;
+    if (!getResourceType(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, resourceType, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+    
+    resultChoiceName(context, g_functionGeneratorResourceType, resourceType);
+
+	return SCPI_RES_OK;
 }
 
 } // namespace scpi

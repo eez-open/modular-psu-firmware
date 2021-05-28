@@ -750,6 +750,13 @@ int PsuModule::getNumFunctionGeneratorResources(int subchannelIndex) {
 	if (channel->channelIndex == 1 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES)) {
 		return 0;
 	}
+    if (channel->flags.trackingEnabled) {
+        for (int i = 0; i < channel->channelIndex; i++) {
+            if (Channel::get(i).flags.trackingEnabled) {
+                return 0;
+            }
+        }
+    }
 	return 2;
 }
 
@@ -757,18 +764,44 @@ FunctionGeneratorResourceType PsuModule::getFunctionGeneratorResourceType(int su
 	return resourceIndex == 0 ? FUNCTION_GENERATOR_RESOURCE_TYPE_U : FUNCTION_GENERATOR_RESOURCE_TYPE_I;
 }
 
-TriggerMode PsuModule::getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex) {
+bool PsuModule::getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode &triggerMode, int *err) {
     auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
-    return resourceIndex == 0 ? channel_dispatcher::getVoltageTriggerMode(*channel) : channel_dispatcher::getCurrentTriggerMode(*channel);
+
+    if (resourceIndex == 0) {
+        triggerMode = channel_dispatcher::getVoltageTriggerMode(*channel);
+        return true;
+    }
+
+    if (resourceIndex == 1) {
+        triggerMode = channel_dispatcher::getCurrentTriggerMode(*channel);
+        return true;
+    }
+
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+
+    return false;
 }
 
-void PsuModule::setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode) {
+bool PsuModule::setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode, int *err) {
     auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+
     if (resourceIndex == 0) {
         channel_dispatcher::setVoltageTriggerMode(*channel, triggerMode);
-    } else {
-        channel_dispatcher::setCurrentTriggerMode(*channel, triggerMode);
+        return true;
     }
+
+    if (resourceIndex == 1) {
+        channel_dispatcher::setCurrentTriggerMode(*channel, triggerMode);
+        return true;
+    }
+
+    if (err) {
+        *err = SCPI_ERROR_HARDWARE_MISSING;
+    }
+
+    return false;
 }
 
 const char *PsuModule::getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) {

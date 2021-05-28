@@ -1901,6 +1901,10 @@ void setCurrentTriggerMode(Channel &channel, TriggerMode mode) {
     }
 }
 
+bool setTriggerMode(int slotIndex, int subchannelIndex, int resourceIndex, TriggerMode mode, int *err) {
+    return g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, mode, err);
+}
+
 bool getTriggerOutputState(Channel &channel) {
     if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
         return Channel::get(0).getTriggerOutputState();

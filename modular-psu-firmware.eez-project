@@ -70878,7 +70878,7 @@
                 "type": [
                   {
                     "type": "discrete",
-                    "enumeration": "Mode1"
+                    "enumeration": "TriggerMode"
                   }
                 ],
                 "isOptional": false
@@ -71566,7 +71566,7 @@
                 "type": [
                   {
                     "type": "discrete",
-                    "enumeration": "Mode1"
+                    "enumeration": "TriggerMode"
                   }
                 ],
                 "isOptional": false
@@ -72318,6 +72318,762 @@
               "type": [
                 {
                   "type": "nr3"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:MODE",
+            "parameters": [
+              {
+                "name": "mode",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "TriggerModeDigitalOutput"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:MODE?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "TriggerModeDigitalOutput"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:DIGital[:OUTPut]:MODE",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "mode",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "TriggerModeDigitalOutput"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:DIGital[:OUTPut]:MODE?",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "TriggerModeDigitalOutput"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:SHAPe",
+            "parameters": [
+              {
+                "name": "shape",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "SourceFunctionShape"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:SHAPe?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "SourceFunctionShape"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:SHAPe",
+            "parameters": [
+              {
+                "name": "shape",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "SourceFunctionShape"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:SHAPe?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "SourceFunctionShape"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:FUNCtion:SHAPe",
+            "parameters": [
+              {
+                "name": "shape",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "SourceFunctionShape"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:FUNCtion:SHAPe?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "SourceFunctionShape"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe",
+            "parameters": [
+              {
+                "name": "shape",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "SourceFunctionShapeDigitalOutput"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "SourceFunctionShapeDigitalOutput"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:FREQuency",
+            "parameters": [
+              {
+                "name": "frequency",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:FREQuency?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:PHASeshift",
+            "parameters": [
+              {
+                "name": "phase_shift",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:PHASeshift?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:AMPLitude",
+            "parameters": [
+              {
+                "name": "amplitude",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:AMPLitude?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:OFFSet",
+            "parameters": [
+              {
+                "name": "offset",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:OFFSet?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:PULSewidth",
+            "parameters": [
+              {
+                "name": "pulse_width",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:PULSewidth?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:SWEep:FREQuency",
+            "parameters": [
+              {
+                "name": "frequency",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:SWEep:FREQuency?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:SWEep:PHASeshift",
+            "parameters": [
+              {
+                "name": "phase_shift",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:SWEep:PHASeshift?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:SWEep:AMPLitude",
+            "parameters": [
+              {
+                "name": "amplitude",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:SWEep:AMPLitude?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:SWEep:OFFSet",
+            "parameters": [
+              {
+                "name": "offset",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:SWEep:OFFSet?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:SWEep:PULSewidth",
+            "parameters": [
+              {
+                "name": "pulse_width",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:SWEep:PULSewidth?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:SWEep:FREQuency",
+            "parameters": [
+              {
+                "name": "frequency",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:SWEep:FREQuency?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:SWEep:PHASeshift",
+            "parameters": [
+              {
+                "name": "phase_shift",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:SWEep:PHASeshift?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:SWEep:AMPLitude",
+            "parameters": [
+              {
+                "name": "amplitude",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:SWEep:AMPLitude?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:SWEep:OFFSet",
+            "parameters": [
+              {
+                "name": "offset",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:SWEep:OFFSet?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:SWEep:PULSewidth",
+            "parameters": [
+              {
+                "name": "pulse_width",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:SWEep:PULSewidth?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:DIGital[:OUTPut]:SWEep:FREQuency",
+            "parameters": [
+              {
+                "name": "frequency",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:DIGital[:OUTPut]:SWEep:FREQuency?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:DIGital[:OUTPut]:SWEep:PHASeshift",
+            "parameters": [
+              {
+                "name": "phase_shift",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:DIGital[:OUTPut]:SWEep:PHASeshift?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:DIGital[:OUTPut]:SWEep:PULSewidth",
+            "parameters": [
+              {
+                "name": "pulse_width",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:DIGital[:OUTPut]:SWEep:PULSewidth?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SOURce:FUNCtion:MODE",
+            "parameters": [
+              {
+                "name": "mode",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "SourceFunction"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SOURce:FUNCtion:MODE?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "SourceFunction"
                 }
               ]
             }
@@ -76429,7 +77185,7 @@
         ]
       },
       {
-        "name": "Mode1",
+        "name": "TriggerMode",
         "members": [
           {
             "name": "FIXed",
@@ -76442,6 +77198,23 @@
           {
             "name": "STEP",
             "value": "3"
+          },
+          {
+            "name": "FUNCgen",
+            "value": "4"
+          }
+        ]
+      },
+      {
+        "name": "TriggerModeDigitalOutput",
+        "members": [
+          {
+            "name": "FIXed",
+            "value": "1"
+          },
+          {
+            "name": "FUNCgen",
+            "value": "4"
           }
         ]
       },
@@ -77268,6 +78041,48 @@
           {
             "name": "SCPI",
             "value": "1"
+          }
+        ]
+      },
+      {
+        "name": "SourceFunctionShape",
+        "members": [
+          {
+            "name": "DC",
+            "value": "1"
+          },
+          {
+            "name": "SINe",
+            "value": "2"
+          },
+          {
+            "name": "TRIangle",
+            "value": "3"
+          },
+          {
+            "name": "SQUare",
+            "value": "4"
+          },
+          {
+            "name": "PULSe",
+            "value": "5"
+          },
+          {
+            "name": "SAWTooth",
+            "value": "6"
+          }
+        ]
+      },
+      {
+        "name": "SourceFunctionShapeDigitalOutput",
+        "members": [
+          {
+            "name": "SQUare",
+            "value": "4"
+          },
+          {
+            "name": "PULSe",
+            "value": "5"
           }
         ]
       }

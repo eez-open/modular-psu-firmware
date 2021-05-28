@@ -58,9 +58,10 @@ void setProfileParameters(const psu::profile::Parameters &profileParams);
 bool writeProfileProperties(psu::profile::WriteContext &ctx, const psu::profile::Parameters &profileParams);
 bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Parameters &profileParams);
 
-void addChannelWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex);
+bool addChannelWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex, int *err = nullptr);
 void addChannelWaveformParameters(psu::Channel &channel);
 
+void removeChannelWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex);
 void removeAllChannels();
 void removePowerChannels();
 void removeOtherTrackingChannels();
@@ -68,6 +69,27 @@ void removeOtherTrackingChannels();
 void selectWaveformParametersForChannel(int slotIndex, int subchannelIndex, int resourceIndex);
 
 int getNumChannelsInFunctionGeneratorTriggerMode();
+
+bool getWaveform(int slotIndex, int subchannelIndex, int resourceIndex, Waveform &waveform, int *err);
+bool setWaveform(int slotIndex, int subchannelIndex, int resourceIndex, Waveform waveform, int *err);
+
+bool getFrequency(int slotIndex, int subchannelIndex, int resourceIndex, float &frequency, int *err);
+bool setFrequency(int slotIndex, int subchannelIndex, int resourceIndex, float frequency, int *err);
+
+bool getPhaseShift(int slotIndex, int subchannelIndex, int resourceIndex, float &phaseShift, int *err);
+bool setPhaseShift(int slotIndex, int subchannelIndex, int resourceIndex, float phaseShift, int *err);
+
+bool getAmplitude(int slotIndex, int subchannelIndex, int resourceIndex, float &amplitude, int *err);
+bool setAmplitude(int slotIndex, int subchannelIndex, int resourceIndex, float amplitude, int *err);
+
+bool getOffset(int slotIndex, int subchannelIndex, int resourceIndex, float &offset, int *err);
+bool setOffset(int slotIndex, int subchannelIndex, int resourceIndex, float offset, int *err);
+
+bool getPulseWidth(int slotIndex, int subchannelIndex, int resourceIndex, float &pulseWidth, int *err);
+bool setPulseWidth(int slotIndex, int subchannelIndex, int resourceIndex, float pulseWidth, int *err);
+
+bool getResourceType(int slotIndex, int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType &resourceType, int *err);
+bool setResourceType(int slotIndex, int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, int *err);
 
 bool isActive();
 void executionStart();

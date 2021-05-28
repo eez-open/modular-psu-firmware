@@ -541,10 +541,6 @@ void ChSettingsTriggerPage::set() {
     channel_dispatcher::setCurrentRampDuration(*g_channel, currentRampDuration);
     channel_dispatcher::setOutputDelayDuration(*g_channel, outputDelayDuration);
 
-	if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-		function_generator::addChannelWaveformParameters(*g_channel);
-	}
-
     pageAlloc();    
 }
 

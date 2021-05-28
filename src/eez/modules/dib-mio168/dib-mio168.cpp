@@ -4536,29 +4536,54 @@ public:
         return FUNCTION_GENERATOR_RESOURCE_TYPE_U;
     }
 
-    TriggerMode getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex) override {
+    bool getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode &triggerMode, int *err) override {
         if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
-            return doutChannel.m_triggerMode[resourceIndex];
-        } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
-            return channel.m_triggerMode;
-        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            auto &channel = aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX];
-            return channel.m_triggerMode;
+            triggerMode = doutChannel.m_triggerMode[resourceIndex];
+            return true;
         }
-        return TRIGGER_MODE_FIXED;
+        
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
+            triggerMode = channel.m_triggerMode;
+            return true;
+        }
+        
+        if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            auto &channel = aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX];
+            triggerMode = channel.m_triggerMode;
+            return true;
+        }
+        
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+
+        return false;
     }
 
-    void setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode) override {
+    bool setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode, int *err) override {
         if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
             doutChannel.m_triggerMode[resourceIndex] = triggerMode;
-        } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+            return true;
+        }
+
+        if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
             channel.m_triggerMode = triggerMode;
-        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            return true;
+        }
+
+        if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             auto &channel = aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX];
             channel.m_triggerMode = triggerMode;
+            return true;
         }
+
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+
+        return false;    
     }
 
     const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) override {

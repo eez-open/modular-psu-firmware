@@ -1318,12 +1318,30 @@ public:
         return FUNCTION_GENERATOR_RESOURCE_TYPE_U;
     }
 
-    TriggerMode getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex) override {
-        return aoutTriggerMode[subchannelIndex];
+    bool getFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode &triggerMode, int *err) override {
+        if (subchannelIndex == 0 || subchannelIndex == 1) {
+            triggerMode = aoutTriggerMode[subchannelIndex];
+            return true;
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+
+        return false;
     }
 
-    void setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode) override {
-        aoutTriggerMode[subchannelIndex] = triggerMode;
+    bool setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode, int *err) override {
+        if (subchannelIndex == 0 || subchannelIndex == 1) {
+            aoutTriggerMode[subchannelIndex] = triggerMode;
+            return true;
+        }
+
+        if (err) {
+            *err = SCPI_ERROR_HARDWARE_MISSING;
+        }
+
+        return false;    
     }
 
     const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) override {
