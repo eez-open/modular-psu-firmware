@@ -1421,6 +1421,12 @@ public:
 
         gui::popPage();
 
+        DlogParamsPage::g_parameters.comment[0] = 0;
+        DlogParamsPage::g_parameters.xAxis.label[0] = 0;
+        for (int i = 0; i < DlogParamsPage::g_parameters.numYAxes; i++) {
+            DlogParamsPage::g_parameters.yAxes[i].label[0] = 0;
+        }
+
         memcpy(&dlog_record::g_recordingParameters, &DlogParamsPage::g_parameters, sizeof(DlogParamsPage::g_parameters));
 
         stringCopy(dlog_record::g_recordingParameters.filePath, sizeof(dlog_record::g_recordingParameters.filePath), filePath);
