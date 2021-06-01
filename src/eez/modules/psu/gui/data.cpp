@@ -1709,6 +1709,18 @@ void data_slot3_channel_index(DataOperationEnum operation, Cursor cursor, Value 
     data_slot_channel_index(g_slotIndexes[2], Channel::getBySlotIndex(g_slotIndexes[2]), operation, cursor, value);
 }
 
+void data_slot1_non_mapped_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+	data_slot_channel_index(0, Channel::getBySlotIndex(0), operation, cursor, value);
+}
+
+void data_slot2_non_mapped_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+	data_slot_channel_index(1, Channel::getBySlotIndex(1), operation, cursor, value);
+}
+
+void data_slot3_non_mapped_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
+	data_slot_channel_index(2, Channel::getBySlotIndex(2), operation, cursor, value);
+}
+
 void data_slot_max_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
     int channelIndex = persist_conf::getMaxChannelIndex();
     data_slot_channel_index(persist_conf::getMaxSlotIndex(), channelIndex == -1 ? nullptr : &Channel::get(channelIndex), operation, cursor, value);

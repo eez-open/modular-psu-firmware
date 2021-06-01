@@ -99,7 +99,7 @@ struct WaveformParameters {
 	float phaseShift;
 	float amplitude;
 	float offset;
-	float pulseWidth;
+	float dutyCycle;
 };
 
 struct SetParams {
@@ -352,7 +352,7 @@ public:
                     params.aoutWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
                     params.aoutWaveformParameters[i].amplitude = calibrationEnabled[i] && isVoltageCalibrationExists(i) ? calibration::remapValue(waveformParameters->amplitude, calConf[i].u) : waveformParameters->amplitude;
                     params.aoutWaveformParameters[i].offset = calibrationEnabled[i] && isVoltageCalibrationExists(i) ? calibration::remapValue(waveformParameters->offset, calConf[i].u) : waveformParameters->offset;
-                    params.aoutWaveformParameters[i].pulseWidth = waveformParameters->pulseWidth;
+                    params.aoutWaveformParameters[i].dutyCycle = waveformParameters->dutyCycle;
                 } else {
                     params.aoutWaveformParameters[i].waveform = Waveform::WAVEFORM_NONE;
                 }
@@ -576,6 +576,7 @@ public:
                     response->command = 0x8000 | currentCommand->command;
 
                     if (currentCommand->command == COMMAND_GET_INFO) {
+						response->getInfo.moduleType = MODULE_TYPE_DIB_SMX46;
                         response->getInfo.firmwareMajorVersion = 1;
                         response->getInfo.firmwareMinorVersion = 0;
                         response->getInfo.idw0 = 0;
@@ -713,7 +714,7 @@ public:
     }
 
     int getLabelsAndColorsPageId() override {
-        return PAGE_ID_DIB_SMX46_LABELS_AND_COLORS;
+        return getTestResult() == TEST_OK ? PAGE_ID_DIB_SMX46_LABELS_AND_COLORS : PAGE_ID_NONE;
     }
 
     void onLowPriorityThreadMessage(uint8_t type, uint32_t param) override {

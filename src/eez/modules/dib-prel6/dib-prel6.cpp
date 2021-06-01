@@ -506,7 +506,8 @@ public:
                     response->command = 0x8000 | currentCommand->command;
 
                     if (currentCommand->command == COMMAND_GET_INFO) {
-                        response->getInfo.firmwareMajorVersion = 1;
+						response->getInfo.moduleType = MODULE_TYPE_DIB_PREL6;
+						response->getInfo.firmwareMajorVersion = 1;
                         response->getInfo.firmwareMinorVersion = 0;
                         response->getInfo.idw0 = 0;
                         response->getInfo.idw1 = 0;
@@ -616,7 +617,7 @@ public:
     }
 
     int getLabelsAndColorsPageId() override {
-        return PAGE_ID_DIB_PREL6_LABELS_AND_COLORS;
+        return getTestResult() == TEST_OK ? PAGE_ID_DIB_PREL6_LABELS_AND_COLORS : PAGE_ID_NONE;
     }
 
     struct ProfileParameters : public Module::ProfileParameters {

@@ -52,19 +52,23 @@ namespace function_generator {
 
 static EnumItem g_waveformEnumDefinition[] = {
 	{ WAVEFORM_DC, "\xc9 DC" },
-	{ WAVEFORM_SINE_WAVE, "\xc3 Sine wave" },
+	{ WAVEFORM_SINE, "\xc3 Sine" },
+	{ WAVEFORM_SINE_HALF, "\xca Sine Half" },
+	{ WAVEFORM_SINE_RECTIFIED, "\xcb Sine Rectified" },
 	{ WAVEFORM_TRIANGLE, "\xc4 Triangle" },
-	{ WAVEFORM_SQUARE_WAVE, "\xc5 Square wave" },
+	{ WAVEFORM_SQUARE, "\xc5 Square" },
 	{ WAVEFORM_PULSE, "\xc6 Pulse" },
 	{ WAVEFORM_SAWTOOTH, "\xc7 Sawtooth" },
 	{ WAVEFORM_ARBITRARY, "\xc8 Arbitrary" },
 	{ 0, 0 }
 };
 
-const char *g_waveformShortLabel[8] = {
+const char *g_waveformShortLabel[10] = {
 	"None",
 	"\xc9",
 	"\xc3",
+	"\xca",
+	"\xcb",
 	"\xc4",
 	"\xc5",
 	"\xc6",
@@ -83,19 +87,24 @@ typedef float(*WaveformFunction)(float);
 
 bool g_active;
 
+FunctionGeneratorOptions g_options = {
+	1, /* isFreq */
+	1, /* isAmpl */
+};
+
 WaveformFunction g_waveFormFuncU[CH_MAX];
 float g_phiU[CH_MAX];
 float g_dphiU[CH_MAX];
 float g_amplitudeU[CH_MAX];
 float g_offsetU[CH_MAX];
-float g_pulseWidthsU[CH_MAX];
+float g_dutyCycleU[CH_MAX];
 
 WaveformFunction g_waveFormFuncI[CH_MAX];
 float g_phiI[CH_MAX];
 float g_dphiI[CH_MAX];
 float g_amplitudeI[CH_MAX];
 float g_offsetI[CH_MAX];
-float g_pulseWidthsI[CH_MAX];
+float g_dutyCycleI[CH_MAX];
 
 static const float PERIOD = 0.0002f;
 
@@ -121,73 +130,8 @@ public:
 		popPage();
 	}
 
-    static void draw(const WidgetCursor &widgetCursor) {
-		const Widget *widget = widgetCursor.widget;
-		const Style* style = getStyle(widget->style);
-		drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
-
-		float T = FLT_MIN;
-		float min = FLT_MAX;
-		float max = -FLT_MAX;
-
-		for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
-			if (
-				FunctionGeneratorPage::g_waveformParameters[i].absoluteResourceIndex != -1 &&
-				FunctionGeneratorPage::g_triggerModes[i] == TRIGGER_MODE_FUNCTION_GENERATOR
-			) {
-				auto &waveformParameters = FunctionGeneratorPage::g_waveformParameters[i];
-				float lower = waveformParameters.offset - waveformParameters.amplitude;
-				float upper = waveformParameters.offset + waveformParameters.amplitude;
-				if (lower < min) {
-					min = lower;
-				}
-				if (upper > max) {
-					max = upper;
-				}
-				float t = 2 * (1 / waveformParameters.frequency);
-				if (t > T) {
-					T = t;
-				}
-			}
-		}
-
-		float d = max - min;
-		if (d == 0) {
-			d = 1.0f;
-		}
-		min = min - d * 0.05f;
-		max = max + d * 0.05f;
-	
-		int itemIndex = 0;
-		int selectedItemIndex = -1;
-		for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
-			if (
-				FunctionGeneratorPage::g_waveformParameters[i].absoluteResourceIndex != -1 &&
-				FunctionGeneratorPage::g_triggerModes[i] == TRIGGER_MODE_FUNCTION_GENERATOR
-			) {
-				if (itemIndex != g_selectedItem) {
-					drawWaveform(widgetCursor, i, T, min, max);
-				} else {
-					selectedItemIndex = itemIndex;
-				}
-				itemIndex++;
-			}
-		}
-
-		if (
-			selectedItemIndex != -1 &&
-			FunctionGeneratorPage::g_triggerModes[selectedItemIndex] == TRIGGER_MODE_FUNCTION_GENERATOR
-		) {
-			drawWaveform(widgetCursor, selectedItemIndex, T, min, max, true);
-			drawWaveform(widgetCursor, selectedItemIndex, T, min, max, true, 1);
-		}
-
-		if (g_active) {
-			reloadWaveformParameters();
-		}
-	}
-
-	static void drawWaveform(const WidgetCursor &widgetCursor, int i, float T, float min, float max, bool selected = false, int yOffset = 0);
+	static void draw(const WidgetCursor &widgetCursor);
+	static void drawWaveform(const WidgetCursor &widgetCursor, WaveformParameters &waveformParameters, float T, float min, float max, bool selected = false, int yOffset = 0);
 
 	static int getNumFunctionGeneratorResources() {
 		uint32_t numResources = 0;
@@ -307,12 +251,12 @@ public:
 
 				if (j == MAX_NUM_WAVEFORMS) {
 					waveformParameters[i].absoluteResourceIndex = absoluteResourceIndex;
-					waveformParameters[i].waveform = waveformParameters[i].resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL ? WAVEFORM_SQUARE_WAVE : WAVEFORM_SINE_WAVE;
+					waveformParameters[i].waveform = waveformParameters[i].resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL ? WAVEFORM_SQUARE : WAVEFORM_SINE;
 					waveformParameters[i].frequency = MIN(100.0f, maxFreq);
 					waveformParameters[i].phaseShift = 0;
-					waveformParameters[i].amplitude = (maxAmp - minAmp) / 2;
-					waveformParameters[i].offset = (minAmp + maxAmp) / 2;
-					waveformParameters[i].pulseWidth = 25.0f;
+					waveformParameters[i].amplitude = maxAmp - minAmp;
+					waveformParameters[i].offset = (minAmp + maxAmp) / 2.0f;
+					waveformParameters[i].dutyCycle = 25.0f;
 
 					triggerModes[i] = TRIGGER_MODE_FUNCTION_GENERATOR;
 				} else {
@@ -323,11 +267,11 @@ public:
 					}
 
 					if (
-						waveformParameters[i].offset + waveformParameters[i].amplitude > maxAmp ||
-						waveformParameters[i].offset - waveformParameters[i].amplitude < minAmp
+						waveformParameters[i].offset + waveformParameters[i].amplitude / 2.0f > maxAmp ||
+						waveformParameters[i].offset - waveformParameters[i].amplitude / 2.0f < minAmp
 						) {
-						waveformParameters[i].amplitude = (maxAmp - minAmp) / 2;
-						waveformParameters[i].offset = (minAmp + maxAmp) / 2;
+						waveformParameters[i].amplitude = maxAmp - minAmp;
+						waveformParameters[i].offset = (minAmp + maxAmp) / 2.0f;
 					}
 				}
 
@@ -468,7 +412,23 @@ eez::gui::SetPage *g_pFunctionGeneratorSelectChannelsPage = &g_functionGenerator
 ////////////////////////////////////////////////////////////////////////////////
 
 float dcf(float t) {
-	return 1.0f;
+	return 0.0f;
+}
+
+float sineHalff(float t) {
+	if (t < M_PI_F) {
+		return sinf(t);
+	}
+
+	return 0.0f;
+}
+
+float sineRectifiedf(float t) {
+	if (t < M_PI_F) {
+		return sinf(t);
+	}
+
+	return sinf(t - M_PI_F);
 }
 
 float trianglef(float t) {
@@ -498,10 +458,10 @@ float squaref(float t) {
 	return -1.0f;
 }
 
-static float g_pulseWidth;
+static float g_dutyCycle;
 
 float pulsef(float t) {
-	if (t < g_pulseWidth * 2.0f * M_PI_F / 100.0f) {
+	if (t < g_dutyCycle * 2.0f * M_PI_F / 100.0f) {
 		return 1.0f;
 	}
 	return -1.0f;
@@ -518,14 +478,18 @@ float arbitraryf(float t) {
 WaveformFunction getWaveformFunction(WaveformParameters &waveformParameters) {
 	if (waveformParameters.waveform == WAVEFORM_DC) {
 		return dcf;
-	} else if (waveformParameters.waveform == WAVEFORM_SINE_WAVE) {
+	} else if (waveformParameters.waveform == WAVEFORM_SINE) {
 		return sinf;
+	} else if (waveformParameters.waveform == WAVEFORM_SINE_HALF) {
+		return sineHalff;
+	} else if (waveformParameters.waveform == WAVEFORM_SINE_RECTIFIED) {
+		return sineRectifiedf;
 	} else if (waveformParameters.waveform == WAVEFORM_TRIANGLE) {
 		return trianglef;
-	} else if (waveformParameters.waveform == WAVEFORM_SQUARE_WAVE) {
+	} else if (waveformParameters.waveform == WAVEFORM_SQUARE) {
 		return squaref;
 	} else if (waveformParameters.waveform == WAVEFORM_PULSE) {
-		g_pulseWidth = waveformParameters.pulseWidth;
+		g_dutyCycle = waveformParameters.dutyCycle;
 		return pulsef;
 	} else if (waveformParameters.waveform == WAVEFORM_SAWTOOTH) {
 		return sawtoothf;
@@ -592,23 +556,167 @@ void FunctionGeneratorPage::apply() {
 	FunctionGeneratorPage::g_version++;
 }
 
-void FunctionGeneratorPage::drawWaveform(const WidgetCursor &widgetCursor, int i, float T, float min, float max, bool selected, int yOffset) {
+////////////////////////////////////////////////////////////////////////////////
+
+void FunctionGeneratorPage::draw(const WidgetCursor &widgetCursor) {
+	const Widget *widget = widgetCursor.widget;
+	const Style* style = getStyle(widget->style);
+	drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
+
+	float T = FLT_MIN;
+
+	float minU = FLT_MAX;
+	float maxU = -FLT_MAX;
+
+	float minI = FLT_MAX;
+	float maxI = -FLT_MAX;
+
+	int numDigital = 0;
+
+	for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
+		if (
+			FunctionGeneratorPage::g_waveformParameters[i].absoluteResourceIndex != -1 &&
+			FunctionGeneratorPage::g_triggerModes[i] == TRIGGER_MODE_FUNCTION_GENERATOR
+		) {
+			auto &waveformParameters = FunctionGeneratorPage::g_waveformParameters[i];
+
+			if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+				++numDigital;
+			} else {
+				int slotIndex;
+				int subchannelIndex;
+				int resourceIndex;
+				FunctionGeneratorSelectChannelsPage::findResource(FunctionGeneratorPage::g_waveformParameters[i].absoluteResourceIndex,
+					slotIndex, subchannelIndex, resourceIndex);
+
+				float lower;
+				float upper;
+				g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, lower, upper);
+
+				if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
+					if (lower < minU) {
+						minU = lower;
+					}
+					if (upper > maxU) {
+						maxU = upper;
+					}
+				} else {
+					if (lower < minI) {
+						minI = lower;
+					}
+					if (upper > maxI) {
+						maxI = upper;
+					}
+				}
+			}
+
+			float t = 2 * (1 / waveformParameters.frequency);
+			if (t > T) {
+				T = t;
+			}
+		}
+	}
+
+	float dU = maxU - minU;
+	if (dU == 0) {
+		dU = 1.0f;
+	}
+	minU = minU - dU * 0.05f;
+	maxU = maxU + dU * 0.05f;
+
+	float dI = maxI - minI;
+	if (dI == 0) {
+		dI = 1.0f;
+	}
+	minI = minI - dI * 0.05f;
+	maxI = maxI + dI * 0.05f;
+
+	int itemIndex = 0;
+	int digitalIndex = 0;
+	int selectedItemIndex = -1;
+	int selectedItemDigitalIndex = -1;
+
+	for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
+		auto &waveformParameters = FunctionGeneratorPage::g_waveformParameters[i];
+		auto triggerMode = FunctionGeneratorPage::g_triggerModes[i];
+
+		if (waveformParameters.absoluteResourceIndex != -1 && triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+			if (itemIndex != g_selectedItem) {
+				if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+					auto digitalWaveformParameters = waveformParameters;
+					
+					digitalWaveformParameters.offset = ((numDigital - digitalIndex - 1) + 0.5f) / numDigital;
+					digitalWaveformParameters.amplitude = 1.0f / numDigital - 4.0f / 118.0f;
+					
+					drawWaveform(widgetCursor, digitalWaveformParameters, T, 0, 1.0f);
+				} else {
+					float min = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? minU : minI;
+					float max = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? maxU : maxI;
+					
+					drawWaveform(widgetCursor, waveformParameters, T, min, max);
+				}
+			} else {
+				selectedItemIndex = itemIndex;
+				selectedItemDigitalIndex = digitalIndex;
+			}
+			
+			itemIndex++;
+
+			if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+				digitalIndex++;
+			}
+		}
+	}
+
+	auto triggerMode = FunctionGeneratorPage::g_triggerModes[selectedItemIndex];
+	if (selectedItemIndex != -1 && triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+		auto &waveformParameters = FunctionGeneratorPage::g_waveformParameters[selectedItemIndex];
+
+		if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+			auto digitalWaveformParameters = waveformParameters;
+
+			digitalWaveformParameters.offset = ((numDigital - selectedItemDigitalIndex - 1) + 0.5f) / numDigital;
+			digitalWaveformParameters.amplitude = 1.0f / numDigital - 4.0f / 118.0f;
+
+			drawWaveform(widgetCursor, digitalWaveformParameters, T, 0, 1.0f, true);
+			drawWaveform(widgetCursor, digitalWaveformParameters, T, 0, 1.0f, true, 1);
+		} else {
+			float min = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? minU : minI;
+			float max = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? maxU : maxI;
+			drawWaveform(widgetCursor, waveformParameters, T, min, max, true);
+			drawWaveform(widgetCursor, waveformParameters, T, min, max, true, 1);
+		}
+	}
+
+	if (g_active) {
+		reloadWaveformParameters();
+	}
+}
+
+void FunctionGeneratorPage::drawWaveform(const WidgetCursor &widgetCursor, WaveformParameters &waveformParameters, float T, float min, float max, bool selected, int yOffset) {
 	const Widget *widget = widgetCursor.widget;
 	const Style* style = getStyle(widget->style);
 	font::Font font = styleGetFont(style);
 	int textHeight = font.getHeight();
-
-	auto &waveformParameters = FunctionGeneratorPage::g_waveformParameters[i];
 
 	float frequency = waveformParameters.frequency;
 	float phaseShift = waveformParameters.phaseShift;
 	float amplitude = waveformParameters.amplitude;
 	float offset = waveformParameters.offset;
 
+	if (waveformParameters.waveform == WAVEFORM_DC) {
+		offset = amplitude;
+		amplitude = 0;
+	}
+
 	int slotIndex;
 	int subchannelIndex;
 	int resourceIndex;
 	FunctionGeneratorSelectChannelsPage::findResource(waveformParameters.absoluteResourceIndex, slotIndex, subchannelIndex, resourceIndex);
+
+	float lower;
+	float upper;
+	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, lower, upper);
 
 	auto tmpChannelIndex = g_channelIndex;
 	auto tmpSlotIndex = hmi::g_selectedSlotIndex;
@@ -645,7 +753,12 @@ void FunctionGeneratorPage::drawWaveform(const WidgetCursor &widgetCursor, int i
 		k = floorf(fi / (2 * M_PI));
 		fi = fi - k * (2 * M_PI);
 
-		float yt = offset + amplitude * func(fi);
+		float yt = offset + amplitude * func(fi) / 2.0f;
+		if (yt < lower) {
+			yt = lower;
+		} else if (yt > upper) {
+			yt = upper;
+		}
 
 		int xNext = xLeft + xOffset;
 		int yNext = yBottom - roundf((yt - min) / d * widget->h) - yOffset;
@@ -697,6 +810,8 @@ WaveformParameters *getWaveformParameters(int slotIndex, int subchannelIndex, in
 ////////////////////////////////////////////////////////////////////////////////
 
 void getProfileParameters(psu::profile::Parameters &profileParams) {
+	profileParams.functionGeneratorParameters.options = g_options;
+
 	for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
 		if (g_waveformParameters[i].absoluteResourceIndex != -1) {
 			int slotIndex;
@@ -720,7 +835,7 @@ void getProfileParameters(psu::profile::Parameters &profileParams) {
 			profileWaveformParameters.phaseShift = g_waveformParameters[i].phaseShift;
 			profileWaveformParameters.amplitude = g_waveformParameters[i].amplitude;
 			profileWaveformParameters.offset = g_waveformParameters[i].offset;
-			profileWaveformParameters.pulseWidth = g_waveformParameters[i].pulseWidth;
+			profileWaveformParameters.dutyCycle = g_waveformParameters[i].dutyCycle;
 		} else {
 			profileParams.functionGeneratorParameters.waveformParameters[i].moduleType = MODULE_TYPE_NONE;
 		}
@@ -728,6 +843,9 @@ void getProfileParameters(psu::profile::Parameters &profileParams) {
 }
 
 void setProfileParameters(const psu::profile::Parameters &profileParams) {
+	g_options = profileParams.functionGeneratorParameters.options;
+
+
 	int i;
 	for (i = 0; i < MAX_NUM_WAVEFORMS; i++) {
 		if (profileParams.functionGeneratorParameters.waveformParameters[i].moduleType != MODULE_TYPE_NONE) {
@@ -756,7 +874,7 @@ void setProfileParameters(const psu::profile::Parameters &profileParams) {
 			g_waveformParameters[i].phaseShift = profileWaveformParameters.phaseShift;
 			g_waveformParameters[i].amplitude = profileWaveformParameters.amplitude;
 			g_waveformParameters[i].offset = profileWaveformParameters.offset;
-			g_waveformParameters[i].pulseWidth = profileWaveformParameters.pulseWidth;
+			g_waveformParameters[i].dutyCycle = profileWaveformParameters.dutyCycle;
 		}
 	}
 
@@ -766,6 +884,10 @@ void setProfileParameters(const psu::profile::Parameters &profileParams) {
 }
 
 bool writeProfileProperties(psu::profile::WriteContext &ctx, const psu::profile::Parameters &profileParams) {
+	ctx.group("funcgen_options");
+	WRITE_PROPERTY("isFreq", profileParams.functionGeneratorParameters.options.isFreq);
+	WRITE_PROPERTY("isAmpl", profileParams.functionGeneratorParameters.options.isAmpl);
+
 	for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
 		auto &profileWaveformParameters = profileParams.functionGeneratorParameters.waveformParameters[i];
 
@@ -788,13 +910,18 @@ bool writeProfileProperties(psu::profile::WriteContext &ctx, const psu::profile:
 		WRITE_PROPERTY("phaseShift", profileWaveformParameters.phaseShift);
 		WRITE_PROPERTY("amplitude", profileWaveformParameters.amplitude);
 		WRITE_PROPERTY("offset", profileWaveformParameters.offset);
-		WRITE_PROPERTY("pulseWidth", profileWaveformParameters.pulseWidth);
+		WRITE_PROPERTY("dutyCycle", profileWaveformParameters.dutyCycle);
 	}
 
 	return true;
 }
 
 bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Parameters &profileParams) {
+	if (ctx.matchGroup("funcgen_options")) {
+		READ_FLAG("isFreq", profileParams.functionGeneratorParameters.options.isFreq);
+		READ_FLAG("isAmpl", profileParams.functionGeneratorParameters.options.isAmpl);
+	}
+
     int i;
     if (ctx.matchGroup("funcgen_waveform", i)) {
         --i;
@@ -814,7 +941,7 @@ bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Paramet
 		READ_PROPERTY("phaseShift", profileWaveformParameters.phaseShift);
 		READ_PROPERTY("amplitude", profileWaveformParameters.amplitude);
 		READ_PROPERTY("offset", profileWaveformParameters.offset);
-		READ_PROPERTY("pulseWidth", profileWaveformParameters.pulseWidth);
+		READ_PROPERTY("dutyCycle", profileWaveformParameters.dutyCycle);
 	}
 
 	return false;
@@ -1012,13 +1139,20 @@ bool setWaveform(int slotIndex, int subchannelIndex, int resourceIndex, Waveform
 	}
 	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
 	if (waveformParameters->resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
-		if (waveform != WAVEFORM_SQUARE_WAVE && waveform != WAVEFORM_PULSE) {
+		if (waveform != WAVEFORM_SQUARE && waveform != WAVEFORM_PULSE) {
 			if (err) {
 				*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
 			}
 			return false;
 		}
 	}
+	
+	if (waveformParameters->waveform == WAVEFORM_DC) {
+		return true;
+	} else {
+		waveformParameters->offset = 0;
+	}
+	
 	waveformParameters->waveform = waveform;
 
 	g_functionGeneratorPage.pageAlloc();
@@ -1136,13 +1270,22 @@ bool setAmplitude(int slotIndex, int subchannelIndex, int resourceIndex, float a
 	float max;
 	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters->resourceType, min, max);
 
-	float maxAmplitude = MIN(max - waveformParameters->offset, waveformParameters->offset - min);
-
-	if (amplitude < 0 || amplitude > maxAmplitude) {
-		if (err) {
-			*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+	if (waveformParameters->waveform == WAVEFORM_DC) {
+		if (amplitude < min || amplitude > max) {
+			if (err) {
+				*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+			}
+			return false;
 		}
-		return false;
+	} else {
+		float maxAmplitude = max - min;
+
+		if (amplitude < 0 || amplitude > maxAmplitude) {
+			if (err) {
+				*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+			}
+			return false;
+		}
 	}
 	
 	waveformParameters->amplitude = amplitude;
@@ -1192,7 +1335,7 @@ bool setOffset(int slotIndex, int subchannelIndex, int resourceIndex, float offs
 	float max;
 	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters->resourceType, min, max);
 
-	if (offset < min + waveformParameters->amplitude || offset > max - waveformParameters->amplitude) {
+	if (offset < min || offset > max) {
 		if (err) {
 			*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
 		}
@@ -1206,7 +1349,7 @@ bool setOffset(int slotIndex, int subchannelIndex, int resourceIndex, float offs
 	return true;
 }
 
-bool getPulseWidth(int slotIndex, int subchannelIndex, int resourceIndex, float &pulseWidth, int *err) {
+bool getDutyCycle(int slotIndex, int subchannelIndex, int resourceIndex, float &dutyCycle, int *err) {
 	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
 	if (!waveformParameters) {
 		if (err) {
@@ -1214,25 +1357,25 @@ bool getPulseWidth(int slotIndex, int subchannelIndex, int resourceIndex, float 
 		}
 		return false;
 	}
-	pulseWidth = waveformParameters->pulseWidth;
+	dutyCycle = waveformParameters->dutyCycle;
 	return true;
 }
 
-bool setPulseWidth(int slotIndex, int subchannelIndex, int resourceIndex, float pulseWidth, int *err) {
+bool setDutyCycle(int slotIndex, int subchannelIndex, int resourceIndex, float dutyCycle, int *err) {
 	if (!addChannelWaveformParameters(slotIndex, subchannelIndex, resourceIndex, err)) {
 		return false;
 	}
 	
 	WaveformParameters *waveformParameters = getWaveformParameters(slotIndex, subchannelIndex, resourceIndex);
 	
-	if (pulseWidth < 0 || pulseWidth > 100.0f) {
+	if (dutyCycle < 0 || dutyCycle > 100.0f) {
 		if (err) {
 			*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
 		}
 		return false;
 	}
 
-	waveformParameters->pulseWidth = pulseWidth;
+	waveformParameters->dutyCycle = dutyCycle;
 
 	g_functionGeneratorPage.pageAlloc();
 	
@@ -1275,11 +1418,41 @@ bool setResourceType(int slotIndex, int subchannelIndex, int resourceIndex, Func
 		return false;
 	}
 
-	waveformParameters->resourceType = resourceType;
+	float minFreq;
+	float maxFreq;
+	g_slots[slotIndex]->getFunctionGeneratorFrequencyInfo(subchannelIndex, resourceIndex, minFreq, maxFreq);
+
+	if (waveformParameters->frequency < minFreq) {
+		waveformParameters->frequency = minFreq;
+	} else if (waveformParameters->frequency > minFreq) {
+		waveformParameters->frequency = maxFreq;
+	}
+
+	float minAmpl;
+	float maxAmpl;
+	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters->resourceType, minAmpl, maxAmpl);
+	if (waveformParameters->frequency > maxAmpl - minAmpl) {
+		waveformParameters->frequency = maxAmpl - minAmpl;
+	}
+	if (waveformParameters->waveform != WAVEFORM_DC) {
+		if (waveformParameters->offset < minAmpl) {
+			waveformParameters->offset = minAmpl;
+		} else if (waveformParameters->offset > maxAmpl) {
+			waveformParameters->offset = maxAmpl;
+		}
+	}
+
+ 	waveformParameters->resourceType = resourceType;
 
 	g_functionGeneratorPage.pageAlloc();
 
 	return true;
+}
+
+void reset() {
+	g_options.isFreq = 1;
+	g_options.isAmpl = 1;
+	removeAllChannels();
 }
 
 bool isActive() {
@@ -1372,21 +1545,35 @@ void reloadWaveformParameters() {
 #endif
 			if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
 				g_waveFormFuncU[channel->channelIndex] = getWaveformFunction(waveformParameters);
-				g_pulseWidthsU[channel->channelIndex] = g_pulseWidth;
+				g_dutyCycleU[channel->channelIndex] = g_dutyCycle;
 				g_phiU[channel->channelIndex] = waveformParameters.phaseShift / 360.0f;
 				g_dphiU[channel->channelIndex] = 2.0f * M_PI_F * waveformParameters.frequency * PERIOD;
-				g_amplitudeU[channel->channelIndex] = waveformParameters.amplitude;
-				g_offsetU[channel->channelIndex] = waveformParameters.offset;
+
+				if (waveformParameters.waveform == WAVEFORM_DC) {
+					g_amplitudeU[channel->channelIndex] = 0.0f;
+					g_offsetU[channel->channelIndex] = waveformParameters.amplitude;
+				} else {
+					g_amplitudeU[channel->channelIndex] = waveformParameters.amplitude;
+					g_offsetU[channel->channelIndex] = waveformParameters.offset;
+				}
 			} else {
 				g_waveFormFuncI[channel->channelIndex] = getWaveformFunction(waveformParameters);
-				g_pulseWidthsI[channel->channelIndex] = g_pulseWidth;
+				g_dutyCycleI[channel->channelIndex] = g_dutyCycle;
 				g_phiI[channel->channelIndex] = waveformParameters.phaseShift / 360.0f;
 				g_dphiI[channel->channelIndex] = 2.0f * M_PI_F * waveformParameters.frequency * PERIOD;
 				g_amplitudeI[channel->channelIndex] = waveformParameters.amplitude;
 				g_offsetI[channel->channelIndex] = waveformParameters.offset;
 
+				if (waveformParameters.waveform == WAVEFORM_DC) {
+					g_amplitudeI[channel->channelIndex] = 0.0f;
+					g_offsetI[channel->channelIndex] = waveformParameters.amplitude;
+				} else {
+					g_amplitudeI[channel->channelIndex] = waveformParameters.amplitude;
+					g_offsetI[channel->channelIndex] = waveformParameters.offset;
+				}
+
 				if (g_slots[slotIndex]->moduleType == MODULE_TYPE_DCP405) {
-					float max = waveformParameters.offset + waveformParameters.amplitude;
+					float max = waveformParameters.offset + waveformParameters.amplitude / 2.0f;
 					if (max > 0.05f) {
 						channel_dispatcher::setCurrentRangeSelectionMode(*channel, CURRENT_RANGE_SELECTION_ALWAYS_HIGH);
 					} else {
@@ -1419,24 +1606,24 @@ void tick() {
         }
 
 		if (channel.flags.voltageTriggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-			g_pulseWidth = g_pulseWidthsU[i];
-			float value = g_offsetU[i] + g_amplitudeU[i] * g_waveFormFuncU[i](g_phiU[i]);
+			g_dutyCycle = g_dutyCycleU[i];
+			float value = g_offsetU[i] + g_amplitudeU[i] * g_waveFormFuncU[i](g_phiU[i]) / 2.0f;
 
 			g_phiU[i] += g_dphiU[i];
 			if (g_phiU[i] >= 2.0f * M_PI_F) {
-				g_phiU[i] = 0;
+				g_phiU[i] -= 2.0f * M_PI_F;
 			}
 
 			channel_dispatcher::setVoltage(channel, value);
 		}
 
 		if (channel.flags.currentTriggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-			g_pulseWidth = g_pulseWidthsI[i];
-			float value = g_offsetI[i] + g_amplitudeI[i] * g_waveFormFuncI[i](g_phiU[i]);
+			g_dutyCycle = g_dutyCycleI[i];
+			float value = g_offsetI[i] + g_amplitudeI[i] * g_waveFormFuncI[i](g_phiU[i]) / 2.0f;
 
 			g_phiI[i] += g_dphiI[i];
 			if (g_phiI[i] >= 2.0f * M_PI_F) {
-				g_phiI[i] = 0;
+				g_phiI[i] -= 2.0f * M_PI_F;
 			}
 
 			channel_dispatcher::setCurrent(channel, value);
@@ -1718,13 +1905,38 @@ void data_function_generator_waveform_short_label(DataOperationEnum operation, C
 
 void setWaveform(uint16_t value) {
 	popPage();
-	FunctionGeneratorPage::g_waveformParameters[FunctionGeneratorPage::g_selectedItem].waveform = (Waveform)value;
+
+	auto &waveformParameters = FunctionGeneratorPage::g_waveformParameters[FunctionGeneratorPage::g_selectedItem];
+
+	auto oldWaveform = waveformParameters.waveform;
+	auto newWaveform = (Waveform)value;
+
+	if (newWaveform == WAVEFORM_DC) {
+		waveformParameters.amplitude = 0;
+		waveformParameters.offset = 0;
+	} else if (oldWaveform == WAVEFORM_DC) {
+		int slotIndex;
+		int subchannelIndex;
+		int resourceIndex;
+		FunctionGeneratorSelectChannelsPage::findResource(waveformParameters.absoluteResourceIndex,
+			slotIndex, subchannelIndex, resourceIndex);
+
+		float min;
+		float max;
+		g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, min, max);
+
+		waveformParameters.amplitude = max - min;
+		waveformParameters.offset = (min + max) / 2.0f;
+	}
+
+	waveformParameters.waveform = newWaveform;
+
 	FunctionGeneratorPage::apply();
 }
 
 bool disabledCallback(uint16_t value) {
 	if (FunctionGeneratorPage::g_waveformParameters[FunctionGeneratorPage::g_selectedItem].resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
-		return value == WAVEFORM_DC || value == WAVEFORM_SINE_WAVE || value == WAVEFORM_TRIANGLE || value == WAVEFORM_SAWTOOTH || value == WAVEFORM_ARBITRARY;
+		return value == WAVEFORM_DC || value == WAVEFORM_SINE || value == WAVEFORM_SINE_HALF || value == WAVEFORM_SINE_RECTIFIED || value == WAVEFORM_TRIANGLE || value == WAVEFORM_SAWTOOTH || value == WAVEFORM_ARBITRARY;
 	}
 	return value == WAVEFORM_ARBITRARY;
 }
@@ -1735,6 +1947,33 @@ void action_function_generator_select_waveform() {
 		disabledCallback, setWaveform, true);
 }
 
+void getDurationStepValues(StepValues *stepValues) {
+	auto &waveformParameters = FunctionGeneratorPage::g_waveformParameters[FunctionGeneratorPage::g_selectedItem];
+
+	int slotIndex;
+	int subchannelIndex;
+	int resourceIndex;
+	FunctionGeneratorSelectChannelsPage::findResource(waveformParameters.absoluteResourceIndex,
+		slotIndex, subchannelIndex, resourceIndex);
+	float minFreq;
+	float maxFreq;
+	g_slots[slotIndex]->getFunctionGeneratorFrequencyInfo(subchannelIndex, resourceIndex, minFreq, maxFreq);
+
+	static float g_values1[] = { 0.001f, 0.01f, 0.1f, 1.0f };
+	static float g_values2[] = { 0.0001f, 0.001f, 0.01f, 0.1f };
+
+	static float *values = maxFreq < 1000.0f ? g_values1 : g_values2;
+
+	stepValues->values = values;
+	stepValues->count = sizeof(g_values1) / sizeof(float);
+	stepValues->unit = UNIT_SECOND;
+
+	stepValues->encoderSettings.accelerationEnabled = true;
+
+	stepValues->encoderSettings.range = g_values1[stepValues->count - 1];
+	stepValues->encoderSettings.step = stepValues->values[0];
+}
+
 void data_function_generator_frequency(DataOperationEnum operation, Cursor cursor, Value &value) {
 	auto &waveformParameters = FunctionGeneratorPage::g_waveformParameters[FunctionGeneratorPage::g_selectedItem];
 
@@ -1743,9 +1982,22 @@ void data_function_generator_frequency(DataOperationEnum operation, Cursor curso
 	int resourceIndex;
 	FunctionGeneratorSelectChannelsPage::findResource(waveformParameters.absoluteResourceIndex,
 		slotIndex, subchannelIndex, resourceIndex);
+	float minFreq;
+	float maxFreq;
+	g_slots[slotIndex]->getFunctionGeneratorFrequencyInfo(subchannelIndex, resourceIndex, minFreq, maxFreq);
+
+	Unit unit = UNIT_HERTZ;
+
 	float min;
 	float max;
-	g_slots[slotIndex]->getFunctionGeneratorFrequencyInfo(subchannelIndex, resourceIndex, min, max);
+	if (g_options.isFreq) {
+		min = minFreq;
+		max = maxFreq;
+	} else {
+		unit = UNIT_SECOND;
+		min = 1.0f / maxFreq;
+		max = 1.0f / minFreq;
+	}
 
 	if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_FREQUENCY;
@@ -1754,40 +2006,57 @@ void data_function_generator_frequency(DataOperationEnum operation, Cursor curso
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
-            value = MakeValue(waveformParameters.frequency, UNIT_HERTZ);
+            value = MakeValue(g_options.isFreq ? waveformParameters.frequency : (1.0f / waveformParameters.frequency), unit);
         }
     } else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
         value = 0;
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(min, UNIT_HERTZ);
+        value = MakeValue(min, unit);
     } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = MakeValue(max, UNIT_HERTZ);
+        value = MakeValue(max, unit);
     } else if (operation == DATA_OPERATION_GET_NAME) {
-        value = "Frequency";
+        value = g_options.isFreq ? "Frequency" : "Duration";
     } else if (operation == DATA_OPERATION_GET_UNIT) {
-        value = UNIT_HERTZ;
+        value = unit;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        StepValues *stepValues = value.getStepValues();
-		g_slots[slotIndex]->getFunctionGeneratorFrequencyInfo(subchannelIndex, resourceIndex, min, max, stepValues);
+		StepValues *stepValues = value.getStepValues();
+		if (g_options.isFreq) {
+			g_slots[slotIndex]->getFunctionGeneratorFrequencyInfo(subchannelIndex, resourceIndex, min, max, stepValues);
 
-        stepValues->encoderSettings.accelerationEnabled = true;
+			stepValues->encoderSettings.accelerationEnabled = true;
 
-        stepValues->encoderSettings.range = 10.0f;
-        stepValues->encoderSettings.step = stepValues->values[0];
-
-        stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_functionGeneratorFrequencyEncoderMode;
-
-        value = 1;
-    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
-        eez::psu::gui::edit_mode_step::g_functionGeneratorFrequencyEncoderMode = (EncoderMode)value.getInt();
+			stepValues->encoderSettings.range = 10.0f;
+			stepValues->encoderSettings.step = stepValues->values[0];
+		} else {
+			getDurationStepValues(stepValues);
+		}
+		stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_functionGeneratorFrequencyEncoderMode;
+		value = 1;
+	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+		eez::psu::gui::edit_mode_step::g_functionGeneratorFrequencyEncoderMode = (EncoderMode)value.getInt();
     } else if (operation == DATA_OPERATION_SET) {
-        waveformParameters.frequency = value.getFloat();
+		if (g_options.isFreq) {
+			waveformParameters.frequency = value.getFloat();
+		} else {
+			waveformParameters.frequency = 1.0f / value.getFloat();
+		}
 		FunctionGeneratorPage::apply();
     }
 }
 
 void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cursor, Value &value) {
 	auto &waveformParameters = FunctionGeneratorPage::g_waveformParameters[FunctionGeneratorPage::g_selectedItem];
+
+	float max;
+	Unit unit;
+
+	if (g_options.isFreq) {
+		max = 360.0f;
+		unit = UNIT_DEGREE;
+	} else {
+		max = 1.0f / waveformParameters.frequency;
+		unit = UNIT_SECOND;
+	}
 
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_PHASE_SHIFT;
@@ -1796,31 +2065,35 @@ void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cur
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
 			data_keypad_text(operation, cursor, value);
 		} else {
-			value = MakeValue(waveformParameters.phaseShift, UNIT_DEGREE);
+			value = MakeValue(g_options.isFreq ? waveformParameters.phaseShift : (value.float_ * max / 360.0f), unit);
 		}
 	} else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
 		value = 1;
 	} else if (operation == DATA_OPERATION_GET_MIN) {
-		value = MakeValue(0, UNIT_DEGREE);
+		value = MakeValue(0, unit);
 	} else if (operation == DATA_OPERATION_GET_MAX) {
-		value = MakeValue(360.0f, UNIT_DEGREE);
+		value = MakeValue(max, unit);
 	} else if (operation == DATA_OPERATION_GET_NAME) {
 		value = "Phase shift";
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
-		value = UNIT_DEGREE;
+		value = unit;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		static float values[] = { 1.0f, 5.0f, 10.0f, 20.0f };
-
 		StepValues *stepValues = value.getStepValues();
 
-		stepValues->values = values;
-		stepValues->count = sizeof(values) / sizeof(float);
-		stepValues->unit = UNIT_DEGREE;
+		if (g_options.isFreq) {
+			static float g_values[] = { 1.0f, 5.0f, 10.0f, 20.0f };
 
-		stepValues->encoderSettings.accelerationEnabled = true;
+			stepValues->values = g_values;
+			stepValues->count = sizeof(g_values) / sizeof(float);
+			stepValues->unit = unit;
 
-		stepValues->encoderSettings.range = 360.0f;
-		stepValues->encoderSettings.step = 1.0f;
+			stepValues->encoderSettings.accelerationEnabled = true;
+
+			stepValues->encoderSettings.range = 360.0f;
+			stepValues->encoderSettings.step = 1.0f;
+		} else {
+			getDurationStepValues(stepValues);
+		}
 
 		stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_functionGeneratorPhaseShiftEncoderMode;
 
@@ -1828,7 +2101,11 @@ void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cur
 	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
 		eez::psu::gui::edit_mode_step::g_functionGeneratorPhaseShiftEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
-		waveformParameters.phaseShift = value.getFloat();
+		if (g_options.isFreq) {
+			waveformParameters.phaseShift = value.getFloat();
+		} else {
+			waveformParameters.phaseShift = 360.0f * value.getFloat() / max;
+		}
 		FunctionGeneratorPage::apply();
 	}
 }
@@ -1845,9 +2122,6 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 	float max;
 	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, min, max);
 
-	float offset = waveformParameters.offset;
-	float maxAmplitude = MIN(max - offset, offset - min);
-
 	Unit unit = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? UNIT_VOLT : UNIT_AMPER;
 
 	if (operation == DATA_OPERATION_GET) {
@@ -1857,14 +2131,14 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
 			data_keypad_text(operation, cursor, value);
 		} else {
-			value = MakeValue(waveformParameters.amplitude, unit);
+			value = MakeValue(g_options.isAmpl ? waveformParameters.amplitude : (waveformParameters.offset - waveformParameters.amplitude / 2.0f), unit);
 		}
 	} else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
-		value = 1;
+		value = 0;
 	} else if (operation == DATA_OPERATION_GET_MIN) {
-		value = MakeValue(0, unit);
+		value = MakeValue(waveformParameters.waveform == WAVEFORM_DC ? min : (g_options.isAmpl ? 0 : min), unit);
 	} else if (operation == DATA_OPERATION_GET_MAX) {
-		value = MakeValue(maxAmplitude, unit);
+		value = MakeValue(waveformParameters.waveform == WAVEFORM_DC ? max : (g_options.isAmpl ? (max - min) : (waveformParameters.offset + waveformParameters.amplitude / 2.0f)), unit);
 	} else if (operation == DATA_OPERATION_GET_NAME) {
 		value = "Amplitude";
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
@@ -1885,7 +2159,14 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
 		eez::psu::gui::edit_mode_step::g_functionGeneratorAmplitudeEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
-		waveformParameters.amplitude = value.getFloat();
+		if (g_options.isAmpl) {
+			waveformParameters.amplitude = value.getFloat();
+		} else {
+			float min = value.getFloat();
+			float max = waveformParameters.offset + waveformParameters.amplitude / 2.0f;
+			waveformParameters.amplitude = max - min;
+			waveformParameters.offset = (min + max) / 2.0f;
+		}
 		FunctionGeneratorPage::apply();
 	}
 }
@@ -1904,8 +2185,6 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 
 	Unit unit = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? UNIT_VOLT: UNIT_AMPER;
 
-	float amplitude = waveformParameters.amplitude;
-
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_OFFSET;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
@@ -1913,14 +2192,14 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
 			data_keypad_text(operation, cursor, value);
 		} else {
-			value = MakeValue(waveformParameters.offset, unit);
+			value = MakeValue(g_options.isAmpl ? waveformParameters.offset : (waveformParameters.offset + waveformParameters.amplitude / 2.0f), unit);
 		}
 	} else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
 		value = 0;
 	} else if (operation == DATA_OPERATION_GET_MIN) {
-		value = MakeValue(min + amplitude, unit);
+		value = MakeValue(g_options.isAmpl ? min : (waveformParameters.offset - waveformParameters.amplitude / 2.0f), unit);
 	} else if (operation == DATA_OPERATION_GET_MAX) {
-		value = MakeValue(max - amplitude, unit);
+		value = MakeValue(max, unit);
 	} else if (operation == DATA_OPERATION_GET_NAME) {
 		value = "Offset";
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
@@ -1941,13 +2220,31 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
 		eez::psu::gui::edit_mode_step::g_functionGeneratorOffsetEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
-		waveformParameters.offset = value.getFloat();
+		if (g_options.isAmpl) {
+			waveformParameters.offset = value.getFloat();
+		} else {
+			float min = waveformParameters.offset - waveformParameters.amplitude / 2.0f;
+			float max = value.getFloat();
+			waveformParameters.amplitude = max - min;
+			waveformParameters.offset = (min + max) / 2.0f;
+		}
 		FunctionGeneratorPage::apply();
 	}
 }
 
-void data_function_generator_pulse_width(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_duty_cycle(DataOperationEnum operation, Cursor cursor, Value &value) {
 	auto &waveformParameters = FunctionGeneratorPage::g_waveformParameters[FunctionGeneratorPage::g_selectedItem];
+
+	float max;
+	Unit unit;
+
+	if (g_options.isFreq) {
+		max = 100.0f;
+		unit = UNIT_PERCENT;
+	} else {
+		max = 1.0f / waveformParameters.frequency;
+		unit = UNIT_SECOND;
+	}
 
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_PWM_DUTY;
@@ -1956,36 +2253,44 @@ void data_function_generator_pulse_width(DataOperationEnum operation, Cursor cur
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
 			data_keypad_text(operation, cursor, value);
 		} else {
-			value = MakeValue(waveformParameters.pulseWidth, UNIT_PERCENT);
+			value = MakeValue(g_options.isFreq ? waveformParameters.dutyCycle : (value.float_ * max / 100.0f), unit);
 		}
 	} else if (operation == DATA_OPERATION_GET_MIN) {
-		value = MakeValue(0.0f, UNIT_PERCENT);
+		value = MakeValue(0.0f, unit);
 	} else if (operation == DATA_OPERATION_GET_MAX) {
-		value = MakeValue(100.0f, UNIT_PERCENT);
+		value = MakeValue(max, unit);
 	} else if (operation == DATA_OPERATION_GET_NAME) {
-		value = "Pulse width";
+		value = g_options.isFreq ? "Duty cycle" : "Pulse width";
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
-		value = UNIT_PERCENT;
+		value = unit;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
-
 		StepValues *stepValues = value.getStepValues();
 
-		stepValues->values = values;
-		stepValues->count = sizeof(values) / sizeof(float);
-		stepValues->unit = UNIT_PERCENT;
+		if (g_options.isFreq) {
+			static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
 
-		stepValues->encoderSettings.accelerationEnabled = false;
-		stepValues->encoderSettings.range = 100.0f;
-		stepValues->encoderSettings.step = 1.0f;
+			stepValues->values = values;
+			stepValues->count = sizeof(values) / sizeof(float);
+			stepValues->unit = unit;
 
-		stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_functionGeneratorPulseWidthEncoderMode;
+			stepValues->encoderSettings.accelerationEnabled = false;
+			stepValues->encoderSettings.range = 100.0f;
+			stepValues->encoderSettings.step = 1.0f;
+		} else {
+			getDurationStepValues(stepValues);
+		}
+
+		stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_functionGeneratorDutyCycleEncoderMode;
 
 		value = 1;
 	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
-		eez::psu::gui::edit_mode_step::g_functionGeneratorPulseWidthEncoderMode = (EncoderMode)value.getInt();
+		eez::psu::gui::edit_mode_step::g_functionGeneratorDutyCycleEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
-		waveformParameters.pulseWidth = value.getFloat();
+		if (g_options.isFreq) {
+			waveformParameters.dutyCycle = value.getFloat();
+		} else {
+			waveformParameters.dutyCycle = 100.0f * value.getFloat() / max;
+		}
 		FunctionGeneratorPage::apply();
 	}
 }
@@ -2033,8 +2338,8 @@ void action_function_generator_mode_select_mode() {
 	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, minAmp, maxAmp);
 
 	waveformParameters.frequency = MIN(100.0f, maxFreq);
-	waveformParameters.amplitude = (maxAmp - minAmp) / 2;
-	waveformParameters.offset = (minAmp + maxAmp) / 2;
+	waveformParameters.amplitude = maxAmp - minAmp;
+	waveformParameters.offset = (minAmp + maxAmp) / 2.0f;
 
 	FunctionGeneratorPage::apply();
 }
@@ -2045,11 +2350,38 @@ void data_function_generator_has_amplitude_and_offset(DataOperationEnum operatio
 	}
 }
 
-void data_function_generator_has_pulse_width(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_has_duty_cycle(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = FunctionGeneratorPage::g_waveformParameters[FunctionGeneratorPage::g_selectedItem].waveform == WAVEFORM_PULSE;
 	}
 }
+
+void data_function_generator_is_freq(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = g_options.isFreq ? 1 : 0;
+	}
+}
+
+void action_function_generator_toggle_freq() {
+	g_options.isFreq = !g_options.isFreq;
+}
+
+void data_function_generator_is_ampl(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = g_options.isAmpl ? 1 : 0;
+	}
+}
+
+void action_function_generator_toggle_ampl() {
+	g_options.isAmpl = !g_options.isAmpl;
+}
+
+void data_function_generator_is_dc(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = FunctionGeneratorPage::g_waveformParameters[FunctionGeneratorPage::g_selectedItem].waveform == WAVEFORM_DC;
+	}
+}
+
 
 } // namespace gui
 } // namespace eez

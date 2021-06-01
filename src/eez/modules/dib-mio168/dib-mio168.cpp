@@ -166,7 +166,7 @@ struct WaveformParameters {
 	float phaseShift;
 	float amplitude;
 	float offset;
-	float pulseWidth;
+	float dutyCycle;
 };
 
 struct SetParams {
@@ -2175,7 +2175,7 @@ public:
 				params.doutWaveformParameters[i].waveform = waveformParameters->waveform;
 				params.doutWaveformParameters[i].frequency = waveformParameters->frequency;
 				params.doutWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
-				params.doutWaveformParameters[i].pulseWidth = waveformParameters->pulseWidth;
+				params.doutWaveformParameters[i].dutyCycle = waveformParameters->dutyCycle;
 			} else {
 				params.doutWaveformParameters[i].waveform = Waveform::WAVEFORM_NONE;
 			}
@@ -2217,10 +2217,18 @@ public:
 				params.aoutWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
 				params.aoutWaveformParameters[i].amplitude = channel->getCalibratedValue(waveformParameters->amplitude);
 				params.aoutWaveformParameters[i].offset = channel->getCalibratedValue(waveformParameters->offset);
-				params.aoutWaveformParameters[i].pulseWidth = waveformParameters->pulseWidth;
+				params.aoutWaveformParameters[i].dutyCycle = waveformParameters->dutyCycle;
 
-                float min = waveformParameters->offset - waveformParameters->amplitude;
-                float max = waveformParameters->offset + waveformParameters->amplitude;
+                float min;
+                float max;
+
+                if (waveformParameters->waveform == function_generator::WAVEFORM_DC) {
+                    min = waveformParameters->amplitude;
+                    max = waveformParameters->amplitude;
+                } else {
+                    min = waveformParameters->offset - waveformParameters->amplitude;
+                    max = waveformParameters->offset + waveformParameters->amplitude;
+                }
 
                 if (waveformParameters->resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
                     if (min >= 0 && max <= 5.0f) {
@@ -2257,7 +2265,7 @@ public:
 				params.aoutWaveformParameters[2 + i].phaseShift = waveformParameters->phaseShift;
 				params.aoutWaveformParameters[2 + i].amplitude = channel->getCalibratedValue(waveformParameters->amplitude);
 				params.aoutWaveformParameters[2 + i].offset = channel->getCalibratedValue(waveformParameters->offset);
-				params.aoutWaveformParameters[2 + i].pulseWidth = waveformParameters->pulseWidth;
+				params.aoutWaveformParameters[2 + i].dutyCycle = waveformParameters->dutyCycle;
 			} else {
 				params.aoutWaveformParameters[2 + i].waveform = Waveform::WAVEFORM_NONE;
 			}
@@ -2925,7 +2933,7 @@ public:
     }
 
     int getLabelsAndColorsPageId() override {
-        return PAGE_ID_DIB_MIO168_LABELS_AND_COLORS;
+        return getTestResult() == TEST_OK ? PAGE_ID_DIB_MIO168_LABELS_AND_COLORS : PAGE_ID_NONE;
     }
 
     void onHighPriorityThreadMessage(uint8_t type, uint32_t param) override;

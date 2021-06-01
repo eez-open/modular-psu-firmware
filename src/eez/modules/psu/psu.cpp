@@ -1125,7 +1125,7 @@ bool psuReset() {
     io_pins::reset();
 
 	//
-	function_generator::removeAllChannels();
+	function_generator::reset();
 
     // SYST:POW ON
     if (powerUp()) {

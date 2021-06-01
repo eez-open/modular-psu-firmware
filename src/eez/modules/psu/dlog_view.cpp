@@ -1106,14 +1106,14 @@ void uploadFile() {
 
 bool Parameters::isDlogItemAvailable(int slotIndex, int subchannelIndex, int resourceIndex) {
 	if (isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex)) {
+        if (getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex) > period) {
+            return false;
+        }
+
 		return true;
 	}
 
 	if (numDlogItems >= dlog_file::MAX_NUM_OF_Y_AXES) {
-		return false;
-	}
-
-	if (getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex) > period) {
 		return false;
 	}
 

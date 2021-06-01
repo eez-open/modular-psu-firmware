@@ -93,13 +93,19 @@ scpi_result_t scpi_cmd_instrumentSelect(scpi_t *context) {
 scpi_result_t scpi_cmd_instrumentSelectQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    for (int i = 0; i < psu_context->selectedChannels.numChannels; i++) {
-        char buffer[20];
-        snprintf(buffer, sizeof(buffer), "(@%d%02d)", psu_context->selectedChannels.channels[i].slotIndex + 1, psu_context->selectedChannels.channels[i].subchannelIndex + 1);
-        SCPI_ResultCharacters(context, buffer, strlen(buffer));
-    }
+	if (psu_context->selectedChannels.numChannels > 0) {
+		for (int i = 0; i < psu_context->selectedChannels.numChannels; i++) {
+			char buffer[20];
+			snprintf(buffer, sizeof(buffer), "(@%d%02d)", psu_context->selectedChannels.channels[i].slotIndex + 1, psu_context->selectedChannels.channels[i].subchannelIndex + 1);
+			SCPI_ResultCharacters(context, buffer, strlen(buffer));
+		}
+		return SCPI_RES_OK;
+	} else {
+		SCPI_ResultText(context, "none");
 
-    return SCPI_RES_OK;
+	}
+
+    return SCPI_RES_ERR;
 }
 
 scpi_result_t scpi_cmd_instrumentNselect(scpi_t *context) {
@@ -130,14 +136,18 @@ scpi_result_t scpi_cmd_instrumentNselect(scpi_t *context) {
 scpi_result_t scpi_cmd_instrumentNselectQ(scpi_t *context) {
     scpi_psu_t *psu_context = (scpi_psu_t *)context->user_context;
 
-    for (int i = 0; i < psu_context->selectedChannels.numChannels; i++) {
-        auto channel = Channel::getBySlotIndex(psu_context->selectedChannels.channels[i].slotIndex, psu_context->selectedChannels.channels[i].subchannelIndex);
-        if (channel) {
-            SCPI_ResultInt(context, channel->channelIndex + 1);
-        } else {
-            SCPI_ResultInt(context, 0);
-        }
-    }
+	if (psu_context->selectedChannels.numChannels > 0) {
+		for (int i = 0; i < psu_context->selectedChannels.numChannels; i++) {
+			auto channel = Channel::getBySlotIndex(psu_context->selectedChannels.channels[i].slotIndex, psu_context->selectedChannels.channels[i].subchannelIndex);
+			if (channel) {
+				SCPI_ResultInt(context, channel->channelIndex + 1);
+			} else {
+				SCPI_ResultInt(context, 0);
+			}
+		}
+	} else {
+		SCPI_ResultInt(context, 0);
+	}
 
     return SCPI_RES_OK;
 }

@@ -1453,6 +1453,21 @@
       "defaultValue": "3"
     },
     {
+      "name": "slot1_non_mapped_channel_index",
+      "type": "integer",
+      "defaultValue": "1"
+    },
+    {
+      "name": "slot2_non_mapped_channel_index",
+      "type": "integer",
+      "defaultValue": "2"
+    },
+    {
+      "name": "slot3_non_mapped_channel_index",
+      "type": "integer",
+      "defaultValue": "3"
+    },
+    {
       "name": "battery",
       "type": "string",
       "defaultValue": "3.1V"
@@ -2585,7 +2600,7 @@
     {
       "name": "function_generator_waveform",
       "type": "enum",
-      "enumItems": "[\n\"None\",\n\"Sine wave\",\n\"Triangle\",\n\"Square wave\",\n\"Pulse\",\n\"Sawtooth\",\n\"Arbitrary\"\n]",
+      "enumItems": "[\n\"None\",\n\"Sine\",\n\"Sine Half\",\n\"Sine Rectified\",\n\"Triangle\",\n\"Square\",\n\"Pulse\",\n\"Sawtooth\",\n\"Arbitrary\"\n]",
       "defaultValue": "Sine wave"
     },
     {
@@ -2620,7 +2635,7 @@
       "defaultValue": "5 V"
     },
     {
-      "name": "function_generator_pulse_width",
+      "name": "function_generator_duty_cycle",
       "type": "float",
       "defaultValue": "75 %"
     },
@@ -2638,9 +2653,24 @@
       "defaultValue": "1"
     },
     {
-      "name": "function_generator_has_pulse_width",
+      "name": "function_generator_has_duty_cycle",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "function_generator_is_freq",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "function_generator_is_ampl",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "function_generator_is_dc",
+      "type": "boolean",
+      "defaultValue": "0"
     }
   ],
   "actions": [
@@ -3934,6 +3964,16 @@
       "components": [],
       "connectionLines": [],
       "name": "trigger_manually"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_toggle_freq"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_toggle_ampl"
     }
   ],
   "pages": [
@@ -30591,106 +30631,71 @@
                       "text": ""
                     },
                     {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 34,
-                      "width": 46,
-                      "height": 28,
-                      "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
-                      "style": {
-                        "inheritFrom": "edit_value_S_left"
-                      },
-                      "text": "Frq:"
-                    },
-                    {
-                      "type": "DisplayData",
-                      "left": 46,
-                      "top": 34,
-                      "width": 90,
-                      "height": 28,
-                      "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
-                      "data": "function_generator_frequency",
-                      "action": "edit",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled",
-                        "padding": "0 5"
-                      },
-                      "displayOption": 0
-                    },
-                    {
-                      "type": "Text",
-                      "left": 136,
-                      "top": 34,
-                      "width": 46,
-                      "height": 28,
-                      "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
-                      "style": {
-                        "inheritFrom": "edit_value_S_left",
-                        "padding": "0 0 0 2"
-                      },
-                      "text": "PSft:"
-                    },
-                    {
-                      "type": "DisplayData",
-                      "left": 182,
-                      "top": 34,
-                      "width": 90,
-                      "height": 28,
-                      "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
-                      "data": "function_generator_phase_shift",
-                      "action": "edit",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled",
-                        "padding": "0 5"
-                      },
-                      "displayOption": 0
-                    },
-                    {
                       "type": "Select",
                       "left": 0,
-                      "top": 64,
+                      "top": 34,
                       "width": 272,
                       "height": 28,
-                      "wireID": "cca68cf6-838a-42e5-bb52-52bf84db8b6d",
-                      "data": "function_generator_has_amplitude_and_offset",
+                      "wireID": "823ba0b7-93ec-40d7-fe62-c955023c9046",
+                      "data": "function_generator_is_dc",
                       "style": {
                         "inheritFrom": "default"
                       },
                       "widgets": [
-                        {
-                          "type": "RectangleWidget",
-                          "left": 0,
-                          "top": 0,
-                          "width": 272,
-                          "height": 28,
-                          "wireID": "2d7c96a5-5388-42dd-87aa-36916aa37f21",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "invertColors": true
-                        },
                         {
                           "type": "Container",
                           "left": 0,
                           "top": 0,
                           "width": 272,
                           "height": 28,
-                          "wireID": "e92e5922-0a5e-409e-cb7f-e121ff12f3b8",
+                          "wireID": "04ac791b-1bb5-4613-d49f-417b6fbb0aab",
                           "style": {
                             "inheritFrom": "default"
                           },
                           "widgets": [
                             {
-                              "type": "Text",
+                              "type": "Select",
                               "left": 0,
                               "top": 0,
                               "width": 46,
                               "height": 28,
-                              "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                              "wireID": "5662faa1-edaa-40fc-ed4f-8b7dc7c68743",
+                              "data": "function_generator_is_freq",
                               "style": {
-                                "inheritFrom": "edit_value_S_left"
+                                "inheritFrom": "default"
                               },
-                              "text": "Amp:"
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 28,
+                                  "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
+                                  "action": "function_generator_toggle_freq",
+                                  "style": {
+                                    "inheritFrom": "edit_value_S_left",
+                                    "color": "action_color",
+                                    "activeBackgroundColor": "action_color"
+                                  },
+                                  "text": "Dur:"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 28,
+                                  "wireID": "1dfd8def-613b-4106-f77e-2167316c61c1",
+                                  "action": "function_generator_toggle_freq",
+                                  "style": {
+                                    "inheritFrom": "edit_value_S_left",
+                                    "color": "action_color",
+                                    "activeBackgroundColor": "action_color"
+                                  },
+                                  "text": "Freq:"
+                                }
+                              ]
                             },
                             {
                               "type": "DisplayData",
@@ -30699,7 +30704,7 @@
                               "width": 90,
                               "height": 28,
                               "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
-                              "data": "function_generator_amplitude",
+                              "data": "function_generator_frequency",
                               "action": "edit",
                               "style": {
                                 "inheritFrom": "encoder_cursor_14_enabled",
@@ -30713,12 +30718,12 @@
                               "top": 0,
                               "width": 46,
                               "height": 28,
-                              "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                              "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
                               "style": {
                                 "inheritFrom": "edit_value_S_left",
                                 "padding": "0 0 0 2"
                               },
-                              "text": "Ofs:"
+                              "text": "PSft:"
                             },
                             {
                               "type": "DisplayData",
@@ -30727,7 +30732,227 @@
                               "width": 90,
                               "height": 28,
                               "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
-                              "data": "function_generator_offset",
+                              "data": "function_generator_phase_shift",
+                              "action": "edit",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "padding": "0 5"
+                              },
+                              "displayOption": 0
+                            }
+                          ]
+                        },
+                        {
+                          "type": "RectangleWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 272,
+                          "height": 28,
+                          "wireID": "9943e603-ad46-4e43-f28a-794708b9eb26",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "invertColors": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Select",
+                      "left": 0,
+                      "top": 64,
+                      "width": 272,
+                      "height": 28,
+                      "wireID": "bf32434d-b348-40ef-d3f0-f81ac706278c",
+                      "data": "function_generator_is_dc",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Select",
+                          "left": 0,
+                          "top": 0,
+                          "width": 272,
+                          "height": 28,
+                          "wireID": "cca68cf6-838a-42e5-bb52-52bf84db8b6d",
+                          "data": "function_generator_has_amplitude_and_offset",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "RectangleWidget",
+                              "left": 0,
+                              "top": 0,
+                              "width": 272,
+                              "height": 28,
+                              "wireID": "2d7c96a5-5388-42dd-87aa-36916aa37f21",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "invertColors": true
+                            },
+                            {
+                              "type": "Container",
+                              "left": 0,
+                              "top": 0,
+                              "width": 272,
+                              "height": 28,
+                              "wireID": "e92e5922-0a5e-409e-cb7f-e121ff12f3b8",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "Select",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 28,
+                                  "wireID": "37ac0603-d0a6-408b-e7da-59da3a050dc3",
+                                  "data": "function_generator_is_ampl",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 46,
+                                      "height": 28,
+                                      "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                                      "action": "function_generator_toggle_ampl",
+                                      "style": {
+                                        "inheritFrom": "edit_value_S_left",
+                                        "color": "action_color",
+                                        "activeBackgroundColor": "action_color"
+                                      },
+                                      "text": "Min:"
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 46,
+                                      "height": 28,
+                                      "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
+                                      "action": "function_generator_toggle_ampl",
+                                      "style": {
+                                        "inheritFrom": "edit_value_S_left",
+                                        "color": "action_color",
+                                        "activeBackgroundColor": "action_color"
+                                      },
+                                      "text": "Ampl:"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "DisplayData",
+                                  "left": 46,
+                                  "top": 0,
+                                  "width": 90,
+                                  "height": 28,
+                                  "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                                  "data": "function_generator_amplitude",
+                                  "action": "edit",
+                                  "style": {
+                                    "inheritFrom": "encoder_cursor_14_enabled",
+                                    "padding": "0 5"
+                                  },
+                                  "displayOption": 0
+                                },
+                                {
+                                  "type": "Select",
+                                  "left": 136,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 28,
+                                  "wireID": "bf685e8a-a972-4fe1-8aea-613eafd4394e",
+                                  "data": "function_generator_is_ampl",
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 46,
+                                      "height": 28,
+                                      "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                                      "style": {
+                                        "inheritFrom": "edit_value_S_left",
+                                        "padding": "0 0 0 2"
+                                      },
+                                      "text": "Max:"
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 46,
+                                      "height": 28,
+                                      "wireID": "0c165171-49b6-4d33-8bc1-2ad8a0dae0ed",
+                                      "style": {
+                                        "inheritFrom": "edit_value_S_left",
+                                        "padding": "0 0 0 2"
+                                      },
+                                      "text": "Offs:"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "DisplayData",
+                                  "left": 182,
+                                  "top": 0,
+                                  "width": 90,
+                                  "height": 28,
+                                  "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                                  "data": "function_generator_offset",
+                                  "action": "edit",
+                                  "style": {
+                                    "inheritFrom": "encoder_cursor_14_enabled",
+                                    "padding": "0 5"
+                                  },
+                                  "displayOption": 0
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 272,
+                          "height": 28,
+                          "wireID": "90f20e5e-5d00-4cee-8d57-2da2de4a82dc",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 46,
+                              "height": 28,
+                              "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "edit_value_S_left"
+                              },
+                              "text": "Ampl:"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 46,
+                              "top": 0,
+                              "width": 90,
+                              "height": 28,
+                              "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                              "data": "function_generator_amplitude",
                               "action": "edit",
                               "style": {
                                 "inheritFrom": "encoder_cursor_14_enabled",
@@ -30812,7 +31037,7 @@
                       "width": 136,
                       "height": 28,
                       "wireID": "9342d96e-df8e-47bb-8278-e4628954ec72",
-                      "data": "function_generator_has_pulse_width",
+                      "data": "function_generator_has_duty_cycle",
                       "style": {
                         "inheritFrom": "default"
                       },
@@ -30841,17 +31066,44 @@
                           },
                           "widgets": [
                             {
-                              "type": "Text",
+                              "type": "Select",
                               "left": 0,
                               "top": 0,
                               "width": 46,
                               "height": 28,
-                              "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
+                              "wireID": "72afb8b2-bbf0-4eb3-fc6d-61a70e29bd69",
+                              "data": "function_generator_is_freq",
                               "style": {
-                                "inheritFrom": "edit_value_S_left",
-                                "padding": "0 0 0 2"
+                                "inheritFrom": "default"
                               },
-                              "text": "PWdt:"
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 28,
+                                  "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
+                                  "style": {
+                                    "inheritFrom": "edit_value_S_left",
+                                    "padding": "0 0 0 2"
+                                  },
+                                  "text": "PWdt:"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 28,
+                                  "wireID": "fe8ce2e2-2c87-46e4-afeb-e135a8928e96",
+                                  "style": {
+                                    "inheritFrom": "edit_value_S_left",
+                                    "padding": "0 0 0 2"
+                                  },
+                                  "text": "Duty:"
+                                }
+                              ]
                             },
                             {
                               "type": "DisplayData",
@@ -30860,7 +31112,7 @@
                               "width": 90,
                               "height": 28,
                               "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
-                              "data": "function_generator_pulse_width",
+                              "data": "function_generator_duty_cycle",
                               "action": "edit",
                               "style": {
                                 "inheritFrom": "encoder_cursor_14_enabled",
@@ -32315,7 +32567,7 @@
             "inheritFrom": "default"
           },
           "layout": "",
-          "context": "slot1_channel_index"
+          "context": "slot1_non_mapped_channel_index"
         },
         {
           "type": "LayoutView",
@@ -32329,7 +32581,7 @@
             "inheritFrom": "default"
           },
           "layout": "",
-          "context": "slot2_channel_index"
+          "context": "slot2_non_mapped_channel_index"
         },
         {
           "type": "LayoutView",
@@ -32343,7 +32595,7 @@
             "inheritFrom": "default"
           },
           "layout": "",
-          "context": "slot3_channel_index"
+          "context": "slot3_non_mapped_channel_index"
         },
         {
           "type": "Container",
@@ -49480,6 +49732,42 @@
             "width": 36,
             "height": 18,
             "pixelArray": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000808080808080808080808080808080808080808080808080808080808080808080808080ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff808080808080808080808080808080808080808080808080808080808080808080808080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 202,
+          "x": 0,
+          "y": -2,
+          "width": 40,
+          "height": 18,
+          "dx": 40,
+          "glyphBitmap": {
+            "width": 40,
+            "height": 18,
+            "pixelArray": "00000000074ee7fefedd3704000000000000000000000000000000000000000000000000189cf6fe0000000121caf9f1f3f7b91e0100000000000000000000000000000000000000000000095ee4faed0000000d77ede27a8ae9eb700b0000000000000000000000000000000000000000000121cff8cc5d00000127d8ec72151b91f1d5200100000000000000000000000000000000000000000b6fecd6320900000b70eccb2001022bd7ec640a00000000000000000000000000000000000000001ccceb6d0b0000001bccea5f0900000c74ebc31600000000000000000000000000000000000000064de7d6210100000545e7dc200000000124e1e2270100000000000000000000000000000000000016bcef9210000000119eec9d110000000015baed860e00000000000000000000000000000000000125e1e432030000001ed8e63d0400000000064de8d01900000000000000000000000000000000000856e7c2180000000648e7d11b0000000000001edee429020000000000000000000000000000000016baea6f0b0000001092e77f0d00000000000014afe9750c0000000000000000000000000000000123e0e328010000001ad5e42b02000000000000074fe6c2170000000000000000000000000000000540e5c718000000002be4db1a00000000000000001fdfe2230100000000000000000000000000000c74e1750c0000000079e7a813000000000000000015b6e34205000000000000000000000000000019d4e3250100000000d3e4430500000000000000000960e0830e00000000000000000000000000001fe2d7190000000000fbe11e0000000000000000000127e3d51900000000000000000000000000064de092100000000000fccb180000000000000000000019d1e290808080808080808080808080808adae132030000000000f7a913000000000000000000000e83dcffffffffffffffffffffffffffffffffe31c000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 203,
+          "x": 0,
+          "y": -2,
+          "width": 40,
+          "height": 18,
+          "dx": 40,
+          "glyphBitmap": {
+            "width": 40,
+            "height": 18,
+            "pixelArray": "0000000000000646cbfbfeed7d17010000000000000000000001136ae6fefdd548080000000000000000000000032accf6efedf6e47b10000000000000000000000d6cdff7eeeef6d13d050000000000000000000121bdf5d76d5fb0f1dd41060000000000000000053cd9f4bd6269d1f6c4280200000000000000000d6ceadb440e0924aef1be25020000000000000121b2f2bf29090c3ad4ed8210000000000000000439d6e8740f00000436c9e9760c0000000000000a64e7d2400500000b60e3db3d040000000000001087e9a51c010000000847e5d12501000000000120c5e85f0c000000001797eb9e1300000000000331dae13c0400000000001dc2ed8a0f000000000c76ebcd2401000000000336dfdf330300000000119beeae19000000000000074be7d4190000000018cce85909000000000000149feda312000000001dd3e44305000000000000001ccce22e030000022ce2d11e00000000000000043ee1da20000000064de5c11900000000000000000d7cebbd1d000019b0ea7d0d000000000000000016a9e45c08000018afe8770c0000000000000000032fd3e345050333dfdc300300000000000000000a64e7bf1d000647e2d526010000000000000000000d70e491100e86e89a130000000000000000000122c8e659080e83e68a0f000000000000000000000332e3d2211dcae54605000000000000000000000a67e59c111dd2e3360300000000000000000000001cc8e96955e5ce1c0000000000000000000000022be2d9224fe5cd1d0000000000000000000000000a66e7c5b1e98a0f00000000000000000000000018c1e970c2eb830e0000000000000000000000000122dff4eee340050000000000000000000000000b70e9cbf9e32f020000000000000000000000000016c1fafac21a000000000000000000000000000123ddf9fdd51a00000000000000000000000000000e87f3f48f0f000000000000000000000000000017c4fb"
           },
           "source": {
             "filePath": "fonts\\Oswald-Medium.ttf",
@@ -72642,10 +72930,10 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:PULSewidth",
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:DUTY",
             "parameters": [
               {
-                "name": "pulse_width",
+                "name": "duty",
                 "type": [
                   {
                     "type": "nr2"
@@ -72660,7 +72948,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:PULSewidth?",
+            "name": "[SOURce[<n>]]:VOLTage:SWEep:DUTY?",
             "parameters": [],
             "response": {
               "type": [
@@ -72787,10 +73075,10 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:PULSewidth",
+            "name": "[SOURce[<n>]]:CURRent:SWEep:DUTY",
             "parameters": [
               {
-                "name": "pulse_width",
+                "name": "duty",
                 "type": [
                   {
                     "type": "nr2"
@@ -72805,7 +73093,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:PULSewidth?",
+            "name": "[SOURce[<n>]]:CURRent:SWEep:DUTY?",
             "parameters": [],
             "response": {
               "type": [
@@ -72932,10 +73220,10 @@
             }
           },
           {
-            "name": "SOURce:SWEep:PULSewidth",
+            "name": "SOURce:SWEep:DUTY",
             "parameters": [
               {
-                "name": "pulse_width",
+                "name": "duty",
                 "type": [
                   {
                     "type": "nr2"
@@ -72950,7 +73238,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:PULSewidth?",
+            "name": "SOURce:SWEep:DUTY?",
             "parameters": [],
             "response": {
               "type": [
@@ -73019,10 +73307,10 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:SWEep:PULSewidth",
+            "name": "SOURce:DIGital[:OUTPut]:SWEep:DUTY",
             "parameters": [
               {
-                "name": "pulse_width",
+                "name": "duty",
                 "type": [
                   {
                     "type": "nr2"
@@ -73037,7 +73325,7 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:SWEep:PULSewidth?",
+            "name": "SOURce:DIGital[:OUTPut]:SWEep:DUTY?",
             "parameters": [],
             "response": {
               "type": [
@@ -78056,20 +78344,26 @@
             "value": "2"
           },
           {
-            "name": "TRIangle",
+            "name": "HALF",
             "value": "3"
           },
           {
-            "name": "SQUare",
+            "name": "RECTified",
             "value": "4"
           },
           {
-            "name": "PULSe",
+            "name": "TRIangle",
             "value": "5"
           },
           {
-            "name": "SAWTooth",
+            "name": "SQUare",
             "value": "6"
+          },
+          {
+            "name": "PULSe"
+          },
+          {
+            "name": "SAWTooth"
           }
         ]
       },

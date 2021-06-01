@@ -292,8 +292,8 @@
     SCPI_COMMAND("[SOURce#]:VOLTage:SWEep:AMPLitude?", scpi_cmd_sourceVoltageSweepAmplitudeQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:SWEep:OFFSet", scpi_cmd_sourceVoltageSweepOffset) \
     SCPI_COMMAND("[SOURce#]:VOLTage:SWEep:OFFSet?", scpi_cmd_sourceVoltageSweepOffsetQ) \
-    SCPI_COMMAND("[SOURce#]:VOLTage:SWEep:PULSewidth", scpi_cmd_sourceVoltageSweepPulsewidth) \
-    SCPI_COMMAND("[SOURce#]:VOLTage:SWEep:PULSewidth?", scpi_cmd_sourceVoltageSweepPulsewidthQ) \
+    SCPI_COMMAND("[SOURce#]:VOLTage:SWEep:DUTY", scpi_cmd_sourceVoltageSweepDuty) \
+    SCPI_COMMAND("[SOURce#]:VOLTage:SWEep:DUTY?", scpi_cmd_sourceVoltageSweepDutyQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:SWEep:FREQuency", scpi_cmd_sourceCurrentSweepFrequency) \
     SCPI_COMMAND("[SOURce#]:CURRent:SWEep:FREQuency?", scpi_cmd_sourceCurrentSweepFrequencyQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:SWEep:PHASeshift", scpi_cmd_sourceCurrentSweepPhaseshift) \
@@ -302,8 +302,8 @@
     SCPI_COMMAND("[SOURce#]:CURRent:SWEep:AMPLitude?", scpi_cmd_sourceCurrentSweepAmplitudeQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:SWEep:OFFSet", scpi_cmd_sourceCurrentSweepOffset) \
     SCPI_COMMAND("[SOURce#]:CURRent:SWEep:OFFSet?", scpi_cmd_sourceCurrentSweepOffsetQ) \
-    SCPI_COMMAND("[SOURce#]:CURRent:SWEep:PULSewidth", scpi_cmd_sourceCurrentSweepPulsewidth) \
-    SCPI_COMMAND("[SOURce#]:CURRent:SWEep:PULSewidth?", scpi_cmd_sourceCurrentSweepPulsewidthQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:SWEep:DUTY", scpi_cmd_sourceCurrentSweepDuty) \
+    SCPI_COMMAND("[SOURce#]:CURRent:SWEep:DUTY?", scpi_cmd_sourceCurrentSweepDutyQ) \
     SCPI_COMMAND("SOURce:SWEep:FREQuency", scpi_cmd_sourceSweepFrequency) \
     SCPI_COMMAND("SOURce:SWEep:FREQuency?", scpi_cmd_sourceSweepFrequencyQ) \
     SCPI_COMMAND("SOURce:SWEep:PHASeshift", scpi_cmd_sourceSweepPhaseshift) \
@@ -312,14 +312,14 @@
     SCPI_COMMAND("SOURce:SWEep:AMPLitude?", scpi_cmd_sourceSweepAmplitudeQ) \
     SCPI_COMMAND("SOURce:SWEep:OFFSet", scpi_cmd_sourceSweepOffset) \
     SCPI_COMMAND("SOURce:SWEep:OFFSet?", scpi_cmd_sourceSweepOffsetQ) \
-    SCPI_COMMAND("SOURce:SWEep:PULSewidth", scpi_cmd_sourceSweepPulsewidth) \
-    SCPI_COMMAND("SOURce:SWEep:PULSewidth?", scpi_cmd_sourceSweepPulsewidthQ) \
+    SCPI_COMMAND("SOURce:SWEep:DUTY", scpi_cmd_sourceSweepDuty) \
+    SCPI_COMMAND("SOURce:SWEep:DUTY?", scpi_cmd_sourceSweepDutyQ) \
     SCPI_COMMAND("SOURce:DIGital[:OUTPut]:SWEep:FREQuency", scpi_cmd_sourceDigitalOutputSweepFrequency) \
     SCPI_COMMAND("SOURce:DIGital[:OUTPut]:SWEep:FREQuency?", scpi_cmd_sourceDigitalOutputSweepFrequencyQ) \
     SCPI_COMMAND("SOURce:DIGital[:OUTPut]:SWEep:PHASeshift", scpi_cmd_sourceDigitalOutputSweepPhaseshift) \
     SCPI_COMMAND("SOURce:DIGital[:OUTPut]:SWEep:PHASeshift?", scpi_cmd_sourceDigitalOutputSweepPhaseshiftQ) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:SWEep:PULSewidth", scpi_cmd_sourceDigitalOutputSweepPulsewidth) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:SWEep:PULSewidth?", scpi_cmd_sourceDigitalOutputSweepPulsewidthQ) \
+    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:SWEep:DUTY", scpi_cmd_sourceDigitalOutputSweepDuty) \
+    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:SWEep:DUTY?", scpi_cmd_sourceDigitalOutputSweepDutyQ) \
     SCPI_COMMAND("SOURce:FUNCtion:MODE", scpi_cmd_sourceFunctionMode) \
     SCPI_COMMAND("SOURce:FUNCtion:MODE?", scpi_cmd_sourceFunctionModeQ) \
     SCPI_COMMAND("STATus:OPERation:CONDition?", scpi_cmd_statusOperationConditionQ) \

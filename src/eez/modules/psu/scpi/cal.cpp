@@ -451,7 +451,7 @@ scpi_result_t scpi_cmd_calibrationState(scpi_t *context) {
 scpi_result_t scpi_cmd_calibrationStateQ(scpi_t *context) {
     SlotAndSubchannelIndex *slotAndSubchannelIndex = getSelectedChannel(context);
     if (!slotAndSubchannelIndex) {
-        SCPI_ErrorPush(context, SCPI_ERROR_BAD_SEQUENCE_OF_CALIBRATION_COMMANDS);
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
 

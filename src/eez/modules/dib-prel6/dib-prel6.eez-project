@@ -1265,7 +1265,7 @@
           "type": "Container",
           "left": 0,
           "top": 0,
-          "width": 476,
+          "width": 480,
           "height": 32,
           "wireID": "48947af5-3cdb-4f6b-a684-d1fdcd04eaa3",
           "style": {
@@ -1276,7 +1276,7 @@
               "type": "Text",
               "left": 0,
               "top": 0,
-              "width": 376,
+              "width": 380,
               "height": 32,
               "wireID": "0e509fa4-039b-4942-a44f-3f30efa96026",
               "data": "slot_title_max",
@@ -1290,7 +1290,7 @@
             },
             {
               "type": "Text",
-              "left": 376,
+              "left": 380,
               "top": 0,
               "width": 50,
               "height": 32,
@@ -1304,7 +1304,7 @@
             },
             {
               "type": "Text",
-              "left": 426,
+              "left": 430,
               "top": 0,
               "width": 50,
               "height": 32,
@@ -1320,7 +1320,7 @@
         },
         {
           "type": "Grid",
-          "left": 3,
+          "left": 5,
           "top": 39,
           "width": 462,
           "height": 160,
@@ -1539,7 +1539,7 @@
       "name": "slot_view_max",
       "left": 0,
       "top": 0,
-      "width": 476,
+      "width": 480,
       "height": 240,
       "dataContextOverrides": "{\"slot_title_max\": \"PREL6\"}"
     },

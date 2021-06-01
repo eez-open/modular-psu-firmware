@@ -538,6 +538,7 @@ public:
                     response->command = 0x8000 | currentCommand->command;
 
                     if (currentCommand->command == COMMAND_GET_INFO) {
+						response->getInfo.moduleType = MODULE_TYPE_DIB_MUX14D;
                         response->getInfo.firmwareMajorVersion = 1;
                         response->getInfo.firmwareMinorVersion = 0;
                         response->getInfo.idw0 = 0;
@@ -657,7 +658,7 @@ public:
     }
 
     int getLabelsAndColorsPageId() override {
-        return PAGE_ID_DIB_MUX14D_LABELS_AND_COLORS;
+        return getTestResult() == TEST_OK ? PAGE_ID_DIB_MUX14D_LABELS_AND_COLORS : PAGE_ID_NONE;
     }
 
     struct ProfileParameters : public Module::ProfileParameters {

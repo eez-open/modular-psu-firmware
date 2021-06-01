@@ -32,9 +32,11 @@ namespace function_generator {
 enum Waveform {
 	WAVEFORM_NONE,
 	WAVEFORM_DC,
-	WAVEFORM_SINE_WAVE,
+	WAVEFORM_SINE,
+	WAVEFORM_SINE_HALF,
+	WAVEFORM_SINE_RECTIFIED,
 	WAVEFORM_TRIANGLE,
-	WAVEFORM_SQUARE_WAVE,
+	WAVEFORM_SQUARE,
 	WAVEFORM_PULSE,
 	WAVEFORM_SAWTOOTH,
 	WAVEFORM_ARBITRARY
@@ -48,7 +50,7 @@ struct WaveformParameters {
 	float phaseShift;
 	float amplitude;
 	float offset;
-	float pulseWidth;
+	float dutyCycle;
 };
 
 WaveformParameters *getWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex);
@@ -85,11 +87,13 @@ bool setAmplitude(int slotIndex, int subchannelIndex, int resourceIndex, float a
 bool getOffset(int slotIndex, int subchannelIndex, int resourceIndex, float &offset, int *err);
 bool setOffset(int slotIndex, int subchannelIndex, int resourceIndex, float offset, int *err);
 
-bool getPulseWidth(int slotIndex, int subchannelIndex, int resourceIndex, float &pulseWidth, int *err);
-bool setPulseWidth(int slotIndex, int subchannelIndex, int resourceIndex, float pulseWidth, int *err);
+bool getDutyCycle(int slotIndex, int subchannelIndex, int resourceIndex, float &dutyCycle, int *err);
+bool setDutyCycle(int slotIndex, int subchannelIndex, int resourceIndex, float dutyCycle, int *err);
 
 bool getResourceType(int slotIndex, int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType &resourceType, int *err);
 bool setResourceType(int slotIndex, int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, int *err);
+
+void reset();
 
 bool isActive();
 void executionStart();
@@ -99,7 +103,7 @@ void abort();
 extern eez::gui::SetPage *g_pFunctionGeneratorPage;
 extern eez::gui::SetPage *g_pFunctionGeneratorSelectChannelsPage;
 
-extern const char *g_waveformShortLabel[8];
+extern const char *g_waveformShortLabel[10];
 
 } // namespace function_generator
 } // namespace eez

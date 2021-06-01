@@ -105,7 +105,7 @@ struct EncoderModes {
     unsigned functionGeneratorPhaseShift: 3;
 	unsigned functionGeneratorAmplitude: 3;
 	unsigned functionGeneratorOffset: 3;
-	unsigned functionGeneratorPulseWidth: 3;
+	unsigned functionGeneratorDutyCycle: 3;
 };
 
 struct FunctionGeneratorWaveformParameters {
@@ -119,13 +119,19 @@ struct FunctionGeneratorWaveformParameters {
 	float phaseShift;
 	float amplitude;
 	float offset;
-	float pulseWidth;
+	float dutyCycle;
 };
 
 static const int MAX_NUM_WAVEFORMS = 16;
 
+struct FunctionGeneratorOptions {
+	unsigned isFreq : 1;
+	unsigned isAmpl : 1;
+};
+
 struct FunctionGeneratorParameters {
 	FunctionGeneratorWaveformParameters waveformParameters[MAX_NUM_WAVEFORMS];
+	FunctionGeneratorOptions options;
 };
 
 /// Profile parameters.
