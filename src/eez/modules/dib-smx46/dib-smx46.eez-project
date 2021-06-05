@@ -3390,6 +3390,19 @@
               "type": "Text",
               "left": 0,
               "top": 0,
+              "width": 288,
+              "height": 40,
+              "wireID": "e977b075-1fb6-49e2-e650-aab354c85dbf",
+              "action": "trigger_show_general_settings",
+              "style": {
+                "inheritFrom": "edit_value_active_M_center"
+              },
+              "text": "\\u009b General trigger settings"
+            },
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 44,
               "width": 136,
               "height": 40,
               "wireID": "1ef3c2e1-9304-4678-eeb5-468733b0d80b",
@@ -3401,7 +3414,7 @@
             {
               "type": "Text",
               "left": 158,
-              "top": 0,
+              "top": 44,
               "width": 184,
               "height": 40,
               "wireID": "dd2e2272-85c9-4686-a117-f9c78a9785c3",
@@ -3414,9 +3427,9 @@
             {
               "type": "Select",
               "left": 0,
-              "top": 48,
-              "width": 260,
-              "height": 88,
+              "top": 88,
+              "width": 184,
+              "height": 40,
               "wireID": "28f8f53d-37c5-4bf0-b74e-9f7ccb41de54",
               "data": "aout_trigger_mode",
               "style": {
@@ -3427,8 +3440,8 @@
                   "type": "RectangleWidget",
                   "left": 0,
                   "top": 0,
-                  "width": 260,
-                  "height": 88,
+                  "width": 184,
+                  "height": 40,
                   "wireID": "0107588b-93cf-45b7-eb92-974331e12819",
                   "style": {
                     "inheritFrom": "default"
@@ -3439,8 +3452,8 @@
                   "type": "RectangleWidget",
                   "left": 0,
                   "top": 0,
-                  "width": 260,
-                  "height": 88,
+                  "width": 184,
+                  "height": 40,
                   "wireID": "10d47030-1576-449b-ca2c-57ca3c03919a",
                   "style": {
                     "inheritFrom": "default"
@@ -3451,8 +3464,8 @@
                   "type": "RectangleWidget",
                   "left": 0,
                   "top": 0,
-                  "width": 260,
-                  "height": 88,
+                  "width": 184,
+                  "height": 40,
                   "wireID": "652c03ee-5248-4089-b889-f1b2ee270d30",
                   "style": {
                     "inheritFrom": "default"
@@ -3460,51 +3473,25 @@
                   "invertColors": true
                 },
                 {
-                  "type": "Container",
+                  "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 260,
-                  "height": 88,
-                  "wireID": "0425d42e-4883-4084-ab33-a01dfab0a446",
+                  "width": 184,
+                  "height": 40,
+                  "wireID": "f78a2381-3acf-4867-c4a7-f8cca9be9e97",
+                  "action": "aout_show_function",
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "edit_value_active_M_center"
                   },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 156,
-                      "height": 40,
-                      "wireID": "f78a2381-3acf-4867-c4a7-f8cca9be9e97",
-                      "action": "aout_show_function",
-                      "style": {
-                        "inheritFrom": "edit_value_active_M_center"
-                      },
-                      "text": "\\u00c2 Edit function"
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 48,
-                      "width": 260,
-                      "height": 40,
-                      "wireID": "e977b075-1fb6-49e2-e650-aab354c85dbf",
-                      "action": "trigger_show_general_settings",
-                      "style": {
-                        "inheritFrom": "edit_value_active_M_center"
-                      },
-                      "text": "\\u009b General trigger settings"
-                    }
-                  ]
+                  "text": "\\u00c2 Edit function"
                 }
               ]
             },
             {
               "type": "Text",
-              "left": 0,
-              "top": 152,
-              "width": 158,
+              "left": 342,
+              "top": 176,
+              "width": 122,
               "height": 40,
               "wireID": "25a7ca2a-59fd-465b-bdd6-ade1fc70aa75",
               "action": "aout_show_calibration",

@@ -33,8 +33,8 @@ enum Waveform {
 	WAVEFORM_NONE,
 	WAVEFORM_DC,
 	WAVEFORM_SINE,
-	WAVEFORM_SINE_HALF,
-	WAVEFORM_SINE_RECTIFIED,
+	WAVEFORM_HALF_RECTIFIED,
+	WAVEFORM_FULL_RECTIFIED,
 	WAVEFORM_TRIANGLE,
 	WAVEFORM_SQUARE,
 	WAVEFORM_PULSE,
@@ -61,12 +61,12 @@ bool writeProfileProperties(psu::profile::WriteContext &ctx, const psu::profile:
 bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Parameters &profileParams);
 
 bool addChannelWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex, int *err = nullptr);
-void addChannelWaveformParameters(psu::Channel &channel);
 
 void removeChannelWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex);
 void removeAllChannels();
 void removePowerChannels();
-void removeOtherTrackingChannels();
+
+bool onTriggerModeChanged(int slotIndex, int subchannelIndex, int resourceIndex, TriggerMode triggerMode, int *err);
 
 void selectWaveformParametersForChannel(int slotIndex, int subchannelIndex, int resourceIndex);
 
@@ -96,6 +96,7 @@ bool setResourceType(int slotIndex, int subchannelIndex, int resourceIndex, Func
 void reset();
 
 bool isActive();
+int checkLimits(int iChannel);
 void executionStart();
 void tick();
 void abort();

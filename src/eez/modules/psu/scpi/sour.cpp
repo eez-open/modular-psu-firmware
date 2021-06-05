@@ -1676,16 +1676,6 @@ scpi_result_t scpi_cmd_sourceVoltageMode(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-	if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-        int err;
-		if (!addChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, &err)) {
-            SCPI_ErrorPush(context, err);
-            return SCPI_RES_ERR;
-        }
-	} else {
-        removeChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex);
-    }
-
     return SCPI_RES_OK;
 }
 
@@ -1743,16 +1733,6 @@ scpi_result_t scpi_cmd_sourceCurrentMode(scpi_t *context) {
     if (!channel_dispatcher::setTriggerMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, (TriggerMode)triggerMode, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
-    }
-
-	if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-        int err;
-		if (!addChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex, &err)) {
-            SCPI_ErrorPush(context, err);
-            return SCPI_RES_ERR;
-        }
-	} else {
-        removeChannelWaveformParameters(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, resourceIndex);
     }
 
     return SCPI_RES_OK;
@@ -1820,16 +1800,6 @@ scpi_result_t scpi_cmd_sourceMode(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-	if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-        int err;
-		if (!addChannelWaveformParameters(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, resourceIndex, &err)) {
-            SCPI_ErrorPush(context, err);
-            return SCPI_RES_ERR;
-        }
-	} else {
-        removeChannelWaveformParameters(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, resourceIndex);
-    }
-
     return SCPI_RES_OK;
 }
 
@@ -1893,16 +1863,6 @@ scpi_result_t scpi_cmd_sourceDigitalOutputMode(scpi_t *context) {
 		return SCPI_RES_ERR;
 	}
 
-	if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-        int err;
-		if (!addChannelWaveformParameters(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, resourceIndex, &err)) {
-            SCPI_ErrorPush(context, err);
-            return SCPI_RES_ERR;
-        }
-	} else {
-        removeChannelWaveformParameters(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, resourceIndex);
-    }
-
 	return SCPI_RES_OK;
 }
 
@@ -1946,8 +1906,8 @@ scpi_result_t scpi_cmd_sourceDigitalOutputModeQ(scpi_t *context) {
 static scpi_choice_def_t g_waveformChoice[] = {
     { "DC", WAVEFORM_DC },
     { "SINe", WAVEFORM_SINE },
-	{ "HALF", WAVEFORM_SINE_HALF },
-	{ "RECTified", WAVEFORM_SINE_RECTIFIED },
+	{ "HALFrectified", WAVEFORM_HALF_RECTIFIED },
+	{ "FULLrectified", WAVEFORM_FULL_RECTIFIED },
     { "TRIangle", WAVEFORM_TRIANGLE },
     { "SQUare", WAVEFORM_SQUARE },
     { "PULSe", WAVEFORM_PULSE },

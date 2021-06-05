@@ -240,7 +240,7 @@ private:
     void writeUint8FieldWithIndex(uint8_t id, uint8_t value, uint8_t index);
     void writeUint16Field(uint8_t id, uint16_t value);
     void writeUint16FieldWithIndex(uint8_t id, uint16_t value, uint8_t index);
-    void writeUint32Field(uint8_t id, uint16_t value);
+    void writeUint32Field(uint8_t id, uint32_t value);
     void writeFloatField(uint8_t id, float value);
     void writeFloatFieldWithIndex(uint8_t id, float value, uint8_t index);
     void writeDoubleField(uint8_t id, double value);

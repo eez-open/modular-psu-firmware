@@ -280,6 +280,10 @@ int checkTrigger() {
                     return err;
                 }
             } else if (channel.getVoltageTriggerMode() == TRIGGER_MODE_FUNCTION_GENERATOR) {
+                int err = function_generator::checkLimits(i);
+                if (err) {
+                    return err;
+                }
             }
 
             onlyFixed = false;

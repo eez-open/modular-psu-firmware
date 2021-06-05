@@ -269,6 +269,8 @@ void setCouplingTypeInPsuThread(CouplingType couplingType) {
                 Channel &channel = Channel::get(i);
                 channel.reset(false /* do not reset label and color */);
             }
+
+            function_generator::removePowerChannels();
         }
     }
 
@@ -430,8 +432,6 @@ void setTrackingChannels(uint16_t trackingEnabled) {
                     trackingChannel.resetHistory();
                 }
             }
-
-            function_generator::removeOtherTrackingChannels();
         }
     }
 }

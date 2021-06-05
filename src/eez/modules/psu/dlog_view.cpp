@@ -1105,11 +1105,11 @@ void uploadFile() {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Parameters::isDlogItemAvailable(int slotIndex, int subchannelIndex, int resourceIndex) {
-	if (isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex)) {
-        if (getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex) > period) {
-            return false;
-        }
+    if (getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex) > period) {
+        return false;
+    }
 
+	if (isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex)) {
 		return true;
 	}
 

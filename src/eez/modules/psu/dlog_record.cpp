@@ -484,7 +484,7 @@ static int doStartImmediately() {
         }
 	}
 
-    g_activeRecording.parameters.startTime = datetime::now();
+    g_activeRecording.parameters.startTime = datetime::nowUtc();
     g_activeRecording.parameters.finalDuration = 0;
 
     if (!isModuleLocalRecording()) {

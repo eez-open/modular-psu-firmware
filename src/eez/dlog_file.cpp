@@ -280,7 +280,7 @@ void Writer::writeUint16FieldWithIndex(uint8_t id, uint16_t value, uint8_t index
     writeUint16(value);
 }
 
-void Writer::writeUint32Field(uint8_t id, uint16_t value) {
+void Writer::writeUint32Field(uint8_t id, uint32_t value) {
 	writeUint16(sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint32_t));
 	writeUint8(id);
 	writeUint32(value);

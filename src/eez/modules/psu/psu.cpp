@@ -830,10 +830,10 @@ void PsuModule::getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resou
 
 void PsuModule::getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) {
     min = 0.1f;
-    max = 400.0f;
+    max = 200.0f;
 
     if (stepValues) {
-        static float values[] = { 1.0f, 5.0f, 10.0f, 50.0f };
+        static float values[] = { 1.0f, 5.0f, 10.0f, 20.0f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_HERTZ;

@@ -1341,6 +1341,9 @@ public:
 
     bool setFunctionGeneratorResourceTriggerMode(int subchannelIndex, int resourceIndex, TriggerMode triggerMode, int *err) override {
         if (subchannelIndex == 0 || subchannelIndex == 1) {
+            if (!function_generator::onTriggerModeChanged(slotIndex, subchannelIndex, resourceIndex, triggerMode, err)) {
+                return false;
+            }
             aoutTriggerMode[subchannelIndex] = triggerMode;
             return true;
         }
@@ -1736,11 +1739,10 @@ void action_dib_smx46_aout_show_calibration() {
 static void onSetTriggerMode(uint16_t value) {
 	popPage();
 
-	((Smx46Module *)g_slots[g_aoutConfigurationPage.g_slotIndex])->aoutTriggerMode[g_aoutConfigurationPage.g_subchannelIndex] = (TriggerMode)value;
-
-    if (value == TRIGGER_MODE_FUNCTION_GENERATOR) {
-        function_generator::addChannelWaveformParameters(g_aoutConfigurationPage.g_slotIndex, g_aoutConfigurationPage.g_subchannelIndex, 0);
-    }
+	int err;
+	if (!g_slots[g_aoutConfigurationPage.g_slotIndex]->setFunctionGeneratorResourceTriggerMode(g_aoutConfigurationPage.g_subchannelIndex, 0, (TriggerMode)value, &err)) {
+		errorMessage("Too many function generator resources");
+	}
 }
 
 void action_dib_smx46_aout_select_trigger_mode() {
@@ -1755,7 +1757,7 @@ void action_dib_smx46_aout_select_trigger_mode() {
 }
 
 void action_dib_smx46_aout_show_function() {
-	function_generator::addChannelWaveformParameters(g_aoutConfigurationPage.g_slotIndex, g_aoutConfigurationPage.g_subchannelIndex, 0);
+	g_slots[g_aoutConfigurationPage.g_slotIndex]->setFunctionGeneratorResourceTriggerMode(g_aoutConfigurationPage.g_subchannelIndex, 0, TRIGGER_MODE_FUNCTION_GENERATOR, nullptr);
 
 	pushPage(PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR);
 

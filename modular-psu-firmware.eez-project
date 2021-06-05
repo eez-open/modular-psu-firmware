@@ -2671,6 +2671,11 @@
       "name": "function_generator_is_dc",
       "type": "boolean",
       "defaultValue": "0"
+    },
+    {
+      "name": "function_generator_any_selected",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -3974,6 +3979,11 @@
       "components": [],
       "connectionLines": [],
       "name": "function_generator_toggle_ampl"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_deselect_all"
     }
   ],
   "pages": [
@@ -30657,7 +30667,7 @@
                               "type": "Select",
                               "left": 0,
                               "top": 0,
-                              "width": 46,
+                              "width": 44,
                               "height": 28,
                               "wireID": "5662faa1-edaa-40fc-ed4f-8b7dc7c68743",
                               "data": "function_generator_is_freq",
@@ -30669,31 +30679,40 @@
                                   "type": "Text",
                                   "left": 0,
                                   "top": 0,
-                                  "width": 46,
+                                  "width": 44,
                                   "height": 28,
                                   "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
                                   "action": "function_generator_toggle_freq",
                                   "style": {
                                     "inheritFrom": "edit_value_S_left",
+                                    "font": "Oswald12",
+                                    "alignHorizontal": "center",
                                     "color": "action_color",
-                                    "activeBackgroundColor": "action_color"
+                                    "backgroundColor": "text_enable_background",
+                                    "activeColor": "text_enable_background",
+                                    "activeBackgroundColor": "action_color",
+                                    "margin": "0"
                                   },
-                                  "text": "Dur:"
+                                  "text": "Period"
                                 },
                                 {
                                   "type": "Text",
                                   "left": 0,
                                   "top": 0,
-                                  "width": 46,
+                                  "width": 44,
                                   "height": 28,
                                   "wireID": "1dfd8def-613b-4106-f77e-2167316c61c1",
                                   "action": "function_generator_toggle_freq",
                                   "style": {
                                     "inheritFrom": "edit_value_S_left",
+                                    "alignHorizontal": "center",
                                     "color": "action_color",
-                                    "activeBackgroundColor": "action_color"
+                                    "backgroundColor": "text_enable_background",
+                                    "activeColor": "text_enable_background",
+                                    "activeBackgroundColor": "action_color",
+                                    "margin": "0"
                                   },
-                                  "text": "Freq:"
+                                  "text": "Freq"
                                 }
                               ]
                             },
@@ -30807,7 +30826,7 @@
                                   "type": "Select",
                                   "left": 0,
                                   "top": 0,
-                                  "width": 46,
+                                  "width": 44,
                                   "height": 28,
                                   "wireID": "37ac0603-d0a6-408b-e7da-59da3a050dc3",
                                   "data": "function_generator_is_ampl",
@@ -30819,31 +30838,38 @@
                                       "type": "Text",
                                       "left": 0,
                                       "top": 0,
-                                      "width": 46,
+                                      "width": 44,
                                       "height": 28,
                                       "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
                                       "action": "function_generator_toggle_ampl",
                                       "style": {
                                         "inheritFrom": "edit_value_S_left",
+                                        "alignHorizontal": "center",
                                         "color": "action_color",
-                                        "activeBackgroundColor": "action_color"
+                                        "backgroundColor": "text_enable_background",
+                                        "activeColor": "text_enable_background",
+                                        "activeBackgroundColor": "action_color",
+                                        "margin": "0"
                                       },
-                                      "text": "Min:"
+                                      "text": "Min"
                                     },
                                     {
                                       "type": "Text",
                                       "left": 0,
                                       "top": 0,
-                                      "width": 46,
+                                      "width": 44,
                                       "height": 28,
                                       "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
                                       "action": "function_generator_toggle_ampl",
                                       "style": {
                                         "inheritFrom": "edit_value_S_left",
+                                        "alignHorizontal": "center",
                                         "color": "action_color",
+                                        "backgroundColor": "text_enable_background",
+                                        "activeColor": "text_enable_background",
                                         "activeBackgroundColor": "action_color"
                                       },
-                                      "text": "Ampl:"
+                                      "text": "Ampl"
                                     }
                                   ]
                                 },
@@ -31007,7 +31033,8 @@
                               "height": 28,
                               "wireID": "a53aeea1-bae6-4f26-e465-a741570c3dab",
                               "style": {
-                                "inheritFrom": "edit_value_S_left"
+                                "inheritFrom": "edit_value_S_left",
+                                "padding": "0 0 0 2"
                               },
                               "text": "Mode:"
                             },
@@ -31608,7 +31635,7 @@
               "type": "Text",
               "left": 41,
               "top": 0,
-              "width": 163,
+              "width": 124,
               "height": 32,
               "wireID": "88f6c35b-5e6e-45b7-829b-1b84ad14dd87",
               "style": {
@@ -31618,29 +31645,60 @@
             },
             {
               "type": "Text",
-              "left": 204,
+              "left": 165,
               "top": 0,
-              "width": 136,
+              "width": 138,
               "height": 32,
               "wireID": "5e940091-ae8d-40d8-b2a2-d3cdc79e1b39",
               "data": "function_generator_num_selected",
               "style": {
-                "inheritFrom": "status_title",
-                "alignHorizontal": "right"
+                "inheritFrom": "status_title"
               },
               "text": ""
             },
             {
-              "type": "RectangleWidget",
-              "left": 340,
+              "type": "Select",
+              "left": 303,
               "top": 0,
-              "width": 64,
+              "width": 95,
               "height": 32,
-              "wireID": "b1b0ff18-928c-4867-cdb5-6e8978b5d8f8",
+              "wireID": "ab85d6f3-7259-4dd8-a296-21881412a190",
+              "data": "function_generator_any_selected",
               "style": {
-                "inheritFrom": "status_title"
+                "inheritFrom": "default"
               },
-              "invertColors": true
+              "widgets": [
+                {
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 95,
+                  "height": 32,
+                  "wireID": "f3f2413a-d0b2-43a8-db13-e487cdfadc3f",
+                  "style": {
+                    "inheritFrom": "default",
+                    "color": "status_line_background",
+                    "activeBackgroundColor": "status_line_background"
+                  },
+                  "invertColors": false
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 95,
+                  "height": 32,
+                  "wireID": "6df42343-c445-4235-9890-d97c25801c82",
+                  "action": "function_generator_deselect_all",
+                  "style": {
+                    "inheritFrom": "status_bgnd",
+                    "font": "Oswald14",
+                    "color": "action_color",
+                    "activeBackgroundColor": "action_color"
+                  },
+                  "text": "Deselect All"
+                }
+              ]
             },
             {
               "type": "Select",
@@ -78344,11 +78402,11 @@
             "value": "2"
           },
           {
-            "name": "HALF",
+            "name": "HALFrectified",
             "value": "3"
           },
           {
-            "name": "RECTified",
+            "name": "FULLrectified",
             "value": "4"
           },
           {

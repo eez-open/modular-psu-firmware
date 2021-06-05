@@ -42,6 +42,7 @@
 #include <eez/scpi/regs.h>
 #include <eez/sound.h>
 #include <eez/index.h>
+#include <eez/function_generator.h>
 #include <eez/gui/gui.h>
 
 #include <eez/modules/bp3c/io_exp.h>
@@ -1383,6 +1384,7 @@ TriggerMode Channel::getVoltageTriggerMode() {
 }
 
 void Channel::setVoltageTriggerMode(TriggerMode mode) {
+	function_generator::onTriggerModeChanged(slotIndex, subchannelIndex, 0, mode, nullptr);
     flags.voltageTriggerMode = mode;
 }
 
@@ -1391,6 +1393,7 @@ TriggerMode Channel::getCurrentTriggerMode() {
 }
 
 void Channel::setCurrentTriggerMode(TriggerMode mode) {
+	function_generator::onTriggerModeChanged(slotIndex, subchannelIndex, 1, mode, nullptr);
     flags.currentTriggerMode = mode;
 }
 
