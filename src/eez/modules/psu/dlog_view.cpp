@@ -1630,7 +1630,7 @@ void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) 
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(DlogParamsPage::g_minPeriod, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = MakeValue(PERIOD_MAX, UNIT_SECOND);
+        value = MakeValue(MIN(DlogParamsPage::g_parameters.duration, PERIOD_MAX), UNIT_SECOND);
     } else if (operation == DATA_OPERATION_SET) {
         DlogParamsPage::setPeriod(value.getFloat());
     }
@@ -1666,7 +1666,7 @@ void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_SECOND;
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(DURATION_MIN, UNIT_SECOND);
+        value = MakeValue(MAX(DURATION_MIN, DlogParamsPage::g_parameters.period), UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(INFINITY, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_SET) {

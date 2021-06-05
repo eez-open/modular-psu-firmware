@@ -935,7 +935,7 @@ public:
             } else if (m_subchannelIndex == AIN_3_SUBCHANNEL_INDEX) {
                 return UNIT_VOLT;
             } else {
-                return UNIT_AMPER;
+                return m_currentRange == 0 ? UNIT_MILLI_AMPER : UNIT_AMPER;
             }
         }
         return m_mode == MEASURE_MODE_VOLTAGE ? UNIT_VOLT : UNIT_AMPER;

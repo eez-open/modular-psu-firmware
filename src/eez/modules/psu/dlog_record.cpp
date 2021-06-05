@@ -572,7 +572,7 @@ static void doFinish(bool afterError) {
     if (!g_traceInitiated) {
         // write X axis step
 	    g_file.seek(g_writer.getXAxisStepFieldOffset());
-        float xAxisStep = g_activeRecording.parameters.finalDuration / g_activeRecording.size;
+        float xAxisStep = g_activeRecording.parameters.finalDuration / (g_activeRecording.size - 1);
 	    g_file.write(&xAxisStep, 4);
     }
 
@@ -836,7 +836,7 @@ void reset() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void tick() {
-    if (g_state == STATE_EXECUTING && g_nextTime < g_activeRecording.parameters.duration && !g_inStateTransition) {
+    if (g_state == STATE_EXECUTING && g_nextTime <= g_activeRecording.parameters.duration && !g_inStateTransition) {
         log();
     }
 }

@@ -244,11 +244,14 @@ scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
 
     float period;
 
+	float min = dlog_view::PERIOD_MIN;
+	float max = MIN(dlog_record::g_recordingParameters.duration, dlog_view::PERIOD_MAX);
+
     if (param.special) {
         if (param.content.tag == SCPI_NUM_MIN) {
-            period = dlog_view::PERIOD_MIN;
+            period = min;
         } else if (param.content.tag == SCPI_NUM_MAX) {
-            period = dlog_view::PERIOD_MAX;
+            period = max;
         } else if (param.content.tag == SCPI_NUM_DEF) {
             period = dlog_view::PERIOD_DEFAULT;
         } else {
@@ -263,6 +266,11 @@ scpi_result_t scpi_cmd_senseDlogPeriod(scpi_t *context) {
 
         period = (float)param.content.value;
     }
+
+	if (period < min || period > max) {
+		SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+		return SCPI_RES_ERR;
+	}
 
     dlog_record::g_recordingParameters.setPeriod(period);
 
@@ -287,11 +295,14 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
 
     float duration;
 
+	float min = MAX(dlog_view::DURATION_MIN, dlog_record::g_recordingParameters.period);
+	float max = dlog_view::DURATION_MAX;
+
     if (param.special) {
         if (param.content.tag == SCPI_NUM_MIN) {
-			duration = dlog_view::DURATION_MIN;
+			duration = min;
         } else if (param.content.tag == SCPI_NUM_MAX) {
-			duration = dlog_view::DURATION_MAX;
+			duration = max;
         } else if (param.content.tag == SCPI_NUM_DEF) {
 			duration = dlog_view::DURATION_DEFAULT;
         } else {
@@ -306,6 +317,11 @@ scpi_result_t scpi_cmd_senseDlogTime(scpi_t *context) {
 
 		duration = (float)param.content.value;
     }
+
+	if (duration < min || duration > max) {
+		SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+		return SCPI_RES_ERR;
+	}
 
     dlog_record::g_recordingParameters.duration = duration;
 
