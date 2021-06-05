@@ -39,5 +39,7 @@ struct Event {
 
 void eventHandling();
 
+extern bool g_isLongTouch;
+
 } // namespace gui
 } // namespace eez

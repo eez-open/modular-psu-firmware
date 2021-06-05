@@ -768,11 +768,15 @@ void action_edit_system_password() {
 }
 
 void action_sys_front_panel_lock() {
-    lockFrontPanel();
+    if (g_isLongTouch) {
+        lockFrontPanel();
+    }
 }
 
 void action_sys_front_panel_unlock() {
-    unlockFrontPanel();
+    if (g_isLongTouch) {
+        unlockFrontPanel();
+    }
 }
 
 void action_sys_settings_sound_toggle() {

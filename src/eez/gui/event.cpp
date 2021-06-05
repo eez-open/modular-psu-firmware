@@ -44,6 +44,8 @@ static OnTouchFunctionType m_onTouchFunction;
 static bool m_longTouchGenerated;
 static bool m_extraLongTouchGenerated;
 
+bool g_isLongTouch;
+
 static void processTouchEvent(EventType type, int x, int y);
 static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
 static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
@@ -195,7 +197,9 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
         m_touchActionExecuted = true;
         int action = widgetCursor.appContext->getLongTouchActionHook(widgetCursor);
         if (action != ACTION_ID_NONE) {
+            g_isLongTouch = true;
             executeAction(action);
+            g_isLongTouch = false;
         }
     } else if (touchEvent.type == EVENT_TYPE_EXTRA_LONG_TOUCH) {
         m_touchActionExecuted = true;

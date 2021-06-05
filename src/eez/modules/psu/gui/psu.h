@@ -241,6 +241,7 @@ public:
     void (*m_dialogCancelCallback)();
     void (*m_dialogLaterCallback)();
 
+    int getLongTouchActionHook(const WidgetCursor &widgetCursor) override;
     int getExtraLongTouchActionHook(const WidgetCursor &widgetCursor) override;
 
 protected:
