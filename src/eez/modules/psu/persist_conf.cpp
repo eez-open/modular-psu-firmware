@@ -128,7 +128,7 @@ void initDefaultDevConf() {
     g_defaultDevConf.dstRule = datetime::DST_RULE_OFF;
 
     // block 3
-    g_defaultDevConf.profileAutoRecallEnabled = 0;
+    g_defaultDevConf.profileAutoRecallEnabled = 1;
 
     g_defaultDevConf.outputProtectionCouple = 0;
     g_defaultDevConf.shutdownWhenProtectionTripped = 0;
@@ -180,7 +180,7 @@ void initDefaultDevConf() {
     g_defaultDevConf.ytGraphUpdateMethod = YT_GRAPH_UPDATE_METHOD_SCROLL;
 
     // block 7
-    g_defaultDevConf.userSwitchAction = USER_SWITCH_ACTION_INHIBIT;
+    g_defaultDevConf.userSwitchAction = USER_SWITCH_ACTION_NONE;
     g_defaultDevConf.sortFilesOption = SORT_FILES_BY_TIME_DESC;
     g_defaultDevConf.eventQueueFilter = event_queue::EVENT_TYPE_INFO;
     g_defaultDevConf.viewFlags.dlogViewLegendViewOption = DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK;

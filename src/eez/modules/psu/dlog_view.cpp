@@ -202,7 +202,12 @@ void stateManagment() {
 				openFile(dlog_record::getLatestFilePath());
 			}
 		}
-	}
+	} else if (isExecuting && !g_wasExecuting) {
+		if (psu::gui::getActivePageId() == PAGE_ID_MAIN) {
+            gui::showPage(PAGE_ID_DLOG_VIEW);
+            openFile(dlog_record::getLatestFilePath());
+		}
+    }
 	g_wasExecuting = isExecuting;
 
 	if (g_refreshed) {

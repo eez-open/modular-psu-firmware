@@ -153,7 +153,7 @@ struct DcpChannel : public Channel {
 		params.I_LOW_RANGE_CAL_POINTS = I_LOW_RANGE_CAL_POINTS;
 		params.I_LOW_RANGE_CAL_U_SET = 30.0f;
 
-		params.OVP_DEFAULT_STATE = false;
+		params.OVP_DEFAULT_STATE = true;
 		params.OVP_MIN_DELAY = 0.0f;
 		params.OVP_DEFAULT_DELAY = 0.0f;
 		params.OVP_MAX_DELAY = 10.0f;

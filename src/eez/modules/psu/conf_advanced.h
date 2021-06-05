@@ -204,7 +204,7 @@
 /// greater then width of YT widget.
 #define CHANNEL_HISTORY_SIZE 512
 
-#define GUI_YT_VIEW_RATE_DEFAULT 0.1f
+#define GUI_YT_VIEW_RATE_DEFAULT 0.005f
 #define GUI_YT_VIEW_RATE_MIN 0.005f
 #define GUI_YT_VIEW_RATE_MAX 300.0f
 
