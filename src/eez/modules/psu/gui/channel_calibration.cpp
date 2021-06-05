@@ -317,7 +317,7 @@ void ChSettingsCalibrationEditPage::onStartPasswordOk() {
 
 void ChSettingsCalibrationEditPage::start() {
     checkPassword("Password: ", persist_conf::devConf.calibrationPassword, onStartPasswordOk);
-    onStartPasswordOk();
+    //onStartPasswordOk();
 }
 
 void ChSettingsCalibrationEditPage::pageAlloc() {
@@ -1379,7 +1379,7 @@ void action_channel_calibration_chart_zoom() {
 }
 
 void action_show_ch_settings_cal() {
-    calibration::g_viewer.start(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
+    calibration::g_viewer.start(hmi::g_selectedSlotIndex, g_channel->subchannelIndex);
     pushPage(PAGE_ID_CH_SETTINGS_CALIBRATION);
 }
 

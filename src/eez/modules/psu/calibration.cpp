@@ -28,6 +28,7 @@
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/profile.h>
+#include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/scpi/psu.h>
 
 #include <eez/modules/psu/gui/psu.h>
@@ -364,6 +365,8 @@ float CalibrationBase::getDacValue(CalibrationValueType valueType) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void CalibrationEditor::doStart() {
+    trigger::abort();
+
     g_slots[m_slotIndex]->initChannelCalibration(m_subchannelIndex);
 
     Channel *channel = Channel::getBySlotIndex(m_slotIndex, m_subchannelIndex);
