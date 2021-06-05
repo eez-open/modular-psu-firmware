@@ -1114,6 +1114,10 @@ void action_user_switch_clicked() {
 void onSetUserSwitchAction(uint16_t value) {
     popPage();
     persist_conf::setUserSwitchAction((persist_conf::UserSwitchAction)value);
+    if (value != persist_conf::USER_SWITCH_ACTION_INHIBIT) {
+		channel_dispatcher::disableOutputForAllChannels();
+        io_pins::setIsInhibitedByUser(false);
+    }
 }
 
 void action_select_user_switch_action() {
