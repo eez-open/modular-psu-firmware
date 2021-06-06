@@ -193,18 +193,23 @@ def show_main_dialog():
 #############################
 def main():
   global module_max_volt
-  # Save state  
+  # Save state and set in known (default) state.  
   scpi("*SAV 10")
   scpi("MEM:STATE:FREEZE ON")
-
+  scpi("*RST")
+  
   # From now on we always restore the state in case of an error.  
   try:
     # Script requires firmware > 1.6, check for it.
-    firmwareversion = scpi("SYSTem:CPU:FIRMware?")
-    if float(firmwareversion) < 1.6:
+    fwstr = scpi("SYSTem:CPU:FIRMware?")
+    i = fwstr.index('.')
+    j = fwstr.index('.',i+1)
+    fwmaj = int(fwstr[0:i]) 
+    fwmin = int(fwstr[i+1:j])
+    if not(fwmaj > 1 or (fwmaj == 1 and fwmin >= 6)):
       scpi('DISP:ERR "Script requires firmware >= 1.6"')
       return
-  
+        
     # Digital output for timing/jitter measurements
     scpi('SYSTEM:DIGITAL:PIN4:FUNCTION DOUTPUT')
     scpi('SYST:DIGITAL:PIN4:POLARITY POS')
@@ -223,6 +228,7 @@ def main():
     scpi("INST ch1")
     module_max_volt = float(scpi("VOLT? MAX"))
     scpi("OUTP 0")
+    
     show_main_dialog()
 
     while True:
