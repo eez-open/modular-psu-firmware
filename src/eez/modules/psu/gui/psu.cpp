@@ -1211,7 +1211,8 @@ static int g_iChannelSetValue;
 void changeValue(Channel &channel, const Value &value, float minValue, float maxValue, float defValue, void (*onSetValue)(float)) {
     NumericKeypadOptions options;
 
-    options.channelIndex = channel.channelIndex;
+	options.slotIndex = channel.slotIndex;
+	options.subchannelIndex = channel.subchannelIndex;
 
     options.editValueUnit = value.getUnit();
 
