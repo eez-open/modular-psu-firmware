@@ -747,16 +747,22 @@ const char *PsuModule::getDlogResourceLabel(int subchannelIndex, int resourceInd
 
 int PsuModule::getNumFunctionGeneratorResources(int subchannelIndex) {
 	auto channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+
 	if (channel->channelIndex == 1 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES)) {
 		return 0;
 	}
-    if (channel->flags.trackingEnabled) {
-        for (int i = 0; i < channel->channelIndex; i++) {
+
+	if (channel->flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; i++) {
             if (Channel::get(i).flags.trackingEnabled) {
-                return 0;
+				if (channel->channelIndex > Channel::get(i).channelIndex) {
+					return 0;
+				}
+				break;
             }
         }
     }
+	
 	return 2;
 }
 
@@ -838,6 +844,14 @@ void PsuModule::getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resou
         stepValues->count = sizeof(values) / sizeof(float);
         stepValues->unit = UNIT_HERTZ;
     }
+}
+
+bool PsuModule::isMicroAmperAllowed(int subchannelIndex) {
+	return Channel::getBySlotIndex(slotIndex, subchannelIndex)->isMicroAmperAllowed();
+}
+
+bool PsuModule::isAmperAllowed(int subchannelIndex) {
+	return Channel::getBySlotIndex(slotIndex, subchannelIndex)->isAmperAllowed();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

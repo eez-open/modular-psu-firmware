@@ -1242,10 +1242,10 @@ public:
 		return "mux14d_pinout.jpg";
 	}
 
-	bool measureTemperature(int subbchannelIndex, float &temperature, int *err) override {
-		subbchannelIndex++;
+	bool measureTemperature(int subchannelIndex, float &temperature, int *err) override {
+		subchannelIndex++;
 
-		if (subbchannelIndex != 31) {
+		if (subchannelIndex != 31) {
 			*err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
 			return false;
 		}

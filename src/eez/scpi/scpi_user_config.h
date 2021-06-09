@@ -163,6 +163,7 @@ extern "C" {
     X(SCPI_ERROR_CH1_CALIBRATION_NOT_ENABLED,                741, "CH1 calibration is not enabled")               \
     X(SCPI_ERROR_CH2_CALIBRATION_NOT_ENABLED,                742, "CH2 calibration is not enabled")               \
     X(SCPI_ERROR_BUFFER_OVERFLOW,                            750, "Buffer overflow")                              \
+    X(SCPI_ERROR_BUFFER_OVERFLOW_SLAVE,                      751, "Module buffer overflow")                       \
 
 // clang-format on
 

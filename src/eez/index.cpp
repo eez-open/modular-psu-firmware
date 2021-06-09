@@ -921,7 +921,7 @@ const char *Module::getPinoutFile() {
     return nullptr;
 }
 
-bool Module::measureTemperature(int subbchannelIndex, float &temperature, int *err) {
+bool Module::measureTemperature(int subchannelIndex, float &temperature, int *err) {
 	if (err) {
 		*err = SCPI_ERROR_HARDWARE_MISSING;
 	}
@@ -933,6 +933,14 @@ bool Module::isCopyToAvailable() {
 }
 
 void Module::copyTo(int slotIndex) {
+}
+
+bool Module::isMicroAmperAllowed(int subchannelIndex) {
+	return false;
+}
+
+bool Module::isAmperAllowed(int subchannelIndex) {
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

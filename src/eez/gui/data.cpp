@@ -896,6 +896,15 @@ int getXScroll(const WidgetCursor &widgetCursor) {
     return value.getType() == VALUE_TYPE_INT ? value.getInt() : 0;
 }
 
+void getSloatAndSubchannelIndex(Cursor cursor, int16_t id, int &slotIndex, int &subchannelIndex) {
+	Value value;
+	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_SLOT_AND_SUBCHANNEL_INDEX, cursor, value);
+	if (value.getType() == VALUE_TYPE_UINT32) {
+		slotIndex = value.getFirstInt16();
+		subchannelIndex = value.getSecondInt16();
+	}
+}
+
 } // namespace gui
 } // namespace eez
 

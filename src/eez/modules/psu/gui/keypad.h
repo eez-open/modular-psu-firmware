@@ -110,7 +110,8 @@ struct NumericKeypadOptions {
 
 	int pageId;
 
-    int channelIndex;
+    int slotIndex;
+	int subchannelIndex;
 
     Unit editValueUnit;
 

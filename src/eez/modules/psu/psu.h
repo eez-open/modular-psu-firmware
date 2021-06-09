@@ -111,6 +111,9 @@ public:
     const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) override;
 	virtual void getFunctionGeneratorAmplitudeInfo(int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, float &min, float &max, StepValues *stepValues) override;
 	virtual void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override;
+
+	bool isMicroAmperAllowed(int subchannelIndex) override;
+	bool isAmperAllowed(int subchannelIndex) override;
 };
 
 /// Channel binary flags stored in profile.

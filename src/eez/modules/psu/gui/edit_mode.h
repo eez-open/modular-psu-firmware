@@ -57,7 +57,7 @@ class NumericKeypad;
 
 namespace edit_mode_keypad {
 
-void enter(int channelIndex, const Value &editValue, bool allowZero, const Value &minValue, Value &maxValue);
+void enter(int slotIndex, int subchannelIndex, const Value &editValue, bool allowZero, const Value &minValue, Value &maxValue);
 void exit();
 
 extern NumericKeypad *g_keypad;

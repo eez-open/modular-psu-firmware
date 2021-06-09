@@ -398,7 +398,8 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_TOUCH_DRAG,
     DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION,
     DATA_OPERATION_GET_TEXT_CURSOR_POSITION,
-    DATA_OPERATION_GET_X_SCROLL
+    DATA_OPERATION_GET_X_SCROLL,
+	DATA_OPERATION_GET_SLOT_AND_SUBCHANNEL_INDEX
 };
 
 int count(int16_t id);
@@ -483,6 +484,8 @@ void ytDataTouchDrag(Cursor cursor, int16_t id, TouchDrag *touchDrag);
 
 int getTextCursorPosition(Cursor cursor, int16_t id);
 int getXScroll(const WidgetCursor &widgetCursor);
+
+void getSloatAndSubchannelIndex(Cursor cursor, int16_t id, int &slotIndex, int &subchannelIndex);
 
 } // namespace gui
 } // namespace eez

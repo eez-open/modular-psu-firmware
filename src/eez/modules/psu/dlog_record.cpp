@@ -68,7 +68,8 @@ enum Event {
     EVENT_TOGGLE_STOP,
     EVENT_FINISH,
     EVENT_ABORT,
-    EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR,
+    EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_MASTER,
+    EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_SLAVE,
     EVENT_ABORT_AFTER_MASS_STORAGE_ERROR,
     EVENT_RESET
 };
@@ -158,7 +159,7 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
 // #if defined(EEZ_PLATFORM_STM32)
 //             taskEXIT_CRITICAL();
 // #endif
-            abortAfterBufferOverflowError();
+            abortAfterBufferOverflowError(0);
             return false;
         }
 
@@ -729,7 +730,7 @@ void stateTransition(int event, int* perr) {
         } else if (event == EVENT_ABORT || event == EVENT_RESET) {
             resetFilePath();
             err = SCPI_RES_OK;
-        } else if (event == EVENT_ABORT_AFTER_MASS_STORAGE_ERROR || event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR) {
+        } else if (event == EVENT_ABORT_AFTER_MASS_STORAGE_ERROR || event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_MASTER || event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_SLAVE) {
             err = SCPI_RES_OK;
         }
 
@@ -745,11 +746,11 @@ void stateTransition(int event, int* perr) {
         } else if (event == EVENT_ABORT_AFTER_MASS_STORAGE_ERROR) {
             resetFilePath();
             setState(STATE_IDLE);
-            err = SCPI_ERROR_BUFFER_OVERFLOW;
-        } else if (event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR) {
+            err = SCPI_ERROR_MASS_STORAGE_ERROR;
+        } else if (event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_MASTER || event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_SLAVE) {
             resetFilePath();
             setState(STATE_IDLE);
-            err = SCPI_ERROR_MASS_STORAGE_ERROR;
+            err = event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_MASTER ? SCPI_ERROR_BUFFER_OVERFLOW : SCPI_ERROR_BUFFER_OVERFLOW_SLAVE;
         }
     } else if (g_state == STATE_EXECUTING) {
         if (event == EVENT_TOGGLE_STOP || event == EVENT_FINISH || event == EVENT_ABORT || event == EVENT_RESET) {
@@ -757,9 +758,9 @@ void stateTransition(int event, int* perr) {
 			err = SCPI_RES_OK;
         } else if (event == EVENT_TOGGLE_START) {
             err = SCPI_RES_OK;
-        } else if (event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR) {
+        } else if (event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_MASTER || event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_SLAVE) {
             doFinish(true);
-            err = SCPI_ERROR_BUFFER_OVERFLOW;
+            err = event == EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_MASTER ? SCPI_ERROR_BUFFER_OVERFLOW : SCPI_ERROR_BUFFER_OVERFLOW_SLAVE;
         } else if (event == EVENT_ABORT_AFTER_MASS_STORAGE_ERROR) {
             doFinish(true);
             err = SCPI_ERROR_MASS_STORAGE_ERROR;
@@ -821,8 +822,8 @@ void abort() {
     stateTransition(EVENT_ABORT);
 }
 
-void abortAfterBufferOverflowError() {
-    stateTransition(EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR);
+void abortAfterBufferOverflowError(int detectionSource) {
+    stateTransition(detectionSource ? EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_SLAVE : EVENT_ABORT_AFTER_BUFFER_OVERFLOW_ERROR_MASTER);
 }
 
 void abortAfterMassStorageError() {

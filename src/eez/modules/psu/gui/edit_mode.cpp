@@ -104,7 +104,16 @@ void enter(int tabIndex, bool setFocus) {
 
     if (g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {
         Cursor cursor(getFocusCursor());
-        edit_mode_keypad::enter(isChannelData(cursor, g_focusDataId) ? getFocusCursor() : -1, g_editValue, getAllowZero(getFocusCursor(), g_focusDataId), g_minValue, g_maxValue);
+        int slotIndex = -1;
+        int subchannelIndex = -1;
+        if (isChannelData(cursor, g_focusDataId)) {
+            auto &channel = Channel::get(cursor);
+            slotIndex = channel.slotIndex;
+            subchannelIndex = channel.subchannelIndex;
+		} else {
+			getSloatAndSubchannelIndex(cursor, g_focusDataId, slotIndex, subchannelIndex);
+		}
+        edit_mode_keypad::enter(slotIndex, subchannelIndex, g_editValue, getAllowZero(getFocusCursor(), g_focusDataId), g_minValue, g_maxValue);
     } else {
         edit_mode_keypad::exit();
     }
@@ -234,12 +243,13 @@ void onKeypadOk(float value) {
     }
 }
 
-void enter(int channelIndex, const Value &editValue, bool allowZero, const Value &minValue, Value &maxValue) {
+void enter(int slotIndex, int subchannelIndex, const Value &editValue, bool allowZero, const Value &minValue, Value &maxValue) {
     g_keypad = &g_theKeypad;
 
     NumericKeypadOptions options;
 
-    options.channelIndex = channelIndex;
+    options.slotIndex = slotIndex;
+	options.subchannelIndex = subchannelIndex;
 
     if (editValue.getType() == VALUE_TYPE_FLOAT) {
         options.editValueUnit = editValue.getUnit();

@@ -441,10 +441,13 @@ struct Module {
 
     virtual const char *getPinoutFile();
 
-	virtual bool measureTemperature(int subbchannelIndex, float &temperature, int *err);
+	virtual bool measureTemperature(int subchannelIndex, float &temperature, int *err);
 
     virtual bool isCopyToAvailable();
     virtual void copyTo(int slotIndex);
+	
+	virtual bool isMicroAmperAllowed(int subchannelIndex);
+	virtual bool isAmperAllowed(int subchannelIndex);
 };
 
 static const int NUM_SLOTS = 3;

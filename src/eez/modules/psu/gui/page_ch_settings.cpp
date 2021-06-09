@@ -280,7 +280,8 @@ void ChSettingsProtectionSetPage::onLimitSet(float value) {
 void ChSettingsProtectionSetPage::editLimit() {
     NumericKeypadOptions options;
 
-    options.channelIndex = g_channel->channelIndex;
+	options.slotIndex = g_channel->slotIndex;
+    options.subchannelIndex = g_channel->subchannelIndex;
 
     options.editValueUnit = limit.getUnit();
 
@@ -305,7 +306,8 @@ void ChSettingsProtectionSetPage::onLevelSet(float value) {
 void ChSettingsProtectionSetPage::editLevel() {
     NumericKeypadOptions options;
 
-    options.channelIndex = g_channel->channelIndex;
+	options.slotIndex = g_channel->slotIndex;
+	options.subchannelIndex = g_channel->subchannelIndex;
 
     options.editValueUnit = level.getUnit();
 
@@ -703,7 +705,8 @@ void ChSettingsListsPage::edit() {
     if (isFocusWidget(getFoundWidgetAtDown())) {
         NumericKeypadOptions options;
 
-        options.channelIndex = g_channel->channelIndex;
+		options.slotIndex = g_channel->slotIndex;
+		options.subchannelIndex = g_channel->subchannelIndex;
 
         Cursor cursor(getCursorIndexWithinPage());
 

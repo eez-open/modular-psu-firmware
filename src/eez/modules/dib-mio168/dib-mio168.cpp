@@ -103,15 +103,16 @@ static const int PWM_1_SUBCHANNEL_INDEX = 10;
 static const int PWM_2_SUBCHANNEL_INDEX = 11;
 
 static float AOUT_DAC7760_ENCODER_STEP_VALUES[] = { 0.01f, 0.1f, 0.2f, 0.5f };
-static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES[] = { 0.001f, 0.005f, 0.01f, 0.05f };
+static float AOUT_DAC7760_ENCODER_STEP_VALUES_20V[] = { 0.05f, 0.1f, 0.2f, 0.5f };
+static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES[] = { 1E-5f, 1E-4f, 1E-3f, 2E-3f };
 
 static float AOUT_DAC7760_ENCODER_STEP_VALUES_CAL[] = { 0.001f, 0.01f, 0.02f, 0.05f };
-static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES_CAL[] = { 0.0001f, 0.0005f, 0.001f, 0.005f };
+static float AOUT_DAC7760_AMPER_ENCODER_STEP_VALUES_CAL[] = { 1E-5f, 1E-4f, 1E-3f, 2E-3f };
 
 static float AOUT_DAC7563_MIN = -10.0f;
 static float AOUT_DAC7563_MAX = 10.0f;
-static float AOUT_DAC7563_ENCODER_STEP_VALUES[] = { 0.01f, 0.1f, 0.2f, 0.5f };
-static float AOUT_DAC7563_ENCODER_STEP_VALUES_CAL[] = { 0.001f, 0.01f, 0.02f, 0.05f };
+static float AOUT_DAC7563_ENCODER_STEP_VALUES[] = { 0.05f, 0.1f, 0.2f, 0.5f };
+static float AOUT_DAC7563_ENCODER_STEP_VALUES_CAL[] = { 0.005f, 0.01f, 0.02f, 0.05f };
 
 static float PWM_MIN_FREQUENCY = 0.1f;
 static float PWM_MAX_FREQUENCY = 1000000.0f;
@@ -186,7 +187,9 @@ struct SetParams {
         float p2CalY;
 	} ain[4];
 
-    uint8_t powerLineFrequency; // 50 or 60
+	uint8_t acAnalysisEnabled;
+
+	uint8_t powerLineFrequency; // 50 or 60
 
 	struct {
 		uint8_t outputEnabled;
@@ -1288,11 +1291,12 @@ struct AoutDac7760Channel {
     bool m_outputEnabled = false;
     uint8_t m_mode = SOURCE_MODE_VOLTAGE;
 
+private:
     uint8_t m_currentRange = 5;
+	uint8_t m_voltageRange = 0;
 
-    uint8_t m_voltageRange = 0;
-
-    float m_currentValue = 0;
+public:
+	float m_currentValue = 0;
     float m_voltageValue = 0;
 
     CalConf calConf[7];
@@ -1435,6 +1439,11 @@ struct AoutDac7760Channel {
     
     void setCurrentRange(int8_t range) {
         m_currentRange = range;
+		if (m_currentValue < getCurrentMinValue()) {
+			m_currentValue = getCurrentMinValue();
+		} else if (m_currentValue > getCurrentMaxValue()) {
+			m_currentValue = getCurrentMaxValue();
+		}
     }
 
     int8_t getVoltageRange() {
@@ -1443,7 +1452,12 @@ struct AoutDac7760Channel {
     
     void setVoltageRange(int8_t range) {
         m_voltageRange = range;
-    }
+		if (m_voltageValue < getVoltageMinValue()) {
+			m_voltageValue = getVoltageMinValue();
+		} else if (m_voltageValue > getVoltageMaxValue()) {
+			m_voltageValue = getVoltageMaxValue();
+		}
+	}
 
     float getValue() {
         return getMode() == SOURCE_MODE_VOLTAGE ? m_voltageValue : m_currentValue;
@@ -1546,11 +1560,13 @@ struct AoutDac7760Channel {
     }
 
     float getVoltageResolution() {
-        return ongoingCal ? 0.0001f : 0.001f;
+		float resolution = m_voltageRange == 0 ? 0.002 : 0.005;
+		return ongoingCal ? 0.1f * resolution : resolution;
     }
 
     float getCurrentResolution() {
-        return ongoingCal ? 0.0001f : 0.001f;
+		float resolution = 1E-5f; // 10 uA
+        return ongoingCal ? 0.1f * resolution : resolution;
     }
 
     float getResolution() {
@@ -1567,8 +1583,13 @@ struct AoutDac7760Channel {
             stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES_CAL) / sizeof(float);
             stepValues->unit = UNIT_VOLT;
         } else {
-            stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES;
-            stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES) / sizeof(float);
+            if (m_voltageRange == 3) {
+                stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES_20V;
+                stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES_20V) / sizeof(float);
+            } else {
+                stepValues->values = AOUT_DAC7760_ENCODER_STEP_VALUES;
+                stepValues->count = sizeof(AOUT_DAC7760_ENCODER_STEP_VALUES) / sizeof(float);
+            }
             stepValues->unit = UNIT_VOLT;
         }
     }
@@ -1943,6 +1964,7 @@ public:
 	uint8_t selectedPageInDefaultView = 0;
 
 	uint8_t efficiencyFormula = EFFICIENCY_FORMULA_P1_OVER_P2;
+	uint8_t acAnalysisEnabled;
 
     Mio168Module() {
 		assert(sizeof(Request) == sizeof(Response));
@@ -2101,7 +2123,7 @@ public:
 						dlog_record::abort();
 						break;
 					case DLOG_STATE_FINISH_RESULT_BUFFER_OVERFLOW:
-						dlog_record::abortAfterBufferOverflowError();
+						dlog_record::abortAfterBufferOverflowError(1);
 						break;
 					case DLOG_STATE_FINISH_RESULT_MASS_STORAGE_ERROR:
 						dlog_record::abortAfterMassStorageError();
@@ -2153,6 +2175,8 @@ public:
                 params.ain[i].p2CalY = 1;
             }
         }
+
+		params.acAnalysisEnabled = acAnalysisEnabled && !(dlog_record::isExecuting() && dlog_record::isModuleAtSlotRecording(slotIndex));
 
         params.powerLineFrequency = persist_conf::getPowerLineFrequency();
 
@@ -2266,7 +2290,7 @@ public:
 
             if (dlogRecordingData.numRecords == 0xFFFF) {
             	// buffer overflow
-            	dlog_record::abortAfterBufferOverflowError();
+            	dlog_record::abortAfterBufferOverflowError(1);
             	return;
             }
 
@@ -2902,6 +2926,7 @@ public:
         uint8_t selectedPageInMaxView;
 		uint8_t selectedPageInDefaultView;
 		uint8_t efficiencyFormula;
+        uint8_t acAnalysisEnabled;
     };
 
     void resetProfileToDefaults(uint8_t *buffer) override {
@@ -2928,6 +2953,7 @@ public:
 		selectedPageInDefaultView = 0;
 		
 		efficiencyFormula = EFFICIENCY_FORMULA_P1_OVER_P2;
+        acAnalysisEnabled = 0;
     }
 
     void getProfileParameters(uint8_t *buffer) override {
@@ -2954,8 +2980,9 @@ public:
 
         parameters->selectedPageInMaxView = selectedPageInMaxView;
 		parameters->selectedPageInDefaultView = selectedPageInDefaultView;
-		
+
 		parameters->efficiencyFormula = efficiencyFormula;
+        parameters->acAnalysisEnabled = acAnalysisEnabled;
     }
     
     void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) override {
@@ -2982,6 +3009,7 @@ public:
 		selectedPageInDefaultView = parameters->selectedPageInDefaultView;
 
 		efficiencyFormula = parameters->efficiencyFormula;
+        acAnalysisEnabled = parameters->acAnalysisEnabled;
     }
     
     bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) override {
@@ -3022,6 +3050,7 @@ public:
 		WRITE_PROPERTY("selectedPageInDefaultView", parameters->selectedPageInDefaultView);
 
 		WRITE_PROPERTY("efficiencyFormula", parameters->efficiencyFormula);
+        WRITE_PROPERTY("acAnalysisEnabled", parameters->acAnalysisEnabled);
 
         return true;
     }
@@ -3064,6 +3093,7 @@ public:
 		READ_PROPERTY("selectedPageInDefaultView", parameters->selectedPageInDefaultView);
 
 		READ_PROPERTY("efficiencyFormula", parameters->efficiencyFormula);
+        READ_PROPERTY("acAnalysisEnabled", parameters->acAnalysisEnabled);
 
         return false;
     }
@@ -3090,6 +3120,7 @@ public:
 		selectedPageInDefaultView = 0;
 
 		efficiencyFormula = EFFICIENCY_FORMULA_P1_OVER_P2;
+        acAnalysisEnabled = 0;
     }
 
     size_t getChannelLabelMaxLength(int subchannelIndex) override {
@@ -3935,8 +3966,8 @@ public:
             auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
             channel.ongoingCal = 1;
             channel.m_mode = calibrationChannelMode;
-            channel.m_voltageRange = calibrationChannelVoltageRange;
-            channel.m_currentRange = calibrationChannelCurrentRange;
+            channel.setVoltageRange(calibrationChannelVoltageRange);
+            channel.setCurrentRange(calibrationChannelCurrentRange);
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
             aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].ongoingCal = 1;
         } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
@@ -4697,6 +4728,20 @@ public:
 		}
 		return nullptr;
 	}
+
+	bool isMicroAmperAllowed(int subchannelIndex) override {
+		if (subchannelIndex == AOUT_1_SUBCHANNEL_INDEX || subchannelIndex == AOUT_2_SUBCHANNEL_INDEX) {
+			return true;
+		}
+		return Module::isMicroAmperAllowed(subchannelIndex);
+	}
+
+	bool isAmperAllowed(int subchannelIndex) override {
+		if (subchannelIndex == AOUT_1_SUBCHANNEL_INDEX || subchannelIndex == AOUT_2_SUBCHANNEL_INDEX) {
+			return false;
+		}
+		return Module::isMicroAmperAllowed(subchannelIndex);
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5097,8 +5142,8 @@ public:
 
         m_outputEnabled = m_outputEnabledOrig = channel.m_outputEnabled;
         m_mode = m_modeOrig = channel.m_mode;
-        m_currentRange = m_currentRangeOrig = channel.m_currentRange;
-        m_voltageRange = m_voltageRangeOrig = channel.m_voltageRange;
+        m_currentRange = m_currentRangeOrig = channel.getCurrentRange();
+        m_voltageRange = m_voltageRangeOrig = channel.getVoltageRange();
         m_triggerMode = m_triggerModeOrig = channel.m_triggerMode;
     }
 
@@ -5176,9 +5221,9 @@ public:
 
 		if (channel.m_outputEnabled) {
 			if (channel.m_mode == MEASURE_MODE_VOLTAGE) {
-				return channel.m_voltageRange;
+				return channel.getVoltageRange();
 			} else {
-				return channel.m_currentRange;
+				return channel.getCurrentRange() - 1;
 			}
 		}
 		else {
@@ -5193,11 +5238,11 @@ public:
         if (modeRange < 4) {
 			channel.m_outputEnabled = true;
             channel.m_mode = MEASURE_MODE_VOLTAGE;
-            channel.m_voltageRange = modeRange;
+            channel.setVoltageRange(modeRange);
         } else if (modeRange < 7) {
 			channel.m_outputEnabled = true;
             channel.m_mode = MEASURE_MODE_CURRENT;
-            channel.m_currentRange = modeRange;
+            channel.setCurrentRange(modeRange + 1);
         } else {
 			channel.m_outputEnabled = false;
         }
@@ -5294,8 +5339,8 @@ void Mio168Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
         auto &channel = aoutDac7760Channels[AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX];
         channel.m_outputEnabled = g_aoutDac7760ConfigurationPage.m_outputEnabled;
         channel.m_mode = g_aoutDac7760ConfigurationPage.m_mode;
-        channel.m_currentRange = g_aoutDac7760ConfigurationPage.m_currentRange;
-        channel.m_voltageRange = g_aoutDac7760ConfigurationPage.m_voltageRange;
+        channel.setCurrentRange(g_aoutDac7760ConfigurationPage.m_currentRange);
+        channel.setVoltageRange(g_aoutDac7760ConfigurationPage.m_voltageRange);
 
 		g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(AoutDac7760ConfigurationPage::g_selectedChannelIndex, 0, g_aoutDac7760ConfigurationPage.m_triggerMode, nullptr);
 
@@ -6320,6 +6365,20 @@ void data_dib_mio168_aout_label_label(DataOperationEnum operation, Cursor cursor
     }
 }
 
+void data_dib_mio168_aout_value_is_off(DataOperationEnum operation, Cursor cursor, Value &value) {
+	int slotIndex = cursor / 4;
+	int aoutChannelIndex = cursor % 4;
+
+	if (operation == DATA_OPERATION_GET) {
+		if (aoutChannelIndex < 2) {
+			auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
+			value = !channel.m_outputEnabled;
+		} else {
+			value = 0;
+		}
+	}
+}
+
 void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Value &value) {
     int slotIndex = cursor / 4;
     int aoutChannelIndex = cursor % 4;
@@ -6391,7 +6450,11 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Valu
             auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7563Channels[aoutChannelIndex - 2];
             channel.m_value = roundPrec(value.getFloat(), channel.getResolution());
         }
-    }
+	} else if (operation == DATA_OPERATION_GET_SLOT_AND_SUBCHANNEL_INDEX) {
+		value.pairOfInt16_.first = slotIndex;
+		value.pairOfInt16_.second = AOUT_1_SUBCHANNEL_INDEX +  aoutChannelIndex;
+		value.type_ = VALUE_TYPE_UINT32;
+	}
 }
 
 void data_dib_mio168_aout_output_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -6822,18 +6885,21 @@ void action_dib_mio168_show_channel_labels() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static const int NUM_PAGES_IN_MAX_VIEW = 7;
+static const int NUM_PAGES_IN_DEFAULT_VIEW = 6;
+
 void data_dib_mio168_pager_list(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
-        value = 6;
+        value = NUM_PAGES_IN_MAX_VIEW;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
-        value = hmi::g_selectedSlotIndex * 6 + value.getInt();
+        value = hmi::g_selectedSlotIndex * NUM_PAGES_IN_MAX_VIEW + value.getInt();
     }
 }
 
 void data_dib_mio168_pager_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-		auto module = (Mio168Module *)g_slots[cursor / 6];
-		value = module->selectedPageInMaxView == cursor % 6 ? 1 : 0;
+		auto module = (Mio168Module *)g_slots[cursor / NUM_PAGES_IN_MAX_VIEW];
+		value = module->selectedPageInMaxView == cursor % NUM_PAGES_IN_MAX_VIEW ? 1 : 0;
 	}
 }
 
@@ -6846,10 +6912,10 @@ void data_dib_mio168_pager_selected_page(DataOperationEnum operation, Cursor cur
 
 void action_dib_mio168_pager_select_page() {
 	auto cursor = getFoundWidgetAtDown().cursor;
-	auto module = (Mio168Module *)g_slots[cursor / 6];
-    if (cursor % 6 != module->selectedPageInMaxView) {
+	auto module = (Mio168Module *)g_slots[cursor / NUM_PAGES_IN_MAX_VIEW];
+    if (cursor % NUM_PAGES_IN_MAX_VIEW != module->selectedPageInMaxView) {
         auto selectedPage = module->selectedPageInMaxView;
-        module->selectedPageInMaxView = cursor % 6;
+        module->selectedPageInMaxView = cursor % NUM_PAGES_IN_MAX_VIEW;
 
         if (module->selectedPageInMaxView > selectedPage) {
             animateSlideLeftWithoutHeader();
@@ -6862,7 +6928,7 @@ void action_dib_mio168_pager_select_page() {
 void data_dib_mio168_is_settings_page_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		auto module = (Mio168Module *)g_slots[cursor];
-		value = module->selectedPageInMaxView == 6;
+		value = module->selectedPageInMaxView == NUM_PAGES_IN_MAX_VIEW;
 	}
 }
 
@@ -6870,7 +6936,7 @@ void action_dib_mio168_show_slot_settings_in_max_view() {
     auto slotIndex = getFoundWidgetAtDown().cursor;
     hmi::selectSlot(slotIndex);
 	auto module = (Mio168Module *)g_slots[slotIndex];
-    module->selectedPageInMaxView = 6;
+    module->selectedPageInMaxView = NUM_PAGES_IN_MAX_VIEW;
     animateSlideLeftWithoutHeader();
 }
 
@@ -6883,7 +6949,7 @@ void data_dib_mio168_selected_page_in_default_view(DataOperationEnum operation, 
 
 void action_dib_mio168_select_page_in_default_view() {
 	auto module = (Mio168Module *)g_slots[getFoundWidgetAtDown().cursor];
-	module->selectedPageInDefaultView = (module->selectedPageInDefaultView + 1) % 7;
+	module->selectedPageInDefaultView = (module->selectedPageInDefaultView + 1) % NUM_PAGES_IN_DEFAULT_VIEW;
 	if (isDefaultViewVertical()) {
 		animateSlideLeftInDefaultViewVert(getFoundWidgetAtDown().cursor);
 	} else {
@@ -6901,6 +6967,25 @@ void data_dib_mio168_is_no_afe(DataOperationEnum operation, Cursor cursor, Value
 		}
 		value = (int)((Mio168Module *)g_slots[slotIndex])->afeVersion == 4;
 	}
+}
+
+void data_dib_mio168_ac_analysis_allowed(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = !(dlog_record::isExecuting() && dlog_record::isModuleAtSlotRecording(cursor));
+	}
+}
+
+void data_dib_mio168_ac_analysis_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		auto module = (Mio168Module *)g_slots[cursor];
+		value = module->acAnalysisEnabled && !(dlog_record::isExecuting() && dlog_record::isModuleAtSlotRecording(cursor));
+	}
+}
+
+void action_dib_mio168_ain_toggle_ac_analysis() {
+	auto slotIndex = getFoundWidgetAtDown().cursor;
+    auto module = (Mio168Module *)g_slots[slotIndex];
+    module->acAnalysisEnabled = !module->acAnalysisEnabled;
 }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

@@ -25,6 +25,7 @@
 
 #include <eez/sound.h>
 #include <eez/system.h>
+#include <eez/index.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/display_data.h>
@@ -344,7 +345,8 @@ int Keypad::getXScroll(const WidgetCursor &widgetCursor) {
 NumericKeypadOptions::NumericKeypadOptions() {
 	pageId = PAGE_ID_NUMERIC_KEYPAD;
 
-    this->channelIndex = -1;
+    this->slotIndex = -1;
+	this->subchannelIndex = -1;
 
     allowZero = false;
     min = NAN;
@@ -677,14 +679,14 @@ Unit NumericKeypad::getSwitchToUnit() {
     if (m_options.editValueUnit == UNIT_AMPER)
         return UNIT_MILLI_AMPER;
     if (m_options.editValueUnit == UNIT_MILLI_AMPER) {
-        if (m_options.channelIndex != -1 && Channel::get(m_options.channelIndex).isMicroAmperAllowed()) {
+        if (m_options.slotIndex != -1 && m_options.subchannelIndex != -1 && g_slots[m_options.slotIndex]->isMicroAmperAllowed(m_options.subchannelIndex)) {
             return UNIT_MICRO_AMPER;
         } else {
             return UNIT_AMPER;
         }
     }
     if (m_options.editValueUnit == UNIT_MICRO_AMPER) {
-        if (m_options.channelIndex == -1 || Channel::get(m_options.channelIndex).isAmperAllowed()) {
+		if (m_options.slotIndex != -1 && m_options.subchannelIndex != -1 && g_slots[m_options.slotIndex]->isAmperAllowed(m_options.subchannelIndex)) {
             return UNIT_AMPER;
         } else {
             return UNIT_MILLI_AMPER;
@@ -1089,8 +1091,9 @@ void NumericKeypad::onEncoder(int counter) {
 
         if (m_startValue.getType() == VALUE_TYPE_FLOAT) {
             float precision;
-            if (m_options.channelIndex != -1) {
-                precision = psu::channel_dispatcher::getValuePrecision(psu::Channel::get(m_options.channelIndex), m_startValue.getUnit(), m_startValue.getFloat());
+			auto channel = Channel::getBySlotIndex(m_options.slotIndex, m_options.subchannelIndex);
+            if (channel) {
+                precision = psu::channel_dispatcher::getValuePrecision(*channel, m_startValue.getUnit(), m_startValue.getFloat());
             } else {
                 precision = m_options.encoderPrecision;
             }

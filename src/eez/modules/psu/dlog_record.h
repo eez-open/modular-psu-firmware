@@ -65,7 +65,7 @@ void triggerGenerated();
 void toggleStart();
 void toggleStop();
 void abort();
-void abortAfterBufferOverflowError();
+void abortAfterBufferOverflowError(int detectionSource);
 void abortAfterMassStorageError();
 void reset();
 
