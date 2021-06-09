@@ -203,12 +203,14 @@ void stateManagment() {
 			}
 		}
 	} else if (isExecuting && !g_wasExecuting) {
-		if (psu::gui::getActivePageId() == PAGE_ID_MAIN) {
+		if (!psu::gui::isPageOnStack(getExternalAssetsFirstPageId())) {
             g_showLatest = true;
-            gui::showPage(PAGE_ID_DLOG_VIEW);
-		} else {
-            eez::gui::refreshScreen();
-        }
+            if (!psu::gui::isPageOnStack(PAGE_ID_DLOG_VIEW)) {
+                gui::showPage(PAGE_ID_DLOG_VIEW);
+            } else {
+                eez::gui::refreshScreen();
+            }
+		}
     }
 	g_wasExecuting = isExecuting;
 
