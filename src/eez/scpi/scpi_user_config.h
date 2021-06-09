@@ -77,6 +77,7 @@ extern "C" {
     X(SCPI_ERROR_CH5_OUTPUT_FAULT_DETECTED,                 -274, "CH5 output fault detected")                    \
     X(SCPI_ERROR_CH6_OUTPUT_FAULT_DETECTED,                 -275, "CH6 output fault detected")                    \
     X(SCPI_ERROR_OUT_OF_DEVICE_MEMORY,                      -321, "Out of memory")                                \
+    X(SCPI_ERROR_TIME_OUT,                                  -365, "Time out error")                               \
     X(SCPI_ERROR_QUERY_ERROR,                               -400, "Query error")                                  \
     X(SCPI_ERROR_CHANNEL_NOT_FOUND,                          100, "Channel not found")                            \
     X(SCPI_ERROR_CALIBRATION_STATE_IS_OFF,                   101, "Calibration state is off")                     \

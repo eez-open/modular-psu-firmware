@@ -16,19 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
 #include <crc.h>
 #include <eez/platform/stm32/spi.h>
-#include <memory.h>
 #include <stdlib.h>
 #endif
 
 #include <eez/debug.h>
 #include <eez/index.h>
 #include <eez/system.h>
+#include <eez/tasks.h>
 
 #include <eez/modules/bp3c/comm.h>
+
+#include "scpi/scpi.h"
 
 #define SPI_SLAVE_SYNBYTE         0x53
 #define SPI_MASTER_SYNBYTE        0xAC
@@ -143,6 +147,37 @@ void abortTransfer(int slotIndex) {
 	spi::abortTransfer(slotIndex);
     spi::deselect(slotIndex);
 #endif
+}
+
+void updateParamsStart() {
+    if (isLowPriorityThread()) {
+#if defined(EEZ_PLATFORM_STM32)        
+        taskENTER_CRITICAL();
+#endif
+    }
+}
+
+bool updateParamsFinish(const void *updateParams, const void *lastTransferedParams, size_t paramsSize, uint32_t timeout, int *err) {
+    if (isLowPriorityThread()) {
+#if defined(EEZ_PLATFORM_STM32)        
+        taskEXIT_CRITICAL();
+#endif
+
+        uint32_t start = millis();
+        while (true) {
+            if (memcmp(updateParams, lastTransferedParams, paramsSize) == 0) {
+                return true;
+            }
+            if (millis() - start > timeout) {
+                if (err) {
+                    *err = SCPI_ERROR_TIME_OUT;
+                }
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 } // namespace comm

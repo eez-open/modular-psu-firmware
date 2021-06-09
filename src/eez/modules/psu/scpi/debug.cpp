@@ -61,6 +61,8 @@ using namespace debug;
 
 namespace scpi {
 
+uint32_t g_startTime;
+
 scpi_result_t scpi_cmd_debug(scpi_t *context) {
 #ifdef DEBUG
     int32_t cmd;
@@ -137,7 +139,9 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             persist_conf::clearMcuRevision();
             restart();
         }
-        else {
+		else if (cmd == 34) {
+			g_startTime = millis();
+		} else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;
         }
@@ -171,7 +175,10 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
             SCPI_ResultText(context, idCode);
 #endif
             return SCPI_RES_OK;
-        } else {
+		} else if (cmd == 34) {
+			SCPI_ResultUInt32(context, millis() - g_startTime);
+			return SCPI_RES_OK;
+		} else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;
         }

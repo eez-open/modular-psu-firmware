@@ -2827,7 +2827,11 @@ public:
 
     void onPowerDown() override {
         powerDown = true;
-        executeCommand(&setParams_command);
+        if (bp3c::flash_slave::g_bootloaderMode) {
+            synchronized = false;
+        } else {
+            executeCommand(&setParams_command);
+        }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
         sendMessageToLowPriorityThread(THREAD_MESSAGE_FS_DRIVER_UNLINK, slotIndex, 0);

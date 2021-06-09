@@ -38,6 +38,9 @@ TransferResult transfer(int slotIndex, uint8_t *output, uint8_t *input, uint32_t
 TransferResult transferDMA(int slotIndex, uint8_t *output, uint8_t *input, uint32_t bufferSize);
 void abortTransfer(int slotIndex);
 
+void updateParamsStart();
+bool updateParamsFinish(const void *updateParams, const void *lastTransferedParams, size_t paramsSize, uint32_t timeout, int *err);
+
 } // namespace comm
 } // namespace bp3c
 } // namespace eez

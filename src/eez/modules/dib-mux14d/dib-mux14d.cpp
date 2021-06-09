@@ -40,6 +40,7 @@
 #include "eez/modules/psu/gui/labels_and_colors.h"
 #include "eez/modules/psu/gui/animations.h"
 #include "eez/modules/bp3c/comm.h"
+#include "eez/modules/bp3c/flash_slave.h"
 
 #include "scpi/scpi.h"
 
@@ -315,13 +316,32 @@ public:
 
     ////////////////////////////////////////
 
+    void getParams(SetParams &params) {
+		memset(&params, 0, sizeof(SetParams));
+        params.p1RelayStates = p1RelayStates;
+		params.p2RelayStates = p2RelayStates;
+        params.adib1RelayState = adib1RelayState;
+        params.adib2RelayState = adib2RelayState;
+		params.extRelayState = extRelayState;
+    }
+
+    bool updateParams(const SetParams &params, int *err) {
+        bp3c::comm::updateParamsStart();
+
+        p1RelayStates = params.p1RelayStates;
+		p2RelayStates = params.p2RelayStates;
+        adib1RelayState = params.adib1RelayState;
+        adib2RelayState = params.adib2RelayState;
+		extRelayState = params.extRelayState;
+
+        return bp3c::comm::updateParamsFinish(&params, &lastTransferredParams, sizeof(SetParams), 100, err);
+    }
+
 	void fillSetParams(SetParams &params) {
 		memset(&params, 0, sizeof(SetParams));
-        params.p1RelayStates = powerDown ? 0 : p1RelayStates;
-		params.p2RelayStates = powerDown ? 0 : p2RelayStates;
-        params.adib1RelayState = powerDown ? 0 : adib1RelayState;
-        params.adib2RelayState = powerDown ? 0 : adib2RelayState;
-		params.extRelayState = powerDown ? 0 : extRelayState;
+        if (!powerDown) {
+            getParams(params);
+        }
 	}
 
     void Command_SetParams_FillRequest(Request &request) {
@@ -546,6 +566,8 @@ public:
                         response->getInfo.idw2 = 0;
 					} else if (currentCommand->command == COMMAND_GET_STATE) {
 						response->getState.cjTemp = 23.0f;
+					} else if (currentCommand->command == COMMAND_SET_PARAMS) {
+						response->setParams.result = 1;
 					}
 
                     stateTransition(EVENT_DMA_TRANSFER_COMPLETED);
@@ -606,7 +628,11 @@ public:
 
     void onPowerDown() override {
         powerDown = true;
-        executeCommand(&setParams_command);
+        if (bp3c::flash_slave::g_bootloaderMode) {
+            synchronized = false;
+        } else {
+            executeCommand(&setParams_command);
+        }
     }
 
     void resync() override {
@@ -984,25 +1010,28 @@ public:
             }
         }
 
+        SetParams params;
+        getParams(params);
+
         for (int i = 0; i < channelList.numChannels; i++) {
 			int subchannelIndex = channelList.channels[i].subchannelIndex;
 
             subchannelIndex++;
 
             if (subchannelIndex == 1) {
-                adib1RelayState = 0;
+                params.adib1RelayState = 0;
             } else if (subchannelIndex == 2) {
-                adib2RelayState = 0;
+                params.adib2RelayState = 0;
             } else if (subchannelIndex == 3) {
-                extRelayState = 0;
+                params.extRelayState = 0;
             } else if (subchannelIndex >= 11 && subchannelIndex <= 17) {
-			    p1RelayStates &= ~(1 << (subchannelIndex - 11));
+			    params.p1RelayStates &= ~(1 << (subchannelIndex - 11));
             } else if (subchannelIndex >= 21 && subchannelIndex <= 27) {
-			    p2RelayStates &= ~(1 << (subchannelIndex - 21));
+			    params.p2RelayStates &= ~(1 << (subchannelIndex - 21));
             }            
         }
 
-        return true;
+        return updateParams(params, err);
     }
 
     bool hasMultipleConnections() {
@@ -1042,23 +1071,26 @@ public:
             }
         }
 
+        SetParams params;
+        getParams(params);
+
         for (int i = 0; i < channelList.numChannels; i++) {
 			int subchannelIndex = channelList.channels[i].subchannelIndex;
 
             subchannelIndex++;
 
             if (subchannelIndex == 1) {
-                adib1RelayState = 1;
+                params.adib1RelayState = 1;
             } else if (subchannelIndex == 2) {
-                adib2RelayState = 1;
+                params.adib2RelayState = 1;
             } else if (subchannelIndex == 3) {
-                extRelayState = 1;
-				p1RelayStates = 0;
-				p2RelayStates = 0;
+                params.extRelayState = 1;
+				params.p1RelayStates = 0;
+				params.p2RelayStates = 0;
             } else if (subchannelIndex >= 11 && subchannelIndex <= 17) {
-			    p1RelayStates |= 1 << (subchannelIndex - 11);
+			    params.p1RelayStates |= 1 << (subchannelIndex - 11);
             } else if (subchannelIndex >= 21 && subchannelIndex <= 27) {
-			    p2RelayStates |= 1 << (subchannelIndex - 21);
+			    params.p2RelayStates |= 1 << (subchannelIndex - 21);
             }            
         }
 
@@ -1066,7 +1098,7 @@ public:
             multipleConnections = true;
         }
 
-        return true;
+        return updateParams(params, err);
     }
 
     bool routeCloseExclusive(ChannelList channelList, int *err) override {
@@ -1077,16 +1109,19 @@ public:
             return false;            
         }
 
+        SetParams params;
+        getParams(params);
+
         int subchannelIndex = channelList.channels[0].subchannelIndex + 1;
         if (subchannelIndex >= 11 && subchannelIndex <= 17) {
-            p1RelayStates = 1 << (subchannelIndex - 11);
-            if (extRelayState) {
-                p2RelayStates = 0;
+            params.p1RelayStates = 1 << (subchannelIndex - 11);
+            if (params.extRelayState) {
+                params.p2RelayStates = 0;
             }
         } else if (subchannelIndex >= 21 && subchannelIndex <= 27) {
-            p2RelayStates = 1 << (subchannelIndex - 21);
-            if (extRelayState) {
-                p1RelayStates = 0;
+            params.p2RelayStates = 1 << (subchannelIndex - 21);
+            if (params.extRelayState) {
+                params.p1RelayStates = 0;
             }
         } else {
             if (err) {
@@ -1095,7 +1130,7 @@ public:
             return false;            
         }
 
-        return true;
+        return updateParams(params, err);
     }
 
     void toggleP1Relay(int relayIndex) {

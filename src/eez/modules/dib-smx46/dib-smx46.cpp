@@ -44,6 +44,7 @@
 #include "eez/modules/psu/gui/labels_and_colors.h"
 #include "eez/modules/psu/gui/edit_mode.h"
 #include "eez/modules/bp3c/comm.h"
+#include "eez/modules/bp3c/flash_slave.h"
 #include "eez/modules/psu/gui/edit_mode.h"
 
 #include "eez/function_generator.h"
@@ -142,6 +143,11 @@ struct Response {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+struct RelayParams {
+    uint32_t routes;
+    uint8_t relayOn;
+};
+
 struct Smx46Module : public Module {
 public:
     TestResult testResult = TEST_NONE;
@@ -159,6 +165,7 @@ public:
 
     uint32_t lastTransferTime = 0;
 	SetParams lastTransferredParams;
+	RelayParams lastTransferredRelayParams;
     bool forceTransferSetParams;
 
 	struct CommandDef {
@@ -336,11 +343,27 @@ public:
 
     ////////////////////////////////////////
 
+    void getRelayParams(RelayParams &params) {
+		memset(&params, 0, sizeof(RelayParams));
+        params.routes = routes;
+		params.relayOn = relayOn ? 1 : 0;
+    }
+
+    bool updateRelayParams(const RelayParams &params, int *err) {
+        bp3c::comm::updateParamsStart();
+
+        routes = params.routes;
+		relayOn = params.relayOn ? true : false;
+
+        return bp3c::comm::updateParamsFinish(&params, &lastTransferredRelayParams, sizeof(RelayParams), 100, err);
+    }
+
 	void fillSetParams(SetParams &params) {
 		memset(&params, 0, sizeof(SetParams));
 
         if (!powerDown) {
             params.routes = routes;
+            params.relayOn = relayOn ? 1 : 0;
 
 			for (int i = 0; i < 2; i++) {
 				params.aoutValue[i] = calibrationEnabled[i] && isVoltageCalibrationExists(i) ? calibration::remapValue(aoutValue[i], calConf[i].u) : aoutValue[i];
@@ -357,8 +380,6 @@ public:
                     params.aoutWaveformParameters[i].waveform = Waveform::WAVEFORM_NONE;
                 }
             }
-            
-            params.relayOn = relayOn ? 1 : 0;
         }
 	}
 
@@ -375,6 +396,10 @@ public:
                 updateRelayCycles(lastTransferredParams.routes, params.routes, lastTransferredParams.relayOn, params.relayOn);
 
                 memcpy(&lastTransferredParams, &params, sizeof(SetParams));
+
+                memset(&lastTransferredRelayParams, 0, sizeof(RelayParams));
+                lastTransferredRelayParams.routes = params.routes;
+                lastTransferredRelayParams.relayOn = params.relayOn;
             }
         }
     }
@@ -642,7 +667,11 @@ public:
 
     void onPowerDown() override {
         powerDown = true;
-        executeCommand(&setParams_command);
+        if (bp3c::flash_slave::g_bootloaderMode) {
+            synchronized = false;
+        } else {
+            executeCommand(&setParams_command);
+        }
     }
 
     void resync() override {
@@ -988,8 +1017,11 @@ public:
     }
 
     bool routeOpen(ChannelList channelList, int *err) override {
-        uint32_t tempRoutes = routes;
-        bool tempRelayOn = relayOn;
+        RelayParams params;
+        getRelayParams(params);
+
+        uint32_t tempRoutes = params.routes;
+        bool tempRelayOn = params.relayOn ? true : false;
         for (int i = 0; i < channelList.numChannels; i++) {
             int subchannelIndex = channelList.channels[i].subchannelIndex + 1;
             if (subchannelIndex == 3) {
@@ -1009,14 +1041,18 @@ public:
 
             tempRoutes &= ~(1 << (y * NUM_COLUMNS + x));
         }
-        routes = tempRoutes;
-        relayOn = tempRelayOn;
-        return true;
+        params.routes = tempRoutes;
+        params.relayOn = tempRelayOn ? 1 : 0;
+
+        return updateRelayParams(params, err);
     }
     
     bool routeClose(ChannelList channelList, int *err) override {
-        uint32_t tempRoutes = routes;
-        bool tempRelayOn = relayOn;
+        RelayParams params;
+        getRelayParams(params);
+
+        uint32_t tempRoutes = params.routes;
+        bool tempRelayOn = params.relayOn ? true : false;
         for (int i = 0; i < channelList.numChannels; i++) {
             int subchannelIndex = channelList.channels[i].subchannelIndex + 1;
             if (subchannelIndex == 3) {
@@ -1036,9 +1072,10 @@ public:
 
             tempRoutes |= (1 << (y * NUM_COLUMNS + x));
         }
-        routes = tempRoutes;
-        relayOn = tempRelayOn;
-        return true;
+        params.routes = tempRoutes;
+        params.relayOn = tempRelayOn ? 1 : 0;
+
+        return updateRelayParams(params, err);
     }
 
     bool getSwitchMatrixNumRows(int &numRows, int *err) override {

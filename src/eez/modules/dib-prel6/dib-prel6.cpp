@@ -40,6 +40,7 @@
 #include "eez/modules/psu/gui/labels_and_colors.h"
 #include "eez/modules/psu/gui/animations.h"
 #include "eez/modules/bp3c/comm.h"
+#include "eez/modules/bp3c/flash_slave.h"
 
 #include "scpi/scpi.h"
 
@@ -287,9 +288,24 @@ public:
 
     ////////////////////////////////////////
 
+    void getParams(SetParams &params) {
+        memset(&params, 0, sizeof(SetParams));
+        params.relayStates = relayStates;
+    }
+
+    bool updateParams(const SetParams &params, int *err) {
+        bp3c::comm::updateParamsStart();
+
+        relayStates = params.relayStates;
+
+        return bp3c::comm::updateParamsFinish(&params, &lastTransferredParams, sizeof(SetParams), 100, err);
+    }
+
 	void fillSetParams(SetParams &params) {
 		memset(&params, 0, sizeof(SetParams));
-        params.relayStates = powerDown ? 0 : relayStates;
+        if (!powerDown) {
+            getParams(params);
+        }
 	}
 
     void Command_SetParams_FillRequest(Request &request) {
@@ -573,7 +589,11 @@ public:
 
     void onPowerDown() override {
         powerDown = true;
-        executeCommand(&setParams_command);
+        if (bp3c::flash_slave::g_bootloaderMode) {
+            synchronized = false;
+        } else {
+            executeCommand(&setParams_command);
+        }
     }
 
     void resync() override {
@@ -755,6 +775,7 @@ public:
             return false;
         }
 
+
         isRouteOpen = relayStates & (1 << subchannelIndex) ? false : true;
         return true;
     }
@@ -770,12 +791,15 @@ public:
             }
         }
 
+        SetParams params;
+        getParams(params);
+
         for (int i = 0; i < channelList.numChannels; i++) {
 			int subchannelIndex = channelList.channels[i].subchannelIndex;
-			relayStates &= ~(1 << subchannelIndex);
+			params.relayStates &= ~(1 << subchannelIndex);
         }
 
-        return true;
+        return updateParams(params, err);
     }
     
     bool routeClose(ChannelList channelList, int *err) override {
@@ -789,12 +813,15 @@ public:
             }
         }
 
+        SetParams params;
+        getParams(params);
+
         for (int i = 0; i < channelList.numChannels; i++) {
 			int subchannelIndex = channelList.channels[i].subchannelIndex;
-			relayStates |= (1 << subchannelIndex);
+			params.relayStates |= (1 << subchannelIndex);
         }
 
-        return true;
+        return updateParams(params, err);
     }
 
     bool routeCloseExclusive(ChannelList channelList, int *err) override {
