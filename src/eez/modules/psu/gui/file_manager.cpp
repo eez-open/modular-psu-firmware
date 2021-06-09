@@ -97,6 +97,7 @@ bool g_fileBrowserMode;
 DialogType g_dialogType;
 const char *g_fileBrowserTitle;
 FileType g_fileBrowserFileType;
+static bool (*g_fileBrowserNameFilter)(const char *fileName);
 static void (*g_fileBrowserOnFileSelected)(const char *filePath);
 
 static ListViewOption g_rootDirectoryListViewOption = LIST_VIEW_LARGE_ICONS;
@@ -120,6 +121,12 @@ bool makeAbsolutePath(const char *relativePath, char *dest) {
 void catalogCallback(void *param, const char *name, FileType type, size_t size, bool isHiddenOrSystemFile) {
     if (isHiddenOrSystemFile || name[0] == '.' || (g_fileBrowserMode && type != FILE_TYPE_DIRECTORY && type != g_fileBrowserFileType)) {
         return;
+    }
+
+    if (g_fileBrowserMode && g_fileBrowserNameFilter) {
+        if (!g_fileBrowserNameFilter(name)) {
+            return;
+        }
     }
 
     auto fileInfo = (FileInfo *)param;
@@ -1051,11 +1058,12 @@ void FileBrowserPage::set() {
     g_fileBrowserOnFileSelected(filePath);
 }
 
-void browseForFile(const char *title, const char *directory, FileType fileType, DialogType dialogType, void(*onFileSelected)(const char *filePath)) {
+void browseForFile(const char *title, const char *directory, FileType fileType, DialogType dialogType, void(*onFileSelected)(const char *filePath), bool (*nameFilter)(const char *)) {
     g_fileBrowserMode = true;
     g_dialogType = dialogType;
     g_fileBrowserTitle = title;
     g_fileBrowserFileType = fileType;
+    g_fileBrowserNameFilter = nameFilter;
     g_fileBrowserOnFileSelected = onFileSelected;
 
 	g_showDiskDrives = false;

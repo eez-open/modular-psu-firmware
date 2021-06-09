@@ -19,6 +19,7 @@
 #if OPTION_DISPLAY
 
 #include <stdio.h>
+#include <ctype.h> // tolower
 
 #include <eez/firmware.h>
 #include <eez/system.h>
@@ -1216,8 +1217,18 @@ void onFirmwareSelected(const char *filePath) {
     bp3c::flash_slave::start(hmi::g_selectedSlotIndex, filePath);
 }
 
+bool firmareFileNameFilter(const char *fileName) {
+	char tmp[64];
+	stringCopy(tmp, sizeof(tmp), g_slots[hmi::g_selectedSlotIndex]->moduleName);
+	auto len = strlen(tmp);
+	for (unsigned i = 0; i < len; i++) {
+		tmp[i] = tolower(tmp[i]);
+	}
+	return strstr(fileName, tmp);
+}
+
 void onSelectFirmware() {
-    file_manager::browseForFile("Select firmware file", "/Updates", FILE_TYPE_HEX, file_manager::DIALOG_TYPE_OPEN, onFirmwareSelected);
+    file_manager::browseForFile("Select firmware file", "/Updates", FILE_TYPE_HEX, file_manager::DIALOG_TYPE_OPEN, onFirmwareSelected, firmareFileNameFilter);
 }
 
 void action_channel_update_firmware() {

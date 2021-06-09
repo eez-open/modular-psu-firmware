@@ -89,7 +89,7 @@ enum DialogType {
     DIALOG_TYPE_SAVE
 };
 
-void browseForFile(const char *title, const char *directory, FileType fileType, DialogType dialogType, void (*onFileSelected)(const char *filePath));
+void browseForFile(const char *title, const char *directory, FileType fileType, DialogType dialogType, void (*onFileSelected)(const char *filePath), bool (*nameFilter)(const char *) = nullptr);
 
 extern const char *g_fileBrowserTitle;
 
