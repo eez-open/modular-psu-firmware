@@ -204,9 +204,11 @@ void stateManagment() {
 		}
 	} else if (isExecuting && !g_wasExecuting) {
 		if (psu::gui::getActivePageId() == PAGE_ID_MAIN) {
+            g_showLatest = true;
             gui::showPage(PAGE_ID_DLOG_VIEW);
-            openFile(dlog_record::getLatestFilePath());
-		}
+		} else {
+            eez::gui::refreshScreen();
+        }
     }
 	g_wasExecuting = isExecuting;
 
@@ -2087,7 +2089,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
         value = Value(recording.parameters.period, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_BOOKMARKS) {
-        value = Value(g_visibleBookmarks, VALUE_TYPE_POINTER);
+        value = Value(dlog_record::isExecuting() ? 0 : g_visibleBookmarks, VALUE_TYPE_POINTER);
 	} else if (operation == DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE) {
         value = &recording != &dlog_record::g_activeRecording;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET) {
