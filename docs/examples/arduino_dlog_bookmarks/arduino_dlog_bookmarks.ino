@@ -28,8 +28,13 @@ void setup() {
     Serial1.println("INST CH1");
     Serial1.println("CURR 2");
     Serial1.println("OUTP 1");
+
+    // make sure all previous commands are executed
+    Serial1.println("*OPC?");
+    while (!Serial1.available());
+
     // wait 1sec
-    delay(1000);
+    delay (1000);
 
     // add "start" bookmark
     Serial1.println("SENS:DLOG:TRAC:BOOK 'Start'");
@@ -37,9 +42,9 @@ void setup() {
     // change output voltage 5 times on CH1
     for (int i = 0; i < 5; i++) {
         Serial1.println("VOLT 10");
-        delay(500);
+        Serial1.println("SYST:DEL 500");
         Serial1.println("VOLT 5");
-        delay(1000);
+        Serial1.println("SYST:DEL 1000");
     }
 
     // add "pause" bookmark
