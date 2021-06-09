@@ -34,8 +34,6 @@ using namespace eez::scpi;
 using namespace eez::psu;
 using namespace eez::psu::scpi;
 
-static const size_t CONF_UART_INPUT_BUFFER_SIZE = 256;
-
 namespace eez {
 namespace uart {
 
@@ -47,6 +45,10 @@ static bool g_scpiInitialized;
 static bool g_dmaStarted;
 static uint8_t g_buffer[128];
 static volatile uint32_t g_RxXferCount;
+
+static bool g_error;
+static bool g_abortCplt;
+static bool g_abortReceiveCplt;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -216,10 +218,32 @@ static void flushRxBuffer(uint16_t RxXferCount) {
 		}
 
 		g_RxXferCount = RxXferCount;
+
+		if (g_RxXferCount == 0) {
+			g_RxXferCount = sizeof(g_buffer);
+		}
 	}
 }
 
 void tick() {
+	if (g_error) {
+		//DebugTrace("UART error\n");
+		reinit();
+		g_error = false;
+	}
+
+	if (g_abortCplt) {
+		DebugTrace("UART abort cplt\n");
+		reinit();
+		g_abortCplt = false;
+	}
+
+	if (g_abortReceiveCplt) {
+		DebugTrace("UART abort receive cplt\n");
+		reinit();
+		g_abortReceiveCplt = false;
+	}
+
 	if (g_initialized && !bp3c::flash_slave::g_bootloaderMode) {
 #ifdef EEZ_PLATFORM_STM32
 		taskENTER_CRITICAL();
@@ -262,7 +286,10 @@ void refresh() {
         if (!bp3c::flash_slave::g_bootloaderMode && psu::io_pins::g_ioPins[DIN1].function != psu::io_pins::FUNCTION_UART) {
 #ifdef EEZ_PLATFORM_STM32
         	if (g_dmaStarted) {
-        		HAL_UART_DMAStop(PHUART);
+        		auto result = HAL_UART_DMAStop(PHUART);
+				if (result != HAL_OK) {
+					DebugTrace("HAL_UART_DMAStop error: %d\n", (int)result);
+				}
         		g_dmaStarted = false;
         	}
             HAL_UART_DeInit(PHUART);
@@ -271,15 +298,13 @@ void refresh() {
         }
     } else {
         if (bp3c::flash_slave::g_bootloaderMode || psu::io_pins::g_ioPins[DIN1].function == psu::io_pins::FUNCTION_UART) {
+#ifdef EEZ_PLATFORM_STM32
             if (g_mcuRevision >= MCU_REVISION_R3B3) {
-#ifdef EEZ_PLATFORM_STM32
-                MX_UART4_Init();
-#endif
+            	MX_UART4_Init();
             } else {
-#ifdef EEZ_PLATFORM_STM32
-                MX_UART7_Init();
-#endif
+            	MX_UART7_Init();
             }
+#endif
             g_initialized = true;
         }
     }
@@ -288,7 +313,10 @@ void refresh() {
     	if (bp3c::flash_slave::g_bootloaderMode) {
         	if (g_dmaStarted) {
 #ifdef EEZ_PLATFORM_STM32
-				HAL_UART_DMAStop(PHUART);
+        		auto result = HAL_UART_DMAStop(PHUART);
+				if (result != HAL_OK) {
+					DebugTrace("HAL_UART_DMAStop error: %d\n", (int)result);
+				}
 #endif
         		g_dmaStarted = false;
         	}
@@ -297,14 +325,73 @@ void refresh() {
 
             if (!g_dmaStarted) {
                 g_inputBuffer.reset();
-
             	g_RxXferCount = sizeof(g_buffer);
+
 #ifdef EEZ_PLATFORM_STM32
-				HAL_UART_Receive_DMA(PHUART, g_buffer, sizeof(g_buffer));
+				auto result = HAL_UART_Receive_DMA(PHUART, g_buffer, sizeof(g_buffer));
+				if (result != HAL_OK) {
+					DebugTrace("HAL_UART_Receive_DMA error: %d\n", (int)result);
+				}
 #endif
         		g_dmaStarted = true;
         	}
     	}
+    }
+}
+
+void reinit() {
+	if (g_initialized) {
+#ifdef EEZ_PLATFORM_STM32
+		if (g_dmaStarted) {
+			auto result = HAL_UART_DMAStop(PHUART);
+			if (result != HAL_OK) {
+				DebugTrace("HAL_UART_DMAStop error: %d\n", (int)result);
+			}
+			g_dmaStarted = false;
+		}
+
+		HAL_UART_DeInit(PHUART);
+#endif
+
+		g_initialized = false;
+
+#ifdef EEZ_PLATFORM_STM32
+        if (g_mcuRevision >= MCU_REVISION_R3B3) {
+            MX_UART4_Init();
+        } else {
+        	MX_UART7_Init();
+        }
+#endif
+
+		g_inputBuffer.reset();
+		g_RxXferCount = sizeof(g_buffer);
+
+		g_error = false;
+		g_abortCplt = false;
+		g_abortReceiveCplt = false;
+
+#ifdef EEZ_PLATFORM_STM32
+		auto result = HAL_UART_Receive_DMA(PHUART, g_buffer, sizeof(g_buffer));
+		if (result != HAL_OK) {
+			DebugTrace("HAL_UART_Receive_DMA error: %d\n", (int)result);
+		}
+#endif
+		g_dmaStarted = true;
+
+        g_initialized = true;
+	}
+}
+
+void disable() {
+    if (g_initialized) {
+#ifdef EEZ_PLATFORM_STM32
+		if (g_dmaStarted) {
+			HAL_UART_DMAStop(PHUART);
+			g_dmaStarted = false;
+		}
+		HAL_UART_DeInit(PHUART);
+#endif
+		g_initialized = false;
     }
 }
 
@@ -344,7 +431,24 @@ HAL_StatusTypeDef receive(uint8_t *data, uint16_t size, uint32_t timeout, uint16
 #endif
 }
 
-bool receiveFromBuffer(uint8_t *data, uint16_t size, uint16_t &n, int *err) {
+bool transmit(uint8_t *data, uint16_t size, uint32_t timeout, int *err) {
+	if (!g_initialized || bp3c::flash_slave::g_bootloaderMode || persist_conf::devConf.uartMode != UART_MODE_BUFFER) {
+		if (*err) {
+			*err = SCPI_ERROR_EXECUTION_ERROR;
+		}
+		return false;
+	}
+
+#ifdef EEZ_PLATFORM_STM32
+    return HAL_UART_Transmit(PHUART, data, size, timeout) == HAL_OK;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    return HAL_ERROR;
+#endif
+}
+
+bool receive(uint8_t *data, uint16_t size, uint16_t &n, int *err) {
 	if (!g_initialized || bp3c::flash_slave::g_bootloaderMode || persist_conf::devConf.uartMode != UART_MODE_BUFFER) {
 		if (*err) {
 			*err = SCPI_ERROR_EXECUTION_ERROR;
@@ -357,10 +461,6 @@ bool receiveFromBuffer(uint8_t *data, uint16_t size, uint16_t &n, int *err) {
 	}
 
 	return true;
-}
-
-void resetInputBuffer() {
-	g_inputBuffer.reset();
 }
 
 void initScpi() {
@@ -379,21 +479,34 @@ extern "C" void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
 	using namespace eez::uart;
 	if (huart == PHUART) {
 		flushRxBuffer(sizeof(g_buffer) / 2);
-   }
+    }
 }
 
 extern "C" void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	using namespace eez::uart;
 	if (huart == PHUART) {
 		flushRxBuffer(0);
-
-		g_RxXferCount = sizeof(g_buffer);
-   }
+    }
 }
 
 extern "C" void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
 	using namespace eez::uart;
 	if (huart == PHUART) {
+		g_error = true;
+	}
+}
+
+extern "C" void HAL_UART_AbortCpltCallback(UART_HandleTypeDef *huart) {
+	using namespace eez::uart;
+	if (huart == PHUART) {
+		g_abortCplt = true;
+	}
+}
+
+extern "C" void HAL_UART_AbortReceiveCpltCallback(UART_HandleTypeDef *huart) {
+	using namespace eez::uart;
+	if (huart == PHUART) {
+		g_abortReceiveCplt = true;
 	}
 }
 

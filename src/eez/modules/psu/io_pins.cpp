@@ -398,10 +398,13 @@ void onTrigger() {
 }
 
 void refresh() {
-    // refresh output pins
+    if (g_ioPins[0].function != FUNCTION_UART) {
+        uart::refresh();
+    }
+
     for (int pin = 0; pin < NUM_IO_PINS; ++pin) {
         if (pin < 2) {
-        	initInputPin(pin);
+            initInputPin(pin);
         } else {
             initOutputPin(pin);
 
@@ -422,7 +425,9 @@ void refresh() {
         }
     }
 
-    uart::refresh();
+    if (g_ioPins[0].function == FUNCTION_UART) {
+        uart::refresh();
+    }
 }
 
 bool getIsInhibitedByUser() {

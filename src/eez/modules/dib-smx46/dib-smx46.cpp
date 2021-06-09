@@ -78,11 +78,11 @@ static const uint32_t MIN_TO_MS = 60L * 1000L;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const int NUM_REQUEST_RETRIES = 10;
-static const int MAX_DMA_TRANSFER_ERRORS = 10;
+static const int NUM_REQUEST_RETRIES = 25;
+static const int MAX_DMA_TRANSFER_ERRORS = 25;
 static const uint32_t REFRESH_TIME_MS = 250;
-static const uint32_t TIMEOUT_TIME_MS = 350;
-static const uint32_t TIMEOUT_UNTIL_OUT_OF_SYNC_MS = 1000;
+static const uint32_t TIMEOUT_TIME_MS = 500;
+static const uint32_t TIMEOUT_UNTIL_OUT_OF_SYNC_MS = 3000;
 
 enum Command {
 	COMMAND_NONE       = 0x113B3759,

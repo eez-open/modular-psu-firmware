@@ -205,13 +205,13 @@ void DMA1_Stream1_IRQHandler(void)
 void DMA1_Stream2_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream2_IRQn 0 */
-  if (g_mcuRevision >= MCU_REVISION_R3B3) {
   /* USER CODE END DMA1_Stream2_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_uart4_rx);
   /* USER CODE BEGIN DMA1_Stream2_IRQn 1 */
-  } else {
+}
+
+void DMA1_Stream3_IRQHandler(void) {
   HAL_DMA_IRQHandler(&hdma_uart7_rx);
-  }
   /* USER CODE END DMA1_Stream2_IRQn 1 */
 }
 
@@ -473,13 +473,6 @@ void UART7_IRQHandler(void)
   /* USER CODE BEGIN UART7_IRQn 1 */
 
   /* USER CODE END UART7_IRQn 1 */
-}
-
-/**
-  * @brief This function handles DMA1 stream3 global interrupt.
-  */
-void DMA1_Stream3_IRQHandler(void) {
-  HAL_DMA_IRQHandler(&hdma_uart7_rx);
 }
 
 /* USER CODE BEGIN 1 */

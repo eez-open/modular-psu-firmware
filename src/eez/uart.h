@@ -28,6 +28,9 @@
 namespace eez {
 namespace uart {
 
+static const size_t CONF_UART_INPUT_BUFFER_SIZE = 256;
+
+
 #if defined(EEZ_PLATFORM_SIMULATOR)
 typedef enum 
 {
@@ -41,11 +44,16 @@ typedef enum
 void tick();
 
 void refresh();
+void reinit();
+void disable();
 
+// called from flash slave
 HAL_StatusTypeDef transmit(uint8_t *data, uint16_t size, uint32_t timeout);
 HAL_StatusTypeDef receive(uint8_t *data, uint16_t size, uint32_t timeout, uint16_t *nreceived = nullptr);
-bool receiveFromBuffer(uint8_t *data, uint16_t size, uint16_t &n, int *err);
-void resetInputBuffer();
+
+// called from SCPI
+bool transmit(uint8_t *data, uint16_t size, uint32_t timeout, int *err);
+bool receive(uint8_t *data, uint16_t size, uint16_t &n, int *err);
 
 void initScpi();
 void onQueueMessage(uint32_t type, uint32_t param);

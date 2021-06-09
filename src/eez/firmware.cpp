@@ -31,6 +31,7 @@
 #include <eez/mp.h>
 #include <eez/sound.h>
 #include <eez/memory.h>
+#include <eez/uart.h>
 #include <eez/usb.h>
 #include <eez/modules/aux_ps/fan.h>
 
@@ -500,6 +501,8 @@ void shutdown() {
 #if OPTION_ETHERNET
     ethernet::update();
 #endif
+
+    uart::disable();
 
 #if !defined(__EMSCRIPTEN__)
     // shutdown SCPI thread
