@@ -185,6 +185,9 @@ void setLoad(Channel &channel, float load);
 void setVoltageInPsuThread(int channelIndex);
 void setCurrentInPsuThread(int channelIndex);
 
+void setVoltageLimitInPsuThread(int channelIndex);
+void setCurrentLimitInPsuThread(int channelIndex);
+
 const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex);
 
 bool isEditEnabled(const eez::gui::WidgetCursor &widgetCursor);

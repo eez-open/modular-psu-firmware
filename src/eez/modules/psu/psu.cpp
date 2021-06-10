@@ -923,6 +923,10 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         channel_dispatcher::setVoltageInPsuThread((int)param);
     } else if (type == PSU_MESSAGE_SET_CURRENT) {
         channel_dispatcher::setCurrentInPsuThread((int)param);
+    } else if (type == PSU_MESSAGE_SET_VOLTAGE_LIMIT) {
+        channel_dispatcher::setVoltageLimitInPsuThread((int)param);
+    } else if (type == PSU_MESSAGE_SET_CURRENT_LIMIT) {
+        channel_dispatcher::setCurrentLimitInPsuThread((int)param);
     } else if (type == PSU_MESSAGE_FLASH_SLAVE_START) {
         bp3c::flash_slave::doStart();
     } else if (type == PSU_MESSAGE_FLASH_SLAVE_LEAVE_BOOTLOADER_MODE) {

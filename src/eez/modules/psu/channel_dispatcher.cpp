@@ -695,7 +695,19 @@ void setVoltageStep(Channel &channel, float voltageStep) {
     }
 }
 
+static float g_setVoltageLimitValues[CH_MAX];
+
+void setVoltageLimitInPsuThread(int channelIndex) {
+    setVoltageLimit(Channel::get(channelIndex), g_setVoltageLimitValues[channelIndex]);
+}
+
 void setVoltageLimit(Channel &channel, float limit) {
+    if (!isPsuThread()) {
+        g_setVoltageLimitValues[channel.channelIndex] = limit;
+        sendMessageToPsu(PSU_MESSAGE_SET_VOLTAGE_LIMIT, channel.channelIndex);
+        return;
+    }
+
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_SERIES) {
         Channel::get(0).setVoltageLimit(limit / 2);
         Channel::get(1).setVoltageLimit(limit / 2);
@@ -1050,7 +1062,19 @@ void setCurrentStep(Channel &channel, float currentStep) {
     }
 }
 
+static float g_setCurrentLimitValues[CH_MAX];
+
+void setCurrentLimitInPsuThread(int channelIndex) {
+    setCurrentLimit(Channel::get(channelIndex), g_setCurrentLimitValues[channelIndex]);
+}
+
 void setCurrentLimit(Channel &channel, float limit) {
+    if (!isPsuThread()) {
+        g_setCurrentLimitValues[channel.channelIndex] = limit;
+        sendMessageToPsu(PSU_MESSAGE_SET_CURRENT_LIMIT, channel.channelIndex);
+        return;
+    }
+    
     if (channel.channelIndex < 2 && g_couplingType == COUPLING_TYPE_PARALLEL) {
         Channel::get(0).setCurrentLimit(limit / 2);
         Channel::get(1).setCurrentLimit(limit / 2);
