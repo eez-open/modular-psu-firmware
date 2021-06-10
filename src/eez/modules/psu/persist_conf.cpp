@@ -185,6 +185,9 @@ void initDefaultDevConf() {
         macAddress[4] = 0;
         macAddress[5] = 0;
 #endif
+
+    macAddress[0] |= 0x02; // Locally administered
+    macAddress[0] &= 0xFE; // Unicast
     
     memcpy(g_defaultDevConf.ethernetMacAddress, macAddress, 6);
 
