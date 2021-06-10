@@ -19,6 +19,10 @@
 #include <assert.h>
 #include <ctype.h> 
 
+#if defined(EEZ_PLATFORM_STM32)
+#include <main.h>
+#endif
+
 #include <eez/system.h>
 #include <eez/usb.h>
 #include <eez/tasks.h>
@@ -157,7 +161,31 @@ void initDefaultDevConf() {
     g_defaultDevConf.ethernetSubnetMask = getIpAddress(255, 255, 255, 0);
     g_defaultDevConf.ethernetScpiPort = TCP_PORT;
     stringCopy(g_defaultDevConf.ntpServer, sizeof(g_defaultDevConf.ntpServer), CONF_DEFAULT_NTP_SERVER);
-    uint8_t macAddress[] = ETHERNET_MAC_ADDRESS;
+    
+    uint8_t macAddress[6];
+#if defined(EEZ_PLATFORM_STM32)
+		uint32_t idw0 = HAL_GetUIDw0();
+		uint32_t idw1 = HAL_GetUIDw1();
+		uint32_t idw2 = HAL_GetUIDw2();
+        uint8_t *pIdw0 = (uint8_t *)&idw0;
+        uint8_t *pIdw1 = (uint8_t *)&idw1;
+        uint8_t *pIdw2 = (uint8_t *)&idw2;
+		macAddress[0] = pIdw0[0] ^ pIdw1[0] ^ pIdw2[7] ^ pIdw2[0];
+        macAddress[1] = pIdw0[1] ^ pIdw1[7] ^ pIdw2[6] ^ pIdw2[1];
+        macAddress[2] = pIdw0[2] ^ pIdw1[1] ^ pIdw2[5] ^ pIdw0[6];
+        macAddress[3] = pIdw0[3] ^ pIdw1[6] ^ pIdw2[4] ^ pIdw0[7];
+        macAddress[4] = pIdw0[4] ^ pIdw1[2] ^ pIdw2[3] ^ pIdw1[3];
+        macAddress[5] = pIdw0[5] ^ pIdw1[5] ^ pIdw2[2] ^ pIdw1[4];
+#endif
+#if defined(EEZ_PLATFORM_SIMULATOR)
+		macAddress[0] = 0;
+        macAddress[1] = 0;
+        macAddress[2] = 0;
+        macAddress[3] = 0;
+        macAddress[4] = 0;
+        macAddress[5] = 0;
+#endif
+    
     memcpy(g_defaultDevConf.ethernetMacAddress, macAddress, 6);
 
     g_defaultDevConf.displayBrightness = DISPLAY_BRIGHTNESS_DEFAULT;

@@ -20,5 +20,3 @@ Use this header file to override anything from conf.h or conf_advanced.h.
 */
 
 #pragma once
-
-#define ETHERNET_MAC_ADDRESS { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x00 }
