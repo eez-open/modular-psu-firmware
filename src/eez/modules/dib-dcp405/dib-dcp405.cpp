@@ -301,12 +301,21 @@ struct DcpChannel : public Channel {
 				setDpEnable(false);
 			}
 		}
-		
-		/// Output power is monitored and if its go below DP_NEG_LEV
-		/// that is negative value in Watts (default -1 W),
-		/// and that condition lasts more then DP_NEG_DELAY seconds (default 5 s),
-		/// down-programmer circuit has to be switched off.
+
 		if (isOutputEnabled()) {
+			// Check continuously output voltage when output is enabled if OVP HW is not enabled.
+			// If U_MON is higher then U_SET for more then 3% automatically switch off output and display popup.
+			if (u.mon_last > u.set * 1.03f) {
+				channel_dispatcher::outputEnable(*this, false);
+				generateChannelError(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED, channelIndex);
+				g_slots[slotIndex]->setTestResult(TEST_FAILED);
+				return;
+			}
+
+			/// Output power is monitored and if its go below DP_NEG_LEV
+			/// that is negative value in Watts (default -1 W),
+			/// and that condition lasts more then DP_NEG_DELAY seconds (default 5 s),
+			/// down-programmer circuit has to be switched off.
 			uint32_t tickCountMs = millis();
 			if (u.mon_last * i.mon_last >= DP_NEG_LEV || tickCountMs < dpNegMonitoringTimeMs) {
 				dpNegMonitoringTimeMs = tickCountMs;
