@@ -69,6 +69,7 @@ void tick() {
 
         // find max. channel temperature
         float maxChannelTemperature = FLT_MIN;
+        int maxChannelTemperatureIndex;
 
         for (int i = 0; i < temp_sensor::NUM_TEMP_SENSORS; ++i) {
             temp_sensor::TempSensor &sensor = temp_sensor::sensors[i];
@@ -77,6 +78,7 @@ void tick() {
                     temperature::TempSensorTemperature &sensorTemperature = temperature::sensors[i];
                     if (sensorTemperature.temperature > maxChannelTemperature) {
                         maxChannelTemperature = sensorTemperature.temperature;
+                        maxChannelTemperatureIndex = sensor.getChannel()->channelIndex;
                     }
                 }
             }
@@ -90,7 +92,7 @@ void tick() {
 
             if (tickCountMs - g_maxTempCheckStartTickMs > FAN_MAX_TEMP_DELAY * 1000L) {
                 // turn off power
-                event_queue::pushEvent(event_queue::EVENT_ERROR_HIGH_TEMPERATURE);
+                event_queue::pushEvent(event_queue::HIGH_TEMPERATURE_CH1 + maxChannelTemperatureIndex);
                 changePowerState(false);
             }
         } else {

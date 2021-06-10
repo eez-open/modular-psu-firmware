@@ -109,7 +109,12 @@ static const int EVENT_TYPE_ERROR = 4;
 	EVENT_ERROR(SLOT3_SYNC_ERROR, 142, "Sync error on module 3")                                   \
     EVENT_ERROR(TOO_MANY_LOG_EVENTS, 150, "Too many log events")                                   \
 	EVENT_ERROR(WATCHDOG_RESET, 151, "Watchdog reset")                                             \
-    EVENT_ERROR(HIGH_TEMPERATURE, 152, "High temperature")                                         \
+    EVENT_ERROR(HIGH_TEMPERATURE_CH1, 152, "High CH1 temperature")                                 \
+    EVENT_ERROR(HIGH_TEMPERATURE_CH2, 153, "High CH2 temperature")                                 \
+    EVENT_ERROR(HIGH_TEMPERATURE_CH3, 154, "High CH3 temperature")                                 \
+    EVENT_ERROR(HIGH_TEMPERATURE_CH4, 155, "High CH4 temperature")                                 \
+    EVENT_ERROR(HIGH_TEMPERATURE_CH5, 156, "High CH5 temperature")                                 \
+    EVENT_ERROR(HIGH_TEMPERATURE_CH6, 157, "High CH6 temperature")                                 \
     EVENT_ERROR(SLOT1_FIRMWARE_MISMATCH, 160, "Firmware mismatch on module 1")                     \
 	EVENT_ERROR(SLOT2_FIRMWARE_MISMATCH, 161, "Firmware mismatch on module 2")                     \
 	EVENT_ERROR(SLOT3_FIRMWARE_MISMATCH, 162, "Firmware mismatch on module 3")                     \
