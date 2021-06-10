@@ -332,6 +332,7 @@ struct DcpChannel : public Channel {
 							dpNegMonitoringTimeMs = 0;
 							channel_dispatcher::outputEnable(*this, false);
 							generateChannelError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF, channelIndex);
+							return;
 						} else {
 							// DebugTrace("CH%d, neg. P, output off: %f", channelIndex + 1, u.mon_last * i.mon_last);
 							generateChannelError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED, channelIndex);
