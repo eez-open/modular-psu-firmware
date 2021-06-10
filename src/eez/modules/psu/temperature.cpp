@@ -92,7 +92,7 @@ void tick() {
 
             if (tickCountMs - g_maxTempCheckStartTickMs > FAN_MAX_TEMP_DELAY * 1000L) {
                 // turn off power
-                event_queue::pushEvent(event_queue::HIGH_TEMPERATURE_CH1 + maxChannelTemperatureIndex);
+                event_queue::pushEvent(event_queue::EVENT_ERROR_HIGH_TEMPERATURE_CH1 + maxChannelTemperatureIndex);
                 changePowerState(false);
             }
         } else {
