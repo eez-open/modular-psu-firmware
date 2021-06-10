@@ -305,7 +305,7 @@ struct DcpChannel : public Channel {
 		if (isOutputEnabled()) {
 			// Check continuously output voltage when output is enabled if OVP HW is not enabled.
 			// If U_MON is higher then U_SET for more then 3% automatically switch off output and display popup.
-			if (!isHwOvpEnabled() && !isRemoteProgrammingEnabled() && u.set > 0.3f && u.mon_last > u.set * 1.03f) {
+			if (!isHwOvpEnabled() && u.set > 0.3f && u.mon_last > u.set * 1.03f) {
 				channel_dispatcher::outputEnable(*this, false);
 				generateChannelError(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED, channelIndex);
 				g_slots[slotIndex]->setTestResult(TEST_FAILED);
