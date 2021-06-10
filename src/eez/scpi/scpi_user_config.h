@@ -165,12 +165,12 @@ extern "C" {
     X(SCPI_ERROR_CH2_CALIBRATION_NOT_ENABLED,                742, "CH2 calibration is not enabled")               \
     X(SCPI_ERROR_BUFFER_OVERFLOW,                            750, "Buffer overflow")                              \
     X(SCPI_ERROR_BUFFER_OVERFLOW_SLAVE,                      751, "Module buffer overflow")                       \
-    X(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED,                  760, "CH1 module fault, please contact support!")    \
-	X(SCPI_ERROR_CH2_MODULE_FAULT_DETECTED,                  761, "CH2 module fault, please contact support!")    \
-    X(SCPI_ERROR_CH3_MODULE_FAULT_DETECTED,                  762, "CH3 module fault, please contact support!")    \
-    X(SCPI_ERROR_CH4_MODULE_FAULT_DETECTED,                  763, "CH4 module fault, please contact support!")    \
-    X(SCPI_ERROR_CH5_MODULE_FAULT_DETECTED,                  764, "CH5 module fault, please contact support!")    \
-    X(SCPI_ERROR_CH6_MODULE_FAULT_DETECTED,                  765, "CH6 module fault, please contact support!")    \
+    X(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED,                  760, "CH1 module fault detected!")                   \
+	X(SCPI_ERROR_CH2_MODULE_FAULT_DETECTED,                  761, "CH2 module fault detected!")                   \
+    X(SCPI_ERROR_CH3_MODULE_FAULT_DETECTED,                  762, "CH3 module fault detected!")                   \
+    X(SCPI_ERROR_CH4_MODULE_FAULT_DETECTED,                  763, "CH4 module fault detected!")                   \
+    X(SCPI_ERROR_CH5_MODULE_FAULT_DETECTED,                  764, "CH5 module fault detected!")                   \
+    X(SCPI_ERROR_CH6_MODULE_FAULT_DETECTED,                  765, "CH6 module fault detected!")                   \
 
 // clang-format on
 
