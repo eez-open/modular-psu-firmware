@@ -37,7 +37,7 @@ static const uint32_t MEMORY_SIZE = 64 * 1024 * 1024;
 
 static uint8_t * const DECOMPRESSED_ASSETS_START_ADDRESS = MEMORY_BEGIN;
 #if defined(EEZ_PLATFORM_STM32)
-static const uint32_t DECOMPRESSED_ASSETS_SIZE = (3 * 512 - 32) * 1024;
+static const uint32_t DECOMPRESSED_ASSETS_SIZE = (3 * 512 + 96) * 1024;
 #endif
 #if defined(EEZ_PLATFORM_SIMULATOR)
 static const uint32_t DECOMPRESSED_ASSETS_SIZE = 8 * 1024 * 1024;
@@ -48,7 +48,7 @@ static const uint32_t DLOG_RECORD_BUFFER_SIZE = (128 + 128) * 1024;
 
 static uint8_t * const FILE_VIEW_BUFFER = DLOG_RECORD_BUFFER + DLOG_RECORD_BUFFER_SIZE;
 #if defined(EEZ_PLATFORM_STM32)
-static const uint32_t FILE_VIEW_BUFFER_SIZE = (1024 - 128) * 1024;
+static const uint32_t FILE_VIEW_BUFFER_SIZE = (1024 - 256) * 1024;
 #endif
 #if defined(EEZ_PLATFORM_SIMULATOR)
 static const uint32_t FILE_VIEW_BUFFER_SIZE = 3 * 512 * 1024;
