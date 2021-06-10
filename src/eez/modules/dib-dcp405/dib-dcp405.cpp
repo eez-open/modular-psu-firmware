@@ -305,7 +305,7 @@ struct DcpChannel : public Channel {
 		if (isOutputEnabled()) {
 			// Check continuously output voltage when output is enabled if OVP HW is not enabled.
 			// If U_MON is higher then U_SET for more then 3% automatically switch off output and display popup.
-			if (u.mon_last > u.set * 1.03f) {
+			if (u.set > 0.3f && u.mon_last > u.set * 1.03f) {
 				channel_dispatcher::outputEnable(*this, false);
 				generateChannelError(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED, channelIndex);
 				g_slots[slotIndex]->setTestResult(TEST_FAILED);
@@ -330,7 +330,7 @@ struct DcpChannel : public Channel {
 						if (dpOn) {
 							// DebugTrace("CH%d, neg. P, DP off: %f", channelIndex + 1, u.mon_last * i.mon_last);
 							dpNegMonitoringTimeMs = 0;
-							setDprogState(DPROG_STATE_OFF);
+							channel_dispatcher::outputEnable(*this, false);
 							generateChannelError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF, channelIndex);
 						} else {
 							// DebugTrace("CH%d, neg. P, output off: %f", channelIndex + 1, u.mon_last * i.mon_last);
