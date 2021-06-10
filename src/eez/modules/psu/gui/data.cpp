@@ -5378,7 +5378,12 @@ void data_channel_voltage_ramp_duration(DataOperationEnum operation, Cursor curs
     } else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_MIN) {
-        value = MakeValue(Channel::get(cursor).params.U_RAMP_DURATION_MIN_VALUE, UNIT_SECOND);
+		auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
+		if (page) {
+			value = MakeValue(Channel::get(cursor).params.U_RAMP_DURATION_MIN_VALUE, UNIT_SECOND);
+		} else {
+			value = MakeValue(g_channel->params.U_RAMP_DURATION_MIN_VALUE, UNIT_SECOND);
+		}
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = MakeValue(RAMP_DURATION_MAX_VALUE, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_LIMIT) {
