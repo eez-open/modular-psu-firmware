@@ -578,6 +578,10 @@ bool Channel::isPowerOk() {
     return flags.powerOk;
 }
 
+TestResult Channel::getTestResult() {
+    return g_slots[slotIndex]->getTestResult();
+}
+
 bool Channel::isTestFailed() {
     return getTestResult() == TEST_FAILED;
 }

@@ -246,10 +246,6 @@ void PsuModule::setEnabled(bool value) {
     }
 }
 
-TestResult PsuModule::getTestResult() {
-    return Channel::getBySlotIndex(slotIndex)->getTestResult();
-}
-
 int PsuModule::getSlotSettingsPageId() {
     return eez::gui::PAGE_ID_CH_SETTINGS;
 }

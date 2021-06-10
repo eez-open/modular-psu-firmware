@@ -196,6 +196,7 @@ void boot() {
         uint16_t prolog[3];
         assert(sizeof(prolog) <= bp3c::eeprom::EEPROM_PROLOG_SIZE);
         if (!bp3c::eeprom::read(slotIndex, (uint8_t *)prolog, bp3c::eeprom::EEPROM_PROLOG_SIZE, bp3c::eeprom::EEPROM_PROLOG_START_ADDRESS)) {
+            g_slots[slotIndex]->setTestResult(TEST_SKIPPED);
             prolog[0] = MODULE_TYPE_NONE;
             prolog[1] = 0;
             prolog[2] = 0;
@@ -578,4 +579,53 @@ void shutdown() {
     }
 }
 
+void updateSpiIrqPin(int slotIndex) {
+	if (slotIndex >= 0 && slotIndex < 3) {
+#if defined(EEZ_PLATFORM_STM32)
+		GPIO_InitTypeDef GPIO_InitStruct = {0};
+#endif
+
+		TestResult testResult = g_slots[slotIndex]->getTestResult();
+		
+		static bool irqDisabled[NUM_SLOTS];
+
+		if (testResult == TEST_SKIPPED || testResult == TEST_FAILED) {
+			if (!irqDisabled[slotIndex]) {
+				irqDisabled[slotIndex] = true;
+
+#if defined(EEZ_PLATFORM_STM32)
+				GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+				GPIO_InitStruct.Pull = GPIO_NOPULL;
+#endif
+			}
+		} else {
+			if (irqDisabled[slotIndex]) {
+				irqDisabled[slotIndex] = false;
+
+#if defined(EEZ_PLATFORM_STM32)
+				GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+				GPIO_InitStruct.Pull = GPIO_PULLUP;
+#endif
+			}
+		}
+
+		if (slotIndex == 0) {
+#if defined(EEZ_PLATFORM_STM32)
+			GPIO_InitStruct.Pin = SPI2_IRQ_Pin;
+			HAL_GPIO_Init(SPI2_IRQ_GPIO_Port, &GPIO_InitStruct);
+#endif
+		} else if (slotIndex == 1) {
+#if defined(EEZ_PLATFORM_STM32)
+			GPIO_InitStruct.Pin = SPI4_IRQ_Pin;
+			HAL_GPIO_Init(SPI4_IRQ_GPIO_Port, &GPIO_InitStruct);
+#endif
+		} else if (slotIndex == 2) {
+#if defined(EEZ_PLATFORM_STM32)
+			GPIO_InitStruct.Pin = SPI4_IRQ_Pin;
+			HAL_GPIO_Init(SPI4_IRQ_GPIO_Port, &GPIO_InitStruct);
+#endif
+		}
+	}
 }
+
+} // namespace eez

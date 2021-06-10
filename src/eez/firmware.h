@@ -42,6 +42,8 @@ void standBy();
 void restart();
 void shutdown();
 
+void updateSpiIrqPin(int slotIndex);
+
 } // namespace eez
 
 extern "C" int g_mcuRevision;

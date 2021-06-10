@@ -643,7 +643,7 @@ public:
 
     virtual void tickSpecific() = 0;
 
-    virtual TestResult getTestResult() = 0;
+    TestResult getTestResult();
 
     virtual unsigned getRPol();
 

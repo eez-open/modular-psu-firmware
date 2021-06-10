@@ -121,8 +121,6 @@ struct Response {
 
 struct Prel6Module : public Module {
 public:
-    TestResult testResult = TEST_NONE;
-
     bool powerDown = false;
     bool synchronized = false;
 
@@ -215,15 +213,11 @@ public:
         return new Prel6Module();
     }
 
-    TestResult getTestResult() override {
-        return testResult;
-    }
-
     void initChannels() override {
         powerDown = false;
 
         if (!synchronized) {
-            testResult = TEST_CONNECTING;
+            setTestResult(TEST_CONNECTING);
 
 			executeCommand(&getInfo_command);
 
@@ -263,10 +257,10 @@ public:
                 firmwareVersionAcquired = true;
 
                 synchronized = true;
-                testResult = TEST_OK;
+                setTestResult(TEST_OK);
             } else {
                 synchronized = false;
-                testResult = TEST_FAILED;
+                setTestResult(TEST_FAILED);
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_FIRMWARE_MISMATCH + slotIndex);
             }
         } else {
@@ -274,7 +268,7 @@ public:
             if (firmwareInstalled) {
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
             }
-            testResult = TEST_FAILED;
+            setTestResult(TEST_FAILED);
         }
     }
 
@@ -389,6 +383,7 @@ public:
 
         if (powerDown) {
             synchronized = false;
+            setTestResult(TEST_FAILED);
         }
 
 		currentCommand = nullptr;
@@ -458,7 +453,7 @@ public:
             if (numCrcErrors >= MAX_DMA_TRANSFER_ERRORS) {
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                 synchronized = false;
-                testResult = TEST_FAILED;
+                setTestResult(TEST_FAILED);
             }
             //else if (numCrcErrors > 5) {
             //    DebugTrace("Slot %d CRC error no. %d\n", slotIndex + 1, numCrcErrors);
@@ -468,7 +463,7 @@ public:
             if (numTransferErrors >= MAX_DMA_TRANSFER_ERRORS) {
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
                 synchronized = false;
-                testResult = TEST_FAILED;
+                setTestResult(TEST_FAILED);
             }
             //else if (numTransferErrors > 5) {
             //    DebugTrace("Slot %d SPI transfer error %d no. %d\n", slotIndex + 1, status, numTransferErrors);
@@ -546,7 +541,7 @@ public:
 #ifdef EEZ_PLATFORM_STM32                
                     event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_SYNC_ERROR + slotIndex);
                     synchronized = false;
-                    testResult = TEST_FAILED;
+                    setTestResult(TEST_FAILED);
 #endif
                 } 
                 else if (tickCountMs - lastRefreshTime >= getRefreshTimeMs()) {
@@ -591,6 +586,7 @@ public:
         powerDown = true;
         if (bp3c::flash_slave::g_bootloaderMode) {
             synchronized = false;
+            setTestResult(TEST_FAILED);
         } else {
             executeCommand(&setParams_command);
         }

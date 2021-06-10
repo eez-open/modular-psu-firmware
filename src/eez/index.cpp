@@ -54,10 +54,16 @@ using namespace gui;
 void Module::setEnabled(bool value) {
     enabled = value;
     psu::persist_conf::setSlotEnabled(slotIndex, value);
+    updateSpiIrqPin(slotIndex);
 }
 
 TestResult Module::getTestResult() {
-    return TEST_SKIPPED;
+    return enabled ? testResult : TEST_SKIPPED;
+}
+
+void Module::setTestResult(TestResult testResult) {
+    this->testResult = testResult;
+    updateSpiIrqPin(slotIndex);
 }
 
 void Module::boot() {

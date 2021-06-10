@@ -227,12 +227,14 @@ struct Module {
 	uint32_t idw2 = 0;
     char label[SLOT_LABEL_MAX_LENGTH + 1] = { 0 };
     uint8_t color = 0;
+    TestResult testResult = TEST_NONE;
 
     virtual void setEnabled(bool value);
 
     virtual Module *createModule() = 0;
 
     virtual TestResult getTestResult();
+    virtual void setTestResult(TestResult testResult);
 
     virtual void boot();
     virtual psu::Channel *createPowerChannel(int slotIndex, int channelIndex, int subchannelIndex);

@@ -217,7 +217,6 @@ struct DcmChannel : public Channel {
 
     void onPowerDown() override;
     bool test() override;
-    TestResult getTestResult() override;
     void tickSpecific() override;
 	
 	bool isInCcMode() override {
@@ -451,7 +450,6 @@ static const float DEFAULT_COUNTERPHASE_FREQUENCY = 500000.0f;
 
 struct DcmModule : public PsuModule {
 public:
-    TestResult testResult = TEST_NONE;
     bool synchronized = false;
     uint8_t numConsecutiveTransferErrors;
     uint32_t lastTransferTickCount;
@@ -488,7 +486,7 @@ public:
 
     void initChannels() override {
         if (enabled && !synchronized) {
-            testResult = TEST_CONNECTING;            
+            setTestResult(TEST_CONNECTING);
            if (bp3c::comm::masterSynchro(slotIndex)) {
                synchronized = true;
                lastTransferTickCount = millis();
@@ -514,17 +512,17 @@ public:
     	}
 #endif
         synchronized = false;
-        testResult = TEST_FAILED;
+        setTestResult(TEST_FAILED);
     }
 
     void test() {
         if (!enabled) {
-            testResult = TEST_SKIPPED;
+            setTestResult(TEST_SKIPPED);
             return;
         }
 
         if (!synchronized) {
-            testResult = TEST_FAILED;
+            setTestResult(TEST_FAILED);
             return;
         }
 
@@ -569,13 +567,17 @@ public:
             channel.flags.powerOk = pwrGood ? 1 : 0;
         }
 
-        testResult = pwrGood ? TEST_OK : TEST_FAILED;
+		setTestResult(pwrGood ? TEST_OK : TEST_FAILED);
 
-        // test temp. sensors
-		for (int subchannelIndex = 0; testResult == TEST_OK && subchannelIndex < 2; subchannelIndex++) {
-			auto &channel = *Channel::getBySlotIndex(slotIndex, subchannelIndex);
-			testResult = temp_sensor::sensors[temp_sensor::CH1 + channel.channelIndex].test() ? TEST_OK : TEST_FAILED;
-		}
+		if (getTestResult() == TEST_OK) {
+			// test temp. sensors
+			for (int subchannelIndex = 0; testResult == TEST_OK && subchannelIndex < 2; subchannelIndex++) {
+				auto &channel = *Channel::getBySlotIndex(slotIndex, subchannelIndex);
+				if (!temp_sensor::sensors[temp_sensor::CH1 + channel.channelIndex].test()) {
+					setTestResult(TEST_FAILED);
+				}
+			}
+        }
     }
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -606,7 +608,7 @@ public:
 #else
                 event_queue::pushEvent(event_queue::EVENT_ERROR_SLOT1_CRC_CHECK_ERROR + slotIndex);
                 synchronized = false;
-                testResult = TEST_FAILED;
+                setTestResult(TEST_FAILED);
                 result = TRANSFER_TIMEOUT;
 #endif
             }
@@ -801,10 +803,6 @@ bool DcmChannel::test() {
         ((DcmModule *)g_slots[slotIndex])->test();
     }
     return isOk();
-}
-
-TestResult DcmChannel::getTestResult() {
-    return ((DcmModule *)g_slots[slotIndex])->testResult;
 }
 
 void DcmChannel::tickSpecific() {

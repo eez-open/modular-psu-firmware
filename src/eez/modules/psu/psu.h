@@ -62,8 +62,6 @@ struct Channel;
 
 struct PsuModule : public Module {
 public:
-    TestResult getTestResult() override;
-
     void setEnabled(bool value) override;
 
     int getSlotSettingsPageId() override;

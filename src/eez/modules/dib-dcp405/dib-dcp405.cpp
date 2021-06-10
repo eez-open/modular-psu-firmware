@@ -70,8 +70,6 @@ struct DcpChannel : public Channel {
 	DigitalAnalogConverter dac;
 	IOExpander ioexp;
 
-	TestResult tempSensorTestResult = TEST_OK;
-
     bool delayed_dp_off;
 	uint32_t delayed_dp_off_start;
 	bool dpOn;
@@ -200,6 +198,8 @@ struct DcpChannel : public Channel {
 	}
 
 	void init() {
+		g_slots[slotIndex]->setTestResult(TEST_NONE);
+
 		ioexp.testResult = TEST_OK;
 		ioexp.init();
 		adc.init();
@@ -208,7 +208,7 @@ struct DcpChannel : public Channel {
 
 	void onPowerDown() override {
 		Channel::onPowerDown();
-		ioexp.testResult = TEST_FAILED;
+		g_slots[slotIndex]->setTestResult(TEST_FAILED);
 	}
 
 	void reset(bool resetLabelAndColor) override {
@@ -228,6 +228,8 @@ struct DcpChannel : public Channel {
             return true;
         }
 
+		g_slots[slotIndex]->setTestResult(TEST_NONE);
+
         flags.powerOk = 0;
 
         init();
@@ -239,28 +241,15 @@ struct DcpChannel : public Channel {
 		adc.test();
 		dac.test(ioexp, adc);
 
-		tempSensorTestResult = TEST_OK;
-		if (!temp_sensor::sensors[temp_sensor::CH1 + channelIndex].test()) {
-			tempSensorTestResult = TEST_FAILED;
+		g_slots[slotIndex]->setTestResult(ioexp.testResult == TEST_OK && adc.testResult == TEST_OK && dac.testResult == TEST_OK ? TEST_OK : TEST_FAILED);
+
+		if (getTestResult() == TEST_OK) {
+			if (!temp_sensor::sensors[temp_sensor::CH1 + channelIndex].test()) {
+				g_slots[slotIndex]->setTestResult(TEST_FAILED);
+			}
 		}
 
 		return isOk();
-	}
-
-	TestResult getTestResult() override {
-        if (!g_slots[slotIndex]->enabled) {
-            return TEST_SKIPPED;
-        }
-        
-        if (ioexp.testResult == TEST_NONE || adc.testResult == TEST_NONE || dac.testResult == TEST_NONE || tempSensorTestResult == TEST_NONE) {
-			return TEST_NONE;
-		}
-
-		if (ioexp.testResult == TEST_OK && adc.testResult == TEST_OK && dac.testResult == TEST_OK && tempSensorTestResult == TEST_OK) {
-			return TEST_OK;
-		}
-
-		return TEST_FAILED;
 	}
 
 	AdcDataType getNextAdcDataType(AdcDataType adcDataType) {
