@@ -53,6 +53,7 @@
 
 #define CONF_FALLING_EDGE_HW_OVP_DELAY_MS 2
 #define CONF_FALLING_EDGE_SW_OVP_DELAY_MS 5
+#define CONF_FALLING_EDGE_DP_OFF_DELAY_MS 3000
 
 #define CONF_OVP_SW_OVP_AT_START_DURATION_MS 5
 #define CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD 1.2f
@@ -303,15 +304,6 @@ struct DcpChannel : public Channel {
 		}
 
 		if (isOutputEnabled()) {
-			// Check continuously output voltage when output is enabled if OVP HW is not enabled.
-			// If U_MON is higher then U_SET for more then 3% automatically switch off output and display popup.
-			if (!isHwOvpEnabled() && u.set > 0.3f && u.mon_last > u.set * 1.03f) {
-				channel_dispatcher::outputEnable(*this, false);
-				generateChannelError(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED, channelIndex);
-				g_slots[slotIndex]->setTestResult(TEST_FAILED);
-				return;
-			}
-
 			/// Output power is monitored and if its go below DP_NEG_LEV
 			/// that is negative value in Watts (default -1 W),
 			/// and that condition lasts more then DP_NEG_DELAY seconds (default 5 s),
@@ -392,6 +384,17 @@ struct DcpChannel : public Channel {
 				// deactivate HW OVP
 				prot_conf.flags.u_hwOvpDeactivated = fallingEdge ? 0 : 1;
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
+			}
+
+			// Check continuously output voltage when output is enabled if OVP HW is not enabled.
+			// If U_MON is higher then U_SET for more then 3% automatically switch off output and display popup.
+			if (!isHwOvpEnabled() && !isRemoteProgrammingEnabled() && u.set > 0.3f && u.mon_last > u.set * 1.03f) {
+				if (!fallingEdge) {
+					channel_dispatcher::outputEnable(*this, false);
+					generateChannelError(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED, channelIndex);
+					g_slots[slotIndex]->setTestResult(TEST_FAILED);
+					return;
+				}
 			}
 		}
 	}
@@ -660,7 +663,12 @@ struct DcpChannel : public Channel {
 			if (value < previousUSet) {
 				fallingEdge = true;
 				fallingEdgePreviousUMonAdc = u.mon_adc;
-				fallingEdgeTimeout = millis() + (belowThreshold ? CONF_FALLING_EDGE_SW_OVP_DELAY_MS : CONF_FALLING_EDGE_HW_OVP_DELAY_MS);
+				fallingEdgeTimeout = millis() + 
+					(belowThreshold || !isHwOvpEnabled() ? 
+						(dpOn ? CONF_FALLING_EDGE_SW_OVP_DELAY_MS : CONF_FALLING_EDGE_DP_OFF_DELAY_MS) : 
+						CONF_FALLING_EDGE_HW_OVP_DELAY_MS
+					);
+
 				if (isHwOvpEnabled()) {
 					// deactivate HW OVP
 					prot_conf.flags.u_hwOvpDeactivated = 0; // this flag should be 0 while fallingEdge is true
