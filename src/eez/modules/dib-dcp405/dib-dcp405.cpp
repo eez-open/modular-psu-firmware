@@ -73,7 +73,7 @@ struct DcpChannel : public Channel {
     bool delayed_dp_off;
 	uint32_t delayed_dp_off_start;
 	bool dpOn;
-	uint32_t dpNegMonitoringTimeMs;
+	uint32_t dpNegMonitoringTimeMs = 0;
 
     float uSet = 0;
 #if CONF_SURVIVE_MODE
@@ -317,28 +317,35 @@ struct DcpChannel : public Channel {
 			/// and that condition lasts more then DP_NEG_DELAY seconds (default 5 s),
 			/// down-programmer circuit has to be switched off.
 			uint32_t tickCountMs = millis();
-			if (u.mon_last * i.mon_last >= DP_NEG_LEV || tickCountMs < dpNegMonitoringTimeMs) {
-				dpNegMonitoringTimeMs = tickCountMs;
+			if (u.mon_last * i.mon_last >= DP_NEG_LEV) {
+				dpNegMonitoringTimeMs = 0;
 			} else {
-				if (tickCountMs - dpNegMonitoringTimeMs > DP_NEG_DELAY * 1000UL) {
-					if (dpOn) {
-						// DebugTrace("CH%d, neg. P, DP off: %f", channelIndex + 1, u.mon_last * i.mon_last);
-						dpNegMonitoringTimeMs = tickCountMs;
-						generateChannelError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF, channelIndex);
-						setDpEnable(false);
-					} else {
-						// DebugTrace("CH%d, neg. P, output off: %f", channelIndex + 1, u.mon_last * i.mon_last);
-						generateChannelError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED, channelIndex);
-						channel_dispatcher::outputEnable(*this, false);
+				if (dpNegMonitoringTimeMs == 0) {
+					dpNegMonitoringTimeMs = tickCountMs;
+					if (dpNegMonitoringTimeMs == 0) {
+						dpNegMonitoringTimeMs = 1;
 					}
-				} else if (tickCountMs - dpNegMonitoringTimeMs > 500UL) {
-					if (dpOn && channelIndex < 2) {
-						if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
-							psu::Channel &otherChannel = psu::Channel::get(channelIndex == 0 ? 1 : 0);
-							voltageBalancing(otherChannel);
-						} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
-							psu::Channel &otherChannel = psu::Channel::get(channelIndex == 0 ? 1 : 0);
-							currentBalancing(otherChannel);
+				} else {
+					if (tickCountMs - dpNegMonitoringTimeMs > DP_NEG_DELAY * 1000UL) {
+						if (dpOn) {
+							// DebugTrace("CH%d, neg. P, DP off: %f", channelIndex + 1, u.mon_last * i.mon_last);
+							dpNegMonitoringTimeMs = 0;
+							setDprogState(DPROG_STATE_OFF);
+							generateChannelError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF, channelIndex);
+						} else {
+							// DebugTrace("CH%d, neg. P, output off: %f", channelIndex + 1, u.mon_last * i.mon_last);
+							generateChannelError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED, channelIndex);
+							channel_dispatcher::outputEnable(*this, false);
+						}
+					} else if (tickCountMs - dpNegMonitoringTimeMs > 500UL) {
+						if (dpOn && channelIndex < 2) {
+							if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES) {
+								psu::Channel &otherChannel = psu::Channel::get(channelIndex == 0 ? 1 : 0);
+								voltageBalancing(otherChannel);
+							} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
+								psu::Channel &otherChannel = psu::Channel::get(channelIndex == 0 ? 1 : 0);
+								currentBalancing(otherChannel);
+							}
 						}
 					}
 				}
@@ -496,10 +503,6 @@ struct DcpChannel : public Channel {
 
 		setOperBits(OPER_ISUM_DP_OFF, !enable);
 		dpOn = enable;
-
-		if (enable) {
-			dpNegMonitoringTimeMs = millis();
-		}
 	}
 
 	void setOutputEnable(bool enable, uint16_t tasks) override {
@@ -538,7 +541,6 @@ struct DcpChannel : public Channel {
 			if (tasks & OUTPUT_ENABLE_TASK_DP) {
 				if (flags.dprogState == DPROG_STATE_ON) {
 					// enable DP
-					dpNegMonitoringTimeMs = millis();
 					delayed_dp_off = false;
 					setDpEnable(true);
 				}
@@ -547,6 +549,8 @@ struct DcpChannel : public Channel {
 			if (tasks & OUTPUT_ENABLE_TASK_ADC_START) {
 				adc.start(ADC_DATA_TYPE_U_MON);
 			}
+
+			dpNegMonitoringTimeMs = 0;			
 		} else {
 			// OVP
 			if (tasks & OUTPUT_ENABLE_TASK_OVP) {
