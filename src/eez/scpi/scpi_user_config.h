@@ -144,12 +144,12 @@ extern "C" {
     X(SCPI_ERROR_PROFILE_MODULE_MISMATCH,                    401, "Module mismatch in profile")                   \
 	X(SCPI_ERROR_RECALL_FROM_PROFILE,                        402, "Recall from profile not possible")             \
 	X(SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM,                   410, "No FAT file system on mass media")             \
-    X(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF,           500, "Down-programmer on CH1 switched off")          \
-    X(SCPI_ERROR_CH2_DOWN_PROGRAMMER_SWITCHED_OFF,           501, "Down-programmer on CH2 switched off")          \
-    X(SCPI_ERROR_CH3_DOWN_PROGRAMMER_SWITCHED_OFF,           502, "Down-programmer on CH3 switched off")          \
-    X(SCPI_ERROR_CH4_DOWN_PROGRAMMER_SWITCHED_OFF,           503, "Down-programmer on CH4 switched off")          \
-    X(SCPI_ERROR_CH5_DOWN_PROGRAMMER_SWITCHED_OFF,           504, "Down-programmer on CH5 switched off")          \
-    X(SCPI_ERROR_CH6_DOWN_PROGRAMMER_SWITCHED_OFF,           505, "Down-programmer on CH6 switched off")          \
+    X(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF,           500, "Sink power limit exceeded on CH1")             \
+    X(SCPI_ERROR_CH2_DOWN_PROGRAMMER_SWITCHED_OFF,           501, "Sink power limit exceeded on CH2")             \
+    X(SCPI_ERROR_CH3_DOWN_PROGRAMMER_SWITCHED_OFF,           502, "Sink power limit exceeded on CH3")             \
+    X(SCPI_ERROR_CH4_DOWN_PROGRAMMER_SWITCHED_OFF,           503, "Sink power limit exceeded on CH4")             \
+    X(SCPI_ERROR_CH5_DOWN_PROGRAMMER_SWITCHED_OFF,           504, "Sink power limit exceeded on CH5")             \
+    X(SCPI_ERROR_CH6_DOWN_PROGRAMMER_SWITCHED_OFF,           505, "Sink power limit exceeded on CH6")             \
     X(SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED,                615, "External EEPROM save failed")                  \
 	X(SCPI_ERROR_FAN_TEST_FAILED,                            630, "Fan test failed")                              \
 	X(SCPI_ERROR_AUX_TEMP_SENSOR_TEST_FAILED,                720, "AUX temperature sensor test failed")           \
