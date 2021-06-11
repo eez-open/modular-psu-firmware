@@ -391,7 +391,7 @@ bool isSysSettingsSubPage(int pageId) {
         pageId == PAGE_ID_SYS_SETTINGS_ETHERNET ||
         pageId == PAGE_ID_SYS_SETTINGS_TRIGGER ||
         pageId == PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY ||
-        pageId == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR ||
+        pageId == PAGE_ID_SYS_SETTINGS_TRACKING ||
         pageId == PAGE_ID_SYS_SETTINGS_DISPLAY ||
         pageId == PAGE_ID_SYS_SETTINGS_SOUND ||
         pageId == PAGE_ID_SYS_SETTINGS_MQTT ||
@@ -448,7 +448,7 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_USER_PROFILES) {
             animateSlideDown();
-        } else if (activePageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
             animateSlideDown();
         } else if (activePageId == PAGE_ID_DLOG_VIEW) {
             animateSlideDown();
@@ -475,17 +475,19 @@ void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
         } else if (activePageId == PAGE_ID_USER_PROFILES) {
             animateSlideUp();
         }
-    } else if (previousPageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
-        if (activePageId == PAGE_ID_MAIN) {
-            animateSlideUp();
-        } else if (activePageId == PAGE_ID_SYS_SETTINGS_COUPLING) {
+	} else if (previousPageId == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
+		if (activePageId == PAGE_ID_MAIN) {
+			animateSlideUp();
+		}
+	} else if (previousPageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
+        if (activePageId == PAGE_ID_SYS_SETTINGS_COUPLING) {
             animateSlideLeft();
-        }
+        } else if (activePageId == PAGE_ID_SYS_SETTINGS) {
+			animateSlideRight();
+		}
     } else if (previousPageId == PAGE_ID_SYS_SETTINGS_COUPLING) {
         if (activePageId == PAGE_ID_SYS_SETTINGS_TRACKING) {
             animateSlideRight();
-        } else if (activePageId == PAGE_ID_MAIN) {
-            animateSlideUp();
         }
     } else if (previousPageId == PAGE_ID_SYS_SETTINGS) {
         if (activePageId == PAGE_ID_MAIN) {
@@ -2215,7 +2217,6 @@ static SysSettingsSoundPage g_SysSettingsSoundPage;
 #if OPTION_ENCODER
 static SysSettingsEncoderPage g_SysSettingsEncoderPage;
 #endif
-static SysSettingsTrackingPage g_sysSettingsTrackingPage;
 static SysSettingsCouplingPage g_sysSettingsCouplingPage;
 static UserProfilesPage g_UserProfilesPage;
 static file_manager::FileBrowserPage g_FileBrowserPage;

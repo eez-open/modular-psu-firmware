@@ -43,7 +43,7 @@ CouplingType getCouplingType() {
     return g_couplingType;
 }
 
-bool isTrackingAllowed(Channel &channel, int *err) {
+bool isTrackingAllowed(Channel &channel, CouplingType couplingType, int *err) {
     if (!channel.isOk()) {
         if (err) {
             *err = SCPI_ERROR_HARDWARE_ERROR;
@@ -58,7 +58,7 @@ bool isTrackingAllowed(Channel &channel, int *err) {
         return false;
     }
 
-    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+    if (channel.channelIndex < 2 && (couplingType == COUPLING_TYPE_SERIES || couplingType == COUPLING_TYPE_PARALLEL)) {
         if (err) {
             *err = SCPI_ERROR_EXECUTE_ERROR_CHANNELS_ARE_COUPLED;
         }
@@ -107,15 +107,6 @@ bool isCouplingTypeAllowed(CouplingType couplingType, int *err) {
                 *err = SCPI_ERROR_HARDWARE_ERROR;
             }
             return false;
-        }
-
-        if (couplingType == COUPLING_TYPE_PARALLEL || couplingType == COUPLING_TYPE_SERIES) {
-            if (Channel::get(0).flags.trackingEnabled || Channel::get(1).flags.trackingEnabled) {
-                if (err) {
-                    *err = SCPI_ERROR_EXECUTION_ERROR;
-                }
-                return false;
-            }
         }
     }
 

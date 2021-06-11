@@ -2890,8 +2890,13 @@ void data_channel_tracking_is_enabled(DataOperationEnum operation, Cursor cursor
 
 void data_channel_tracking_is_allowed(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        auto &channel = Channel::get(cursor);
-        value = channel_dispatcher::isTrackingAllowed(channel, nullptr) ? 1 : 0;
+        auto page = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
+        if (page) {
+            auto &channel = Channel::get(cursor);
+            value = channel_dispatcher::isTrackingAllowed(channel, page->m_couplingType, nullptr) ? 1 : 0;
+        } else {
+            value = 0;
+        }
     }
 }
 
@@ -2936,9 +2941,14 @@ channel_dispatcher::CouplingType getCouplingType() {
     auto page = (SysSettingsCouplingPage *)getPage(PAGE_ID_SYS_SETTINGS_COUPLING);
     if (page) {
         return page->m_couplingType;
-    } else {
-        return channel_dispatcher::getCouplingType();
-    }
+	} else {
+		auto page = (SysSettingsTrackingPage *)getPage(PAGE_ID_SYS_SETTINGS_TRACKING);
+		if (page) {
+			return page->m_couplingType;
+		}
+
+		return channel_dispatcher::getCouplingType();
+	}
 }
 
 void data_coupling_type(DataOperationEnum operation, Cursor cursor, Value &value) {

@@ -35,7 +35,7 @@ namespace channel_dispatcher {
 
 enum CouplingType { COUPLING_TYPE_NONE, COUPLING_TYPE_PARALLEL, COUPLING_TYPE_SERIES, COUPLING_TYPE_COMMON_GND, COUPLING_TYPE_SPLIT_RAILS };
 
-bool isTrackingAllowed(Channel &channel, int *err);
+bool isTrackingAllowed(Channel &channel, CouplingType couplingType, int *err);
 bool isCouplingTypeAllowed(CouplingType couplingType, int *err);
 
 bool setCouplingType(CouplingType couplingType, int *err);

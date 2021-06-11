@@ -6494,72 +6494,18 @@
               ]
             },
             {
-              "type": "Select",
+              "type": "TextWidget",
               "left": 280,
               "top": 0,
               "width": 40,
               "height": 32,
-              "wireID": "4ee69c73-df27-48f8-a66d-4ca0ec3954c6",
-              "data": "is_tracking_allowed",
+              "wireID": "0bc66862-44d6-45f7-a481-0ce7c2e8a1fc",
+              "action": "show_sys_settings_function_generator",
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "status_icon_enabled",
+                "font": "Oswald14"
               },
-              "widgets": [
-                {
-                  "type": "Text",
-                  "left": 0,
-                  "top": 0,
-                  "width": 40,
-                  "height": 32,
-                  "wireID": "6472e369-0bdc-4b64-bfe3-257850be70d9",
-                  "action": "",
-                  "style": {
-                    "inheritFrom": "status_icon_disabled"
-                  },
-                  "text": "\\u007f"
-                },
-                {
-                  "type": "Select",
-                  "left": 0,
-                  "top": 0,
-                  "width": 40,
-                  "height": 32,
-                  "wireID": "7d127b1f-1248-4b47-a2cb-6b98a3477eac",
-                  "data": "is_coupled_or_tracked",
-                  "action": "show_sys_settings_tracking",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 40,
-                      "height": 32,
-                      "wireID": "a2a47e48-02d0-412f-96bb-1cd1b1ab1fe9",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "status_icon_enabled"
-                      },
-                      "text": "\\u007f"
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 40,
-                      "height": 32,
-                      "wireID": "8058948e-99dc-4d08-e34a-2a70dc7804a4",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "status_icon_enabled_and_active"
-                      },
-                      "text": "\\u007f"
-                    }
-                  ]
-                }
-              ]
+              "text": "\\u00c2"
             },
             {
               "type": "Text",
@@ -21375,19 +21321,78 @@
               "hangingIndent": 24
             },
             {
-              "type": "MultilineText",
+              "type": "Select",
               "left": 363,
               "top": 63,
               "width": 114,
               "height": 54,
-              "wireID": "c7e1a43c-f9ec-41c1-d9bb-cf2dd0cbe0dc",
-              "action": "show_sys_settings_function_generator",
+              "wireID": "75c414b5-5846-4e2c-ee40-6db4eb17c228",
+              "data": "is_tracking_allowed",
               "style": {
-                "inheritFrom": "icon_and_text_S"
+                "inheritFrom": "default"
               },
-              "text": "\\u00c2 Function generator",
-              "firstLineIndent": 0,
-              "hangingIndent": 24
+              "widgets": [
+                {
+                  "type": "MultilineTextWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "5a767289-bdcc-4ecc-a0c6-1149b9afdb84",
+                  "style": {
+                    "inheritFrom": "icon_and_text_S",
+                    "color": "text_disabled",
+                    "backgroundColor": "text_disabled_background",
+                    "activeBackgroundColor": "text_disabled"
+                  },
+                  "text": "\\u00cc Tracking & Coupling",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                },
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "7d127b1f-1248-4b47-a2cb-6b98a3477eac",
+                  "data": "is_coupled_or_tracked",
+                  "action": "show_sys_settings_tracking",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "MultilineTextWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 114,
+                      "height": 54,
+                      "wireID": "998071a3-d219-4008-d113-15df0da44fb0",
+                      "style": {
+                        "inheritFrom": "icon_and_text_S"
+                      },
+                      "text": "\\u00cc Tracking & Coupling",
+                      "firstLineIndent": 0,
+                      "hangingIndent": 24
+                    },
+                    {
+                      "type": "MultilineTextWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 114,
+                      "height": 54,
+                      "wireID": "98c4a27a-6070-426c-dce8-3377687d6234",
+                      "style": {
+                        "inheritFrom": "icon_and_text_S"
+                      },
+                      "text": "\\u00cc Tracking & Coupling",
+                      "firstLineIndent": 0,
+                      "hangingIndent": 24
+                    }
+                  ]
+                }
+              ]
             },
             {
               "type": "MultilineText",
@@ -49656,14 +49661,14 @@
         {
           "encoding": 194,
           "x": 0,
-          "y": -3,
-          "width": 20,
-          "height": 20,
-          "dx": 20,
+          "y": -4,
+          "width": 22,
+          "height": 22,
+          "dx": 23,
           "glyphBitmap": {
-            "width": 20,
-            "height": 20,
-            "pixelArray": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a01000000000000000000000000000000000007e36d000000000000000000000000000000000047fec600000000000000000000000000000000009afefc1e00000000000000000000165f00000003e8b0fc7000000000000000000000a4fc2c00003cfe39c9c400000000000000000038fcfc98000090e10275fb1c12676a6a41142e2fc8cc7df21102e0920022fc6da2fefdfdc7c4fefefc3f17f67034fe430000c9dffc811412061d3a352b0000a2d98bea05000075fedd090000000000000000003afdfc9f00000021f6540000000000000000000001cafe4c000000001000000000000000000000000058df09000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "width": 22,
+            "height": 22,
+            "pixelArray": "0000000000000c5ca3d3efefd3ab601000000000000000000000004ce3ffffffffffffffffeb5400000000000000000c93ffffbb64240c0c2864bbffff9f1000000000000cd7ffef60000000000000000060efffdf100000000093ffc31c0000000000000a0100001cc3ff9f0000004cffef1c00000000000007e36d0000001cefff4c000ce3ff600000000000000047fec60000000060ffe30c5cffbb00000000000000009afefc1e00000000bfff5ca3ff640000165f00000003e8b0fc70000000007cffa3d3ff240000a4fc2c00003cfe39c9c4000000004cffd3efff0c0038fcfc98000090e10275fb1c12676a76ffeff3ff382fc8cc7df21102e0920022fc6da2fefdfeffefd7fffffefc3f17f67034fe430000c9dffc811459ffd3abff88352b0000a2d98bea05000075fedd09007cffab60ffbb000000003afdfc9f00000021f6540000bfff6010ebff6000000001cafe4c0000000010000060ffeb100054ffef1c00000058df090000000000001cefff54000000a3ffc31c000000030000000000001cc3ffab0000000010dfffef60000000000000000060efffe7140000000000109fffffbf7c4c14144c7cbfffffab1400000000000000004ce3ffffffffffffffffeb5400000000000000000000000c5ca3d3efefd3ab6010000000000000"
           },
           "source": {
             "filePath": "fonts\\Oswald-Medium.ttf",
@@ -49826,6 +49831,24 @@
             "width": 40,
             "height": 18,
             "pixelArray": "0000000000000646cbfbfeed7d17010000000000000000000001136ae6fefdd548080000000000000000000000032accf6efedf6e47b10000000000000000000000d6cdff7eeeef6d13d050000000000000000000121bdf5d76d5fb0f1dd41060000000000000000053cd9f4bd6269d1f6c4280200000000000000000d6ceadb440e0924aef1be25020000000000000121b2f2bf29090c3ad4ed8210000000000000000439d6e8740f00000436c9e9760c0000000000000a64e7d2400500000b60e3db3d040000000000001087e9a51c010000000847e5d12501000000000120c5e85f0c000000001797eb9e1300000000000331dae13c0400000000001dc2ed8a0f000000000c76ebcd2401000000000336dfdf330300000000119beeae19000000000000074be7d4190000000018cce85909000000000000149feda312000000001dd3e44305000000000000001ccce22e030000022ce2d11e00000000000000043ee1da20000000064de5c11900000000000000000d7cebbd1d000019b0ea7d0d000000000000000016a9e45c08000018afe8770c0000000000000000032fd3e345050333dfdc300300000000000000000a64e7bf1d000647e2d526010000000000000000000d70e491100e86e89a130000000000000000000122c8e659080e83e68a0f000000000000000000000332e3d2211dcae54605000000000000000000000a67e59c111dd2e3360300000000000000000000001cc8e96955e5ce1c0000000000000000000000022be2d9224fe5cd1d0000000000000000000000000a66e7c5b1e98a0f00000000000000000000000018c1e970c2eb830e0000000000000000000000000122dff4eee340050000000000000000000000000b70e9cbf9e32f020000000000000000000000000016c1fafac21a000000000000000000000000000123ddf9fdd51a00000000000000000000000000000e87f3f48f0f000000000000000000000000000017c4fb"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 204,
+          "x": 0,
+          "y": -2,
+          "width": 19,
+          "height": 19,
+          "dx": 19,
+          "glyphBitmap": {
+            "width": 19,
+            "height": 19,
+            "pixelArray": "00000026c7f49b080000000000000000000000000028e7ffffffb608000000000000000000000028e7ffc173e7ffb70800000000000000000028e8ffb5080027e6ffb8070000000000000000c8ffc00800000027e6ff760000000000000000f8ff6e000000010327e6a10000000000000000a1ffe3230001baef3f274600000000000000000abbffe22305f2fff53e000000000000000000000abbffe22346f7fff43d00419d730700000000000abbffe22346f7fff43c27e6ffb5080000000000087ca7460046f7fff33b26e5ffb5080000000000000000000046f7ffef0625e5ffb5080000000000000000422246f5cd020025e5ff9c0000000000000000a3e2220a030000006ffff700000000000000007affe12100000005b9ffcc000000000000000008bbffe1210005acffea2a0000000000000000000abbffe26bb8ffea2b00000000000000000000000abbffffffea2b000000000000000000000000000aa1f8cb2a000000"
           },
           "source": {
             "filePath": "fonts\\Oswald-Medium.ttf",
@@ -52765,14 +52788,14 @@
         {
           "encoding": 194,
           "x": 0,
-          "y": 0,
-          "width": 26,
-          "height": 16,
-          "dx": 26,
+          "y": -4,
+          "width": 27,
+          "height": 27,
+          "dx": 27,
           "glyphBitmap": {
-            "width": 26,
-            "height": 16,
-            "pixelArray": "00000000000000000000000000005eac080000000000000000000000000000000000000000000001e0fe540000000000000000000000000000000000000000000036fefea60000000000000000000000000000000000000000000089fefef10900000000000000000000000000001a100000000000d9fee1fe52000000000000000000000000001befcb010000002dfed868fea800000000000000000000000000a0fefe4100000082fe8516fbf10a000000000000000000000035fcfdfead000000d4fe3100bcfe520025717171713000000003c5fe7feefb1f0025fddf000067fea706d8fefefefeca96e9eaedfed8078bfe870079fe8e000016faf27cfed282827b43a4f5f3f0ed470023fbeb0acdfe3d000000bafefdfb37000000000107060504000000b4fe85fce70200000065fefea00000000000000000000000000049fefefe970000000014f9f1190000000000000000000000000001dafefe43000000000042380000000000000000000000000000006ffeec03000000000000000000000000000000000000000000000ec2770000000000000000000000000000"
+            "width": 27,
+            "height": 27,
+            "pixelArray": "00000000000000000c58a3cfe3ffe3cfab5c0c00000000000000000000000000001087f7fffffffffffffffffff78710000000000000000000000058efffffcb7c381c001c387cc3ffffef5400000000000000000483ffffbf4000000000000000000038bfffff830000000000000083fffb780000000000000000000000000078fbff83000000000058fffb54000000000000000000315a0600000054fbff5400000010efff7800000000000000000001e0fe540000000068ffef10000087ffbf0000000000000000000036fefea60000000000b3ff87000cf7ff400000000000000000000089fefef1090000000030fff70c58ffcb000000001a100000000000d9fee1fe520000000000bfff58a3ff7c0000001befcb010000002dfed868fea8000000000074ffa3cfff38000000a0fefe4100000082fe8516fbf10a0000000038ffcfe3ff1c000035fcfdfead000000d4fe3100bcfe520025717181ffe7ffff000003c5fe7feefb1f0025fddf000067fea706d8fefefeffffe7ffeceaedfed8078bfe870079fe8e000016faf27cfed28290ffe8d3fff8f3f0ed470023fbeb0acdfe3d000000bafefdfb370038ffcfabff80060504000000b4fe85fce70200000065fefea0000074ffab5cffc300000000000049fefefe970000000014f9f1190000bbff5c0cf7ff38000000000001dafefe4300000000004238000028fbf70c0087ffbf0000000000006ffeec03000000000000000000b3ff87000010efff780000000000096b3c00000000000000000068ffef1000000058fffb5400000000000000000000000000000054fbff54000000000083fffb680000000000000000000000000068fbff830000000000000483ffffaf3000000000000000000028b3ffff8300000000000000000058efffffbf74381c001c3874bbfbffef5400000000000000000000001087f7fffffffffffffffffff7871000000000000000000000000000000c58a3cfe3ffe3cfab5c0c0000000000000000"
           },
           "source": {
             "filePath": "fonts\\OpenSans-SemiBold.ttf",

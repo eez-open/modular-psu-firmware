@@ -182,7 +182,7 @@ scpi_result_t scpi_cmd_outputTrackState(scpi_t *context) {
         auto channel = Channel::getBySlotIndex(channelList.channels[i].slotIndex, channelList.channels[i].subchannelIndex);
         if (channel) {
             int err;
-            if (!channel_dispatcher::isTrackingAllowed(*channel, &err)) {
+            if (!channel_dispatcher::isTrackingAllowed(*channel, channel_dispatcher::getCouplingType(), &err)) {
                 SCPI_ErrorPush(context, err);
                 return SCPI_RES_ERR;
             }

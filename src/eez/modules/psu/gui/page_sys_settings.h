@@ -353,10 +353,14 @@ public:
     void untrackAll();
 
     uint16_t m_trackingEnabled;
+    channel_dispatcher::CouplingType m_couplingType;
 
 private:
     uint16_t m_trackingEnabledOrig;
-}; 
+    channel_dispatcher::CouplingType m_couplingTypeOrig;
+};
+
+extern SysSettingsTrackingPage g_sysSettingsTrackingPage;
 
 class SysSettingsCouplingPage : public SetPage {
 public:
