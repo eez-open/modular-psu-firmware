@@ -941,8 +941,8 @@ void tick() {
     else if (g_connectionState == CONNECTION_STATE_DNS_FOUND) {
         mqtt_connect_client_info_t clientInfo;
         clientInfo.client_id = getClientId();
-        clientInfo.client_user = persist_conf::devConf.mqttUsername;
-        clientInfo.client_pass = persist_conf::devConf.mqttPassword;
+        clientInfo.client_user = *persist_conf::devConf.mqttUsername ? persist_conf::devConf.mqttUsername : nullptr;
+        clientInfo.client_pass = *persist_conf::devConf.mqttPassword ? persist_conf::devConf.mqttPassword : nullptr;
         clientInfo.keep_alive = 60; // seconds
         clientInfo.will_topic = nullptr; // not used
 
