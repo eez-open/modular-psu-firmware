@@ -114,6 +114,10 @@ SelectFromEnumPage g_selectFromEnumPage;
 
 int g_displayTestColorIndex = 0;
 
+bool g_setFocusCursor = false;
+Cursor g_focusCursorToSet;
+int16_t g_focusDataIdToSet;
+
 bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
 
@@ -363,6 +367,14 @@ void PsuAppContext::stateManagment() {
             psu::gui::showPage(slotSettingsPageId);
         }
     }
+
+	//
+	if (g_setFocusCursor) {
+		g_setFocusCursor = false;
+		g_focusCursor = g_focusCursorToSet;
+		g_focusDataId = g_focusDataIdToSet;
+		g_focusEditValue = Value();
+	}
 }
 
 bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
@@ -1450,9 +1462,9 @@ int16_t g_focusDataId = DATA_ID_CHANNEL_U_EDIT;
 Value g_focusEditValue;
 
 void setFocusCursor(const Cursor cursor, int16_t dataId) {
-    g_focusCursor = cursor;
-    g_focusDataId = dataId;
-    g_focusEditValue = Value();
+    g_setFocusCursor = true;
+	g_focusCursorToSet = cursor;
+	g_focusDataIdToSet = dataId;
 }
 
 bool isFocusChanged() {

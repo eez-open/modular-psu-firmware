@@ -185,6 +185,8 @@ eez::gui::SetPage *getParamsPage();
 
 float getSample(Recording &recording, uint8_t *rowData, unsigned columnIndex);
 
+void appendLiveBookmark(uint32_t position, const char *bookmarkText, size_t bookmarkTextLen);
+
 ////////////////////////////////////////////////////////////////////////////////
 
 } // namespace dlog_view

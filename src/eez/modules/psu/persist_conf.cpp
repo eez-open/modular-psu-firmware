@@ -216,6 +216,7 @@ void initDefaultDevConf() {
     g_defaultDevConf.eventQueueFilter = event_queue::EVENT_TYPE_INFO;
     g_defaultDevConf.viewFlags.dlogViewLegendViewOption = DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK;
     g_defaultDevConf.viewFlags.dlogViewShowLabels = 1;
+    g_defaultDevConf.viewFlags.dlogViewDrawerIsOpen = 0;
     g_defaultDevConf.ntpRefreshFrequency = NTP_REFRESH_FREQUENCY_DEF;
 
     // block 8
@@ -1303,6 +1304,10 @@ void setDlogViewShowLabels(bool showLabels) {
     g_devConf.viewFlags.dlogViewShowLabels = showLabels;
 }
 
+void setDlogViewDrawerIsOpen(bool drawerIsOpen) {
+    g_devConf.viewFlags.dlogViewDrawerIsOpen = drawerIsOpen;
+}
+
 bool isSlotEnabled(int slotIndex) {
     return (devConf.slotEnabledBits & (1 << slotIndex)) != 0;
 }
@@ -1335,10 +1340,6 @@ void setMcuRevision(int mcuRevision) {
 void clearMcuRevision() {
     g_devConf.mcuRevisionTag = 0;
     g_devConf.mcuRevision = 0;
-}
-
-void setUartMode(uint8_t uartMode) {
-    g_devConf.uartMode = uartMode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

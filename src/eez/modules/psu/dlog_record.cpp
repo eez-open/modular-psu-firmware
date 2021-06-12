@@ -501,6 +501,8 @@ static int doStartImmediately() {
 
     g_lastSavedBufferTickCount = millis();
 
+    g_activeRecording.parameters.bookmarksSize = 0;
+
     setState(STATE_EXECUTING);
 
     return SCPI_RES_OK;
@@ -978,7 +980,9 @@ void logBookmark(const char *text, size_t textLen) {
 
         uint8_t buffer[8];
 
-		((uint32_t *)buffer)[0] = g_activeRecording.size;
+        uint32_t positon = g_activeRecording.size;
+
+		((uint32_t *)buffer)[0] = positon;
 		((uint32_t *)buffer)[1] = g_bookmarksTextFile.size();
 
         if (g_bookmarksIndexFile.write(buffer, sizeof(buffer)) != sizeof(buffer)) {
@@ -996,6 +1000,8 @@ void logBookmark(const char *text, size_t textLen) {
         }
 
 		g_bookmarksTextFile.sync();
+
+		dlog_view::appendLiveBookmark(positon, text, textLen);
     }
 }
 

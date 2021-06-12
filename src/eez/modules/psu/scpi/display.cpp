@@ -169,11 +169,6 @@ scpi_result_t scpi_cmd_displayWindowTextClear(scpi_t *context) {
 
 scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 #if OPTION_DISPLAY
-    if (!sd_card::isMounted(nullptr, nullptr)) {
-    	SCPI_ErrorPush(context, SCPI_ERROR_MISSING_MASS_MEDIA);
-        return SCPI_RES_ERR;
-    }
-
     if (dlog_record::isExecuting() && dlog_record::g_recordingParameters.period < 1.0f) {
     	SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;

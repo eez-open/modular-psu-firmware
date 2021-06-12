@@ -68,6 +68,7 @@ enum DlogViewLegendViewOption {
 struct ViewFlags {
     unsigned dlogViewLegendViewOption: 3;
     unsigned dlogViewShowLabels: 1;
+    unsigned dlogViewDrawerIsOpen: 1;
 };
 
 /// Device configuration block.
@@ -116,7 +117,7 @@ struct DeviceConfiguration {
 
     // block 4
     uint8_t startOfBlock4; // was serialBaud
-    uint8_t uartMode;
+    uint8_t reserved40; // was uartMode
     
     uint32_t ethernetIpAddress;
     uint32_t ethernetDns;
@@ -341,6 +342,7 @@ void setIsInhibitedByUser(int isInhibitedByUser);
 
 void setDlogViewLegendViewOption(DlogViewLegendViewOption dlogViewLegendViewOption);
 void setDlogViewShowLabels(bool showLabels);
+void setDlogViewDrawerIsOpen(bool drawerIsOpen);
 
 bool isSlotEnabled(int slotIndex);
 void setSlotEnabled(int slotIndex, bool enabled);
@@ -353,8 +355,6 @@ void setPowerLineFrequency(int powerLineFrequency);
 
 void setMcuRevision(int mcuRevision);
 void clearMcuRevision();
-
-void setUartMode(uint8_t uartMode);
 
 ////////////////////////////////////////////////////////////////////////////////
 
