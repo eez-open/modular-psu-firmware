@@ -1426,7 +1426,7 @@ bool isActive() {
 }
 
 float getMax(WaveformParameters &waveformParameters) {
-	return waveformParameters.offset + waveformParameters.amplitude;
+	return waveformParameters.offset + waveformParameters.amplitude / 2.0f;
 }
 
 int checkLimits(int iChannel) {
@@ -2504,7 +2504,11 @@ void data_function_generator_is_dc(DataOperationEnum operation, Cursor cursor, V
 
 void data_function_generator_any_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-		value = g_functionGeneratorSelectChannelsPage.m_selectedChannels != 0;
+		if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
+			value = g_functionGeneratorPage.m_selectedResources.m_numResources > 0;
+		} else {
+			value = g_functionGeneratorSelectChannelsPage.m_selectedChannels != 0;
+		}
 	}
 }
 
