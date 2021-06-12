@@ -61,7 +61,7 @@ void onQueueMessage(uint32_t type, uint32_t param);
 enum UartMode {
 	UART_MODE_BUFFER,
 	UART_MODE_SCPI,
-  UART_MODE_BOOKMARK,
+	UART_MODE_BOOKMARK,
 };
 
 } // uart

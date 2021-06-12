@@ -147,6 +147,7 @@ struct Parameters {
     io_pins::IOPin ioPins[NUM_IO_PINS];
     float ioPinsPwmFrequency[NUM_IO_PINS - DOUT1];
     float ioPinsPwmDuty[NUM_IO_PINS - DOUT1];
+    uint8_t uartMode;
     EncoderModes encoderModes;
     FunctionGeneratorParameters functionGeneratorParameters;
 };

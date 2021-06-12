@@ -26,6 +26,8 @@ static const uint8_t DOUT1 = 2;
 static const uint8_t DOUT2 = 3;
 static const uint8_t NUM_IO_PINS = 4;
 
+#include <eez/uart.h>
+
 namespace eez {
 namespace psu {
 namespace io_pins {
@@ -58,6 +60,7 @@ struct IOPin {
 extern IOPin g_ioPins[NUM_IO_PINS];
 extern float g_pwmFrequency[NUM_IO_PINS - DOUT1];
 extern float g_pwmDuty[NUM_IO_PINS - DOUT1];
+extern uart::UartMode g_uartMode;
 
 void reset();
 void tick();

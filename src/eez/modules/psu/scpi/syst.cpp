@@ -2431,14 +2431,14 @@ scpi_result_t scpi_cmd_systemCommunicateUartMode(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    persist_conf::setUartMode((uint8_t)uartMode);
+    io_pins::g_uartMode = (uart::UartMode)uartMode;
     uart::reinit();
     
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemCommunicateUartModeQ(scpi_t *context) {
-    resultChoiceName(context, g_uartModeChoice, persist_conf::devConf.uartMode);
+    resultChoiceName(context, g_uartModeChoice, io_pins::g_uartMode);
 	return SCPI_RES_OK;
 }
 

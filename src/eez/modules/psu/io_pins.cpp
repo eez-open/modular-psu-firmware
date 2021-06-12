@@ -26,7 +26,6 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
-#include <eez/uart.h>
 
 #include <eez/modules/psu/psu.h>
 
@@ -59,7 +58,9 @@ static uint32_t g_toutputPulseStartTickCountMs;
 float g_pwmFrequency[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_FREQUENCY, PWM_DEFAULT_FREQUENCY };
 float g_pwmDuty[NUM_IO_PINS - DOUT1] = { PWM_DEFAULT_DUTY, PWM_DEFAULT_DUTY };
 static uint32_t g_pwmPeriodInt[NUM_IO_PINS - DOUT1];
-static bool m_gPwmStarted;
+static bool g_pwmStarted;
+
+uart::UartMode g_uartMode;
 
 #if defined EEZ_PLATFORM_STM32
 static float g_pwmStartedFrequency;
@@ -197,12 +198,12 @@ void calcPwmPrescalerAndPeriod(float frequency, uint32_t &prescalerInt, uint32_t
 }
 
 void pwmStop(int pin) {
-    if (m_gPwmStarted) {    
+    if (g_pwmStarted) {    
 #if defined EEZ_PLATFORM_STM32
         HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_2);
         HAL_TIM_PWM_DeInit(&htim3);
 #endif
-        m_gPwmStarted = false;
+        g_pwmStarted = false;
     }
 
 #if defined EEZ_PLATFORM_STM32
@@ -227,7 +228,7 @@ void updatePwmFrequency(int pin) {
     g_pwmPeriodInt[pin - DOUT1] = periodInt; 
 
 #if defined EEZ_PLATFORM_STM32
-    if (!m_gPwmStarted) {
+    if (!g_pwmStarted) {
         MX_TIM3_Init();
     }
 
@@ -240,9 +241,9 @@ void updatePwmFrequency(int pin) {
     updatePwmDuty(pin);
 
     if (isPowerUp() && frequency > 0) {
-        if (!m_gPwmStarted) {
+        if (!g_pwmStarted) {
             HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
-            m_gPwmStarted = true;
+            g_pwmStarted = true;
         } else {
     		if (g_pwmStartedFrequency < 1 && frequency > 2 * g_pwmStartedFrequency) {
     			// forces an update event

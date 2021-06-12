@@ -34,6 +34,7 @@
 #include <eez/mp.h>
 #include <eez/memory.h>
 #include <eez/hmi.h>
+#include <eez/uart.h>
 #include <eez/usb.h>
 
 #include <eez/fs_driver.h>
@@ -303,6 +304,13 @@ EnumItem g_enumDefinition_USB_DEVICE_CLASS[] = {
     { USB_DEVICE_CLASS_VIRTUAL_COM_PORT, "Virtual COM Port" },
     { USB_DEVICE_CLASS_MASS_STORAGE_CLIENT, "Mass Storage Device" },
     { 0, 0 }
+};
+
+EnumItem g_enumDefinition_UART_MODE[] = {
+	{ uart::UART_MODE_BUFFER, "Buffer" },
+	{ uart::UART_MODE_SCPI, "SCPI" },
+	{ uart::UART_MODE_BOOKMARK, "Bookmark" },
+	{ 0, 0 }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4417,9 +4425,15 @@ void data_io_pins_inhibit_state(DataOperationEnum operation, Cursor cursor, Valu
     }
 }
 
-void data_io_pin_number(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_io_pin_label(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(cursor + 1);
+		const char *g_pin_label[] = {
+			"#1 Din1",
+			"#2 Din2",
+			"#3 Dout1",
+			"#4 Dout2",
+		};
+        value = g_pin_label[cursor];
     }
 }
 
@@ -4438,8 +4452,10 @@ void data_io_pin_function(DataOperationEnum operation, Cursor cursor, Value &val
         if (page) {
             if (page->m_function[cursor] == io_pins::FUNCTION_PWM) {
                 value = 0;
+            } else if (page->m_function[cursor] == io_pins::FUNCTION_UART) {
+				value = 1;
             } else {
-                value = 1;
+                value = 2;
             }
         }
     }
@@ -4597,6 +4613,13 @@ void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &val
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         eez::psu::gui::edit_mode_step::g_dutyEncoderMode = (EncoderMode)value.getInt();
     } 
+}
+
+void data_io_pin_uart_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+	SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+	if (page) {
+		value = MakeEnumDefinitionValue(page->m_uartMode, ENUM_DEFINITION_UART_MODE);
+	}
 }
 
 void data_ntp_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {

@@ -838,6 +838,8 @@ void SysSettingsIOPinsPage::pageAlloc() {
 
         }
     }
+
+	m_uartMode = m_uartModeOrig = io_pins::g_uartMode;
 }
 
 void SysSettingsIOPinsPage::togglePolarity() {
@@ -912,6 +914,17 @@ float SysSettingsIOPinsPage::getPwmDuty(int pin) {
     return g_pwmDuty[pin - DOUT1];
 }
 
+void SysSettingsIOPinsPage::onUartModeSet(uint16_t value) {
+	popPage();
+
+	SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getActivePage();
+	page->m_uartMode = (uart::UartMode)value;
+}
+
+void SysSettingsIOPinsPage::selectUartMode() {
+	pushSelectFromEnumPage(ENUM_DEFINITION_UART_MODE, m_uartMode, 0, onUartModeSet);
+}
+
 int SysSettingsIOPinsPage::getDirty() {
     for (int i = 0; i < NUM_IO_PINS; ++i) {
         if (m_polarityOrig[i] != m_polarity[i] || m_functionOrig[i] != m_function[i]) {
@@ -923,12 +936,17 @@ int SysSettingsIOPinsPage::getDirty() {
             }
         }
     }
+	if (m_uartMode != m_uartModeOrig) {
+		return true;
+	}
     return false;
 }
 
 void SysSettingsIOPinsPage::set() {
     if (getDirty()) {
-        for (int i = 0; i < NUM_IO_PINS; i++) {
+		io_pins::g_uartMode = m_uartMode;
+		
+		for (int i = 0; i < NUM_IO_PINS; i++) {
             io_pins::setPinPolarity(i, m_polarity[i]);
             io_pins::setPinFunction(i, m_function[i]);
             if (i >= DOUT1) {
@@ -940,7 +958,8 @@ void SysSettingsIOPinsPage::set() {
                 }
             }
         }
-        pageAlloc();
+        
+		pageAlloc();
     }
 }
 

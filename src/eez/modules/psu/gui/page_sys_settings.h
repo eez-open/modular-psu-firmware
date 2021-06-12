@@ -317,11 +317,15 @@ class SysSettingsIOPinsPage : public SetPage {
     void setPwmDuty(int pin, float duty);
     float getPwmDuty(int pin);
 
+	void selectUartMode();
+
     int getDirty();
     void set();
 
     io_pins::Polarity m_polarity[NUM_IO_PINS];
     io_pins::Function m_function[NUM_IO_PINS];
+
+	uart::UartMode m_uartMode;
 
   private:
     int pinNumber;
@@ -335,7 +339,10 @@ class SysSettingsIOPinsPage : public SetPage {
     float g_pwmDutyOrig[NUM_IO_PINS - DOUT1];
     float g_pwmDuty[NUM_IO_PINS - DOUT1];
 
+	uart::UartMode m_uartModeOrig;
+
     static void onFunctionSet(uint16_t value);
+	static void onUartModeSet(uint16_t value);
 };
 
 class SysSettingsTrackingPage : public SetPage {

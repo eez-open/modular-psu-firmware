@@ -255,12 +255,12 @@ void tick() {
 	    flushRxBuffer(g_RxXferCount);
 #endif
 
-		if (persist_conf::devConf.uartMode == UART_MODE_SCPI) {
+		if (io_pins::g_uartMode == UART_MODE_SCPI) {
 			while (!g_inputBuffer.isEmpty()) {
 				auto ch = (char)g_inputBuffer.get();
 				input(g_scpiContext, &ch, 1);
 			}
-		} else if (persist_conf::devConf.uartMode == UART_MODE_BOOKMARK) {
+		} else if (io_pins::g_uartMode == UART_MODE_BOOKMARK) {
 			static char bookmarkText[dlog_file::MAX_BOOKMARK_TEXT_LEN];
 			static unsigned bookmarkTextLen;
 
@@ -432,7 +432,7 @@ HAL_StatusTypeDef receive(uint8_t *data, uint16_t size, uint32_t timeout, uint16
 }
 
 bool transmit(uint8_t *data, uint16_t size, uint32_t timeout, int *err) {
-	if (!g_initialized || bp3c::flash_slave::g_bootloaderMode || persist_conf::devConf.uartMode != UART_MODE_BUFFER) {
+	if (!g_initialized || bp3c::flash_slave::g_bootloaderMode || io_pins::g_uartMode != UART_MODE_BUFFER) {
 		if (*err) {
 			*err = SCPI_ERROR_EXECUTION_ERROR;
 		}
@@ -449,7 +449,7 @@ bool transmit(uint8_t *data, uint16_t size, uint32_t timeout, int *err) {
 }
 
 bool receive(uint8_t *data, uint16_t size, uint16_t &n, int *err) {
-	if (!g_initialized || bp3c::flash_slave::g_bootloaderMode || persist_conf::devConf.uartMode != UART_MODE_BUFFER) {
+	if (!g_initialized || bp3c::flash_slave::g_bootloaderMode || io_pins::g_uartMode != UART_MODE_BUFFER) {
 		if (*err) {
 			*err = SCPI_ERROR_EXECUTION_ERROR;
 		}

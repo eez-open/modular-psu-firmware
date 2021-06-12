@@ -948,6 +948,10 @@ void action_io_pin_select_function() {
     ((SysSettingsIOPinsPage *)getActivePage())->selectFunction();
 }
 
+void action_io_pin_select_uart_mode() {
+    ((SysSettingsIOPinsPage *)getActivePage())->selectUartMode();
+}
+
 void action_ntp_toggle() {
     ((SysSettingsDateTimePage *)getActivePage())->toggleNtp();
 }
