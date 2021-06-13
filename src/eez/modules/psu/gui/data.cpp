@@ -163,7 +163,7 @@ EnumItem g_enumDefinition_IO_PINS_INPUT1_FUNCTION[] = {
     { io_pins::FUNCTION_INPUT, "Input" },
     { io_pins::FUNCTION_INHIBIT, "Inhibit" },
     { io_pins::FUNCTION_SYSTRIG, "System trigger", "SysTrig" },
-    { io_pins::FUNCTION_UART, "UART" },
+    { io_pins::FUNCTION_UART, "UART RX" },
     { 0, 0 }
 };
 
@@ -172,7 +172,7 @@ EnumItem g_enumDefinition_IO_PINS_INPUT1_FUNCTION_WITH_DLOG_TRIGGER[] = {
     { io_pins::FUNCTION_INPUT, "Input" },
     { io_pins::FUNCTION_INHIBIT, "Inhibit" },
     { io_pins::FUNCTION_SYSTRIG, "System trigger", "SysTrig" },
-    { io_pins::FUNCTION_UART, "UART" },
+    { io_pins::FUNCTION_UART, "UART RX" },
     { io_pins::FUNCTION_DLOGTRIG, "DLOG trigger", "DlogTrig" },
     { 0, 0 }
 };
@@ -200,7 +200,7 @@ EnumItem g_enumDefinition_IO_PINS_OUTPUT1_FUNCTION[] = {
     { io_pins::FUNCTION_FAULT, "Fault" },
     { io_pins::FUNCTION_ON_COUPLE, "Channel ON couple", "ONcoup" },
     { io_pins::FUNCTION_TOUTPUT, "Trigger output", "Toutput" },
-    { io_pins::FUNCTION_UART, "UART" },
+    { io_pins::FUNCTION_UART, "UART TX" },
     { 0, 0 }
 };
 
