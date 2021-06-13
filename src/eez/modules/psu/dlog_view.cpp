@@ -1211,7 +1211,7 @@ float roundValueOnXAxis(Recording &recording, float value) {
 
 float roundValueOnYAxis(Recording &recording, int yAxisIndex, float value) {
 	float prec;
-	if (value < 1E-5f) {
+	if (fabs(value) < 1E-5f) {
 		prec = 1E-5f;
 	} else {
 		prec = powf(10.0f, floorf(log10f(fabs(value)))) / 1000.0f;
@@ -2453,7 +2453,7 @@ void guessStepValues(StepValues *stepValues, Unit unit) {
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     } else if (unit == UNIT_AMPER) {
-        static float values[] = { 0.00001f, 0.0001f, 0.001f, 0.01f, 0.1f };
+        static float values[] = { 0.0001f, 0.001f, 0.01f, 0.1f };
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
     } else if (unit == UNIT_WATT) {
