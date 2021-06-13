@@ -157,7 +157,7 @@ struct DcmChannel : public Channel {
 		params.I_DEF = 0.0f;
 		params.I_MAX = 4.9f;
 
-    	params.I_MON_MIN = 0.0f;
+    	params.I_MON_MIN = -5.0f;
 
 		params.I_MIN_STEP = 0.01f;
 		params.I_DEF_STEP = 0.01f;
