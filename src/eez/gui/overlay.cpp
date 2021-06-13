@@ -56,20 +56,26 @@ void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
             overlay->yOffset = overlay->y - widgetCursor.widget->y;
         }
 
+        int x1 = 0;
+        int y1 = 0;
+        int x2 = 0;
+        int y2 = 0;
+        expandRectWithShadow(x1, y1, x2, y2);
+
         int x = widgetCursor.x + overlay->xOffset;
-        if (x < widgetCursor.appContext->rect.x) {
-            x = widgetCursor.appContext->rect.x;
+        if (x + x1 < widgetCursor.appContext->rect.x) {
+            x = widgetCursor.appContext->rect.x - x1;
         }
-        if (x + overlay->width > widgetCursor.appContext->rect.x + widgetCursor.appContext->rect.w) {
-            x = widgetCursor.appContext->rect.x + widgetCursor.appContext->rect.w - overlay->width;
+        if (x + overlay->width + x2 > widgetCursor.appContext->rect.x + widgetCursor.appContext->rect.w) {
+            x = widgetCursor.appContext->rect.x + widgetCursor.appContext->rect.w - overlay->width - x2;
         }
 
         int y = widgetCursor.y + overlay->yOffset;
-        if (y < widgetCursor.appContext->rect.y) {
-            y = widgetCursor.appContext->rect.y;
+        if (y + y1 < widgetCursor.appContext->rect.y) {
+            y = widgetCursor.appContext->rect.y - y1;
         }
-        if (y + overlay->height > widgetCursor.appContext->rect.y + widgetCursor.appContext->rect.h) {
-            y = widgetCursor.appContext->rect.y + widgetCursor.appContext->rect.h - overlay->height;
+        if (y + overlay->height + y2 > widgetCursor.appContext->rect.y + widgetCursor.appContext->rect.h) {
+            y = widgetCursor.appContext->rect.y + widgetCursor.appContext->rect.h - overlay->height - y2;
         }
 
         xOffset = overlay->xOffset = x - widgetCursor.x;
