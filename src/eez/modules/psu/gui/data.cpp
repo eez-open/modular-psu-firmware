@@ -1235,7 +1235,7 @@ void editValue(int16_t dataId) {
 
 int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
     auto testResult = g_slots[slotIndex]->getTestResult();
-    if (g_slots[slotIndex]->enabled && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
+    if ((g_slots[slotIndex]->enabled && (testResult == TEST_OK || testResult == TEST_SKIPPED)) || g_slots[slotIndex]->moduleType == MODULE_TYPE_NONE) {
         return g_slots[slotIndex]->getSlotView(slotViewType, slotIndex, cursor);
     } else {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
@@ -1618,7 +1618,13 @@ void data_channels_is_2col_view(DataOperationEnum operation, Cursor cursor, Valu
 
 void data_slot_is_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = g_slots[hmi::g_selectedSlotIndex]->numPowerChannels == 2;
+		int slotIndex = hmi::g_selectedSlotIndex;
+        auto testResult = g_slots[slotIndex]->getTestResult();
+        if (g_slots[slotIndex]->enabled && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
+            value = g_slots[hmi::g_selectedSlotIndex]->numPowerChannels == 2;
+        } else {
+            value = 0;
+        }
     }
 }
 
@@ -4616,9 +4622,56 @@ void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &val
 }
 
 void data_io_pin_uart_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
-	SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
-	if (page) {
-		value = MakeEnumDefinitionValue(page->m_uartMode, ENUM_DEFINITION_UART_MODE);
+	if (operation == DATA_OPERATION_GET) {
+		SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+		if (page) {
+			value = MakeEnumDefinitionValue(page->m_uartMode, ENUM_DEFINITION_UART_MODE);
+		}
+	}
+}
+
+void data_io_pin_is_uart_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+		if (page) {
+			value = page->m_function[0] == io_pins::FUNCTION_UART;
+		}
+	}
+}
+
+void data_io_pin_uart_baud(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+		if (page) {
+			value = "115200";
+		}
+	}
+}
+
+void data_io_pin_uart_data_bits(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+		if (page) {
+			value = "8";
+		}
+	}
+}
+
+void data_io_pin_uart_parity(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+		if (page) {
+			value = "Event";
+		}
+	}
+}
+
+void data_io_pin_uart_stop_bits(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
+		if (page) {
+			value = "1";
+		}
 	}
 }
 
