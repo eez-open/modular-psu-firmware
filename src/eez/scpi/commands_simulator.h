@@ -478,6 +478,14 @@
     SCPI_COMMAND("SYSTem:VERSion?", scpi_cmd_systemVersionQ) \
     SCPI_COMMAND("SYSTem:LFRequency", scpi_cmd_systemLfrequency) \
     SCPI_COMMAND("SYSTem:LFRequency?", scpi_cmd_systemLfrequencyQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:BAUD", scpi_cmd_systemCommunicateUartBaud) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:BAUD?", scpi_cmd_systemCommunicateUartBaudQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:PARIty", scpi_cmd_systemCommunicateUartParity) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:PARIty?", scpi_cmd_systemCommunicateUartParityQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:DATA", scpi_cmd_systemCommunicateUartData) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:DATA?", scpi_cmd_systemCommunicateUartDataQ) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:STOP", scpi_cmd_systemCommunicateUartStop) \
+    SCPI_COMMAND("SYSTem:COMMunicate:UART:STOP?", scpi_cmd_systemCommunicateUartStopQ) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce", scpi_cmd_triggerDlogSource) \
     SCPI_COMMAND("TRIGger:DLOG:SOURce?", scpi_cmd_triggerDlogSourceQ) \
     SCPI_COMMAND("TRIGger:DLOG[:IMMediate]", scpi_cmd_triggerDlogImmediate) \

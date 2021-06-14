@@ -294,10 +294,9 @@ class FunctionGeneratorPage : public SetPage {
 public:
     static const int PAGE_SIZE = 4;
 
-	void pageAlloc() {
-		hmi::selectSlot(-1);
-		selectChannel(nullptr);
+	bool m_initialized = false;
 
+	void init() {
 		for (int i = 0; i < g_selectedResources.m_numResources; i++) {
 			int slotIndex;
 			int subchannelIndex;
@@ -309,6 +308,15 @@ public:
 		memcpy(&m_selectedResources, &g_selectedResources, sizeof(g_selectedResources));
 		m_selectedItem = 0;
 		m_scrollPosition = 0;
+
+		m_initialized = true;
+	}
+
+	void pageAlloc() {
+		hmi::selectSlot(-1);
+		selectChannel(nullptr);
+
+		init();
 	}
 
     int getDirty() {
@@ -360,6 +368,10 @@ public:
 					g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, TRIGGER_MODE_FUNCTION_GENERATOR, nullptr);
 				}
 			}
+		}
+
+		if (g_active) {
+			reloadWaveformParameters();
 		}
 
 		m_version++;
@@ -499,10 +511,6 @@ public:
 				drawWaveform(widgetCursor, waveformParameters, T, min, max, true);
 				drawWaveform(widgetCursor, waveformParameters, T, min, max, true, 1);
 			}
-		}
-
-		if (g_active) {
-			reloadWaveformParameters();
 		}
 	}
 
@@ -1592,6 +1600,10 @@ void reloadWaveformParameters() {
 }
 
 void tick() {
+	if (!g_functionGeneratorPage.m_initialized) {
+		g_functionGeneratorPage.init();
+	}
+
 	if (!g_active) {
 		return;
 	}
@@ -1829,6 +1841,19 @@ void data_function_generator_item_label(DataOperationEnum operation, Cursor curs
 		}
 	}
 }
+void data_function_generator_selected_item_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		int subchannelIndex;
+		int resourceIndex;
+		AllResources::findResource(
+			g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].absoluteResourceIndex,
+			slotIndex, subchannelIndex, resourceIndex
+		);
+		value = g_slots[slotIndex]->getFunctionGeneratorResourceLabel(subchannelIndex, resourceIndex);
+	}
+}
+
 
 void data_function_generator_item_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
 		if (operation == DATA_OPERATION_GET) {

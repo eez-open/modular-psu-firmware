@@ -1628,7 +1628,7 @@
       "name": "dlog_state",
       "type": "enum",
       "enumItems": "[\n    \"Idle\", \n    \"Initiated\", \n    \"Executing\"\n]",
-      "defaultValue": "3"
+      "defaultValue": "2"
     },
     {
       "name": "dlog_toggle_state",
@@ -1826,7 +1826,8 @@
     {
       "name": "script_info",
       "type": "string",
-      "defaultValue": "script info"
+      "defaultValue": "script info",
+      "defaultValueList": ""
     },
     {
       "name": "script_is_started",
@@ -2606,6 +2607,11 @@
     },
     {
       "name": "function_generator_item_label",
+      "type": "string",
+      "defaultValue": "DCP405 #1 U"
+    },
+    {
+      "name": "function_generator_selected_item_label",
       "type": "string",
       "defaultValue": "DCP405 #1 U"
     },
@@ -6690,10 +6696,10 @@
         },
         {
           "type": "Container",
-          "left": 232,
-          "top": 144,
-          "width": 248,
-          "height": 128,
+          "left": 244,
+          "top": 57,
+          "width": 236,
+          "height": 215,
           "wireID": "cebaa727-0fbe-422b-aab4-95714a141e48",
           "data": "",
           "action": "drag_overlay",
@@ -6704,8 +6710,8 @@
           "widgets": [
             {
               "type": "Text",
-              "left": 8,
-              "top": 8,
+              "left": 2,
+              "top": 2,
               "width": 28,
               "height": 28,
               "wireID": "f38c9aa7-dbad-4518-ab22-bf33c2f9577d",
@@ -6716,9 +6722,9 @@
             },
             {
               "type": "Grid",
-              "left": 40,
-              "top": 8,
-              "width": 200,
+              "left": 38,
+              "top": 2,
+              "width": 196,
               "height": 28,
               "wireID": "d202ee9d-5e8f-407b-e15c-dcecb7f61818",
               "data": "channels_with_list_counter_visible",
@@ -6729,7 +6735,7 @@
                 "type": "Container",
                 "left": 0,
                 "top": 0,
-                "width": 100,
+                "width": 98,
                 "height": 28,
                 "wireID": "27a623f8-896b-45a5-ba18-8cd3cd60ec50",
                 "style": {
@@ -6753,7 +6759,7 @@
                     "type": "DisplayData",
                     "left": 25,
                     "top": 0,
-                    "width": 75,
+                    "width": 73,
                     "height": 28,
                     "wireID": "164fc946-7cfc-4b35-a14b-0bb9081ed87c",
                     "data": "channel_list_countdown",
@@ -6768,8 +6774,8 @@
             },
             {
               "type": "Text",
-              "left": 8,
-              "top": 36,
+              "left": 2,
+              "top": 30,
               "width": 28,
               "height": 28,
               "wireID": "9aaddf0c-f7fa-4b50-d4d1-38c21067a431",
@@ -6780,9 +6786,9 @@
             },
             {
               "type": "Grid",
-              "left": 40,
-              "top": 36,
-              "width": 200,
+              "left": 38,
+              "top": 30,
+              "width": 196,
               "height": 28,
               "wireID": "c86216e0-611a-4d48-ef7d-63766de484ab",
               "data": "channels_with_ramp_counter_visible",
@@ -6793,7 +6799,7 @@
                 "type": "Container",
                 "left": 0,
                 "top": 0,
-                "width": 100,
+                "width": 98,
                 "height": 28,
                 "wireID": "a73eb878-568b-4dd3-beb0-abf6721efd0b",
                 "style": {
@@ -6817,7 +6823,7 @@
                     "type": "DisplayData",
                     "left": 25,
                     "top": 0,
-                    "width": 75,
+                    "width": 73,
                     "height": 28,
                     "wireID": "fd76d371-4833-4b4d-a4fd-571634325280",
                     "data": "channel_ramp_countdown",
@@ -6832,8 +6838,8 @@
             },
             {
               "type": "Container",
-              "left": 8,
-              "top": 64,
+              "left": 2,
+              "top": 58,
               "width": 232,
               "height": 28,
               "wireID": "6dbeb735-3d97-48b7-9f02-64f07c1b7247",
@@ -6935,8 +6941,8 @@
             },
             {
               "type": "Container",
-              "left": 8,
-              "top": 92,
+              "left": 2,
+              "top": 86,
               "width": 232,
               "height": 28,
               "wireID": "b864940e-623f-4188-843f-13e7dd830d1e",
@@ -6969,6 +6975,567 @@
                     "inheritFrom": "overlay_left"
                   },
                   "text": ""
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 2,
+              "top": 114,
+              "width": 232,
+              "height": 99,
+              "wireID": "bd1de53e-a8b5-478f-83e3-e53bf55f86b8",
+              "style": {
+                "inheritFrom": "overlay"
+              },
+              "name": "function generator",
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 28,
+                  "height": 28,
+                  "wireID": "0443a7f4-6737-4221-9194-ee208e23b9a7",
+                  "style": {
+                    "inheritFrom": "overlay_icon",
+                    "font": "Oswald14"
+                  },
+                  "text": "\\u00c2"
+                },
+                {
+                  "type": "Container",
+                  "left": 28,
+                  "top": 0,
+                  "width": 204,
+                  "height": 99,
+                  "wireID": "cd2c1411-15f6-4542-9030-6edab397f3f2",
+                  "style": {
+                    "inheritFrom": "overlay_left"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 84,
+                      "height": 24,
+                      "wireID": "6558e91d-5b38-468f-bdcb-3cb8bdd48588",
+                      "data": "function_generator_selected_item_label",
+                      "style": {
+                        "inheritFrom": "overlay_left"
+                      },
+                      "text": ""
+                    },
+                    {
+                      "type": "Text",
+                      "left": 84,
+                      "top": 0,
+                      "width": 120,
+                      "height": 24,
+                      "wireID": "8dae9187-d08d-4c27-bd12-237cb78aeac1",
+                      "data": "function_generator_waveform_label",
+                      "action": "function_generator_select_waveform",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center",
+                        "font": "RobotoCondensed-Regular"
+                      },
+                      "text": ""
+                    },
+                    {
+                      "type": "Select",
+                      "left": 0,
+                      "top": 25,
+                      "width": 204,
+                      "height": 24,
+                      "wireID": "823ba0b7-93ec-40d7-fe62-c955023c9046",
+                      "data": "function_generator_is_dc",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 204,
+                          "height": 24,
+                          "wireID": "04ac791b-1bb5-4613-d49f-417b6fbb0aab",
+                          "style": {
+                            "inheritFrom": "overlay_left"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Select",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 24,
+                              "wireID": "5662faa1-edaa-40fc-ed4f-8b7dc7c68743",
+                              "data": "function_generator_is_freq",
+                              "style": {
+                                "inheritFrom": "overlay_left"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 28,
+                                  "height": 24,
+                                  "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
+                                  "action": "",
+                                  "style": {
+                                    "inheritFrom": "overlay_left"
+                                  },
+                                  "text": "Per"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 28,
+                                  "height": 24,
+                                  "wireID": "1dfd8def-613b-4106-f77e-2167316c61c1",
+                                  "action": "",
+                                  "style": {
+                                    "inheritFrom": "overlay_left"
+                                  },
+                                  "text": "Freq"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 29,
+                              "top": 0,
+                              "width": 72,
+                              "height": 24,
+                              "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                              "data": "function_generator_frequency",
+                              "action": "edit",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "RobotoCondensed-Regular",
+                                "padding": "0 5"
+                              },
+                              "displayOption": 0
+                            },
+                            {
+                              "type": "Text",
+                              "left": 102,
+                              "top": 0,
+                              "width": 28,
+                              "height": 24,
+                              "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
+                              "style": {
+                                "inheritFrom": "overlay_left",
+                                "padding": "0 0 0 2"
+                              },
+                              "text": "PSft"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 131,
+                              "top": 0,
+                              "width": 73,
+                              "height": 24,
+                              "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                              "data": "function_generator_phase_shift",
+                              "action": "edit",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "RobotoCondensed-Regular",
+                                "padding": "0 5"
+                              },
+                              "displayOption": 0
+                            }
+                          ]
+                        },
+                        {
+                          "type": "RectangleWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 204,
+                          "height": 24,
+                          "wireID": "9943e603-ad46-4e43-f28a-794708b9eb26",
+                          "style": {
+                            "inheritFrom": "overlay_left"
+                          },
+                          "invertColors": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Select",
+                      "left": 0,
+                      "top": 50,
+                      "width": 204,
+                      "height": 24,
+                      "wireID": "bf32434d-b348-40ef-d3f0-f81ac706278c",
+                      "data": "function_generator_is_dc",
+                      "style": {
+                        "inheritFrom": "overlay_left"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Select",
+                          "left": 0,
+                          "top": 0,
+                          "width": 204,
+                          "height": 24,
+                          "wireID": "cca68cf6-838a-42e5-bb52-52bf84db8b6d",
+                          "data": "function_generator_has_amplitude_and_offset",
+                          "style": {
+                            "inheritFrom": "overlay_left"
+                          },
+                          "widgets": [
+                            {
+                              "type": "RectangleWidget",
+                              "left": 0,
+                              "top": 0,
+                              "width": 204,
+                              "height": 24,
+                              "wireID": "2d7c96a5-5388-42dd-87aa-36916aa37f21",
+                              "style": {
+                                "inheritFrom": "overlay_left"
+                              },
+                              "invertColors": true
+                            },
+                            {
+                              "type": "Container",
+                              "left": 0,
+                              "top": 0,
+                              "width": 204,
+                              "height": 24,
+                              "wireID": "e92e5922-0a5e-409e-cb7f-e121ff12f3b8",
+                              "style": {
+                                "inheritFrom": "overlay_left"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "Select",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 28,
+                                  "height": 24,
+                                  "wireID": "37ac0603-d0a6-408b-e7da-59da3a050dc3",
+                                  "data": "function_generator_is_ampl",
+                                  "style": {
+                                    "inheritFrom": "overlay_left"
+                                  },
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 28,
+                                      "height": 24,
+                                      "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                                      "action": "",
+                                      "style": {
+                                        "inheritFrom": "overlay_left"
+                                      },
+                                      "text": "Min"
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 28,
+                                      "height": 24,
+                                      "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
+                                      "action": "",
+                                      "style": {
+                                        "inheritFrom": "overlay_left"
+                                      },
+                                      "text": "Ampl"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "DisplayData",
+                                  "left": 29,
+                                  "top": 0,
+                                  "width": 72,
+                                  "height": 24,
+                                  "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                                  "data": "function_generator_amplitude",
+                                  "action": "edit",
+                                  "style": {
+                                    "inheritFrom": "encoder_cursor_14_enabled",
+                                    "font": "RobotoCondensed-Regular",
+                                    "padding": "0 5"
+                                  },
+                                  "displayOption": 0
+                                },
+                                {
+                                  "type": "Select",
+                                  "left": 102,
+                                  "top": 0,
+                                  "width": 28,
+                                  "height": 24,
+                                  "wireID": "bf685e8a-a972-4fe1-8aea-613eafd4394e",
+                                  "data": "function_generator_is_ampl",
+                                  "style": {
+                                    "inheritFrom": "overlay_left"
+                                  },
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 28,
+                                      "height": 24,
+                                      "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                                      "style": {
+                                        "inheritFrom": "overlay_left",
+                                        "padding": "0 0 0 2"
+                                      },
+                                      "text": "Max"
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 28,
+                                      "height": 24,
+                                      "wireID": "0c165171-49b6-4d33-8bc1-2ad8a0dae0ed",
+                                      "style": {
+                                        "inheritFrom": "overlay_left",
+                                        "padding": "0 0 0 2"
+                                      },
+                                      "text": "Offs"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "DisplayData",
+                                  "left": 131,
+                                  "top": 0,
+                                  "width": 73,
+                                  "height": 24,
+                                  "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                                  "data": "function_generator_offset",
+                                  "action": "edit",
+                                  "style": {
+                                    "inheritFrom": "encoder_cursor_14_enabled",
+                                    "font": "RobotoCondensed-Regular",
+                                    "padding": "0 5"
+                                  },
+                                  "displayOption": 0
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 204,
+                          "height": 24,
+                          "wireID": "90f20e5e-5d00-4cee-8d57-2da2de4a82dc",
+                          "style": {
+                            "inheritFrom": "overlay_left"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 24,
+                              "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "overlay_left"
+                              },
+                              "text": "Ampl"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 29,
+                              "top": 0,
+                              "width": 72,
+                              "height": 24,
+                              "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                              "data": "function_generator_amplitude",
+                              "action": "edit",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "RobotoCondensed-Regular",
+                                "padding": "0 5"
+                              },
+                              "displayOption": 0
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Select",
+                      "left": 0,
+                      "top": 75,
+                      "width": 101,
+                      "height": 24,
+                      "wireID": "3a10a1c6-af20-4974-97b5-318959731ad4",
+                      "data": "function_generator_has_mode_select",
+                      "style": {
+                        "inheritFrom": "overlay_left"
+                      },
+                      "widgets": [
+                        {
+                          "type": "RectangleWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 101,
+                          "height": 24,
+                          "wireID": "f564df57-b89b-4529-8d83-e128e0af016e",
+                          "style": {
+                            "inheritFrom": "overlay_left"
+                          },
+                          "invertColors": true
+                        },
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 101,
+                          "height": 24,
+                          "wireID": "b9a0a5d6-6e92-4779-a4cc-4d7173f2da48",
+                          "style": {
+                            "inheritFrom": "overlay_left"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 24,
+                              "wireID": "a53aeea1-bae6-4f26-e465-a741570c3dab",
+                              "style": {
+                                "inheritFrom": "overlay_left"
+                              },
+                              "text": "Mod"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 29,
+                              "top": 0,
+                              "width": 72,
+                              "height": 24,
+                              "wireID": "af7e6997-6b6a-4efc-eb60-31ebf6268b91",
+                              "data": "function_generator_mode",
+                              "action": "function_generator_mode_select_mode",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "RobotoCondensed-Regular",
+                                "padding": "0 5"
+                              },
+                              "displayOption": 0
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Select",
+                      "left": 102,
+                      "top": 75,
+                      "width": 102,
+                      "height": 24,
+                      "wireID": "9342d96e-df8e-47bb-8278-e4628954ec72",
+                      "data": "function_generator_has_duty_cycle",
+                      "style": {
+                        "inheritFrom": "overlay_left"
+                      },
+                      "widgets": [
+                        {
+                          "type": "RectangleWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 102,
+                          "height": 24,
+                          "wireID": "8f983108-a5e4-4d30-a312-c2cc9ca0e431",
+                          "style": {
+                            "inheritFrom": "overlay_left"
+                          },
+                          "invertColors": true
+                        },
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 102,
+                          "height": 24,
+                          "wireID": "86b0a4f5-2e33-44fe-81c0-87c78f2192bb",
+                          "style": {
+                            "inheritFrom": "overlay_left"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Select",
+                              "left": 0,
+                              "top": 0,
+                              "width": 28,
+                              "height": 24,
+                              "wireID": "72afb8b2-bbf0-4eb3-fc6d-61a70e29bd69",
+                              "data": "function_generator_is_freq",
+                              "style": {
+                                "inheritFrom": "overlay_left"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 28,
+                                  "height": 24,
+                                  "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
+                                  "style": {
+                                    "inheritFrom": "overlay_left",
+                                    "padding": "0 0 0 2"
+                                  },
+                                  "text": "PWd"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 28,
+                                  "height": 24,
+                                  "wireID": "fe8ce2e2-2c87-46e4-afeb-e135a8928e96",
+                                  "style": {
+                                    "inheritFrom": "overlay_left",
+                                    "padding": "0 0 0 2"
+                                  },
+                                  "text": "Duty"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 29,
+                              "top": 0,
+                              "width": 73,
+                              "height": 24,
+                              "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                              "data": "function_generator_duty_cycle",
+                              "action": "edit",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "RobotoCondensed-Regular",
+                                "padding": "0 5"
+                              },
+                              "displayOption": 0
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -45119,6 +45686,7 @@
     {
       "name": "overlay_left",
       "inheritFrom": "overlay",
+      "font": "RobotoCondensed-Regular",
       "alignHorizontal": "left"
     },
     {
@@ -76682,6 +77250,124 @@
                 {}
               ]
             }
+          },
+          {
+            "name": "SYSTem:COMMunicate:UART:BAUD",
+            "parameters": [
+              {
+                "name": "baud",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:UART:BAUD?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:UART:PARIty",
+            "parameters": [
+              {
+                "name": "parity",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "UartParity"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:UART:PARIty?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "UartParity"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:UART:DATA",
+            "parameters": [
+              {
+                "name": "bits",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:UART:DATA?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:UART:STOP",
+            "parameters": [
+              {
+                "name": "bits",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SYSTem:COMMunicate:UART:STOP?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr1"
+                }
+              ]
+            }
           }
         ]
       },
@@ -78714,6 +79400,23 @@
           {
             "name": "PULSe",
             "value": "5"
+          }
+        ]
+      },
+      {
+        "name": "UartParity",
+        "members": [
+          {
+            "name": "NONe",
+            "value": "0"
+          },
+          {
+            "name": "EVEN",
+            "value": "1"
+          },
+          {
+            "name": "ODD",
+            "value": "2"
           }
         ]
       }
