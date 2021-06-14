@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -30,16 +30,16 @@
   * @brief  Drive VBUS.
   * @param  state : VBUS state
   *          This parameter can be one of the these values:
-  *           - 0 : VBUS Active
-  *           - 1 : VBUS Inactive
+  *           - 1 : VBUS Active
+  *           - 0 : VBUS Inactive
   */
 void MX_DriverVbusFS(uint8_t state)
-{ 
-  uint8_t data = state; 
+{
+  uint8_t data = state;
   /* USER CODE BEGIN PREPARE_GPIO_DATA_VBUS_FS */
   if(state == 0)
   {
-    /* Drive high Charge pump */ 	     
+    /* Drive high Charge pump */
     data = GPIO_PIN_RESET;
   }
   else

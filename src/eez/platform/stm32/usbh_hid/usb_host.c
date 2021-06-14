@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -47,6 +47,7 @@ ApplicationTypeDef Appli_state = APPLICATION_IDLE;
  * -- Insert your variables declaration here --
  */
 /* USER CODE BEGIN 0 */
+
 /* USER CODE END 0 */
 
 /*
@@ -58,19 +59,10 @@ static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
  * -- Insert your external function declaration here --
  */
 /* USER CODE BEGIN 1 */
-int g_mxUsbHostOperationUsbResult;
-int g_mxUsbHostOperationResult;
-
 void MX_USB_HOST_DeInit(void) {
-  g_mxUsbHostOperationUsbResult = USBH_Stop(&hUsbHostFS);
-  if (g_mxUsbHostOperationUsbResult != USBH_OK){
-    g_mxUsbHostOperationResult = -1;
-  }
+  USBH_Stop(&hUsbHostFS);
 
-  g_mxUsbHostOperationUsbResult = USBH_DeInit(&hUsbHostFS);
-  if (g_mxUsbHostOperationUsbResult != USBH_OK){
-    g_mxUsbHostOperationResult = -2;
-  }
+  USBH_DeInit(&hUsbHostFS);
 
   if (hUsbHostFS.thread) {
     osThreadTerminate(hUsbHostFS.thread);
@@ -81,9 +73,6 @@ void MX_USB_HOST_DeInit(void) {
     osMessageDelete(hUsbHostFS.os_event);
     hUsbHostFS.os_event = 0;
   }
-
-  g_mxUsbHostOperationUsbResult = USBH_OK;
-  g_mxUsbHostOperationResult = 0;
 }
 
 /* USER CODE END 1 */
@@ -95,26 +84,8 @@ void MX_USB_HOST_DeInit(void) {
 void MX_USB_HOST_Init(void)
 {
   /* USER CODE BEGIN USB_HOST_Init_PreTreatment */
-  g_mxUsbHostOperationUsbResult = USBH_Init(&hUsbHostFS, USBH_UserProcess, HOST_FS);
-  if (g_mxUsbHostOperationUsbResult != USBH_OK) {
-    g_mxUsbHostOperationResult = -1;
-    return;
-  }
-
-  g_mxUsbHostOperationUsbResult = USBH_RegisterClass(&hUsbHostFS, USBH_HID_CLASS);
-  if (g_mxUsbHostOperationUsbResult != USBH_OK) {
-    g_mxUsbHostOperationResult = -2;
-    return;
-  }
-
-  g_mxUsbHostOperationUsbResult = USBH_Start(&hUsbHostFS);
-  if (g_mxUsbHostOperationUsbResult != USBH_OK) {
-    g_mxUsbHostOperationResult = -3;
-    return;
-  }
-#if 0
   /* USER CODE END USB_HOST_Init_PreTreatment */
-  
+
   /* Init host Library, add supported class and start the library. */
   if (USBH_Init(&hUsbHostFS, USBH_UserProcess, HOST_FS) != USBH_OK)
   {
@@ -129,10 +100,7 @@ void MX_USB_HOST_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USB_HOST_Init_PostTreatment */
-#endif
 
-  g_mxUsbHostOperationUsbResult = USBH_OK;
-  g_mxUsbHostOperationResult = 0;
   /* USER CODE END USB_HOST_Init_PostTreatment */
 }
 

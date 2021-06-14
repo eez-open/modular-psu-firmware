@@ -170,7 +170,7 @@ USBH_StatusTypeDef  USBH_Init(USBH_HandleTypeDef *phost,
 
 
 /**
-  * @brief  HCD_Init
+  * @brief  HCD_DeInit
   *         De-Initialize the Host portion of the driver.
   * @param  phost: Host Handle
   * @retval USBH Status
@@ -191,6 +191,8 @@ USBH_StatusTypeDef USBH_DeInit(USBH_HandleTypeDef *phost)
   {
     USBH_LL_Stop(phost);
   }
+
+  USBH_LL_DeInit(phost);
 
   return USBH_OK;
 }

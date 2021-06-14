@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -32,8 +32,6 @@
 #include "stm32f7xx_hal.h"
 
 /* USER CODE BEGIN INCLUDE */
-extern int g_mxUsbHostOperationUsbResult;
-extern int g_mxUsbHostOperationResult;
 void MX_USB_HOST_DeInit(void);
 /* USER CODE END INCLUDE */
 
