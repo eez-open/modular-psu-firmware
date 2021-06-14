@@ -952,6 +952,18 @@ void action_io_pin_select_uart_mode() {
     ((SysSettingsIOPinsPage *)getActivePage())->selectUartMode();
 }
 
+void action_io_pin_select_uart_baud() {
+}
+
+void action_io_pin_select_uart_data_bits() {
+}
+
+void action_io_pin_select_uart_parity() {
+}
+
+void action_io_pin_select_uart_stop_bits() {
+}
+
 void action_ntp_toggle() {
     ((SysSettingsDateTimePage *)getActivePage())->toggleNtp();
 }
