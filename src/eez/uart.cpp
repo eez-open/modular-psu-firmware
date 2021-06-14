@@ -34,6 +34,11 @@ using namespace eez::scpi;
 using namespace eez::psu;
 using namespace eez::psu::scpi;
 
+uint32_t g_uartBaudRate;
+uint32_t g_uartWordLength;
+uint32_t g_uartStopBits;
+uint32_t g_uartParity;
+
 namespace eez {
 namespace uart {
 
@@ -143,7 +148,7 @@ static size_t uartOutputBufferWriteFunc(const char *data, size_t len) {
 	g_messageAvailable = true;
 	if (g_initialized) {
 #ifdef EEZ_PLATFORM_STM32
-		HAL_UART_Transmit(PHUART, (uint8_t *)data, (uint16_t)len, 10);
+		HAL_UART_Transmit(PHUART, (uint8_t *)data, (uint16_t)len, 1000);
 #endif
 	}
     return len;
@@ -299,6 +304,20 @@ void refresh() {
     } else {
         if (bp3c::flash_slave::g_bootloaderMode || psu::io_pins::g_ioPins[DIN1].function == psu::io_pins::FUNCTION_UART) {
 #ifdef EEZ_PLATFORM_STM32
+			if (bp3c::flash_slave::g_bootloaderMode) {
+				g_uartBaudRate = 115200;
+				g_uartWordLength = UART_WORDLENGTH_9B;
+				g_uartStopBits = UART_STOPBITS_1;
+				g_uartParity = UART_PARITY_EVEN;
+			} else {
+				int dataBits = io_pins::g_uartDataBits + (io_pins::g_uartParity == 0 ? 0 : 1);
+
+				g_uartBaudRate = io_pins::g_uartBaudRate;
+				g_uartWordLength = dataBits == 7 ? UART_WORDLENGTH_7B : dataBits == 8 ? UART_WORDLENGTH_8B : UART_WORDLENGTH_9B;
+				g_uartStopBits = io_pins::g_uartStopBits == 1 ? UART_STOPBITS_1 : UART_STOPBITS_2;
+				g_uartParity = io_pins::g_uartParity == 0 ? UART_PARITY_NONE : io_pins::g_uartParity == 1 ? UART_PARITY_EVEN : UART_PARITY_ODD;
+			}
+
             if (g_mcuRevision >= MCU_REVISION_R3B3) {
             	MX_UART4_Init();
             } else {
@@ -356,6 +375,20 @@ void reinit() {
 		g_initialized = false;
 
 #ifdef EEZ_PLATFORM_STM32
+		if (bp3c::flash_slave::g_bootloaderMode) {
+			g_uartBaudRate = 115200;
+			g_uartWordLength = UART_WORDLENGTH_9B;
+			g_uartStopBits = UART_STOPBITS_1;
+			g_uartParity = UART_PARITY_EVEN;
+		} else {
+			int dataBits = io_pins::g_uartDataBits + (io_pins::g_uartParity == 0 ? 0 : 1);
+
+			g_uartBaudRate = io_pins::g_uartBaudRate;
+			g_uartWordLength = dataBits == 7 ? UART_WORDLENGTH_7B : dataBits == 8 ? UART_WORDLENGTH_8B : UART_WORDLENGTH_9B;
+			g_uartStopBits = io_pins::g_uartStopBits == 1 ? UART_STOPBITS_1 : UART_STOPBITS_2;
+			g_uartParity = io_pins::g_uartParity == 0 ? UART_PARITY_NONE : io_pins::g_uartParity == 1 ? UART_PARITY_EVEN : UART_PARITY_ODD;
+		}
+
         if (g_mcuRevision >= MCU_REVISION_R3B3) {
             MX_UART4_Init();
         } else {

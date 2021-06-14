@@ -953,15 +953,19 @@ void action_io_pin_select_uart_mode() {
 }
 
 void action_io_pin_select_uart_baud() {
+    ((SysSettingsIOPinsPage *)getActivePage())->selectUartBaudRate();
 }
 
 void action_io_pin_select_uart_data_bits() {
+    ((SysSettingsIOPinsPage *)getActivePage())->selectUartDataBits();
 }
 
 void action_io_pin_select_uart_parity() {
+    ((SysSettingsIOPinsPage *)getActivePage())->selectUartParity();
 }
 
 void action_io_pin_select_uart_stop_bits() {
+    ((SysSettingsIOPinsPage *)getActivePage())->selectUartStopBits();
 }
 
 void action_ntp_toggle() {

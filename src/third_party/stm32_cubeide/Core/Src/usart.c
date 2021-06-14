@@ -22,6 +22,10 @@
 
 /* USER CODE BEGIN 0 */
 DMA_HandleTypeDef hdma_uart7_rx;
+extern uint32_t g_uartBaudRate; // 115200
+extern uint32_t g_uartWordLength; // UART_WORDLENGTH_9B
+extern uint32_t g_uartStopBits; // UART_STOPBITS_1
+extern uint32_t g_uartParity; // UART_PARITY_EVEN
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart4;
@@ -39,10 +43,10 @@ void MX_UART4_Init(void)
 
   /* USER CODE END UART4_Init 1 */
   huart4.Instance = UART4;
-  huart4.Init.BaudRate = 115200;
-  huart4.Init.WordLength = UART_WORDLENGTH_9B;
-  huart4.Init.StopBits = UART_STOPBITS_1;
-  huart4.Init.Parity = UART_PARITY_EVEN;
+  huart4.Init.BaudRate = g_uartBaudRate;
+  huart4.Init.WordLength = g_uartWordLength;
+  huart4.Init.StopBits = g_uartStopBits;
+  huart4.Init.Parity = g_uartParity;
   huart4.Init.Mode = UART_MODE_TX_RX;
   huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart4.Init.OverSampling = UART_OVERSAMPLING_16;
@@ -196,10 +200,10 @@ void MX_UART7_Init(void)
 {
 
   huart7.Instance = UART7;
-  huart7.Init.BaudRate = 115200;
-  huart7.Init.WordLength = UART_WORDLENGTH_9B;
-  huart7.Init.StopBits = UART_STOPBITS_1;
-  huart7.Init.Parity = UART_PARITY_EVEN;
+  huart7.Init.BaudRate = g_uartBaudRate;
+  huart7.Init.WordLength = g_uartWordLength;
+  huart7.Init.StopBits = g_uartStopBits;
+  huart7.Init.Parity = g_uartParity;
   huart7.Init.Mode = UART_MODE_TX_RX;
   huart7.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart7.Init.OverSampling = UART_OVERSAMPLING_16;

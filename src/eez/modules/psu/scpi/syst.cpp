@@ -2442,6 +2442,96 @@ scpi_result_t scpi_cmd_systemCommunicateUartModeQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_systemCommunicateUartBaud(scpi_t *context) {
+    uint32_t uartBaudRate;
+    if (!SCPI_ParamUInt32(context, &uartBaudRate, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (uartBaudRate != 9600 && uartBaudRate != 14400 && uartBaudRate != 19200 && uartBaudRate != 38400 && uartBaudRate != 57600 && uartBaudRate != 115200) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+        return SCPI_RES_ERR;
+    }
+
+    io_pins::g_uartBaudRate = uartBaudRate;
+    uart::reinit();
+    
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUartBaudQ(scpi_t *context) {
+    SCPI_ResultUInt32(context, io_pins::g_uartBaudRate);
+	return SCPI_RES_OK;
+}
+
+static scpi_choice_def_t g_uartParityChoice[] = {
+    { "NONe", 0 },
+    { "EVEN", 1 },
+    { "ODD", 2 },
+    SCPI_CHOICE_LIST_END
+};
+
+scpi_result_t scpi_cmd_systemCommunicateUartParity(scpi_t *context) {
+    int32_t uartParity;
+    if (!SCPI_ParamChoice(context, g_uartParityChoice, &uartParity, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    io_pins::g_uartParity = uartParity;
+    uart::reinit();
+    
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUartParityQ(scpi_t *context) {
+    resultChoiceName(context, g_uartParityChoice, io_pins::g_uartParity);
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUartData(scpi_t *context) {
+    uint32_t uartDataBits;
+    if (!SCPI_ParamUInt32(context, &uartDataBits, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (uartDataBits < 6 || uartDataBits > 8) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+        return SCPI_RES_ERR;
+    }
+
+    io_pins::g_uartDataBits = uartDataBits;
+    uart::reinit();
+    
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUartDataQ(scpi_t *context) {
+    SCPI_ResultUInt32(context, io_pins::g_uartDataBits);
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUartStop(scpi_t *context) {
+    uint32_t uartStopBits;
+    if (!SCPI_ParamUInt32(context, &uartStopBits, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (uartStopBits < 1 || uartStopBits > 2) {
+        SCPI_ErrorPush(context, SCPI_ERROR_DATA_OUT_OF_RANGE);
+        return SCPI_RES_ERR;
+    }
+
+    io_pins::g_uartStopBits = uartStopBits;
+    uart::reinit();
+    
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_systemCommunicateUartStopQ(scpi_t *context) {
+    SCPI_ResultUInt32(context, io_pins::g_uartStopBits);
+	return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

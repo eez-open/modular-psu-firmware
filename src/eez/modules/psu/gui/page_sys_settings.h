@@ -317,7 +317,11 @@ class SysSettingsIOPinsPage : public SetPage {
     void setPwmDuty(int pin, float duty);
     float getPwmDuty(int pin);
 
-	void selectUartMode();
+	  void selectUartMode();
+    void selectUartBaudRate();
+    void selectUartDataBits();
+    void selectUartStopBits();
+    void selectUartParity();
 
     int getDirty();
     void set();
@@ -325,7 +329,11 @@ class SysSettingsIOPinsPage : public SetPage {
     io_pins::Polarity m_polarity[NUM_IO_PINS];
     io_pins::Function m_function[NUM_IO_PINS];
 
-	uart::UartMode m_uartMode;
+	  uart::UartMode m_uartMode;
+    uint32_t m_uartBaudRate;
+    uint32_t m_uartDataBits;
+    uint32_t m_uartStopBits;
+    uint32_t m_uartParity;
 
   private:
     int pinNumber;
@@ -339,10 +347,18 @@ class SysSettingsIOPinsPage : public SetPage {
     float g_pwmDutyOrig[NUM_IO_PINS - DOUT1];
     float g_pwmDuty[NUM_IO_PINS - DOUT1];
 
-	uart::UartMode m_uartModeOrig;
+	  uart::UartMode m_uartModeOrig;
+    uint32_t m_uartBaudRateOrig;
+    uint32_t m_uartDataBitsOrig;
+    uint32_t m_uartStopBitsOrig;
+    uint32_t m_uartParityOrig;
 
     static void onFunctionSet(uint16_t value);
-	static void onUartModeSet(uint16_t value);
+	  static void onUartModeSet(uint16_t value);
+    static void onUartBaudRateSet(uint16_t value);
+    static void onUartDataBitsSet(uint16_t value);
+    static void onUartStopBitsSet(uint16_t value);
+    static void onUartParitySet(uint16_t value);
 };
 
 class SysSettingsTrackingPage : public SetPage {

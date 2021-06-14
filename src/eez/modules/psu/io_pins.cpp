@@ -61,6 +61,10 @@ static uint32_t g_pwmPeriodInt[NUM_IO_PINS - DOUT1];
 static bool g_pwmStarted;
 
 uart::UartMode g_uartMode;
+uint32_t g_uartBaudRate = 115200;
+uint32_t g_uartDataBits = 8;
+uint32_t g_uartStopBits = 1;
+uint32_t g_uartParity = 1;
 
 #if defined EEZ_PLATFORM_STM32
 static float g_pwmStartedFrequency;

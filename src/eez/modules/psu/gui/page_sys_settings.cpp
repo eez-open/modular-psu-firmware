@@ -840,6 +840,11 @@ void SysSettingsIOPinsPage::pageAlloc() {
     }
 
 	m_uartMode = m_uartModeOrig = io_pins::g_uartMode;
+    
+    m_uartBaudRate = m_uartBaudRateOrig = io_pins::g_uartBaudRate;
+    m_uartDataBits = m_uartDataBitsOrig = io_pins::g_uartDataBits;
+    m_uartStopBits = m_uartStopBitsOrig = io_pins::g_uartStopBits;
+    m_uartParity = m_uartParityOrig = io_pins::g_uartParity;
 }
 
 void SysSettingsIOPinsPage::togglePolarity() {
@@ -925,6 +930,76 @@ void SysSettingsIOPinsPage::selectUartMode() {
 	pushSelectFromEnumPage(ENUM_DEFINITION_UART_MODE, m_uartMode, 0, onUartModeSet);
 }
 
+void SysSettingsIOPinsPage::onUartBaudRateSet(uint16_t value) {
+	popPage();
+
+	SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getActivePage();
+    if (value == 1) {
+	    page->m_uartBaudRate = 14400;
+    } else if (value == 2) {
+	    page->m_uartBaudRate = 19200;
+    } else if (value == 3) {
+	    page->m_uartBaudRate = 38400;
+    } else if (value == 4) {
+	    page->m_uartBaudRate = 57600;
+    } else if (value == 5) {
+	    page->m_uartBaudRate = 115200;
+    } else {
+        page->m_uartBaudRate = 9600;
+    }
+}
+
+void SysSettingsIOPinsPage::selectUartBaudRate() {
+    uint16_t value;
+    if (m_uartBaudRate == 14400) {
+        value = 1;
+    } else if (m_uartBaudRate == 19200) {
+        value = 2;
+    } else if (m_uartBaudRate == 38400) {
+        value = 3;
+    } else if (m_uartBaudRate == 57600) {
+        value = 4;
+    } else if (m_uartBaudRate == 115200) {
+        value = 5;
+    } else {
+		value = 0;
+    }
+	pushSelectFromEnumPage(ENUM_DEFINITION_UART_BAUD_RATE, value, 0, onUartBaudRateSet);
+}
+
+void SysSettingsIOPinsPage::onUartDataBitsSet(uint16_t value) {
+	popPage();
+
+	SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getActivePage();
+	page->m_uartDataBits = value;
+}
+
+void SysSettingsIOPinsPage::selectUartDataBits() {
+	pushSelectFromEnumPage(ENUM_DEFINITION_UART_DATA_BITS, m_uartDataBits, 0, onUartDataBitsSet);
+}
+
+void SysSettingsIOPinsPage::onUartParitySet(uint16_t value) {
+	popPage();
+
+	SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getActivePage();
+	page->m_uartParity = value;
+}
+
+void SysSettingsIOPinsPage::selectUartParity() {
+	pushSelectFromEnumPage(ENUM_DEFINITION_UART_PARITY, m_uartParity, 0, onUartParitySet);
+}
+
+void SysSettingsIOPinsPage::onUartStopBitsSet(uint16_t value) {
+	popPage();
+
+	SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getActivePage();
+	page->m_uartStopBits = value;
+}
+
+void SysSettingsIOPinsPage::selectUartStopBits() {
+	pushSelectFromEnumPage(ENUM_DEFINITION_UART_STOP_BITS, m_uartStopBits, 0, onUartStopBitsSet);
+}
+
 int SysSettingsIOPinsPage::getDirty() {
     for (int i = 0; i < NUM_IO_PINS; ++i) {
         if (m_polarityOrig[i] != m_polarity[i] || m_functionOrig[i] != m_function[i]) {
@@ -936,7 +1011,7 @@ int SysSettingsIOPinsPage::getDirty() {
             }
         }
     }
-	if (m_uartMode != m_uartModeOrig) {
+	if (m_uartMode != m_uartModeOrig || m_uartBaudRate != m_uartBaudRateOrig || m_uartDataBits != m_uartDataBitsOrig || m_uartStopBits != m_uartStopBitsOrig || m_uartParity != m_uartParityOrig) {
 		return true;
 	}
     return false;
@@ -945,20 +1020,32 @@ int SysSettingsIOPinsPage::getDirty() {
 void SysSettingsIOPinsPage::set() {
     if (getDirty()) {
 		io_pins::g_uartMode = m_uartMode;
+        io_pins::g_uartBaudRate = m_uartBaudRate;
+        io_pins::g_uartDataBits = m_uartDataBits;
+        io_pins::g_uartStopBits = m_uartStopBits;
+        io_pins::g_uartParity = m_uartParity;
 		
+        bool uartReinitialized = false;
+
 		for (int i = 0; i < NUM_IO_PINS; i++) {
             io_pins::setPinPolarity(i, m_polarity[i]);
             io_pins::setPinFunction(i, m_function[i]);
             if (i >= DOUT1) {
                 if (g_pwmFrequencyOrig[i - DOUT1] != g_pwmFrequency[i - DOUT1]) {
                     io_pins::setPwmFrequency(i, g_pwmFrequency[i - DOUT1]);
+                    uartReinitialized = true;
                 }
                 if (g_pwmDutyOrig[i - DOUT1] != g_pwmDuty[i - DOUT1]) {
                     io_pins::setPwmDuty(i, g_pwmDuty[i - DOUT1]);
+                    uartReinitialized = true;
                 }
             }
         }
-        
+
+        if (!uartReinitialized) {
+            uart::reinit();
+        }
+
 		pageAlloc();
     }
 }

@@ -60,7 +60,27 @@ struct IOPin {
 extern IOPin g_ioPins[NUM_IO_PINS];
 extern float g_pwmFrequency[NUM_IO_PINS - DOUT1];
 extern float g_pwmDuty[NUM_IO_PINS - DOUT1];
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+#define UART_WORDLENGTH_7B          USART_CR1_M1   /*!< 7-bit long UART frame */
+#define UART_WORDLENGTH_8B          0x00000000U    /*!< 8-bit long UART frame */
+#define UART_WORDLENGTH_9B          USART_CR1_M0   /*!< 9-bit long UART frame */
+
+#define UART_STOPBITS_0_5                    USART_CR2_STOP_0                     /*!< UART frame with 0.5 stop bit  */
+#define UART_STOPBITS_1                     0x00000000U                           /*!< UART frame with 1 stop bit    */
+#define UART_STOPBITS_1_5                   (USART_CR2_STOP_0 | USART_CR2_STOP_1) /*!< UART frame with 1.5 stop bits */
+#define UART_STOPBITS_2                      USART_CR2_STOP_1                     /*!< UART frame with 2 stop bits   */
+
+#define UART_PARITY_NONE                    0x00000000U                        /*!< No parity   */
+#define UART_PARITY_EVEN                    USART_CR1_PCE                      /*!< Even parity */
+#define UART_PARITY_ODD                     (USART_CR1_PCE | USART_CR1_PS)     /*!< Odd parity  */
+#endif
+
 extern uart::UartMode g_uartMode;
+extern uint32_t g_uartBaudRate;
+extern uint32_t g_uartDataBits;
+extern uint32_t g_uartStopBits;
+extern uint32_t g_uartParity; // 0 - None, 1 - Even, 2 - Odd
 
 void reset();
 void tick();

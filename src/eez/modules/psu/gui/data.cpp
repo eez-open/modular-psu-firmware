@@ -36,6 +36,7 @@
 #include <eez/hmi.h>
 #include <eez/uart.h>
 #include <eez/usb.h>
+#include <eez/function_generator.h>
 
 #include <eez/fs_driver.h>
 
@@ -310,6 +311,36 @@ EnumItem g_enumDefinition_UART_MODE[] = {
 	{ uart::UART_MODE_BUFFER, "Buffer" },
 	{ uart::UART_MODE_SCPI, "SCPI" },
 	{ uart::UART_MODE_BOOKMARK, "Bookmark" },
+	{ 0, 0 }
+};
+
+EnumItem g_enumDefinition_UART_BAUD_RATE[] = {
+	{ 0, "9600" },
+	{ 1, "14400" },
+	{ 2, "19200" },
+    { 3, "38400" },
+    { 4, "57600" },
+    { 5, "115200" },
+	{ 0, 0 }
+};
+
+EnumItem g_enumDefinition_UART_DATA_BITS[] = {
+	{ 6, "6" },
+	{ 7, "7" },
+	{ 8, "8" },
+	{ 0, 0 }
+};
+
+EnumItem g_enumDefinition_UART_STOP_BITS[] = {
+	{ 1, "1" },
+	{ 2, "2" },
+	{ 0, 0 }
+};
+
+EnumItem g_enumDefinition_UART_PARITY[] = {
+	{ 0, "None" },
+	{ 1, "Even" },
+	{ 2, "Odd" },
 	{ 0, 0 }
 };
 
@@ -4643,7 +4674,7 @@ void data_io_pin_uart_baud(DataOperationEnum operation, Cursor cursor, Value &va
 	if (operation == DATA_OPERATION_GET) {
 		SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
 		if (page) {
-			value = "115200";
+			value = (int)page->m_uartBaudRate;
 		}
 	}
 }
@@ -4652,7 +4683,7 @@ void data_io_pin_uart_data_bits(DataOperationEnum operation, Cursor cursor, Valu
 	if (operation == DATA_OPERATION_GET) {
 		SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
 		if (page) {
-			value = "8";
+			value = (int)page->m_uartDataBits;
 		}
 	}
 }
@@ -4661,7 +4692,7 @@ void data_io_pin_uart_parity(DataOperationEnum operation, Cursor cursor, Value &
 	if (operation == DATA_OPERATION_GET) {
 		SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
 		if (page) {
-			value = "Event";
+			value = page->m_uartParity == 0 ? "None" : page->m_uartParity == 1 ? "Even" : "Odd";
 		}
 	}
 }
@@ -4670,7 +4701,7 @@ void data_io_pin_uart_stop_bits(DataOperationEnum operation, Cursor cursor, Valu
 	if (operation == DATA_OPERATION_GET) {
 		SysSettingsIOPinsPage *page = (SysSettingsIOPinsPage *)getPage(PAGE_ID_SYS_SETTINGS_IO);
 		if (page) {
-			value = "1";
+			value = (int)page->m_uartStopBits;
 		}
 	}
 }
@@ -4833,6 +4864,7 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
         RAMP_GRID_WIDGET,
         DLOG_INFO_WIDGET,
         SCRIPT_INFO_WIDGET,
+        FUNCTION_GENERATOR_WIDGET,
         NUM_WIDGETS
     };
 
@@ -4848,9 +4880,10 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
         bool areRampCountersVisible = ramp::g_numChannelsWithVisibleCounters > 0;
         bool isDlogVisible = !dlog_record::isIdle();
         bool isScriptVisible = !mp::isIdle();
+        bool isFunctionGeneratorVisible = function_generator::isActive();
 
         int state = 0;
-        if (areListCountersVisible || areRampCountersVisible || isDlogVisible || isScriptVisible) {
+        if (areListCountersVisible || areRampCountersVisible || isDlogVisible || isScriptVisible || isFunctionGeneratorVisible) {
             state = 0;
 
             if (list::g_numChannelsWithVisibleCounters > 0) {
@@ -4884,6 +4917,10 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
             if (isScriptVisible) {
                 state |= 0x4000;
             }
+
+            if (isFunctionGeneratorVisible) {
+                state |= 0x10000;
+            }
         }
 
         if (overlay.state != state) {
@@ -4899,9 +4936,10 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
                 const Widget *rampGridWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, RAMP_GRID_WIDGET);
                 const Widget *dlogInfoWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_INFO_WIDGET);
                 const Widget *scriptInfoWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, SCRIPT_INFO_WIDGET);
+                const Widget *functionGeneratorWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, FUNCTION_GENERATOR_WIDGET);
 
                 overlay.width = widgetCursor.widget->w;
-                if (list::g_numChannelsWithVisibleCounters <= 1 && ramp::g_numChannelsWithVisibleCounters <= 1 && !isDlogVisible && !isScriptVisible) {
+                if (list::g_numChannelsWithVisibleCounters <= 1 && ramp::g_numChannelsWithVisibleCounters <= 1 && !isDlogVisible && !isScriptVisible && !isFunctionGeneratorVisible) {
                     overlay.width -= listGridWidget->w / 2;
                 }
 
@@ -4987,6 +5025,17 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
                 } else {
                     widgetOverrides[SCRIPT_INFO_WIDGET].isVisible = false;
                     overlay.height -= scriptInfoWidget->h;
+                }
+
+                if (isFunctionGeneratorVisible) {
+                    widgetOverrides[FUNCTION_GENERATOR_WIDGET].isVisible = true;
+                    widgetOverrides[FUNCTION_GENERATOR_WIDGET].x = functionGeneratorWidget->x;
+                    widgetOverrides[FUNCTION_GENERATOR_WIDGET].y = overlay.height - (widgetCursor.widget->h - functionGeneratorWidget->y);
+                    widgetOverrides[FUNCTION_GENERATOR_WIDGET].w = functionGeneratorWidget->w;
+                    widgetOverrides[FUNCTION_GENERATOR_WIDGET].h = functionGeneratorWidget->h;
+                } else {
+                    widgetOverrides[FUNCTION_GENERATOR_WIDGET].isVisible = false;
+                    overlay.height -= functionGeneratorWidget->h;
                 }
 
                 overlay.x = 480 - overlay.width;

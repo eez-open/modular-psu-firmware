@@ -521,6 +521,12 @@ static void resetProfileToDefaults(Parameters &profile) {
             profile.tempProt[i].state = OTP_CH_DEFAULT_STATE;
         }
     }
+
+    profile.uartMode = uart::UART_MODE_BUFFER;
+    profile.uartBaudRate = 115200;
+    profile.uartDataBits = 8;
+    profile.uartStopBits = 1;
+    profile.uartParity = 1;
 }
 
 static bool repositionSlotsInProfileToMatchCurrentSlotsConfiguration(Parameters &profile) {
@@ -765,6 +771,10 @@ static void saveState(Parameters &profile, List *lists) {
     memcpy(profile.ioPinsPwmFrequency, io_pins::g_pwmFrequency, sizeof(profile.ioPinsPwmFrequency));
     memcpy(profile.ioPinsPwmDuty, io_pins::g_pwmDuty, sizeof(profile.ioPinsPwmDuty));
     profile.uartMode = io_pins::g_uartMode;
+    profile.uartBaudRate = io_pins::g_uartBaudRate;
+    profile.uartDataBits = io_pins::g_uartDataBits;
+    profile.uartStopBits = io_pins::g_uartStopBits;
+    profile.uartParity = io_pins::g_uartParity;
 
     eez::psu::gui::edit_mode_step::getProfileParameters(profile);
 
@@ -867,6 +877,10 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
     memcpy(io_pins::g_pwmFrequency, profile.ioPinsPwmFrequency, sizeof(profile.ioPinsPwmFrequency));
     memcpy(io_pins::g_pwmDuty, profile.ioPinsPwmDuty, sizeof(profile.ioPinsPwmDuty));
     io_pins::g_uartMode = (uart::UartMode)profile.uartMode;
+    io_pins::g_uartBaudRate = profile.uartBaudRate;
+    io_pins::g_uartDataBits = profile.uartDataBits;
+    io_pins::g_uartStopBits = profile.uartStopBits;
+    io_pins::g_uartParity = profile.uartParity;
     io_pins::refresh();
 
     eez::psu::gui::edit_mode_step::setProfileParameters(profile);
@@ -1114,6 +1128,10 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
     
     ctx.group("uart");
     WRITE_PROPERTY("mode", parameters.uartMode);
+    WRITE_PROPERTY("baudRate", parameters.uartBaudRate);
+    WRITE_PROPERTY("dataBits", parameters.uartDataBits);
+    WRITE_PROPERTY("stopBits", parameters.uartStopBits);
+    WRITE_PROPERTY("parity", parameters.uartParity);
 
     if (!eez::psu::gui::edit_mode_step::writeProfileProperties(ctx, parameters)) {
         return false;
@@ -1472,6 +1490,10 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
 
     if (ctx.matchGroup("uart")) {
 		READ_PROPERTY("mode", parameters.uartMode);
+        READ_PROPERTY("baudRate", parameters.uartBaudRate);
+        READ_PROPERTY("dataBits", parameters.uartDataBits);
+        READ_PROPERTY("stopBits", parameters.uartStopBits);
+        READ_PROPERTY("parity", parameters.uartParity);
     }
 
     if (eez::psu::gui::edit_mode_step::readProfileProperties(ctx, parameters)) {

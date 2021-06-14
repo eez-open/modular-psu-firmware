@@ -148,6 +148,10 @@ struct Parameters {
     float ioPinsPwmFrequency[NUM_IO_PINS - DOUT1];
     float ioPinsPwmDuty[NUM_IO_PINS - DOUT1];
     uint8_t uartMode;
+    unsigned int uartBaudRate;
+    unsigned int uartDataBits;
+    unsigned int uartStopBits;
+    unsigned int uartParity;    
     EncoderModes encoderModes;
     FunctionGeneratorParameters functionGeneratorParameters;
 };

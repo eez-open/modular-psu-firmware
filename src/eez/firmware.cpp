@@ -627,9 +627,10 @@ void updateSpiIrqPin(int slotIndex) {
 		}
 	}
 
-  /* EXTI interrupt init*/
-  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+#if defined(EEZ_PLATFORM_STM32)
+	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+	HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+#endif
 }
 
 } // namespace eez
