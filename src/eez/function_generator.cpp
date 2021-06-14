@@ -295,6 +295,9 @@ public:
     static const int PAGE_SIZE = 4;
 
 	void pageAlloc() {
+		hmi::selectSlot(-1);
+		selectChannel(nullptr);
+
 		for (int i = 0; i < g_selectedResources.m_numResources; i++) {
 			int slotIndex;
 			int subchannelIndex;
@@ -679,6 +682,8 @@ public:
     static const int PAGE_SIZE = 7;
 
     void pageAlloc() {
+		AllResources::reset();
+
 		m_selectedChannelsOrig = 0;
 		for (int i = 0; i < g_functionGeneratorPage.m_selectedResources.m_numResources; i++) {
 			m_selectedChannelsOrig |= ((uint64_t)1 << g_functionGeneratorPage.m_selectedResources.m_waveformParameters[i].absoluteResourceIndex);
