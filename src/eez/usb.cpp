@@ -89,19 +89,20 @@ void init() {
 
 void tick() {
 #if defined(EEZ_PLATFORM_STM32)
-    static int x;
-
+    /*
+    static int lastState;
     if (HAL_GPIO_ReadPin(USB_OTG_FS_ID_GPIO_Port, USB_OTG_FS_ID_Pin)) {
-        if (!x) {
+        if (!lastState) {
             DebugTrace("USB_OTG_FS_ID_Pin is HIGH\n");
         }
-        x = 1;
+        lastState = 1;
     } else {
-        if (x) {
+        if (lastState) {
             DebugTrace("USB_OTG_FS_ID_Pin is LOW\n");
         }
-        x = 0;
+        lastState = 0;
     }
+    */
 
     stateTransition(HAL_GPIO_ReadPin(USB_OTG_FS_OC_GPIO_Port, USB_OTG_FS_OC_Pin) ? EVENT_OTG_OC_HI : EVENT_OTG_OC_LOW);
     stateTransition(HAL_GPIO_ReadPin(USB_OTG_FS_ID_GPIO_Port, USB_OTG_FS_ID_Pin) ? EVENT_OTG_ID_HI : EVENT_OTG_ID_LOW);
