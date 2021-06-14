@@ -2008,7 +2008,7 @@ public:
 
 			executeCommand(&getInfo_command);
 
-			if (!g_isBooted) {
+//			if (!g_isBooted) {
 				while (state != STATE_IDLE) {
                     WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
 #if defined(EEZ_PLATFORM_STM32)
@@ -2022,7 +2022,7 @@ public:
 					tick();
                     osDelay(1);
 				}
-			}
+//			}
 
             forceTransferSetParams = true;
         }

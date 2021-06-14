@@ -269,21 +269,19 @@ public:
 
 			executeCommand(&getInfo_command);
 
-			if (!g_isBooted) {
-				while (state != STATE_IDLE) {
-                    WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+            while (state != STATE_IDLE) {
+                WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
 #if defined(EEZ_PLATFORM_STM32)
-					if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
-                        osDelay(1);
-                        if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
-						    spiReady = true;
-                        }
-					}
-#endif
-					tick();
+                if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
                     osDelay(1);
-				}
-			}
+                    if (HAL_GPIO_ReadPin(spi::IRQ_GPIO_Port[slotIndex], spi::IRQ_Pin[slotIndex]) == GPIO_PIN_RESET) {
+                        spiReady = true;
+                    }
+                }
+#endif
+                tick();
+                osDelay(1);
+            }
 
             forceTransferSetParams = true;
         }

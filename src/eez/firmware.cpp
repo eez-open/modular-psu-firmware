@@ -595,7 +595,7 @@ void updateSpiIrqPin(int slotIndex) {
 
 #if defined(EEZ_PLATFORM_STM32)
 				GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-				GPIO_InitStruct.Pull = GPIO_NOPULL;
+				GPIO_InitStruct.Pull = GPIO_PULLUP;
 #endif
 			}
 		} else {
@@ -621,11 +621,15 @@ void updateSpiIrqPin(int slotIndex) {
 #endif
 		} else if (slotIndex == 2) {
 #if defined(EEZ_PLATFORM_STM32)
-			GPIO_InitStruct.Pin = SPI4_IRQ_Pin;
-			HAL_GPIO_Init(SPI4_IRQ_GPIO_Port, &GPIO_InitStruct);
+			GPIO_InitStruct.Pin = SPI5_IRQ_Pin;
+			HAL_GPIO_Init(SPI5_IRQ_GPIO_Port, &GPIO_InitStruct);
 #endif
 		}
 	}
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 } // namespace eez
