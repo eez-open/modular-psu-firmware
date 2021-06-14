@@ -1305,6 +1305,9 @@ void action_ch_settings_calibration_start_calibration() {
 }
 
 void action_ch_settings_calibration_view_points() {
+	if (g_channel) {
+		hmi::g_selectedSubchannelIndex = g_channel->subchannelIndex;
+	}
     ChSettingsCalibrationViewPage::start();
 }
 
