@@ -1131,7 +1131,7 @@ bool setWaveform(int slotIndex, int subchannelIndex, int resourceIndex, Waveform
 		waveformParameters->offset = 0;
 	}
 	
-	g_functionGeneratorPage.pageAlloc();
+	g_functionGeneratorPage.init();
 
 	return true;
 }
@@ -1168,7 +1168,7 @@ bool setFrequency(int slotIndex, int subchannelIndex, int resourceIndex, float f
 
 	waveformParameters->frequency = frequency;
 	
-	g_functionGeneratorPage.pageAlloc();
+	g_functionGeneratorPage.init();
 
 	return true;
 }
@@ -1201,7 +1201,7 @@ bool setPhaseShift(int slotIndex, int subchannelIndex, int resourceIndex, float 
 
 	waveformParameters->phaseShift = phaseShift;
 
-	g_functionGeneratorPage.pageAlloc();
+	g_functionGeneratorPage.init();
 	
 	return true;
 }
@@ -1268,7 +1268,7 @@ bool setAmplitude(int slotIndex, int subchannelIndex, int resourceIndex, float a
 	
 	waveformParameters->amplitude = amplitude;
 
-	g_functionGeneratorPage.pageAlloc();
+	g_functionGeneratorPage.init();
 	
 	return true;
 }
@@ -1322,7 +1322,7 @@ bool setOffset(int slotIndex, int subchannelIndex, int resourceIndex, float offs
 	
 	waveformParameters->offset = offset;
 
-	g_functionGeneratorPage.pageAlloc();
+	g_functionGeneratorPage.init();
 
 	return true;
 }
@@ -1355,7 +1355,7 @@ bool setDutyCycle(int slotIndex, int subchannelIndex, int resourceIndex, float d
 
 	waveformParameters->dutyCycle = dutyCycle;
 
-	g_functionGeneratorPage.pageAlloc();
+	g_functionGeneratorPage.init();
 	
 	return true;
 }
@@ -1422,7 +1422,7 @@ bool setResourceType(int slotIndex, int subchannelIndex, int resourceIndex, Func
 
  	waveformParameters->resourceType = resourceType;
 
-	g_functionGeneratorPage.pageAlloc();
+	g_functionGeneratorPage.init();
 
 	return true;
 }
@@ -1478,9 +1478,6 @@ int checkLimits(int iChannel) {
 }
 
 void executionStart() {
-	g_functionGeneratorPage.pageAlloc();
-	g_functionGeneratorSelectChannelsPage.pageAlloc();
-
 	for (int i = 0; i < g_selectedResources.m_numResources; i++) {
 		int slotIndex;
 		int subchannelIndex;
@@ -1494,10 +1491,7 @@ void executionStart() {
 
 		if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
 			g_active = true;
-			g_functionGeneratorPage.pageAlloc();
-
 			reloadWaveformParameters();
-
 			return;
 		}
 	}

@@ -1342,6 +1342,18 @@ void clearMcuRevision() {
     g_devConf.mcuRevision = 0;
 }
 
+void setOverlayVisibility(uint8_t overlayVisibility) {
+	g_devConf.overlayVisibility = overlayVisibility;
+}
+
+void setOverlayPositions(int xOffsetMinimized, int yOffsetMinimized, int xOffsetMaximized, int yOffsetMaximized) {
+	g_devConf.overlayMoved = true;
+    g_devConf.overlayXOffsetMinimized = xOffsetMinimized;
+    g_devConf.overlayYOffsetMinimized = yOffsetMinimized;
+    g_devConf.overlayXOffsetMaximized = xOffsetMaximized;
+    g_devConf.overlayYOffsetMaximized = yOffsetMaximized;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 ModuleConfiguration g_moduleConf[NUM_SLOTS];

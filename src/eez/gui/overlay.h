@@ -21,6 +21,11 @@
 namespace eez {
 namespace gui {
 
+enum OverlayVisibiliy {
+	OVERLAY_MINIMIZED = (1 << 0),
+	OVERLAY_HIDDEN = (1 << 1)
+};
+
 struct WidgetOverride {
     bool isVisible;
     int16_t x;
@@ -39,11 +44,16 @@ struct Overlay {
     WidgetOverride *widgetOverrides;
 
     bool moved = false;
-    
-    int xOffset;
-    int yOffset;
 
-    int xOffsetOnTouchDown;
+	int visibility = 0;
+    
+    int xOffsetMinimized;
+    int yOffsetMinimized;
+
+	int xOffsetMaximized;
+	int yOffsetMaximized;
+	
+	int xOffsetOnTouchDown;
     int yOffsetOnTouchDown;
 
     int xOnTouchDown;

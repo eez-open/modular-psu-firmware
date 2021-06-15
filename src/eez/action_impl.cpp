@@ -1384,6 +1384,21 @@ void action_show_pinout() {
     }
 }
 
+void action_toggle_overlay_minimized() {
+	persist_conf::setOverlayVisibility(
+        persist_conf::devConf.overlayVisibility & OVERLAY_MINIMIZED ? 
+        persist_conf::devConf.overlayVisibility & ~OVERLAY_MINIMIZED : 
+        persist_conf::devConf.overlayVisibility | OVERLAY_MINIMIZED);
+}
+
+void action_hide_overlay() {
+	persist_conf::setOverlayVisibility(persist_conf::devConf.overlayVisibility | OVERLAY_HIDDEN);
+}
+
+void action_show_overlay() {
+	persist_conf::setOverlayVisibility(persist_conf::devConf.overlayVisibility & ~OVERLAY_HIDDEN);
+}
+
 } // namespace gui
 } // namespace eez
 

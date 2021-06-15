@@ -180,8 +180,13 @@ struct DeviceConfiguration {
     SortFilesOption sortFilesOption;
     int eventQueueFilter;
     ViewFlags viewFlags;
-    uint8_t reserved6; // was encoderMode
-    uint8_t reserved7[43];
+    uint8_t overlayVisibility;
+	uint8_t overlayMoved;
+	int overlayXOffsetMinimized;
+    int overlayYOffsetMinimized;
+    int overlayXOffsetMaximized;
+    int overlayYOffsetMaximized;
+    uint8_t reserved7[26];
     uint32_t ntpRefreshFrequency;
 
     // block 8
@@ -355,6 +360,9 @@ void setPowerLineFrequency(int powerLineFrequency);
 
 void setMcuRevision(int mcuRevision);
 void clearMcuRevision();
+
+void setOverlayVisibility(uint8_t overlayVisibility);
+void setOverlayPositions(int xOffsetMinimized, int yOffsetMinimized, int xOffsetMaximized, int yOffsetMaximized);
 
 ////////////////////////////////////////////////////////////////////////////////
 

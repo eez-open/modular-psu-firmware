@@ -2717,6 +2717,16 @@
       "name": "function_generator_any_selected",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "overlay_minimized",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
+      "name": "overlay_hidden",
+      "type": "boolean",
+      "defaultValue": "0"
     }
   ],
   "actions": [
@@ -4050,6 +4060,21 @@
       "components": [],
       "connectionLines": [],
       "name": "function_generator_deselect_all"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "toggle_overlay_minimized"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "hide_overlay"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "show_overlay"
     }
   ],
   "pages": [
@@ -6697,9 +6722,9 @@
         {
           "type": "Container",
           "left": 244,
-          "top": 57,
+          "top": 53,
           "width": 236,
-          "height": 215,
+          "height": 219,
           "wireID": "cebaa727-0fbe-422b-aab4-95714a141e48",
           "data": "",
           "action": "drag_overlay",
@@ -6710,10 +6735,113 @@
           "widgets": [
             {
               "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 23,
+              "height": 32,
+              "wireID": "f38c9aa7-dbad-4518-ab22-bf33c2f9577d",
+              "style": {
+                "inheritFrom": "overlay"
+              },
+              "text": "\\u00a1"
+            },
+            {
+              "type": "Text",
+              "left": 23,
+              "top": 0,
+              "width": 23,
+              "height": 32,
+              "wireID": "9aaddf0c-f7fa-4b50-d4d1-38c21067a431",
+              "style": {
+                "inheritFrom": "overlay"
+              },
+              "text": "\\u00b5"
+            },
+            {
+              "type": "Text",
+              "left": 46,
+              "top": 0,
+              "width": 23,
+              "height": 32,
+              "wireID": "267f37b4-3218-41bb-bdf0-be7b0be23c98",
+              "style": {
+                "inheritFrom": "overlay"
+              },
+              "text": "\\u00a3"
+            },
+            {
+              "type": "Text",
+              "left": 69,
+              "top": 0,
+              "width": 23,
+              "height": 32,
+              "wireID": "0443a7f4-6737-4221-9194-ee208e23b9a7",
+              "style": {
+                "inheritFrom": "overlay_icon"
+              },
+              "text": "\\u007d"
+            },
+            {
+              "type": "Text",
+              "left": 92,
+              "top": 0,
+              "width": 23,
+              "height": 32,
+              "wireID": "0443a7f4-6737-4221-9194-ee208e23b9a7",
+              "style": {
+                "inheritFrom": "overlay_icon",
+                "font": "Oswald14"
+              },
+              "text": "\\u00c2"
+            },
+            {
+              "type": "Text",
+              "left": 116,
+              "top": 0,
+              "width": 40,
+              "height": 32,
+              "wireID": "0443a7f4-6737-4221-9194-ee208e23b9a7",
+              "action": "toggle_overlay_minimized",
+              "style": {
+                "inheritFrom": "overlay_icon",
+                "font": "Heydings14"
+              },
+              "text": "\\u008d"
+            },
+            {
+              "type": "Text",
+              "left": 156,
+              "top": 0,
+              "width": 40,
+              "height": 32,
+              "wireID": "0443a7f4-6737-4221-9194-ee208e23b9a7",
+              "action": "toggle_overlay_minimized",
+              "style": {
+                "inheritFrom": "overlay_icon",
+                "font": "Heydings14"
+              },
+              "text": "\\u008e"
+            },
+            {
+              "type": "Text",
+              "left": 196,
+              "top": 0,
+              "width": 40,
+              "height": 32,
+              "wireID": "483a067b-0281-4d0d-8e8d-8aa29196b5e0",
+              "action": "hide_overlay",
+              "style": {
+                "inheritFrom": "overlay_icon",
+                "font": "Heydings14"
+              },
+              "text": "\\u008f"
+            },
+            {
+              "type": "Text",
               "left": 2,
-              "top": 2,
+              "top": 32,
               "width": 28,
-              "height": 28,
+              "height": 22,
               "wireID": "f38c9aa7-dbad-4518-ab22-bf33c2f9577d",
               "style": {
                 "inheritFrom": "overlay"
@@ -6723,9 +6851,9 @@
             {
               "type": "Grid",
               "left": 38,
-              "top": 2,
+              "top": 32,
               "width": 196,
-              "height": 28,
+              "height": 22,
               "wireID": "d202ee9d-5e8f-407b-e15c-dcecb7f61818",
               "data": "channels_with_list_counter_visible",
               "style": {
@@ -6736,7 +6864,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 98,
-                "height": 28,
+                "height": 22,
                 "wireID": "27a623f8-896b-45a5-ba18-8cd3cd60ec50",
                 "style": {
                   "inheritFrom": "overlay"
@@ -6747,7 +6875,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 25,
-                    "height": 28,
+                    "height": 22,
                     "wireID": "7837e007-d60c-43fe-bcea-2fe73da710cd",
                     "data": "list_counter_label",
                     "style": {
@@ -6760,7 +6888,7 @@
                     "left": 25,
                     "top": 0,
                     "width": 73,
-                    "height": 28,
+                    "height": 22,
                     "wireID": "164fc946-7cfc-4b35-a14b-0bb9081ed87c",
                     "data": "channel_list_countdown",
                     "style": {
@@ -6775,9 +6903,9 @@
             {
               "type": "Text",
               "left": 2,
-              "top": 30,
+              "top": 54,
               "width": 28,
-              "height": 28,
+              "height": 22,
               "wireID": "9aaddf0c-f7fa-4b50-d4d1-38c21067a431",
               "style": {
                 "inheritFrom": "overlay"
@@ -6787,9 +6915,9 @@
             {
               "type": "Grid",
               "left": 38,
-              "top": 30,
+              "top": 54,
               "width": 196,
-              "height": 28,
+              "height": 22,
               "wireID": "c86216e0-611a-4d48-ef7d-63766de484ab",
               "data": "channels_with_ramp_counter_visible",
               "style": {
@@ -6800,7 +6928,7 @@
                 "left": 0,
                 "top": 0,
                 "width": 98,
-                "height": 28,
+                "height": 22,
                 "wireID": "a73eb878-568b-4dd3-beb0-abf6721efd0b",
                 "style": {
                   "inheritFrom": "overlay"
@@ -6811,7 +6939,7 @@
                     "left": 0,
                     "top": 0,
                     "width": 25,
-                    "height": 28,
+                    "height": 22,
                     "wireID": "fc929a05-bd92-4694-b76a-615b8c2a25f3",
                     "data": "ramp_counter_label",
                     "style": {
@@ -6824,7 +6952,7 @@
                     "left": 25,
                     "top": 0,
                     "width": 73,
-                    "height": 28,
+                    "height": 22,
                     "wireID": "fd76d371-4833-4b4d-a4fd-571634325280",
                     "data": "channel_ramp_countdown",
                     "style": {
@@ -6839,9 +6967,9 @@
             {
               "type": "Container",
               "left": 2,
-              "top": 58,
+              "top": 76,
               "width": 232,
-              "height": 28,
+              "height": 22,
               "wireID": "6dbeb735-3d97-48b7-9f02-64f07c1b7247",
               "style": {
                 "inheritFrom": "overlay"
@@ -6853,7 +6981,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 28,
-                  "height": 28,
+                  "height": 22,
                   "wireID": "267f37b4-3218-41bb-bdf0-be7b0be23c98",
                   "style": {
                     "inheritFrom": "overlay"
@@ -6865,7 +6993,7 @@
                   "left": 32,
                   "top": 0,
                   "width": 200,
-                  "height": 28,
+                  "height": 22,
                   "wireID": "56c53357-9b26-4149-85ba-217cbbca20b9",
                   "data": "dlog_state",
                   "style": {
@@ -6877,7 +7005,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 200,
-                      "height": 28,
+                      "height": 22,
                       "wireID": "6b7e53c8-6c15-4952-d74c-63ec801ef8f0",
                       "style": {
                         "inheritFrom": "overlay"
@@ -6889,7 +7017,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 200,
-                      "height": 28,
+                      "height": 22,
                       "wireID": "a8cf2d62-e516-4ee8-9dfe-a2a55b7d0da7",
                       "style": {
                         "inheritFrom": "overlay_left"
@@ -6901,7 +7029,7 @@
                       "left": 0,
                       "top": 0,
                       "width": 200,
-                      "height": 28,
+                      "height": 22,
                       "wireID": "2f34426d-e7a4-48b2-c3da-86945cf05678",
                       "style": {
                         "inheritFrom": "default"
@@ -6912,7 +7040,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 100,
-                          "height": 28,
+                          "height": 22,
                           "wireID": "a8a363e7-753c-44ab-c8a9-15f56be0a6af",
                           "data": "dlog_current_time",
                           "style": {
@@ -6925,7 +7053,7 @@
                           "left": 100,
                           "top": 0,
                           "width": 100,
-                          "height": 28,
+                          "height": 22,
                           "wireID": "939094bc-2f4f-4418-a2ab-330f297e160d",
                           "data": "dlog_file_length",
                           "style": {
@@ -6942,9 +7070,9 @@
             {
               "type": "Container",
               "left": 2,
-              "top": 86,
+              "top": 98,
               "width": 232,
-              "height": 28,
+              "height": 20,
               "wireID": "b864940e-623f-4188-843f-13e7dd830d1e",
               "style": {
                 "inheritFrom": "overlay"
@@ -6956,7 +7084,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 28,
-                  "height": 28,
+                  "height": 20,
                   "wireID": "0443a7f4-6737-4221-9194-ee208e23b9a7",
                   "style": {
                     "inheritFrom": "overlay_icon"
@@ -6968,7 +7096,7 @@
                   "left": 32,
                   "top": 0,
                   "width": 200,
-                  "height": 28,
+                  "height": 20,
                   "wireID": "fa27d13c-a976-4461-ee3b-3ca64b554c3d",
                   "data": "script_info",
                   "style": {
@@ -6981,7 +7109,7 @@
             {
               "type": "Container",
               "left": 2,
-              "top": 114,
+              "top": 118,
               "width": 232,
               "height": 99,
               "wireID": "bd1de53e-a8b5-478f-83e3-e53bf55f86b8",
@@ -6995,7 +7123,7 @@
                   "left": 0,
                   "top": 0,
                   "width": 28,
-                  "height": 28,
+                  "height": 24,
                   "wireID": "0443a7f4-6737-4221-9194-ee208e23b9a7",
                   "style": {
                     "inheritFrom": "overlay_icon",
@@ -7018,7 +7146,7 @@
                       "type": "Text",
                       "left": 0,
                       "top": 0,
-                      "width": 84,
+                      "width": 83,
                       "height": 24,
                       "wireID": "6558e91d-5b38-468f-bdcb-3cb8bdd48588",
                       "data": "function_generator_selected_item_label",
@@ -7047,7 +7175,7 @@
                       "left": 0,
                       "top": 25,
                       "width": 204,
-                      "height": 24,
+                      "height": 74,
                       "wireID": "823ba0b7-93ec-40d7-fe62-c955023c9046",
                       "data": "function_generator_is_dc",
                       "style": {
@@ -7059,7 +7187,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 204,
-                          "height": 24,
+                          "height": 74,
                           "wireID": "04ac791b-1bb5-4613-d49f-417b6fbb0aab",
                           "style": {
                             "inheritFrom": "overlay_left"
@@ -7149,78 +7277,189 @@
                                 "padding": "0 5"
                               },
                               "displayOption": 0
-                            }
-                          ]
-                        },
-                        {
-                          "type": "RectangleWidget",
-                          "left": 0,
-                          "top": 0,
-                          "width": 204,
-                          "height": 24,
-                          "wireID": "9943e603-ad46-4e43-f28a-794708b9eb26",
-                          "style": {
-                            "inheritFrom": "overlay_left"
-                          },
-                          "invertColors": true
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Select",
-                      "left": 0,
-                      "top": 50,
-                      "width": 204,
-                      "height": 24,
-                      "wireID": "bf32434d-b348-40ef-d3f0-f81ac706278c",
-                      "data": "function_generator_is_dc",
-                      "style": {
-                        "inheritFrom": "overlay_left"
-                      },
-                      "widgets": [
-                        {
-                          "type": "Select",
-                          "left": 0,
-                          "top": 0,
-                          "width": 204,
-                          "height": 24,
-                          "wireID": "cca68cf6-838a-42e5-bb52-52bf84db8b6d",
-                          "data": "function_generator_has_amplitude_and_offset",
-                          "style": {
-                            "inheritFrom": "overlay_left"
-                          },
-                          "widgets": [
-                            {
-                              "type": "RectangleWidget",
-                              "left": 0,
-                              "top": 0,
-                              "width": 204,
-                              "height": 24,
-                              "wireID": "2d7c96a5-5388-42dd-87aa-36916aa37f21",
-                              "style": {
-                                "inheritFrom": "overlay_left"
-                              },
-                              "invertColors": true
                             },
                             {
-                              "type": "Container",
+                              "type": "Select",
                               "left": 0,
-                              "top": 0,
+                              "top": 25,
                               "width": 204,
                               "height": 24,
-                              "wireID": "e92e5922-0a5e-409e-cb7f-e121ff12f3b8",
+                              "wireID": "cca68cf6-838a-42e5-bb52-52bf84db8b6d",
+                              "data": "function_generator_has_amplitude_and_offset",
                               "style": {
                                 "inheritFrom": "overlay_left"
                               },
                               "widgets": [
                                 {
-                                  "type": "Select",
+                                  "type": "RectangleWidget",
                                   "left": 0,
                                   "top": 0,
-                                  "width": 28,
+                                  "width": 204,
                                   "height": 24,
-                                  "wireID": "37ac0603-d0a6-408b-e7da-59da3a050dc3",
-                                  "data": "function_generator_is_ampl",
+                                  "wireID": "2d7c96a5-5388-42dd-87aa-36916aa37f21",
+                                  "style": {
+                                    "inheritFrom": "overlay_left"
+                                  },
+                                  "invertColors": true
+                                },
+                                {
+                                  "type": "Container",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 204,
+                                  "height": 24,
+                                  "wireID": "e92e5922-0a5e-409e-cb7f-e121ff12f3b8",
+                                  "style": {
+                                    "inheritFrom": "overlay_left"
+                                  },
+                                  "widgets": [
+                                    {
+                                      "type": "Select",
+                                      "left": 0,
+                                      "top": 0,
+                                      "width": 28,
+                                      "height": 24,
+                                      "wireID": "37ac0603-d0a6-408b-e7da-59da3a050dc3",
+                                      "data": "function_generator_is_ampl",
+                                      "style": {
+                                        "inheritFrom": "overlay_left"
+                                      },
+                                      "widgets": [
+                                        {
+                                          "type": "Text",
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 28,
+                                          "height": 24,
+                                          "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                                          "action": "",
+                                          "style": {
+                                            "inheritFrom": "overlay_left"
+                                          },
+                                          "text": "Min"
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 28,
+                                          "height": 24,
+                                          "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
+                                          "action": "",
+                                          "style": {
+                                            "inheritFrom": "overlay_left"
+                                          },
+                                          "text": "Ampl"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "DisplayData",
+                                      "left": 29,
+                                      "top": 0,
+                                      "width": 72,
+                                      "height": 24,
+                                      "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                                      "data": "function_generator_amplitude",
+                                      "action": "edit",
+                                      "style": {
+                                        "inheritFrom": "encoder_cursor_14_enabled",
+                                        "font": "RobotoCondensed-Regular",
+                                        "padding": "0 5"
+                                      },
+                                      "displayOption": 0
+                                    },
+                                    {
+                                      "type": "Select",
+                                      "left": 102,
+                                      "top": 0,
+                                      "width": 28,
+                                      "height": 24,
+                                      "wireID": "bf685e8a-a972-4fe1-8aea-613eafd4394e",
+                                      "data": "function_generator_is_ampl",
+                                      "style": {
+                                        "inheritFrom": "overlay_left"
+                                      },
+                                      "widgets": [
+                                        {
+                                          "type": "Text",
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 28,
+                                          "height": 24,
+                                          "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                                          "style": {
+                                            "inheritFrom": "overlay_left",
+                                            "padding": "0 0 0 2"
+                                          },
+                                          "text": "Max"
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 28,
+                                          "height": 24,
+                                          "wireID": "0c165171-49b6-4d33-8bc1-2ad8a0dae0ed",
+                                          "style": {
+                                            "inheritFrom": "overlay_left",
+                                            "padding": "0 0 0 2"
+                                          },
+                                          "text": "Offs"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "DisplayData",
+                                      "left": 131,
+                                      "top": 0,
+                                      "width": 73,
+                                      "height": 24,
+                                      "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                                      "data": "function_generator_offset",
+                                      "action": "edit",
+                                      "style": {
+                                        "inheritFrom": "encoder_cursor_14_enabled",
+                                        "font": "RobotoCondensed-Regular",
+                                        "padding": "0 5"
+                                      },
+                                      "displayOption": 0
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Select",
+                              "left": 0,
+                              "top": 50,
+                              "width": 101,
+                              "height": 24,
+                              "wireID": "3a10a1c6-af20-4974-97b5-318959731ad4",
+                              "data": "function_generator_has_mode_select",
+                              "style": {
+                                "inheritFrom": "overlay_left"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "RectangleWidget",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 101,
+                                  "height": 24,
+                                  "wireID": "f564df57-b89b-4529-8d83-e128e0af016e",
+                                  "style": {
+                                    "inheritFrom": "overlay_left"
+                                  },
+                                  "invertColors": true
+                                },
+                                {
+                                  "type": "Container",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 101,
+                                  "height": 24,
+                                  "wireID": "b9a0a5d6-6e92-4779-a4cc-4d7173f2da48",
                                   "style": {
                                     "inheritFrom": "overlay_left"
                                   },
@@ -7231,99 +7470,124 @@
                                       "top": 0,
                                       "width": 28,
                                       "height": 24,
-                                      "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
-                                      "action": "",
+                                      "wireID": "a53aeea1-bae6-4f26-e465-a741570c3dab",
                                       "style": {
                                         "inheritFrom": "overlay_left"
                                       },
-                                      "text": "Min"
+                                      "text": "Mod"
                                     },
                                     {
-                                      "type": "Text",
-                                      "left": 0,
+                                      "type": "DisplayData",
+                                      "left": 29,
                                       "top": 0,
-                                      "width": 28,
+                                      "width": 72,
                                       "height": 24,
-                                      "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
-                                      "action": "",
+                                      "wireID": "af7e6997-6b6a-4efc-eb60-31ebf6268b91",
+                                      "data": "function_generator_mode",
+                                      "action": "function_generator_mode_select_mode",
                                       "style": {
-                                        "inheritFrom": "overlay_left"
+                                        "inheritFrom": "encoder_cursor_14_enabled",
+                                        "font": "RobotoCondensed-Regular",
+                                        "padding": "0 5"
                                       },
-                                      "text": "Ampl"
+                                      "displayOption": 0
                                     }
                                   ]
-                                },
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Select",
+                              "left": 102,
+                              "top": 50,
+                              "width": 102,
+                              "height": 24,
+                              "wireID": "9342d96e-df8e-47bb-8278-e4628954ec72",
+                              "data": "function_generator_has_duty_cycle",
+                              "style": {
+                                "inheritFrom": "overlay_left"
+                              },
+                              "widgets": [
                                 {
-                                  "type": "DisplayData",
-                                  "left": 29,
+                                  "type": "RectangleWidget",
+                                  "left": 0,
                                   "top": 0,
-                                  "width": 72,
+                                  "width": 102,
                                   "height": 24,
-                                  "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
-                                  "data": "function_generator_amplitude",
-                                  "action": "edit",
+                                  "wireID": "8f983108-a5e4-4d30-a312-c2cc9ca0e431",
                                   "style": {
-                                    "inheritFrom": "encoder_cursor_14_enabled",
-                                    "font": "RobotoCondensed-Regular",
-                                    "padding": "0 5"
+                                    "inheritFrom": "overlay_left"
                                   },
-                                  "displayOption": 0
+                                  "invertColors": true
                                 },
                                 {
-                                  "type": "Select",
-                                  "left": 102,
+                                  "type": "Container",
+                                  "left": 0,
                                   "top": 0,
-                                  "width": 28,
+                                  "width": 102,
                                   "height": 24,
-                                  "wireID": "bf685e8a-a972-4fe1-8aea-613eafd4394e",
-                                  "data": "function_generator_is_ampl",
+                                  "wireID": "86b0a4f5-2e33-44fe-81c0-87c78f2192bb",
                                   "style": {
                                     "inheritFrom": "overlay_left"
                                   },
                                   "widgets": [
                                     {
-                                      "type": "Text",
+                                      "type": "Select",
                                       "left": 0,
                                       "top": 0,
                                       "width": 28,
                                       "height": 24,
-                                      "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                                      "wireID": "72afb8b2-bbf0-4eb3-fc6d-61a70e29bd69",
+                                      "data": "function_generator_is_freq",
                                       "style": {
-                                        "inheritFrom": "overlay_left",
-                                        "padding": "0 0 0 2"
+                                        "inheritFrom": "overlay_left"
                                       },
-                                      "text": "Max"
+                                      "widgets": [
+                                        {
+                                          "type": "Text",
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 28,
+                                          "height": 24,
+                                          "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
+                                          "style": {
+                                            "inheritFrom": "overlay_left",
+                                            "padding": "0 0 0 2"
+                                          },
+                                          "text": "PWd"
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 28,
+                                          "height": 24,
+                                          "wireID": "fe8ce2e2-2c87-46e4-afeb-e135a8928e96",
+                                          "style": {
+                                            "inheritFrom": "overlay_left",
+                                            "padding": "0 0 0 2"
+                                          },
+                                          "text": "Duty"
+                                        }
+                                      ]
                                     },
                                     {
-                                      "type": "Text",
-                                      "left": 0,
+                                      "type": "DisplayData",
+                                      "left": 29,
                                       "top": 0,
-                                      "width": 28,
+                                      "width": 73,
                                       "height": 24,
-                                      "wireID": "0c165171-49b6-4d33-8bc1-2ad8a0dae0ed",
+                                      "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
+                                      "data": "function_generator_duty_cycle",
+                                      "action": "edit",
                                       "style": {
-                                        "inheritFrom": "overlay_left",
-                                        "padding": "0 0 0 2"
+                                        "inheritFrom": "encoder_cursor_14_enabled",
+                                        "font": "RobotoCondensed-Regular",
+                                        "padding": "0 5"
                                       },
-                                      "text": "Offs"
+                                      "displayOption": 0
                                     }
                                   ]
-                                },
-                                {
-                                  "type": "DisplayData",
-                                  "left": 131,
-                                  "top": 0,
-                                  "width": 73,
-                                  "height": 24,
-                                  "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
-                                  "data": "function_generator_offset",
-                                  "action": "edit",
-                                  "style": {
-                                    "inheritFrom": "encoder_cursor_14_enabled",
-                                    "font": "RobotoCondensed-Regular",
-                                    "padding": "0 5"
-                                  },
-                                  "displayOption": 0
                                 }
                               ]
                             }
@@ -7334,7 +7598,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 204,
-                          "height": 24,
+                          "height": 74,
                           "wireID": "90f20e5e-5d00-4cee-8d57-2da2de4a82dc",
                           "style": {
                             "inheritFrom": "overlay_left"
@@ -7344,185 +7608,23 @@
                               "type": "Text",
                               "left": 0,
                               "top": 0,
-                              "width": 28,
+                              "width": 61,
                               "height": 24,
                               "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
                               "action": "",
                               "style": {
                                 "inheritFrom": "overlay_left"
                               },
-                              "text": "Ampl"
+                              "text": "Amplitude"
                             },
                             {
                               "type": "DisplayData",
-                              "left": 29,
+                              "left": 84,
                               "top": 0,
                               "width": 72,
                               "height": 24,
                               "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
                               "data": "function_generator_amplitude",
-                              "action": "edit",
-                              "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled",
-                                "font": "RobotoCondensed-Regular",
-                                "padding": "0 5"
-                              },
-                              "displayOption": 0
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Select",
-                      "left": 0,
-                      "top": 75,
-                      "width": 101,
-                      "height": 24,
-                      "wireID": "3a10a1c6-af20-4974-97b5-318959731ad4",
-                      "data": "function_generator_has_mode_select",
-                      "style": {
-                        "inheritFrom": "overlay_left"
-                      },
-                      "widgets": [
-                        {
-                          "type": "RectangleWidget",
-                          "left": 0,
-                          "top": 0,
-                          "width": 101,
-                          "height": 24,
-                          "wireID": "f564df57-b89b-4529-8d83-e128e0af016e",
-                          "style": {
-                            "inheritFrom": "overlay_left"
-                          },
-                          "invertColors": true
-                        },
-                        {
-                          "type": "Container",
-                          "left": 0,
-                          "top": 0,
-                          "width": 101,
-                          "height": 24,
-                          "wireID": "b9a0a5d6-6e92-4779-a4cc-4d7173f2da48",
-                          "style": {
-                            "inheritFrom": "overlay_left"
-                          },
-                          "widgets": [
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 28,
-                              "height": 24,
-                              "wireID": "a53aeea1-bae6-4f26-e465-a741570c3dab",
-                              "style": {
-                                "inheritFrom": "overlay_left"
-                              },
-                              "text": "Mod"
-                            },
-                            {
-                              "type": "DisplayData",
-                              "left": 29,
-                              "top": 0,
-                              "width": 72,
-                              "height": 24,
-                              "wireID": "af7e6997-6b6a-4efc-eb60-31ebf6268b91",
-                              "data": "function_generator_mode",
-                              "action": "function_generator_mode_select_mode",
-                              "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled",
-                                "font": "RobotoCondensed-Regular",
-                                "padding": "0 5"
-                              },
-                              "displayOption": 0
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Select",
-                      "left": 102,
-                      "top": 75,
-                      "width": 102,
-                      "height": 24,
-                      "wireID": "9342d96e-df8e-47bb-8278-e4628954ec72",
-                      "data": "function_generator_has_duty_cycle",
-                      "style": {
-                        "inheritFrom": "overlay_left"
-                      },
-                      "widgets": [
-                        {
-                          "type": "RectangleWidget",
-                          "left": 0,
-                          "top": 0,
-                          "width": 102,
-                          "height": 24,
-                          "wireID": "8f983108-a5e4-4d30-a312-c2cc9ca0e431",
-                          "style": {
-                            "inheritFrom": "overlay_left"
-                          },
-                          "invertColors": true
-                        },
-                        {
-                          "type": "Container",
-                          "left": 0,
-                          "top": 0,
-                          "width": 102,
-                          "height": 24,
-                          "wireID": "86b0a4f5-2e33-44fe-81c0-87c78f2192bb",
-                          "style": {
-                            "inheritFrom": "overlay_left"
-                          },
-                          "widgets": [
-                            {
-                              "type": "Select",
-                              "left": 0,
-                              "top": 0,
-                              "width": 28,
-                              "height": 24,
-                              "wireID": "72afb8b2-bbf0-4eb3-fc6d-61a70e29bd69",
-                              "data": "function_generator_is_freq",
-                              "style": {
-                                "inheritFrom": "overlay_left"
-                              },
-                              "widgets": [
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 28,
-                                  "height": 24,
-                                  "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
-                                  "style": {
-                                    "inheritFrom": "overlay_left",
-                                    "padding": "0 0 0 2"
-                                  },
-                                  "text": "PWd"
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 28,
-                                  "height": 24,
-                                  "wireID": "fe8ce2e2-2c87-46e4-afeb-e135a8928e96",
-                                  "style": {
-                                    "inheritFrom": "overlay_left",
-                                    "padding": "0 0 0 2"
-                                  },
-                                  "text": "Duty"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "DisplayData",
-                              "left": 29,
-                              "top": 0,
-                              "width": 73,
-                              "height": 24,
-                              "wireID": "46e40f0b-8ec4-4e3e-f115-a245fcb80668",
-                              "data": "function_generator_duty_cycle",
                               "action": "edit",
                               "style": {
                                 "inheritFrom": "encoder_cursor_14_enabled",
@@ -27983,9 +28085,9 @@
             },
             {
               "type": "Text",
-              "left": 71,
+              "left": 79,
               "top": 8,
-              "width": 141,
+              "width": 133,
               "height": 40,
               "wireID": "ba3d9f9a-0dcc-4759-a637-b895b466797d",
               "data": "selected_theme",
@@ -28293,6 +28395,60 @@
                   "style": {
                     "inheritFrom": "default"
                   }
+                }
+              ]
+            },
+            {
+              "type": "Text",
+              "left": 12,
+              "top": 198,
+              "width": 58,
+              "height": 40,
+              "wireID": "4cb5c55f-a26e-48f0-a352-48165f11c384",
+              "style": {
+                "inheritFrom": "edit_value_S_left"
+              },
+              "text": "Overlay:"
+            },
+            {
+              "type": "Select",
+              "left": 79,
+              "top": 198,
+              "width": 132,
+              "height": 40,
+              "wireID": "d4282f47-343d-47a2-86a5-126232bf2caa",
+              "data": "overlay_hidden",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 132,
+                  "height": 40,
+                  "wireID": "33efa9e3-3625-4cf2-afda-0aec3e953bb3",
+                  "data": "overlay_hidden",
+                  "action": "hide_overlay",
+                  "style": {
+                    "inheritFrom": "edit_value_active_S_center"
+                  },
+                  "text": "Visible"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 132,
+                  "height": 40,
+                  "wireID": "b7371e22-bce8-4bdb-9603-8026447b9e41",
+                  "data": "overlay_hidden",
+                  "action": "show_overlay",
+                  "style": {
+                    "inheritFrom": "edit_value_active_S_center"
+                  },
+                  "text": "Hidden"
                 }
               ]
             }
@@ -49891,7 +50047,7 @@
         {
           "encoding": 161,
           "x": 0,
-          "y": 0,
+          "y": -3,
           "width": 19,
           "height": 19,
           "dx": 19,
@@ -50251,7 +50407,7 @@
         {
           "encoding": 181,
           "x": 0,
-          "y": 0,
+          "y": -1,
           "width": 19,
           "height": 15,
           "dx": 19,
@@ -64531,7 +64687,7 @@
         {
           "encoding": 125,
           "x": 0,
-          "y": 0,
+          "y": 1,
           "width": 19,
           "height": 20,
           "dx": 19,
@@ -64809,6 +64965,60 @@
             "width": 12,
             "height": 10,
             "pixelArray": "0000000000000000000000000000000000000000000000000000540b000000000b5400000054a8880b00000b88a85400000b89a8880b0b88a8890b0000000b89a88888a8890b00000000000b89a8a8890b000000000000000b89890b0000000000000000000b0b0000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\webhostinghub-glyphs.ttf",
+            "size": 6,
+            "encoding": 63078
+          }
+        },
+        {
+          "encoding": 141,
+          "x": 0,
+          "y": 0,
+          "width": 19,
+          "height": 19,
+          "dx": 19,
+          "glyphBitmap": {
+            "width": 19,
+            "height": 19,
+            "pixelArray": "42cecdcdcdcdcdcdcdcdcdcdcdcdcdc82b0000ca15000000000000000000000000002eb20000cb000000000000000000000000000004c80000cb000000000000000000000000000004c80000cb000000000000000000000000000004c80000cb000000000000000000000000000004c80000cb000000000000000000000000000004c80000cb000000000000000000000000000004c80000cb000000000000000000000000000004c80000cb000000000000000000000000000004c80000cb000000000000000000000000000004c80000cb000000000000000000000000000004c80000cb000000000000000000000000000004c80000cb0000000000000000000000003aa9acedaa80cb00000000000000000000000094fffffffffec71e000000000000000000000094fffffffffe37c6cdcdcdcdcdcdcdcdcdcdcdeafffffffffe0000000000000000000000000094fffffffffe0000000000000000000000000064f3f5f5f5c8"
+          },
+          "source": {
+            "filePath": "fonts\\webhostinghub-glyphs.ttf",
+            "size": 6,
+            "encoding": 63078
+          }
+        },
+        {
+          "encoding": 142,
+          "x": 0,
+          "y": 0,
+          "width": 19,
+          "height": 19,
+          "dx": 19,
+          "glyphBitmap": {
+            "width": 19,
+            "height": 19,
+            "pixelArray": "aacececed17500000000000000000000000000cc00000124b006060606060606060606060200cc0039e1ffffffffffffffffffffffffffea4dcc00c3ffffffffffffffffffffffffffffffe0cf14dbfffffffffffffffffffffffffffffff681bbf5fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000d8fffffffffffffffffffffffffffffff60000bdffffffffffffffffffffffffffffffda00002dcdf0f0f0f0f0f0f0f0f0f0f0f0f0d73f"
+          },
+          "source": {
+            "filePath": "fonts\\webhostinghub-glyphs.ttf",
+            "size": 6,
+            "encoding": 63078
+          }
+        },
+        {
+          "encoding": 143,
+          "x": 2,
+          "y": 2,
+          "width": 15,
+          "height": 15,
+          "dx": 19,
+          "glyphBitmap": {
+            "width": 15,
+            "height": 15,
+            "pixelArray": "ffc30c0000000000000000000cc3ffd7ffc30c000000000000000cc3ffd718d7ffc30c00000000000cc3ffd7180018d7ffc30c0000000cc3ffd71800000018d7ffc30c000cc3ffd718000000000018d7ffc317c3ffd7180000000000000018d7fff1ffd71800000000000000000023f6fff6230000000000000000000cc3fff9ffc30c000000000000000cc3ffd72ed7ffc30c00000000000cc3ffd7180018d7ffc30c0000000cc3ffd71800000018d7ffc30c000cc3ffd718000000000018d7ffc30cc3ffd7180000000000000018d7ffc3ffd71800000000000000000018d7ff"
           },
           "source": {
             "filePath": "fonts\\webhostinghub-glyphs.ttf",
@@ -67845,6 +68055,1338 @@
             "width": 7,
             "height": 7,
             "pixelArray": "0054d7ffd7540054ffffffffff54d7ffffffffffd7ffffffffffffffd7ffffffffffd75cffffffffff5c005cd7ffd75c00"
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 130,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 7,
+            "height": 7,
+            "pixelArray": "0054d7ffd7540054ffffffffff54d7ffffffffffd7ffffffffffffffd7ffffffffffd75cffffffffff5c005cd7ffd75c00"
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 131,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 132,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 133,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 134,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 135,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 136,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 137,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 138,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 139,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 140,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 141,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 142,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 143,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 144,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 145,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 146,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 147,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 148,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 149,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 150,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 151,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 152,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 153,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 154,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 155,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 156,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 157,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 158,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 159,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 160,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 161,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 162,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 163,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 164,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 165,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 166,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 167,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 168,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 169,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 170,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 171,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 172,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 173,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 174,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 175,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 176,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 177,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 178,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 179,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 180,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 181,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 182,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 183,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 184,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 185,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 186,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 187,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 188,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 189,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 190,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 191,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 192,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 193,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 194,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "dx": 0,
+          "glyphBitmap": {
+            "width": 0,
+            "height": 0,
+            "pixelArray": ""
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 195,
+          "x": 0,
+          "y": 0,
+          "width": 27,
+          "height": 12,
+          "dx": 27,
+          "glyphBitmap": {
+            "width": 27,
+            "height": 12,
+            "pixelArray": "0000000000073f7f966a2100000000000000000000000000015467000000000a63c8cebdd4a22300000000000000000000000004aa7b0000000579cc6d13052eaea31600000000000000000000003dc13000000146c86f080000003ac160000000000000000000000a8f8f0b00002ab87507000000000463b8240000000000000000014bc42c00000081b71700000000000017b26e05000000000000000aa5950300002fc749010000000000000056be280000000000000463bd2e000008859b10000000000000000019ac7b02000000000136bc6c06000038c335000000000000000000014bc14c0300000130bb9b080000007aab07000000000000000000000b90bb42040643b0af2b000000009f4f0100000000000000000000001492d3bbbed59c1d0000000000201100000000000000000000000001175e9d965719000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 196,
+          "x": 0,
+          "y": 0,
+          "width": 27,
+          "height": 12,
+          "dx": 27,
+          "glyphBitmap": {
+            "width": 27,
+            "height": 12,
+            "pixelArray": "000000000000000001298631000000000000000000000000002428000000000000000024a7c98409000000000000000000000015aa74000000000000022bb18038bc360000000000000000000023a3871200000000000027ab85130b878a0300000000000000000e99a1160000000000022db57d0900002bb43e000000000000001894991b0000000000002bae87110000000387890b00000000000887af2101000000000230ba8208000000000026bd3b000000000f81aa2400000000000030b083130000000000000882910300000772ba2d01000000000233bc7d07000000000000000028b343010a6eb73000000000000032b37d1200000000000000000003808e125dbb3e03000000000000727a04000000000000000000000022bb8dbe40000000000000000028100000000000000000000000000881ce51050000000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 197,
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 12,
+          "dx": 27,
+          "glyphBitmap": {
+            "width": 20,
+            "height": 12,
+            "pixelArray": "000000000041d6cac9c9c9c9c9ce9f1000000000000000000051a93c353535353555aa1500000000000000000051980a00000000002baa1500000000000000000051980a00000000002baa1500000000000000000051980a00000000002eaa1500000000000000000051980a000000000034aa1500000000000000000051980a000000000034aa1500000000000000000051980a000000000034aa1500000000000000000051980a000000000034aa1500000000000000000051980a000000000034aa15000000000e111111115c980a000000000034ae251111111088a6a6a6a6bb9509000000000032d1aba6a6a698"
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 198,
+          "x": 0,
+          "y": 0,
+          "width": 21,
+          "height": 12,
+          "dx": 27,
+          "glyphBitmap": {
+            "width": 21,
+            "height": 12,
+            "pixelArray": "000000089ab3b3b3b3b3b3b3b02c000152999a9a7f0000000dc4674c4c4c4c4c56b2440002889a5e5e4e0000000dbc29000000000012a444000389680000000000000dbc29000000000012a44400058c680000000000000dbc29000000000012a44400058d680000000000000dbc29000000000012a44400058d680000000000000dbc29000000000012a44400058d680000000000000dbc29000000000012a44400058d680000000000000dbc29000000000012a44300058d680000000000000dbc29000000000012a43e00058d680000000b0d0d19bd29000000000012a44b151a95620000008a9f9fa3c329000000000012a3b8aaabcb60000000"
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 199,
+          "x": 0,
+          "y": 0,
+          "width": 21,
+          "height": 12,
+          "dx": 27,
+          "glyphBitmap": {
+            "width": 21,
+            "height": 12,
+            "pixelArray": "000000000000000000000000000000053ba93c00000000000000000000000000000000014dbfd1440000000000000000000000000000000f6fbb59b54100000000000000000000000000000c81ba420eb0390000000000000000000000000029a19e25000bb2360000000000000000000000012ca79820000010b63200000000000000000000064fbc730a00000014b82f000000000000000000055bbb650c0000000018b62c0000000000000000157eb9410100000000001cb42a000000000000001291b1340300000000000021b42800000508080934ab921a000000000000000025af260805869b9b9cbb88150000000000000000002bc9a49b77"
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 200,
+          "x": 0,
+          "y": 0,
+          "width": 22,
+          "height": 12,
+          "dx": 27,
+          "glyphBitmap": {
+            "width": 22,
+            "height": 12,
+            "pixelArray": "000000179bb63c0200000000000000000000000000000000097e9263aa1d000000000000000000000000000000004db410009969000000000000000000000000000000019f6600004dad03000805000000000000000000000032ae1d000018ab3305b86600000000000000000000037d7803000003866827dd9b0000000000003358000025b52100000000479e79bbb9030250320014bbcf410050a8020000000016c2c36fb61327d2b81b6e93738e089b5d0000000000008aad15a24484786cbfbe2013b72da12c0000000000001820028887b4270c87750101a154010000000000000000000053d8960000000000005e950000000000000000000000169b38000000000000359e"
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 201,
+          "x": 0,
+          "y": 0,
+          "width": 24,
+          "height": 12,
+          "dx": 27,
+          "glyphBitmap": {
+            "width": 24,
+            "height": 12,
+            "pixelArray": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000555555555555555555555555555555555555555555555555d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d52b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 202,
+          "x": 0,
+          "y": 0,
+          "width": 27,
+          "height": 12,
+          "dx": 27,
+          "glyphBitmap": {
+            "width": 27,
+            "height": 12,
+            "pixelArray": "00000550ebfac6310100000000000000000000000000000125ccf8000021afd5a8e48d0e00000000000000000000000000000a80eaa600036ee04a1186e23c020000000000000000000000000140ce8110000ebcaa120134c78a080000000000000000000000000679d927010343db5b01000887c0230100000000000000000000001cd59408000889bd2800000346d25e0300000000000000000000023cdc54010026b887080000000fc28c0c000000000000000000000b99b21f00004dd837020000000780c5220000000000000000000018b38d09000079d315000000000042db3b0100000000000000000145c63c030000c59209000000000025b468050000000000000000026ad212000000f05e0100000000000889bb352b2b2b2b2b2b2b2b36a48b07000000e24d010000000000045ed5d7d5d5d5d5d5d5d5d5d9ec5601000000"
+          },
+          "source": {
+            "filePath": "fonts\\RobotoCondensed-Regular.ttf",
+            "size": 10,
+            "encoding": 127
+          }
+        },
+        {
+          "encoding": 203,
+          "x": 0,
+          "y": 0,
+          "width": 27,
+          "height": 12,
+          "dx": 27,
+          "glyphBitmap": {
+            "width": 27,
+            "height": 12,
+            "pixelArray": "000000012cb0f5f4901d010000000000011984f1f6b532010000000000000f9fe49bafde70090000000000086addb59ae2a81200000000000964d7680c1190d74603000000023fd49b130a5fd56f0a0000000029b79a1a00012ab29b0e0000000c91bb3201001590bf2f000000057dd62c010000055fd2570300024ed0680700000127d38005000010c8970d0000000119c27e0700067bc41d010000000b91cc1200044bd04c01000000000571d63b0134d27205000000000142ca5605159bad1b0000000000012ebc750b6ccc3701000000000018a4a51a40cc53040000000000000a87be34b88f0d0000000000000340d24972d81f00000000000000034ece9cce5e04000000000000001ad484db9409000000000000000010bff4c41d01000000000000000788def1620100000000000000000996f69a0a00000000000000000159eb"
           },
           "source": {
             "filePath": "fonts\\RobotoCondensed-Regular.ttf",

@@ -51,9 +51,12 @@ Overlay *getOverlay(const WidgetCursor &widgetCursor) {
 void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
     Overlay *overlay = getOverlay(widgetCursor);
     if (overlay) {
+		auto &overlayXOffset = (overlay->visibility & OVERLAY_MINIMIZED) != 0 ? overlay->xOffsetMinimized : overlay->xOffsetMaximized;
+		auto &overlayYOffset = (overlay->visibility & OVERLAY_MINIMIZED) != 0 ? overlay->yOffsetMinimized : overlay->yOffsetMaximized;
+
         if (!overlay->moved && overlay->state) {
-            overlay->xOffset = overlay->x - widgetCursor.widget->x;
-            overlay->yOffset = overlay->y - widgetCursor.widget->y;
+			overlayXOffset = overlay->x - widgetCursor.widget->x;
+			overlayYOffset = overlay->y - widgetCursor.widget->y;
         }
 
         int x1 = 0;
@@ -62,7 +65,7 @@ void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
         int y2 = 0;
         expandRectWithShadow(x1, y1, x2, y2);
 
-        int x = widgetCursor.x + overlay->xOffset;
+        int x = widgetCursor.x + overlayXOffset;
         if (x + x1 < widgetCursor.appContext->rect.x) {
             x = widgetCursor.appContext->rect.x - x1;
         }
@@ -70,7 +73,7 @@ void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
             x = widgetCursor.appContext->rect.x + widgetCursor.appContext->rect.w - overlay->width - x2;
         }
 
-        int y = widgetCursor.y + overlay->yOffset;
+        int y = widgetCursor.y + overlayYOffset;
         if (y + y1 < widgetCursor.appContext->rect.y) {
             y = widgetCursor.appContext->rect.y - y1;
         }
@@ -78,8 +81,8 @@ void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
             y = widgetCursor.appContext->rect.y + widgetCursor.appContext->rect.h - overlay->height - y2;
         }
 
-        xOffset = overlay->xOffset = x - widgetCursor.x;
-        yOffset = overlay->yOffset = y - widgetCursor.y;
+        xOffset = overlayXOffset = x - widgetCursor.x;
+        yOffset = overlayYOffset = y - widgetCursor.y;
     } else {
         xOffset = 0;
         yOffset = 0;
@@ -89,15 +92,17 @@ void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
 void dragOverlay(Event &touchEvent) {
     Overlay *overlay = getOverlay(getFoundWidgetAtDown());
     if (overlay) {
-        if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
+		auto &overlayXOffset = (overlay->visibility & OVERLAY_MINIMIZED) != 0 ? overlay->xOffsetMinimized : overlay->xOffsetMaximized;
+		auto &overlayYOffset = (overlay->visibility & OVERLAY_MINIMIZED) != 0 ? overlay->yOffsetMinimized : overlay->yOffsetMaximized;
+		if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
             overlay->xOnTouchDown = touchEvent.x;
             overlay->yOnTouchDown = touchEvent.y;
-            overlay->xOffsetOnTouchDown = overlay->xOffset;
-            overlay->yOffsetOnTouchDown = overlay->yOffset;
+            overlay->xOffsetOnTouchDown = overlayXOffset;
+            overlay->yOffsetOnTouchDown = overlayYOffset;
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
             overlay->moved = true;
-            overlay->xOffset = overlay->xOffsetOnTouchDown + touchEvent.x - overlay->xOnTouchDown;
-            overlay->yOffset = overlay->yOffsetOnTouchDown + touchEvent.y - overlay->yOnTouchDown;
+			overlayXOffset = overlay->xOffsetOnTouchDown + touchEvent.x - overlay->xOnTouchDown;
+			overlayYOffset = overlay->yOffsetOnTouchDown + touchEvent.y - overlay->yOnTouchDown;
         }
     }
 }

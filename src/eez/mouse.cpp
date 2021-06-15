@@ -149,10 +149,19 @@ void updateDisplay() {
             }
 
             if (m_foundWidgetAtMouse && m_onTouchFunctionAtMouse) {
-                drawFocusFrame(
-                    m_foundWidgetAtMouse.x, m_foundWidgetAtMouse.y,
-                    m_foundWidgetAtMouse.widget->w, m_foundWidgetAtMouse.widget->h
-                );
+                auto w = m_foundWidgetAtMouse.widget->w;
+                auto h = m_foundWidgetAtMouse.widget->h;
+
+                Overlay *overlay = nullptr;
+                if (isOverlay(m_foundWidgetAtMouse)) {
+                    overlay = getOverlay(m_foundWidgetAtMouse);
+                    if (overlay && overlay->widgetOverrides) {
+                        w = overlay->width;
+                        h = overlay->height;
+                    }
+                }
+
+                drawFocusFrame(m_foundWidgetAtMouse.x, m_foundWidgetAtMouse.y, w, h);
             }
 
             mcu::display::drawBitmap(&image, g_lastMouseCursorX, g_lastMouseCursorY);
