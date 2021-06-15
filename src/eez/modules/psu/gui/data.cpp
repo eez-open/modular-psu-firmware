@@ -985,16 +985,6 @@ void SLOT_TITLE_MAX_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%s R%dB%d", slot.getLabelOrDefault(), (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
 }
 
-bool compare_SLOT_TITLE_MIN_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
-}
-
-void SLOT_TITLE_MIN_value_to_text(const Value &value, char *text, int count) {
-    int slotIndex = value.getInt();
-    auto &slot = *g_slots[slotIndex];
-    snprintf(text, count, "%s", slot.getLabelOrDefault());
-}
-
 bool compare_SLOT_TITLE_SETTINGS_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -1279,20 +1269,11 @@ int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
             return isVert ? PAGE_ID_SLOT_DEF_VERT_ERROR_2COL : PAGE_ID_SLOT_DEF_HORZ_ERROR_2COL;
         }
 
-        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-            return PAGE_ID_SLOT_MAX_ERROR;
-        }
-
-        assert(slotViewType == SLOT_VIEW_TYPE_MIN);
-        return PAGE_ID_SLOT_MIN_ERROR;
+        assert(slotViewType == SLOT_VIEW_TYPE_MAX);
+        return PAGE_ID_SLOT_MAX_ERROR;
     }
 }
 
-bool isSlotFullScreenView() {
-	int pageId = getSlotView(SLOT_VIEW_TYPE_MAX, persist_conf::getMaxSlotIndex(), 0);
-	auto page = getPageWidget(pageId);
-	return page->h == 240;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1633,11 +1614,7 @@ void data_channel_other_value_mon(DataOperationEnum operation, Cursor cursor, Va
 
 void data_slot_view_type(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        if (persist_conf::isMaxView()) {
-            value = isSlotFullScreenView() ? 2 : 1;
-        } else {
-            value = 0;
-        }
+        value = persist_conf::isMaxView() ? 1 : 0;
     }
 }
 
@@ -1771,16 +1748,6 @@ void data_slot_max_channel_index(DataOperationEnum operation, Cursor cursor, Val
     data_slot_channel_index(persist_conf::getMaxSlotIndex(), channelIndex == -1 ? nullptr : &Channel::get(channelIndex), operation, cursor, value);
 }
 
-void data_slot_min1_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    int channelIndex = persist_conf::getMin1ChannelIndex();
-    data_slot_channel_index(persist_conf::getMin1SlotIndex(), channelIndex == -1 ? nullptr : &Channel::get(channelIndex), operation, cursor, value);
-}
-
-void data_slot_min2_channel_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    int channelIndex = persist_conf::getMin2ChannelIndex();
-    data_slot_channel_index(persist_conf::getMin2SlotIndex(), channelIndex == -1 ? nullptr : &Channel::get(channelIndex), operation, cursor, value);
-}
-
 void data_slot_default_view(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = getSlotView(g_isCol2Mode ? SLOT_VIEW_TYPE_DEFAULT_2COL : SLOT_VIEW_TYPE_DEFAULT, hmi::g_selectedSlotIndex, cursor);
@@ -1790,12 +1757,6 @@ void data_slot_default_view(DataOperationEnum operation, Cursor cursor, Value &v
 void data_slot_max_view(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getSlotView(SLOT_VIEW_TYPE_MAX, persist_conf::getMaxSlotIndex(), cursor);
-    }
-}
-
-void data_slot_min_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = getSlotView(SLOT_VIEW_TYPE_MIN, hmi::g_selectedSlotIndex, cursor);
     }
 }
 
@@ -5516,12 +5477,6 @@ void data_slot_title_def(DataOperationEnum operation, Cursor cursor, Value &valu
 void data_slot_title_max(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_MAX);
-    }
-}
-
-void data_slot_title_min(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = Value(hmi::g_selectedSlotIndex, VALUE_TYPE_SLOT_TITLE_MIN);
     }
 }
 

@@ -3308,61 +3308,6 @@
         {
           "type": "Container",
           "left": 0,
-          "top": 0,
-          "width": 235,
-          "height": 24,
-          "wireID": "c7b0e5fa-c0af-4a68-f681-218a8dee84ac",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 190,
-              "height": 24,
-              "wireID": "8e96f03f-7e81-4e98-9aed-f601447b3d6e",
-              "data": "slot_title_min",
-              "style": {
-                "inheritFrom": "channel1",
-                "alignHorizontal": "left",
-                "padding": "0 5"
-              },
-              "text": ""
-            },
-            {
-              "type": "Text",
-              "left": 190,
-              "top": 0,
-              "width": 45,
-              "height": 24,
-              "wireID": "aedad225-220b-4456-f632-ef32a66c2bbd",
-              "data": "",
-              "action": "toggle_slot_max_view",
-              "style": {
-                "inheritFrom": "channel1",
-                "font": "Heydings14",
-                "alignVertical": "bottom"
-              },
-              "text": "e"
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_view_min",
-      "left": 0,
-      "top": 0,
-      "width": 235,
-      "height": 68,
-      "dataContextOverrides": "{\"slot_title_min\": \"MUX14D\"}"
-    },
-    {
-      "components": [
-        {
-          "type": "Container",
-          "left": 0,
           "top": 240,
           "width": 480,
           "height": 32,

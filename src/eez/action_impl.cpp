@@ -599,17 +599,14 @@ void action_toggle_channels_max_view() {
     selectChannelByCursor();
 
     auto isMaxViewBefore = persist_conf::isMaxView();
-    auto wasFullScreenView = isMaxViewBefore && isSlotFullScreenView();
     auto maxSlotIndexBefore = isMaxViewBefore ? persist_conf::getMaxSlotIndex() : -1;
 
     persist_conf::toggleMaxChannelIndex(g_channel->channelIndex);
     
     if (!isMaxViewBefore && persist_conf::isMaxView()) {
-        animateFromDefaultViewToMaxView(g_channel->slotIndex, isSlotFullScreenView());
-    } else if (isMaxViewBefore && !persist_conf::isMaxView()) {
-        animateFromMaxViewToDefaultView(maxSlotIndexBefore, wasFullScreenView);
+        animateFromDefaultViewToMaxView(g_channel->slotIndex);
     } else {
-        animateFromMinViewToMaxView(maxSlotIndexBefore, isSlotFullScreenView());
+        animateFromMaxViewToDefaultView(maxSlotIndexBefore);
     }
 }
 
@@ -618,17 +615,14 @@ void action_toggle_slot_max_view() {
     hmi::selectSlot(slotIndex);
 
     auto isMaxViewBefore = persist_conf::isMaxView();
-    auto wasFullScreenView = isMaxViewBefore && isSlotFullScreenView();
     auto maxSlotIndexBefore = isMaxViewBefore ? persist_conf::getMaxSlotIndex() : -1;
 
     persist_conf::toggleMaxSlotIndex(slotIndex);
     
     if (!isMaxViewBefore && persist_conf::isMaxView()) {
-        animateFromDefaultViewToMaxView(slotIndex, isSlotFullScreenView());
-    } else if (isMaxViewBefore && !persist_conf::isMaxView()) {
-        animateFromMaxViewToDefaultView(maxSlotIndexBefore, wasFullScreenView);
+        animateFromDefaultViewToMaxView(slotIndex);
     } else {
-        animateFromMinViewToMaxView(maxSlotIndexBefore, isSlotFullScreenView());
+        animateFromMaxViewToDefaultView(maxSlotIndexBefore);
     }
 }
 
@@ -1389,6 +1383,12 @@ void action_toggle_overlay_minimized() {
         persist_conf::devConf.overlayVisibility & OVERLAY_MINIMIZED ? 
         persist_conf::devConf.overlayVisibility & ~OVERLAY_MINIMIZED : 
         persist_conf::devConf.overlayVisibility | OVERLAY_MINIMIZED);
+}
+
+void action_hide_overlay_long_touch() {
+    if (g_isLongTouch) {
+	    persist_conf::setOverlayVisibility(persist_conf::devConf.overlayVisibility | OVERLAY_HIDDEN);
+    }
 }
 
 void action_hide_overlay() {

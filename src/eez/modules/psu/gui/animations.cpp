@@ -63,16 +63,7 @@ static const Rect g_horzDefRectsCol2Mode[] = {
 	{ 0, 120, 480, 120 },
 };
 
-static const Rect g_maxRect = { 0, 0, 480, 168 };
 static const Rect g_fullScreenRect = { 0, 0, 480, 240 };
-
-static const Rect g_maxRectMax = { 0, 0, 360, 168 };
-static const Rect g_maxRectMin = { 360, 0, 120, 168 };
-
-static const Rect g_minRects[] = {
-    {   0, 168, 240, 72 },
-    { 240, 168, 240, 72 }
-};
 
 namespace eez {
 namespace psu {
@@ -80,7 +71,7 @@ namespace gui {
 
 const Rect g_workingAreaRect = { 0, 0, 480, 240 };
 
-void animateFromDefaultViewToMaxView(int iMax, bool isFullScreenView) {
+void animateFromDefaultViewToMaxView(int iMax) {
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 
@@ -94,20 +85,16 @@ void animateFromDefaultViewToMaxView(int iMax, bool isFullScreenView) {
 
     g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    g_animRects[i++] = { BUFFER_OLD, defRects[iMin1], isFullScreenView ? defRects[iMin1] : g_minRects[0], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_OLD, defRects[iMin2], isFullScreenView ? defRects[iMin2] : g_minRects[1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_OLD, defRects[iMax], isFullScreenView ? g_fullScreenRect : g_maxRect, 0, OPACITY_FADE_OUT, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
+    g_animRects[i++] = { BUFFER_OLD, defRects[iMin1], defRects[iMin1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_OLD, defRects[iMin2], defRects[iMin2], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_OLD, defRects[iMax], g_fullScreenRect, 0, OPACITY_FADE_OUT, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
 
-    if (!isFullScreenView) {
-        g_animRects[i++] = { BUFFER_NEW, defRects[iMin1], g_minRects[0], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-        g_animRects[i++] = { BUFFER_NEW, defRects[iMin2], g_minRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    }
-    g_animRects[i++] = { BUFFER_NEW, defRects[iMax], isFullScreenView ? g_fullScreenRect : g_maxRect, 0, OPACITY_FADE_IN, POSITION_BOTTOM};
+    g_animRects[i++] = { BUFFER_NEW, defRects[iMax], g_fullScreenRect, 0, OPACITY_FADE_IN, POSITION_BOTTOM};
     
     animateRects(&g_psuAppContext, BUFFER_OLD, i);
 }
 
-void animateFromMaxViewToDefaultView(int iMax, bool isFullScreenView) {
+void animateFromMaxViewToDefaultView(int iMax) {
     int iMin1 = iMax == 0 ? 1 : 0;
     int iMin2 = iMax == 2 ? 1 : 2;
 
@@ -121,87 +108,11 @@ void animateFromMaxViewToDefaultView(int iMax, bool isFullScreenView) {
 
     g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    if (!isFullScreenView) {
-        g_animRects[i++] = { BUFFER_OLD, g_minRects[0], defRects[iMin1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-        g_animRects[i++] = { BUFFER_OLD, g_minRects[1], defRects[iMin2], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-    }
-    g_animRects[i++] = { BUFFER_OLD, isFullScreenView ? g_fullScreenRect : g_maxRect, defRects[iMax], 0, OPACITY_FADE_OUT, POSITION_BOTTOM };
+    g_animRects[i++] = { BUFFER_OLD, g_fullScreenRect, defRects[iMax], 0, OPACITY_FADE_OUT, POSITION_BOTTOM };
 
-    g_animRects[i++] = { BUFFER_NEW, isFullScreenView ? defRects[iMin1] : g_minRects[0], defRects[iMin1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, isFullScreenView ? defRects[iMin2] : g_minRects[1], defRects[iMin2], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, isFullScreenView ? g_fullScreenRect : g_maxRect, defRects[iMax], 0, OPACITY_FADE_IN, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
-
-    animateRects(&g_psuAppContext, BUFFER_OLD, i);
-}
-
-void animateFromMinViewToMaxView(int maxSlotIndexBefore, bool isFullScreenView) {
-    int iMaxBefore = maxSlotIndexBefore + 1;
-    int iMax = psu::persist_conf::getMaxSlotIndex() + 1;
-
-    int i = 0;
-
-    g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
-
-    if ((iMax == 1 && iMaxBefore == 2) || (iMax == 2 && iMaxBefore == 1)) {
-		if (!isFullScreenView) {
-			g_animRects[i++] = { BUFFER_NEW, g_minRects[1], g_minRects[1], 0, OPACITY_SOLID, POSITION_CENTER };
-		}
-
-        g_animRects[i++] = { BUFFER_OLD, g_maxRect, isFullScreenView ? g_maxRect : g_minRects[0], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-        g_animRects[i++] = { BUFFER_OLD, g_minRects[0], isFullScreenView ? g_minRects[0] : g_maxRect, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-		if (isFullScreenView) {
-			g_animRects[i++] = { BUFFER_OLD, g_minRects[1], g_minRects[1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-		}
-
-		if (!isFullScreenView) {
-			g_animRects[i++] = { BUFFER_NEW, g_maxRect, g_minRects[0], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-		}
-        g_animRects[i++] = { BUFFER_NEW, g_minRects[0], isFullScreenView ? g_fullScreenRect : g_maxRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    } else if ((iMax == 2 && iMaxBefore == 3) || (iMax == 3 && iMaxBefore == 2)) {
-		if (!isFullScreenView) {
-			g_animRects[i++] = { BUFFER_NEW, g_minRects[0], g_minRects[0], 0, OPACITY_SOLID, POSITION_CENTER };
-		}
-
-		if (isFullScreenView) {
-			g_animRects[i++] = { BUFFER_OLD, g_minRects[0], g_minRects[0], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-		}
-        g_animRects[i++] = { BUFFER_OLD, g_maxRect, isFullScreenView ? g_maxRect : g_minRects[1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-        g_animRects[i++] = { BUFFER_OLD, g_minRects[1], isFullScreenView ? g_minRects[1] : g_maxRect, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-
-		if (!isFullScreenView) {
-			g_animRects[i++] = { BUFFER_NEW, g_maxRect, g_minRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-		}
-        g_animRects[i++] = { BUFFER_NEW, g_minRects[1], isFullScreenView ? g_fullScreenRect : g_maxRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    } else if (iMax == 1 && iMaxBefore == 3) {
-        g_animRects[i++] = { BUFFER_OLD, g_minRects[1], isFullScreenView ? g_minRects[1] : g_minRects[0], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-        g_animRects[i++] = { BUFFER_OLD, g_maxRect, isFullScreenView ? g_maxRect : g_minRects[1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-        g_animRects[i++] = { BUFFER_OLD, g_minRects[0], isFullScreenView ? g_fullScreenRect : g_maxRect, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-
-        if (!isFullScreenView) {
-            g_animRects[i++] = { BUFFER_NEW, g_minRects[1], g_minRects[0], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-			g_animRects[i++] = { BUFFER_NEW, g_maxRect, g_minRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-		}
-        g_animRects[i++] = { BUFFER_NEW, g_minRects[0], isFullScreenView ? g_fullScreenRect : g_maxRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    } else if (iMax == 3 && iMaxBefore == 1) {
-        g_animRects[i++] = { BUFFER_OLD, g_minRects[0], isFullScreenView ? g_minRects[0] : g_minRects[1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-        g_animRects[i++] = { BUFFER_OLD, g_maxRect, isFullScreenView ? g_maxRect : g_minRects[0], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-        g_animRects[i++] = { BUFFER_OLD, g_minRects[1], isFullScreenView ? g_fullScreenRect : g_maxRect, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-
-        if (!isFullScreenView) {
-            g_animRects[i++] = { BUFFER_NEW, g_minRects[0], g_minRects[1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-			g_animRects[i++] = { BUFFER_NEW, g_maxRect, g_minRects[0], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-		}
-        g_animRects[i++] = { BUFFER_NEW, g_minRects[1], isFullScreenView ? g_fullScreenRect : g_maxRect, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    } else {
-        g_animRects[i++] = { BUFFER_NEW, g_minRects[0], g_minRects[0], 0, OPACITY_SOLID, POSITION_CENTER };
-        g_animRects[i++] = { BUFFER_NEW, g_minRects[1], g_minRects[1], 0, OPACITY_SOLID, POSITION_CENTER };
-
-        g_animRects[i++] = { BUFFER_OLD, g_maxRectMax, g_maxRectMin, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-        g_animRects[i++] = { BUFFER_OLD, g_maxRectMin, g_maxRectMax, 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-
-        g_animRects[i++] = { BUFFER_NEW, g_maxRectMax, g_maxRectMin, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-        g_animRects[i++] = { BUFFER_NEW, g_maxRectMin, g_maxRectMax, 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    }
+    g_animRects[i++] = { BUFFER_NEW, defRects[iMin1], defRects[iMin1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, defRects[iMin2], defRects[iMin2], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
+    g_animRects[i++] = { BUFFER_NEW, g_fullScreenRect, defRects[iMax], 0, OPACITY_FADE_IN, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
 
     animateRects(&g_psuAppContext, BUFFER_OLD, i);
 }

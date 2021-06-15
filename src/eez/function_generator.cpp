@@ -182,6 +182,7 @@ FunctionGeneratorOptions g_options = {
 };
 
 WaveformFunction g_waveFormFuncU[CH_MAX];
+float g_phaseShiftU[CH_MAX];
 float g_phiU[CH_MAX];
 float g_dphiU[CH_MAX];
 float g_amplitudeU[CH_MAX];
@@ -189,6 +190,7 @@ float g_offsetU[CH_MAX];
 float g_dutyCycleU[CH_MAX];
 
 WaveformFunction g_waveFormFuncI[CH_MAX];
+float g_phaseShiftI[CH_MAX];
 float g_phiI[CH_MAX];
 float g_dphiI[CH_MAX];
 float g_amplitudeI[CH_MAX];
@@ -1502,13 +1504,17 @@ void reloadWaveformParameters() {
 
 	for (int i = 0; i < CH_MAX; i++) {
 		g_waveFormFuncU[i] = dcf;
-		g_phiU[i] = 0;
+		if (!g_active) {
+			g_phiU[i] = 0;
+		}
 		g_dphiU[i] = 0;
 		g_amplitudeU[i] = 0;
 		g_offsetU[i] = 0;
 
 		g_waveFormFuncI[i] = dcf;
-		g_phiI[i] = 0;
+		if (!g_active) {
+			g_phiI[i] = 0;
+		}
 		g_dphiI[i] = 0;
 		g_amplitudeI[i] = 0;
 		g_offsetI[i] = 0;
@@ -1553,8 +1559,11 @@ void reloadWaveformParameters() {
 			if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
 				g_waveFormFuncU[channel->channelIndex] = getWaveformFunction(waveformParameters);
 				g_dutyCycleU[channel->channelIndex] = g_dutyCycle;
-				g_phiU[channel->channelIndex] = waveformParameters.phaseShift / 360.0f;
-				g_dphiU[channel->channelIndex] = 2.0f * M_PI_F * waveformParameters.frequency * PERIOD;
+				if (!g_active || g_phaseShiftU[i] != waveformParameters.phaseShift) {
+					g_phiU[channel->channelIndex] = 2.0 * M_PI * waveformParameters.phaseShift / 360.0f;
+					g_phaseShiftU[i] = waveformParameters.phaseShift;
+				}
+				g_dphiU[channel->channelIndex] = 2.0 * M_PI * waveformParameters.frequency * PERIOD;
 
 				if (waveformParameters.waveform == WAVEFORM_DC) {
 					g_amplitudeU[channel->channelIndex] = 0.0f;
@@ -1566,8 +1575,11 @@ void reloadWaveformParameters() {
 			} else {
 				g_waveFormFuncI[channel->channelIndex] = getWaveformFunction(waveformParameters);
 				g_dutyCycleI[channel->channelIndex] = g_dutyCycle;
-				g_phiI[channel->channelIndex] = waveformParameters.phaseShift / 360.0f;
-				g_dphiI[channel->channelIndex] = 2.0f * M_PI_F * waveformParameters.frequency * PERIOD;
+				if (!g_active || g_phaseShiftI[i] != waveformParameters.phaseShift) {
+					g_phiI[channel->channelIndex] = 2.0 * M_PI * waveformParameters.phaseShift / 360.0f;
+					g_phaseShiftI[i] = waveformParameters.phaseShift;
+				}
+				g_dphiI[channel->channelIndex] = 2.0 * M_PI * waveformParameters.frequency * PERIOD;
 
 				if (waveformParameters.waveform == WAVEFORM_DC) {
 					g_amplitudeI[channel->channelIndex] = 0.0f;
@@ -1622,7 +1634,7 @@ void tick() {
 			float value = g_offsetU[i] + g_amplitudeU[i] * g_waveFormFuncU[i](g_phiU[i]) / 2.0f;
 
 			g_phiU[i] += g_dphiU[i];
-			if (g_phiU[i] >= 2.0f * M_PI_F) {
+			while (g_phiU[i] >= 2.0f * M_PI_F) {
 				g_phiU[i] -= 2.0f * M_PI_F;
 			}
 

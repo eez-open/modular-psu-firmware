@@ -24,9 +24,8 @@ namespace gui {
 
 extern const Rect g_workingAreaRect;
 
-void animateFromDefaultViewToMaxView(int iMax, bool isFullScreenView);
-void animateFromMaxViewToDefaultView(int iMax, bool isFullScreenView);
-void animateFromMinViewToMaxView(int maxSlotIndexBefore, bool isFullScreenView);
+void animateFromDefaultViewToMaxView(int iMax);
+void animateFromMaxViewToDefaultView(int iMax);
 
 void animateSlideUp();
 void animateSlideDown();

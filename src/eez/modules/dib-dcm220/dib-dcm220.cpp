@@ -578,12 +578,8 @@ public:
             return isVert ? PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_VERT_2COL : PAGE_ID_DIB_DCM220_SLOT_DEF_2CH_HORZ_2COL;
         }
 
-        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-            return PAGE_ID_DIB_DCM220_SLOT_MAX_2CH;
-        }
-
-        assert(slotViewType == SLOT_VIEW_TYPE_MIN);
-        return PAGE_ID_DIB_DCM220_SLOT_MIN_2CH;
+        assert(slotViewType == SLOT_VIEW_TYPE_MAX);
+        return PAGE_ID_DIB_DCM220_SLOT_MAX_2CH;
     }
 
     int getLabelsAndColorsPageId() override {
@@ -717,13 +713,6 @@ void data_dib_dcm220_slot_max_2ch_min_view(DataOperationEnum operation, Cursor c
     }
 }
 
-
-void data_dib_dcm220_slot_min_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-        value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM220_SLOT_MIN_2CH_ON : PAGE_ID_DIB_DCM220_SLOT_MIN_2CH_OFF;
-    }
-}
 
 } // namespace gui
 

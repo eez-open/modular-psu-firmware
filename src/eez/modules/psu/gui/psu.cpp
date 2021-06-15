@@ -1027,7 +1027,11 @@ void PsuAppContext::dialogClose() {
 }
 
 int PsuAppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {
-    if (widgetCursor.widget->action == ACTION_ID_SYS_FRONT_PANEL_LOCK || widgetCursor.widget->action == ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
+    if (
+        widgetCursor.widget->action == ACTION_ID_SYS_FRONT_PANEL_LOCK ||
+        widgetCursor.widget->action == ACTION_ID_SYS_FRONT_PANEL_UNLOCK ||
+        widgetCursor.widget->action == ACTION_ID_HIDE_OVERLAY_LONG_TOUCH
+    ) {
         return widgetCursor.widget->action;
     }    
     return AppContext::getLongTouchActionHook(widgetCursor);

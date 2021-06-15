@@ -1547,61 +1547,6 @@
       "components": [
         {
           "type": "Container",
-          "left": 0,
-          "top": 0,
-          "width": 235,
-          "height": 24,
-          "wireID": "bf18c27f-970d-46a7-8941-d5614d03a85d",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 190,
-              "height": 24,
-              "wireID": "a8414e22-aaba-40d4-8343-9bdbfa510e6c",
-              "data": "slot_title_min",
-              "style": {
-                "inheritFrom": "channel1",
-                "alignHorizontal": "left",
-                "padding": "0 5"
-              },
-              "text": ""
-            },
-            {
-              "type": "Text",
-              "left": 190,
-              "top": 0,
-              "width": 45,
-              "height": 24,
-              "wireID": "11c2277b-e4ee-43ab-97f9-a8df608429b2",
-              "data": "",
-              "action": "toggle_slot_max_view",
-              "style": {
-                "inheritFrom": "channel1",
-                "font": "Heydings14",
-                "alignVertical": "bottom"
-              },
-              "text": "e"
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_view_min",
-      "left": 0,
-      "top": 0,
-      "width": 235,
-      "height": 68,
-      "dataContextOverrides": "{\"slot_title_min\": \"PREL6\"}"
-    },
-    {
-      "components": [
-        {
-          "type": "Container",
           "left": 8,
           "top": 8,
           "width": 464,

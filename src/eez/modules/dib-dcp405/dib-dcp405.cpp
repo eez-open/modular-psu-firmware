@@ -1059,26 +1059,8 @@ public:
 			}
 		}
 
-		if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-			if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
-				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_NUM_ON : PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_NUM_OFF;
-			} else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
-				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_HBAR_ON : PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_HBAR_OFF;
-			} else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_YT) {
-				return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_YT_ON : PAGE_ID_DIB_DCP405_SLOT_MAX_1CH_YT_OFF;
-			} else {
-				return PAGE_ID_SLOT_MAX_ERROR;
-			}
-		}
-
-		assert(slotViewType == SLOT_VIEW_TYPE_MIN);
-		if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES && channel.channelIndex == 1) {
-			return PAGE_ID_DIB_DCP405_SLOT_MIN_1CH_COUPLED_SERIES;
-		} else if (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL && channel.channelIndex == 1) {
-			return PAGE_ID_DIB_DCP405_SLOT_MIN_1CH_COUPLED_PARALLEL;
-		} else {
-			return channel.isOutputEnabled() ? PAGE_ID_DIB_DCP405_SLOT_MIN_1CH_ON : PAGE_ID_DIB_DCP405_SLOT_MIN_1CH_OFF;
-		}
+		assert(slotViewType == SLOT_VIEW_TYPE_MAX);
+		return PAGE_ID_DIB_DCP405_SLOT_MAX;
 	}
 
     int getLabelsAndColorsPageId() override {

@@ -309,8 +309,8 @@
     },
     {
       "name": "aout_value_is_off",
-      "type": "float",
-      "defaultValue": "1.0 V"
+      "type": "boolean",
+      "defaultValue": "0"
     },
     {
       "name": "ac_analysis_allowed",
@@ -10905,60 +10905,6 @@
       "width": 480,
       "height": 240,
       "dataContextOverrides": "{\n    \"slot_title_max\": \"MIO R3B3\",\n    \"pager_list\": [\n        { \"pager_is_selected\": 1 },\n        { \"pager_is_selected\": 0 },\n        { \"pager_is_selected\": 0 },\n        { \"pager_is_selected\": 0 },\n        { \"pager_is_selected\": 0 },\n        { \"pager_is_selected\": 0 }\n    ]\n}"
-    },
-    {
-      "components": [
-        {
-          "type": "Container",
-          "left": 0,
-          "top": 0,
-          "width": 235,
-          "height": 24,
-          "wireID": "000fc1b6-6408-4f35-8154-8dc1ea6fde89",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 190,
-              "height": 24,
-              "wireID": "b23d38b5-c2bc-4b7f-e8fd-b1e11336ff20",
-              "data": "slot_title_min",
-              "style": {
-                "inheritFrom": "channel1",
-                "alignHorizontal": "left",
-                "padding": "0 5"
-              },
-              "text": ""
-            },
-            {
-              "type": "Text",
-              "left": 190,
-              "top": 0,
-              "width": 45,
-              "height": 24,
-              "wireID": "683d0567-0ed4-4698-d7af-b3f2658e2143",
-              "data": "",
-              "action": "toggle_slot_max_view",
-              "style": {
-                "inheritFrom": "channel1",
-                "font": "Heydings14",
-                "alignVertical": "bottom"
-              },
-              "text": "e"
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_view_min",
-      "left": 0,
-      "top": 0,
-      "width": 235,
-      "height": 68
     },
     {
       "components": [

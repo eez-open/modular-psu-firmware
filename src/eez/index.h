@@ -52,8 +52,7 @@ static const uint16_t MODULE_TYPE_DIB_MUX14D = 14;
 enum SlotViewType {
     SLOT_VIEW_TYPE_DEFAULT,
     SLOT_VIEW_TYPE_DEFAULT_2COL,
-    SLOT_VIEW_TYPE_MAX,
-    SLOT_VIEW_TYPE_MIN
+    SLOT_VIEW_TYPE_MAX
 };
 
 enum FlashMethod {

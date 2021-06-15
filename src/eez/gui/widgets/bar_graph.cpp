@@ -35,6 +35,8 @@ namespace gui {
 #define BAR_GRAPH_ORIENTATION_RIGHT_LEFT 2
 #define BAR_GRAPH_ORIENTATION_TOP_BOTTOM 3
 #define BAR_GRAPH_ORIENTATION_BOTTOM_TOP 4
+#define BAR_GRAPH_ORIENTATION_MASK 0x0F
+#define BAR_GRAPH_DO_NOT_DISPLAY_VALUE (1 << 4)
 
 struct BarGraphWidget {
     uint8_t orientation; // BAR_GRAPH_ORIENTATION_...
@@ -81,11 +83,11 @@ void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, uint1
     const Style *style = getStyle(lineStyleID);
 
     display::setColor(style->color);
-    if (barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_LEFT_RIGHT) {
+    if ((barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_LEFT_RIGHT) {
         display::drawVLine(x + p, y, h - 1);
-    } else if (barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_RIGHT_LEFT) {
+    } else if ((barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_RIGHT_LEFT) {
         display::drawVLine(x - p, y, h - 1);
-    } else if (barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_TOP_BOTTOM) {
+    } else if ((barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_TOP_BOTTOM) {
         display::drawHLine(x, y + p, w - 1);
     } else {
         display::drawHLine(x, y - p, w - 1);
@@ -161,7 +163,9 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             max = getMax(widgetCursor.cursor, widget->data).getFloat();
         }
 
-        bool horizontal = barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_LEFT_RIGHT || barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_RIGHT_LEFT;
+        bool horizontal = 
+            (barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_LEFT_RIGHT || 
+            (barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_RIGHT_LEFT;
 
         int d = horizontal ? w : h;
 
@@ -203,34 +207,40 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             char valueText[64];
             int pText = 0;
             int wText = 0;
-            if (barGraphWidget->textStyle) {
-                font::Font font = styleGetFont(&textStyle);
+            if (!(barGraphWidget->orientation & BAR_GRAPH_DO_NOT_DISPLAY_VALUE)) {
+                if (barGraphWidget->textStyle) {
+                    font::Font font = styleGetFont(&textStyle);
 
-                currentState->textData.toText(valueText, sizeof(valueText));
-                wText = display::measureStr(valueText, -1, font, w);
+                    currentState->textData.toText(valueText, sizeof(valueText));
+                    wText = display::measureStr(valueText, -1, font, w);
 
-                int padding = textStyle.padding_left;
-                wText += padding;
-
-                if (pValue + wText <= d) {
-                    textStyle.background_color = bg;
-                    pText = pValue;
-                } else {
-                    textStyle.background_color = fg;
-                    textStyle.color = textStyle.active_color;
+                    int padding = textStyle.padding_left;
                     wText += padding;
-                    pText = MAX(pValue - wText, 0);
+
+                    if (pValue + wText <= d) {
+                        textStyle.background_color = bg;
+                        pText = pValue;
+                    } else {
+                        textStyle.background_color = fg;
+                        textStyle.color = textStyle.active_color;
+                        wText += padding;
+                        pText = MAX(pValue - wText, 0);
+                    }
                 }
+            } else {
+                pText = pValue;
             }
 
-            if (barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_LEFT_RIGHT) {
+            if ((barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_LEFT_RIGHT) {
                 // draw bar
                 if (pText > 0) {
                     display::setColor(fg);
                     display::fillRect(x, y, x + pText - 1, y + h - 1);
                 }
 
-                drawText(valueText, -1, x + pText, y, wText, h, &textStyle, false, false, false, nullptr, nullptr, nullptr, nullptr);
+                if (!(barGraphWidget->orientation & BAR_GRAPH_DO_NOT_DISPLAY_VALUE)) {
+                    drawText(valueText, -1, x + pText, y, wText, h, &textStyle, false, false, false, nullptr, nullptr, nullptr, nullptr);
+                }
 
                 // draw background, but do not draw over line 1 and line 2
                 display::setColor(bg);
@@ -267,7 +277,9 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                     display::fillRect(x - (pText - 1), y, x, y + h - 1);
                 }
 
-                drawText(valueText, -1, x - (pText + wText - 1), y, wText, h, &textStyle, false, false, false, nullptr, nullptr, nullptr, nullptr);
+                if (!(barGraphWidget->orientation & BAR_GRAPH_DO_NOT_DISPLAY_VALUE)) {
+                    drawText(valueText, -1, x - (pText + wText - 1), y, wText, h, &textStyle, false, false, false, nullptr, nullptr, nullptr, nullptr);
+                }
 
                 // draw background, but do not draw over line 1 and line 2
                 display::setColor(bg);
@@ -328,7 +340,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                 }
             }
 
-            if (barGraphWidget->orientation == BAR_GRAPH_ORIENTATION_TOP_BOTTOM) {
+            if ((barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_TOP_BOTTOM) {
                 // draw bar
                 if (pText > 0) {
                     display::setColor(fg);

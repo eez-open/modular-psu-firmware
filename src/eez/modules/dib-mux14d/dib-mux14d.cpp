@@ -666,11 +666,8 @@ public:
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT_2COL) {
             return psu::gui::isDefaultViewVertical() ? gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_DEF_2COL_VERT : gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_DEF_2COL_HORZ;
         }
-        if (slotViewType == SLOT_VIEW_TYPE_MAX) {
-            return gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_MAX;
-        }
-        assert(slotViewType == SLOT_VIEW_TYPE_MIN);
-        return gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_MIN;
+        assert(slotViewType == SLOT_VIEW_TYPE_MAX);
+        return gui::PAGE_ID_DIB_MUX14D_SLOT_VIEW_MAX;
     }
 
     int getSlotSettingsPageId() override {

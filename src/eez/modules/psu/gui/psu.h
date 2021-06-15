@@ -451,8 +451,6 @@ bool isDefaultViewVertical();
 
 namespace gui {
 
-bool isSlotFullScreenView();
-
 } // namespace gui
 
 } // namespace eez
