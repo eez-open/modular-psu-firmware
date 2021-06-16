@@ -2086,8 +2086,9 @@ void channelToggleOutput() {
 }
 
 void selectChannelByCursor() {
-    if (getFoundWidgetAtDown().cursor >= 0 && getFoundWidgetAtDown().cursor < CH_NUM) {
-        selectChannel(&Channel::get(getFoundWidgetAtDown().cursor));
+	auto cursor = getFoundWidgetAtDown().cursor;
+    if (cursor >= 0 && cursor < CH_NUM) {
+        selectChannel(&Channel::get(cursor));
     }
 }
 

@@ -660,7 +660,7 @@ public:
         }
 
         assert(slotViewType == SLOT_VIEW_TYPE_MAX);
-        return PAGE_ID_DIB_DCM224_SLOT_MAX_2CH;
+        return PAGE_ID_DIB_DCM224_SLOT_MAX;
     }
 
     int getLabelsAndColorsPageId() override {
@@ -1100,27 +1100,6 @@ void data_dib_dcm224_slot_def_2ch_view(DataOperationEnum operation, Cursor curso
                 (isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT_ON : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ_ON) :
                 (isVert ? PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_VERT_OFF : PAGE_ID_DIB_DCM224_SLOT_DEF_2CH_HORZ_OFF);
         }
-    }
-}
-
-void data_dib_dcm224_slot_max_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-
-        if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
-            value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_NUM_ON : PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_NUM_OFF;
-        } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
-            value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_HBAR_ON : PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_HBAR_OFF;
-        } else {
-            value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_YT_ON : PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_YT_OFF;
-        }
-    }
-}
-
-void data_dib_dcm224_slot_max_2ch_min_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-        value = channel.isOutputEnabled() ? PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_ON : PAGE_ID_DIB_DCM224_SLOT_MAX_2CH_MIN_OFF;
     }
 }
 

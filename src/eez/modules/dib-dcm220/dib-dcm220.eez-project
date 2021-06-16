@@ -36,11 +36,6 @@
       "defaultValue": "slot_def_2ch_vert_on"
     },
     {
-      "name": "slot_max_2ch_view",
-      "type": "string",
-      "defaultValue": "slot_max_2ch_num_on"
-    },
-    {
       "name": "slot_2ch_ch1_index",
       "type": "integer",
       "defaultValue": "1"
@@ -49,11 +44,6 @@
       "name": "slot_2ch_ch2_index",
       "type": "integer",
       "defaultValue": "1"
-    },
-    {
-      "name": "slot_max_2ch_min_view",
-      "type": "string",
-      "defaultValue": "slot_max_2ch_min_on"
     }
   ],
   "actions": [],
@@ -2012,264 +2002,102 @@
     {
       "components": [
         {
-          "type": "LayoutView",
+          "type": "Container",
           "left": 0,
           "top": 0,
-          "width": 399,
-          "height": 240,
-          "wireID": "07e23e65-db69-4514-ec23-296e05984352",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_max_2ch_with_border",
-          "context": "slot_2ch_ch1_index"
-        },
-        {
-          "type": "LayoutView",
-          "left": 401,
-          "top": 0,
-          "width": 79,
-          "height": 240,
-          "wireID": "31fc0267-c2cb-40db-d37f-77f7193f5977",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_max_2ch_with_border_min",
-          "context": "slot_2ch_ch2_index"
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_2ch",
-      "left": 0,
-      "top": 0,
-      "width": 480,
-      "height": 240
-    },
-    {
-      "components": [
-        {
-          "type": "LayoutView",
-          "left": 2,
-          "top": 0,
-          "width": 395,
-          "height": 238,
-          "wireID": "47379afb-82fb-4c55-dd80-614d062e2bff",
-          "data": "slot_max_2ch_view",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "context": ""
-        },
-        {
-          "type": "Rectangle",
-          "left": 0,
-          "top": 0,
-          "width": 2,
-          "height": 240,
-          "wireID": "f4cc818a-605d-43af-b8a9-f256fe189957",
-          "style": {
-            "inheritFrom": "default",
-            "color": "channel1"
-          }
-        },
-        {
-          "type": "Rectangle",
-          "left": 397,
-          "top": 0,
-          "width": 2,
-          "height": 240,
-          "wireID": "8ebed500-431c-4e53-a0af-38df296f26d9",
-          "style": {
-            "inheritFrom": "default",
-            "color": "channel1"
-          }
-        },
-        {
-          "type": "Rectangle",
-          "left": 2,
-          "top": 238,
-          "width": 395,
-          "height": 2,
-          "wireID": "3fe59356-b585-42c1-b4e6-ef95808f3205",
-          "style": {
-            "inheritFrom": "default",
-            "color": "channel1"
-          }
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_2ch_with_border",
-      "left": 0,
-      "top": 0,
-      "width": 399,
-      "height": 240
-    },
-    {
-      "components": [
-        {
-          "type": "LayoutView",
-          "left": 2,
-          "top": 0,
-          "width": 75,
-          "height": 238,
-          "wireID": "2e561511-9022-4094-ee20-1170bfcd52e5",
-          "data": "slot_max_2ch_min_view",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "",
-          "context": ""
-        },
-        {
-          "type": "Rectangle",
-          "left": 0,
-          "top": 0,
-          "width": 2,
-          "height": 240,
-          "wireID": "8aa38365-be0f-40f4-cecf-112acafbeb9c",
-          "style": {
-            "inheritFrom": "default",
-            "color": "channel1"
-          }
-        },
-        {
-          "type": "Rectangle",
-          "left": 77,
-          "top": 0,
-          "width": 2,
-          "height": 240,
-          "wireID": "647c18d6-abdf-4b0e-a925-f23a1d44ada5",
-          "style": {
-            "inheritFrom": "default",
-            "color": "channel1"
-          }
-        },
-        {
-          "type": "Rectangle",
-          "left": 2,
-          "top": 238,
-          "width": 75,
-          "height": 2,
-          "wireID": "ca3efb26-4f00-466e-9fb6-39ae3f26d1d3",
-          "style": {
-            "inheritFrom": "default",
-            "color": "channel1"
-          }
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_2ch_with_border_min",
-      "left": 0,
-      "top": 0,
-      "width": 79,
-      "height": 240
-    },
-    {
-      "components": [
-        {
-          "type": "Text",
-          "left": 0,
-          "top": 0,
-          "width": 307,
+          "width": 480,
           "height": 32,
-          "wireID": "bd8dbe0f-7413-4de3-a272-c2477b638d8b",
-          "data": "channel_long_title",
-          "style": {
-            "inheritFrom": "channel1",
-            "font": "Oswald14",
-            "alignHorizontal": "left",
-            "padding": "0 5"
-          },
-          "text": ""
-        },
-        {
-          "type": "Select",
-          "left": 307,
-          "top": 0,
-          "width": 44,
-          "height": 32,
-          "wireID": "567847ac-1a8f-4832-d15d-4f1c345973d8",
-          "data": "channel_protection_status",
-          "action": "show_ch_settings",
+          "wireID": "56297000-2019-44cb-ddb9-38c59fedcdd5",
           "style": {
             "inheritFrom": "default"
           },
+          "name": "Title",
           "widgets": [
             {
               "type": "Text",
               "left": 0,
               "top": 0,
+              "width": 392,
+              "height": 32,
+              "wireID": "915212ac-a3fc-48f5-98d2-0a5b29db629d",
+              "data": "channel_long_title",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Oswald14",
+                "alignHorizontal": "left",
+                "padding": "0 5"
+              },
+              "text": ""
+            },
+            {
+              "type": "Select",
+              "left": 392,
+              "top": 0,
               "width": 44,
               "height": 32,
-              "wireID": "f0645120-0e59-4023-8d6f-a8cb1d203877",
-              "action": "",
+              "wireID": "18814ba5-8494-430e-be1c-ee6b591646cd",
+              "data": "channel_protection_status",
+              "action": "show_ch_settings",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 44,
+                  "height": 32,
+                  "wireID": "a27f2c7b-4dcc-439b-a7b1-d0a7a2a65fe8",
+                  "action": "",
+                  "style": {
+                    "inheritFrom": "channel1",
+                    "font": "Heydings14"
+                  },
+                  "text": "D"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 44,
+                  "height": 32,
+                  "wireID": "a9a5e4c9-a232-4364-d168-3ded7fa65d1a",
+                  "action": "",
+                  "style": {
+                    "inheritFrom": "channel1",
+                    "font": "Heydings14",
+                    "color": "status_warning",
+                    "activeBackgroundColor": "status_warning"
+                  },
+                  "text": "9"
+                }
+              ]
+            },
+            {
+              "type": "Text",
+              "left": 436,
+              "top": 0,
+              "width": 44,
+              "height": 32,
+              "wireID": "9eacf5e7-80c1-4262-894f-66877ba75e75",
+              "action": "toggle_channels_max_view",
               "style": {
                 "inheritFrom": "channel1",
                 "font": "Heydings14"
               },
-              "text": "D"
-            },
-            {
-              "type": "Text",
-              "left": 0,
-              "top": 0,
-              "width": 44,
-              "height": 32,
-              "wireID": "85986f80-5bdc-4730-a936-61073402f581",
-              "action": "",
-              "style": {
-                "inheritFrom": "channel1",
-                "font": "Heydings14",
-                "color": "status_warning",
-                "activeBackgroundColor": "status_warning"
-              },
-              "text": "9"
+              "text": "E"
             }
           ]
         },
         {
-          "type": "Text",
-          "left": 351,
-          "top": 0,
-          "width": 44,
-          "height": 32,
-          "wireID": "7951cfb7-c6b2-46ce-9771-08670369f8a6",
-          "action": "toggle_channels_max_view",
-          "style": {
-            "inheritFrom": "channel1",
-            "font": "Heydings14"
-          },
-          "text": "E"
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_2ch_title",
-      "left": 0,
-      "top": 0,
-      "width": 395,
-      "height": 32
-    },
-    {
-      "components": [
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 0,
-          "width": 239,
-          "height": 32,
-          "wireID": "d70f62f2-efd5-47bf-b6eb-3a9b0e345cd3",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_max_2ch_title"
-        },
-        {
-          "type": "Container",
+          "type": "Select",
           "left": 0,
           "top": 32,
-          "width": 395,
-          "height": 132,
-          "wireID": "fa1f9d7b-09d5-41ee-8b95-5fec96162127",
+          "width": 480,
+          "height": 112,
+          "wireID": "8f90a0c0-235a-41b2-8f29-1385ff9b14d5",
+          "data": "channel_output_state",
           "style": {
             "inheritFrom": "default"
           },
@@ -2277,237 +2105,659 @@
             {
               "type": "Container",
               "left": 0,
-              "top": 2,
-              "width": 395,
-              "height": 64,
-              "wireID": "131eb528-9800-4d98-8758-cbab6f79eb49",
-              "action": "channel_toggle_output",
+              "top": 0,
+              "width": 480,
+              "height": 112,
+              "wireID": "bb7e8fd0-786d-44b1-d2db-521d3b967b40",
               "style": {
                 "inheritFrom": "default"
               },
-              "name": "mon section",
               "widgets": [
                 {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 142,
-                  "height": 64,
-                  "wireID": "e76bf197-d1dd-4efc-dce0-1b6297c88081",
-                  "action": "",
+                  "type": "Text",
+                  "left": 2,
+                  "top": 2,
+                  "width": 476,
+                  "height": 108,
+                  "wireID": "10b1d8da-284f-441f-e29a-44ac6088e21f",
+                  "data": "channel_off_label",
+                  "action": "channel_toggle_output",
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "channel_off_button_38"
                   },
-                  "name": "Voltage",
-                  "widgets": [
-                    {
-                      "type": "DisplayData",
-                      "left": 0,
-                      "top": 0,
-                      "width": 89,
-                      "height": 64,
-                      "wireID": "436982eb-2933-4744-a1b4-0e5968e0cd45",
-                      "data": "channel_u_mon",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "mon_value_38_right"
-                      },
-                      "displayOption": 1
-                    },
-                    {
-                      "type": "DisplayData",
-                      "left": 89,
-                      "top": 0,
-                      "width": 53,
-                      "height": 30,
-                      "wireID": "0b92181b-a003-41f8-b453-45ee7df59bd9",
-                      "data": "channel_u_mon",
-                      "style": {
-                        "inheritFrom": "mon_value_20_left"
-                      },
-                      "displayOption": 4
-                    },
-                    {
-                      "type": "DisplayData",
-                      "left": 89,
-                      "top": 30,
-                      "width": 53,
-                      "height": 34,
-                      "wireID": "ba0777ac-9fa0-4099-9032-aeb033725f32",
-                      "data": "channel_u_mon",
-                      "style": {
-                        "inheritFrom": "mon_value_20_left"
-                      },
-                      "displayOption": 3
-                    }
-                  ]
-                },
-                {
-                  "type": "Container",
-                  "left": 143,
-                  "top": 0,
-                  "width": 142,
-                  "height": 64,
-                  "wireID": "4a84011b-b8ca-4a1d-b3a9-072a50bf0185",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "name": "Current",
-                  "widgets": [
-                    {
-                      "type": "DisplayData",
-                      "left": 0,
-                      "top": 0,
-                      "width": 89,
-                      "height": 64,
-                      "wireID": "61d2f951-0948-4ebc-95de-75fd236e5396",
-                      "data": "channel_i_mon",
-                      "style": {
-                        "inheritFrom": "mon_value_38_right",
-                        "font": "Oswald38"
-                      },
-                      "displayOption": 1
-                    },
-                    {
-                      "type": "DisplayData",
-                      "left": 89,
-                      "top": 0,
-                      "width": 53,
-                      "height": 30,
-                      "wireID": "100a4f99-af7c-49e8-ce67-84b6671e3bb7",
-                      "data": "channel_i_mon",
-                      "style": {
-                        "inheritFrom": "mon_value_20_left"
-                      },
-                      "displayOption": 4
-                    },
-                    {
-                      "type": "DisplayData",
-                      "left": 89,
-                      "top": 30,
-                      "width": 53,
-                      "height": 34,
-                      "wireID": "4bfa62da-334c-4157-bd00-8cd4943d1844",
-                      "data": "channel_i_mon",
-                      "style": {
-                        "inheritFrom": "mon_value_20_left"
-                      },
-                      "displayOption": 3
-                    }
-                  ]
-                },
-                {
-                  "type": "Container",
-                  "left": 286,
-                  "top": 0,
-                  "width": 109,
-                  "height": 64,
-                  "wireID": "382c5ead-8b04-40db-c41c-8054ed58d86c",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "name": "Power",
-                  "widgets": [
-                    {
-                      "type": "DisplayData",
-                      "left": 0,
-                      "top": 0,
-                      "width": 63,
-                      "height": 64,
-                      "wireID": "be008fe6-1b36-49ba-d726-1fc5977a232d",
-                      "data": "channel_p_mon",
-                      "style": {
-                        "inheritFrom": "mon_value_24_right"
-                      },
-                      "displayOption": 1
-                    },
-                    {
-                      "type": "DisplayData",
-                      "left": 63,
-                      "top": 0,
-                      "width": 46,
-                      "height": 30,
-                      "wireID": "eecbbf10-011d-49ac-fcb0-3c1722419221",
-                      "data": "channel_p_mon",
-                      "style": {
-                        "inheritFrom": "mon_value_20_left"
-                      },
-                      "displayOption": 4
-                    },
-                    {
-                      "type": "DisplayData",
-                      "left": 63,
-                      "top": 30,
-                      "width": 46,
-                      "height": 34,
-                      "wireID": "80fe139e-025a-4861-aecd-16ad94386c1f",
-                      "data": "channel_p_mon",
-                      "style": {
-                        "inheritFrom": "mon_value_20_left"
-                      },
-                      "displayOption": 3
-                    }
-                  ]
+                  "text": ""
                 }
               ]
             },
             {
               "type": "Container",
               "left": 0,
-              "top": 66,
-              "width": 395,
-              "height": 66,
-              "wireID": "f692e06b-6679-4432-bf8b-492829d8c3d0",
+              "top": 0,
+              "width": 480,
+              "height": 112,
+              "wireID": "cae4d5d0-c809-4c03-ad46-bac1370be38c",
               "style": {
                 "inheritFrom": "default"
               },
+              "widgets": [
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 480,
+                  "height": 112,
+                  "wireID": "31a3ace1-fdca-4c88-d17d-906c6a1a19af",
+                  "data": "channels_view_mode_in_max",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Container",
+                      "left": 0,
+                      "top": 0,
+                      "width": 480,
+                      "height": 112,
+                      "wireID": "0808febc-aef1-4dc6-871e-ad0dd88c334f",
+                      "action": "channel_toggle_output",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "name": "",
+                      "widgets": [
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 132,
+                          "height": 110,
+                          "wireID": "5163a7fd-c8bf-425f-ce15-5acbe004e6ff",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "name": "Voltage",
+                          "widgets": [
+                            {
+                              "type": "DisplayData",
+                              "left": 0,
+                              "top": 21,
+                              "width": 80,
+                              "height": 62,
+                              "wireID": "e8b1f928-2374-49b6-ae7a-3586a43706d0",
+                              "data": "channel_u_mon",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald48"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 80,
+                              "top": 21,
+                              "width": 52,
+                              "height": 29,
+                              "wireID": "5a9aad8b-06c9-4f6a-c638-a7d7a095bee6",
+                              "data": "channel_u_mon",
+                              "style": {
+                                "inheritFrom": "mon_value_20_left"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 80,
+                              "top": 53,
+                              "width": 52,
+                              "height": 33,
+                              "wireID": "10480d41-01de-444b-e759-bdc84f9b3ab4",
+                              "data": "channel_u_mon",
+                              "style": {
+                                "inheritFrom": "mon_value_20_left",
+                                "font": "Oswald20",
+                                "alignVertical": "bottom"
+                              },
+                              "displayOption": 3
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Container",
+                          "left": 134,
+                          "top": 0,
+                          "width": 150,
+                          "height": 110,
+                          "wireID": "f732a2b9-d216-49d2-df98-77dff1c08e22",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "name": "Current",
+                          "widgets": [
+                            {
+                              "type": "DisplayData",
+                              "left": 0,
+                              "top": 21,
+                              "width": 98,
+                              "height": 62,
+                              "wireID": "b40e8477-88c7-4297-bf07-e84333d52851",
+                              "data": "channel_i_mon",
+                              "style": {
+                                "inheritFrom": "mon_value_38_right",
+                                "font": "Oswald48"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 98,
+                              "top": 21,
+                              "width": 52,
+                              "height": 29,
+                              "wireID": "2f9a5d5a-211d-41ca-c40b-e8c8220e0c94",
+                              "data": "channel_i_mon",
+                              "style": {
+                                "inheritFrom": "mon_value_20_left"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 98,
+                              "top": 53,
+                              "width": 52,
+                              "height": 33,
+                              "wireID": "e4924f2f-fe8e-495b-d965-8cffe885e613",
+                              "data": "channel_i_mon",
+                              "style": {
+                                "inheritFrom": "mon_value_20_left",
+                                "alignVertical": "bottom"
+                              },
+                              "displayOption": 3
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Container",
+                          "left": 286,
+                          "top": 0,
+                          "width": 150,
+                          "height": 112,
+                          "wireID": "ae6b4026-9f93-4a73-be5b-e34552e5deae",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "name": "Power",
+                          "widgets": [
+                            {
+                              "type": "DisplayData",
+                              "left": 0,
+                              "top": 21,
+                              "width": 98,
+                              "height": 62,
+                              "wireID": "170cd85f-87e8-417a-fc0e-569674900799",
+                              "data": "channel_p_mon",
+                              "style": {
+                                "inheritFrom": "mon_value_38_right",
+                                "font": "Oswald48"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 98,
+                              "top": 21,
+                              "width": 52,
+                              "height": 29,
+                              "wireID": "f1c999c3-1962-45cd-ea49-eea5e9096024",
+                              "data": "channel_p_mon",
+                              "style": {
+                                "inheritFrom": "mon_value_20_left"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 98,
+                              "top": 53,
+                              "width": 52,
+                              "height": 33,
+                              "wireID": "fc956669-ec4f-45ad-cee3-bbe3ebf13357",
+                              "data": "channel_p_mon",
+                              "style": {
+                                "inheritFrom": "mon_value_20_left",
+                                "alignVertical": "bottom",
+                                "margin": "0"
+                              },
+                              "displayOption": 3
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Container",
+                          "left": 436,
+                          "top": 0,
+                          "width": 44,
+                          "height": 110,
+                          "wireID": "4e4d73c8-1416-426f-daa9-dedb6b1dbd16",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "name": "Temperature",
+                          "widgets": [
+                            {
+                              "type": "DisplayData",
+                              "left": 0,
+                              "top": 60,
+                              "width": 44,
+                              "height": 23,
+                              "wireID": "e9ca517d-2eac-4be6-c449-56ae511f8f1c",
+                              "data": "channel_temp",
+                              "style": {
+                                "inheritFrom": "default_S"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 0,
+                              "top": 21,
+                              "width": 44,
+                              "height": 39,
+                              "wireID": "cfba6a43-9f07-4e8e-9883-d6e518b51711",
+                              "data": "channel_temp",
+                              "style": {
+                                "inheritFrom": "default_S",
+                                "font": "Oswald20"
+                              },
+                              "displayOption": 1
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Container",
+                      "left": 0,
+                      "top": 0,
+                      "width": 480,
+                      "height": 112,
+                      "wireID": "06727a83-0c5f-4350-8cc2-4f4a903fad89",
+                      "action": "channel_toggle_output",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "name": "",
+                      "widgets": [
+                        {
+                          "type": "BarGraph",
+                          "left": 0,
+                          "top": 0,
+                          "width": 348,
+                          "height": 55,
+                          "wireID": "25c48cea-4a9b-4348-d44e-080d6edb0135",
+                          "data": "channel_display_value1",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "bar_graph_U_default",
+                            "font": "Oswald14",
+                            "color": "bar_graph_voltage",
+                            "backgroundColor": "bar_graph_background",
+                            "activeColor": "bar_graph_background",
+                            "activeBackgroundColor": "bar_graph_voltage"
+                          },
+                          "orientation": "left-right",
+                          "displayValue": false,
+                          "textStyle": {
+                            "inheritFrom": "bar_graph_text"
+                          },
+                          "line1Data": "channel_display_value1_set",
+                          "line1Style": {
+                            "inheritFrom": "bar_graph_set_line"
+                          },
+                          "line2Data": "channel_display_value1_limit",
+                          "line2Style": {
+                            "inheritFrom": "bar_graph_limit_line"
+                          }
+                        },
+                        {
+                          "type": "LayoutView",
+                          "left": 348,
+                          "top": 0,
+                          "width": 132,
+                          "height": 55,
+                          "wireID": "823ab483-38c8-436e-ee4c-3b15abbfdec3",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "layout": "voltage_monitor"
+                        },
+                        {
+                          "type": "BarGraph",
+                          "left": 0,
+                          "top": 56,
+                          "width": 348,
+                          "height": 55,
+                          "wireID": "9af1dc30-571f-4fae-d692-25d186d46eed",
+                          "data": "channel_display_value2",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "bar_graph_I_default",
+                            "font": "Oswald14",
+                            "color": "bar_graph_current",
+                            "backgroundColor": "bar_graph_background",
+                            "activeColor": "bar_graph_background",
+                            "activeBackgroundColor": "bar_graph_current"
+                          },
+                          "orientation": "left-right",
+                          "displayValue": false,
+                          "textStyle": {
+                            "inheritFrom": "bar_graph_text"
+                          },
+                          "line1Data": "channel_display_value2_set",
+                          "line1Style": {
+                            "inheritFrom": "bar_graph_set_line"
+                          },
+                          "line2Data": "channel_display_value2_limit",
+                          "line2Style": {
+                            "inheritFrom": "bar_graph_limit_line"
+                          }
+                        },
+                        {
+                          "type": "LayoutView",
+                          "left": 348,
+                          "top": 55,
+                          "width": 132,
+                          "height": 55,
+                          "wireID": "872d9481-7611-4b36-c8ac-c22a8bdbb286",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "layout": "current_monitor"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Container",
+                      "left": 0,
+                      "top": 0,
+                      "width": 480,
+                      "height": 112,
+                      "wireID": "7a924d85-8f29-457f-d3c2-9e9a536b9d57",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "YTGraph",
+                          "left": 0,
+                          "top": 0,
+                          "width": 348,
+                          "height": 112,
+                          "wireID": "26cc8b9f-57a4-4daa-cf8b-86460adae0c3",
+                          "data": "channel_history_values",
+                          "action": "channel_toggle_output",
+                          "style": {
+                            "inheritFrom": "yt_graph"
+                          },
+                          "y1Style": {
+                            "inheritFrom": "yt_graph_U_default"
+                          },
+                          "y2Data": "channel_display_value2",
+                          "y2Style": {
+                            "inheritFrom": "yt_graph_I_default"
+                          }
+                        },
+                        {
+                          "type": "LayoutView",
+                          "left": 348,
+                          "top": 0,
+                          "width": 132,
+                          "height": 55,
+                          "wireID": "1af713e7-16b2-4baa-d298-1c479ea43324",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "layout": "voltage_monitor"
+                        },
+                        {
+                          "type": "LayoutView",
+                          "left": 348,
+                          "top": 55,
+                          "width": 132,
+                          "height": 55,
+                          "wireID": "e1b8687e-79a5-4385-d937-9204400e60bb",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "layout": "current_monitor"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Select",
+          "left": 0,
+          "top": 144,
+          "width": 480,
+          "height": 96,
+          "wireID": "becb8d73-3d82-4531-cdf2-a98da7541e3c",
+          "data": "trigger_is_initiated",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 96,
+              "wireID": "7e43a5e9-8fad-4061-8355-b5c3add10d8d",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "name": "Set",
               "widgets": [
                 {
                   "type": "Container",
                   "left": 0,
                   "top": 0,
                   "width": 141,
-                  "height": 66,
-                  "wireID": "ca5a173a-ca21-43f7-d635-f27c172593e0",
+                  "height": 96,
+                  "wireID": "03b17043-bde2-4967-d1bc-dfc67c827fe7",
                   "style": {
                     "inheritFrom": "default",
                     "font": "Oswald14"
                   },
-                  "name": "Set voltage",
+                  "name": "Voltage",
                   "widgets": [
                     {
-                      "type": "Text",
+                      "type": "RectangleWidget",
                       "left": 0,
                       "top": 0,
-                      "width": 46,
-                      "height": 32,
-                      "wireID": "a3f4c1af-d0fc-47ce-9c58-80a886f0902e",
+                      "width": 140,
+                      "height": 1,
+                      "wireID": "11fc9973-bda4-41f6-9738-9a96dda6b70f",
                       "style": {
-                        "inheritFrom": "default_S"
-                      },
-                      "text": "Set"
+                        "inheritFrom": "default"
+                      }
                     },
                     {
-                      "type": "DisplayData",
-                      "left": 0,
-                      "top": 34,
-                      "width": 46,
-                      "height": 32,
-                      "wireID": "9d9c24b9-99d2-4435-edcc-80e9d1a3f1b4",
-                      "data": "channel_u_edit",
-                      "action": "edit",
+                      "type": "RectangleWidget",
+                      "left": 140,
+                      "top": 0,
+                      "width": 1,
+                      "height": 95,
+                      "wireID": "976d5919-aceb-4695-cd72-b3cfc7eb8a7b",
                       "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled"
+                        "inheritFrom": "default"
+                      }
+                    },
+                    {
+                      "type": "Select",
+                      "left": 2,
+                      "top": 2,
+                      "width": 137,
+                      "height": 31,
+                      "wireID": "f6b668c1-774b-4036-fcc7-0bdc32aae62a",
+                      "data": "channel_output_state",
+                      "style": {
+                        "inheritFrom": "default"
                       },
-                      "displayOption": 0
+                      "widgets": [
+                        {
+                          "type": "Select",
+                          "left": 0,
+                          "top": 0,
+                          "width": 137,
+                          "height": 31,
+                          "wireID": "57421cea-f9af-463f-f32a-2ec00deab1f7",
+                          "data": "channel_trigger_mode",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Container",
+                              "left": 0,
+                              "top": 0,
+                              "width": 137,
+                              "height": 31,
+                              "wireID": "4d4b3f0b-1ec1-4e17-93e3-7ff65266baf8",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 31,
+                                  "wireID": "4ba3205e-78f7-4fe4-a9ef-53e0257d5680",
+                                  "style": {
+                                    "inheritFrom": "default_S"
+                                  },
+                                  "text": "U Set"
+                                },
+                                {
+                                  "type": "DisplayData",
+                                  "left": 46,
+                                  "top": 0,
+                                  "width": 91,
+                                  "height": 31,
+                                  "wireID": "ef952896-354e-492d-b8cf-941aced3a39f",
+                                  "data": "channel_u_edit",
+                                  "action": "edit",
+                                  "style": {
+                                    "inheritFrom": "encoder_cursor_14_enabled"
+                                  },
+                                  "displayOption": 0
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 137,
+                              "height": 31,
+                              "wireID": "b1259242-0e2c-468b-c03f-b92ca6a68bb4",
+                              "data": "",
+                              "action": "show_ch_settings_trigger",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "Oswald17"
+                              },
+                              "text": "\\u00a1"
+                            },
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 137,
+                              "height": 31,
+                              "wireID": "2cfeb929-2d49-4507-fcbb-5cb61b091256",
+                              "data": "",
+                              "action": "show_ch_settings_trigger",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "Oswald17"
+                              },
+                              "text": "\\u00b5"
+                            },
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 137,
+                              "height": 31,
+                              "wireID": "50e960f8-d36a-41aa-d5b8-749f60f3cd08",
+                              "data": "",
+                              "action": "show_ch_settings_trigger",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "Oswald17"
+                              },
+                              "text": "\\u00c2"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 137,
+                          "height": 31,
+                          "wireID": "4d4b3f0b-1ec1-4e17-93e3-7ff65266baf8",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 46,
+                              "height": 31,
+                              "wireID": "4ba3205e-78f7-4fe4-a9ef-53e0257d5680",
+                              "style": {
+                                "inheritFrom": "default_S"
+                              },
+                              "text": "U Set"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 46,
+                              "top": 0,
+                              "width": 91,
+                              "height": 31,
+                              "wireID": "ef952896-354e-492d-b8cf-941aced3a39f",
+                              "data": "channel_u_edit",
+                              "action": "edit",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled"
+                              },
+                              "displayOption": 0
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "Text",
-                      "left": 48,
-                      "top": 0,
-                      "width": 46,
-                      "height": 32,
-                      "wireID": "420eed95-806b-4c93-a214-b0e6458235d2",
+                      "left": 0,
+                      "top": 64,
+                      "width": 48,
+                      "height": 31,
+                      "wireID": "c7d040b1-59e0-442b-b3e0-e39f659e4b46",
                       "style": {
                         "inheritFrom": "default_S"
                       },
@@ -2516,10 +2766,10 @@
                     {
                       "type": "DisplayData",
                       "left": 48,
-                      "top": 34,
-                      "width": 46,
-                      "height": 32,
-                      "wireID": "e2f55d01-fcae-42e8-d387-0098779e44c9",
+                      "top": 64,
+                      "width": 91,
+                      "height": 31,
+                      "wireID": "5f52fb75-de1f-40f0-ac77-cb47e6479312",
                       "data": "channel_protection_ovp_limit",
                       "action": "edit",
                       "style": {
@@ -2529,11 +2779,11 @@
                     },
                     {
                       "type": "Select",
-                      "left": 96,
-                      "top": 0,
+                      "left": 48,
+                      "top": 34,
                       "width": 45,
-                      "height": 32,
-                      "wireID": "f6b47d40-2fa0-4e59-ece4-cfa95e3f5f2f",
+                      "height": 29,
+                      "wireID": "031210bc-fe73-4106-9c09-dce7cd6c2c5a",
                       "data": "ovp",
                       "action": "show_ch_settings_prot_ovp",
                       "style": {
@@ -2545,8 +2795,8 @@
                           "left": 0,
                           "top": 0,
                           "width": 45,
-                          "height": 32,
-                          "wireID": "a41ffbcc-b84a-46ae-dd6b-83491ff47cb8",
+                          "height": 29,
+                          "wireID": "3bc51a38-3dd7-4ab6-f85d-d80bd6e8a373",
                           "action": "",
                           "style": {
                             "inheritFrom": "ch_prot_off"
@@ -2558,8 +2808,8 @@
                           "left": 0,
                           "top": 0,
                           "width": 45,
-                          "height": 32,
-                          "wireID": "58812067-d843-4f7f-efad-30bcf6c28b16",
+                          "height": 29,
+                          "wireID": "6b8061a1-8695-4673-8743-fd82f2b6f4c3",
                           "action": "",
                           "style": {
                             "inheritFrom": "ch_prot_on"
@@ -2571,8 +2821,8 @@
                           "left": 0,
                           "top": 0,
                           "width": 45,
-                          "height": 32,
-                          "wireID": "01e0a51c-948e-4f57-c237-f2744c56d730",
+                          "height": 29,
+                          "wireID": "494bf02c-396d-4120-e727-38f55046750d",
                           "action": "",
                           "style": {
                             "inheritFrom": "ch_prot_tripped"
@@ -2583,11 +2833,11 @@
                     },
                     {
                       "type": "LayoutView",
-                      "left": 96,
+                      "left": 94,
                       "top": 34,
                       "width": 45,
-                      "height": 32,
-                      "wireID": "ef80c0f8-d7de-43d9-aeff-768470b9b868",
+                      "height": 29,
+                      "wireID": "ba97ff5a-6bfa-4cc3-928b-d1b5ecf89d0f",
                       "style": {
                         "inheritFrom": "default"
                       },
@@ -2597,36 +2847,197 @@
                 },
                 {
                   "type": "Container",
-                  "left": 143,
+                  "left": 141,
                   "top": 0,
                   "width": 141,
-                  "height": 66,
-                  "wireID": "9464de97-69a1-47a0-fad4-419f35903fc6",
+                  "height": 96,
+                  "wireID": "1dfaf324-b149-4d6d-90bc-286e7a33d429",
                   "style": {
                     "inheritFrom": "default",
                     "font": "Oswald14"
                   },
-                  "name": "Set current",
+                  "name": "Current",
                   "widgets": [
                     {
-                      "type": "Text",
+                      "type": "RectangleWidget",
                       "left": 0,
                       "top": 0,
-                      "width": 46,
-                      "height": 32,
-                      "wireID": "4b003728-c3ba-4e16-a61b-49b9fcafadec",
+                      "width": 140,
+                      "height": 1,
+                      "wireID": "5b8ba52a-15df-4ae3-867c-73b1e074d6c4",
                       "style": {
-                        "inheritFrom": "default_S"
+                        "inheritFrom": "default"
+                      }
+                    },
+                    {
+                      "type": "RectangleWidget",
+                      "left": 140,
+                      "top": 0,
+                      "width": 1,
+                      "height": 95,
+                      "wireID": "54a14e33-4212-4642-cf3a-4c28b1ad6a02",
+                      "style": {
+                        "inheritFrom": "default"
+                      }
+                    },
+                    {
+                      "type": "Select",
+                      "left": 2,
+                      "top": 2,
+                      "width": 137,
+                      "height": 31,
+                      "wireID": "c276658d-27c4-4380-b9a6-7be9c1ed1abc",
+                      "data": "channel_output_state",
+                      "style": {
+                        "inheritFrom": "default"
                       },
-                      "text": "Set"
+                      "widgets": [
+                        {
+                          "type": "Select",
+                          "left": 0,
+                          "top": 0,
+                          "width": 137,
+                          "height": 31,
+                          "wireID": "ef8eedfc-b1a6-4c5c-9814-53732bae6691",
+                          "data": "channel_trigger_mode",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Container",
+                              "left": 0,
+                              "top": 0,
+                              "width": 137,
+                              "height": 31,
+                              "wireID": "b9956974-4416-44f1-c1f0-11dc0262d729",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 46,
+                                  "height": 31,
+                                  "wireID": "37092928-9995-4333-e1b4-6615cd6c49ac",
+                                  "style": {
+                                    "inheritFrom": "default_S"
+                                  },
+                                  "text": "I Set"
+                                },
+                                {
+                                  "type": "DisplayData",
+                                  "left": 46,
+                                  "top": 0,
+                                  "width": 91,
+                                  "height": 31,
+                                  "wireID": "d451375e-c1bc-45bb-b573-41abee334e46",
+                                  "data": "channel_i_edit",
+                                  "action": "edit",
+                                  "style": {
+                                    "inheritFrom": "encoder_cursor_14_enabled"
+                                  },
+                                  "displayOption": 0
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 137,
+                              "height": 31,
+                              "wireID": "39036b20-a295-4d72-ad5b-72541c77fb8c",
+                              "data": "",
+                              "action": "show_ch_settings_trigger",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "Oswald17"
+                              },
+                              "text": "\\u00a1"
+                            },
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 137,
+                              "height": 31,
+                              "wireID": "99c6c1ab-aa2c-4b8f-e005-9f13c347bd74",
+                              "data": "",
+                              "action": "show_ch_settings_trigger",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "Oswald17"
+                              },
+                              "text": "\\u00b5"
+                            },
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 137,
+                              "height": 31,
+                              "wireID": "b99b25f0-01a3-4e4d-c455-3523772201b8",
+                              "data": "",
+                              "action": "show_ch_settings_trigger",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled",
+                                "font": "Oswald17"
+                              },
+                              "text": "\\u00c2"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 137,
+                          "height": 31,
+                          "wireID": "b9956974-4416-44f1-c1f0-11dc0262d729",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 46,
+                              "height": 31,
+                              "wireID": "37092928-9995-4333-e1b4-6615cd6c49ac",
+                              "style": {
+                                "inheritFrom": "default_S"
+                              },
+                              "text": "I Set"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 46,
+                              "top": 0,
+                              "width": 91,
+                              "height": 31,
+                              "wireID": "84ae449c-c1b1-4a74-9e56-db6d1f938494",
+                              "data": "channel_i_edit",
+                              "action": "edit",
+                              "style": {
+                                "inheritFrom": "encoder_cursor_14_enabled"
+                              },
+                              "displayOption": 0
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "type": "Text",
-                      "left": 48,
-                      "top": 0,
-                      "width": 46,
-                      "height": 32,
-                      "wireID": "840fa3a4-5f77-4e34-e95c-215948a009e0",
+                      "left": 0,
+                      "top": 64,
+                      "width": 48,
+                      "height": 31,
+                      "wireID": "8655df00-f067-4b09-e4b0-8dc155be5fa3",
                       "style": {
                         "inheritFrom": "default_S"
                       },
@@ -2634,25 +3045,11 @@
                     },
                     {
                       "type": "DisplayData",
-                      "left": 0,
-                      "top": 34,
-                      "width": 46,
-                      "height": 32,
-                      "wireID": "19c844b5-0af0-4ef6-da44-82f6e8ba4069",
-                      "data": "channel_i_edit",
-                      "action": "edit",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled"
-                      },
-                      "displayOption": 0
-                    },
-                    {
-                      "type": "DisplayData",
                       "left": 48,
-                      "top": 34,
-                      "width": 46,
-                      "height": 32,
-                      "wireID": "d7363871-7769-4aca-ecbd-d63407ddc86e",
+                      "top": 64,
+                      "width": 91,
+                      "height": 31,
+                      "wireID": "cd67ec17-c426-43a0-ec9b-d10f906f1370",
                       "data": "channel_protection_ocp_limit",
                       "action": "edit",
                       "style": {
@@ -2662,11 +3059,11 @@
                     },
                     {
                       "type": "Select",
-                      "left": 96,
-                      "top": 0,
+                      "left": 48,
+                      "top": 34,
                       "width": 45,
-                      "height": 32,
-                      "wireID": "d4610540-5600-43c8-a501-0a7f3e9e8123",
+                      "height": 29,
+                      "wireID": "d61641af-c962-4773-ac47-4806d710e75a",
                       "data": "ocp",
                       "action": "show_ch_settings_prot_ocp",
                       "style": {
@@ -2678,8 +3075,8 @@
                           "left": 0,
                           "top": 0,
                           "width": 45,
-                          "height": 32,
-                          "wireID": "011d2adb-1091-4f09-f6c6-fd4581b8a2ad",
+                          "height": 29,
+                          "wireID": "2e58940e-8731-4258-8b38-bff9f4b513ba",
                           "action": "",
                           "style": {
                             "inheritFrom": "ch_prot_off"
@@ -2691,8 +3088,8 @@
                           "left": 0,
                           "top": 0,
                           "width": 45,
-                          "height": 32,
-                          "wireID": "edb19ecb-f34b-4405-de44-55f4667b7783",
+                          "height": 29,
+                          "wireID": "e89b9427-b3a7-43eb-a48b-65e51dd42269",
                           "action": "",
                           "style": {
                             "inheritFrom": "ch_prot_on"
@@ -2704,8 +3101,8 @@
                           "left": 0,
                           "top": 0,
                           "width": 45,
-                          "height": 32,
-                          "wireID": "b57c26fe-6bf6-4a43-ad84-a07cb79f7a47",
+                          "height": 29,
+                          "wireID": "e6f80415-7606-4e2f-8441-06c824d6a07e",
                           "action": "",
                           "style": {
                             "inheritFrom": "ch_prot_tripped"
@@ -2716,11 +3113,11 @@
                     },
                     {
                       "type": "Text",
-                      "left": 96,
+                      "left": 94,
                       "top": 34,
                       "width": 45,
-                      "height": 32,
-                      "wireID": "275d64ab-e095-4178-a9eb-8705ec012db2",
+                      "height": 29,
+                      "wireID": "3a9c443b-c135-47a8-cde2-25d7c1142ce9",
                       "data": "",
                       "style": {
                         "inheritFrom": "default_S"
@@ -2731,36 +3128,101 @@
                 },
                 {
                   "type": "Container",
-                  "left": 286,
+                  "left": 282,
                   "top": 0,
-                  "width": 109,
-                  "height": 66,
-                  "wireID": "85e31d26-f81b-4efd-e388-343112b226ae",
+                  "width": 141,
+                  "height": 96,
+                  "wireID": "ae8b8a38-d5d5-46de-f68b-f247c6636457",
                   "style": {
                     "inheritFrom": "default",
                     "font": "Oswald14"
                   },
-                  "name": "Set power",
+                  "name": "Power",
                   "widgets": [
+                    {
+                      "type": "RectangleWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 140,
+                      "height": 1,
+                      "wireID": "fa524267-29b3-41f0-f37e-eaac3e11ad0c",
+                      "style": {
+                        "inheritFrom": "default"
+                      }
+                    },
+                    {
+                      "type": "RectangleWidget",
+                      "left": 140,
+                      "top": 0,
+                      "width": 1,
+                      "height": 95,
+                      "wireID": "ba1d1d38-6ebc-46ef-fd46-4ba61bb4da22",
+                      "style": {
+                        "inheritFrom": "default"
+                      }
+                    },
                     {
                       "type": "Text",
                       "left": 0,
-                      "top": 0,
-                      "width": 64,
+                      "top": 2,
+                      "width": 58,
                       "height": 32,
-                      "wireID": "def239c6-f9bc-47df-a9ca-05b519d24868",
+                      "wireID": "b092a3fa-eb48-483e-b46f-a2aa656ef2cb",
                       "style": {
                         "inheritFrom": "default_S"
                       },
-                      "text": "Lim./Tri."
+                      "text": "P Limit"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "left": 58,
+                      "top": 2,
+                      "width": 81,
+                      "height": 31,
+                      "wireID": "060ecdc8-e71c-484d-f3ba-3f90f6acd0ff",
+                      "data": "channel_protection_opp_limit",
+                      "action": "edit",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled"
+                      },
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "Text",
+                      "left": 9,
+                      "top": 34,
+                      "width": 48,
+                      "height": 31,
+                      "wireID": "171edc22-34fe-4bf8-d17d-33a40bbe005c",
+                      "style": {
+                        "inheritFrom": "default_S"
+                      },
+                      "text": "Trip"
+                    },
+                    {
+                      "type": "DisplayData",
+                      "left": 58,
+                      "top": 34,
+                      "width": 81,
+                      "height": 31,
+                      "wireID": "cac2b3c5-2c06-4857-8660-237018bfd2a1",
+                      "data": "channel_protection_opp_level",
+                      "action": "edit",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "font": "Oswald14",
+                        "backgroundColor": "text_enable_background",
+                        "activeColor": "text_enable_background"
+                      },
+                      "displayOption": 0
                     },
                     {
                       "type": "Select",
-                      "left": 64,
-                      "top": 0,
+                      "left": 12,
+                      "top": 66,
                       "width": 45,
-                      "height": 32,
-                      "wireID": "d5549c4b-0a5b-4679-c406-6061e7d6ca8c",
+                      "height": 29,
+                      "wireID": "136e32b8-82f0-4b48-b85e-ef2eee16596e",
                       "data": "opp",
                       "action": "show_ch_settings_prot_opp",
                       "style": {
@@ -2772,8 +3234,8 @@
                           "left": 0,
                           "top": 0,
                           "width": 45,
-                          "height": 32,
-                          "wireID": "9907e9f3-5958-4428-b6d2-d65143e43b5f",
+                          "height": 29,
+                          "wireID": "ca518583-64a2-44bc-c25b-275288f0f1e4",
                           "action": "",
                           "style": {
                             "inheritFrom": "ch_prot_off"
@@ -2785,8 +3247,8 @@
                           "left": 0,
                           "top": 0,
                           "width": 45,
-                          "height": 32,
-                          "wireID": "3e0692ee-2f93-4366-febb-aa187be67756",
+                          "height": 29,
+                          "wireID": "247fdd50-8cf2-4a06-c9a4-2464c8df7755",
                           "action": "",
                           "style": {
                             "inheritFrom": "ch_prot_on"
@@ -2798,8 +3260,8 @@
                           "left": 0,
                           "top": 0,
                           "width": 45,
-                          "height": 32,
-                          "wireID": "4fa7188d-fa71-46c1-cc25-8fe1098ffcce",
+                          "height": 29,
+                          "wireID": "9fe5827c-81f3-457e-9a48-c8d0637de8b1",
                           "action": "",
                           "style": {
                             "inheritFrom": "ch_prot_tripped"
@@ -2810,12 +3272,108 @@
                     },
                     {
                       "type": "DisplayData",
+                      "left": 58,
+                      "top": 66,
+                      "width": 81,
+                      "height": 29,
+                      "wireID": "530d2c4c-64d6-4470-da75-7b89b8449978",
+                      "data": "channel_protection_opp_delay",
+                      "action": "edit",
+                      "style": {
+                        "inheritFrom": "encoder_cursor_14_enabled",
+                        "font": "Oswald14",
+                        "backgroundColor": "text_enable_background",
+                        "activeColor": "text_enable_background"
+                      },
+                      "displayOption": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "Container",
+                  "left": 423,
+                  "top": 0,
+                  "width": 57,
+                  "height": 96,
+                  "wireID": "907159b2-0ef0-4657-d97e-93befb61f935",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "name": "Temperature",
+                  "widgets": [
+                    {
+                      "type": "RectangleWidget",
                       "left": 0,
+                      "top": 0,
+                      "width": 57,
+                      "height": 1,
+                      "wireID": "9cc5a708-4fc4-4eb0-ae44-7206c33279c4",
+                      "style": {
+                        "inheritFrom": "default"
+                      }
+                    },
+                    {
+                      "type": "Select",
+                      "left": 1,
+                      "top": 2,
+                      "width": 56,
+                      "height": 31,
+                      "wireID": "194a9f4d-6846-44d1-db40-b030504bbba8",
+                      "data": "otp_ch",
+                      "action": "show_ch_settings_prot_otp",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 56,
+                          "height": 31,
+                          "wireID": "bf29de55-26ae-48ff-d158-2587855d75e9",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "ch_prot_off"
+                          },
+                          "text": "OTP"
+                        },
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 56,
+                          "height": 31,
+                          "wireID": "35e169c3-26f7-4b70-c0d2-15175578b8d9",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "ch_prot_on"
+                          },
+                          "text": "OTP"
+                        },
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 56,
+                          "height": 31,
+                          "wireID": "e059a0a4-a59a-41e5-f603-e2ea8f4ecdb6",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "ch_prot_tripped"
+                          },
+                          "text": "OTP"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "DisplayData",
+                      "left": 1,
                       "top": 34,
-                      "width": 54,
-                      "height": 32,
-                      "wireID": "533433f8-73a7-4e43-84c8-071e70107042",
-                      "data": "channel_protection_opp_limit",
+                      "width": 56,
+                      "height": 31,
+                      "wireID": "ca496cad-f687-43b3-9e28-96358b0a0876",
+                      "data": "channel_protection_otp_level",
                       "action": "edit",
                       "style": {
                         "inheritFrom": "encoder_cursor_14_enabled"
@@ -2824,2128 +3382,19 @@
                     },
                     {
                       "type": "DisplayData",
-                      "left": 56,
-                      "top": 34,
-                      "width": 53,
-                      "height": 32,
-                      "wireID": "2f05a7f3-4df8-474e-b665-1915d79a4d18",
-                      "data": "channel_protection_opp_level",
-                      "action": "edit",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled",
-                        "backgroundColor": "text_enable_background",
-                        "activeColor": "text_enable_background"
-                      },
-                      "displayOption": 0
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_2ch_num_on",
-      "description": " ",
-      "left": 0,
-      "top": 0,
-      "width": 395,
-      "height": 238,
-      "dataContextOverrides": "{\n    \"channel_i_mon\": \"< 300 mA\"\n}"
-    },
-    {
-      "components": [
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 0,
-          "width": 239,
-          "height": 32,
-          "wireID": "57666974-d1d2-4977-9d1f-4045af38425e",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_max_2ch_title"
-        },
-        {
-          "type": "Container",
-          "left": 0,
-          "top": 32,
-          "width": 395,
-          "height": 132,
-          "wireID": "5a2935c4-a8a3-4ba8-8f46-5a9a3c91e8af",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Select",
-              "left": 0,
-              "top": 0,
-              "width": 395,
-              "height": 132,
-              "wireID": "939d0831-b854-44f9-be08-ed277939b932",
-              "data": "trigger_is_initiated",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 395,
-                  "height": 132,
-                  "wireID": "bcc17bfc-0268-41b1-d52b-b16efecf4da7",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 2,
-                      "top": 2,
-                      "width": 391,
-                      "height": 62,
-                      "wireID": "802d9996-b407-4789-ece4-79a3c8319718",
-                      "data": "channel_off_label",
-                      "action": "channel_toggle_output",
-                      "style": {
-                        "inheritFrom": "channel_off_button_38"
-                      },
-                      "text": ""
-                    },
-                    {
-                      "type": "Container",
-                      "left": 0,
+                      "left": 1,
                       "top": 66,
-                      "width": 395,
-                      "height": 66,
-                      "wireID": "af9f0c46-72e4-44c2-94db-49009bd806f6",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "widgets": [
-                        {
-                          "type": "Container",
-                          "left": 0,
-                          "top": 0,
-                          "width": 141,
-                          "height": 66,
-                          "wireID": "4bf4a8f8-aefd-4254-a537-e4be2133f388",
-                          "style": {
-                            "inheritFrom": "default",
-                            "font": "Oswald14"
-                          },
-                          "name": "Set voltage",
-                          "widgets": [
-                            {
-                              "type": "Select",
-                              "left": 0,
-                              "top": 0,
-                              "width": 46,
-                              "height": 66,
-                              "wireID": "8a524794-a82f-4cd6-ebb1-69b15ec1f2ef",
-                              "data": "channel_trigger_mode",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "widgets": [
-                                {
-                                  "type": "Container",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 46,
-                                  "height": 66,
-                                  "wireID": "4a9a3421-5d18-434f-9ec6-b246c160cb1c",
-                                  "style": {
-                                    "inheritFrom": "default"
-                                  },
-                                  "widgets": [
-                                    {
-                                      "type": "Text",
-                                      "left": 0,
-                                      "top": 0,
-                                      "width": 46,
-                                      "height": 32,
-                                      "wireID": "e875556c-5574-455c-b6c0-709283d38c0c",
-                                      "style": {
-                                        "inheritFrom": "default_S"
-                                      },
-                                      "text": "Set"
-                                    },
-                                    {
-                                      "type": "DisplayData",
-                                      "left": 0,
-                                      "top": 34,
-                                      "width": 46,
-                                      "height": 32,
-                                      "wireID": "8ac89a07-1b52-4e46-f3fa-29a2933a180f",
-                                      "data": "channel_u_edit",
-                                      "action": "edit",
-                                      "style": {
-                                        "inheritFrom": "encoder_cursor_14_enabled"
-                                      },
-                                      "displayOption": 0
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "Container",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 46,
-                                  "height": 66,
-                                  "wireID": "7066a7c1-14ba-492b-f88a-1070ae46256c",
-                                  "style": {
-                                    "inheritFrom": "default"
-                                  },
-                                  "widgets": [
-                                    {
-                                      "type": "Text",
-                                      "left": 2,
-                                      "top": 0,
-                                      "width": 44,
-                                      "height": 66,
-                                      "wireID": "f30ed4d8-34ca-4e63-dd3a-5f36164ed3c1",
-                                      "data": "",
-                                      "action": "show_ch_settings_trigger",
-                                      "style": {
-                                        "inheritFrom": "encoder_cursor_14_enabled",
-                                        "font": "Oswald17"
-                                      },
-                                      "text": "\\u00a1"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "Container",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 46,
-                                  "height": 66,
-                                  "wireID": "07898685-02ad-490f-d453-cb7018269461",
-                                  "style": {
-                                    "inheritFrom": "default"
-                                  },
-                                  "widgets": [
-                                    {
-                                      "type": "Text",
-                                      "left": 2,
-                                      "top": 0,
-                                      "width": 44,
-                                      "height": 66,
-                                      "wireID": "9d7db5e1-0467-42c9-efdd-e637e0162372",
-                                      "data": "",
-                                      "action": "show_ch_settings_trigger",
-                                      "style": {
-                                        "inheritFrom": "encoder_cursor_14_enabled",
-                                        "font": "Oswald17"
-                                      },
-                                      "text": "\\u00b5"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "Container",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 46,
-                                  "height": 66,
-                                  "wireID": "f5a2849c-aae2-40b6-f39c-035538ed4292",
-                                  "style": {
-                                    "inheritFrom": "default"
-                                  },
-                                  "widgets": [
-                                    {
-                                      "type": "Text",
-                                      "left": 2,
-                                      "top": 0,
-                                      "width": 44,
-                                      "height": 66,
-                                      "wireID": "77f8b5e8-bf73-4b6b-bcdf-ab952d4b1021",
-                                      "data": "",
-                                      "action": "show_ch_settings_trigger",
-                                      "style": {
-                                        "inheritFrom": "encoder_cursor_14_enabled",
-                                        "font": "Oswald17"
-                                      },
-                                      "text": "\\u00b5"
-                                    }
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "Text",
-                              "left": 48,
-                              "top": 0,
-                              "width": 46,
-                              "height": 32,
-                              "wireID": "f072d50d-ca98-494c-a8e2-7d73fb695cb9",
-                              "style": {
-                                "inheritFrom": "default_S"
-                              },
-                              "text": "Limit"
-                            },
-                            {
-                              "type": "DisplayData",
-                              "left": 48,
-                              "top": 34,
-                              "width": 46,
-                              "height": 32,
-                              "wireID": "2fd7bfb8-580e-4cfd-a542-87eabe46e4a1",
-                              "data": "channel_protection_ovp_limit",
-                              "action": "edit",
-                              "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled"
-                              },
-                              "displayOption": 0
-                            },
-                            {
-                              "type": "Select",
-                              "left": 96,
-                              "top": 0,
-                              "width": 45,
-                              "height": 32,
-                              "wireID": "705cf1e1-04b8-424e-8fa8-44bc41360315",
-                              "data": "ovp",
-                              "action": "show_ch_settings_prot_ovp",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "widgets": [
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 45,
-                                  "height": 32,
-                                  "wireID": "44365065-dcd1-4e2b-9781-88d841e370bf",
-                                  "action": "",
-                                  "style": {
-                                    "inheritFrom": "ch_prot_off"
-                                  },
-                                  "text": "OVP"
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 45,
-                                  "height": 32,
-                                  "wireID": "076d6892-d126-4a89-e106-16091bcbc646",
-                                  "action": "",
-                                  "style": {
-                                    "inheritFrom": "ch_prot_on"
-                                  },
-                                  "text": "OVP"
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 45,
-                                  "height": 32,
-                                  "wireID": "d20dd579-37c0-47ef-d3a7-7e65773c7e18",
-                                  "action": "",
-                                  "style": {
-                                    "inheritFrom": "ch_prot_tripped"
-                                  },
-                                  "text": "OVP"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "LayoutView",
-                              "left": 96,
-                              "top": 34,
-                              "width": 45,
-                              "height": 32,
-                              "wireID": "cff4cbc0-bd3e-45eb-ad3a-a16b0cd4a933",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "layout": "ovp_type"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "Container",
-                          "left": 143,
-                          "top": 0,
-                          "width": 141,
-                          "height": 66,
-                          "wireID": "951a4f13-c172-4830-850a-a3b1cd823929",
-                          "style": {
-                            "inheritFrom": "default",
-                            "font": "Oswald14"
-                          },
-                          "name": "Set current",
-                          "widgets": [
-                            {
-                              "type": "Select",
-                              "left": 0,
-                              "top": 0,
-                              "width": 46,
-                              "height": 66,
-                              "wireID": "18ac36ec-4dce-42e1-e68c-1d127fd088cb",
-                              "data": "channel_trigger_mode",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "widgets": [
-                                {
-                                  "type": "Container",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 46,
-                                  "height": 66,
-                                  "wireID": "60e02910-8724-486d-a253-ed68fc269b4e",
-                                  "style": {
-                                    "inheritFrom": "default"
-                                  },
-                                  "widgets": [
-                                    {
-                                      "type": "Text",
-                                      "left": 0,
-                                      "top": 0,
-                                      "width": 46,
-                                      "height": 32,
-                                      "wireID": "8f673717-6c48-47f6-a7cf-21dfefd01a62",
-                                      "style": {
-                                        "inheritFrom": "default_S"
-                                      },
-                                      "text": "Set"
-                                    },
-                                    {
-                                      "type": "DisplayData",
-                                      "left": 0,
-                                      "top": 34,
-                                      "width": 46,
-                                      "height": 32,
-                                      "wireID": "c9a0696c-8de9-46ef-c53d-924e23983967",
-                                      "data": "channel_i_edit",
-                                      "action": "edit",
-                                      "style": {
-                                        "inheritFrom": "encoder_cursor_14_enabled"
-                                      },
-                                      "displayOption": 0
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 46,
-                                  "height": 66,
-                                  "wireID": "94c0ecd2-acc1-4155-f2e7-10148e0cab9f",
-                                  "data": "",
-                                  "action": "show_ch_settings_trigger",
-                                  "style": {
-                                    "inheritFrom": "encoder_cursor_14_enabled",
-                                    "font": "Oswald17"
-                                  },
-                                  "text": "\\u00a1"
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 46,
-                                  "height": 66,
-                                  "wireID": "43c7115d-36e5-465d-ff7c-6b4035ef90d1",
-                                  "data": "",
-                                  "action": "show_ch_settings_trigger",
-                                  "style": {
-                                    "inheritFrom": "encoder_cursor_14_enabled",
-                                    "font": "Oswald17"
-                                  },
-                                  "text": "\\u00b5"
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 46,
-                                  "height": 66,
-                                  "wireID": "5e0f669e-17db-4dc2-d376-a3153bc23013",
-                                  "data": "",
-                                  "action": "show_ch_settings_trigger",
-                                  "style": {
-                                    "inheritFrom": "encoder_cursor_14_enabled",
-                                    "font": "Oswald17"
-                                  },
-                                  "text": "\\u00b5"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "Text",
-                              "left": 48,
-                              "top": 0,
-                              "width": 46,
-                              "height": 32,
-                              "wireID": "38e6128a-b610-4f11-aab2-4a952ce4474c",
-                              "style": {
-                                "inheritFrom": "default_S"
-                              },
-                              "text": "Limit"
-                            },
-                            {
-                              "type": "DisplayData",
-                              "left": 48,
-                              "top": 34,
-                              "width": 46,
-                              "height": 32,
-                              "wireID": "207d40a1-fd3e-405e-8311-1b8647ceeda1",
-                              "data": "channel_protection_ocp_limit",
-                              "action": "edit",
-                              "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled"
-                              },
-                              "displayOption": 0
-                            },
-                            {
-                              "type": "Select",
-                              "left": 96,
-                              "top": 0,
-                              "width": 45,
-                              "height": 32,
-                              "wireID": "c7098354-5a15-469d-a7c0-94fffcd89c03",
-                              "data": "ocp",
-                              "action": "show_ch_settings_prot_ocp",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "widgets": [
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 45,
-                                  "height": 32,
-                                  "wireID": "aa6db13c-a757-4a72-e3c4-2377712e4858",
-                                  "action": "",
-                                  "style": {
-                                    "inheritFrom": "ch_prot_off"
-                                  },
-                                  "text": "OCP"
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 45,
-                                  "height": 32,
-                                  "wireID": "fa91b700-e77d-4d8b-9cfa-29f1c41112a7",
-                                  "action": "",
-                                  "style": {
-                                    "inheritFrom": "ch_prot_on"
-                                  },
-                                  "text": "OCP"
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 45,
-                                  "height": 32,
-                                  "wireID": "a71eed86-5c3f-4006-a9a9-a3519373c7b7",
-                                  "action": "",
-                                  "style": {
-                                    "inheritFrom": "ch_prot_tripped"
-                                  },
-                                  "text": "OCP"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "Text",
-                              "left": 96,
-                              "top": 34,
-                              "width": 45,
-                              "height": 32,
-                              "wireID": "585134e3-4b91-41de-ec18-abd7398bc77e",
-                              "data": "",
-                              "style": {
-                                "inheritFrom": "default_S"
-                              },
-                              "text": "High"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "Container",
-                          "left": 286,
-                          "top": 0,
-                          "width": 109,
-                          "height": 66,
-                          "wireID": "1ddd6043-106f-4864-a754-df8bdf8d86f5",
-                          "style": {
-                            "inheritFrom": "default",
-                            "font": "Oswald14"
-                          },
-                          "name": "Set power",
-                          "widgets": [
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 64,
-                              "height": 32,
-                              "wireID": "bce2adb3-87f0-4bc3-a07f-869637eef92a",
-                              "style": {
-                                "inheritFrom": "default_S"
-                              },
-                              "text": "Lim./Tri."
-                            },
-                            {
-                              "type": "DisplayData",
-                              "left": 0,
-                              "top": 34,
-                              "width": 54,
-                              "height": 32,
-                              "wireID": "f431b7cf-d544-4d9a-a752-cfd55f382e4b",
-                              "data": "channel_protection_opp_limit",
-                              "action": "edit",
-                              "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled"
-                              },
-                              "displayOption": 0
-                            },
-                            {
-                              "type": "DisplayData",
-                              "left": 56,
-                              "top": 34,
-                              "width": 53,
-                              "height": 32,
-                              "wireID": "80de2148-23b8-425e-ee8a-6299352d7312",
-                              "data": "channel_protection_opp_level",
-                              "action": "edit",
-                              "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled",
-                                "font": "Oswald14",
-                                "backgroundColor": "text_enable_background",
-                                "activeColor": "text_enable_background"
-                              },
-                              "displayOption": 0
-                            },
-                            {
-                              "type": "Select",
-                              "left": 64,
-                              "top": 0,
-                              "width": 45,
-                              "height": 32,
-                              "wireID": "8e5d049f-faa4-4cde-b83c-55371a577a30",
-                              "data": "opp",
-                              "action": "show_ch_settings_prot_opp",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "widgets": [
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 45,
-                                  "height": 32,
-                                  "wireID": "b0e0df4e-72cf-4644-8b87-0f02cc1befaa",
-                                  "action": "",
-                                  "style": {
-                                    "inheritFrom": "ch_prot_off"
-                                  },
-                                  "text": "OPP"
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 45,
-                                  "height": 32,
-                                  "wireID": "97f1d961-8a11-401e-f367-e1a4e34b2d44",
-                                  "action": "",
-                                  "style": {
-                                    "inheritFrom": "ch_prot_on"
-                                  },
-                                  "text": "OPP"
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 45,
-                                  "height": 32,
-                                  "wireID": "b07a334d-76e8-4bda-f4a9-ac1ae9ef3a83",
-                                  "action": "",
-                                  "style": {
-                                    "inheritFrom": "ch_prot_tripped"
-                                  },
-                                  "text": "OPP"
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 395,
-                  "height": 132,
-                  "wireID": "ec4afb6f-86b4-4ff2-8934-36a6bbd6d2e3",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 2,
-                      "top": 2,
-                      "width": 391,
-                      "height": 62,
-                      "wireID": "ba3cf4b8-42b4-43e6-99c4-282bfd6c16c9",
-                      "data": "channel_off_label",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "channel_off_button_38"
-                      },
-                      "text": ""
-                    },
-                    {
-                      "type": "Button",
-                      "left": 2,
-                      "top": 66,
-                      "width": 391,
-                      "height": 64,
-                      "wireID": "3c4351eb-b5fc-4710-e6e8-3b91a3f6e9e3",
-                      "data": "trigger_is_initiated",
-                      "action": "trigger_generate_manual",
-                      "style": {
-                        "inheritFrom": "trigger_button_24"
-                      },
-                      "text": "\\u00a4 TRG",
-                      "enabled": "trigger_is_manual",
-                      "disabledStyle": {
-                        "inheritFrom": "trigger_button_24",
-                        "color": "text_regular",
-                        "activeBackgroundColor": "text_regular"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_2ch_num_off",
-      "left": 0,
-      "top": 0,
-      "width": 395,
-      "height": 238
-    },
-    {
-      "components": [
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 0,
-          "width": 395,
-          "height": 32,
-          "wireID": "fab0cc5b-48a9-4d43-a627-c49583ced502",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_max_2ch_title"
-        },
-        {
-          "type": "Container",
-          "left": 0,
-          "top": 32,
-          "width": 395,
-          "height": 132,
-          "wireID": "b835ac5f-a520-4cc6-b24d-4208a134b7d2",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Container",
-              "left": 0,
-              "top": 0,
-              "width": 143,
-              "height": 65,
-              "wireID": "dfe7d8bc-31f5-4065-b2e6-bbdb3c22896a",
-              "style": {
-                "inheritFrom": "default",
-                "font": "Oswald14"
-              },
-              "name": "Set voltage",
-              "widgets": [
-                {
-                  "type": "Text",
-                  "left": 0,
-                  "top": 0,
-                  "width": 46,
-                  "height": 31,
-                  "wireID": "d956a723-a8dd-4672-de6f-d859b7f6509f",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "text": "Set"
-                },
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 33,
-                  "width": 46,
-                  "height": 32,
-                  "wireID": "54c53f8e-2d93-4e35-9bc8-ad2cbdd3fef0",
-                  "data": "channel_u_edit",
-                  "action": "edit",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled"
-                  },
-                  "displayOption": 0
-                },
-                {
-                  "type": "Text",
-                  "left": 48,
-                  "top": 0,
-                  "width": 46,
-                  "height": 31,
-                  "wireID": "6d9eca8d-f70e-4153-d674-176f897de6aa",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "text": "Limit"
-                },
-                {
-                  "type": "DisplayData",
-                  "left": 48,
-                  "top": 33,
-                  "width": 46,
-                  "height": 32,
-                  "wireID": "9051aff0-8c62-493a-c32a-6b7f8280dbf9",
-                  "data": "channel_protection_ovp_limit",
-                  "action": "edit",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled"
-                  },
-                  "displayOption": 0
-                },
-                {
-                  "type": "Select",
-                  "left": 96,
-                  "top": 0,
-                  "width": 45,
-                  "height": 31,
-                  "wireID": "5bf73d20-f735-4c7e-a1be-67f38c6398c0",
-                  "data": "ovp",
-                  "action": "show_ch_settings_prot_ovp",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 45,
-                      "height": 31,
-                      "wireID": "e377cacd-490b-4595-ecc2-0d6f46fec046",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "ch_prot_off"
-                      },
-                      "text": "OVP"
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 45,
-                      "height": 31,
-                      "wireID": "a0cc7f4c-cf6b-42a2-913e-9a5228dc9ec1",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "ch_prot_on"
-                      },
-                      "text": "OVP"
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 45,
-                      "height": 31,
-                      "wireID": "2c7c0ae0-2c05-468f-8155-ae73dc7ada7c",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "ch_prot_tripped"
-                      },
-                      "text": "OVP"
-                    }
-                  ]
-                },
-                {
-                  "type": "LayoutView",
-                  "left": 96,
-                  "top": 33,
-                  "width": 45,
-                  "height": 32,
-                  "wireID": "f2d7f386-729c-47a2-fc66-885ff5c477b6",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "layout": "ovp_type"
-                }
-              ]
-            },
-            {
-              "type": "Container",
-              "left": 0,
-              "top": 67,
-              "width": 143,
-              "height": 65,
-              "wireID": "65a6b0e1-95ab-41df-bdba-08d656121993",
-              "style": {
-                "inheritFrom": "default",
-                "font": "Oswald14"
-              },
-              "name": "Set current",
-              "widgets": [
-                {
-                  "type": "Text",
-                  "left": 0,
-                  "top": 0,
-                  "width": 46,
-                  "height": 31,
-                  "wireID": "0ab9c16e-364b-40b4-92f1-a3f28a299de2",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "text": "Set"
-                },
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 33,
-                  "width": 46,
-                  "height": 32,
-                  "wireID": "b965ebb5-0cfe-4108-b650-13d79bf62de8",
-                  "data": "channel_i_edit",
-                  "action": "edit",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled"
-                  },
-                  "displayOption": 0
-                },
-                {
-                  "type": "Text",
-                  "left": 48,
-                  "top": 0,
-                  "width": 46,
-                  "height": 31,
-                  "wireID": "6a61652f-7ebd-40f2-91aa-258269a3112f",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "text": "Limit"
-                },
-                {
-                  "type": "DisplayData",
-                  "left": 48,
-                  "top": 33,
-                  "width": 46,
-                  "height": 32,
-                  "wireID": "f9570895-8ccd-4ea3-b921-fae9f7382c40",
-                  "data": "channel_protection_ocp_limit",
-                  "action": "edit",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled"
-                  },
-                  "displayOption": 0
-                },
-                {
-                  "type": "Select",
-                  "left": 96,
-                  "top": 0,
-                  "width": 45,
-                  "height": 31,
-                  "wireID": "1320db30-7e81-406e-88d8-5053be95359c",
-                  "data": "ocp",
-                  "action": "show_ch_settings_prot_ocp",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 45,
-                      "height": 31,
-                      "wireID": "18642602-b145-4a17-9cec-e78b5d93f29c",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "ch_prot_off"
-                      },
-                      "text": "OCP"
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 45,
-                      "height": 31,
-                      "wireID": "767b2d4b-ea1a-4f72-8934-03265b998d17",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "ch_prot_on"
-                      },
-                      "text": "OCP"
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 45,
-                      "height": 31,
-                      "wireID": "a4fec3dc-749f-49f2-da13-aff68a18b678",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "ch_prot_tripped"
-                      },
-                      "text": "OCP"
-                    }
-                  ]
-                },
-                {
-                  "type": "Text",
-                  "left": 96,
-                  "top": 33,
-                  "width": 45,
-                  "height": 32,
-                  "wireID": "f7ee2fe1-b665-406c-8677-626261efe480",
-                  "data": "",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "text": "High"
-                }
-              ]
-            },
-            {
-              "type": "Container",
-              "left": 143,
-              "top": 0,
-              "width": 202,
-              "height": 132,
-              "wireID": "d35062e9-8503-4ec0-fbdd-bd0e41b6d60a",
-              "action": "channel_toggle_output",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "name": "mon section",
-              "widgets": [
-                {
-                  "type": "BarGraph",
-                  "left": 0,
-                  "top": 0,
-                  "width": 202,
-                  "height": 65,
-                  "wireID": "cb62b421-c18e-402c-9899-0c0fc796f495",
-                  "data": "channel_display_value1",
-                  "action": "",
-                  "style": {
-                    "inheritFrom": "bar_graph_U_default",
-                    "font": "Oswald14",
-                    "color": "bar_graph_voltage",
-                    "backgroundColor": "bar_graph_background",
-                    "activeColor": "bar_graph_background",
-                    "activeBackgroundColor": "bar_graph_voltage"
-                  },
-                  "orientation": "left-right",
-                  "displayValue": true,
-                  "textStyle": {
-                    "inheritFrom": "bar_graph_text"
-                  },
-                  "line1Data": "channel_display_value1_set",
-                  "line1Style": {
-                    "inheritFrom": "bar_graph_set_line"
-                  },
-                  "line2Data": "channel_display_value1_limit",
-                  "line2Style": {
-                    "inheritFrom": "bar_graph_limit_line"
-                  }
-                },
-                {
-                  "type": "BarGraph",
-                  "left": 0,
-                  "top": 67,
-                  "width": 202,
-                  "height": 65,
-                  "wireID": "b963d444-2213-48f3-8f9f-504f48bf8719",
-                  "data": "channel_display_value2",
-                  "action": "",
-                  "style": {
-                    "inheritFrom": "bar_graph_I_default",
-                    "font": "Oswald14",
-                    "color": "bar_graph_current",
-                    "backgroundColor": "bar_graph_background",
-                    "activeColor": "bar_graph_background",
-                    "activeBackgroundColor": "bar_graph_current"
-                  },
-                  "orientation": "left-right",
-                  "displayValue": true,
-                  "textStyle": {
-                    "inheritFrom": "bar_graph_text"
-                  },
-                  "line1Data": "channel_display_value2_set",
-                  "line1Style": {
-                    "inheritFrom": "bar_graph_set_line"
-                  },
-                  "line2Data": "channel_display_value2_limit",
-                  "line2Style": {
-                    "inheritFrom": "bar_graph_limit_line"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "Container",
-              "left": 347,
-              "top": 0,
-              "width": 48,
-              "height": 132,
-              "wireID": "be6b8d97-9c9c-4dcc-c8dd-3cb4aaaf46f2",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "name": "Power",
-              "widgets": [
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 0,
-                  "width": 48,
-                  "height": 23,
-                  "wireID": "6a501a07-dfd4-4160-c6f8-dccda7a5deca",
-                  "data": "channel_display_value3",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "displayOption": 1
-                },
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 24,
-                  "width": 48,
-                  "height": 23,
-                  "wireID": "49ed1667-26ee-4b66-b78a-00ce811710e7",
-                  "data": "channel_display_value3",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "displayOption": 2
-                },
-                {
-                  "type": "Select",
-                  "left": 0,
-                  "top": 47,
-                  "width": 48,
-                  "height": 27,
-                  "wireID": "c63a6cf9-7c3d-4fa2-a384-6cd5c4fffb29",
-                  "data": "opp",
-                  "action": "show_ch_settings_prot_opp",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 48,
-                      "height": 27,
-                      "wireID": "fb6d865e-be52-4416-970c-0b56b6d74b7d",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "ch_prot_off"
-                      },
-                      "text": "OPP"
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 48,
-                      "height": 27,
-                      "wireID": "90890005-b480-43b2-b8cb-838513b4a33b",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "ch_prot_on"
-                      },
-                      "text": "OPP"
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 0,
-                      "width": 48,
-                      "height": 27,
-                      "wireID": "4c8c695e-531c-4190-ef14-5b6ee9e817e4",
-                      "action": "",
-                      "style": {
-                        "inheritFrom": "ch_prot_tripped"
-                      },
-                      "text": "OPP"
-                    }
-                  ]
-                },
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 76,
-                  "width": 48,
-                  "height": 27,
-                  "wireID": "2efd60e0-a4e1-4217-9ca1-85e234c8943d",
-                  "data": "channel_protection_opp_level",
-                  "action": "edit",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled"
-                  },
-                  "displayOption": 0
-                },
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 105,
-                  "width": 48,
-                  "height": 27,
-                  "wireID": "2472a132-6278-468a-824e-b937e1b10642",
-                  "data": "channel_protection_opp_delay",
-                  "action": "edit",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled"
-                  },
-                  "displayOption": 0
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_2ch_hbar_on",
-      "left": 0,
-      "top": 0,
-      "width": 395,
-      "height": 238
-    },
-    {
-      "components": [
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 0,
-          "width": 395,
-          "height": 32,
-          "wireID": "4826a768-bb0a-43ce-bafa-c55a1c84ac2a",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_max_2ch_title"
-        },
-        {
-          "type": "Container",
-          "left": 0,
-          "top": 32,
-          "width": 395,
-          "height": 132,
-          "wireID": "c426d973-4d6a-42b4-c082-23847cfd874c",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Select",
-              "left": 0,
-              "top": 0,
-              "width": 395,
-              "height": 132,
-              "wireID": "853ca135-d35c-474d-fa04-dcab69c2540b",
-              "data": "trigger_is_initiated",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 395,
-                  "height": 132,
-                  "wireID": "739cee7c-34eb-4fa4-f7b7-9876a03b7c15",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Select",
-                      "left": 0,
-                      "top": 0,
-                      "width": 46,
-                      "height": 132,
-                      "wireID": "5c6e74ad-3c97-4e0f-ed03-90053f0ff580",
-                      "data": "channel_trigger_mode",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "widgets": [
-                        {
-                          "type": "Container",
-                          "left": 0,
-                          "top": 0,
-                          "width": 46,
-                          "height": 132,
-                          "wireID": "484d61b7-df5d-4cd4-f6ea-a853a1653445",
-                          "style": {
-                            "inheritFrom": "default",
-                            "font": "Oswald14"
-                          },
-                          "name": "Set",
-                          "widgets": [
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 46,
-                              "height": 31,
-                              "wireID": "c5a574fd-a8d0-4ad3-a63c-83a03dd2356d",
-                              "style": {
-                                "inheritFrom": "default_S"
-                              },
-                              "text": "Set"
-                            },
-                            {
-                              "type": "DisplayData",
-                              "left": 0,
-                              "top": 33,
-                              "width": 46,
-                              "height": 32,
-                              "wireID": "9b1742db-b36a-4eb1-c342-fff212ac0d63",
-                              "data": "channel_u_edit",
-                              "action": "edit",
-                              "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled"
-                              },
-                              "displayOption": 0
-                            },
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 67,
-                              "width": 46,
-                              "height": 31,
-                              "wireID": "e8b20897-3075-46ae-ff44-78dc752a41a1",
-                              "style": {
-                                "inheritFrom": "default_S"
-                              },
-                              "text": "Set"
-                            },
-                            {
-                              "type": "DisplayData",
-                              "left": 0,
-                              "top": 100,
-                              "width": 46,
-                              "height": 32,
-                              "wireID": "02c430b3-d296-4f29-9114-def9299f7ce1",
-                              "data": "channel_i_edit",
-                              "action": "edit",
-                              "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled"
-                              },
-                              "displayOption": 0
-                            }
-                          ]
-                        },
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 46,
-                          "height": 132,
-                          "wireID": "35708db1-6601-4c42-9b37-55f7e2ad3f5f",
-                          "data": "",
-                          "action": "show_ch_settings_trigger",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled",
-                            "font": "Oswald17"
-                          },
-                          "text": "\\u00a1"
-                        },
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 46,
-                          "height": 132,
-                          "wireID": "65d2b0e3-af56-4a5b-9bf1-1e854eaee282",
-                          "data": "",
-                          "action": "show_ch_settings_trigger",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled",
-                            "font": "Oswald17"
-                          },
-                          "text": "\\u00b5"
-                        },
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 46,
-                          "height": 132,
-                          "wireID": "6424e2fc-ecb5-4aa1-9fed-e381239cde4e",
-                          "data": "",
-                          "action": "show_ch_settings_trigger",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled",
-                            "font": "Oswald17"
-                          },
-                          "text": "\\u00b5"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Container",
-                      "left": 48,
-                      "top": 0,
-                      "width": 93,
-                      "height": 65,
-                      "wireID": "9e152379-1143-4811-b1dd-22aa61ebecfd",
-                      "style": {
-                        "inheritFrom": "default",
-                        "font": "Oswald14"
-                      },
-                      "name": "Set voltage",
-                      "widgets": [
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 46,
-                          "height": 31,
-                          "wireID": "3315db9d-890b-4ff2-cc8f-f70dd94ecf91",
-                          "style": {
-                            "inheritFrom": "default_S"
-                          },
-                          "text": "Limit"
-                        },
-                        {
-                          "type": "DisplayData",
-                          "left": 0,
-                          "top": 33,
-                          "width": 46,
-                          "height": 32,
-                          "wireID": "e5d64726-c9b5-43f4-dd02-9fd97652106d",
-                          "data": "channel_protection_ovp_limit",
-                          "action": "edit",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled"
-                          },
-                          "displayOption": 0
-                        },
-                        {
-                          "type": "Select",
-                          "left": 48,
-                          "top": 0,
-                          "width": 45,
-                          "height": 31,
-                          "wireID": "f14bd3ad-c924-49b6-a105-5155a0f775b0",
-                          "data": "ovp",
-                          "action": "show_ch_settings_prot_ovp",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "widgets": [
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 45,
-                              "height": 31,
-                              "wireID": "f3f1ba3c-58ec-4f01-e28f-e3cc615dafc5",
-                              "action": "",
-                              "style": {
-                                "inheritFrom": "ch_prot_off"
-                              },
-                              "text": "OVP"
-                            },
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 45,
-                              "height": 31,
-                              "wireID": "98ab5ec9-7a82-4dd2-c704-67e935c8f2af",
-                              "action": "",
-                              "style": {
-                                "inheritFrom": "ch_prot_on"
-                              },
-                              "text": "OVP"
-                            },
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 45,
-                              "height": 31,
-                              "wireID": "72612fa1-40a3-4ff2-d71f-2201330505fb",
-                              "action": "",
-                              "style": {
-                                "inheritFrom": "ch_prot_tripped"
-                              },
-                              "text": "OVP"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "LayoutView",
-                          "left": 48,
-                          "top": 33,
-                          "width": 45,
-                          "height": 32,
-                          "wireID": "bd8f0c72-baa3-4bf1-9ff4-f874c4aef5dd",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "layout": "ovp_type"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Container",
-                      "left": 48,
-                      "top": 67,
-                      "width": 93,
-                      "height": 65,
-                      "wireID": "31922e07-ced8-47c2-b6fd-4ed18feb2777",
-                      "style": {
-                        "inheritFrom": "default",
-                        "font": "Oswald14"
-                      },
-                      "name": "Set current",
-                      "widgets": [
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 46,
-                          "height": 31,
-                          "wireID": "4ba46331-2cbe-4ec9-e75a-8c9e2ef5fe2f",
-                          "style": {
-                            "inheritFrom": "default_S"
-                          },
-                          "text": "Limit"
-                        },
-                        {
-                          "type": "DisplayData",
-                          "left": 0,
-                          "top": 33,
-                          "width": 46,
-                          "height": 32,
-                          "wireID": "c3f09255-8a96-4da9-ba2c-a7d03a8daa60",
-                          "data": "channel_protection_ocp_limit",
-                          "action": "edit",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled"
-                          },
-                          "displayOption": 0
-                        },
-                        {
-                          "type": "Select",
-                          "left": 48,
-                          "top": 0,
-                          "width": 45,
-                          "height": 31,
-                          "wireID": "e2f2aad2-5cfe-4d3a-fb91-5ecf9eb92f16",
-                          "data": "ocp",
-                          "action": "show_ch_settings_prot_ocp",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "widgets": [
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 45,
-                              "height": 31,
-                              "wireID": "45a728a4-4de3-4a18-d7d9-e15584a621d2",
-                              "action": "",
-                              "style": {
-                                "inheritFrom": "ch_prot_off"
-                              },
-                              "text": "OCP"
-                            },
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 45,
-                              "height": 31,
-                              "wireID": "aa531763-4736-4731-d628-58aa4af3333f",
-                              "action": "",
-                              "style": {
-                                "inheritFrom": "ch_prot_on"
-                              },
-                              "text": "OCP"
-                            },
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 45,
-                              "height": 31,
-                              "wireID": "70112114-a810-4601-c799-19cb58a671ed",
-                              "action": "",
-                              "style": {
-                                "inheritFrom": "ch_prot_tripped"
-                              },
-                              "text": "OCP"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "Text",
-                          "left": 48,
-                          "top": 33,
-                          "width": 45,
-                          "height": 32,
-                          "wireID": "3e99d476-c043-4508-a42f-4a1efaccbdbb",
-                          "data": "",
-                          "style": {
-                            "inheritFrom": "default_S"
-                          },
-                          "text": "High"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Text",
-                      "left": 143,
-                      "top": 0,
-                      "width": 202,
-                      "height": 132,
-                      "wireID": "0433b30a-7874-4ea7-eba8-e63274878865",
-                      "data": "channel_off_label",
-                      "action": "channel_toggle_output",
-                      "style": {
-                        "inheritFrom": "channel_off_button_38"
-                      },
-                      "text": ""
-                    },
-                    {
-                      "type": "Container",
-                      "left": 347,
-                      "top": 0,
-                      "width": 48,
-                      "height": 132,
-                      "wireID": "e93ea25a-af52-407b-9147-daf02ef67719",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "name": "Power",
-                      "widgets": [
-                        {
-                          "type": "DisplayData",
-                          "left": 0,
-                          "top": 0,
-                          "width": 48,
-                          "height": 23,
-                          "wireID": "3df2a8de-2626-4fbd-fba7-6248498984ff",
-                          "data": "channel_display_value3",
-                          "style": {
-                            "inheritFrom": "default_S"
-                          },
-                          "displayOption": 1
-                        },
-                        {
-                          "type": "DisplayData",
-                          "left": 0,
-                          "top": 24,
-                          "width": 48,
-                          "height": 23,
-                          "wireID": "5fdcb7df-f63f-4444-9866-6e1d5f25e799",
-                          "data": "channel_display_value3",
-                          "style": {
-                            "inheritFrom": "default_S"
-                          },
-                          "displayOption": 2
-                        },
-                        {
-                          "type": "Select",
-                          "left": 0,
-                          "top": 47,
-                          "width": 48,
-                          "height": 27,
-                          "wireID": "6db146bf-ffec-496a-9a08-60c7375f19c8",
-                          "data": "opp",
-                          "action": "show_ch_settings_prot_opp",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "widgets": [
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 48,
-                              "height": 27,
-                              "wireID": "2c0b49a4-e939-4670-c73b-ec4ceb67d380",
-                              "action": "",
-                              "style": {
-                                "inheritFrom": "ch_prot_off"
-                              },
-                              "text": "OPP"
-                            },
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 48,
-                              "height": 27,
-                              "wireID": "edb06fa6-e4f8-4193-a607-1ecde95c552d",
-                              "action": "",
-                              "style": {
-                                "inheritFrom": "ch_prot_on"
-                              },
-                              "text": "OPP"
-                            },
-                            {
-                              "type": "Text",
-                              "left": 0,
-                              "top": 0,
-                              "width": 48,
-                              "height": 27,
-                              "wireID": "84c107b1-1c9a-44f2-9267-838a38dfac5b",
-                              "action": "",
-                              "style": {
-                                "inheritFrom": "ch_prot_tripped"
-                              },
-                              "text": "OPP"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "DisplayData",
-                          "left": 0,
-                          "top": 76,
-                          "width": 48,
-                          "height": 27,
-                          "wireID": "e0a33623-9d6d-4d08-a59c-9a312bf69131",
-                          "data": "channel_protection_opp_level",
-                          "action": "edit",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled"
-                          },
-                          "displayOption": 0
-                        },
-                        {
-                          "type": "DisplayData",
-                          "left": 0,
-                          "top": 105,
-                          "width": 48,
-                          "height": 27,
-                          "wireID": "410f0986-2f5c-49a1-a7cf-de8f87b95786",
-                          "data": "channel_protection_opp_delay",
-                          "action": "edit",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled"
-                          },
-                          "displayOption": 0
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 395,
-                  "height": 132,
-                  "wireID": "d4d983ad-6b45-4f54-e782-eeedec3e097f",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Button",
-                      "left": 2,
-                      "top": 2,
-                      "width": 195,
-                      "height": 128,
-                      "wireID": "34f16d93-adfb-47fa-d215-bb1b8fd26619",
-                      "data": "trigger_is_initiated",
-                      "action": "trigger_generate_manual",
-                      "style": {
-                        "inheritFrom": "trigger_button_24"
-                      },
-                      "text": "\\u00a4 TRG",
-                      "enabled": "trigger_is_manual",
-                      "disabledStyle": {
-                        "inheritFrom": "trigger_button_24",
-                        "color": "text_regular",
-                        "activeBackgroundColor": "text_regular"
-                      }
-                    },
-                    {
-                      "type": "Text",
-                      "left": 199,
-                      "top": 2,
-                      "width": 194,
-                      "height": 128,
-                      "wireID": "1fb4bfad-b060-4064-b156-5a95356bc2ca",
-                      "data": "channel_off_label",
-                      "action": "channel_toggle_output",
-                      "style": {
-                        "inheritFrom": "channel_off_button_38"
-                      },
-                      "text": ""
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_2ch_hbar_off",
-      "left": 0,
-      "top": 0,
-      "width": 395,
-      "height": 238
-    },
-    {
-      "components": [
-        {
-          "type": "Text",
-          "left": 0,
-          "top": 0,
-          "width": 53,
-          "height": 32,
-          "wireID": "13f64718-900b-44a4-b499-31c86faa3daf",
-          "data": "channel_short_title",
-          "style": {
-            "inheritFrom": "channel1",
-            "alignHorizontal": "left",
-            "padding": "0 5"
-          },
-          "text": ""
-        },
-        {
-          "type": "Text",
-          "left": 53,
-          "top": 0,
-          "width": 22,
-          "height": 32,
-          "wireID": "2b31fb09-803b-4ccd-979e-12673ba8f079",
-          "action": "toggle_channels_max_view",
-          "style": {
-            "inheritFrom": "channel1",
-            "font": "Heydings14",
-            "alignVertical": "top"
-          },
-          "text": "e"
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_2ch_min_title",
-      "left": 0,
-      "top": 0,
-      "width": 75,
-      "height": 32
-    },
-    {
-      "components": [
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 0,
-          "width": 75,
-          "height": 32,
-          "wireID": "5a2ddf67-a78b-4144-bdd3-bf3f0f182e8a",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_max_2ch_min_title"
-        },
-        {
-          "type": "Container",
-          "left": 0,
-          "top": 34,
-          "width": 75,
-          "height": 64,
-          "wireID": "9edc5005-a443-4a8b-a20a-e3423a935746",
-          "action": "channel_toggle_output",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "name": "mon section",
-          "widgets": [
-            {
-              "type": "DisplayData",
-              "left": 0,
-              "top": 0,
-              "width": 75,
-              "height": 31,
-              "wireID": "9ff1c945-54d4-4131-c441-4a0b46b13167",
-              "data": "channel_display_value1",
-              "style": {
-                "inheritFrom": "mon_value_14_center"
-              },
-              "displayOption": 0
-            },
-            {
-              "type": "DisplayData",
-              "left": 0,
-              "top": 33,
-              "width": 75,
-              "height": 31,
-              "wireID": "7f005356-d65c-4fe6-bbf3-1009057c41e5",
-              "data": "channel_display_value2",
-              "style": {
-                "inheritFrom": "mon_value_14_center"
-              },
-              "displayOption": 0
-            }
-          ]
-        },
-        {
-          "type": "DisplayData",
-          "left": 0,
-          "top": 100,
-          "width": 75,
-          "height": 31,
-          "wireID": "8709f4b3-c4ed-4d45-f20a-df08f39199f0",
-          "data": "channel_u_edit",
-          "action": "edit",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_right_enabled"
-          },
-          "displayOption": 0
-        },
-        {
-          "type": "DisplayData",
-          "left": 0,
-          "top": 133,
-          "width": 75,
-          "height": 31,
-          "wireID": "25fe6e57-6b6a-405b-86b9-1c86637b1aa9",
-          "data": "channel_i_edit",
-          "action": "edit",
-          "style": {
-            "inheritFrom": "encoder_cursor_14_right_enabled"
-          },
-          "displayOption": 0
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_2ch_min_on",
-      "left": 0,
-      "top": 0,
-      "width": 75,
-      "height": 238
-    },
-    {
-      "components": [
-        {
-          "type": "LayoutView",
-          "left": 0,
-          "top": 0,
-          "width": 75,
-          "height": 32,
-          "wireID": "b31038c8-c003-4871-8ea6-be95aa6723c7",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "layout": "slot_max_2ch_min_title"
-        },
-        {
-          "type": "Text",
-          "left": 1,
-          "top": 33,
-          "width": 73,
-          "height": 65,
-          "wireID": "e8a45cc0-a7ec-48b7-b15c-f76bc8597af7",
-          "data": "channel_off_label",
-          "action": "channel_toggle_output",
-          "style": {
-            "inheritFrom": "channel_off_button_20"
-          },
-          "text": ""
-        },
-        {
-          "type": "Select",
-          "left": 0,
-          "top": 100,
-          "width": 75,
-          "height": 64,
-          "wireID": "7a2a08a6-a7c2-4c30-b2d6-a26d9fb22d62",
-          "data": "trigger_is_initiated",
-          "style": {
-            "inheritFrom": "default"
-          },
-          "widgets": [
-            {
-              "type": "Select",
-              "left": 0,
-              "top": 0,
-              "width": 75,
-              "height": 64,
-              "wireID": "85349852-48bf-4a09-c24e-2bbd7c9d2154",
-              "data": "channel_trigger_mode",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 75,
-                  "height": 64,
-                  "wireID": "c4c56f8f-8dfd-41cb-f098-0ddff463de3b",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "DisplayData",
-                      "left": 0,
-                      "top": 0,
-                      "width": 75,
-                      "height": 31,
-                      "wireID": "e76e91cd-0a62-48e3-e295-630d2b3544d8",
-                      "data": "channel_u_edit",
+                      "width": 56,
+                      "height": 29,
+                      "wireID": "64d8d7e0-26b0-45b0-ec1c-4dee49a4a8d1",
+                      "data": "channel_protection_otp_delay",
                       "action": "edit",
                       "style": {
-                        "inheritFrom": "encoder_cursor_14_right_enabled"
-                      },
-                      "displayOption": 0
-                    },
-                    {
-                      "type": "DisplayData",
-                      "left": 0,
-                      "top": 33,
-                      "width": 75,
-                      "height": 31,
-                      "wireID": "6ad6ce17-f43d-4d8c-b031-21654a078070",
-                      "data": "channel_i_edit",
-                      "action": "edit",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_right_enabled"
+                        "inheritFrom": "encoder_cursor_14_enabled"
                       },
                       "displayOption": 0
                     }
                   ]
-                },
-                {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 75,
-                  "height": 64,
-                  "wireID": "9d848275-5b4a-46f8-9990-1f3a2660a0bd",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 1,
-                      "top": 0,
-                      "width": 73,
-                      "height": 63,
-                      "wireID": "8d536f28-d307-4eaa-cbeb-9f1ff6eb8c7a",
-                      "data": "",
-                      "action": "show_ch_settings_trigger",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled",
-                        "font": "Oswald17"
-                      },
-                      "text": "\\u00a1"
-                    }
-                  ]
-                },
-                {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 75,
-                  "height": 64,
-                  "wireID": "57e4f476-c867-44a2-82e8-2ec0f1f58229",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 1,
-                      "top": 0,
-                      "width": 73,
-                      "height": 63,
-                      "wireID": "fa991c7e-60df-4a8b-f8f3-6a3c19141d57",
-                      "data": "",
-                      "action": "show_ch_settings_trigger",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled",
-                        "font": "Oswald17"
-                      },
-                      "text": "\\u00b5"
-                    }
-                  ]
-                },
-                {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 75,
-                  "height": 64,
-                  "wireID": "58530233-4e76-4606-b90a-f6ac2af9d840",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Text",
-                      "left": 1,
-                      "top": 0,
-                      "width": 73,
-                      "height": 63,
-                      "wireID": "80b003ba-3cc3-459f-f11d-ca34cefba790",
-                      "data": "",
-                      "action": "show_ch_settings_trigger",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled",
-                        "font": "Oswald17"
-                      },
-                      "text": "\\u00b5"
-                    }
-                  ]
                 }
               ]
             },
@@ -4953,29 +3402,29 @@
               "type": "Container",
               "left": 0,
               "top": 0,
-              "width": 75,
-              "height": 64,
-              "wireID": "7555fab9-f551-4459-9462-6b6df71d8575",
+              "width": 480,
+              "height": 96,
+              "wireID": "7cb3797b-a17e-4aaf-cce5-e38e5fa72c8d",
               "style": {
                 "inheritFrom": "default"
               },
               "widgets": [
                 {
                   "type": "Button",
-                  "left": 1,
+                  "left": 2,
                   "top": 0,
-                  "width": 73,
-                  "height": 63,
-                  "wireID": "6679cc63-067e-408c-cfa8-5c600c039b78",
+                  "width": 476,
+                  "height": 94,
+                  "wireID": "4efd022e-a14a-4eb1-e608-6cc5c4d5cf2b",
                   "data": "trigger_is_initiated",
                   "action": "trigger_generate_manual",
                   "style": {
-                    "inheritFrom": "trigger_button_14"
+                    "inheritFrom": "trigger_button_24"
                   },
                   "text": "\\u00a4 TRG",
                   "enabled": "trigger_is_manual",
                   "disabledStyle": {
-                    "inheritFrom": "trigger_button_14",
+                    "inheritFrom": "trigger_button_24",
                     "color": "text_regular",
                     "activeBackgroundColor": "text_regular"
                   }
@@ -4986,431 +3435,120 @@
         }
       ],
       "connectionLines": [],
-      "name": "slot_max_2ch_min_off",
+      "name": "slot_max",
       "left": 0,
       "top": 0,
-      "width": 75,
-      "height": 238
+      "width": 480,
+      "height": 240
     },
     {
       "components": [
         {
-          "type": "LayoutView",
+          "type": "DisplayData",
           "left": 0,
-          "top": 0,
-          "width": 395,
-          "height": 32,
-          "wireID": "0986a1f9-fa1b-46a5-acae-85685674cdb7",
+          "top": 6,
+          "width": 81,
+          "height": 47,
+          "wireID": "e8b1f928-2374-49b6-ae7a-3586a43706d0",
+          "data": "channel_display_value1",
+          "action": "",
           "style": {
-            "inheritFrom": "default"
+            "inheritFrom": "mon_value_48_right",
+            "font": "Oswald38"
           },
-          "layout": "slot_max_2ch_title"
+          "displayOption": 1
         },
         {
-          "type": "Container",
-          "left": 0,
-          "top": 32,
-          "width": 395,
-          "height": 132,
-          "wireID": "980f9238-7d62-4a09-cf18-1bb5b8cbcb95",
+          "type": "DisplayData",
+          "left": 81,
+          "top": 0,
+          "width": 51,
+          "height": 24,
+          "wireID": "5a9aad8b-06c9-4f6a-c638-a7d7a095bee6",
+          "data": "channel_display_value1",
           "style": {
-            "inheritFrom": "default"
+            "inheritFrom": "mon_value_20_left",
+            "font": "Oswald17",
+            "alignHorizontal": "left",
+            "padding": "0 0 0 4"
           },
-          "widgets": [
-            {
-              "type": "Container",
-              "left": 0,
-              "top": 0,
-              "width": 66,
-              "height": 132,
-              "wireID": "29d33b0f-a7e3-4b02-c0e1-34f3f9dfbae7",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 0,
-                  "width": 66,
-                  "height": 32,
-                  "wireID": "fe59037b-6678-4cf3-b262-15dfef527af1",
-                  "data": "channel_u_edit",
-                  "action": "edit",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled"
-                  },
-                  "displayOption": 0
-                },
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 34,
-                  "width": 66,
-                  "height": 31,
-                  "wireID": "73a49bb5-bdf5-4482-efd5-7be9bfb48f3c",
-                  "data": "channel_i_edit",
-                  "action": "edit",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled"
-                  },
-                  "displayOption": 0
-                },
-                {
-                  "type": "Text",
-                  "left": 0,
-                  "top": 67,
-                  "width": 66,
-                  "height": 31,
-                  "wireID": "0c2b859a-98cb-49cf-c4e0-ef9b2556ec37",
-                  "data": "",
-                  "style": {
-                    "inheritFrom": "default_S"
-                  },
-                  "text": "High"
-                },
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 100,
-                  "width": 66,
-                  "height": 32,
-                  "wireID": "c1509f51-b0c3-45f8-ef8b-acd22cc4ad2e",
-                  "data": "channel_protection_opp_limit",
-                  "action": "edit",
-                  "style": {
-                    "inheritFrom": "encoder_cursor_14_enabled"
-                  },
-                  "displayOption": 0
-                }
-              ]
-            },
-            {
-              "type": "YTGraph",
-              "left": 68,
-              "top": 0,
-              "width": 327,
-              "height": 132,
-              "wireID": "f1e49c7f-1abe-4cfc-fcdb-fb33931ecc0b",
-              "data": "channel_history_values",
-              "action": "channel_toggle_output",
-              "style": {
-                "inheritFrom": "yt_graph"
-              },
-              "y1Style": {
-                "inheritFrom": "yt_graph_U_default"
-              },
-              "y2Data": "channel_display_value2",
-              "y2Style": {
-                "inheritFrom": "yt_graph_I_default"
-              }
-            },
-            {
-              "type": "Container",
-              "left": 70,
-              "top": 2,
-              "width": 66,
-              "height": 67,
-              "wireID": "22bf8e50-a671-4e42-f486-654bab5d9b35",
-              "action": "channel_toggle_output",
-              "style": {
-                "inheritFrom": "yt_graph",
-                "opacity": 192
-              },
-              "widgets": [
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 0,
-                  "width": 66,
-                  "height": 32,
-                  "wireID": "cdb1f28e-881e-47dd-8f39-1daac47b2c0b",
-                  "data": "channel_display_value1",
-                  "style": {
-                    "inheritFrom": "yt_graph_U_default",
-                    "backgroundColor": "yt_graph_background",
-                    "activeColor": "yt_graph_background"
-                  },
-                  "displayOption": 0
-                },
-                {
-                  "type": "DisplayData",
-                  "left": 0,
-                  "top": 34,
-                  "width": 66,
-                  "height": 32,
-                  "wireID": "eff641c3-b59a-4082-b0c4-c8489085dc3a",
-                  "data": "channel_display_value2",
-                  "style": {
-                    "inheritFrom": "yt_graph_I_default",
-                    "backgroundColor": "yt_graph_background",
-                    "activeColor": "yt_graph_background"
-                  },
-                  "displayOption": 0
-                }
-              ],
-              "overlay": "nondrag_overlay"
-            }
-          ]
+          "displayOption": 4
+        },
+        {
+          "type": "DisplayData",
+          "left": 80,
+          "top": 25,
+          "width": 52,
+          "height": 29,
+          "wireID": "10480d41-01de-444b-e759-bdc84f9b3ab4",
+          "data": "channel_display_value1",
+          "style": {
+            "inheritFrom": "mon_value_20_left",
+            "font": "Oswald20"
+          },
+          "displayOption": 3
         }
       ],
       "connectionLines": [],
-      "name": "slot_max_2ch_yt_on",
+      "name": "voltage_monitor",
       "left": 0,
       "top": 0,
-      "width": 395,
-      "height": 238
+      "width": 132,
+      "height": 55
     },
     {
       "components": [
         {
-          "type": "LayoutView",
+          "type": "DisplayData",
           "left": 0,
-          "top": 0,
-          "width": 395,
-          "height": 32,
-          "wireID": "0be5f3aa-4bdc-4e78-ac92-9db95d444127",
+          "top": 6,
+          "width": 81,
+          "height": 47,
+          "wireID": "b40e8477-88c7-4297-bf07-e84333d52851",
+          "data": "channel_display_value2",
           "style": {
-            "inheritFrom": "default"
+            "inheritFrom": "mon_value_38_right",
+            "font": "Oswald38"
           },
-          "layout": "slot_max_2ch_title"
+          "displayOption": 1
         },
         {
-          "type": "Container",
-          "left": 0,
-          "top": 32,
-          "width": 395,
-          "height": 132,
-          "wireID": "4a1a727b-0739-40c6-ff5b-3d9b17a2db4a",
+          "type": "DisplayData",
+          "left": 81,
+          "top": 0,
+          "width": 51,
+          "height": 24,
+          "wireID": "2f9a5d5a-211d-41ca-c40b-e8c8220e0c94",
+          "data": "channel_display_value2",
           "style": {
-            "inheritFrom": "default"
+            "inheritFrom": "mon_value_20_left",
+            "font": "Oswald17",
+            "padding": "0 0 0 4"
           },
-          "widgets": [
-            {
-              "type": "Select",
-              "left": 0,
-              "top": 0,
-              "width": 66,
-              "height": 132,
-              "wireID": "3b2270d9-0ae4-48e2-8d3e-434adc28231c",
-              "data": "trigger_is_initiated",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 66,
-                  "height": 132,
-                  "wireID": "3cecd8d2-5ea8-4110-856a-57174193cd5f",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Select",
-                      "left": 0,
-                      "top": 0,
-                      "width": 66,
-                      "height": 65,
-                      "wireID": "edd9fee1-bff2-47bc-f0ec-eac9e71bb206",
-                      "data": "channel_trigger_mode",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "widgets": [
-                        {
-                          "type": "Container",
-                          "left": 0,
-                          "top": 0,
-                          "width": 66,
-                          "height": 65,
-                          "wireID": "b4308f5f-6f33-440c-9332-bc2896613767",
-                          "style": {
-                            "inheritFrom": "default"
-                          },
-                          "widgets": [
-                            {
-                              "type": "DisplayData",
-                              "left": 0,
-                              "top": 0,
-                              "width": 66,
-                              "height": 32,
-                              "wireID": "5dbd8212-1353-4113-d849-4c4cedf5ddce",
-                              "data": "channel_u_edit",
-                              "action": "edit",
-                              "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled"
-                              },
-                              "displayOption": 0
-                            },
-                            {
-                              "type": "DisplayData",
-                              "left": 0,
-                              "top": 34,
-                              "width": 66,
-                              "height": 31,
-                              "wireID": "6e09238e-acea-4a05-8c38-9d49ecd636bb",
-                              "data": "channel_i_edit",
-                              "action": "edit",
-                              "style": {
-                                "inheritFrom": "encoder_cursor_14_enabled"
-                              },
-                              "displayOption": 0
-                            }
-                          ]
-                        },
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 66,
-                          "height": 65,
-                          "wireID": "89cb54e3-58da-4b32-ccc7-d967b22e64c9",
-                          "data": "",
-                          "action": "show_ch_settings_trigger",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled",
-                            "font": "Oswald17"
-                          },
-                          "text": "\\u00a1"
-                        },
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 66,
-                          "height": 65,
-                          "wireID": "eb05e467-b386-4c93-e3f0-3faa37445c1c",
-                          "data": "",
-                          "action": "show_ch_settings_trigger",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled",
-                            "font": "Oswald17"
-                          },
-                          "text": "\\u00b5"
-                        },
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 66,
-                          "height": 65,
-                          "wireID": "bba55cf7-c685-4236-fa49-d68c657aed8e",
-                          "data": "",
-                          "action": "show_ch_settings_trigger",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled",
-                            "font": "Oswald17"
-                          },
-                          "text": "\\u00b5"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Text",
-                      "left": 0,
-                      "top": 67,
-                      "width": 66,
-                      "height": 31,
-                      "wireID": "9b52fbca-4b8f-444f-f872-bed44792f6d8",
-                      "data": "",
-                      "style": {
-                        "inheritFrom": "default_S"
-                      },
-                      "text": "High"
-                    },
-                    {
-                      "type": "DisplayData",
-                      "left": 0,
-                      "top": 100,
-                      "width": 66,
-                      "height": 32,
-                      "wireID": "68d7282a-485d-4382-86e3-e896a6fa5367",
-                      "data": "channel_protection_opp_limit",
-                      "action": "edit",
-                      "style": {
-                        "inheritFrom": "encoder_cursor_14_enabled"
-                      },
-                      "displayOption": 0
-                    }
-                  ]
-                },
-                {
-                  "type": "Container",
-                  "left": 0,
-                  "top": 0,
-                  "width": 66,
-                  "height": 132,
-                  "wireID": "9cc056f4-0946-43b0-fb9f-ac0a2e8712ea",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "Button",
-                      "left": 2,
-                      "top": 2,
-                      "width": 64,
-                      "height": 128,
-                      "wireID": "f1b48656-1574-4171-d4e4-b4d78abc4bdb",
-                      "data": "trigger_is_initiated",
-                      "action": "trigger_generate_manual",
-                      "style": {
-                        "inheritFrom": "trigger_button_14"
-                      },
-                      "text": "\\u00a4 TRG",
-                      "enabled": "trigger_is_manual",
-                      "disabledStyle": {
-                        "inheritFrom": "trigger_button_14",
-                        "color": "text_regular",
-                        "activeBackgroundColor": "text_regular"
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "Container",
-              "left": 66,
-              "top": 0,
-              "width": 329,
-              "height": 132,
-              "wireID": "63af2bc1-3e2d-4607-b602-6cfa5f44cce1",
-              "action": "channel_toggle_output",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "name": "YT-view off",
-              "widgets": [
-                {
-                  "type": "Text",
-                  "left": 2,
-                  "top": 2,
-                  "width": 325,
-                  "height": 128,
-                  "wireID": "535a8708-43d9-4cf1-a374-40ade1a56761",
-                  "data": "channel_off_label",
-                  "action": "",
-                  "style": {
-                    "inheritFrom": "channel_off_button_38"
-                  },
-                  "text": ""
-                }
-              ]
-            }
-          ]
+          "displayOption": 4
+        },
+        {
+          "type": "DisplayData",
+          "left": 80,
+          "top": 26,
+          "width": 52,
+          "height": 29,
+          "wireID": "e4924f2f-fe8e-495b-d965-8cffe885e613",
+          "data": "channel_display_value2",
+          "style": {
+            "inheritFrom": "mon_value_20_left",
+            "font": "Oswald20"
+          },
+          "displayOption": 3
         }
       ],
       "connectionLines": [],
-      "name": "slot_max_2ch_yt_off",
+      "name": "current_monitor",
       "left": 0,
       "top": 0,
-      "width": 395,
-      "height": 238
+      "width": 132,
+      "height": 55,
+      "dataContextOverrides": "{\n    \"channel_display_value2\": \"999.999mW\"\n}"
     },
     {
       "components": [
