@@ -2768,7 +2768,7 @@
                     {
                       "type": "Text",
                       "left": 0,
-                      "top": 64,
+                      "top": 34,
                       "width": 48,
                       "height": 31,
                       "wireID": "c7d040b1-59e0-442b-b3e0-e39f659e4b46",
@@ -2780,7 +2780,7 @@
                     {
                       "type": "DisplayData",
                       "left": 48,
-                      "top": 64,
+                      "top": 34,
                       "width": 91,
                       "height": 31,
                       "wireID": "5f52fb75-de1f-40f0-ac77-cb47e6479312",
@@ -2794,7 +2794,7 @@
                     {
                       "type": "Select",
                       "left": 48,
-                      "top": 34,
+                      "top": 66,
                       "width": 45,
                       "height": 29,
                       "wireID": "031210bc-fe73-4106-9c09-dce7cd6c2c5a",
@@ -2848,7 +2848,7 @@
                     {
                       "type": "LayoutView",
                       "left": 94,
-                      "top": 34,
+                      "top": 66,
                       "width": 45,
                       "height": 29,
                       "wireID": "ba97ff5a-6bfa-4cc3-928b-d1b5ecf89d0f",
@@ -3048,7 +3048,7 @@
                     {
                       "type": "Text",
                       "left": 0,
-                      "top": 64,
+                      "top": 34,
                       "width": 48,
                       "height": 31,
                       "wireID": "8655df00-f067-4b09-e4b0-8dc155be5fa3",
@@ -3060,7 +3060,7 @@
                     {
                       "type": "DisplayData",
                       "left": 48,
-                      "top": 64,
+                      "top": 34,
                       "width": 91,
                       "height": 31,
                       "wireID": "cd67ec17-c426-43a0-ec9b-d10f906f1370",
@@ -3074,7 +3074,7 @@
                     {
                       "type": "Select",
                       "left": 48,
-                      "top": 34,
+                      "top": 66,
                       "width": 45,
                       "height": 29,
                       "wireID": "d61641af-c962-4773-ac47-4806d710e75a",
@@ -3128,7 +3128,7 @@
                     {
                       "type": "Text",
                       "left": 94,
-                      "top": 34,
+                      "top": 66,
                       "width": 45,
                       "height": 29,
                       "wireID": "3a9c443b-c135-47a8-cde2-25d7c1142ce9",
@@ -3309,7 +3309,7 @@
                   "top": 0,
                   "width": 57,
                   "height": 96,
-                  "wireID": "907159b2-0ef0-4657-d97e-93befb61f935",
+                  "wireID": "3b0f4c93-5140-40e0-9de4-b7f5bbc8c51a",
                   "style": {
                     "inheritFrom": "default"
                   },
@@ -3327,64 +3327,10 @@
                       }
                     },
                     {
-                      "type": "Select",
-                      "left": 1,
-                      "top": 2,
-                      "width": 56,
-                      "height": 31,
-                      "wireID": "194a9f4d-6846-44d1-db40-b030504bbba8",
-                      "data": "otp_ch",
-                      "action": "show_ch_settings_prot_otp",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "widgets": [
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 56,
-                          "height": 31,
-                          "wireID": "bf29de55-26ae-48ff-d158-2587855d75e9",
-                          "action": "",
-                          "style": {
-                            "inheritFrom": "ch_prot_off"
-                          },
-                          "text": "OTP"
-                        },
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 56,
-                          "height": 31,
-                          "wireID": "35e169c3-26f7-4b70-c0d2-15175578b8d9",
-                          "action": "",
-                          "style": {
-                            "inheritFrom": "ch_prot_on"
-                          },
-                          "text": "OTP"
-                        },
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 56,
-                          "height": 31,
-                          "wireID": "e059a0a4-a59a-41e5-f603-e2ea8f4ecdb6",
-                          "action": "",
-                          "style": {
-                            "inheritFrom": "ch_prot_tripped"
-                          },
-                          "text": "OTP"
-                        }
-                      ]
-                    },
-                    {
                       "type": "DisplayData",
                       "left": 1,
-                      "top": 34,
-                      "width": 56,
+                      "top": 2,
+                      "width": 55,
                       "height": 31,
                       "wireID": "ca496cad-f687-43b3-9e28-96358b0a0876",
                       "data": "channel_protection_otp_level",
@@ -3397,9 +3343,9 @@
                     {
                       "type": "DisplayData",
                       "left": 1,
-                      "top": 66,
-                      "width": 56,
-                      "height": 29,
+                      "top": 34,
+                      "width": 55,
+                      "height": 31,
                       "wireID": "64d8d7e0-26b0-45b0-ec1c-4dee49a4a8d1",
                       "data": "channel_protection_otp_delay",
                       "action": "edit",
@@ -3407,6 +3353,60 @@
                         "inheritFrom": "encoder_cursor_14_enabled"
                       },
                       "displayOption": 0
+                    },
+                    {
+                      "type": "Select",
+                      "left": 1,
+                      "top": 66,
+                      "width": 55,
+                      "height": 29,
+                      "wireID": "194a9f4d-6846-44d1-db40-b030504bbba8",
+                      "data": "otp_ch",
+                      "action": "show_ch_settings_prot_otp",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 55,
+                          "height": 29,
+                          "wireID": "bf29de55-26ae-48ff-d158-2587855d75e9",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "ch_prot_off"
+                          },
+                          "text": "OTP"
+                        },
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 55,
+                          "height": 29,
+                          "wireID": "35e169c3-26f7-4b70-c0d2-15175578b8d9",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "ch_prot_on"
+                          },
+                          "text": "OTP"
+                        },
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 55,
+                          "height": 29,
+                          "wireID": "e059a0a4-a59a-41e5-f603-e2ea8f4ecdb6",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "ch_prot_tripped"
+                          },
+                          "text": "OTP"
+                        }
+                      ]
                     }
                   ]
                 }
