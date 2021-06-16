@@ -6883,7 +6883,7 @@ void action_dib_mio168_show_channel_labels() {
 ////////////////////////////////////////////////////////////////////////////////
 
 static const int NUM_PAGES_IN_MAX_VIEW = 7;
-static const int NUM_PAGES_IN_DEFAULT_VIEW = 6;
+static const int NUM_PAGES_IN_DEFAULT_VIEW = 7;
 
 void data_dib_mio168_pager_list(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
@@ -6913,6 +6913,7 @@ void action_dib_mio168_pager_select_page() {
     if (cursor % NUM_PAGES_IN_MAX_VIEW != module->selectedPageInMaxView) {
         auto selectedPage = module->selectedPageInMaxView;
         module->selectedPageInMaxView = cursor % NUM_PAGES_IN_MAX_VIEW;
+		module->selectedPageInDefaultView = module->selectedPageInMaxView;
 
         if (module->selectedPageInMaxView > selectedPage) {
             animateSlideLeftWithoutHeader();
@@ -6947,6 +6948,7 @@ void data_dib_mio168_selected_page_in_default_view(DataOperationEnum operation, 
 void action_dib_mio168_select_page_in_default_view() {
 	auto module = (Mio168Module *)g_slots[getFoundWidgetAtDown().cursor];
 	module->selectedPageInDefaultView = (module->selectedPageInDefaultView + 1) % NUM_PAGES_IN_DEFAULT_VIEW;
+	module->selectedPageInMaxView = module->selectedPageInDefaultView;
 	if (isDefaultViewVertical()) {
 		animateSlideLeftInDefaultViewVert(getFoundWidgetAtDown().cursor);
 	} else {

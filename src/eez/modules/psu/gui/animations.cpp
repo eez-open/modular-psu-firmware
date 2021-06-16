@@ -85,9 +85,19 @@ void animateFromDefaultViewToMaxView(int iMax) {
 
     g_animRects[i++] = { BUFFER_SOLID_COLOR, g_workingAreaRect, g_workingAreaRect, 0, OPACITY_SOLID, POSITION_TOP_LEFT };
 
-    g_animRects[i++] = { BUFFER_OLD, defRects[iMin1], defRects[iMin1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_OLD, defRects[iMin2], defRects[iMin2], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_OLD, defRects[iMax], g_fullScreenRect, 0, OPACITY_FADE_OUT, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
+	if (!g_isCol2Mode || iMin1 < 2) {
+		g_animRects[i++] = { BUFFER_OLD, defRects[iMin1], defRects[iMin1], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
+	}
+	
+	if (!g_isCol2Mode || iMin2 < 2) {
+		g_animRects[i++] = { BUFFER_OLD, defRects[iMin2], defRects[iMin2], 0, OPACITY_FADE_OUT, POSITION_TOP_LEFT };
+	}
+	
+	if (iMax == 1) {
+		g_animRects[i++] = { BUFFER_OLD, defRects[iMax], defRects[iMax], 0, OPACITY_FADE_OUT, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
+	} else {
+		g_animRects[i++] = { BUFFER_OLD, defRects[iMax], g_fullScreenRect, 0, OPACITY_FADE_OUT, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
+	}
 
     g_animRects[i++] = { BUFFER_NEW, defRects[iMax], g_fullScreenRect, 0, OPACITY_FADE_IN, POSITION_BOTTOM};
     
@@ -110,9 +120,19 @@ void animateFromMaxViewToDefaultView(int iMax) {
 
     g_animRects[i++] = { BUFFER_OLD, g_fullScreenRect, defRects[iMax], 0, OPACITY_FADE_OUT, POSITION_BOTTOM };
 
-    g_animRects[i++] = { BUFFER_NEW, defRects[iMin1], defRects[iMin1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, defRects[iMin2], defRects[iMin2], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
-    g_animRects[i++] = { BUFFER_NEW, g_fullScreenRect, defRects[iMax], 0, OPACITY_FADE_IN, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
+	if (!g_isCol2Mode || iMin1 < 2) {
+		g_animRects[i++] = { BUFFER_NEW, defRects[iMin1], defRects[iMin1], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
+	}
+	
+	if (!g_isCol2Mode || iMin2 < 2) {
+		g_animRects[i++] = { BUFFER_NEW, defRects[iMin2], defRects[iMin2], 0, OPACITY_FADE_IN, POSITION_TOP_LEFT };
+	}
+
+	if (iMax == 1) {
+		g_animRects[i++] = { BUFFER_NEW, defRects[iMax], defRects[iMax], 0, OPACITY_FADE_IN, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
+	} else {
+		g_animRects[i++] = { BUFFER_NEW, g_fullScreenRect, defRects[iMax], 0, OPACITY_FADE_IN, iMax == 1 ? POSITION_CENTER : POSITION_TOP };
+	}
 
     animateRects(&g_psuAppContext, BUFFER_OLD, i);
 }

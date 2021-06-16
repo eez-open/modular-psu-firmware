@@ -4060,6 +4060,11 @@
       "components": [],
       "connectionLines": [],
       "name": "hide_overlay_long_touch"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "show_next_channel_in_max_view"
     }
   ],
   "pages": [
@@ -64743,6 +64748,24 @@
             "width": 15,
             "height": 15,
             "pixelArray": "ffc30c0000000000000000000cc3ffd7ffc30c000000000000000cc3ffd718d7ffc30c00000000000cc3ffd7180018d7ffc30c0000000cc3ffd71800000018d7ffc30c000cc3ffd718000000000018d7ffc317c3ffd7180000000000000018d7fff1ffd71800000000000000000023f6fff6230000000000000000000cc3fff9ffc30c000000000000000cc3ffd72ed7ffc30c00000000000cc3ffd7180018d7ffc30c0000000cc3ffd71800000018d7ffc30c000cc3ffd718000000000018d7ffc30cc3ffd7180000000000000018d7ffc3ffd71800000000000000000018d7ff"
+          },
+          "source": {
+            "filePath": "fonts\\webhostinghub-glyphs.ttf",
+            "size": 6,
+            "encoding": 63078
+          }
+        },
+        {
+          "encoding": 144,
+          "x": 0,
+          "y": 2,
+          "width": 20,
+          "height": 17,
+          "dx": 20,
+          "glyphBitmap": {
+            "width": 20,
+            "height": 17,
+            "pixelArray": "0000000000000034ee6a01000000000000000000000000000000004effffb2150000000000000000000000000000004effffffe74700000000000000000000000000004efffffffffe8f0700000000007e9d9d9d9d9d9dbbffffffffffffd02b00000000fffffffffffffffffffffffffffffff66a010000ffffffffffffffffffffffffffffffffffb21500ffffffffffffffffffffffffffffffffffffe746ffffffffffffffffffffffffffffffffffffffefffffffffffffffffffffffffffffffffffffdf3affffffffffffffffffffffffffffffffffa70f00fffffffffffffffffffffffffffffff25f0000007e9d9d9d9d9d9dbbffffffffffffca2500000000000000000000004efffffffffd88050000000000000000000000004effffffe54300000000000000000000000000004effffb01400000000000000000000000000000034ef6901000000000000000000"
           },
           "source": {
             "filePath": "fonts\\webhostinghub-glyphs.ttf",

@@ -1399,6 +1399,24 @@ void action_show_overlay() {
 	persist_conf::setOverlayVisibility(persist_conf::devConf.overlayVisibility & ~OVERLAY_HIDDEN);
 }
 
+void action_show_next_channel_in_max_view() {
+    int slotIndexBefore = persist_conf::getMaxSlotIndex();
+    int subchannelIndexBefore = persist_conf::getMaxSubchannelIndex();
+
+	Channel *channel = Channel::getBySlotIndex(slotIndexBefore, subchannelIndexBefore + 1);
+	if (channel) {
+		persist_conf::setMaxChannelIndex(channel->channelIndex);
+	} else {
+		if (slotIndexBefore == NUM_SLOTS - 1) {
+			persist_conf::setMaxSlotIndex(0);
+		} else {
+			persist_conf::setMaxSlotIndex(slotIndexBefore + 1);
+		}
+	}
+    
+    animateSlideLeft();
+}
+
 } // namespace gui
 } // namespace eez
 

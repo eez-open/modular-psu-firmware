@@ -257,15 +257,12 @@ void toggleChannelsViewMode();
 bool isMaxView();
 
 int getMaxSlotIndex();
-int getMin1SlotIndex();
-int getMin2SlotIndex();
-
 void setMaxSlotIndex(int slotIndex);
 void toggleMaxSlotIndex(int slotIndex);
 
+int getMaxSubchannelIndex();
+
 int getMaxChannelIndex();
-int getMin1ChannelIndex();
-int getMin2ChannelIndex();
 
 void setMaxChannelIndex(int channelIndex);
 void toggleMaxChannelIndex(int channelIndex);

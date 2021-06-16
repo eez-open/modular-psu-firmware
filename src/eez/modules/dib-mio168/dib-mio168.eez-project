@@ -421,7 +421,7 @@
     {
       "name": "selected_page_in_default_view",
       "type": "enum",
-      "enumItems": "[\n    \"Overview\",\n    \"Digital Inputs\",\n    \"Digital Outputs\",\n    \"Analog Inputs\",\n    \"Analog Outputs\",\n    \"PWM\"\n]",
+      "enumItems": "[\n    \"Overview\",\n    \"Digital Inputs\",\n    \"Digital Outputs\",\n    \"Analog Inputs\",\n    \"AC Power\",\n    \"Analog Outputs\",\n    \"PWM\"\n]",
       "defaultValue": "0"
     },
     {
@@ -2148,6 +2148,540 @@
               "top": 0,
               "width": 154,
               "height": 204,
+              "wireID": "9689830d-a6ff-4eda-8032-f1af08083810",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 154,
+                  "height": 204,
+                  "wireID": "5bb26f2d-4e7f-4ce2-cfd9-4d7f4b2f0d7b",
+                  "data": "is_no_afe",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Select",
+                      "left": 0,
+                      "top": 0,
+                      "width": 154,
+                      "height": 204,
+                      "wireID": "e18e9df7-6f4c-4ab5-985d-006f3d8c7246",
+                      "data": "ac_analysis_enabled",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 154,
+                          "height": 204,
+                          "wireID": "f53da979-1f8f-410f-82dd-c9a49877623c",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Select",
+                              "left": 1,
+                              "top": 84,
+                              "width": 150,
+                              "height": 36,
+                              "wireID": "97c119b7-8193-4af0-deba-4c9288c6f4e2",
+                              "data": "ac_analysis_allowed",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 150,
+                                  "height": 36,
+                                  "wireID": "c7f22368-dd9f-403a-a8d6-cc3a1eb9565c",
+                                  "action": "",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_S_left",
+                                    "font": "Oswald14",
+                                    "alignHorizontal": "center",
+                                    "color": "text_disabled",
+                                    "backgroundColor": "text_disabled_background",
+                                    "activeColor": "text_disabled_background",
+                                    "activeBackgroundColor": "text_disabled",
+                                    "margin": "0"
+                                  },
+                                  "text": "Enable AC Analysis"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 150,
+                                  "height": 36,
+                                  "wireID": "0372cd35-3028-4cc1-8904-16dfc2566d7b",
+                                  "action": "ain_toggle_ac_analysis",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_S_left",
+                                    "font": "Oswald14",
+                                    "alignHorizontal": "center",
+                                    "color": "action_color",
+                                    "backgroundColor": "text_enable_background",
+                                    "activeColor": "text_enable_background",
+                                    "activeBackgroundColor": "action_color",
+                                    "margin": "0"
+                                  },
+                                  "text": "Enable AC Analysis"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ContainerWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 154,
+                          "height": 204,
+                          "wireID": "a06c3b5c-4d28-42e5-afdd-977e69724b4c",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 1,
+                              "width": 36,
+                              "height": 32,
+                              "wireID": "fd355896-61d7-420a-a40f-c574a7254e5b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12"
+                              },
+                              "text": "S"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 36,
+                              "top": 1,
+                              "width": 38,
+                              "height": 32,
+                              "wireID": "d89aa79c-b562-47ad-b91c-baff99a362f0",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 74,
+                              "top": 1,
+                              "width": 45,
+                              "height": 32,
+                              "wireID": "e3a1544f-9e05-4f7f-be1d-b771ba14b8c7",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 119,
+                              "top": 1,
+                              "width": 34,
+                              "height": 32,
+                              "wireID": "e3a1544f-9e05-4f7f-be1d-b771ba14b8c7",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 35,
+                              "width": 36,
+                              "height": 32,
+                              "wireID": "436d9919-5608-4f92-9695-a66dceb6b1ae",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12"
+                              },
+                              "text": "P"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 36,
+                              "top": 35,
+                              "width": 38,
+                              "height": 32,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 74,
+                              "top": 35,
+                              "width": 45,
+                              "height": 32,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 119,
+                              "top": 35,
+                              "width": 34,
+                              "height": 32,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 69,
+                              "width": 36,
+                              "height": 32,
+                              "wireID": "15780ac5-7494-4c7e-d083-b86c2f61470e",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12"
+                              },
+                              "text": "Q"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 36,
+                              "top": 69,
+                              "width": 38,
+                              "height": 32,
+                              "wireID": "4b1b83d1-efbe-4922-8aac-99c86eba41e7",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 74,
+                              "top": 69,
+                              "width": 45,
+                              "height": 32,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 119,
+                              "top": 69,
+                              "width": 34,
+                              "height": 32,
+                              "wireID": "4b1b83d1-efbe-4922-8aac-99c86eba41e7",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 103,
+                              "width": 36,
+                              "height": 32,
+                              "wireID": "16b49f8e-5849-4d5c-e0dc-cf763736cd4b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12"
+                              },
+                              "text": "Urms"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 36,
+                              "top": 103,
+                              "width": 38,
+                              "height": 32,
+                              "wireID": "40219f5b-74e6-4781-c071-d4599b469c45",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 74,
+                              "top": 103,
+                              "width": 45,
+                              "height": 32,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 119,
+                              "top": 103,
+                              "width": 34,
+                              "height": 32,
+                              "wireID": "40219f5b-74e6-4781-c071-d4599b469c45",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 137,
+                              "width": 36,
+                              "height": 32,
+                              "wireID": "16b49f8e-5849-4d5c-e0dc-cf763736cd4b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12"
+                              },
+                              "text": "Irms"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 36,
+                              "top": 137,
+                              "width": 38,
+                              "height": 32,
+                              "wireID": "12577dac-5b35-4cdc-9811-e30932b44c5a",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 74,
+                              "top": 137,
+                              "width": 45,
+                              "height": 32,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 119,
+                              "top": 137,
+                              "width": 34,
+                              "height": 32,
+                              "wireID": "12577dac-5b35-4cdc-9811-e30932b44c5a",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 171,
+                              "width": 36,
+                              "height": 32,
+                              "wireID": "02c4d22d-17b5-463a-9ffa-6482fab5af0f",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12"
+                              },
+                              "text": "PF"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 36,
+                              "top": 171,
+                              "width": 67,
+                              "height": 32,
+                              "wireID": "fab2b5fd-33bc-4702-e28a-7e237899d735",
+                              "data": "ain_power_factor",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "alignHorizontal": "right",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 103,
+                              "top": 171,
+                              "width": 49,
+                              "height": 32,
+                              "wireID": "6038d936-8d02-4cd1-8264-26e91a76eba6",
+                              "data": "ain_power_factor",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "TextWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 154,
+                      "height": 204,
+                      "wireID": "72a3c2e8-2d3e-4b55-bfa9-f633907d96f2",
+                      "style": {
+                        "inheritFrom": "default_M"
+                      },
+                      "text": "No AFE"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 154,
+              "height": 204,
               "wireID": "ebf8011d-1d5d-4c30-a384-cb66b9cb6ee4",
               "style": {
                 "inheritFrom": "default"
@@ -3699,6 +4233,540 @@
                         "inheritFrom": "default_M"
                       },
                       "text": "No AFE detected"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 426,
+              "height": 74,
+              "wireID": "3d77fbb5-165c-4c51-9b0a-af12def867cc",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 426,
+                  "height": 74,
+                  "wireID": "5bb26f2d-4e7f-4ce2-cfd9-4d7f4b2f0d7b",
+                  "data": "is_no_afe",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Select",
+                      "left": 0,
+                      "top": 0,
+                      "width": 426,
+                      "height": 74,
+                      "wireID": "612e6122-457f-406f-e58c-c89a7ec0fb81",
+                      "data": "ac_analysis_enabled",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 426,
+                          "height": 74,
+                          "wireID": "7f31b601-a511-4df2-beb1-9ec976f4bce9",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Select",
+                              "left": 138,
+                              "top": 19,
+                              "width": 150,
+                              "height": 36,
+                              "wireID": "97c119b7-8193-4af0-deba-4c9288c6f4e2",
+                              "data": "ac_analysis_allowed",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 150,
+                                  "height": 36,
+                                  "wireID": "c7f22368-dd9f-403a-a8d6-cc3a1eb9565c",
+                                  "action": "",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_S_left",
+                                    "font": "Oswald14",
+                                    "alignHorizontal": "center",
+                                    "color": "text_disabled",
+                                    "backgroundColor": "text_disabled_background",
+                                    "activeColor": "text_disabled_background",
+                                    "activeBackgroundColor": "text_disabled",
+                                    "margin": "0"
+                                  },
+                                  "text": "Enable AC Analysis"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 150,
+                                  "height": 36,
+                                  "wireID": "0372cd35-3028-4cc1-8904-16dfc2566d7b",
+                                  "action": "ain_toggle_ac_analysis",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_S_left",
+                                    "font": "Oswald14",
+                                    "alignHorizontal": "center",
+                                    "color": "action_color",
+                                    "backgroundColor": "text_enable_background",
+                                    "activeColor": "text_enable_background",
+                                    "activeBackgroundColor": "action_color",
+                                    "margin": "0"
+                                  },
+                                  "text": "Enable AC Analysis"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ContainerWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 426,
+                          "height": 74,
+                          "wireID": "1fb614d4-139e-4898-ad12-f43c817d0517",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "TextWidget",
+                              "left": 292,
+                              "top": 1,
+                              "width": 18,
+                              "height": 36,
+                              "wireID": "fd355896-61d7-420a-a40f-c574a7254e5b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "S"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 310,
+                              "top": 1,
+                              "width": 38,
+                              "height": 36,
+                              "wireID": "d89aa79c-b562-47ad-b91c-baff99a362f0",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 348,
+                              "top": 1,
+                              "width": 45,
+                              "height": 36,
+                              "wireID": "e3a1544f-9e05-4f7f-be1d-b771ba14b8c7",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 393,
+                              "top": 1,
+                              "width": 33,
+                              "height": 36,
+                              "wireID": "e3a1544f-9e05-4f7f-be1d-b771ba14b8c7",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 0,
+                              "width": 18,
+                              "height": 36,
+                              "wireID": "436d9919-5608-4f92-9695-a66dceb6b1ae",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "P"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 18,
+                              "top": 0,
+                              "width": 38,
+                              "height": 36,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 56,
+                              "top": 0,
+                              "width": 45,
+                              "height": 36,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 101,
+                              "top": 0,
+                              "width": 34,
+                              "height": 36,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 38,
+                              "width": 18,
+                              "height": 36,
+                              "wireID": "15780ac5-7494-4c7e-d083-b86c2f61470e",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "Q"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 18,
+                              "top": 38,
+                              "width": 38,
+                              "height": 36,
+                              "wireID": "4b1b83d1-efbe-4922-8aac-99c86eba41e7",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 56,
+                              "top": 38,
+                              "width": 45,
+                              "height": 36,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 101,
+                              "top": 38,
+                              "width": 34,
+                              "height": 36,
+                              "wireID": "4b1b83d1-efbe-4922-8aac-99c86eba41e7",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 135,
+                              "top": 0,
+                              "width": 40,
+                              "height": 36,
+                              "wireID": "16b49f8e-5849-4d5c-e0dc-cf763736cd4b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "Urms"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 175,
+                              "top": 1,
+                              "width": 38,
+                              "height": 36,
+                              "wireID": "40219f5b-74e6-4781-c071-d4599b469c45",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 213,
+                              "top": 1,
+                              "width": 45,
+                              "height": 36,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 258,
+                              "top": 1,
+                              "width": 34,
+                              "height": 36,
+                              "wireID": "40219f5b-74e6-4781-c071-d4599b469c45",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 135,
+                              "top": 38,
+                              "width": 40,
+                              "height": 36,
+                              "wireID": "16b49f8e-5849-4d5c-e0dc-cf763736cd4b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "Irms"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 175,
+                              "top": 38,
+                              "width": 38,
+                              "height": 36,
+                              "wireID": "12577dac-5b35-4cdc-9811-e30932b44c5a",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 213,
+                              "top": 38,
+                              "width": 45,
+                              "height": 36,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 258,
+                              "top": 38,
+                              "width": 34,
+                              "height": 36,
+                              "wireID": "12577dac-5b35-4cdc-9811-e30932b44c5a",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 292,
+                              "top": 38,
+                              "width": 18,
+                              "height": 36,
+                              "wireID": "02c4d22d-17b5-463a-9ffa-6482fab5af0f",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "PF"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 310,
+                              "top": 38,
+                              "width": 67,
+                              "height": 36,
+                              "wireID": "fab2b5fd-33bc-4702-e28a-7e237899d735",
+                              "data": "ain_power_factor",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "right",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 377,
+                              "top": 38,
+                              "width": 49,
+                              "height": 36,
+                              "wireID": "6038d936-8d02-4cd1-8264-26e91a76eba6",
+                              "data": "ain_power_factor",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "TextWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 426,
+                      "height": 74,
+                      "wireID": "72a3c2e8-2d3e-4b55-bfa9-f633907d96f2",
+                      "style": {
+                        "inheritFrom": "default_M"
+                      },
+                      "text": "No AFE"
                     }
                   ]
                 }
@@ -5277,6 +6345,546 @@
                         "inheritFrom": "default_M"
                       },
                       "text": "No AFE detected"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 234,
+              "height": 204,
+              "wireID": "187df36a-2c41-4119-d4d3-836f432b52bd",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 234,
+                  "height": 204,
+                  "wireID": "5bb26f2d-4e7f-4ce2-cfd9-4d7f4b2f0d7b",
+                  "data": "is_no_afe",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Select",
+                      "left": 0,
+                      "top": 0,
+                      "width": 234,
+                      "height": 204,
+                      "wireID": "e18e9df7-6f4c-4ab5-985d-006f3d8c7246",
+                      "data": "ac_analysis_enabled",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 234,
+                          "height": 204,
+                          "wireID": "f53da979-1f8f-410f-82dd-c9a49877623c",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Select",
+                              "left": 42,
+                              "top": 84,
+                              "width": 150,
+                              "height": 36,
+                              "wireID": "97c119b7-8193-4af0-deba-4c9288c6f4e2",
+                              "data": "ac_analysis_allowed",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 150,
+                                  "height": 36,
+                                  "wireID": "c7f22368-dd9f-403a-a8d6-cc3a1eb9565c",
+                                  "action": "",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_S_left",
+                                    "font": "Oswald14",
+                                    "alignHorizontal": "center",
+                                    "color": "text_disabled",
+                                    "backgroundColor": "text_disabled_background",
+                                    "activeColor": "text_disabled_background",
+                                    "activeBackgroundColor": "text_disabled",
+                                    "margin": "0"
+                                  },
+                                  "text": "Enable AC Analysis"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 150,
+                                  "height": 36,
+                                  "wireID": "0372cd35-3028-4cc1-8904-16dfc2566d7b",
+                                  "action": "ain_toggle_ac_analysis",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_S_left",
+                                    "font": "Oswald14",
+                                    "alignHorizontal": "center",
+                                    "color": "action_color",
+                                    "backgroundColor": "text_enable_background",
+                                    "activeColor": "text_enable_background",
+                                    "activeBackgroundColor": "action_color",
+                                    "margin": "0"
+                                  },
+                                  "text": "Enable AC Analysis"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ContainerWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 234,
+                          "height": 204,
+                          "wireID": "a06c3b5c-4d28-42e5-afdd-977e69724b4c",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "TextWidget",
+                              "left": 11,
+                              "top": 1,
+                              "width": 94,
+                              "height": 32,
+                              "wireID": "fd355896-61d7-420a-a40f-c574a7254e5b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12",
+                                "alignHorizontal": "left"
+                              },
+                              "text": "Apparent:"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 105,
+                              "top": 1,
+                              "width": 38,
+                              "height": 32,
+                              "wireID": "d89aa79c-b562-47ad-b91c-baff99a362f0",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 143,
+                              "top": 1,
+                              "width": 45,
+                              "height": 32,
+                              "wireID": "e3a1544f-9e05-4f7f-be1d-b771ba14b8c7",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 188,
+                              "top": 1,
+                              "width": 34,
+                              "height": 32,
+                              "wireID": "e3a1544f-9e05-4f7f-be1d-b771ba14b8c7",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 11,
+                              "top": 35,
+                              "width": 94,
+                              "height": 32,
+                              "wireID": "436d9919-5608-4f92-9695-a66dceb6b1ae",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12",
+                                "alignHorizontal": "left"
+                              },
+                              "text": "Active:"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 105,
+                              "top": 35,
+                              "width": 38,
+                              "height": 32,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 143,
+                              "top": 35,
+                              "width": 45,
+                              "height": 32,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 188,
+                              "top": 35,
+                              "width": 34,
+                              "height": 32,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 11,
+                              "top": 69,
+                              "width": 94,
+                              "height": 32,
+                              "wireID": "15780ac5-7494-4c7e-d083-b86c2f61470e",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12",
+                                "alignHorizontal": "left"
+                              },
+                              "text": "Reactive:"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 105,
+                              "top": 69,
+                              "width": 38,
+                              "height": 32,
+                              "wireID": "4b1b83d1-efbe-4922-8aac-99c86eba41e7",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 143,
+                              "top": 69,
+                              "width": 45,
+                              "height": 32,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 188,
+                              "top": 69,
+                              "width": 34,
+                              "height": 32,
+                              "wireID": "4b1b83d1-efbe-4922-8aac-99c86eba41e7",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 11,
+                              "top": 103,
+                              "width": 94,
+                              "height": 32,
+                              "wireID": "16b49f8e-5849-4d5c-e0dc-cf763736cd4b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12",
+                                "alignHorizontal": "left"
+                              },
+                              "text": "Urms:"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 105,
+                              "top": 103,
+                              "width": 38,
+                              "height": 32,
+                              "wireID": "40219f5b-74e6-4781-c071-d4599b469c45",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 143,
+                              "top": 103,
+                              "width": 45,
+                              "height": 32,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 188,
+                              "top": 103,
+                              "width": 34,
+                              "height": 32,
+                              "wireID": "40219f5b-74e6-4781-c071-d4599b469c45",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 11,
+                              "top": 137,
+                              "width": 94,
+                              "height": 32,
+                              "wireID": "16b49f8e-5849-4d5c-e0dc-cf763736cd4b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12",
+                                "alignHorizontal": "left"
+                              },
+                              "text": "Irms:"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 105,
+                              "top": 137,
+                              "width": 38,
+                              "height": 32,
+                              "wireID": "12577dac-5b35-4cdc-9811-e30932b44c5a",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 143,
+                              "top": 137,
+                              "width": 45,
+                              "height": 32,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 188,
+                              "top": 137,
+                              "width": 34,
+                              "height": 32,
+                              "wireID": "12577dac-5b35-4cdc-9811-e30932b44c5a",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 11,
+                              "top": 171,
+                              "width": 94,
+                              "height": 32,
+                              "wireID": "02c4d22d-17b5-463a-9ffa-6482fab5af0f",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald12",
+                                "alignHorizontal": "left"
+                              },
+                              "text": "Power factor:"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 105,
+                              "top": 171,
+                              "width": 67,
+                              "height": 32,
+                              "wireID": "fab2b5fd-33bc-4702-e28a-7e237899d735",
+                              "data": "ain_power_factor",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald17",
+                                "alignHorizontal": "right",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 172,
+                              "top": 171,
+                              "width": 49,
+                              "height": 32,
+                              "wireID": "6038d936-8d02-4cd1-8264-26e91a76eba6",
+                              "data": "ain_power_factor",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "TextWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 234,
+                      "height": 204,
+                      "wireID": "72a3c2e8-2d3e-4b55-bfa9-f633907d96f2",
+                      "style": {
+                        "inheritFrom": "default_M"
+                      },
+                      "text": "No AFE"
                     }
                   ]
                 }
@@ -6939,6 +8547,540 @@
               "top": 0,
               "width": 426,
               "height": 114,
+              "wireID": "26e1862d-3401-4517-9e9f-3bfea13878a9",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 426,
+                  "height": 114,
+                  "wireID": "5bb26f2d-4e7f-4ce2-cfd9-4d7f4b2f0d7b",
+                  "data": "is_no_afe",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Select",
+                      "left": 0,
+                      "top": 0,
+                      "width": 426,
+                      "height": 114,
+                      "wireID": "612e6122-457f-406f-e58c-c89a7ec0fb81",
+                      "data": "ac_analysis_enabled",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Container",
+                          "left": 0,
+                          "top": 0,
+                          "width": 426,
+                          "height": 114,
+                          "wireID": "7f31b601-a511-4df2-beb1-9ec976f4bce9",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "Select",
+                              "left": 138,
+                              "top": 39,
+                              "width": 150,
+                              "height": 36,
+                              "wireID": "97c119b7-8193-4af0-deba-4c9288c6f4e2",
+                              "data": "ac_analysis_allowed",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 150,
+                                  "height": 36,
+                                  "wireID": "c7f22368-dd9f-403a-a8d6-cc3a1eb9565c",
+                                  "action": "",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_S_left",
+                                    "font": "Oswald14",
+                                    "alignHorizontal": "center",
+                                    "color": "text_disabled",
+                                    "backgroundColor": "text_disabled_background",
+                                    "activeColor": "text_disabled_background",
+                                    "activeBackgroundColor": "text_disabled",
+                                    "margin": "0"
+                                  },
+                                  "text": "Enable AC Analysis"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 150,
+                                  "height": 36,
+                                  "wireID": "0372cd35-3028-4cc1-8904-16dfc2566d7b",
+                                  "action": "ain_toggle_ac_analysis",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_S_left",
+                                    "font": "Oswald14",
+                                    "alignHorizontal": "center",
+                                    "color": "action_color",
+                                    "backgroundColor": "text_enable_background",
+                                    "activeColor": "text_enable_background",
+                                    "activeBackgroundColor": "action_color",
+                                    "margin": "0"
+                                  },
+                                  "text": "Enable AC Analysis"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ContainerWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 426,
+                          "height": 114,
+                          "wireID": "1fb614d4-139e-4898-ad12-f43c817d0517",
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "widgets": [
+                            {
+                              "type": "TextWidget",
+                              "left": 292,
+                              "top": 22,
+                              "width": 18,
+                              "height": 36,
+                              "wireID": "fd355896-61d7-420a-a40f-c574a7254e5b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "S"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 310,
+                              "top": 22,
+                              "width": 38,
+                              "height": 36,
+                              "wireID": "d89aa79c-b562-47ad-b91c-baff99a362f0",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 348,
+                              "top": 22,
+                              "width": 45,
+                              "height": 36,
+                              "wireID": "e3a1544f-9e05-4f7f-be1d-b771ba14b8c7",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 393,
+                              "top": 22,
+                              "width": 33,
+                              "height": 36,
+                              "wireID": "e3a1544f-9e05-4f7f-be1d-b771ba14b8c7",
+                              "data": "ain_apparent_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 21,
+                              "width": 18,
+                              "height": 36,
+                              "wireID": "436d9919-5608-4f92-9695-a66dceb6b1ae",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "P"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 18,
+                              "top": 21,
+                              "width": 38,
+                              "height": 36,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 56,
+                              "top": 21,
+                              "width": 45,
+                              "height": 36,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 101,
+                              "top": 21,
+                              "width": 34,
+                              "height": 36,
+                              "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
+                              "data": "ain_active_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 59,
+                              "width": 18,
+                              "height": 36,
+                              "wireID": "15780ac5-7494-4c7e-d083-b86c2f61470e",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "Q"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 18,
+                              "top": 59,
+                              "width": 38,
+                              "height": 36,
+                              "wireID": "4b1b83d1-efbe-4922-8aac-99c86eba41e7",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 56,
+                              "top": 59,
+                              "width": 45,
+                              "height": 36,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 101,
+                              "top": 59,
+                              "width": 34,
+                              "height": 36,
+                              "wireID": "4b1b83d1-efbe-4922-8aac-99c86eba41e7",
+                              "data": "ain_reactive_power",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 135,
+                              "top": 21,
+                              "width": 40,
+                              "height": 36,
+                              "wireID": "16b49f8e-5849-4d5c-e0dc-cf763736cd4b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "Urms"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 175,
+                              "top": 22,
+                              "width": 38,
+                              "height": 36,
+                              "wireID": "40219f5b-74e6-4781-c071-d4599b469c45",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 213,
+                              "top": 22,
+                              "width": 45,
+                              "height": 36,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 258,
+                              "top": 22,
+                              "width": 34,
+                              "height": 36,
+                              "wireID": "40219f5b-74e6-4781-c071-d4599b469c45",
+                              "data": "ain_volt_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 135,
+                              "top": 59,
+                              "width": 40,
+                              "height": 36,
+                              "wireID": "16b49f8e-5849-4d5c-e0dc-cf763736cd4b",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "Irms"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 175,
+                              "top": 59,
+                              "width": 38,
+                              "height": 36,
+                              "wireID": "12577dac-5b35-4cdc-9811-e30932b44c5a",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 213,
+                              "top": 59,
+                              "width": 45,
+                              "height": 36,
+                              "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 258,
+                              "top": 59,
+                              "width": 34,
+                              "height": 36,
+                              "wireID": "12577dac-5b35-4cdc-9811-e30932b44c5a",
+                              "data": "ain_curr_rms",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 4"
+                              },
+                              "displayOption": 4
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 292,
+                              "top": 59,
+                              "width": 18,
+                              "height": 36,
+                              "wireID": "02c4d22d-17b5-463a-9ffa-6482fab5af0f",
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "text": "PF"
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 310,
+                              "top": 59,
+                              "width": 67,
+                              "height": 36,
+                              "wireID": "fab2b5fd-33bc-4702-e28a-7e237899d735",
+                              "data": "ain_power_factor",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "right",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background"
+                              },
+                              "displayOption": 1
+                            },
+                            {
+                              "type": "DisplayData",
+                              "left": 377,
+                              "top": 59,
+                              "width": 49,
+                              "height": 36,
+                              "wireID": "6038d936-8d02-4cd1-8264-26e91a76eba6",
+                              "data": "ain_power_factor",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "mon_value_48_right",
+                                "font": "Oswald14",
+                                "alignHorizontal": "left",
+                                "alignVertical": "top",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "padding": "5 0 0 2"
+                              },
+                              "displayOption": 3
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "TextWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 426,
+                      "height": 114,
+                      "wireID": "72a3c2e8-2d3e-4b55-bfa9-f633907d96f2",
+                      "style": {
+                        "inheritFrom": "default_M"
+                      },
+                      "text": "No AFE"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 426,
+              "height": 114,
               "wireID": "ebf8011d-1d5d-4c30-a384-cb66b9cb6ee4",
               "style": {
                 "inheritFrom": "default"
@@ -7156,7 +9298,7 @@
               "type": "Text",
               "left": 0,
               "top": 0,
-              "width": 144,
+              "width": 156,
               "height": 32,
               "wireID": "702c04b4-590b-40d4-d149-9632bc4627ab",
               "data": "slot_title_max",
@@ -7170,7 +9312,7 @@
             },
             {
               "type": "List",
-              "left": 144,
+              "left": 156,
               "top": 0,
               "width": 192,
               "height": 32,
@@ -7227,9 +9369,9 @@
             },
             {
               "type": "Select",
-              "left": 336,
+              "left": 348,
               "top": 0,
-              "width": 50,
+              "width": 44,
               "height": 32,
               "wireID": "8bd39f59-9875-4e69-8a3b-90c08b03222d",
               "data": "is_settings_page_selected",
@@ -7242,7 +9384,7 @@
                   "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 50,
+                  "width": 44,
                   "height": 32,
                   "wireID": "cb01cc2d-c2bf-4828-aecd-588d6858e675",
                   "action": "",
@@ -7256,7 +9398,7 @@
                   "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 50,
+                  "width": 44,
                   "height": 32,
                   "wireID": "bfcfc6aa-042b-42c4-9446-4783f91cda6a",
                   "action": "",
@@ -7272,22 +9414,10 @@
               ]
             },
             {
-              "type": "Rectangle",
-              "left": 386,
+              "type": "Text",
+              "left": 392,
               "top": 0,
               "width": 44,
-              "height": 32,
-              "wireID": "51b99add-f88e-41a2-ce8c-040a62073ab7",
-              "style": {
-                "inheritFrom": "channel1"
-              },
-              "invertColors": true
-            },
-            {
-              "type": "Text",
-              "left": 430,
-              "top": 0,
-              "width": 50,
               "height": 32,
               "wireID": "0ae8fc46-cf8a-4f1d-e4dd-a6ec4a6a4678",
               "action": "toggle_slot_max_view",
@@ -7296,6 +9426,20 @@
                 "font": "Heydings14"
               },
               "text": "E"
+            },
+            {
+              "type": "Text",
+              "left": 436,
+              "top": 0,
+              "width": 44,
+              "height": 32,
+              "wireID": "67d6df60-d804-41bb-9503-4d6b44573639",
+              "action": "show_next_channel_in_max_view",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14"
+              },
+              "text": "\\u0090"
             }
           ]
         },

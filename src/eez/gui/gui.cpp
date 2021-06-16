@@ -377,10 +377,25 @@ void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst
             w = animRect.srcRect.w;
             h = animRect.srcRect.h;
         } else {
-            x = (int)roundf(animRect.srcRect.x + t1 * (animRect.dstRect.x - animRect.srcRect.x));
-            y = (int)roundf(animRect.srcRect.y + t1 * (animRect.dstRect.y - animRect.srcRect.y));
-            w = (int)roundf(animRect.srcRect.w + t1 * (animRect.dstRect.w - animRect.srcRect.w));
-            h = (int)roundf(animRect.srcRect.h + t1 * (animRect.dstRect.h - animRect.srcRect.h));
+			if (animRect.dstRect.x > animRect.srcRect.x)
+				x = (int)roundf(animRect.srcRect.x + t1 * (animRect.dstRect.x - animRect.srcRect.x));
+			else
+				x = (int)floorf(animRect.srcRect.x + t1 * (animRect.dstRect.x - animRect.srcRect.x));
+
+			if (animRect.dstRect.y > animRect.srcRect.y)
+				y = (int)roundf(animRect.srcRect.y + t1 * (animRect.dstRect.y - animRect.srcRect.y));
+			else
+				y = (int)floorf(animRect.srcRect.y + t1 * (animRect.dstRect.y - animRect.srcRect.y));
+			
+			if (animRect.dstRect.w > animRect.srcRect.w)
+				w = (int)ceilf(animRect.srcRect.w + t1 * (animRect.dstRect.w - animRect.srcRect.w));
+			else
+				w = (int)floorf(animRect.srcRect.w + t1 * (animRect.dstRect.w - animRect.srcRect.w));
+			
+			if (animRect.dstRect.h > animRect.srcRect.h)
+				h = (int)ceilf(animRect.srcRect.h + t1 * (animRect.dstRect.h - animRect.srcRect.h));
+			else
+				h = (int)floorf(animRect.srcRect.h + t1 * (animRect.dstRect.h - animRect.srcRect.h));
         }
 
         uint8_t opacity;

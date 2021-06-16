@@ -734,25 +734,13 @@ int getMaxSlotIndex() {
     return g_devConf.maxSlotIndex - 1;
 }
 
-int getMin1SlotIndex() {
-    if (getMaxSlotIndex() == 0) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-int getMin2SlotIndex() {
-    if (getMaxSlotIndex() == 2) {
-        return 1;
-    } else {
-        return 2;
-    }
-}
-
 void setMaxSlotIndex(int slotIndex) {
     g_devConf.maxSlotIndex = slotIndex + 1;
     g_devConf.maxSubchannelIndex = 0;
+}
+
+int getMaxSubchannelIndex() {
+    return g_devConf.maxSubchannelIndex;
 }
 
 void toggleMaxSlotIndex(int slotIndex) {
@@ -767,16 +755,6 @@ void toggleMaxSlotIndex(int slotIndex) {
 int getMaxChannelIndex() {
     auto channel = Channel::getBySlotIndex(getMaxSlotIndex());
     return channel ? channel->channelIndex + g_devConf.maxSubchannelIndex : -1;
-}
-
-int getMin1ChannelIndex() {
-    auto channel = Channel::getBySlotIndex(getMin1SlotIndex());
-    return channel ? channel->channelIndex : -1;
-}
-
-int getMin2ChannelIndex() {
-    auto channel = Channel::getBySlotIndex(getMin2SlotIndex());
-    return channel ? channel->channelIndex : -1;
 }
 
 void setMaxChannelIndex(int channelIndex) {

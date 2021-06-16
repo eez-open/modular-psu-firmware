@@ -2017,7 +2017,7 @@
               "type": "Text",
               "left": 0,
               "top": 0,
-              "width": 392,
+              "width": 348,
               "height": 32,
               "wireID": "915212ac-a3fc-48f5-98d2-0a5b29db629d",
               "data": "channel_long_title",
@@ -2031,7 +2031,7 @@
             },
             {
               "type": "Select",
-              "left": 392,
+              "left": 348,
               "top": 0,
               "width": 44,
               "height": 32,
@@ -2076,7 +2076,7 @@
             },
             {
               "type": "Text",
-              "left": 436,
+              "left": 392,
               "top": 0,
               "width": 44,
               "height": 32,
@@ -2087,6 +2087,20 @@
                 "font": "Heydings14"
               },
               "text": "E"
+            },
+            {
+              "type": "Text",
+              "left": 436,
+              "top": 0,
+              "width": 44,
+              "height": 32,
+              "wireID": "7103e83e-8613-4c6d-c72e-e05bbf1d11e9",
+              "action": "show_next_channel_in_max_view",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14"
+              },
+              "text": "\\u0090"
             }
           ]
         },
