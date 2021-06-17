@@ -2707,6 +2707,16 @@
       "name": "overlay_hidden",
       "type": "boolean",
       "defaultValue": "0"
+    },
+    {
+      "name": "next_channel_in_max_view_button_enabled",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "prev_channel_in_max_view_button_enabled",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -4065,6 +4075,11 @@
       "components": [],
       "connectionLines": [],
       "name": "show_next_channel_in_max_view"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "show_prev_channel_in_max_view"
     }
   ],
   "pages": [
@@ -64757,6 +64772,24 @@
         },
         {
           "encoding": 144,
+          "x": 0,
+          "y": 2,
+          "width": 20,
+          "height": 17,
+          "dx": 20,
+          "glyphBitmap": {
+            "width": 20,
+            "height": 17,
+            "pixelArray": "000000000000000000016aee3400000000000000000000000000000015b2ffff4e000000000000000000000000000047e7ffffff4e000000000000000000000000078ffeffffffff4e00000000000000000000002bd0ffffffffffffbb9d9d9d9d9d9d7e0000016af6ffffffffffffffffffffffffffffff0015b2ffffffffffffffffffffffffffffffffff46e7ffffffffffffffffffffffffffffffffffffefffffffffffffffffffffffffffffffffffffff3adfffffffffffffffffffffffffffffffffffff000fa7ffffffffffffffffffffffffffffffffff0000005ff2ffffffffffffffffffffffffffffff0000000025caffffffffffffbb9d9d9d9d9d9d7e00000000000588fdffffffff4e000000000000000000000000000043e5ffffff4e00000000000000000000000000000014b0ffff4e000000000000000000000000000000000169ef3400000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\webhostinghub-glyphs.ttf",
+            "size": 6,
+            "encoding": 63078
+          }
+        },
+        {
+          "encoding": 145,
           "x": 0,
           "y": 2,
           "width": 20,

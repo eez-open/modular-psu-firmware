@@ -1273,10 +1273,31 @@
           },
           "widgets": [
             {
-              "type": "Text",
+              "type": "ButtonWidget",
               "left": 0,
               "top": 0,
-              "width": 348,
+              "width": 44,
+              "height": 32,
+              "wireID": "01b71ec8-48d0-4982-a330-47b646600635",
+              "action": "show_prev_channel_in_max_view",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14"
+              },
+              "text": "\\u0090",
+              "enabled": "prev_channel_in_max_view_button_enabled",
+              "disabledStyle": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14",
+                "color": "channel1",
+                "activeBackgroundColor": "channel1"
+              }
+            },
+            {
+              "type": "Text",
+              "left": 44,
+              "top": 0,
+              "width": 304,
               "height": 32,
               "wireID": "0e509fa4-039b-4942-a44f-3f30efa96026",
               "data": "slot_title_max",
@@ -1317,18 +1338,25 @@
               "text": "E"
             },
             {
-              "type": "Text",
+              "type": "ButtonWidget",
               "left": 436,
               "top": 0,
               "width": 44,
               "height": 32,
-              "wireID": "c9d91ac5-6f05-4db8-f08c-31911658a4f0",
+              "wireID": "f97e45eb-815c-4e1b-9ad1-7958bea7a4ab",
               "action": "show_next_channel_in_max_view",
               "style": {
                 "inheritFrom": "channel1",
                 "font": "Heydings14"
               },
-              "text": "\\u0090"
+              "text": "\\u0091",
+              "enabled": "next_channel_in_max_view_button_enabled",
+              "disabledStyle": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14",
+                "color": "status_line_text_disabled",
+                "activeBackgroundColor": "status_line_text_disabled"
+              }
             }
           ]
         },

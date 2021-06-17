@@ -994,6 +994,16 @@ Module *getModule(uint16_t moduleType) {
     return &noneModule;
 }
 
+int getNumModules() {
+    int count = 0;
+    for (int i = 0; i < NUM_SLOTS; i++) {
+        if (g_slots[i]->moduleType != MODULE_TYPE_NONE) {
+            count++;
+        }
+    }
+    return count;
+}
+
 void getModuleSerialInfo(uint8_t slotIndex, char *serialStr) {
     auto &module = *g_slots[slotIndex];
     if (module.idw0 != 0 || module.idw1 != 0 || module.idw2 != 0) {

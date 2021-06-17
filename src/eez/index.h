@@ -456,6 +456,8 @@ extern Module *g_slots[NUM_SLOTS];
 
 Module *getModule(uint16_t moduleType);
 
+int getNumModules();
+
 void getModuleSerialInfo(uint8_t slotIndex, char *serialStr);
 bool setModuleSerialInfo(uint8_t slotIndex, const char *serialStr, size_t serialStrLen, int *err);
 

@@ -2384,10 +2384,31 @@
           "name": "Header",
           "widgets": [
             {
-              "type": "Text",
+              "type": "ButtonWidget",
               "left": 0,
               "top": 0,
-              "width": 348,
+              "width": 44,
+              "height": 32,
+              "wireID": "131aba90-d402-4ba2-a959-b49b37e00c1f",
+              "action": "show_prev_channel_in_max_view",
+              "style": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14"
+              },
+              "text": "\\u0090",
+              "enabled": "prev_channel_in_max_view_button_enabled",
+              "disabledStyle": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14",
+                "color": "channel1",
+                "activeBackgroundColor": "channel1"
+              }
+            },
+            {
+              "type": "Text",
+              "left": 44,
+              "top": 0,
+              "width": 304,
               "height": 32,
               "wireID": "99619a66-bd73-45a8-9608-29dd500a40af",
               "data": "slot_title_max",
@@ -2428,18 +2449,25 @@
               "text": "E"
             },
             {
-              "type": "Text",
+              "type": "ButtonWidget",
               "left": 436,
               "top": 0,
               "width": 44,
               "height": 32,
-              "wireID": "65d7e5f8-1669-436b-b08a-ae80afbf3337",
+              "wireID": "7601aa84-8aae-46bb-8375-ed3b0036859e",
               "action": "show_next_channel_in_max_view",
               "style": {
                 "inheritFrom": "channel1",
                 "font": "Heydings14"
               },
-              "text": "\\u0090"
+              "text": "\\u0091",
+              "enabled": "next_channel_in_max_view_button_enabled",
+              "disabledStyle": {
+                "inheritFrom": "channel1",
+                "font": "Heydings14",
+                "color": "status_line_text_disabled",
+                "activeBackgroundColor": "status_line_text_disabled"
+              }
             }
           ]
         },

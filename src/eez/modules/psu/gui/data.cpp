@@ -982,7 +982,7 @@ bool compare_SLOT_TITLE_MAX_value(const Value &a, const Value &b) {
 void SLOT_TITLE_MAX_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
-    snprintf(text, count, "%s R%dB%d", slot.getLabelOrDefault(), (int)(slot.moduleRevision >> 8), (int)(slot.moduleRevision & 0xFF));
+    snprintf(text, count, "%s #%d", slot.getLabelOrDefault(), slotIndex + 1);
 }
 
 bool compare_SLOT_TITLE_SETTINGS_value(const Value &a, const Value &b) {
@@ -5853,6 +5853,18 @@ void data_ac_mains(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
         value = Value(1.0f * page->powerLineFrequency, UNIT_HERTZ);
+    }
+}
+
+void data_prev_channel_in_max_view_button_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = CH_NUM > 1 || getNumModules() > 1;
+    }
+}
+
+void data_next_channel_in_max_view_button_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = CH_NUM > 1 || getNumModules() > 1;
     }
 }
 

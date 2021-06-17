@@ -1399,21 +1399,67 @@ void action_show_overlay() {
 	persist_conf::setOverlayVisibility(persist_conf::devConf.overlayVisibility & ~OVERLAY_HIDDEN);
 }
 
-void action_show_next_channel_in_max_view() {
-    int slotIndexBefore = persist_conf::getMaxSlotIndex();
-    int subchannelIndexBefore = persist_conf::getMaxSubchannelIndex();
+void action_show_prev_channel_in_max_view() {
+	int slotIndex = persist_conf::getMaxSlotIndex();
+    int subchannelIndex = persist_conf::getMaxSubchannelIndex();
 
-	Channel *channel = Channel::getBySlotIndex(slotIndexBefore, subchannelIndexBefore + 1);
+    if (subchannelIndex > 0) {
+		subchannelIndex--;
+	} else {
+		slotIndex--;
+		if (slotIndex < 0) {
+			slotIndex = NUM_SLOTS - 1;
+			subchannelIndex = 1;
+		}
+		
+		if (g_slots[slotIndex]->numPowerChannels > 0) {
+			subchannelIndex = g_slots[slotIndex]->numPowerChannels - 1;
+		} else {
+			subchannelIndex = 0;
+		}
+	}
+
+	Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
 	if (channel) {
 		persist_conf::setMaxChannelIndex(channel->channelIndex);
 	} else {
-		if (slotIndexBefore == NUM_SLOTS - 1) {
+        persist_conf::setMaxSlotIndex(slotIndex);
+	}
+
+	slotIndex = persist_conf::getMaxSlotIndex();
+	if (g_slots[slotIndex]->moduleType == MODULE_TYPE_NONE) {
+		action_show_prev_channel_in_max_view();
+		return;
+	}
+
+    refreshScreen();
+    
+    animateSlideRight();
+}
+
+void action_show_next_channel_in_max_view() {
+    int slotIndex = persist_conf::getMaxSlotIndex();
+    int subchannelIndex = persist_conf::getMaxSubchannelIndex();
+
+	Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex + 1);
+	if (channel) {
+		persist_conf::setMaxChannelIndex(channel->channelIndex);
+	} else {
+		if (slotIndex == NUM_SLOTS - 1) {
 			persist_conf::setMaxSlotIndex(0);
 		} else {
-			persist_conf::setMaxSlotIndex(slotIndexBefore + 1);
+			persist_conf::setMaxSlotIndex(slotIndex + 1);
 		}
 	}
     
+	slotIndex = persist_conf::getMaxSlotIndex();
+	if (g_slots[slotIndex]->moduleType == MODULE_TYPE_NONE) {
+		action_show_next_channel_in_max_view();
+		return;
+	}
+
+    refreshScreen();
+
     animateSlideLeft();
 }
 
