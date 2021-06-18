@@ -2167,7 +2167,7 @@ scpi_result_t scpi_cmd_sourceDigitalOutputFunctionShapeQ(scpi_t *context) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-scpi_result_t getSweepParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, float &param, bool powerChannel = false) {
+scpi_result_t getFunctionParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, float &param, bool powerChannel = false) {
 	if (powerChannel) {
 		if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
 			return SCPI_RES_ERR;
@@ -2201,7 +2201,7 @@ scpi_result_t getSweepParam(scpi_t *context, SlotAndSubchannelIndex &slotAndSubc
 	return SCPI_RES_OK;
 }
 
-scpi_result_t getSweepChannel(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, bool powerChannel = true) {
+scpi_result_t getFunctionChannel(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, bool powerChannel = true) {
 	if (powerChannel) {
 		if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
 			return SCPI_RES_ERR;
@@ -2226,7 +2226,7 @@ scpi_result_t getSweepChannel(scpi_t *context, SlotAndSubchannelIndex &slotAndSu
 	return SCPI_RES_OK;
 }
 
-scpi_result_t getSweepParamDigital(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, int32_t &pin, float &param) {
+scpi_result_t getFunctionParamDigital(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, int32_t &pin, float &param) {
     auto pSlotAndSubchannelIndex = getSelectedChannel(context);
     if (!pSlotAndSubchannelIndex) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -2254,7 +2254,7 @@ scpi_result_t getSweepParamDigital(scpi_t *context, SlotAndSubchannelIndex &slot
 	return SCPI_RES_OK;
 }
 
-scpi_result_t getSweepChannelDigital(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, int32_t &pin) {
+scpi_result_t getFunctionChannelDigital(scpi_t *context, SlotAndSubchannelIndex &slotAndSubchannelIndex, int32_t &pin) {
     auto pSlotAndSubchannelIndex = getSelectedChannel(context);
     if (!pSlotAndSubchannelIndex) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -2273,10 +2273,10 @@ scpi_result_t getSweepChannelDigital(scpi_t *context, SlotAndSubchannelIndex &sl
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageSweepFrequency(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageFunctionFrequency(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 	
@@ -2291,9 +2291,9 @@ scpi_result_t scpi_cmd_sourceVoltageSweepFrequency(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageSweepFrequencyQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageFunctionFrequencyQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2311,10 +2311,10 @@ scpi_result_t scpi_cmd_sourceVoltageSweepFrequencyQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageSweepPhaseshift(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageFunctionPhaseshift(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2329,9 +2329,9 @@ scpi_result_t scpi_cmd_sourceVoltageSweepPhaseshift(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageSweepPhaseshiftQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageFunctionPhaseshiftQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2349,10 +2349,10 @@ scpi_result_t scpi_cmd_sourceVoltageSweepPhaseshiftQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageSweepAmplitude(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageFunctionAmplitude(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2367,9 +2367,9 @@ scpi_result_t scpi_cmd_sourceVoltageSweepAmplitude(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageSweepAmplitudeQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageFunctionAmplitudeQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2387,10 +2387,10 @@ scpi_result_t scpi_cmd_sourceVoltageSweepAmplitudeQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageSweepOffset(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageFunctionOffset(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2405,9 +2405,9 @@ scpi_result_t scpi_cmd_sourceVoltageSweepOffset(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageSweepOffsetQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageFunctionOffsetQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2425,10 +2425,10 @@ scpi_result_t scpi_cmd_sourceVoltageSweepOffsetQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageSweepDuty(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageFunctionDuty(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2443,9 +2443,9 @@ scpi_result_t scpi_cmd_sourceVoltageSweepDuty(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageSweepDutyQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageFunctionDutyQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2463,10 +2463,10 @@ scpi_result_t scpi_cmd_sourceVoltageSweepDutyQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentSweepFrequency(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentFunctionFrequency(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2481,9 +2481,9 @@ scpi_result_t scpi_cmd_sourceCurrentSweepFrequency(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentSweepFrequencyQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentFunctionFrequencyQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2501,10 +2501,10 @@ scpi_result_t scpi_cmd_sourceCurrentSweepFrequencyQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentSweepPhaseshift(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentFunctionPhaseshift(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2519,9 +2519,9 @@ scpi_result_t scpi_cmd_sourceCurrentSweepPhaseshift(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentSweepPhaseshiftQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentFunctionPhaseshiftQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2539,10 +2539,10 @@ scpi_result_t scpi_cmd_sourceCurrentSweepPhaseshiftQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentSweepAmplitude(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentFunctionAmplitude(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2557,9 +2557,9 @@ scpi_result_t scpi_cmd_sourceCurrentSweepAmplitude(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentSweepAmplitudeQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentFunctionAmplitudeQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2577,10 +2577,10 @@ scpi_result_t scpi_cmd_sourceCurrentSweepAmplitudeQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentSweepOffset(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentFunctionOffset(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2595,9 +2595,9 @@ scpi_result_t scpi_cmd_sourceCurrentSweepOffset(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentSweepOffsetQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentFunctionOffsetQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2615,10 +2615,10 @@ scpi_result_t scpi_cmd_sourceCurrentSweepOffsetQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentSweepDuty(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentFunctionDuty(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2633,9 +2633,9 @@ scpi_result_t scpi_cmd_sourceCurrentSweepDuty(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentSweepDutyQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentFunctionDutyQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex, true) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2653,10 +2653,10 @@ scpi_result_t scpi_cmd_sourceCurrentSweepDutyQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceSweepFrequency(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionFrequency(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2671,9 +2671,9 @@ scpi_result_t scpi_cmd_sourceSweepFrequency(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceSweepFrequencyQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionFrequencyQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2691,10 +2691,10 @@ scpi_result_t scpi_cmd_sourceSweepFrequencyQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceSweepPhaseshift(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionPhaseshift(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2710,9 +2710,9 @@ scpi_result_t scpi_cmd_sourceSweepPhaseshift(scpi_t *context) {
 
 }
 
-scpi_result_t scpi_cmd_sourceSweepPhaseshiftQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionPhaseshiftQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2730,10 +2730,10 @@ scpi_result_t scpi_cmd_sourceSweepPhaseshiftQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceSweepAmplitude(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionAmplitude(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2748,9 +2748,9 @@ scpi_result_t scpi_cmd_sourceSweepAmplitude(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceSweepAmplitudeQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionAmplitudeQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2768,10 +2768,10 @@ scpi_result_t scpi_cmd_sourceSweepAmplitudeQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceSweepOffset(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionOffset(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2787,9 +2787,9 @@ scpi_result_t scpi_cmd_sourceSweepOffset(scpi_t *context) {
 
 }
 
-scpi_result_t scpi_cmd_sourceSweepOffsetQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionOffsetQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2807,10 +2807,10 @@ scpi_result_t scpi_cmd_sourceSweepOffsetQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceSweepDuty(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionDuty(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
 	float param;
-	if (getSweepParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
+	if (getFunctionParam(context, slotAndSubchannelIndex, param) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2825,9 +2825,9 @@ scpi_result_t scpi_cmd_sourceSweepDuty(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceSweepDutyQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceFunctionDutyQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
-	if (getSweepChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
+	if (getFunctionChannel(context, slotAndSubchannelIndex) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2845,11 +2845,11 @@ scpi_result_t scpi_cmd_sourceSweepDutyQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputSweepFrequency(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalOutputFunctionFrequency(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
 	float param;
-	if (getSweepParamDigital(context, slotAndSubchannelIndex, pin, param) == SCPI_RES_ERR) {
+	if (getFunctionParamDigital(context, slotAndSubchannelIndex, pin, param) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2869,10 +2869,10 @@ scpi_result_t scpi_cmd_sourceDigitalOutputSweepFrequency(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputSweepFrequencyQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalOutputFunctionFrequencyQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
-	if (getSweepChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
+	if (getFunctionChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2895,11 +2895,11 @@ scpi_result_t scpi_cmd_sourceDigitalOutputSweepFrequencyQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputSweepPhaseshift(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalOutputFunctionPhaseshift(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
 	float param;
-	if (getSweepParamDigital(context, slotAndSubchannelIndex, pin, param) == SCPI_RES_ERR) {
+	if (getFunctionParamDigital(context, slotAndSubchannelIndex, pin, param) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2919,10 +2919,10 @@ scpi_result_t scpi_cmd_sourceDigitalOutputSweepPhaseshift(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputSweepPhaseshiftQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalOutputFunctionPhaseshiftQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
-	if (getSweepChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
+	if (getFunctionChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2945,11 +2945,11 @@ scpi_result_t scpi_cmd_sourceDigitalOutputSweepPhaseshiftQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputSweepDuty(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalOutputFunctionDuty(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
 	float param;
-	if (getSweepParamDigital(context, slotAndSubchannelIndex, pin, param) == SCPI_RES_ERR) {
+	if (getFunctionParamDigital(context, slotAndSubchannelIndex, pin, param) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 
@@ -2969,10 +2969,10 @@ scpi_result_t scpi_cmd_sourceDigitalOutputSweepDuty(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputSweepDutyQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalOutputFunctionDutyQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
-	if (getSweepChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
+	if (getFunctionChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
 		return SCPI_RES_ERR;
 	}
 

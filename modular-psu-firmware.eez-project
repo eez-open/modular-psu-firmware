@@ -6572,7 +6572,7 @@
                   "width": 40,
                   "height": 32,
                   "wireID": "acef5ec8-91d5-4a28-aa90-b69cf22bb617",
-                  "action": "toggle_channels_view_mode",
+                  "action": "",
                   "style": {
                     "inheritFrom": "status_icon_enabled",
                     "color": "status_line_text_disabled",
@@ -75075,7 +75075,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:FREQuency",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:FREQuency",
             "parameters": [
               {
                 "name": "frequency",
@@ -75093,7 +75093,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:FREQuency?",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:FREQuency?",
             "parameters": [],
             "response": {
               "type": [
@@ -75104,7 +75104,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:PHASeshift",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:PHASeshift",
             "parameters": [
               {
                 "name": "phase_shift",
@@ -75122,7 +75122,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:PHASeshift?",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:PHASeshift?",
             "parameters": [],
             "response": {
               "type": [
@@ -75133,7 +75133,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:AMPLitude",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:AMPLitude",
             "parameters": [
               {
                 "name": "amplitude",
@@ -75151,7 +75151,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:AMPLitude?",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:AMPLitude?",
             "parameters": [],
             "response": {
               "type": [
@@ -75162,7 +75162,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:OFFSet",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:OFFSet",
             "parameters": [
               {
                 "name": "offset",
@@ -75180,7 +75180,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:OFFSet?",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:OFFSet?",
             "parameters": [],
             "response": {
               "type": [
@@ -75191,7 +75191,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:DUTY",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:DUTY",
             "parameters": [
               {
                 "name": "duty",
@@ -75209,7 +75209,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:SWEep:DUTY?",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:DUTY?",
             "parameters": [],
             "response": {
               "type": [
@@ -75220,7 +75220,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:FREQuency",
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:FREQuency",
             "parameters": [
               {
                 "name": "frequency",
@@ -75238,7 +75238,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:FREQuency?",
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:FREQuency?",
             "parameters": [],
             "response": {
               "type": [
@@ -75249,7 +75249,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:PHASeshift",
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:PHASeshift",
             "parameters": [
               {
                 "name": "phase_shift",
@@ -75267,7 +75267,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:PHASeshift?",
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:PHASeshift?",
             "parameters": [],
             "response": {
               "type": [
@@ -75278,7 +75278,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:AMPLitude",
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:AMPLitude",
             "parameters": [
               {
                 "name": "amplitude",
@@ -75296,7 +75296,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:AMPLitude?",
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:AMPLitude?",
             "parameters": [],
             "response": {
               "type": [
@@ -75307,7 +75307,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:OFFSet",
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:OFFSet",
             "parameters": [
               {
                 "name": "offset",
@@ -75325,7 +75325,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:OFFSet?",
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:OFFSet?",
             "parameters": [],
             "response": {
               "type": [
@@ -75336,7 +75336,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:DUTY",
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:DUTY",
             "parameters": [
               {
                 "name": "duty",
@@ -75354,7 +75354,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:CURRent:SWEep:DUTY?",
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:DUTY?",
             "parameters": [],
             "response": {
               "type": [
@@ -75365,7 +75365,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:FREQuency",
+            "name": "SOURce:FUNCtion:FREQuency",
             "parameters": [
               {
                 "name": "frequency",
@@ -75383,7 +75383,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:FREQuency?",
+            "name": "SOURce:FUNCtion:FREQuency?",
             "parameters": [],
             "response": {
               "type": [
@@ -75394,7 +75394,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:PHASeshift",
+            "name": "SOURce:FUNCtion:PHASeshift",
             "parameters": [
               {
                 "name": "phase_shift",
@@ -75412,7 +75412,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:PHASeshift?",
+            "name": "SOURce:FUNCtion:PHASeshift?",
             "parameters": [],
             "response": {
               "type": [
@@ -75423,7 +75423,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:AMPLitude",
+            "name": "SOURce:FUNCtion:AMPLitude",
             "parameters": [
               {
                 "name": "amplitude",
@@ -75441,7 +75441,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:AMPLitude?",
+            "name": "SOURce:FUNCtion:AMPLitude?",
             "parameters": [],
             "response": {
               "type": [
@@ -75452,7 +75452,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:OFFSet",
+            "name": "SOURce:FUNCtion:OFFSet",
             "parameters": [
               {
                 "name": "offset",
@@ -75470,7 +75470,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:OFFSet?",
+            "name": "SOURce:FUNCtion:OFFSet?",
             "parameters": [],
             "response": {
               "type": [
@@ -75481,7 +75481,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:DUTY",
+            "name": "SOURce:FUNCtion:DUTY",
             "parameters": [
               {
                 "name": "duty",
@@ -75499,7 +75499,7 @@
             }
           },
           {
-            "name": "SOURce:SWEep:DUTY?",
+            "name": "SOURce:FUNCtion:DUTY?",
             "parameters": [],
             "response": {
               "type": [
@@ -75510,7 +75510,7 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:SWEep:FREQuency",
+            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency",
             "parameters": [
               {
                 "name": "frequency",
@@ -75528,7 +75528,7 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:SWEep:FREQuency?",
+            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency?",
             "parameters": [],
             "response": {
               "type": [
@@ -75539,7 +75539,7 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:SWEep:PHASeshift",
+            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift",
             "parameters": [
               {
                 "name": "phase_shift",
@@ -75557,7 +75557,7 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:SWEep:PHASeshift?",
+            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift?",
             "parameters": [],
             "response": {
               "type": [
@@ -75568,7 +75568,7 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:SWEep:DUTY",
+            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:DUTY",
             "parameters": [
               {
                 "name": "duty",
@@ -75586,7 +75586,7 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:SWEep:DUTY?",
+            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:DUTY?",
             "parameters": [],
             "response": {
               "type": [
