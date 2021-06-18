@@ -592,7 +592,34 @@ void action_profile_edit_remark() {
 
 void action_toggle_channels_view_mode() {
     persist_conf::toggleChannelsViewMode();
-    animateFadeOutFadeInWorkingArea();
+
+    if (persist_conf::isMaxView()) {
+        if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
+            infoMessage("Numeric");
+        } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
+            infoMessage("Horizontal Bars");
+        } else {
+            if (persist_conf::devConf.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
+                infoMessage("YT Scroll");
+            } else {
+                infoMessage("YT Scan Line");
+            }
+        }
+    } else {
+        if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
+            infoMessage("Numeric");
+        } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
+            infoMessage("Horizontal Bars");
+        } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
+            infoMessage("Vertical Bars");
+        } else {
+            if (persist_conf::devConf.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
+                infoMessage("YT Scroll");
+            } else {
+                infoMessage("YT Scan Line");
+            }
+        }
+    }
 }
 
 void action_toggle_channels_max_view() {

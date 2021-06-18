@@ -70,7 +70,7 @@
 #include <eez/platform/simulator/front_panel.h>
 #endif
 
-#define CONF_GUI_TOAST_DURATION_MS 2000L
+#define CONF_GUI_TOAST_DURATION_MS 1000L
 
 #define CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT_MS 2000
 #define CONF_GUI_STANDBY_PAGE_TIMEOUT_MS 4000
