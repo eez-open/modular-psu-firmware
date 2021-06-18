@@ -84,6 +84,10 @@ void tick() {
             }
         }
 
+        for (int i = 0; i < NUM_SLOTS; ++i) {
+            maxChannelTemperature = MAX(maxChannelTemperature, g_slots[i]->getMaxTemperature());
+        }
+
         // check if max_channel_temperature is too high
         if (isPowerUp() && maxChannelTemperature > FAN_MAX_TEMP) {
             if (g_lastMaxChannelTemperature <= FAN_MAX_TEMP) {

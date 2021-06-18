@@ -945,6 +945,10 @@ bool Module::isAmperAllowed(int subchannelIndex) {
 	return false;
 }
 
+float Module::getMaxTemperature() {
+    return 25.0f;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct NoneModule : public Module {

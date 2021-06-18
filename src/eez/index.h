@@ -449,6 +449,8 @@ struct Module {
 	
 	virtual bool isMicroAmperAllowed(int subchannelIndex);
 	virtual bool isAmperAllowed(int subchannelIndex);
+
+    virtual float getMaxTemperature();
 };
 
 static const int NUM_SLOTS = 3;

@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <memory.h>
+#include <float.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <spi.h>
@@ -4744,6 +4745,21 @@ public:
 		}
 		return Module::isMicroAmperAllowed(subchannelIndex);
 	}
+
+    float getMaxTemperature() {
+        if (afeVersion != 4) {
+            float maxCurrent = FLT_MIN;
+            for (int i = 0; i < 4; i++) {
+                if (ainChannels[i].getMode() == MEASURE_MODE_CURRENT) {
+                    maxCurrent = MAX(maxCurrent, ainChannels[i].getValue());
+                }
+            }
+
+            return clamp(remap(maxCurrent, 5.0f, FAN_MIN_TEMP, 8.0f, FAN_MAX_TEMP), 25.0f, FAN_MAX_TEMP);
+        }
+
+        return Module::getMaxTemperature();
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
