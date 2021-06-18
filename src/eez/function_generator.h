@@ -47,6 +47,7 @@ struct WaveformParameters {
 	FunctionGeneratorResourceType resourceType;
 	Waveform waveform;
 	float frequency;
+	bool resetPhase;
 	float phaseShift;
 	float amplitude;
 	float offset;
