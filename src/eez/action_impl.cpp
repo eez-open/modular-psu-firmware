@@ -597,29 +597,34 @@ void action_toggle_channels_view_mode() {
         if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
             infoMessage("Numeric");
         } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
-            infoMessage("Horizontal Bars");
+            infoMessage("Horizontal Bar");
         } else {
             if (persist_conf::devConf.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
                 infoMessage("YT Scroll");
             } else {
-                infoMessage("YT Scan Line");
+                infoMessage("YT Scan");
             }
         }
     } else {
         if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
-            infoMessage("Numeric");
+            infoMessage(CH_NUM > 0 ? "Numeric" : "Vertical");
         } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
-            infoMessage("Horizontal Bars");
+            infoMessage(CH_NUM > 0 ? "Horizontal Bar": "Horizontal");
         } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
-            infoMessage("Vertical Bars");
+            infoMessage(CH_NUM > 0 ? "Vertical Bar": "Vertical");
         } else {
-            if (persist_conf::devConf.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
-                infoMessage("YT Scroll");
+            if (CH_NUM > 0) {
+                if (persist_conf::devConf.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
+                    infoMessage("YT Scroll");
+                } else {
+                    infoMessage("YT Scan");
+                }
             } else {
-                infoMessage("YT Scan Line");
+                infoMessage("Horizontal");
             }
         }
     }
+    
 }
 
 void action_toggle_channels_max_view() {

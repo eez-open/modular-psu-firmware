@@ -5868,6 +5868,12 @@ void data_next_channel_in_max_view_button_enabled(DataOperationEnum operation, C
     }
 }
 
+void data_is_toggle_channels_view_mode_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = CH_NUM > 0 || !persist_conf::isMaxView();
+    }
+}
+
 } // namespace gui
 } // namespace eez
 

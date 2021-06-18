@@ -720,9 +720,19 @@ void setChannelsViewModeInMax(unsigned int channelsViewModeInMax) {
 
 void toggleChannelsViewMode() {
     if (isMaxView()) {
-        setChannelsViewModeInMax(g_devConf.channelsViewModeInMax + 1);
+        if (CH_NUM > 0) {
+            setChannelsViewModeInMax(g_devConf.channelsViewModeInMax + 1);
+        }
     } else {
-        setChannelsViewMode(g_devConf.channelsViewMode + 1);
+        if (CH_NUM > 0) {
+            setChannelsViewMode(g_devConf.channelsViewMode + 1);
+        } else {
+            if (g_devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
+                setChannelsViewMode(CHANNELS_VIEW_MODE_HORZ_BAR);
+            } else {
+                setChannelsViewMode(CHANNELS_VIEW_MODE_NUMERIC);
+            }
+        }
     }
 }
 

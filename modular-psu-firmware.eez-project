@@ -2717,6 +2717,11 @@
       "name": "prev_channel_in_max_view_button_enabled",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "is_toggle_channels_view_mode_enabled",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -6549,17 +6554,46 @@
               "text": "\\u00c2"
             },
             {
-              "type": "Text",
+              "type": "Select",
               "left": 320,
               "top": 0,
               "width": 40,
               "height": 32,
-              "wireID": "acef5ec8-91d5-4a28-aa90-b69cf22bb617",
-              "action": "toggle_channels_view_mode",
+              "wireID": "8569b7fd-7ba2-4614-a2d3-13712486584d",
+              "data": "is_toggle_channels_view_mode_enabled",
               "style": {
-                "inheritFrom": "status_icon_enabled"
+                "inheritFrom": "default"
               },
-              "text": "6"
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 40,
+                  "height": 32,
+                  "wireID": "acef5ec8-91d5-4a28-aa90-b69cf22bb617",
+                  "action": "toggle_channels_view_mode",
+                  "style": {
+                    "inheritFrom": "status_icon_enabled",
+                    "color": "status_line_text_disabled",
+                    "activeBackgroundColor": "status_line_text_disabled"
+                  },
+                  "text": "6"
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 40,
+                  "height": 32,
+                  "wireID": "46623059-a3b8-414a-d94e-190229153cb5",
+                  "action": "toggle_channels_view_mode",
+                  "style": {
+                    "inheritFrom": "status_icon_enabled"
+                  },
+                  "text": "6"
+                }
+              ]
             },
             {
               "type": "Select",
