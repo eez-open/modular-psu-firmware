@@ -1755,6 +1755,56 @@
               ]
             },
             {
+              "type": "Select",
+              "left": 244,
+              "top": 58,
+              "width": 220,
+              "height": 50,
+              "wireID": "364b4c2d-8e7b-423d-fed4-f0333bac4449",
+              "data": "channel_copy_available",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "MultilineText",
+                  "left": 0,
+                  "top": 0,
+                  "width": 220,
+                  "height": 50,
+                  "wireID": "582fa3a7-707a-4c28-e4b7-fb81a86270c1",
+                  "action": "",
+                  "style": {
+                    "inheritFrom": "default_disabled_S_left",
+                    "alignHorizontal": "left",
+                    "alignVertical": "top",
+                    "padding": "13"
+                  },
+                  "text": "\\u00a9 Copy",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                },
+                {
+                  "type": "MultilineText",
+                  "left": 0,
+                  "top": 0,
+                  "width": 220,
+                  "height": 50,
+                  "wireID": "3549916a-434e-4af7-f578-f98cdeb32673",
+                  "action": "ch_settings_copy",
+                  "style": {
+                    "inheritFrom": "edit_value_active_S_center",
+                    "alignHorizontal": "left",
+                    "alignVertical": "top",
+                    "padding": "13"
+                  },
+                  "text": "\\u00a9 Copy to",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                }
+              ]
+            },
+            {
               "type": "MultilineText",
               "left": 244,
               "top": 116,

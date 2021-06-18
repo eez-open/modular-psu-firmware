@@ -882,6 +882,22 @@ public:
 	const char *getPinoutFile() override {
 		return "prel6_pinout.jpg";
 	}
+
+	bool isCopyToAvailable() override {
+		int n = 0;
+		for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
+			if (g_slots[slotIndex]->moduleType == MODULE_TYPE_DIB_PREL6) {
+				n++;
+			}
+		}
+		return n > 1;
+	}
+
+	void copyTo(int slotIndex) override {
+		auto otherModule = (Prel6Module *)g_slots[slotIndex];
+
+		otherModule->relayStates = relayStates;
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -2475,9 +2475,16 @@ void data_function_generator_has_mode_select(DataOperationEnum operation, Cursor
 		int slotIndex;
 		int subchannelIndex;
 		int resourceIndex;
-		AllResources::findResource(g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].absoluteResourceIndex,
-			slotIndex, subchannelIndex, resourceIndex);
-		value = g_slots[slotIndex]->getFunctionGeneratorResourceType(subchannelIndex, resourceIndex) == FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I;
+		if (
+			AllResources::findResource(
+				g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].absoluteResourceIndex,
+				slotIndex, subchannelIndex, resourceIndex
+			)
+		) {
+			value = g_slots[slotIndex]->getFunctionGeneratorResourceType(subchannelIndex, resourceIndex) == FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I;
+		} else {
+			value = 0;
+		}
 	}
 }
 
