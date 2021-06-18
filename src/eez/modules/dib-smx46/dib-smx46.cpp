@@ -97,6 +97,7 @@ using function_generator::Waveform;
 struct WaveformParameters {
 	Waveform waveform;
 	float frequency;
+    uint8_t resetPhase;
 	float phaseShift;
 	float amplitude;
 	float offset;
@@ -364,6 +365,7 @@ public:
                 if (!powerDown && waveformParameters && aoutTriggerMode[i] == TRIGGER_MODE_FUNCTION_GENERATOR && function_generator::isActive()) {
                     params.aoutWaveformParameters[i].waveform = waveformParameters->waveform;
                     params.aoutWaveformParameters[i].frequency = waveformParameters->frequency;
+                    params.aoutWaveformParameters[i].resetPhase = waveformParameters->resetPhase;
                     params.aoutWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
                     params.aoutWaveformParameters[i].amplitude = calibrationEnabled[i] && isVoltageCalibrationExists(i) ? calibration::remapValue(waveformParameters->amplitude, calConf[i].u) : waveformParameters->amplitude;
                     params.aoutWaveformParameters[i].offset = calibrationEnabled[i] && isVoltageCalibrationExists(i) ? calibration::remapValue(waveformParameters->offset, calConf[i].u) : waveformParameters->offset;

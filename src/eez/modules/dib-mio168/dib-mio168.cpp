@@ -164,6 +164,7 @@ struct DlogState {
 struct WaveformParameters {
 	Waveform waveform;
 	float frequency;
+    uint8_t resetPhase;
 	float phaseShift;
 	float amplitude;
 	float offset;
@@ -2144,7 +2145,9 @@ public:
 
 				params.doutWaveformParameters[i].waveform = waveformParameters->waveform;
 				params.doutWaveformParameters[i].frequency = waveformParameters->frequency;
+
 				params.doutWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
+                params.doutWaveformParameters[i].resetPhase = waveformParameters->resetPhase;
 				params.doutWaveformParameters[i].dutyCycle = waveformParameters->dutyCycle;
 			} else {
 				params.doutWaveformParameters[i].waveform = Waveform::WAVEFORM_NONE;
@@ -2186,6 +2189,7 @@ public:
 
 				params.aoutWaveformParameters[i].waveform = waveformParameters->waveform;
 				params.aoutWaveformParameters[i].frequency = waveformParameters->frequency;
+                params.aoutWaveformParameters[i].resetPhase = waveformParameters->resetPhase;
 				params.aoutWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
 				params.aoutWaveformParameters[i].amplitude = channel->getCalibratedValue(waveformParameters->amplitude);
 				params.aoutWaveformParameters[i].offset = channel->getCalibratedValue(waveformParameters->offset);
@@ -2235,6 +2239,7 @@ public:
 				params.aoutWaveformParameters[2 + i].waveform = waveformParameters->waveform;
 				params.aoutWaveformParameters[2 + i].frequency = waveformParameters->frequency;
 				params.aoutWaveformParameters[2 + i].phaseShift = waveformParameters->phaseShift;
+                params.aoutWaveformParameters[2 + i].resetPhase = waveformParameters->resetPhase;
 				params.aoutWaveformParameters[2 + i].amplitude = channel->getCalibratedValue(waveformParameters->amplitude);
 				params.aoutWaveformParameters[2 + i].offset = channel->getCalibratedValue(waveformParameters->offset);
 				params.aoutWaveformParameters[2 + i].dutyCycle = waveformParameters->dutyCycle;

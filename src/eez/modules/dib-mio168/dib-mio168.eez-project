@@ -7472,7 +7472,7 @@
                                         "action": "dout_toggle_state",
                                         "style": {
                                           "inheritFrom": "default",
-                                          "font": "Oswald12",
+                                          "font": "RobotoCondensed-Regular",
                                           "alignVertical": "center",
                                           "color": "action_color",
                                           "activeBackgroundColor": "action_color"
@@ -7503,7 +7503,7 @@
                                         "action": "dout_toggle_state",
                                         "style": {
                                           "inheritFrom": "default_inverse",
-                                          "font": "Oswald12",
+                                          "font": "RobotoCondensed-Regular",
                                           "alignVertical": "center",
                                           "backgroundColor": "action_color",
                                           "activeColor": "action_color",

@@ -3053,11 +3053,12 @@
                               "left": 80,
                               "top": 21,
                               "width": 52,
-                              "height": 29,
+                              "height": 32,
                               "wireID": "5a9aad8b-06c9-4f6a-c638-a7d7a095bee6",
                               "data": "channel_u_mon",
                               "style": {
-                                "inheritFrom": "mon_value_20_left"
+                                "inheritFrom": "mon_value_20_left",
+                                "padding": "0 0 0 4"
                               },
                               "displayOption": 4
                             },
@@ -3066,13 +3067,12 @@
                               "left": 80,
                               "top": 53,
                               "width": 52,
-                              "height": 33,
+                              "height": 30,
                               "wireID": "10480d41-01de-444b-e759-bdc84f9b3ab4",
                               "data": "channel_u_mon",
                               "style": {
                                 "inheritFrom": "mon_value_20_left",
-                                "font": "Oswald20",
-                                "alignVertical": "bottom"
+                                "font": "Oswald20"
                               },
                               "displayOption": 3
                             }
@@ -3109,11 +3109,12 @@
                               "left": 98,
                               "top": 21,
                               "width": 52,
-                              "height": 29,
+                              "height": 32,
                               "wireID": "2f9a5d5a-211d-41ca-c40b-e8c8220e0c94",
                               "data": "channel_i_mon",
                               "style": {
-                                "inheritFrom": "mon_value_20_left"
+                                "inheritFrom": "mon_value_20_left",
+                                "padding": "0 0 0 4"
                               },
                               "displayOption": 4
                             },
@@ -3122,12 +3123,11 @@
                               "left": 98,
                               "top": 53,
                               "width": 52,
-                              "height": 33,
+                              "height": 30,
                               "wireID": "e4924f2f-fe8e-495b-d965-8cffe885e613",
                               "data": "channel_i_mon",
                               "style": {
-                                "inheritFrom": "mon_value_20_left",
-                                "alignVertical": "bottom"
+                                "inheritFrom": "mon_value_20_left"
                               },
                               "displayOption": 3
                             }
@@ -3164,11 +3164,12 @@
                               "left": 98,
                               "top": 21,
                               "width": 52,
-                              "height": 29,
+                              "height": 32,
                               "wireID": "f1c999c3-1962-45cd-ea49-eea5e9096024",
                               "data": "channel_p_mon",
                               "style": {
-                                "inheritFrom": "mon_value_20_left"
+                                "inheritFrom": "mon_value_20_left",
+                                "padding": "0 0 0 4"
                               },
                               "displayOption": 4
                             },
@@ -3177,12 +3178,11 @@
                               "left": 98,
                               "top": 53,
                               "width": 52,
-                              "height": 33,
+                              "height": 30,
                               "wireID": "fc956669-ec4f-45ad-cee3-bbe3ebf13357",
                               "data": "channel_p_mon",
                               "style": {
                                 "inheritFrom": "mon_value_20_left",
-                                "alignVertical": "bottom",
                                 "margin": "0"
                               },
                               "displayOption": 3
@@ -3249,7 +3249,7 @@
                           "type": "BarGraph",
                           "left": 0,
                           "top": 0,
-                          "width": 348,
+                          "width": 346,
                           "height": 55,
                           "wireID": "25c48cea-4a9b-4348-d44e-080d6edb0135",
                           "data": "channel_display_value1",
@@ -3292,7 +3292,7 @@
                           "type": "BarGraph",
                           "left": 0,
                           "top": 56,
-                          "width": 348,
+                          "width": 346,
                           "height": 55,
                           "wireID": "9af1dc30-571f-4fae-d692-25d186d46eed",
                           "data": "channel_display_value2",
@@ -4329,9 +4329,9 @@
         {
           "type": "DisplayData",
           "left": 0,
-          "top": 6,
+          "top": 0,
           "width": 81,
-          "height": 47,
+          "height": 55,
           "wireID": "e8b1f928-2374-49b6-ae7a-3586a43706d0",
           "data": "channel_display_value1",
           "action": "",
@@ -4360,14 +4360,15 @@
         {
           "type": "DisplayData",
           "left": 80,
-          "top": 25,
+          "top": 24,
           "width": 52,
-          "height": 29,
+          "height": 31,
           "wireID": "10480d41-01de-444b-e759-bdc84f9b3ab4",
           "data": "channel_display_value1",
           "style": {
             "inheritFrom": "mon_value_20_left",
-            "font": "Oswald20"
+            "font": "Oswald20",
+            "alignVertical": "center"
           },
           "displayOption": 3
         }
@@ -4384,9 +4385,9 @@
         {
           "type": "DisplayData",
           "left": 0,
-          "top": 6,
+          "top": 0,
           "width": 81,
-          "height": 47,
+          "height": 55,
           "wireID": "b40e8477-88c7-4297-bf07-e84333d52851",
           "data": "channel_display_value2",
           "style": {
@@ -4400,7 +4401,7 @@
           "left": 81,
           "top": 0,
           "width": 51,
-          "height": 24,
+          "height": 26,
           "wireID": "2f9a5d5a-211d-41ca-c40b-e8c8220e0c94",
           "data": "channel_display_value2",
           "style": {
