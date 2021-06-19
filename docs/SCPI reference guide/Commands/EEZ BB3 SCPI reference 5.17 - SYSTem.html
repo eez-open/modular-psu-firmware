@@ -384,6 +384,70 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi2">:UART</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_uart_baud"><span style="text-decoration: underline;">:BAUD </span></a><a href="#syst_comm_uart_baud"><span style="text-decoration: underline;">{&lt;baud&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sets UART speed in bits per second</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_uart_data"><span style="text-decoration: underline;">:DATA </span></a><a href="#syst_comm_uart_data"><span style="text-decoration: underline;">{&lt;data&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sets UART data size in bits</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_uart_mode"><span style="text-decoration: underline;">:MODE {&lt;mode&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sets UART operation mode</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_uart_pari"><span style="text-decoration: underline;">:</span></a><a href="#syst_comm_uart_pari"><span style="text-decoration: underline;">PARIty {&lt;parity&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sets UART partity check</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_uart_rec"><span style="text-decoration: underline;">:RECeive?</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Receive string via UART</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_uart_stop"><span style="text-decoration: underline;">:</span></a><a href="#syst_comm_uart_stop"><span style="text-decoration: underline;">STOP {&lt;stop&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sets UART number of stop bits</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
+					<p class="scpi3"><a href="#syst_comm_uart_tran"><span style="text-decoration: underline;">:TRANsmit {&lt;string&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
+					<p>Sends string via UART</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 47%;">
 					<p class="scpi2">:USB</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 53%;">
@@ -1262,7 +1326,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col1.png" alt="syst_col1.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col1.png" alt="syst_col1.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1271,7 +1335,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col2.png" alt="syst_col2.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col2.png" alt="syst_col2.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1280,7 +1344,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col3.png" alt="syst_col3.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col3.png" alt="syst_col3.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1289,7 +1353,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col4.png" alt="syst_col4.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col4.png" alt="syst_col4.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1303,7 +1367,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col5.png" alt="syst_col5.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col5.png" alt="syst_col5.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1312,7 +1376,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col6.png" alt="syst_col6.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col6.png" alt="syst_col6.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1321,7 +1385,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col7.png" alt="syst_col7.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col7.png" alt="syst_col7.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1330,7 +1394,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col8.png" alt="syst_col8.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col8.png" alt="syst_col8.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1344,7 +1408,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col9.png" alt="syst_col9.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col9.png" alt="syst_col9.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1353,7 +1417,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col10.png" alt="syst_col10.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col10.png" alt="syst_col10.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1362,7 +1426,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col11.png" alt="syst_col11.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col11.png" alt="syst_col11.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1371,7 +1435,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col12.png" alt="syst_col12.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col12.png" alt="syst_col12.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1385,7 +1449,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col13.png" alt="syst_col13.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col13.png" alt="syst_col13.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1394,7 +1458,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col14.png" alt="syst_col14.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col14.png" alt="syst_col14.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1403,7 +1467,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col15.png" alt="syst_col15.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col15.png" alt="syst_col15.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1412,7 +1476,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col16.png" alt="syst_col16.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col16.png" alt="syst_col16.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1426,7 +1490,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col17.png" alt="syst_col17.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col17.png" alt="syst_col17.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1435,7 +1499,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col18.png" alt="syst_col18.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col18.png" alt="syst_col18.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1444,7 +1508,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col19.png" alt="syst_col19.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col19.png" alt="syst_col19.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1453,7 +1517,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col20.png" alt="syst_col20.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col20.png" alt="syst_col20.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1467,7 +1531,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col21.png" alt="syst_col21.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col21.png" alt="syst_col21.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1476,7 +1540,7 @@
 				</td>
 				<td colspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col22.png" alt="syst_col22.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col22.png" alt="syst_col22.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1485,7 +1549,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col23.png" alt="syst_col23.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col23.png" alt="syst_col23.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -1494,7 +1558,7 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 11%;">
 					<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-						<img src="wp-content/uploads/2021/02//EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col24.png" alt="syst_col24.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
+						<img src="images/EEZ BB3 SCPI reference 5.17 - SYSTem-syst_col24.png" alt="syst_col24.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 9.24mm; height: 9.24mm;"/>
 					</div>
 					<p class="cc-license">&#160;</p>
 				</td>
@@ -3385,7 +3449,7 @@
 			</tr>
 		</table>
 		<p class="Heading_3">5.17.30. <a name="syst_comm_ntp_freq"></a>SYSTem:COMMunicate:NTP:FREQuency</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+		<table style="border-collapse: collapse; background: transparent; width: 170mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
@@ -3463,7 +3527,550 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.31. <a name="syst_comm_usb_cla"></a>SYSTem:COMMunicate:USB:CLAss</p>
+		<p class="Heading_3">5.17.31. <a name="syst_comm_uart_baud"></a>SYSTem:COMMunicate:UART:BAUD</p>
+		<table style="border-collapse: collapse; background: transparent; width: 170mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:UART:BAUD {&lt;baud&gt;}</p>
+					<p class="cmd_root">SYSTem:COMMunicate:UART:BAUD?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>This command sets one of predefined communication speed in bits per second (baud) if UART is configured on DIN1/DIN2.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;baud&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">9600|14400|38400|57600|115200</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query command returns the set UART communication speed.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:UART:BAUD 19200</p>
+					<p class="cmd_code">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Errors</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">-222,&quot;Data out of range&quot;</p>
+				</td>
+			</tr>
+			<tr style="height: 4.94mm; background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:COMMunicate:UART:MODE</p>
+					<p>SYSTem:COMMunicate:UART:RECeive</p>
+					<p>SYSTem:COMMunicate:UART:TRANsmit</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.17.32. <a name="syst_comm_uart_data"></a>SYSTem:COMMunicate:UART:DATA</p>
+		<table style="border-collapse: collapse; background: transparent; width: 170mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:UART:DATA {&lt;data&gt;}</p>
+					<p class="cmd_root">SYSTem:COMMunicate:UART:DATA?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set the data size in bits of UART communication.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;data&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">6 – 8</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query command returns the set UART communication data size in bits.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:UART:DATA 8</p>
+					<p class="cmd_code">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Errors</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">-222,&quot;Data out of range&quot;</p>
+				</td>
+			</tr>
+			<tr style="height: 4.94mm; background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:COMMunicate:UART:MODE</p>
+					<p>SYSTem:COMMunicate:UART:RECeive</p>
+					<p>SYSTem:COMMunicate:UART:TRANsmit</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.17.33. <a name="syst_comm_uart_mode"></a>SYSTem:COMMunicate:UART:MODE</p>
+		<table style="border-collapse: collapse; background: transparent; width: 170mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:UART:MODE {&lt;uart_mode&gt;}</p>
+					<p class="cmd_root">SYSTem:COMMunicate:UART:MODE?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set UART mode of operation define with &lt;uart_mode&gt; as follows:</p>
+					<ul>
+						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">BOOKmark – adds the received string as a new bookmark to the active DLOG session. See also the SENSe:DLOG:TRACe:BOOKmark command.</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">BUFFer – data received via the UART is not interpreted as SCPI but stored in input buffer which can be retrieved by using the SYSTem:COMMunicate:UART:RECeive? query.</li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">SCPI – received data via UART will be passed to the SCPI parser and interpreted. Use this if you want that e.g. the external device you are testing controls BB3.  </li>
+					</ul>
+					<p>Use the SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion command to activate UART. Changing DIN1 function to UART will automatically set DOUT1 to UART and vice versa.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;uart_mode&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>BOOKmark|BUFFer|SCPI</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Returns the UART mode as a quoted string.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:UART:MODE SCPI</p>
+				</td>
+			</tr>
+			<tr style="height: 8.71mm; background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>*RST</p>
+					<p>SENSe:DLOG:TRACe:BOOKmark</p>
+					<p>SYSTem:COMMunicate:ENABle</p>
+					<p>SYSTem:COMMunicate:UART:RECeive</p>
+					<p>SYSTem:COMMunicate:UART:TRANsmit</p>
+					<p>SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.17.34. <a name="syst_comm_uart_pari"></a>SYSTem:COMMunicate:UART:PARIty</p>
+		<table style="border-collapse: collapse; background: transparent; width: 170mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:UART:PARIty {&lt;parity&gt;}</p>
+					<p class="cmd_root">SYSTem:COMMunicate:UART:PARIty?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set the parity check of UART communication.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;parity&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NONe|EVEN|ODD</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query command returns the set UART communication parity check.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:UART:PARI NON</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Errors</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">-224,&quot;Illegal parameter value&quot;</p>
+				</td>
+			</tr>
+			<tr style="height: 4.94mm; background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:COMMunicate:UART:MODE</p>
+					<p>SYSTem:COMMunicate:UART:RECeive</p>
+					<p>SYSTem:COMMunicate:UART:TRANsmit</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.17.35. <a name="syst_comm_uart_rec"></a>SYSTem:COMMunicate:UART:RECeive</p>
+		<table style="border-collapse: collapse; background: transparent; width: 170mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:UART:RECeive?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Returns quoted string with the contents of the input buffer when UART {mode} is set to BUFFer. Use this query multiple times until input buffer is emptied (in which case it returns an empty string '&quot;&quot;') to get the whole contents of the buffer.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:UART:REC?</p>
+					<p class="cmd_code_Start">Test string</p>
+				</td>
+			</tr>
+			<tr style="height: 8.71mm; background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>*RST</p>
+					<p>SYSTem:COMMunicate:ENABle</p>
+					<p>SYSTem:COMMunicate:UART:MODE</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.17.36. <a name="syst_comm_uart_stop"></a>SYSTem:COMMunicate:UART:STOP</p>
+		<table style="border-collapse: collapse; background: transparent; width: 170mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:UART:STOP {&lt;stop&gt;}</p>
+					<p class="cmd_root">SYSTem:COMMunicate:UART:STOP?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set the number of stop bits for UART communication.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;stop&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">1 – 2</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query command returns the set numbe of stop bits for UART communication.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SYST:COMM:UART:BAUD 19200</p>
+					<p class="cmd_code">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Errors</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">-222,&quot;Data out of range&quot;</p>
+				</td>
+			</tr>
+			<tr style="height: 4.94mm; background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>SYSTem:COMMunicate:UART:MODE</p>
+					<p>SYSTem:COMMunicate:UART:RECeive</p>
+					<p>SYSTem:COMMunicate:UART:TRANsmit</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.17.37. <a name="syst_comm_uart_tran"></a>SYSTem:COMMunicate:UART:TRANsmit</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SYSTem:COMMunicate:UART:TRANsmit {&lt;string&gt;}</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to transmit {string} over UART. The new line character (\n) is always appended.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;string&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">&#160;</p>
+				</td>
+			</tr>
+			<tr style="height: 8.71mm; background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>*RST</p>
+					<p>SYSTem:COMMunicate:ENABle</p>
+					<p>SYSTem:COMMunicate:UART:MODE</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.17.38. <a name="syst_comm_usb_cla"></a>SYSTem:COMMunicate:USB:CLAss</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3541,7 +4148,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.32. <a name="syst_comm_usb_mode"></a>SYSTem:COMMunicate:USB:MODE</p>
+		<p class="Heading_3">5.17.39. <a name="syst_comm_usb_mode"></a>SYSTem:COMMunicate:USB:MODE</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3623,7 +4230,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.33. <a name="syst_comm_rlst"></a>SYSTem:COMMunicate:RLSTate</p>
+		<p class="Heading_3">5.17.40. <a name="syst_comm_rlst"></a>SYSTem:COMMunicate:RLSTate</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3710,7 +4317,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.34. <a name="syst_cpu_firm"></a>SYSTem:CPU:FIRMware?</p>
+		<p class="Heading_3">5.17.41. <a name="syst_cpu_firm"></a>SYSTem:CPU:FIRMware?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3738,7 +4345,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.35. <a name="syst_cpu_ont_last"></a>SYSTem:CPU:INFOrmation:ONTime:LAST?</p>
+		<p class="Heading_3">5.17.42. <a name="syst_cpu_ont_last"></a>SYSTem:CPU:INFOrmation:ONTime:LAST?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3766,7 +4373,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.36. <a name="syst_cpu_ont_tot"></a>SYSTem:CPU:INFOrmation:ONTime:TOTal?</p>
+		<p class="Heading_3">5.17.43. <a name="syst_cpu_ont_tot"></a>SYSTem:CPU:INFOrmation:ONTime:TOTal?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3794,7 +4401,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.37. <a name="syst_cpu_mod"></a>SYSTem:CPU:MODel?</p>
+		<p class="Heading_3">5.17.44. <a name="syst_cpu_mod"></a>SYSTem:CPU:MODel?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3831,7 +4438,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.38. <a name="syst_cpu_sno"></a>SYSTem:CPU:SNO?</p>
+		<p class="Heading_3">5.17.45. <a name="syst_cpu_sno"></a>SYSTem:CPU:SNO?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3867,7 +4474,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.39. <a name="syst_cpu_vers"></a>SYSTem:CPU:VERSion?</p>
+		<p class="Heading_3">5.17.46. <a name="syst_cpu_vers"></a>SYSTem:CPU:VERSion?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -3903,7 +4510,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.40. <a name="syst_date"></a>SYSTem:DATE</p>
+		<p class="Heading_3">5.17.47. <a name="syst_date"></a>SYSTem:DATE</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4013,7 +4620,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.41. <a name="syst_del"></a>SYSTem:DELay</p>
+		<p class="Heading_3">5.17.48. <a name="syst_del"></a>SYSTem:DELay</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4071,7 +4678,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.42. <a name="syst_dig_inp_data"></a>SYSTem:DIGital:INPut:DATA</p>
+		<p class="Heading_3">5.17.49. <a name="syst_dig_inp_data"></a>SYSTem:DIGital:INPut:DATA</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4148,7 +4755,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.43. <a name="syst_dig_outp_data"></a>SYSTem:DIGital:OUTPut:DATA</p>
+		<p class="Heading_3">5.17.50. <a name="syst_dig_outp_data"></a>SYSTem:DIGital:OUTPut:DATA</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4249,7 +4856,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.44. <a name="syst_dig_outp_pwm_duty"></a>SYSTem:DIGital:OUTPut:PWM:DUTY</p>
+		<p class="Heading_3">5.17.51. <a name="syst_dig_outp_pwm_duty"></a>SYSTem:DIGital:OUTPut:PWM:DUTY</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4351,7 +4958,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.45. <a name="syst_dig_outp_pwm_freq"></a>SYSTem:DIGital:OUTPut:PWM:FREQuency</p>
+		<p class="Heading_3">5.17.52. <a name="syst_dig_outp_pwm_freq"></a>SYSTem:DIGital:OUTPut:PWM:FREQuency</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4453,7 +5060,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.46. <a name="syst_dig_pin_func"></a>SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion</p>
+		<p class="Heading_3">5.17.53. <a name="syst_dig_pin_func"></a>SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4481,7 +5088,8 @@
 						<li class="List_1" style="text-indent: 0; list-style-type: disc;">ONCouple – output pin synchronize channel output state.</li>
 						<li class="List_1" style="text-indent: 0; list-style-type: disc;">PWM – (<span style="font-style: italic;">pin 4 only</span>) square wave generator output.</li>
 						<li class="List_1" style="text-indent: 0; list-style-type: disc;">SYSTrig – The pin is configured as a system trigger input. When configured as a trigger input, the pin can be selected as the source for trigger signals. See TRIGger[:SEQuence]:SOURce.</li>
-						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">TOUTput – This allows a BUS trigger to be sent to any digital port pin that has been configured as a trigger output. A trigger out pulse is generated when the state is on and a bus trigger is received. A BUS trigger is generated using the *TRG command.</li>
+						<li class="List_1" style="text-indent: 0; list-style-type: disc;">TOUTput – This allows a BUS trigger to be sent to any digital port pin that has been configured as a trigger output. A trigger out pulse is generated when the state is on and a bus trigger is received. A BUS trigger is generated using the *TRG command.</li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">UART – defines pin 1 as UART receiver, and pin 3 as UART transmitter.</li>
 					</ul>
 				</td>
 			</tr>
@@ -4552,6 +5160,7 @@
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>TRIGger[:SEQuence]:SOURce</p>
+					<p>SYSTem:COMMunicate:UART:MODE</p>
 					<p>SYSTem:DIGital:INPut:DATA</p>
 					<p>SYSTem:DIGital:OUTPut:DATA</p>
 					<p>SYSTem:DIGital:OUTPut:PWM:DUTY</p>
@@ -4559,7 +5168,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.47. <a name="syst_dig_pin_pol"></a>SYSTem:DIGital:PIN&lt;n&gt;:POLarity</p>
+		<p class="Heading_3">5.17.54. <a name="syst_dig_pin_pol"></a>SYSTem:DIGital:PIN&lt;n&gt;:POLarity</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4652,7 +5261,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.48. <a name="__RefHeading__23078_295952897"></a><a name="syst_err"></a>SYSTem:ERRor<a name="__RefHeading__23078_295952897"></a></p>
+		<p class="Heading_3">5.17.55. <a name="__RefHeading__23078_295952897"></a><a name="syst_err"></a>SYSTem:ERRor<a name="__RefHeading__23078_295952897"></a></p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4709,7 +5318,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.49. <a name="syst_err_coun"></a>SYSTem:ERRor:COUNt?</p>
+		<p class="Heading_3">5.17.56. <a name="syst_err_coun"></a>SYSTem:ERRor:COUNt?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4747,7 +5356,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.50. <a name="syst_fan_spe"></a>SYSTem:FAN:SPEed?</p>
+		<p class="Heading_3">5.17.57. <a name="syst_fan_spe"></a>SYSTem:FAN:SPEed?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4783,7 +5392,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.51. <a name="syst_fan_stat"></a>SYSTem:FAN:STATus?</p>
+		<p class="Heading_3">5.17.58. <a name="syst_fan_stat"></a>SYSTem:FAN:STATus?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4834,7 +5443,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.52. <a name="syst_form_date"></a>SYSTem:FORMat:DATE</p>
+		<p class="Heading_3">5.17.59. <a name="syst_form_date"></a>SYSTem:FORMat:DATE</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4915,7 +5524,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.53. <a name="syst_form_time"></a>SYSTem:FORMat:TIME</p>
+		<p class="Heading_3">5.17.60. <a name="syst_form_time"></a>SYSTem:FORMat:TIME</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -4996,7 +5605,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.54. <a name="syst_inh"></a>SYSTem:INHibit?</p>
+		<p class="Heading_3">5.17.61. <a name="syst_inh"></a>SYSTem:INHibit?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5043,7 +5652,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.55. <a name="syst_kloc"></a>SYSTem:KLOCk</p>
+		<p class="Heading_3">5.17.62. <a name="syst_kloc"></a>SYSTem:KLOCk</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5080,7 +5689,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.56. <a name="syst_lfr"></a>SYSTem:LFRequency</p>
+		<p class="Heading_3">5.17.63. <a name="syst_lfr"></a>SYSTem:LFRequency</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5156,7 +5765,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.57. <a name="syst_loc"></a>SYSTem:LOCal</p>
+		<p class="Heading_3">5.17.64. <a name="syst_loc"></a>SYSTem:LOCal</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5193,7 +5802,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.58. <a name="syst_meas_temp"></a>SYSTem:MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]</p>
+		<p class="Heading_3">5.17.65. <a name="syst_meas_temp"></a>SYSTem:MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5288,7 +5897,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.59. <a name="syst_meas_volt"></a>SYSTem:MEASure[:SCALar][:VOLTage][:DC]?</p>
+		<p class="Heading_3">5.17.66. <a name="syst_meas_volt"></a>SYSTem:MEASure[:SCALar][:VOLTage][:DC]?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5350,7 +5959,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.60. <a name="syst_pass_cal_res"></a>SYSTem:PASSword:CALibration:RESet</p>
+		<p class="Heading_3">5.17.67. <a name="syst_pass_cal_res"></a>SYSTem:PASSword:CALibration:RESet</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5386,7 +5995,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.61. <a name="syst_pass_fpan_res"></a>SYSTem:PASSword:FPANel:RESet</p>
+		<p class="Heading_3">5.17.68. <a name="syst_pass_fpan_res"></a>SYSTem:PASSword:FPANel:RESet</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5422,7 +6031,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.62. <a name="syst_pass_new"></a>SYSTem:PASSword:NEW</p>
+		<p class="Heading_3">5.17.69. <a name="syst_pass_new"></a>SYSTem:PASSword:NEW</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5513,7 +6122,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.63. <a name="syst_pon_outp_dis"></a>SYSTem:PON:OUTPut:DISable</p>
+		<p class="Heading_3">5.17.70. <a name="syst_pon_outp_dis"></a>SYSTem:PON:OUTPut:DISable</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5594,7 +6203,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.64. <a name="syst_pow"></a>SYSTem:POWer</p>
+		<p class="Heading_3">5.17.71. <a name="syst_pow"></a>SYSTem:POWer</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5673,7 +6282,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.65. <a name="syst_pow_prot_trip"></a>SYSTem:POWer:PROTection:TRIP</p>
+		<p class="Heading_3">5.17.72. <a name="syst_pow_prot_trip"></a>SYSTem:POWer:PROTection:TRIP</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5749,7 +6358,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.66. <a name="syst_rel_cycl"></a>SYSTem:RELay:CYCLes?</p>
+		<p class="Heading_3">5.17.73. <a name="syst_rel_cycl"></a>SYSTem:RELay:CYCLes?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5836,7 +6445,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.67. <a name="syst_rem"></a>SYSTem:REMote</p>
+		<p class="Heading_3">5.17.74. <a name="syst_rem"></a>SYSTem:REMote</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5874,7 +6483,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.68. <a name="syst_res"></a>SYSTem:REStart</p>
+		<p class="Heading_3">5.17.75. <a name="syst_res"></a>SYSTem:REStart</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5910,7 +6519,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.69. <a name="syst_rwl"></a>SYSTem:RWLock</p>
+		<p class="Heading_3">5.17.76. <a name="syst_rwl"></a>SYSTem:RWLock</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5947,7 +6556,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.70. <a name="syst_slot_coun"></a>SYSTem:SLOT[:COUNt]?</p>
+		<p class="Heading_3">5.17.77. <a name="syst_slot_coun"></a>SYSTem:SLOT[:COUNt]?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5985,7 +6594,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.71. <a name="syst_slot_col"></a>SYSTem:SLOT:COLor</p>
+		<p class="Heading_3">5.17.78. <a name="syst_slot_col"></a>SYSTem:SLOT:COLor</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6093,7 +6702,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.72. <a name="syst_slot_firm"></a>SYSTem:SLOT:FIRMware?</p>
+		<p class="Heading_3">5.17.79. <a name="syst_slot_firm"></a>SYSTem:SLOT:FIRMware?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6172,7 +6781,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.73. <a name="syst_slot_lab"></a>SYSTem:SLOT:LABel</p>
+		<p class="Heading_3">5.17.80. <a name="syst_slot_lab"></a>SYSTem:SLOT:LABel</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6272,7 +6881,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.74. <a name="syst_slot_mod"></a>SYSTem:SLOT:MODel?</p>
+		<p class="Heading_3">5.17.81. <a name="syst_slot_mod"></a>SYSTem:SLOT:MODel?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6343,7 +6952,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.75. <a name="syst_slot_sno"></a>SYSTem:SLOT:SNO</p>
+		<p class="Heading_3">5.17.82. <a name="syst_slot_sno"></a>SYSTem:SLOT:SNO</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6443,7 +7052,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.76. <a name="syst_slot_stat"></a>SYSTem:SLOT:STATe</p>
+		<p class="Heading_3">5.17.83. <a name="syst_slot_stat"></a>SYSTem:SLOT:STATe</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6544,7 +7153,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.77. <a name="syst_slot_vers"></a>SYSTem:SLOT:VERSion?</p>
+		<p class="Heading_3">5.17.84. <a name="syst_slot_vers"></a>SYSTem:SLOT:VERSion?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6613,7 +7222,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.78. <a name="syst_temp_prot"></a>SYSTem:TEMPerature:PROTection[:HIGH][:LEVel]</p>
+		<p class="Heading_3">5.17.85. <a name="syst_temp_prot"></a>SYSTem:TEMPerature:PROTection[:HIGH][:LEVel]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6712,7 +7321,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.79. <a name="syst_temp_prot_cle"></a>SYSTem:TEMPerature:PROTection[:HIGH]:CLEar</p>
+		<p class="Heading_3">5.17.86. <a name="syst_temp_prot_cle"></a>SYSTem:TEMPerature:PROTection[:HIGH]:CLEar</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6779,7 +7388,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.80. <a name="syst_temp_prot_del"></a>SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]</p>
+		<p class="Heading_3">5.17.87. <a name="syst_temp_prot_del"></a>SYSTem:TEMPerature:PROTection[:HIGH]:DELay[:TIME]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6870,7 +7479,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.81. <a name="syst_temp_prot_stat"></a>SYSTem:TEMPerature:PROTection[:HIGH]:STATe </p>
+		<p class="Heading_3">5.17.88. <a name="syst_temp_prot_stat"></a>SYSTem:TEMPerature:PROTection[:HIGH]:STATe </p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6961,7 +7570,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.82. <a name="syst_temp_prot_trip"></a>SYSTem:TEMPerature:PROTection[:HIGH]:TRIPped?</p>
+		<p class="Heading_3">5.17.89. <a name="syst_temp_prot_trip"></a>SYSTem:TEMPerature:PROTection[:HIGH]:TRIPped?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -7038,7 +7647,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.83. <a name="syst_time"></a>SYSTem:TIME</p>
+		<p class="Heading_3">5.17.90. <a name="syst_time"></a>SYSTem:TIME</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -7148,7 +7757,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.84. <a name="syst_time_dst"></a>SYSTem:TIME:DST</p>
+		<p class="Heading_3">5.17.91. <a name="syst_time_dst"></a>SYSTem:TIME:DST</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -7227,7 +7836,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.85. <a name="syst_time_zone"></a>SYSTem:TIME:ZONE</p>
+		<p class="Heading_3">5.17.92. <a name="syst_time_zone"></a>SYSTem:TIME:ZONE</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -7306,7 +7915,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.17.86. <a name="syst_vers"></a>SYSTem:VERSion?</p>
+		<p class="Heading_3">5.17.93. <a name="syst_vers"></a>SYSTem:VERSion?</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">

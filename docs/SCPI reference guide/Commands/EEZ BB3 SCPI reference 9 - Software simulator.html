@@ -43,32 +43,24 @@
 	</head>
 	<body>
 		<p class="Heading_1">9. <a name="_simulator"></a>Software simulator</p>
-		<p>The BB3 firmware can be compiled and executed on a Windows, Linux or OS X system. The  software simulator is a terminal application that can respond to almost all of currently supported SCPI command described in this document. SCPI commands could be entered directly in the simulator’s terminal window (Fig. 1) or remotely by using the e.g. a <a href="https://en.wikipedia.org/wiki/Telnet" target="_blank"><span style="text-decoration: underline;">Telnet</span></a> client (Fig. 2). </p>
-		<p>&#160;</p>
-		<div>
-			<p class="Caption">Fig. 1: Simulator welcome screen</p>
-		</div>
-		<p>&#160;</p>
-		<div>
-			<p class="Caption">Fig. 2: Remote connection using a telnet client</p>
-		</div>
-		<p>&#160;</p>
-		<p>The simulator also has built-in GUI.  When started, open a separate window with the picture of the BB3 front panel.</p>
-		<p>&#160;</p>
+		<p>The BB3 firmware can be compiled and executed on a Windows, Linux or OS X system. The  software simulator is a terminal application that can respond to almost all of currently supported SCPI command described in this document. SCPI commands could be entered directly in the simulator’s terminal window (Fig.&#160;1).</p>
 		<p>&#160;</p>
 		<div>
 			<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-<a href="https://www.envox.hr/eez/images/bb3_simulator_gui.png">				<img src="images/EEZ BB3 SCPI reference 9 - Software simulator-bb3_simulator_gui.png" alt="bb3_simulator_gui.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 170mm; height: 68.53mm;"/>
+<a href="https://www.envox.eu/wp-content/uploads/bb3_simulator_term.png">				<img src="images/EEZ BB3 SCPI reference 9 - Software simulator-bb3_simulator_term.png" alt="bb3_simulator_term.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 140mm; height: 73.2mm;"/>
 </a>			</div>
-			<p class="Caption">Fig. 3: Firmware simulator GUI</p>
+			<p class="Caption">Fig. 1: Simulator terminal session</p>
 		</div>
-		<p>&#160;</p>
-		<p>The GUI simulator front panel currently displays only changes in LED indicators and indicates whether load is applied on the output terminals or not. For example if an 8.2&#160;Ω load is connected to channel 2 and causes that channel to enter CC mode, the GUI front panel will indicate that in the following way:</p>
+		<p>The simulator also has built-in GUI. When started, a separate window is opened with the picture of the BB3 front panel.</p>
 		<p>&#160;</p>
 		<div>
-			<p class="Caption">Fig. 4: Simulator GUI with a connected load on channel 2(r5B12) </p>
+			<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+<a href="https://www.envox.eu/wp-content/uploads/bb3_simulator_gui.png">				<img src="images/EEZ BB3 SCPI reference 9 - Software simulator-bb3_simulator_gui.png" alt="bb3_simulator_gui.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 170mm; height: 68.53mm;"/>
+</a>			</div>
+			<p class="Caption">Fig. 2: Firmware simulator GUI</p>
 		</div>
 		<p>&#160;</p>
+		<p>Additionally, firmware features could be evaluated using the Web firmware simulator that can be found on the following address: <a href="https://www.envox.eu/bb3-simulator/index.html" target="_blank"><span style="text-decoration: underline;">https://www.envox.eu/bb3-simulator/index.html</span></a></p>
 		<p>&#160;</p>
 		<p class="Heading_2">9.1. SIMUlator</p>
 		<p>The SIMUlator software subsystem implements a set of unclassified SCPI commands for managing external parameters and events such as load impedance, connection and disconnection of the load, sensor temperature or the BB3 control circuit power supply state. Thus it is possible to exercise the measuring and protection commands that depend on external events.  </p>
@@ -223,7 +215,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command starts the GUI simulation in a new window (see Fig. 3 and Fig. Error: Reference source not found).</p>
+					<p>This command starts the GUI simulation in a new window (see Fig.&#160;2).</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -264,7 +256,7 @@
 					<p>&#160;</p>
 					<p>The simulated load value can be also changed by clicking and dragging the load’s image. Move to the left to decrease, or to the right to increase the simulated value in increments of 1&#160;Ω.</p>
 					<p>&#160;</p>
-					<p class="note">The simulator currently cannot emulate the “UR” mode of operation (see the <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/5-subsystem-command-reference/bb3-scpi-output.html#outp_mode"><span style="text-decoration: underline;">OUTPut:MODE?</span></a> command). </p>
+					<p class="note">The simulator currently cannot emulate the “UR” mode of operation (see the <a href="https://www.envox.eu/eez-bench-box-3/bb3-scpi-reference-manual/5-subsystem-command-reference/bb3-scpi-output#outp_mode"><span style="text-decoration: underline;">OUTPut:MODE?</span></a> command). </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -340,7 +332,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command “connects” or “disconnects” the simulated load on the channel output. If the GUI simulator has been started (via the SIMUlator:GUI command) a load symbol with the currently selected value in Ohms will be displayed (See Fig. 4).</p>
+					<p>This command “connects” or “disconnects” the simulated load on the channel output. If the GUI simulator has been started (via the SIMUlator:GUI command) a load symbol with the currently selected value in Ohms will be displayed.</p>
 					<p>&#160;</p>
 					<p>Another possibility to connect (or disconnect) a load is by click on its image.</p>
 				</td>

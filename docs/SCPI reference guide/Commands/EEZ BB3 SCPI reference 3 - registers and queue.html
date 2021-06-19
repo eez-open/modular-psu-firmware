@@ -53,15 +53,15 @@
 		<p>Message interchanging between Controller and Instrument is accomplished by using input buffer and Output queue and Error queue. The length of the Input buffer is 48 characters. Both Output and Error queue can handle up to 20 messages.</p>
 		<div>
 			<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-<a href="https://www.envox.hr/eez/images/bb3_status_structure_registers.png">				<img src="images/EEZ BB3 SCPI reference 3 - registers and queue-bb3_status_structure_registers.png" alt="bb3_status_structure_registers.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 170mm; height: 149.01mm;"/>
+<a href="https://www.envox.eu/wp-content/uploads/bb3_status_structure_registers.png">				<img src="images/EEZ BB3 SCPI reference 3 - registers and queue-bb3_status_structure_registers.png" alt="bb3_status_structure_registers.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 170mm; height: 149.01mm;"/>
 </a>			</div>
 			<p class="Caption">Fig. 1: Summary of status structure registers</p>
 		</div>
-		<p class="Heading_2">3.1. <a name="__RefHeading__5462_1776152697"></a><a name="__RefNumPara__5224_1776698109"></a><a name="std_even_stat_reg"></a>Standard Event Status Register<a name="__RefHeading__5462_1776152697"></a><a name="__RefNumPara__5224_1776698109"></a></p>
+		<p class="Heading_2">3.1. <a name="__RefNumPara__5224_1776698109"></a><a name="__RefHeading__5462_1776152697"></a><a name="std_even_stat_reg"></a>Standard Event Status Register<a name="__RefNumPara__5224_1776698109"></a><a name="__RefHeading__5462_1776152697"></a></p>
 		<p>An status register group is consist of Condition, Event and Enable registers (see Fig.&#160;1):</p>
 		<ul>
 			<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">The Condition register is a read-only register, which holds the live (unlatched) operational status of the instrument. Reading the Condition register does not clear it.</li>
-			<li class="List_1" style="text-indent: 0; list-style-type: disc;">The Event register is a read-only that reports defined conditions within the BB3. Bits in an event register are latched. Once an event bit is set, subsequent state changes are ignored. Bits in the Event register are automatically cleared by a query of that register (such as *ESR? or STATus:QUEStionable:EVENt?) or by sending the *CLS (clear status) command. A reset (*RST) or device clear will <span style="font-style: italic;">not</span> clear bits in event registers (See <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-parameters-and-settings.html#reset_settings"><span style="text-decoration: underline;">Section 8.2</span></a>). Querying an event register returns a decimal value which corresponds to the binary-weighted sum of all bits set in the register.</li>
+			<li class="List_1" style="text-indent: 0; list-style-type: disc;">The Event register is a read-only that reports defined conditions within the BB3. Bits in an event register are latched. Once an event bit is set, subsequent state changes are ignored. Bits in the Event register are automatically cleared by a query of that register (such as *ESR? or STATus:QUEStionable:EVENt?) or by sending the *CLS (clear status) command. A reset (*RST) or device clear will <span style="font-style: italic;">not</span> clear bits in event registers (See <a href="https://www.envox.eu/eez-bench-box-3/bb3-scpi-reference-manual/8-parameters-and-settings/#reset_settings"><span style="text-decoration: underline;">Section 8.2</span></a>). Querying an event register returns a decimal value which corresponds to the binary-weighted sum of all bits set in the register.</li>
 			<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">The ENABle register is used to define which bits of the Event Status register will latch ESB (bit 5) of the Status byte register. </li>
 		</ul>
 		<p>An error status (bit 2, 3, 4 or 5) records one or more errors in the BB3 error queue. The SYSTem:ERRor? command can be used to read the error queue. </p>
@@ -159,7 +159,7 @@
 					<p>Command ERROR (CME) – Command Errors are detected by the parser. This event bit indicates that one of the following events has occurred:</p>
 					<ul>
 						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">An IEEE 488.2 syntax error has been detected by the parser. That is, a controller-to-device message was received that is in violation of this standard. Possible violations include a data element that violates the device listening formats or whose type is unacceptable to the device (see also IEEE 488.2 Section 7.1.2.2).</li>
-						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">A semantic error has occurred indicating that an unrecognized header was received. Unrecognized headers include incorrect device-specific headers and incorrect or unimplemented common commands described in <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-common-command-reference.html"><span style="text-decoration: underline;">Section 4</span></a></li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">A semantic error has occurred indicating that an unrecognized header was received. Unrecognized headers include incorrect device-specific headers and incorrect or unimplemented common commands described in <a href="https://www.envox.eu/eez-bench-box-3/bb3-scpi-reference-manual/4-common-command-reference/"><span style="text-decoration: underline;">Section 4</span></a></li>
 					</ul>
 					<p>When the BB3 detects a Command Error, parser synchronization may be lost.</p>
 					<p class="note">When a Command Error is detected, any prior parsable elements of the same &lt;PROGRAM MESSAGE&gt; will be executed. That is also true for all parsable elements that follows after detected Command Error.</p>
@@ -202,7 +202,7 @@
 			</tr>
 		</table>
 		<p>&#160;</p>
-		<p class="Heading_2">3.2. <a name="__RefHeading__6866_1044300784"></a><a name="__RefNumPara__7055_1776698109"></a><a name="stat_byte_reg"></a>Status Byte Register<a name="__RefHeading__6866_1044300784"></a><a name="__RefNumPara__7055_1776698109"></a></p>
+		<p class="Heading_2">3.2. <a name="__RefNumPara__7055_1776698109"></a><a name="__RefHeading__6866_1044300784"></a><a name="stat_byte_reg"></a>Status Byte Register<a name="__RefNumPara__7055_1776698109"></a><a name="__RefHeading__6866_1044300784"></a></p>
 		<p>The Status Byte summary register reports conditions from the other status registers (see Fig.&#160;1). Query data that is waiting in the BB3’s output buffer is immediately reported through the &quot;Message Available&quot; (MAV) bit (bit 4) of the Status Byte register. Bits in the summary register are NOT latched. Clearing an event register will clear the corresponding bits in the Status Byte summary register. Reading all messages in the output buffer, including any pending queries, will clear the message available bit (MAV).</p>
 		<p>The Status Byte summary register is cleared when the *CLS (clear status) command has been executed.</p>
 		<p>The Status Byte enable register (request service) is cleared when the *SRE 0 command has been executed.</p>
@@ -450,7 +450,7 @@
 		<p>The Event Status Enable register is cleared when the STAT:EVEN:ENAB 0 command is executed. The *CLS command can be also used to clear the register.</p>
 		<div>
 			<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-<a href="https://www.envox.hr/eez/images/bb3_operation_status_registers.png">				<img src="images/EEZ BB3 SCPI reference 3 - registers and queue-bb3_operation_status_registers.png" alt="bb3_operation_status_registers.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 170mm; height: 161.01mm;"/>
+<a href="https://www.envox.eu/wp-content/uploads/bb3_operation_status_registers.png">				<img src="images/EEZ BB3 SCPI reference 3 - registers and queue-bb3_operation_status_registers.png" alt="bb3_operation_status_registers.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 170mm; height: 161.01mm;"/>
 </a>			</div>
 			<p class="Caption">Fig. 2: OPERation Status registers summary</p>
 		</div>
@@ -558,7 +558,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">3.3.2. <a name="oper_isum_stat_reg"></a><a name="__RefHeading__15454_670294931"></a>Operation Instrument SUMmary status register<a name="__RefHeading__15454_670294931"></a></p>
+		<p class="Heading_3">3.3.2. <a name="__RefHeading__15454_670294931"></a><a name="oper_isum_stat_reg"></a>Operation Instrument SUMmary status register<a name="__RefHeading__15454_670294931"></a></p>
 		<p>The ISUMmary registers report to the INSTrument register, which in turn reports to bit 13 of the Operation Status register. This is illustrated on Fig. 2. Using such a status register configuration allows a status event to be cross- referenced by output channel and type of event. The INSTrument register indicates which channel(s) have generated an event. The ISUMmary register represent a pseudo-operation Status register for a particular logical output.</p>
 		<p>&#160;</p>
 		<p>The bit definition of OPERation INSTrument ISUMmary Status register shown on Fig.2.:</p>
@@ -767,7 +767,7 @@
 		<p>&#160;</p>
 		<div>
 			<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-<a href="https://www.envox.hr/eez/images/bb3_questionable_instrument_registers.png">				<img src="images/EEZ BB3 SCPI reference 3 - registers and queue-bb3_questionable_instrument_registers.png" alt="bb3_questionable_instrument_registers.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 170mm; height: 175.81mm;"/>
+<a href="https://www.envox.eu/wp-content/uploads/bb3_questionable_instrument_registers.png">				<img src="images/EEZ BB3 SCPI reference 3 - registers and queue-bb3_questionable_instrument_registers.png" alt="bb3_questionable_instrument_registers.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 170mm; height: 175.81mm;"/>
 </a>			</div>
 			<p class="Caption">Fig. 3: QUEStionable INSTrument registers summary</p>
 		</div>
@@ -890,7 +890,7 @@
 		</table>
 		<p>&#160;</p>
 		<p>The Questionable Status Enable register is cleared when the STAT:QUES:ENAB 0 command is executed. The *CLS command can be also used to clear the register.</p>
-		<p class="Heading_3">3.4.1. <a name="__RefHeading__17188_670294931"></a><a name="__RefNumPara__35965_1442645923"></a><a name="ques_inst_stat_reg"></a>Questionable INSTrument Status register<a name="__RefHeading__17188_670294931"></a><a name="__RefNumPara__35965_1442645923"></a></p>
+		<p class="Heading_3">3.4.1. <a name="__RefNumPara__35965_1442645923"></a><a name="__RefHeading__17188_670294931"></a><a name="ques_inst_stat_reg"></a>Questionable INSTrument Status register<a name="__RefNumPara__35965_1442645923"></a><a name="__RefHeading__17188_670294931"></a></p>
 		<p>Bit definition for QUEStionable INSTrument register:</p>
 		<p>&#160;</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
@@ -994,7 +994,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">3.4.2. <a name="__RefNumPara__35967_1442645923"></a><a name="__RefHeading__17192_670294931"></a><a name="ques_isum_stat_reg"></a>Questionable Instrument SUMmary status register<a name="__RefNumPara__35967_1442645923"></a><a name="__RefHeading__17192_670294931"></a></p>
+		<p class="Heading_3">3.4.2. <a name="__RefHeading__17192_670294931"></a><a name="__RefNumPara__35967_1442645923"></a><a name="ques_isum_stat_reg"></a>Questionable Instrument SUMmary status register<a name="__RefHeading__17192_670294931"></a><a name="__RefNumPara__35967_1442645923"></a></p>
 		<p>There are three questionable instrument summary registers, one for each power module output. These registers provide information about voltage and current regulation. </p>
 		<p>Bit definition for QUEStionable INSTrument SUMmary register:</p>
 		<p>&#160;</p>
@@ -1173,7 +1173,7 @@
 		<p>The &lt;Error/event_number&gt; is a unique integer in the range [-32&#160;768, 32&#160;767]. All positive numbers are instrument-dependent. All negative numbers are reserved by the SCPI standard with certain standard error/event codes. The value, zero, is also reserved to indicate that no error or event has occurred.</p>
 		<p>The second parameter of the full response is a quoted string containing an &lt;Error/event_description&gt;. Each &lt;Error/event_number&gt; has a unique and fixed &lt;Error/event_description&gt; associated with it. An example:</p>
 		<p class="cmd_code_single">-113,&quot;Undefined header&quot;</p>
-		<p>The maximum string length of &lt;Error/event_description&gt; plus &lt;Device-dependent_info&gt; is 255 characters. List of all error/event messages can be found in <a href="https://www.envox.hr/eez/eez-bench-box-3/bb3-scpi-reference-manual/bb3-scpi-error-messages.html"><span style="text-decoration: underline;">Section 7</span></a> of this document.</p>
+		<p>The maximum string length of &lt;Error/event_description&gt; plus &lt;Device-dependent_info&gt; is 255 characters. List of all error/event messages can be found in <a href="https://www.envox.eu/eez-bench-box-3/bb3-scpi-reference-manual/7-error-messages/"><span style="text-decoration: underline;">Section 7</span></a> of this document.</p>
 		<p>&#160;</p>
 		<p>As errors and events are detected, they are placed in a queue. This queue is first in, first out. If the queue overflows, the last error/event in the queue is replaced with error:</p>
 		<p class="cmd_code_single">-350,&quot;Queue overflow&quot;</p>
