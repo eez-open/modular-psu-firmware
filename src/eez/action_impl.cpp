@@ -73,7 +73,7 @@ using namespace eez::psu::gui;
 namespace eez {
 namespace gui {
 
-static const char *g_discardMessage = "All changes will be lost.";
+const char *g_discardMessage = "All changes will be lost.";
 
 void action_channel_toggle_output() {
     channelToggleOutput();

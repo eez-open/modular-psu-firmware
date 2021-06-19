@@ -4085,6 +4085,11 @@
       "components": [],
       "connectionLines": [],
       "name": "show_prev_channel_in_max_view"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_show_previous_page"
     }
   ],
   "pages": [
@@ -32116,7 +32121,7 @@
               "width": 41,
               "height": 32,
               "wireID": "bca0eb2f-f370-4bad-9c37-fb08d73ba81e",
-              "action": "show_previous_page",
+              "action": "function_generator_show_previous_page",
               "style": {
                 "inheritFrom": "status_icon_enabled"
               },

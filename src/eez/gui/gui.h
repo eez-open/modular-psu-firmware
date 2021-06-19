@@ -169,6 +169,8 @@ void executeInternalActionHook(int actionId);
 
 bool activePageHasBackdropHook();
 
+extern const char *g_discardMessage;
+
 } // namespace gui
 } // namespace eez
 

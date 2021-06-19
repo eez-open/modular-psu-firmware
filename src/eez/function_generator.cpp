@@ -312,11 +312,25 @@ public:
 		m_initialized = true;
 	}
 
+	int m_savedSlotIndex;
+	int m_savedSubchannelIndex;
+	Channel *m_savedChannel;
+
 	void pageAlloc() {
+		m_savedSlotIndex = hmi::g_selectedSlotIndex;
+		m_savedSubchannelIndex = hmi::g_selectedSubchannelIndex;
+		m_savedChannel = g_channel;
+
 		hmi::selectSlot(-1);
 		selectChannel(nullptr);
 
 		init();
+	}
+
+	void restoreSlotIndex() {
+		hmi::selectSlot(m_savedSlotIndex);
+		hmi::g_selectedSubchannelIndex = m_savedSubchannelIndex;
+		selectChannel(m_savedChannel);
 	}
 
     int getDirty() {
@@ -1693,9 +1707,11 @@ void action_show_sys_settings_function_generator_select_channel() {
 		page->set();
 	}
 	
+	Channel *channel = g_channel;
+
 	pushPage(PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR);
 
-	selectWaveformParametersForChannel(*g_channel);
+	selectWaveformParametersForChannel(*channel);
 }
 
 void data_function_generator_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -2572,6 +2588,19 @@ void data_function_generator_any_selected(DataOperationEnum operation, Cursor cu
 
 void action_function_generator_deselect_all() {
 	g_functionGeneratorSelectChannelsPage.m_selectedChannels = 0;
+}
+
+void closeFunctionGeneratorPage() {
+	g_functionGeneratorPage.restoreSlotIndex();
+	popPage();
+}
+
+void action_function_generator_show_previous_page() {
+    if (g_functionGeneratorPage.getDirty()) {
+        areYouSureWithMessage(g_discardMessage, closeFunctionGeneratorPage);
+    } else {
+        closeFunctionGeneratorPage();
+    }	
 }
 
 } // namespace gui
