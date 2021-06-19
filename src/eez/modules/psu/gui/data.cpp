@@ -142,6 +142,8 @@ EnumItem g_enumDefinition_CHANNEL_CURRENT_RANGE_SELECTION_MODE[] = {
 EnumItem g_enumDefinition_CHANNEL_CURRENT_RANGE[] = {
     { CURRENT_RANGE_HIGH, "High" },
     { CURRENT_RANGE_LOW, "Low" },
+    { CURRENT_RANGE_HIGH + 2, "High*" },
+    { CURRENT_RANGE_LOW + 2, "Low*" },
     { 0, 0 }
 };
 
@@ -4377,7 +4379,11 @@ void data_channel_ranges_currently_selected(DataOperationEnum operation, Cursor 
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
-        value = MakeEnumDefinitionValue(channel.flags.currentCurrentRange, ENUM_DEFINITION_CHANNEL_CURRENT_RANGE);
+        value = MakeEnumDefinitionValue(
+            (channel.flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH ? 2 : 0) +
+                channel.flags.currentCurrentRange,
+            ENUM_DEFINITION_CHANNEL_CURRENT_RANGE
+        );
     }
 }
 

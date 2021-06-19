@@ -953,8 +953,20 @@ void action_turn_display_off() {
     psu::persist_conf::setDisplayState(0);
 }
 
+void onModeSet(uint16_t value) {
+	popPage();
+	channel_dispatcher::setCurrentRangeSelectionMode(*g_channel, (CurrentRangeSelectionMode)value);
+}
+
 void action_ch_settings_adv_ranges_select_mode() {
-    ((ChSettingsAdvRangesPage *)getActivePage())->selectMode();
+	auto page = (ChSettingsAdvRangesPage *)getActivePage();
+	if (page) {
+		page->selectMode();
+	} else {
+		int channelIndex = getFoundWidgetAtDown().cursor;
+		selectChannel(&Channel::get(channelIndex));
+		pushSelectFromEnumPage(ENUM_DEFINITION_CHANNEL_CURRENT_RANGE_SELECTION_MODE, g_channel->getCurrentRangeSelectionMode(), 0, onModeSet);
+	}
 }
 
 void action_ch_settings_adv_ranges_toggle_auto_ranging() {

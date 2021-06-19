@@ -1019,7 +1019,7 @@ void DcmModule::tick(uint8_t slotIndex) {
 
     float *floatValues = (float *)(outputSetValues + 4);
 
-    if (page && (g_channel == &channel1 || (g_channel->flags.trackingEnabled && channel1.flags.trackingEnabled))) {
+    if (page && g_channel && (g_channel == &channel1 || (g_channel->flags.trackingEnabled && channel1.flags.trackingEnabled))) {
         floatValues[0] = page->m_pwmEnabled ? page->m_pwmFrequency : 1.0f;
         floatValues[1] = page->m_pwmEnabled ? page->m_pwmDuty : 100.0f;
     } else {
@@ -1027,7 +1027,7 @@ void DcmModule::tick(uint8_t slotIndex) {
         floatValues[1] = channel1.pwmEnabled ? channel1.pwmDuty : 100.0f;
     }
 
-    if (page && (g_channel == &channel2 || (g_channel->flags.trackingEnabled && channel2.flags.trackingEnabled))) {
+    if (page && g_channel && (g_channel == &channel2 || (g_channel->flags.trackingEnabled && channel2.flags.trackingEnabled))) {
         floatValues[2] = page->m_pwmEnabled ? page->m_pwmFrequency : 1.0f;
         floatValues[3] = page->m_pwmEnabled ? page->m_pwmDuty : 100.0f;
     } else {

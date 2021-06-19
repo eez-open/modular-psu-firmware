@@ -344,6 +344,18 @@ inline double getAinConversionFactor(uint8_t afeVersion, uint8_t channelIndex, u
                 return 2.4 / 0.01 / 12; // +/- 10 A (0.01 ohm, PGA is 12)
             }
         }
+    }  else if (afeVersion == 2) {
+        if (channelIndex == 0 || channelIndex == 1) {
+            if (range == 0) {
+                return -3.0 * 2.4 / 2.24; // +/- 3 V (3 V is 2.24 V)
+            }
+            return -12.0 * 2.4 / 2.0; // +/- 12 V (12 V is 2.0 V)
+        } else {
+            if (range == 0) {
+                return -2.4 / 833.3; // +/- 2.4 mA (833.3 ohm, PGA is 1)
+            }
+            return 2.4 / 2.11; // +/- 2 A (2.11 ohm, PGA is 1)
+        }
     } else if (afeVersion == 3) {
         if (channelIndex == 0) {
             if (range == 0) {
@@ -698,6 +710,22 @@ public:
 					m_voltageRange = 1;
 				}
 			}
+		} else if (m_afeVersion == 2) {
+			if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+				if (m_mode == MEASURE_MODE_CURRENT) {
+					m_mode = MEASURE_MODE_VOLTAGE;
+				}
+				if (m_voltageRange > 1) {
+					m_voltageRange = 1;
+				}
+			} else {
+				if (m_mode == MEASURE_MODE_VOLTAGE) {
+					m_mode = MEASURE_MODE_CURRENT;
+				}
+				if (m_currentRange > 1) {
+					m_currentRange = 1;
+				}
+			}
 		} else if (m_afeVersion == 3) {
 			if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
 				if (m_mode == MEASURE_MODE_CURRENT) {
@@ -757,6 +785,16 @@ public:
 			} else {
 				parameters.currentRange = 2;
 				parameters.voltageRange = 1;
+			}
+		} else if (m_afeVersion == 2) {
+			if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+				parameters.mode = MEASURE_MODE_VOLTAGE;
+				parameters.currentRange = 0;
+				parameters.voltageRange = 1;
+			} else {
+				parameters.mode = MEASURE_MODE_CURRENT;
+				parameters.currentRange = 1;
+				parameters.voltageRange = 0;
 			}
 		} else if (m_afeVersion == 3) {
 			if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
@@ -881,6 +919,16 @@ public:
 				m_currentRange = 2;
 				m_voltageRange = 1;
 			}
+		} else if (m_afeVersion == 2) {
+			if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+				m_mode = MEASURE_MODE_VOLTAGE;
+				m_currentRange = 0;
+				m_voltageRange = 1;
+			} else {
+				m_mode = MEASURE_MODE_CURRENT;
+				m_currentRange = 1;
+				m_voltageRange = 0;
+			}
 		} else if (m_afeVersion == 3) {
 			if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
 				m_mode = MEASURE_MODE_VOLTAGE;
@@ -932,6 +980,12 @@ public:
             } else {
                 return m_mode == MEASURE_MODE_VOLTAGE ? UNIT_VOLT : m_currentRange == 0 ? UNIT_MILLI_AMPER : UNIT_AMPER;
             }
+        } else if (m_afeVersion == 2) {
+            if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+                return UNIT_VOLT;
+            } else {
+                return m_currentRange == 0 ? UNIT_MICRO_AMPER : UNIT_AMPER;
+            }
         } else if (m_afeVersion == 3) {
             if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
                 return UNIT_VOLT;
@@ -975,6 +1029,20 @@ public:
                     } else {
                         return 3; // +/- 10 A
                     }
+                }
+            }
+        } else if (m_afeVersion == 2) {
+            if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+                if (m_voltageRange == 0) {
+                    return 4; // +/- 3 V
+                } else {
+                    return 3; // +/- 12 V
+                }
+            } else {
+                if (m_currentRange == 0) {
+                    return 6; // +/- 2.4 mA
+                } else {
+                    return 4; // +/- 2 A
                 }
             }
         } else if (m_afeVersion == 3) {
@@ -1051,6 +1119,20 @@ public:
                     }
                 }
             }
+        } else if (m_afeVersion == 2) { 
+            if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+                if (m_voltageRange == 0) {
+                    return 3.0f;
+                } else {
+                    return 12.0f;
+                }
+            } else {
+                if (m_currentRange == 0) {
+                    return 2.4E-3f;
+                } else {
+                    return 2.0f;
+                }
+            }
         } else if (m_afeVersion == 3) { 
             if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
                 if (m_voltageRange == 0) {
@@ -1101,6 +1183,12 @@ public:
             } else {
                 return 2;
             }
+        } else if (m_afeVersion == 2) {
+            if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+                return -1;
+            } else {
+                return 1;
+            }
         } else if (m_afeVersion == 3) {
             if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
                 return -1;
@@ -1123,6 +1211,12 @@ public:
             }
             else {
                 return 1;
+            }
+        } else if (m_afeVersion == 2) {
+            if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+                return 1;
+            } else {
+                return -1;
             }
         } else if (m_afeVersion == 3) {
             if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
@@ -1154,6 +1248,18 @@ public:
 			{ 2, "\xbd""48 mA" },
             { 3, "\xbd""1.2 A" },
             { 4, "\xbd""10 A" },
+			{ 0, 0 }
+		};
+
+		static EnumItem g_afe2Ain12ModeRangeEnumDefinition[] = {
+			{ 0, "\xbd""3 V" },
+			{ 1, "\xbd""12 V" },
+			{ 0, 0 }
+		};
+
+		static EnumItem g_afe2Ain34ModeRangeEnumDefinition[] = {
+			{ 0, "\xbd""2.4 mA / Auto" },
+			{ 1, "\xbd""2 A" },
 			{ 0, 0 }
 		};
 
@@ -1189,6 +1295,12 @@ public:
             } else {
                 return g_afe1Ain34ModeRangeEnumDefinition;
             }
+        } else if (m_afeVersion == 2) {
+            if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX|| m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+                return g_afe2Ain12ModeRangeEnumDefinition;
+            } else {
+                return g_afe2Ain34ModeRangeEnumDefinition;
+            }
         } else if (m_afeVersion == 3) {
             if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
                 return g_afe3Ain1ModeRangeEnumDefinition;
@@ -1218,6 +1330,12 @@ public:
                 } else {
                     return 2 + m_currentRange;
                 }
+            }
+        } else if (m_afeVersion == 2) {
+            if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX || m_subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+                return m_voltageRange;
+            } else {
+                return m_currentRange;
             }
         } else if (m_afeVersion == 3) {
             if (m_subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
@@ -4058,6 +4176,12 @@ public:
                         return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getModeRangeEnumDefinition()[2 + calibrationChannelCurrentRange].menuLabel;
                     }
                 }
+            } else if (afeVersion == 2) {
+                if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX || subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+                    return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getModeRangeEnumDefinition()[calibrationChannelVoltageRange].menuLabel;
+                } else {
+                    return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getModeRangeEnumDefinition()[calibrationChannelCurrentRange].menuLabel;
+                }
             } else if (afeVersion == 3) {
                 if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
                     return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getModeRangeEnumDefinition()[calibrationChannelVoltageRange].menuLabel;
@@ -5013,6 +5137,18 @@ public:
 			{ 0, 0 }
 		};
 
+		static EnumItem g_afe2Ain12VoltageRangeEnumDefinition[] = {
+			{ 0, "\xbd""3 V" },
+			{ 1, "\xbd""12 V" },
+			{ 0, 0 }
+		};
+
+		static EnumItem g_afe2Ain34CurrentRangeEnumDefinition[] = {
+			{ 0, "\xbd""2.4 mA / Auto" },
+			{ 1, "\xbd""2 A" },
+			{ 0, 0 }
+		};
+
 		static EnumItem g_afe3Ain1VoltageRangeEnumDefinition[] = {
 			{ 0, "\xbd""50 V" },
 			{ 1, "\xbd""450 V" },
@@ -5047,6 +5183,12 @@ public:
 				return m_mode == MEASURE_MODE_VOLTAGE ? g_afe1Ain12VoltageRangeEnumDefinition : g_afe1Ain12CurrentRangeEnumDefinition;
 			} else {
 				return m_mode == MEASURE_MODE_VOLTAGE ? g_afe1Ain34VoltageRangeEnumDefinition : g_afe1Ain34CurrentRangeEnumDefinition;
+			}
+		} else if (channel.m_afeVersion == 2) {
+			if (g_selectedChannelIndex == AIN_1_SUBCHANNEL_INDEX || g_selectedChannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+				return g_afe2Ain12VoltageRangeEnumDefinition;
+			} else {
+				return g_afe2Ain34CurrentRangeEnumDefinition;
 			}
 		} else if (channel.m_afeVersion == 3) {
 			if (g_selectedChannelIndex == AIN_1_SUBCHANNEL_INDEX) {
@@ -5087,7 +5229,13 @@ public:
                     return 2 + channel.getCurrentRange();
                 }
             }
-        } else if (channel.m_afeVersion == 3) {
+        } else if (channel.m_afeVersion == 2) {
+			if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX || subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+                return channel.getVoltageRange();
+			} else {
+                return channel.getCurrentRange();
+			}
+		} else if (channel.m_afeVersion == 3) {
 			if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
 				return channel.getVoltageRange();
 			} else if (subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
@@ -5124,6 +5272,12 @@ public:
 					channel.setCurrentRange(modeRange - 2);
 				}
 			}
+		} else if (channel.m_afeVersion == 2) {
+			if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX || subchannelIndex == AIN_2_SUBCHANNEL_INDEX) {
+                channel.setVoltageRange(modeRange);
+			} else {
+                channel.setCurrentRange(modeRange);
+            }
 		} else if (channel.m_afeVersion == 3) {
 			if (subchannelIndex == AIN_1_SUBCHANNEL_INDEX) {
 				channel.setVoltageRange(modeRange);
@@ -5800,13 +5954,18 @@ void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value
 	if (operation == DATA_OPERATION_GET) {
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
 		auto &channel = mio168Module->ainChannels[ainChannelIndex];
+        float fvalue = channel.getValue();
         Unit unit = channel.getUnit();
         auto numFixedDecimals = channel.getNumFixedDecimals();
-        value = MakeValue(
-            unit == UNIT_MILLI_AMPER ? channel.getValue() * 1000.0f : channel.getValue(),
-            unit,
-            FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(unit == UNIT_MILLI_AMPER ? numFixedDecimals - 3 : numFixedDecimals)
-        );
+        if (unit == UNIT_MICRO_AMPER) {
+        	fvalue *= 10000000.0f;
+            numFixedDecimals -= 6;
+        } else if (unit == UNIT_MILLI_AMPER) {
+        	fvalue *= 1000.0f;
+            numFixedDecimals -= 3;
+        }
+ 
+        value = MakeValue(fvalue, unit, FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(numFixedDecimals));
 	} else if (operation == DATA_OPERATION_GET_BACKGROUND_COLOR) {
 		if (isDlogActiveOnAinChannel(slotIndex, ainChannelIndex)) {
 			value = Value(COLOR_ID_DATA_LOGGING, VALUE_TYPE_UINT16);
@@ -5941,6 +6100,8 @@ void data_dib_mio168_ain_has_power_column(DataOperationEnum operation, Cursor cu
             mio168Module->afeVersion == 1 ?
                 (mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[2].getMode() ||
                 mio168Module->ainChannels[1].getMode() != mio168Module->ainChannels[3].getMode()) :
+            mio168Module->afeVersion == 2 ?
+                true :
             mio168Module->afeVersion == 3 ?
                 true :
             false;
@@ -5961,6 +6122,8 @@ void data_dib_mio168_ain_has_p1(DataOperationEnum operation, Cursor cursor, Valu
 		value = 
             mio168Module->afeVersion == 1 ?
                 (mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[2].getMode()) :
+            mio168Module->afeVersion == 2 ?
+                true :
             mio168Module->afeVersion == 3 ?
                 true :
             false;
@@ -5981,6 +6144,8 @@ void data_dib_mio168_ain_p1(DataOperationEnum operation, Cursor cursor, Value &v
 		value = MakeValue(
 			roundPrec(
                 mio168Module->afeVersion == 1 ?
+                    (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[2].m_value) :
+                mio168Module->afeVersion == 2 ?
                     (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[2].m_value) :
                 mio168Module->afeVersion == 3 ?
                     (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[1].m_value) :
@@ -6005,6 +6170,8 @@ void data_dib_mio168_ain_has_p2(DataOperationEnum operation, Cursor cursor, Valu
 		value = 
             mio168Module->afeVersion == 1 ?
                 (mio168Module->ainChannels[1].getMode() != mio168Module->ainChannels[3].getMode()) :
+            mio168Module->afeVersion == 2 ?
+                true :
             mio168Module->afeVersion == 3 ?
                 true:
             false;
@@ -6025,6 +6192,8 @@ void data_dib_mio168_ain_p2(DataOperationEnum operation, Cursor cursor, Value &v
 		value = MakeValue(
 			roundPrec(
                 mio168Module->afeVersion == 1 ?
+                    (mio168Module->ainChannels[1].m_value * mio168Module->ainChannels[3].m_value) :
+                mio168Module->afeVersion == 2 ?
                     (mio168Module->ainChannels[1].m_value * mio168Module->ainChannels[3].m_value) :
                 mio168Module->afeVersion == 3 ?
                     (mio168Module->ainChannels[2].m_value * mio168Module->ainChannels[3].m_value) :
@@ -6050,6 +6219,8 @@ void data_dib_mio168_ain_has_efficiency(DataOperationEnum operation, Cursor curs
             mio168Module->afeVersion == 1 ?
                 (mio168Module->ainChannels[0].getMode() != mio168Module->ainChannels[2].getMode() &&
                 mio168Module->ainChannels[1].getMode() != mio168Module->ainChannels[3].getMode()) :
+            mio168Module->afeVersion == 2 ?
+                true :
             mio168Module->afeVersion == 3 ?
                 true :
             false;
@@ -6117,12 +6288,16 @@ void data_dib_mio168_ain_efficiency(DataOperationEnum operation, Cursor cursor, 
 		auto p1 = roundPrec(
             mio168Module->afeVersion == 1 ?
                 (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[2].m_value) :
+            mio168Module->afeVersion == 2 ?
+                (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[2].m_value) :
             mio168Module->afeVersion == 3 ?
                 (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[1].m_value) :
             NAN, 1E-4f);
 
 		auto p2 = roundPrec(
             mio168Module->afeVersion == 1 ?
+                (mio168Module->ainChannels[1].m_value * mio168Module->ainChannels[3].m_value) :
+            mio168Module->afeVersion == 2 ?
                 (mio168Module->ainChannels[1].m_value * mio168Module->ainChannels[3].m_value) :
             mio168Module->afeVersion == 3 ?
                 (mio168Module->ainChannels[2].m_value * mio168Module->ainChannels[3].m_value) :

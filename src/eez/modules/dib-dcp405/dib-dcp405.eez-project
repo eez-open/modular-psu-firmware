@@ -3967,45 +3967,18 @@
                       ]
                     },
                     {
-                      "type": "Select",
+                      "type": "Text",
                       "left": 94,
                       "top": 66,
                       "width": 45,
                       "height": 29,
-                      "wireID": "5d2482d2-b882-4cee-ad63-a80f4b4f21c3",
-                      "data": "channel_has_support_for_current_dual_range",
+                      "wireID": "8c5bbf22-a21e-4e78-cdb1-6b9cfddfb7ec",
+                      "data": "channel_ranges_currently_selected",
+                      "action": "ch_settings_adv_ranges_select_mode",
                       "style": {
-                        "inheritFrom": "default"
+                        "inheritFrom": "encoder_cursor_14_enabled"
                       },
-                      "widgets": [
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 45,
-                          "height": 29,
-                          "wireID": "3e93652b-647c-4a1b-bd32-99a386760689",
-                          "data": "",
-                          "style": {
-                            "inheritFrom": "default_S"
-                          },
-                          "text": "High"
-                        },
-                        {
-                          "type": "Text",
-                          "left": 0,
-                          "top": 0,
-                          "width": 45,
-                          "height": 29,
-                          "wireID": "8c5bbf22-a21e-4e78-cdb1-6b9cfddfb7ec",
-                          "data": "channel_ranges_currently_selected",
-                          "action": "ch_settings_adv_ranges_select_mode",
-                          "style": {
-                            "inheritFrom": "encoder_cursor_14_enabled"
-                          },
-                          "text": ""
-                        }
-                      ]
+                      "text": ""
                     }
                   ]
                 },

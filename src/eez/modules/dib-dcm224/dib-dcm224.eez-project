@@ -4783,32 +4783,19 @@
     {
       "components": [
         {
-          "type": "Select",
+          "type": "DisplayData",
           "left": 0,
           "top": 0,
           "width": 81,
           "height": 55,
-          "wireID": "d2cce92c-6e14-4a5b-fe39-2dc8eb50625a",
+          "wireID": "e8b1f928-2374-49b6-ae7a-3586a43706d0",
+          "data": "channel_display_value1",
+          "action": "",
           "style": {
-            "inheritFrom": "default"
+            "inheritFrom": "mon_value_48_right",
+            "font": "Oswald38"
           },
-          "widgets": [
-            {
-              "type": "DisplayData",
-              "left": 0,
-              "top": 0,
-              "width": 81,
-              "height": 47,
-              "wireID": "e8b1f928-2374-49b6-ae7a-3586a43706d0",
-              "data": "channel_display_value1",
-              "action": "",
-              "style": {
-                "inheritFrom": "mon_value_48_right",
-                "font": "Oswald38"
-              },
-              "displayOption": 1
-            }
-          ]
+          "displayOption": 1
         },
         {
           "type": "DisplayData",
@@ -4853,9 +4840,9 @@
         {
           "type": "DisplayData",
           "left": 0,
-          "top": 6,
+          "top": 0,
           "width": 81,
-          "height": 47,
+          "height": 54,
           "wireID": "b40e8477-88c7-4297-bf07-e84333d52851",
           "data": "channel_display_value2",
           "style": {
@@ -4869,7 +4856,7 @@
           "left": 81,
           "top": 0,
           "width": 51,
-          "height": 24,
+          "height": 26,
           "wireID": "2f9a5d5a-211d-41ca-c40b-e8c8220e0c94",
           "data": "channel_display_value2",
           "style": {

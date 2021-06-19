@@ -2780,4 +2780,4 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_RELAY_CYCLES = 241
 };
 
-extern const uint8_t assets[624331];
+extern const uint8_t assets[624241];
