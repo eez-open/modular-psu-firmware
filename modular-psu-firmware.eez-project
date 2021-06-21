@@ -2722,6 +2722,11 @@
       "name": "is_toggle_channels_view_mode_enabled",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "dlog_has_bookmark",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -37980,7 +37985,7 @@
                                   "left": 0,
                                   "top": 0,
                                   "width": 480,
-                                  "height": 32,
+                                  "height": 35,
                                   "wireID": "4f75fee3-ca76-4c62-d0bd-10bba1e40a87",
                                   "style": {
                                     "inheritFrom": "default"
@@ -37991,7 +37996,7 @@
                                       "left": 0,
                                       "top": 0,
                                       "width": 78,
-                                      "height": 32,
+                                      "height": 35,
                                       "wireID": "c0341fd0-72c3-496e-9498-bac94b6c62f5",
                                       "data": "dlog_visible_value_label",
                                       "action": "dlog_view_select_visible_value",
@@ -38009,7 +38014,7 @@
                                       "left": 78,
                                       "top": 0,
                                       "width": 56,
-                                      "height": 32,
+                                      "height": 35,
                                       "wireID": "ef9272db-6fe5-4012-c7fe-8e67436886d2",
                                       "data": "",
                                       "style": {
@@ -38024,7 +38029,7 @@
                                       "left": 134,
                                       "top": 0,
                                       "width": 78,
-                                      "height": 32,
+                                      "height": 35,
                                       "wireID": "66bbbb14-4a5b-4604-f3ef-82b89215dbab",
                                       "data": "dlog_visible_value_offset",
                                       "action": "edit",
@@ -38041,7 +38046,7 @@
                                       "left": 212,
                                       "top": 0,
                                       "width": 46,
-                                      "height": 32,
+                                      "height": 35,
                                       "wireID": "e8590985-8f1f-41d0-d7d4-6cbc4461461a",
                                       "data": "",
                                       "style": {
@@ -38056,7 +38061,7 @@
                                       "left": 258,
                                       "top": 0,
                                       "width": 78,
-                                      "height": 32,
+                                      "height": 35,
                                       "wireID": "c8985f36-ac6a-492f-a22b-8d7d409dd8db",
                                       "data": "dlog_visible_value_div",
                                       "action": "edit",
@@ -38073,7 +38078,7 @@
                                       "left": 336,
                                       "top": 0,
                                       "width": 66,
-                                      "height": 32,
+                                      "height": 35,
                                       "wireID": "ea373b1a-3979-469a-ff3c-6df500959421",
                                       "data": "",
                                       "style": {
@@ -38088,7 +38093,7 @@
                                       "left": 402,
                                       "top": 0,
                                       "width": 78,
-                                      "height": 32,
+                                      "height": 35,
                                       "wireID": "8d20f29b-9c4e-47da-c365-423c210d4b81",
                                       "data": "dlog_visible_value_cursor",
                                       "action": "",
@@ -38105,7 +38110,7 @@
                                 {
                                   "type": "Rectangle",
                                   "left": 0,
-                                  "top": 32,
+                                  "top": 35,
                                   "width": 480,
                                   "height": 1,
                                   "wireID": "463b05d9-3b47-4b90-8b8b-aaaba38446fe",
@@ -38119,9 +38124,9 @@
                                 {
                                   "type": "YTGraph",
                                   "left": 0,
-                                  "top": 33,
+                                  "top": 36,
                                   "width": 480,
-                                  "height": 207,
+                                  "height": 204,
                                   "wireID": "0dbe9e5f-076f-46b2-ed43-c9b5afdd4488",
                                   "data": "recording",
                                   "action": "edit",
@@ -40035,139 +40040,35 @@
                   "top": 0,
                   "width": 160,
                   "height": 208,
-                  "wireID": "08d98d52-5686-468c-c433-231b1bc6c2be",
-                  "data": "dlog_bookmarks_is_scrollbar_visible",
+                  "wireID": "1d74e39a-2238-419a-9fef-fed39e5a2703",
+                  "data": "dlog_has_bookmark",
                   "style": {
                     "inheritFrom": "default"
                   },
                   "widgets": [
                     {
-                      "type": "List",
+                      "type": "MultilineTextWidget",
                       "left": 0,
                       "top": 0,
                       "width": 160,
                       "height": 208,
-                      "wireID": "2af0e5bb-c21b-4b98-b234-3021c589a62f",
-                      "data": "dlog_bookmarks",
-                      "action": "",
+                      "wireID": "a4dae702-cabb-4b79-a739-13092b6e7857",
                       "style": {
-                        "inheritFrom": "default"
+                        "inheritFrom": "default",
+                        "font": "Oswald14"
                       },
-                      "itemWidget": {
-                        "type": "Select",
-                        "left": 0,
-                        "top": 0,
-                        "width": 160,
-                        "height": 26,
-                        "wireID": "74dfd3a0-e84b-4d6c-8098-b8775b661975",
-                        "data": "dlog_bookmark_is_selected",
-                        "action": "dlog_view_select_bookmark",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "widgets": [
-                          {
-                            "type": "Container",
-                            "left": 0,
-                            "top": 0,
-                            "width": 160,
-                            "height": 26,
-                            "wireID": "db077db0-cd45-4ac2-ae2b-5147e6c9e7da",
-                            "style": {
-                              "inheritFrom": "default"
-                            },
-                            "widgets": [
-                              {
-                                "type": "Text",
-                                "left": 0,
-                                "top": 0,
-                                "width": 64,
-                                "height": 26,
-                                "wireID": "bb8aadea-7bef-4e85-a7ee-f5352045c7cd",
-                                "data": "dlog_bookmark_x_value",
-                                "style": {
-                                  "inheritFrom": "default",
-                                  "font": "RobotoCondensed-Regular"
-                                },
-                                "text": ""
-                              },
-                              {
-                                "type": "Text",
-                                "left": 64,
-                                "top": 0,
-                                "width": 96,
-                                "height": 26,
-                                "wireID": "844565e6-8460-40e8-f373-42a68b8aaa8c",
-                                "data": "dlog_bookmark_text",
-                                "style": {
-                                  "inheritFrom": "default",
-                                  "font": "RobotoCondensed-Regular"
-                                },
-                                "text": ""
-                              }
-                            ]
-                          },
-                          {
-                            "type": "Container",
-                            "left": 0,
-                            "top": 0,
-                            "width": 160,
-                            "height": 26,
-                            "wireID": "6b5f9798-f14d-4ab0-d1f5-712dd792f816",
-                            "style": {
-                              "inheritFrom": "default"
-                            },
-                            "widgets": [
-                              {
-                                "type": "Text",
-                                "left": 0,
-                                "top": 0,
-                                "width": 64,
-                                "height": 26,
-                                "wireID": "45d6e2a3-edce-414e-acd4-88a805d5b3fd",
-                                "data": "dlog_bookmark_x_value",
-                                "style": {
-                                  "inheritFrom": "default",
-                                  "font": "RobotoCondensed-Regular",
-                                  "color": "text_regular",
-                                  "backgroundColor": "selected_bookmark",
-                                  "activeColor": "selected_bookmark",
-                                  "activeBackgroundColor": "text_regular"
-                                },
-                                "text": ""
-                              },
-                              {
-                                "type": "Text",
-                                "left": 64,
-                                "top": 0,
-                                "width": 96,
-                                "height": 26,
-                                "wireID": "029c9d39-101e-4a2d-9701-3dd93788a79a",
-                                "data": "dlog_bookmark_text",
-                                "style": {
-                                  "inheritFrom": "default",
-                                  "font": "RobotoCondensed-Regular",
-                                  "color": "text_regular",
-                                  "backgroundColor": "selected_bookmark",
-                                  "activeColor": "selected_bookmark",
-                                  "activeBackgroundColor": "text_regular"
-                                },
-                                "text": ""
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      "listType": "vertical",
-                      "gap": 0
+                      "text": "No bookmarks",
+                      "firstLineIndent": 0,
+                      "hangingIndent": 0
                     },
                     {
-                      "type": "Container",
+                      "type": "Select",
                       "left": 0,
                       "top": 0,
                       "width": 160,
                       "height": 208,
-                      "wireID": "77d62334-5497-4e9c-cc1e-85d93c0ecc60",
+                      "wireID": "08d98d52-5686-468c-c433-231b1bc6c2be",
+                      "data": "dlog_bookmarks_is_scrollbar_visible",
                       "style": {
                         "inheritFrom": "default"
                       },
@@ -40176,9 +40077,9 @@
                           "type": "List",
                           "left": 0,
                           "top": 0,
-                          "width": 128,
+                          "width": 160,
                           "height": 208,
-                          "wireID": "052d40ab-f728-48a5-9874-cdda28106915",
+                          "wireID": "2af0e5bb-c21b-4b98-b234-3021c589a62f",
                           "data": "dlog_bookmarks",
                           "action": "",
                           "style": {
@@ -40188,9 +40089,9 @@
                             "type": "Select",
                             "left": 0,
                             "top": 0,
-                            "width": 128,
+                            "width": 160,
                             "height": 26,
-                            "wireID": "9f39986d-1389-4bf6-b407-c19b5bbeb12f",
+                            "wireID": "74dfd3a0-e84b-4d6c-8098-b8775b661975",
                             "data": "dlog_bookmark_is_selected",
                             "action": "dlog_view_select_bookmark",
                             "style": {
@@ -40201,9 +40102,9 @@
                                 "type": "Container",
                                 "left": 0,
                                 "top": 0,
-                                "width": 128,
+                                "width": 160,
                                 "height": 26,
-                                "wireID": "75123caa-3dc2-4d69-997e-e51dca7c1bd2",
+                                "wireID": "db077db0-cd45-4ac2-ae2b-5147e6c9e7da",
                                 "style": {
                                   "inheritFrom": "default"
                                 },
@@ -40212,9 +40113,9 @@
                                     "type": "Text",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 48,
+                                    "width": 64,
                                     "height": 26,
-                                    "wireID": "a4b682c5-79f7-466e-884a-332efa6caf2f",
+                                    "wireID": "bb8aadea-7bef-4e85-a7ee-f5352045c7cd",
                                     "data": "dlog_bookmark_x_value",
                                     "style": {
                                       "inheritFrom": "default",
@@ -40224,11 +40125,11 @@
                                   },
                                   {
                                     "type": "Text",
-                                    "left": 48,
+                                    "left": 64,
                                     "top": 0,
-                                    "width": 80,
+                                    "width": 96,
                                     "height": 26,
-                                    "wireID": "4e8bef53-b2fe-41f4-daaf-3b4ff10e9360",
+                                    "wireID": "844565e6-8460-40e8-f373-42a68b8aaa8c",
                                     "data": "dlog_bookmark_text",
                                     "style": {
                                       "inheritFrom": "default",
@@ -40242,9 +40143,9 @@
                                 "type": "Container",
                                 "left": 0,
                                 "top": 0,
-                                "width": 128,
+                                "width": 160,
                                 "height": 26,
-                                "wireID": "ecf72fe0-3c0c-4193-edf9-35b469a1655a",
+                                "wireID": "6b5f9798-f14d-4ab0-d1f5-712dd792f816",
                                 "style": {
                                   "inheritFrom": "default"
                                 },
@@ -40253,9 +40154,9 @@
                                     "type": "Text",
                                     "left": 0,
                                     "top": 0,
-                                    "width": 48,
+                                    "width": 64,
                                     "height": 26,
-                                    "wireID": "dd435f82-0432-44e3-9d66-b72c51200b1b",
+                                    "wireID": "45d6e2a3-edce-414e-acd4-88a805d5b3fd",
                                     "data": "dlog_bookmark_x_value",
                                     "style": {
                                       "inheritFrom": "default",
@@ -40269,11 +40170,11 @@
                                   },
                                   {
                                     "type": "Text",
-                                    "left": 48,
+                                    "left": 64,
                                     "top": 0,
-                                    "width": 80,
+                                    "width": 96,
                                     "height": 26,
-                                    "wireID": "08ba2b2d-a639-4278-9fa6-b81a6385b863",
+                                    "wireID": "029c9d39-101e-4a2d-9701-3dd93788a79a",
                                     "data": "dlog_bookmark_text",
                                     "style": {
                                       "inheritFrom": "default",
@@ -40293,25 +40194,158 @@
                           "gap": 0
                         },
                         {
-                          "type": "ScrollBar",
-                          "left": 128,
+                          "type": "Container",
+                          "left": 0,
                           "top": 0,
-                          "width": 32,
+                          "width": 160,
                           "height": 208,
-                          "wireID": "45507836-a1f8-4155-bd3a-3beabc0be47b",
-                          "data": "dlog_bookmarks",
-                          "action": "scroll",
+                          "wireID": "77d62334-5497-4e9c-cc1e-85d93c0ecc60",
                           "style": {
-                            "inheritFrom": "default_inverse"
+                            "inheritFrom": "default"
                           },
-                          "thumbStyle": {
-                            "inheritFrom": "scrollbar_thumb"
-                          },
-                          "buttonsStyle": {
-                            "inheritFrom": "scrollbar_button"
-                          },
-                          "leftButtonText": "\\u0083",
-                          "rightButtonText": "\\u0084"
+                          "widgets": [
+                            {
+                              "type": "List",
+                              "left": 0,
+                              "top": 0,
+                              "width": 128,
+                              "height": 208,
+                              "wireID": "052d40ab-f728-48a5-9874-cdda28106915",
+                              "data": "dlog_bookmarks",
+                              "action": "",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "itemWidget": {
+                                "type": "Select",
+                                "left": 0,
+                                "top": 0,
+                                "width": 128,
+                                "height": 26,
+                                "wireID": "9f39986d-1389-4bf6-b407-c19b5bbeb12f",
+                                "data": "dlog_bookmark_is_selected",
+                                "action": "dlog_view_select_bookmark",
+                                "style": {
+                                  "inheritFrom": "default"
+                                },
+                                "widgets": [
+                                  {
+                                    "type": "Container",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 128,
+                                    "height": 26,
+                                    "wireID": "75123caa-3dc2-4d69-997e-e51dca7c1bd2",
+                                    "style": {
+                                      "inheritFrom": "default"
+                                    },
+                                    "widgets": [
+                                      {
+                                        "type": "Text",
+                                        "left": 0,
+                                        "top": 0,
+                                        "width": 48,
+                                        "height": 26,
+                                        "wireID": "a4b682c5-79f7-466e-884a-332efa6caf2f",
+                                        "data": "dlog_bookmark_x_value",
+                                        "style": {
+                                          "inheritFrom": "default",
+                                          "font": "RobotoCondensed-Regular"
+                                        },
+                                        "text": ""
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "left": 48,
+                                        "top": 0,
+                                        "width": 80,
+                                        "height": 26,
+                                        "wireID": "4e8bef53-b2fe-41f4-daaf-3b4ff10e9360",
+                                        "data": "dlog_bookmark_text",
+                                        "style": {
+                                          "inheritFrom": "default",
+                                          "font": "RobotoCondensed-Regular"
+                                        },
+                                        "text": ""
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "Container",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 128,
+                                    "height": 26,
+                                    "wireID": "ecf72fe0-3c0c-4193-edf9-35b469a1655a",
+                                    "style": {
+                                      "inheritFrom": "default"
+                                    },
+                                    "widgets": [
+                                      {
+                                        "type": "Text",
+                                        "left": 0,
+                                        "top": 0,
+                                        "width": 48,
+                                        "height": 26,
+                                        "wireID": "dd435f82-0432-44e3-9d66-b72c51200b1b",
+                                        "data": "dlog_bookmark_x_value",
+                                        "style": {
+                                          "inheritFrom": "default",
+                                          "font": "RobotoCondensed-Regular",
+                                          "color": "text_regular",
+                                          "backgroundColor": "selected_bookmark",
+                                          "activeColor": "selected_bookmark",
+                                          "activeBackgroundColor": "text_regular"
+                                        },
+                                        "text": ""
+                                      },
+                                      {
+                                        "type": "Text",
+                                        "left": 48,
+                                        "top": 0,
+                                        "width": 80,
+                                        "height": 26,
+                                        "wireID": "08ba2b2d-a639-4278-9fa6-b81a6385b863",
+                                        "data": "dlog_bookmark_text",
+                                        "style": {
+                                          "inheritFrom": "default",
+                                          "font": "RobotoCondensed-Regular",
+                                          "color": "text_regular",
+                                          "backgroundColor": "selected_bookmark",
+                                          "activeColor": "selected_bookmark",
+                                          "activeBackgroundColor": "text_regular"
+                                        },
+                                        "text": ""
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              "listType": "vertical",
+                              "gap": 0
+                            },
+                            {
+                              "type": "ScrollBar",
+                              "left": 128,
+                              "top": 0,
+                              "width": 32,
+                              "height": 208,
+                              "wireID": "45507836-a1f8-4155-bd3a-3beabc0be47b",
+                              "data": "dlog_bookmarks",
+                              "action": "scroll",
+                              "style": {
+                                "inheritFrom": "default_inverse"
+                              },
+                              "thumbStyle": {
+                                "inheritFrom": "scrollbar_thumb"
+                              },
+                              "buttonsStyle": {
+                                "inheritFrom": "scrollbar_button"
+                              },
+                              "leftButtonText": "\\u0083",
+                              "rightButtonText": "\\u0084"
+                            }
+                          ]
                         }
                       ]
                     }

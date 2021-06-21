@@ -1009,7 +1009,7 @@ bool addChannelWaveformParameters(int slotIndex, int subchannelIndex, int resour
 		}
 	}
 
-	for (int j = g_selectedResources.m_numResources; j > i + 1; j--) {
+	for (int j = g_selectedResources.m_numResources; j >= i + 1; j--) {
 		g_selectedResources.m_waveformParameters[j] = g_selectedResources.m_waveformParameters[j - 1];
 	}
 
@@ -2520,6 +2520,7 @@ void data_function_generator_has_mode_select(DataOperationEnum operation, Cursor
 		int subchannelIndex;
 		int resourceIndex;
 		if (
+			g_functionGeneratorPage.m_selectedItem >= 0 && g_functionGeneratorPage.m_selectedItem < g_functionGeneratorPage.m_selectedResources.m_numResources &&
 			AllResources::findResource(
 				g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].absoluteResourceIndex,
 				slotIndex, subchannelIndex, resourceIndex

@@ -65,6 +65,8 @@ void setState(State newState) {
 }
 
 void reset() {
+	abort();
+
     g_triggerDelay = trigger::DELAY_DEFAULT;
     setSource(trigger::SOURCE_IMMEDIATE);
     g_triggerContinuousInitializationEnabled = 0;
