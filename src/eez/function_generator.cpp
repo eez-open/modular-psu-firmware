@@ -1166,6 +1166,10 @@ bool setWaveform(int slotIndex, int subchannelIndex, int resourceIndex, Waveform
 	
 	g_functionGeneratorPage.init();
 
+	if (g_active) {
+		reloadWaveformParameters();
+	}
+
 	return true;
 }
 
@@ -1203,6 +1207,10 @@ bool setFrequency(int slotIndex, int subchannelIndex, int resourceIndex, float f
 	
 	g_functionGeneratorPage.init();
 
+	if (g_active) {
+		reloadWaveformParameters();
+	}
+
 	return true;
 }
 
@@ -1236,6 +1244,10 @@ bool setPhaseShift(int slotIndex, int subchannelIndex, int resourceIndex, float 
 
 	g_functionGeneratorPage.init();
 	
+	if (g_active) {
+		reloadWaveformParameters();
+	}
+
 	return true;
 }
 
@@ -1303,6 +1315,10 @@ bool setAmplitude(int slotIndex, int subchannelIndex, int resourceIndex, float a
 
 	g_functionGeneratorPage.init();
 	
+	if (g_active) {
+		reloadWaveformParameters();
+	}
+
 	return true;
 }
 
@@ -1357,6 +1373,10 @@ bool setOffset(int slotIndex, int subchannelIndex, int resourceIndex, float offs
 
 	g_functionGeneratorPage.init();
 
+	if (g_active) {
+		reloadWaveformParameters();
+	}
+
 	return true;
 }
 
@@ -1390,6 +1410,10 @@ bool setDutyCycle(int slotIndex, int subchannelIndex, int resourceIndex, float d
 
 	g_functionGeneratorPage.init();
 	
+	if (g_active) {
+		reloadWaveformParameters();
+	}
+
 	return true;
 }
 
@@ -1456,6 +1480,10 @@ bool setResourceType(int slotIndex, int subchannelIndex, int resourceIndex, Func
  	waveformParameters->resourceType = resourceType;
 
 	g_functionGeneratorPage.init();
+
+	if (g_active) {
+		reloadWaveformParameters();
+	}
 
 	return true;
 }
@@ -1619,7 +1647,7 @@ void reloadWaveformParameters() {
 				}
 
 				if (g_slots[slotIndex]->moduleType == MODULE_TYPE_DCP405) {
-					float max = waveformParameters.offset + waveformParameters.amplitude / 2.0f;
+					float max = g_offsetI[channel->channelIndex] + g_amplitudeI[channel->channelIndex] / 2.0f;
 					if (max > 0.05f) {
 						channel_dispatcher::setCurrentRangeSelectionMode(*channel, CURRENT_RANGE_SELECTION_ALWAYS_HIGH);
 					} else {
