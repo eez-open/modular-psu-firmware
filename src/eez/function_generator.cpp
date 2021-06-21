@@ -983,6 +983,8 @@ bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Paramet
 ////////////////////////////////////////////////////////////////////////////////
 
 bool addChannelWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex, int *err) {
+	AllResources::reset();
+	
 	if (g_selectedResources.m_numResources == MAX_NUM_WAVEFORMS) {
 		if (err) {
 			*err = SCPI_ERROR_OUT_OF_MEMORY_FOR_REQ_OP;
