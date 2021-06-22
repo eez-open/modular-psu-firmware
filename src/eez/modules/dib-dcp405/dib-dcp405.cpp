@@ -1070,7 +1070,19 @@ public:
 	const char *getPinoutFile() override {
 		return "dcp405_pinout.jpg";
 	}
- };
+
+    void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override {
+        min = 0.1f;
+        max = 200.0f;
+
+        if (stepValues) {
+            static float values[] = { 1.0f, 5.0f, 10.0f, 25.0f };
+            stepValues->values = values;
+            stepValues->count = sizeof(values) / sizeof(float);
+            stepValues->unit = UNIT_HERTZ;
+        }
+    }
+};
 
 static DcpModule g_dcpModule;
 Module *g_module = &g_dcpModule;

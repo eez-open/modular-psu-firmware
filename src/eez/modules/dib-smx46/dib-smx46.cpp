@@ -1405,10 +1405,10 @@ public:
 	
     void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override {
         min = 0.1f;
-        max = 10000.0f;
+        max = 20.0f;
 
         if (stepValues) {
-            static float values[] = { 1.0f, 10.0f, 100.0f, 500.0f };
+            static float values[] = { 0.1f, 0.5f, 1.0f, 2.0f };
             stepValues->values = values;
             stepValues->count = sizeof(values) / sizeof(float);
             stepValues->unit = UNIT_HERTZ;

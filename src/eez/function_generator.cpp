@@ -2617,6 +2617,25 @@ void data_function_generator_any_selected(DataOperationEnum operation, Cursor cu
 	}
 }
 
+void data_function_generator_is_any_channel_active(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = 0;
+		for (int i = 0; i < g_functionGeneratorPage.m_selectedResources.m_numResources; i++) {
+			if (g_functionGeneratorPage.m_selectedResources.m_triggerModes[i] == TRIGGER_MODE_FUNCTION_GENERATOR) {
+				value = 1;
+				break;
+			}
+		}
+	}
+}
+
+void action_function_generator_trigger() {
+	if (g_functionGeneratorPage.getDirty()) {
+		g_functionGeneratorPage.set();
+	}
+	action_trigger_manually();
+}
+
 void action_function_generator_deselect_all() {
 	g_functionGeneratorSelectChannelsPage.m_selectedChannels = 0;
 }
@@ -2633,6 +2652,8 @@ void action_function_generator_show_previous_page() {
         closeFunctionGeneratorPage();
     }	
 }
+
+
 
 } // namespace gui
 } // namespace eez

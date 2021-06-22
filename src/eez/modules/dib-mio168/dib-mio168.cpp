@@ -4765,20 +4765,30 @@ public:
     void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override {
         if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
             min = 0.1f;
-            max = 50000.0f;
+            max = 8000.0f;
 
             if (stepValues) {
-                static float values[] = { 1.0f, 10.0f, 100.0f, 500.0f };
+                static float values[] = { 1.0f, 10.0f, 25.0f, 100.0f };
                 stepValues->values = values;
                 stepValues->count = sizeof(values) / sizeof(float);
                 stepValues->unit = UNIT_HERTZ;
             }
-        } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+        } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             min = 0.1f;
-            max = 10000.0f;
+            max = 120.0f;
 
             if (stepValues) {
-                static float values[] = { 1.0f, 10.0f, 100.0f, 500.0f };
+                static float values[] = { 1.0f, 2.0f, 5.0f, 10.0f };
+                stepValues->values = values;
+                stepValues->count = sizeof(values) / sizeof(float);
+                stepValues->unit = UNIT_HERTZ;
+            }
+        } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+            min = 0.1f;
+            max = 200.0f;
+
+            if (stepValues) {
+                static float values[] = { 1.0f, 2.0f, 5.0f, 10.0f };
                 stepValues->values = values;
                 stepValues->count = sizeof(values) / sizeof(float);
                 stepValues->unit = UNIT_HERTZ;

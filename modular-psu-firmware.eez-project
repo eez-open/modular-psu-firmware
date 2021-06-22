@@ -2727,6 +2727,11 @@
       "name": "dlog_has_bookmark",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "function_generator_is_any_channel_active",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -4045,6 +4050,11 @@
       "components": [],
       "connectionLines": [],
       "name": "trigger_manually"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_trigger"
     },
     {
       "components": [],
@@ -32161,16 +32171,109 @@
               "text": "Select channels"
             },
             {
-              "type": "RectangleWidget",
+              "type": "Select",
               "left": 327,
               "top": 0,
               "width": 71,
               "height": 32,
-              "wireID": "fc8df9d9-cdd8-4804-c0a7-e684c0154b11",
+              "wireID": "f4c988d0-a901-4267-e13c-7c1920560517",
+              "data": "function_generator_is_any_channel_active",
               "style": {
-                "inheritFrom": "status_title"
+                "inheritFrom": "default"
               },
-              "invertColors": true
+              "widgets": [
+                {
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 71,
+                  "height": 32,
+                  "wireID": "b94e9054-b9eb-462c-dfc9-25bccd3e5c1c",
+                  "style": {
+                    "inheritFrom": "status_title"
+                  },
+                  "invertColors": true
+                },
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 71,
+                  "height": 32,
+                  "wireID": "347aa336-3898-46ca-959f-c8699da57382",
+                  "data": "trigger_state",
+                  "action": "function_generator_trigger",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 71,
+                      "height": 32,
+                      "wireID": "3fbe39a4-b7a8-486b-e84b-5fc10531ac6b",
+                      "action": "",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "font": "Oswald14",
+                        "color": "action_color",
+                        "activeBackgroundColor": "action_color"
+                      },
+                      "text": "Start"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 71,
+                      "height": 32,
+                      "wireID": "437c7b46-0f23-4a37-b88e-245a6da8ce9c",
+                      "action": "",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "font": "Oswald14",
+                        "color": "action_color",
+                        "activeBackgroundColor": "action_color"
+                      },
+                      "text": "Abort"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 71,
+                      "height": 32,
+                      "wireID": "ca8d622d-d848-4276-a38e-2e080cd3235b",
+                      "action": "",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "font": "Oswald14",
+                        "color": "action_color",
+                        "activeBackgroundColor": "action_color"
+                      },
+                      "text": "Abort"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 71,
+                      "height": 32,
+                      "wireID": "050b1699-7fe9-48ee-91e7-2f1a69ea8a5d",
+                      "action": "",
+                      "style": {
+                        "inheritFrom": "status_bgnd",
+                        "font": "Oswald14",
+                        "color": "action_color",
+                        "activeBackgroundColor": "action_color"
+                      },
+                      "text": "Stop"
+                    }
+                  ]
+                }
+              ]
             },
             {
               "type": "Select",
