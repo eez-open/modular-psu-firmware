@@ -351,7 +351,7 @@ struct YTGraphStaticDrawHelper {
     }
 
     void drawGraph(uint32_t currentHistoryValuePosition, int startX, int endX, int vertDivisions) {
-        xLabels[m_valueIndex] = INT_MIN;
+        //xLabels[m_valueIndex] = INT_MIN;
         yLabels[m_valueIndex] = INT_MIN;
 
         if (ytDataDataValueIsVisible(widgetCursor.cursor, widget->data, m_valueIndex)) {
@@ -374,11 +374,13 @@ struct YTGraphStaticDrawHelper {
                 yPrevMax = yMax;
 
                 if (yMin != INT_MIN) {
-                    xLabels[m_valueIndex] = x;
+                    //xLabels[m_valueIndex] = x;
                     yLabels[m_valueIndex] = widgetCursor.y + yMin;
                 }
             }
         }
+
+		xLabels[m_valueIndex] = endX;
     }
 
     void drawLabel(font::Font &font, bool transparent) {

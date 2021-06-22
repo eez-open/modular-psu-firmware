@@ -40,6 +40,9 @@
 
 #include <eez/memory.h>
 
+//uint32_t g_debugVar1;
+//uint32_t g_debugVar2;
+//uint32_t g_debugVar3;
 
 #if defined(EEZ_PLATFORM_STM32)
 extern RTC_HandleTypeDef hrtc;
@@ -142,44 +145,45 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
     buffer = nullptr;
     bufferSize = 0;
 
-// #if defined(EEZ_PLATFORM_STM32)
-//     taskENTER_CRITICAL();
-// #endif
-    int32_t timeDiff = millis() - g_lastSavedBufferTickCount;
-    uint32_t indexDiff = g_writer.getBufferIndex() - g_lastSavedBufferIndex;
-    if (indexDiff > 0 && (flush || timeDiff >= CONF_DLOG_SYNC_FILE_TIME_MS || indexDiff >= CHUNK_SIZE)) {
-        bufferSize = MIN(indexDiff, CHUNK_SIZE);
-        buffer = g_saveBuffer;
+#if defined(EEZ_PLATFORM_STM32)
+    taskENTER_CRITICAL();
+#endif
+	int32_t timeDiff = millis() - g_lastSavedBufferTickCount;
+	uint32_t indexDiff = (g_writer.getBufferIndex() - g_lastSavedBufferIndex);
 
-        int32_t i = g_writer.getBufferIndex() - (g_lastSavedBufferIndex + DLOG_RECORD_BUFFER_SIZE);
+	if (indexDiff > 0 && (flush || timeDiff >= CONF_DLOG_SYNC_FILE_TIME_MS || indexDiff >= CHUNK_SIZE)) {
+		bufferSize = MIN(indexDiff, CHUNK_SIZE);
+		buffer = g_saveBuffer;
 
-        if (i <= 0) {
-            i = 0;
-        } else {
-// #if defined(EEZ_PLATFORM_STM32)
-//             taskEXIT_CRITICAL();
-// #endif
-            abortAfterBufferOverflowError(0);
-            return false;
-        }
+		int32_t i = g_writer.getBufferIndex() - (g_lastSavedBufferIndex + DLOG_RECORD_BUFFER_SIZE);
 
-        if ((uint32_t)i < bufferSize) {
-            uint32_t tail = (g_lastSavedBufferIndex + i) % DLOG_RECORD_BUFFER_SIZE;
-            uint32_t head = (g_lastSavedBufferIndex + bufferSize) % DLOG_RECORD_BUFFER_SIZE;
-            if (tail < head) {
-                memcpy(g_saveBuffer + i, DLOG_RECORD_BUFFER + tail, head - tail);
-            } else {
-                uint32_t n = DLOG_RECORD_BUFFER_SIZE - tail;
-                memcpy(g_saveBuffer, DLOG_RECORD_BUFFER + tail, n);
-                if (head > 0) {
-                    memcpy(g_saveBuffer + n, DLOG_RECORD_BUFFER, head);
-                }
-            }
-        } 
-    }
-// #if defined(EEZ_PLATFORM_STM32)
-//     taskEXIT_CRITICAL();
-// #endif
+		if (i <= 0) {
+			i = 0;
+		} else {
+			#if defined(EEZ_PLATFORM_STM32)
+			            taskEXIT_CRITICAL();
+			#endif
+			abortAfterBufferOverflowError(0);
+			return false;
+		}
+
+		if ((uint32_t)i < bufferSize) {
+			uint32_t tail = (g_lastSavedBufferIndex + i) % DLOG_RECORD_BUFFER_SIZE;
+			uint32_t head = (g_lastSavedBufferIndex + bufferSize) % DLOG_RECORD_BUFFER_SIZE;
+			if (tail < head) {
+				memcpy(g_saveBuffer + i, DLOG_RECORD_BUFFER + tail, head - tail);
+			} else {
+				uint32_t n = DLOG_RECORD_BUFFER_SIZE - tail;
+				memcpy(g_saveBuffer, DLOG_RECORD_BUFFER + tail, n);
+				if (head > 0) {
+					memcpy(g_saveBuffer + n, DLOG_RECORD_BUFFER, head);
+				}
+			}
+		}
+	}
+#if defined(EEZ_PLATFORM_STM32)
+    taskEXIT_CRITICAL();
+#endif
 
     return true;
 }
@@ -209,30 +213,19 @@ void fileWrite(bool flush) {
 
         int err = 0;
 
-        // File g_file;
-        // if (g_file.open(g_activeRecording.parameters.filePath, FILE_OPEN_APPEND | FILE_WRITE)) {
-        //     if (g_file.seek(g_lastSavedBufferIndex)) {
-                size_t written = g_file.write(buffer, bufferSize);
+        //g_debugVar3 = g_lastSavedBufferIndex;
+        size_t written = g_file.write(buffer, bufferSize);
+        //g_debugVar3 = 0;
 
-                if (written != bufferSize) {
-                    err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
-                }
+        if (written != bufferSize) {
+            err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
+        }
 
-                // if (!g_file.close()) {
-                //     err = event_queue::EVENT_ERROR_DLOG_WRITE_ERROR;
-                // }
-
-                if (!err) {
-                    g_file.sync();
-                    g_lastSavedBufferIndex += bufferSize;
-                    g_lastSavedBufferTickCount = millis();
-                }
-        //     } else {
-        //         err = event_queue::EVENT_ERROR_DLOG_SEEK_ERROR;
-        //     }
-        // } else {
-        //     err = event_queue::EVENT_ERROR_DLOG_FILE_REOPEN_ERROR;
-        // }
+        if (!err) {
+            g_file.sync();
+            g_lastSavedBufferIndex += bufferSize;
+            g_lastSavedBufferTickCount = millis();
+        }
 
         if (err) {
             //DebugTrace("write error\n");
@@ -366,7 +359,7 @@ static void log() {
         ++g_activeRecording.size;
 
         g_nextTime = ++g_iSample * g_activeRecording.parameters.period;
-        
+
         if (g_nextTime > g_activeRecording.parameters.duration) {
             stateTransition(EVENT_FINISH);
             break;
@@ -833,12 +826,15 @@ void abortAfterMassStorageError() {
 }
 
 void reset() {
+	abort();
     stateTransition(EVENT_RESET);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void tick() {
+	//g_debugVar1 = g_writer.getBufferIndex();
+	//g_debugVar2 = g_lastSavedBufferIndex;
     if (g_state == STATE_EXECUTING && g_nextTime <= g_activeRecording.parameters.duration && !g_inStateTransition) {
         log();
     }

@@ -120,6 +120,11 @@ static uint32_t g_yValuesScrollPosition = 0;
 static Overlay g_multipleValuesOverlay;
 static Overlay g_singleValueOverlay;
 
+static Recording *g_cacheRecording;
+static int g_cacheDlogValueIndex;
+static float g_cacheMin;
+static float g_cacheMax;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static uint32_t getPosition(Recording& recording);
@@ -167,6 +172,8 @@ void loadSamples() {
 
     if (g_loadedRowIndex < numRows) {
         loadBlockElements();
+
+		g_cacheRecording = nullptr;
     }
 }
 
@@ -207,6 +214,11 @@ void stateManagment() {
         if (recording.cursorOffset >= (VIEW_WIDTH - 1) * recording.parameters.period) {
             recording.cursorOffset = (VIEW_WIDTH - 1) * recording.parameters.period;
         }
+    }
+
+    auto newViewHeight = persist_conf::devConf.viewFlags.dlogViewLegendViewOption == persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK && !persist_conf::devConf.viewFlags.dlogViewDrawerIsOpen ? 204 : 240;
+    if (newViewHeight != VIEW_HEIGHT) {
+        VIEW_HEIGHT = newViewHeight;
     }
 
 	auto isExecuting = dlog_record::isExecuting();
@@ -463,6 +475,37 @@ static float getDuration(Recording &recording) {
 	return recording.size > 0 ? (recording.size - 1) * recording.parameters.xAxis.step : 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+static void getRangeOfScreenData(Recording &recording, int dlogValueIndex, float &totalMin, float &totalMax) {
+	if (g_cacheRecording == &recording && g_cacheDlogValueIndex == dlogValueIndex) {
+		totalMin = g_cacheMin;
+		totalMax = g_cacheMax;
+		return;
+	}
+
+	totalMin = FLT_MAX;
+	totalMax = -FLT_MAX;
+	auto startPosition = getPosition(recording);
+	for (auto position = startPosition; position < startPosition + VIEW_WIDTH; position++) {
+		float max;
+		float min = recording.getValue(position, dlogValueIndex, &max);
+		if (min < totalMin) {
+			totalMin = min;
+		}
+		if (max > totalMax) {
+			totalMax = max;
+		}
+	}
+
+	g_cacheRecording = &recording;
+	g_cacheDlogValueIndex = dlogValueIndex;
+	g_cacheMin = totalMin;
+	g_cacheMax = totalMax;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 static void adjustXAxisOffset(Recording &recording) {
     auto duration = getDuration(recording);
     if (recording.xAxisOffset + VIEW_WIDTH * recording.parameters.period > duration) {
@@ -480,6 +523,19 @@ static Unit getXAxisUnit(Recording& recording) {
 
 static Unit getYAxisUnit(Recording& recording, int dlogValueIndex) {
     return recording.parameters.yAxisScaleType == dlog_file::SCALE_LINEAR ? recording.parameters.yAxes[dlogValueIndex].unit : UNIT_UNKNOWN;
+}
+
+float getYAxisRangeMax(Recording& recording, int dlogValueIndex) {
+    return recording.parameters.yAxes[dlogValueIndex].range.max;
+}
+
+float getYAxisResolution(Recording& recording, int dlogValueIndex) {
+    if (recording.parameters.yAxes[dlogValueIndex].unit == UNIT_AMPER) {
+        if (getYAxisRangeMax(recording, dlogValueIndex) <= 0.05f) {
+            return 0.00001f;
+        }
+    }
+    return 0.001f;
 }
 
 static uint32_t getPosition(Recording& recording) {
@@ -2480,6 +2536,13 @@ void guessStepValues(StepValues *stepValues, Unit unit) {
 void data_dlog_value_div(DataOperationEnum operation, Cursor cursor, Value &value) {
 	auto &recording = dlog_view::getRecording();
 
+	float minValue;
+	float maxValue;
+	getRangeOfScreenData(recording, cursor, minValue, maxValue);
+
+	float minDiv = (maxValue - minValue) / 100;
+	float maxDiv = (maxValue - minValue) * 3;
+
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
@@ -2495,11 +2558,18 @@ void data_dlog_value_div(DataOperationEnum operation, Cursor cursor, Value &valu
             value = Value(recording.dlogValues[cursor].div, getYAxisUnit(recording, cursor));
 		}
 	} else if (operation == DATA_OPERATION_GET_MIN) {
-        value = Value(1E-6f, getYAxisUnit(recording, cursor));
+        value = Value(minDiv, getYAxisUnit(recording, cursor));
 	} else if (operation == DATA_OPERATION_GET_MAX) {
-		value = Value(1E6f, getYAxisUnit(recording, cursor));
+		value = Value(maxDiv, getYAxisUnit(recording, cursor));
 	} else if (operation == DATA_OPERATION_SET) {
-        recording.dlogValues[cursor].offset = recording.dlogValues[cursor].offset * value.getFloat() / recording.dlogValues[cursor].div;
+		float mid = (minValue + maxValue) / 2;
+		float oldDiv = recording.dlogValues[cursor].div;
+		float newDiv = value.getFloat();
+		float oldOffset = recording.dlogValues[cursor].offset;
+
+		float newOffset = (mid + oldOffset) * newDiv / oldDiv - mid;
+
+        recording.dlogValues[cursor].offset = newOffset;
         recording.dlogValues[cursor].div = value.getFloat();
 	} else if (operation == DATA_OPERATION_GET_NAME) {
 		value = "Div";
@@ -2509,8 +2579,14 @@ void data_dlog_value_div(DataOperationEnum operation, Cursor cursor, Value &valu
 		value = 0;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
 		StepValues *stepValues = value.getStepValues();
-		guessStepValues(stepValues, getYAxisUnit(recording, cursor));
-		stepValues->encoderSettings.mode = edit_mode_step::g_visibleValueDivEncoderMode;
+
+        stepValues->values = nullptr;
+        stepValues->count = 0;
+
+		stepValues->encoderSettings.range = 100 * minDiv;
+        stepValues->encoderSettings.step = minDiv;
+
+		stepValues->encoderSettings.mode = ENCODER_MODE_AUTO;
 		value = 1;
 	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_visibleValueDivEncoderMode = (EncoderMode)value.getInt();
@@ -2525,6 +2601,22 @@ void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Val
 
 void data_dlog_value_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
 	auto &recording = dlog_view::getRecording();
+
+	float minValue;
+	float maxValue;
+	getRangeOfScreenData(recording, cursor, minValue, maxValue);
+
+	float minOffset = -recording.dlogValues[cursor].div * NUM_VERT_DIVISIONS / 2 - maxValue;
+	float maxOffset = recording.dlogValues[cursor].div * NUM_VERT_DIVISIONS / 2 - minValue;
+
+	if (recording.dlogValues[cursor].offset < minOffset) {
+		minOffset = recording.dlogValues[cursor].offset;
+	}
+
+	if (recording.dlogValues[cursor].offset > maxOffset) {
+		maxOffset = recording.dlogValues[cursor].offset;
+	}
+
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
@@ -2540,12 +2632,12 @@ void data_dlog_value_offset(DataOperationEnum operation, Cursor cursor, Value &v
             value = Value(recording.dlogValues[cursor].offset, getYAxisUnit(recording, cursor));
 		}
 	} else if (operation == DATA_OPERATION_GET_MIN) {
-		value = Value(-1E6f, getYAxisUnit(recording, cursor));
+		value = Value(minOffset, getYAxisUnit(recording, cursor));
 	} else if (operation == DATA_OPERATION_GET_MAX) {
 		float rangeMin;
 		float rangeMax;
 		getRange(recording, cursor, rangeMin, rangeMax);
-        value = Value(1E6f, getYAxisUnit(recording, cursor));
+        value = Value(maxOffset, getYAxisUnit(recording, cursor));
 	} else if (operation == DATA_OPERATION_SET) {
         recording.dlogValues[cursor].offset = value.getFloat();
 	} else if (operation == DATA_OPERATION_GET_NAME) {
@@ -2556,11 +2648,15 @@ void data_dlog_value_offset(DataOperationEnum operation, Cursor cursor, Value &v
 		value = 0;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
 		StepValues *stepValues = value.getStepValues();
-		guessStepValues(stepValues, getYAxisUnit(recording, cursor));
-		stepValues->encoderSettings.mode = edit_mode_step::g_visibleValueOffsetEncoderMode;
+		
+        stepValues->values = nullptr;
+        stepValues->count = 0;
+
+		stepValues->encoderSettings.range = maxOffset - minOffset;
+		stepValues->encoderSettings.step = (maxOffset - minOffset) / VIEW_HEIGHT;
+
+		stepValues->encoderSettings.mode = ENCODER_MODE_AUTO;
 		value = 1;
-	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
-        edit_mode_step::g_visibleValueOffsetEncoderMode = (EncoderMode)value.getInt();
 	}
 }
 
@@ -2754,6 +2850,12 @@ void action_dlog_view_select_bookmarks_tab() {
 
 void action_dlog_view_select_options_tab() {
 	g_selectedTab = TAB_OPTIONS;
+}
+
+void data_dlog_has_bookmark(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+        value = getRecording().parameters.bookmarksSize > 0;
+    }
 }
 
 void data_dlog_bookmarks_is_scrollbar_visible(DataOperationEnum operation, Cursor cursor, Value &value) {
