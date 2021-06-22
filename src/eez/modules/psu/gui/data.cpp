@@ -1258,7 +1258,7 @@ void editValue(int16_t dataId) {
 
 int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
     auto testResult = g_slots[slotIndex]->getTestResult();
-    if ((g_slots[slotIndex]->enabled && (testResult == TEST_OK || testResult == TEST_SKIPPED)) || g_slots[slotIndex]->moduleType == MODULE_TYPE_NONE) {
+    if ((g_slots[slotIndex]->enabled && (testResult == TEST_OK || testResult == TEST_SKIPPED || testResult == TEST_CONNECTING)) || g_slots[slotIndex]->moduleType == MODULE_TYPE_NONE) {
         return g_slots[slotIndex]->getSlotView(slotViewType, slotIndex, cursor);
     } else {
         if (slotViewType == SLOT_VIEW_TYPE_DEFAULT) {
@@ -5776,7 +5776,11 @@ void data_slot_error_message(DataOperationEnum operation, Cursor cursor, Value &
         auto slot = g_slots[hmi::g_selectedSlotIndex];
         if (slot->enabled) {
             if (slot->flashMethod == FLASH_METHOD_NONE || slot->firmwareInstalled) {
-                value = "Error";
+                if (bp3c::flash_slave::g_bootloaderMode) {
+                    value = "";
+                } else {
+                    value = "Error";
+                }
             } else {
                 value = "No firmware";
             }

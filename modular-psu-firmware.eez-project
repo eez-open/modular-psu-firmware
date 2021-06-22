@@ -36917,124 +36917,31 @@
     {
       "components": [
         {
-          "type": "Select",
+          "type": "ButtonWidget",
           "left": 0,
           "top": 0,
-          "width": 480,
-          "height": 166,
-          "wireID": "6d8ae1d3-680b-4868-d8fb-8cee5b2d76da",
-          "data": "slot_is_2ch_view",
+          "width": 44,
+          "height": 32,
+          "wireID": "605e038b-3370-4d4e-9d27-0487f5da4e33",
+          "action": "show_prev_channel_in_max_view",
           "style": {
-            "inheritFrom": "default"
+            "inheritFrom": "channel1",
+            "font": "Heydings14"
           },
-          "widgets": [
-            {
-              "type": "Container",
-              "left": 0,
-              "top": 0,
-              "width": 480,
-              "height": 166,
-              "wireID": "5bfaa38f-7cae-4780-ef24-1d7343bcd17f",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "LayoutView",
-                  "left": 2,
-                  "top": 0,
-                  "width": 476,
-                  "height": 164,
-                  "wireID": "24b390a9-6742-476d-8664-1bf8c5b346e9",
-                  "data": "slot_max_view",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "layout": "",
-                  "context": ""
-                },
-                {
-                  "type": "Rectangle",
-                  "left": 0,
-                  "top": 0,
-                  "width": 2,
-                  "height": 166,
-                  "wireID": "655d1768-c0c4-4d0b-83b8-f2a1de69d64f",
-                  "style": {
-                    "inheritFrom": "default",
-                    "color": "channel1"
-                  }
-                },
-                {
-                  "type": "Rectangle",
-                  "left": 478,
-                  "top": 0,
-                  "width": 2,
-                  "height": 166,
-                  "wireID": "216fa6d3-1e6b-49f7-aa8f-4c3e18f6b9ef",
-                  "style": {
-                    "inheritFrom": "default",
-                    "color": "channel1"
-                  }
-                },
-                {
-                  "type": "Rectangle",
-                  "left": 2,
-                  "top": 164,
-                  "width": 476,
-                  "height": 2,
-                  "wireID": "115119f0-8b76-4636-f712-1f07999a6d14",
-                  "style": {
-                    "inheritFrom": "default",
-                    "color": "channel1"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "Container",
-              "left": 0,
-              "top": 0,
-              "width": 480,
-              "height": 166,
-              "wireID": "1e9748c7-8470-4042-fc83-b7d10d6720d8",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "LayoutView",
-                  "left": 0,
-                  "top": 0,
-                  "width": 480,
-                  "height": 166,
-                  "wireID": "6aa24cfa-0533-4ea5-e335-f5995693c694",
-                  "data": "slot_max_view",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "layout": "",
-                  "context": ""
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "connectionLines": [],
-      "name": "slot_max_with_border",
-      "left": 0,
-      "top": 0,
-      "width": 480,
-      "height": 166
-    },
-    {
-      "components": [
+          "text": "\\u0090",
+          "enabled": "prev_channel_in_max_view_button_enabled",
+          "disabledStyle": {
+            "inheritFrom": "channel1",
+            "font": "Heydings14",
+            "color": "channel1",
+            "activeBackgroundColor": "channel1"
+          }
+        },
         {
           "type": "Select",
-          "left": 0,
+          "left": 44,
           "top": 0,
-          "width": 426,
+          "width": 342,
           "height": 32,
           "wireID": "ebd38ea0-b681-4e38-bc3e-a6f2685651a4",
           "data": "channel_has_error_settings",
@@ -37046,7 +36953,7 @@
               "type": "Text",
               "left": 0,
               "top": 0,
-              "width": 426,
+              "width": 342,
               "height": 32,
               "wireID": "5536b19c-8675-4a57-af0e-42047fa27339",
               "data": "slot_title_def",
@@ -37061,7 +36968,7 @@
               "type": "Container",
               "left": 0,
               "top": 0,
-              "width": 426,
+              "width": 342,
               "height": 32,
               "wireID": "37633a72-5c47-40ae-905b-5106972254a3",
               "style": {
@@ -37070,9 +36977,9 @@
               "widgets": [
                 {
                   "type": "Text",
-                  "left": 1,
+                  "left": 0,
                   "top": 0,
-                  "width": 375,
+                  "width": 298,
                   "height": 32,
                   "wireID": "a3003936-5a49-4b17-c7a7-e84f31b63e07",
                   "data": "slot_title_def",
@@ -37085,9 +36992,9 @@
                 },
                 {
                   "type": "Select",
-                  "left": 376,
+                  "left": 298,
                   "top": 0,
-                  "width": 50,
+                  "width": 44,
                   "height": 32,
                   "wireID": "e900b788-c994-4509-ec9e-31dc542d4fbf",
                   "data": "slot_is_enabled",
@@ -37099,7 +37006,7 @@
                       "type": "Rectangle",
                       "left": 0,
                       "top": 0,
-                      "width": 50,
+                      "width": 44,
                       "height": 32,
                       "wireID": "c9d654cf-a37a-4162-b645-fe98010bca41",
                       "style": {
@@ -37111,7 +37018,7 @@
                       "type": "Text",
                       "left": 0,
                       "top": 0,
-                      "width": 50,
+                      "width": 44,
                       "height": 32,
                       "wireID": "e5333ff8-8455-4dc5-a2d2-69652001e121",
                       "action": "show_slot_settings",
@@ -37129,7 +37036,7 @@
         },
         {
           "type": "Text",
-          "left": 426,
+          "left": 386,
           "top": 0,
           "width": 50,
           "height": 32,
@@ -37143,11 +37050,32 @@
           "text": "E"
         },
         {
+          "type": "ButtonWidget",
+          "left": 436,
+          "top": 0,
+          "width": 44,
+          "height": 32,
+          "wireID": "e02d9ba3-3b39-4ae8-f5c4-eb508710308a",
+          "action": "show_next_channel_in_max_view",
+          "style": {
+            "inheritFrom": "channel1",
+            "font": "Heydings14"
+          },
+          "text": "\\u0091",
+          "enabled": "next_channel_in_max_view_button_enabled",
+          "disabledStyle": {
+            "inheritFrom": "channel1",
+            "font": "Heydings14",
+            "color": "status_line_text_disabled",
+            "activeBackgroundColor": "status_line_text_disabled"
+          }
+        },
+        {
           "type": "Text",
           "left": 0,
           "top": 32,
           "width": 476,
-          "height": 132,
+          "height": 208,
           "wireID": "2f9bd7a1-e552-4bc5-cf2a-3a45667b9a72",
           "data": "slot_error_message",
           "style": {
@@ -37163,16 +37091,37 @@
       "name": "slot_max_error",
       "left": 0,
       "top": 0,
-      "width": 476,
-      "height": 164
+      "width": 480,
+      "height": 240
     },
     {
       "components": [
         {
-          "type": "Rectangle",
+          "type": "ButtonWidget",
           "left": 0,
           "top": 0,
-          "width": 426,
+          "width": 44,
+          "height": 32,
+          "wireID": "dea3d1fe-4eef-4821-d0b8-43cd8f969cf0",
+          "action": "show_prev_channel_in_max_view",
+          "style": {
+            "inheritFrom": "channel1",
+            "font": "Heydings14"
+          },
+          "text": "\\u0090",
+          "enabled": "prev_channel_in_max_view_button_enabled",
+          "disabledStyle": {
+            "inheritFrom": "channel1",
+            "font": "Heydings14",
+            "color": "channel1",
+            "activeBackgroundColor": "channel1"
+          }
+        },
+        {
+          "type": "Rectangle",
+          "left": 44,
+          "top": 0,
+          "width": 348,
           "height": 32,
           "wireID": "3836421f-d9f2-4813-9e8f-1d071e9e1df2",
           "style": {
@@ -37182,9 +37131,9 @@
         },
         {
           "type": "Text",
-          "left": 426,
+          "left": 392,
           "top": 0,
-          "width": 50,
+          "width": 44,
           "height": 32,
           "wireID": "32fd4d37-2924-4353-ff87-86880b8aff54",
           "action": "toggle_channels_max_view",
@@ -37196,11 +37145,32 @@
           "text": "E"
         },
         {
+          "type": "ButtonWidget",
+          "left": 436,
+          "top": 0,
+          "width": 44,
+          "height": 32,
+          "wireID": "c63e769f-c8ad-4fe0-a82f-4798b6ffe58d",
+          "action": "show_next_channel_in_max_view",
+          "style": {
+            "inheritFrom": "channel1",
+            "font": "Heydings14"
+          },
+          "text": "\\u0091",
+          "enabled": "next_channel_in_max_view_button_enabled",
+          "disabledStyle": {
+            "inheritFrom": "channel1",
+            "font": "Heydings14",
+            "color": "status_line_text_disabled",
+            "activeBackgroundColor": "status_line_text_disabled"
+          }
+        },
+        {
           "type": "Text",
           "left": 0,
           "top": 32,
           "width": 476,
-          "height": 132,
+          "height": 208,
           "wireID": "28a99af7-ccdc-402c-a81f-03a3ebd75e87",
           "style": {
             "inheritFrom": "default",
@@ -37213,8 +37183,8 @@
       "name": "slot_max_not_installed",
       "left": 0,
       "top": 0,
-      "width": 476,
-      "height": 164
+      "width": 480,
+      "height": 240
     },
     {
       "components": [

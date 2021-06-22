@@ -2713,7 +2713,7 @@ void data_dlog_x_axis_div(DataOperationEnum operation, Cursor cursor, Value &val
     } else if (operation == DATA_OPERATION_GET_MAX) {
         value = Value(recording.xAxisDivMax, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_SET) {
-        dlog_view::changeXAxisDiv(recording, value.getFloat());
+        dlog_view::changeXAxisDiv(recording, roundPrec(value.getFloat(), 0.001f));
     } else if (operation == DATA_OPERATION_GET_NAME) {
         value = "Div";
     } else if (operation == DATA_OPERATION_GET_UNIT) {
@@ -2722,11 +2722,15 @@ void data_dlog_x_axis_div(DataOperationEnum operation, Cursor cursor, Value &val
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         StepValues *stepValues = value.getStepValues();
-        guessStepValues(stepValues, dlog_view::getXAxisUnit(recording));
-        stepValues->encoderSettings.mode = edit_mode_step::g_xAxisDivEncoderMode;
-        value = 1;
-    } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
-        edit_mode_step::g_xAxisDivEncoderMode = (EncoderMode)value.getInt();
+		
+        stepValues->values = nullptr;
+        stepValues->count = 0;
+
+		stepValues->encoderSettings.range = recording.xAxisDivMax - recording.xAxisDivMin;
+		stepValues->encoderSettings.step = (recording.xAxisDivMax - recording.xAxisDivMin) / 100;
+
+		stepValues->encoderSettings.mode = ENCODER_MODE_AUTO;
+		value = 1;
     }
 }
 

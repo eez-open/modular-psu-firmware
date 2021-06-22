@@ -287,13 +287,13 @@ Exit:
 }
 
 void leaveBootloaderMode() {
-    g_bootloaderMode = false;
-
 #if defined(EEZ_PLATFORM_STM32)
     // disable BOOT0 flag
     io_exp::writeToOutputPort(0b10000000);
     osDelay(5);
 	io_exp::hardResetModules();
+
+    g_bootloaderMode = false;
 
     psu::initChannels();
     psu::testChannels();
