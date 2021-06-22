@@ -1697,7 +1697,9 @@ void tick() {
 				g_phiU[i] -= 2.0f * M_PI_F;
 			}
 
-			channel_dispatcher::setVoltage(channel, value);
+			if (!io_pins::isInhibited()) {
+				channel_dispatcher::setVoltage(channel, value);
+			}
 		}
 
 		if (channel.flags.currentTriggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
@@ -1709,7 +1711,9 @@ void tick() {
 				g_phiI[i] -= 2.0f * M_PI_F;
 			}
 
-			channel_dispatcher::setCurrent(channel, value);
+			if (!io_pins::isInhibited()) {
+				channel_dispatcher::setCurrent(channel, value);
+			}
 		}
 	}
 }
