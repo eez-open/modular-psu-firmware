@@ -907,6 +907,14 @@ void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
           /* Disable the transfer complete interrupt */
           hdma->Instance->CR  &= ~(DMA_IT_TC);
 
+          // mvladic: DO NOT REMOVE!
+          // Occasionally we get the transfer completed interrupt before the DMA enable bit is reset
+          // If we don't reset it here we get a transfer error interrupt when we next call DMA_SetConfig()
+          if ((hdma->Instance->CR & DMA_SxCR_EN) != RESET)
+          {
+            __HAL_DMA_DISABLE(hdma);  // hdma->Instance->CR &= ~DMA_SxCR_EN;
+          }
+
           /* Process Unlocked */
           __HAL_UNLOCK(hdma);
 
