@@ -2000,6 +2000,8 @@ void action_function_generator_item_toggle_checked() {
 		auto absoluteResourceIndex = getFoundWidgetAtDown().cursor;
 		g_functionGeneratorSelectChannelsPage.m_selectedChannels ^= (uint64_t)1 << absoluteResourceIndex;
 
+		bool isSelected = g_functionGeneratorSelectChannelsPage.m_selectedChannels & (uint64_t)1 << absoluteResourceIndex;
+
 		int slotIndex;
 		int subchannelIndex;
 		int resourceIndex;
@@ -2007,9 +2009,17 @@ void action_function_generator_item_toggle_checked() {
 
 		if (Channel::getBySlotIndex(slotIndex, subchannelIndex)) {
 			if (resourceIndex == 0) {
-				g_functionGeneratorSelectChannelsPage.m_selectedChannels ^= (uint64_t)1 << (absoluteResourceIndex + 1);
+				if (isSelected) {
+					g_functionGeneratorSelectChannelsPage.m_selectedChannels |= (uint64_t)1 << (absoluteResourceIndex + 1);
+				} else {
+					g_functionGeneratorSelectChannelsPage.m_selectedChannels &= ~((uint64_t)1 << (absoluteResourceIndex + 1));
+				}
 			} else {
-				g_functionGeneratorSelectChannelsPage.m_selectedChannels ^= (uint64_t)1 << (absoluteResourceIndex - 1);
+				if (isSelected) {
+					g_functionGeneratorSelectChannelsPage.m_selectedChannels |= (uint64_t)1 << (absoluteResourceIndex - 1);
+				} else {
+					g_functionGeneratorSelectChannelsPage.m_selectedChannels &= ~((uint64_t)1 << (absoluteResourceIndex - 1));
+				}
 			}
 		}
 	}
