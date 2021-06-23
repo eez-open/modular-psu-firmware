@@ -2190,6 +2190,12 @@ public:
     }
 
     uint8_t ainDiagStatus;
+    bool isError(int subchannelIndex) {
+		if (afeVersion == 3 && (subchannelIndex == 0 || subchannelIndex == 1)) {
+			return (ainDiagStatus & (1 << (subchannelIndex))) != 0;
+		}
+		return false;
+    }
 
     float activePower = 0;
     float reactivePower = 0;
@@ -2949,6 +2955,7 @@ public:
                     } else if (currentCommand->command == COMMAND_GET_STATE) {
 						memset(&response->getState, 0, sizeof(response->getState));
                         response->getState.flags |= GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT;
+						//response->getState.ainDiagStatus = 3;
                     } else {
                         if (
                             currentCommand->command == COMMAND_DLOG_RECORDING_DATA ||
@@ -3811,7 +3818,7 @@ public:
     }
 
     bool getMeasureMode(int subchannelIndex, MeasureMode &mode, int *err) override {
-		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
             if (err) {
                 *err = SCPI_ERROR_HARDWARE_MISSING;
             }
@@ -3822,7 +3829,7 @@ public:
     }
     
     bool setMeasureMode(int subchannelIndex, MeasureMode mode, int *err) override {
-		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
             if (err) {
                 *err = SCPI_ERROR_HARDWARE_MISSING;
             }
@@ -3833,7 +3840,7 @@ public:
     }
 
     bool getMeasureCurrentRange(int subchannelIndex, uint8_t &range, int *err) override {
-		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
             if (err) {
                 *err = SCPI_ERROR_HARDWARE_MISSING;
             }
@@ -3844,7 +3851,7 @@ public:
     }
     
     bool setMeasureCurrentRange(int subchannelIndex, uint8_t range, int *err) override {
-		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
             if (err) {
                 *err = SCPI_ERROR_HARDWARE_MISSING;
             }
@@ -3866,7 +3873,7 @@ public:
     }
 
 	bool getMeasureVoltageRange(int subchannelIndex, uint8_t &range, int *err) override {
-		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
@@ -3877,7 +3884,7 @@ public:
 	}
 
 	bool setMeasureVoltageRange(int subchannelIndex, uint8_t range, int *err) override {
-		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
@@ -3899,7 +3906,7 @@ public:
 	}
 
     bool getMeasureCurrentNPLC(int subchannelIndex, float &nplc, int *err) override {
-		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
@@ -3910,7 +3917,7 @@ public:
     }
 
     bool setMeasureCurrentNPLC(int subchannelIndex, float nplc, int *err) override {
-		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
@@ -3930,7 +3937,7 @@ public:
     }
 
     bool getMeasureVoltageNPLC(int subchannelIndex, float &nplc, int *err) override {
-		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
@@ -3941,7 +3948,7 @@ public:
     }
 
     bool setMeasureVoltageNPLC(int subchannelIndex, float nplc, int *err) override {
-		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
@@ -4020,7 +4027,7 @@ public:
     }
 
     bool getMeasuredVoltage(int subchannelIndex, float &value, int *err) override {
-        if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+        if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
             if (err) {
                 *err = SCPI_ERROR_HARDWARE_MISSING;
             }
@@ -4156,6 +4163,12 @@ public:
 				calConf->clear();
 			}
 		} else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			if (isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
+				if (err) {
+					*err = SCPI_ERROR_HARDWARE_MISSING;
+				}
+				return false;
+			}
 			for (int i = 0; i < 5; i++) {
 				CalConf *calConf = &ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].calConf[i];
 				if (!afeCheck || !persist_conf::loadChannelCalibrationConfiguration(slotIndex, 2 * 7 + 2 + (subchannelIndex - AIN_1_SUBCHANNEL_INDEX) * 5 + i, &calConf->header, sizeof(CalConf), CalConf::VERSION)) {
@@ -4179,6 +4192,12 @@ public:
             calConf = &aoutDac7563Channels[subchannelIndex - AOUT_3_SUBCHANNEL_INDEX].calConf;
             calConfIndex = 2 * 7 + (subchannelIndex - AOUT_3_SUBCHANNEL_INDEX);
         } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			if (isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
+				if (err) {
+					*err = SCPI_ERROR_HARDWARE_MISSING;
+				}
+				return false;
+			}
             int ainChannelIndex = subchannelIndex - AIN_1_SUBCHANNEL_INDEX;
             calConf = &ainChannels[ainChannelIndex].getCalConf();
             calConfIndex = 2 * 7 + 2 + ainChannelIndex * 5 + ainChannels[ainChannelIndex].getCalConfIndex();
@@ -4246,7 +4265,14 @@ public:
 
     bool calibrationMeasure(int subchannelIndex, float &measuredValue, int *err) override {
         if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
-            auto &channel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+			if (isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
+				if (err) {
+					*err = SCPI_ERROR_HARDWARE_MISSING;
+				}
+				return false;
+			}
+			
+			auto &channel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
             measuredValue = channel.getValue();
             return true;
         }
@@ -4364,7 +4390,16 @@ public:
     }
     
     bool getCalibrationConfiguration(int subchannelIndex, CalibrationConfiguration &calConf, int *err) override {
-        CalConf *mioCalConf = getCalConf(subchannelIndex);
+		if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			if (isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
+				if (err) {
+					*err = SCPI_ERROR_HARDWARE_MISSING;
+				}
+				return false;
+			}
+		}
+		
+		CalConf *mioCalConf = getCalConf(subchannelIndex);
 
         if (mioCalConf) {
             memset(&calConf, 0, sizeof(CalibrationConfiguration));
@@ -4402,7 +4437,16 @@ public:
     }
 
     bool setCalibrationConfiguration(int subchannelIndex, const CalibrationConfiguration &calConf, int *err) override {
-        CalConf *mioCalConf = getCalConf(subchannelIndex);
+		if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			if (isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
+				if (err) {
+					*err = SCPI_ERROR_HARDWARE_MISSING;
+				}
+				return false;
+			}
+		}
+		
+		CalConf *mioCalConf = getCalConf(subchannelIndex);
 
         if (mioCalConf) {
             memset(mioCalConf, 0, sizeof(CalConf));
@@ -4435,7 +4479,16 @@ public:
     }
 
     bool getCalibrationRemark(int subchannelIndex, const char *&calibrationRemark, int *err) override {
-        CalConf *mioCalConf = getCalConf(subchannelIndex);
+		if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+			if (isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
+				if (err) {
+					*err = SCPI_ERROR_HARDWARE_MISSING;
+				}
+				return false;
+			}
+		}
+		
+		CalConf *mioCalConf = getCalConf(subchannelIndex);
 
         if (mioCalConf) {
             calibrationRemark = mioCalConf->calibrationRemark;
@@ -4485,7 +4538,7 @@ public:
     }
 
     bool getMeasuredCurrent(int subchannelIndex, float &value, int *err) override {
-        if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX) {
+        if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
             if (err) {
                 *err = SCPI_ERROR_HARDWARE_MISSING;
             }
@@ -4597,7 +4650,7 @@ public:
         }
         
         if (afeVersion != 4) {
-            if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX && !isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
                 return 1;
             }
         }
@@ -4765,7 +4818,7 @@ public:
     int getNumFunctionGeneratorResources(int subchannelIndex) override {
 		if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
 			return 8;
-		} else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
+		} else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX && !isError(subchannelIndex - AOUT_1_SUBCHANNEL_INDEX)) {
             return 1;
         }
         return 0;
@@ -6155,6 +6208,15 @@ void data_dib_mio168_ain_is_overflow(DataOperationEnum operation, Cursor cursor,
 	if (operation == DATA_OPERATION_GET) {
 		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
         value = mio168Module->isFaultP(ainChannelIndex) || mio168Module->isFaultN(ainChannelIndex);
+	}
+}
+
+void data_dib_mio168_ain_is_error(DataOperationEnum operation, Cursor cursor, Value &value) {
+	int slotIndex = cursor / 4;
+	int ainChannelIndex = cursor % 4;
+	if (operation == DATA_OPERATION_GET) {
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+        value = mio168Module->isError(ainChannelIndex);
 	}
 }
 
