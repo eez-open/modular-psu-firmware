@@ -2192,7 +2192,7 @@ public:
     uint8_t ainDiagStatus;
     bool isError(int subchannelIndex) {
 		if (afeVersion == 3 && (subchannelIndex == 0 || subchannelIndex == 1)) {
-			return (ainDiagStatus & (1 << (subchannelIndex))) != 0;
+			return (ainDiagStatus & (1 << (subchannelIndex))) == 0;
 		}
 		return false;
     }
