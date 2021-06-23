@@ -1698,6 +1698,21 @@ void tick() {
 			}
 
 			if (!io_pins::isInhibited()) {
+				if (channel.isVoltageLimitExceeded(value)) {
+					g_errorChannelIndex = channel.channelIndex;
+					generateError(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
+					trigger::abort();
+					return;
+				}
+
+				int err;
+				if (channel.isPowerLimitExceeded(value, channel.i.set, &err)) {
+					g_errorChannelIndex = channel.channelIndex;
+					generateError(err);
+					trigger::abort();
+					return;
+				}
+
 				channel_dispatcher::setVoltage(channel, value);
 			}
 		}
@@ -1712,6 +1727,21 @@ void tick() {
 			}
 
 			if (!io_pins::isInhibited()) {
+				if (channel.isCurrentLimitExceeded(value)) {
+					g_errorChannelIndex = channel.channelIndex;
+					generateError(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
+					trigger::abort();
+					return;
+				}
+
+				int err;
+				if (channel.isPowerLimitExceeded(channel.u.set, value, &err)) {
+					g_errorChannelIndex = channel.channelIndex;
+					generateError(err);
+					trigger::abort();
+					return;
+				}
+
 				channel_dispatcher::setCurrent(channel, value);
 			}
 		}
