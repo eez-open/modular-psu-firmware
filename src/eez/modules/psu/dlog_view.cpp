@@ -2539,6 +2539,11 @@ void data_dlog_value_div(DataOperationEnum operation, Cursor cursor, Value &valu
 	float minValue;
 	float maxValue;
 	getRangeOfScreenData(recording, cursor, minValue, maxValue);
+	float range = (recording.parameters.yAxes[cursor].range.max - recording.parameters.yAxes[cursor].range.min);
+	if (maxValue - minValue < range / 100.0f) {
+		minValue -= range / 200.0f;
+		maxValue += range / 200.0f;
+	}
 
 	float minDiv = (maxValue - minValue) / 100;
 	float maxDiv = (maxValue - minValue) * 3;
@@ -2605,6 +2610,11 @@ void data_dlog_value_offset(DataOperationEnum operation, Cursor cursor, Value &v
 	float minValue;
 	float maxValue;
 	getRangeOfScreenData(recording, cursor, minValue, maxValue);
+	float range = (recording.parameters.yAxes[cursor].range.max - recording.parameters.yAxes[cursor].range.min);
+	if (maxValue - minValue < range / 100.0f) {
+		minValue -= range / 200.0f;
+		maxValue += range / 200.0f;
+	}
 
 	float minOffset = -recording.dlogValues[cursor].div * NUM_VERT_DIVISIONS / 2 - maxValue;
 	float maxOffset = recording.dlogValues[cursor].div * NUM_VERT_DIVISIONS / 2 - minValue;
