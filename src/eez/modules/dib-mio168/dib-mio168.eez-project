@@ -273,6 +273,11 @@
       "defaultValue": "P1/P2"
     },
     {
+      "name": "ain_is_auto_range",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
       "name": "is_no_afe",
       "type": "boolean",
       "defaultValue": "0"
@@ -16180,20 +16185,46 @@
               ]
             },
             {
-              "type": "Text",
+              "type": "Select",
               "left": 0,
               "top": 144,
               "width": 178,
               "height": 40,
-              "wireID": "700059b3-ca69-4122-b000-c66739f48be6",
-              "action": "show_calibration",
+              "wireID": "94336377-f2cc-451a-d1cd-89ceac763a2a",
+              "data": "ain_is_auto_range",
               "style": {
-                "inheritFrom": "encoder_cursor_14_enabled",
-                "font": "Oswald17",
-                "color": "action_color",
-                "activeBackgroundColor": "action_color"
+                "inheritFrom": "default"
               },
-              "text": "Calibration"
+              "widgets": [
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 178,
+                  "height": 40,
+                  "wireID": "700059b3-ca69-4122-b000-c66739f48be6",
+                  "action": "show_calibration",
+                  "style": {
+                    "inheritFrom": "encoder_cursor_14_enabled",
+                    "font": "Oswald17",
+                    "color": "action_color",
+                    "activeBackgroundColor": "action_color"
+                  },
+                  "text": "Calibration"
+                },
+                {
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 178,
+                  "height": 40,
+                  "wireID": "936b25a0-9a73-4b99-cb20-d39f0d070f8a",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "invertColors": true
+                }
+              ]
             }
           ]
         },
