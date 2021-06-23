@@ -716,7 +716,6 @@ void SysSettingsTemperaturePage::setParams() {
 
 void SysSettingsTemperaturePage::clear() {
     temperature::sensors[temp_sensor::AUX].clearProtection();
-    popPage();
     infoMessage("Cleared!");
 }
 
