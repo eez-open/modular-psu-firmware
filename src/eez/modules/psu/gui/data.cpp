@@ -3116,16 +3116,18 @@ void data_sys_info_has_error(DataOperationEnum operation, Cursor cursor, Value &
 
 void data_sys_settings_has_error(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
+        temperature::TempSensorTemperature &tempSensor = temperature::sensors[temp_sensor::AUX];
+        
+        value = (getSysInfoHasError()
+            // System temp & fan
+            || tempSensor.isTripped()
 #if OPTION_ETHERNET
-        value = (getSysInfoHasError() ||
             // Ethernet
-            ethernet::g_testResult == TEST_FAILED ||
+            || ethernet::g_testResult == TEST_FAILED
             // Mqtt
-            (persist_conf::devConf.mqttEnabled && mqtt::g_connectionState == mqtt::CONNECTION_STATE_ERROR)
-        ) ? 1 : 0;
-#else
-        value = 0;
+            || (persist_conf::devConf.mqttEnabled && mqtt::g_connectionState == mqtt::CONNECTION_STATE_ERROR)
 #endif
+        ) ? 1 : 0;
     }
 }
 

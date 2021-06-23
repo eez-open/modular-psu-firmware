@@ -21994,50 +21994,19 @@
           "name": "Menu",
           "widgets": [
             {
-              "type": "Select",
+              "type": "MultilineText",
               "left": 3,
               "top": 3,
               "width": 114,
               "height": 54,
-              "wireID": "839cdd84-e1a1-4091-8aa9-7713e6ba14ec",
-              "data": "sys_temp_aux_otp_is_tripped",
+              "wireID": "1bd5bbb4-64e7-419e-d2e8-4547a4a64fe3",
+              "action": "show_sys_settings_protections",
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "icon_and_text_S"
               },
-              "widgets": [
-                {
-                  "type": "MultilineText",
-                  "left": 0,
-                  "top": 0,
-                  "width": 114,
-                  "height": 54,
-                  "wireID": "1bd5bbb4-64e7-419e-d2e8-4547a4a64fe3",
-                  "action": "show_sys_settings_protections",
-                  "style": {
-                    "inheritFrom": "icon_and_text_S"
-                  },
-                  "text": "\\u0081 System protection",
-                  "firstLineIndent": 0,
-                  "hangingIndent": 24
-                },
-                {
-                  "type": "MultilineText",
-                  "left": 0,
-                  "top": 0,
-                  "width": 114,
-                  "height": 54,
-                  "wireID": "efa19821-4321-4a0c-bc26-2c83970a83db",
-                  "action": "show_sys_settings_protections",
-                  "style": {
-                    "inheritFrom": "icon_and_text_S",
-                    "color": "status_warning",
-                    "activeBackgroundColor": "status_warning"
-                  },
-                  "text": "\\u0081 System protection",
-                  "firstLineIndent": 0,
-                  "hangingIndent": 24
-                }
-              ]
+              "text": "\\u0081 System protection",
+              "firstLineIndent": 0,
+              "hangingIndent": 24
             },
             {
               "type": "MultilineText",
@@ -22159,19 +22128,50 @@
               ]
             },
             {
-              "type": "MultilineText",
+              "type": "Select",
               "left": 3,
               "top": 63,
               "width": 114,
               "height": 54,
-              "wireID": "dad5f942-7610-4b5f-8780-3ae26e6baad0",
-              "action": "show_sys_settings_aux_otp",
+              "wireID": "e30db119-0e6c-4be0-ee56-d4f7949c3460",
+              "data": "sys_temp_aux_otp_is_tripped",
               "style": {
-                "inheritFrom": "icon_and_text_S"
+                "inheritFrom": "default"
               },
-              "text": "\\u0089 System temp & fan",
-              "firstLineIndent": 0,
-              "hangingIndent": 24
+              "widgets": [
+                {
+                  "type": "MultilineText",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "dad5f942-7610-4b5f-8780-3ae26e6baad0",
+                  "action": "show_sys_settings_aux_otp",
+                  "style": {
+                    "inheritFrom": "icon_and_text_S"
+                  },
+                  "text": "\\u0089 System temp & fan",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                },
+                {
+                  "type": "MultilineText",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "edca906c-0b69-45c6-ac5a-94ddef64932d",
+                  "action": "show_sys_settings_aux_otp",
+                  "style": {
+                    "inheritFrom": "icon_and_text_S",
+                    "color": "status_warning",
+                    "activeBackgroundColor": "status_warning"
+                  },
+                  "text": "\\u0089 System temp & fan",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                }
+              ]
             },
             {
               "type": "MultilineText",
