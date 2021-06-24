@@ -796,7 +796,7 @@ dlog_file::DataType Module::getDlogResourceDataType(int subchannelIndex, int res
 }
 
 double Module::getDlogResourceTransformOffset(int subchannelIndex, int resourceIndex) {
-    return 1.0;
+    return 0.0;
 }
 
 double Module::getDlogResourceTransformScale(int subchannelIndex, int resourceIndex) {

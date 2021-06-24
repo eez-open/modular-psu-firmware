@@ -44997,22 +44997,10 @@
       "alignHorizontal": "right"
     },
     {
-      "name": "mon_value_24_right",
-      "inheritFrom": "mon_value",
-      "font": "Oswald24",
-      "alignHorizontal": "right"
-    },
-    {
       "name": "mon_value_14_right",
       "inheritFrom": "mon_value",
       "font": "Oswald14",
       "alignHorizontal": "right"
-    },
-    {
-      "name": "mon_value_14_left",
-      "inheritFrom": "mon_value",
-      "font": "Oswald14",
-      "alignHorizontal": "left"
     },
     {
       "name": "mon_value_14_center",
@@ -45024,12 +45012,6 @@
       "inheritFrom": "mon_value",
       "font": "Oswald20",
       "alignHorizontal": "left"
-    },
-    {
-      "name": "mon_value_20_right",
-      "inheritFrom": "mon_value",
-      "font": "Oswald20",
-      "alignHorizontal": "right"
     },
     {
       "name": "button_S",
@@ -45579,11 +45561,6 @@
       "name": "channel_off_button_38",
       "inheritFrom": "channel_off_button",
       "font": "Oswald38"
-    },
-    {
-      "name": "channel_off_button_14",
-      "inheritFrom": "channel_off_button",
-      "font": "Oswald14"
     },
     {
       "id": 4,

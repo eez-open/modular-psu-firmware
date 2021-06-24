@@ -2189,7 +2189,7 @@ public:
         return (ainFaultStatus & (1 << (subchannelIndex))) != 0;
     }
 
-    uint8_t ainDiagStatus;
+    uint8_t ainDiagStatus = 3;
     bool isError(int subchannelIndex) {
 		if (afeVersion == 3 && (subchannelIndex == 0 || subchannelIndex == 1)) {
 			return (ainDiagStatus & (1 << (subchannelIndex))) == 0;
@@ -2955,7 +2955,7 @@ public:
                     } else if (currentCommand->command == COMMAND_GET_STATE) {
 						memset(&response->getState, 0, sizeof(response->getState));
                         response->getState.flags |= GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT;
-						//response->getState.ainDiagStatus = 3;
+						response->getState.ainDiagStatus = 3;
                     } else {
                         if (
                             currentCommand->command == COMMAND_DLOG_RECORDING_DATA ||
@@ -4693,6 +4693,26 @@ public:
         return dlog_file::DATA_TYPE_FLOAT;
     }
 
+    double getDlogResourceTransformOffset(int subchannelIndex, int resourceIndex) override {
+        if (afeVersion != 4) {
+            if (
+                subchannelIndex >= AIN_1_SUBCHANNEL_INDEX &&
+                subchannelIndex <= AIN_4_SUBCHANNEL_INDEX &&
+                dlog_record::g_recordingParameters.period < 1.0f / 1000
+            ) {
+                auto ainChannelIndex = subchannelIndex - AIN_1_SUBCHANNEL_INDEX;
+                auto &ainChannel = ainChannels[ainChannelIndex];
+                auto &calConf = ainChannel.getCalConf();
+                if (calConf.state.calEnabled) {
+                    return calConf.points[0].uncalValue - calConf.points[0].calValue * 
+                        (calConf.points[1].uncalValue - calConf.points[0].uncalValue) / (calConf.points[1].calValue - calConf.points[0].calValue);
+                }
+            }
+        }
+
+        return 0.0f;
+    }
+
     double getDlogResourceTransformScale(int subchannelIndex, int resourceIndex) override {
         if (afeVersion != 4) {
             if (
@@ -4703,6 +4723,7 @@ public:
                 auto ainChannelIndex = subchannelIndex - AIN_1_SUBCHANNEL_INDEX;
                 auto &ainChannel = ainChannels[ainChannelIndex];
                 auto mode = ainChannel.getMode();
+                
                 double f = getAinConversionFactor(
                     afeVersion,
                     ainChannelIndex,
@@ -4710,12 +4731,19 @@ public:
                     mode == MEASURE_MODE_VOLTAGE ?
                         ainChannel.getVoltageRange() : ainChannel.getCurrentRange()
                 );
+                
                 if (dlog_record::g_recordingParameters.period < 1.0f / 16000) {
-                    // 16 bit
-                    return f / (1 << 15);
+                    f /= 1 << 15; // 16 bit
+                } else {
+                    f /= (1 << 23); // 24 bit
                 }
-                // 24 bit
-                return f / (1 << 23);
+
+                auto &calConf = ainChannel.getCalConf();
+                if (calConf.state.calEnabled) {
+					f *= (calConf.points[1].uncalValue - calConf.points[0].uncalValue) / (calConf.points[1].calValue - calConf.points[0].calValue);
+                }
+
+                return f;
             }
         }
 
