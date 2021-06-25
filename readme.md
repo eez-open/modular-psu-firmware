@@ -42,6 +42,12 @@ cmake ../..
 make
 ```
 
+Start simulator with:
+
+```
+./modular-psu-firmware
+```
+
 #### Emscripten
 
 [Download and install Emscripten](https://emscripten.org/docs/getting_started/downloads.html)
@@ -53,12 +59,6 @@ mkdir -p /path/to/modular-psu-firmware/build/emscripten
 cd /path/to/modular-psu-firmware/build/emscripten
 cmake -DCMAKE_TOOLCHAIN_FILE=../../cmake/Emscripten.cmake -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" ../..
 make
-```
-
-Start simulator with:
-
-```
-./modular-psu-firmware
 ```
 
 #### Windows
