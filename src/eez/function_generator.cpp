@@ -706,7 +706,7 @@ void initWaveformParameters(WaveformParameters &waveformParameters) {
 	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, minAmp, maxAmp);
 
 	waveformParameters.waveform = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL ? WAVEFORM_SQUARE : WAVEFORM_DC;
-	waveformParameters.frequency = persist_conf::devConf.powerLineFrequencyMode == 0 ? 50.0f : 60.0f;
+	waveformParameters.frequency = 10.0f;
 	waveformParameters.phaseShift = 0;
 	if (waveformParameters.waveform == WAVEFORM_DC) {
 		waveformParameters.amplitude = (minAmp + maxAmp) / 2.0f;
@@ -1657,15 +1657,6 @@ void reloadWaveformParameters() {
 					g_amplitudeI[channel->channelIndex] = waveformParameters.amplitude;
 					g_offsetI[channel->channelIndex] = waveformParameters.offset;
 				}
-
-				if (g_slots[slotIndex]->moduleType == MODULE_TYPE_DCP405) {
-					float max = g_offsetI[channel->channelIndex] + g_amplitudeI[channel->channelIndex] / 2.0f;
-					if (max > 0.05f) {
-						channel_dispatcher::setCurrentRangeSelectionMode(*channel, CURRENT_RANGE_SELECTION_ALWAYS_HIGH);
-					} else {
-						channel_dispatcher::setCurrentRangeSelectionMode(*channel, CURRENT_RANGE_SELECTION_ALWAYS_LOW);
-					}
-				}
 			}
 #if defined(EEZ_PLATFORM_STM32)
 			__enable_irq();
@@ -1729,7 +1720,7 @@ void tick() {
 
 		if (channel.flags.currentTriggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
 			g_dutyCycle = g_dutyCycleI[i];
-			float value = g_offsetI[i] + g_amplitudeI[i] * g_waveFormFuncI[i](g_phiU[i]) / 2.0f;
+			float value = g_offsetI[i] + g_amplitudeI[i] * g_waveFormFuncI[i](g_phiI[i]) / 2.0f;
 
 			g_phiI[i] += g_dphiI[i];
 			if (g_phiI[i] >= 2.0f * M_PI_F) {
@@ -2630,7 +2621,7 @@ void action_function_generator_mode_select_mode() {
 	float maxAmp;
 	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, minAmp, maxAmp);
 
-	waveformParameters.frequency = persist_conf::devConf.powerLineFrequencyMode == 0 ? 50.0f : 60.0f;;
+	waveformParameters.frequency = 10.0f;
 	waveformParameters.amplitude = maxAmp - minAmp;
 	waveformParameters.offset = (minAmp + maxAmp) / 2.0f;
 
