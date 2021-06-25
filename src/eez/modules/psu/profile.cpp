@@ -527,6 +527,8 @@ static void resetProfileToDefaults(Parameters &profile) {
     profile.uartDataBits = 8;
     profile.uartStopBits = 1;
     profile.uartParity = 1;
+
+    profile.flags.triggerInitiateAll = 1;
 }
 
 static bool repositionSlotsInProfileToMatchCurrentSlotsConfiguration(Parameters &profile) {
@@ -764,6 +766,7 @@ static void saveState(Parameters &profile, List *lists) {
     }
 
     profile.flags.triggerContinuousInitializationEnabled = trigger::g_triggerContinuousInitializationEnabled;
+    profile.flags.triggerInitiateAll = trigger::g_triggerInitiateAll;
     profile.triggerSource = trigger::g_triggerSource;
     profile.triggerDelay = trigger::g_triggerDelay;
 
@@ -868,6 +871,7 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
     }
 
     trigger::g_triggerContinuousInitializationEnabled = profile.flags.triggerContinuousInitializationEnabled;
+    trigger::g_triggerInitiateAll = profile.flags.triggerInitiateAll;
     trigger::g_triggerSource = (trigger::Source)profile.triggerSource;
     trigger::g_triggerDelay = profile.triggerDelay;
 
@@ -1112,6 +1116,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 
     ctx.group("trigger");
     WRITE_PROPERTY("continuousInitializationEnabled", parameters.flags.triggerContinuousInitializationEnabled);
+    WRITE_PROPERTY("initiateAllEnabled", parameters.flags.triggerInitiateAll);
     WRITE_PROPERTY("source", parameters.triggerSource);
     WRITE_PROPERTY("delay", parameters.triggerDelay);
 
@@ -1469,6 +1474,7 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
 
     if (ctx.matchGroup("trigger")) {
         READ_FLAG("continuousInitializationEnabled", parameters.flags.triggerContinuousInitializationEnabled);
+        READ_FLAG("initiateAllEnabled", parameters.flags.triggerInitiateAll);
         READ_PROPERTY("source", parameters.triggerSource);
         READ_PROPERTY("delay", parameters.triggerDelay);
     }

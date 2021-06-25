@@ -771,6 +771,7 @@ void SysSettingsTriggerPage::pageAlloc() {
     m_sourceOrig = m_source = trigger::g_triggerSource;
     m_delayOrig = m_delay = trigger::g_triggerDelay;
     m_initiateContinuouslyOrig = m_initiateContinuously = trigger::g_triggerContinuousInitializationEnabled;
+    m_initiateAllOrig = m_initiateAll = trigger::g_triggerInitiateAll;
 }
 
 void SysSettingsTriggerPage::onTriggerSourceSet(uint16_t value) {
@@ -808,9 +809,16 @@ void SysSettingsTriggerPage::toggleInitiateContinuously() {
     m_initiateContinuously = !m_initiateContinuously;
 }
 
+void SysSettingsTriggerPage::toggleInitiateAll() {
+    m_initiateAll = !m_initiateAll;
+}
+
 int SysSettingsTriggerPage::getDirty() {
-    return m_sourceOrig != m_source || m_delayOrig != m_delay ||
-           m_initiateContinuouslyOrig != m_initiateContinuously;
+    return 
+        m_sourceOrig != m_source ||
+        m_delayOrig != m_delay ||
+        m_initiateContinuouslyOrig != m_initiateContinuously  ||
+        m_initiateAllOrig != m_initiateAll;
 }
 
 void SysSettingsTriggerPage::set() {
@@ -818,6 +826,7 @@ void SysSettingsTriggerPage::set() {
         trigger::setSource(m_source);
         trigger::setDelay(m_delay);
         trigger::enableInitiateContinuous(m_initiateContinuously);
+        trigger::enableInitiateAll(m_initiateAll);
 
         popPage();
         

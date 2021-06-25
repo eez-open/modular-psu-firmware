@@ -55,7 +55,8 @@ struct ProfileFlags {
     unsigned powerIsUp: 1;
     unsigned couplingType : 3;
     unsigned triggerContinuousInitializationEnabled: 1;
-    unsigned reserverd : 10;
+    unsigned triggerInitiateAll: 1;
+    unsigned reserverd : 9;
 };
 
 enum LoadStatus {

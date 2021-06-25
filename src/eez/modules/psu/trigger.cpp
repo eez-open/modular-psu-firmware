@@ -38,6 +38,7 @@ namespace trigger {
 Source g_triggerSource;
 float g_triggerDelay;
 bool g_triggerContinuousInitializationEnabled;
+bool g_triggerInitiateAll;
 
 static State g_state;
 static uint32_t g_triggeredTime;
@@ -70,6 +71,7 @@ void reset() {
     g_triggerDelay = trigger::DELAY_DEFAULT;
     setSource(trigger::SOURCE_IMMEDIATE);
     g_triggerContinuousInitializationEnabled = 0;
+    g_triggerInitiateAll = 1;
 
     setState(STATE_IDLE);
 }
@@ -392,6 +394,10 @@ int enableInitiateContinuous(bool enable) {
     } else {
         return SCPI_RES_OK;
     }
+}
+
+void enableInitiateAll(bool enable) {
+    g_triggerInitiateAll = enable;
 }
 
 State getState() {

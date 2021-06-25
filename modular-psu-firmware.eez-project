@@ -2732,6 +2732,11 @@
       "name": "function_generator_is_any_channel_active",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "trigger_initiate_all",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -4105,6 +4110,11 @@
       "components": [],
       "connectionLines": [],
       "name": "function_generator_show_previous_page"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "trigger_toggle_initiate_all"
     }
   ],
   "pages": [
@@ -23625,7 +23635,7 @@
               "type": "Text",
               "left": 89,
               "top": 10,
-              "width": 113,
+              "width": 144,
               "height": 40,
               "wireID": "cdefbd5e-318d-478c-9416-d90e2181052c",
               "data": "trigger_source",
@@ -23651,7 +23661,7 @@
               "type": "Text",
               "left": 89,
               "top": 62,
-              "width": 67,
+              "width": 72,
               "height": 40,
               "wireID": "6911ab0a-fc89-4d58-f3de-c3d56d69af8f",
               "data": "trigger_delay",
@@ -23675,9 +23685,9 @@
             },
             {
               "type": "Select",
-              "left": 212,
+              "left": 215,
               "top": 114,
-              "width": 71,
+              "width": 72,
               "height": 40,
               "wireID": "3ef3ab14-04bf-4629-dda2-36092ca7c19e",
               "data": "trigger_initiate_continuously",
@@ -23689,7 +23699,7 @@
                   "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 71,
+                  "width": 72,
                   "height": 40,
                   "wireID": "67ca2d55-757d-46bd-e4d1-9db57a8baed5",
                   "data": "",
@@ -23703,7 +23713,7 @@
                   "type": "Text",
                   "left": 0,
                   "top": 0,
-                  "width": 71,
+                  "width": 72,
                   "height": 40,
                   "wireID": "e96d3c06-5fd6-4091-f447-52faa09d1f05",
                   "data": "",
@@ -23712,6 +23722,123 @@
                     "inheritFrom": "edit_value_active_M_center"
                   },
                   "text": "Yes"
+                }
+              ]
+            },
+            {
+              "type": "Select",
+              "left": 10,
+              "top": 166,
+              "width": 390,
+              "height": 40,
+              "wireID": "3b2d9125-d39f-4a71-bc23-adb68de4fd4c",
+              "data": "trigger_source",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 390,
+                  "height": 40,
+                  "wireID": "3e66881f-b2f7-41c4-bae0-1954c130780c",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "invertColors": true
+                },
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 390,
+                  "height": 40,
+                  "wireID": "e9a81774-f11f-4794-809b-83dd8626969b",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 315,
+                      "height": 40,
+                      "wireID": "2afe7aa5-7929-4202-bb7b-a0bf1c0d63de",
+                      "style": {
+                        "inheritFrom": "edit_value_M_left",
+                        "alignHorizontal": "left"
+                      },
+                      "text": "Initate all triggers on DLOG start:"
+                    },
+                    {
+                      "type": "Select",
+                      "left": 318,
+                      "top": 0,
+                      "width": 72,
+                      "height": 40,
+                      "wireID": "0d5bf3c1-a63c-414c-b887-686b3889afd2",
+                      "data": "trigger_initiate_all",
+                      "action": "trigger_toggle_initiate_all",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 72,
+                          "height": 40,
+                          "wireID": "7c3d900a-8ab4-4ba5-bbe6-df6a0aa9d551",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "edit_value_active_M_center"
+                          },
+                          "text": "No"
+                        },
+                        {
+                          "type": "Text",
+                          "left": 0,
+                          "top": 0,
+                          "width": 72,
+                          "height": 40,
+                          "wireID": "fb64f973-3a89-4e0e-8ca3-97d391ba4398",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "edit_value_active_M_center"
+                          },
+                          "text": "Yes"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 390,
+                  "height": 40,
+                  "wireID": "5d448da8-5d02-4e2f-879a-908065a4c35a",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "invertColors": true
+                },
+                {
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 390,
+                  "height": 40,
+                  "wireID": "ae2629d1-2075-4e0f-9ff9-35814baea3e1",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "invertColors": true
                 }
               ]
             }

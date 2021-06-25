@@ -287,6 +287,7 @@ class SysSettingsTriggerPage : public SetPage {
     void selectSource();
     void editDelay();
     void toggleInitiateContinuously();
+    void toggleInitiateAll();
 
     int getDirty();
     void set();
@@ -294,11 +295,13 @@ class SysSettingsTriggerPage : public SetPage {
     trigger::Source m_source;
     float m_delay;
     bool m_initiateContinuously;
+    bool m_initiateAll;
 
   private:
     trigger::Source m_sourceOrig;
     float m_delayOrig;
     bool m_initiateContinuouslyOrig;
+    bool m_initiateAllOrig;
 
     static void onTriggerSourceSet(uint16_t value);
     static void onDelaySet(float value);

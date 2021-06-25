@@ -912,6 +912,10 @@ void action_trigger_toggle_initiate_continuously() {
     ((SysSettingsTriggerPage *)getActivePage())->toggleInitiateContinuously();
 }
 
+void action_trigger_toggle_initiate_all() {
+    ((SysSettingsTriggerPage *)getActivePage())->toggleInitiateAll();
+}
+
 void action_trigger_generate_manual() {
     trigger::generateTrigger(trigger::SOURCE_MANUAL, false);
 }

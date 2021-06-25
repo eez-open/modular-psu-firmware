@@ -4328,6 +4328,17 @@ void data_trigger_initiate_continuously(DataOperationEnum operation, Cursor curs
     }
 }
 
+void data_trigger_initiate_all(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        SysSettingsTriggerPage *page =
+            (SysSettingsTriggerPage *)getPage(PAGE_ID_SYS_SETTINGS_TRIGGER);
+        if (page) {
+            value = page->m_initiateAll;
+        }
+    }
+}
+
+
 void data_trigger_state(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = trigger::getState();

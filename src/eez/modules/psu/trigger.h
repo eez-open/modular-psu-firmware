@@ -37,6 +37,7 @@ enum Source {
 extern Source g_triggerSource;
 extern float g_triggerDelay;
 extern bool g_triggerContinuousInitializationEnabled;
+extern bool g_triggerInitiateAll;
 
 void init();
 void reset();
@@ -59,6 +60,7 @@ int startImmediately();
 void startImmediatelyInPsuThread();
 int initiate();
 int enableInitiateContinuous(bool enable);
+void enableInitiateAll(bool enable);
 void setTriggerFinished(Channel &channel);
 bool isIdle();
 bool isInitiated();

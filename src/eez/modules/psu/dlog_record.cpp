@@ -806,6 +806,15 @@ void triggerGenerated() {
 }
 
 void toggleStart() {
+	if (trigger::g_triggerInitiateAll) {
+		if (trigger::isIdle() && trigger::g_triggerSource == trigger::SOURCE_IMMEDIATE) {
+			int err = trigger::startImmediately();
+			if (err != SCPI_RES_OK) {
+				eez::psu::gui::psuErrorMessage(g_errorChannelIndex, MakeScpiErrorValue(err));
+				return;
+			}
+		}
+	}
     stateTransition(EVENT_TOGGLE_START);
 }
 
