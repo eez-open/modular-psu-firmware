@@ -55,6 +55,12 @@ cmake -DCMAKE_TOOLCHAIN_FILE=../../cmake/Emscripten.cmake -DCMAKE_BUILD_TYPE=Deb
 make
 ```
 
+Start simulator with:
+
+```
+./modular-psu-firmware
+```
+
 #### Windows
 
 Install [Visual Studio Community 2017](https://visualstudio.microsoft.com/downloads/) and [CMake](https://cmake.org/install/).
