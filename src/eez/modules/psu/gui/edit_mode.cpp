@@ -111,7 +111,7 @@ void enter(int tabIndex, bool setFocus) {
             slotIndex = channel.slotIndex;
             subchannelIndex = channel.subchannelIndex;
 		} else {
-			getSloatAndSubchannelIndex(cursor, g_focusDataId, slotIndex, subchannelIndex);
+			getSlotAndSubchannelIndex(cursor, g_focusDataId, slotIndex, subchannelIndex);
 		}
         edit_mode_keypad::enter(slotIndex, subchannelIndex, g_editValue, getAllowZero(getFocusCursor(), g_focusDataId), g_minValue, g_maxValue);
     } else {

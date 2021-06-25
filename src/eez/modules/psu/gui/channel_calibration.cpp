@@ -1117,7 +1117,11 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
             }
         } else if (operation == DATA_OPERATION_SET) {
             editPage->setDacValue(value.getFloat());
-        }
+        } else if (operation == DATA_OPERATION_IS_MICRO_AMPER_ALLOWED) {
+			value = g_slots[slotIndex]->isMicroAmperAllowed(subchannelIndex);
+		} else if (operation == DATA_OPERATION_IS_AMPER_ALLOWED) {
+			value = g_slots[slotIndex]->isAmperAllowed(subchannelIndex);
+		}
     } else {
         auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
         if (operation == DATA_OPERATION_GET) {
@@ -1190,7 +1194,11 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
             }
         } else if (operation == DATA_OPERATION_SET) {
             editPage->setMeasuredValue(value.getFloat());
-        }
+		} else if (operation == DATA_OPERATION_IS_MICRO_AMPER_ALLOWED) {
+			value = g_slots[slotIndex]->isMicroAmperAllowed(subchannelIndex);
+		} else if (operation == DATA_OPERATION_IS_AMPER_ALLOWED) {
+			value = g_slots[slotIndex]->isAmperAllowed(subchannelIndex);
+		}
     } else {
         auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
         if (operation == DATA_OPERATION_GET) {

@@ -230,6 +230,9 @@ public:
     void onEncoder(int counter) override;
 #endif
 
+	bool isMicroAmperAllowed();
+	bool isAmperAllowed();
+
     Unit getSwitchToUnit() override;
 
     virtual int getCursorPostion() override;

@@ -160,9 +160,9 @@ bool getNextWriteBuffer(const uint8_t *&buffer, uint32_t &bufferSize, bool flush
 		if (i <= 0) {
 			i = 0;
 		} else {
-			#if defined(EEZ_PLATFORM_STM32)
-			            taskEXIT_CRITICAL();
-			#endif
+#if defined(EEZ_PLATFORM_STM32)
+            taskEXIT_CRITICAL();
+#endif
 			abortAfterBufferOverflowError(0);
 			return false;
 		}

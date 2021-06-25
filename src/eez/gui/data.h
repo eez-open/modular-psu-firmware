@@ -399,7 +399,9 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION,
     DATA_OPERATION_GET_TEXT_CURSOR_POSITION,
     DATA_OPERATION_GET_X_SCROLL,
-	DATA_OPERATION_GET_SLOT_AND_SUBCHANNEL_INDEX
+	DATA_OPERATION_GET_SLOT_AND_SUBCHANNEL_INDEX,
+	DATA_OPERATION_IS_MICRO_AMPER_ALLOWED,
+	DATA_OPERATION_IS_AMPER_ALLOWED
 };
 
 int count(int16_t id);
@@ -485,7 +487,10 @@ void ytDataTouchDrag(Cursor cursor, int16_t id, TouchDrag *touchDrag);
 int getTextCursorPosition(Cursor cursor, int16_t id);
 int getXScroll(const WidgetCursor &widgetCursor);
 
-void getSloatAndSubchannelIndex(Cursor cursor, int16_t id, int &slotIndex, int &subchannelIndex);
+void getSlotAndSubchannelIndex(Cursor cursor, int16_t id, int &slotIndex, int &subchannelIndex);
+
+bool isMicroAmperAllowed(Cursor cursor, int16_t id);
+bool isAmperAllowed(Cursor cursor, int16_t id);
 
 } // namespace gui
 } // namespace eez
