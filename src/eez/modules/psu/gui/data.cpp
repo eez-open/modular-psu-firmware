@@ -5658,7 +5658,7 @@ void data_channel_voltage_ramp_duration(DataOperationEnum operation, Cursor curs
     } if (operation == DATA_OPERATION_GET_NAME) {
         value = "U ramp dur.";
     } else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
-        value = 1;
+        value = 0;
     } else if (operation == DATA_OPERATION_GET_MIN) {
 		auto page = (SysSettingsRampAndDelayPage *)getPage(PAGE_ID_SYS_SETTINGS_RAMP_AND_DELAY);
 		if (page) {
