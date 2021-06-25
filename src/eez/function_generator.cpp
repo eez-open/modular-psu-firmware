@@ -187,6 +187,7 @@ float g_dphiU[CH_MAX];
 float g_amplitudeU[CH_MAX];
 float g_offsetU[CH_MAX];
 float g_dutyCycleU[CH_MAX];
+float g_freqU[CH_MAX];
 
 WaveformFunction g_waveFormFuncI[CH_MAX];
 float g_phiI[CH_MAX];
@@ -194,6 +195,8 @@ float g_dphiI[CH_MAX];
 float g_amplitudeI[CH_MAX];
 float g_offsetI[CH_MAX];
 float g_dutyCycleI[CH_MAX];
+
+bool g_dprogStateModified[CH_MAX];
 
 static const float PERIOD = 0.0002f;
 
@@ -1541,6 +1544,10 @@ int checkLimits(int iChannel) {
 }
 
 void executionStart() {
+	for (int i = 0; i < CH_NUM; i++) {
+		g_dprogStateModified[i] = false;
+	}
+
 	for (int i = 0; i < g_selectedResources.m_numResources; i++) {
 		int slotIndex;
 		int subchannelIndex;
@@ -1571,6 +1578,7 @@ void reloadWaveformParameters() {
 		g_dphiU[i] = 0;
 		g_amplitudeU[i] = 0;
 		g_offsetU[i] = 0;
+		g_freqU[i] = 0;
 
 		g_waveFormFuncI[i] = dcf;
 		if (!g_active) {
@@ -1628,9 +1636,11 @@ void reloadWaveformParameters() {
 				if (waveformParameters.waveform == WAVEFORM_DC) {
 					g_amplitudeU[channel->channelIndex] = 0.0f;
 					g_offsetU[channel->channelIndex] = waveformParameters.amplitude;
+					g_freqU[channel->channelIndex] = 0;
 				} else {
 					g_amplitudeU[channel->channelIndex] = waveformParameters.amplitude;
 					g_offsetU[channel->channelIndex] = waveformParameters.offset;
+					g_freqU[channel->channelIndex] = waveformParameters.frequency;
 				}
 			} else {
 				g_waveFormFuncI[channel->channelIndex] = getWaveformFunction(waveformParameters);
@@ -1745,11 +1755,25 @@ void tick() {
 				channel_dispatcher::setCurrent(channel, value);
 			}
 		}
+
+		// If DCP405 is selected, for 100 Hz or more, and measured current of 1 A or more, DP has to be disabled
+		if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCP405 && g_freqU[i] >= 100.0f && channel.i.mon >= 1.0f) {
+			if (channel.flags.dprogState) {
+				channel.setDprogState(DPROG_STATE_OFF);
+				g_dprogStateModified[channel.channelIndex] = true;
+			}
+		}
 	}
 }
 
 void abort() {
 	g_active = false;
+
+	for (int i = 0; i < CH_NUM; i++) {
+		if (g_dprogStateModified[i]) {
+			Channel::get(i).setDprogState(DPROG_STATE_ON);
+		}
+	}
 }
 
 } // namespace function_generator
