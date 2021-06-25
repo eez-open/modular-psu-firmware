@@ -5709,7 +5709,7 @@ void data_channel_current_ramp_duration(DataOperationEnum operation, Cursor curs
     } if (operation == DATA_OPERATION_GET_NAME) {
         value = "I ramp dur.";
     } else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
-        value = 1;
+        value = 0;
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(RAMP_DURATION_MIN_VALUE, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_MAX) {

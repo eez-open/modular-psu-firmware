@@ -48,7 +48,7 @@ public:
     void setVoltage(float voltage, RampOption rampOption = NO_RAMP);
     void setDacVoltage(uint16_t voltage);
 
-    void setCurrent(float voltage);
+    void setCurrent(float voltage, RampOption rampOption = NO_RAMP);
     void setDacCurrent(uint16_t current);
 
     bool isTesting() {
@@ -58,11 +58,7 @@ public:
     bool isOverHwOvpThreshold();
 
     bool isRampActive() {
-#if CONF_SURVIVE_MODE
         return m_uIsRampActive|| m_iIsRampActive;
-#else
-        return m_uIsRampActive;
-#endif
     }
 
 private:
@@ -75,12 +71,10 @@ private:
     uint32_t m_uRampStartTimeUsec;
 
     // I ramp
-#if CONF_SURVIVE_MODE    
     bool m_iIsRampActive = false;
     uint16_t m_iRampLastValue;
     uint16_t m_iRampTargetValue;
     uint32_t m_iRampStartTimeUsec;
-#endif
 
 #if defined(EEZ_PLATFORM_STM32)
     void set(uint8_t buffer, uint16_t value, RampOption rampOption = NO_RAMP);
