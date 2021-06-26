@@ -795,6 +795,7 @@ uint32_t PsuAppContext::getAsyncInProgressStartTime() {
 
 void PsuAppContext::setTextMessage(const char *message, unsigned int len) {
     stringCopy(m_textMessage, MIN(len + 1, sizeof(m_textMessage)), message);
+	DebugTrace("Display text changed: %s\n", m_textMessage);
     m_showTextMessage = true;
 }
 

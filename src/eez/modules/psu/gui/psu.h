@@ -405,7 +405,7 @@ inline void hideAsyncOperationInProgress() {
 }
 
 inline void setTextMessage(const char *message, unsigned int len) {
-    g_psuAppContext.setTextMessage(message, len); 
+	g_psuAppContext.setTextMessage(message, len);
 }
 
 inline void clearTextMessage() {
