@@ -502,6 +502,14 @@ void initScpi() {
     }
 }
 
+#ifdef EEZ_PLATFORM_SIMULATOR
+void simulatorPut(const char *text, size_t textLen) {
+	for (size_t i = 0; i < textLen; i++) {
+		g_inputBuffer.put(text[i]);
+	}
+}
+#endif
+
 } // uart
 } // eez
 

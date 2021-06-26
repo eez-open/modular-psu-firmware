@@ -61,5 +61,9 @@ enum UartMode {
 	UART_MODE_BOOKMARK,
 };
 
+#ifdef EEZ_PLATFORM_SIMULATOR
+void simulatorPut(const char *text, size_t textLen);
+#endif
+
 } // uart
 } // eez
