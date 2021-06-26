@@ -396,6 +396,19 @@ scpi_result_t scpi_cmd_simulatorDigitalDataByte(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_simulatorUart(scpi_t *context) {
+	const char *text;
+	size_t textLen;
+
+	if (!SCPI_ParamCharacters(context, &text, &textLen, true)) {
+		return SCPI_RES_ERR;
+	}
+
+	uart::simulatorPut(text, textLen);
+
+	return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez
@@ -502,6 +515,11 @@ scpi_result_t scpi_cmd_simulatorPin2Q(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_simulatorDigitalDataByte(scpi_t *context) {
+	SCPI_ErrorPush(context, SCPI_ERROR_UNDEFINED_HEADER);
+	return SCPI_RES_ERR;
+}
+
+scpi_result_t scpi_cmd_simulatorUart(scpi_t *context) {
 	SCPI_ErrorPush(context, SCPI_ERROR_UNDEFINED_HEADER);
 	return SCPI_RES_ERR;
 }

@@ -519,6 +519,7 @@
     SCPI_COMMAND("SIMUlator:VOLTage:PROGram:EXTernal", scpi_cmd_simulatorVoltageProgramExternal) \
     SCPI_COMMAND("SIMUlator:VOLTage:PROGram:EXTernal?", scpi_cmd_simulatorVoltageProgramExternalQ) \
     SCPI_COMMAND("SIMUlator:DIGital:DATA[:BYTE]", scpi_cmd_simulatorDigitalDataByte) \
+    SCPI_COMMAND("SIMUlator:UART", scpi_cmd_simulatorUart) \
     SCPI_COMMAND("DEBUg", scpi_cmd_debug) \
     SCPI_COMMAND("DEBUg:ONTime?", scpi_cmd_debugOntimeQ) \
     SCPI_COMMAND("DEBUg:VOLTage", scpi_cmd_debugVoltage) \
