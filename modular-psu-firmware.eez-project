@@ -23729,7 +23729,7 @@
               "type": "Select",
               "left": 10,
               "top": 166,
-              "width": 390,
+              "width": 395,
               "height": 40,
               "wireID": "3b2d9125-d39f-4a71-bc23-adb68de4fd4c",
               "data": "trigger_source",
@@ -23741,7 +23741,7 @@
                   "type": "RectangleWidget",
                   "left": 0,
                   "top": 0,
-                  "width": 390,
+                  "width": 395,
                   "height": 40,
                   "wireID": "3e66881f-b2f7-41c4-bae0-1954c130780c",
                   "style": {
@@ -23753,7 +23753,7 @@
                   "type": "Container",
                   "left": 0,
                   "top": 0,
-                  "width": 390,
+                  "width": 395,
                   "height": 40,
                   "wireID": "e9a81774-f11f-4794-809b-83dd8626969b",
                   "style": {
@@ -23771,11 +23771,11 @@
                         "inheritFrom": "edit_value_M_left",
                         "alignHorizontal": "left"
                       },
-                      "text": "Initate all triggers on DLOG start:"
+                      "text": "Initiate all triggers on DLOG start:"
                     },
                     {
                       "type": "Select",
-                      "left": 318,
+                      "left": 323,
                       "top": 0,
                       "width": 72,
                       "height": 40,
@@ -23820,7 +23820,7 @@
                   "type": "RectangleWidget",
                   "left": 0,
                   "top": 0,
-                  "width": 390,
+                  "width": 395,
                   "height": 40,
                   "wireID": "5d448da8-5d02-4e2f-879a-908065a4c35a",
                   "style": {
@@ -23832,7 +23832,7 @@
                   "type": "RectangleWidget",
                   "left": 0,
                   "top": 0,
-                  "width": 390,
+                  "width": 395,
                   "height": 40,
                   "wireID": "ae2629d1-2075-4e0f-9ff9-35814baea3e1",
                   "style": {
@@ -79653,6 +79653,9 @@
           },
           {
             "name": "SIMUlator:DIGital:DATA[:BYTE]",
+            "usedIn": [
+              "simulator"
+            ],
             "parameters": [
               {
                 "name": "channel",
@@ -79668,6 +79671,27 @@
                 "type": [
                   {
                     "type": "nr1"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SIMUlator:UART",
+            "usedIn": [
+              "simulator"
+            ],
+            "parameters": [
+              {
+                "name": "text",
+                "type": [
+                  {
+                    "type": "quoted-string"
                   }
                 ]
               }
