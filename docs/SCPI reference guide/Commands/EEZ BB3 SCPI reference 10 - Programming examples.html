@@ -37,6 +37,15 @@
 	</head>
 	<body>
 		<p class="Heading_1">10. <a name="_programming examples"></a>Programming examples</p>
+		<ul>
+			<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">Set channel output values and working with the OCP</li>
+			<li class="List_1" style="text-indent: 0; list-style-type: disc;">Voltage and current calibration</li>
+			<li class="List_1" style="text-indent: 0; list-style-type: disc;">Working with profiles</li>
+			<li class="List_1" style="text-indent: 0; list-style-type: disc;">Get identification info and self-test results</li>
+			<li class="List_1" style="text-indent: 0; list-style-type: disc;">Programming output voltage using the list of values</li>
+			<li class="List_1" style="text-indent: 0; list-style-type: disc;">Create a DLOG file</li>
+			<li class="List_1" style="text-indent: 0; list-style-type: disc;">Generate a full-rectified signal with function generator</li>
+		</ul>
 		<p class="Heading_2">10.1. Set channel output values and working with the OCP</p>
 		<p>This is a SCPI commands sequence that sets a voltage, current, and the over-current protection (OCP) on the channel two:</p>
 		<p>&#160;</p>
@@ -46,7 +55,7 @@
 					<p class="cmd_code">INST?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check currently selected output</p>
+					<p class="table_body">Check currently selected output.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -62,7 +71,7 @@
 					<p class="cmd_code">INST CH2</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Select channel two as current channel</p>
+					<p class="table_body">Select channel two as current channel.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -70,7 +79,7 @@
 					<p class="cmd_code">VOLT 10</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Set output voltage</p>
+					<p class="table_body">Set output voltage.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -78,7 +87,7 @@
 					<p class="cmd_code">CURR</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Set output current</p>
+					<p class="table_body">Set output current.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -86,7 +95,7 @@
 					<p class="cmd_code">CURR:PROT:STAT?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check OCP status</p>
+					<p class="table_body">Check OCP status.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -102,7 +111,7 @@
 					<p class="cmd_code">CURR:PROT:STAT 1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Enable OCP</p>
+					<p class="table_body">Enable OCP.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -110,7 +119,7 @@
 					<p class="cmd_code">CURR:PROT:DEL 100ms</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Set OCP delay</p>
+					<p class="table_body">Set OCP delay.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -118,7 +127,7 @@
 					<p class="cmd_code">OUTP 1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Enable output</p>
+					<p class="table_body">Enable output.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -126,7 +135,7 @@
 					<p class="cmd_code">MEAS?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Measure output voltage</p>
+					<p class="table_body">Measure output voltage.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -142,7 +151,7 @@
 					<p class="cmd_code">MEAS:CURR?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Measure output current</p>
+					<p class="table_body">Measure output current.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -150,7 +159,7 @@
 					<p class="cmd_code">0.00</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Current is zero since no load is connected</p>
+					<p class="table_body">Current is zero since no load is connected.</p>
 				</td>
 			</tr>
 		</table>
@@ -163,7 +172,7 @@
 					<p class="cmd_code">SIMU:LOAD 20</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Define connected load impedance</p>
+					<p class="table_body">Define connected load impedance.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -171,7 +180,7 @@
 					<p class="cmd_code">MEAS?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Measure voltage once again</p>
+					<p class="table_body">Measure voltage once again.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -187,7 +196,7 @@
 					<p class="cmd_code">MEAS:CURR?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Measure current once again</p>
+					<p class="table_body">Measure current once again.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -195,7 +204,7 @@
 					<p class="cmd_code">0.50</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Measured current</p>
+					<p class="table_body">Measured current.</p>
 				</td>
 			</tr>
 		</table>
@@ -208,7 +217,7 @@
 					<p class="cmd_code">OUTP:MODE?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check mode of operation</p>
+					<p class="table_body">Check mode of operation.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -216,7 +225,7 @@
 					<p class="cmd_code">&quot;CV&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">The channel is in constant-voltage mode since output current is below previously programmed level</p>
+					<p class="table_body">The channel is in constant-voltage mode since output current is below previously programmed level.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -224,7 +233,7 @@
 					<p class="cmd_code">SIMU:LOAD?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check load value</p>
+					<p class="table_body">Check load value.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -240,7 +249,7 @@
 					<p class="cmd_code">CURR:PROT:STAT?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check OCP status</p>
+					<p class="table_body">Check OCP status.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -256,7 +265,7 @@
 					<p class="cmd_code">CURR:PROT:STAT OFF</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Disable OCP</p>
+					<p class="table_body">Disable OCP.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -264,7 +273,7 @@
 					<p class="cmd_code">SIMU:LOAD 4</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Decrease load impedance</p>
+					<p class="table_body">Decrease load impedance.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -272,7 +281,7 @@
 					<p class="cmd_code">OUTP:MODE?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check once again mode of operation</p>
+					<p class="table_body">Check once again mode of operation.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -280,7 +289,7 @@
 					<p class="cmd_code">&quot;CC&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Channel enters constant-current mode since I<span style="vertical-align: sub;">max&#160;</span>= U&#160;/&#160;R = 10&#160;/&#160;4 = 2.5&#160;A and current is limited to the 1&#160;A</p>
+					<p class="table_body">Channel enters constant-current mode since I<span style="vertical-align: sub;">max&#160;</span>= U&#160;/&#160;R = 10&#160;/&#160;4 = 2.5&#160;A and current is limited to the 1&#160;A.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -288,7 +297,7 @@
 					<p class="cmd_code">MEAS:CURR?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Measure output current</p>
+					<p class="table_body">Measure output current.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -304,7 +313,7 @@
 					<p class="cmd_code">MEAS?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Measure output voltage</p>
+					<p class="table_body">Measure output voltage.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -312,7 +321,7 @@
 					<p class="cmd_code">4.00</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Output voltage is decreased since U = I&#160;*&#160;R = 1&#160;*&#160;4 = 4&#160;V</p>
+					<p class="table_body">Output voltage is decreased since U = I&#160;*&#160;R = 1&#160;*&#160;4 = 4&#160;V.</p>
 				</td>
 			</tr>
 		</table>
@@ -325,7 +334,7 @@
 					<p class="cmd_code">OUTP OFF</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Disable channel output</p>
+					<p class="table_body">Disable channel output.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -333,7 +342,7 @@
 					<p class="cmd_code">CURR:PROT:TRIP?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check OCP status</p>
+					<p class="table_body">Check OCP status.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -341,7 +350,7 @@
 					<p class="cmd_code">0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">OCP is not activated</p>
+					<p class="table_body">OCP is not activated.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -349,7 +358,7 @@
 					<p class="cmd_code">CURR:PROT:STAT ON</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Enable OCP</p>
+					<p class="table_body">Enable OCP.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -357,7 +366,7 @@
 					<p class="cmd_code">VOLT?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check programmed output voltage</p>
+					<p class="table_body">Check programmed output voltage.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -373,7 +382,7 @@
 					<p class="cmd_code">CURR?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check programmed output current</p>
+					<p class="table_body">Check programmed output current.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -389,7 +398,7 @@
 					<p class="cmd_code">SIMU:LOAD?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check simulated load value</p>
+					<p class="table_body">Check simulated load value.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -405,7 +414,7 @@
 					<p class="cmd_code">OUTP ON</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Enable channel output</p>
+					<p class="table_body">Enable channel output.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -413,7 +422,7 @@
 					<p class="cmd_code">CURR:PROT:TRIP?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check OCP status once again</p>
+					<p class="table_body">Check OCP status once again.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -421,7 +430,7 @@
 					<p class="cmd_code">1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">OCP has been tripped</p>
+					<p class="table_body">OCP has been tripped.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -429,7 +438,7 @@
 					<p class="cmd_code">OUTP?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check channel output state</p>
+					<p class="table_body">Check channel output state.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -437,7 +446,7 @@
 					<p class="cmd_code">0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Channel output is changed to OFF stated by the OCP</p>
+					<p class="table_body">Channel output is changed to OFF stated by the OCP.</p>
 				</td>
 			</tr>
 		</table>
@@ -450,7 +459,7 @@
 					<p class="cmd_code">OUTP ON</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">First attempt to enable channel output</p>
+					<p class="table_body">First attempt to enable channel output.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -466,7 +475,7 @@
 					<p class="cmd_code">0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">This attempt failed, the channel output remain disabled</p>
+					<p class="table_body">This attempt failed, the channel output remain disabled.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -474,7 +483,7 @@
 					<p class="cmd_code">OUTP:PROT:CLE</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Channel protections reset</p>
+					<p class="table_body">Channel protections reset.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -482,7 +491,7 @@
 					<p class="cmd_code">OUTP ON</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Second to enable channel output</p>
+					<p class="table_body">Second to enable channel output.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -490,7 +499,7 @@
 					<p class="cmd_code">0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Channel output was enabled for a short time (100ms) and returns back to OFF state</p>
+					<p class="table_body">Channel output was enabled for a short time (100ms) and returns back to OFF state.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -498,7 +507,7 @@
 					<p class="cmd_code">CURR:PROT:TRIP?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Check OCP status</p>
+					<p class="table_body">Check OCP status.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -506,7 +515,7 @@
 					<p class="cmd_code">1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">OCP has been tripped</p>
+					<p class="table_body">OCP has been tripped.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -514,7 +523,7 @@
 					<p class="cmd_code">OUTP:PROT:CLE</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Reset channel protections once again</p>
+					<p class="table_body">Reset channel protections once again.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -522,7 +531,7 @@
 					<p class="cmd_code">CURR:PROT:STAT OFF</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Disable OCP</p>
+					<p class="table_body">Disable OCP.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -530,7 +539,7 @@
 					<p class="cmd_code">OUTP ON</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Third attempt to enable channel output</p>
+					<p class="table_body">Third attempt to enable channel output.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -546,7 +555,7 @@
 					<p class="cmd_code">1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Output is finally enabled</p>
+					<p class="table_body">Output is finally enabled.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -562,7 +571,7 @@
 					<p class="cmd_code">&quot;CC&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 73%;">
-					<p class="table_body">Channel enters CC mode of operation </p>
+					<p class="table_body">Channel enters CC mode of operation .</p>
 				</td>
 			</tr>
 		</table>
@@ -605,7 +614,7 @@
 					<p class="cmd_code">SYST:RWL</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Make sure that BB3 is in remote mode and cannot be unlock from local console (TFT display)</p>
+					<p class="table_body">Make sure that BB3 is in remote mode and cannot be unlock from local console (TFT display).</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -662,7 +671,7 @@
 					<p class="cmd_code">CAL:VOLT:LEV 1,0.15</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Set the channel to the first calibration point and output voltage to 150&#160;mV</p>
+					<p class="table_body">Set the channel to the first calibration point and output voltage to 150&#160;mV.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -684,7 +693,7 @@
 					<p class="cmd_code">CAL:VOLT:LEV 2,38</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 65%;">
-					<p class="table_body">Set the channel to the second calibration point and output voltage 38&#160;V</p>
+					<p class="table_body">Set the channel to the second calibration point and output voltage 38&#160;V.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -874,7 +883,7 @@
 					<p class="cmd_code">MEM:STAT:VAL? 4</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Check to see if profile selected location is empty</p>
+					<p class="table_body">Check to see if profile selected location is empty.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -890,7 +899,7 @@
 					<p class="cmd_code">MEM:STAT:NAME? 4</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">We can also check that by querying profile location name</p>
+					<p class="table_body">We can also check that by querying profile location name.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -907,7 +916,7 @@
 					<p class="cmd_code">VOLT?;:CURR?;:OUTP? </p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Examine currently programmed output values of the first channel</p>
+					<p class="table_body">Examine currently programmed output values of the first channel.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -924,7 +933,7 @@
 					<p class="cmd_code">VOLT?;:CURR?;:OUTP? </p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Examine currently programmed output values of the second channel</p>
+					<p class="table_body">Examine currently programmed output values of the second channel.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -943,7 +952,7 @@
 					<p class="cmd_code">OUTP 1;:OUTP 1, CH2</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Reprogram both channel output values that will be stored as a new profile</p>
+					<p class="table_body">Reprogram both channel output values that will be stored as a new profile.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -951,7 +960,7 @@
 					<p class="cmd_code">*SAV 4</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">All profile parameters is now storing on the selected location</p>
+					<p class="table_body">All profile parameters is now storing on the selected location.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -959,7 +968,7 @@
 					<p class="cmd_code">MEM:STAT:NAME? 4</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Check profile name</p>
+					<p class="table_body">Check profile name.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -975,7 +984,7 @@
 					<p class="cmd_code">MEM:STAT:NAME 4, &quot;Dual 12V/300mA, Output ON&quot;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Set the profile name (only ASCII characters are allowed!)</p>
+					<p class="table_body">Set the profile name (only ASCII characters are allowed!).</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -983,7 +992,7 @@
 					<p class="cmd_code">MEM:STAT:NAME? 4</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Check the profile name once again</p>
+					<p class="table_body">Check the profile name once again.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1004,7 +1013,7 @@
 					<p class="cmd_code">SYST:POW 0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">The BB3 enters the standby mode</p>
+					<p class="table_body">The BB3 enters the standby mode.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1012,7 +1021,7 @@
 					<p class="cmd_code">SYST:POW 1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Returns back from the standby mode. Please note that this command can be executed with the minimum of 5 seconds delay otherwise a -200,&quot;Execution error&quot; will be generated (you can check that with the SYST:ERR? command) </p>
+					<p class="table_body">Returns back from the standby mode. Please note that this command can be executed with the minimum of 5 seconds delay otherwise a -200,&quot;Execution error&quot; will be generated (you can check that with the SYST:ERR? command).</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1020,7 +1029,7 @@
 					<p class="cmd_code">VOLT?;:CURR?;:OUTP?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Query programmed voltage, current and output state of the currently selected channel</p>
+					<p class="table_body">Query programmed voltage, current and output state of the currently selected channel.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1028,7 +1037,7 @@
 					<p class="cmd_code">0.00;0.00;0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Returned data indicate that previously saved values in profile number 4 were not used</p>
+					<p class="table_body">Returned data indicate that previously saved values in profile number 4 were not used.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1037,7 +1046,7 @@
 					<p class="cmd_code">VOLT?;:CURR?;:OUTP?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Recall parameters from desired location and execute query once again</p>
+					<p class="table_body">Recall parameters from desired location and execute query once again.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1045,7 +1054,7 @@
 					<p class="cmd_code">12.00;0.30;1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">The channel output values are now programmed using the selected profile</p>
+					<p class="table_body">The channel output values are now programmed using the selected profile.</p>
 				</td>
 			</tr>
 		</table>
@@ -1058,7 +1067,7 @@
 					<p class="cmd_code">MEM:STAT:REC:AUTO?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Query status of automatic profile recall during power on sequence</p>
+					<p class="table_body">Query status of automatic profile recall during power on sequence.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1066,7 +1075,7 @@
 					<p class="cmd_code">0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Automatic recall is turned off</p>
+					<p class="table_body">Automatic recall is turned off.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1074,7 +1083,7 @@
 					<p class="cmd_code">MEM:STAT:REC:AUTO ON</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Turn on automatic recall</p>
+					<p class="table_body">Turn on automatic recall.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1082,7 +1091,7 @@
 					<p class="cmd_code">MEM:STAT:REC:SEL?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Query which profile will be used when automatic recall is turned on</p>
+					<p class="table_body">Query which profile will be used when automatic recall is turned on.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1090,7 +1099,7 @@
 					<p class="cmd_code">0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Selected profile was 0</p>
+					<p class="table_body">Selected profile was 0.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1098,7 +1107,7 @@
 					<p class="cmd_code">MEM:STAT:REC:SEL 4</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Change power on profile to 4</p>
+					<p class="table_body">Change power on profile to 4.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1106,7 +1115,7 @@
 					<p class="cmd_code">SYST:POW 0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Switch the BB3 to the standby mode once again</p>
+					<p class="table_body">Switch the BB3 to the standby mode once again.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1114,7 +1123,7 @@
 					<p class="cmd_code">SYST:POW 1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Returns back from the standby mode. Again wait at least 5 seconds before enters this command</p>
+					<p class="table_body">Returns back from the standby mode. Again wait at least 5 seconds before enters this command.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1122,7 +1131,7 @@
 					<p class="cmd_code">VOLT?;:CURR?;:OUTP?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">Query programmed voltage, current and output state of the currently selected channel</p>
+					<p class="table_body">Query programmed voltage, current and output state of the currently selected channel.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1130,7 +1139,7 @@
 					<p class="cmd_code">12.00;0.30;1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 66%;">
-					<p class="table_body">The channel output values are programmed using the selected profile</p>
+					<p class="table_body">The channel output values are programmed using the selected profile.</p>
 				</td>
 			</tr>
 		</table>
@@ -1143,7 +1152,7 @@
 					<p class="cmd_code">*IDN?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="table_body">Query identification string</p>
+					<p class="table_body">Query identification string.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1151,7 +1160,7 @@
 					<p class="cmd_code">Envox,EEZ BB3 (STM32),0000000,M1 0.2</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="table_body">BB3 with two different channels is identified, the  first channel is 0-50V/3A and the second is 0-40V/5A. Serial number is 00001, and firmware version M1.0.93</p>
+					<p class="table_body">Returned BB3 identification string.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1159,7 +1168,7 @@
 					<p class="cmd_code">*TST?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="table_body">Execute self-test and query result</p>
+					<p class="table_body">Execute self-test and query result.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1167,7 +1176,7 @@
 					<p class="cmd_code">0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="table_body">Self-test is passed</p>
+					<p class="table_body">Self-test is passed.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1175,7 +1184,7 @@
 					<p class="cmd_code">DIAG:TEST?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="table_body">Query additional information about self-test</p>
+					<p class="table_body">Query additional information about self-test.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1205,7 +1214,7 @@
 					<p class="cmd_code">SYST:POW 0</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="table_body">The BB3 enters the standby mode</p>
+					<p class="table_body">The BB3 enters the standby mode.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1213,7 +1222,7 @@
 					<p class="cmd_code">DIAG:TEST?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="table_body">Query additional information about self-test</p>
+					<p class="table_body">Query additional information about self-test.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1238,7 +1247,7 @@
 					<p class="cmd_code">SYST:POW 1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="table_body">Returns back from the standby mode</p>
+					<p class="table_body">Returns back from the standby mode.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1246,7 +1255,7 @@
 					<p class="cmd_code">DIAG:ADC?</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="table_body">Additional information about currently selected channel ADC inputs</p>
+					<p class="table_body">Additional information about currently selected channel ADC inputs.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1268,7 +1277,7 @@
 					<p class="cmd_code">INST CH1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
-					<p class="table_body">Select the channel that has to be programmed</p>
+					<p class="table_body">Select the channel that has to be programmed.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1276,7 +1285,7 @@
 					<p class="cmd_code">VOLT:MODE LIST</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
-					<p class="table_body">Set voltage programming mode to the list of values</p>
+					<p class="table_body">Set voltage programming mode to the list of values.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1284,7 +1293,7 @@
 					<p class="cmd_code">LIST:VOLT 5, 10, 20, 40, 0 </p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
-					<p class="table_body">Define sequence of output voltage</p>
+					<p class="table_body">Define sequence of output voltage.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1316,7 +1325,7 @@
 					<p class="cmd_code">LIST:COUN INF</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
-					<p class="table_body">Repeat continuously LIST sequence</p>
+					<p class="table_body">Repeat continuously LIST sequence.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -1342,6 +1351,231 @@
 		<div style="text-align: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
 <a href="http://www.envox.hr/eez/images/bb3_scpi_example_list.png">			<img src="images/EEZ BB3 SCPI reference 10 - Programming examples-bb3_scpi_example_list.png" alt="bb3_scpi_example_list.png" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; width: 127mm; height: 71.97mm;"/>
 </a>		</div>
+		<p>&#160;</p>
+		<p class="Heading_2">10.6. Create DLOG file</p>
+		<table style="border-collapse: collapse; background: transparent; width: 175.02mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:CLE </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">Resets all DLOG parameters (from previous session).</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:REM &quot;This is remark&quot; </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">Add DLOG comment.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:X:UNIT VOLT </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">Set X-axis units to Voltage.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:X:STEP 0.1 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">Set X-axis step (i.e. difference between two points) to 0.1.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:X:RANG:MIN 0 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">X-axis minimum value is set to 0.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:X:RANG:MAX 40 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:X:LABel &quot;U&quot; </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:Y1:UNIT AMPER </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:Y1:RANG:MIN 0 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:Y1:RANG:MAX 5 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:Y1:LABel &quot;I1&quot; </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:Y2:UNIT AMPER </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:Y2:RANG:MIN 0 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:Y2:RANG:MAX 5 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:Y2:LABel &quot;I2&quot; </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">INIT:DLOG:TRACE &quot;/Recordings/test.dlog&quot; </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 1.1, 3.1 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 1.2, 3.2 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 1.3, 3.3 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 1.4, 3.4 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 1.5, 3.5 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 1.6, 3.6 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 1.7, 3.7 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 1.8, 3.8 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 1.9, 3.9 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">SENS:DLOG:TRAC:DATA 2.0, 4.0 </p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 37%;">
+					<p class="cmd_code">ABOR:DLOG</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 63%;">
+					<p class="table_body">&#160;</p>
+				</td>
+			</tr>
+		</table>
+		<p>&#160;</p>
+		<p>&#160;</p>
+		<p>&#160;</p>
+		<p>&#160;</p>
+		<p class="Heading_2">10.7. Generate a full-rectified signal with function generator</p>
 		<p>&#160;</p>
 	</body>
 </html>

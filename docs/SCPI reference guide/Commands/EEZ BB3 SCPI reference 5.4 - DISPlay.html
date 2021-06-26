@@ -22,6 +22,7 @@
 			.cmd_code_Start { text-align: left; margin-top: 1.99mm; font-family: "Courier New"; }
 			.cmd_code_single { text-align: left; margin-top: 1.99mm; margin-bottom: 1.99mm; font-family: "Courier New"; }
 			.cmd_root { text-align: left; color: #0066cc; }
+			.note { font-style: italic; }
 			.scpi0 { text-align: left; }
 			.scpi1 { text-align: left; margin-left: 4.99mm; }
 			.scpi2 { text-align: left; margin-left: 10mm; }
@@ -283,8 +284,10 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This query reads screen image data. The image is formatted as a .png file. </p>
+					<p>This query reads screen image data (i.e. create screenshot). The image is formatted as a .png file. </p>
 					<p>Use the HCOPy[:IMMediate] or HCOPy:SDUMp[:IMMediate] command to capture screen image and save it as a file on the SD card.</p>
+					<p>&#160;</p>
+					<p class="note">An attempt to reads screen image data while DLOG recording is in progress will generate an execution error.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -302,6 +305,14 @@
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_code">DISP:DATA?</p>
 					<p class="cmd_code">#&lt;length-digits&gt;&lt;length&gt;&lt;block&gt;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">-200,&quot;Execution error&quot;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
