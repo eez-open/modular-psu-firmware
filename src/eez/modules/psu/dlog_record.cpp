@@ -809,7 +809,8 @@ void toggleStart() {
 	if (trigger::g_triggerInitiateAll) {
 		if (trigger::isIdle() && trigger::g_triggerSource == trigger::SOURCE_IMMEDIATE) {
 			int err = trigger::startImmediately();
-			if (err != SCPI_RES_OK) {
+			if (err != SCPI_RES_OK && err != SCPI_ERROR_CANNOT_INITIATE_WHILE_IN_FIXED_MODE) {
+				dlog_record::g_recordingParameters.filePath[0] = 0;
 				eez::psu::gui::psuErrorMessage(g_errorChannelIndex, MakeScpiErrorValue(err));
 				return;
 			}

@@ -135,8 +135,8 @@ static void changeXAxisDiv(Recording &recording, double xAxisDiv);
 ////////////////////////////////////////////////////////////////////////////////
 
 void tick() {
-	if (g_state == STATE_READY) {
-        loadSamples();
+	if (psu::gui::isPageOnStack(PAGE_ID_DLOG_VIEW) && &getRecording() == &g_dlogFile && g_state == STATE_READY) {
+		loadSamples();
 
 		if (g_bookmarksScrollPosition != g_loadedBookmarksScrollPosition) {
 			loadBookmarks();
