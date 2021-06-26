@@ -136,8 +136,7 @@ private:
 	bool m_full = false;
 };
 
-static uint8_t g_inputBufferMemory[CONF_UART_INPUT_BUFFER_SIZE];
-CircularBuffer g_inputBuffer(g_inputBufferMemory, sizeof(g_inputBufferMemory));
+CircularBuffer g_inputBuffer(UART_BUFFER_MEMORY, UART_BUFFER_MEMORY_SIZE);
 
 ////////////////////////////////////////////////////////////////////////////////
 

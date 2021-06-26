@@ -2404,7 +2404,7 @@ scpi_result_t scpi_cmd_systemCommunicateUartTransmit(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemCommunicateUartReceiveQ(scpi_t *context) {
-    char text[uart::CONF_UART_INPUT_BUFFER_SIZE + 1];
+    char text[256 + 1];
 	uint16_t n;
     int err;
 	if (!uart::receive((uint8_t *)text, sizeof(text) - 1, n, &err)) {

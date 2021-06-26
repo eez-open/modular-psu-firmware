@@ -28,9 +28,6 @@
 namespace eez {
 namespace uart {
 
-static const size_t CONF_UART_INPUT_BUFFER_SIZE = 256;
-
-
 #if defined(EEZ_PLATFORM_SIMULATOR)
 typedef enum 
 {
