@@ -307,10 +307,10 @@ void onQueueMessage(uint32_t type, uint32_t param) {
     if (type == MP_LOAD_SCRIPT) {
         loadScript();
     } else if (type == MP_EXECUTE_SCPI) {
-       input(g_scpiContext, (const char *)g_commandOrQueryText, strlen(g_commandOrQueryText));
-       input(g_scpiContext, "\r\n", 2);
+        input(g_scpiContext, (const char *)g_commandOrQueryText, strlen(g_commandOrQueryText));
+        input(g_scpiContext, "\r\n", 2);
 
-       osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_SCPI_RESULT, osWaitForever);
+        osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_SCPI_RESULT, osWaitForever);
    }
 }
 
@@ -356,6 +356,21 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
         g_scpiDataLen -= 2;
         g_scpiData[g_scpiDataLen] = 0;
     }
+
+	if (g_scpiDataLen >= 3 && g_scpiData[0] == '"' && g_scpiData[g_scpiDataLen - 1] == '"') {
+		// replace "" with "
+		size_t j = 1;
+		size_t i;
+		for (i = 1; i < g_scpiDataLen - 2; i++, j++) {
+			g_scpiData[j] = g_scpiData[i];
+			if (g_scpiData[i] == '"' && g_scpiData[i + 1] == '"') {
+				i++;
+			}
+		}
+		g_scpiData[j] = g_scpiData[i];
+		g_scpiData[j + 1] = '"';
+		g_scpiDataLen -= i - j;
+	}
 
     // if (g_scpiDataLen > 0) {
     //     DebugTrace("< %s\n", g_scpiData);
