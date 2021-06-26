@@ -42,6 +42,12 @@ cmake ../..
 make
 ```
 
+Start simulator with:
+
+```
+./modular-psu-firmware
+```
+
 #### Emscripten
 
 [Download and install Emscripten](https://emscripten.org/docs/getting_started/downloads.html)
