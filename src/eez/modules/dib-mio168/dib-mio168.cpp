@@ -7346,6 +7346,8 @@ void action_dib_mio168_show_channel_labels() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static int g_slotIndex;
+
 static const int NUM_PAGES_IN_MAX_VIEW = 7;
 static const int NUM_PAGES_IN_DEFAULT_VIEW = 7;
 
@@ -7409,15 +7411,30 @@ void data_dib_mio168_selected_page_in_default_view(DataOperationEnum operation, 
 	}
 }
 
-void action_dib_mio168_select_page_in_default_view() {
-	auto module = (Mio168Module *)g_slots[getFoundWidgetAtDown().cursor];
-	module->selectedPageInDefaultView = (module->selectedPageInDefaultView + 1) % NUM_PAGES_IN_DEFAULT_VIEW;
+void setPageInDefaultView(uint16_t value) {
+    popPage();
+
+	auto module = (Mio168Module *)g_slots[g_slotIndex];
+
+	module->selectedPageInDefaultView = value;
 	module->selectedPageInMaxView = module->selectedPageInDefaultView;
-	if (isDefaultViewVertical()) {
-		animateSlideLeftInDefaultViewVert(getFoundWidgetAtDown().cursor);
-	} else {
-		animateSlideLeftInDefaultViewHorz(getFoundWidgetAtDown().cursor);
-	}
+}
+
+void action_dib_mio168_select_page_in_default_view() {
+	g_slotIndex = getFoundWidgetAtDown().cursor;
+
+	static EnumItem enumItems[] = {
+		{ 0, "Overview" },
+		{ 1, "Digital inputs" },
+		{ 2, "Digital outputs" },
+		{ 3, "Analog inputs" },
+        { 4, "AC power" },
+        { 5, "Analog outputs" },
+        { 6, "PWM" },
+		{ 0, 0 }
+	};
+
+	pushSelectFromEnumPage(enumItems, ((Mio168Module *)g_slots[g_slotIndex])->selectedPageInDefaultView, NULL, setPageInDefaultView);
 }
 
 void data_dib_mio168_is_no_afe(DataOperationEnum operation, Cursor cursor, Value &value) {
@@ -7452,8 +7469,6 @@ void action_dib_mio168_ain_toggle_ac_analysis() {
 }
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-
-static int g_slotIndex;
 
 void onSetSimulatorAfeVersion(uint16_t value) {
 	g_frontPanelAppContext.popPage();
