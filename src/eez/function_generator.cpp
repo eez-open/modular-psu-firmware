@@ -2382,7 +2382,7 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 			value = MakeValue(g_options.isAmpl ? range : MIN(maxValue, 2 * max - maxValue), unit);
 		}
 	} else if (operation == DATA_OPERATION_GET_NAME) {
-		value = "Amplitude";
+		value = g_options.isAmpl ? "Amplitude" : "Minimum";
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
 		value = unit;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
@@ -2466,7 +2466,7 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 			value = MakeValue(g_options.isAmpl ? max : MIN(minValue + range, 2 * max - minValue), unit);
 		}
 	} else if (operation == DATA_OPERATION_GET_NAME) {
-		value = "Offset";
+		value = g_options.isAmpl ? "Offset" : "Maximum";
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
 		value = unit;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
