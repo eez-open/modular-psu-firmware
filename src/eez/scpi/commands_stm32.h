@@ -272,18 +272,8 @@
     SCPI_COMMAND("SOURce:PWM:DUTY?", scpi_cmd_sourcePwmDutyQ) \
     SCPI_COMMAND("SOURce:PWM:FREQuency", scpi_cmd_sourcePwmFrequency) \
     SCPI_COMMAND("SOURce:PWM:FREQuency?", scpi_cmd_sourcePwmFrequencyQ) \
-    SCPI_COMMAND("SOURce:MODE", scpi_cmd_sourceMode) \
-    SCPI_COMMAND("SOURce:MODE?", scpi_cmd_sourceModeQ) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:MODE", scpi_cmd_sourceDigitalOutputMode) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:MODE?", scpi_cmd_sourceDigitalOutputModeQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:SHAPe", scpi_cmd_sourceVoltageFunctionShape) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:SHAPe?", scpi_cmd_sourceVoltageFunctionShapeQ) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:SHAPe", scpi_cmd_sourceCurrentFunctionShape) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:SHAPe?", scpi_cmd_sourceCurrentFunctionShapeQ) \
-    SCPI_COMMAND("SOURce:FUNCtion:SHAPe", scpi_cmd_sourceFunctionShape) \
-    SCPI_COMMAND("SOURce:FUNCtion:SHAPe?", scpi_cmd_sourceFunctionShapeQ) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe", scpi_cmd_sourceDigitalOutputFunctionShape) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe?", scpi_cmd_sourceDigitalOutputFunctionShapeQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:FREQuency", scpi_cmd_sourceVoltageFunctionFrequency) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:FREQuency?", scpi_cmd_sourceVoltageFunctionFrequencyQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:PHASeshift", scpi_cmd_sourceVoltageFunctionPhaseshift) \
@@ -294,6 +284,8 @@
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:OFFSet?", scpi_cmd_sourceVoltageFunctionOffsetQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:DUTY", scpi_cmd_sourceVoltageFunctionDuty) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:DUTY?", scpi_cmd_sourceVoltageFunctionDutyQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:SHAPe", scpi_cmd_sourceCurrentFunctionShape) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:SHAPe?", scpi_cmd_sourceCurrentFunctionShapeQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:FREQuency", scpi_cmd_sourceCurrentFunctionFrequency) \
     SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:FREQuency?", scpi_cmd_sourceCurrentFunctionFrequencyQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:PHASeshift", scpi_cmd_sourceCurrentFunctionPhaseshift) \
@@ -304,24 +296,16 @@
     SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:OFFSet?", scpi_cmd_sourceCurrentFunctionOffsetQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:DUTY", scpi_cmd_sourceCurrentFunctionDuty) \
     SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:DUTY?", scpi_cmd_sourceCurrentFunctionDutyQ) \
-    SCPI_COMMAND("SOURce:FUNCtion:FREQuency", scpi_cmd_sourceFunctionFrequency) \
-    SCPI_COMMAND("SOURce:FUNCtion:FREQuency?", scpi_cmd_sourceFunctionFrequencyQ) \
-    SCPI_COMMAND("SOURce:FUNCtion:PHASeshift", scpi_cmd_sourceFunctionPhaseshift) \
-    SCPI_COMMAND("SOURce:FUNCtion:PHASeshift?", scpi_cmd_sourceFunctionPhaseshiftQ) \
-    SCPI_COMMAND("SOURce:FUNCtion:AMPLitude", scpi_cmd_sourceFunctionAmplitude) \
-    SCPI_COMMAND("SOURce:FUNCtion:AMPLitude?", scpi_cmd_sourceFunctionAmplitudeQ) \
-    SCPI_COMMAND("SOURce:FUNCtion:OFFSet", scpi_cmd_sourceFunctionOffset) \
-    SCPI_COMMAND("SOURce:FUNCtion:OFFSet?", scpi_cmd_sourceFunctionOffsetQ) \
-    SCPI_COMMAND("SOURce:FUNCtion:DUTY", scpi_cmd_sourceFunctionDuty) \
-    SCPI_COMMAND("SOURce:FUNCtion:DUTY?", scpi_cmd_sourceFunctionDutyQ) \
+    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:MODE", scpi_cmd_sourceDigitalOutputMode) \
+    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:MODE?", scpi_cmd_sourceDigitalOutputModeQ) \
+    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe", scpi_cmd_sourceDigitalOutputFunctionShape) \
+    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe?", scpi_cmd_sourceDigitalOutputFunctionShapeQ) \
     SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency", scpi_cmd_sourceDigitalOutputFunctionFrequency) \
     SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency?", scpi_cmd_sourceDigitalOutputFunctionFrequencyQ) \
     SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift", scpi_cmd_sourceDigitalOutputFunctionPhaseshift) \
     SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift?", scpi_cmd_sourceDigitalOutputFunctionPhaseshiftQ) \
     SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:DUTY", scpi_cmd_sourceDigitalOutputFunctionDuty) \
     SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:DUTY?", scpi_cmd_sourceDigitalOutputFunctionDutyQ) \
-    SCPI_COMMAND("SOURce:FUNCtion:MODE", scpi_cmd_sourceFunctionMode) \
-    SCPI_COMMAND("SOURce:FUNCtion:MODE?", scpi_cmd_sourceFunctionModeQ) \
     SCPI_COMMAND("STATus:OPERation:CONDition?", scpi_cmd_statusOperationConditionQ) \
     SCPI_COMMAND("STATus:OPERation:ENABle", scpi_cmd_statusOperationEnable) \
     SCPI_COMMAND("STATus:OPERation:ENABle?", scpi_cmd_statusOperationEnableQ) \

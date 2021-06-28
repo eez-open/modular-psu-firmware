@@ -1432,13 +1432,6 @@ bool getResourceType(int slotIndex, int subchannelIndex, int resourceIndex, Func
 		return false;
 	}
 
-	if (g_slots[slotIndex]->getFunctionGeneratorResourceType(subchannelIndex, resourceIndex) != FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I) {
-		if (err) {
-			*err = SCPI_ERROR_QUERY_ERROR;
-		}
-		return false;
-	}
-
 	resourceType = waveformParameters->resourceType;
 
 	return true;

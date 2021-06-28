@@ -75121,85 +75121,6 @@
             }
           },
           {
-            "name": "SOURce:MODE",
-            "parameters": [
-              {
-                "name": "mode",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "TriggerModeDigitalOutput"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "SOURce:MODE?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "discrete",
-                  "enumeration": "TriggerModeDigitalOutput"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SOURce:DIGital[:OUTPut]:MODE",
-            "parameters": [
-              {
-                "name": "pin",
-                "type": [
-                  {
-                    "type": "nr1"
-                  }
-                ]
-              },
-              {
-                "name": "mode",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "TriggerModeDigitalOutput"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "SOURce:DIGital[:OUTPut]:MODE?",
-            "parameters": [
-              {
-                "name": "pin",
-                "type": [
-                  {
-                    "type": "nr1"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "discrete",
-                  "enumeration": "TriggerModeDigitalOutput"
-                }
-              ]
-            }
-          },
-          {
             "name": "[SOURce[<n>]]:VOLTage:FUNCtion:SHAPe",
             "parameters": [
               {
@@ -75226,99 +75147,6 @@
                 {
                   "type": "discrete",
                   "enumeration": "SourceFunctionShape"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:SHAPe",
-            "parameters": [
-              {
-                "name": "shape",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "SourceFunctionShape"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:SHAPe?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "discrete",
-                  "enumeration": "SourceFunctionShape"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SOURce:FUNCtion:SHAPe",
-            "parameters": [
-              {
-                "name": "shape",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "SourceFunctionShape"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "SOURce:FUNCtion:SHAPe?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "discrete",
-                  "enumeration": "SourceFunctionShape"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe",
-            "parameters": [
-              {
-                "name": "shape",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "SourceFunctionShapeDigitalOutput"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "discrete",
-                  "enumeration": "SourceFunctionShapeDigitalOutput"
                 }
               ]
             }
@@ -75469,6 +75297,37 @@
             }
           },
           {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:SHAPe",
+            "parameters": [
+              {
+                "name": "shape",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "SourceFunctionShape"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:SHAPe?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "SourceFunctionShape"
+                }
+              ]
+            }
+          },
+          {
             "name": "[SOURce[<n>]]:CURRent:FUNCtion:FREQuency",
             "parameters": [
               {
@@ -75614,13 +75473,22 @@
             }
           },
           {
-            "name": "SOURce:FUNCtion:FREQuency",
+            "name": "SOURce:DIGital[:OUTPut]:MODE",
             "parameters": [
               {
-                "name": "frequency",
+                "name": "pin",
                 "type": [
                   {
-                    "type": "nr2"
+                    "type": "nr1"
+                  }
+                ]
+              },
+              {
+                "name": "mode",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "TriggerModeDigitalOutput"
                   }
                 ]
               }
@@ -75632,24 +75500,35 @@
             }
           },
           {
-            "name": "SOURce:FUNCtion:FREQuency?",
-            "parameters": [],
+            "name": "SOURce:DIGital[:OUTPut]:MODE?",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ]
+              }
+            ],
             "response": {
               "type": [
                 {
-                  "type": "nr2"
+                  "type": "discrete",
+                  "enumeration": "TriggerModeDigitalOutput"
                 }
               ]
             }
           },
           {
-            "name": "SOURce:FUNCtion:PHASeshift",
+            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe",
             "parameters": [
               {
-                "name": "phase_shift",
+                "name": "shape",
                 "type": [
                   {
-                    "type": "nr2"
+                    "type": "discrete",
+                    "enumeration": "SourceFunctionShapeDigitalOutput"
                   }
                 ]
               }
@@ -75661,99 +75540,13 @@
             }
           },
           {
-            "name": "SOURce:FUNCtion:PHASeshift?",
+            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe?",
             "parameters": [],
             "response": {
               "type": [
                 {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SOURce:FUNCtion:AMPLitude",
-            "parameters": [
-              {
-                "name": "amplitude",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "SOURce:FUNCtion:AMPLitude?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SOURce:FUNCtion:OFFSet",
-            "parameters": [
-              {
-                "name": "offset",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "SOURce:FUNCtion:OFFSet?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SOURce:FUNCtion:DUTY",
-            "parameters": [
-              {
-                "name": "duty",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "SOURce:FUNCtion:DUTY?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
+                  "type": "discrete",
+                  "enumeration": "SourceFunctionShapeDigitalOutput"
                 }
               ]
             }
@@ -75841,37 +75634,6 @@
               "type": [
                 {
                   "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SOURce:FUNCtion:MODE",
-            "parameters": [
-              {
-                "name": "mode",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "SourceFunction"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "SOURce:FUNCtion:MODE?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "discrete",
-                  "enumeration": "SourceFunction"
                 }
               ]
             }
