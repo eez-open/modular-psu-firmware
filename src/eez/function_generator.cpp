@@ -1140,6 +1140,46 @@ bool getWaveform(int slotIndex, int subchannelIndex, int resourceIndex, Waveform
 	return true;
 }
 
+void onWaveformChanged(WaveformParameters &waveformParameters, Waveform oldWaveform, Waveform newWaveform) {
+	if (newWaveform == WAVEFORM_DC) {
+		if (oldWaveform == WAVEFORM_HALF_RECTIFIED || oldWaveform == WAVEFORM_FULL_RECTIFIED) {
+			waveformParameters.amplitude = waveformParameters.offset + waveformParameters.amplitude / 2.0f;
+		} else {
+			waveformParameters.amplitude = waveformParameters.offset;
+		}
+		waveformParameters.offset = 0;
+	} else if (oldWaveform == WAVEFORM_DC) {
+		float amplitude = waveformParameters.amplitude;
+		if (newWaveform == WAVEFORM_HALF_RECTIFIED || newWaveform == WAVEFORM_FULL_RECTIFIED) {
+			if (amplitude >= 0) {
+				waveformParameters.amplitude = amplitude;
+				waveformParameters.offset = 0;
+			} else {
+				waveformParameters.amplitude = -amplitude;
+				waveformParameters.offset = amplitude;
+			}
+		} else {
+			if (amplitude >= 0) {
+				waveformParameters.amplitude = waveformParameters.offset = amplitude / 2.0f;
+			} else {
+				waveformParameters.amplitude = -amplitude / 2.0f;
+				waveformParameters.offset = amplitude / 2.0f;
+			}
+		}
+	} else if (
+		!(oldWaveform == WAVEFORM_HALF_RECTIFIED || oldWaveform == WAVEFORM_FULL_RECTIFIED) &&
+		(newWaveform == WAVEFORM_HALF_RECTIFIED || newWaveform == WAVEFORM_FULL_RECTIFIED)
+	) {
+		waveformParameters.offset -= waveformParameters.amplitude / 2;
+	} else if (
+		(oldWaveform == WAVEFORM_HALF_RECTIFIED || oldWaveform == WAVEFORM_FULL_RECTIFIED) &&
+		!(newWaveform == WAVEFORM_HALF_RECTIFIED || newWaveform == WAVEFORM_FULL_RECTIFIED)
+	) {
+		waveformParameters.offset += waveformParameters.amplitude / 2;
+	}
+
+}
+
 bool setWaveform(int slotIndex, int subchannelIndex, int resourceIndex, Waveform waveform, int *err) {
 	if (!addChannelWaveformParameters(slotIndex, subchannelIndex, resourceIndex, err)) {
 		return false;
@@ -1165,9 +1205,7 @@ bool setWaveform(int slotIndex, int subchannelIndex, int resourceIndex, Waveform
 	
 	waveformParameters->waveform = newWaveform;
 
-	if (newWaveform == WAVEFORM_DC) {
-		waveformParameters->offset = 0;
-	}
+	onWaveformChanged(*waveformParameters, oldWaveform, newWaveform);
 	
 	g_functionGeneratorPage.init();
 
@@ -1296,8 +1334,6 @@ bool setAmplitude(int slotIndex, int subchannelIndex, int resourceIndex, float a
 	float max;
 	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters->resourceType, min, max);
 
-	float range = max - min;
-
 	if (waveformParameters->waveform == WAVEFORM_DC) {
 		if (amplitude < min || amplitude > max) {
 			if (err) {
@@ -1305,10 +1341,15 @@ bool setAmplitude(int slotIndex, int subchannelIndex, int resourceIndex, float a
 			}
 			return false;
 		}
+	} else if (waveformParameters->waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters->waveform == WAVEFORM_FULL_RECTIFIED) {
+		if (waveformParameters->offset + amplitude > max) {
+			if (err) {
+				*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+			}
+			return false;
+		}
 	} else {
-		float maxAmplitude = range;
-
-		if (amplitude < 0 || amplitude > maxAmplitude) {
+		if (waveformParameters->offset - amplitude / 2.0f < min || waveformParameters->offset + amplitude / 2.0f > max) {
 			if (err) {
 				*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
 			}
@@ -1363,17 +1404,33 @@ bool setOffset(int slotIndex, int subchannelIndex, int resourceIndex, float offs
 		return false;
 	}
 
+	if (waveformParameters->waveform == WAVEFORM_DC) {
+		if (err) {
+			*err = SCPI_ERROR_EXECUTION_ERROR;
+		}
+		return false;
+	}
+
 	float min;
 	float max;
 	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters->resourceType, min, max);
 
-	if (offset < min || offset > max) {
-		if (err) {
-			*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+	if (waveformParameters->waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters->waveform == WAVEFORM_FULL_RECTIFIED) {
+		if (offset + waveformParameters->amplitude > max) {
+			if (err) {
+				*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+			}
+			return false;
 		}
-		return false;
+	} else {
+		if (offset - waveformParameters->amplitude / 2.0f < min || offset + waveformParameters->amplitude / 2.0f > max) {
+			if (err) {
+				*err = SCPI_ERROR_DATA_OUT_OF_RANGE;
+			}
+			return false;
+		}
 	}
-	
+
 	waveformParameters->offset = offset;
 
 	g_functionGeneratorPage.init();
@@ -1498,7 +1555,15 @@ bool isActive() {
 }
 
 float getMax(WaveformParameters &waveformParameters) {
-	return waveformParameters.waveform == WAVEFORM_DC ? waveformParameters.amplitude : waveformParameters.offset + waveformParameters.amplitude / 2.0f;
+	if (waveformParameters.waveform == WAVEFORM_DC) {
+		return waveformParameters.amplitude;
+	}
+	
+	if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
+		return waveformParameters.offset + waveformParameters.amplitude;
+	}
+
+	return waveformParameters.offset + waveformParameters.amplitude / 2.0f;
 }
 
 int checkLimits(int iChannel) {
@@ -2094,44 +2159,8 @@ void setWaveform(uint16_t value) {
 	}
 
 	waveformParameters.waveform = newWaveform;
-
-	if (newWaveform == WAVEFORM_DC) {
-		if (oldWaveform == WAVEFORM_HALF_RECTIFIED || oldWaveform == WAVEFORM_FULL_RECTIFIED) {
-			waveformParameters.amplitude = waveformParameters.offset + waveformParameters.amplitude / 2.0f;
-		} else {
-			waveformParameters.amplitude = waveformParameters.offset;
-		}
-		waveformParameters.offset = 0;
-	} else if (oldWaveform == WAVEFORM_DC) {
-		float amplitude = waveformParameters.amplitude;
-		if (newWaveform == WAVEFORM_HALF_RECTIFIED || newWaveform == WAVEFORM_FULL_RECTIFIED) {
-			if (amplitude >= 0) {
-				waveformParameters.amplitude = amplitude;
-				waveformParameters.offset = 0;
-			} else {
-				waveformParameters.amplitude = -amplitude;
-				waveformParameters.offset = amplitude;
-			}
-		} else {
-			if (amplitude >= 0) {
-				waveformParameters.amplitude = waveformParameters.offset = amplitude / 2.0f;
-			} else {
-				waveformParameters.amplitude = -amplitude / 2.0f;
-				waveformParameters.offset = amplitude / 2.0f;
-			}
-		}
-	} else if (
-		!(oldWaveform == WAVEFORM_HALF_RECTIFIED || oldWaveform == WAVEFORM_FULL_RECTIFIED) &&
-		(newWaveform == WAVEFORM_HALF_RECTIFIED || newWaveform == WAVEFORM_FULL_RECTIFIED)
-	) {
-		waveformParameters.offset -= waveformParameters.amplitude / 2;
-	} else if (
-		(oldWaveform == WAVEFORM_HALF_RECTIFIED || oldWaveform == WAVEFORM_FULL_RECTIFIED) &&
-		!(newWaveform == WAVEFORM_HALF_RECTIFIED || newWaveform == WAVEFORM_FULL_RECTIFIED)
-	) {
-		waveformParameters.offset += waveformParameters.amplitude / 2;
-	}
-
+	onWaveformChanged(waveformParameters, oldWaveform, newWaveform);
+	
 	g_functionGeneratorPage.apply();
 }
 
@@ -2329,6 +2358,7 @@ void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cur
 }
 
 void data_function_generator_amplitude(DataOperationEnum operation, Cursor cursor, Value &value) {
+	// ... or minumum
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
 	int slotIndex;
@@ -2365,21 +2395,27 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 		if (waveformParameters.waveform == WAVEFORM_DC) {
 			value = MakeValue(min, unit);
 		} else if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
-			float maxValue = waveformParameters.offset + waveformParameters.amplitude;
-			value = MakeValue(g_options.isAmpl ? 0 : MAX(maxValue - range, min), unit);
+			value = MakeValue(g_options.isAmpl ? 0 : min, unit);
 		} else {
-			float maxValue = waveformParameters.offset + waveformParameters.amplitude / 2;
-			value = MakeValue(g_options.isAmpl ? 0 : MAX(maxValue - range, 2 * min - maxValue), unit);
+			value = MakeValue(g_options.isAmpl ? 0 : min, unit);
 		}
 	} else if (operation == DATA_OPERATION_GET_MAX) {
 		if (waveformParameters.waveform == WAVEFORM_DC) {
 			value = MakeValue(max, unit);
 		} else if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
-			float maxValue = waveformParameters.offset + waveformParameters.amplitude;
-			value = MakeValue(g_options.isAmpl ? range : MIN(maxValue, max), unit);
+			value = MakeValue(
+				g_options.isAmpl ?
+					max - waveformParameters.offset : 
+					waveformParameters.offset + waveformParameters.amplitude,
+				unit
+			);
 		} else {
-			float maxValue = waveformParameters.offset + waveformParameters.amplitude / 2;
-			value = MakeValue(g_options.isAmpl ? range : MIN(maxValue, 2 * max - maxValue), unit);
+			value = MakeValue(
+				g_options.isAmpl ? 
+					2.0f * MIN(waveformParameters.offset - min, max - waveformParameters.offset) : 
+					waveformParameters.offset + waveformParameters.amplitude / 2,
+				unit
+			);
 		}
 	} else if (operation == DATA_OPERATION_GET_NAME) {
 		value = g_options.isAmpl ? "Amplitude" : "Minimum";
@@ -2421,6 +2457,7 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 }
 
 void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
+	// ... or maximum
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
 	int slotIndex;
@@ -2455,15 +2492,27 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 		if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
 			value = MakeValue(g_options.isAmpl ? min : waveformParameters.offset, unit);
 		} else {
-			float minValue = waveformParameters.offset - waveformParameters.amplitude / 2;
-			value = MakeValue(g_options.isAmpl ? min : MAX(minValue, 2 * min - minValue), unit);
+			value = MakeValue(
+				g_options.isAmpl ? 
+					min + waveformParameters.amplitude / 2.0f : 
+					waveformParameters.offset - waveformParameters.amplitude / 2,
+				unit
+			);
 		}
 	} else if (operation == DATA_OPERATION_GET_MAX) {
 		if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
-			value = MakeValue(g_options.isAmpl ? max : waveformParameters.offset + range, unit);
+			value = MakeValue(
+				g_options.isAmpl ? 
+					max - waveformParameters.amplitude : 
+					max,
+				unit
+			);
 		} else {
-			float minValue = waveformParameters.offset - waveformParameters.amplitude / 2;
-			value = MakeValue(g_options.isAmpl ? max : MIN(minValue + range, 2 * max - minValue), unit);
+			value = MakeValue(
+				g_options.isAmpl ?
+					max - waveformParameters.amplitude / 2.0f :
+					max,
+				unit);
 		}
 	} else if (operation == DATA_OPERATION_GET_NAME) {
 		value = g_options.isAmpl ? "Offset" : "Maximum";
