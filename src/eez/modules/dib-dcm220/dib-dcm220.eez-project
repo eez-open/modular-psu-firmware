@@ -717,7 +717,7 @@
                     "inheritFrom": "encoder_cursor_14_enabled",
                     "font": "Oswald17"
                   },
-                  "text": "\\u00b5"
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -1142,7 +1142,7 @@
                     "inheritFrom": "encoder_cursor_14_enabled",
                     "font": "Oswald17"
                   },
-                  "text": "\\u00b5"
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -1547,7 +1547,7 @@
                     "inheritFrom": "encoder_cursor_14_enabled",
                     "font": "Oswald17"
                   },
-                  "text": "\\u00b5"
+                  "text": "\\u00c2"
                 }
               ]
             },
@@ -1952,7 +1952,7 @@
                     "inheritFrom": "encoder_cursor_14_enabled",
                     "font": "Oswald17"
                   },
-                  "text": "\\u00b5"
+                  "text": "\\u00c2"
                 }
               ]
             },
