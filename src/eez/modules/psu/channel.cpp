@@ -1597,7 +1597,7 @@ float DisplayValue::getRange(Channel *channel) {
         return channel_dispatcher::getPowerMaxLimit(*channel);
     }
     
-    if (scale == DISPLAY_VALUE_SCALE_LIMIT) {
+    if (scale == DISPLAY_VALUE_SCALE_LIMIT || (scale == DISPLAY_VALUE_SCALE_AUTO && channel->getVoltageTriggerMode() != TRIGGER_MODE_FIXED)) {
         if (type == DISPLAY_VALUE_VOLTAGE) {
             return channel_dispatcher::getULimit(*channel);
         }
