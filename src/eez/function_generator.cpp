@@ -1498,7 +1498,7 @@ bool isActive() {
 }
 
 float getMax(WaveformParameters &waveformParameters) {
-	return waveformParameters.offset + waveformParameters.amplitude / 2.0f;
+	return waveformParameters.waveform == WAVEFORM_DC ? waveformParameters.amplitude : waveformParameters.offset + waveformParameters.amplitude / 2.0f;
 }
 
 int checkLimits(int iChannel) {
@@ -1694,7 +1694,7 @@ void tick() {
 			if (!io_pins::isInhibited()) {
 				if (channel.isVoltageLimitExceeded(value)) {
 					g_errorChannelIndex = channel.channelIndex;
-					generateError(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED);
+					psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED));
 					trigger::abort();
 					return;
 				}
@@ -1702,7 +1702,7 @@ void tick() {
 				int err;
 				if (channel.isPowerLimitExceeded(value, channel.i.set, &err)) {
 					g_errorChannelIndex = channel.channelIndex;
-					generateError(err);
+					psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(err));
 					trigger::abort();
 					return;
 				}
@@ -1723,7 +1723,7 @@ void tick() {
 			if (!io_pins::isInhibited()) {
 				if (channel.isCurrentLimitExceeded(value)) {
 					g_errorChannelIndex = channel.channelIndex;
-					generateError(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED);
+					psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED));
 					trigger::abort();
 					return;
 				}
@@ -1731,7 +1731,7 @@ void tick() {
 				int err;
 				if (channel.isPowerLimitExceeded(channel.u.set, value, &err)) {
 					g_errorChannelIndex = channel.channelIndex;
-					generateError(err);
+					psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(err));
 					trigger::abort();
 					return;
 				}

@@ -631,7 +631,7 @@ void tick() {
 
                     int err;
                     if (!setListValue(channel, g_execution[i].it, &err)) {
-                        generateError(err);
+						psu::gui::psuErrorMessage(channelIndex, MakeScpiErrorValue(err));
                         setActive(false);
                         trigger::abort();
                         return;
