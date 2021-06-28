@@ -360,7 +360,7 @@ struct DcpChannel : public Channel {
 			fallingEdge =
 				(int32_t(fallingEdgeTimeout - millis()) > 0) ||
 				(fallingEdgePreviousUMonAdc > u.mon_adc) ||
-				(u.mon_adc > uSet * (1.0f + CONF_FALLING_EDGE_OVP_PERCENTAGE / 100.0f));
+				(u.mon_adc > u.set * (1.0f + CONF_FALLING_EDGE_OVP_PERCENTAGE / 100.0f));
 
 			if (fallingEdge) {
 				fallingEdgePreviousUMonAdc = u.mon_adc;
@@ -383,13 +383,13 @@ struct DcpChannel : public Channel {
 				ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
 			}
 
-			// Check continuously output voltage when output is enabled if OVP HW is not enabled.
+			// Check continuously output voltage when output is enabled if OVP is not enabled.
 			// If U_MON is higher then U_SET for more then 3% automatically switch off output and display popup.
 			if (!prot_conf.flags.u_state && !isRemoteProgrammingEnabled() && u.set > 0.3f && u.mon_last > u.set * 1.03f) {
 				if (!fallingEdge) {
+					DebugTrace("U_MON (%.4f) is more then 3%% above U_SET (%.4f), difference is: %.4f\n", u.mon_last, u.set, u.mon_last - u.set * 1.03f);
 					channel_dispatcher::outputEnable(*this, false);
 					generateChannelError(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED, channelIndex);
-					g_slots[slotIndex]->setTestResult(TEST_FAILED);
 					return;
 				}
 			}

@@ -4937,13 +4937,6 @@ public:
 		if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
 			min = 0;
 			max = 1.0f;
-
-			if (stepValues) {
-				static float values[] = { 0.001f, 0.05f, 0.1f, 0.2f };
-				stepValues->values = values;
-				stepValues->count = sizeof(values) / sizeof(float);
-				stepValues->unit = UNIT_HERTZ;
-			}
 		} else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
             if (resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {

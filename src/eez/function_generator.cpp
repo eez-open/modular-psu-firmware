@@ -2335,7 +2335,7 @@ void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cur
 }
 
 void data_function_generator_amplitude(DataOperationEnum operation, Cursor cursor, Value &value) {
-	// ... or minumum
+	// ... or minimum
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
 	int slotIndex;
@@ -2345,7 +2345,8 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 		slotIndex, subchannelIndex, resourceIndex);
 	float min;
 	float max;
-	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, min, max);
+	StepValues stepValues;
+	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, min, max, &stepValues);
 
 	float range = max - min;
 
@@ -2365,6 +2366,7 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 			} else {
 				value = MakeValue(g_options.isAmpl ? waveformParameters.amplitude : (waveformParameters.offset - waveformParameters.amplitude / 2.0f), unit);
 			}
+			value.float_ = roundPrec(value.float_, stepValues.values[0]);
 		}
 	} else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
 		value = 0;
@@ -2399,16 +2401,16 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
 		value = unit;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		StepValues *stepValues = value.getStepValues();
+		StepValues *pStepValues = value.getStepValues();
 
-		g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, min, max, stepValues);
+		memcpy(pStepValues, &stepValues, sizeof(stepValues));
 
-		stepValues->encoderSettings.accelerationEnabled = true;
+		pStepValues->encoderSettings.accelerationEnabled = true;
 
-		stepValues->encoderSettings.range = range;
-		stepValues->encoderSettings.step = stepValues->values[0];
+		pStepValues->encoderSettings.range = range;
+		pStepValues->encoderSettings.step = pStepValues->values[0];
 
-		stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_functionGeneratorAmplitudeEncoderMode;
+		pStepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_functionGeneratorAmplitudeEncoderMode;
 
 		value = 1;
 	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
@@ -2444,7 +2446,8 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 		slotIndex, subchannelIndex, resourceIndex);
 	float min;
 	float max;
-	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, min, max);
+	StepValues stepValues;
+	g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, min, max, &stepValues);
 
 	float range = max - min;
 
@@ -2462,6 +2465,7 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 			} else {
 				value = MakeValue(g_options.isAmpl ? waveformParameters.offset : (waveformParameters.offset + waveformParameters.amplitude / 2.0f), unit);
 			}
+			value.float_ = roundPrec(value.float_, stepValues.values[0]);
 		}
 	} else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
 		value = 0;
@@ -2496,16 +2500,16 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
 		value = unit;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		StepValues *stepValues = value.getStepValues();
+		StepValues *pStepValues = value.getStepValues();
 
-		g_slots[slotIndex]->getFunctionGeneratorAmplitudeInfo(subchannelIndex, resourceIndex, waveformParameters.resourceType, min, max, stepValues);
+		memcpy(pStepValues, &stepValues, sizeof(stepValues));
 
-		stepValues->encoderSettings.accelerationEnabled = true;
+		pStepValues->encoderSettings.accelerationEnabled = true;
 
-		stepValues->encoderSettings.range = range;
-		stepValues->encoderSettings.step = stepValues->values[0];
+		pStepValues->encoderSettings.range = range;
+		pStepValues->encoderSettings.step = pStepValues->values[0];
 
-		stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_functionGeneratorOffsetEncoderMode;
+		pStepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_functionGeneratorOffsetEncoderMode;
 
 		value = 1;
 	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
