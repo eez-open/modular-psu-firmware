@@ -408,7 +408,27 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
         delay -= PROT_DELAY_CORRECTION;
     } else if (IS_OCP_VALUE(this, cpv)) {
         state = prot_conf.flags.i_state;
-        condition = channel_dispatcher::getIMonLast(*this) >= channel_dispatcher::getISet(*this);
+
+        // We have the following problem: if OCP is enabled (i.e. e-fuse feature), it is possible that it will never trip
+        // because of tiny difference between I_SET and I_MON despite the fact that channel is calibrated.
+        // That difference could be a result of rounding and e.g. for I_SET of 2 A, a I_MON of 1.9995 mA will be measured
+        // and protection will never trip which could be fatal in some cases.
+        // To avoid this potential problem in case when OCP is enabled we can use 0.1% lower trip level then I_SET or difference
+        // of e.g. min 0.5 mA on high range and min 5 uA on low range.
+        float i_set = channel_dispatcher::getISet(*this);
+        float i_trip_diff = 0.001f * channel_dispatcher::getISet(*this);
+        if (flags.currentCurrentRange == CURRENT_RANGE_HIGH) {
+            if (i_trip_diff < 0.0005) {
+                i_trip_diff = 0.0005f;
+            }
+        } else {
+            if (i_trip_diff < 0.000005f) {
+                i_trip_diff = 0.000005f;
+            }
+        }
+        float i_trip = i_set - i_trip_diff;
+
+        condition = channel_dispatcher::getIMonLast(*this) >= i_trip;
         delay = prot_conf.i_delay;
         delay -= PROT_DELAY_CORRECTION;
     } else {
