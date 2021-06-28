@@ -194,6 +194,10 @@ struct ChannelParams {
     uint32_t ADC_MAX;
 
     float U_RAMP_DURATION_MIN_VALUE;
+
+    float OCP_TRIP_LEVEL_PERCENT;
+    float OCP_TRIP_LEVEL_PERCENT_MIN_VALUE_HIGH_RANGE;
+    float OCP_TRIP_LEVEL_PERCENT_MIN_VALUE_LOW_RANGE;
 };
 
 /// Runtime protection binary flags (alarmed, tripped)

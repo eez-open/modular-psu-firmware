@@ -2737,6 +2737,11 @@
       "name": "trigger_initiate_all",
       "type": "boolean",
       "defaultValue": "1"
+    },
+    {
+      "name": "channel_ocp_trip_level_info",
+      "type": "string",
+      "defaultValue": "Trip level = 99.9% of Iset"
     }
   ],
   "actions": [
@@ -14912,10 +14917,11 @@
               "width": 243,
               "height": 32,
               "wireID": "51e53b91-1393-42d0-d91b-230e54d8981f",
+              "data": "channel_ocp_trip_level_info",
               "style": {
                 "inheritFrom": "edit_value_M_left"
               },
-              "text": "Trip level = 99.9% of Iset"
+              "text": ""
             },
             {
               "type": "Text",

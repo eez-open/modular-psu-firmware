@@ -183,6 +183,9 @@ struct DcmChannel : public Channel {
 		I_MAX_FOR_REMAP = 4.1667f;
 
 		params.U_RAMP_DURATION_MIN_VALUE = 0.002f;
+
+        params.OCP_TRIP_LEVEL_PERCENT = 90.0f;
+		params.OCP_TRIP_LEVEL_PERCENT_MIN_VALUE_HIGH_RANGE = 0.1f;
 	}
 
     void onPowerDown() override;

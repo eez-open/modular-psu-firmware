@@ -1178,6 +1178,14 @@ void MASS_STORAGE_DEVICE_LABEL_value_to_text(const Value &value, char *text, int
 	}
 }
 
+bool compare_OCP_TRIP_LEVEL_INFO_value(const Value &a, const Value &b) {
+    return a.getFloat() == b.getFloat();
+}
+
+void OCP_TRIP_LEVEL_INFO_value_to_text(const Value &value, char *text, int count) {
+    snprintf(text, count, "Trip level = %g%% of Iset", value.getFloat());
+}
+
 static Cursor g_editValueCursor(-1);
 static int16_t g_editValueDataId;
 
@@ -2462,6 +2470,13 @@ void data_channel_protection_ocp_state(DataOperationEnum operation, Cursor curso
             value = page->state;
         }
     }
+}
+
+void data_channel_ocp_trip_level_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+        value.float_ = g_channel->params.OCP_TRIP_LEVEL_PERCENT;
+        value.type_ = VALUE_TYPE_OCP_TRIP_LEVEL_INFO;
+	}
 }
 
 void data_channel_protection_ocp_delay(DataOperationEnum operation, Cursor cursor, Value &value) {

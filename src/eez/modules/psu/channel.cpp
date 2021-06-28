@@ -416,14 +416,14 @@ void Channel::protectionCheck(ProtectionValue &cpv) {
         // To avoid this potential problem in case when OCP is enabled we can use 0.1% lower trip level then I_SET or difference
         // of e.g. min 0.5 mA on high range and min 5 uA on low range.
         float i_set = channel_dispatcher::getISet(*this);
-        float i_trip_diff = 0.001f * channel_dispatcher::getISet(*this);
+        float i_trip_diff = (100.0f - params.OCP_TRIP_LEVEL_PERCENT) / 100.0f * channel_dispatcher::getISet(*this);
         if (flags.currentCurrentRange == CURRENT_RANGE_HIGH) {
-            if (i_trip_diff < 0.0005) {
-                i_trip_diff = 0.0005f;
+            if (i_trip_diff < params.OCP_TRIP_LEVEL_PERCENT_MIN_VALUE_HIGH_RANGE) {
+                i_trip_diff = params.OCP_TRIP_LEVEL_PERCENT_MIN_VALUE_HIGH_RANGE;
             }
         } else {
-            if (i_trip_diff < 0.000005f) {
-                i_trip_diff = 0.000005f;
+            if (i_trip_diff < params.OCP_TRIP_LEVEL_PERCENT_MIN_VALUE_LOW_RANGE) {
+                i_trip_diff = params.OCP_TRIP_LEVEL_PERCENT_MIN_VALUE_LOW_RANGE;
             }
         }
         float i_trip = i_set - i_trip_diff;

@@ -194,6 +194,10 @@ struct DcpChannel : public Channel {
 		params.ADC_MAX = AnalogDigitalConverter::ADC_MAX;
 
 		params.U_RAMP_DURATION_MIN_VALUE = moduleRevision <= MODULE_REVISION_DCP405_R2B11 ? 0.004f : 0.002f;
+
+		params.OCP_TRIP_LEVEL_PERCENT = 99.9f;
+		params.OCP_TRIP_LEVEL_PERCENT_MIN_VALUE_HIGH_RANGE = 0.0005f;
+		params.OCP_TRIP_LEVEL_PERCENT_MIN_VALUE_LOW_RANGE = 0.000005f;
 	}
 
 	void init() {
