@@ -2416,16 +2416,17 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
 		eez::psu::gui::edit_mode_step::g_functionGeneratorAmplitudeEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
+		float amplitude = roundPrec(value.getFloat(), stepValues.values[0]);
 		if (g_options.isAmpl || waveformParameters.waveform == WAVEFORM_DC) {
-			waveformParameters.amplitude = value.getFloat();
+			waveformParameters.amplitude = amplitude;
 		} else {
 			if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
-				float min = value.getFloat();
+				float min = amplitude;
 				float max = waveformParameters.offset + waveformParameters.amplitude;
 				waveformParameters.offset = min;
 				waveformParameters.amplitude = max - min;
 			} else {
-				float min = value.getFloat();
+				float min = amplitude;
 				float max = waveformParameters.offset + waveformParameters.amplitude / 2.0f;
 				waveformParameters.amplitude = max - min;
 				waveformParameters.offset = (min + max) / 2.0f;
@@ -2515,14 +2516,15 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
 		eez::psu::gui::edit_mode_step::g_functionGeneratorOffsetEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
+		float offset = roundPrec(value.getFloat(), stepValues.values[0]);
 		if (g_options.isAmpl) {
-			waveformParameters.offset = value.getFloat();
+			waveformParameters.offset = offset;
 		} else {
 			if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
-				waveformParameters.amplitude = value.getFloat() - waveformParameters.offset;
+				waveformParameters.amplitude = offset - waveformParameters.offset;
 			} else {
 				float min = waveformParameters.offset - waveformParameters.amplitude / 2.0f;
-				float max = value.getFloat();
+				float max = offset;
 				waveformParameters.amplitude = max - min;
 				waveformParameters.offset = (min + max) / 2.0f;
 			}
