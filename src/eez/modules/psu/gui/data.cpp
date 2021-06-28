@@ -4928,31 +4928,31 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
             }
 
             if (isDlogVisible) {
-                state |= 0x8000;
+                state |= 1 << 8;
             }
 
             if (isScriptVisible) {
-                state |= 0x4000;
+                state |= 1 << 9;
             }
 
             if (isFunctionGeneratorVisible) {
-                state |= 0x10000;
+                state |= 1 << 10;
             }
 
 			if (isMinimized) {
-				state |= 0x20000;
+				state |= 1 << 11;
 			}
 
 			if (isDC) {
-				state |= 0x40000;
+				state |= 1 << 12;
 			}
 
 			if (hasModeSelect) {
-				state |= 0x40000;
+				state |= 1 << 13;
 			}
 
 			if (hasDutyCycle) {
-				state |= 0x160000;
+				state |= 1 << 14;
 			}
 		}
 
