@@ -155,7 +155,6 @@ AllResources::ResourceAddress AllResources::g_resources[64];
 
 struct SelectedResources {
 	WaveformParameters m_waveformParameters[MAX_NUM_WAVEFORMS];
-	TriggerMode m_triggerModes[MAX_NUM_WAVEFORMS];
 	int m_numResources = 0;
 
 	int findResource(int absoluteResourceIndex) {
@@ -300,14 +299,6 @@ public:
 	bool m_initialized = false;
 
 	void init() {
-		for (int i = 0; i < g_selectedResources.m_numResources; i++) {
-			int slotIndex;
-			int subchannelIndex;
-			int resourceIndex;
-			AllResources::findResource(g_selectedResources.m_waveformParameters[i].absoluteResourceIndex, slotIndex, subchannelIndex, resourceIndex);
-			g_slots[slotIndex]->getFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, g_selectedResources.m_triggerModes[i], nullptr);
-		}
-
 		memcpy(&m_selectedResources, &g_selectedResources, sizeof(g_selectedResources));
 
 		m_initialized = true;
@@ -341,47 +332,40 @@ public:
 	void apply() {
 		bool triggerAbortCalled = false;
 
-		for (int i = 0; i < g_selectedResources.m_numResources; ) {
-			if (g_selectedResources.m_triggerModes[i] == TRIGGER_MODE_FUNCTION_GENERATOR) {
-				int j = m_selectedResources.findResource(g_selectedResources.m_waveformParameters[i].absoluteResourceIndex);
-				if (j == -1 || m_selectedResources.m_triggerModes[i] != TRIGGER_MODE_FUNCTION_GENERATOR) {
-					int slotIndex;
-					int subchannelIndex;
-					int resourceIndex;
-					AllResources::findResource(g_selectedResources.m_waveformParameters[i].absoluteResourceIndex, slotIndex, subchannelIndex, resourceIndex);
-
-					if (!triggerAbortCalled) {
-						triggerAbortCalled = true;
-						trigger::abort();
-					}
-
-					g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, TRIGGER_MODE_FIXED, nullptr);
-					continue;
-				}
-			}
-
-			i++;
-		}
-
-		memcpy(&g_selectedResources, &m_selectedResources, sizeof(g_selectedResources));
-
 		for (int i = 0; i < g_selectedResources.m_numResources; i++) {
-			if (g_selectedResources.m_triggerModes[i] == TRIGGER_MODE_FUNCTION_GENERATOR) {
+			int j = m_selectedResources.findResource(g_selectedResources.m_waveformParameters[i].absoluteResourceIndex);
+			if (j == -1) {
 				int slotIndex;
 				int subchannelIndex;
 				int resourceIndex;
 				AllResources::findResource(g_selectedResources.m_waveformParameters[i].absoluteResourceIndex, slotIndex, subchannelIndex, resourceIndex);
 
-				TriggerMode triggerMode;
-				g_slots[slotIndex]->getFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, triggerMode, nullptr);
-				if (triggerMode != TRIGGER_MODE_FUNCTION_GENERATOR) {
-					if (!triggerAbortCalled) {
-						triggerAbortCalled = true;
-						trigger::abort();
-					}
-
-					g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, TRIGGER_MODE_FUNCTION_GENERATOR, nullptr);
+				if (!triggerAbortCalled) {
+					triggerAbortCalled = true;
+					trigger::abort();
 				}
+
+				g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, TRIGGER_MODE_FIXED, nullptr);
+			}
+		}
+
+		memcpy(&g_selectedResources, &m_selectedResources, sizeof(g_selectedResources));
+
+		for (int i = 0; i < g_selectedResources.m_numResources; i++) {
+			int slotIndex;
+			int subchannelIndex;
+			int resourceIndex;
+			AllResources::findResource(g_selectedResources.m_waveformParameters[i].absoluteResourceIndex, slotIndex, subchannelIndex, resourceIndex);
+
+			TriggerMode triggerMode;
+			g_slots[slotIndex]->getFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, triggerMode, nullptr);
+			if (triggerMode != TRIGGER_MODE_FUNCTION_GENERATOR) {
+				if (!triggerAbortCalled) {
+					triggerAbortCalled = true;
+					trigger::abort();
+				}
+
+				g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, TRIGGER_MODE_FUNCTION_GENERATOR, nullptr);
 			}
 		}
 
@@ -415,10 +399,6 @@ public:
 		int numDigital = 0;
 
 		for (int i = 0; i < m_selectedResources.m_numResources; i++) {
-			if (m_selectedResources.m_triggerModes[i] != TRIGGER_MODE_FUNCTION_GENERATOR) {
-				continue;
-			}
-
 			auto &waveformParameters = m_selectedResources.m_waveformParameters[i];
 
 			if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
@@ -450,10 +430,16 @@ public:
 				}
 			}
 
-			float t = 2 * (1 / waveformParameters.frequency);
-			if (t > T) {
-				T = t;
+			if (waveformParameters.waveform != WAVEFORM_DC) {
+				float t = 2 * (1 / waveformParameters.frequency);
+				if (t > T) {
+					T = t;
+				}
 			}
+		}
+
+		if (T == FLT_MIN) {
+			T = 1.0f;
 		}
 
 		float dU = maxU - minU;
@@ -484,13 +470,6 @@ public:
 				continue;
 			}
 
-			if (m_selectedResources.m_triggerModes[i] != TRIGGER_MODE_FUNCTION_GENERATOR) {
-				if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
-					digitalIndex++;
-				}
-				continue;
-			}
-
 			if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
 				auto digitalWaveformParameters = waveformParameters;
 
@@ -508,24 +487,21 @@ public:
 			}
 		}
 
-		auto triggerMode = m_selectedResources.m_triggerModes[m_selectedItem];
-		if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-			auto &waveformParameters = m_selectedResources.m_waveformParameters[m_selectedItem];
+		auto &waveformParameters = m_selectedResources.m_waveformParameters[m_selectedItem];
 
-			if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
-				auto digitalWaveformParameters = waveformParameters;
+		if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL) {
+			auto digitalWaveformParameters = waveformParameters;
 
-				digitalWaveformParameters.offset = ((numDigital - selectedItemDigitalIndex - 1) + 0.5f) / numDigital;
-				digitalWaveformParameters.amplitude = 1.0f / numDigital - 4.0f / 118.0f;
+			digitalWaveformParameters.offset = ((numDigital - selectedItemDigitalIndex - 1) + 0.5f) / numDigital;
+			digitalWaveformParameters.amplitude = 1.0f / numDigital - 4.0f / 118.0f;
 
-				drawWaveform(widgetCursor, digitalWaveformParameters, T, 0, 1.0f, true);
-				drawWaveform(widgetCursor, digitalWaveformParameters, T, 0, 1.0f, true, 1);
-			} else {
-				float min = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? minU : minI;
-				float max = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? maxU : maxI;
-				drawWaveform(widgetCursor, waveformParameters, T, min, max, true);
-				drawWaveform(widgetCursor, waveformParameters, T, min, max, true, 1);
-			}
+			drawWaveform(widgetCursor, digitalWaveformParameters, T, 0, 1.0f, true);
+			drawWaveform(widgetCursor, digitalWaveformParameters, T, 0, 1.0f, true, 1);
+		} else {
+			float min = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? minU : minI;
+			float max = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? maxU : maxI;
+			drawWaveform(widgetCursor, waveformParameters, T, min, max, true);
+			drawWaveform(widgetCursor, waveformParameters, T, min, max, true, 1);
 		}
 	}
 
@@ -730,12 +706,10 @@ public:
 
 				if (j != -1) {
 					memcpy(&selectedResources.m_waveformParameters[i], &g_functionGeneratorPage.m_selectedResources.m_waveformParameters[j], sizeof(WaveformParameters));
-					selectedResources.m_triggerModes[i] = g_functionGeneratorPage.m_selectedResources.m_triggerModes[j];
 				} else {
 					auto &waveformParameters = selectedResources.m_waveformParameters[i];
 					waveformParameters.absoluteResourceIndex = absoluteResourceIndex;
 					initWaveformParameters(waveformParameters);
-					selectedResources.m_triggerModes[i] = TRIGGER_MODE_FUNCTION_GENERATOR;
 				}
 
 				i++;
@@ -880,6 +854,14 @@ void setProfileParameters(const psu::profile::Parameters &profileParams) {
 				break;
 			}
 
+			TriggerMode triggerMode;
+			if (!channel_dispatcher::getTriggerMode(profileWaveformParameters.slotIndex, profileWaveformParameters.subchannelIndex, profileWaveformParameters.resourceIndex, triggerMode, nullptr)) {
+				break;
+			}
+			if (triggerMode != TRIGGER_MODE_FUNCTION_GENERATOR) {
+				break;
+			}
+
 			auto &waveformParameters = g_selectedResources.m_waveformParameters[j];
 
 			waveformParameters.absoluteResourceIndex = absoluteResourceIndex;
@@ -894,6 +876,22 @@ void setProfileParameters(const psu::profile::Parameters &profileParams) {
 			waveformParameters.dutyCycle = profileWaveformParameters.dutyCycle;
 
 			j++;
+		}
+	}
+
+	for (int i = 0; i < AllResources::getNumResources(); i++) {
+		int slotIndex;
+		int subchannelIndex;
+		int resourceIndex;
+		AllResources::findResource(i, slotIndex, subchannelIndex, resourceIndex);
+
+		TriggerMode triggerMode;
+		if (channel_dispatcher::getTriggerMode(slotIndex, subchannelIndex, resourceIndex, triggerMode, nullptr)) {
+			if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+				if (!g_selectedResources.findResource(i)) {
+					channel_dispatcher::setTriggerMode(slotIndex, subchannelIndex, resourceIndex, TRIGGER_MODE_FIXED, nullptr);
+				}
+			}
 		}
 	}
 
@@ -2021,14 +2019,8 @@ void action_function_generator_item_toggle_selected() {
 }
 
 void data_function_generator_item_is_checked(DataOperationEnum operation, Cursor cursor, Value &value) {
-	if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
-		if (operation == DATA_OPERATION_GET) {
-			value = g_functionGeneratorPage.m_selectedResources.m_triggerModes[cursor] == TRIGGER_MODE_FUNCTION_GENERATOR;
-		}
-	} else if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR_SELECT_CHANNELS) {
-		if (operation == DATA_OPERATION_GET) {
-			value = g_functionGeneratorSelectChannelsPage.m_selectedChannels & ((uint64_t)1 << cursor) ? 1 : 0;
-		}
+	if (operation == DATA_OPERATION_GET) {
+		value = g_functionGeneratorSelectChannelsPage.m_selectedChannels & ((uint64_t)1 << cursor) ? 1 : 0;
 	}
 }
 
@@ -2056,52 +2048,28 @@ void data_function_generator_num_selected(DataOperationEnum operation, Cursor cu
 }
 
 void action_function_generator_item_toggle_checked() {
-	if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
-		auto index = getFoundWidgetAtDown().cursor;
-		if (g_functionGeneratorPage.m_selectedResources.m_triggerModes[index] == TRIGGER_MODE_FUNCTION_GENERATOR) {
-			g_functionGeneratorPage.m_selectedResources.m_triggerModes[index] = TRIGGER_MODE_FIXED;
-		} else {
-			g_functionGeneratorPage.m_selectedResources.m_triggerModes[index] = TRIGGER_MODE_FUNCTION_GENERATOR;
-		}
+	auto absoluteResourceIndex = getFoundWidgetAtDown().cursor;
+	g_functionGeneratorSelectChannelsPage.m_selectedChannels ^= (uint64_t)1 << absoluteResourceIndex;
 
-		int slotIndex;
-		int subchannelIndex;
-		int resourceIndex;
-		AllResources::findResource(g_functionGeneratorPage.m_selectedResources.m_waveformParameters[index].absoluteResourceIndex, slotIndex, subchannelIndex, resourceIndex);
+	bool isSelected = g_functionGeneratorSelectChannelsPage.m_selectedChannels & (uint64_t)1 << absoluteResourceIndex;
 
-		if (Channel::getBySlotIndex(slotIndex, subchannelIndex)) {
-			if (resourceIndex == 0) {
-				g_functionGeneratorPage.m_selectedResources.m_triggerModes[index + 1] = g_functionGeneratorPage.m_selectedResources.m_triggerModes[index];
+	int slotIndex;
+	int subchannelIndex;
+	int resourceIndex;
+	AllResources::findResource(absoluteResourceIndex, slotIndex, subchannelIndex, resourceIndex);
+
+	if (Channel::getBySlotIndex(slotIndex, subchannelIndex)) {
+		if (resourceIndex == 0) {
+			if (isSelected) {
+				g_functionGeneratorSelectChannelsPage.m_selectedChannels |= (uint64_t)1 << (absoluteResourceIndex + 1);
 			} else {
-				g_functionGeneratorPage.m_selectedResources.m_triggerModes[index - 1] = g_functionGeneratorPage.m_selectedResources.m_triggerModes[index];
+				g_functionGeneratorSelectChannelsPage.m_selectedChannels &= ~((uint64_t)1 << (absoluteResourceIndex + 1));
 			}
-		}
-
-		g_functionGeneratorPage.apply();
-	} else if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR_SELECT_CHANNELS) {
-		auto absoluteResourceIndex = getFoundWidgetAtDown().cursor;
-		g_functionGeneratorSelectChannelsPage.m_selectedChannels ^= (uint64_t)1 << absoluteResourceIndex;
-
-		bool isSelected = g_functionGeneratorSelectChannelsPage.m_selectedChannels & (uint64_t)1 << absoluteResourceIndex;
-
-		int slotIndex;
-		int subchannelIndex;
-		int resourceIndex;
-		AllResources::findResource(absoluteResourceIndex, slotIndex, subchannelIndex, resourceIndex);
-
-		if (Channel::getBySlotIndex(slotIndex, subchannelIndex)) {
-			if (resourceIndex == 0) {
-				if (isSelected) {
-					g_functionGeneratorSelectChannelsPage.m_selectedChannels |= (uint64_t)1 << (absoluteResourceIndex + 1);
-				} else {
-					g_functionGeneratorSelectChannelsPage.m_selectedChannels &= ~((uint64_t)1 << (absoluteResourceIndex + 1));
-				}
+		} else {
+			if (isSelected) {
+				g_functionGeneratorSelectChannelsPage.m_selectedChannels |= (uint64_t)1 << (absoluteResourceIndex - 1);
 			} else {
-				if (isSelected) {
-					g_functionGeneratorSelectChannelsPage.m_selectedChannels |= (uint64_t)1 << (absoluteResourceIndex - 1);
-				} else {
-					g_functionGeneratorSelectChannelsPage.m_selectedChannels &= ~((uint64_t)1 << (absoluteResourceIndex - 1));
-				}
+				g_functionGeneratorSelectChannelsPage.m_selectedChannels &= ~((uint64_t)1 << (absoluteResourceIndex - 1));
 			}
 		}
 	}
@@ -2714,13 +2682,7 @@ void data_function_generator_any_selected(DataOperationEnum operation, Cursor cu
 
 void data_function_generator_is_any_channel_active(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-		value = 0;
-		for (int i = 0; i < g_functionGeneratorPage.m_selectedResources.m_numResources; i++) {
-			if (g_functionGeneratorPage.m_selectedResources.m_triggerModes[i] == TRIGGER_MODE_FUNCTION_GENERATOR) {
-				value = 1;
-				break;
-			}
-		}
+		value = g_functionGeneratorPage.m_selectedResources.m_numResources > 0;
 	}
 }
 

@@ -31476,64 +31476,25 @@
                                 "invertColors": true
                               },
                               {
-                                "type": "Select",
+                                "type": "Text",
                                 "left": 6,
                                 "top": 0,
-                                "width": 30,
-                                "height": 30,
-                                "wireID": "7e9cdc1c-d5d4-441c-8da5-5b8d44d89b03",
-                                "data": "function_generator_item_is_checked",
-                                "action": "function_generator_item_toggle_checked",
-                                "style": {
-                                  "inheritFrom": "default"
-                                },
-                                "widgets": [
-                                  {
-                                    "type": "Text",
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 30,
-                                    "height": 30,
-                                    "wireID": "ed9ff35d-849b-4309-b89d-5aee70bd3bcf",
-                                    "style": {
-                                      "inheritFrom": "default_S"
-                                    },
-                                    "text": "\\u00a0"
-                                  },
-                                  {
-                                    "type": "Text",
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 30,
-                                    "height": 30,
-                                    "wireID": "3e72229f-f141-4b48-a43f-e7158b87b15f",
-                                    "style": {
-                                      "inheritFrom": "default_S"
-                                    },
-                                    "text": "\\u009F"
-                                  }
-                                ]
-                              },
-                              {
-                                "type": "Text",
-                                "left": 36,
-                                "top": 0,
-                                "width": 34,
+                                "width": 44,
                                 "height": 30,
                                 "wireID": "c3ed44c6-5506-4f51-e90c-556698340724",
                                 "data": "function_generator_channel",
                                 "style": {
                                   "inheritFrom": "default_S_left",
-                                  "alignHorizontal": "left",
+                                  "alignHorizontal": "center",
                                   "padding": "0"
                                 },
                                 "text": ""
                               },
                               {
                                 "type": "Text",
-                                "left": 70,
+                                "left": 50,
                                 "top": 0,
-                                "width": 106,
+                                "width": 126,
                                 "height": 30,
                                 "wireID": "51df7739-d02d-46de-a994-56a23c406cf4",
                                 "data": "function_generator_item_label",
@@ -31587,63 +31548,16 @@
                                 ]
                               },
                               {
-                                "type": "Select",
+                                "type": "Text",
                                 "left": 6,
                                 "top": 0,
-                                "width": 30,
-                                "height": 30,
-                                "wireID": "5145c6b1-c07b-4f1d-99e7-96fc3f8ed282",
-                                "data": "function_generator_item_is_checked",
-                                "action": "function_generator_item_toggle_checked",
-                                "style": {
-                                  "inheritFrom": "default"
-                                },
-                                "widgets": [
-                                  {
-                                    "type": "Text",
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 30,
-                                    "height": 30,
-                                    "wireID": "ed9ff35d-849b-4309-b89d-5aee70bd3bcf",
-                                    "style": {
-                                      "inheritFrom": "default_S",
-                                      "color": "background",
-                                      "backgroundColor": "text_regular",
-                                      "activeColor": "text_regular",
-                                      "activeBackgroundColor": "background"
-                                    },
-                                    "text": "\\u00a0"
-                                  },
-                                  {
-                                    "type": "Text",
-                                    "left": 0,
-                                    "top": 0,
-                                    "width": 30,
-                                    "height": 30,
-                                    "wireID": "3e72229f-f141-4b48-a43f-e7158b87b15f",
-                                    "style": {
-                                      "inheritFrom": "default_S",
-                                      "color": "background",
-                                      "backgroundColor": "text_regular",
-                                      "activeColor": "text_regular",
-                                      "activeBackgroundColor": "background"
-                                    },
-                                    "text": "\\u009F"
-                                  }
-                                ]
-                              },
-                              {
-                                "type": "Text",
-                                "left": 36,
-                                "top": 0,
-                                "width": 34,
+                                "width": 44,
                                 "height": 30,
                                 "wireID": "c3ed44c6-5506-4f51-e90c-556698340724",
                                 "data": "function_generator_channel",
                                 "style": {
                                   "inheritFrom": "default_S_left",
-                                  "alignHorizontal": "left",
+                                  "alignHorizontal": "center",
                                   "color": "background",
                                   "backgroundColor": "text_regular",
                                   "activeColor": "text_regular",
@@ -31654,9 +31568,9 @@
                               },
                               {
                                 "type": "Text",
-                                "left": 70,
+                                "left": 50,
                                 "top": 0,
-                                "width": 106,
+                                "width": 126,
                                 "height": 30,
                                 "wireID": "51df7739-d02d-46de-a994-56a23c406cf4",
                                 "data": "function_generator_item_label",
@@ -74892,7 +74806,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:DIGital:SPEED",
+            "name": "[SOURce[<n>]]:DIGital:SPEed",
             "parameters": [
               {
                 "name": "pin",
@@ -74919,7 +74833,7 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:DIGital:SPEED?",
+            "name": "[SOURce[<n>]]:DIGital:SPEed?",
             "parameters": [
               {
                 "name": "pin",

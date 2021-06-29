@@ -258,8 +258,8 @@
     SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]?", scpi_cmd_sourceDigitalDataByteQ) \
     SCPI_COMMAND("[SOURce#]:DIGital:RANGe", scpi_cmd_sourceDigitalRange) \
     SCPI_COMMAND("[SOURce#]:DIGital:RANGe?", scpi_cmd_sourceDigitalRangeQ) \
-    SCPI_COMMAND("[SOURce#]:DIGital:SPEED", scpi_cmd_sourceDigitalSpeed) \
-    SCPI_COMMAND("[SOURce#]:DIGital:SPEED?", scpi_cmd_sourceDigitalSpeedQ) \
+    SCPI_COMMAND("[SOURce#]:DIGital:SPEed", scpi_cmd_sourceDigitalSpeed) \
+    SCPI_COMMAND("[SOURce#]:DIGital:SPEed?", scpi_cmd_sourceDigitalSpeedQ) \
     SCPI_COMMAND("SOURce:FUNCtion[:ON]", scpi_cmd_sourceFunctionOn) \
     SCPI_COMMAND("SOURce:FUNCtion[:ON]?", scpi_cmd_sourceFunctionOnQ) \
     SCPI_COMMAND("SOURce:CURRent:RANGe", scpi_cmd_sourceCurrentRange) \

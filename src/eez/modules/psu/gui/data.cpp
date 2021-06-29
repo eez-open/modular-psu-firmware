@@ -4738,8 +4738,12 @@ void data_sys_display_background_luminosity_step(DataOperationEnum operation, Cu
 
 void data_simulator_load_state(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-        Channel &channel = Channel::get(cursor);
-        value = channel.simulator.getLoadEnabled() ? 1 : 0;
+		if (cursor >= 0 && cursor < CH_NUM) {
+			Channel &channel = Channel::get(cursor);
+			value = channel.simulator.getLoadEnabled() ? 1 : 0;
+		} else {
+			value = 0;
+		}
 	}
 }
 
