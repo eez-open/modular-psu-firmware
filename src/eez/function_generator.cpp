@@ -332,7 +332,7 @@ public:
 	void apply() {
 		bool triggerAbortCalled = false;
 
-		for (int i = 0; i < g_selectedResources.m_numResources; i++) {
+		for (int i = 0; i < g_selectedResources.m_numResources;) {
 			int j = m_selectedResources.findResource(g_selectedResources.m_waveformParameters[i].absoluteResourceIndex);
 			if (j == -1) {
 				int slotIndex;
@@ -346,6 +346,8 @@ public:
 				}
 
 				g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, TRIGGER_MODE_FIXED, nullptr);
+			} else {
+				i++;
 			}
 		}
 
@@ -879,6 +881,8 @@ void setProfileParameters(const psu::profile::Parameters &profileParams) {
 		}
 	}
 
+	g_selectedResources.m_numResources = j;
+
 	for (int i = 0; i < AllResources::getNumResources(); i++) {
 		int slotIndex;
 		int subchannelIndex;
@@ -888,14 +892,12 @@ void setProfileParameters(const psu::profile::Parameters &profileParams) {
 		TriggerMode triggerMode;
 		if (channel_dispatcher::getTriggerMode(slotIndex, subchannelIndex, resourceIndex, triggerMode, nullptr)) {
 			if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-				if (!g_selectedResources.findResource(i)) {
+				if (g_selectedResources.findResource(i) == -1) {
 					channel_dispatcher::setTriggerMode(slotIndex, subchannelIndex, resourceIndex, TRIGGER_MODE_FIXED, nullptr);
 				}
 			}
 		}
 	}
-
-	g_selectedResources.m_numResources = j;
 }
 
 bool writeProfileProperties(psu::profile::WriteContext &ctx, const psu::profile::Parameters &profileParams) {

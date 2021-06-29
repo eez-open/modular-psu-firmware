@@ -1830,44 +1830,114 @@
                         "top": 0,
                         "width": 84,
                         "height": 25,
-                        "wireID": "dbfe4f5a-f905-47a0-d2bd-a1ccb9947bc0",
-                        "data": "dout_state",
-                        "action": "",
+                        "wireID": "c08c1166-51c5-4cf9-a8d9-ccb00d645e75",
+                        "data": "dout_trigger_mode",
                         "style": {
                           "inheritFrom": "default"
                         },
                         "widgets": [
                           {
-                            "type": "Container",
+                            "type": "Select",
                             "left": 0,
                             "top": 0,
                             "width": 84,
                             "height": 25,
-                            "wireID": "6ad4507a-1214-4c31-eda5-939a8e6ab879",
+                            "wireID": "dbfe4f5a-f905-47a0-d2bd-a1ccb9947bc0",
+                            "data": "dout_state",
+                            "action": "",
                             "style": {
                               "inheritFrom": "default"
                             },
                             "widgets": [
                               {
-                                "type": "Text",
+                                "type": "Container",
                                 "left": 0,
                                 "top": 0,
-                                "width": 83,
-                                "height": 24,
-                                "wireID": "2747d0f4-95ac-4ccb-ab84-b215d1e87644",
-                                "data": "dout_no",
-                                "action": "dout_toggle_state",
+                                "width": 84,
+                                "height": 25,
+                                "wireID": "6ad4507a-1214-4c31-eda5-939a8e6ab879",
                                 "style": {
-                                  "inheritFrom": "default",
-                                  "font": "Oswald12",
-                                  "alignVertical": "center",
-                                  "color": "action_color",
-                                  "activeBackgroundColor": "action_color",
-                                  "borderSize": "1"
+                                  "inheritFrom": "default"
                                 },
-                                "text": ""
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "2747d0f4-95ac-4ccb-ab84-b215d1e87644",
+                                    "data": "dout_no",
+                                    "action": "dout_toggle_state",
+                                    "style": {
+                                      "inheritFrom": "default",
+                                      "font": "Oswald12",
+                                      "alignVertical": "center",
+                                      "color": "action_color",
+                                      "activeBackgroundColor": "action_color",
+                                      "borderSize": "1"
+                                    },
+                                    "text": ""
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Container",
+                                "left": 0,
+                                "top": 0,
+                                "width": 84,
+                                "height": 25,
+                                "wireID": "33d54765-8705-4aec-ea2e-1b4acf7461ae",
+                                "style": {
+                                  "inheritFrom": "default"
+                                },
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "932f9007-c2ec-4aea-87e8-13b2efc3de29",
+                                    "data": "dout_no",
+                                    "action": "dout_toggle_state",
+                                    "style": {
+                                      "inheritFrom": "default_inverse",
+                                      "font": "Oswald12",
+                                      "alignVertical": "center",
+                                      "backgroundColor": "action_color",
+                                      "activeColor": "action_color",
+                                      "borderSize": "1"
+                                    },
+                                    "text": ""
+                                  }
+                                ]
                               }
                             ]
+                          },
+                          {
+                            "type": "RectangleWidget",
+                            "left": 0,
+                            "top": 0,
+                            "width": 84,
+                            "height": 25,
+                            "wireID": "cd885ee1-1438-463e-a5ff-4f4d23ede288",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "invertColors": true
+                          },
+                          {
+                            "type": "RectangleWidget",
+                            "left": 0,
+                            "top": 0,
+                            "width": 84,
+                            "height": 25,
+                            "wireID": "70ede9b3-7ead-4d67-b1c7-0f654a2969e1",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -1875,29 +1945,86 @@
                             "top": 0,
                             "width": 84,
                             "height": 25,
-                            "wireID": "33d54765-8705-4aec-ea2e-1b4acf7461ae",
+                            "wireID": "b72c688b-306e-48cf-f0df-b7568bf9cb5a",
                             "style": {
                               "inheritFrom": "default"
                             },
                             "widgets": [
                               {
-                                "type": "Text",
+                                "type": "Select",
                                 "left": 0,
                                 "top": 0,
                                 "width": 83,
                                 "height": 24,
-                                "wireID": "932f9007-c2ec-4aea-87e8-13b2efc3de29",
-                                "data": "dout_no",
-                                "action": "dout_toggle_state",
+                                "wireID": "122310cc-45f6-459f-a7e7-2ae9db4a58d0",
+                                "data": "trigger_state",
+                                "action": "trigger_manually",
                                 "style": {
-                                  "inheritFrom": "default_inverse",
-                                  "font": "Oswald12",
-                                  "alignVertical": "center",
-                                  "backgroundColor": "action_color",
-                                  "activeColor": "action_color",
-                                  "borderSize": "1"
+                                  "inheritFrom": "default"
                                 },
-                                "text": ""
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "b64ee877-31af-4fa7-d5b5-7981831a25fb",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Init"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "be1768bc-214b-40ea-b1d0-f9cd36cc10c4",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Abort"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "5b6a9502-a339-4040-b26a-7b03509e3ecd",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Abort"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "a52afc04-11f4-4e4c-a699-baee9850f575",
+                                    "data": "dout_function_label",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald14",
+                                      "blink": true
+                                    },
+                                    "text": ""
+                                  }
+                                ]
                               }
                             ]
                           }
@@ -3475,7 +3602,7 @@
                                         "action": "dout_toggle_state",
                                         "style": {
                                           "inheritFrom": "default",
-                                          "font": "Oswald12",
+                                          "font": "RobotoCondensed-Regular",
                                           "alignVertical": "center",
                                           "color": "action_color",
                                           "activeBackgroundColor": "action_color"
@@ -3506,7 +3633,7 @@
                                         "action": "dout_toggle_state",
                                         "style": {
                                           "inheritFrom": "default_inverse",
-                                          "font": "Oswald12",
+                                          "font": "RobotoCondensed-Regular",
                                           "alignVertical": "center",
                                           "backgroundColor": "action_color",
                                           "activeColor": "action_color",
@@ -3579,7 +3706,7 @@
                                     "action": "",
                                     "style": {
                                       "inheritFrom": "button_S",
-                                      "font": "Oswald12"
+                                      "font": "RobotoCondensed-Regular"
                                     },
                                     "text": "Init"
                                   },
@@ -3594,7 +3721,7 @@
                                     "action": "",
                                     "style": {
                                       "inheritFrom": "button_S",
-                                      "font": "Oswald12"
+                                      "font": "RobotoCondensed-Regular"
                                     },
                                     "text": "Abort"
                                   },
@@ -3609,7 +3736,7 @@
                                     "action": "",
                                     "style": {
                                       "inheritFrom": "button_S",
-                                      "font": "Oswald12"
+                                      "font": "RobotoCondensed-Regular"
                                     },
                                     "text": "Abort"
                                   },
@@ -3624,7 +3751,7 @@
                                     "action": "",
                                     "style": {
                                       "inheritFrom": "button_S",
-                                      "font": "Oswald14",
+                                      "font": "RobotoCondensed-Regular",
                                       "blink": true
                                     },
                                     "text": ""
@@ -4226,44 +4353,114 @@
                         "top": 24,
                         "width": 53,
                         "height": 49,
-                        "wireID": "dbfe4f5a-f905-47a0-d2bd-a1ccb9947bc0",
-                        "data": "dout_state",
-                        "action": "",
+                        "wireID": "b6057187-94ea-4b19-b6aa-c4ab0b1f18e2",
+                        "data": "dout_trigger_mode",
                         "style": {
                           "inheritFrom": "default"
                         },
                         "widgets": [
                           {
-                            "type": "Container",
+                            "type": "Select",
                             "left": 0,
                             "top": 0,
                             "width": 53,
                             "height": 49,
-                            "wireID": "6ad4507a-1214-4c31-eda5-939a8e6ab879",
+                            "wireID": "dbfe4f5a-f905-47a0-d2bd-a1ccb9947bc0",
+                            "data": "dout_state",
+                            "action": "",
                             "style": {
                               "inheritFrom": "default"
                             },
                             "widgets": [
                               {
-                                "type": "Text",
+                                "type": "Container",
                                 "left": 0,
                                 "top": 0,
-                                "width": 52,
-                                "height": 48,
-                                "wireID": "2747d0f4-95ac-4ccb-ab84-b215d1e87644",
-                                "data": "dout_no",
-                                "action": "dout_toggle_state",
+                                "width": 53,
+                                "height": 49,
+                                "wireID": "6ad4507a-1214-4c31-eda5-939a8e6ab879",
                                 "style": {
-                                  "inheritFrom": "default",
-                                  "font": "Oswald12",
-                                  "alignVertical": "center",
-                                  "color": "action_color",
-                                  "activeBackgroundColor": "action_color",
-                                  "borderSize": "1"
+                                  "inheritFrom": "default"
                                 },
-                                "text": ""
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "2747d0f4-95ac-4ccb-ab84-b215d1e87644",
+                                    "data": "dout_no",
+                                    "action": "dout_toggle_state",
+                                    "style": {
+                                      "inheritFrom": "default",
+                                      "font": "Oswald12",
+                                      "alignVertical": "center",
+                                      "color": "action_color",
+                                      "activeBackgroundColor": "action_color",
+                                      "borderSize": "1"
+                                    },
+                                    "text": ""
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Container",
+                                "left": 0,
+                                "top": 0,
+                                "width": 53,
+                                "height": 49,
+                                "wireID": "33d54765-8705-4aec-ea2e-1b4acf7461ae",
+                                "style": {
+                                  "inheritFrom": "default"
+                                },
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "932f9007-c2ec-4aea-87e8-13b2efc3de29",
+                                    "data": "dout_no",
+                                    "action": "dout_toggle_state",
+                                    "style": {
+                                      "inheritFrom": "default_inverse",
+                                      "font": "Oswald12",
+                                      "alignVertical": "center",
+                                      "backgroundColor": "action_color",
+                                      "activeColor": "action_color",
+                                      "borderSize": "1"
+                                    },
+                                    "text": ""
+                                  }
+                                ]
                               }
                             ]
+                          },
+                          {
+                            "type": "RectangleWidget",
+                            "left": 0,
+                            "top": 0,
+                            "width": 53,
+                            "height": 49,
+                            "wireID": "b7eadec4-0512-4373-d546-03848adab3d8",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "invertColors": true
+                          },
+                          {
+                            "type": "RectangleWidget",
+                            "left": 0,
+                            "top": 0,
+                            "width": 53,
+                            "height": 49,
+                            "wireID": "16f14d83-94f7-46b5-f716-dbdb8b4566fd",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -4271,29 +4468,86 @@
                             "top": 0,
                             "width": 53,
                             "height": 49,
-                            "wireID": "33d54765-8705-4aec-ea2e-1b4acf7461ae",
+                            "wireID": "f0b13ce9-7f87-4b86-8e53-0a735528f541",
                             "style": {
                               "inheritFrom": "default"
                             },
                             "widgets": [
                               {
-                                "type": "Text",
+                                "type": "Select",
                                 "left": 0,
                                 "top": 0,
                                 "width": 52,
                                 "height": 48,
-                                "wireID": "932f9007-c2ec-4aea-87e8-13b2efc3de29",
-                                "data": "dout_no",
-                                "action": "dout_toggle_state",
+                                "wireID": "122310cc-45f6-459f-a7e7-2ae9db4a58d0",
+                                "data": "trigger_state",
+                                "action": "trigger_manually",
                                 "style": {
-                                  "inheritFrom": "default_inverse",
-                                  "font": "Oswald12",
-                                  "alignVertical": "center",
-                                  "backgroundColor": "action_color",
-                                  "activeColor": "action_color",
-                                  "borderSize": "1"
+                                  "inheritFrom": "default"
                                 },
-                                "text": ""
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "b64ee877-31af-4fa7-d5b5-7981831a25fb",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Init"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "be1768bc-214b-40ea-b1d0-f9cd36cc10c4",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Abort"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "5b6a9502-a339-4040-b26a-7b03509e3ecd",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Abort"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "a52afc04-11f4-4e4c-a699-baee9850f575",
+                                    "data": "dout_function_label",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12",
+                                      "blink": true
+                                    },
+                                    "text": ""
+                                  }
+                                ]
                               }
                             ]
                           }
@@ -6626,44 +6880,114 @@
                         "top": 0,
                         "width": 84,
                         "height": 25,
-                        "wireID": "dbfe4f5a-f905-47a0-d2bd-a1ccb9947bc0",
-                        "data": "dout_state",
-                        "action": "",
+                        "wireID": "0d1c7209-1e05-4e91-bf3a-42269cfa1fbb",
+                        "data": "dout_trigger_mode",
                         "style": {
                           "inheritFrom": "default"
                         },
                         "widgets": [
                           {
-                            "type": "Container",
+                            "type": "Select",
                             "left": 0,
                             "top": 0,
                             "width": 84,
                             "height": 25,
-                            "wireID": "6ad4507a-1214-4c31-eda5-939a8e6ab879",
+                            "wireID": "dbfe4f5a-f905-47a0-d2bd-a1ccb9947bc0",
+                            "data": "dout_state",
+                            "action": "",
                             "style": {
                               "inheritFrom": "default"
                             },
                             "widgets": [
                               {
-                                "type": "Text",
+                                "type": "Container",
                                 "left": 0,
                                 "top": 0,
-                                "width": 83,
-                                "height": 24,
-                                "wireID": "2747d0f4-95ac-4ccb-ab84-b215d1e87644",
-                                "data": "dout_no",
-                                "action": "dout_toggle_state",
+                                "width": 84,
+                                "height": 25,
+                                "wireID": "6ad4507a-1214-4c31-eda5-939a8e6ab879",
                                 "style": {
-                                  "inheritFrom": "default",
-                                  "font": "Oswald12",
-                                  "alignVertical": "center",
-                                  "color": "action_color",
-                                  "activeBackgroundColor": "action_color",
-                                  "borderSize": "1"
+                                  "inheritFrom": "default"
                                 },
-                                "text": ""
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "2747d0f4-95ac-4ccb-ab84-b215d1e87644",
+                                    "data": "dout_no",
+                                    "action": "dout_toggle_state",
+                                    "style": {
+                                      "inheritFrom": "default",
+                                      "font": "Oswald12",
+                                      "alignVertical": "center",
+                                      "color": "action_color",
+                                      "activeBackgroundColor": "action_color",
+                                      "borderSize": "1"
+                                    },
+                                    "text": ""
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Container",
+                                "left": 0,
+                                "top": 0,
+                                "width": 84,
+                                "height": 25,
+                                "wireID": "33d54765-8705-4aec-ea2e-1b4acf7461ae",
+                                "style": {
+                                  "inheritFrom": "default"
+                                },
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "932f9007-c2ec-4aea-87e8-13b2efc3de29",
+                                    "data": "dout_no",
+                                    "action": "dout_toggle_state",
+                                    "style": {
+                                      "inheritFrom": "default_inverse",
+                                      "font": "Oswald12",
+                                      "alignVertical": "center",
+                                      "backgroundColor": "action_color",
+                                      "activeColor": "action_color",
+                                      "borderSize": "1"
+                                    },
+                                    "text": ""
+                                  }
+                                ]
                               }
                             ]
+                          },
+                          {
+                            "type": "RectangleWidget",
+                            "left": 0,
+                            "top": 0,
+                            "width": 84,
+                            "height": 25,
+                            "wireID": "32b320b2-5aef-4a3d-dcee-8eb5c8e1378e",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "invertColors": true
+                          },
+                          {
+                            "type": "RectangleWidget",
+                            "left": 0,
+                            "top": 0,
+                            "width": 84,
+                            "height": 25,
+                            "wireID": "74485f82-8d78-4691-8e4d-b345b61e2975",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -6671,29 +6995,86 @@
                             "top": 0,
                             "width": 84,
                             "height": 25,
-                            "wireID": "33d54765-8705-4aec-ea2e-1b4acf7461ae",
+                            "wireID": "e62a2d9b-aa90-4951-ff56-420e72cfa47c",
                             "style": {
                               "inheritFrom": "default"
                             },
                             "widgets": [
                               {
-                                "type": "Text",
+                                "type": "Select",
                                 "left": 0,
                                 "top": 0,
                                 "width": 83,
                                 "height": 24,
-                                "wireID": "932f9007-c2ec-4aea-87e8-13b2efc3de29",
-                                "data": "dout_no",
-                                "action": "dout_toggle_state",
+                                "wireID": "122310cc-45f6-459f-a7e7-2ae9db4a58d0",
+                                "data": "trigger_state",
+                                "action": "trigger_manually",
                                 "style": {
-                                  "inheritFrom": "default_inverse",
-                                  "font": "Oswald12",
-                                  "alignVertical": "center",
-                                  "backgroundColor": "action_color",
-                                  "activeColor": "action_color",
-                                  "borderSize": "1"
+                                  "inheritFrom": "default"
                                 },
-                                "text": ""
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "b64ee877-31af-4fa7-d5b5-7981831a25fb",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Init"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "be1768bc-214b-40ea-b1d0-f9cd36cc10c4",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Abort"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "5b6a9502-a339-4040-b26a-7b03509e3ecd",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Abort"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 83,
+                                    "height": 24,
+                                    "wireID": "a52afc04-11f4-4e4c-a699-baee9850f575",
+                                    "data": "dout_function_label",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald14",
+                                      "blink": true
+                                    },
+                                    "text": ""
+                                  }
+                                ]
                               }
                             ]
                           }
@@ -8206,97 +8587,6 @@
                       "top": 14,
                       "width": 72,
                       "height": 100,
-                      "wireID": "dfeb6f7c-9cac-48da-c286-4949d62c8260",
-                      "data": "dout_pins",
-                      "style": {
-                        "inheritFrom": "default"
-                      },
-                      "itemWidget": {
-                        "type": "Select",
-                        "left": 0,
-                        "top": 0,
-                        "width": 36,
-                        "height": 25,
-                        "wireID": "20a8a25a-9373-4de7-f097-2d75d93852e9",
-                        "data": "dout_state",
-                        "action": "",
-                        "style": {
-                          "inheritFrom": "default"
-                        },
-                        "widgets": [
-                          {
-                            "type": "Container",
-                            "left": 0,
-                            "top": 0,
-                            "width": 36,
-                            "height": 25,
-                            "wireID": "8c5165f8-555e-4a57-acc5-bff489d5be06",
-                            "style": {
-                              "inheritFrom": "default"
-                            },
-                            "widgets": [
-                              {
-                                "type": "Text",
-                                "left": 0,
-                                "top": 0,
-                                "width": 35,
-                                "height": 24,
-                                "wireID": "6235b147-e1dc-4def-d834-57644d8c681c",
-                                "data": "dout_no",
-                                "action": "dout_toggle_state",
-                                "style": {
-                                  "inheritFrom": "default",
-                                  "font": "RobotoCondensed-Regular",
-                                  "alignVertical": "center",
-                                  "color": "action_color",
-                                  "activeBackgroundColor": "action_color"
-                                },
-                                "text": ""
-                              }
-                            ]
-                          },
-                          {
-                            "type": "Container",
-                            "left": 0,
-                            "top": 0,
-                            "width": 36,
-                            "height": 25,
-                            "wireID": "7638c8ab-566a-4206-b78d-1c49e326234a",
-                            "style": {
-                              "inheritFrom": "default"
-                            },
-                            "widgets": [
-                              {
-                                "type": "Text",
-                                "left": 0,
-                                "top": 0,
-                                "width": 35,
-                                "height": 24,
-                                "wireID": "e9aa2d39-dde2-4402-edef-bba77731c0a5",
-                                "data": "dout_no",
-                                "action": "dout_toggle_state",
-                                "style": {
-                                  "inheritFrom": "default_inverse",
-                                  "font": "RobotoCondensed-Regular",
-                                  "alignVertical": "center",
-                                  "backgroundColor": "action_color",
-                                  "activeColor": "action_color",
-                                  "padding": "0"
-                                },
-                                "text": ""
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      "gridFlow": "row"
-                    },
-                    {
-                      "type": "Grid",
-                      "left": 0,
-                      "top": 14,
-                      "width": 72,
-                      "height": 100,
                       "wireID": "a165b2d5-6894-4419-bd04-2d91dbfff6f5",
                       "data": "dout_pins",
                       "style": {
@@ -9110,44 +9400,114 @@
                         "top": 24,
                         "width": 53,
                         "height": 49,
-                        "wireID": "dbfe4f5a-f905-47a0-d2bd-a1ccb9947bc0",
-                        "data": "dout_state",
-                        "action": "",
+                        "wireID": "41478d85-e458-4c9d-ed45-db59fd8de246",
+                        "data": "dout_trigger_mode",
                         "style": {
                           "inheritFrom": "default"
                         },
                         "widgets": [
                           {
-                            "type": "Container",
+                            "type": "Select",
                             "left": 0,
                             "top": 0,
                             "width": 53,
                             "height": 49,
-                            "wireID": "6ad4507a-1214-4c31-eda5-939a8e6ab879",
+                            "wireID": "dbfe4f5a-f905-47a0-d2bd-a1ccb9947bc0",
+                            "data": "dout_state",
+                            "action": "",
                             "style": {
                               "inheritFrom": "default"
                             },
                             "widgets": [
                               {
-                                "type": "Text",
+                                "type": "Container",
                                 "left": 0,
                                 "top": 0,
-                                "width": 52,
-                                "height": 48,
-                                "wireID": "2747d0f4-95ac-4ccb-ab84-b215d1e87644",
-                                "data": "dout_no",
-                                "action": "dout_toggle_state",
+                                "width": 53,
+                                "height": 49,
+                                "wireID": "6ad4507a-1214-4c31-eda5-939a8e6ab879",
                                 "style": {
-                                  "inheritFrom": "default",
-                                  "font": "Oswald12",
-                                  "alignVertical": "center",
-                                  "color": "action_color",
-                                  "activeBackgroundColor": "action_color",
-                                  "borderSize": "1"
+                                  "inheritFrom": "default"
                                 },
-                                "text": ""
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "2747d0f4-95ac-4ccb-ab84-b215d1e87644",
+                                    "data": "dout_no",
+                                    "action": "dout_toggle_state",
+                                    "style": {
+                                      "inheritFrom": "default",
+                                      "font": "Oswald12",
+                                      "alignVertical": "center",
+                                      "color": "action_color",
+                                      "activeBackgroundColor": "action_color",
+                                      "borderSize": "1"
+                                    },
+                                    "text": ""
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Container",
+                                "left": 0,
+                                "top": 0,
+                                "width": 53,
+                                "height": 49,
+                                "wireID": "33d54765-8705-4aec-ea2e-1b4acf7461ae",
+                                "style": {
+                                  "inheritFrom": "default"
+                                },
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "932f9007-c2ec-4aea-87e8-13b2efc3de29",
+                                    "data": "dout_no",
+                                    "action": "dout_toggle_state",
+                                    "style": {
+                                      "inheritFrom": "default_inverse",
+                                      "font": "Oswald12",
+                                      "alignVertical": "center",
+                                      "backgroundColor": "action_color",
+                                      "activeColor": "action_color",
+                                      "borderSize": "1"
+                                    },
+                                    "text": ""
+                                  }
+                                ]
                               }
                             ]
+                          },
+                          {
+                            "type": "RectangleWidget",
+                            "left": 0,
+                            "top": 0,
+                            "width": 53,
+                            "height": 49,
+                            "wireID": "bde295af-b2a4-4717-e04b-cb4d7253efdd",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "invertColors": true
+                          },
+                          {
+                            "type": "RectangleWidget",
+                            "left": 0,
+                            "top": 0,
+                            "width": 53,
+                            "height": 49,
+                            "wireID": "b2e64f5d-45c4-4103-e048-4b2747b6f2a4",
+                            "style": {
+                              "inheritFrom": "default"
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -9155,29 +9515,86 @@
                             "top": 0,
                             "width": 53,
                             "height": 49,
-                            "wireID": "33d54765-8705-4aec-ea2e-1b4acf7461ae",
+                            "wireID": "663499af-ebd8-4cb5-ade7-7e850ce9e568",
                             "style": {
                               "inheritFrom": "default"
                             },
                             "widgets": [
                               {
-                                "type": "Text",
+                                "type": "Select",
                                 "left": 0,
                                 "top": 0,
                                 "width": 52,
                                 "height": 48,
-                                "wireID": "932f9007-c2ec-4aea-87e8-13b2efc3de29",
-                                "data": "dout_no",
-                                "action": "dout_toggle_state",
+                                "wireID": "122310cc-45f6-459f-a7e7-2ae9db4a58d0",
+                                "data": "trigger_state",
+                                "action": "trigger_manually",
                                 "style": {
-                                  "inheritFrom": "default_inverse",
-                                  "font": "Oswald12",
-                                  "alignVertical": "center",
-                                  "backgroundColor": "action_color",
-                                  "activeColor": "action_color",
-                                  "borderSize": "1"
+                                  "inheritFrom": "default"
                                 },
-                                "text": ""
+                                "widgets": [
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "b64ee877-31af-4fa7-d5b5-7981831a25fb",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Init"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "be1768bc-214b-40ea-b1d0-f9cd36cc10c4",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Abort"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "5b6a9502-a339-4040-b26a-7b03509e3ecd",
+                                    "data": "",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12"
+                                    },
+                                    "text": "Abort"
+                                  },
+                                  {
+                                    "type": "Text",
+                                    "left": 0,
+                                    "top": 0,
+                                    "width": 52,
+                                    "height": 48,
+                                    "wireID": "a52afc04-11f4-4e4c-a699-baee9850f575",
+                                    "data": "dout_function_label",
+                                    "action": "",
+                                    "style": {
+                                      "inheritFrom": "button_S",
+                                      "font": "Oswald12",
+                                      "blink": true
+                                    },
+                                    "text": ""
+                                  }
+                                ]
                               }
                             ]
                           }

@@ -841,8 +841,6 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
         return false;
     }
 
-    function_generator::setProfileParameters(profile);
-
     mismatch = repositionChannelsInProfileToMatchCurrentChannelConfiguration(profile, lists);
 
     int numTrackingChannels = 0;
