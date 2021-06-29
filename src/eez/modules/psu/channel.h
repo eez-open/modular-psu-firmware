@@ -488,6 +488,7 @@ public:
     bool isRemoteProgrammingEnabled();
 
     float getCalibratedVoltage(float value);
+    float getCalibratedCurrent(float value);
 
     /// Set channel voltage level.
     void setVoltage(float voltage);

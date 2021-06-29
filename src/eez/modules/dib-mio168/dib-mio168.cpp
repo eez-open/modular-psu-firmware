@@ -3856,7 +3856,7 @@ public:
         
         range -= 1;
 
-        if ((int8_t)range > ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCurrentRangeMaxValue()) {
+        if ((int8_t)range < 0 || (int8_t)range > ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCurrentRangeMaxValue()) {
             if (err) {
                 *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
             }
@@ -3889,7 +3889,7 @@ public:
 
         range -= 1;
 
-		if ((int8_t)range > ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getVoltageRangeMaxValue()) {
+		if ((int8_t)range < 0 || (int8_t)range > ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getVoltageRangeMaxValue()) {
 			if (err) {
 				*err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
 			}

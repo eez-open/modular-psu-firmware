@@ -567,7 +567,7 @@ struct DcpChannel : public Channel {
 			// DAC
 			if (tasks & OUTPUT_ENABLE_TASK_DAC) {
 				dac.setDacVoltage(0);
-				dac.setDacCurrent(0.1f); // 100 mA to prevent both CC and CV leds on
+				dac.setCurrent(getCalibratedCurrent(0.0005f)); // set 0.5 mA to prevent both CC and CV leds on when channel is off
 			}
 
 			// OE

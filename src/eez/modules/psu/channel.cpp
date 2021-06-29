@@ -1133,6 +1133,16 @@ float Channel::getCalibratedVoltage(float value) {
     return value;
 }
 
+float Channel::getCalibratedCurrent(float value) {
+    if (isCurrentCalibrationEnabled()) {
+        value = calibration::remapValue(value, cal_conf.i[flags.currentCurrentRange]);
+    }
+
+    value += getDualRangeGndOffset();
+
+    return value;
+}
+
 void Channel::doSetVoltage(float value) {
     u.set = value;
     u.mon_dac = 0;
@@ -1170,11 +1180,7 @@ void Channel::doSetCurrent(float value) {
     i.set = value;
     i.mon_dac = 0;
 
-    if (isCurrentCalibrationEnabled()) {
-        value = calibration::remapValue(value, cal_conf.i[flags.currentCurrentRange]);
-    }
-
-    value += getDualRangeGndOffset();
+    value = getCalibratedCurrent(value);
 
     setDacCurrentFloat(value);
 }
