@@ -101,7 +101,7 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
 
     Unit unit = value.getUnit();
 
-    bool appendDotZero = unit == UNIT_VOLT || unit == UNIT_AMPER || unit == UNIT_WATT;
+    bool appendDotZero = unit == UNIT_VOLT || unit == UNIT_VOLT_PP || unit == UNIT_AMPER || unit == UNIT_AMPER_PP || unit == UNIT_WATT;
 
     uint16_t options = value.getOptions();
     bool fixedDecimals = (options & FLOAT_OPTIONS_FIXED_DECIMALS) != 0;
@@ -113,7 +113,12 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
                     unit = UNIT_MILLI_VOLT;
                     floatValue *= 1E3f;
                 }
-            } else if (unit == UNIT_AMPER) {
+            } else if (unit == UNIT_VOLT_PP) {
+				if (fabs(floatValue) < 1) {
+					unit = UNIT_MILLI_VOLT_PP;
+					floatValue *= 1E3f;
+				}
+			} else if (unit == UNIT_AMPER) {
                 if (fabs(floatValue) < 0.001f && fabs(floatValue) != 0.0005f) {
                     unit = UNIT_MICRO_AMPER;
                     floatValue *= 1E6f;
@@ -121,7 +126,15 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
                     unit = UNIT_MILLI_AMPER;
                     floatValue *= 1E3f;
                 }
-            } else if (unit == UNIT_WATT) {
+            } else if (unit == UNIT_AMPER_PP) {
+				if (fabs(floatValue) < 0.001f && fabs(floatValue) != 0.0005f) {
+					unit = UNIT_MICRO_AMPER_PP;
+					floatValue *= 1E6f;
+				} else if (fabs(floatValue) < 1) {
+					unit = UNIT_MILLI_AMPER_PP;
+					floatValue *= 1E3f;
+				}
+			} else if (unit == UNIT_WATT) {
                 if (fabs(floatValue) < 1) {
                     unit = UNIT_MILLI_WATT;
                     floatValue *= 1E3f;
@@ -443,7 +456,7 @@ bool Value::isMicro() const {
     Unit unit = getUnit();
 
     if (floatValue != 0) {
-        if (unit == UNIT_AMPER) {
+        if (unit == UNIT_AMPER || unit == UNIT_AMPER_PP) {
             if (fabs(floatValue) < 1E-3f && fabs(floatValue) != 0.0005f) {
                 return true;
             }
@@ -462,11 +475,11 @@ bool Value::isMilli() const {
     Unit unit = getUnit();
 
     if (floatValue != 0) {
-        if (unit == UNIT_AMPER) {
+        if (unit == UNIT_AMPER || unit == UNIT_AMPER_PP) {
             if (fabs(floatValue) < 1 && !(fabs(floatValue) < 1E-3f && fabs(floatValue) != 0.0005f)) {
                 return true;
             }
-        } else if (unit == UNIT_VOLT || unit == UNIT_WATT || unit == UNIT_SECOND || unit == UNIT_FARAD || unit == UNIT_HERTZ) {
+        } else if (unit == UNIT_VOLT || unit == UNIT_VOLT_PP || unit == UNIT_WATT || unit == UNIT_SECOND || unit == UNIT_FARAD || unit == UNIT_HERTZ) {
             if (fabs(floatValue) < 1) {
                 return true;
             }

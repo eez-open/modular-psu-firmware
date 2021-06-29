@@ -183,7 +183,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
             style, widgetCursor.currentState->flags.active,
             widgetCursor.currentState->flags.blinking, false,
             &currentState->color, &currentState->backgroundColor, &currentState->activeColor, &currentState->activeBackgroundColor,
-            widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT,
+            true,
             currentState->cursorPosition, currentState->xScroll);
     }
 };

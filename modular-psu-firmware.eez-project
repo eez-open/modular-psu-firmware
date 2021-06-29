@@ -2742,11 +2742,6 @@
       "name": "channel_ocp_trip_level_info",
       "type": "string",
       "defaultValue": "Trip level = 99.9% of Iset"
-    },
-    {
-      "name": "function_generator_amplitude_label",
-      "type": "string",
-      "defaultValue": "Vpp"
     }
   ],
   "actions": [
@@ -7170,13 +7165,12 @@
                       "type": "Text",
                       "left": 0,
                       "top": 0,
-                      "width": 84,
+                      "width": 83,
                       "height": 24,
                       "wireID": "6558e91d-5b38-468f-bdcb-3cb8bdd48588",
                       "data": "function_generator_selected_item_label",
                       "style": {
-                        "inheritFrom": "overlay_left",
-                        "alignHorizontal": "center"
+                        "inheritFrom": "overlay_left"
                       },
                       "text": ""
                     },
@@ -7339,18 +7333,44 @@
                                   },
                                   "widgets": [
                                     {
-                                      "type": "Text",
+                                      "type": "Select",
                                       "left": 0,
                                       "top": 0,
                                       "width": 28,
                                       "height": 24,
-                                      "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
-                                      "data": "function_generator_amplitude_label",
-                                      "action": "",
+                                      "wireID": "37ac0603-d0a6-408b-e7da-59da3a050dc3",
+                                      "data": "function_generator_is_ampl",
                                       "style": {
                                         "inheritFrom": "overlay_left"
                                       },
-                                      "text": ""
+                                      "widgets": [
+                                        {
+                                          "type": "Text",
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 28,
+                                          "height": 24,
+                                          "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                                          "action": "",
+                                          "style": {
+                                            "inheritFrom": "overlay_left"
+                                          },
+                                          "text": "Min"
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "left": 0,
+                                          "top": 0,
+                                          "width": 28,
+                                          "height": 24,
+                                          "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
+                                          "action": "",
+                                          "style": {
+                                            "inheritFrom": "overlay_left"
+                                          },
+                                          "text": "Ampl"
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "DisplayData",
@@ -7607,16 +7627,14 @@
                               "type": "Text",
                               "left": 0,
                               "top": 0,
-                              "width": 84,
+                              "width": 61,
                               "height": 24,
                               "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
-                              "data": "function_generator_amplitude_label",
                               "action": "",
                               "style": {
-                                "inheritFrom": "overlay_left",
-                                "alignHorizontal": "center"
+                                "inheritFrom": "overlay_left"
                               },
-                              "text": ""
+                              "text": "Amplitude"
                             },
                             {
                               "type": "DisplayData",
@@ -31927,23 +31945,55 @@
                                       },
                                       "widgets": [
                                         {
-                                          "type": "Text",
+                                          "type": "Select",
                                           "left": 0,
                                           "top": 0,
                                           "width": 44,
                                           "height": 28,
-                                          "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
-                                          "data": "function_generator_amplitude_label",
-                                          "action": "function_generator_toggle_ampl",
+                                          "wireID": "37ac0603-d0a6-408b-e7da-59da3a050dc3",
+                                          "data": "function_generator_is_ampl",
                                           "style": {
-                                            "inheritFrom": "edit_value_S_left",
-                                            "alignHorizontal": "center",
-                                            "color": "action_color",
-                                            "backgroundColor": "text_enable_background",
-                                            "activeColor": "text_enable_background",
-                                            "activeBackgroundColor": "action_color"
+                                            "inheritFrom": "default"
                                           },
-                                          "text": ""
+                                          "widgets": [
+                                            {
+                                              "type": "Text",
+                                              "left": 0,
+                                              "top": 0,
+                                              "width": 44,
+                                              "height": 28,
+                                              "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
+                                              "action": "function_generator_toggle_ampl",
+                                              "style": {
+                                                "inheritFrom": "edit_value_S_left",
+                                                "alignHorizontal": "center",
+                                                "color": "action_color",
+                                                "backgroundColor": "text_enable_background",
+                                                "activeColor": "text_enable_background",
+                                                "activeBackgroundColor": "action_color",
+                                                "margin": "0"
+                                              },
+                                              "text": "Min"
+                                            },
+                                            {
+                                              "type": "Text",
+                                              "left": 0,
+                                              "top": 0,
+                                              "width": 44,
+                                              "height": 28,
+                                              "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
+                                              "action": "function_generator_toggle_ampl",
+                                              "style": {
+                                                "inheritFrom": "edit_value_S_left",
+                                                "alignHorizontal": "center",
+                                                "color": "action_color",
+                                                "backgroundColor": "text_enable_background",
+                                                "activeColor": "text_enable_background",
+                                                "activeBackgroundColor": "action_color"
+                                              },
+                                              "text": "Ampl"
+                                            }
+                                          ]
                                         },
                                         {
                                           "type": "DisplayData",
@@ -32034,20 +32084,14 @@
                                       "type": "Text",
                                       "left": 0,
                                       "top": 0,
-                                      "width": 44,
+                                      "width": 46,
                                       "height": 28,
-                                      "wireID": "8e533d03-663c-4154-a814-b0e3784a325c",
-                                      "data": "function_generator_amplitude_label",
-                                      "action": "function_generator_toggle_ampl",
+                                      "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
+                                      "action": "",
                                       "style": {
-                                        "inheritFrom": "edit_value_S_left",
-                                        "alignHorizontal": "center",
-                                        "color": "action_color",
-                                        "backgroundColor": "text_enable_background",
-                                        "activeColor": "text_enable_background",
-                                        "activeBackgroundColor": "action_color"
+                                        "inheritFrom": "edit_value_S_left"
                                       },
-                                      "text": ""
+                                      "text": "Ampl:"
                                     },
                                     {
                                       "type": "DisplayData",

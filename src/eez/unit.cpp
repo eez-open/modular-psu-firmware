@@ -53,7 +53,12 @@ const char *g_unitNames[] = {
     "minutes",
     "VA",
     "VAR",
-	DEGREE_SYMBOL
+	DEGREE_SYMBOL,
+	"Vpp",
+	"mVpp",
+	"App",
+	"mApp",
+	"uApp",
 };
 
 static const int g_scpiUnits[] = {
@@ -89,6 +94,11 @@ static const int g_scpiUnits[] = {
 	SCPI_UNIT_WATT,
 	SCPI_UNIT_WATT,
 	SCPI_UNIT_DEGREE,
+	SCPI_UNIT_VOLT,
+	SCPI_UNIT_VOLT,
+	SCPI_UNIT_AMPER,
+	SCPI_UNIT_AMPER,
+	SCPI_UNIT_AMPER,
 };
 
 int getScpiUnit(Unit unit) {

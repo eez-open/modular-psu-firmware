@@ -149,9 +149,9 @@ void Keypad::getKeypadText(char *text, size_t count) {
 
     if (*m_label) {
         stringCopy(textPtr, count, m_label);
-		auto len = strlen(m_label);
+        auto len = strlen(m_label);
         textPtr += len;
-		count -= len;
+        count -= len;
     }
 
     if (m_isPassword) {
@@ -343,10 +343,10 @@ int Keypad::getXScroll(const WidgetCursor &widgetCursor) {
 ////////////////////////////////////////////////////////////////////////////////
 
 NumericKeypadOptions::NumericKeypadOptions() {
-	pageId = PAGE_ID_NUMERIC_KEYPAD;
+    pageId = PAGE_ID_NUMERIC_KEYPAD;
 
     this->slotIndex = -1;
-	this->subchannelIndex = -1;
+    this->subchannelIndex = -1;
 
     allowZero = false;
     min = NAN;
@@ -533,8 +533,12 @@ Unit NumericKeypad::getEditUnit() {
 Unit NumericKeypad::getValueUnit() {
     if (m_options.editValueUnit == UNIT_MILLI_VOLT)
         return UNIT_VOLT;
+    if (m_options.editValueUnit == UNIT_MILLI_VOLT_PP)
+        return UNIT_VOLT_PP;
     if (m_options.editValueUnit == UNIT_MILLI_AMPER || m_options.editValueUnit == UNIT_MICRO_AMPER)
         return UNIT_AMPER;
+    if (m_options.editValueUnit == UNIT_MILLI_AMPER_PP || m_options.editValueUnit == UNIT_MICRO_AMPER_PP)
+        return UNIT_AMPER_PP;
     if (m_options.editValueUnit == UNIT_MILLI_SECOND)
         return UNIT_SECOND;
     if (m_options.editValueUnit == UNIT_MILLI_WATT)
@@ -575,16 +579,18 @@ bool NumericKeypad::isNano() {
 }
 
 bool NumericKeypad::isMicro() {
-    return m_options.editValueUnit == UNIT_MICRO_AMPER || m_options.editValueUnit == UNIT_MICRO_FARAD;
+    return m_options.editValueUnit == UNIT_MICRO_AMPER || m_options.editValueUnit == UNIT_MICRO_AMPER_PP || m_options.editValueUnit == UNIT_MICRO_FARAD;
 }
 
 bool NumericKeypad::isMilli() {
     return m_options.editValueUnit == UNIT_MILLI_VOLT ||
-           m_options.editValueUnit == UNIT_MILLI_AMPER ||
-           m_options.editValueUnit == UNIT_MILLI_WATT ||
-           m_options.editValueUnit == UNIT_MILLI_SECOND ||
-           m_options.editValueUnit == UNIT_MILLI_FARAD ||
-           m_options.editValueUnit == UNIT_MILLI_HERTZ;
+        m_options.editValueUnit == UNIT_MILLI_VOLT_PP ||
+        m_options.editValueUnit == UNIT_MILLI_AMPER ||
+        m_options.editValueUnit == UNIT_MILLI_AMPER_PP ||
+        m_options.editValueUnit == UNIT_MILLI_WATT ||
+        m_options.editValueUnit == UNIT_MILLI_SECOND ||
+        m_options.editValueUnit == UNIT_MILLI_FARAD ||
+        m_options.editValueUnit == UNIT_MILLI_HERTZ;
 }
 
 bool NumericKeypad::isKilo() {
@@ -610,6 +616,8 @@ Unit NumericKeypad::getNanoUnit() {
 Unit NumericKeypad::getMicroUnit() {
     if (m_options.editValueUnit == UNIT_AMPER || m_options.editValueUnit == UNIT_MILLI_AMPER)
         return UNIT_MICRO_AMPER;
+    if (m_options.editValueUnit == UNIT_AMPER_PP || m_options.editValueUnit == UNIT_MILLI_AMPER_PP)
+        return UNIT_MICRO_AMPER_PP;
     if (m_options.editValueUnit == UNIT_FARAD || m_options.editValueUnit == UNIT_MILLI_FARAD || m_options.editValueUnit == UNIT_MICRO_FARAD || m_options.editValueUnit == UNIT_NANO_FARAD || m_options.editValueUnit == UNIT_PICO_FARAD)
         return UNIT_MICRO_FARAD;
     return m_options.editValueUnit;
@@ -618,8 +626,12 @@ Unit NumericKeypad::getMicroUnit() {
 Unit NumericKeypad::getMilliUnit() {
     if (m_options.editValueUnit == UNIT_VOLT)
         return UNIT_MILLI_VOLT;
+    if (m_options.editValueUnit == UNIT_VOLT_PP)
+        return UNIT_MILLI_VOLT_PP;
     if (m_options.editValueUnit == UNIT_AMPER || m_options.editValueUnit == UNIT_MICRO_AMPER)
         return UNIT_MILLI_AMPER;
+    if (m_options.editValueUnit == UNIT_AMPER_PP || m_options.editValueUnit == UNIT_MICRO_AMPER_PP)
+        return UNIT_MILLI_AMPER_PP;
     if (m_options.editValueUnit == UNIT_WATT)
         return UNIT_MILLI_WATT;
     if (m_options.editValueUnit == UNIT_SECOND)
@@ -672,28 +684,34 @@ void NumericKeypad::switchToMega() {
 }
 
 bool NumericKeypad::isMicroAmperAllowed() {
-	if (m_options.slotIndex != -1 && m_options.subchannelIndex != -1) {
-		return g_slots[m_options.slotIndex]->isMicroAmperAllowed(m_options.subchannelIndex);
-	}
+    if (m_options.slotIndex != -1 && m_options.subchannelIndex != -1) {
+        return g_slots[m_options.slotIndex]->isMicroAmperAllowed(m_options.subchannelIndex);
+    }
 
-	return eez::gui::isMicroAmperAllowed(g_focusCursor, g_focusDataId);
+    return eez::gui::isMicroAmperAllowed(g_focusCursor, g_focusDataId);
 }
 
 bool NumericKeypad::isAmperAllowed() {
-	if (m_options.slotIndex != -1 && m_options.subchannelIndex != -1) {
-		return g_slots[m_options.slotIndex]->isAmperAllowed(m_options.subchannelIndex);
-	}
+    if (m_options.slotIndex != -1 && m_options.subchannelIndex != -1) {
+        return g_slots[m_options.slotIndex]->isAmperAllowed(m_options.subchannelIndex);
+    }
 
-	return eez::gui::isAmperAllowed(g_focusCursor, g_focusDataId);
+    return eez::gui::isAmperAllowed(g_focusCursor, g_focusDataId);
 }
 
 Unit NumericKeypad::getSwitchToUnit() {
     if (m_options.editValueUnit == UNIT_VOLT)
         return UNIT_MILLI_VOLT;
+    if (m_options.editValueUnit == UNIT_VOLT_PP)
+        return UNIT_MILLI_VOLT_PP;
     if (m_options.editValueUnit == UNIT_MILLI_VOLT)
         return UNIT_VOLT;
+    if (m_options.editValueUnit == UNIT_MILLI_VOLT_PP)
+        return UNIT_VOLT_PP;
     if (m_options.editValueUnit == UNIT_AMPER)
         return UNIT_MILLI_AMPER;
+    if (m_options.editValueUnit == UNIT_AMPER_PP)
+        return UNIT_MILLI_AMPER_PP;
     if (m_options.editValueUnit == UNIT_MILLI_AMPER) {
         if (isMicroAmperAllowed()) {
             return UNIT_MICRO_AMPER;
@@ -701,11 +719,25 @@ Unit NumericKeypad::getSwitchToUnit() {
             return UNIT_AMPER;
         }
     }
+    if (m_options.editValueUnit == UNIT_MILLI_AMPER_PP) {
+        if (isMicroAmperAllowed()) {
+            return UNIT_MICRO_AMPER_PP;
+        } else {
+            return UNIT_AMPER_PP;
+        }
+    }
     if (m_options.editValueUnit == UNIT_MICRO_AMPER) {
-		if (isAmperAllowed()) {
+        if (isAmperAllowed()) {
             return UNIT_AMPER;
         } else {
             return UNIT_MILLI_AMPER;
+        }
+    }
+    if (m_options.editValueUnit == UNIT_MICRO_AMPER_PP) {
+        if (isAmperAllowed()) {
+            return UNIT_AMPER_PP;
+        } else {
+            return UNIT_MILLI_AMPER_PP;
         }
     }
     if (m_options.editValueUnit == UNIT_WATT)
@@ -1107,7 +1139,7 @@ void NumericKeypad::onEncoder(int counter) {
 
         if (m_startValue.getType() == VALUE_TYPE_FLOAT) {
             float precision;
-			auto channel = Channel::getBySlotIndex(m_options.slotIndex, m_options.subchannelIndex);
+            auto channel = Channel::getBySlotIndex(m_options.slotIndex, m_options.subchannelIndex);
             if (channel) {
                 precision = psu::channel_dispatcher::getValuePrecision(*channel, m_startValue.getUnit(), m_startValue.getFloat());
             } else {

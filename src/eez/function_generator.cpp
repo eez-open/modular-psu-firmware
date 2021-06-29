@@ -2336,21 +2336,6 @@ void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cur
 	}
 }
 
-void data_function_generator_amplitude_label(DataOperationEnum operation, Cursor cursor, Value &value) {
-	if (operation == DATA_OPERATION_GET) {
-		if (g_options.isAmpl) {
-			auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
-			if (waveformParameters.waveform == WAVEFORM_DC) {
-				value = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? "V" : "A";
-			} else {
-				value = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? "Vpp" : "App";
-			}
-		} else {
-			value = "Min";
-		}
-	}
-}
-
 void data_function_generator_amplitude(DataOperationEnum operation, Cursor cursor, Value &value) {
 	// ... or minimum
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
@@ -2368,6 +2353,12 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 	float range = max - min;
 
 	Unit unit = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? UNIT_VOLT : UNIT_AMPER;
+
+	if (g_options.isAmpl) {
+		if (waveformParameters.waveform != WAVEFORM_DC) {
+			unit = unit == UNIT_VOLT ? UNIT_VOLT_PP : UNIT_AMPER_PP;
+		}
+	}
 
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_AMPLITUDE;
