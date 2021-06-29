@@ -389,9 +389,9 @@ struct DcpChannel : public Channel {
 
 			// Check continuously output voltage when output is enabled if OVP is not enabled.
 			// If U_MON is higher then U_SET for more then 3% automatically switch off output and display popup.
-			if (!prot_conf.flags.u_state && !isRemoteProgrammingEnabled() && u.set > 0.3f && u.mon_last > u.set * 1.03f) {
+			if (!prot_conf.flags.u_state && !isRemoteProgrammingEnabled() && u.set > 0.3f && u.mon > u.set * 1.03f) {
 				if (!fallingEdge) {
-					DebugTrace("U_MON (%.4f) is more then 3%% above U_SET (%.4f), difference is: %.4f\n", u.mon_last, u.set, u.mon_last - u.set * 1.03f);
+					DebugTrace("U_MON (%.4f) is more then 3%% above U_SET (%.4f), difference is: %.4f\n", u.mon, u.set, u.mon_last - u.set * 1.03f);
 					channel_dispatcher::outputEnable(*this, false);
 					generateChannelError(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED, channelIndex);
 					return;
