@@ -676,7 +676,9 @@ void initWaveformParameters(WaveformParameters &waveformParameters) {
 
 	waveformParameters.resourceType = g_slots[slotIndex]->getFunctionGeneratorResourceType(subchannelIndex, resourceIndex);
 	if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I) {
-		waveformParameters.resourceType = FUNCTION_GENERATOR_RESOURCE_TYPE_U;
+		SourceMode mode;
+		channel_dispatcher::getSourceMode(slotIndex, subchannelIndex, mode, nullptr);
+		waveformParameters.resourceType = mode == SOURCE_MODE_CURRENT ? FUNCTION_GENERATOR_RESOURCE_TYPE_I : FUNCTION_GENERATOR_RESOURCE_TYPE_U;
 	}
 
 	float minFreq;
@@ -1514,6 +1516,8 @@ bool setResourceType(int slotIndex, int subchannelIndex, int resourceIndex, Func
 	}
 
  	waveformParameters->resourceType = resourceType;
+	channel_dispatcher::setSourceMode(slotIndex, subchannelIndex, 
+		resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_I ? SOURCE_MODE_CURRENT : SOURCE_MODE_VOLTAGE, nullptr);
 
 	g_functionGeneratorPage.init();
 
@@ -2637,6 +2641,9 @@ void action_function_generator_mode_select_mode() {
 	int subchannelIndex;
 	int resourceIndex;
 	AllResources::findResource(waveformParameters.absoluteResourceIndex, slotIndex, subchannelIndex, resourceIndex);
+
+	channel_dispatcher::setSourceMode(slotIndex, subchannelIndex,
+		waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_I ? SOURCE_MODE_CURRENT : SOURCE_MODE_VOLTAGE, nullptr);
 
 	float minFreq;
 	float maxFreq;

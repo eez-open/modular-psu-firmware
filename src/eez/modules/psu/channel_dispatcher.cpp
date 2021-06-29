@@ -1916,6 +1916,10 @@ void setCurrentTriggerMode(Channel &channel, TriggerMode mode) {
     }
 }
 
+bool getTriggerMode(int slotIndex, int subchannelIndex, int resourceIndex, TriggerMode &mode, int *err) {
+    return g_slots[slotIndex]->getFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, mode, err);
+}
+
 bool setTriggerMode(int slotIndex, int subchannelIndex, int resourceIndex, TriggerMode mode, int *err) {
     return g_slots[slotIndex]->setFunctionGeneratorResourceTriggerMode(subchannelIndex, resourceIndex, mode, err);
 }

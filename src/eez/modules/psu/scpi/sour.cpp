@@ -1425,6 +1425,14 @@ scpi_result_t scpi_cmd_sourceFunctionOn(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
+    TriggerMode triggerMode;
+    if (channel_dispatcher::getTriggerMode(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, 0, triggerMode, nullptr)) {
+        if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+			function_generator::setResourceType(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, 0,
+				mode == SOURCE_MODE_CURRENT ? FUNCTION_GENERATOR_RESOURCE_TYPE_I : FUNCTION_GENERATOR_RESOURCE_TYPE_U, nullptr);
+        }
+    }
+
     return SCPI_RES_OK;
 }
 
@@ -1663,10 +1671,12 @@ scpi_result_t scpi_cmd_sourceVoltageMode(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    int resourceIndex = 0;
+    int resourceIndex;
 
     Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex);
-    if (!channel) {
+    if (channel) {
+		resourceIndex = 0;
+    } else {
         if (triggerMode != TRIGGER_MODE_FIXED && triggerMode != TRIGGER_MODE_FUNCTION_GENERATOR) {
             SCPI_ErrorPush(context, SCPI_ERROR_PARAMETER_NOT_ALLOWED);
             return SCPI_RES_ERR;
@@ -1674,29 +1684,23 @@ scpi_result_t scpi_cmd_sourceVoltageMode(scpi_t *context) {
 
         auto resourceType = g_slots[slotAndSubchannelIndex->slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex->subchannelIndex, 0);
         if (resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I) {
-            if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-                int err;
-                if (!setResourceType(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, 0, FUNCTION_GENERATOR_RESOURCE_TYPE_U, &err)) {
-                    SCPI_ErrorPush(context, err);
-                    return SCPI_RES_ERR;
-                }
-            } else {
-                FunctionGeneratorResourceType resourceType;
-                int err;
-                if (!getResourceType(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, 0, resourceType, &err)) {
-                    SCPI_ErrorPush(context, err);
-                    return SCPI_RES_ERR;
-                }
+            SourceMode mode;
+            int err;
+            if (!channel_dispatcher::getSourceMode(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, mode, &err)) {
+                SCPI_ErrorPush(context, err);
+                return SCPI_RES_ERR;
+            }
 
-                if (resourceType != FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
-                    SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-                    return SCPI_RES_ERR;
-                }
+            if (mode != SOURCE_MODE_VOLTAGE) {
+                SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+                return SCPI_RES_ERR;
             }
         } else if (resourceType != FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
             SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
             return SCPI_RES_ERR;
         }
+
+		resourceIndex = 0;
     }
 
     int err;
@@ -1719,39 +1723,34 @@ scpi_result_t scpi_cmd_sourceVoltageModeQ(scpi_t *context) {
 
     Channel *channel = Channel::getBySlotIndex(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex);
     if (channel) {
-        resourceIndex = 1;
+		resourceIndex = 0;
     } else {
         auto resourceType = g_slots[slotAndSubchannelIndex->slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex->subchannelIndex, 0);
         if (resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I) {
+            SourceMode mode;
+            int err;
+            if (!channel_dispatcher::getSourceMode(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, mode, &err)) {
+                SCPI_ErrorPush(context, err);
+                return SCPI_RES_ERR;
+            }
+
+            if (mode != SOURCE_MODE_VOLTAGE) {
+                SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+                return SCPI_RES_ERR;
+            }
         } else if (resourceType != FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
             SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
             return SCPI_RES_ERR;
         }
 
-        resourceIndex = 0;
+		resourceIndex = 0;
     }
 
     TriggerMode triggerMode;
     int err;
-	if (!g_slots[slotAndSubchannelIndex->slotIndex]->getFunctionGeneratorResourceTriggerMode(slotAndSubchannelIndex->subchannelIndex, resourceIndex, triggerMode, &err)) {
+	if (!channel_dispatcher::getTriggerMode(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, resourceIndex, triggerMode, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
-    }
-
-    if (!channel) {
-        if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-            FunctionGeneratorResourceType resourceType;
-            int err;
-            if (!getResourceType(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, 0, resourceType, &err)) {
-                SCPI_ErrorPush(context, err);
-                return SCPI_RES_ERR;
-            }
-
-            if (resourceType != FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
-                SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-                return SCPI_RES_ERR;
-            }
-        }
     }
 
     resultChoiceName(context, g_triggerModeChoice, triggerMode);
@@ -1789,24 +1788,16 @@ scpi_result_t scpi_cmd_sourceCurrentMode(scpi_t *context) {
 
         auto resourceType = g_slots[slotAndSubchannelIndex->slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex->subchannelIndex, 0);
         if (resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I) {
-            if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-                int err;
-                if (!setResourceType(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, 0, FUNCTION_GENERATOR_RESOURCE_TYPE_I, &err)) {
-                    SCPI_ErrorPush(context, err);
-                    return SCPI_RES_ERR;
-                }
-            } else {
-                FunctionGeneratorResourceType resourceType;
-                int err;
-                if (!getResourceType(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, 0, resourceType, &err)) {
-                    SCPI_ErrorPush(context, err);
-                    return SCPI_RES_ERR;
-                }
+            SourceMode mode;
+            int err;
+            if (!channel_dispatcher::getSourceMode(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, mode, &err)) {
+                SCPI_ErrorPush(context, err);
+                return SCPI_RES_ERR;
+            }
 
-                if (resourceType != FUNCTION_GENERATOR_RESOURCE_TYPE_I) {
-                    SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-                    return SCPI_RES_ERR;
-                }
+            if (mode != SOURCE_MODE_CURRENT) {
+                SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+                return SCPI_RES_ERR;
             }
         } else if (resourceType != FUNCTION_GENERATOR_RESOURCE_TYPE_I) {
             SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
@@ -1840,12 +1831,23 @@ scpi_result_t scpi_cmd_sourceCurrentModeQ(scpi_t *context) {
     } else {
         auto resourceType = g_slots[slotAndSubchannelIndex->slotIndex]->getFunctionGeneratorResourceType(slotAndSubchannelIndex->subchannelIndex, 0);
         if (resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U_AND_I) {
+            SourceMode mode;
+            int err;
+            if (!channel_dispatcher::getSourceMode(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, mode, &err)) {
+                SCPI_ErrorPush(context, err);
+                return SCPI_RES_ERR;
+            }
+
+            if (mode != SOURCE_MODE_CURRENT) {
+                SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+                return SCPI_RES_ERR;
+            }
         } else if (resourceType != FUNCTION_GENERATOR_RESOURCE_TYPE_I) {
             SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
             return SCPI_RES_ERR;
         }
 
-        resourceIndex = 0;
+		resourceIndex = 0;
     }
 
     TriggerMode triggerMode;
@@ -1853,22 +1855,6 @@ scpi_result_t scpi_cmd_sourceCurrentModeQ(scpi_t *context) {
 	if (!g_slots[slotAndSubchannelIndex->slotIndex]->getFunctionGeneratorResourceTriggerMode(slotAndSubchannelIndex->subchannelIndex, resourceIndex, triggerMode, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
-    }
-
-    if (!channel) {
-        if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-            FunctionGeneratorResourceType resourceType;
-            int err;
-            if (!getResourceType(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, 0, resourceType, &err)) {
-                SCPI_ErrorPush(context, err);
-                return SCPI_RES_ERR;
-            }
-
-            if (resourceType != FUNCTION_GENERATOR_RESOURCE_TYPE_I) {
-                SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-                return SCPI_RES_ERR;
-            }
-        }
     }
 
     resultChoiceName(context, g_triggerModeChoice, triggerMode);

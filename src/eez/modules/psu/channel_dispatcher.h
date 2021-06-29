@@ -155,6 +155,7 @@ void setVoltageTriggerMode(Channel &channel, TriggerMode mode);
 TriggerMode getCurrentTriggerMode(Channel &channel);
 void setCurrentTriggerMode(Channel &channel, TriggerMode mode);
 
+bool getTriggerMode(int slotIndex, int subchannelIndex, int resourceIndex, TriggerMode &mode, int *err);
 bool setTriggerMode(int slotIndex, int subchannelIndex, int resourceIndex, TriggerMode mode, int *err);
 
 bool getTriggerOutputState(Channel &channel);
