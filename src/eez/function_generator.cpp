@@ -309,8 +309,6 @@ public:
 		}
 
 		memcpy(&m_selectedResources, &g_selectedResources, sizeof(g_selectedResources));
-		m_selectedItem = 0;
-		m_scrollPosition = 0;
 
 		m_initialized = true;
 	}
@@ -2335,6 +2333,21 @@ void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cur
 			waveformParameters.phaseShift = 360.0f * value.getFloat() / max;
 		}
 		g_functionGeneratorPage.apply();
+	}
+}
+
+void data_function_generator_amplitude_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		if (g_options.isAmpl) {
+			auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
+			if (waveformParameters.waveform == WAVEFORM_DC) {
+				value = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? "V" : "A";
+			} else {
+				value = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? "Vpp" : "App";
+			}
+		} else {
+			value = "Min";
+		}
 	}
 }
 
