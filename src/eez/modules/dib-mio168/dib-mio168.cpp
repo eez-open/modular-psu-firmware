@@ -3842,7 +3842,24 @@ public:
             }
             return false;
         }
-        range = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCurrentRange() + 1;
+
+        auto &ainChannel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+
+        auto maxRange = ainChannel.getCurrentRangeMaxValue();
+        if (maxRange == -1) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+		range = ainChannel.getCurrentRange();
+		if (AinChannel::isAutoRange(ainChannel.m_afeVersion, subchannelIndex, MEASURE_MODE_CURRENT, range, ainChannel.getVoltageRange())) {
+            range = 0;
+        } else {
+		    range++;
+        }
+
         return true;
     }
     
@@ -3853,14 +3870,34 @@ public:
             }
             return false;
         }
-        
-        range -= 1;
 
-        if ((int8_t)range < 0 || (int8_t)range > ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCurrentRangeMaxValue()) {
+        auto &ainChannel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+
+        auto maxRange = ainChannel.getCurrentRangeMaxValue();
+        if (maxRange == -1) {
             if (err) {
-                *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                *err = SCPI_ERROR_HARDWARE_MISSING;
             }
             return false;
+        }
+
+		if (range == 0) {
+            if (maxRange == 0) {
+                if (err) {
+                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                }
+                return false;
+            }
+            range = maxRange;
+        } else {
+            range--;
+
+            if (range < 0 || (maxRange == 0 && range != 0) || (int8_t)range > maxRange - 1) {
+                if (err) {
+                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                }
+                return false;
+            }
         }
 
         ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].setCurrentRange(range);
@@ -3875,7 +3912,25 @@ public:
 			}
 			return false;
 		}
-		range = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getVoltageRange() + 1;
+
+        auto &ainChannel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
+
+
+        auto maxRange = ainChannel.getVoltageRangeMaxValue();
+        if (maxRange == -1) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+		range = ainChannel.getVoltageRange();
+		if (AinChannel::isAutoRange(ainChannel.m_afeVersion, subchannelIndex, MEASURE_MODE_VOLTAGE, ainChannel.getCurrentRange(), range)) {
+            range = 0;
+        } else {
+		    range++;
+        }        
+
 		return true;
 	}
 
@@ -3887,13 +3942,33 @@ public:
 			return false;
 		}
 
-        range -= 1;
+		auto &ainChannel = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX];
 
-		if ((int8_t)range < 0 || (int8_t)range > ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getVoltageRangeMaxValue()) {
-			if (err) {
-				*err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+		auto maxRange = ainChannel.getVoltageRangeMaxValue();
+        if (maxRange == -1) {
+            if (err) {
+                *err = SCPI_ERROR_HARDWARE_MISSING;
+            }
+            return false;
+        }
+
+		if (range == 0) {
+			if (maxRange == 0) {
+				if (err) {
+					*err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+				}
+				return false;
 			}
-			return false;
+			range = maxRange;
+		} else {
+			range--;
+
+			if (range < 0 || (maxRange == 0 && range != 0) || (int8_t)range > maxRange - 1) {
+				if (err) {
+					*err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+				}
+				return false;
+			}
 		}
 
 		ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].setVoltageRange(range);
