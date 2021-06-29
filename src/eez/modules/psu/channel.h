@@ -714,6 +714,7 @@ public:
 protected:
     void doRemoteSensingEnable(bool enable);
     void doRemoteProgrammingEnable(bool enable);
+    float getITrip();
     void protectionEnter(ProtectionValue &cpv, bool hwOvp);
 
     ChannelHistory *channelHistory;
