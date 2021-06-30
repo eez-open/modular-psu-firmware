@@ -4708,6 +4708,10 @@ public:
     }
 
     int getNumDlogResources(int subchannelIndex) override {
+        if (!synchronized) {
+            return 0;
+        }
+
 		if (subchannelIndex == DIN_SUBCHANNEL_INDEX) {
             return 8;
         }
@@ -4907,6 +4911,10 @@ public:
     }
 
     int getNumFunctionGeneratorResources(int subchannelIndex) override {
+        if (!synchronized) {
+            return 0;
+        }
+
 		if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
 			return 8;
 		} else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX && !isError(subchannelIndex - AOUT_1_SUBCHANNEL_INDEX)) {
