@@ -723,7 +723,7 @@ public:
             return false;
         }
 
-        enabled = channel->pwmFrequency;
+        frequency = channel->pwmFrequency;
 
 		return true;
 	}
@@ -758,7 +758,7 @@ public:
             return false;
         }
 
-        enabled = channel->pwmDuty;
+        duty = channel->pwmDuty;
 
 		return true;
 	}

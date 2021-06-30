@@ -224,7 +224,7 @@ scpi_result_t scpi_cmd_senseVoltageDcRangeQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_senseCurrentDcNplcycles(scpi_t *context) {
+scpi_result_t scpi_cmd_senseNplcycles(scpi_t *context) {
     float nplc;
     if (!SCPI_ParamFloat(context, &nplc, true)) {
         return SCPI_RES_ERR;
@@ -236,7 +236,7 @@ scpi_result_t scpi_cmd_senseCurrentDcNplcycles(scpi_t *context) {
     }
 
     int err;
-    if (!channel_dispatcher::setMeasureCurrentNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
+    if (!channel_dispatcher::setMeasureNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -244,7 +244,7 @@ scpi_result_t scpi_cmd_senseCurrentDcNplcycles(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_senseCurrentDcNplcyclesQ(scpi_t *context) {
+scpi_result_t scpi_cmd_senseNplcyclesQ(scpi_t *context) {
     SlotAndSubchannelIndex slotAndSubchannelIndex;
     if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
@@ -252,7 +252,7 @@ scpi_result_t scpi_cmd_senseCurrentDcNplcyclesQ(scpi_t *context) {
 
     float nplc;
     int err;
-    if (!channel_dispatcher::getMeasureCurrentNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
+    if (!channel_dispatcher::getMeasureNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -262,27 +262,9 @@ scpi_result_t scpi_cmd_senseCurrentDcNplcyclesQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_senseCurrentDcApertureQ(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
-    float nplc;
-    int err;
-    if (!channel_dispatcher::getMeasureCurrentNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
-
-    SCPI_ResultFloat(context, nplc / persist_conf::getPowerLineFrequency());
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_senseVoltageDcNplcycles(scpi_t *context) {
-    float nplc;
-    if (!SCPI_ParamFloat(context, &nplc, true)) {
+scpi_result_t scpi_cmd_senseAperture(scpi_t *context) {
+    float aperture;
+    if (!SCPI_ParamFloat(context, &aperture, true)) {
         return SCPI_RES_ERR;
     }
 
@@ -292,7 +274,7 @@ scpi_result_t scpi_cmd_senseVoltageDcNplcycles(scpi_t *context) {
     }
 
     int err;
-    if (!channel_dispatcher::setMeasureVoltageNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
+    if (!channel_dispatcher::setMeasureAperture(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, aperture, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -300,38 +282,20 @@ scpi_result_t scpi_cmd_senseVoltageDcNplcycles(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_senseVoltageDcNplcyclesQ(scpi_t *context) {
+scpi_result_t scpi_cmd_senseApertureQ(scpi_t *context) {
     SlotAndSubchannelIndex slotAndSubchannelIndex;
     if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
     }
 
-    float nplc;
+    float aperture;
     int err;
-    if (!channel_dispatcher::getMeasureVoltageNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
+    if (!channel_dispatcher::getMeasureAperture(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, aperture, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
-    SCPI_ResultUInt8(context, nplc);
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_senseVoltageDcApertureQ(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
-    float nplc;
-    int err;
-    if (!channel_dispatcher::getMeasureVoltageNPLC(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, nplc, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
-
-    SCPI_ResultFloat(context, nplc / persist_conf::getPowerLineFrequency());
+    SCPI_ResultFloat(context, aperture);
 
     return SCPI_RES_OK;
 }

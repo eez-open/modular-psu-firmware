@@ -32481,7 +32481,7 @@
         },
         {
           "type": "Container",
-          "left": 171,
+          "left": 173,
           "top": 2,
           "width": 134,
           "height": 33,
@@ -72737,14 +72737,14 @@
             }
           },
           {
-            "name": "SENSe:CURRent[:DC]:NPLCycles",
+            "name": "SENSe:NPLCycles",
             "helpLink": "",
             "parameters": [
               {
                 "name": "cycles",
                 "type": [
                   {
-                    "type": "nr1"
+                    "type": "nr3"
                   }
                 ],
                 "isOptional": false
@@ -72769,7 +72769,7 @@
             }
           },
           {
-            "name": "SENSe:CURRent[:DC]:NPLCycles?",
+            "name": "SENSe:NPLCycles?",
             "helpLink": "",
             "parameters": [
               {
@@ -72778,6 +72778,28 @@
                   {
                     "type": "discrete",
                     "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
+            "response": {
+              "type": [
+                {
+                  "type": "nr3"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SENSe:APERture",
+            "helpLink": "",
+            "parameters": [
+              {
+                "name": "aperture",
+                "type": [
+                  {
+                    "type": "nr3"
                   }
                 ],
                 "isOptional": true
@@ -72792,7 +72814,7 @@
             }
           },
           {
-            "name": "SENSe:CURRent[:DC]:APERture?",
+            "name": "SENSe:APERture?",
             "helpLink": "",
             "parameters": [
               {
@@ -72809,85 +72831,7 @@
             "response": {
               "type": [
                 {
-                  "type": "numeric"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SENSe:VOLTage[:DC]:NPLCycles",
-            "helpLink": "",
-            "parameters": [
-              {
-                "name": "cycles",
-                "type": [
-                  {
-                    "type": "nr1"
-                  }
-                ],
-                "isOptional": false
-              },
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "numeric"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SENSe:VOLTage[:DC]:NPLCycles?",
-            "helpLink": "",
-            "parameters": [
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "numeric"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SENSe:VOLTage[:DC]:APERture?",
-            "helpLink": "",
-            "parameters": [
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
-            "response": {
-              "type": [
-                {
-                  "type": "numeric"
+                  "type": "nr3"
                 }
               ]
             }

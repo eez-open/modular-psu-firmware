@@ -150,12 +150,10 @@
     SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe?", scpi_cmd_senseCurrentDcRangeQ) \
     SCPI_COMMAND("SENSe:VOLTage[:DC]:RANGe", scpi_cmd_senseVoltageDcRange) \
     SCPI_COMMAND("SENSe:VOLTage[:DC]:RANGe?", scpi_cmd_senseVoltageDcRangeQ) \
-    SCPI_COMMAND("SENSe:CURRent[:DC]:NPLCycles", scpi_cmd_senseCurrentDcNplcycles) \
-    SCPI_COMMAND("SENSe:CURRent[:DC]:NPLCycles?", scpi_cmd_senseCurrentDcNplcyclesQ) \
-    SCPI_COMMAND("SENSe:CURRent[:DC]:APERture?", scpi_cmd_senseCurrentDcApertureQ) \
-    SCPI_COMMAND("SENSe:VOLTage[:DC]:NPLCycles", scpi_cmd_senseVoltageDcNplcycles) \
-    SCPI_COMMAND("SENSe:VOLTage[:DC]:NPLCycles?", scpi_cmd_senseVoltageDcNplcyclesQ) \
-    SCPI_COMMAND("SENSe:VOLTage[:DC]:APERture?", scpi_cmd_senseVoltageDcApertureQ) \
+    SCPI_COMMAND("SENSe:NPLCycles", scpi_cmd_senseNplcycles) \
+    SCPI_COMMAND("SENSe:NPLCycles?", scpi_cmd_senseNplcyclesQ) \
+    SCPI_COMMAND("SENSe:APERture", scpi_cmd_senseAperture) \
+    SCPI_COMMAND("SENSe:APERture?", scpi_cmd_senseApertureQ) \
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:CURRent", scpi_cmd_senseDlogFunctionCurrent) \
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:CURRent?", scpi_cmd_senseDlogFunctionCurrentQ) \
     SCPI_COMMAND("SENSe:DLOG:FUNCtion:POWer", scpi_cmd_senseDlogFunctionPower) \

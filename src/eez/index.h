@@ -340,11 +340,10 @@ struct Module {
     virtual bool getMeasureVoltageRange(int subchannelIndex, uint8_t &range, int *err);
     virtual bool setMeasureVoltageRange(int subchannelIndex, uint8_t range, int *err);
 
-    virtual bool getMeasureCurrentNPLC(int subchannelIndex, float &nplc, int *err);
-    virtual bool setMeasureCurrentNPLC(int subchannelIndex, float nplc, int *err);
-
-    virtual bool getMeasureVoltageNPLC(int subchannelIndex, float &nplc, int *err);
-    virtual bool setMeasureVoltageNPLC(int subchannelIndex, float nplc, int *err);
+    virtual bool getMeasureNPLC(int subchannelIndex, float &nplc, int *err);
+    virtual bool setMeasureNPLC(int subchannelIndex, float nplc, int *err);
+    virtual bool getMeasureAperture(int subchannelIndex, float &aperture, int *err);
+    virtual bool setMeasureAperture(int subchannelIndex, float aperture, int *err);
 
     virtual bool isRouteOpen(int subchannelIndex, bool &isRouteOpen, int *err);
     virtual bool routeOpen(ChannelList channelList, int *err);

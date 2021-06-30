@@ -126,6 +126,8 @@ static const uint32_t REFRESH_TIME_MS = 249;
 static const uint32_t TIMEOUT_TIME_MS = 350;
 static const uint32_t TIMEOUT_UNTIL_OUT_OF_SYNC_MS = 10000;
 
+static const float NPLC_PRECISION = 0.001f;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 enum Command {
@@ -682,8 +684,7 @@ private:
 	uint8_t m_voltageRange;
 
 public:
-    float m_currentNPLC = 1.0f;
-    float m_voltageNPLC = 1.0f;
+    float m_nplc = 1.0f;
     
 	char m_label[CHANNEL_LABEL_MAX_LENGTH + 1];
 
@@ -772,8 +773,7 @@ public:
         uint8_t mode;
 		uint8_t currentRange;
         uint8_t voltageRange;
-        float currentNPLC;
-        float voltageNPLC;
+        float nplc;
         char label[CHANNEL_LABEL_MAX_LENGTH + 1];
     };
 
@@ -821,8 +821,7 @@ public:
 			parameters.voltageRange = 0;
 		}
 
-        parameters.currentNPLC = 5.0f;
-        parameters.voltageNPLC = 5.0f;
+        parameters.nplc = 5.0f;
         *parameters.label = 0;
     }
 
@@ -830,8 +829,7 @@ public:
         parameters.mode = m_mode;
 		parameters.currentRange = m_currentRange;
         parameters.voltageRange = m_voltageRange;
-        parameters.currentNPLC = m_currentNPLC;
-        parameters.voltageNPLC = m_voltageNPLC;
+        parameters.nplc = m_nplc;
         memcpy(parameters.label, m_label, sizeof(m_label));
     }
 
@@ -839,8 +837,7 @@ public:
         m_mode = parameters.mode;
 		m_currentRange = parameters.currentRange;
 		m_voltageRange = parameters.voltageRange;
-        m_currentNPLC = parameters.currentNPLC;
-        m_voltageNPLC = parameters.voltageNPLC;
+        m_nplc = parameters.nplc;
         memcpy(m_label, parameters.label, sizeof(m_label));
 
 		if (m_mode == MEASURE_MODE_VOLTAGE) {
@@ -874,11 +871,8 @@ public:
 		snprintf(propName, sizeof(propName), "ain_%d_voltageRange", i + 1);
 		WRITE_PROPERTY(propName, parameters.voltageRange);
 		
-		snprintf(propName, sizeof(propName), "ain_%d_currentNPLC", i + 1);
-		WRITE_PROPERTY(propName, parameters.currentNPLC);
-
-		snprintf(propName, sizeof(propName), "ain_%d_voltageNPLC", i + 1);
-		WRITE_PROPERTY(propName, parameters.voltageNPLC);
+		snprintf(propName, sizeof(propName), "ain_%d_nplc", i + 1);
+		WRITE_PROPERTY(propName, parameters.nplc);
 
 		snprintf(propName, sizeof(propName), "ain_%d_label", i+1);
         WRITE_PROPERTY(propName, parameters.label);
@@ -898,11 +892,8 @@ public:
 		snprintf(propName, sizeof(propName), "ain_%d_voltageRange", i + 1);
 		READ_PROPERTY(propName, parameters.voltageRange);
 		
-		snprintf(propName, sizeof(propName), "ain_%d_currentNPLC", i + 1);
-		READ_PROPERTY(propName, parameters.currentNPLC);
-
-		snprintf(propName, sizeof(propName), "ain_%d_voltageNPLC", i + 1);
-		READ_PROPERTY(propName, parameters.voltageNPLC);
+		snprintf(propName, sizeof(propName), "ain_%d_nplc", i + 1);
+		READ_PROPERTY(propName, parameters.nplc);
 
 		snprintf(propName, sizeof(propName), "ain_%d_label", i+1);
         READ_STRING_PROPERTY(propName, parameters.label, CHANNEL_LABEL_MAX_LENGTH);
@@ -953,8 +944,7 @@ public:
 			m_currentRange = 0;
 			m_voltageRange = 0;
 		}
-        m_currentNPLC = 5.0f;
-        m_voltageNPLC = 5.0f;
+        m_nplc = 5.0f;
         *m_label = 0;
     }
 
@@ -2411,7 +2401,7 @@ public:
             auto channel = &ainChannels[i];
             params.ain[i].mode = channel->getMode();
             params.ain[i].range = channel->getMode() == MEASURE_MODE_VOLTAGE ? channel->getVoltageRange() : channel->getCurrentRange();
-            params.ain[i].nplc = channel->ongoingCal ? 25.0f : (channel->getMode() == MEASURE_MODE_VOLTAGE ? channel->m_voltageNPLC : channel->m_currentNPLC);
+            params.ain[i].nplc = channel->ongoingCal ? 25.0f : channel->m_nplc;
             
             int calConfIndex = channel->getCalConfIndex(0);
             for (int j = 0; j < 3; j++) {
@@ -3976,18 +3966,18 @@ public:
 		return true;
 	}
 
-    bool getMeasureCurrentNPLC(int subchannelIndex, float &nplc, int *err) override {
+    bool getMeasureNPLC(int subchannelIndex, float &nplc, int *err) override {
 		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
 			return false;
 		}
-        nplc = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_currentNPLC;
+        nplc = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_nplc;
         return true;
     }
 
-    bool setMeasureCurrentNPLC(int subchannelIndex, float nplc, int *err) override {
+    bool setMeasureNPLC(int subchannelIndex, float nplc, int *err) override {
 		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
@@ -4002,29 +3992,31 @@ public:
 			return false;
 		}
 
-		ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_currentNPLC = nplc;
+		ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_nplc = roundPrec(nplc, NPLC_PRECISION);
 
 		return true;
     }
 
-    bool getMeasureVoltageNPLC(int subchannelIndex, float &nplc, int *err) override {
+    bool getMeasureAperture(int subchannelIndex, float &aperture, int *err) override {
 		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
 			return false;
 		}
-        nplc = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_voltageNPLC;
+        aperture = ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_nplc / persist_conf::getPowerLineFrequency();
         return true;
     }
 
-    bool setMeasureVoltageNPLC(int subchannelIndex, float nplc, int *err) override {
+    bool setMeasureAperture(int subchannelIndex, float aperture, int *err) override {
 		if (subchannelIndex < AIN_1_SUBCHANNEL_INDEX || subchannelIndex > AIN_4_SUBCHANNEL_INDEX || isError(subchannelIndex - AIN_1_SUBCHANNEL_INDEX)) {
 			if (err) {
 				*err = SCPI_ERROR_HARDWARE_MISSING;
 			}
 			return false;
 		}
+
+		float nplc = aperture * persist_conf::getPowerLineFrequency();
  
 		if (nplc < 0.0f || nplc > 25.0f) {
 			if (err) {
@@ -4033,7 +4025,7 @@ public:
 			return false;
 		}
 
-		ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_voltageNPLC = nplc;
+		ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].m_nplc = roundPrec(nplc, NPLC_PRECISION);
 
 		return true;
     }
@@ -5171,6 +5163,54 @@ public:
 
         return Module::getMaxTemperature();
     }
+
+    bool getSourcePwmFrequency(int subchannelIndex, float &frequency, int *err) override  {
+        if (subchannelIndex >= PWM_1_SUBCHANNEL_INDEX && subchannelIndex <= PWM_2_SUBCHANNEL_INDEX) {
+            frequency = pwmChannels[subchannelIndex - PWM_1_SUBCHANNEL_INDEX].m_freq;
+            return true;
+        }
+
+        return Module::getSourcePwmFrequency(subchannelIndex, frequency, err);
+	}
+    
+    bool setSourcePwmFrequency(int subchannelIndex, float frequency, int *err) override  {
+        if (subchannelIndex >= PWM_1_SUBCHANNEL_INDEX && subchannelIndex <= PWM_2_SUBCHANNEL_INDEX) {
+            if (frequency < PWM_MIN_FREQUENCY || frequency > PWM_MAX_FREQUENCY) {
+                if (err) {
+                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                }
+                return false;
+            }
+            pwmChannels[subchannelIndex - PWM_1_SUBCHANNEL_INDEX].m_freq = frequency;
+			return true;
+        }
+
+		return Module::setSourcePwmFrequency(subchannelIndex, frequency, err);
+	}
+
+    bool getSourcePwmDuty(int subchannelIndex, float &duty, int *err) override  {
+        if (subchannelIndex >= PWM_1_SUBCHANNEL_INDEX && subchannelIndex <= PWM_2_SUBCHANNEL_INDEX) {
+            duty = pwmChannels[subchannelIndex - PWM_1_SUBCHANNEL_INDEX].m_duty;
+            return true;
+        }
+
+        return Module::getSourcePwmFrequency(subchannelIndex, duty, err);
+	}
+    
+    bool setSourcePwmDuty(int subchannelIndex, float duty, int *err) override  {
+        if (subchannelIndex >= PWM_1_SUBCHANNEL_INDEX && subchannelIndex <= PWM_2_SUBCHANNEL_INDEX) {
+            if (duty < 0 || duty > 100.0f) {
+                if (err) {
+                    *err = SCPI_ERROR_ILLEGAL_PARAMETER_VALUE;
+                }
+                return false;
+            }
+            pwmChannels[subchannelIndex - PWM_1_SUBCHANNEL_INDEX].m_duty = duty;
+			return true;
+        }
+
+		return Module::setSourcePwmFrequency(subchannelIndex, duty, err);
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5369,8 +5409,7 @@ public:
         m_mode = m_modeOrig = channel.getMode();
         m_currentRange = m_currentRangeOrig = channel.getCurrentRange();
 		m_voltageRange = m_voltageRangeOrig = channel.getVoltageRange();
-        m_currentNPLC = m_currentNPLCOrig = channel.m_currentNPLC;
-        m_voltageNPLC = m_voltageNPLCOrig = channel.m_voltageNPLC;
+        m_nplc = m_nplcOrig = channel.m_nplc;
     }
 
     int getDirty() { 
@@ -5378,11 +5417,15 @@ public:
             return true;
         }
 
-        if (m_mode == MEASURE_MODE_VOLTAGE) {
-            return m_voltageRange != m_voltageRangeOrig || m_voltageNPLC != m_voltageNPLCOrig;
+        if (m_nplc != m_nplcOrig) {
+            return true;
         }
 
-        return m_currentRange != m_currentRangeOrig || m_currentNPLC != m_currentNPLCOrig;
+        if (m_mode == MEASURE_MODE_VOLTAGE) {
+            return m_voltageRange != m_voltageRangeOrig;
+        }
+
+        return m_currentRange != m_currentRangeOrig;
     }
 
     void set() {
@@ -5502,8 +5545,7 @@ public:
     uint8_t m_mode;
 	uint8_t m_currentRange;
     uint8_t m_voltageRange;
-    float m_currentNPLC;
-    float m_voltageNPLC;
+    float m_nplc;
 
     static uint8_t getModeRange(int slotIndex, int subchannelIndex) {
         Mio168Module *module = (Mio168Module *)g_slots[slotIndex];
@@ -5616,8 +5658,7 @@ private:
     uint8_t m_modeOrig;
     uint8_t m_currentRangeOrig;
 	uint8_t m_voltageRangeOrig;
-    float m_currentNPLCOrig;
-    float m_voltageNPLCOrig;
+    float m_nplcOrig;
 };
 
 int AinConfigurationPage::g_selectedChannelIndex;
@@ -5823,11 +5864,10 @@ void Mio168Module::onHighPriorityThreadMessage(uint8_t type, uint32_t param) {
         channel.setMode((MeasureMode)g_ainConfigurationPage.m_mode);
 		if (g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE) {
 			channel.setVoltageRange(g_ainConfigurationPage.m_voltageRange);
-            channel.m_voltageNPLC = g_ainConfigurationPage.m_voltageNPLC;
 		} else {
 			channel.setCurrentRange(g_ainConfigurationPage.m_currentRange);
-            channel.m_currentNPLC = g_ainConfigurationPage.m_currentNPLC;
 		}
+        channel.m_nplc = g_ainConfigurationPage.m_nplc;
     } else if (type == PSU_MESSAGE_AOUT_DAC7760_CONFIGURE) {
         auto &channel = aoutDac7760Channels[AoutDac7760ConfigurationPage::g_selectedChannelIndex - AOUT_1_SUBCHANNEL_INDEX];
         channel.m_outputEnabled = g_aoutDac7760ConfigurationPage.m_outputEnabled;
@@ -6364,12 +6404,7 @@ void data_dib_mio168_ain_nplc(DataOperationEnum operation, Cursor cursor, Value 
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
         } else {
-            value = MakeValue(
-                g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE ?
-                    g_ainConfigurationPage.m_voltageNPLC :
-                    g_ainConfigurationPage.m_currentNPLC,
-                UNIT_UNKNOWN
-            );
+            value = MakeValue(g_ainConfigurationPage.m_nplc, UNIT_UNKNOWN);
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = MakeValue(0.0f, UNIT_UNKNOWN);
@@ -6396,22 +6431,13 @@ void data_dib_mio168_ain_nplc(DataOperationEnum operation, Cursor cursor, Value 
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
 		edit_mode_step::g_mio168NplcEncoderMode = (EncoderMode)value.getInt();
     } else if (operation == DATA_OPERATION_SET) {
-        if (g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE) {
-            g_ainConfigurationPage.m_voltageNPLC = value.getFloat();
-        } else {
-            g_ainConfigurationPage.m_currentNPLC = value.getFloat();
-        }
+        g_ainConfigurationPage.m_nplc = roundPrec(value.getFloat(), NPLC_PRECISION);
     }
 }
 
 void data_dib_mio168_ain_aperture(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(
-            (
-                g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE ?
-                    g_ainConfigurationPage.m_voltageNPLC :
-                    g_ainConfigurationPage.m_currentNPLC
-            ) / persist_conf::getPowerLineFrequency(), UNIT_SECOND);
+        value = Value(g_ainConfigurationPage.m_nplc / persist_conf::getPowerLineFrequency(), UNIT_SECOND);
     }
 }
 

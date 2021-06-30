@@ -2381,20 +2381,20 @@ bool setMeasureVoltageRange(int slotIndex, int subchannelIndex, uint8_t range, i
     return g_slots[slotIndex]->setMeasureVoltageRange(subchannelIndex, range, err);
 }
 
-bool getMeasureCurrentNPLC(int slotIndex, int subchannelIndex, float &nplc, int *err) {
-    return g_slots[slotIndex]->getMeasureCurrentNPLC(subchannelIndex, nplc, err);
+bool getMeasureNPLC(int slotIndex, int subchannelIndex, float &nplc, int *err) {
+    return g_slots[slotIndex]->getMeasureNPLC(subchannelIndex, nplc, err);
 }
 
-bool setMeasureCurrentNPLC(int slotIndex, int subchannelIndex, float nplc, int *err) {
-    return g_slots[slotIndex]->setMeasureCurrentNPLC(subchannelIndex, nplc, err);
+bool setMeasureNPLC(int slotIndex, int subchannelIndex, float nplc, int *err) {
+    return g_slots[slotIndex]->setMeasureNPLC(subchannelIndex, nplc, err);
 }
 
-bool getMeasureVoltageNPLC(int slotIndex, int subchannelIndex, float &nplc, int *err) {
-    return g_slots[slotIndex]->getMeasureVoltageNPLC(subchannelIndex, nplc, err);
+bool getMeasureAperture(int slotIndex, int subchannelIndex, float &aperture, int *err) {
+    return g_slots[slotIndex]->getMeasureAperture(subchannelIndex, aperture, err);
 }
 
-bool setMeasureVoltageNPLC(int slotIndex, int subchannelIndex, float nplc, int *err) {
-    return g_slots[slotIndex]->setMeasureVoltageNPLC(subchannelIndex, nplc, err);
+bool setMeasureAperture(int slotIndex, int subchannelIndex, float aperture, int *err) {
+    return g_slots[slotIndex]->setMeasureAperture(subchannelIndex, aperture, err);
 }
 
 bool routeOpen(ChannelList channelList, int *err) {

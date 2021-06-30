@@ -460,29 +460,29 @@ bool Module::setMeasureVoltageRange(int subchannelIndex, uint8_t range, int *err
 	return false;
 }
 
-bool Module::getMeasureCurrentNPLC(int subchannelIndex, float &nplc, int *err) {
+bool Module::getMeasureNPLC(int subchannelIndex, float &nplc, int *err) {
 	if (err) {
 		*err = SCPI_ERROR_HARDWARE_MISSING;
 	}
 	return false;
 }
 
-bool Module::setMeasureCurrentNPLC(int subchannelIndex, float nplc, int *err) {
+bool Module::setMeasureNPLC(int subchannelIndex, float nplc, int *err) {
 	if (err) {
 		*err = SCPI_ERROR_HARDWARE_MISSING;
 	}
 	return false;
 }
 
-bool Module::getMeasureVoltageNPLC(int subchannelIndex, float &nplc, int *err) {
+bool Module::getMeasureAperture(int subchannelIndex, float &nplc, int *err) {
 	if (err) {
 		*err = SCPI_ERROR_HARDWARE_MISSING;
 	}
 	return false;
 }
 
-bool Module::setMeasureVoltageNPLC(int subchannelIndex, float nplc, int *err) {
-	if (err) { 
+bool Module::setMeasureAperture(int subchannelIndex, float nplc, int *err) {
+	if (err) {
 		*err = SCPI_ERROR_HARDWARE_MISSING;
 	}
 	return false;
