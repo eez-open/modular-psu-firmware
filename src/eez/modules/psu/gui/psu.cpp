@@ -620,9 +620,7 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
         } else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
             edit_mode_step::onTouchUp();
         } else if (activePageId == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
-#if !defined(EEZ_PLATFORM_SIMULATOR)
             enterTouchCalibration();
-#endif
         }
     } else if (touchEvent.type == EVENT_TYPE_LONG_TOUCH) {
         if (activePageId == PAGE_ID_NONE || activePageId == PAGE_ID_STANDBY) {

@@ -29,6 +29,8 @@
 #include <eez/system.h>
 #include <eez/index.h>
 #include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/persist_conf.h>
+#include <eez/modules/psu/psu.h>
 #include <eez/modules/bp3c/eeprom.h>
 
 #include <scpi/scpi.h>
@@ -103,7 +105,12 @@ bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t addr
     char *filePath = getConfFilePath(fileName);
     FILE *fp = fopen(filePath, "r+b");
     if (fp == NULL) {
-        writeModuleType(slotIndex, MODULE_TYPE_DCP405);
+        if (slotIndex == 2) {
+            writeModuleType(slotIndex, MODULE_TYPE_DIB_MIO168);
+            psu::persist_conf::setAfeVersion(slotIndex, 3);
+        } else {
+            writeModuleType(slotIndex, MODULE_TYPE_DCP405);
+        }
         fp = fopen(filePath, "r+b");
     }
     

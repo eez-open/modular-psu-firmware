@@ -69950,12 +69950,12 @@
           },
           {
             "name": "CALibration:CURRent:MEASure?",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_curr_meas",
             "parameters": [],
             "response": {
               "type": [
                 {
-                  "type": "nr1"
+                  "type": "boolean"
                 }
               ]
             }
@@ -70126,12 +70126,12 @@
           },
           {
             "name": "CALibration:VOLTage:MEASure?",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.2 - CALibrate.html#cal_volt_meas",
             "parameters": [],
             "response": {
               "type": [
                 {
-                  "type": "nr1"
+                  "type": "boolean"
                 }
               ]
             }
@@ -71225,11 +71225,14 @@
           },
           {
             "name": "MEASure:DIGital[:BYTE]?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_dig",
             "parameters": [
               {
+                "name": "channel",
                 "type": [
                   {
-                    "type": "channel-list"
+                    "type": "discrete",
+                    "enumeration": "Channel"
                   }
                 ],
                 "isOptional": true
@@ -71245,14 +71248,16 @@
           },
           {
             "name": "MEASure[:SCALar]:TEMPerature[:THERmistor][:DC]?",
+            "helpLink": "EEZ BB3 SCPI reference 5.9 - MEASure.html#meas_temp",
             "parameters": [
               {
-                "name": "channels",
+                "name": "chanlist",
                 "type": [
                   {
                     "type": "channel-list"
                   }
-                ]
+                ],
+                "isOptional": true
               }
             ],
             "response": {
@@ -72569,14 +72574,14 @@
         "commands": [
           {
             "name": "SENSe:FUNCtion[:ON]",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sense_func",
             "parameters": [
               {
                 "name": "function",
                 "type": [
                   {
                     "type": "discrete",
-                    "enumeration": "MeasureFunction"
+                    "enumeration": "SourceFunction"
                   }
                 ],
                 "isOptional": false
@@ -72602,7 +72607,7 @@
           },
           {
             "name": "SENSe:FUNCtion[:ON]?",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sense_func",
             "parameters": [
               {
                 "name": "channel",
@@ -72683,7 +72688,7 @@
           },
           {
             "name": "SENSe:VOLTage[:DC]:RANGe",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_volt_rang",
             "parameters": [
               {
                 "name": "range",
@@ -72715,7 +72720,7 @@
           },
           {
             "name": "SENSe:VOLTage[:DC]:RANGe?",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_volt_rang",
             "parameters": [
               {
                 "name": "channel",
@@ -72738,26 +72743,16 @@
           },
           {
             "name": "SENSe:NPLCycles",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sense_nplc",
             "parameters": [
               {
                 "name": "cycles",
                 "type": [
                   {
-                    "type": "nr3"
+                    "type": "nr2"
                   }
                 ],
                 "isOptional": false
-              },
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
               }
             ],
             "response": {
@@ -72770,39 +72765,28 @@
           },
           {
             "name": "SENSe:NPLCycles?",
-            "helpLink": "",
-            "parameters": [
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sense_nplc",
+            "parameters": [],
             "response": {
               "type": [
                 {
-                  "type": "nr3"
+                  "type": "nr2"
                 }
               ]
             }
           },
           {
             "name": "SENSe:APERture",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_aper",
             "parameters": [
               {
-                "name": "aperture",
+                "name": "period",
                 "type": [
                   {
-                    "type": "nr3"
+                    "type": "nr2"
                   }
                 ],
-                "isOptional": true
+                "isOptional": false
               }
             ],
             "response": {
@@ -72815,19 +72799,8 @@
           },
           {
             "name": "SENSe:APERture?",
-            "helpLink": "",
-            "parameters": [
-              {
-                "name": "channel",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Channel"
-                  }
-                ],
-                "isOptional": true
-              }
-            ],
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_aper",
+            "parameters": [],
             "response": {
               "type": [
                 {
@@ -73003,7 +72976,7 @@
           },
           {
             "name": "SENSe:DLOG:FUNCtion:DIGital[:INPut]",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_func_dig",
             "parameters": [
               {
                 "name": "pin",
@@ -73011,7 +72984,8 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               },
               {
                 "name": "enable",
@@ -73019,7 +72993,8 @@
                   {
                     "type": "boolean"
                   }
-                ]
+                ],
+                "isOptional": false
               },
               {
                 "name": "channel",
@@ -73029,7 +73004,7 @@
                     "enumeration": "Channel"
                   }
                 ],
-                "isOptional": true
+                "isOptional": false
               }
             ],
             "response": {
@@ -73042,7 +73017,7 @@
           },
           {
             "name": "SENSe:DLOG:FUNCtion:DIGital[:INPut]?",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_func_dig",
             "parameters": [
               {
                 "name": "pin",
@@ -73050,7 +73025,8 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               },
               {
                 "name": "channel",
@@ -73060,7 +73036,7 @@
                     "enumeration": "Channel"
                   }
                 ],
-                "isOptional": true
+                "isOptional": false
               }
             ],
             "response": {
@@ -73553,10 +73529,10 @@
           },
           {
             "name": "SENSe:DLOG:TRACe:BOOKmark",
-            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_trac_data",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dlog_book",
             "parameters": [
               {
-                "name": "bookmark_text",
+                "name": "bookmark",
                 "type": [
                   {
                     "type": "quoted-string"
@@ -73578,6 +73554,92 @@
             "response": {
               "type": [
                 {}
+              ]
+            }
+          },
+          {
+            "name": "SENSe:DIGital:RANGe",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dig_rang",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "range",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Range"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SENSe:DIGital:RANGe?",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dig_rang",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Range"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SENSe:DIGital:SPEed",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dig_spe",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "speed",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Speed"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SENSe:DIGital:SPEed?",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html#sens_dig_spe",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "Speed"
+                }
               ]
             }
           }
@@ -73941,6 +74003,200 @@
               "type": [
                 {
                   "type": "numeric"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:SHAPe",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_shap",
+            "parameters": [
+              {
+                "name": "waveform",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "SourceFunctionShape"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:SHAPe?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_shap",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "discrete",
+                  "enumeration": "SourceFunctionShape"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:FREQuency",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_freq",
+            "parameters": [
+              {
+                "name": "frequency",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:FREQuency?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_freq",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:PHASeshift",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_phas",
+            "parameters": [
+              {
+                "name": "phase",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:PHASeshift?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_phas",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:AMPLitude",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_ampl",
+            "parameters": [
+              {
+                "name": "amplitude",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:AMPLitude?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_ampl",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:OFFSet",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_offs",
+            "parameters": [
+              {
+                "name": "offset",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:OFFSet?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_offs",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:DUTY",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_duty",
+            "parameters": [
+              {
+                "name": "duty",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:CURRent:FUNCtion:DUTY?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_func_duty",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
                 }
               ]
             }
@@ -74778,15 +75034,18 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:DIGital:DATA[:BYTE]",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:SHAPe",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_shap",
             "parameters": [
               {
-                "name": "value",
+                "name": "waveform",
                 "type": [
                   {
-                    "type": "nr1"
+                    "type": "discrete",
+                    "enumeration": "SourceFunctionShape"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -74796,35 +75055,30 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:DIGital:DATA[:BYTE]?",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:SHAPe?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_shap",
             "parameters": [],
             "response": {
               "type": [
                 {
-                  "type": "nr1"
+                  "type": "discrete",
+                  "enumeration": "SourceFunctionShape"
                 }
               ]
             }
           },
           {
-            "name": "[SOURce[<n>]]:DIGital:RANGe",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:FREQuency",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_freq",
             "parameters": [
               {
-                "name": "pin",
+                "name": "frequency",
                 "type": [
                   {
-                    "type": "nr1"
+                    "type": "nr2"
                   }
-                ]
-              },
-              {
-                "name": "range",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Range"
-                  }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -74834,45 +75088,29 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:DIGital:RANGe?",
-            "parameters": [
-              {
-                "name": "pin",
-                "type": [
-                  {
-                    "type": "nr1"
-                  }
-                ]
-              }
-            ],
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:FREQuency?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_freq",
+            "parameters": [],
             "response": {
               "type": [
                 {
-                  "type": "discrete",
-                  "enumeration": "Range"
+                  "type": "nr2"
                 }
               ]
             }
           },
           {
-            "name": "[SOURce[<n>]]:DIGital:SPEed",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:PHASeshift",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_phas",
             "parameters": [
               {
-                "name": "pin",
+                "name": "phase",
                 "type": [
                   {
-                    "type": "nr1"
+                    "type": "nr2"
                   }
-                ]
-              },
-              {
-                "name": "speed",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "Speed"
-                  }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -74882,28 +75120,116 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:DIGital:SPEed?",
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:PHASeshift?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_phas",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:AMPLitude",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_ampl",
             "parameters": [
               {
-                "name": "pin",
+                "name": "amplitude",
                 "type": [
                   {
-                    "type": "nr1"
+                    "type": "nr2"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
               "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:AMPLitude?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_ampl",
+            "parameters": [],
+            "response": {
+              "type": [
                 {
-                  "type": "discrete",
-                  "enumeration": "Speed"
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:OFFSet",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_offs",
+            "parameters": [
+              {
+                "name": "offset",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:OFFSet?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_offs",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:DUTY",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_duty",
+            "parameters": [
+              {
+                "name": "duty",
+                "type": [
+                  {
+                    "type": "nr2"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:DUTY?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_func_duty",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "nr2"
                 }
               ]
             }
           },
           {
             "name": "SOURce:FUNCtion[:ON]",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_func",
             "parameters": [
               {
                 "name": "function",
@@ -74912,7 +75238,8 @@
                     "type": "discrete",
                     "enumeration": "SourceFunction"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -74923,6 +75250,7 @@
           },
           {
             "name": "SOURce:FUNCtion[:ON]?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_func",
             "parameters": [],
             "response": {
               "type": [
@@ -74934,7 +75262,8 @@
             }
           },
           {
-            "name": "SOURce:CURRent:RANGe",
+            "name": "SOURce:CURRent[:DC]:RANGe",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_rang",
             "parameters": [
               {
                 "name": "range",
@@ -74942,7 +75271,18 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
               }
             ],
             "response": {
@@ -74952,8 +75292,20 @@
             }
           },
           {
-            "name": "SOURce:CURRent:RANGe?",
-            "parameters": [],
+            "name": "SOURce:CURRent[:DC]:RANGe?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_curr_rang",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
             "response": {
               "type": [
                 {
@@ -74963,7 +75315,8 @@
             }
           },
           {
-            "name": "SOURce:VOLTage:RANGe",
+            "name": "SOURce:VOLTage[:DC]:RANGe",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_rang",
             "parameters": [
               {
                 "name": "range",
@@ -74971,7 +75324,18 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
               }
             ],
             "response": {
@@ -74981,8 +75345,20 @@
             }
           },
           {
-            "name": "SOURce:VOLTage:RANGe?",
-            "parameters": [],
+            "name": "SOURce:VOLTage[:DC]:RANGe?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_volt_rang",
+            "parameters": [
+              {
+                "name": "channel",
+                "type": [
+                  {
+                    "type": "discrete",
+                    "enumeration": "Channel"
+                  }
+                ],
+                "isOptional": true
+              }
+            ],
             "response": {
               "type": [
                 {
@@ -74993,10 +75369,10 @@
           },
           {
             "name": "SOURce:PWM:STATe",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_pwm_stat",
             "parameters": [
               {
-                "name": "enable",
+                "name": "bool",
                 "type": [
                   {
                     "type": "boolean"
@@ -75015,7 +75391,7 @@
           },
           {
             "name": "SOURce:PWM:STATe?",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_pwm_stat",
             "parameters": [],
             "response": {
               "type": [
@@ -75027,13 +75403,13 @@
           },
           {
             "name": "SOURce:PWM:DUTY",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_pwm_duty",
             "parameters": [
               {
                 "name": "duty",
                 "type": [
                   {
-                    "type": "nr3"
+                    "type": "nr2"
                   }
                 ],
                 "isOptional": false
@@ -75047,25 +75423,25 @@
           },
           {
             "name": "SOURce:PWM:DUTY?",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_pwm_duty",
             "parameters": [],
             "response": {
               "type": [
                 {
-                  "type": "nr3"
+                  "type": "nr2"
                 }
               ]
             }
           },
           {
             "name": "SOURce:PWM:FREQuency",
-            "helpLink": "",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_pwm_freq",
             "parameters": [
               {
                 "name": "frequency",
                 "type": [
                   {
-                    "type": "nr3"
+                    "type": "nr2"
                   }
                 ],
                 "isOptional": false
@@ -75079,67 +75455,7 @@
           },
           {
             "name": "SOURce:PWM:FREQuency?",
-            "helpLink": "",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr3"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:SHAPe",
-            "parameters": [
-              {
-                "name": "shape",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "SourceFunctionShape"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:SHAPe?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "discrete",
-                  "enumeration": "SourceFunctionShape"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:FREQuency",
-            "parameters": [
-              {
-                "name": "frequency",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:FREQuency?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_pwm_freq",
             "parameters": [],
             "response": {
               "type": [
@@ -75150,15 +75466,17 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:PHASeshift",
+            "name": "SOURce:DIGital:DATA[:BYTE]",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_dig_data",
             "parameters": [
               {
-                "name": "phase_shift",
+                "name": "value",
                 "type": [
                   {
-                    "type": "nr2"
+                    "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -75168,281 +75486,20 @@
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:PHASeshift?",
+            "name": "SOURce:DIGital:DATA[:BYTE]?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_dig_data",
             "parameters": [],
             "response": {
               "type": [
                 {
-                  "type": "nr2"
+                  "type": "nr1"
                 }
               ]
             }
           },
           {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:AMPLitude",
-            "parameters": [
-              {
-                "name": "amplitude",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:AMPLitude?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:OFFSet",
-            "parameters": [
-              {
-                "name": "offset",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:OFFSet?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:DUTY",
-            "parameters": [
-              {
-                "name": "duty",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:VOLTage:FUNCtion:DUTY?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:SHAPe",
-            "parameters": [
-              {
-                "name": "shape",
-                "type": [
-                  {
-                    "type": "discrete",
-                    "enumeration": "SourceFunctionShape"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:SHAPe?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "discrete",
-                  "enumeration": "SourceFunctionShape"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:FREQuency",
-            "parameters": [
-              {
-                "name": "frequency",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:FREQuency?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:PHASeshift",
-            "parameters": [
-              {
-                "name": "phase_shift",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:PHASeshift?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:AMPLitude",
-            "parameters": [
-              {
-                "name": "amplitude",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:AMPLitude?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:OFFSet",
-            "parameters": [
-              {
-                "name": "offset",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:OFFSet?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:DUTY",
-            "parameters": [
-              {
-                "name": "duty",
-                "type": [
-                  {
-                    "type": "nr2"
-                  }
-                ]
-              }
-            ],
-            "response": {
-              "type": [
-                {}
-              ]
-            }
-          },
-          {
-            "name": "[SOURce[<n>]]:CURRent:FUNCtion:DUTY?",
-            "parameters": [],
-            "response": {
-              "type": [
-                {
-                  "type": "nr2"
-                }
-              ]
-            }
-          },
-          {
-            "name": "SOURce:DIGital[:OUTPut]:MODE",
+            "name": "SOURce:DIGital:MODE",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_digi_mode",
             "parameters": [
               {
                 "name": "pin",
@@ -75450,7 +75507,8 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               },
               {
                 "name": "mode",
@@ -75459,7 +75517,8 @@
                     "type": "discrete",
                     "enumeration": "TriggerModeDigitalOutput"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -75469,7 +75528,8 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:MODE?",
+            "name": "SOURce:DIGital:MODE?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_digi_mode",
             "parameters": [
               {
                 "name": "pin",
@@ -75477,7 +75537,8 @@
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -75490,16 +75551,27 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe",
+            "name": "SOURce:DIGital:FUNCtion:SHAPe",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_dig_func_shap",
             "parameters": [
               {
-                "name": "shape",
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "waveform",
                 "type": [
                   {
                     "type": "discrete",
                     "enumeration": "SourceFunctionShapeDigitalOutput"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -75509,8 +75581,19 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe?",
-            "parameters": [],
+            "name": "SOURce:DIGital:FUNCtion:SHAPe?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_dig_func_shap",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
             "response": {
               "type": [
                 {
@@ -75521,15 +75604,26 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency",
+            "name": "SOURce:DIGital:FUNCtion:FREQuency",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_digi_func_freq",
             "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              },
               {
                 "name": "frequency",
                 "type": [
                   {
                     "type": "nr2"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -75539,8 +75633,19 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency?",
-            "parameters": [],
+            "name": "SOURce:DIGital:FUNCtion:FREQuency?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_digi_func_freq",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
             "response": {
               "type": [
                 {
@@ -75550,15 +75655,26 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift",
+            "name": "SOURce:DIGital:FUNCtion:PHASeshift",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_digi_func_phas",
             "parameters": [
               {
-                "name": "phase_shift",
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              },
+              {
+                "name": "phase",
                 "type": [
                   {
                     "type": "nr2"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -75568,8 +75684,19 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift?",
-            "parameters": [],
+            "name": "SOURce:DIGital:FUNCtion:PHASeshift?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_digi_func_phas",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
             "response": {
               "type": [
                 {
@@ -75579,15 +75706,26 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:DUTY",
+            "name": "SOURce:DIGital:FUNCtion:DUTY",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_dig_func_duty",
             "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              },
               {
                 "name": "duty",
                 "type": [
                   {
                     "type": "nr2"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -75597,8 +75735,19 @@
             }
           },
           {
-            "name": "SOURce:DIGital[:OUTPut]:FUNCtion:DUTY?",
-            "parameters": [],
+            "name": "SOURce:DIGital:FUNCtion:DUTY?",
+            "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html#sour_digi_func_duty",
+            "parameters": [
+              {
+                "name": "pin",
+                "type": [
+                  {
+                    "type": "nr1"
+                  }
+                ],
+                "isOptional": false
+              }
+            ],
             "response": {
               "type": [
                 {
@@ -77083,16 +77232,17 @@
           },
           {
             "name": "SYSTem:COMMunicate:UART:MODE",
-            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_usb_mode",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_uart_mode",
             "parameters": [
               {
-                "name": "mode",
+                "name": "uart_mode",
                 "type": [
                   {
                     "type": "discrete",
                     "enumeration": "UartMode"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -78589,14 +78739,17 @@
           },
           {
             "name": "SYSTem:COMMunicate:UART:BAUD",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_uart_baud",
             "parameters": [
               {
                 "name": "baud",
                 "type": [
                   {
-                    "type": "nr1"
+                    "type": "discrete",
+                    "enumeration": "UartBaud"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -78607,17 +78760,23 @@
           },
           {
             "name": "SYSTem:COMMunicate:UART:BAUD?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_uart_baud",
             "parameters": [],
             "response": {
               "type": [
                 {
                   "type": "nr1"
+                },
+                {
+                  "type": "discrete",
+                  "enumeration": "UartBaud"
                 }
               ]
             }
           },
           {
             "name": "SYSTem:COMMunicate:UART:PARIty",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_uart_pari",
             "parameters": [
               {
                 "name": "parity",
@@ -78626,7 +78785,8 @@
                     "type": "discrete",
                     "enumeration": "UartParity"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -78637,6 +78797,7 @@
           },
           {
             "name": "SYSTem:COMMunicate:UART:PARIty?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_uart_pari",
             "parameters": [],
             "response": {
               "type": [
@@ -78649,14 +78810,16 @@
           },
           {
             "name": "SYSTem:COMMunicate:UART:DATA",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_uart_data",
             "parameters": [
               {
-                "name": "bits",
+                "name": "data",
                 "type": [
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -78667,6 +78830,7 @@
           },
           {
             "name": "SYSTem:COMMunicate:UART:DATA?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_uart_data",
             "parameters": [],
             "response": {
               "type": [
@@ -78678,14 +78842,16 @@
           },
           {
             "name": "SYSTem:COMMunicate:UART:STOP",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_uart_stop",
             "parameters": [
               {
-                "name": "bits",
+                "name": "stop",
                 "type": [
                   {
                     "type": "nr1"
                   }
-                ]
+                ],
+                "isOptional": false
               }
             ],
             "response": {
@@ -78696,6 +78862,7 @@
           },
           {
             "name": "SYSTem:COMMunicate:UART:STOP?",
+            "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html#syst_comm_uart_stop",
             "parameters": [],
             "response": {
               "type": [
@@ -80659,11 +80826,11 @@
         "name": "Speed",
         "members": [
           {
-            "name": "Fast",
+            "name": "FAST",
             "value": "0"
           },
           {
-            "name": "Slow",
+            "name": "SLOW",
             "value": "1"
           }
         ]
@@ -80678,10 +80845,6 @@
           {
             "name": "VOLTage",
             "value": "1"
-          },
-          {
-            "name": "OPEN",
-            "value": "2"
           }
         ]
       },
@@ -80706,12 +80869,15 @@
         "name": "UartMode",
         "members": [
           {
-            "name": "PASS",
+            "name": "BOOKmark",
             "value": "0"
           },
           {
-            "name": "SCPI",
+            "name": "BUFFer",
             "value": "1"
+          },
+          {
+            "name": "SCPI"
           }
         ]
       },
@@ -80754,6 +80920,10 @@
         "name": "SourceFunctionShapeDigitalOutput",
         "members": [
           {
+            "name": "DC",
+            "value": "1"
+          },
+          {
             "name": "SQUare",
             "value": "4"
           },
@@ -80777,6 +80947,35 @@
           {
             "name": "ODD",
             "value": "2"
+          }
+        ]
+      },
+      {
+        "name": "UartBaud",
+        "members": [
+          {
+            "name": "9600",
+            "value": "9600"
+          },
+          {
+            "name": "14400",
+            "value": "14400"
+          },
+          {
+            "name": "19200",
+            "value": "19200"
+          },
+          {
+            "name": "38400",
+            "value": "38400"
+          },
+          {
+            "name": "57600",
+            "value": "57600"
+          },
+          {
+            "name": "115200",
+            "value": "115200"
           }
         ]
       }
@@ -80979,9 +81178,9 @@
       "idn": "Envox,EEZ BB3 (STM32)",
       "idfName": "EEZ BB3 STM32",
       "idfShortName": "EEZ-BB3-STM32",
-      "idfFirmwareVersion": "1.6",
+      "idfFirmwareVersion": "1.7",
       "idfGuid": "687b6dee-2093-4c36-afb7-cfc7ea2bf262",
-      "idfRevisionNumber": "1.6.0",
+      "idfRevisionNumber": "1.7.0",
       "idfDescription": "EEZ Bench box 3-module T&M chassis",
       "idfSupportedModels": "EEZ-BB3-STM32",
       "idfRevisionComments": "Initial version",
@@ -80999,9 +81198,9 @@
       "idn": "Envox,EEZ BB3 (Simulator)",
       "idfName": "EEZ BB3 Simulator",
       "idfShortName": "EEZ-BB3-SIM",
-      "idfFirmwareVersion": "1.6",
+      "idfFirmwareVersion": "1.7",
       "idfGuid": "7cab6860-e593-4ba2-ee68-57fe84460fa4",
-      "idfRevisionNumber": "1.6.0",
+      "idfRevisionNumber": "1.7.0",
       "idfDescription": "EEZ Bench box 3-module T&M chassis firmware simulator",
       "idfSupportedModels": "EEZ-BB3-SIM",
       "idfRevisionComments": "Initial version",

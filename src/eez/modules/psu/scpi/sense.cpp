@@ -300,6 +300,142 @@ scpi_result_t scpi_cmd_senseApertureQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+static scpi_choice_def_t g_senseDigitalRangeChoice[] = {
+    { "LOW", 0 },
+    { "HIGH", 1 },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_senseDigitalRange(scpi_t *context) {
+	auto slotAndSubchannelIndex = getSelectedChannel(context);
+    if (!slotAndSubchannelIndex) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin < 1 || pin > 256) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    pin--;
+
+    int32_t range;
+    if (!SCPI_ParamChoice(context, g_senseDigitalRangeChoice, &range, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::setDigitalInputRange(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, pin, range, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDigitalRangeQ(scpi_t *context) {
+	auto slotAndSubchannelIndex = getSelectedChannel(context);
+    if (!slotAndSubchannelIndex) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin < 1 || pin > 256) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    pin--;
+
+    uint8_t range;
+    int err;
+    if (!channel_dispatcher::getDigitalInputRange(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, pin, range, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_senseDigitalRangeChoice, range);
+
+    return SCPI_RES_OK;
+}
+
+static scpi_choice_def_t g_senseDigitalSpeedChoice[] = {
+    { "FAST", 0 },
+    { "SLOW", 1 },
+    SCPI_CHOICE_LIST_END /* termination of option list */
+};
+
+scpi_result_t scpi_cmd_senseDigitalSpeed(scpi_t *context) {
+	auto slotAndSubchannelIndex = getSelectedChannel(context);
+    if (!slotAndSubchannelIndex) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin < 1 || pin > 256) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    pin--;
+
+    int32_t speed;
+    if (!SCPI_ParamChoice(context, g_senseDigitalSpeedChoice, &speed, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    int err;
+    if (!channel_dispatcher::setDigitalInputSpeed(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, pin, speed, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_senseDigitalSpeedQ(scpi_t *context) {
+	auto slotAndSubchannelIndex = getSelectedChannel(context);
+    if (!slotAndSubchannelIndex) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+        return SCPI_RES_ERR;
+    }
+
+    int32_t pin;
+    if (!SCPI_ParamInt(context, &pin, true)) {
+        return SCPI_RES_ERR;
+    }
+
+    if (pin < 1 || pin > 256) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
+    }
+    pin--;
+
+    uint8_t speed;
+    int err;
+    if (!channel_dispatcher::getDigitalInputSpeed(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, pin, speed, &err)) {
+        SCPI_ErrorPush(context, err);
+        return SCPI_RES_ERR;
+    }
+
+    resultChoiceName(context, g_senseDigitalSpeedChoice, speed);
+
+    return SCPI_RES_OK;
+}
+
 } // namespace scpi
 } // namespace psu
 } // namespace eez

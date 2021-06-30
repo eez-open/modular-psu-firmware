@@ -1228,8 +1228,9 @@ scpi_result_t scpi_cmd_sourceVoltageRampDurationQ(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceDigitalDataByte(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+	auto slotAndSubchannelIndex = getSelectedChannel(context);
+    if (!slotAndSubchannelIndex) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
 
@@ -1244,7 +1245,7 @@ scpi_result_t scpi_cmd_sourceDigitalDataByte(scpi_t *context) {
     }
 
     int err;
-    if (!channel_dispatcher::setDigitalOutputData(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, data, &err)) {
+    if (!channel_dispatcher::setDigitalOutputData(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, data, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
@@ -1253,151 +1254,20 @@ scpi_result_t scpi_cmd_sourceDigitalDataByte(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_sourceDigitalDataByteQ(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
+	auto slotAndSubchannelIndex = getSelectedChannel(context);
+    if (!slotAndSubchannelIndex) {
+        SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
         return SCPI_RES_ERR;
     }
 
     int err;
     uint8_t data;
-    if (!channel_dispatcher::getDigitalOutputData(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, data, &err)) {
+    if (!channel_dispatcher::getDigitalOutputData(slotAndSubchannelIndex->slotIndex, slotAndSubchannelIndex->subchannelIndex, data, &err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
 
     SCPI_ResultUInt8(context, data);
-
-    return SCPI_RES_OK;
-}
-
-static scpi_choice_def_t g_sourceDigitalRangeChoice[] = {
-    { "LOW", 0 },
-    { "HIGH", 1 },
-    SCPI_CHOICE_LIST_END /* termination of option list */
-};
-
-scpi_result_t scpi_cmd_sourceDigitalRange(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
-    int32_t pin;
-    if (!SCPI_ParamInt(context, &pin, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (pin < 1 || pin > 256) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-        return SCPI_RES_ERR;
-    }
-    pin--;
-
-    int32_t range;
-    if (!SCPI_ParamChoice(context, g_sourceDigitalRangeChoice, &range, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    int err;
-    if (!channel_dispatcher::setDigitalInputRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, pin, range, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_sourceDigitalRangeQ(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
-    int32_t pin;
-    if (!SCPI_ParamInt(context, &pin, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (pin < 1 || pin > 256) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-        return SCPI_RES_ERR;
-    }
-    pin--;
-
-    uint8_t range;
-    int err;
-    if (!channel_dispatcher::getDigitalInputRange(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, pin, range, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
-
-    resultChoiceName(context, g_sourceDigitalRangeChoice, range);
-
-    return SCPI_RES_OK;
-}
-
-static scpi_choice_def_t g_sourceDigitalSpeedChoice[] = {
-    { "FAST", 0 },
-    { "SLOW", 1 },
-    SCPI_CHOICE_LIST_END /* termination of option list */
-};
-
-scpi_result_t scpi_cmd_sourceDigitalSpeed(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
-    int32_t pin;
-    if (!SCPI_ParamInt(context, &pin, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (pin < 1 || pin > 256) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-        return SCPI_RES_ERR;
-    }
-    pin--;
-
-    int32_t speed;
-    if (!SCPI_ParamChoice(context, g_sourceDigitalSpeedChoice, &speed, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    int err;
-    if (!channel_dispatcher::setDigitalInputSpeed(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, pin, speed, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
-
-    return SCPI_RES_OK;
-}
-
-scpi_result_t scpi_cmd_sourceDigitalSpeedQ(scpi_t *context) {
-    SlotAndSubchannelIndex slotAndSubchannelIndex;
-    if (!getChannelFromCommandNumber(context, slotAndSubchannelIndex)) {
-        return SCPI_RES_ERR;
-    }
-
-    int32_t pin;
-    if (!SCPI_ParamInt(context, &pin, true)) {
-        return SCPI_RES_ERR;
-    }
-
-    if (pin < 1 || pin > 256) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-        return SCPI_RES_ERR;
-    }
-    pin--;
-
-    uint8_t speed;
-    int err;
-    if (!channel_dispatcher::getDigitalInputSpeed(slotAndSubchannelIndex.slotIndex, slotAndSubchannelIndex.subchannelIndex, pin, speed, &err)) {
-        SCPI_ErrorPush(context, err);
-        return SCPI_RES_ERR;
-    }
-
-    resultChoiceName(context, g_sourceDigitalSpeedChoice, speed);
 
     return SCPI_RES_OK;
 }
@@ -1454,7 +1324,7 @@ scpi_result_t scpi_cmd_sourceFunctionOnQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentRange(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentDcRange(scpi_t *context) {
     int32_t range;
     if (!SCPI_ParamInt32(context, &range, true)) {
         return SCPI_RES_ERR;
@@ -1474,7 +1344,7 @@ scpi_result_t scpi_cmd_sourceCurrentRange(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceCurrentRangeQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceCurrentDcRangeQ(scpi_t *context) {
     SlotAndSubchannelIndex slotAndSubchannelIndex;
     if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
@@ -1492,7 +1362,7 @@ scpi_result_t scpi_cmd_sourceCurrentRangeQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageRange(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageDcRange(scpi_t *context) {
     int32_t range;
     if (!SCPI_ParamInt32(context, &range, true)) {
         return SCPI_RES_ERR;
@@ -1512,7 +1382,7 @@ scpi_result_t scpi_cmd_sourceVoltageRange(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceVoltageRangeQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceVoltageDcRangeQ(scpi_t *context) {
     SlotAndSubchannelIndex slotAndSubchannelIndex;
     if (!getChannelFromParam(context, slotAndSubchannelIndex)) {
         return SCPI_RES_ERR;
@@ -1868,7 +1738,7 @@ static scpi_choice_def_t g_triggerModeDigitalOutputChoice[] = {
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
-scpi_result_t scpi_cmd_sourceDigitalOutputMode(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalMode(scpi_t *context) {
 	auto slotAndSubchannelIndex = getSelectedChannel(context);
     if (!slotAndSubchannelIndex) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -1910,7 +1780,7 @@ scpi_result_t scpi_cmd_sourceDigitalOutputMode(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputModeQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalModeQ(scpi_t *context) {
 	auto slotAndSubchannelIndex = getSelectedChannel(context);
     if (!slotAndSubchannelIndex) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -2667,7 +2537,7 @@ scpi_result_t getFunctionChannelDigital(scpi_t *context, SlotAndSubchannelIndex 
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputFunctionShape(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalFunctionShape(scpi_t *context) {
 	auto slotAndSubchannelIndex = getSelectedChannel(context);
     if (!slotAndSubchannelIndex) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -2704,7 +2574,7 @@ scpi_result_t scpi_cmd_sourceDigitalOutputFunctionShape(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputFunctionShapeQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalFunctionShapeQ(scpi_t *context) {
 	auto slotAndSubchannelIndex = getSelectedChannel(context);
     if (!slotAndSubchannelIndex) {
         SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
@@ -2739,7 +2609,7 @@ scpi_result_t scpi_cmd_sourceDigitalOutputFunctionShapeQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputFunctionFrequency(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalFunctionFrequency(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
 	float param;
@@ -2763,7 +2633,7 @@ scpi_result_t scpi_cmd_sourceDigitalOutputFunctionFrequency(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputFunctionFrequencyQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalFunctionFrequencyQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
 	if (getFunctionChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
@@ -2789,7 +2659,7 @@ scpi_result_t scpi_cmd_sourceDigitalOutputFunctionFrequencyQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputFunctionPhaseshift(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalFunctionPhaseshift(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
 	float param;
@@ -2813,7 +2683,7 @@ scpi_result_t scpi_cmd_sourceDigitalOutputFunctionPhaseshift(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputFunctionPhaseshiftQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalFunctionPhaseshiftQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
 	if (getFunctionChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {
@@ -2839,7 +2709,7 @@ scpi_result_t scpi_cmd_sourceDigitalOutputFunctionPhaseshiftQ(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputFunctionDuty(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalFunctionDuty(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
 	float param;
@@ -2863,7 +2733,7 @@ scpi_result_t scpi_cmd_sourceDigitalOutputFunctionDuty(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
-scpi_result_t scpi_cmd_sourceDigitalOutputFunctionDutyQ(scpi_t *context) {
+scpi_result_t scpi_cmd_sourceDigitalFunctionDutyQ(scpi_t *context) {
 	SlotAndSubchannelIndex slotAndSubchannelIndex;
     int32_t pin;
 	if (getFunctionChannelDigital(context, slotAndSubchannelIndex, pin) == SCPI_RES_ERR) {

@@ -193,6 +193,10 @@
     SCPI_COMMAND("SENSe:DLOG:TRACe[:DATA]", scpi_cmd_senseDlogTraceData) \
     SCPI_COMMAND("SENSe:DLOG:TRACe:BOOKmark", scpi_cmd_senseDlogTraceBookmark) \
     SCPI_COMMAND("SENSe:DLOG:CLEar", scpi_cmd_senseDlogClear) \
+    SCPI_COMMAND("SENSe:DIGital:RANGe", scpi_cmd_senseDigitalRange) \
+    SCPI_COMMAND("SENSe:DIGital:RANGe?", scpi_cmd_senseDigitalRangeQ) \
+    SCPI_COMMAND("SENSe:DIGital:SPEed", scpi_cmd_senseDigitalSpeed) \
+    SCPI_COMMAND("SENSe:DIGital:SPEed?", scpi_cmd_senseDigitalSpeedQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:LIMit[:POSitive][:IMMediate][:AMPLitude]", scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitude) \
     SCPI_COMMAND("[SOURce#]:CURRent:LIMit[:POSitive][:IMMediate][:AMPLitude]?", scpi_cmd_sourceCurrentLimitPositiveImmediateAmplitudeQ) \
     SCPI_COMMAND("[SOURce#]:CURRent:MODE", scpi_cmd_sourceCurrentMode) \
@@ -210,6 +214,18 @@
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel][:IMMediate]:STEP[:INCRement]?", scpi_cmd_sourceCurrentLevelImmediateStepIncrementQ) \
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel][:IMMediate][:AMPLitude]", scpi_cmd_sourceCurrentLevelImmediateAmplitude) \
     SCPI_COMMAND("[SOURce#]:CURRent[:LEVel][:IMMediate][:AMPLitude]?", scpi_cmd_sourceCurrentLevelImmediateAmplitudeQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:SHAPe", scpi_cmd_sourceCurrentFunctionShape) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:SHAPe?", scpi_cmd_sourceCurrentFunctionShapeQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:FREQuency", scpi_cmd_sourceCurrentFunctionFrequency) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:FREQuency?", scpi_cmd_sourceCurrentFunctionFrequencyQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:PHASeshift", scpi_cmd_sourceCurrentFunctionPhaseshift) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:PHASeshift?", scpi_cmd_sourceCurrentFunctionPhaseshiftQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:AMPLitude", scpi_cmd_sourceCurrentFunctionAmplitude) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:AMPLitude?", scpi_cmd_sourceCurrentFunctionAmplitudeQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:OFFSet", scpi_cmd_sourceCurrentFunctionOffset) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:OFFSet?", scpi_cmd_sourceCurrentFunctionOffsetQ) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:DUTY", scpi_cmd_sourceCurrentFunctionDuty) \
+    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:DUTY?", scpi_cmd_sourceCurrentFunctionDutyQ) \
     SCPI_COMMAND("[SOURce#]:LIST:COUNt", scpi_cmd_sourceListCount) \
     SCPI_COMMAND("[SOURce#]:LIST:COUNt?", scpi_cmd_sourceListCountQ) \
     SCPI_COMMAND("[SOURce#]:LIST:CURRent[:LEVel]", scpi_cmd_sourceListCurrentLevel) \
@@ -252,24 +268,6 @@
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate]:STEP[:INCRement]?", scpi_cmd_sourceVoltageLevelImmediateStepIncrementQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate][:AMPLitude]", scpi_cmd_sourceVoltageLevelImmediateAmplitude) \
     SCPI_COMMAND("[SOURce#]:VOLTage[:LEVel][:IMMediate][:AMPLitude]?", scpi_cmd_sourceVoltageLevelImmediateAmplitudeQ) \
-    SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]", scpi_cmd_sourceDigitalDataByte) \
-    SCPI_COMMAND("[SOURce#]:DIGital:DATA[:BYTE]?", scpi_cmd_sourceDigitalDataByteQ) \
-    SCPI_COMMAND("[SOURce#]:DIGital:RANGe", scpi_cmd_sourceDigitalRange) \
-    SCPI_COMMAND("[SOURce#]:DIGital:RANGe?", scpi_cmd_sourceDigitalRangeQ) \
-    SCPI_COMMAND("[SOURce#]:DIGital:SPEed", scpi_cmd_sourceDigitalSpeed) \
-    SCPI_COMMAND("[SOURce#]:DIGital:SPEed?", scpi_cmd_sourceDigitalSpeedQ) \
-    SCPI_COMMAND("SOURce:FUNCtion[:ON]", scpi_cmd_sourceFunctionOn) \
-    SCPI_COMMAND("SOURce:FUNCtion[:ON]?", scpi_cmd_sourceFunctionOnQ) \
-    SCPI_COMMAND("SOURce:CURRent:RANGe", scpi_cmd_sourceCurrentRange) \
-    SCPI_COMMAND("SOURce:CURRent:RANGe?", scpi_cmd_sourceCurrentRangeQ) \
-    SCPI_COMMAND("SOURce:VOLTage:RANGe", scpi_cmd_sourceVoltageRange) \
-    SCPI_COMMAND("SOURce:VOLTage:RANGe?", scpi_cmd_sourceVoltageRangeQ) \
-    SCPI_COMMAND("SOURce:PWM:STATe", scpi_cmd_sourcePwmState) \
-    SCPI_COMMAND("SOURce:PWM:STATe?", scpi_cmd_sourcePwmStateQ) \
-    SCPI_COMMAND("SOURce:PWM:DUTY", scpi_cmd_sourcePwmDuty) \
-    SCPI_COMMAND("SOURce:PWM:DUTY?", scpi_cmd_sourcePwmDutyQ) \
-    SCPI_COMMAND("SOURce:PWM:FREQuency", scpi_cmd_sourcePwmFrequency) \
-    SCPI_COMMAND("SOURce:PWM:FREQuency?", scpi_cmd_sourcePwmFrequencyQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:SHAPe", scpi_cmd_sourceVoltageFunctionShape) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:SHAPe?", scpi_cmd_sourceVoltageFunctionShapeQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:FREQuency", scpi_cmd_sourceVoltageFunctionFrequency) \
@@ -282,28 +280,30 @@
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:OFFSet?", scpi_cmd_sourceVoltageFunctionOffsetQ) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:DUTY", scpi_cmd_sourceVoltageFunctionDuty) \
     SCPI_COMMAND("[SOURce#]:VOLTage:FUNCtion:DUTY?", scpi_cmd_sourceVoltageFunctionDutyQ) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:SHAPe", scpi_cmd_sourceCurrentFunctionShape) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:SHAPe?", scpi_cmd_sourceCurrentFunctionShapeQ) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:FREQuency", scpi_cmd_sourceCurrentFunctionFrequency) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:FREQuency?", scpi_cmd_sourceCurrentFunctionFrequencyQ) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:PHASeshift", scpi_cmd_sourceCurrentFunctionPhaseshift) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:PHASeshift?", scpi_cmd_sourceCurrentFunctionPhaseshiftQ) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:AMPLitude", scpi_cmd_sourceCurrentFunctionAmplitude) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:AMPLitude?", scpi_cmd_sourceCurrentFunctionAmplitudeQ) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:OFFSet", scpi_cmd_sourceCurrentFunctionOffset) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:OFFSet?", scpi_cmd_sourceCurrentFunctionOffsetQ) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:DUTY", scpi_cmd_sourceCurrentFunctionDuty) \
-    SCPI_COMMAND("[SOURce#]:CURRent:FUNCtion:DUTY?", scpi_cmd_sourceCurrentFunctionDutyQ) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:MODE", scpi_cmd_sourceDigitalOutputMode) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:MODE?", scpi_cmd_sourceDigitalOutputModeQ) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe", scpi_cmd_sourceDigitalOutputFunctionShape) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe?", scpi_cmd_sourceDigitalOutputFunctionShapeQ) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency", scpi_cmd_sourceDigitalOutputFunctionFrequency) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency?", scpi_cmd_sourceDigitalOutputFunctionFrequencyQ) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift", scpi_cmd_sourceDigitalOutputFunctionPhaseshift) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift?", scpi_cmd_sourceDigitalOutputFunctionPhaseshiftQ) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:DUTY", scpi_cmd_sourceDigitalOutputFunctionDuty) \
-    SCPI_COMMAND("SOURce:DIGital[:OUTPut]:FUNCtion:DUTY?", scpi_cmd_sourceDigitalOutputFunctionDutyQ) \
+    SCPI_COMMAND("SOURce:FUNCtion[:ON]", scpi_cmd_sourceFunctionOn) \
+    SCPI_COMMAND("SOURce:FUNCtion[:ON]?", scpi_cmd_sourceFunctionOnQ) \
+    SCPI_COMMAND("SOURce:CURRent[:DC]:RANGe", scpi_cmd_sourceCurrentDcRange) \
+    SCPI_COMMAND("SOURce:CURRent[:DC]:RANGe?", scpi_cmd_sourceCurrentDcRangeQ) \
+    SCPI_COMMAND("SOURce:VOLTage[:DC]:RANGe", scpi_cmd_sourceVoltageDcRange) \
+    SCPI_COMMAND("SOURce:VOLTage[:DC]:RANGe?", scpi_cmd_sourceVoltageDcRangeQ) \
+    SCPI_COMMAND("SOURce:PWM:STATe", scpi_cmd_sourcePwmState) \
+    SCPI_COMMAND("SOURce:PWM:STATe?", scpi_cmd_sourcePwmStateQ) \
+    SCPI_COMMAND("SOURce:PWM:DUTY", scpi_cmd_sourcePwmDuty) \
+    SCPI_COMMAND("SOURce:PWM:DUTY?", scpi_cmd_sourcePwmDutyQ) \
+    SCPI_COMMAND("SOURce:PWM:FREQuency", scpi_cmd_sourcePwmFrequency) \
+    SCPI_COMMAND("SOURce:PWM:FREQuency?", scpi_cmd_sourcePwmFrequencyQ) \
+    SCPI_COMMAND("SOURce:DIGital:DATA[:BYTE]", scpi_cmd_sourceDigitalDataByte) \
+    SCPI_COMMAND("SOURce:DIGital:DATA[:BYTE]?", scpi_cmd_sourceDigitalDataByteQ) \
+    SCPI_COMMAND("SOURce:DIGital:MODE", scpi_cmd_sourceDigitalMode) \
+    SCPI_COMMAND("SOURce:DIGital:MODE?", scpi_cmd_sourceDigitalModeQ) \
+    SCPI_COMMAND("SOURce:DIGital:FUNCtion:SHAPe", scpi_cmd_sourceDigitalFunctionShape) \
+    SCPI_COMMAND("SOURce:DIGital:FUNCtion:SHAPe?", scpi_cmd_sourceDigitalFunctionShapeQ) \
+    SCPI_COMMAND("SOURce:DIGital:FUNCtion:FREQuency", scpi_cmd_sourceDigitalFunctionFrequency) \
+    SCPI_COMMAND("SOURce:DIGital:FUNCtion:FREQuency?", scpi_cmd_sourceDigitalFunctionFrequencyQ) \
+    SCPI_COMMAND("SOURce:DIGital:FUNCtion:PHASeshift", scpi_cmd_sourceDigitalFunctionPhaseshift) \
+    SCPI_COMMAND("SOURce:DIGital:FUNCtion:PHASeshift?", scpi_cmd_sourceDigitalFunctionPhaseshiftQ) \
+    SCPI_COMMAND("SOURce:DIGital:FUNCtion:DUTY", scpi_cmd_sourceDigitalFunctionDuty) \
+    SCPI_COMMAND("SOURce:DIGital:FUNCtion:DUTY?", scpi_cmd_sourceDigitalFunctionDutyQ) \
     SCPI_COMMAND("STATus:OPERation:CONDition?", scpi_cmd_statusOperationConditionQ) \
     SCPI_COMMAND("STATus:OPERation:ENABle", scpi_cmd_statusOperationEnable) \
     SCPI_COMMAND("STATus:OPERation:ENABle?", scpi_cmd_statusOperationEnableQ) \
