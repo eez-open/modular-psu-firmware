@@ -515,10 +515,6 @@ public:
     /// Disable protection for this channel
     void disableProtection();
 
-    bool isHwOvpEnabled() {
-	    return prot_conf.flags.u_state && prot_conf.flags.u_type && !flags.rprogEnabled;
-    }
-
     /// Turn on/off bit in SCPI Questinable Instrument Isummary register for this channel.
     void setQuesBits(int bit_mask, bool on);
 

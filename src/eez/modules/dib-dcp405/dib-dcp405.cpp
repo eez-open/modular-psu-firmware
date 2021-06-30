@@ -29,6 +29,7 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/channel_dispatcher.h>
+#include <eez/modules/psu/trigger.h>
 #include <eez/modules/psu/gui/psu.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 
@@ -389,13 +390,12 @@ struct DcpChannel : public Channel {
 
 			// Check continuously output voltage when output is enabled if OVP is not enabled.
 			// If U_MON is higher then U_SET for more then 3% automatically switch off output and display popup.
-			if (!prot_conf.flags.u_state && !isRemoteProgrammingEnabled() && u.set > 0.3f && u.mon > u.set * 1.03f) {
-				if (!fallingEdge) {
-					DebugTrace("U_MON (%.4f) is more then 3%% above U_SET (%.4f), difference is: %.4f\n", u.mon, u.set, u.mon_last - u.set * 1.03f);
-					channel_dispatcher::outputEnable(*this, false);
-					generateChannelError(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED, channelIndex);
-					return;
-				}
+			if (!fallingEdge && !isOvpEnabled() && !isRemoteProgrammingEnabled() && u.set > 1.0f && u.mon_last > u.set * 1.03f) {
+				DebugTrace("U_MON (%.4g) is more then 3%% above U_SET (%.4g), difference is: %.4g\n", u.mon_last, u.set * 1.03f, u.mon_last - u.set * 1.03f);
+				trigger::abort();
+				channel_dispatcher::outputEnable(*this, false);
+				generateChannelError(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED, channelIndex);
+				return;
 			}
 		}
 	}
@@ -403,6 +403,22 @@ struct DcpChannel : public Channel {
 	unsigned getRPol() override {
 		return !ioexp.testBit(IOExpander::IO_BIT_IN_RPOL);
 	}
+
+	bool isOvpEnabled() {
+		if (prot_conf.flags.u_state) {
+			auto &slot = *g_slots[slotIndex];
+			if (slot.moduleRevision <= MODULE_REVISION_DCP405_R2B11) {
+				return getVoltageTriggerMode() != TRIGGER_MODE_LIST && getVoltageTriggerMode() != TRIGGER_MODE_FUNCTION_GENERATOR;
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+    bool isHwOvpEnabled() {
+	    return isOvpEnabled() && prot_conf.flags.u_type && !flags.rprogEnabled;
+    }
 
 	bool isInCcMode() override {
 		return ioexp.testBit(IOExpander::IO_BIT_IN_CC_ACTIVE);
@@ -956,7 +972,7 @@ public:
 		moduleType = MODULE_TYPE_DCP405;
 		moduleName = "DCP405";
 		moduleBrand = "Envox";
-		latestModuleRevision = MODULE_REVISION_DCP405_R2B11;
+		latestModuleRevision = MODULE_REVISION_DCP405_R3B3;
 		flashMethod = FLASH_METHOD_NONE;
 		spiBaudRatePrescaler = 0;
 		spiCrcCalculationEnable = false;
