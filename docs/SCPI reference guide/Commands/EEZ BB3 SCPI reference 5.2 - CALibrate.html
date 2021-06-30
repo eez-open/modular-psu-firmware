@@ -98,6 +98,14 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 46%;">
+					<p class="scpi2"><a href="#cal_curr_meas"><span style="text-decoration: underline;">:MEASure?</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 54%;">
+					<p>Initiates current calibration measurement</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 46%;">
 					<p class="scpi2"><a href="#cal_curr_rang"><span style="text-decoration: underline;">:RANGe {range}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 54%;">
@@ -176,7 +184,16 @@
 					<p>Calibrates the output voltage programming</p>
 				</td>
 			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 46%;">
+					<p class="scpi2"><a href="#cal_volt_meas"><span style="text-decoration: underline;">:MEASure?</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 54%;">
+					<p>Initiates voltage calibration measurement</p>
+				</td>
+			</tr>
 		</table>
+		<p>&#160;</p>
 		<p class="Heading_3">5.2.1. <a name="cal_mode"></a>CALibration[:MODE]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
@@ -615,7 +632,62 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.2.5. <a name="cal_curr_rang"></a>CALibration:CURRent:RANGe</p>
+		<p class="Heading_3">5.2.5. <a name="cal_curr_meas"></a>CALibration:CURRent:MEASure?</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">CALibration:CURRent:MEASure?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Modules</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p><span class="DCP405" style="background-color: #81d41a;">&#160;MIO&#160;</span></p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this query to initiate current measurement on the selected analog input of the MIO168 module and store that data for the selected calibration point.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">CAL:CURR:MEAS?</p>
+					<p class="cmd_code_Start">1</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Errors</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">101,&quot;Calibration state is off&quot;</p>
+					<p class="cmd_code">104,&quot;Bad sequence of calibration commands&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>CALibration:STATe</p>
+					<p>CALibration:VOLTage:MEASure?</p>
+					<p>INSTrument[:SELect]</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.2.6. <a name="cal_curr_rang"></a>CALibration:CURRent:RANGe</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -708,7 +780,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.2.6. <a name="cal_pass_new"></a>CALibration:PASSword:NEW</p>
+		<p class="Heading_3">5.2.7. <a name="cal_pass_new"></a>CALibration:PASSword:NEW</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -810,7 +882,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.2.7. <a name="cal_rem"></a>CALibration:REMark</p>
+		<p class="Heading_3">5.2.8. <a name="cal_rem"></a>CALibration:REMark</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -906,7 +978,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.2.8. <a name="cal_save"></a>CALibration:SAVE</p>
+		<p class="Heading_3">5.2.9. <a name="cal_save"></a>CALibration:SAVE</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -960,7 +1032,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.2.9. <a name="cal_scr"></a>CALibration:SCReen:INIT</p>
+		<p class="Heading_3">5.2.10. <a name="cal_scr"></a>CALibration:SCReen:INIT</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -997,7 +1069,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.2.10. <a name="cal_stat"></a>CALibration:STATe</p>
+		<p class="Heading_3">5.2.11. <a name="cal_stat"></a>CALibration:STATe</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1088,7 +1160,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.2.11. <a name="cal_volt"></a>CALibration:VOLTage[:DATA]</p>
+		<p class="Heading_3">5.2.12. <a name="cal_volt"></a>CALibration:VOLTage[:DATA]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1184,7 +1256,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.2.12. <a name="cal_volt_lev"></a>CALibration:VOLTage:LEVel</p>
+		<p class="Heading_3">5.2.13. <a name="cal_volt_lev"></a>CALibration:VOLTage:LEVel</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1293,7 +1365,61 @@
 				</td>
 			</tr>
 		</table>
-		<p>&#160;</p>
+		<p class="Heading_3">5.2.14. <a name="cal_volt_meas"></a>CALibration:VOLTage:MEASure?</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">CALibration:VOLTage:MEASure?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Modules</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p><span class="DCP405" style="background-color: #81d41a;">&#160;MIO&#160;</span></p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this query to initiate voltage measurement on the selected analog input of the MIO168 module and store that data for the selected calibration point.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">CAL:VOLT:MEAS?</p>
+					<p class="cmd_code_Start">1</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Errors</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">101,&quot;Calibration state is off&quot;</p>
+					<p class="cmd_code">104,&quot;Bad sequence of calibration commands&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>CALibration:CURRent:MEASure?</p>
+					<p>CALibration:STATe</p>
+					<p>INSTrument[:SELect]</p>
+				</td>
+			</tr>
+		</table>
 		<p>&#160;</p>
 	</body>
 </html>

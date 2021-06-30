@@ -13,9 +13,12 @@
 			.Default_nt2 { text-align: left; font-size: 10.0pt; font-weight: bold; }
 			.Heading_2 { margin-left: 7.62mm; margin-top: 4.5mm; margin-bottom: 2.5mm; text-indent: -7.62mm; font-size: 12.0pt; font-weight: bold; font-style: italic; color: #0066cc; }
 			.Heading_3 { margin-left: 7.62mm; margin-top: 4.5mm; margin-bottom: 2.5mm; text-indent: -7.62mm; font-size: 11.0pt; font-weight: bold; color: #0066cc; }
+			.List_1_End { text-align: left; margin-left: 10mm; margin-right: 1.99mm; margin-bottom: 3mm; text-indent: -6mm; }
+			.List_1_Start { text-align: left; margin-left: 10mm; margin-right: 1.99mm; margin-top: 3mm; text-indent: -6mm; }
 			p { text-align: justify; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; text-indent: 0; background: transparent; font-family: "Arial"; font-size: 10.5pt; font-weight: normal; font-style: normal; }
 			li { text-align: justify; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; text-indent: 0; background: transparent; font-family: "Arial"; font-size: 10.5pt; font-weight: normal; font-style: normal; }
 			.cmd_code { text-align: left; font-family: "Courier New"; }
+			.cmd_code_End { text-align: left; margin-bottom: 1.99mm; font-family: "Courier New"; }
 			.cmd_code_Start { text-align: left; margin-top: 1.99mm; font-family: "Courier New"; }
 			.cmd_root { text-align: left; color: #0066cc; }
 			.note { font-style: italic; }
@@ -45,7 +48,7 @@
 		<p class="Heading_2">5.14. <a name="_sense"></a>SENSe</p>
 		<p>The SENSe control the current measurement range, energy counting/window, the data acquisition sequence and DLOG viewer parameters.</p>
 		<p>&#160;</p>
-		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+		<table style="border-collapse: collapse; background: transparent; width: 175.02mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 44%;">
 					<p class="table_header">SCPI command</p>
@@ -96,6 +99,30 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 44%;">
+					<p class="scpi1">:DIGital</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 56%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 44%;">
+					<p class="scpi2"><a href="#sens_dig_rang"><span style="text-decoration: underline;">:RANGe  {&lt;pin&gt;}, {&lt;range&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 56%;">
+					<p>Set the range of the digital input</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 44%;">
+					<p class="scpi2"><a href="#sens_dig_spe"><span style="text-decoration: underline;">:SPEed {&lt;pin&gt;}, {&lt;speed&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 56%;">
+					<p>Set the speed of the digital input</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 44%;">
 					<p class="scpi1">:DLOG</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 56%;">
@@ -124,6 +151,22 @@
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 56%;">
 					<p>Enables/disables output current internal data logging</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 44%;">
+					<p class="scpi3">:DIGital</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 56%;">
+					<p>&#160;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 44%;">
+					<p class="scpi4"><a href="#sens_dlog_func_dig"><span style="text-decoration: underline;">[:INPut] {&lt;pin&gt;}, {&lt;enable&gt;}, {&lt;channel&gt;}</span></a></p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 56%;">
+					<p>Enables/disables digital input internal data logging</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -176,7 +219,7 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 44%;">
-					<p class="scpi3"><a href="#sens_dlog_book"><span style="text-decoration: underline;">BOOKmark {&lt;bookmark&gt;}</span></a></p>
+					<p class="scpi3"><a href="#sens_dlog_book"><span style="text-decoration: underline;">:BOOKmark {&lt;bookmark&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 56%;">
 					<p>Adds a bookmark into the active DLOG</p>
@@ -396,13 +439,13 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p>&#160;</p>
+					<p>&lt;period&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">&#160;</p>
+					<p style="text-align: center;">NR2</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">&#160;</p>
+					<p style="text-align: center;">0 – 0.5</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">–</p>
@@ -468,7 +511,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command selects a DC current measurement range when power board with multiple current ranges is installed (e.g. DCP405 that can be find out with the SYSTem:CHANnel:MODel? command). The entered range must be higher than the maximum current that you expect to measure. Units are in amperes. </p>
+					<p>This command selects a DC current measurement range when module with multiple current ranges is installed (e.g. DCP405 that can be find out with the SYSTem:CHANnel:MODel? Command). The entered range must be higher than the maximum current that you expect to measure. Units are in amperes. </p>
 					<p>&#160;</p>
 					<p class="note">When used on the MIO168 (i.e. its AFE) use range 0 for auto-ranging function.</p>
 				</td>
@@ -515,7 +558,7 @@
 					<p style="text-align: center;">Channel</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">DCP and DCM: CH1|CH2|CH3|CH4|CH5|CH6,<br>MIO+AFE3: (@n04), (@n06) </p>
+					<p style="text-align: center;">DCP: CH1|CH2|CH3|CH4|CH5|CH6,<br>MIO+AFE3: (@n04), (@n06) </p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">–</p>
@@ -556,7 +599,217 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.3. <a name="sens_dlog_cle"></a>SENSe:DLOG:CLEar</p>
+		<p class="Heading_3">5.14.3. <a name="sens_dig_rang"></a>SENSe:DIGital:RANGe</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SENSe:DIGital:RANGe {&lt;pin&gt;}, {&lt;range&gt;}</p>
+					<p class="cmd_root">SENSe:DIGital:RANGe?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Modules</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p><span class="DCP405" style="background-color: #81d41a;">&#160;MIO&#160;</span></p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set the voltage range of the input specified by &lt;pin&gt; on the 8-bit digital port (@n01) where n is the MIO168 module slot number:</p>
+					<ul>
+						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">Low – 0 to 3.3 / 5&#160;V </li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">High – 0 to 12&#160;V (resilient to 24&#160;V) </li>
+					</ul>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p>&lt;pin&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">1 – 8</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p>&lt;range&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">LOW|HIGH</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query command returns the voltage range of the selected digital input.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">INST (@301)</p>
+					<p class="cmd_code">SENS:DIG:RANG 1,HIGH</p>
+					<p class="cmd_code_End">SENS:DIG:RANG? 1</p>
+					<p class="cmd_code">&quot;HIGH&quot;</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>MEASure:DIGital[:BYTE]</p>
+					<p>SENSe:DIGital:SPEed</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.14.4. <a name="sens_dig_spe"></a>SENSe:DIGital:SPEed</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SENSe:DIGital:SPEed {&lt;pin&gt;}, {&lt;speed&gt;}</p>
+					<p class="cmd_root">SENSe:DIGital:SPEed?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Modules</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p><span class="DCP405" style="background-color: #81d41a;">&#160;MIO&#160;</span></p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set the speed of the input specified by &lt;pin&gt; on the digital port (@n01) where n is the MIO168 module slot number. This command is applicable only to pin 1 and 2.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p>&lt;pin&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">1 – 2</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p>&lt;speed&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">FAST|SLOW</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query command returns the speed of the selected digital input.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">INST (@301)</p>
+					<p class="cmd_code">SENS:DIG:SPE 1,FAST</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>MEASure:DIGital[:BYTE]</p>
+					<p>SENSe:DIGital:RANGe</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.14.5. <a name="sens_dlog_cle"></a>SENSe:DLOG:CLEar</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -591,7 +844,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.4. <a name="sens_dlog_func_curr"></a>SENSe:DLOG:FUNCtion:CURRent</p>
+		<p class="Heading_3">5.14.6. <a name="sens_dlog_func_curr"></a>SENSe:DLOG:FUNCtion:CURRent</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -684,7 +937,123 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.5. <a name="sens_dlog_func_pow"></a>SENSe:DLOG:FUNCtion:POWer</p>
+		<p class="Heading_3">5.14.7. <a name="sens_dlog_func_dig"></a>SENSe:DLOG:FUNCtion:DIGital[:INPut]</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SENSe:DLOG:FUNCtion:DIGital[:INPut] {&lt;pin&gt;}, {&lt;enable&gt;}, {&lt;channel&gt;}</p>
+					<p class="cmd_root">SENSe:DLOG:FUNCtion:DIGital[:INPut]? {&lt;pin&gt;}, {&lt;channel&gt;}</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Modules</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p><span class="DCP405" style="background-color: #81d41a;">&#160;MIO&#160;</span></p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to enable or disable digital input internal data logging on the specified channel.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;pin&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">1 – 8</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;enable&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Boolean</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">ON|OFF|0|1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">OFF</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p>&lt;channel&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Channel</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">(@n02) where n is the slot number</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query command returns the status (0 or 1) of the digital input internal data logging enabled on the specified channel</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">SENS:DLOG:FUNC:DIG 1, ON, (@302)</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>INIT:DLOG</p>
+					<p>SENSe:DLOG:CURRent</p>
+					<p>SENSe:DLOG:FUNCtion:POWer</p>
+					<p>SENSe:DLOG:FUNCtion:VOLTage</p>
+					<p>SENSe:DLOG:PERiod</p>
+					<p>SENSe:DLOG:TIME</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.14.8. <a name="sens_dlog_func_pow"></a>SENSe:DLOG:FUNCtion:POWer</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -777,7 +1146,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.6. <a name="sens_dlog_func_volt"></a>SENSe:DLOG:FUNCtion:VOLTage</p>
+		<p class="Heading_3">5.14.9. <a name="sens_dlog_func_volt"></a>SENSe:DLOG:FUNCtion:VOLTage</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -870,7 +1239,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.7. <a name="sens_dlog_per"></a>SENSe:DLOG:PERiod</p>
+		<p class="Heading_3">5.14.10. <a name="sens_dlog_per"></a>SENSe:DLOG:PERiod</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -946,7 +1315,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.8. <a name="sens_dlog_time"></a>SENSe:DLOG:TIME</p>
+		<p class="Heading_3">5.14.11. <a name="sens_dlog_time"></a>SENSe:DLOG:TIME</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1023,7 +1392,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.9. <a name="sens_dlog_book"></a>SENSe:DLOG:TRACe:BOOKmark</p>
+		<p class="Heading_3">5.14.12. <a name="sens_dlog_book"></a>SENSe:DLOG:TRACe:BOOKmark</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1090,7 +1459,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.10. <a name="sens_dlog_trac_data"></a>SENSe:DLOG:TRACe[:DATA]</p>
+		<p class="Heading_3">5.14.13. <a name="sens_dlog_trac_data"></a>SENSe:DLOG:TRACe[:DATA]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1157,7 +1526,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.11. <a name="sens_dlog_trac_rem"></a>SENSe:DLOG:TRACe:REMark</p>
+		<p class="Heading_3">5.14.14. <a name="sens_dlog_trac_rem"></a>SENSe:DLOG:TRACe:REMark</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1234,7 +1603,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.12. SENSe:DLOG:TRACe:X:LABel</p>
+		<p class="Heading_3">5.14.15. <a name="sens_dlog_trac_x_lab"></a>SENSe:DLOG:TRACe:X:LABel</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1310,7 +1679,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.13. <a name="sens_dlog_trac_x_unit"></a>SENSe:DLOG:TRACe:X:UNIT</p>
+		<p class="Heading_3">5.14.16. <a name="sens_dlog_trac_x_unit"></a>SENSe:DLOG:TRACe:X:UNIT</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1386,7 +1755,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.14. <a name="sens_dlog_trac_x_step"></a>SENSe:DLOG:TRACe:X:STEP</p>
+		<p class="Heading_3">5.14.17. <a name="sens_dlog_trac_x_step"></a>SENSe:DLOG:TRACe:X:STEP</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1462,7 +1831,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.15. <a name="sens_dlog_trac_x_min"></a>SENSe:DLOG:TRACe:X[:RANGe]:MIN</p>
+		<p class="Heading_3">5.14.18. <a name="sens_dlog_trac_x_min"></a>SENSe:DLOG:TRACe:X[:RANGe]:MIN</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1537,7 +1906,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.16. <a name="sens_dlog_trac_x_max"></a>SENSe:DLOG:TRACe:X[:RANGe]:MAX</p>
+		<p class="Heading_3">5.14.19. <a name="sens_dlog_trac_x_max"></a>SENSe:DLOG:TRACe:X[:RANGe]:MAX</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1612,7 +1981,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.17. <a name="sens_dlog_trac_x_scal"></a>SENSe:DLOG:TRACe:X:SCALe</p>
+		<p class="Heading_3">5.14.20. <a name="sens_dlog_trac_x_scal"></a>SENSe:DLOG:TRACe:X:SCALe</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1690,7 +2059,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.18. <a name="sens_dlog_trac_y_lab"></a>SENSe:DLOG:TRACe:Y&lt;n&gt;:LABel</p>
+		<p class="Heading_3">5.14.21. <a name="sens_dlog_trac_y_lab"></a>SENSe:DLOG:TRACe:Y&lt;n&gt;:LABel</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1765,7 +2134,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.19. <a name="sens_dlog_trac_y_min"></a>SENSe:DLOG:TRACe:Y&lt;n&gt;[:RANGe]:MIN</p>
+		<p class="Heading_3">5.14.22. <a name="sens_dlog_trac_y_min"></a>SENSe:DLOG:TRACe:Y&lt;n&gt;[:RANGe]:MIN</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1841,7 +2210,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.20. <a name="sens_dlog_trac_y_max"></a>SENSe:DLOG:TRACe:Y&lt;n&gt;[:RANGe]:MAX</p>
+		<p class="Heading_3">5.14.23. <a name="sens_dlog_trac_y_max"></a>SENSe:DLOG:TRACe:Y&lt;n&gt;[:RANGe]:MAX</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1917,7 +2286,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.21. <a name="sens_dlog_trac_y_scal"></a>SENSe:DLOG:TRACe:Y:SCALe</p>
+		<p class="Heading_3">5.14.24. <a name="sens_dlog_trac_y_scal"></a>SENSe:DLOG:TRACe:Y:SCALe</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -1992,7 +2361,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.22. <a name="sens_dlog_trac_y_unit"></a>SENSe:DLOG:TRACe:Y&lt;n&gt;:UNIT</p>
+		<p class="Heading_3">5.14.25. <a name="sens_dlog_trac_y_unit"></a>SENSe:DLOG:TRACe:Y&lt;n&gt;:UNIT</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2068,7 +2437,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.23. <a name="sense_func"></a>SENSe:FUNCtion[:ON] {&lt;function&gt;}[, &lt;channel&gt;]</p>
+		<p class="Heading_3">5.14.26. <a name="sense_func"></a>SENSe:FUNCtion[:ON]</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2081,10 +2450,18 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Modules</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p><span class="DCP405" style="background-color: #81d41a;">&#160;MIO&#160;</span></p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command defines AOUT1 and AOUT2 output mode of the MIO168 module that could be current or voltage.</p>
+					<p>This command defines AIN1 to AIN4 input mode of the MIO168 module with AFE1 that could be current or voltage.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -2106,7 +2483,7 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p>function</p>
+					<p>&lt;function&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">Discrete</p>
@@ -2123,13 +2500,13 @@
 					<p>&#160;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p>channel</p>
+					<p>&lt;channel&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">channel</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">(@n03), (@n04) where n is the slot number</p>
+					<p style="text-align: center;">(@n03) to (@n06) where n is the slot number</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">&#160;</p>
@@ -2140,7 +2517,7 @@
 					<p class="Default_nt2">Return</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
+					<p>The query command returns set analog input mode.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -2159,10 +2536,11 @@
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p>SENSe:CURRent[:DC]:RANGe</p>
 					<p>SENSe:VOLTage[:DC]:RANGe</p>
+					<p>SOURce:FUNCtion[:ON]</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.24. <a name="sense_nplc"></a>SENSe:NPLCycles</p>
+		<p class="Heading_3">5.14.27. <a name="sense_nplc"></a>SENSe:NPLCycles</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2261,7 +2639,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.14.25. <a name="sens_volt_rang"></a>SENSe:VOLTage[:DC]:RANGe</p>
+		<p class="Heading_3">5.14.28. <a name="sens_volt_rang"></a>SENSe:VOLTage[:DC]:RANGe</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -2312,7 +2690,7 @@
 					<p>&lt;range&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">NR2|Discrete</p>
+					<p style="text-align: center;">NR1</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">MIO+AFE3: 0 – 3</p>

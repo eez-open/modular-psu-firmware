@@ -3571,7 +3571,7 @@
 					<p style="text-align: center;">Discrete</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">9600|14400|38400|57600|115200</p>
+					<p style="text-align: center;">9600|14400|19200|38400|57600|115200</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">–</p>
@@ -4034,10 +4034,10 @@
 					<p>&lt;string&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p style="text-align: center;">Discrete</p>
+					<p style="text-align: center;">Quoted string</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p>&#160;</p>
+					<p style="text-align: center;">1 to 4096 characters</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">–</p>
@@ -4045,18 +4045,10 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Return</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>&#160;</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">&#160;</p>
+					<p class="cmd_code">SYST:COMM:UART:TRAN &quot;Hello World!&quot;</p>
 				</td>
 			</tr>
 			<tr style="height: 8.71mm; background: transparent;">
@@ -4872,7 +4864,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Use this command to set duty cycle of the output pin defined as PWM (see the SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion command). Applies only to 4.</p>
+					<p>Use this command to set duty cycle of the output pin defined as PWM (see the SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion command). Applies only to pin 4.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -4974,7 +4966,7 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>Use this command to set frequency of the output pin defined as PWM (see the SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion command). Applies only to 4.</p>
+					<p>Use this command to set frequency of the output pin defined as PWM (see the SYSTem:DIGital:PIN&lt;n&gt;:FUNCtion command). Applies only to pin 4.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5121,7 +5113,7 @@
 					<p style="text-align: center;">Discrete</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
-					<p>DINP|DLOG|DOUT|FAUL|INH|ONC|PWM|SYST|TOUT</p>
+					<p>DINP|DLOG|DOUT|FAUL|INH|ONC|PWM|SYST|TOUT|UART</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">–</p>
@@ -5132,7 +5124,7 @@
 					<p class="Default_nt2">Return</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>The query command returns DINP, DOUT, FAUL, INH or TINP.</p>
+					<p>The query command returns the set pin function.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
