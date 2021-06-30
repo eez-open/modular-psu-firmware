@@ -502,6 +502,8 @@ public:
     bool isVoltageCalibrationExists();
     bool isCurrentCalibrationExists(uint8_t currentRange);
 
+    virtual bool isOvpEnabled() { return prot_conf.flags.u_state; }
+
     /// Is OVP, OCP or OPP tripped?
     bool isTripped();
 

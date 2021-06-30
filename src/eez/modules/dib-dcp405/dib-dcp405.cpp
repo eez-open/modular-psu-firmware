@@ -404,16 +404,16 @@ struct DcpChannel : public Channel {
 		return !ioexp.testBit(IOExpander::IO_BIT_IN_RPOL);
 	}
 
-	bool isOvpEnabled() {
+	bool isOvpEnabled() override {
 		if (prot_conf.flags.u_state) {
 			auto &slot = *g_slots[slotIndex];
 			if (slot.moduleRevision <= MODULE_REVISION_DCP405_R2B11) {
-				return getVoltageTriggerMode() != TRIGGER_MODE_LIST && getVoltageTriggerMode() != TRIGGER_MODE_FUNCTION_GENERATOR;
+				auto triggerMode = getVoltageTriggerMode();
+				return triggerMode != TRIGGER_MODE_LIST && triggerMode != TRIGGER_MODE_FUNCTION_GENERATOR;
 			}
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
     bool isHwOvpEnabled() {
