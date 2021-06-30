@@ -55,6 +55,7 @@ struct WaveformParameters {
 
 WaveformParameters *getWaveformParameters(int slotIndex, int subchannelIndex, int resourceIndex);
 
+void resetProfileParameters(psu::profile::Parameters &profileParams);
 void getProfileParameters(psu::profile::Parameters &profileParams);
 void setProfileParameters(const psu::profile::Parameters &profileParams);
 bool writeProfileProperties(psu::profile::WriteContext &ctx, const psu::profile::Parameters &profileParams);

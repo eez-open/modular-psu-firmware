@@ -529,6 +529,8 @@ static void resetProfileToDefaults(Parameters &profile) {
     profile.uartParity = 1;
 
     profile.flags.triggerInitiateAll = 1;
+
+	function_generator::resetProfileParameters(profile);
 }
 
 static bool repositionSlotsInProfileToMatchCurrentSlotsConfiguration(Parameters &profile) {

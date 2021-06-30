@@ -180,6 +180,11 @@ FunctionGeneratorOptions g_options = {
 	1, /* isAmpl */
 };
 
+static const float PREVIEW_PERIOD_MAX = 100.0f;
+static const float PREVIEW_PERIOD_MIN = 0.001f;
+static const float PREVIEW_PERIOD_DEF = 0.2f;
+float g_previewPeriod = PREVIEW_PERIOD_DEF;
+
 WaveformFunction g_waveFormFuncU[CH_MAX];
 float g_phiU[CH_MAX];
 float g_dphiU[CH_MAX];
@@ -216,7 +221,7 @@ float sineHalfRectifiedf(float t) {
 }
 
 float sineFullRectifiedf(float t) {
-	return 2.0f * sinf(t / 2);
+	return 2.0f * sinf(t / 2.0f);
 }
 
 float trianglef(float t) {
@@ -386,8 +391,6 @@ public:
 		const Style* style = getStyle(widget->style);
 		drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
 
-		float T = FLT_MIN;
-
 		float minU = FLT_MAX;
 		float maxU = -FLT_MAX;
 
@@ -427,17 +430,6 @@ public:
 					}
 				}
 			}
-
-			if (waveformParameters.waveform != WAVEFORM_DC) {
-				float t = 2 * (1 / waveformParameters.frequency);
-				if (t > T) {
-					T = t;
-				}
-			}
-		}
-
-		if (T == FLT_MIN) {
-			T = 1.0f;
 		}
 
 		float dU = maxU - minU;
@@ -474,14 +466,14 @@ public:
 				digitalWaveformParameters.offset = ((numDigital - digitalIndex - 1) + 0.5f) / numDigital;
 				digitalWaveformParameters.amplitude = 1.0f / numDigital - 4.0f / 118.0f;
 
-				drawWaveform(widgetCursor, digitalWaveformParameters, T, 0, 1.0f);
+				drawWaveform(widgetCursor, digitalWaveformParameters, g_previewPeriod, 0, 1.0f);
 
 				digitalIndex++;
 			} else {
 				float min = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? minU : minI;
 				float max = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? maxU : maxI;
 
-				drawWaveform(widgetCursor, waveformParameters, T, min, max);
+				drawWaveform(widgetCursor, waveformParameters, g_previewPeriod, min, max);
 			}
 		}
 
@@ -493,13 +485,13 @@ public:
 			digitalWaveformParameters.offset = ((numDigital - selectedItemDigitalIndex - 1) + 0.5f) / numDigital;
 			digitalWaveformParameters.amplitude = 1.0f / numDigital - 4.0f / 118.0f;
 
-			drawWaveform(widgetCursor, digitalWaveformParameters, T, 0, 1.0f, true);
-			drawWaveform(widgetCursor, digitalWaveformParameters, T, 0, 1.0f, true, 1);
+			drawWaveform(widgetCursor, digitalWaveformParameters, g_previewPeriod, 0, 1.0f, true);
+			drawWaveform(widgetCursor, digitalWaveformParameters, g_previewPeriod, 0, 1.0f, true, 1);
 		} else {
 			float min = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? minU : minI;
 			float max = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? maxU : maxI;
-			drawWaveform(widgetCursor, waveformParameters, T, min, max, true);
-			drawWaveform(widgetCursor, waveformParameters, T, min, max, true, 1);
+			drawWaveform(widgetCursor, waveformParameters, g_previewPeriod, min, max, true);
+			drawWaveform(widgetCursor, waveformParameters, g_previewPeriod, min, max, true, 1);
 		}
 	}
 
@@ -795,8 +787,18 @@ WaveformParameters *getWaveformParameters(int slotIndex, int subchannelIndex, in
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void resetProfileParameters(psu::profile::Parameters &profileParams) {
+	profileParams.functionGeneratorParameters.options.isAmpl = 1;
+	profileParams.functionGeneratorParameters.options.isFreq = 1;
+	profileParams.functionGeneratorParameters.previewPeriod = PREVIEW_PERIOD_DEF;
+	for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
+		profileParams.functionGeneratorParameters.waveformParameters[i].moduleType = MODULE_TYPE_NONE;
+	}
+}
+
 void getProfileParameters(psu::profile::Parameters &profileParams) {
 	profileParams.functionGeneratorParameters.options = g_options;
+	profileParams.functionGeneratorParameters.previewPeriod = g_previewPeriod;
 
 	for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
 		if (i < g_selectedResources.m_numResources) {
@@ -831,6 +833,7 @@ void getProfileParameters(psu::profile::Parameters &profileParams) {
 
 void setProfileParameters(const psu::profile::Parameters &profileParams) {
 	g_options = profileParams.functionGeneratorParameters.options;
+	g_previewPeriod = profileParams.functionGeneratorParameters.previewPeriod;
 
 	int j = 0;
 
@@ -900,6 +903,7 @@ bool writeProfileProperties(psu::profile::WriteContext &ctx, const psu::profile:
 	ctx.group("funcgen_options");
 	WRITE_PROPERTY("isFreq", profileParams.functionGeneratorParameters.options.isFreq);
 	WRITE_PROPERTY("isAmpl", profileParams.functionGeneratorParameters.options.isAmpl);
+	WRITE_PROPERTY("previewPeriod", profileParams.functionGeneratorParameters.previewPeriod);
 
 	for (int i = 0; i < MAX_NUM_WAVEFORMS; i++) {
 		auto &profileWaveformParameters = profileParams.functionGeneratorParameters.waveformParameters[i];
@@ -933,6 +937,7 @@ bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Paramet
 	if (ctx.matchGroup("funcgen_options")) {
 		READ_FLAG("isFreq", profileParams.functionGeneratorParameters.options.isFreq);
 		READ_FLAG("isAmpl", profileParams.functionGeneratorParameters.options.isAmpl);
+		READ_PROPERTY("previewPeriod", profileParams.functionGeneratorParameters.previewPeriod);
 	}
 
     int i;
@@ -1526,6 +1531,7 @@ void reset() {
 	AllResources::reset();
 	g_options.isFreq = 1;
 	g_options.isAmpl = 1;
+	g_previewPeriod = PREVIEW_PERIOD_DEF;
 	removeAllChannels();
 }
 
@@ -2708,7 +2714,113 @@ void action_function_generator_show_previous_page() {
     }	
 }
 
+void data_function_generator_preview_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
+    static Overlay overlay;
 
+    if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_UPDATE_OVERLAY_DATA) {
+        overlay.state = g_selectedResources.m_numResources > 0;
+        
+        WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
+        overlay.width = widgetCursor.widget->w;
+        overlay.height = widgetCursor.widget->h;
+        
+        overlay.x = widgetCursor.widget->x;
+        overlay.y = widgetCursor.widget->y;
+
+        value = Value(&overlay, VALUE_TYPE_POINTER);
+    }
+}
+
+void data_function_generator_preview_period(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_PHASE_SHIFT;
+		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+			value = g_focusEditValue;
+		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
+			data_keypad_text(operation, cursor, value);
+		} else {
+			value = MakeValue(g_previewPeriod, UNIT_SECOND);
+		}
+	} else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
+		value = 0;
+	} else if (operation == DATA_OPERATION_GET_MIN) {
+		value = MakeValue(PREVIEW_PERIOD_MIN, UNIT_SECOND);
+	} else if (operation == DATA_OPERATION_GET_MAX) {
+		value = MakeValue(PREVIEW_PERIOD_MAX, UNIT_SECOND);
+	} else if (operation == DATA_OPERATION_GET_NAME) {
+		value = "Preview period";
+	} else if (operation == DATA_OPERATION_GET_UNIT) {
+		value = UNIT_SECOND;
+	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
+		StepValues *stepValues = value.getStepValues();
+
+		if (g_options.isFreq) {
+			static float g_values[] = { PREVIEW_PERIOD_MIN, PREVIEW_PERIOD_MIN * 10.0f, PREVIEW_PERIOD_MIN * 100.0f, PREVIEW_PERIOD_MIN * 1000.0f };
+
+			stepValues->values = g_values;
+			stepValues->count = sizeof(g_values) / sizeof(float);
+			stepValues->unit = UNIT_SECOND;
+
+			stepValues->encoderSettings.accelerationEnabled = true;
+
+			stepValues->encoderSettings.range = 1000.0f * PREVIEW_PERIOD_MIN;
+			stepValues->encoderSettings.step = PREVIEW_PERIOD_MIN;
+		} else {
+			getPhaseShiftStepValues(stepValues);
+		}
+
+		stepValues->encoderSettings.mode = eez::psu::gui::edit_mode_step::g_functionGeneratorPreviewPeriodEncoderMode;
+
+		value = 1;
+	} else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
+		eez::psu::gui::edit_mode_step::g_functionGeneratorPreviewPeriodEncoderMode = (EncoderMode)value.getInt();
+	} else if (operation == DATA_OPERATION_SET) {
+		g_previewPeriod = value.getFloat();
+		refreshScreen();
+	}
+}
+
+static const float g_previewPeriodZoomLevels[] = {
+	0.001f, 0.002f, 0.005f,
+	0.01f, 0.02f, 0.05f,
+	0.1f, 0.2f, 0.5f,
+	1.0f, 2.0f, 5.0f,
+	10.0f, 20.0f, 50.0f, 100.0f
+};
+
+void data_function_generator_preview_period_zoom_in_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = g_previewPeriod > g_previewPeriodZoomLevels[0];
+	}
+}
+
+void data_function_generator_preview_period_zoom_out_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = g_previewPeriod  < g_previewPeriodZoomLevels[sizeof(g_previewPeriodZoomLevels) / sizeof(float) - 1];
+	}
+}
+
+void action_function_generator_preview_period_zoom_in() {
+	for (unsigned i = sizeof(g_previewPeriodZoomLevels) / sizeof(float) - 1; i >= 0; i--) {
+		if (g_previewPeriod > g_previewPeriodZoomLevels[i]) {
+			g_previewPeriod = g_previewPeriodZoomLevels[i];
+			refreshScreen();
+			break;
+		}
+	}
+}
+
+void action_function_generator_preview_period_zoom_out() {
+	for (unsigned i = 0; i < sizeof(g_previewPeriodZoomLevels) / sizeof(float); i++) {
+		if (g_previewPeriod < g_previewPeriodZoomLevels[i]) {
+			g_previewPeriod = g_previewPeriodZoomLevels[i];
+			refreshScreen();
+			break;
+		}
+	}
+}
 
 } // namespace gui
 } // namespace eez

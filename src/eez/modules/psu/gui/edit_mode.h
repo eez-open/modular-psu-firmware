@@ -126,6 +126,7 @@ extern EncoderMode g_functionGeneratorPhaseShiftEncoderMode;
 extern EncoderMode g_functionGeneratorAmplitudeEncoderMode;
 extern EncoderMode g_functionGeneratorOffsetEncoderMode;
 extern EncoderMode g_functionGeneratorDutyCycleEncoderMode;
+extern EncoderMode g_functionGeneratorPreviewPeriodEncoderMode;
 
 float getEncoderStepValue();
 void switchToNextEncoderMode();

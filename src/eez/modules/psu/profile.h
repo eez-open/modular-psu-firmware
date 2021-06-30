@@ -107,6 +107,7 @@ struct EncoderModes {
 	unsigned functionGeneratorAmplitude: 3;
 	unsigned functionGeneratorOffset: 3;
 	unsigned functionGeneratorDutyCycle: 3;
+    unsigned functionGeneratorPreviewPeriod: 3;
 };
 
 struct FunctionGeneratorWaveformParameters {
@@ -133,6 +134,7 @@ struct FunctionGeneratorOptions {
 struct FunctionGeneratorParameters {
 	FunctionGeneratorWaveformParameters waveformParameters[MAX_NUM_WAVEFORMS];
 	FunctionGeneratorOptions options;
+    float previewPeriod;
 };
 
 /// Profile parameters.

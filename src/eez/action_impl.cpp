@@ -1135,8 +1135,8 @@ void action_user_switch_clicked() {
             if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE && !((ToastMessagePage *)getActivePage())->hasAction()) {
                 popPage();
             }
-
             psu::gui::edit_mode_step::switchToNextEncoderMode();
+			refreshScreen();
         }
 #endif
         break;

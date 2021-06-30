@@ -419,6 +419,7 @@ EncoderMode g_functionGeneratorPhaseShiftEncoderMode = ENCODER_MODE_AUTO;
 EncoderMode g_functionGeneratorAmplitudeEncoderMode = ENCODER_MODE_AUTO;
 EncoderMode g_functionGeneratorOffsetEncoderMode = ENCODER_MODE_AUTO;
 EncoderMode g_functionGeneratorDutyCycleEncoderMode = ENCODER_MODE_AUTO;
+EncoderMode g_functionGeneratorPreviewPeriodEncoderMode = ENCODER_MODE_AUTO;
 
 static Value getCurrentEncoderStepValue() {
     StepValues stepValues;
@@ -522,6 +523,7 @@ void getProfileParameters(profile::Parameters &parameters) {
     parameters.encoderModes.functionGeneratorAmplitude = g_functionGeneratorAmplitudeEncoderMode;
     parameters.encoderModes.functionGeneratorOffset = g_functionGeneratorOffsetEncoderMode;
     parameters.encoderModes.functionGeneratorDutyCycle = g_functionGeneratorDutyCycleEncoderMode;
+    parameters.encoderModes.functionGeneratorPreviewPeriod = g_functionGeneratorPreviewPeriodEncoderMode;
 }
 
 void setProfileParameters(const profile::Parameters &parameters) {
@@ -566,6 +568,7 @@ void setProfileParameters(const profile::Parameters &parameters) {
     g_functionGeneratorAmplitudeEncoderMode = (EncoderMode)parameters.encoderModes.functionGeneratorAmplitude;
     g_functionGeneratorOffsetEncoderMode = (EncoderMode)parameters.encoderModes.functionGeneratorOffset;
     g_functionGeneratorDutyCycleEncoderMode = (EncoderMode)parameters.encoderModes.functionGeneratorDutyCycle;
+    g_functionGeneratorPreviewPeriodEncoderMode = (EncoderMode)parameters.encoderModes.functionGeneratorPreviewPeriod;
 }
 
 bool writeProfileProperties(profile::WriteContext &ctx, const profile::Parameters &parameters) {
@@ -612,6 +615,7 @@ bool writeProfileProperties(profile::WriteContext &ctx, const profile::Parameter
     if (parameters.encoderModes.functionGeneratorAmplitude) WRITE_PROPERTY("functionGeneratorAmplitude", parameters.encoderModes.functionGeneratorAmplitude);
     if (parameters.encoderModes.functionGeneratorOffset) WRITE_PROPERTY("functionGeneratorOffset", parameters.encoderModes.functionGeneratorOffset);
     if (parameters.encoderModes.functionGeneratorDutyCycle) WRITE_PROPERTY("functionGeneratorDutyCycle", parameters.encoderModes.functionGeneratorDutyCycle);
+    if (parameters.encoderModes.functionGeneratorPreviewPeriod) WRITE_PROPERTY("functionGeneratorPreviewPeriod", parameters.encoderModes.functionGeneratorPreviewPeriod);
 
     return true;
 }
@@ -662,6 +666,7 @@ bool readProfileProperties(profile::ReadContext &ctx, profile::Parameters &param
     READ_FLAG("functionGeneratorAmplitude", parameters.encoderModes.functionGeneratorAmplitude);
     READ_FLAG("functionGeneratorOffset", parameters.encoderModes.functionGeneratorOffset);
     READ_FLAG("functionGeneratorDutyCycle", parameters.encoderModes.functionGeneratorDutyCycle);
+    READ_FLAG("functionGeneratorPreviewPeriod", parameters.encoderModes.functionGeneratorPreviewPeriod);
 
     return false;
 }

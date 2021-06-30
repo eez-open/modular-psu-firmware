@@ -2742,6 +2742,24 @@
       "name": "channel_ocp_trip_level_info",
       "type": "string",
       "defaultValue": "Trip level = 99.9% of Iset"
+    },
+    {
+      "name": "function_generator_preview_period",
+      "type": "float",
+      "defaultValue": "500 ms"
+    },
+    {
+      "name": "function_generator_preview_overlay"
+    },
+    {
+      "name": "function_generator_preview_period_zoom_out_enabled",
+      "type": "boolean",
+      "defaultValue": "0"
+    },
+    {
+      "name": "function_generator_preview_period_zoom_in_enabled",
+      "type": "boolean",
+      "defaultValue": "1"
     }
   ],
   "actions": [
@@ -4120,6 +4138,16 @@
       "components": [],
       "connectionLines": [],
       "name": "trigger_toggle_initiate_all"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_preview_period_zoom_in"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_preview_period_zoom_out"
     }
   ],
   "pages": [
@@ -32450,6 +32478,83 @@
               ]
             }
           ]
+        },
+        {
+          "type": "Container",
+          "left": 171,
+          "top": 2,
+          "width": 134,
+          "height": 33,
+          "wireID": "6e9ee58d-defa-47dc-ff9e-2a43a488bc7b",
+          "data": "",
+          "action": "",
+          "style": {
+            "inheritFrom": "overlay",
+            "opacity": 208
+          },
+          "name": "Preview period",
+          "widgets": [
+            {
+              "type": "DisplayData",
+              "left": 1,
+              "top": 1,
+              "width": 50,
+              "height": 31,
+              "wireID": "512a2b04-f7a5-43cf-c6d4-56489429943e",
+              "data": "function_generator_preview_period",
+              "action": "edit",
+              "style": {
+                "inheritFrom": "encoder_cursor_14_enabled",
+                "font": "RobotoCondensed-Regular",
+                "padding": "0 5"
+              },
+              "displayOption": 0
+            },
+            {
+              "type": "Button",
+              "left": 93,
+              "top": 1,
+              "width": 40,
+              "height": 31,
+              "wireID": "6ba78286-334b-42ad-9cb9-dae723801749",
+              "action": "function_generator_preview_period_zoom_out",
+              "style": {
+                "inheritFrom": "encoder_cursor_14_enabled",
+                "font": "Oswald14"
+              },
+              "text": "\\u00b8",
+              "enabled": "function_generator_preview_period_zoom_out_enabled",
+              "disabledStyle": {
+                "inheritFrom": "encoder_cursor_14_enabled",
+                "color": "text_regular",
+                "backgroundColor": "text_enable_background",
+                "activeColor": "text_enable_background",
+                "activeBackgroundColor": "text_regular"
+              }
+            },
+            {
+              "type": "Button",
+              "left": 52,
+              "top": 1,
+              "width": 40,
+              "height": 31,
+              "wireID": "a6a1e2e8-a6ed-4c36-a5eb-175a231a56f8",
+              "action": "function_generator_preview_period_zoom_in",
+              "style": {
+                "inheritFrom": "encoder_cursor_14_enabled",
+                "font": "Oswald14"
+              },
+              "text": "\\u00b9",
+              "enabled": "function_generator_preview_period_zoom_in_enabled",
+              "disabledStyle": {
+                "inheritFrom": "encoder_cursor_14_enabled",
+                "color": "text_regular",
+                "activeBackgroundColor": "text_regular"
+              }
+            }
+          ],
+          "overlay": "function_generator_preview_overlay",
+          "shadow": true
         }
       ],
       "connectionLines": [],
