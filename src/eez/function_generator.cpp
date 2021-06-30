@@ -1787,10 +1787,17 @@ void tick() {
 		}
 
 		// If DCP405 is selected, for 100 Hz or more, and measured current of 1 A or more, DP has to be disabled
-		if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCP405 && g_freqU[i] >= 100.0f && channel.i.mon >= 0.5f) {
-			if (channel.flags.dprogState) {
-				channel.setDprogState(DPROG_STATE_OFF);
-				g_dprogStateModified[channel.channelIndex] = true;
+		if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCP405 && g_freqU[i] >= 100.0f) {
+			if (channel.i.mon >= 0.5f) {
+				if (channel.flags.dprogState) {
+					channel.setDprogState(DPROG_STATE_OFF);
+					g_dprogStateModified[channel.channelIndex] = true;
+				}
+			} else {
+				if (g_dprogStateModified[channel.channelIndex]) {
+					channel.setDprogState(DPROG_STATE_ON);
+					g_dprogStateModified[channel.channelIndex] = false;
+				}
 			}
 		}
 	}
