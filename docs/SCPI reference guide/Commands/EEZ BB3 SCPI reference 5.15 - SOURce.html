@@ -654,14 +654,6 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
-					<p class="scpi1"><a href="#sour_mode"><span style="text-decoration: underline;">:MODE {&lt;mode&gt;}</span></a></p>
-				</td>
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 51%;">
-					<p>Sets the output trigger mode</p>
-				</td>
-			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 49%;">
 					<p class="scpi1">:VOLTage</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 51%;">
@@ -2865,7 +2857,7 @@
 					<p>&#160;</p>
 					<p>At *RST, the signal being sourced will be set to a &quot;safe&quot; condition. This is achieved by setting the amplitude to its MINimum value (see <a href="http://www.envox.hr/eez/bench-power-supply/psu-scpi-reference-manual/psu-scpi-parameters-and-settings.html#programming_parameters"><span style="text-decoration: underline;">Section 8.1</span></a>).</p>
 					<p>&#160;</p>
-					<p>The SMX46 has the following two channels that can be programmed with VOLTage command (n is slot number):</p>
+					<p>The SMX46 has the following two channels that can be programmed with VOLTage command (n is the slot number):</p>
 					<ul>
 						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">(@n01) – Analog output #1, 0&#160;–&#160;10&#160;V, 10&#160;mV set resolution</li>
 						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">(@n02) – Analog output #2, 0&#160;–&#160;10&#160;V, 10&#160;mV set resolution</li>
@@ -4665,7 +4657,6 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
 					<p>SOURce:VOLTage:FUNCtion:AMPLitude</p>
 				</td>
 			</tr>
@@ -4749,7 +4740,6 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
 					<p>SOURce:VOLTage:FUNCtion:DUTY</p>
 				</td>
 			</tr>
@@ -4833,7 +4823,6 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
 					<p>SOURce:VOLTage:FUNCtion:FREQuency</p>
 				</td>
 			</tr>
@@ -4917,7 +4906,6 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
 					<p>SOURce:VOLTage:FUNCtion:OFFSet</p>
 				</td>
 			</tr>
@@ -5001,7 +4989,6 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
 					<p>SOURce:VOLTage:FUNCtion:PHASeshift</p>
 				</td>
 			</tr>
@@ -5087,20 +5074,19 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
 					<p>SOURce:VOLTage:FUNCtion:SHAPe</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.52. <a name="sour_digi_func_duty"></a>SOURce:DIGItal[:OUTPut]:FUNCtion:DUTY {&lt;duty&gt;}</p>
+		<p class="Heading_3">5.15.52. <a name="sour_digi_func_duty"></a>SOURce:DIGital[:OUTPut]:FUNCtion:DUTY {&lt;duty&gt;}</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SOURce:DIGItal[:OUTPut]:FUNCtion:DUTY {&lt;duty&gt;}</p>
-					<p class="cmd_root">[SOURce:DIGItal[:OUTPut]:FUNCtion:DUTY?</p>
+					<p class="cmd_root">SOURce:DIGital[:OUTPut]:FUNCtion:DUTY {&lt;duty&gt;}</p>
+					<p class="cmd_root">[SOURce:DIGital[:OUTPut]:FUNCtion:DUTY?</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5163,7 +5149,7 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SOUR:DIGI:FUNC:DUTY 10</p>
+					<p class="cmd_code">SOUR:DIG:FUNC:DUTY 10</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5171,20 +5157,19 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
 					<p>SOURce:VOLTage:FUNCtion:DUTY</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.53. <a name="sour_digi_func_freq"></a>SOURce:DIGItal[:OUTPut]:FUNCtion:FREQuency {&lt;frequency&gt;}</p>
+		<p class="Heading_3">5.15.53. <a name="sour_digi_func_freq"></a>SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency {&lt;frequency&gt;}</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SOURce:DIGItal[:OUTPut]:FUNCtion:FREQuency {&lt;frequency&gt;}</p>
-					<p class="cmd_root">SOURce:DIGItal[:OUTPut]:FUNCtion:FREQuency?</p>
+					<p class="cmd_root">SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency {&lt;frequency&gt;}</p>
+					<p class="cmd_root">SOURce:DIGital[:OUTPut]:FUNCtion:FREQuency?</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5247,7 +5232,7 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SOUR:DIGI:FUNC:FREQ 4000</p>
+					<p class="cmd_code">SOUR:DIG:FUNC:FREQ 4000</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5255,20 +5240,19 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
 					<p>SOURce:VOLTage:FUNCtion:FREQuency</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.54. <a name="sour_digi_func_phas"></a><a name="sour_digi_func_shap"></a>SOURce:DIGItal[:OUTPut]:FUNCtion:PHASeshift {&lt;phase&gt;}</p>
+		<p class="Heading_3">5.15.54. <a name="sour_digi_func_shap"></a><a name="sour_digi_func_phas"></a>SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift {&lt;phase&gt;}</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SOURce:DIGItal[:OUTPut]:FUNCtion:PHASeshift {&lt;phase&gt;}</p>
-					<p class="cmd_root">SOURce:DIGItal[:OUTPut]:FUNCtion:PHASeshift?</p>
+					<p class="cmd_root">SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift {&lt;phase&gt;}</p>
+					<p class="cmd_root">SOURce:DIGital[:OUTPut]:FUNCtion:PHASeshift?</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5331,7 +5315,7 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SOUR:DIGI:FUNC:PHAS 90</p>
+					<p class="cmd_code">SOUR:DIG:FUNC:PHAS 90</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5339,20 +5323,19 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
 					<p>SOURce:VOLTage:FUNCtion:PHASeshift</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.55. SOURce:DIGItal[:OUTPut]:FUNCtion:SHAPe {&lt;waveform&gt;}</p>
+		<p class="Heading_3">5.15.55. SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe {&lt;waveform&gt;}</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SOURce:DIGItal[:OUTPut]:FUNCtion:SHAPe {&lt;waveform&gt;}</p>
-					<p class="cmd_root">SOURce:DIGItal[:OUTPut]:FUNCtion:SHAPe?</p>
+					<p class="cmd_root">SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe {&lt;waveform&gt;}</p>
+					<p class="cmd_root">SOURce:DIGital[:OUTPut]:FUNCtion:SHAPe?</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5415,7 +5398,7 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">SOUR:DIGI:FUNC:SHAP PULS</p>
+					<p class="cmd_code">SOUR:DIG:FUNC:SHAP PULS</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5423,20 +5406,19 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
 					<p>SOURce:VOLTage:FUNCtion:SHAPe</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.56. <a name="sour_digi_mode"></a>SOURce:DIGItal[:OUTPut]:MODE</p>
+		<p class="Heading_3">5.15.56. <a name="sour_digi_mode"></a>SOURce:DIGital[:OUTPut]:MODE</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SOURce:DIGItal[:OUTPut]:MODE {&lt;mode&gt;}</p>
-					<p class="cmd_root">SOURce:DIGItal[:OUTPut]:MODE?</p>
+					<p class="cmd_root">SOURce:DIGital[:OUTPut]:MODE {&lt;mode&gt;}</p>
+					<p class="cmd_root">SOURce:DIGital[:OUTPut]:MODE?</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5495,7 +5477,7 @@
 					<p class="Default_nt2">Return</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>The query command returns the mode of the currently selected channel.</p>
+					<p>The query command returns the mode of the currently selected digital output.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5504,29 +5486,20 @@
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
 					<p class="cmd_code">INST (@301)</p>
-					<p class="cmd_code">SOUR:MODE?</p>
+					<p class="cmd_code">SOUR:DIG:MODE?</p>
 					<p class="cmd_code_Start">FIX</p>
 				</td>
 			</tr>
-			<tr style="background: transparent;">
-				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
-					<p class="Default_nt2">Related Commands</p>
-				</td>
-				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>SOURce:MODE</p>
-					<p>&#160;</p>
-				</td>
-			</tr>
 		</table>
-		<p class="Heading_3">5.15.57. <a name="sour_mode"></a>SOURce:MODE</p>
+		<p class="Heading_3">5.15.57. <a name="sour_dig_data"></a>SOURce:DIGital:DATA</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
 					<p class="Default_nt2">Syntax</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_root">SOURce:MODE {&lt;mode&gt;}</p>
-					<p class="cmd_root">SOURce:MODE?</p>
+					<p class="cmd_root">SOURce:DIGital:DATA[:BYTE] {&lt;value&gt;}</p>
+					<p class="cmd_root">SOURce:DIGital:DATA[:BYTE]?</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5534,7 +5507,7 @@
 					<p class="Default_nt2">Modules</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p><span class="DCP405" style="background-color: #99ffcc;">&#160;SMX&#160;</span><span class="DCP405" style="background-color: #81d41a;">&#160;MIO&#160;</span></p>
+					<p><span class="DCP405" style="background-color: #81d41a;">&#160;MIO&#160;</span></p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5542,10 +5515,87 @@
 					<p class="Default_nt2">Description</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>This command determines what happens to the output when the transient system is initiated and triggered:</p>
+					<p>Use this command to set output states of the digital output channel on the MIO168. Value is binary-weighted decimal representing the bits, for example if we want to set bit 1,2 and 8, set value has to be 1+2+128=131. </p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p>&lt;value&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">0 – 255</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Returns a binary-weighted decimal representing the bits set on the selected digital output channel.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Set DOUT1 and DOUT2 on the MIO168 module installed in slot 2:</p>
+					<p class="cmd_code_Start">INST (@302)</p>
+					<p class="cmd_code">SOUR:DIG:DATA 3</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.15.58. <a name="sour_dig_rang"></a>SOURce:DIGital:RANGe</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SOURce:DIGital:RANGe {&lt;pin&gt;}, {&lt;range&gt;}</p>
+					<p class="cmd_root">SOURce:DIGital:RANGe?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Modules</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p><span class="DCP405" style="background-color: #81d41a;">&#160;MIO&#160;</span></p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set the range of the input specified by &lt;pin&gt; on the 8-bit digital port (@n01) where n is the MIO168 module slot number:</p>
 					<ul>
-						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">FIXed – the output remains at the immediate value</li>
-						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">FUNCgen – the output follows the function generator waveform when a trigger occurs.</li>
+						<li class="List_1_Start" style="text-indent: 0; list-style-type: disc;">Low – 0 to 3.3 / 5&#160;V </li>
+						<li class="List_1_End" style="text-indent: 0; list-style-type: disc;">High – 0 to 12&#160;V (resilient to 24&#160;V) </li>
 					</ul>
 				</td>
 			</tr>
@@ -5568,16 +5618,33 @@
 			</tr>
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p>&lt;mode&gt;</p>
+					<p>&lt;pin&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">1 – 8</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p>&lt;range&gt;</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
 					<p style="text-align: center;">Discrete</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
-					<p style="text-align: left;">FIXed|FUNCgen</p>
+					<p style="text-align: center;">LOW|HIGH</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
-					<p style="text-align: center;">FIXed</p>
+					<p style="text-align: center;">–</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5585,7 +5652,7 @@
 					<p class="Default_nt2">Return</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>The query command returns the mode of the currently selected channel.</p>
+					<p>The query command returns the range of the selected digital input.</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5593,9 +5660,10 @@
 					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p class="cmd_code">INST (@307)</p>
-					<p class="cmd_code">SOUR:MODE?</p>
-					<p class="cmd_code_Start">FIX</p>
+					<p class="cmd_code">INST (@301)</p>
+					<p class="cmd_code">SOUR:DIG:RANG 1,HIGH</p>
+					<p class="cmd_code_End">SOUR:DIG:RANG? 1</p>
+					<p class="cmd_code">&quot;HIGH&quot;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -5603,13 +5671,114 @@
 					<p class="Default_nt2">Related Commands</p>
 				</td>
 				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
-					<p>[SOURce[&lt;n&gt;]]:CURRent:MODE</p>
-					<p>[SOURce[&lt;n&gt;]]:VOLTage:MODE</p>
-					<p>SOURce:DIGItal[:OUTPut]:MODE</p>
+					<p>MEASure:DIGital[:BYTE]</p>
+					<p>SOURce:DIGital:SPEed</p>
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.58. <a name="sour_volt_func_mio_ampl"></a>SOURce:VOLTage:FUNCtion:AMPLitude {&lt;amplitude&gt;}</p>
+		<p class="Heading_3">5.15.59. <a name="sour_dig_spe"></a>SOURce:DIGital:SPEed</p>
+		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Syntax</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_root">SOURce:DIGital:SPEed {&lt;pin&gt;}, {&lt;speed&gt;}</p>
+					<p class="cmd_root">SOURce:DIGital:SPEed?</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Modules</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p><span class="DCP405" style="background-color: #81d41a;">&#160;MIO&#160;</span></p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Description</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>Use this command to set the speed of the input specified by &lt;pin&gt; on the digital port (@n01) where n is the MIO168 module slot number. This command is applicable only to pin 1 and 2.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td rowspan="2" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Parameters</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Name</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Type</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">Range</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">Default</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p>&lt;pin&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">NR1</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">1 – 2</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p>&#160;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p>&lt;speed&gt;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 22%;">
+					<p style="text-align: center;">Discrete</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 23%;">
+					<p style="text-align: center;">FAST|SLOW</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 21%;">
+					<p style="text-align: center;">–</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Return</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>The query command returns the speed of the selected digital input.</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Usage<span style="font-style: italic;"> </span>example</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p class="cmd_code">INST (@301)</p>
+					<p class="cmd_code">SOUR:DIG:SPE 1,FAST</p>
+				</td>
+			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
+					<p class="Default_nt2">Related Commands</p>
+				</td>
+				<td colspan="4" style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 87%;">
+					<p>MEASure:DIGital[:BYTE]</p>
+					<p>SOURce:DIGital:RANGe</p>
+				</td>
+			</tr>
+		</table>
+		<p class="Heading_3">5.15.60. <a name="sour_volt_func_mio_ampl"></a>SOURce:VOLTage:FUNCtion:AMPLitude {&lt;amplitude&gt;}</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5693,7 +5862,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.59. <a name="sour_volt_func_mio_duty"></a>SOURce:VOLTage:FUNCtion:DUTY {&lt;duty&gt;}</p>
+		<p class="Heading_3">5.15.61. <a name="sour_volt_func_mio_duty"></a>SOURce:VOLTage:FUNCtion:DUTY {&lt;duty&gt;}</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5777,7 +5946,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.60. <a name="sour_volt_func_mio_freq"></a>SOURce:VOLTage:FUNCtion:FREQuency {&lt;frequency&gt;}</p>
+		<p class="Heading_3">5.15.62. <a name="sour_volt_func_mio_freq"></a>SOURce:VOLTage:FUNCtion:FREQuency {&lt;frequency&gt;}</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5861,7 +6030,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.61. <a name="sour_volt_func_mio_offs"></a>SOURce:VOLTage:FUNCtion:OFFSet {&lt;offset&gt;}</p>
+		<p class="Heading_3">5.15.63. <a name="sour_volt_func_mio_offs"></a>SOURce:VOLTage:FUNCtion:OFFSet {&lt;offset&gt;}</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -5945,7 +6114,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.62. <a name="sour_volt_func_mio_phas"></a>SOURce:VOLTage:FUNCtion:PHASeshift {&lt;phase&gt;}</p>
+		<p class="Heading_3">5.15.64. <a name="sour_volt_func_mio_phas"></a>SOURce:VOLTage:FUNCtion:PHASeshift {&lt;phase&gt;}</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
@@ -6029,7 +6198,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.15.63. <a name="sour_volt_func_mio_shap"></a>SOURce:VOLTage:FUNCtion:SHAPe {&lt;waveform&gt;}</p>
+		<p class="Heading_3">5.15.65. <a name="sour_volt_func_mio_shap"></a>SOURce:VOLTage:FUNCtion:SHAPe {&lt;waveform&gt;}</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
