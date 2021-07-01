@@ -3024,7 +3024,7 @@
                           "type": "Container",
                           "left": 0,
                           "top": 0,
-                          "width": 132,
+                          "width": 147,
                           "height": 110,
                           "wireID": "5163a7fd-c8bf-425f-ce15-5acbe004e6ff",
                           "action": "",
@@ -3037,7 +3037,7 @@
                               "type": "DisplayData",
                               "left": 0,
                               "top": 21,
-                              "width": 80,
+                              "width": 99,
                               "height": 62,
                               "wireID": "e8b1f928-2374-49b6-ae7a-3586a43706d0",
                               "data": "channel_u_mon",
@@ -3050,9 +3050,9 @@
                             },
                             {
                               "type": "DisplayData",
-                              "left": 80,
+                              "left": 99,
                               "top": 21,
-                              "width": 52,
+                              "width": 48,
                               "height": 32,
                               "wireID": "5a9aad8b-06c9-4f6a-c638-a7d7a095bee6",
                               "data": "channel_u_mon",
@@ -3064,9 +3064,9 @@
                             },
                             {
                               "type": "DisplayData",
-                              "left": 80,
+                              "left": 99,
                               "top": 53,
-                              "width": 52,
+                              "width": 48,
                               "height": 30,
                               "wireID": "10480d41-01de-444b-e759-bdc84f9b3ab4",
                               "data": "channel_u_mon",
@@ -3080,9 +3080,9 @@
                         },
                         {
                           "type": "Container",
-                          "left": 134,
+                          "left": 147,
                           "top": 0,
-                          "width": 150,
+                          "width": 161,
                           "height": 110,
                           "wireID": "f732a2b9-d216-49d2-df98-77dff1c08e22",
                           "style": {
@@ -3094,7 +3094,7 @@
                               "type": "DisplayData",
                               "left": 0,
                               "top": 21,
-                              "width": 98,
+                              "width": 99,
                               "height": 62,
                               "wireID": "b40e8477-88c7-4297-bf07-e84333d52851",
                               "data": "channel_i_mon",
@@ -3106,9 +3106,9 @@
                             },
                             {
                               "type": "DisplayData",
-                              "left": 98,
+                              "left": 99,
                               "top": 21,
-                              "width": 52,
+                              "width": 62,
                               "height": 32,
                               "wireID": "2f9a5d5a-211d-41ca-c40b-e8c8220e0c94",
                               "data": "channel_i_mon",
@@ -3120,9 +3120,9 @@
                             },
                             {
                               "type": "DisplayData",
-                              "left": 98,
+                              "left": 99,
                               "top": 53,
-                              "width": 52,
+                              "width": 62,
                               "height": 30,
                               "wireID": "e4924f2f-fe8e-495b-d965-8cffe885e613",
                               "data": "channel_i_mon",
@@ -3135,9 +3135,9 @@
                         },
                         {
                           "type": "Container",
-                          "left": 286,
+                          "left": 308,
                           "top": 0,
-                          "width": 150,
+                          "width": 138,
                           "height": 112,
                           "wireID": "ae6b4026-9f93-4a73-be5b-e34552e5deae",
                           "style": {
@@ -3149,7 +3149,7 @@
                               "type": "DisplayData",
                               "left": 0,
                               "top": 21,
-                              "width": 98,
+                              "width": 99,
                               "height": 62,
                               "wireID": "170cd85f-87e8-417a-fc0e-569674900799",
                               "data": "channel_p_mon",
@@ -3163,13 +3163,13 @@
                               "type": "DisplayData",
                               "left": 98,
                               "top": 21,
-                              "width": 52,
+                              "width": 40,
                               "height": 32,
                               "wireID": "f1c999c3-1962-45cd-ea49-eea5e9096024",
                               "data": "channel_p_mon",
                               "style": {
                                 "inheritFrom": "mon_value_20_left",
-                                "padding": "0 0 0 4"
+                                "alignHorizontal": "left"
                               },
                               "displayOption": 4
                             },
@@ -3177,7 +3177,7 @@
                               "type": "DisplayData",
                               "left": 98,
                               "top": 53,
-                              "width": 52,
+                              "width": 40,
                               "height": 30,
                               "wireID": "fc956669-ec4f-45ad-cee3-bbe3ebf13357",
                               "data": "channel_p_mon",
@@ -3191,9 +3191,9 @@
                         },
                         {
                           "type": "Container",
-                          "left": 436,
+                          "left": 448,
                           "top": 0,
-                          "width": 44,
+                          "width": 32,
                           "height": 110,
                           "wireID": "4e4d73c8-1416-426f-daa9-dedb6b1dbd16",
                           "style": {
@@ -3205,7 +3205,7 @@
                               "type": "DisplayData",
                               "left": 0,
                               "top": 60,
-                              "width": 44,
+                              "width": 32,
                               "height": 23,
                               "wireID": "e9ca517d-2eac-4be6-c449-56ae511f8f1c",
                               "data": "channel_temp",
@@ -3218,7 +3218,7 @@
                               "type": "DisplayData",
                               "left": 0,
                               "top": 21,
-                              "width": 44,
+                              "width": 32,
                               "height": 39,
                               "wireID": "cfba6a43-9f07-4e8e-9883-d6e518b51711",
                               "data": "channel_temp",
@@ -4295,7 +4295,8 @@
       "left": 0,
       "top": 0,
       "width": 480,
-      "height": 240
+      "height": 240,
+      "dataContextOverrides": "{\n    \"channel_u_mon\": \"999.999V\",\n    \"channel_i_mon\": \"999.9999mA\",\n    \"channel_p_mon\": \"999.99mW\",\n    \"channel_temp\": \"99.99\\u008aC\"\n}"
     },
     {
       "components": [
