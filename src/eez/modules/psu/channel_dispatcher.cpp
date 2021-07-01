@@ -2270,6 +2270,14 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
     channel_dispatcher::setVoltageList(dstChannel, voltageList, voltageListLength);
     channel_dispatcher::setCurrentList(dstChannel, currentList, currentListLength);
 
+    if (srcChannel.flags.voltageTriggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+        function_generator::copyTo(srcChannel.slotIndex, srcChannel.subchannelIndex, dstChannel.slotIndex, dstChannel.subchannelIndex, 0);
+    }
+
+    if (srcChannel.flags.currentTriggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
+        function_generator::copyTo(srcChannel.slotIndex, srcChannel.subchannelIndex, dstChannel.slotIndex, dstChannel.subchannelIndex, 1);
+    }
+
     return nullptr;
 }
 

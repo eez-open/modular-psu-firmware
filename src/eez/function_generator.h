@@ -94,6 +94,8 @@ bool setDutyCycle(int slotIndex, int subchannelIndex, int resourceIndex, float d
 bool getResourceType(int slotIndex, int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType &resourceType, int *err);
 bool setResourceType(int slotIndex, int subchannelIndex, int resourceIndex, FunctionGeneratorResourceType resourceType, int *err);
 
+void copyTo(int srcSlotIndex, int srcSubchannelIndex, int dstSlotIndex, int dstSubchannelIndex, int resourceIndex);
+
 void reset();
 
 bool isActive();

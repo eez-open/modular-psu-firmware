@@ -2390,6 +2390,8 @@ public:
 				params.doutWaveformParameters[i].waveform = waveformParameters->waveform;
 				params.doutWaveformParameters[i].frequency = waveformParameters->frequency;
 
+				params.doutWaveformParameters[i].amplitude = waveformParameters->amplitude;
+
 				params.doutWaveformParameters[i].phaseShift = waveformParameters->phaseShift;
 				params.doutWaveformParameters[i].dutyCycle = waveformParameters->dutyCycle;
 			} else {
@@ -5012,6 +5014,12 @@ public:
 		if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
 			min = 0;
 			max = 1.0f;
+            if (stepValues) {
+                static const float g_doutStepValues[] = { 1.0f };
+                stepValues->values = g_doutStepValues;
+                stepValues->count = 1;
+                stepValues->unit = UNIT_NONE;
+            }
 		} else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
             auto &channel = aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX];
             if (resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
@@ -5041,31 +5049,31 @@ public:
 	
     void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override {
         if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
-            min = 0.1f;
+            min = 0.01f;
             max = 8000.0f;
 
             if (stepValues) {
-                static float values[] = { 1.0f, 10.0f, 25.0f, 100.0f };
+                static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
                 stepValues->values = values;
                 stepValues->count = sizeof(values) / sizeof(float);
                 stepValues->unit = UNIT_HERTZ;
             }
         } else if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
-            min = 0.1f;
+            min = 0.01f;
             max = 120.0f;
 
             if (stepValues) {
-                static float values[] = { 1.0f, 2.0f, 5.0f, 10.0f };
+                static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
                 stepValues->values = values;
                 stepValues->count = sizeof(values) / sizeof(float);
                 stepValues->unit = UNIT_HERTZ;
             }
         } else if (subchannelIndex >= AOUT_3_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_4_SUBCHANNEL_INDEX) {
-            min = 0.1f;
+            min = 0.01f;
             max = 200.0f;
 
             if (stepValues) {
-                static float values[] = { 1.0f, 2.0f, 5.0f, 10.0f };
+                static float values[] = { 0.01f, 0.1f, 1.0f, 10.0f };
                 stepValues->values = values;
                 stepValues->count = sizeof(values) / sizeof(float);
                 stepValues->unit = UNIT_HERTZ;

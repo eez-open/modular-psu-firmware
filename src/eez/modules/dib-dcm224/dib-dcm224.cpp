@@ -789,11 +789,11 @@ public:
 	}
 
     void getFunctionGeneratorFrequencyInfo(int subchannelIndex, int resourceIndex, float &min, float &max, StepValues *stepValues) override {
-        min = 0.1f;
+        min = 0.01f;
         max = 10.0f;
 
         if (stepValues) {
-            static float values[] = { 0.1f, 0.5f, 1.0f, 2.0f };
+            static float values[] = { 0.01f, 0.1f, 0.5f, 1.0f };
             stepValues->values = values;
             stepValues->count = sizeof(values) / sizeof(float);
             stepValues->unit = UNIT_HERTZ;

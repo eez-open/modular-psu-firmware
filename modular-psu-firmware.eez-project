@@ -4148,6 +4148,11 @@
       "components": [],
       "connectionLines": [],
       "name": "function_generator_preview_period_zoom_out"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "function_generator_toggle_selected_item"
     }
   ],
   "pages": [
@@ -7197,8 +7202,10 @@
                       "height": 24,
                       "wireID": "6558e91d-5b38-468f-bdcb-3cb8bdd48588",
                       "data": "function_generator_selected_item_label",
+                      "action": "function_generator_toggle_selected_item",
                       "style": {
-                        "inheritFrom": "overlay_left"
+                        "inheritFrom": "edit_value_active_M_center",
+                        "font": "RobotoCondensed-Regular"
                       },
                       "text": ""
                     },
@@ -7259,9 +7266,12 @@
                                   "width": 28,
                                   "height": 24,
                                   "wireID": "4ee3a810-03f1-4bff-a445-2439e4648556",
-                                  "action": "",
+                                  "action": "function_generator_toggle_freq",
                                   "style": {
-                                    "inheritFrom": "overlay_left"
+                                    "inheritFrom": "encoder_cursor_14_enabled",
+                                    "font": "RobotoCondensed-Regular",
+                                    "color": "action_color",
+                                    "activeBackgroundColor": "action_color"
                                   },
                                   "text": "Per"
                                 },
@@ -7272,9 +7282,12 @@
                                   "width": 28,
                                   "height": 24,
                                   "wireID": "1dfd8def-613b-4106-f77e-2167316c61c1",
-                                  "action": "",
+                                  "action": "function_generator_toggle_freq",
                                   "style": {
-                                    "inheritFrom": "overlay_left"
+                                    "inheritFrom": "encoder_cursor_14_enabled",
+                                    "font": "RobotoCondensed-Regular",
+                                    "color": "action_color",
+                                    "activeBackgroundColor": "action_color"
                                   },
                                   "text": "Freq"
                                 }
@@ -7379,9 +7392,10 @@
                                           "width": 28,
                                           "height": 24,
                                           "wireID": "e7b1c7d0-5bf5-4383-eca3-7a3dcb5f3b27",
-                                          "action": "",
+                                          "action": "function_generator_toggle_ampl",
                                           "style": {
-                                            "inheritFrom": "overlay_left"
+                                            "inheritFrom": "encoder_cursor_14_enabled",
+                                            "font": "RobotoCondensed-Regular"
                                           },
                                           "text": "Min"
                                         },
@@ -7392,9 +7406,10 @@
                                           "width": 28,
                                           "height": 24,
                                           "wireID": "dfb3fc58-fbc7-442e-bc65-dd0f5a458bb1",
-                                          "action": "",
+                                          "action": "function_generator_toggle_ampl",
                                           "style": {
-                                            "inheritFrom": "overlay_left"
+                                            "inheritFrom": "encoder_cursor_14_enabled",
+                                            "font": "RobotoCondensed-Regular"
                                           },
                                           "text": "Ampl"
                                         }

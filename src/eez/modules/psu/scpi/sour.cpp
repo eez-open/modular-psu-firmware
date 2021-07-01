@@ -1830,6 +1830,7 @@ static scpi_choice_def_t g_waveformChoice[] = {
 };
 
 static scpi_choice_def_t g_waveformChoiceDigitalOutput[] = {
+    { "DC", WAVEFORM_DC },
     { "SQUare", WAVEFORM_SQUARE },
     { "PULSe", WAVEFORM_PULSE },
     SCPI_CHOICE_LIST_END /* termination of option list */
