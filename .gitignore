@@ -8,3 +8,4 @@ src/third_party/stm32_cubeide/Debug (FPGA)
 src/third_party/stm32_cubeide/Release
 *.eez-project-ui-state
 src/third_party/stm32_cubeide/.settings/language.settings.xml
+scripts/Hello world - EEZ Flow

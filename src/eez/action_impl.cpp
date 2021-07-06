@@ -559,7 +559,7 @@ void action_show_user_profile_settings() {
 }
 
 void action_profiles_toggle_auto_recall() {
-    ((UserProfilesPage *)getActivePage())->toggleAutoRecall();
+    UserProfilesPage::toggleAutoRecall();
 }
 
 void action_profile_toggle_is_auto_recall_location() {

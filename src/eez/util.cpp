@@ -609,7 +609,25 @@ void formatBytes(uint64_t bytes, char *text, int count) {
     }
 }
 
-void getBaseFileName(const char *path, char *baseName, unsigned basenameSize) {
+void getFileName(const char *path, char *fileName, unsigned fileNameSize) {
+    const char *a = strrchr(path, '/');
+    if (a) {
+         a++;
+    } else {
+        a = path;
+    }
+    
+    const char *b = path + strlen(path);
+
+    unsigned n = b - a;
+    n = MIN(fileNameSize - 1, n);
+    if (n > 0) {
+        memcpy(fileName, a, n);
+    }
+    fileName[n] = 0;
+}
+
+void getBaseFileName(const char *path, char *baseName, unsigned baseNameSize) {
     const char *a = strrchr(path, '/');
     if (a) {
          a++;
@@ -623,7 +641,7 @@ void getBaseFileName(const char *path, char *baseName, unsigned basenameSize) {
     }
 
     unsigned n = b - a;
-    n = MIN(basenameSize - 1, n);
+    n = MIN(baseNameSize - 1, n);
     if (n > 0) {
         memcpy(baseName, a, n);
     }

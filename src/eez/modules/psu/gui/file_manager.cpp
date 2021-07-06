@@ -39,7 +39,6 @@
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/persist_conf.h>
-#include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/dlog_view.h>
 
 #include <eez/modules/psu/scpi/psu.h>
@@ -108,9 +107,14 @@ bool makeAbsolutePath(const char *relativePath, char *dest) {
         return false;
     }
 
-    dest[0] = '0' + g_currentDiskDrive;
-	dest[1] = ':';
-    stringCopy(dest + 2, MAX_PATH_LENGTH - 2, g_currentDirectory);
+	if (fs_driver::getDiskDrivesNum() > 1) {
+		dest[0] = '0' + g_currentDiskDrive;
+		dest[1] = ':';
+		stringCopy(dest + 2, MAX_PATH_LENGTH - 2, g_currentDirectory);
+	} else {
+		stringCopy(dest, MAX_PATH_LENGTH, g_currentDirectory);
+	}
+
     if (relativePath) {
     	stringAppendString(dest, MAX_PATH_LENGTH, "/");
     	stringAppendString(dest, MAX_PATH_LENGTH, relativePath);

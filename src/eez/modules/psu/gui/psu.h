@@ -87,9 +87,10 @@ void errorMessageWithAction(Value value, void (*action)(int param), const char *
 void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel);
 
 void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)());
+void yesNoDialog(int yesNoPageId, Value value, void(*yes_callback)(), void(*no_callback)(), void(*cancel_callback)());
 void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*later_callback)() = 0);
 void areYouSure(void (*yes_callback)());
-void areYouSureWithMessage(const char *message, void (*yes_callback)());
+void areYouSureWithMessage(const char *message, void (*yes_callback)(), void (*no_callback)() = 0, void (*cancel_callback)() = 0);
 
 void dialogYes();
 void dialogNo();

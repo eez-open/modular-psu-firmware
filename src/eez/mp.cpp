@@ -29,8 +29,14 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/datetime.h>
 #include <eez/modules/psu/event_queue.h>
+#include <eez/modules/psu/profile.h>
+#include <eez/modules/psu/persist_conf.h>
+#include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/gui/psu.h>
+#include <eez/modules/psu/gui/file_manager.h>
+
+#include <eez/modules/mcu/encoder.h>
 
 #include <eez/memory.h>
 
@@ -79,6 +85,12 @@ char *g_scriptPath = (char *)MP_BUFFER;
 static char *g_scriptSource = g_scriptPath + MAX_PATH_LENGTH + 1;
 static const size_t MAX_SCRIPT_LENGTH = 32 * 1024;
 static size_t g_scriptSourceLength;
+
+static struct eez::psu::profile::ScriptingParameters g_scriptingParameters = { "", 1 };
+static uint32_t g_scriptParametersVersion;
+
+static bool g_autoStartConditionIsChecked;
+static bool g_autoStartScriptIsRunning;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -157,6 +169,10 @@ void startThread() {
     g_mpTaskHandle = osThreadCreate(osThread(g_mpTask), nullptr);
 }
 
+void terminateThread() {
+	osThreadTerminate(g_mpTaskHandle);
+}
+
 void oneIter();
 
 void mainLoop(const void *) {
@@ -179,7 +195,7 @@ void oneIter() {
     if (event.status == osEventMessage) {
         if (event.value.v == QUEUE_MESSAGE_START_SCRIPT) {
             char scriptName[64];
-            getBaseFileName(g_scriptPath, scriptName, sizeof(scriptName));
+            getFileName(g_scriptPath, scriptName, sizeof(scriptName));
             InfoTrace("Script started: %s\n", scriptName);
 
 #if 1
@@ -189,6 +205,8 @@ void oneIter() {
 			mp_stack_set_top((void *)&dummy);
 			gc_init(g_scriptSource + MAX_SCRIPT_LENGTH, MP_BUFFER + MP_BUFFER_SIZE - MAX_SCRIPT_LENGTH);
 			mp_init();
+
+            bool wasException = false;
 
             nlr_buf_t nlr;
             if (nlr_push(&nlr) == 0) {
@@ -202,6 +220,7 @@ void oneIter() {
                 // uncaught exception
                 mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
                 onUncaughtScriptExceptionHook();
+                wasException = true;
             }
 
             gc_sweep_all();
@@ -242,35 +261,59 @@ void oneIter() {
             g_state = STATE_IDLE;
 
             InfoTrace("Script ended: %s\n", scriptName);
+
+            if (g_autoStartScriptIsRunning) {
+                g_autoStartScriptIsRunning = false;
+                if (wasException) {
+                    psu::gui::showMainPage();
+                }
+            }
         }
     }
 }
 
-void startScript(const char *filePath) {
-    if (g_state == STATE_IDLE) {
-        g_state = STATE_EXECUTING;
-        stringCopy(g_scriptPath, MAX_PATH_LENGTH, filePath);
+void doStopScript() {
+	terminateThread();
 
-        //DebugTrace("T1 %d\n", millis());
-        sendMessageToLowPriorityThread(MP_LOAD_SCRIPT);
+	psu::gui::hideAsyncOperationInProgress();
+	psu::gui::clearTextMessage();
 
-        psu::gui::showAsyncOperationInProgress();
-    }
+	g_state = STATE_IDLE;
+
+	char scriptName[64];
+	getFileName(g_scriptPath, scriptName, sizeof(scriptName));
+	InfoTrace("Script stopped: %s\n", scriptName);
+
+	if (g_autoStartScriptIsRunning) {
+		g_autoStartScriptIsRunning = false;
+	}
+
+	psu::gui::showMainPage();
+
+	startThread();
 }
 
-void loadScript() {
+bool loadScript(int *err = nullptr) {
     uint32_t fileSize;
     uint32_t bytesRead;
 
     eez::File file;
     if (!file.open(g_scriptPath, FILE_OPEN_EXISTING | FILE_READ)) {
-        generateError(SCPI_ERROR_FILE_NOT_FOUND);
+		if (err) {
+			*err = SCPI_ERROR_FILE_NOT_FOUND;
+		} else {
+			generateError(SCPI_ERROR_FILE_NOT_FOUND);
+		}
         goto ErrorNoClose;
     }
 
     fileSize = file.size();
     if (fileSize > MAX_SCRIPT_LENGTH) {
-        generateError(SCPI_ERROR_OUT_OF_DEVICE_MEMORY);
+		if (err) {
+			*err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
+		} else {
+			generateError(SCPI_ERROR_OUT_OF_DEVICE_MEMORY);
+		}
         goto Error;
     }
 
@@ -279,16 +322,19 @@ void loadScript() {
     file.close();
 
     if (bytesRead != fileSize) {
-        generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
+		if (err) {
+			*err = SCPI_ERROR_MASS_STORAGE_ERROR;
+		} else {
+			generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
+		}
         goto Error;
     }
 
     g_scriptSourceLength = fileSize;
 
-    //DebugTrace("T2 %d\n", millis());
     osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_SCRIPT, osWaitForever);
 
-    return;
+    return true;
 
 Error:
     file.close();
@@ -298,7 +344,65 @@ ErrorNoClose:
 
     g_state = STATE_IDLE;
 
-    return;
+	if (g_autoStartScriptIsRunning) {
+		g_autoStartScriptIsRunning = false;
+		psu::gui::showMainPage();
+	}
+
+	gui::refreshScreen();
+
+    return false;
+}
+
+bool startScript(const char *filePath, int *err) {
+	if (g_state == STATE_IDLE) {
+		g_state = STATE_EXECUTING;
+		stringCopy(g_scriptPath, MAX_PATH_LENGTH, filePath);
+
+		int localErr = SCPI_RES_OK;
+		if (!err) {
+			err = &localErr;
+		}
+
+		*err = SCPI_RES_OK;
+
+		if (isLowPriorityThread()) {
+			loadScript(err);
+		} else {
+			sendMessageToLowPriorityThread(MP_LOAD_SCRIPT);
+			*err = SCPI_RES_OK;
+		}
+
+		if (*err == SCPI_RES_OK && !g_autoStartScriptIsRunning) {
+			psu::gui::showAsyncOperationInProgress();
+		}
+
+		return *err == SCPI_RES_OK;
+	}
+
+	if (err) {
+		*err = SCPI_ERROR_SCRIPT_ENGINE_ALREADY_RUNNING;
+	}
+
+	return false;
+}
+
+bool stopScript(int *err) {
+	if (g_state == STATE_EXECUTING) {
+		if (!isLowPriorityThread()) {
+			sendMessageToLowPriorityThread(MP_STOP_SCRIPT);
+			return true;
+		}
+
+		doStopScript();
+
+		return true;
+	}
+	
+	if (err) {
+		*err = SCPI_ERROR_EXECUTION_ERROR;
+	}
+	return false;
 }
 
 static const char *g_commandOrQueryText;
@@ -306,6 +410,8 @@ static const char *g_commandOrQueryText;
 void onQueueMessage(uint32_t type, uint32_t param) {
     if (type == MP_LOAD_SCRIPT) {
         loadScript();
+    } else if (type == MP_STOP_SCRIPT) {
+        stopScript();
     } else if (type == MP_EXECUTE_SCPI) {
         input(g_scpiContext, (const char *)g_commandOrQueryText, strlen(g_commandOrQueryText));
         input(g_scpiContext, "\r\n", 2);
@@ -329,7 +435,7 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
         g_commandOrQueryText = commandOrQueryText;
         sendMessageToLowPriorityThread(MP_EXECUTE_SCPI);
 
-        static const uint32_t SCPI_TIMEOUT = 3000;
+        static const uint32_t SCPI_TIMEOUT = 60 * 60 * 1000;
 
         while (true) {
             osEvent event = osMessageGet(g_mpMessageQueueId, SCPI_TIMEOUT);
@@ -381,5 +487,234 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
     return true;
 }
 
+void resetSettings() {
+	g_scriptingParameters.autoStartScript[0] = 0;
+    g_scriptingParameters.options.autoStartConfirmation = 1;
+	g_scriptParametersVersion++;
+}
+
+bool isAutoStartEnabled() {
+	if (!g_autoStartConditionIsChecked) {
+	    sendMessageToLowPriorityThread(THREAD_MESSAGE_AUTO_START_SCRIPT);
+		return true;
+	}
+
+	return g_autoStartScriptIsRunning;
+}
+
+void doAutoStart() {
+	psu::gui::popPage();
+    startScript(g_scriptingParameters.autoStartScript);
+}
+
+void skipAutoStart() {
+	psu::gui::popPage();
+	g_autoStartScriptIsRunning = false;
+}
+
+void getAutoStartConfirmationMessage(char *text, int count) {
+	char fileName[MAX_PATH_LENGTH + 1];
+	getFileName(g_scriptingParameters.autoStartScript, fileName, sizeof(fileName));
+	snprintf(text, count, "Start \"%s\" script?", fileName);
+}
+
+void clearAutoStartScript() {
+	g_scriptingParameters.autoStartScript[0] = 0;
+	g_scriptParametersVersion++;
+	int location = psu::persist_conf::getProfileAutoRecallLocation();
+	if (location != 0) {
+		psu::profile::saveToLocation(location);
+	}
+}
+
+void autoStart() {
+    if (!g_autoStartConditionIsChecked) {
+		if (g_scriptingParameters.autoStartScript[0]) {
+			if (mcu::encoder::isButtonPressed()) {
+				psu::gui::yesNoDialog(PAGE_ID_YES_NO_AUTO_START_SKIPPED, Value(), clearAutoStartScript, nullptr, nullptr);
+			} else {
+				if (psu::sd_card::exists(g_scriptingParameters.autoStartScript, nullptr)) {
+					g_autoStartScriptIsRunning = true;
+					if (g_scriptingParameters.options.autoStartConfirmation) {
+                        psu::gui::yesNoDialog(PAGE_ID_YES_NO_AUTO_START, Value(0, VALUE_TYPE_AUTO_START_SCRIPT_CONFIRMATION_MESSAGE), doAutoStart, skipAutoStart, skipAutoStart);
+                    } else {
+						startScript(g_scriptingParameters.autoStartScript);
+                    }
+				} else {
+					ErrorTrace("Auto start script not found\n");
+				}
+			}
+		}
+	
+		g_autoStartConditionIsChecked = true;
+	}
+}
+
+void resetProfileParameters(psu::profile::Parameters &profileParams) {
+    profileParams.scriptingParameters.autoStartScript[0] = 0;
+    profileParams.scriptingParameters.options.autoStartConfirmation = 1;
+}
+
+void getProfileParameters(psu::profile::Parameters &profileParams) {
+    memcpy(&profileParams.scriptingParameters, &g_scriptingParameters, sizeof(profileParams.scriptingParameters));
+}
+
+void setProfileParameters(const psu::profile::Parameters &profileParams) {
+    memcpy(&g_scriptingParameters, &profileParams.scriptingParameters, sizeof(g_scriptingParameters));
+}
+
+bool writeProfileProperties(psu::profile::WriteContext &ctx, const psu::profile::Parameters &profileParams) {
+	ctx.group("scripting");
+	WRITE_PROPERTY("autoStartConfirmation", profileParams.scriptingParameters.options.autoStartConfirmation);
+	WRITE_PROPERTY("autoStartScript", profileParams.scriptingParameters.autoStartScript);
+	return true;
+}
+
+bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Parameters &profileParams) {
+	if (ctx.matchGroup("scripting")) {
+		READ_FLAG("autoStartConfirmation", profileParams.scriptingParameters.options.autoStartConfirmation);
+		READ_STRING_PROPERTY("autoStartScript", profileParams.scriptingParameters.autoStartScript, sizeof(profileParams.scriptingParameters.autoStartScript));
+	}
+	return false;
+}
+
 } // mp
+
+namespace gui {
+
+using namespace ::eez::mp;
+using namespace ::eez::psu::gui;
+
+void data_sys_settings_scripting_auto_start_script(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+        if (g_scriptingParameters.autoStartScript[0]) {
+            static char g_fileName[MAX_PATH_LENGTH + 1];
+            getFileName(g_scriptingParameters.autoStartScript, g_fileName, sizeof(g_fileName));
+            value = Value(g_scriptParametersVersion, g_fileName);
+        } else {
+            value = "<not selected>";
+        }
+	}
+}
+
+void data_sys_settings_scripting_auto_start_script_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = g_scriptingParameters.autoStartScript[0] ? 1 : 0;
+	}
+}
+
+void data_sys_settings_scripting_auto_start_confirmation(DataOperationEnum operation, Cursor cursor, Value &value) {
+	if (operation == DATA_OPERATION_GET) {
+		value = g_scriptingParameters.options.autoStartConfirmation ? 1 : 0;
+	}
+}
+
+void action_show_sys_settings_scripting() {
+	pushPage(PAGE_ID_SYS_SETTINGS_SCRIPTING);
+}
+
+void onAutoStartScriptFileSelected(const char *filePath) {
+	stringCopy(g_scriptingParameters.autoStartScript, sizeof(g_scriptingParameters.autoStartScript), filePath);
+	g_scriptParametersVersion++;
+}
+
+void action_sys_settings_scripting_select_auto_start_script() {
+	browseForFile("Select auto start script", "/Scripts", FILE_TYPE_MICROPYTHON, file_manager::DIALOG_TYPE_OPEN, onAutoStartScriptFileSelected);
+}
+
+void action_sys_settings_scripting_clear_auto_start_script() {
+	g_scriptingParameters.autoStartScript[0] = 0;
+	g_scriptParametersVersion++;
+}
+
+void action_sys_settings_scripting_toggle_auto_start_confirmation() {
+	g_scriptingParameters.options.autoStartConfirmation = !g_scriptingParameters.options.autoStartConfirmation;
+	g_scriptParametersVersion++;
+}
+
+} // gui
+
+namespace psu {
+namespace scpi {
+
+scpi_result_t scpi_cmd_scriptRun(scpi_t *context) {
+	char scriptFilePath[MAX_PATH_LENGTH + 1];
+	if (!getFilePath(context, scriptFilePath, false)) {
+		return SCPI_RES_ERR;
+	}
+
+	int err;
+	if (!startScript(scriptFilePath, &err)) {
+		SCPI_ErrorPush(context, err);
+		return SCPI_RES_ERR;
+	}
+	
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_scriptStop(scpi_t *context) {
+	int err;
+
+	if (!stopScript(&err)) {
+		SCPI_ErrorPush(context, err);
+		return SCPI_RES_ERR;
+	}
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_scriptRecall(scpi_t *context) {
+	char scriptFilePath[MAX_PATH_LENGTH + 1];
+	if (!getFilePath(context, scriptFilePath, false)) {
+		return SCPI_RES_ERR;
+	}
+
+    int err;
+    if (!sd_card::exists(scriptFilePath, &err)) {
+        if (err != 0) {
+            SCPI_ErrorPush(context, err);
+        }
+        return SCPI_RES_ERR;
+    }
+
+	stringCopy(g_scriptingParameters.autoStartScript, sizeof(g_scriptingParameters.autoStartScript), scriptFilePath);
+	g_scriptParametersVersion++;
+	
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_scriptRecallQ(scpi_t *context) {
+	SCPI_ResultText(context, g_scriptingParameters.autoStartScript);
+    
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_scriptRecallClear(scpi_t *context) {
+	g_scriptingParameters.autoStartScript[0] = 0;
+	g_scriptParametersVersion++;
+	
+	return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_scriptRecallConfirmation(scpi_t *context) {
+	bool enable;
+	if (!SCPI_ParamBool(context, &enable, TRUE)) {
+		return SCPI_RES_ERR;
+	}
+
+	g_scriptingParameters.options.autoStartConfirmation = enable;
+	g_scriptParametersVersion++;
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_scriptRecallConfirmationQ(scpi_t *context) {
+	SCPI_ResultBool(context, g_scriptingParameters.options.autoStartConfirmation);
+
+	return SCPI_RES_OK;
+}
+
+}
+}
+
 } // eez

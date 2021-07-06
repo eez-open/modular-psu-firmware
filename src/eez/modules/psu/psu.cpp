@@ -1129,6 +1129,9 @@ bool psuReset() {
 	//
 	function_generator::reset();
 
+	//
+	mp::resetSettings();
+
     // SYST:POW ON
     if (powerUp()) {
         Channel::updateAllChannels();

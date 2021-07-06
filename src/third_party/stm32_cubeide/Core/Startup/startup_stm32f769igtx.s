@@ -252,7 +252,8 @@ g_pfnVectors:
   .word     CAN3_SCE_IRQHandler               /* CAN3 SCE                     */
   .word     JPEG_IRQHandler                   /* JPEG                         */
   .word     MDIOS_IRQHandler                  /* MDIOS                        */
-  
+  .word     0x55AA11EE                        /* BOOTLOADER_READY: Reserved for OpenBLT checksum*/
+
 /*******************************************************************************
 *
 * Provide weak aliases for each Exception handler to the Default_Handler. 

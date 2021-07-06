@@ -102,7 +102,7 @@
     {
       "name": "channel_u_set",
       "description": "scpi: volt? and volt",
-      "type": "float",
+      "type": "string",
       "defaultValue": "30.00V",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
@@ -110,35 +110,35 @@
     {
       "name": "channel_display_value1_set",
       "description": "scpi: volt? and volt",
-      "type": "float",
+      "type": "string",
       "defaultValue": "30.00V",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
     },
     {
       "name": "channel_u_mon",
-      "type": "float",
+      "type": "string",
       "defaultValue": "25.83V",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
     },
     {
       "name": "channel_u_mon_dac",
-      "type": "float",
+      "type": "string",
       "defaultValue": "25.00V",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
     },
     {
       "name": "channel_u_limit",
-      "type": "float",
+      "type": "string",
       "defaultValue": "35.00V",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
     },
     {
       "name": "channel_display_value1_limit",
-      "type": "float",
+      "type": "string",
       "defaultValue": "35.00V",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
@@ -146,7 +146,7 @@
     {
       "name": "channel_u_edit",
       "description": "scpi: volt? and volt",
-      "type": "float",
+      "type": "string",
       "defaultValue": "30.005 V",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
@@ -154,7 +154,7 @@
     {
       "name": "channel_i_set",
       "description": "scpi: curr? and curr",
-      "type": "float",
+      "type": "string",
       "defaultValue": "1.00A",
       "defaultMinValue": 0,
       "defaultMaxValue": 5
@@ -162,35 +162,35 @@
     {
       "name": "channel_display_value2_set",
       "description": "scpi: curr? and curr",
-      "type": "float",
+      "type": "string",
       "defaultValue": "1.00A",
       "defaultMinValue": 0,
       "defaultMaxValue": 5
     },
     {
       "name": "channel_i_mon",
-      "type": "float",
+      "type": "string",
       "defaultValue": "999.00mA",
       "defaultMinValue": 0,
       "defaultMaxValue": 5
     },
     {
       "name": "channel_i_mon_dac",
-      "type": "float",
+      "type": "string",
       "defaultValue": "1.00A",
       "defaultMinValue": 0,
       "defaultMaxValue": 5
     },
     {
       "name": "channel_i_limit",
-      "type": "float",
+      "type": "string",
       "defaultValue": "3.00A",
       "defaultMinValue": 0,
       "defaultMaxValue": 5
     },
     {
       "name": "channel_display_value2_limit",
-      "type": "float",
+      "type": "string",
       "defaultValue": "3.00A",
       "defaultMinValue": 0,
       "defaultMaxValue": 5
@@ -198,21 +198,21 @@
     {
       "name": "channel_i_edit",
       "description": "",
-      "type": "float",
+      "type": "string",
       "defaultValue": "1.00A",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
     },
     {
       "name": "channel_p_mon",
-      "type": "float",
+      "type": "string",
       "defaultValue": "285.00W",
       "defaultMinValue": 0,
       "defaultMaxValue": 150
     },
     {
       "name": "channel_other_value_mon",
-      "type": "float",
+      "type": "string",
       "defaultValue": "999.00mA",
       "defaultMinValue": 0,
       "defaultMaxValue": 5
@@ -256,21 +256,21 @@
     },
     {
       "name": "channel_display_value1",
-      "type": "float",
+      "type": "string",
       "defaultValue": "25.00V",
       "defaultMinValue": 8,
       "defaultMaxValue": 40
     },
     {
       "name": "channel_display_value2",
-      "type": "float",
+      "type": "string",
       "defaultValue": "1.00A",
       "defaultMinValue": 0,
       "defaultMaxValue": 5
     },
     {
       "name": "channel_display_value3",
-      "type": "float",
+      "type": "string",
       "defaultValue": "71.23 W",
       "defaultMinValue": 0,
       "defaultMaxValue": 5
@@ -330,7 +330,7 @@
     },
     {
       "name": "edit_value",
-      "type": "float",
+      "type": "string",
       "defaultValue": "99.9999V",
       "defaultMinValue": 0,
       "defaultMaxValue": 50
@@ -457,7 +457,7 @@
     {
       "name": "channel_temp",
       "description": "",
-      "type": "float",
+      "type": "string",
       "defaultValue": "45.5\\u008aC"
     },
     {
@@ -536,17 +536,17 @@
     },
     {
       "name": "channel_protection_ovp_level",
-      "type": "float",
+      "type": "string",
       "defaultValue": "40.00V"
     },
     {
       "name": "channel_protection_ovp_delay",
-      "type": "float",
+      "type": "string",
       "defaultValue": "0.05s"
     },
     {
       "name": "channel_protection_ovp_limit",
-      "type": "float",
+      "type": "string",
       "defaultValue": "30.50V"
     },
     {
@@ -557,12 +557,12 @@
     },
     {
       "name": "channel_protection_ocp_delay",
-      "type": "float",
+      "type": "string",
       "defaultValue": "0.5s"
     },
     {
       "name": "channel_protection_ocp_limit",
-      "type": "float",
+      "type": "string",
       "defaultValue": "1.00A"
     },
     {
@@ -580,17 +580,17 @@
     },
     {
       "name": "channel_protection_opp_level",
-      "type": "float",
+      "type": "string",
       "defaultValue": "150.00W"
     },
     {
       "name": "channel_protection_opp_delay",
-      "type": "float",
+      "type": "string",
       "defaultValue": "60 s"
     },
     {
       "name": "channel_protection_opp_limit",
-      "type": "float",
+      "type": "string",
       "defaultValue": "100.00W"
     },
     {
@@ -607,7 +607,7 @@
     },
     {
       "name": "channel_protection_otp_level",
-      "type": "float",
+      "type": "string",
       "defaultValue": "125\\u008aC"
     },
     {
@@ -725,7 +725,7 @@
     },
     {
       "name": "sys_temp_aux_otp_level",
-      "type": "float",
+      "type": "string",
       "defaultValue": "125.00\\u008aC"
     },
     {
@@ -739,7 +739,7 @@
     },
     {
       "name": "sys_temp_aux",
-      "type": "float",
+      "type": "string",
       "defaultValue": "45.5\\u008aC"
     },
     {
@@ -771,7 +771,7 @@
     },
     {
       "name": "sys_info_fan_speed",
-      "type": "float",
+      "type": "string",
       "defaultValue": "2012rpm"
     },
     {
@@ -885,12 +885,12 @@
     },
     {
       "name": "profile_channel_u_set",
-      "type": "float",
+      "type": "string",
       "defaultValue": "12.00V"
     },
     {
       "name": "profile_channel_i_set",
-      "type": "float",
+      "type": "string",
       "defaultValue": "1.00A"
     },
     {
@@ -1066,7 +1066,7 @@
     },
     {
       "name": "channel_display_view_settings_yt_view_rate",
-      "type": "float",
+      "type": "string",
       "defaultValue": "100 ms"
     },
     {
@@ -1120,14 +1120,14 @@
     },
     {
       "name": "channel_u_trigger_value",
-      "type": "float",
+      "type": "string",
       "defaultValue": "24.00V",
       "defaultMinValue": 0,
       "defaultMaxValue": 40
     },
     {
       "name": "channel_i_trigger_value",
-      "type": "float",
+      "type": "string",
       "defaultValue": "2.00A",
       "defaultMinValue": 0,
       "defaultMaxValue": 5
@@ -1398,7 +1398,7 @@
     },
     {
       "name": "progress",
-      "type": "float",
+      "type": "string",
       "defaultValue": "66%"
     },
     {
@@ -1433,7 +1433,7 @@
     },
     {
       "name": "animations_duration",
-      "type": "float",
+      "type": "string",
       "defaultValue": "250ms"
     },
     {
@@ -1655,7 +1655,7 @@
     },
     {
       "name": "dlog_visible_value_div",
-      "type": "float",
+      "type": "string",
       "defaultValue": "2.000V"
     },
     {
@@ -1714,17 +1714,17 @@
     },
     {
       "name": "dlog_period",
-      "type": "float",
+      "type": "string",
       "defaultValue": "100ms"
     },
     {
       "name": "dlog_period_spec",
-      "type": "float",
+      "type": "string",
       "defaultValue": "100ms"
     },
     {
       "name": "dlog_duration",
-      "type": "float",
+      "type": "string",
       "defaultValue": "1h"
     },
     {
@@ -1851,7 +1851,7 @@
     },
     {
       "name": "mqtt_period",
-      "type": "float",
+      "type": "string",
       "defaultValue": "1s"
     },
     {
@@ -2093,12 +2093,12 @@
     },
     {
       "name": "io_pin_pwm_frequency",
-      "type": "float",
+      "type": "string",
       "defaultValue": "10 KHz"
     },
     {
       "name": "io_pin_pwm_duty",
-      "type": "float",
+      "type": "string",
       "defaultValue": "50 %"
     },
     {
@@ -2108,12 +2108,12 @@
     },
     {
       "name": "channel_voltage_ramp_duration",
-      "type": "float",
+      "type": "string",
       "defaultValue": "0 s"
     },
     {
       "name": "channel_current_ramp_duration",
-      "type": "float",
+      "type": "string",
       "defaultValue": "0 s"
     },
     {
@@ -2444,7 +2444,7 @@
     },
     {
       "name": "calibration_point_live_measured_value",
-      "type": "float",
+      "type": "string",
       "defaultValue": "2.44 A"
     },
     {
@@ -2632,32 +2632,32 @@
     },
     {
       "name": "function_generator_frequency",
-      "type": "float",
+      "type": "string",
       "defaultValue": "50 Hz"
     },
     {
       "name": "function_generator_mode",
-      "type": "float",
+      "type": "string",
       "defaultValue": "50 Hz"
     },
     {
       "name": "function_generator_phase_shift",
-      "type": "float",
+      "type": "string",
       "defaultValue": "25 DEG"
     },
     {
       "name": "function_generator_amplitude",
-      "type": "float",
+      "type": "string",
       "defaultValue": "10 V"
     },
     {
       "name": "function_generator_offset",
-      "type": "float",
+      "type": "string",
       "defaultValue": "5 V"
     },
     {
       "name": "function_generator_duty_cycle",
-      "type": "float",
+      "type": "string",
       "defaultValue": "75 %"
     },
     {
@@ -2745,7 +2745,7 @@
     },
     {
       "name": "function_generator_preview_period",
-      "type": "float",
+      "type": "string",
       "defaultValue": "500 ms"
     },
     {
@@ -2758,6 +2758,21 @@
     },
     {
       "name": "function_generator_preview_period_zoom_in_enabled",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "sys_settings_scripting_auto_start_script",
+      "type": "string",
+      "defaultValue": "AutoStart.py"
+    },
+    {
+      "name": "sys_settings_scripting_auto_start_confirmation",
+      "type": "boolean",
+      "defaultValue": "1"
+    },
+    {
+      "name": "sys_settings_scripting_auto_start_script_enabled",
       "type": "boolean",
       "defaultValue": "1"
     }
@@ -4153,6 +4168,26 @@
       "components": [],
       "connectionLines": [],
       "name": "function_generator_toggle_selected_item"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "show_sys_settings_scripting"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "sys_settings_scripting_select_auto_start_script"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "sys_settings_scripting_toggle_auto_start_confirmation"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "name": "sys_settings_scripting_clear_auto_start_script"
     }
   ],
   "pages": [
@@ -9427,7 +9462,7 @@
         },
         {
           "type": "Text",
-          "left": 82,
+          "left": 95,
           "top": 110,
           "width": 100,
           "height": 32,
@@ -9444,7 +9479,7 @@
         },
         {
           "type": "Text",
-          "left": 182,
+          "left": 205,
           "top": 110,
           "width": 100,
           "height": 32,
@@ -9468,6 +9503,138 @@
       "top": 60,
       "width": 400,
       "height": 152
+    },
+    {
+      "components": [
+        {
+          "type": "MultilineText",
+          "left": 10,
+          "top": 10,
+          "width": 380,
+          "height": 60,
+          "wireID": "671eec21-bb52-4899-b05c-985b34b95cd9",
+          "data": "alert_message",
+          "style": {
+            "inheritFrom": "default",
+            "font": "Oswald17",
+            "color": "text_regular",
+            "backgroundColor": "popup_background_warning",
+            "activeColor": "popup_background_warning",
+            "activeBackgroundColor": "text_regular"
+          },
+          "text": "",
+          "firstLineIndent": 0,
+          "hangingIndent": 0
+        },
+        {
+          "type": "Text",
+          "left": 95,
+          "top": 80,
+          "width": 100,
+          "height": 32,
+          "wireID": "3b0fa1cc-b60d-4767-cf3d-ae3db10c193e",
+          "action": "yes",
+          "style": {
+            "inheritFrom": "yes_no_button",
+            "color": "action_color",
+            "backgroundColor": "popup_background_warning",
+            "activeColor": "popup_background_warning",
+            "activeBackgroundColor": "action_color"
+          },
+          "text": "Start"
+        },
+        {
+          "type": "Text",
+          "left": 205,
+          "top": 80,
+          "width": 100,
+          "height": 32,
+          "wireID": "2225ca40-8a5b-4bd3-d3e7-88547f4c1d6b",
+          "action": "no",
+          "style": {
+            "inheritFrom": "yes_no_button",
+            "color": "action_color",
+            "backgroundColor": "popup_background_warning",
+            "activeColor": "popup_background_warning",
+            "activeBackgroundColor": "action_color"
+          },
+          "text": "Skip"
+        }
+      ],
+      "connectionLines": [],
+      "name": "yes_no_auto_start",
+      "description": "Confirmation message",
+      "style": "yes_no",
+      "left": 40,
+      "top": 75,
+      "width": 400,
+      "height": 122
+    },
+    {
+      "components": [
+        {
+          "type": "MultilineText",
+          "left": 10,
+          "top": 10,
+          "width": 440,
+          "height": 60,
+          "wireID": "671eec21-bb52-4899-b05c-985b34b95cd9",
+          "data": "",
+          "style": {
+            "inheritFrom": "default",
+            "font": "Oswald17",
+            "color": "text_regular",
+            "backgroundColor": "popup_background_warning",
+            "activeColor": "popup_background_warning",
+            "activeBackgroundColor": "text_regular"
+          },
+          "text": "Auto script execution has been skipped.\\nDo you also want to skip all future executions?",
+          "firstLineIndent": 0,
+          "hangingIndent": 0
+        },
+        {
+          "type": "Text",
+          "left": 130,
+          "top": 80,
+          "width": 100,
+          "height": 32,
+          "wireID": "3b0fa1cc-b60d-4767-cf3d-ae3db10c193e",
+          "action": "yes",
+          "style": {
+            "inheritFrom": "yes_no_button",
+            "color": "action_color",
+            "backgroundColor": "popup_background_warning",
+            "activeColor": "popup_background_warning",
+            "activeBackgroundColor": "action_color"
+          },
+          "text": "Yes"
+        },
+        {
+          "type": "Text",
+          "left": 230,
+          "top": 80,
+          "width": 100,
+          "height": 32,
+          "wireID": "2225ca40-8a5b-4bd3-d3e7-88547f4c1d6b",
+          "action": "no",
+          "style": {
+            "inheritFrom": "yes_no_button",
+            "color": "action_color",
+            "backgroundColor": "popup_background_warning",
+            "activeColor": "popup_background_warning",
+            "activeBackgroundColor": "action_color"
+          },
+          "text": "No"
+        }
+      ],
+      "connectionLines": [],
+      "name": "yes_no_auto_start_skipped",
+      "description": "Confirmation message",
+      "style": "yes_no",
+      "left": 10,
+      "top": 75,
+      "width": 460,
+      "height": 122
     },
     {
       "components": [
@@ -22069,171 +22236,6 @@
             },
             {
               "type": "MultilineText",
-              "left": 3,
-              "top": 123,
-              "width": 114,
-              "height": 54,
-              "wireID": "d3b8a9ff-8a24-4430-a9ca-902a6aa7cc73",
-              "action": "show_sys_settings_io",
-              "style": {
-                "inheritFrom": "icon_and_text_S"
-              },
-              "text": "\\u009c Digital I/O",
-              "firstLineIndent": 0,
-              "hangingIndent": 24
-            },
-            {
-              "type": "MultilineText",
-              "left": 123,
-              "top": 63,
-              "width": 114,
-              "height": 54,
-              "wireID": "a388597d-856a-409c-d869-022b024919a7",
-              "action": "show_sys_settings_trigger",
-              "style": {
-                "inheritFrom": "icon_and_text_S"
-              },
-              "text": "\\u009b Trigger",
-              "firstLineIndent": 0,
-              "hangingIndent": 24
-            },
-            {
-              "type": "MultilineText",
-              "left": 243,
-              "top": 63,
-              "width": 114,
-              "height": 54,
-              "wireID": "c02c71d7-b29a-4c2e-f621-331a1f5b74b1",
-              "action": "show_sys_settings_ramp_and_delay",
-              "style": {
-                "inheritFrom": "icon_and_text_S"
-              },
-              "text": "\\u00b5 Ramp & delay",
-              "firstLineIndent": 0,
-              "hangingIndent": 24
-            },
-            {
-              "type": "Select",
-              "left": 363,
-              "top": 63,
-              "width": 114,
-              "height": 54,
-              "wireID": "75c414b5-5846-4e2c-ee40-6db4eb17c228",
-              "data": "is_tracking_allowed",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "MultilineTextWidget",
-                  "left": 0,
-                  "top": 0,
-                  "width": 114,
-                  "height": 54,
-                  "wireID": "5a767289-bdcc-4ecc-a0c6-1149b9afdb84",
-                  "style": {
-                    "inheritFrom": "icon_and_text_S",
-                    "color": "text_disabled",
-                    "backgroundColor": "text_disabled_background",
-                    "activeBackgroundColor": "text_disabled"
-                  },
-                  "text": "\\u00cc Tracking & Coupling",
-                  "firstLineIndent": 0,
-                  "hangingIndent": 24
-                },
-                {
-                  "type": "Select",
-                  "left": 0,
-                  "top": 0,
-                  "width": 114,
-                  "height": 54,
-                  "wireID": "7d127b1f-1248-4b47-a2cb-6b98a3477eac",
-                  "data": "is_coupled_or_tracked",
-                  "action": "show_sys_settings_tracking",
-                  "style": {
-                    "inheritFrom": "default"
-                  },
-                  "widgets": [
-                    {
-                      "type": "MultilineTextWidget",
-                      "left": 0,
-                      "top": 0,
-                      "width": 114,
-                      "height": 54,
-                      "wireID": "998071a3-d219-4008-d113-15df0da44fb0",
-                      "style": {
-                        "inheritFrom": "icon_and_text_S"
-                      },
-                      "text": "\\u00cc Tracking & Coupling",
-                      "firstLineIndent": 0,
-                      "hangingIndent": 24
-                    },
-                    {
-                      "type": "MultilineTextWidget",
-                      "left": 0,
-                      "top": 0,
-                      "width": 114,
-                      "height": 54,
-                      "wireID": "98c4a27a-6070-426c-dce8-3377687d6234",
-                      "style": {
-                        "inheritFrom": "icon_and_text_S"
-                      },
-                      "text": "\\u00cc Tracking & Coupling",
-                      "firstLineIndent": 0,
-                      "hangingIndent": 24
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "Select",
-              "left": 3,
-              "top": 63,
-              "width": 114,
-              "height": 54,
-              "wireID": "e30db119-0e6c-4be0-ee56-d4f7949c3460",
-              "data": "sys_temp_aux_otp_is_tripped",
-              "style": {
-                "inheritFrom": "default"
-              },
-              "widgets": [
-                {
-                  "type": "MultilineText",
-                  "left": 0,
-                  "top": 0,
-                  "width": 114,
-                  "height": 54,
-                  "wireID": "dad5f942-7610-4b5f-8780-3ae26e6baad0",
-                  "action": "show_sys_settings_aux_otp",
-                  "style": {
-                    "inheritFrom": "icon_and_text_S"
-                  },
-                  "text": "\\u0089 System temp & fan",
-                  "firstLineIndent": 0,
-                  "hangingIndent": 24
-                },
-                {
-                  "type": "MultilineText",
-                  "left": 0,
-                  "top": 0,
-                  "width": 114,
-                  "height": 54,
-                  "wireID": "edca906c-0b69-45c6-ac5a-94ddef64932d",
-                  "action": "show_sys_settings_aux_otp",
-                  "style": {
-                    "inheritFrom": "icon_and_text_S",
-                    "color": "status_warning",
-                    "activeBackgroundColor": "status_warning"
-                  },
-                  "text": "\\u0089 System temp & fan",
-                  "firstLineIndent": 0,
-                  "hangingIndent": 24
-                }
-              ]
-            },
-            {
-              "type": "MultilineText",
               "left": 123,
               "top": 3,
               "width": 114,
@@ -22429,6 +22431,216 @@
               ]
             },
             {
+              "type": "Select",
+              "left": 3,
+              "top": 63,
+              "width": 114,
+              "height": 54,
+              "wireID": "e30db119-0e6c-4be0-ee56-d4f7949c3460",
+              "data": "sys_temp_aux_otp_is_tripped",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "MultilineText",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "dad5f942-7610-4b5f-8780-3ae26e6baad0",
+                  "action": "show_sys_settings_aux_otp",
+                  "style": {
+                    "inheritFrom": "icon_and_text_S"
+                  },
+                  "text": "\\u0089 System temp & fan",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                },
+                {
+                  "type": "MultilineText",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "edca906c-0b69-45c6-ac5a-94ddef64932d",
+                  "action": "show_sys_settings_aux_otp",
+                  "style": {
+                    "inheritFrom": "icon_and_text_S",
+                    "color": "status_warning",
+                    "activeBackgroundColor": "status_warning"
+                  },
+                  "text": "\\u0089 System temp & fan",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                }
+              ]
+            },
+            {
+              "type": "MultilineText",
+              "left": 123,
+              "top": 63,
+              "width": 114,
+              "height": 54,
+              "wireID": "a388597d-856a-409c-d869-022b024919a7",
+              "action": "show_sys_settings_trigger",
+              "style": {
+                "inheritFrom": "icon_and_text_S"
+              },
+              "text": "\\u009b Trigger",
+              "firstLineIndent": 0,
+              "hangingIndent": 24
+            },
+            {
+              "type": "MultilineText",
+              "left": 243,
+              "top": 63,
+              "width": 114,
+              "height": 54,
+              "wireID": "c02c71d7-b29a-4c2e-f621-331a1f5b74b1",
+              "action": "show_sys_settings_ramp_and_delay",
+              "style": {
+                "inheritFrom": "icon_and_text_S"
+              },
+              "text": "\\u00b5 Ramp & delay",
+              "firstLineIndent": 0,
+              "hangingIndent": 24
+            },
+            {
+              "type": "Select",
+              "left": 363,
+              "top": 63,
+              "width": 114,
+              "height": 54,
+              "wireID": "75c414b5-5846-4e2c-ee40-6db4eb17c228",
+              "data": "is_tracking_allowed",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "MultilineTextWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "5a767289-bdcc-4ecc-a0c6-1149b9afdb84",
+                  "style": {
+                    "inheritFrom": "icon_and_text_S",
+                    "color": "text_disabled",
+                    "backgroundColor": "text_disabled_background",
+                    "activeBackgroundColor": "text_disabled"
+                  },
+                  "text": "\\u00cc Tracking & Coupling",
+                  "firstLineIndent": 0,
+                  "hangingIndent": 24
+                },
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 114,
+                  "height": 54,
+                  "wireID": "7d127b1f-1248-4b47-a2cb-6b98a3477eac",
+                  "data": "is_coupled_or_tracked",
+                  "action": "show_sys_settings_tracking",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "MultilineTextWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 114,
+                      "height": 54,
+                      "wireID": "998071a3-d219-4008-d113-15df0da44fb0",
+                      "style": {
+                        "inheritFrom": "icon_and_text_S"
+                      },
+                      "text": "\\u00cc Tracking & Coupling",
+                      "firstLineIndent": 0,
+                      "hangingIndent": 24
+                    },
+                    {
+                      "type": "MultilineTextWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 114,
+                      "height": 54,
+                      "wireID": "98c4a27a-6070-426c-dce8-3377687d6234",
+                      "style": {
+                        "inheritFrom": "icon_and_text_S"
+                      },
+                      "text": "\\u00cc Tracking & Coupling",
+                      "firstLineIndent": 0,
+                      "hangingIndent": 24
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "MultilineText",
+              "left": 3,
+              "top": 123,
+              "width": 114,
+              "height": 54,
+              "wireID": "d3b8a9ff-8a24-4430-a9ca-902a6aa7cc73",
+              "action": "show_sys_settings_io",
+              "style": {
+                "inheritFrom": "icon_and_text_S"
+              },
+              "text": "\\u009c Digital I/O",
+              "firstLineIndent": 0,
+              "hangingIndent": 24
+            },
+            {
+              "type": "MultilineText",
+              "left": 123,
+              "top": 123,
+              "width": 114,
+              "height": 54,
+              "wireID": "e3d4f00e-c22c-43d3-baa7-9b7a7398062f",
+              "action": "show_sys_settings_display",
+              "style": {
+                "inheritFrom": "icon_and_text_S"
+              },
+              "text": "\\u0098 Display",
+              "firstLineIndent": 0,
+              "hangingIndent": 24
+            },
+            {
+              "type": "MultilineText",
+              "left": 243,
+              "top": 123,
+              "width": 114,
+              "height": 54,
+              "wireID": "dfb1f440-e16b-4137-b7d2-df320ed1079f",
+              "action": "show_labels_and_colors",
+              "style": {
+                "inheritFrom": "icon_and_text_S"
+              },
+              "text": "\\u00c0 Labels & colors",
+              "firstLineIndent": 0,
+              "hangingIndent": 24
+            },
+            {
+              "type": "MultilineText",
+              "left": 363,
+              "top": 123,
+              "width": 114,
+              "height": 54,
+              "wireID": "f9f28819-6b2c-42ce-fd43-bdf92f2068e0",
+              "action": "show_sys_settings_sound",
+              "style": {
+                "inheritFrom": "icon_and_text_S"
+              },
+              "text": "\\u009a Sound",
+              "firstLineIndent": 0,
+              "hangingIndent": 24
+            },
+            {
               "type": "MultilineText",
               "left": 3,
               "top": 183,
@@ -22462,37 +22674,22 @@
             },
             {
               "type": "MultilineText",
-              "left": 123,
-              "top": 123,
-              "width": 114,
-              "height": 54,
-              "wireID": "e3d4f00e-c22c-43d3-baa7-9b7a7398062f",
-              "action": "show_sys_settings_display",
-              "style": {
-                "inheritFrom": "icon_and_text_S"
-              },
-              "text": "\\u0098 Display",
-              "firstLineIndent": 0,
-              "hangingIndent": 24
-            },
-            {
-              "type": "MultilineText",
-              "left": 363,
-              "top": 123,
+              "left": 243,
+              "top": 183,
               "width": 114,
               "height": 54,
               "wireID": "66c6f9b7-49bb-45e3-8891-127a1fa23fc6",
-              "action": "show_sys_settings_sound",
+              "action": "show_sys_settings_scripting",
               "style": {
                 "inheritFrom": "icon_and_text_S"
               },
-              "text": "\\u009a Sound",
+              "text": "\\u00cd Scripting",
               "firstLineIndent": 0,
               "hangingIndent": 24
             },
             {
               "type": "Select",
-              "left": 243,
+              "left": 363,
               "top": 183,
               "width": 114,
               "height": 54,
@@ -22538,21 +22735,6 @@
                   "hangingIndent": 24
                 }
               ]
-            },
-            {
-              "type": "MultilineText",
-              "left": 243,
-              "top": 123,
-              "width": 114,
-              "height": 54,
-              "wireID": "dfb1f440-e16b-4137-b7d2-df320ed1079f",
-              "action": "show_labels_and_colors",
-              "style": {
-                "inheritFrom": "icon_and_text_S"
-              },
-              "text": "\\u00c0 Labels & colors",
-              "firstLineIndent": 0,
-              "hangingIndent": 24
             }
           ]
         },
@@ -34081,6 +34263,470 @@
       ],
       "connectionLines": [],
       "name": "sys_settings_labels_and_colors",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272
+    },
+    {
+      "components": [
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 0,
+          "width": 480,
+          "height": 240,
+          "wireID": "bb168461-8a61-411e-9cfa-2800f537466c",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Content",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 10,
+              "top": 10,
+              "width": 170,
+              "height": 40,
+              "wireID": "75260520-7bba-476d-f9a9-a9a0800aaccd",
+              "style": {
+                "inheritFrom": "edit_value_M_left"
+              },
+              "text": "Auto start script:"
+            },
+            {
+              "type": "Select",
+              "left": 180,
+              "top": 10,
+              "width": 290,
+              "height": 40,
+              "wireID": "057cdf82-8f75-4e70-b81b-a459bd9cfd93",
+              "data": "profiles_auto_recall_status",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "TextWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 290,
+                  "height": 40,
+                  "wireID": "0476b554-9d5c-4102-cdc5-374f30fe8f32",
+                  "data": "sys_settings_scripting_auto_start_script",
+                  "style": {
+                    "inheritFrom": "edit_value_active_M_center",
+                    "color": "text_disabled",
+                    "activeBackgroundColor": "text_disabled"
+                  },
+                  "text": ""
+                },
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 290,
+                  "height": 40,
+                  "wireID": "9e0f14e9-26c9-47c1-8b47-1e28cdf769ef",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "DisplayData",
+                      "left": 0,
+                      "top": 0,
+                      "width": 249,
+                      "height": 40,
+                      "wireID": "dbdbbdac-19a6-4d74-e2d8-79f1750f02d8",
+                      "data": "sys_settings_scripting_auto_start_script",
+                      "action": "sys_settings_scripting_select_auto_start_script",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center"
+                      },
+                      "displayOption": 0
+                    },
+                    {
+                      "type": "ButtonWidget",
+                      "left": 250,
+                      "top": 0,
+                      "width": 40,
+                      "height": 40,
+                      "wireID": "cd3dfbe4-938a-4ff0-e62e-15a5369f45c0",
+                      "action": "sys_settings_scripting_clear_auto_start_script",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center",
+                        "font": "Heydings14"
+                      },
+                      "text": "\\u008f",
+                      "enabled": "sys_settings_scripting_auto_start_script_enabled",
+                      "disabledStyle": {
+                        "inheritFrom": "edit_value_active_M_center",
+                        "font": "Heydings14",
+                        "color": "text_disabled",
+                        "activeBackgroundColor": "text_disabled"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Text",
+              "left": 10,
+              "top": 60,
+              "width": 317,
+              "height": 40,
+              "wireID": "680b6c55-7a79-44ad-a3a3-70ff6b09a7cf",
+              "style": {
+                "inheritFrom": "edit_value_M_left"
+              },
+              "text": "Auto start confirmation required:"
+            },
+            {
+              "type": "Select",
+              "left": 327,
+              "top": 60,
+              "width": 65,
+              "height": 40,
+              "wireID": "7fdaab9a-d641-4a67-b545-596529d709f2",
+              "data": "profiles_auto_recall_status",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 65,
+                  "height": 40,
+                  "wireID": "e2b194fc-658e-41bd-977f-db5fb9ebb4d5",
+                  "data": "sys_settings_scripting_auto_start_confirmation",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 65,
+                      "height": 40,
+                      "wireID": "5fc344ff-1415-4e17-9582-9695a2f55ada",
+                      "action": "",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center",
+                        "color": "text_disabled",
+                        "activeBackgroundColor": "text_disabled"
+                      },
+                      "text": "No"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 65,
+                      "height": 40,
+                      "wireID": "04ca235f-aad1-41c0-a38c-4e1f182194a1",
+                      "action": "",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center",
+                        "color": "text_disabled",
+                        "activeBackgroundColor": "text_disabled"
+                      },
+                      "text": "Yes"
+                    }
+                  ]
+                },
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 65,
+                  "height": 40,
+                  "wireID": "03bb681d-7d57-423a-9a48-5a19ea3cdad8",
+                  "data": "sys_settings_scripting_auto_start_confirmation",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 65,
+                      "height": 40,
+                      "wireID": "5fc344ff-1415-4e17-9582-9695a2f55ada",
+                      "action": "sys_settings_scripting_toggle_auto_start_confirmation",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center"
+                      },
+                      "text": "No"
+                    },
+                    {
+                      "type": "Text",
+                      "left": 0,
+                      "top": 0,
+                      "width": 65,
+                      "height": 40,
+                      "wireID": "04ca235f-aad1-41c0-a38c-4e1f182194a1",
+                      "action": "sys_settings_scripting_toggle_auto_start_confirmation",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center"
+                      },
+                      "text": "Yes"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Select",
+              "left": 10,
+              "top": 110,
+              "width": 460,
+              "height": 120,
+              "wireID": "a64e6985-a45e-449d-8fbc-1d1a29ef29c5",
+              "data": "profiles_auto_recall_status",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 460,
+                  "height": 120,
+                  "wireID": "443fe357-fafd-4b2e-d3e8-7f66ceb4c35c",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "RectangleWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 458,
+                      "height": 2,
+                      "wireID": "5019fc67-de17-47a1-9675-ad80ced4014f",
+                      "style": {
+                        "inheritFrom": "default"
+                      }
+                    },
+                    {
+                      "type": "RectangleWidget",
+                      "left": 458,
+                      "top": 0,
+                      "width": 2,
+                      "height": 118,
+                      "wireID": "2f33e72d-baf4-4e8e-fe55-56ebd8013706",
+                      "style": {
+                        "inheritFrom": "default"
+                      }
+                    },
+                    {
+                      "type": "RectangleWidget",
+                      "left": 2,
+                      "top": 118,
+                      "width": 458,
+                      "height": 2,
+                      "wireID": "c790a840-3dd1-4c07-f945-a7149d1bfa42",
+                      "style": {
+                        "inheritFrom": "default"
+                      }
+                    },
+                    {
+                      "type": "RectangleWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 2,
+                      "height": 120,
+                      "wireID": "ec8608b1-036d-4ae2-eb09-ecb52706234e",
+                      "style": {
+                        "inheritFrom": "default"
+                      }
+                    },
+                    {
+                      "type": "MultilineTextWidget",
+                      "left": 12,
+                      "top": 2,
+                      "width": 436,
+                      "height": 66,
+                      "wireID": "8810271f-f246-4d87-e040-a2311be22148",
+                      "style": {
+                        "inheritFrom": "default_M",
+                        "alignHorizontal": "center",
+                        "alignVertical": "center"
+                      },
+                      "text": "Setting auto start script is not allowed because auto recall profile is disabled.",
+                      "firstLineIndent": 0,
+                      "hangingIndent": 0
+                    },
+                    {
+                      "type": "Text",
+                      "left": 139,
+                      "top": 68,
+                      "width": 180,
+                      "height": 40,
+                      "wireID": "1813e4ea-76c9-4657-a821-9bfc182ad51e",
+                      "action": "profiles_toggle_auto_recall",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_center"
+                      },
+                      "text": "Enable auto recall"
+                    }
+                  ]
+                },
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 0,
+                  "width": 460,
+                  "height": 120,
+                  "wireID": "53ec53a2-4873-4058-b41f-782ee082b922",
+                  "data": "sys_settings_scripting_auto_start_confirmation",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Container",
+                      "left": 0,
+                      "top": 0,
+                      "width": 460,
+                      "height": 120,
+                      "wireID": "a845660b-86ba-4409-817d-8d8291bd927b",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "RectangleWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 458,
+                          "height": 2,
+                          "wireID": "5019fc67-de17-47a1-9675-ad80ced4014f",
+                          "style": {
+                            "inheritFrom": "default"
+                          }
+                        },
+                        {
+                          "type": "RectangleWidget",
+                          "left": 458,
+                          "top": 0,
+                          "width": 2,
+                          "height": 74,
+                          "wireID": "2f33e72d-baf4-4e8e-fe55-56ebd8013706",
+                          "style": {
+                            "inheritFrom": "default"
+                          }
+                        },
+                        {
+                          "type": "RectangleWidget",
+                          "left": 2,
+                          "top": 72,
+                          "width": 458,
+                          "height": 2,
+                          "wireID": "c790a840-3dd1-4c07-f945-a7149d1bfa42",
+                          "style": {
+                            "inheritFrom": "default"
+                          }
+                        },
+                        {
+                          "type": "RectangleWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 2,
+                          "height": 75,
+                          "wireID": "ec8608b1-036d-4ae2-eb09-ecb52706234e",
+                          "style": {
+                            "inheritFrom": "default"
+                          }
+                        },
+                        {
+                          "type": "MultilineTextWidget",
+                          "left": 12,
+                          "top": 2,
+                          "width": 436,
+                          "height": 70,
+                          "wireID": "8810271f-f246-4d87-e040-a2311be22148",
+                          "style": {
+                            "inheritFrom": "default_M",
+                            "alignHorizontal": "center",
+                            "alignVertical": "center"
+                          },
+                          "text": "You can still skip execution of the auto start script if you press encoder switch during boot.",
+                          "firstLineIndent": 0,
+                          "hangingIndent": 0
+                        }
+                      ]
+                    },
+                    {
+                      "type": "RectangleWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 460,
+                      "height": 120,
+                      "wireID": "5019fc67-de17-47a1-9675-ad80ced4014f",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "invertColors": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 240,
+          "width": 480,
+          "height": 32,
+          "wireID": "4444c6a7-cb9a-4b79-8040-2ee2ce6506d6",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Status line",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 41,
+              "height": 32,
+              "wireID": "8ab69f61-16b4-4f68-ea8e-5c9005165f11",
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "status_icon_enabled"
+              },
+              "text": "E"
+            },
+            {
+              "type": "Text",
+              "left": 41,
+              "top": 0,
+              "width": 439,
+              "height": 32,
+              "wireID": "9cc4c972-fa1d-4818-fdc7-043ab34e4c9e",
+              "data": "",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "text": "Scripting"
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "name": "sys_settings_scripting",
+      "description": "AUX temperature sensor settings\n",
+      "style": "default",
       "left": 0,
       "top": 0,
       "width": 480,
@@ -50896,6 +51542,24 @@
             "width": 19,
             "height": 19,
             "pixelArray": "00000026c7f49b080000000000000000000000000028e7ffffffb608000000000000000000000028e7ffc173e7ffb70800000000000000000028e8ffb5080027e6ffb8070000000000000000c8ffc00800000027e6ff760000000000000000f8ff6e000000010327e6a10000000000000000a1ffe3230001baef3f274600000000000000000abbffe22305f2fff53e000000000000000000000abbffe22346f7fff43d00419d730700000000000abbffe22346f7fff43c27e6ffb5080000000000087ca7460046f7fff33b26e5ffb5080000000000000000000046f7ffef0625e5ffb5080000000000000000422246f5cd020025e5ff9c0000000000000000a3e2220a030000006ffff700000000000000007affe12100000005b9ffcc000000000000000008bbffe1210005acffea2a0000000000000000000abbffe26bb8ffea2b00000000000000000000000abbffffffea2b000000000000000000000000000aa1f8cb2a000000"
+          },
+          "source": {
+            "filePath": "fonts\\Oswald-Medium.ttf",
+            "size": 16,
+            "encoding": 177
+          }
+        },
+        {
+          "encoding": 205,
+          "x": 0,
+          "y": -2,
+          "width": 19,
+          "height": 20,
+          "dx": 19,
+          "glyphBitmap": {
+            "width": 19,
+            "height": 20,
+            "pixelArray": "0000000000013d5c5c5c5c5c3d0100000000000000000000aaffe0f8ffffffffa80000000000000000002affff2db5ffffffffff2b00000000000000003afffffeffffffffffff44000000000000000001292c2c2da2ffffffff4400000000000764999c9c9c9c9ddeffffffff44589b66040fcaffffffffffffffffffffffff4490ffff939affffffffffffffffffffffffff4490fffff5f1ffffffffffffffffffffffffff2396ffffffffffffffffffffffffffffffff8a07e3ffffffffffffffffd75c3d3c3c3c3c1f05a2fffffffffffffffffa1b32858c8c8c8c91ddfffffffffdffffffffc600e2ffffffffffffffffffffffcacbffffffc000fffffffffffffffffffffffc402eceffffc000ffffffffffffffffffffcf4300000003040300ffffffb3050404040403000000000000000000ffffffc1252424210100000000000000000000ffffffffffffffff3d00000000000000000000c8ffffffd241fffe22000000000000000000002ccbffffffffe66c0000000000"
           },
           "source": {
             "filePath": "fonts\\Oswald-Medium.ttf",
@@ -70475,6 +71139,15 @@
             }
           },
           {
+            "name": "DISPlay[:WINdow]:HOMe",
+            "parameters": [],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
             "name": "DISPlay[:WINdow]:DLOG",
             "helpLink": "EEZ BB3 SCPI reference 5.4 - DISPlay.html#disp_dlog",
             "parameters": [
@@ -72584,7 +73257,106 @@
         ]
       },
       {
-        "name": "5.14. SENSe",
+        "name": "5.14. SCRipt",
+        "commands": [
+          {
+            "name": "SCRipt:RUN",
+            "parameters": [
+              {
+                "name": "script_file_path",
+                "type": [
+                  {
+                    "type": "quoted-string"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SCRipt:STOP",
+            "parameters": [],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SCRipt:RECall",
+            "parameters": [
+              {
+                "name": "script_file_path",
+                "type": [
+                  {
+                    "type": "quoted-string"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SCRipt:RECall?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SCRipt:RECall:CLEar",
+            "parameters": [],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SCRipt:RECall:CONFirmation",
+            "parameters": [
+              {
+                "name": "enable",
+                "type": [
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              }
+            ],
+            "response": {
+              "type": [
+                {}
+              ]
+            }
+          },
+          {
+            "name": "SCRipt:RECall:CONFirmation?",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "boolean"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "5.15. SENSe",
         "helpLink": "EEZ BB3 SCPI reference 5.14 - SENSe.html",
         "commands": [
           {
@@ -73661,7 +74433,7 @@
         ]
       },
       {
-        "name": "5.15. SOURce",
+        "name": "5.16. SOURce",
         "helpLink": "EEZ BB3 SCPI reference 5.15 - SOURce.html",
         "commands": [
           {
@@ -75774,7 +76546,7 @@
         ]
       },
       {
-        "name": "5.16. STATus ",
+        "name": "5.17. STATus ",
         "helpLink": "EEZ BB3 SCPI reference 5.16 - STATus.html",
         "commands": [
           {
@@ -76140,7 +76912,7 @@
         ]
       },
       {
-        "name": "5.17. SYSTem",
+        "name": "5.18. SYSTem",
         "helpLink": "EEZ BB3 SCPI reference 5.17 - SYSTem.html",
         "commands": [
           {
@@ -78890,7 +79662,7 @@
         ]
       },
       {
-        "name": "5.18. TRIGger",
+        "name": "5.19. TRIGger",
         "helpLink": "EEZ BB3 SCPI reference 5.18 - TRIGger.html",
         "commands": [
           {
@@ -79808,7 +80580,7 @@
                     "type": "nr1"
                   }
                 ],
-                "description": "1, 2 or 3"
+                "description": "0: master firmware\n1: slot 1\n2: slot 2\n3: slot 3"
               },
               {
                 "name": "firmware_file_path",

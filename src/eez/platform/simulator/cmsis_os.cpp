@@ -3,8 +3,11 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include <map>
+
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
 #include <windows.h>
+std::map<DWORD, HANDLE> g_handles;
 #else
 #include <sys/time.h>
 #include <time.h>
@@ -24,7 +27,8 @@ Thread *g_currentThread;
 osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *argument) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     DWORD threadId;
-    CreateThread(NULL, thread_def->stacksize, (LPTHREAD_START_ROUTINE)thread_def->pthread, argument, 0, &threadId);
+    HANDLE handle = CreateThread(NULL, thread_def->stacksize, (LPTHREAD_START_ROUTINE)thread_def->pthread, argument, 0, &threadId);
+	g_handles.insert(std::make_pair(threadId, handle));
     return threadId;
 #elif defined(__EMSCRIPTEN__)
     for (int i = 0; i < MAX_THREADS; ++i) {
@@ -40,6 +44,22 @@ osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *argument) {
     pthread_t thread;
     pthread_create(&thread, 0, thread_def->pthread, 0);
     return thread;
+#endif    
+}
+
+osStatus osThreadTerminate(osThreadId thread_id) {
+#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
+	HANDLE handle = g_handles.at(thread_id);
+	TerminateThread(handle, 1);
+	WaitForSingleObject(handle, INFINITE);
+	CloseHandle(handle);
+	return osOK;
+#elif defined(__EMSCRIPTEN__)
+	return osOK;
+#else
+	pthread_kill(thread_id, SIGKILL);
+	pthread_join(thread_id, 0);
+	return osOK;
 #endif    
 }
 

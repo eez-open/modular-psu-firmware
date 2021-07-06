@@ -29,6 +29,10 @@
 #include <eez/system.h>
 #include <eez/hmi.h>
 #include <eez/keyboard.h>
+#include <eez/mp.h>
+#if OPTION_ENCODER
+#include <eez/modules/mcu/encoder.h>
+#endif
 
 #include <eez/scpi/regs.h>
 
@@ -185,6 +189,12 @@ void PsuAppContext::stateManagment() {
     }
 
 #if EEZ_PLATFORM_STM32
+    if (g_userSwitch.isPressed() && mcu::encoder::isButtonPressed()) {
+        mp::stopScript();
+    }
+#endif
+
+#if EEZ_PLATFORM_STM32
     if (g_userSwitch.isLongPress()) {
         action_select_user_switch_action();
     } else if (g_userSwitch.isClicked()) {
@@ -220,10 +230,13 @@ void PsuAppContext::stateManagment() {
             // touch screen is not calibrated
             sound::playBeep(true);
             showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
-        } else {
+			return;
+		}
+
+		if (!mp::isAutoStartEnabled()) {
             showPage(getMainPageId());
+			return;
         }
-        return;
     }
 
     // start touch screen calibration automatically after period of time
@@ -408,7 +421,8 @@ bool isSysSettingsSubPage(int pageId) {
         pageId == PAGE_ID_SYS_SETTINGS_SOUND ||
         pageId == PAGE_ID_SYS_SETTINGS_MQTT ||
         pageId == PAGE_ID_SYS_SETTINGS_LABELS_AND_COLORS ||
-        pageId == PAGE_ID_SYS_INFO;
+        pageId == PAGE_ID_SYS_INFO ||
+		pageId == PAGE_ID_SYS_SETTINGS_SCRIPTING;
 }
 
 bool isChSettingsSubPage(int pageId) {
@@ -1671,6 +1685,16 @@ void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), v
     pushPage(yesNoPageId);
 }
 
+void yesNoDialog(int yesNoPageId, Value value, void(*yes_callback)(), void(*no_callback)(), void(*cancel_callback)()) {
+	set(Cursor(-1), DATA_ID_ALERT_MESSAGE, value);
+
+	g_psuAppContext.m_dialogYesCallback = yes_callback;
+	g_psuAppContext.m_dialogNoCallback = no_callback;
+	g_psuAppContext.m_dialogCancelCallback = cancel_callback;
+
+	pushPage(yesNoPageId);
+}
+
 void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*later_callback)()) {
     set(Cursor(-1), DATA_ID_ALERT_MESSAGE, Value(message));
 
@@ -1685,8 +1709,8 @@ void areYouSure(void (*yes_callback)()) {
     yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", yes_callback, 0, 0);
 }
 
-void areYouSureWithMessage(const char *message, void (*yes_callback)()) {
-    yesNoDialog(PAGE_ID_ARE_YOU_SURE_WITH_MESSAGE, message, yes_callback, 0, 0);
+void areYouSureWithMessage(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)()) {
+    yesNoDialog(PAGE_ID_ARE_YOU_SURE_WITH_MESSAGE, message, yes_callback, no_callback, cancel_callback);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

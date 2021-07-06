@@ -32,7 +32,7 @@ public:
     
     void showProfile();
 
-    void toggleAutoRecall();
+    static void toggleAutoRecall();
     void toggleIsAutoRecallLocation();
 
     void saveProfile();

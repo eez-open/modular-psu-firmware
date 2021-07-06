@@ -21,6 +21,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <eez/modules/psu/psu.h>
+#include <eez/modules/psu/profile.h>
+
 namespace eez {
 namespace mp {
 
@@ -38,11 +41,25 @@ void startThread();
 
 void onQueueMessage(uint32_t type, uint32_t param);
 
-void startScript(const char *filePath);
+bool startScript(const char *filePath, int *err = nullptr);
+bool stopScript(int *err = nullptr);
 inline bool isIdle() { return g_state == STATE_IDLE; }
 bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen);
 
 void onUncaughtScriptExceptionHook();
+
+void resetSettings();
+
+bool isAutoStartEnabled();
+void autoStart();
+
+void resetProfileParameters(psu::profile::Parameters &profileParams);
+void getProfileParameters(psu::profile::Parameters &profileParams);
+void setProfileParameters(const psu::profile::Parameters &profileParams);
+bool writeProfileProperties(psu::profile::WriteContext &ctx, const psu::profile::Parameters &profileParams);
+bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Parameters &profileParams);
+
+void getAutoStartConfirmationMessage(char *text, int count);
 
 } // mp
 } // eez

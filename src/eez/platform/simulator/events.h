@@ -30,6 +30,8 @@ extern bool g_mouseButton1IsPressed;
 
 void readEvents();
 
+bool isMiddleButtonPressed();
+
 } // namespace simulator
 } // namespace platform
 } // namespace eez

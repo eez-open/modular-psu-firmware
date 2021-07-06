@@ -31,6 +31,7 @@ public:
 
     bool isClicked();
     bool isLongPress();
+    bool isPressed();
 
 private:
     GPIO_TypeDef* m_port;

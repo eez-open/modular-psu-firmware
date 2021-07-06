@@ -204,6 +204,16 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 #endif
 }
 
+scpi_result_t scpi_cmd_displayWindowHome(scpi_t *context) {
+#if OPTION_DISPLAY
+    psu::gui::showMainPage();
+    return SCPI_RES_OK;
+#else
+    SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+    return SCPI_RES_ERR;
+#endif
+}
+
 scpi_result_t scpi_cmd_displayWindowDlog(scpi_t *context) {
 #if OPTION_DISPLAY
     char filePath[MAX_PATH_LENGTH + 1];

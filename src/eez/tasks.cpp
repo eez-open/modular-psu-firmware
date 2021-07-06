@@ -464,6 +464,8 @@ void lowPriorityThreadOneIter() {
                 fs_driver::LinkDriver(param);
             } else if (type == THREAD_MESSAGE_FS_DRIVER_UNLINK) {
                 fs_driver::UnLinkDriver(param);
+            } else if (type == THREAD_MESSAGE_AUTO_START_SCRIPT) {
+            	mp::autoStart();
             }
         }
 

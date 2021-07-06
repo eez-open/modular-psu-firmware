@@ -83,6 +83,7 @@ enum LowPriorityThreadMessage {
 
     MP_LOAD_SCRIPT,
     MP_EXECUTE_SCPI,
+    MP_STOP_SCRIPT,
 
     MP_LAST_MESSAGE_TYPE,
 
@@ -125,6 +126,7 @@ enum LowPriorityThreadMessage {
     THREAD_MESSAGE_LOAD_CUSTOM_LOGO,
     THREAD_MESSAGE_FS_DRIVER_LINK,
     THREAD_MESSAGE_FS_DRIVER_UNLINK,
+    THREAD_MESSAGE_AUTO_START_SCRIPT,
 
     // this must be at the end
     THREAD_MESSAGE_MODULE_SPECIFIC

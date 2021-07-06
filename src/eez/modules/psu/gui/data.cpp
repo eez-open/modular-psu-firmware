@@ -1186,6 +1186,14 @@ void OCP_TRIP_LEVEL_INFO_value_to_text(const Value &value, char *text, int count
     snprintf(text, count, "Trip level = %g%% of Iset", value.getFloat());
 }
 
+bool compare_AUTO_START_SCRIPT_CONFIRMATION_MESSAGE_value(const Value &a, const Value &b) {
+	return a.getInt() == b.getInt();
+}
+
+void AUTO_START_SCRIPT_CONFIRMATION_MESSAGE_value_to_text(const Value &value, char *text, int count) {
+	mp::getAutoStartConfirmationMessage(text, count);
+}
+
 static Cursor g_editValueCursor(-1);
 static int16_t g_editValueDataId;
 

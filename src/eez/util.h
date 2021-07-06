@@ -130,7 +130,8 @@ bool endsWithNoCase(const char *str, const char *suffix);
 
 void formatBytes(uint64_t bytes, char *text, int count);
 
-void getBaseFileName(const char *path, char *baseName, unsigned basenameSize);
+void getFileName(const char *path, char *fileName, unsigned fileNameSize);
+void getBaseFileName(const char *path, char *baseName, unsigned baseNameSize);
 
 template <typename T, typename Total, uint64_t N>
 class MovingAverage {

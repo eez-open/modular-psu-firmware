@@ -171,6 +171,7 @@ extern "C" {
     X(SCPI_ERROR_CH4_MODULE_FAULT_DETECTED,                  763, "CH4 module fault detected!")                   \
     X(SCPI_ERROR_CH5_MODULE_FAULT_DETECTED,                  764, "CH5 module fault detected!")                   \
     X(SCPI_ERROR_CH6_MODULE_FAULT_DETECTED,                  765, "CH6 module fault detected!")                   \
+    X(SCPI_ERROR_SCRIPT_ENGINE_ALREADY_RUNNING,              770, "Script engine is already running")
 
 // clang-format on
 

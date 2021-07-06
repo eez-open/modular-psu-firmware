@@ -269,6 +269,19 @@ void STR_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+bool compare_VERSIONED_STR_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void VERSIONED_STR_value_to_text(const Value &value, char *text, int count) {
+    const char *str = value.getString();
+    if (str) {
+        stringCopy(text, count, str);
+    } else {
+        text[0] = 0;
+    }
+}
+
 bool compare_PASSWORD_value(const Value &a, const Value &b) {
     return strlen(a.getString()) == strlen(b.getString());
 }

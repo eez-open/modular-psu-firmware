@@ -42,6 +42,7 @@ typedef uint32_t osThreadId;
 #else
 
 #include <pthread.h>
+#include <signal.h>
 
 #define osThreadDef(name, thread, priority, instances, stacksz)                                    \
     void *os_thread_func_##name(void *lpParam) {                                                   \
@@ -62,6 +63,7 @@ typedef pthread_t osThreadId;
 #define osThread(name) &os_thread_def_##name
 
 osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *argument);
+osStatus osThreadTerminate(osThreadId thread_id);
 
 osThreadId osThreadGetId();
 

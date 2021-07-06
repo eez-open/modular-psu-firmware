@@ -137,6 +137,15 @@ struct FunctionGeneratorParameters {
     float previewPeriod;
 };
 
+struct ScriptingOptions {
+    unsigned autoStartConfirmation : 1;
+};
+
+struct ScriptingParameters {
+	char autoStartScript[MAX_PATH_LENGTH + 1];
+	ScriptingOptions options;
+};
+
 /// Profile parameters.
 struct Parameters {
     LoadStatus loadStatus;
@@ -157,6 +166,7 @@ struct Parameters {
     unsigned int uartParity;    
     EncoderModes encoderModes;
     FunctionGeneratorParameters functionGeneratorParameters;
+    ScriptingParameters scriptingParameters;
 };
 
 void init();

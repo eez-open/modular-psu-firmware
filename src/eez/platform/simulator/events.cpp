@@ -84,6 +84,14 @@ void readEvents() {
 #endif
 }
 
+bool isMiddleButtonPressed() {
+    int x;
+    int y;
+	osDelay(1000);
+    auto buttons = SDL_GetMouseState(&x, &y);
+    return buttons & SDL_BUTTON(2) ? true : false;
+}
+
 } // namespace simulator
 } // namespace platform
 } // namespace eez

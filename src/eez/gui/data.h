@@ -100,6 +100,11 @@ struct Value {
         : type_(VALUE_TYPE_STR), options_(0), unit_(UNIT_UNKNOWN), str_(str) 
     {
     }
+    
+    Value(int, const char *str) 
+        : type_(VALUE_TYPE_VERSIONED_STR), options_(0), unit_(UNIT_UNKNOWN), str_(str) 
+    {
+    }
 
     Value(const char *str, ValueType type)
         : type_(type), options_(0), unit_(UNIT_UNKNOWN), str_(str)

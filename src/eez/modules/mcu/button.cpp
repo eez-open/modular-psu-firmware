@@ -88,6 +88,10 @@ bool Button::isLongPress() {
     return false;
 }
 
+bool Button::isPressed() {
+    return m_btnIsDown;
+}
+
 } // namespace mcu
 } // namespace eez
 

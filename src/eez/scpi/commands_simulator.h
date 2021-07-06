@@ -49,6 +49,7 @@
     SCPI_COMMAND("DISPlay[:WINdow][:STATe]", scpi_cmd_displayWindowState) \
     SCPI_COMMAND("DISPlay[:WINdow][:STATe]?", scpi_cmd_displayWindowStateQ) \
     SCPI_COMMAND("DISPlay:DATA?", scpi_cmd_displayDataQ) \
+    SCPI_COMMAND("DISPlay[:WINdow]:HOMe", scpi_cmd_displayWindowHome) \
     SCPI_COMMAND("DISPlay[:WINdow]:DLOG", scpi_cmd_displayWindowDlog) \
     SCPI_COMMAND("DISPlay[:WINdow]:INPut?", scpi_cmd_displayWindowInputQ) \
     SCPI_COMMAND("DISPlay[:WINdow]:SELect?", scpi_cmd_displayWindowSelectQ) \
@@ -144,6 +145,13 @@
     SCPI_COMMAND("ROUTe:LABel:ROW?", scpi_cmd_routeLabelRowQ) \
     SCPI_COMMAND("ROUTe:LABel:COLumn", scpi_cmd_routeLabelColumn) \
     SCPI_COMMAND("ROUTe:LABel:COLumn?", scpi_cmd_routeLabelColumnQ) \
+    SCPI_COMMAND("SCRipt:RUN", scpi_cmd_scriptRun) \
+    SCPI_COMMAND("SCRipt:STOP", scpi_cmd_scriptStop) \
+    SCPI_COMMAND("SCRipt:RECall", scpi_cmd_scriptRecall) \
+    SCPI_COMMAND("SCRipt:RECall?", scpi_cmd_scriptRecallQ) \
+    SCPI_COMMAND("SCRipt:RECall:CLEar", scpi_cmd_scriptRecallClear) \
+    SCPI_COMMAND("SCRipt:RECall:CONFirmation", scpi_cmd_scriptRecallConfirmation) \
+    SCPI_COMMAND("SCRipt:RECall:CONFirmation?", scpi_cmd_scriptRecallConfirmationQ) \
     SCPI_COMMAND("SENSe:FUNCtion[:ON]", scpi_cmd_senseFunctionOn) \
     SCPI_COMMAND("SENSe:FUNCtion[:ON]?", scpi_cmd_senseFunctionOnQ) \
     SCPI_COMMAND("SENSe:CURRent[:DC]:RANGe", scpi_cmd_senseCurrentDcRange) \

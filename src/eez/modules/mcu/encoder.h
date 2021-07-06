@@ -38,11 +38,14 @@ void enableAcceleration(bool enable, float range = DEFAULT_ENCODER_RANGE, float 
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 void write(int counter, bool clicked);
+void setButtonState(bool pressed);
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
 void onPinInterrupt();
 #endif
+
+bool isButtonPressed();
 
 } // namespace encoder
 } // namespace mcu

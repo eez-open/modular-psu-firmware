@@ -31,6 +31,10 @@
 #include <eez/modules/mcu/button.h>
 #endif
 
+#if defined(EEZ_PLATFORM_SIMULATOR)	
+#include <eez/platform/simulator/events.h>
+#endif
+
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/persist_conf.h>
@@ -154,6 +158,16 @@ void onPinInterrupt() {
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
+
+bool isButtonPressed() {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    return eez::platform::simulator::isMiddleButtonPressed();
+#endif
+
+#if defined(EEZ_PLATFORM_STM32)
+    return g_encoderSwitch.isPressed();
+#endif
+}
 
 static bool isButtonClicked() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
