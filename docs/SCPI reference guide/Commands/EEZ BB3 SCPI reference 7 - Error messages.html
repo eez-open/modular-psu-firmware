@@ -954,6 +954,14 @@
 					<p>The measured output voltage exceeds 3% of the set voltage at CH5, and the hardware OVP and DP are off. The reason for this may be a fault in the voltage regulation (requires servicing) or an external voltage that is higher than the set one has been applied. </p>
 				</td>
 			</tr>
+			<tr style="background: transparent;">
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 38%;">
+					<p class="cmd_code">770,&quot;Script engine is already running&quot;</p>
+				</td>
+				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 62%;">
+					<p>An attempt was made to run the MicroPython script when the previous execution was not completed. </p>
+				</td>
+			</tr>
 		</table>
 		<p class="Heading_3">7.3.1. <a name="__RefHeading__10051_1925441995"></a><a name="self-test_err_msg"></a>Self-Test Error Messages<a name="__RefHeading__10051_1925441995"></a></p>
 		<p>During power-up, the BB3 will start self-test sequences when communication with all SPI devices that is marked as installed will be established. The scope of the self-test depends on device capability and it could vary from simply reading device registers, and waiting for expected responses to more complex operations such as setting DAC registers and reading back those values using the ADC (if ADC test passed). Every test failure will be announced by an error beep, and one error message per failed test will be inserted into the error queue. The device-specific error bit (DDE, bit 3) in the Standard Event Status Register (see <a href="https://www.envox.eu/eez-bench-box-3/bb3-scpi-reference-manual/3-registers-and-queues/#std_even_stat_reg"><span style="text-decoration: underline;">Section 3.1</span></a>) will also be set.</p>
