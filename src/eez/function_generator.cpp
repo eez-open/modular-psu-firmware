@@ -557,52 +557,105 @@ public:
 		int xLeft = widgetCursor.x;
 		int yBottom = widgetCursor.y + widget->h - 1;
 
-		int yPrev = 0;
-		int xPrev = 0;
+		int yPrev1 = 0;
+		int yPrev2 = 0;
+
+		float ytMin;
+		float ytMax;
+		if (waveformParameters.waveform == WAVEFORM_DC) {
+			ytMin = ytMax = waveformParameters.amplitude;
+		} else if (waveformParameters.waveform == WAVEFORM_DC || waveformParameters.waveform == WAVEFORM_DC) {
+			ytMin = waveformParameters.offset;
+			ytMax = waveformParameters.amplitude;
+		} else {
+			ytMin = waveformParameters.offset - waveformParameters.amplitude / 2.0f;
+			ytMax = waveformParameters.offset + waveformParameters.amplitude / 2.0f;
+		}
 
 		for (int xOffset = 0; xOffset < widget->w; xOffset++) {
-			float t = xOffset * T / widget->w;
+			float t1 = xOffset * T / widget->w;
+			float t2 = (xOffset + 1) * T / widget->w;
 
-			int k;
+			float fi1 = (2 * frequency * t1 + phaseShift / 180.0f) * M_PI_F;
+			float fi2 = (2 * frequency * t2 + phaseShift / 180.0f) * M_PI_F;
+				
+			float yt1 = ytMax;
+			float yt2 = ytMin;
 
-			static const float sampleRate = 1 / 100000.0f;
-			k = floorf(t / sampleRate);
-			t = k * sampleRate;
+			if (fi2 - fi1 < 2 * M_PI || waveformParameters.waveform == WAVEFORM_DC) {
+				int D = 10;
+				float dfi = (fi2 - fi1) / D;
+				for (int i = 0; i < D; i++) {
+					float fi = fi1 + dfi * i;
+					int k = floorf(fi / (2 * M_PI));
+					fi = fi - k * (2 * M_PI);
 
-			float fi = (2 * frequency * t + phaseShift / 180) * M_PI;
+					float yt = offset + amplitude * func(fi) / 2.0f;
+					if (yt < lower) {
+						yt = lower;
+					} else if (yt > upper) {
+						yt = upper;
+					}
 
-			k = floorf(fi / (2 * M_PI));
-			fi = fi - k * (2 * M_PI);
-
-			float yt = offset + amplitude * func(fi) / 2.0f;
-			if (yt < lower) {
-				yt = lower;
-			} else if (yt > upper) {
-				yt = upper;
-			}
-
-			int xNext = xLeft + xOffset;
-			int yNext = yBottom - roundf((yt - min) / range * widget->h) - yOffset;
-
-			if (xOffset == 0 || abs(yNext - yPrev) <= 1) {
-				mcu::display::drawPixel(xNext, yNext);
-			} else {
-				if (yNext < yPrev) {
-					mcu::display::drawVLine(xNext, yNext, yPrev - yNext - 1);
-				} else {
-					mcu::display::drawVLine(xNext, yPrev, yNext - yPrev - 1);
+					if (yt < yt1) {
+						yt1 = yt;
+					}
+					if (yt > yt2) {
+						yt2 = yt;
+					}
 				}
 			}
 
-			xPrev = xNext;
-			yPrev = yNext;
+			int xNext = xLeft + xOffset;
+			
+			int yNext1 = yBottom - roundf((yt1 - min) / range * widget->h) - yOffset;
+			int yNext2 = yBottom - roundf((yt2 - min) / range * widget->h) - yOffset;
+
+			if (yNext1 > yNext2) {
+				auto temp = yNext2;
+				yNext2 = yNext1;
+				yNext1 = temp;
+			}
+
+			if (xOffset > 0) {
+				if (yPrev2 < yNext1) {
+					yNext1 = yPrev2;
+				} else if (yPrev1 > yNext2) {
+					yNext2 = yPrev1;
+				}
+			}
+
+			if (abs(yNext2 - yNext1) <= 1) {
+				mcu::display::drawPixel(xNext, yNext1);
+			} else {
+				if (yNext1 < yNext2) {
+					mcu::display::drawVLine(xNext, yNext1, yNext2 - yNext1 - 1);
+				} else {
+					mcu::display::drawVLine(xNext, yNext2, yNext1 - yNext2 - 1);
+				}
+			}
+
+			yPrev1 = yNext1;
+			yPrev2 = yNext2;
 		}
 
 		if (selected && yOffset == 1) {
 			const char *label = g_slots[slotIndex]->getFunctionGeneratorResourceLabel(subchannelIndex, resourceIndex);
 			int textWidth = mcu::display::measureStr(label, -1, font, 0);
+
+			int yText = yBottom - roundf(((ytMin + ytMax) / 2 - min) / range * widget->h) - yOffset;
+			
+			int x1 = xLeft + widget->w - textWidth;
+			int y1 = yText - textHeight > widgetCursor.y ? yText - textHeight : yText;
+			int x2 = x1 + textWidth - 1;
+			int y2 = y1 + textHeight - 1;
+
+			mcu::display::setColor(style->background_color);
+			mcu::display::fillRect(x1, y1, x2, y2);
+
+			mcu::display::setColor(COLOR_ID_CHANNEL1);
 			mcu::display::drawStr(label, -1,
-				xPrev - textWidth, yPrev - textHeight > widgetCursor.y ? yPrev - textHeight : yPrev,
+				x1, y1,
 				widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1,
 				font, -1
 			);
