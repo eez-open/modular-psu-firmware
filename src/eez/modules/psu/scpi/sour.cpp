@@ -757,10 +757,10 @@ scpi_result_t scpi_cmd_sourceVoltageLimitPositiveImmediateAmplitude(scpi_t *cont
         return SCPI_RES_ERR;
     }
 
-    if (channel->isRemoteProgrammingEnabled()) {
-        SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
-        return SCPI_RES_ERR;
-    }
+    //if (channel->isRemoteProgrammingEnabled()) {
+    //    SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+    //    return SCPI_RES_ERR;
+    //}
 
     float limit;
     if (!get_voltage_limit_param(context, limit, channel, &channel->i)) {

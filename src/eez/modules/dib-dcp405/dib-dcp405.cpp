@@ -60,6 +60,8 @@
 #define CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD 1.2f
 #define CONF_OVP_SW_OVP_AT_START_U_PROTECTION_LEVEL 1.55f
 
+volatile float g_uSet;
+
 namespace eez {
 
 using namespace gui;
@@ -365,7 +367,7 @@ struct DcpChannel : public Channel {
 			fallingEdge =
 				(int32_t(fallingEdgeTimeout - millis()) > 0) ||
 				(fallingEdgePreviousUMonAdc > u.mon_adc) ||
-				(u.mon_adc > u.set * (1.0f + CONF_FALLING_EDGE_OVP_PERCENTAGE / 100.0f));
+				(u.mon_last > uSet * (1.0f + CONF_FALLING_EDGE_OVP_PERCENTAGE / 100.0f));
 
 			if (fallingEdge) {
 				fallingEdgePreviousUMonAdc = u.mon_adc;
@@ -670,25 +672,31 @@ struct DcpChannel : public Channel {
 
 		uSet = value;
 
+		if (slotIndex == 2) {
+			g_uSet = value;
+		}
+
+		bool bIsHwOvpEnabled = isHwOvpEnabled();
+
 		if (isOutputEnabled()) {
 			bool belowThreshold = !dac.isOverHwOvpThreshold();
 
 			if (value < previousUSet) {
 				fallingEdge = true;
 				fallingEdgePreviousUMonAdc = u.mon_adc;
-				fallingEdgeTimeout = millis() + 
-					(belowThreshold || !isHwOvpEnabled() ? 
-						(dpOn ? CONF_FALLING_EDGE_SW_OVP_DELAY_MS : CONF_FALLING_EDGE_DP_OFF_DELAY_MS) : 
-						CONF_FALLING_EDGE_HW_OVP_DELAY_MS
-					);
 
-				if (isHwOvpEnabled()) {
+				uint32_t delay = belowThreshold || !bIsHwOvpEnabled ?
+					(dpOn ? CONF_FALLING_EDGE_SW_OVP_DELAY_MS : CONF_FALLING_EDGE_DP_OFF_DELAY_MS) :
+					CONF_FALLING_EDGE_HW_OVP_DELAY_MS;
+				fallingEdgeTimeout = millis() + delay;
+
+				if (bIsHwOvpEnabled) {
 					// deactivate HW OVP
 					prot_conf.flags.u_hwOvpDeactivated = 0; // this flag should be 0 while fallingEdge is true
 					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);
 				}
 			} else if (belowThreshold) {
-				if (isHwOvpEnabled()) {
+				if (bIsHwOvpEnabled) {
 					// deactivate HW OVP
 					prot_conf.flags.u_hwOvpDeactivated = 1;
 					ioexp.changeBit(IOExpander::IO_BIT_OUT_OVP_ENABLE, false);

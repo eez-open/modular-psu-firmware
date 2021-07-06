@@ -30,6 +30,10 @@
 #include <eez/modules/psu/event_queue.h>
 #endif
 
+volatile uint32_t g_debugOvp;
+volatile uint32_t g_debugDP;
+volatile uint32_t g_debugOE;
+
 namespace eez {
 namespace psu {
 
@@ -357,6 +361,20 @@ bool IOExpander::isAdcReady() {
 
 void IOExpander::changeBit(int io_bit, bool set) {
 	auto &slot = *g_slots[slotIndex];
+
+	if (slotIndex == 2) {
+		if (io_bit == IO_BIT_OUT_OVP_ENABLE) {
+			g_debugOvp = set;
+		}
+
+		if (io_bit == IO_BIT_OUT_DP_ENABLE) {
+			g_debugDP = set;
+		}
+
+		if (io_bit == IO_BIT_OUT_OUTPUT_ENABLE) {
+			g_debugOE = set;
+		}        
+	}
 
 #if defined(EEZ_PLATFORM_STM32)
     if (io_bit == IO_BIT_OUT_OVP_ENABLE) {

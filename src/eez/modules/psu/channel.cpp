@@ -1026,8 +1026,9 @@ void Channel::doRemoteProgrammingEnable(bool enable) {
     flags.rprogEnabled = enable;
 
     if (enable) {
-    	channel_dispatcher::setVoltageLimit(*this, channel_dispatcher::getUMaxOvpLimit(*this));
-    	channel_dispatcher::setVoltage(*this, u.min);
+		auto limit = channel_dispatcher::getUMaxOvpLimit(*this);
+    	channel_dispatcher::setVoltageLimit(*this, limit);
+    	channel_dispatcher::setVoltage(*this, limit);
     	channel_dispatcher::setOvpLevel(*this, channel_dispatcher::getUMaxOvpLevel(*this));
     	channel_dispatcher::setOvpState(*this, 1);
 
@@ -1112,6 +1113,9 @@ void Channel::remoteProgrammingEnable(bool enable) {
                 trigger::abort();
             }
             doRemoteProgrammingEnable(enable);
+			if (!enable) {
+				channel_dispatcher::setVoltage(*this, u.min);
+			}
             event_queue::pushChannelEvent((enable ? event_queue::EVENT_INFO_CH_REMOTE_PROG_ENABLED : event_queue::EVENT_INFO_CH_REMOTE_PROG_DISABLED), channelIndex);
         }
     }
