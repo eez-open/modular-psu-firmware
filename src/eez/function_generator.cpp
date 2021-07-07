@@ -202,6 +202,7 @@ float g_dutyCycleI[CH_MAX];
 
 bool g_dprogStateModified[CH_MAX];
 bool g_currentRangeModified[CH_MAX];
+float g_savedCurrentLimit[CH_MAX];
 
 static const float PERIOD = 0.0002f;
 
@@ -1834,11 +1835,15 @@ void reloadWaveformParameters() {
 					Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
 					if (channel->getCurrentRangeSelectionMode() == CURRENT_RANGE_SELECTION_USE_BOTH) {
 						float max = getMax(waveformParameters);
+
+						g_savedCurrentLimit[i] = channel->getCurrentLimit();
+
 						if (max > 0.05f) {
 							channel_dispatcher::setCurrentRangeSelectionMode(*channel, CURRENT_RANGE_SELECTION_ALWAYS_HIGH);
 						} else {
 							channel_dispatcher::setCurrentRangeSelectionMode(*channel, CURRENT_RANGE_SELECTION_ALWAYS_LOW);
 						}
+
 						g_currentRangeModified[i] = true;
 					}
 				}
@@ -1959,7 +1964,9 @@ void abort() {
 			}
 
 			if (g_currentRangeModified[i]) {
-				channel_dispatcher::setCurrentRangeSelectionMode(Channel::get(i), CURRENT_RANGE_SELECTION_USE_BOTH);
+            	Channel &channel = Channel::get(i);
+				channel_dispatcher::setCurrentRangeSelectionMode(channel, CURRENT_RANGE_SELECTION_USE_BOTH);
+				channel_dispatcher::setCurrentLimit(channel, g_savedCurrentLimit[i]);
 			}
 		}
 	}

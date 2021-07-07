@@ -71,6 +71,7 @@ static struct {
 static bool g_active;
 
 bool g_currentRangeModified[CH_MAX];
+float g_savedCurrentLimit[CH_MAX];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -516,7 +517,9 @@ void setActive(bool active, bool forceUpdate = false) {
         if (g_active) {
             for (int i = 0; i < CH_NUM; i++) {
                 if (g_currentRangeModified[i]) {
-                    channel_dispatcher::setCurrentRangeSelectionMode(Channel::get(i), CURRENT_RANGE_SELECTION_USE_BOTH);
+                	Channel &channel = Channel::get(i);
+                    channel_dispatcher::setCurrentRangeSelectionMode(channel, CURRENT_RANGE_SELECTION_USE_BOTH);
+                    channel_dispatcher::setCurrentLimit(channel, g_savedCurrentLimit[i]);
                 }
             }
         }
@@ -548,6 +551,8 @@ void executionStart(Channel &channel) {
                     max = current;
                 }
             }
+
+            g_savedCurrentLimit[channel.channelIndex] = channel.getCurrentLimit();
 
             if (max > 0.05f) {
                 channel_dispatcher::setCurrentRangeSelectionMode(channel, CURRENT_RANGE_SELECTION_ALWAYS_HIGH);
