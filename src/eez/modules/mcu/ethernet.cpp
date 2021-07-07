@@ -36,7 +36,7 @@ extern ip4_addr_t ipaddr;
 ip4_addr_t dns;
 extern ip4_addr_t netmask;
 extern ip4_addr_t gw;
-#endif
+#endif // EEZ_PLATFORM_STM32
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
@@ -60,7 +60,7 @@ extern ip4_addr_t gw;
 #include <sys/types.h>
 #include <unistd.h>
 #endif
-#endif
+#endif // EEZ_PLATFORM_SIMULATOR
 
 #include <eez/firmware.h>
 #include <eez/system.h>
@@ -76,6 +76,7 @@ using namespace eez::psu::ethernet;
 using namespace eez::scpi;
 
 #define CONF_CONNECT_TIMEOUT 30000
+#define ACCEPT_CLIENT_TIMEOUT 1000
 
 namespace eez {
 namespace mcu {
@@ -123,6 +124,7 @@ enum {
 };
 
 #if defined(EEZ_PLATFORM_STM32)
+
 enum ConnectionState {
     CONNECTION_STATE_INITIALIZED,
     CONNECTION_STATE_CONNECTED,
@@ -147,7 +149,10 @@ static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t le
 		if (conn == g_tcpListenConnection) {
             g_acceptClientIsDone = false;
 			osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_ACCEPT_CLIENT, osWaitForever);
-            while (!g_acceptClientIsDone) {
+            for (int i = 0; i < ACCEPT_CLIENT_TIMEOUT; i++) {
+                if (g_acceptClientIsDone) {
+                    break;
+                }
                 osDelay(1);
             }
 		} else if (conn == g_tcpClientConnection) {
@@ -197,6 +202,16 @@ static void dhcpStart() {
     return;
 }
 
+void destroyTcpServer() {
+    if (g_tcpListenConnection) {
+        auto tmp = g_tcpListenConnection;
+        g_tcpListenConnection = nullptr;
+        netconn_close(tmp);
+        //netconn_shutdown(tmp, true, true);
+        netconn_delete(tmp);
+    }
+}
+
 static void onEvent(uint8_t eventType) {
 	switch (eventType) {
 	case QUEUE_MESSAGE_CONNECT:
@@ -243,16 +258,24 @@ static void onEvent(uint8_t eventType) {
 		break;
 
 	case QUEUE_MESSAGE_CREATE_TCP_SERVER:
+	    if (g_tcpClientConnection) {
+	        auto tmp = g_tcpClientConnection;
+		    g_tcpClientConnection = nullptr;
+		    netconn_delete(tmp);
+		    sendMessageToLowPriorityThread(ETHERNET_CLIENT_DISCONNECTED);
+	    }
+
+	    if (g_tcpListenConnection) {
+			break;
+		}
+
 		g_tcpListenConnection = netconn_new_with_callback(NETCONN_TCP, netconnCallback);
 		if (g_tcpListenConnection == nullptr) {
 			break;
 		}
 
-		// Is this required?
-		// netconn_set_nonblocking(conn, 1);
-
 		if (netconn_bind(g_tcpListenConnection, nullptr, g_port) != ERR_OK) {
-			netconn_delete(g_tcpListenConnection);
+		    destroyTcpServer();
 			break;
 		}
 
@@ -260,8 +283,7 @@ static void onEvent(uint8_t eventType) {
 		break;
 
     case QUEUE_MESSAGE_DESTROY_TCP_SERVER:
-        netconn_delete(g_tcpListenConnection);
-        g_tcpListenConnection = nullptr;
+        destroyTcpServer();
         break;
 
 	case QUEUE_MESSAGE_ACCEPT_CLIENT:
@@ -309,12 +331,8 @@ void onIdle() {
             sendMessageToLowPriorityThread(ETHERNET_CONNECTED);
 		}
 	}
-
-	if (g_tcpClientConnection) {
-
-	}
 }
-#endif
+#endif // EEZ_PLATFORM_STM32
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 #define INPUT_BUFFER_SIZE 1024
@@ -873,4 +891,4 @@ void ntpStateTransition(int transition) {
 } // namespace mcu
 } // namespace eez
 
-#endif
+#endif // EEZ_PLATFORM_SIMULATOR
