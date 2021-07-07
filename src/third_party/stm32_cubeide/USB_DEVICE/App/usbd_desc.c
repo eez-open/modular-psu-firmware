@@ -67,7 +67,7 @@
 #define USBD_LANGID_STRING     1033
 #define USBD_MANUFACTURER_STRING     "EEZ"
 #define USBD_PID_FS     8216
-#define USBD_PRODUCT_STRING_FS     "MCU Virtual ComPort"
+#define USBD_PRODUCT_STRING_FS     "BB3 Virtual ComPort"
 #define USBD_CONFIGURATION_STRING_FS     "CDC Config"
 #define USBD_INTERFACE_STRING_FS     "CDC Interface"
 
