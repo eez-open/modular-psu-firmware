@@ -70,6 +70,8 @@ static struct {
 
 static bool g_active;
 
+bool g_currentRangeModified[CH_MAX];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void init() {
@@ -511,6 +513,14 @@ void updateChannelsWithVisibleCountersList();
 
 void setActive(bool active, bool forceUpdate = false) {
     if (g_active != active) {
+        if (g_active) {
+            for (int i = 0; i < CH_NUM; i++) {
+                if (g_currentRangeModified[i]) {
+                    channel_dispatcher::setCurrentRangeSelectionMode(Channel::get(i), CURRENT_RANGE_SELECTION_USE_BOTH);
+                }
+            }
+        }
+
         g_active = active;
         updateChannelsWithVisibleCountersList();
     } else {
@@ -523,8 +533,34 @@ void setActive(bool active, bool forceUpdate = false) {
 void executionStart(Channel &channel) {
     g_execution[channel.channelIndex].it = -1;
     g_execution[channel.channelIndex].counter = g_channelsLists[channel.channelIndex].count;
+
     channel_dispatcher::setVoltage(channel, 0);
+
+    g_currentRangeModified[channel.channelIndex] = false;
+    if (g_slots[channel.slotIndex]->moduleType == MODULE_TYPE_DCP405) {
+        if (channel.getCurrentRangeSelectionMode() == CURRENT_RANGE_SELECTION_USE_BOTH) {
+            float max = 0.0f;
+            
+            uint16_t currentListLength = g_channelsLists[channel.channelIndex].currentListLength;
+            for (int j = 0; j < currentListLength; ++j) {
+                float current = g_channelsLists[channel.channelIndex].currentList[j];
+                if (j == 0 || current > max) {
+                    max = current;
+                }
+            }
+
+            if (max > 0.05f) {
+                channel_dispatcher::setCurrentRangeSelectionMode(channel, CURRENT_RANGE_SELECTION_ALWAYS_HIGH);
+            } else {
+                channel_dispatcher::setCurrentRangeSelectionMode(channel, CURRENT_RANGE_SELECTION_ALWAYS_LOW);
+            }
+            
+            g_currentRangeModified[channel.channelIndex] = true;
+        }
+    }
+
     channel_dispatcher::setCurrent(channel, 0);
+
     setActive(true, true);
 }
 

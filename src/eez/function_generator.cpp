@@ -201,6 +201,7 @@ float g_offsetI[CH_MAX];
 float g_dutyCycleI[CH_MAX];
 
 bool g_dprogStateModified[CH_MAX];
+bool g_currentRangeModified[CH_MAX];
 
 static const float PERIOD = 0.0002f;
 
@@ -289,6 +290,30 @@ WaveformFunction getWaveformFunction(WaveformParameters &waveformParameters) {
 	} else {
 		return arbitraryf;
 	}
+}
+
+float getMin(WaveformParameters &waveformParameters) {
+	if (waveformParameters.waveform == WAVEFORM_DC) {
+		return waveformParameters.amplitude;
+	}
+
+	if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
+		return waveformParameters.offset;
+	}
+
+	return waveformParameters.offset - waveformParameters.amplitude / 2.0f;
+}
+
+float getMax(WaveformParameters &waveformParameters) {
+	if (waveformParameters.waveform == WAVEFORM_DC) {
+		return waveformParameters.amplitude;
+	}
+
+	if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
+		return waveformParameters.offset + waveformParameters.amplitude;
+	}
+
+	return waveformParameters.offset + waveformParameters.amplitude / 2.0f;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -560,17 +585,8 @@ public:
 		int yPrev1 = 0;
 		int yPrev2 = 0;
 
-		float ytMin;
-		float ytMax;
-		if (waveformParameters.waveform == WAVEFORM_DC) {
-			ytMin = ytMax = waveformParameters.amplitude;
-		} else if (waveformParameters.waveform == WAVEFORM_DC || waveformParameters.waveform == WAVEFORM_DC) {
-			ytMin = waveformParameters.offset;
-			ytMax = waveformParameters.amplitude;
-		} else {
-			ytMin = waveformParameters.offset - waveformParameters.amplitude / 2.0f;
-			ytMax = waveformParameters.offset + waveformParameters.amplitude / 2.0f;
-		}
+		float ytMin = getMin(waveformParameters);
+		float ytMax = getMax(waveformParameters);
 
 		for (int xOffset = 0; xOffset < widget->w; xOffset++) {
 			float t1 = xOffset * T / widget->w;
@@ -1667,18 +1683,6 @@ bool isActive() {
 	return g_active;
 }
 
-float getMax(WaveformParameters &waveformParameters) {
-	if (waveformParameters.waveform == WAVEFORM_DC) {
-		return waveformParameters.amplitude;
-	}
-	
-	if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
-		return waveformParameters.offset + waveformParameters.amplitude;
-	}
-
-	return waveformParameters.offset + waveformParameters.amplitude / 2.0f;
-}
-
 int checkLimits(int iChannel) {
     Channel &channel = Channel::get(iChannel);
 
@@ -1717,6 +1721,7 @@ int checkLimits(int iChannel) {
 void executionStart() {
 	for (int i = 0; i < CH_NUM; i++) {
 		g_dprogStateModified[i] = false;
+		g_currentRangeModified[i] = false;
 	}
 
 	for (int i = 0; i < g_selectedResources.m_numResources; i++) {
@@ -1823,6 +1828,19 @@ void reloadWaveformParameters() {
 				} else {
 					g_amplitudeI[channel->channelIndex] = waveformParameters.amplitude;
 					g_offsetI[channel->channelIndex] = waveformParameters.offset;
+				}
+
+				if (g_slots[slotIndex]->moduleType == MODULE_TYPE_DCP405) {
+					Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
+					if (channel->getCurrentRangeSelectionMode() == CURRENT_RANGE_SELECTION_USE_BOTH) {
+						float max = getMax(waveformParameters);
+						if (max > 0.05f) {
+							channel_dispatcher::setCurrentRangeSelectionMode(*channel, CURRENT_RANGE_SELECTION_ALWAYS_HIGH);
+						} else {
+							channel_dispatcher::setCurrentRangeSelectionMode(*channel, CURRENT_RANGE_SELECTION_ALWAYS_LOW);
+						}
+						g_currentRangeModified[i] = true;
+					}
 				}
 			}
 #if defined(EEZ_PLATFORM_STM32)
@@ -1932,11 +1950,17 @@ void tick() {
 }
 
 void abort() {
-	g_active = false;
+	if (g_active) {
+		g_active = false;
 
-	for (int i = 0; i < CH_NUM; i++) {
-		if (g_dprogStateModified[i]) {
-			Channel::get(i).setDprogState(DPROG_STATE_ON);
+		for (int i = 0; i < CH_NUM; i++) {
+			if (g_dprogStateModified[i]) {
+				Channel::get(i).setDprogState(DPROG_STATE_ON);
+			}
+
+			if (g_currentRangeModified[i]) {
+				channel_dispatcher::setCurrentRangeSelectionMode(Channel::get(i), CURRENT_RANGE_SELECTION_USE_BOTH);
+			}
 		}
 	}
 }
