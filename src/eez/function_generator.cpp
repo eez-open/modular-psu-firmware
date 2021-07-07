@@ -583,7 +583,7 @@ public:
 			float yt2 = ytMin;
 
 			if (fi2 - fi1 < 2 * M_PI || waveformParameters.waveform == WAVEFORM_DC) {
-				int D = 10;
+				int D = 20;
 				float dfi = (fi2 - fi1) / D;
 				for (int i = 0; i < D; i++) {
 					float fi = fi1 + dfi * i;
