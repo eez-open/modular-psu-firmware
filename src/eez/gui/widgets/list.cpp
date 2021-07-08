@@ -47,14 +47,6 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
         endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
     }
 
-    // move to the first child widget state
-    if (widgetCursor.previousState) {
-        ++widgetCursor.previousState;
-    }
-    if (widgetCursor.currentState) {
-        ++widgetCursor.currentState;
-    }
-
     auto savedWidget = widgetCursor.widget;
 
     auto parentWidget = savedWidget;
@@ -71,6 +63,14 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
             widgetCursor.previousState = 0;
         }
     }
+
+	// move to the first child widget state
+	if (widgetCursor.previousState) {
+		++widgetCursor.previousState;
+	}
+	if (widgetCursor.currentState) {
+		++widgetCursor.currentState;
+	}
 
     const Widget *childWidget = GET_WIDGET_PROPERTY(listWidget, itemWidget, const Widget *);
     widgetCursor.widget = childWidget;

@@ -51,7 +51,7 @@ namespace gui {
     WIDGET_TYPE(CANVAS, 22) \
 
 #define WIDGET_TYPE(NAME, ID) WIDGET_TYPE_##NAME = ID,
-enum ValueTypes {
+enum WidgetTypes {
 	WIDGET_TYPES
 };
 #undef WIDGET_TYPE

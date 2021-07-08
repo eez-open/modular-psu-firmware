@@ -104,31 +104,6 @@ static FixPointersFunctionType *g_fixWidgetPointersFunctions[] = {
 };
 #undef WIDGET_TYPE
 
-// static FixWidgetPointersFunction g_fixWidgetPointersFunctions[] = {
-//     nullptr,                         // WIDGET_TYPE_NONE
-//     ContainerWidget_fixPointers,     // WIDGET_TYPE_CONTAINER
-//     ListWidget_fixPointers,          // WIDGET_TYPE_LIST
-//     GridWidget_fixPointers,          // WIDGET_TYPE_GRID
-//     SelectWidget_fixPointers,        // WIDGET_TYPE_SELECT
-//     nullptr,                         // WIDGET_TYPE_DISPLAY_DATA
-//     TextWidget_fixPointers,          // WIDGET_TYPE_TEXT
-//     MultilineTextWidget_fixPointers, // WIDGET_TYPE_MULTILINE_TEXT
-//     nullptr,                         // WIDGET_TYPE_RECTANGLE
-//     nullptr,                         // WIDGET_TYPE_BITMAP
-//     ButtonWidget_fixPointers,        // WIDGET_TYPE_BUTTON
-//     ToggleButtonWidget_fixPointers,  // WIDGET_TYPE_TOGGLE_BUTTON
-//     nullptr,                         // WIDGET_TYPE_BUTTON_GROUP
-//     nullptr,                         // WIDGET_TYPE_RESERVED
-//     nullptr,                         // WIDGET_TYPE_BAR_GRAPH
-//     nullptr,                         // WIDGET_TYPE_LAYOUT_VIEW
-//     nullptr,                         // WIDGET_TYPE_YT_GRAPH
-//     UpDownWidget_fixPointers,        // WIDGET_TYPE_UP_DOWN
-//     nullptr,                         // WIDGET_TYPE_LIST_GRAPH
-//     nullptr,                         // WIDGET_TYPE_APP_VIEW
-//     ScrollBarWidget_fixPointers,     // WIDGET_TYPE_SCROLL_BAR
-//     nullptr,                         // WIDGET_TYPE_SCROLL_BAR
-// };
-
 void Widget_fixPointers(Widget *widget) {
     widget->specific = (void *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)widget->specific);
     if (*g_fixWidgetPointersFunctions[widget->type]) {

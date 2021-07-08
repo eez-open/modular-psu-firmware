@@ -270,7 +270,7 @@ void STR_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_VERSIONED_STR_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
+    return a.unit_ == b.unit_; // here unit_ is used as string version
 }
 
 void VERSIONED_STR_value_to_text(const Value &value, char *text, int count) {

@@ -101,8 +101,8 @@ struct Value {
     {
     }
     
-    Value(int, const char *str) 
-        : type_(VALUE_TYPE_VERSIONED_STR), options_(0), unit_(UNIT_UNKNOWN), str_(str) 
+    Value(int version, const char *str) 
+        : type_(VALUE_TYPE_VERSIONED_STR), options_(0), unit_(version), str_(str) 
     {
     }
 
