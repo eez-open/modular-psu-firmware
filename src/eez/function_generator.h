@@ -104,6 +104,8 @@ void executionStart();
 void tick();
 void abort();
 
+void tickGui();
+
 extern eez::gui::SetPage *g_pFunctionGeneratorPage;
 extern eez::gui::SetPage *g_pFunctionGeneratorSelectChannelsPage;
 

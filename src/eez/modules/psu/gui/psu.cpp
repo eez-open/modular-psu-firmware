@@ -388,6 +388,8 @@ void PsuAppContext::stateManagment() {
 		g_focusDataId = g_focusDataIdToSet;
 		g_focusEditValue = Value();
 	}
+
+    function_generator::tickGui();
 }
 
 bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {

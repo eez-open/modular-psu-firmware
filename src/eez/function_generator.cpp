@@ -30,6 +30,7 @@
 #include <eez/index.h>
 #include <eez/hmi.h>
 #include <eez/util.h>
+#include <eez/system.h>
 #include <eez/gui/gui.h>
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -185,6 +186,9 @@ static const float PREVIEW_PERIOD_MIN = 0.001f;
 static const float PREVIEW_PERIOD_DEF = 0.2f;
 float g_previewPeriod = PREVIEW_PERIOD_DEF;
 
+int g_funcGenChannelIndex;
+uint64_t g_tickCountAtStart;
+
 WaveformFunction g_waveFormFuncU[CH_MAX];
 float g_phiU[CH_MAX];
 float g_dphiU[CH_MAX];
@@ -192,6 +196,7 @@ float g_amplitudeU[CH_MAX];
 float g_offsetU[CH_MAX];
 float g_dutyCycleU[CH_MAX];
 float g_freqU[CH_MAX];
+bool g_isDcSetU[CH_MAX];
 
 WaveformFunction g_waveFormFuncI[CH_MAX];
 float g_phiI[CH_MAX];
@@ -199,6 +204,7 @@ float g_dphiI[CH_MAX];
 float g_amplitudeI[CH_MAX];
 float g_offsetI[CH_MAX];
 float g_dutyCycleI[CH_MAX];
+bool g_isDcSetI[CH_MAX];
 
 bool g_dprogStateModified[CH_MAX];
 bool g_currentRangeModified[CH_MAX];
@@ -417,6 +423,15 @@ public:
 		const Style* style = getStyle(widget->style);
 		drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
 
+		int D;
+		if (m_selectedResources.m_numResources <= 2) {
+			D = 20;
+		} else if (m_selectedResources.m_numResources <= 4) {
+			D = 10;
+		} else {
+			D = 5;
+		}
+
 		float minU = FLT_MAX;
 		float maxU = -FLT_MAX;
 
@@ -502,14 +517,14 @@ public:
 					digitalWaveformParameters.offset = 0;
 				}
 
-				drawWaveform(widgetCursor, digitalWaveformParameters, g_previewPeriod, 0, 1.0f);
+				drawWaveform(widgetCursor, digitalWaveformParameters, g_previewPeriod, 0, 1.0f, D);
 
 				digitalIndex++;
 			} else {
 				float min = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? minU : minI;
 				float max = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? maxU : maxI;
 
-				drawWaveform(widgetCursor, waveformParameters, g_previewPeriod, min, max);
+				drawWaveform(widgetCursor, waveformParameters, g_previewPeriod, min, max, D);
 			}
 		}
 
@@ -530,17 +545,17 @@ public:
 				digitalWaveformParameters.offset = 0;
 			}
 
-			drawWaveform(widgetCursor, digitalWaveformParameters, g_previewPeriod, 0, 1.0f, true);
-			drawWaveform(widgetCursor, digitalWaveformParameters, g_previewPeriod, 0, 1.0f, true, 1);
+			drawWaveform(widgetCursor, digitalWaveformParameters, g_previewPeriod, 0, 1.0f, D, true);
+			drawWaveform(widgetCursor, digitalWaveformParameters, g_previewPeriod, 0, 1.0f, D, true, 1);
 		} else {
 			float min = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? minU : minI;
 			float max = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? maxU : maxI;
-			drawWaveform(widgetCursor, waveformParameters, g_previewPeriod, min, max, true);
-			drawWaveform(widgetCursor, waveformParameters, g_previewPeriod, min, max, true, 1);
+			drawWaveform(widgetCursor, waveformParameters, g_previewPeriod, min, max, D, true);
+			drawWaveform(widgetCursor, waveformParameters, g_previewPeriod, min, max, D, true, 1);
 		}
 	}
 
-	static void drawWaveform(const WidgetCursor &widgetCursor, WaveformParameters &waveformParameters, float T, float min, float max, bool selected = false, int yOffset = 0) {
+	static void drawWaveform(const WidgetCursor &widgetCursor, WaveformParameters &waveformParameters, float T, float min, float max, int D, bool selected = false, int yOffset = 0) {
 		const Widget *widget = widgetCursor.widget;
 		const Style* style = getStyle(widget->style);
 		font::Font font = styleGetFont(style);
@@ -600,7 +615,6 @@ public:
 			float yt2 = ytMin;
 
 			if (fi2 - fi1 < 2 * M_PI || waveformParameters.waveform == WAVEFORM_DC) {
-				int D = 20;
 				float dfi = (fi2 - fi1) / D;
 				for (int i = 0; i < D; i++) {
 					float fi = fi1 + dfi * i;
@@ -696,7 +710,7 @@ public:
 		
 		if (scrollPosition != m_scrollPosition) {
 			m_scrollPosition = scrollPosition;
-			refreshScreen();
+			//refreshScreen();
 		}
 	}
 
@@ -1804,29 +1818,34 @@ void reloadWaveformParameters() {
 #endif
 			if (waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U) {
 				g_waveFormFuncU[channel->channelIndex] = getWaveformFunction(waveformParameters);
-				g_dutyCycleU[channel->channelIndex] = g_dutyCycle;
-				g_phiU[channel->channelIndex] = 2.0 * M_PI * waveformParameters.phaseShift / 360.0f;
-				g_dphiU[channel->channelIndex] = 2.0 * M_PI * waveformParameters.frequency * PERIOD;
 
 				if (waveformParameters.waveform == WAVEFORM_DC) {
+					g_phiU[channel->channelIndex] = 0.0f;
+					g_dphiU[channel->channelIndex] = 1.0f;
 					g_amplitudeU[channel->channelIndex] = 0.0f;
 					g_offsetU[channel->channelIndex] = waveformParameters.amplitude;
-					g_freqU[channel->channelIndex] = 0;
+					g_isDcSetU[channel->channelIndex] = false;
 				} else {
+					g_dutyCycleU[channel->channelIndex] = g_dutyCycle;
+					g_phiU[channel->channelIndex] = 2.0 * M_PI * waveformParameters.phaseShift / 360.0f;
+					g_dphiU[channel->channelIndex] = 2.0 * M_PI * waveformParameters.frequency * PERIOD;
 					g_amplitudeU[channel->channelIndex] = waveformParameters.amplitude;
 					g_offsetU[channel->channelIndex] = waveformParameters.offset;
 					g_freqU[channel->channelIndex] = waveformParameters.frequency;
 				}
 			} else {
 				g_waveFormFuncI[channel->channelIndex] = getWaveformFunction(waveformParameters);
-				g_dutyCycleI[channel->channelIndex] = g_dutyCycle;
-				g_phiI[channel->channelIndex] = 2.0 * M_PI * waveformParameters.phaseShift / 360.0f;
-				g_dphiI[channel->channelIndex] = 2.0 * M_PI * waveformParameters.frequency * PERIOD;
 
 				if (waveformParameters.waveform == WAVEFORM_DC) {
+					g_phiI[channel->channelIndex] = 0.0f;
+					g_dphiI[channel->channelIndex] = 1.0f;
 					g_amplitudeI[channel->channelIndex] = 0.0f;
 					g_offsetI[channel->channelIndex] = waveformParameters.amplitude;
+					g_isDcSetI[channel->channelIndex] = false;
 				} else {
+					g_dutyCycleI[channel->channelIndex] = g_dutyCycle;
+					g_phiI[channel->channelIndex] = 2.0 * M_PI * waveformParameters.phaseShift / 360.0f;
+					g_dphiI[channel->channelIndex] = 2.0 * M_PI * waveformParameters.frequency * PERIOD;
 					g_amplitudeI[channel->channelIndex] = waveformParameters.amplitude;
 					g_offsetI[channel->channelIndex] = waveformParameters.offset;
 				}
@@ -1836,7 +1855,7 @@ void reloadWaveformParameters() {
 					if (channel->getCurrentRangeSelectionMode() == CURRENT_RANGE_SELECTION_USE_BOTH) {
 						float max = getMax(waveformParameters);
 
-						g_savedCurrentLimit[i] = channel->getCurrentLimit();
+						g_savedCurrentLimit[channel->channelIndex] = channel->getCurrentLimit();
 
 						if (max > 0.05f) {
 							channel_dispatcher::setCurrentRangeSelectionMode(*channel, CURRENT_RANGE_SELECTION_ALWAYS_HIGH);
@@ -1844,7 +1863,7 @@ void reloadWaveformParameters() {
 							channel_dispatcher::setCurrentRangeSelectionMode(*channel, CURRENT_RANGE_SELECTION_ALWAYS_LOW);
 						}
 
-						g_currentRangeModified[i] = true;
+						g_currentRangeModified[channel->channelIndex] = true;
 					}
 				}
 			}
@@ -1853,6 +1872,16 @@ void reloadWaveformParameters() {
 #endif
 		}
 	}
+
+	g_funcGenChannelIndex = 0;
+
+#if defined(EEZ_PLATFORM_STM32)
+	g_tickCountAtStart = g_tickCount;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	g_tickCountAtStart = millis() * 1 / (1000 * PERIOD);
+#endif
 }
 
 void tick() {
@@ -1866,7 +1895,23 @@ void tick() {
 
 	int trackingChannel = -1;
 
-	for (int i = 0; i < CH_NUM; i++) {
+	uint64_t tickCount;
+
+#if defined(EEZ_PLATFORM_STM32)
+	tickCount = g_tickCount;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	tickCount = millis() * 1 / (1000 * PERIOD);
+#endif
+
+	uint64_t tickDiff = tickCount - g_tickCountAtStart;
+
+	static const int MAX_VALUE_CHANGES_PER_TICK = 2;
+	int n = MAX_VALUE_CHANGES_PER_TICK;
+	for (int j = 0; j < CH_NUM && n > 0; j++) {
+		int i = g_funcGenChannelIndex;
+		g_funcGenChannelIndex = (g_funcGenChannelIndex + 1) % CH_NUM;
 		Channel &channel = Channel::get(i);
 
 		if (channel.flags.trackingEnabled) {
@@ -1880,60 +1925,68 @@ void tick() {
 		}
 
 		if (channel.flags.voltageTriggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-			g_dutyCycle = g_dutyCycleU[i];
-			float value = g_offsetU[i] + g_amplitudeU[i] * g_waveFormFuncU[i](g_phiU[i]) / 2.0f;
+			if (g_waveFormFuncU[i] != dcf || !g_isDcSetU[i]) {
+				g_dutyCycle = g_dutyCycleU[i];
+				float phi = fmod(g_phiU[i] + tickDiff * g_dphiU[i], 2.0f * M_PI_F);
+				float value = g_offsetU[i] + g_amplitudeU[i] * g_waveFormFuncU[i](phi) / 2.0f;
 
-			g_phiU[i] += g_dphiU[i];
-			while (g_phiU[i] >= 2.0f * M_PI_F) {
-				g_phiU[i] -= 2.0f * M_PI_F;
-			}
+				if (channel_dispatcher::getUSet(channel) != value) {
+					if (!io_pins::isInhibited()) {
+						if (channel.isVoltageLimitExceeded(value)) {
+							g_errorChannelIndex = channel.channelIndex;
+							psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED));
+							trigger::abort();
+							return;
+						}
 
-			if (!io_pins::isInhibited()) {
-				if (channel.isVoltageLimitExceeded(value)) {
-					g_errorChannelIndex = channel.channelIndex;
-					psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED));
-					trigger::abort();
-					return;
+						int err;
+						if (channel.isPowerLimitExceeded(value, channel.i.set, &err)) {
+							g_errorChannelIndex = channel.channelIndex;
+							psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(err));
+							trigger::abort();
+							return;
+						}
+
+						channel_dispatcher::setVoltage(channel, value);
+						g_isDcSetU[i] = true;
+						n--;
+					}
+				} else {
+					g_isDcSetU[i] = true;
 				}
-
-				int err;
-				if (channel.isPowerLimitExceeded(value, channel.i.set, &err)) {
-					g_errorChannelIndex = channel.channelIndex;
-					psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(err));
-					trigger::abort();
-					return;
-				}
-
-				channel_dispatcher::setVoltage(channel, value);
 			}
 		}
 
 		if (channel.flags.currentTriggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
-			g_dutyCycle = g_dutyCycleI[i];
-			float value = g_offsetI[i] + g_amplitudeI[i] * g_waveFormFuncI[i](g_phiI[i]) / 2.0f;
+			if (g_waveFormFuncI[i] != dcf || !g_isDcSetI[i]) {
+				g_dutyCycle = g_dutyCycleI[i];
+				float phi = fmod(g_phiI[i] + tickDiff * g_dphiI[i], 2.0f * M_PI_F);
+				float value = g_offsetI[i] + g_amplitudeI[i] * g_waveFormFuncI[i](phi) / 2.0f;
 
-			g_phiI[i] += g_dphiI[i];
-			if (g_phiI[i] >= 2.0f * M_PI_F) {
-				g_phiI[i] -= 2.0f * M_PI_F;
-			}
+				if (channel_dispatcher::getISet(channel) != value) {
+					if (!io_pins::isInhibited()) {
+						if (channel.isCurrentLimitExceeded(value)) {
+							g_errorChannelIndex = channel.channelIndex;
+							psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED));
+							trigger::abort();
+							return;
+						}
 
-			if (!io_pins::isInhibited()) {
-				if (channel.isCurrentLimitExceeded(value)) {
-					g_errorChannelIndex = channel.channelIndex;
-					psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(SCPI_ERROR_CURRENT_LIMIT_EXCEEDED));
-					trigger::abort();
-					return;
+						int err;
+						if (channel.isPowerLimitExceeded(channel.u.set, value, &err)) {
+							g_errorChannelIndex = channel.channelIndex;
+							psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(err));
+							trigger::abort();
+							return;
+						}
+
+						channel_dispatcher::setCurrent(channel, value);
+						g_isDcSetI[i] = true;
+						n--;
+					}
+				} else {
+					g_isDcSetI[i] = true;
 				}
-
-				int err;
-				if (channel.isPowerLimitExceeded(channel.u.set, value, &err)) {
-					g_errorChannelIndex = channel.channelIndex;
-					psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(err));
-					trigger::abort();
-					return;
-				}
-
-				channel_dispatcher::setCurrent(channel, value);
 			}
 		}
 
@@ -1952,6 +2005,8 @@ void tick() {
 			}
 		}
 	}
+
+	
 }
 
 void abort() {
@@ -1970,6 +2025,36 @@ void abort() {
 			}
 		}
 	}
+}
+
+void tickGui() {
+	// // change m_selectedItem to the currently selected channel in max view
+	// if (psu::gui::getActivePageId() == PAGE_ID_MAIN && persist_conf::isMaxView()) {
+	// 	int maxSlotIndex = persist_conf::getMaxSlotIndex();
+	// 	int maxSubchannelIndex = persist_conf::getMaxSubchannelIndex();
+
+	// 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
+	// 	int slotIndex;
+	// 	int subchannelIndex;
+	// 	int resourceIndex;
+	// 	AllResources::findResource(waveformParameters.absoluteResourceIndex,
+	// 		slotIndex, subchannelIndex, resourceIndex);
+
+	// 	if (slotIndex != maxSlotIndex || (maxSubchannelIndex != -1 && subchannelIndex != maxSubchannelIndex)) {
+	// 		for (int i = 0; i < g_selectedResources.m_numResources; i++) {
+	// 			auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[i];
+	// 			int slotIndex;
+	// 			int subchannelIndex;
+	// 			int resourceIndex;
+	// 			AllResources::findResource(waveformParameters.absoluteResourceIndex,
+	// 				slotIndex, subchannelIndex, resourceIndex);
+	// 			if (slotIndex == maxSlotIndex && (maxSubchannelIndex == -1 || maxSubchannelIndex == subchannelIndex)) {
+	// 				g_functionGeneratorPage.m_selectedItem = i;
+	// 				break;
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 } // namespace function_generator
@@ -2171,15 +2256,16 @@ void data_function_generator_selected_item_label(DataOperationEnum operation, Cu
 			g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].absoluteResourceIndex,
 			slotIndex, subchannelIndex, resourceIndex
 		);
-		value = g_slots[slotIndex]->getFunctionGeneratorResourceLabel(subchannelIndex, resourceIndex);
+		value = Value((int)((slotIndex << 6) | (subchannelIndex << 1) | resourceIndex),
+			g_slots[slotIndex]->getFunctionGeneratorResourceLabel(subchannelIndex, resourceIndex));
 	}
 }
 
 
 void data_function_generator_item_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
-		if (operation == DATA_OPERATION_GET) {
-			value = g_functionGeneratorPage.m_selectedItem == cursor;
-		}
+	if (operation == DATA_OPERATION_GET) {
+		value = g_functionGeneratorPage.m_selectedItem == cursor;
+	}
 }
 
 void action_function_generator_item_toggle_selected() {
