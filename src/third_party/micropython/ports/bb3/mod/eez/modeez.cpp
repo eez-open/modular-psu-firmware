@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include <eez/index.h>
-#include <eez/mp.h>
+#include <eez/scripting.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -44,7 +44,7 @@ extern "C" {
 #pragma warning( pop ) 
 #endif
 
-using namespace eez::mp;
+using namespace eez::scripting;
 using namespace eez::psu;
 
 mp_obj_t modeez_scpi(mp_obj_t commandOrQueryText) {

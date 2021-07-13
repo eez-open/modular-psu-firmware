@@ -20,7 +20,8 @@
 #include <stdio.h>
 
 #include <eez/firmware.h>
-#include <eez/mp.h>
+#include <eez/flow.h>
+#include <eez/scripting.h>
 #include <eez/system.h>
 #include <eez/sound.h>
 
@@ -57,7 +58,7 @@ extern "C" {
 #endif
 
 namespace eez {
-namespace mp {
+namespace scripting {
 
 void mainLoop(const void *);
 
@@ -186,89 +187,115 @@ void mainLoop(const void *) {
 }
 
 enum {
-    QUEUE_MESSAGE_START_SCRIPT,
+    QUEUE_MESSAGE_START_MP_SCRIPT,
+	QUEUE_MESSAGE_START_FLOW_SCRIPT,
     QUEUE_MESSAGE_SCPI_RESULT
 };
+
+void startMpScript() {
+	char scriptName[64];
+	getFileName(g_scriptPath, scriptName, sizeof(scriptName));
+	InfoTrace("Script started: %s\n", scriptName);
+
+#if 1
+	// this version reinitialise MP every time
+
+	volatile char dummy;
+	mp_stack_set_top((void *)&dummy);
+	gc_init(g_scriptSource + MAX_SCRIPT_LENGTH, MP_BUFFER + MP_BUFFER_SIZE - MAX_SCRIPT_LENGTH);
+	mp_init();
+
+	bool wasException = false;
+
+	nlr_buf_t nlr;
+	if (nlr_push(&nlr) == 0) {
+		mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, g_scriptSource, g_scriptSourceLength, 0);
+		qstr source_name = lex->source_name;
+		mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
+		mp_obj_t module_fun = mp_compile(&parse_tree, source_name/*, MP_EMIT_OPT_NONE*/, true);
+		mp_call_function_0(module_fun);
+		nlr_pop();
+	} else {
+		// uncaught exception
+		mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
+		onUncaughtScriptExceptionHook();
+		wasException = true;
+	}
+
+	gc_sweep_all();
+	mp_deinit();
+#endif
+
+#if 0
+	// this version doesn't reinitialise MP every time
+
+	static bool g_initialized = false;
+	if (!g_initialized) {
+		volatile char dummy;
+		g_initialized = true;
+		mp_stack_set_top((void *)&dummy);
+		gc_init(g_scriptSource + MAX_SCRIPT_LENGTH, MP_BUFFER + MP_BUFFER_SIZE - MAX_SCRIPT_LENGTH);
+		mp_init();
+	}
+
+	nlr_buf_t nlr;
+	if (nlr_push(&nlr) == 0) {
+		mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, g_scriptSource, g_scriptSourceLength, 0);
+		qstr source_name = lex->source_name;
+		mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
+		mp_obj_t module_fun = mp_compile(&parse_tree, source_name/*, MP_EMIT_OPT_NONE*/, true);
+		//DebugTrace("T3 %d\n", millis());
+		mp_call_function_0(module_fun);
+		nlr_pop();
+	} else {
+		// uncaught exception
+		mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
+		onUncaughtScriptExceptionHook();
+	}
+#endif
+
+	psu::gui::hideAsyncOperationInProgress();
+	psu::gui::clearTextMessage();
+
+	g_state = STATE_IDLE;
+
+	InfoTrace("Script ended: %s\n", scriptName);
+
+	if (g_autoStartScriptIsRunning) {
+		g_autoStartScriptIsRunning = false;
+		if (wasException) {
+			psu::gui::showMainPage();
+		}
+	}
+}
+
+void startFlowScript() {
+	char scriptName[64];
+	getFileName(g_scriptPath, scriptName, sizeof(scriptName));
+	InfoTrace("App started: %s\n", scriptName);
+
+	flow::run();
+
+	psu::gui::hideAsyncOperationInProgress();
+	psu::gui::clearTextMessage();
+
+	g_state = STATE_IDLE;
+
+	InfoTrace("App ended: %s\n", scriptName);
+
+	if (g_autoStartScriptIsRunning) {
+		g_autoStartScriptIsRunning = false;
+	}
+}
 
 void oneIter() {
     osEvent event = osMessageGet(g_mpMessageQueueId, osWaitForever);
     if (event.status == osEventMessage) {
-        if (event.value.v == QUEUE_MESSAGE_START_SCRIPT) {
-            char scriptName[64];
-            getFileName(g_scriptPath, scriptName, sizeof(scriptName));
-            InfoTrace("Script started: %s\n", scriptName);
-
-#if 1
-        	// this version reinitialise MP every time
-
-			volatile char dummy;
-			mp_stack_set_top((void *)&dummy);
-			gc_init(g_scriptSource + MAX_SCRIPT_LENGTH, MP_BUFFER + MP_BUFFER_SIZE - MAX_SCRIPT_LENGTH);
-			mp_init();
-
-            bool wasException = false;
-
-            nlr_buf_t nlr;
-            if (nlr_push(&nlr) == 0) {
-                mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, g_scriptSource, g_scriptSourceLength, 0);
-                qstr source_name = lex->source_name;
-                mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
-                mp_obj_t module_fun = mp_compile(&parse_tree, source_name/*, MP_EMIT_OPT_NONE*/, true);
-                mp_call_function_0(module_fun);
-                nlr_pop();
-            } else {
-                // uncaught exception
-                mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
-                onUncaughtScriptExceptionHook();
-                wasException = true;
-            }
-
-            gc_sweep_all();
-            mp_deinit();
-#endif
-
-#if 0
-        	// this version doesn't reinitialise MP every time
-
-			static bool g_initialized = false;
-			if (!g_initialized) {
-				volatile char dummy;
-				g_initialized = true;
-				mp_stack_set_top((void *)&dummy);
-				gc_init(g_scriptSource + MAX_SCRIPT_LENGTH, MP_BUFFER + MP_BUFFER_SIZE - MAX_SCRIPT_LENGTH);
-				mp_init();
-			}
-
-			nlr_buf_t nlr;
-			if (nlr_push(&nlr) == 0) {
-				mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, g_scriptSource, g_scriptSourceLength, 0);
-				qstr source_name = lex->source_name;
-				mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
-				mp_obj_t module_fun = mp_compile(&parse_tree, source_name/*, MP_EMIT_OPT_NONE*/, true);
-                //DebugTrace("T3 %d\n", millis());
-				mp_call_function_0(module_fun);
-				nlr_pop();
-			} else {
-				// uncaught exception
-				mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
-                onUncaughtScriptExceptionHook();
-			}
-#endif
-
-            psu::gui::hideAsyncOperationInProgress();
-            psu::gui::clearTextMessage();
-
-            g_state = STATE_IDLE;
-
-            InfoTrace("Script ended: %s\n", scriptName);
-
-            if (g_autoStartScriptIsRunning) {
-                g_autoStartScriptIsRunning = false;
-                if (wasException) {
-                    psu::gui::showMainPage();
-                }
-            }
-        }
+		if (event.value.v == QUEUE_MESSAGE_START_MP_SCRIPT) {
+			startMpScript();
+		} else if (event.value.v == QUEUE_MESSAGE_START_FLOW_SCRIPT) {
+			startFlowScript();
+		}
     }
 }
 
@@ -293,7 +320,7 @@ void doStopScript() {
 	startThread();
 }
 
-bool loadScript(int *err = nullptr) {
+bool loadMpScript(int *err) {
     uint32_t fileSize;
     uint32_t bytesRead;
 
@@ -332,7 +359,7 @@ bool loadScript(int *err = nullptr) {
 
     g_scriptSourceLength = fileSize;
 
-    osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_SCRIPT, osWaitForever);
+    osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_MP_SCRIPT, osWaitForever);
 
     return true;
 
@@ -341,17 +368,42 @@ Error:
 
 ErrorNoClose:
     psu::gui::hideAsyncOperationInProgress();
-
     g_state = STATE_IDLE;
-
 	if (g_autoStartScriptIsRunning) {
 		g_autoStartScriptIsRunning = false;
 		psu::gui::showMainPage();
 	}
-
 	gui::refreshScreen();
 
     return false;
+}
+
+bool loadApp(int *err) {
+	if (eez::gui::loadExternalAssets(g_scriptPath, err) && psu::gui::g_psuAppContext.dialogOpen(err)) {
+		osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_FLOW_SCRIPT, osWaitForever);
+        return true;
+    }
+
+	char scriptName[64];
+	getFileName(g_scriptPath, scriptName, sizeof(scriptName));
+	ErrorTrace("App error: %s\n", scriptName);
+
+	psu::gui::hideAsyncOperationInProgress();
+	g_state = STATE_IDLE;
+	if (g_autoStartScriptIsRunning) {
+		g_autoStartScriptIsRunning = false;
+		psu::gui::showMainPage();
+	}
+	gui::refreshScreen();
+	return false;
+}
+
+bool loadScript(int *err = nullptr) {
+	if (endsWithNoCase(g_scriptPath, ".py")) {
+		return loadMpScript(err);
+	} {
+		return loadApp(err);
+	}
 }
 
 bool startScript(const char *filePath, int *err) {
@@ -578,11 +630,11 @@ bool readProfileProperties(psu::profile::ReadContext &ctx, psu::profile::Paramet
 	return false;
 }
 
-} // mp
+} // scripting
 
 namespace gui {
 
-using namespace ::eez::mp;
+using namespace ::eez::scripting;
 using namespace ::eez::psu::gui;
 
 void data_sys_settings_scripting_auto_start_script(DataOperationEnum operation, Cursor cursor, Value &value) {

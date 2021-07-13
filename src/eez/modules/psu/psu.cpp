@@ -28,7 +28,7 @@
 #include <eez/sound.h>
 #include <eez/index.h>
 #include <eez/util.h>
-#include <eez/mp.h>
+#include <eez/scripting.h>
 
 #include <eez/scpi/scpi.h>
 
@@ -1131,7 +1131,7 @@ bool psuReset() {
 	function_generator::reset();
 
 	//
-	mp::resetSettings();
+	scripting::resetSettings();
 
     // SYST:POW ON
     if (powerUp()) {

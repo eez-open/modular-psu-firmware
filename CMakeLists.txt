@@ -16,7 +16,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 endif()
 
 add_definitions(-DFIRMWARE_VERSION_MAJOR=1)
-add_definitions(-DFIRMWARE_VERSION_MINOR=7.1)
+add_definitions(-DFIRMWARE_VERSION_MINOR=7.2)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[png]'")
@@ -98,6 +98,7 @@ set(src_eez
     src/eez/debug.cpp
     src/eez/dlog_file.cpp
     src/eez/file_type.cpp
+    src/eez/flow.cpp
     src/eez/fs_driver.cpp
     src/eez/function_generator.cpp
     src/eez/hmi.cpp
@@ -106,8 +107,8 @@ set(src_eez
     src/eez/main.cpp
     src/eez/memory.cpp
     src/eez/mouse.cpp
-    src/eez/mp.cpp
     src/eez/mqtt.cpp
+    src/eez/scripting.cpp
     src/eez/sound.cpp
     src/eez/system.cpp
     src/eez/tasks.cpp
@@ -122,6 +123,8 @@ set(header_eez
     src/eez/debug.h
     src/eez/dlog_file.h
     src/eez/file_type.h
+    src/eez/flow.h
+    src/eez/flow_defs_v3.h
     src/eez/fs_driver.h
     src/eez/function_generator.h
     src/eez/hmi.h
@@ -129,8 +132,8 @@ set(header_eez
     src/eez/keyboard.h
     src/eez/memory.h
     src/eez/mouse.h
-    src/eez/mp.h
     src/eez/mqtt.h
+    src/eez/scripting.h
     src/eez/sound.h
     src/eez/system.h
     src/eez/tasks.h
@@ -295,6 +298,7 @@ list (APPEND src_files ${src_eez_gui})
 set(header_eez_gui
     src/eez/gui/app_context.h
     src/eez/gui/assets.h
+    src/eez/gui/assets_ptr.h
     src/eez/gui/data.h
     src/eez/gui/document.h
     src/eez/gui/document_simulator.h

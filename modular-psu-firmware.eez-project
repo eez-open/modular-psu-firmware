@@ -1,7 +1,7 @@
 {
   "settings": {
     "general": {
-      "projectVersion": "v2",
+      "projectVersion": "v3",
       "projectType": "master",
       "scpiDocFolder": "docs\\SCPI reference guide\\Commands",
       "imports": [
@@ -39,12 +39,12 @@
         {
           "name": "stm32",
           "description": "Modular PSU",
-          "properties": "{\n  \"connection\": {\n    \"ethernet\": {\n      \"port\": 5025\n    },\n    \"serial\": {\n      \"baudRates\": [9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000],\n      \"defaultBaudRate\": 115200\n    }\n  },\n  \"channels\": [\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    },\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    }\n  ],\n  \"lists\": {\n    \"maxPoints\": 256,\n    \"minDwell\": 0.0001,\n    \"maxDwell\": 65535,\n    \"dwellDigits\": 4,\n    \"voltageDigits\": 3,\n    \"currentDigits\": 3\n  },\n  \"fileDownload\": {\n    \"shortFileName\": false,\n    \"startCommand\": \"MMEM:DOWN:FNAMe <file>\",\n    \"fileSizeCommand\": \"MMEM:DOWN:SIZE <filesize>\",\n    \"sendChunkCommand\": \"MMEM:DOWN:DATA <chunk>\",\n    \"finishCommand\": \"MMEM:DOWN:FNAMe \\\"\\\"\",\n    \"abortCommand\": \"MMEM:DOWN:ABORt\",\n    \"chunkSize\": 4096,\n    \"favoriteDestinationPaths\": [\n        { \"path\": \"/\"},\n        { \"ext\": \".list\", \"path\": \"/Lists\"},\n        { \"ext\": \".profile\", \"path\": \"/Profiles\" },\n        { \"ext\": \"py\", \"path\": \"/Scripts\" },\n        { \"ext\": \"res\", \"path\": \"/Scripts\" },\n        { \"ext\": \"hex\", \"path\": \"/Updates\" },\n        { \"ext\": \"dlog\", \"path\": \"/Recordings\" }\n   ]\n  }\n}"
+          "properties": "{\n  \"connection\": {\n    \"ethernet\": {\n      \"port\": 5025\n    },\n    \"serial\": {\n      \"baudRates\": [9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000],\n      \"defaultBaudRate\": 115200\n    }\n  },\n  \"channels\": [\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    },\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    }\n  ],\n  \"lists\": {\n    \"maxPoints\": 256,\n    \"minDwell\": 0.0001,\n    \"maxDwell\": 65535,\n    \"dwellDigits\": 4,\n    \"voltageDigits\": 3,\n    \"currentDigits\": 3\n  },\n  \"fileDownload\": {\n    \"shortFileName\": false,\n    \"startCommand\": \"MMEM:DOWN:FNAMe <file>\",\n    \"fileSizeCommand\": \"MMEM:DOWN:SIZE <filesize>\",\n    \"sendChunkCommand\": \"MMEM:DOWN:DATA <chunk>\",\n    \"finishCommand\": \"MMEM:DOWN:FNAMe \\\"\\\"\",\n    \"abortCommand\": \"MMEM:DOWN:ABORt\",\n    \"chunkSize\": 4096,\n    \"favoriteDestinationPaths\": [\n        { \"path\": \"/\"},\n        { \"ext\": \".list\", \"path\": \"/Lists\"},\n        { \"ext\": \".profile\", \"path\": \"/Profiles\" },\n        { \"ext\": \"py\", \"path\": \"/Scripts\" },\n        { \"ext\": \"res\", \"path\": \"/Scripts\" },\n        { \"ext\": \"app\", \"path\": \"/Scripts\" },\n        { \"ext\": \"hex\", \"path\": \"/Updates\" },\n        { \"ext\": \"dlog\", \"path\": \"/Recordings\" }\n   ]\n  }\n}"
         },
         {
           "name": "simulator",
           "description": "Cross-platfrom simulator for EEZ PSU",
-          "properties": "{\n  \"connection\": {\n    \"ethernet\": {\n      \"port\": 5025\n    },\n    \"serial\": {\n      \"baudRates\": [9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000],\n      \"defaultBaudRate\": 115200\n    }\n  },\n  \"channels\": [\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    },\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    }\n  ],\n  \"lists\": {\n    \"maxPoints\": 256,\n    \"minDwell\": 0.0001,\n    \"maxDwell\": 65535,\n    \"dwellDigits\": 4,\n    \"voltageDigits\": 3,\n    \"currentDigits\": 3\n  },\n  \"fileDownload\": {\n    \"shortFileName\": false,\n    \"startCommand\": \"MMEM:DOWN:FNAMe <file>\",\n    \"fileSizeCommand\": \"MMEM:DOWN:SIZE <filesize>\",\n    \"sendChunkCommand\": \"MMEM:DOWN:DATA <chunk>\",\n    \"finishCommand\": \"MMEM:DOWN:FNAMe \\\"\\\"\",\n    \"abortCommand\": \"MMEM:DOWN:ABORt\",\n    \"chunkSize\": 1024,\n    \"favoriteDestinationPaths\": [\n        { \"path\": \"/\"},\n        { \"ext\": \".list\", \"path\": \"/Lists\"},\n        { \"ext\": \".profile\", \"path\": \"/Profiles\" },\n        { \"ext\": \"py\", \"path\": \"/Scripts\" },\n        { \"ext\": \"res\", \"path\": \"/Scripts\" },\n        { \"ext\": \"hex\", \"path\": \"/Updates\" },\n        { \"ext\": \"dlog\", \"path\": \"/Recordings\" }\n    ]\n  }\n}"
+          "properties": "{\n  \"connection\": {\n    \"ethernet\": {\n      \"port\": 5025\n    },\n    \"serial\": {\n      \"baudRates\": [9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000],\n      \"defaultBaudRate\": 115200\n    }\n  },\n  \"channels\": [\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    },\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    }\n  ],\n  \"lists\": {\n    \"maxPoints\": 256,\n    \"minDwell\": 0.0001,\n    \"maxDwell\": 65535,\n    \"dwellDigits\": 4,\n    \"voltageDigits\": 3,\n    \"currentDigits\": 3\n  },\n  \"fileDownload\": {\n    \"shortFileName\": false,\n    \"startCommand\": \"MMEM:DOWN:FNAMe <file>\",\n    \"fileSizeCommand\": \"MMEM:DOWN:SIZE <filesize>\",\n    \"sendChunkCommand\": \"MMEM:DOWN:DATA <chunk>\",\n    \"finishCommand\": \"MMEM:DOWN:FNAMe \\\"\\\"\",\n    \"abortCommand\": \"MMEM:DOWN:ABORt\",\n    \"chunkSize\": 1024,\n    \"favoriteDestinationPaths\": [\n        { \"path\": \"/\"},\n        { \"ext\": \".list\", \"path\": \"/Lists\"},\n        { \"ext\": \".profile\", \"path\": \"/Profiles\" },\n        { \"ext\": \"py\", \"path\": \"/Scripts\" },\n        { \"ext\": \"res\", \"path\": \"/Scripts\" },\n        { \"ext\": \"app\", \"path\": \"/Scripts\" },\n        { \"ext\": \"hex\", \"path\": \"/Updates\" },\n        { \"ext\": \"dlog\", \"path\": \"/Recordings\" }\n    ]\n  }\n}"
         }
       ],
       "files": [
@@ -59332,13 +59332,13 @@
           "encoding": 149,
           "x": 0,
           "y": 0,
-          "width": 0,
-          "height": 0,
-          "dx": 8,
+          "width": 33,
+          "height": 33,
+          "dx": 33,
           "glyphBitmap": {
-            "height": 0,
-            "pixelArray": "",
-            "width": 0
+            "width": 33,
+            "height": 33,
+            "pixelArray": "0000000000000000000000000000000000000000000000049bfbffffffffffe84300000000000000000000000000000000000000000000005bffffffffffffffffe500000000000000000000000000000000000000000000007ffff9726d6d6dabffff0000000000000000000000000000000000001b7b888888c3fff5090000006dffff000000000000000000000000000000000014e0fffffffffffff5090000006dffff00000000000000000000000000000000005cfffff2f1f1f7fff5090000006dffff000000000000000000000000000000000064ffff1f050581fff61209090972ffff000000000000000000000000000000000064ffff1b000076fffef6f5f5f5f9fffb000000000000000000000000000000000064ffff1b00001fe8ffffffffffffff9a0c7fa4a4a4a4a4a4a4a4a4a48b1800000064ffff1b0000001c767f7f7f7f7f5b04b4ffffffffffffffffffffffffcf05000064ffff1b000000000000000000000000fdffe9dadadadadadadadae4ffff32000064ffff1b000000083f48484848482800ffff6d000000000000000048ffff36000064ffff1b00000fcafffffffffffffc6affff6d000000000000000048ffff36000064ffff1b00006bfffffffffffffffff4ffff6d000000000000000048ffff36000064ffff1b00007ffff73d3636368bffffffff6d000000000000000048ffffccbfbfd7ffffc5bfbfdefff5090000006dffffffff6d000000000000000048fffffffffffffffffffffffffff5090000006dffffffff6d000000000000000048ffffccbfbfd7ffffc5bfbfdefff5090000006dffffffff6d000000000000000048ffff36000064ffff1b00007ffff73d3636368bffffffff6d000000000000000048ffff36000064ffff1b00006bfffffffffffffffff4ffff6d000000000000000048ffff36000064ffff1b00000fc6fffffffffffffc6efdffe9dadadadadadadadae4ffff32000064ffff1b000000063f48484848482700b4ffffffffffffffffffffffffd305000064ffff1b0000000000000000000000000b7ca4a4a4a4a4a4a4a4a4a48b1800000064ffff1b0000001f767f7f7f7f7f5b04000000000000000000000000000000000064ffff1b00001fe8ffffffffffffff96000000000000000000000000000000000064ffff1b000076fffef6f5f5f5f9fffb000000000000000000000000000000000064ffff1f050581fff61209090972ffff00000000000000000000000000000000005cfffff2f1f1f7fff5090000006dffff000000000000000000000000000000000014dffffffffffffff5090000006dffff000000000000000000000000000000000000177b888888c3fff5090000006dffff00000000000000000000000000000000000000000000007ffff9726d6d6dabffff00000000000000000000000000000000000000000000005bffffffffffffffffe700000000000000000000000000000000000000000000000496fbffffffffffe744"
           },
           "source": {
             "filePath": "fonts\\Oswald-Medium.ttf",
@@ -63727,6 +63727,24 @@
             "size": 40,
             "encoding": 61703
           }
+        },
+        {
+          "encoding": 143,
+          "x": 0,
+          "y": -2,
+          "width": 56,
+          "height": 56,
+          "dx": 56,
+          "glyphBitmap": {
+            "width": 56,
+            "height": 56,
+            "pixelArray": "000000000000000000000000000000000000000000000000000000000000000000000000000000000054dbffffffffffffffffffffdb53000000000000000000000000000000000000000000000000000000000000000000000000000000000054fbfffffffffffffffffffffffffb4900000000000000000000000000000000000000000000000000000000000000000000000000000002dbffffffffffffffffffffffffffffda0000000000000000000000000000000000000000000000000000000000000000000000000000001effffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000000000000000000001effffffff371e1e1e1e1e1e37ffffffff0000000000000000000000000000000000000000000000000000000000000000021e1e1e1e1e1e37ffffffff1e0000000000001effffffff0000000000000000000000000000000000000000000000000000000000000054dbffffffffffffffffffffff1e0000000000001effffffff00000000000000000000000000000000000000000000000000000000000054fbffffffffffffffffffffffff1e0000000000001effffffff000000000000000000000000000000000000000000000000000000000002dbffffffffffffffffffffffffff1e0000000000001effffffff00000000000000000000000000000000000000000000000000000000001effffffffffffffffffffffffffff1e0000000000001effffffff00000000000000000000000000000000000000000000000000000000001effffffff371e1e1e1e37ffffffff1e0000000000001effffffff00000000000000000000000000000000000000000000000000000000001effffffff1e000000001effffffff371e1e1e1e1e1e37ffffffff00000000000000000000000000000000000000000000000000000000001effffffff1e000000001effffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000001effffffff1e0000000002dbffffffffffffffffffffffffffffdb00000000000000000000000000000000000000000000000000000000001effffffff1e000000000053fbfffffffffffffffffffffffffb530000021e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e02000000000000001effffffff1e00000000000049daffffffffffffffffffffdb53000054dbffffffffffffffffffffffffffffffffffffdb530000000000001effffffff1e00000000000000021e1e1e1e1e1e1e1e1e1e02000054fbfffffffffffffffffffffffffffffffffffffffffb4900000000001effffffff1e000000000000000000000000000000000000000000dbffffffffffffffffffffffffffffffffffffffffffffda02000000001effffffff1e000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffff1e000000001effffffff1e00000000000000021e1e1e1e1e1e1e1e1e1e020000ffffffff371e1e1e1e1e1e1e1e1e1e1e1e1e1e37ffffffff1e000000001effffffff1e00000000000054dbffffffffffffffffffffdb5300ffffffff1e00000000000000000000000000001effffffff1e000000001effffffff1e000000000054fbfffffffffffffffffffffffffb49ffffffff1e00000000000000000000000000001effffffff1e000000001effffffff1e0000000002dbffffffffffffffffffffffffffffdaffffffff1e00000000000000000000000000001effffffff1e000000001effffffff1e000000001effffffffffffffffffffffffffffffffffffffff1e00000000000000000000000000001effffffff1e000000001effffffff1e000000001effffffff371e1e1e1e1e1e37ffffffffffffffff1e00000000000000000000000000001effffffff371e1e1e1e37ffffffff371e1e1e1e37ffffffff1e0000000000001effffffffffffffff1e00000000000000000000000000001effffffffffffffffffffffffffffffffffffffffffffffff1e0000000000001effffffffffffffff1e00000000000000000000000000001effffffffffffffffffffffffffffffffffffffffffffffff1e0000000000001effffffffffffffff1e00000000000000000000000000001effffffffffffffffffffffffffffffffffffffffffffffff1e0000000000001effffffffffffffff1e00000000000000000000000000001effffffffffffffffffffffffffffffffffffffffffffffff1e0000000000001effffffffffffffff1e00000000000000000000000000001effffffff371e1e1e1e37ffffffff371e1e1e1e37ffffffff1e0000000000001effffffffffffffff1e00000000000000000000000000001effffffff1e000000001effffffff1e000000001effffffff371e1e1e1e1e1e37ffffffffffffffff1e00000000000000000000000000001effffffff1e000000001effffffff1e000000001effffffffffffffffffffffffffffffffffffffff1e00000000000000000000000000001effffffff1e000000001effffffff1e0000000002dbffffffffffffffffffffffffffffdbffffffff1e00000000000000000000000000001effffffff1e000000001effffffff1e000000000053fbfffffffffffffffffffffffffb53ffffffff371e1e1e1e1e1e1e1e1e1e1e1e1e1e37ffffffff1e000000001effffffff1e00000000000049daffffffffffffffffffffdb5300ffffffffffffffffffffffffffffffffffffffffffffffff1e000000001effffffff1e00000000000000021e1e1e1e1e1e1e1e1e1e020000dbffffffffffffffffffffffffffffffffffffffffffffdb02000000001effffffff1e00000000000000000000000000000000000000000053fbfffffffffffffffffffffffffffffffffffffffffb5300000000001effffffff1e0000000000000000000000000000000000000000000049daffffffffffffffffffffffffffffffffffffdb530000000000001effffffff1e00000000000000021e1e1e1e1e1e1e1e1e1e0200000000021e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e02000000000000001effffffff1e00000000000054dbffffffffffffffffffffdb530000000000000000000000000000000000000000000000000000000000001effffffff1e000000000054fbfffffffffffffffffffffffffb4900000000000000000000000000000000000000000000000000000000001effffffff1e0000000002dbffffffffffffffffffffffffffffda00000000000000000000000000000000000000000000000000000000001effffffff1e000000001effffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000001effffffff1e000000001effffffff371e1e1e1e1e1e37ffffffff00000000000000000000000000000000000000000000000000000000001effffffff371e1e1e1e37ffffffff1e0000000000001effffffff00000000000000000000000000000000000000000000000000000000001effffffffffffffffffffffffffff1e0000000000001effffffff000000000000000000000000000000000000000000000000000000000002dbffffffffffffffffffffffffff1e0000000000001effffffff00000000000000000000000000000000000000000000000000000000000053fbffffffffffffffffffffffff1e0000000000001effffffff0000000000000000000000000000000000000000000000000000000000000049daffffffffffffffffffffff1e0000000000001effffffff0000000000000000000000000000000000000000000000000000000000000000021e1e1e1e1e1e37ffffffff1e0000000000001effffffff0000000000000000000000000000000000000000000000000000000000000000000000000000001effffffff371e1e1e1e1e1e37ffffffff0000000000000000000000000000000000000000000000000000000000000000000000000000001effffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000002dbffffffffffffffffffffffffffffdb0000000000000000000000000000000000000000000000000000000000000000000000000000000053fbfffffffffffffffffffffffffb53000000000000000000000000000000000000000000000000000000000000000000000000000000000049daffffffffffffffffffffdb5300"
+          },
+          "source": {
+            "filePath": "fonts\\webhostinghub-glyphs.ttf",
+            "size": 40,
+            "encoding": 61703
+          }
         }
       ]
     },
@@ -65786,6 +65804,24 @@
             "width": 20,
             "height": 17,
             "pixelArray": "0000000000000034ee6a01000000000000000000000000000000004effffb2150000000000000000000000000000004effffffe74700000000000000000000000000004efffffffffe8f0700000000007e9d9d9d9d9d9dbbffffffffffffd02b00000000fffffffffffffffffffffffffffffff66a010000ffffffffffffffffffffffffffffffffffb21500ffffffffffffffffffffffffffffffffffffe746ffffffffffffffffffffffffffffffffffffffefffffffffffffffffffffffffffffffffffffdf3affffffffffffffffffffffffffffffffffa70f00fffffffffffffffffffffffffffffff25f0000007e9d9d9d9d9d9dbbffffffffffffca2500000000000000000000004efffffffffd88050000000000000000000000004effffffe54300000000000000000000000000004effffb01400000000000000000000000000000034ef6901000000000000000000"
+          },
+          "source": {
+            "filePath": "fonts\\webhostinghub-glyphs.ttf",
+            "size": 6,
+            "encoding": 63078
+          }
+        },
+        {
+          "encoding": 146,
+          "x": 0,
+          "y": 1,
+          "width": 20,
+          "height": 20,
+          "dx": 20,
+          "glyphBitmap": {
+            "width": 20,
+            "height": 20,
+            "pixelArray": "000000000000000000000000000065faffffffa80000000000000000000000000000c0de7878b7ff000000000000000000000ebae5e5f8c1000078ff0000000000000000000050ffae9de7c1000078ff0000000000000000000054ff2f00b9f0c1c1defa1753545454545444010054ff2f0034b9c1c1c065dcffffffffffffff700054ff2f00000000000000ff912f2f2f2f2fea9d0054ff2f004ddde5e5e585ff780000000000e59d0054ff2f00bde79d9dcbfdff780000000000e5e7c1d5ffccc1f0c1000078ffff780000000000e5e7c1d5ffccc1f0c1000078ffff780000000000e59d0054ff2f00bde79d9dcbfdff912f2f2f2f2fea9d0054ff2f004bdde5e5e586dcffffffffffffff710054ff2f000000000000001553545454545444010054ff2f0035b9c1c1c0640000000000000000000054ff2f00b9f0c1c1defa0000000000000000000050ffae9de7c1000078ff000000000000000000000db8e5e5f8c1000078ff0000000000000000000000000000c0de7878b7ff000000000000000000000000000064faffffffa9"
           },
           "source": {
             "filePath": "fonts\\webhostinghub-glyphs.ttf",
@@ -81970,9 +82006,9 @@
       "idn": "Envox,EEZ BB3 (STM32)",
       "idfName": "EEZ BB3 STM32",
       "idfShortName": "EEZ-BB3-STM32",
-      "idfFirmwareVersion": "1.7",
+      "idfFirmwareVersion": "1.7.1",
       "idfGuid": "687b6dee-2093-4c36-afb7-cfc7ea2bf262",
-      "idfRevisionNumber": "1.7.0",
+      "idfRevisionNumber": "1.7.1",
       "idfDescription": "EEZ Bench box 3-module T&M chassis",
       "idfSupportedModels": "EEZ-BB3-STM32",
       "idfRevisionComments": "Initial version",
@@ -81990,9 +82026,9 @@
       "idn": "Envox,EEZ BB3 (Simulator)",
       "idfName": "EEZ BB3 Simulator",
       "idfShortName": "EEZ-BB3-SIM",
-      "idfFirmwareVersion": "1.7",
+      "idfFirmwareVersion": "1.7.1",
       "idfGuid": "7cab6860-e593-4ba2-ee68-57fe84460fa4",
-      "idfRevisionNumber": "1.7.0",
+      "idfRevisionNumber": "1.7.1",
       "idfDescription": "EEZ Bench box 3-module T&M chassis firmware simulator",
       "idfSupportedModels": "EEZ-BB3-SIM",
       "idfRevisionComments": "Initial version",

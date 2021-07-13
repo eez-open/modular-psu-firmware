@@ -29,7 +29,7 @@
 #include <eez/system.h>
 #include <eez/hmi.h>
 #include <eez/keyboard.h>
-#include <eez/mp.h>
+#include <eez/scripting.h>
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif
@@ -190,7 +190,7 @@ void PsuAppContext::stateManagment() {
 
 #if EEZ_PLATFORM_STM32
     if (g_userSwitch.isPressed() && mcu::encoder::isButtonPressed()) {
-        mp::stopScript();
+        scripting::stopScript();
     }
 #endif
 
@@ -233,7 +233,7 @@ void PsuAppContext::stateManagment() {
 			return;
 		}
 
-		if (!mp::isAutoStartEnabled()) {
+		if (!scripting::isAutoStartEnabled()) {
             showPage(getMainPageId());
 			return;
         }
@@ -2585,7 +2585,7 @@ OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor)
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace eez {
-namespace mp {
+namespace scripting {
 
 void onUncaughtScriptExceptionHook() {
     g_psuAppContext.dialogClose();

@@ -20,7 +20,7 @@
 
 #include <eez/file_type.h>
 #include <eez/hmi.h>
-#include <eez/mp.h>
+#include <eez/scripting.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -532,7 +532,7 @@ static void resetProfileToDefaults(Parameters &profile) {
     profile.flags.triggerInitiateAll = 1;
 
 	function_generator::resetProfileParameters(profile);
-    mp::resetProfileParameters(profile);
+    scripting::resetProfileParameters(profile);
 }
 
 static bool repositionSlotsInProfileToMatchCurrentSlotsConfiguration(Parameters &profile) {
@@ -786,7 +786,7 @@ static void saveState(Parameters &profile, List *lists) {
     eez::psu::gui::edit_mode_step::getProfileParameters(profile);
 
 	function_generator::getProfileParameters(profile);
-    mp::getProfileParameters(profile);
+    scripting::getProfileParameters(profile);
 
     profile.flags.isValid = true;
 }
@@ -893,7 +893,7 @@ static bool recallState(Parameters &profile, List *lists, int recallOptions, int
     eez::psu::gui::edit_mode_step::setProfileParameters(profile);
 
 	function_generator::setProfileParameters(profile);
-    mp::setProfileParameters(profile);
+    scripting::setProfileParameters(profile);
 
     return true;
 }
@@ -1150,7 +1150,7 @@ static bool profileWrite(WriteContext &ctx, const Parameters &parameters, List *
 		return false;
 	}
 
-	if (!mp::writeProfileProperties(ctx, parameters)) {
+	if (!scripting::writeProfileProperties(ctx, parameters)) {
 		return false;
 	}
 
@@ -1518,7 +1518,7 @@ static bool profileReadCallback(ReadContext &ctx, Parameters &parameters, List *
 		return true;
 	}
 
-	if (mp::readProfileProperties(ctx, parameters)) {
+	if (scripting::readProfileProperties(ctx, parameters)) {
 		return true;
 	}
 

@@ -26,66 +26,70 @@
 namespace eez {
 
 static const char *fileTypeExtension[] = {
-    nullptr,
-    nullptr,
-    LIST_EXT,
-    PROFILE_EXT,
-    ".dlog",
-    ".jpg",
-    ".py",
-    ".hex",
-    nullptr,
-    nullptr
+    nullptr, // FILE_TYPE_NONE
+    nullptr, // FILE_TYPE_DIRECTORY
+    LIST_EXT, // FILE_TYPE_LIST
+    PROFILE_EXT, // FILE_TYPE_PROFILE
+    ".dlog", // FILE_TYPE_DLOG
+    ".jpg", // FILE_TYPE_IMAGE
+    ".py", // FILE_TYPE_MICROPYTHON
+    ".app", // FILE_TYPE_APP
+    ".hex", // FILE_TYPE_HEX
+    nullptr, // FILE_TYPE_OTHER
+    nullptr // FILE_TYPE_DISK_DRIVE
 };
 
 static const char *scpiFileTypeNames[] = {
-    nullptr,
-    "FOLD",
-    "LIST",
-    "PROF",
-    "DLOG",
-    "IMG",
-    "MP",
-    "HEX",
-    "BIN",
-    nullptr
+    nullptr, // FILE_TYPE_NONE 
+    "FOLD", // FILE_TYPE_DIRECTORY
+    "LIST", // FILE_TYPE_LIST
+    "PROF", // FILE_TYPE_PROFILE
+    "DLOG", // FILE_TYPE_DLOG
+    "IMG", // FILE_TYPE_IMAGE
+    "MP", // FILE_TYPE_MICROPYTHON
+    "APP", // FILE_TYPE_APP
+    "HEX", // FILE_TYPE_HEX
+    "BIN", // FILE_TYPE_OTHER
+    nullptr // FILE_TYPE_DISK_DRIVE
 };
 
 static const char *smallIcons[] = {
-    nullptr,
-    "\x46",
-    "\x85",
-    "\x30",
-    "\x27",
-    "\x5b",
-    "\x7d",
-    "\x6a",
-    "\x6a",
-    "\x89",
+    nullptr, // FILE_TYPE_NONE
+    "\x46", // FILE_TYPE_DIRECTORY
+    "\x85", // FILE_TYPE_LIST
+    "\x30", // FILE_TYPE_PROFILE
+    "\x27", // FILE_TYPE_DLOG
+    "\x5b", // FILE_TYPE_IMAGE
+    "\x7d", // FILE_TYPE_MICROPYTHON
+    "\x92", // FILE_TYPE_APP
+    "\x6a", // FILE_TYPE_HEX
+    "\x6a", // FILE_TYPE_OTHER
+    "\x89", // FILE_TYPE_DISK_DRIVE
 };
 
 static const char *largeIcons[] = {
-    nullptr,
-    "\x80",
-    "\x81",
-    "\x82",
-    "\x83",
-    "\x84",
-    "\x85",
-    "\x86",
-    "\x86",
-    "\x8E",
+    nullptr, // FILE_TYPE_NONE
+    "\x80", // FILE_TYPE_DIRECTORY
+    "\x81", // FILE_TYPE_LIST
+    "\x82", // FILE_TYPE_PROFILE
+    "\x83", // FILE_TYPE_DLOG
+    "\x84", // FILE_TYPE_IMAGE
+    "\x85", // FILE_TYPE_MICROPYTHON
+    "\x8F", // FILE_TYPE_APP
+    "\x86", // FILE_TYPE_HEX
+    "\x86", // FILE_TYPE_OTHER
+    "\x8E", // FILE_TYPE_DISK_DRIVE
 };
 
 static const char *rootDirectoryIcons[] = {
-    "\x80",
-    "\x87",
-    "\x88",
-    "\x89",
-    "\x8A",
-    "\x8B",
-    "\x8C",
-    "\x8D"
+    "\x80", // ROOT_DIRECTORY_TYPE_NONE
+    "\x87", // ROOT_DIRECTORY_TYPE_SCRIPTS
+    "\x88", // ROOT_DIRECTORY_TYPE_SCREENSHOTS
+    "\x89", // ROOT_DIRECTORY_TYPE_RECORDINGS
+    "\x8A", // ROOT_DIRECTORY_TYPE_LISTS
+    "\x8B", // ROOT_DIRECTORY_TYPE_PROFILES
+    "\x8C", // ROOT_DIRECTORY_TYPE_LOGS
+    "\x8D" // ROOT_DIRECTORY_TYPE_UPDATES
 };
 
 FileType getFileTypeFromExtension(const char *filePath) {

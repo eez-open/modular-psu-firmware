@@ -31,7 +31,7 @@
 #include <eez/util.h>
 #include <eez/index.h>
 #include <eez/file_type.h>
-#include <eez/mp.h>
+#include <eez/scripting.h>
 #include <eez/memory.h>
 #include <eez/hmi.h>
 #include <eez/uart.h>
@@ -1191,7 +1191,7 @@ bool compare_AUTO_START_SCRIPT_CONFIRMATION_MESSAGE_value(const Value &a, const 
 }
 
 void AUTO_START_SCRIPT_CONFIRMATION_MESSAGE_value_to_text(const Value &value, char *text, int count) {
-	mp::getAutoStartConfirmationMessage(text, count);
+	scripting::getAutoStartConfirmationMessage(text, count);
 }
 
 static Cursor g_editValueCursor(-1);
@@ -4916,7 +4916,7 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
         bool areListCountersVisible = list::g_numChannelsWithVisibleCounters > 0;
         bool areRampCountersVisible = ramp::g_numChannelsWithVisibleCounters > 0;
         bool isDlogVisible = !dlog_record::isIdle();
-        bool isScriptVisible = !mp::isIdle();
+        bool isScriptVisible = !scripting::isIdle();
         bool isFunctionGeneratorVisible = function_generator::isActive();
 
         bool isHidden = (overlay.visibility & OVERLAY_HIDDEN) != 0;
@@ -5295,15 +5295,15 @@ void data_is_single_page_on_stack(DataOperationEnum operation, Cursor cursor, Va
 
 void data_script_is_started(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = mp::isIdle() ? 0 : 1;
+        value = scripting::isIdle() ? 0 : 1;
     }
 }
 
 void data_script_info(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         // get script file name
-        const char *p = mp::g_scriptPath + strlen(mp::g_scriptPath) - 1;
-        while (p >= mp::g_scriptPath && *p != '/' && *p != '\\') {
+        const char *p = scripting::g_scriptPath + strlen(scripting::g_scriptPath) - 1;
+        while (p >= scripting::g_scriptPath && *p != '/' && *p != '\\') {
             p--;
         }
         value = p + 1;

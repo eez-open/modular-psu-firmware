@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 #include <eez/system.h>
-#include <eez/mp.h>
+#include <eez/scripting.h>
 #include <eez/memory.h>
 #include <eez/fs_driver.h>
 
@@ -142,7 +142,7 @@ void catalogCallback(void *param, const char *name, FileType type, size_t size, 
     size_t descriptionLenWithPadding = 0;
 
     if (isScriptsDirectory() && (getListViewOption() == LIST_VIEW_SCRIPTS || getListViewOption() == LIST_VIEW_LARGE_ICONS)) {
-        if (type != FILE_TYPE_MICROPYTHON) {
+        if (type != FILE_TYPE_MICROPYTHON && type != FILE_TYPE_APP) {
             return;
         }
 
@@ -677,7 +677,7 @@ const char *getFileIcon(uint32_t fileIndex) {
     }
 
     if (getListViewOption() == LIST_VIEW_SCRIPTS) {
-        return "\x94";
+        return fileType == FILE_TYPE_APP ? "\x95" : "\x94";
     }
 
     if (fileType == FILE_TYPE_DIRECTORY) {
@@ -741,14 +741,18 @@ void selectFile(uint32_t fileIndex) {
             g_selectedFileIndex = fileIndex;
             if (!g_fileBrowserMode) {
                 if (isScriptsDirectory() && (getListViewOption() == LIST_VIEW_SCRIPTS || getListViewOption() == LIST_VIEW_LARGE_ICONS)) {
-                    if (mp::isIdle()) {
+                    if (scripting::isIdle()) {
                         if (strlen(fileItem->name) + 3 <= MAX_PATH_LENGTH) {
                             char fileName[MAX_PATH_LENGTH + 1];
                             stringCopy(fileName, sizeof(fileName), fileItem->name);
-                            stringAppendString(fileName, MAX_PATH_LENGTH, ".py");
+							if (fileItem->type == FILE_TYPE_MICROPYTHON) {
+								stringAppendString(fileName, MAX_PATH_LENGTH, ".py");
+							} else {
+								stringAppendString(fileName, MAX_PATH_LENGTH, ".app");
+							}
                             char filePath[MAX_PATH_LENGTH + 1];
                             if (makeAbsolutePath(fileName, filePath)) {
-                                mp::startScript(filePath);
+                                scripting::startScript(filePath);
                             } else {
                                 errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
                             }
@@ -781,7 +785,7 @@ bool isOpenFileEnabled() {
     }
 
     if (fileItem->type == FILE_TYPE_MICROPYTHON) {
-        return mp::isIdle();
+        return scripting::isIdle();
     }
 
     if (fileItem->type == FILE_TYPE_OTHER) {
@@ -816,7 +820,7 @@ void openFile() {
 		makeAbsolutePath(fileItem->name, filePath);
         openImageFile(filePath, gui::PAGE_ID_IMAGE_VIEW);
     } else if (fileItem->type == FILE_TYPE_MICROPYTHON) {
-        mp::startScript(filePath);
+        scripting::startScript(filePath);
     } else if (fileItem->type == FILE_TYPE_OTHER) {
         if (endsWithNoCase(filePath, ".bit")) {
             sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_OPEN_BIT_FILE);

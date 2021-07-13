@@ -23,7 +23,7 @@
 #endif
 
 #include <eez/tasks.h>
-#include <eez/mp.h>
+#include <eez/scripting.h>
 #include <eez/sound.h>
 #include <eez/hmi.h>
 #include <eez/uart.h>
@@ -290,7 +290,7 @@ void lowPriorityThreadOneIter() {
         }
 #endif  
         else if (type < MP_LAST_MESSAGE_TYPE) {
-            mp::onQueueMessage(type, param);
+            scripting::onQueueMessage(type, param);
         }
 
         else {
@@ -465,7 +465,7 @@ void lowPriorityThreadOneIter() {
             } else if (type == THREAD_MESSAGE_FS_DRIVER_UNLINK) {
                 fs_driver::UnLinkDriver(param);
             } else if (type == THREAD_MESSAGE_AUTO_START_SCRIPT) {
-            	mp::autoStart();
+            	scripting::autoStart();
             }
         }
 

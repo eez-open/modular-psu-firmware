@@ -28,7 +28,7 @@
 #include <eez/firmware.h>
 #include <eez/system.h>
 #include <eez/tasks.h>
-#include <eez/mp.h>
+#include <eez/scripting.h>
 #include <eez/sound.h>
 #include <eez/memory.h>
 #include <eez/uart.h>
@@ -310,8 +310,8 @@ void boot() {
     startHighPriorityThread();
     startLowPriorityThread();
 
-    mp::initMessageQueue();
-    mp::startThread();
+    scripting::initMessageQueue();
+    scripting::startThread();
 
 #if defined(EEZ_PLATFORM_STM32)
     if (g_RCC_CSR & RCC_CSR_LPWRRSTF) {

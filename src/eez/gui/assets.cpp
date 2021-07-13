@@ -24,6 +24,7 @@
 
 #include <eez/system.h>
 #include <eez/memory.h>
+#include <eez/debug.h>
 
 #include <eez/libs/lz4/lz4.h>
 
@@ -43,6 +44,15 @@ static Assets g_mainAssets;
 static Assets g_externalAssets;
 
 static Assets *g_fixPointersAssets;
+
+static const uint32_t HEADER_TAG = 0x7A65657E;
+
+struct Header {
+	uint32_t tag; // HEADER_TAG
+	uint16_t projectVersion;
+	uint16_t assetsType;
+	uint32_t decompressedSize;
+};
 
 void StyleList_fixPointers() {
     g_fixPointersAssets->styles->first = (const Style *)((uint8_t *)g_fixPointersAssets->styles + (uint32_t)g_fixPointersAssets->styles->first);
@@ -111,37 +121,68 @@ void Widget_fixPointers(Widget *widget) {
     }
 }
 
-void initAssets(Assets &assets, bool external, uint8_t *decompressedAssets) {
+void initAssets(Assets &assets, uint16_t projectVersion, bool external, uint8_t *decompressedAssets) {
     assets.document = (Document *)(decompressedAssets + ((uint32_t *)decompressedAssets)[0]);
     assets.styles = (StyleList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[1]);
-    assets.fontsData = decompressedAssets + ((uint32_t *)decompressedAssets)[2];
-    assets.bitmapsData = decompressedAssets + ((uint32_t *)decompressedAssets)[3];
+    assets.fontsData = (uint8_t *)(decompressedAssets + ((uint32_t *)decompressedAssets)[2]);
+    assets.bitmapsData = (uint8_t *)(decompressedAssets + ((uint32_t *)decompressedAssets)[3]);
     assets.colorsData = (Colors *)(decompressedAssets + ((uint32_t *)decompressedAssets)[4]);
+
     if (external) {
         assets.actionNames = (NameList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[5]);
         assets.dataItemNames = (NameList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[6]);
     } else {
-        assets.actionNames = nullptr;
-        assets.dataItemNames = nullptr;
+        if (projectVersion >= 3) {
+            assets.actionNames = (NameList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[5]);
+            assets.dataItemNames = (NameList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[6]);
+        } else {
+            assets.actionNames = nullptr;
+            assets.dataItemNames = nullptr;
+        }
     }
+
+    if (projectVersion >= 3) {
+        assets.flowDefinition = (eez::flow::FlowDefinition *)(decompressedAssets + ((uint32_t *)decompressedAssets)[7]);
+    }
+
+    fixPointers(assets);
 }
 
 void decompressAssets() {
     uint8_t *decompressedAssets;
 
-    int compressedSize = sizeof(assets) - 4;
+    uint16_t projectVersion;
+
+	int compressedSize;
+	uint32_t decompressedSize;
+	uint32_t compressedDataOffset;
+
+	auto header = (Header *)assets;
+	if (header->tag == HEADER_TAG) {
+		// project version >= 3
+        projectVersion = header->projectVersion;
+
+		compressedSize = sizeof(assets) - sizeof(Header);
+		decompressedSize = header->decompressedSize;
+		compressedDataOffset = sizeof(Header);
+	} else {
+		// project version < 3,
+        projectVersion = 2;
+
+		// first 4 bytes (uint32_t) are decompressed size
+		compressedSize = sizeof(assets) - 4;
+		decompressedSize = ((uint32_t *)header)[0];
+		compressedDataOffset = 4;
+	}
 
     // first 4 bytes (uint32_t) are decompressed size
-    uint32_t decompressedSize = ((uint32_t *)assets)[0];
     assert(decompressedSize <= DECOMPRESSED_ASSETS_SIZE);
     decompressedAssets = DECOMPRESSED_ASSETS_START_ADDRESS;
 
-    int result = LZ4_decompress_safe((const char *)assets + 4, (char *)decompressedAssets, compressedSize, (int)decompressedSize);
+    int result = LZ4_decompress_safe((const char *)(assets + compressedDataOffset), (char *)decompressedAssets, compressedSize, (int)decompressedSize);
     assert(result == (int)decompressedSize);
 
-    initAssets(g_mainAssets, false, decompressedAssets);
-
-    fixPointers(g_mainAssets);
+    initAssets(g_mainAssets, projectVersion, false, decompressedAssets);
 
     g_assetsLoaded = true;
 }
@@ -259,10 +300,29 @@ bool loadExternalAssets(const char *filePath, int *err) {
         return false;
     }
 
-    int compressedSize = fileSize - 4;
+    uint16_t projectVersion;
 
-    // first 4 bytes (uint32_t) are decompressed size
-    uint32_t decompressedSize = ((uint32_t *)fileData)[0];
+    int compressedSize;
+    uint32_t decompressedSize;
+	uint32_t compressedDataOffset;
+
+	auto header = (Header *)fileData;
+	if (header->tag == HEADER_TAG) {
+		// project version >= 3
+        projectVersion = header->projectVersion;
+
+		compressedSize = fileSize - sizeof(Header);
+		decompressedSize = header->decompressedSize;
+		compressedDataOffset = sizeof(Header);
+	} else {
+		// project version < 3,
+        projectVersion = 2;
+
+		// first 4 bytes (uint32_t) are decompressed size
+		compressedSize = fileSize - 4;
+		decompressedSize = ((uint32_t *)header)[0];
+		compressedDataOffset = 4;
+	}
 
     if (decompressedSize > (uint32_t)(fileData - EXTERNAL_ASSETS_BUFFER)) {
         if (err) {
@@ -273,7 +333,7 @@ bool loadExternalAssets(const char *filePath, int *err) {
 
     uint8_t *decompressedAssets = EXTERNAL_ASSETS_BUFFER;
 
-    int result = LZ4_decompress_safe((const char *)fileData + 4, (char *)decompressedAssets, compressedSize, (int)decompressedSize);
+    int result = LZ4_decompress_safe((const char *)fileData + compressedDataOffset, (char *)decompressedAssets, compressedSize, (int)decompressedSize);
     if (result != (int)decompressedSize) {
         if (err) {
             *err = SCPI_ERROR_INVALID_BLOCK_DATA;
@@ -281,9 +341,7 @@ bool loadExternalAssets(const char *filePath, int *err) {
         return false;
     }
 
-    initAssets(g_externalAssets, true, decompressedAssets);
-
-    fixPointers(g_externalAssets);
+    initAssets(g_externalAssets, projectVersion, true, decompressedAssets);
 
     return true;
 }
