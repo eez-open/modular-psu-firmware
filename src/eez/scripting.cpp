@@ -93,6 +93,8 @@ static uint32_t g_scriptParametersVersion;
 static bool g_autoStartConditionIsChecked;
 static bool g_autoStartScriptIsRunning;
 
+static unsigned g_flowHandle;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 using namespace eez::scpi;
@@ -274,29 +276,31 @@ void startFlowScript() {
 	getFileName(g_scriptPath, scriptName, sizeof(scriptName));
 	InfoTrace("App started: %s\n", scriptName);
 
-	flow::run();
+	g_flowHandle = flow::start(g_externalAssets);
 
-	psu::gui::hideAsyncOperationInProgress();
-	psu::gui::clearTextMessage();
+	//psu::gui::hideAsyncOperationInProgress();
+	//psu::gui::clearTextMessage();
 
-	g_state = STATE_IDLE;
+	//g_state = STATE_IDLE;
 
-	InfoTrace("App ended: %s\n", scriptName);
+	//InfoTrace("App ended: %s\n", scriptName);
 
-	if (g_autoStartScriptIsRunning) {
-		g_autoStartScriptIsRunning = false;
-	}
+	//if (g_autoStartScriptIsRunning) {
+	//	g_autoStartScriptIsRunning = false;
+	//}
 }
 
 void oneIter() {
-    osEvent event = osMessageGet(g_mpMessageQueueId, osWaitForever);
+    osEvent event = osMessageGet(g_mpMessageQueueId, 1);
     if (event.status == osEventMessage) {
 		if (event.value.v == QUEUE_MESSAGE_START_MP_SCRIPT) {
 			startMpScript();
 		} else if (event.value.v == QUEUE_MESSAGE_START_FLOW_SCRIPT) {
 			startFlowScript();
 		}
-    }
+	} else {
+		flow::tick(g_flowHandle);
+	}
 }
 
 void doStopScript() {

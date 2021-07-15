@@ -32,9 +32,7 @@ struct GridWidget {
 };
 
 FixPointersFunctionType GRID_fixPointers = [](Widget *widget, Assets *assets) {
-    GridWidget *gridWidget = (GridWidget *)widget->specific;
-    gridWidget->itemWidget = (Widget *)((uint8_t *)(void *)assets->document + (uint32_t)gridWidget->itemWidget);
-    Widget_fixPointers((Widget *)&*gridWidget->itemWidget);
+    Widget_fixPointers(&GridWidget::itemWidget, widget, assets);
 };
 
 EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {

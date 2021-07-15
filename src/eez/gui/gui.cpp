@@ -68,7 +68,7 @@ osMessageQId g_guiMessageQueueId;
 #define GUI_QUEUE_MESSAGE_PARAM(param) ((int16_t)(message >> 8))
 
 void startThread() {
-    decompressAssets();
+    loadMainAssets();
     mcu::display::onThemeChanged();
     mouse::init();
     g_guiMessageQueueId = osMessageCreate(osMessageQ(g_guiMessageQueue), 0);

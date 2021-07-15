@@ -33,9 +33,7 @@ struct ListWidget {
 };
 
 FixPointersFunctionType LIST_fixPointers = [](Widget *widget, Assets *assets) {
-    ListWidget *listWidget = (ListWidget *)widget->specific;
-    listWidget->itemWidget = (Widget *)((uint8_t *)(void *)assets->document + (uint32_t)listWidget->itemWidget);
-    Widget_fixPointers((Widget *)&*listWidget->itemWidget);
+    Widget_fixPointers(&ListWidget::itemWidget, widget, assets);
 };
 
 EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {

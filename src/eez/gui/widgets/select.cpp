@@ -25,12 +25,12 @@ namespace eez {
 namespace gui {
 
 struct SelectWidget {
-    WidgetList widgets;
+    List<const Widget> widgets;
 };
 
 FixPointersFunctionType SELECT_fixPointers = [](Widget *widget, Assets *assets) {
     SelectWidget *selectWidget = (SelectWidget *)widget->specific;
-    WidgetList_fixPointers(selectWidget->widgets);
+    WidgetList_fixPointers(selectWidget->widgets, assets);
 };
 
 EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {

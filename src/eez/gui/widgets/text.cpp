@@ -31,8 +31,7 @@ namespace eez {
 namespace gui {
 
 FixPointersFunctionType TEXT_fixPointers = [](Widget *widget, Assets *assets) {
-    TextWidgetSpecific *textWidget = (TextWidgetSpecific *)widget->specific;
-    textWidget->text = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)textWidget->text);
+    Text_fixPointer(&TextWidgetSpecific::text, widget, assets);
 };
 
 EnumFunctionType TEXT_enum = nullptr;

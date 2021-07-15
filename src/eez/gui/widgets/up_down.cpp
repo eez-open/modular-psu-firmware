@@ -34,9 +34,8 @@ struct UpDownWidget {
 };
 
 FixPointersFunctionType UP_DOWN_fixPointers = [](Widget *widget, Assets *assets) {
-    UpDownWidget *upDownWidget = (UpDownWidget *)widget->specific;
-    upDownWidget->downButtonText = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)upDownWidget->downButtonText);
-    upDownWidget->upButtonText = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)upDownWidget->upButtonText);
+    Text_fixPointer(&UpDownWidget::downButtonText, widget, assets);
+    Text_fixPointer(&UpDownWidget::upButtonText, widget, assets);
 };
 
 EnumFunctionType UP_DOWN_enum = nullptr;

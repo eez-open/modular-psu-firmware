@@ -23,29 +23,260 @@
 namespace eez {
 namespace gui {
 
-void decompressAssets();
+template <typename T>
+struct List {
+    uint32_t count;
+    AssetsPtr<T> first;
+};
 
-extern bool g_assetsLoaded;
+////////////////////////////////////////////////////////////////////////////////
 
-const Style *getStyle(int styleID);
+#define SHADOW_FLAG 1
+#define CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG 2
+
+struct PageWidget {
+    List<const Widget> widgets;
+    uint16_t overlay;
+    uint8_t flags;
+};
+
+struct Widget {
+    uint8_t type;
+    int16_t data;
+    int16_t action;
+    int16_t x;
+    int16_t y;
+    int16_t w;
+    int16_t h;
+    uint16_t style;
+    AssetsPtr<const void> specific;
+};
+
+struct Document {
+	List<const Widget> pages;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+#define STYLE_FLAGS_HORZ_ALIGN_MASK 0x7
+#define STYLE_FLAGS_HORZ_ALIGN_LEFT 0
+#define STYLE_FLAGS_HORZ_ALIGN_RIGHT 1
+#define STYLE_FLAGS_HORZ_ALIGN_CENTER 2
+
+#define STYLE_FLAGS_VERT_ALIGN_MASK (0x7 << 3)
+#define STYLE_FLAGS_VERT_ALIGN_TOP (0 << 3)
+#define STYLE_FLAGS_VERT_ALIGN_BOTTOM (1 << 3)
+#define STYLE_FLAGS_VERT_ALIGN_CENTER (2 << 3)
+
+#define STYLE_FLAGS_BLINK (1 << 6)
+
+struct Style {
+    uint16_t flags; // STYLE_FLAGS_...
+    uint16_t background_color;
+    uint16_t color;
+    uint16_t active_background_color;
+    uint16_t active_color;
+    uint16_t focus_background_color;
+    uint16_t focus_color;
+    uint8_t border_size_top;
+    uint8_t border_size_right;
+    uint8_t border_size_bottom;
+    uint8_t border_size_left;
+    uint16_t border_radius;
+    uint16_t border_color;
+    uint8_t font;
+    uint8_t opacity; // 0 - 255
+    uint8_t padding_top;
+    uint8_t padding_right;
+    uint8_t padding_bottom;
+    uint8_t padding_left;
+    uint8_t margin_top;
+    uint8_t margin_right;
+    uint8_t margin_bottom;
+    uint8_t margin_left;
+};
+
+struct StyleList {
+    uint32_t count;
+    AssetsPtr<const Style> first;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+struct Bitmap {
+    int16_t w;
+    int16_t h;
+    int16_t bpp;
+    int16_t reserved;
+    const uint8_t pixels[1];
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+struct ColorList {
+    uint32_t count;
+    AssetsPtr<const uint16_t> first;
+};
+
+struct Theme {
+    AssetsPtr<const char> name;
+    ColorList colors;
+};
+
+struct ThemeList {
+    uint32_t count;
+    AssetsPtr<const Theme> first;
+};
+
+struct Colors {
+    ThemeList themes;
+    ColorList colors;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+struct NameList {
+    uint32_t count;
+    AssetsPtr<AssetsPtr<const char>> first;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+struct ComponentInputValue {
+    uint16_t valueIndex;
+};
+
+struct ComponentInput {
+    List<ComponentInputValue> values;
+};
+
+struct Connection {
+    uint16_t targetComponentIndex;
+    uint8_t targetInputIndex;
+};
+
+struct ComponentOutput {
+    List<Connection> connections;
+};
+
+struct Component {
+    uint16_t type;
+    List<ComponentInput> inputs;
+    List<ComponentOutput> outputs;
+    AssetsPtr<const void> specific;
+};
+
+struct Flow {
+    List<const Component> components;
+};
+
+enum FlowValueType {
+	FLOW_VALUE_TYPE_UNDEFINED,
+	FLOW_VALUE_TYPE_NULL,
+	FLOW_VALUE_TYPE_BOOLEAN,
+	FLOW_VALUE_TYPE_INT8,
+	FLOW_VALUE_TYPE_UINT8,
+	FLOW_VALUE_TYPE_INT16,
+	FLOW_VALUE_TYPE_UINT16,
+	FLOW_VALUE_TYPE_INT32,
+	FLOW_VALUE_TYPE_UINT32,
+	FLOW_VALUE_TYPE_INT64,
+	FLOW_VALUE_TYPE_UINT64,
+	FLOW_VALUE_TYPE_FLOAT,
+	FLOW_VALUE_TYPE_DOUBLE,
+	FLOW_VALUE_TYPE_STRING
+};
+
+struct FlowValue {
+    union {
+        unsigned type : 8;
+        unsigned refCount: 32;
+		unsigned reserved: 24;
+    } header;
+
+    union {
+        int8_t int8_;
+        uint8_t uint8_;
+        int16_t int16_;
+        uint16_t uint16_;
+        int32_t int32_;
+        uint32_t uint32_;
+        int64_t int64_;
+        uint64_t uint64_;
+        float float_;
+        double double_;
+        AssetsPtr<const char> string_;
+    } value;
+};
+
+struct FlowDefinition {
+    List<const Flow> flows;
+    List<FlowValue> flowValues;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+struct Assets {
+    uint16_t projectVersion;
+    bool external;
+
+    AssetsPtr<Document> document;
+    AssetsPtr<StyleList> styles;
+    AssetsPtr<uint8_t> fontsData;
+    AssetsPtr<uint8_t> bitmapsData;
+    AssetsPtr<Colors> colorsData;
+
+    AssetsPtr<NameList> actionNames;
+	AssetsPtr<NameList> dataItemNames;
+
+    AssetsPtr<FlowDefinition> flowDefinition;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+void WidgetList_fixPointers(List<const Widget> &list, Assets *assets);
+void Widget_fixPointers(Widget *widget, Assets *assets);
+
+template <typename T>
+void Widget_fixPointers(AssetsPtr<const Widget> T::*widgetProperty, Widget *widget, Assets *assets) {
+    auto specific = (T *)widget->specific;
+    specific->*widgetProperty = (Widget *)((uint8_t *)(void *)assets->document + (uint32_t)(specific->*widgetProperty));
+	Widget_fixPointers((Widget *)&*(specific->*widgetProperty), assets);
+}
+
+template <typename T>
+void Text_fixPointer(AssetsPtr<const char> T::*textProperty, Widget *widget, Assets *assets) {
+	auto specific = (T *)widget->specific;
+	specific->*textProperty = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)(specific->*textProperty));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void loadMainAssets();
+bool loadExternalAssets(const char *filePath, int *err);
+
+extern bool g_isMainAssetsLoaded;
+extern Assets *g_mainAssets;
+extern Assets *g_externalAssets;
+
 const Widget *getPageWidget(int pageId);
+const Style *getStyle(int styleID);
 const uint8_t *getFontData(int fontID);
 const Bitmap *getBitmap(int bitmapID);
+
 int getThemesCount();
 const char *getThemeName(int i);
 const uint16_t *getThemeColors(int themeIndex);
 const uint32_t getThemeColorsCount(int themeIndex);
 const uint16_t *getColors();
 
+int getExternalAssetsFirstPageId();
+
 const char *getActionName(int16_t actionId);
 int16_t getDataIdFromName(const char *name);
 
-int getExternalAssetsFirstPageId();
-
 #define GET_WIDGET_PROPERTY(widget, propertyName, type) ((type)widget->propertyName)
 #define GET_WIDGET_LIST_ELEMENT(list, index) &((list).first[index])
-
-bool loadExternalAssets(const char *filePath, int *err);
 
 ////////////////////////////////////////////////////////////////////////////////
 

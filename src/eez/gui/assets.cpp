@@ -38,12 +38,9 @@
 namespace eez {
 namespace gui {
 
-bool g_assetsLoaded;
-static Assets g_mainAssets;
-
-static Assets g_externalAssets;
-
-static Assets *g_fixPointersAssets;
+bool g_isMainAssetsLoaded;
+Assets *g_mainAssets = (Assets *)DECOMPRESSED_ASSETS_START_ADDRESS;
+Assets *g_externalAssets = (Assets *)EXTERNAL_ASSETS_BUFFER;
 
 static const uint32_t HEADER_TAG = 0x7A65657E;
 
@@ -54,56 +51,7 @@ struct Header {
 	uint32_t decompressedSize;
 };
 
-void StyleList_fixPointers() {
-    g_fixPointersAssets->styles->first = (const Style *)((uint8_t *)g_fixPointersAssets->styles + (uint32_t)g_fixPointersAssets->styles->first);
-}
-
-void WidgetList_fixPointers(WidgetList &widgetList) {
-    widgetList.first = (Widget *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)widgetList.first);
-    for (uint32_t i = 0; i < widgetList.count; ++i) {
-        Widget_fixPointers((Widget *)&widgetList.first[i]);
-    }
-}
-
-void ColorList_fixPointers(ColorList &colorList) {
-    colorList.first = (uint16_t *)((uint8_t *)g_fixPointersAssets->colorsData + (uint32_t)colorList.first);
-}
-
-void Theme_fixPointers(Theme *theme) {
-    theme->name = (const char *)((uint8_t *)g_fixPointersAssets->colorsData + (uint32_t)theme->name);
-    ColorList_fixPointers(theme->colors);
-}
-
-void ThemeList_fixPointers(ThemeList &themeList) {
-    themeList.first = (Theme *)((uint8_t *)g_fixPointersAssets->colorsData + (uint32_t)themeList.first);
-    for (uint32_t i = 0; i < themeList.count; ++i) {
-        Theme_fixPointers(const_cast<Theme*>(&themeList.first[i]));
-    }
-}
-
-void ColorsData_fixPointers() {
-    ThemeList_fixPointers(g_fixPointersAssets->colorsData->themes);
-    ColorList_fixPointers(g_fixPointersAssets->colorsData->colors);
-}
-
-void NameList_fixPointers(NameList *nameList) {
-    if (nameList) {
-        nameList->first = (const char **)((uint8_t *)nameList + (uint32_t)nameList->first);
-        for (uint32_t i = 0; i < nameList->count; i++) {
-            nameList->first[i] = (const char *)((uint8_t *)nameList + (uint32_t)nameList->first[i]);
-        }
-    }
-}
-
-void fixPointers(Assets &assets) { 
-    g_fixPointersAssets = &assets;
-
-    WidgetList_fixPointers(g_fixPointersAssets->document->pages);
-    StyleList_fixPointers();
-    ColorsData_fixPointers();
-    NameList_fixPointers(g_fixPointersAssets->actionNames);
-    NameList_fixPointers(g_fixPointersAssets->dataItemNames);
-}
+////////////////////////////////////////////////////////////////////////////////
 
 #define WIDGET_TYPE(NAME, ID) extern FixPointersFunctionType NAME##_fixPointers;
 WIDGET_TYPES
@@ -114,43 +62,146 @@ static FixPointersFunctionType *g_fixWidgetPointersFunctions[] = {
 };
 #undef WIDGET_TYPE
 
-void Widget_fixPointers(Widget *widget) {
-    widget->specific = (void *)((uint8_t *)g_fixPointersAssets->document + (uint32_t)widget->specific);
+////////////////////////////////////////////////////////////////////////////////
+
+void Widget_fixPointers(Widget *widget, Assets *assets) {
+    widget->specific = (void *)((uint8_t *)assets->document + (uint32_t)widget->specific);
+
     if (*g_fixWidgetPointersFunctions[widget->type]) {
-        (*g_fixWidgetPointersFunctions[widget->type])(widget, g_fixPointersAssets);
+        (*g_fixWidgetPointersFunctions[widget->type])(widget, assets);
     }
 }
 
-void initAssets(Assets &assets, uint16_t projectVersion, bool external, uint8_t *decompressedAssets) {
-    assets.document = (Document *)(decompressedAssets + ((uint32_t *)decompressedAssets)[0]);
-    assets.styles = (StyleList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[1]);
-    assets.fontsData = (uint8_t *)(decompressedAssets + ((uint32_t *)decompressedAssets)[2]);
-    assets.bitmapsData = (uint8_t *)(decompressedAssets + ((uint32_t *)decompressedAssets)[3]);
-    assets.colorsData = (Colors *)(decompressedAssets + ((uint32_t *)decompressedAssets)[4]);
+void WidgetList_fixPointers(List<const Widget> &widgetList, Assets *assets) {
+    widgetList.first = (Widget *)((uint8_t *)assets->document + (uint32_t)widgetList.first);
 
-    if (external) {
-        assets.actionNames = (NameList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[5]);
-        assets.dataItemNames = (NameList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[6]);
-    } else {
-        if (projectVersion >= 3) {
-            assets.actionNames = (NameList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[5]);
-            assets.dataItemNames = (NameList *)(decompressedAssets + ((uint32_t *)decompressedAssets)[6]);
-        } else {
-            assets.actionNames = nullptr;
-            assets.dataItemNames = nullptr;
+    for (uint32_t i = 0; i < widgetList.count; ++i) {
+        Widget_fixPointers((Widget *)&widgetList.first[i], assets);
+    }
+}
+
+////////////////////////////////////////
+
+void StyleList_fixPointers(Assets *assets) {
+	assets->styles->first = (const Style *)((uint8_t *)assets->styles + (uint32_t)assets->styles->first);
+}
+
+////////////////////////////////////////
+
+void ColorList_fixPointers(Assets *assets, ColorList &colorList) {
+    colorList.first = (uint16_t *)((uint8_t *)assets->colorsData + (uint32_t)colorList.first);
+}
+
+void Theme_fixPointers(Assets *assets, Theme *theme) {
+    theme->name = (const char *)((uint8_t *)assets->colorsData + (uint32_t)theme->name);
+    ColorList_fixPointers(assets, theme->colors);
+}
+
+void ThemeList_fixPointers(Assets *assets) {
+	ThemeList &themeList = assets->colorsData->themes;
+
+    themeList.first = (Theme *)((uint8_t *)assets->colorsData + (uint32_t)themeList.first);
+    for (uint32_t i = 0; i < themeList.count; ++i) {
+        Theme_fixPointers(assets, const_cast<Theme*>(&themeList.first[i]));
+    }
+}
+
+void ColorsData_fixPointers(Assets *assets) {
+    ThemeList_fixPointers(assets);
+    ColorList_fixPointers(assets, assets->colorsData->colors);
+}
+
+////////////////////////////////////////
+
+void NameList_fixPointers(NameList *nameList) {
+    if (nameList) {
+        nameList->first = (const char **)((uint8_t *)nameList + (uint32_t)nameList->first);
+        for (uint32_t i = 0; i < nameList->count; i++) {
+            nameList->first[i] = (const char *)((uint8_t *)nameList + (uint32_t)nameList->first[i]);
         }
     }
-
-    if (projectVersion >= 3) {
-        assets.flowDefinition = (eez::flow::FlowDefinition *)(decompressedAssets + ((uint32_t *)decompressedAssets)[7]);
-    }
-
-    fixPointers(assets);
 }
 
-void decompressAssets() {
-    uint8_t *decompressedAssets;
+////////////////////////////////////////
 
+void Component_fixPointers(Component *component, Assets *assets) {
+	component->inputs.first = (ComponentInput *)((uint8_t *)assets->flowDefinition + (uint32_t)component->inputs.first);
+    for (uint32_t i = 0; i < component->inputs.count; ++i) {
+        component->inputs.first[i].values.first =
+            (Connection *)((uint8_t *)assets->flowDefinition + (uint32_t)component->inputs.first[i].values.first);
+    }
+
+	component->outputs.first = (ComponentOutput *)((uint8_t *)assets->flowDefinition + (uint32_t)component->outputs.first);
+    for (uint32_t i = 0; i < component->outputs.count; ++i) {
+        component->outputs.first[i].connections.first = 
+            (Connection *)((uint8_t *)assets->flowDefinition + (uint32_t)component->outputs.first[i].connections.first);
+    }
+
+	component->specific = (void *)((uint8_t *)assets->flowDefinition + (uint32_t)component->specific);
+}
+
+void Flow_fixPointers(Flow *flow, Assets *assets) {
+    // fix components pointers
+    flow->components.first = (Flow *)((uint8_t *)assets->flowDefinition + (uint32_t)flow->components.first);
+    for (uint32_t i = 0; i < flow->components.count; ++i) {
+        Component_fixPointers((Component *)&flow->components.first[i], assets);
+    }
+}
+
+void FlowValue_fixPointers(FlowValue &flowValue, Assets *assets) {
+    if (flowValue.header.type == FLOW_VALUE_TYPE_STRING) {
+        flowValue.value.string_ = (const char *)((uint8_t *)(void *)assets->flowDefinition + (uint32_t)(flowValue.value.string_));
+    }
+}
+
+void FlowDefinition_fixPointers(Assets *assets) {
+    // fix flows pointers
+    assets->flowDefinition->flows.first = (Flow *)((uint8_t *)assets->flowDefinition + (uint32_t)assets->flowDefinition->flows.first);
+    for (uint32_t i = 0; i < assets->flowDefinition->flows.count; ++i) {
+        Flow_fixPointers((Flow *)&assets->flowDefinition->flows.first[i], assets);
+    }
+
+    // fix values pointers
+    assets->flowDefinition->flowValues.first = (FlowValue *)((uint8_t *)assets->flowDefinition + (uint32_t)assets->flowDefinition->flowValues.first);
+	for (uint32_t i = 0; i < assets->flowDefinition->flowValues.count; ++i) {
+		FlowValue_fixPointers(assets->flowDefinition->flowValues.first[i], assets);
+	}
+}
+
+////////////////////////////////////////
+
+void fixPointers(Assets *assets) {
+	auto offsetOrigin = (uint8_t *)&assets->document;
+
+	assets->document = offsetOrigin + (uint32_t)assets->document;
+	WidgetList_fixPointers(assets->document->pages, assets);
+
+	assets->styles = offsetOrigin + (uint32_t)assets->styles;
+	StyleList_fixPointers(assets);
+
+	assets->fontsData = offsetOrigin + (uint32_t)assets->fontsData;
+	assets->bitmapsData = offsetOrigin + (uint32_t)assets->bitmapsData;
+
+	assets->colorsData = offsetOrigin + (uint32_t)assets->colorsData;
+	ColorsData_fixPointers(assets);
+
+	if (assets->external || assets->projectVersion >= 3) {
+		assets->actionNames = offsetOrigin + (uint32_t)assets->actionNames;
+		NameList_fixPointers(assets->actionNames);
+
+		assets->dataItemNames = offsetOrigin + (uint32_t)assets->dataItemNames;
+		NameList_fixPointers(assets->dataItemNames);
+	}
+
+	if (assets->projectVersion >= 3) {
+		assets->flowDefinition = offsetOrigin + (uint32_t)assets->flowDefinition;
+        FlowDefinition_fixPointers(assets);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void loadMainAssets() {
     uint16_t projectVersion;
 
 	int compressedSize;
@@ -175,93 +226,17 @@ void decompressAssets() {
 		compressedDataOffset = 4;
 	}
 
-    // first 4 bytes (uint32_t) are decompressed size
-    assert(decompressedSize <= DECOMPRESSED_ASSETS_SIZE);
-    decompressedAssets = DECOMPRESSED_ASSETS_START_ADDRESS;
+    assert(decompressedSize + ((uint8_t *)(&g_mainAssets->document) - (uint8_t *)g_mainAssets) <= DECOMPRESSED_ASSETS_SIZE);
 
-    int result = LZ4_decompress_safe((const char *)(assets + compressedDataOffset), (char *)decompressedAssets, compressedSize, (int)decompressedSize);
+    g_mainAssets->projectVersion = projectVersion;
+    g_mainAssets->external = false;
+
+    int result = LZ4_decompress_safe((const char *)(assets + compressedDataOffset), (char *)&g_mainAssets->document, compressedSize, (int)decompressedSize);
     assert(result == (int)decompressedSize);
 
-    initAssets(g_mainAssets, projectVersion, false, decompressedAssets);
+	fixPointers(g_mainAssets);
 
-    g_assetsLoaded = true;
-}
-
-const Style *getStyle(int styleID) {
-    return g_mainAssets.styles->first + styleID - 1;
-}
-
-const Widget* getPageWidget(int pageId) {
-    if (pageId > 0) {
-        return g_mainAssets.document->pages.first + (pageId - 1);
-    } else if (pageId < 0) {
-        return g_externalAssets.document->pages.first + (-pageId - 1);
-    }
-    return nullptr;
-}
-
-const uint8_t *getFontData(int fontID) {
-    if (fontID == 0) {
-        return 0;
-    }
-    return g_mainAssets.fontsData + ((uint32_t *)g_mainAssets.fontsData)[fontID - 1];
-}
-
-const Bitmap *getBitmap(int bitmapID) {
-    if (bitmapID > 0) {
-        return (const Bitmap *)(g_mainAssets.bitmapsData + ((uint32_t *)g_mainAssets.bitmapsData)[bitmapID - 1]);
-    } else if (bitmapID < 0) {
-        return (const Bitmap *)(g_externalAssets.bitmapsData + ((uint32_t *)g_externalAssets.bitmapsData)[-bitmapID - 1]);
-    }
-    return nullptr;
-}
-
-int getThemesCount() {
-    return (int)g_mainAssets.colorsData->themes.count;
-}
-
-const Theme *getTheme(int i) {
-    return g_mainAssets.colorsData->themes.first + i;
-}
-
-const char *getThemeName(int i) {
-    return getTheme(i)->name;
-}
-
-const uint16_t *getThemeColors(int themeIndex) {
-    return getTheme(themeIndex)->colors.first;
-}
-
-const uint32_t getThemeColorsCount(int themeIndex) {
-    return getTheme(themeIndex)->colors.count;
-}
-
-const uint16_t *getColors() {
-    return g_mainAssets.colorsData->colors.first;
-}
-
-const char *getActionName(int16_t actionId) {
-    if (actionId == 0) {
-        return nullptr;
-    }
-    if (actionId < 0) {
-        actionId = -actionId;
-    }
-    actionId--;
-    return g_externalAssets.actionNames->first[actionId];
-}
-
-int16_t getDataIdFromName(const char *name) {
-    for (uint32_t i = 0; i < g_externalAssets.dataItemNames->count; i++) {
-        if (strcmp(g_externalAssets.dataItemNames->first[i], name) == 0) {
-            return -((int16_t)i+1);
-        }
-    }
-    return 0;
-}
-
-int getExternalAssetsFirstPageId() {
-    return -1;
+    g_isMainAssetsLoaded = true;
 }
 
 bool loadExternalAssets(const char *filePath, int *err) {
@@ -324,16 +299,18 @@ bool loadExternalAssets(const char *filePath, int *err) {
 		compressedDataOffset = 4;
 	}
 
-    if (decompressedSize > (uint32_t)(fileData - EXTERNAL_ASSETS_BUFFER)) {
+	uint32_t availableDecompressedSize = (uint32_t)(fileData - EXTERNAL_ASSETS_BUFFER - (((uint8_t *)(&g_externalAssets->document) - (uint8_t *)g_externalAssets)));
+    if (decompressedSize > availableDecompressedSize) {
         if (err) {
             *err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
         }
         return false;
     }
 
-    uint8_t *decompressedAssets = EXTERNAL_ASSETS_BUFFER;
+    g_externalAssets->projectVersion = projectVersion;
+    g_externalAssets->external = true;
 
-    int result = LZ4_decompress_safe((const char *)fileData + compressedDataOffset, (char *)decompressedAssets, compressedSize, (int)decompressedSize);
+    int result = LZ4_decompress_safe((const char *)fileData + compressedDataOffset, (char *)&g_externalAssets->document, compressedSize, (int)decompressedSize);
     if (result != (int)decompressedSize) {
         if (err) {
             *err = SCPI_ERROR_INVALID_BLOCK_DATA;
@@ -341,9 +318,86 @@ bool loadExternalAssets(const char *filePath, int *err) {
         return false;
     }
 
-    initAssets(g_externalAssets, projectVersion, true, decompressedAssets);
+    fixPointers(g_externalAssets);
 
     return true;
+}
+
+const Style *getStyle(int styleID) {
+	return g_mainAssets->styles->first + styleID - 1;
+}
+
+const Widget* getPageWidget(int pageId) {
+	if (pageId > 0) {
+		return g_mainAssets->document->pages.first + (pageId - 1);
+	} else if (pageId < 0) {
+		return g_externalAssets->document->pages.first + (-pageId - 1);
+	}
+	return nullptr;
+}
+
+const uint8_t *getFontData(int fontID) {
+	if (fontID == 0) {
+		return 0;
+	}
+	return g_mainAssets->fontsData + ((uint32_t *)g_mainAssets->fontsData)[fontID - 1];
+}
+
+const Bitmap *getBitmap(int bitmapID) {
+	if (bitmapID > 0) {
+		return (const Bitmap *)(g_mainAssets->bitmapsData + ((uint32_t *)g_mainAssets->bitmapsData)[bitmapID - 1]);
+	} else if (bitmapID < 0) {
+		return (const Bitmap *)(g_externalAssets->bitmapsData + ((uint32_t *)g_externalAssets->bitmapsData)[-bitmapID - 1]);
+	}
+	return nullptr;
+}
+
+int getThemesCount() {
+	return (int)g_mainAssets->colorsData->themes.count;
+}
+
+const Theme *getTheme(int i) {
+	return g_mainAssets->colorsData->themes.first + i;
+}
+
+const char *getThemeName(int i) {
+	return getTheme(i)->name;
+}
+
+const uint16_t *getThemeColors(int themeIndex) {
+	return getTheme(themeIndex)->colors.first;
+}
+
+const uint32_t getThemeColorsCount(int themeIndex) {
+	return getTheme(themeIndex)->colors.count;
+}
+
+const uint16_t *getColors() {
+	return g_mainAssets->colorsData->colors.first;
+}
+
+int getExternalAssetsFirstPageId() {
+	return -1;
+}
+
+const char *getActionName(int16_t actionId) {
+	if (actionId == 0) {
+		return nullptr;
+	}
+	if (actionId < 0) {
+		actionId = -actionId;
+	}
+	actionId--;
+	return g_externalAssets->actionNames->first[actionId];
+}
+
+int16_t getDataIdFromName(const char *name) {
+	for (uint32_t i = 0; i < g_externalAssets->dataItemNames->count; i++) {
+		if (strcmp(g_externalAssets->dataItemNames->first[i], name) == 0) {
+			return -((int16_t)i + 1);
+		}
+	}
+	return 0;
 }
 
 } // namespace gui

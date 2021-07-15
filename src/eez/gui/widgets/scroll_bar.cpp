@@ -58,9 +58,8 @@ struct ScrollBarWidgetState {
 };
 
 FixPointersFunctionType SCROLL_BAR_fixPointers = [](Widget *widget, Assets *assets) {
-    ScrollBarWidget *scrollBarWidget = (ScrollBarWidget *)widget->specific;
-    scrollBarWidget->leftButtonText = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)scrollBarWidget->leftButtonText);
-    scrollBarWidget->rightButtonText = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)scrollBarWidget->rightButtonText);
+    Text_fixPointer(&ScrollBarWidget::leftButtonText, widget, assets);
+    Text_fixPointer(&ScrollBarWidget::rightButtonText, widget, assets);
 };
 
 EnumFunctionType SCROLL_BAR_enum = nullptr;

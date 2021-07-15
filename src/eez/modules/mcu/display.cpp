@@ -95,7 +95,7 @@ uint32_t blendColor(uint32_t fgColor, uint32_t bgColor) {
 }
 
 void onThemeChanged() {
-	if (g_assetsLoaded) {
+	if (g_isMainAssetsLoaded) {
 		g_themeColors = getThemeColors(psu::persist_conf::devConf.selectedThemeIndex);
 		g_themeColorsCount = getThemeColorsCount(psu::persist_conf::devConf.selectedThemeIndex);
 		g_colors = getColors();

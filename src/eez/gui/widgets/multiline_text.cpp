@@ -32,8 +32,7 @@ struct MultilineTextWidget {
 };
 
 FixPointersFunctionType MULTILINE_TEXT_fixPointers = [](Widget *widget, Assets *assets) {
-    MultilineTextWidget *multilineTextWidget = (MultilineTextWidget *)widget->specific;
-    multilineTextWidget->text = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)multilineTextWidget->text);
+    Text_fixPointer(&MultilineTextWidget::text, widget, assets);
 };
 
 EnumFunctionType MULTILINE_TEXT_enum = nullptr;

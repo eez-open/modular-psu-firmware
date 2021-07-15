@@ -22,12 +22,12 @@ namespace eez {
 namespace gui {
 
 struct ContainerWidget {
-    WidgetList widgets;
+    List<const Widget> widgets;
     int16_t overlay;
     uint8_t flags;
 };
 
-void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const WidgetList &widgets);
+void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const List<const Widget> &widgets);
 
 } // namespace gui
 } // namespace eez

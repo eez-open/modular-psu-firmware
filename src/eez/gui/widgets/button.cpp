@@ -27,8 +27,7 @@ namespace eez {
 namespace gui {
 
 FixPointersFunctionType BUTTON_fixPointers = [](Widget *widget, Assets *assets) {
-    ButtonWidget *buttonWidget = (ButtonWidget *)widget->specific;
-    buttonWidget->text = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)buttonWidget->text);
+    Text_fixPointer(&ButtonWidget::text, widget, assets);
 };
 
 EnumFunctionType BUTTON_enum = nullptr;

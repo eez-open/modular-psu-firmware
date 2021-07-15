@@ -36,10 +36,10 @@ struct ContainerWidgetState {
 
 FixPointersFunctionType CONTAINER_fixPointers = [](Widget *widget, Assets *assets) {
     ContainerWidget *containerWidget = (ContainerWidget *)widget->specific;
-    WidgetList_fixPointers(containerWidget->widgets);
+    WidgetList_fixPointers(containerWidget->widgets, assets);
 };
 
-void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const WidgetList &widgets) {
+void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const List<const Widget> &widgets) {
     auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 

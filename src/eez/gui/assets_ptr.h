@@ -20,6 +20,8 @@
 
 #include <type_traits>
 
+#include <eez/memory.h>
+
 namespace eez {
 
 template<typename T, bool is_void>
@@ -43,11 +45,11 @@ struct AssetsPtrImpl<T, false>
     AssetsPtrImpl() = default;
     AssetsPtrImpl(std::nullptr_t v) {};
     /* Can accept void or T pointers. Store the offset to MEMORY_BEGIN. */
-    AssetsPtrImpl(T * p) : val(reinterpret_cast<const uint8_t*>(p) - MEMORY_BEGIN) {}
-    AssetsPtrImpl(void * p) : val(reinterpret_cast<const uint8_t*>(p) - MEMORY_BEGIN) {}
+    AssetsPtrImpl(T * p) : offset(reinterpret_cast<const uint8_t*>(p) - MEMORY_BEGIN) {}
+    AssetsPtrImpl(void * p) : offset(reinterpret_cast<const uint8_t*>(p) - MEMORY_BEGIN) {}
 
     /* Conversion to an int return the raw value */
-    operator uint32_t() const { return val; }
+    operator uint32_t() const { return offset; }
     
     /* Implicit conversion to a T pointer */
     operator T*() const { return ptr(); }
@@ -67,21 +69,28 @@ struct AssetsPtrImpl<T, false>
     /* Array access */
     T&       operator[](uint32_t i)       { return ptr()[i]; }
     const T& operator[](uint32_t i) const { return ptr()[i]; }
-    
+
+	T&       operator[](int i) { return ptr()[i]; }
+	const T& operator[](int i) const { return ptr()[i]; }
+
+	T&       operator[](int16_t i) { return ptr()[i]; }
+	const T& operator[](int16_t i) const { return ptr()[i]; }
+
+
     /* Implement addition of ints just like 'normal' pointers */
     T* operator+(int i)      { return &ptr()[i]; }
     T* operator+(unsigned i) { return &ptr()[i]; }
 
     /* Calculate the pointer, return a null pointer if the value is invalid */
     T* ptr() const {
-        if (val == 0xFFFFFFFF) {
+        if (offset == 0xFFFFFFFF) {
             return 0;
         } else {
-            return (T*)(MEMORY_BEGIN + val);
+            return (T*)(MEMORY_BEGIN + offset);
         }
     }
 
-    uint32_t val{0xFFFFFFFF};
+    uint32_t offset{0xFFFFFFFF};
 };
 
 /* Template specialization for void pointers that does not allow dereferencing */
@@ -90,13 +99,19 @@ struct AssetsPtrImpl<T, true>
 {
     AssetsPtrImpl() = default;
     AssetsPtrImpl(std::nullptr_t) {};
-    AssetsPtrImpl(T* p) : val(reinterpret_cast<const uint8_t*>(p) - MEMORY_BEGIN) {}
-    operator uint32_t() const { return val; }
-    operator T*() const { return reinterpret_cast<T*>(MEMORY_BEGIN + val); }
+    AssetsPtrImpl(T* p) : offset(reinterpret_cast<const uint8_t*>(p) - MEMORY_BEGIN) {}
+    operator uint32_t() const { return offset; }
+    operator T*() const {
+		if (offset == 0xFFFFFFFF) {
+			return 0;
+		} else {
+			return (T*)(MEMORY_BEGIN + offset);
+		}
+	}
 
     /* Implicit conversions to convert to any pointer type */
     template<typename U> operator U() const { return (U)(T*)(*this); }
-    uint32_t val{0xFFFFFFFF};
+    uint32_t offset{0xFFFFFFFF};
 };
 
 /* This struct chooses the type used for AssetsPtr<T> - by default it uses an AssetsPtrImpl<> */
@@ -106,12 +121,14 @@ struct AssetsPtrChooser
     using type = AssetsPtrImpl<T, std::is_void<T>::value>;
 };
 
-/* On 32-bit systems, we can just use raw pointers */
+#if defined(EEZ_PLATFORM_STM32)
+/* On STM32 (32 bit), we can just use raw pointers */
 template<typename T>
 struct AssetsPtrChooser<T, 4>
 {
     using type = T*;
 };
+#endif
 
 /* Utility typedef that delegates to AssetsPtrChooser */
 template<typename T>

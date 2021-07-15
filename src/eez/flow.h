@@ -18,59 +18,13 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <eez/gui/assets_ptr.h>
+#include <eez/gui/assets.h>
 
 namespace eez {
-
-namespace gui {
-	struct Assets;
-}
-
 namespace flow {
 
-template <typename T>
-struct List {
-    uint32_t count;
-    AssetsPtr<T> first;
-};
-
-struct ComponentInput {
-    uint8_t count;
-    uint16_t valueIndex[255];
-};
-
-struct Connection {
-    uint16_t targetComponentIndex;
-    uint8_t targetInputIndex;
-};
-
-struct ComponentOutput {
-    uint8_t count;
-    Connection connections[255];
-};
-
-struct Component {
-    uint16_t type;
-    List<ComponentInput> inputs;
-    List<ComponentOutput> outputs;
-    AssetsPtr<const void> specific;
-};
-
-struct Flow {
-    List<const Component> flows;
-};
-
-struct Value {
-    uint8_t type;
-};
-
-struct FlowDefinition {
-    List<const Flow> flows;
-    List<Value> values;
-};
-
-void run();
+unsigned start(eez::gui::Assets *assets);
+void tick(unsigned flowHandle);
 
 } // flow
 } // eez
