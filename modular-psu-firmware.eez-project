@@ -1,7 +1,7 @@
 {
   "settings": {
     "general": {
-      "projectVersion": "v3",
+      "projectVersion": "v2",
       "projectType": "master",
       "scpiDocFolder": "docs\\SCPI reference guide\\Commands",
       "imports": [
