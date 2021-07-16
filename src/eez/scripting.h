@@ -24,6 +24,8 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/profile.h>
 
+#include <eez/gui/gui.h>
+
 namespace eez {
 namespace scripting {
 
@@ -45,6 +47,10 @@ bool startScript(const char *filePath, int *err = nullptr);
 bool stopScript(int *err = nullptr);
 inline bool isIdle() { return g_state == STATE_IDLE; }
 bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen);
+
+bool isFlowRunning();
+void executeFlowAction(int16_t actionId);
+void dataOperation(int16_t dataId, gui::DataOperationEnum operation, gui::Cursor cursor, gui::Value &value);
 
 void onUncaughtScriptExceptionHook();
 

@@ -170,48 +170,11 @@ struct Flow {
     List<const Component> components;
 };
 
-enum FlowValueType {
-	FLOW_VALUE_TYPE_UNDEFINED,
-	FLOW_VALUE_TYPE_NULL,
-	FLOW_VALUE_TYPE_BOOLEAN,
-	FLOW_VALUE_TYPE_INT8,
-	FLOW_VALUE_TYPE_UINT8,
-	FLOW_VALUE_TYPE_INT16,
-	FLOW_VALUE_TYPE_UINT16,
-	FLOW_VALUE_TYPE_INT32,
-	FLOW_VALUE_TYPE_UINT32,
-	FLOW_VALUE_TYPE_INT64,
-	FLOW_VALUE_TYPE_UINT64,
-	FLOW_VALUE_TYPE_FLOAT,
-	FLOW_VALUE_TYPE_DOUBLE,
-	FLOW_VALUE_TYPE_STRING
-};
-
-struct FlowValue {
-    union {
-        unsigned type : 8;
-        unsigned refCount: 32;
-		unsigned reserved: 24;
-    } header;
-
-    union {
-        int8_t int8_;
-        uint8_t uint8_;
-        int16_t int16_;
-        uint16_t uint16_;
-        int32_t int32_;
-        uint32_t uint32_;
-        int64_t int64_;
-        uint64_t uint64_;
-        float float_;
-        double double_;
-        AssetsPtr<const char> string_;
-    } value;
-};
-
 struct FlowDefinition {
     List<const Flow> flows;
-    List<FlowValue> flowValues;
+    List<gui::Value> flowValues;
+    List<AssetsPtr<ComponentInput>> widgetDataItems;
+    List<AssetsPtr<ComponentOutput>> widgetActions;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

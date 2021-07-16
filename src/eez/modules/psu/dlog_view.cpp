@@ -2550,14 +2550,14 @@ void data_dlog_value_div(DataOperationEnum operation, Cursor cursor, Value &valu
 
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
-		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else {
             value = Value(dlog_view::roundValueOnYAxis(recording, cursor, recording.dlogValues[cursor].div), getYAxisUnit(recording, cursor));
 		}
 	} else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
-		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else {
             value = Value(recording.dlogValues[cursor].div, getYAxisUnit(recording, cursor));
@@ -2629,14 +2629,14 @@ void data_dlog_value_offset(DataOperationEnum operation, Cursor cursor, Value &v
 
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
-		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else {
             value = Value(dlog_view::roundValueOnYAxis(recording, cursor, recording.dlogValues[cursor].offset), getYAxisUnit(recording, cursor));
 		}
 	} else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
-		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else {
             value = Value(recording.dlogValues[cursor].offset, getYAxisUnit(recording, cursor));
@@ -2681,7 +2681,7 @@ void data_dlog_x_axis_offset(DataOperationEnum operation, Cursor cursor, Value &
 
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_OFFSET;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else {
             value = Value(recording.xAxisOffset, dlog_view::getXAxisUnit(recording));
@@ -2713,7 +2713,7 @@ void data_dlog_x_axis_div(DataOperationEnum operation, Cursor cursor, Value &val
 
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else {
             value = Value(recording.xAxisDiv, dlog_view::getXAxisUnit(recording));

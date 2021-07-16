@@ -54,7 +54,7 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
         const Bitmap *bitmap = nullptr;
 
         if (widget->data) {
-            if (widgetCursor.currentState->data.getType() != VALUE_TYPE_NONE) {
+            if (widgetCursor.currentState->data.getType() != VALUE_TYPE_UNDEFINED) {
                 drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, true, true);
                 auto image = (Image *)widgetCursor.currentState->data.getVoidPointer();
                 if (image) {

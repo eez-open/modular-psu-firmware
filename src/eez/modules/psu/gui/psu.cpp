@@ -661,7 +661,7 @@ bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
 }
 
 bool PsuAppContext::isBlinking(const Cursor cursor, int16_t id) {
-    if (g_focusCursor == cursor && g_focusDataId == id && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+    if (g_focusCursor == cursor && g_focusDataId == id && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
         return true;
     }
 
@@ -1495,7 +1495,7 @@ void setFocusCursor(const Cursor cursor, int16_t dataId) {
 }
 
 bool isFocusChanged() {
-    return g_focusEditValue.getType() != VALUE_TYPE_NONE;
+    return g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1927,7 +1927,7 @@ void onEncoder(int counter, bool clicked) {
         bool encoderEnabled = isEncoderEnabledInActivePage();
         if (encoderEnabled) {
             Value value;
-            if (persist_conf::devConf.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (persist_conf::devConf.encoderConfirmationMode && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
                 value = getEditValue(g_focusCursor, g_focusDataId);
@@ -2548,18 +2548,26 @@ float getDefaultAnimationDurationHook() {
     return psu::persist_conf::devConf.animationsDuration;
 }
 
-void executeExternalActionHook(int32_t actionId) {
-    g_externalActionId = actionId;
+void executeExternalActionHook(int16_t actionId) {
+    if (scripting::isFlowRunning()) {
+        scripting::executeFlowAction(actionId);
+    } else {
+        g_externalActionId = actionId;
+    }
 }
 
 void externalDataHook(int16_t dataId, DataOperationEnum operation, Cursor cursor, Value &value) {
-    if (dataId < 0) {
-        dataId = -dataId;
-    }
-    dataId--;
-    if ((uint16_t)dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
-        if (operation == DATA_OPERATION_GET) {
-            value = g_externalDataItemValues[dataId].value;
+    if (scripting::isFlowRunning()) {
+        scripting::dataOperation(dataId, operation, cursor, value);
+    } else {
+        if (dataId < 0) {
+            dataId = -dataId;
+        }
+        dataId--;
+        if ((uint16_t)dataId < MAX_NUM_EXTERNAL_DATA_ITEM_VALUES) {
+            if (operation == DATA_OPERATION_GET) {
+                value = g_externalDataItemValues[dataId].value;
+            }
         }
     }
 }

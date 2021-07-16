@@ -1235,7 +1235,7 @@ void editValue(int16_t dataId) {
 		options.enableMinButton();
 
         auto max = getMax(g_editValueCursor, g_editValueDataId);
-        if (max.getType() != VALUE_TYPE_NONE) {
+        if (max.getType() != VALUE_TYPE_UNDEFINED) {
             if (isinf(max.getFloat())) {
                 options.flags.option1ButtonEnabled = true;
                 options.option1ButtonText = INFINITY_SYMBOL;
@@ -1247,7 +1247,7 @@ void editValue(int16_t dataId) {
         }
 
         auto def = getDef(g_editValueCursor, g_editValueDataId);
-        if (def.getType() != VALUE_TYPE_NONE) {
+        if (def.getType() != VALUE_TYPE_UNDEFINED) {
             options.def = def.getFloat();
             options.enableDefButton();
         }
@@ -1419,7 +1419,7 @@ void data_channel_u_edit(DataOperationEnum operation, Cursor cursor, Value &valu
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
@@ -1539,7 +1539,7 @@ void data_channel_i_edit(DataOperationEnum operation, Cursor cursor, Value &valu
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_I_EDIT;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
@@ -2369,7 +2369,7 @@ void data_channel_protection_ovp_level(DataOperationEnum operation, Cursor curso
             value = page->level;
         } else {
             bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_LEVEL;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
                 value = MakeValue(channel.prot_conf.u_level, UNIT_VOLT);
@@ -2406,7 +2406,7 @@ void data_channel_protection_ovp_delay(DataOperationEnum operation, Cursor curso
             value = page->delay;
         } else {
             bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_DELAY;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
                 value = MakeValue(channel.prot_conf.u_delay, UNIT_SECOND);
@@ -2444,7 +2444,7 @@ void data_channel_protection_ovp_limit(DataOperationEnum operation, Cursor curso
                 value = page->limit;
             } else {
                 bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT;
-                if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                     value = g_focusEditValue;
                 } else {
                     value = MakeValue(channel_dispatcher::getULimit(channel), UNIT_VOLT);
@@ -2496,7 +2496,7 @@ void data_channel_protection_ocp_delay(DataOperationEnum operation, Cursor curso
             value = page->delay;
         } else {
             bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OCP_DELAY;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
                 value = MakeValue(channel.prot_conf.i_delay, UNIT_SECOND);
@@ -2531,7 +2531,7 @@ void data_channel_protection_ocp_limit(DataOperationEnum operation, Cursor curso
             value = page->limit;
         } else {
             bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
                 value = MakeValue(channel_dispatcher::getILimit(channel), UNIT_AMPER);
@@ -2581,7 +2581,7 @@ void data_channel_protection_opp_level(DataOperationEnum operation, Cursor curso
             value = page->level;
         } else {
             bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
                 value = MakeValue(channel_dispatcher::getOppLevel(channel), UNIT_WATT);
@@ -2616,7 +2616,7 @@ void data_channel_protection_opp_delay(DataOperationEnum operation, Cursor curso
             value = page->delay;
         } else {
             bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
                 value = MakeValue(channel.prot_conf.p_delay, UNIT_SECOND);
@@ -2654,7 +2654,7 @@ void data_channel_protection_opp_limit(DataOperationEnum operation, Cursor curso
                 value = page->limit;
             } else {
                 bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT;
-                if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+                if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                     value = g_focusEditValue;
                 } else {
                     value = MakeValue(channel_dispatcher::getPowerLimit(channel), UNIT_WATT);
@@ -2706,7 +2706,7 @@ void data_channel_protection_otp_level(DataOperationEnum operation, Cursor curso
             value = page->level;
         } else {
             bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
                 value = MakeValue(temperature::getChannelSensorLevel(&channel), UNIT_CELSIUS);
@@ -2752,7 +2752,7 @@ void data_channel_protection_otp_delay(DataOperationEnum operation, Cursor curso
             value = page->delay;
         } else {
             bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
                 value = MakeValue(temperature::getChannelSensorDelay(&channel), UNIT_SECOND);
@@ -4549,7 +4549,7 @@ void data_io_pin_state(DataOperationEnum operation, Cursor cursor, Value &value)
 void data_io_pin_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_IO_PIN_PWM_FREQUENCY;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
@@ -4607,7 +4607,7 @@ void data_io_pin_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value
 void data_io_pin_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_IO_PIN_PWM_DUTY;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);

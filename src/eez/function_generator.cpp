@@ -2456,7 +2456,7 @@ void data_function_generator_frequency(DataOperationEnum operation, Cursor curso
 
 	if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_FREQUENCY;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
@@ -2515,7 +2515,7 @@ void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cur
 
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_PHASE_SHIFT;
-		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
 			data_keypad_text(operation, cursor, value);
@@ -2592,7 +2592,7 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_AMPLITUDE;
-		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
 			data_keypad_text(operation, cursor, value);
@@ -2694,7 +2694,7 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_OFFSET;
-		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
 			data_keypad_text(operation, cursor, value);
@@ -2787,7 +2787,7 @@ void data_function_generator_duty_cycle(DataOperationEnum operation, Cursor curs
 
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_PWM_DUTY;
-		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
 			data_keypad_text(operation, cursor, value);
@@ -2994,7 +2994,7 @@ void data_function_generator_preview_overlay(DataOperationEnum operation, Cursor
 void data_function_generator_preview_period(DataOperationEnum operation, Cursor cursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_PHASE_SHIFT;
-		if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
 			data_keypad_text(operation, cursor, value);

@@ -407,7 +407,7 @@ bool SelectFromEnumPage::getLabel(int i, char *text, int count) {
         Value value;
         Cursor cursor(i);
         enumDefinitionFunc(DATA_OPERATION_GET_LABEL, cursor, value);
-        if (value.getType() != VALUE_TYPE_NONE) {
+        if (value.getType() != VALUE_TYPE_UNDEFINED) {
             if (text) {
                 value.toText(text, count);
             }

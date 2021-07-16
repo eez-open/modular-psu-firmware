@@ -26,5 +26,8 @@ namespace flow {
 unsigned start(eez::gui::Assets *assets);
 void tick(unsigned flowHandle);
 
+void executeFlowAction(unsigned flowHandle, int16_t actionId);
+void dataOperation(unsigned flowHandle, int16_t dataId, gui::DataOperationEnum operation, gui::Cursor cursor, gui::Value &value);
+
 } // flow
 } // eez

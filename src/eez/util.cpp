@@ -98,8 +98,24 @@ void stringCopy(char *dst, size_t maxStrLength, const char *src) {
     dst[maxStrLength - 1] = 0;
 }
 
+void stringCopyLength(char *dst, size_t maxStrLength, const char *src, size_t length) {
+	size_t n = MIN(length, maxStrLength);
+	strncpy(dst, src, n);
+	dst[n] = 0;
+}
+
 void stringAppendString(char *str, size_t maxStrLength, const char *value) {
-    strncat(str, value, maxStrLength - strlen(str) - 1);
+    int n = maxStrLength - strlen(str) - 1;
+    if (n >= 0) {
+        strncat(str, value, n);
+    }
+}
+
+void stringAppendStringLength(char *str, size_t maxStrLength, const char *value, size_t length) {
+    int n = MIN(maxStrLength - strlen(str) - 1, length);
+    if (n >= 0) {
+        strncat(str, value, n);
+    }
 }
 
 void stringAppendInt(char *str, size_t maxStrLength, int value) {

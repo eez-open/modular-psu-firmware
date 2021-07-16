@@ -80,7 +80,7 @@ void initEditValue() {
 void enter(int tabIndex, bool setFocus) {
 #if OPTION_ENCODER
     if (setFocus && !isActive(&g_psuAppContext)) {
-        if (!g_psuAppContext.isFocusWidget(getFoundWidgetAtDown()) || g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (!g_psuAppContext.isFocusWidget(getFoundWidgetAtDown()) || g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             setFocusCursor(getFoundWidgetAtDown().cursor, getFoundWidgetAtDown().widget->data);
             return;
         }

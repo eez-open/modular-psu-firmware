@@ -43,19 +43,35 @@ const char *getWidgetLabel(EnumItem *enumDefinition, uint16_t value) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool compare_NONE_value(const Value &a, const Value &b) {
+bool compare_UNDEFINED_value(const Value &a, const Value &b) {
     return true;
 }
 
-void NONE_value_to_text(const Value &value, char *text, int count) {
+void UNDEFINED_value_to_text(const Value &value, char *text, int count) {
     *text = 0;
 }
 
-bool compare_INT_value(const Value &a, const Value &b) {
+bool compare_NULL_value(const Value &a, const Value &b) {
+    return true;
+}
+
+void NULL_value_to_text(const Value &value, char *text, int count) {
+    *text = 0;
+}
+
+bool compare_BOOLEAN_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
 
-void INT_value_to_text(const Value &value, char *text, int count) {
+void BOOLEAN_value_to_text(const Value &value, char *text, int count) {
+    stringAppendInt(text, count, value.getInt());
+}
+
+bool compare_INT8_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void INT8_value_to_text(const Value &value, char *text, int count) {
     stringAppendInt(text, count, value.getInt());
 }
 
@@ -67,12 +83,28 @@ void UINT8_value_to_text(const Value &value, char *text, int count) {
     stringAppendUInt32(text, count, value.getUInt8());
 }
 
+bool compare_INT16_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void INT16_value_to_text(const Value &value, char *text, int count) {
+    stringAppendInt(text, count, value.getInt());
+}
+
 bool compare_UINT16_value(const Value &a, const Value &b) {
     return a.getUInt16() == b.getUInt16();
 }
 
 void UINT16_value_to_text(const Value &value, char *text, int count) {
     stringAppendUInt32(text, count, value.getUInt16());
+}
+
+bool compare_INT32_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void INT32_value_to_text(const Value &value, char *text, int count) {
+    stringAppendInt(text, count, value.getInt());
 }
 
 bool compare_UINT32_value(const Value &a, const Value &b) {
@@ -240,15 +272,7 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
-bool compare_RANGE_value(const Value &a, const Value &b) {
-    return a.getUInt32() == b.getUInt32();
-}
-
-void RANGE_value_to_text(const Value &value, char *text, int count) {
-    text[0] = 0;
-}
-
-bool compare_STR_value(const Value &a, const Value &b) {
+bool compare_STRING_value(const Value &a, const Value &b) {
     const char *astr = a.getString();
     const char *bstr = b.getString();
     if (!astr && !bstr) {
@@ -260,7 +284,7 @@ bool compare_STR_value(const Value &a, const Value &b) {
     return strcmp(astr, bstr) == 0;
 }
 
-void STR_value_to_text(const Value &value, char *text, int count) {
+void STRING_value_to_text(const Value &value, char *text, int count) {
     const char *str = value.getString();
     if (str) {
         stringCopy(text, count, str);
@@ -269,17 +293,33 @@ void STR_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
-bool compare_VERSIONED_STR_value(const Value &a, const Value &b) {
+bool compare_INT_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void INT_value_to_text(const Value &value, char *text, int count) {
+    stringAppendInt(text, count, value.getInt());
+}
+
+bool compare_VERSIONED_STRING_value(const Value &a, const Value &b) {
     return a.unit_ == b.unit_; // here unit_ is used as string version
 }
 
-void VERSIONED_STR_value_to_text(const Value &value, char *text, int count) {
+void VERSIONED_STRING_value_to_text(const Value &value, char *text, int count) {
     const char *str = value.getString();
     if (str) {
         stringCopy(text, count, str);
     } else {
         text[0] = 0;
     }
+}
+
+bool compare_RANGE_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void RANGE_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
 }
 
 bool compare_PASSWORD_value(const Value &a, const Value &b) {

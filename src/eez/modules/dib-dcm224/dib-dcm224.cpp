@@ -1133,7 +1133,7 @@ void data_dib_dcm224_pwm_enabled(DataOperationEnum operation, Cursor cursor, Val
 void data_dib_dcm224_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_DCM224_PWM_FREQUENCY;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
@@ -1195,7 +1195,7 @@ void data_dib_dcm224_pwm_frequency(DataOperationEnum operation, Cursor cursor, V
 void data_dib_dcm224_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_IO_PIN_PWM_DUTY;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);
@@ -1250,7 +1250,7 @@ void data_dib_dcm224_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
 void data_dib_dcm224_counterphase_frequency(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_DCM224_COUNTERPHASE_FREQUENCY;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);

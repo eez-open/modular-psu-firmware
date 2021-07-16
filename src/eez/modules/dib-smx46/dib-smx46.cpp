@@ -1621,7 +1621,7 @@ void data_dib_smx46_aout_value(DataOperationEnum operation, Cursor cursor, Value
 	
 	if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_SMX46_AOUT_VALUE;
-        if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+        if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
             data_keypad_text(operation, cursor, value);

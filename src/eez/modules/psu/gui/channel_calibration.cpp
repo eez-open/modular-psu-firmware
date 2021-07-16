@@ -1075,7 +1075,7 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
 
         if (operation == DATA_OPERATION_GET) {
             bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
                 data_keypad_text(operation, cursor, value);
@@ -1152,7 +1152,7 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
 
         if (operation == DATA_OPERATION_GET) {
             bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
-            if (focused && g_focusEditValue.getType() != VALUE_TYPE_NONE) {
+            if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
                 data_keypad_text(operation, cursor, value);

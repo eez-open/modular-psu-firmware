@@ -55,8 +55,11 @@ float remapOutExp(float x, float x1, float y1, float x2, float y2);
 float clamp(float x, float min, float max);
 
 void stringCopy(char *dst, size_t maxStrLength, const char *src);
+void stringCopyLength(char *dst, size_t maxStrLength, const char *src, size_t length);
 
 void stringAppendString(char *str, size_t maxStrLength, const char *value);
+void stringAppendStringLength(char *str, size_t maxStrLength, const char *value, size_t length);
+
 void stringAppendInt(char *str, size_t maxStrLength, int value);
 void stringAppendUInt32(char *str, size_t maxStrLength, uint32_t value);
 void stringAppendFloat(char *str, size_t maxStrLength, float value);

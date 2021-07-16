@@ -600,7 +600,7 @@ scpi_result_t scpi_cmd_displayWindowDialogActionQ(scpi_t *context) {
 scpi_choice_def_t dataTypeChoice[] = {
     { "INTeger", VALUE_TYPE_INT },
     { "FLOat", VALUE_TYPE_FLOAT },
-    { "STRing", VALUE_TYPE_STR },
+    { "STRing", VALUE_TYPE_STRING },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
@@ -663,7 +663,7 @@ scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
 
         Value dataValue = (int)value;
         psu::gui::g_psuAppContext.dialogSetDataItemValue(dataId, dataValue);
-    } else if (type == VALUE_TYPE_STR) {
+    } else if (type == VALUE_TYPE_STRING) {
         const char *valueText;
         size_t valueTextLen;
         if (!SCPI_ParamCharacters(context, &valueText, &valueTextLen, true)) {

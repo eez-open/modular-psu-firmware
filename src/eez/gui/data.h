@@ -81,95 +81,95 @@ typedef uint8_t ValueType;
 struct Value {
   public:
     Value() 
-        : type_(VALUE_TYPE_NONE), options_(0), unit_(UNIT_UNKNOWN) 
+        : type_(VALUE_TYPE_UNDEFINED), unit_(UNIT_UNKNOWN), options_(0)
     {
         pVoid_ = 0;
     }
 
     Value(int value) 
-        : type_(VALUE_TYPE_INT), options_(0), unit_(UNIT_UNKNOWN), int_(value) 
+        : type_(VALUE_TYPE_INT), unit_(UNIT_UNKNOWN), options_(0), int_(value)
     {
     }
 
     Value(bool value)
-        : type_(VALUE_TYPE_INT), options_(0), unit_(UNIT_UNKNOWN), int_(value ? 1 : 0) 
+        : type_(VALUE_TYPE_INT), unit_(UNIT_UNKNOWN), options_(0), int_(value ? 1 : 0)
     {
     }
     
     Value(const char *str) 
-        : type_(VALUE_TYPE_STR), options_(0), unit_(UNIT_UNKNOWN), str_(str) 
+        : type_(VALUE_TYPE_STRING), unit_(UNIT_UNKNOWN), options_(0), str_(str)
     {
     }
     
     Value(int version, const char *str) 
-        : type_(VALUE_TYPE_VERSIONED_STR), options_(0), unit_(version), str_(str) 
+        : type_(VALUE_TYPE_VERSIONED_STRING), unit_(version), options_(0), str_(str)
     {
     }
 
     Value(const char *str, ValueType type)
-        : type_(type), options_(0), unit_(UNIT_UNKNOWN), str_(str)
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), str_(str)
     {
     }
 
     Value(int value, ValueType type)
-        : type_(type), options_(0), unit_(UNIT_UNKNOWN), int_(value) 
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), int_(value)
     {
     }
 
     Value(int value, ValueType type, uint16_t options)
-        : type_(type), options_(options), unit_(UNIT_UNKNOWN), int_(value) 
+        : type_(type), unit_(UNIT_UNKNOWN), options_(options), int_(value)
     {
     }
 
     Value(uint8_t value, ValueType type)
-        : type_(type), options_(0), unit_(UNIT_UNKNOWN), uint8_(value) 
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint8_(value)
     {
     }
 
     Value(uint16_t value, ValueType type)
-        : type_(type), options_(0), unit_(UNIT_UNKNOWN), uint16_(value) 
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint16_(value)
     {
     }
 
     Value(uint32_t value, ValueType type)
-        : type_(type), options_(0), unit_(UNIT_UNKNOWN), uint32_(value) 
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint32_(value)
     {
     }
 
     Value(float value, Unit unit)
-        : type_(VALUE_TYPE_FLOAT), options_(0), unit_(unit), float_(value) 
+        : type_(VALUE_TYPE_FLOAT), unit_(unit), options_(0), float_(value)
     {
     }
 
     Value(float value, Unit unit, uint16_t options)
-        : type_(VALUE_TYPE_FLOAT), options_(options), unit_(unit), float_(value) 
+        : type_(VALUE_TYPE_FLOAT), unit_(unit), options_(options), float_(value)
     {
     }
 
     Value(float value, ValueType type)
-        : type_(type), options_(0), unit_(UNIT_UNKNOWN), float_(value)
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), float_(value)
     {
     }
 
     Value(const char *value, ValueType type, int16_t options)
-        : type_(type), options_(options), unit_(UNIT_UNKNOWN), str_(value)
+        : type_(type), unit_(UNIT_UNKNOWN), options_(options), str_(value)
     {
     }
 
     Value(void *value, ValueType type) 
-        : type_(type), pVoid_(value) 
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), pVoid_(value)
     {
     }
 
     Value(AppContext *appContext) 
-        : type_(VALUE_TYPE_POINTER), pVoid_(appContext) 
+        : type_(VALUE_TYPE_POINTER), unit_(UNIT_UNKNOWN), options_(0), pVoid_(appContext)
     {
     }
 
     typedef float (*YtDataGetValueFunctionPointer)(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
     Value(YtDataGetValueFunctionPointer ytDataGetValueFunctionPointer)
-        : type_(VALUE_TYPE_YT_DATA_GET_VALUE_FUNCTION_POINTER), pVoid_((void *)ytDataGetValueFunctionPointer)
+        : type_(VALUE_TYPE_YT_DATA_GET_VALUE_FUNCTION_POINTER), unit_(UNIT_UNKNOWN), options_(0), pVoid_((void *)ytDataGetValueFunctionPointer)
     {
     }
 
@@ -186,7 +186,7 @@ struct Value {
         return type_ == VALUE_TYPE_FLOAT;
     }
     bool isString() {
-        return type_ == VALUE_TYPE_STR;
+        return type_ == VALUE_TYPE_STRING;
     }
 
     Unit getUnit() const {
@@ -294,8 +294,8 @@ struct Value {
 
   public:
     ValueType type_;
-    uint16_t options_;
     uint8_t unit_;
+    uint16_t options_;
     union {
         int int_;
         int16_t int16_;

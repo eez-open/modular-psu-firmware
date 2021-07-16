@@ -73312,6 +73312,18 @@
             }
           },
           {
+            "name": "SCRipt:RUN?",
+            "helpLink": "EEZ BB3 SCPI reference 5.14 - SCRipt.html#scr_run",
+            "parameters": [],
+            "response": {
+              "type": [
+                {
+                  "type": "quoted-string"
+                }
+              ]
+            }
+          },
+          {
             "name": "SCRipt:STOP",
             "helpLink": "EEZ BB3 SCPI reference 5.14 - SCRipt.html#scr_stop",
             "parameters": [],

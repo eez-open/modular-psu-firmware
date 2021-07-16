@@ -342,9 +342,11 @@ void boot() {
 #endif
 
     if (g_numMasterErrors > 0) {
+
 		ErrorTrace("MCU errors: %s\n", g_masterErrorMessage);
     }
 
+	DebugTrace("sizeof(Value) = %d\n", sizeof(gui::Value));
     // DebugTrace("Memory left: %d\n", MEMORY_SIZE - (uint32_t)(MEMORY_END - MEMORY_BEGIN));
 }
 

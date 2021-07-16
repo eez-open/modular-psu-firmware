@@ -597,7 +597,7 @@ void ChSettingsListsPage::nextPage() {
 bool ChSettingsListsPage::isFocusedValueEmpty() {
     Cursor cursor(getCursorIndexWithinPage());
     Value value = get(cursor, getDataIdAtCursor());
-    return value.getType() == VALUE_TYPE_STR;
+    return value.getType() == VALUE_TYPE_STRING;
 }
 
 float ChSettingsListsPage::getFocusedValue() {
@@ -605,7 +605,7 @@ float ChSettingsListsPage::getFocusedValue() {
 
     Value value = get(cursor, getDataIdAtCursor());
 
-    if (value.getType() == VALUE_TYPE_STR) {
+    if (value.getType() == VALUE_TYPE_STRING) {
         value = getDef(cursor, getDataIdAtCursor());
     }
 
@@ -716,7 +716,7 @@ void ChSettingsListsPage::edit() {
 
         Value def = getDef(cursor, dataId);
 
-        if (value.getType() == VALUE_TYPE_STR) {
+        if (value.getType() == VALUE_TYPE_STRING) {
             value = Value();
             options.editValueUnit = def.getUnit();
         } else {
@@ -897,7 +897,7 @@ void ChSettingsListsPage::onEncoder(int counter) {
     int16_t dataId = getDataIdAtCursor();
 
     Value value = get(cursor, dataId);
-    if (value.getType() == VALUE_TYPE_STR) {
+    if (value.getType() == VALUE_TYPE_STRING) {
         value = getDef(cursor, dataId);
     }
 
@@ -954,7 +954,7 @@ Unit ChSettingsListsPage::getEncoderUnit() {
 
     Value value = get(cursor, getDataIdAtCursor());
 
-    if (value.getType() == VALUE_TYPE_STR) {
+    if (value.getType() == VALUE_TYPE_STRING) {
         value = getDef(cursor, getDataIdAtCursor());
     }
 

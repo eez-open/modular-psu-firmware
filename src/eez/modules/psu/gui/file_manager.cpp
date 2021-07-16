@@ -1202,7 +1202,7 @@ void data_file_manager_file_name(DataOperationEnum operation, Cursor cursor, Val
     if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
-            value = Value(getFileName(cursor), VALUE_TYPE_STR, STRING_OPTIONS_FILE_ELLIPSIS);
+            value = Value(getFileName(cursor), VALUE_TYPE_STRING, STRING_OPTIONS_FILE_ELLIPSIS);
         }
     }
 }

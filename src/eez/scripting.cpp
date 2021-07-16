@@ -276,10 +276,10 @@ void startFlowScript() {
 	getFileName(g_scriptPath, scriptName, sizeof(scriptName));
 	InfoTrace("App started: %s\n", scriptName);
 
-	g_flowHandle = flow::start(g_externalAssets);
+	psu::gui::hideAsyncOperationInProgress();
+	psu::gui::clearTextMessage();
 
-	//psu::gui::hideAsyncOperationInProgress();
-	//psu::gui::clearTextMessage();
+	g_flowHandle = flow::start(g_externalAssets);
 
 	//g_state = STATE_IDLE;
 
@@ -299,11 +299,15 @@ void oneIter() {
 			startFlowScript();
 		}
 	} else {
-		flow::tick(g_flowHandle);
+		if (g_flowHandle != 0) {
+			flow::tick(g_flowHandle);
+		}
 	}
 }
 
 void doStopScript() {
+	g_flowHandle = 0;
+
 	terminateThread();
 
 	psu::gui::hideAsyncOperationInProgress();
@@ -319,8 +323,10 @@ void doStopScript() {
 		g_autoStartScriptIsRunning = false;
 	}
 
-	psu::gui::showMainPage();
-
+	while (psu::gui::isPageOnStack(getExternalAssetsFirstPageId())) {
+		psu::gui::popPage();
+	}
+	
 	startThread();
 }
 
@@ -459,6 +465,18 @@ bool stopScript(int *err) {
 		*err = SCPI_ERROR_EXECUTION_ERROR;
 	}
 	return false;
+}
+
+bool isFlowRunning() {
+	return g_flowHandle != 0;
+}
+
+void executeFlowAction(int16_t actionId) {
+	flow::executeFlowAction(g_flowHandle, actionId);
+}
+
+void dataOperation(int16_t dataId, DataOperationEnum operation, Cursor cursor, Value &value) {
+	flow::dataOperation(g_flowHandle, dataId, operation, cursor, value);
 }
 
 static const char *g_commandOrQueryText;
@@ -707,6 +725,16 @@ scpi_result_t scpi_cmd_scriptRun(scpi_t *context) {
 	
 	return SCPI_RES_OK;
 }
+
+scpi_result_t scpi_cmd_scriptRunQ(scpi_t *context) {
+	if (!isIdle()) {
+		SCPI_ResultText(context, g_scriptPath);
+	} else {
+		SCPI_ResultText(context, "");
+	}
+	return SCPI_RES_OK;
+}
+
 
 scpi_result_t scpi_cmd_scriptStop(scpi_t *context) {
 	int err;

@@ -153,7 +153,7 @@ void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, floa
 
 float getDefaultAnimationDurationHook();
 
-void executeExternalActionHook(int32_t actionId);
+void executeExternalActionHook(int16_t actionId);
 void externalDataHook(int16_t id, DataOperationEnum operation, Cursor cursor, Value &value);
 
 OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor);

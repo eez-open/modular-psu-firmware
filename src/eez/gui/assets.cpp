@@ -128,7 +128,7 @@ void Component_fixPointers(Component *component, Assets *assets) {
 	component->inputs.first = (ComponentInput *)((uint8_t *)assets->flowDefinition + (uint32_t)component->inputs.first);
     for (uint32_t i = 0; i < component->inputs.count; ++i) {
         component->inputs.first[i].values.first =
-            (Connection *)((uint8_t *)assets->flowDefinition + (uint32_t)component->inputs.first[i].values.first);
+            (ComponentInputValue *)((uint8_t *)assets->flowDefinition + (uint32_t)component->inputs.first[i].values.first);
     }
 
 	component->outputs.first = (ComponentOutput *)((uint8_t *)assets->flowDefinition + (uint32_t)component->outputs.first);
@@ -142,15 +142,15 @@ void Component_fixPointers(Component *component, Assets *assets) {
 
 void Flow_fixPointers(Flow *flow, Assets *assets) {
     // fix components pointers
-    flow->components.first = (Flow *)((uint8_t *)assets->flowDefinition + (uint32_t)flow->components.first);
+    flow->components.first = (const Component *)((uint8_t *)assets->flowDefinition + (uint32_t)flow->components.first);
     for (uint32_t i = 0; i < flow->components.count; ++i) {
         Component_fixPointers((Component *)&flow->components.first[i], assets);
     }
 }
 
-void FlowValue_fixPointers(FlowValue &flowValue, Assets *assets) {
-    if (flowValue.header.type == FLOW_VALUE_TYPE_STRING) {
-        flowValue.value.string_ = (const char *)((uint8_t *)(void *)assets->flowDefinition + (uint32_t)(flowValue.value.string_));
+void FlowValue_fixPointers(gui::Value &flowValue, Assets *assets) {
+    if (flowValue.type_ == VALUE_TYPE_STRING) {
+        flowValue.str_ = (const char *)((uint8_t *)(void *)assets->flowDefinition + (uint32_t)(flowValue.str_));
     }
 }
 
@@ -161,10 +161,22 @@ void FlowDefinition_fixPointers(Assets *assets) {
         Flow_fixPointers((Flow *)&assets->flowDefinition->flows.first[i], assets);
     }
 
-    // fix values pointers
-    assets->flowDefinition->flowValues.first = (FlowValue *)((uint8_t *)assets->flowDefinition + (uint32_t)assets->flowDefinition->flowValues.first);
+    // fix flowValues pointers
+    assets->flowDefinition->flowValues.first = (gui::Value *)((uint8_t *)assets->flowDefinition + (uint32_t)assets->flowDefinition->flowValues.first);
 	for (uint32_t i = 0; i < assets->flowDefinition->flowValues.count; ++i) {
 		FlowValue_fixPointers(assets->flowDefinition->flowValues.first[i], assets);
+	}
+
+    // fix widgetDataItems pointers
+    assets->flowDefinition->widgetDataItems.first = (AssetsPtr<ComponentInput> *)((uint8_t *)assets->flowDefinition + (uint32_t)assets->flowDefinition->widgetDataItems.first);
+	for (uint32_t i = 0; i < assets->flowDefinition->widgetDataItems.count; ++i) {
+		assets->flowDefinition->widgetDataItems.first[i] = (ComponentInput *)((uint8_t *)assets->flowDefinition + (uint32_t)assets->flowDefinition->widgetDataItems.first[i]);
+	}
+
+    // fix widgetActions pointers
+    assets->flowDefinition->widgetActions.first = (AssetsPtr<ComponentOutput> *)((uint8_t *)assets->flowDefinition + (uint32_t)assets->flowDefinition->widgetActions.first);
+	for (uint32_t i = 0; i < assets->flowDefinition->widgetActions.count; ++i) {
+		assets->flowDefinition->widgetActions.first[i] = (ComponentOutput *)((uint8_t *)assets->flowDefinition + (uint32_t)assets->flowDefinition->widgetActions.first[i]);
 	}
 }
 
@@ -173,28 +185,28 @@ void FlowDefinition_fixPointers(Assets *assets) {
 void fixPointers(Assets *assets) {
 	auto offsetOrigin = (uint8_t *)&assets->document;
 
-	assets->document = offsetOrigin + (uint32_t)assets->document;
+	assets->document = (Document *)(offsetOrigin + (uint32_t)assets->document);
 	WidgetList_fixPointers(assets->document->pages, assets);
 
-	assets->styles = offsetOrigin + (uint32_t)assets->styles;
+	assets->styles = (StyleList *)(offsetOrigin + (uint32_t)assets->styles);
 	StyleList_fixPointers(assets);
 
 	assets->fontsData = offsetOrigin + (uint32_t)assets->fontsData;
 	assets->bitmapsData = offsetOrigin + (uint32_t)assets->bitmapsData;
 
-	assets->colorsData = offsetOrigin + (uint32_t)assets->colorsData;
+	assets->colorsData = (Colors *)(offsetOrigin + (uint32_t)assets->colorsData);
 	ColorsData_fixPointers(assets);
 
 	if (assets->external || assets->projectVersion >= 3) {
-		assets->actionNames = offsetOrigin + (uint32_t)assets->actionNames;
+		assets->actionNames = (NameList *)(offsetOrigin + (uint32_t)assets->actionNames);
 		NameList_fixPointers(assets->actionNames);
 
-		assets->dataItemNames = offsetOrigin + (uint32_t)assets->dataItemNames;
+		assets->dataItemNames = (NameList *)(offsetOrigin + (uint32_t)assets->dataItemNames);
 		NameList_fixPointers(assets->dataItemNames);
 	}
 
 	if (assets->projectVersion >= 3) {
-		assets->flowDefinition = offsetOrigin + (uint32_t)assets->flowDefinition;
+		assets->flowDefinition = (FlowDefinition *)(offsetOrigin + (uint32_t)assets->flowDefinition);
         FlowDefinition_fixPointers(assets);
 	}
 }

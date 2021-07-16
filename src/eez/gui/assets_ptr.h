@@ -121,14 +121,16 @@ struct AssetsPtrChooser
     using type = AssetsPtrImpl<T, std::is_void<T>::value>;
 };
 
-#if defined(EEZ_PLATFORM_STM32)
-/* On STM32 (32 bit), we can just use raw pointers */
+//#if defined(EEZ_PLATFORM_STM32)
+
+/* On 32 bit systems, we can just use raw pointers */
 template<typename T>
 struct AssetsPtrChooser<T, 4>
 {
     using type = T*;
 };
-#endif
+
+//#endif
 
 /* Utility typedef that delegates to AssetsPtrChooser */
 template<typename T>

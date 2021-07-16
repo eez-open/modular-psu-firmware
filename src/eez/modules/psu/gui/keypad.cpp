@@ -929,7 +929,7 @@ void NumericKeypad::dot() {
 }
 
 void NumericKeypad::reset() {
-    m_state = m_startValue.getType() != VALUE_TYPE_NONE ? START : EMPTY;
+    m_state = m_startValue.getType() != VALUE_TYPE_UNDEFINED ? START : EMPTY;
     m_keypadText[0] = 0;
     m_cursorPosition = 0;
 }

@@ -146,6 +146,7 @@
     SCPI_COMMAND("ROUTe:LABel:COLumn", scpi_cmd_routeLabelColumn) \
     SCPI_COMMAND("ROUTe:LABel:COLumn?", scpi_cmd_routeLabelColumnQ) \
     SCPI_COMMAND("SCRipt:RUN", scpi_cmd_scriptRun) \
+    SCPI_COMMAND("SCRipt:RUN?", scpi_cmd_scriptRunQ) \
     SCPI_COMMAND("SCRipt:STOP", scpi_cmd_scriptStop) \
     SCPI_COMMAND("SCRipt:RECall", scpi_cmd_scriptRecall) \
     SCPI_COMMAND("SCRipt:RECall?", scpi_cmd_scriptRecallQ) \
