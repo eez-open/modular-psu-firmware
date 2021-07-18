@@ -32,7 +32,7 @@ extern Assets *g_externalAssets;
 template<typename T>
 struct AssetsPtr {
     T* ptr(Assets *assets) {
-        return (T *)((uint8_t *)assets + 4 + offset); // 4 is offset of Assets::pages
+        return offset ? (T *)((uint8_t *)assets + 4 + offset) : nullptr; // 4 is offset of Assets::pages
     }
 
     void operator=(T* ptr) {
@@ -55,6 +55,18 @@ private:
     AssetsPtr<AssetsPtr<uint32_t>> items;
 };
 
+template<typename T>
+struct SimpleList {
+    T *ptr(Assets *assets) {
+        return items.ptr(assets);
+    }
+
+	uint32_t count;
+
+private:
+    AssetsPtr<T> items;
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #define SHADOW_FLAG 1
@@ -62,7 +74,7 @@ private:
 
 struct Widget {
 	uint8_t type;
-	uint8_t reserved;
+	uint8_t reserved1;
 	int16_t data;
 	int16_t action;
 	int16_t x;
@@ -154,13 +166,12 @@ struct Bitmap {
 
 struct Theme {
 	AssetsPtr<const char> name;
-	AssetsPtr<uint16_t> colors;
+	SimpleList<uint16_t> colors;
 };
 
 struct Colors {
-	uint32_t nThemeColors;
 	AssetsPtrList<Theme> themes;
-	AssetsPtr<uint16_t> colors;
+	SimpleList<uint16_t> colors;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

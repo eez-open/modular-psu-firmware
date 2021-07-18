@@ -26,8 +26,6 @@ namespace eez {
 namespace gui {
 namespace font {
 
-static const int GLYPH_HEADER_SIZE = 5;
-
 struct Font {
     const FontData *fontData;
 

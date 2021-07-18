@@ -398,7 +398,7 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
         x_glyph = clip_x1;
     }
 
-    int offset = gui::font::GLYPH_HEADER_SIZE;
+    int offset = 0;
 	int glyphHeight = glyph->height;
     if (y_glyph < clip_y1) {
         int dy_off = clip_y1 - y_glyph;

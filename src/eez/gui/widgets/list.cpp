@@ -26,7 +26,7 @@ namespace gui {
 #define LIST_TYPE_VERTICAL 1
 #define LIST_TYPE_HORIZONTAL 2
 
-struct ListWidget {
+struct ListWidget : public Widget {
     AssetsPtr<Widget> itemWidget;
     uint8_t listType; // LIST_TYPE_VERTICAL or LIST_TYPE_HORIZONTAL
     uint8_t gap;

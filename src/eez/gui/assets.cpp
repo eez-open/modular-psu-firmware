@@ -217,7 +217,7 @@ const uint16_t *getThemeColors(int themeIndex) {
 }
 
 const uint32_t getThemeColorsCount(int themeIndex) {
-	return g_mainAssets->colorsDefinition.ptr(g_mainAssets)->nThemeColors;
+	return getTheme(themeIndex)->colors.count;
 }
 
 const uint16_t *getColors() {
