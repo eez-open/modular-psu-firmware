@@ -582,40 +582,39 @@ const uint8_t *takeScreenshot() {
 
 static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, int clip_y2,
                         uint8_t encoding) {
-    gui::font::Glyph glyph;
-    g_font.getGlyph(encoding, glyph);
+    auto glyph = g_font.getGlyph(encoding);
     if (!glyph) {
         return 0;
     }
 
-    int x_glyph = x1 + glyph.x;
-    int y_glyph = y1 + g_font.getAscent() - (glyph.y + glyph.height);
+    int x_glyph = x1 + glyph->x;
+    int y_glyph = y1 + g_font.getAscent() - (glyph->y + glyph->height);
 
     // draw glyph pixels
     int iStartByte = 0;
     if (x_glyph < clip_x1) {
         int dx_off = clip_x1 - x_glyph;
         iStartByte = dx_off;
-        if (iStartByte >= glyph.width) {
-            return glyph.dx;
+        if (iStartByte >= glyph->width) {
+            return glyph->dx;
         }
         x_glyph = clip_x1;
     }
 
     int offset = gui::font::GLYPH_HEADER_SIZE;
-    int glyphHeight = glyph.height;
+    int glyphHeight = glyph->height;
     if (y_glyph < clip_y1) {
         int dy_off = clip_y1 - y_glyph;
-        offset += dy_off * glyph.width;
+        offset += dy_off * glyph->width;
         glyphHeight -= dy_off;
         y_glyph = clip_y1;
     }
 
     int width;
-    if (x_glyph + (glyph.width - iStartByte) - 1 > clip_x2) {
+    if (x_glyph + (glyph->width - iStartByte) - 1 > clip_x2) {
     	width = clip_x2 - x_glyph + 1;
     } else {
-        width = (glyph.width - iStartByte);
+        width = (glyph->width - iStartByte);
     }
 
     int height;
@@ -626,10 +625,10 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
     }
 
     if (width > 0 && height > 0) {
-        bitBltA8(glyph.data + offset + iStartByte, glyph.width - width, x_glyph, y_glyph, width,height);
+        bitBltA8(glyph->pixels + offset + iStartByte, glyph->width - width, x_glyph, y_glyph, width,height);
     }
 
-    return glyph.dx;
+    return glyph->dx;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

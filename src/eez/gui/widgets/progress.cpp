@@ -25,8 +25,6 @@
 namespace eez {
 namespace gui {
 
-FixPointersFunctionType PROGRESS_fixPointers = nullptr;
-
 EnumFunctionType PROGRESS_enum = nullptr;
 
 DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {

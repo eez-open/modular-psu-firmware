@@ -21,17 +21,12 @@
 namespace eez {
 namespace gui {
 
-struct TextWidgetSpecific {
+struct TextWidget : public Widget {
     AssetsPtr<const char> text;
     uint8_t flags;
-};
-
-struct TextWidget {
-    Widget common;
-    TextWidgetSpecific specific;
 }; 
 
-void TextWidget_autoSize(TextWidget& widget);
+void TextWidget_autoSize(Assets *assets, TextWidget& widget);
 
 } // namespace gui
 } // namespace eez

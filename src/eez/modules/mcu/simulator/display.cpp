@@ -357,14 +357,14 @@ const uint8_t *takeScreenshot() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void doDrawGlyph(const gui::font::Glyph &glyph, int x_glyph, int y_glyph, int width, int height, int offset, int iStartByte) {
+static void doDrawGlyph(const gui::GlyphData &glyph, int x_glyph, int y_glyph, int width, int height, int offset, int iStartByte) {
     uint32_t pixel;
     ((uint8_t *)&pixel)[0] = COLOR_TO_B(g_fc);
     ((uint8_t *)&pixel)[1] = COLOR_TO_G(g_fc);
     ((uint8_t *)&pixel)[2] = COLOR_TO_R(g_fc);
     uint8_t *pixelAlpha = ((uint8_t *)&pixel) + 3;
 
-    const uint8_t *src = glyph.data + offset + iStartByte;
+    const uint8_t *src = glyph.pixels + offset + iStartByte;
     int nlSrc = glyph.width - width;
 
     uint32_t *dst = g_buffer + y_glyph * DISPLAY_WIDTH + x_glyph;
@@ -379,40 +379,39 @@ static void doDrawGlyph(const gui::font::Glyph &glyph, int x_glyph, int y_glyph,
 }
 
 static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, int clip_y2, uint8_t encoding) {
-    gui::font::Glyph glyph;
-    g_font.getGlyph(encoding, glyph);
+    auto glyph = g_font.getGlyph(encoding);
     if (!glyph) {
         return 0;
     }
 
-    int x_glyph = x1 + glyph.x;
-    int y_glyph = y1 + g_font.getAscent() - (glyph.y + glyph.height);
+    int x_glyph = x1 + glyph->x;
+    int y_glyph = y1 + g_font.getAscent() - (glyph->y + glyph->height);
 
     // draw glyph pixels
     int iStartByte = 0;
     if (x_glyph < clip_x1) {
         int dx_off = clip_x1 - x_glyph;
         iStartByte = dx_off;
-        if (iStartByte >= glyph.width) {
-            return glyph.dx;
+        if (iStartByte >= glyph->width) {
+            return glyph->dx;
         }
         x_glyph = clip_x1;
     }
 
     int offset = gui::font::GLYPH_HEADER_SIZE;
-	int glyphHeight = glyph.height;
+	int glyphHeight = glyph->height;
     if (y_glyph < clip_y1) {
         int dy_off = clip_y1 - y_glyph;
-        offset += dy_off * glyph.width;
+        offset += dy_off * glyph->width;
 		glyphHeight -= dy_off;
         y_glyph = clip_y1;
     }
 
     int width;
-    if (x_glyph + (glyph.width - iStartByte) - 1 > clip_x2) {
+    if (x_glyph + (glyph->width - iStartByte) - 1 > clip_x2) {
         width = clip_x2 - x_glyph + 1;
     } else {
-        width = (glyph.width - iStartByte);
+        width = (glyph->width - iStartByte);
     }
 
     int height;
@@ -423,10 +422,10 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
     }
 
     if (width > 0 && height > 0) {
-        doDrawGlyph(glyph, x_glyph, y_glyph, width, height, offset, iStartByte);
+        doDrawGlyph(*glyph, x_glyph, y_glyph, width, height, offset, iStartByte);
     }
 
-    return glyph.dx;
+    return glyph->dx;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

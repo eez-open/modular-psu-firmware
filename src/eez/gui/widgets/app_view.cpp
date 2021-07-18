@@ -25,8 +25,6 @@
 namespace eez {
 namespace gui {
 
-FixPointersFunctionType APP_VIEW_fixPointers = nullptr;
-
 EnumFunctionType APP_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     Value appContextValue;
     DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);

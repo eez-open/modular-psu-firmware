@@ -26,13 +26,9 @@ namespace gui {
 #define GRID_FLOW_ROW 1
 #define GRID_FLOW_COLUMN 2
 
-struct GridWidget {
+struct GridWidget : public Widget {
+    AssetsPtr<Widget> itemWidget;
     uint8_t gridFlow; // GRID_FLOW_ROW or GRID_FLOW_COLUMN
-    AssetsPtr<const Widget> itemWidget;
-};
-
-FixPointersFunctionType GRID_fixPointers = [](Widget *widget, Assets *assets) {
-    Widget_fixPointers(&GridWidget::itemWidget, widget, assets);
 };
 
 EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
@@ -48,7 +44,7 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
     auto parentWidget = savedWidget;
 
-    const GridWidget *gridWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const GridWidget *);
+    auto gridWidget = (GridWidget *)widgetCursor.widget;
 
     int startPosition = ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 
@@ -69,7 +65,7 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 		++widgetCursor.currentState;
 	}
 
-	const Widget *childWidget = GET_WIDGET_PROPERTY(gridWidget, itemWidget, const Widget *);
+	const Widget *childWidget = gridWidget->itemWidget.ptr(widgetCursor.assets);
     widgetCursor.widget = childWidget;
 
 	auto savedX = widgetCursor.x;

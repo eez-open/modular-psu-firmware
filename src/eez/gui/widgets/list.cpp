@@ -27,13 +27,9 @@ namespace gui {
 #define LIST_TYPE_HORIZONTAL 2
 
 struct ListWidget {
+    AssetsPtr<Widget> itemWidget;
     uint8_t listType; // LIST_TYPE_VERTICAL or LIST_TYPE_HORIZONTAL
-    AssetsPtr<const Widget> itemWidget;
     uint8_t gap;
-};
-
-FixPointersFunctionType LIST_fixPointers = [](Widget *widget, Assets *assets) {
-    Widget_fixPointers(&ListWidget::itemWidget, widget, assets);
 };
 
 EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
@@ -49,7 +45,7 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
     auto parentWidget = savedWidget;
 
-    const ListWidget *listWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ListWidget *);
+    ListWidget *listWidget = (ListWidget *)widgetCursor.widget;
 
     int startPosition = ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 
@@ -70,7 +66,7 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 		++widgetCursor.currentState;
 	}
 
-    const Widget *childWidget = GET_WIDGET_PROPERTY(listWidget, itemWidget, const Widget *);
+    const Widget *childWidget = listWidget->itemWidget.ptr(widgetCursor.assets);
     widgetCursor.widget = childWidget;
 
 	auto savedX = widgetCursor.x;

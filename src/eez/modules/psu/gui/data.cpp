@@ -4988,24 +4988,24 @@ void data_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
 			if (state > 0) {
 				WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
 
-				const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+				auto containerWidget = (ContainerWidget *)widgetCursor.widget;
 
-				const Widget *titleListIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, TITLE_LIST_ICON_WIDGET);
-				const Widget *titleRampIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, TITLE_RAMP_ICON_WIDGET);
-				const Widget *titleDlogIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, TITLE_DLOG_ICON_WIDGET);
-				const Widget *titleMpIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, TITLE_MP_ICON_WIDGET);
-				const Widget *titleFuncgenIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, TITLE_FUNCGEN_ICON_WIDGET);
-				const Widget *titleMinIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, TITLE_MIN_ICON_WIDGET);
-				const Widget *titleMaxIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, TITLE_MAX_ICON_WIDGET);
-				const Widget *titleHideIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, TITLE_HIDE_ICON_WIDGET);
+				const Widget *titleListIconWidget = containerWidget->widgets.item(widgetCursor.assets, TITLE_LIST_ICON_WIDGET);
+				const Widget *titleRampIconWidget = containerWidget->widgets.item(widgetCursor.assets, TITLE_RAMP_ICON_WIDGET);
+				const Widget *titleDlogIconWidget = containerWidget->widgets.item(widgetCursor.assets, TITLE_DLOG_ICON_WIDGET);
+				const Widget *titleMpIconWidget = containerWidget->widgets.item(widgetCursor.assets, TITLE_MP_ICON_WIDGET);
+				const Widget *titleFuncgenIconWidget = containerWidget->widgets.item(widgetCursor.assets, TITLE_FUNCGEN_ICON_WIDGET);
+				const Widget *titleMinIconWidget = containerWidget->widgets.item(widgetCursor.assets, TITLE_MIN_ICON_WIDGET);
+				const Widget *titleMaxIconWidget = containerWidget->widgets.item(widgetCursor.assets, TITLE_MAX_ICON_WIDGET);
+				const Widget *titleHideIconWidget = containerWidget->widgets.item(widgetCursor.assets, TITLE_HIDE_ICON_WIDGET);
 
-				const Widget *listIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LIST_ICON_WIDGET);
-				const Widget *listGridWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, LIST_GRID_WIDGET);
-				const Widget *rampIconWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, RAMP_ICON_WIDGET);
-				const Widget *rampGridWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, RAMP_GRID_WIDGET);
-				const Widget *dlogInfoWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, DLOG_INFO_WIDGET);
-				const Widget *scriptInfoWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, SCRIPT_INFO_WIDGET);
-				const Widget *funcgenWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, FUNCGEN_WIDGET);
+				const Widget *listIconWidget = containerWidget->widgets.item(widgetCursor.assets, LIST_ICON_WIDGET);
+				const Widget *listGridWidget = containerWidget->widgets.item(widgetCursor.assets, LIST_GRID_WIDGET);
+				const Widget *rampIconWidget = containerWidget->widgets.item(widgetCursor.assets, RAMP_ICON_WIDGET);
+				const Widget *rampGridWidget = containerWidget->widgets.item(widgetCursor.assets, RAMP_GRID_WIDGET);
+				const Widget *dlogInfoWidget = containerWidget->widgets.item(widgetCursor.assets, DLOG_INFO_WIDGET);
+				const Widget *scriptInfoWidget = containerWidget->widgets.item(widgetCursor.assets, SCRIPT_INFO_WIDGET);
+				const Widget *funcgenWidget = containerWidget->widgets.item(widgetCursor.assets, FUNCGEN_WIDGET);
 
 				if (overlay.visibility == OVERLAY_MINIMIZED) {
 					auto x = titleListIconWidget->x;

@@ -20,7 +20,6 @@
 
 #include <eez/gui/geometry.h>
 #include <eez/memory.h>
-#include <eez/gui/assets_ptr.h>
 
 namespace eez {
 namespace gui {
@@ -61,7 +60,6 @@ typedef void (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
 struct Widget;
 struct Assets;
 
-typedef void (*FixPointersFunctionType)(Widget *widget, Assets *assets);
 typedef void (*EnumFunctionType)(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 typedef void (*DrawFunctionType)(const WidgetCursor &widgetCursor);
 typedef void (*OnTouchFunctionType)(const WidgetCursor &widgetCursor, Event &touchEvent);
@@ -85,7 +83,8 @@ struct WidgetState {
 class AppContext;
 
 struct WidgetCursor {
-    AppContext *appContext;
+	Assets *assets;
+	AppContext *appContext;
     const Widget *widget;
     int16_t x;
     int16_t y;
@@ -94,7 +93,8 @@ struct WidgetCursor {
     WidgetState *currentState;
 
     WidgetCursor() 
-		: appContext(nullptr)
+		: assets(nullptr)
+		, appContext(nullptr)
         , widget(nullptr)
         , x(0)
         , y(0)
@@ -105,6 +105,7 @@ struct WidgetCursor {
     }
 
     WidgetCursor(
+		Assets *assets_,
         AppContext *appContext_,
         const Widget *widget_,
         int x_,
@@ -113,7 +114,8 @@ struct WidgetCursor {
         WidgetState *previousState_,
         WidgetState *currentState_
     )
-        : appContext(appContext_)
+        : assets(assets_)
+		, appContext(appContext_)
         , widget(widget_)
         , x(x_)
         , y(y_)

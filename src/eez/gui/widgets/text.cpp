@@ -30,29 +30,25 @@
 namespace eez {
 namespace gui {
 
-FixPointersFunctionType TEXT_fixPointers = [](Widget *widget, Assets *assets) {
-    Text_fixPointer(&TextWidgetSpecific::text, widget, assets);
-};
-
 EnumFunctionType TEXT_enum = nullptr;
 
-void TextWidget_autoSize(TextWidget& widget) {
-    const Style *style = getStyle(widget.common.style);
+void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
+    const Style *style = getStyle(widget.style);
     font::Font font = styleGetFont(style);
-    widget.common.w = style->border_size_left + style->padding_left + mcu::display::measureStr(widget.specific.text, -1, font, 0) + style->border_size_right + style->padding_right;
-    widget.common.h = style->border_size_top + style->padding_top + font.getHeight() + style->border_size_bottom + style->padding_bottom;
+    widget.w = style->border_size_left + style->padding_left + mcu::display::measureStr(widget.text.ptr(assets), -1, font, 0) + style->border_size_right + style->padding_right;
+    widget.h = style->border_size_top + style->padding_top + font.getHeight() + style->border_size_bottom + style->padding_bottom;
 }
 
 DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const TextWidgetSpecific *textWidget = GET_WIDGET_PROPERTY(widget, specific, const TextWidgetSpecific *);
+    auto textWidget = (TextWidget *)widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
     
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
-    const char *text = GET_WIDGET_PROPERTY(textWidget, text, const char *);
+    const char *text = textWidget->text.ptr(widgetCursor.assets);
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
     widgetCursor.currentState->data = !(text && text[0]) && widget->data ? get(widgetCursor.cursor, widget->data) : 0;

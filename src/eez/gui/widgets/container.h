@@ -21,13 +21,13 @@
 namespace eez {
 namespace gui {
 
-struct ContainerWidget {
-    List<const Widget> widgets;
+struct ContainerWidget : public Widget {
+	AssetsPtrList<Widget> widgets;
     int16_t overlay;
-    uint8_t flags;
+    uint16_t flags;
 };
 
-void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const List<const Widget> &widgets);
+void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, AssetsPtrList<Widget> &widgets);
 
 } // namespace gui
 } // namespace eez

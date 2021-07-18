@@ -402,9 +402,8 @@ struct MultilineTextRender {
             return 0;
         }
 
-        font::Glyph space_glyph;
-        font.getGlyph(' ', space_glyph);
-        spaceWidth = space_glyph.dx;
+        auto spaceGlyph = font.getGlyph(' ');
+        spaceWidth = spaceGlyph->dx;
 
         x1 += style->padding_left;
         x2 -= style->padding_right;
@@ -443,9 +442,8 @@ struct MultilineTextRender {
             return;
         }
 
-        font::Glyph space_glyph;
-        font.getGlyph(' ', space_glyph);
-        spaceWidth = space_glyph.dx;
+        auto spaceGlyph = font.getGlyph(' ');
+        spaceWidth = spaceGlyph->dx;
 
         // draw text
         display::setColor(active ? style->active_color : style->color);

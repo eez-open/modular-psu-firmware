@@ -28,7 +28,7 @@ bool isOverlay(const  WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->type != WIDGET_TYPE_CONTAINER) {
         return false;
     }
-    const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+    auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
     return containerWidget->overlay != DATA_ID_NONE;
 }
 
@@ -36,7 +36,7 @@ Overlay *getOverlay(const WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->type != WIDGET_TYPE_CONTAINER) {
         return nullptr;
     }
-    const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+    auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
     if (containerWidget->overlay == DATA_ID_NONE) {
         return nullptr;
     }
@@ -113,7 +113,7 @@ void overlayEnumWidgetHook(WidgetCursor &widgetCursor, EnumWidgetsCallback callb
     }
 
     // update overlay data
-    const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+    auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
     Value widgetCursorValue((void *)&widgetCursor, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(containerWidget->overlay, DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor.cursor, widgetCursorValue);
 

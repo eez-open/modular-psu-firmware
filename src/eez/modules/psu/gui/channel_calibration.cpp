@@ -53,7 +53,7 @@ enum Align {
     ALIGN_BOTTOM = 2,
 };
 
-void drawGlyph(font::Font &font, font::Glyph &glyph, uint8_t encoding, int x, int y, Align horz, Align vert, int clip_x1, int clip_y1, int clip_x2, int clip_y2) {
+void drawGlyph(font::Font &font, const GlyphData &glyph, uint8_t encoding, int x, int y, Align horz, Align vert, int clip_x1, int clip_y1, int clip_x2, int clip_y2) {
     x -= glyph.x;
     y -= font.getAscent() - (glyph.y + glyph.height);
 
@@ -105,12 +105,11 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     drawRectangle(x, y, w, h, style, false, false, true);
 
     font::Font font(getFontData(FONT_ID_ROBOTO_CONDENSED_REGULAR));
-    font::Glyph glyphLabel;
-    font.getGlyph('0', glyphLabel);
+    auto glyphLabel = font.getGlyph('0');
 
     static const int GAP_BETWEEN_LABEL_AND_AXIS = 4;
     static const int GAP_BETWEEN_LABEL_AND_EDGE = 4;
-    static const int MARGIN = GAP_BETWEEN_LABEL_AND_AXIS + glyphLabel.height + GAP_BETWEEN_LABEL_AND_EDGE;
+    static const int MARGIN = GAP_BETWEEN_LABEL_AND_AXIS + glyphLabel->height + GAP_BETWEEN_LABEL_AND_EDGE;
 
     float minLimit;
     Unit unit;
@@ -155,7 +154,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     }
     mcu::display::drawStr(text, -1,
         xLabelText,
-        y + h - MARGIN + GAP_BETWEEN_LABEL_AND_AXIS - (font.getAscent() - glyphLabel.height),
+        y + h - MARGIN + GAP_BETWEEN_LABEL_AND_AXIS - (font.getAscent() - glyphLabel->height),
         x, y, x + w - 1, y + w - 1,
         font, -1);
 
@@ -169,7 +168,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     }
     mcu::display::drawStr(text, -1,
         xLabelText,
-        y + h - MARGIN + GAP_BETWEEN_LABEL_AND_AXIS - (font.getAscent() - glyphLabel.height),
+        y + h - MARGIN + GAP_BETWEEN_LABEL_AND_AXIS - (font.getAscent() - glyphLabel->height),
         x, y, x + w - 1, y + w - 1,
         font, -1);
 
@@ -212,15 +211,14 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
         }
     }
 
-    font::Glyph markerGlyph;
-    font.getGlyph('\x80', markerGlyph);
+    auto markerGlyph = font.getGlyph('\x80');
 
     for (unsigned int i = 0; i < configuration.numPoints; i++) {
 
         if (xPoints[i + 1] >= 0.0f && xPoints[i + 1] <= 1.0f * (w - 2 * MARGIN - 1) &&
             yPoints[i + 1] >= 0.0f && yPoints[i + 1] <= 1.0f * (h - 2 * MARGIN - 1))
         {
-            drawGlyph(font, markerGlyph, '\x80',
+            drawGlyph(font, *markerGlyph, '\x80',
                 x + MARGIN + (int)roundf(xPoints[i + 1]),
                 y + h - MARGIN - 1 - (int)roundf(yPoints[i + 1]),
                 ALIGN_CENTER,
@@ -247,7 +245,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
 
         auto y1 = (h - 2 * MARGIN - 1) * scale(remapDacValue(calibrationBase, configuration, unit, dacValue));
         if (y1 >= 0.0f && y1 <= 1.0f * (h - 2 * MARGIN - 1)) {
-            drawGlyph(font, markerGlyph, '\x80',
+            drawGlyph(font, *markerGlyph, '\x80',
                 x + MARGIN + (int)roundf(x1),
                 y + h - MARGIN - 1 - (int)roundf(y1),
                 ALIGN_CENTER,

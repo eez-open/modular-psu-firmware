@@ -25,14 +25,10 @@
 namespace eez {
 namespace gui {
 
-struct MultilineTextWidget {
+struct MultilineTextWidget : public Widget {
     AssetsPtr<const char> text;
     int16_t firstLineIndent;
     int16_t hangingIndent;
-};
-
-FixPointersFunctionType MULTILINE_TEXT_fixPointers = [](Widget *widget, Assets *assets) {
-    Text_fixPointer(&MultilineTextWidget::text, widget, assets);
 };
 
 EnumFunctionType MULTILINE_TEXT_enum = nullptr;
@@ -52,7 +48,7 @@ DrawFunctionType MULTILINE_TEXT_draw = [](const WidgetCursor &widgetCursor) {
     if (refresh) {
         const Style* style = getStyle(widget->style);
 
-        const MultilineTextWidget *display_string_widget = GET_WIDGET_PROPERTY(widget, specific, const MultilineTextWidget *);
+        MultilineTextWidget *display_string_widget = (MultilineTextWidget *)widget;
 
         if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
@@ -70,7 +66,7 @@ DrawFunctionType MULTILINE_TEXT_draw = [](const WidgetCursor &widgetCursor) {
             }
         } else {
             drawMultilineText(
-                GET_WIDGET_PROPERTY(display_string_widget, text, const char *), 
+                display_string_widget->text.ptr(widgetCursor.assets), 
                 widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                 style, widgetCursor.currentState->flags.active,
                 display_string_widget->firstLineIndent, display_string_widget->hangingIndent);

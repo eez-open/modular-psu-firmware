@@ -380,21 +380,19 @@ void fillRoundedRect(int x1, int y1, int x2, int y2, int r) {
 }
 
 static int8_t measureGlyph(uint8_t encoding) {
-    gui::font::Glyph glyph;
-    g_font.getGlyph(encoding, glyph);
+    auto glyph = g_font.getGlyph(encoding);
     if (!glyph)
         return 0;
 
-    return glyph.dx;
+    return glyph->dx;
 }
 
 int8_t measureGlyph(uint8_t encoding, gui::font::Font &font) {
-    gui::font::Glyph glyph;
-    font.getGlyph(encoding, glyph);
+    auto glyph = g_font.getGlyph(encoding);
     if (!glyph)
         return 0;
 
-    return glyph.dx;
+    return glyph->dx;
 }
 
 int measureStr(const char *text, int textLength, gui::font::Font &font, int max_width) {
@@ -611,11 +609,10 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
 
     for (i = 0; i < textLength && text[i]; ++i) {
         char encoding = text[i];
-        gui::font::Glyph glyph;
-        font.getGlyph(encoding, glyph);
+        auto glyph = font.getGlyph(encoding);
         auto dx = 0;
         if (glyph) {
-            dx = glyph.dx;
+            dx = glyph->dx;
         }
         if (xPos < x + dx / 2) {
             return i;
@@ -636,10 +633,9 @@ int getCursorXPosition(int cursorPosition, const char *text, int textLength, int
             return x;
         }
         char encoding = text[i];
-        gui::font::Glyph glyph;
-        font.getGlyph(encoding, glyph);
+        auto glyph = font.getGlyph(encoding);
         if (glyph) {
-            x += glyph.dx;
+            x += glyph->dx;
         }
     }
 

@@ -43,13 +43,11 @@ bool g_isActiveWidget;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-FixPointersFunctionType NONE_fixPointers = nullptr;
 EnumFunctionType NONE_enum = nullptr;
 DrawFunctionType NONE_draw = nullptr;
 OnTouchFunctionType NONE_onTouch = nullptr;
 OnKeyboardFunctionType NONE_onKeyboard = nullptr;
 
-FixPointersFunctionType RESERVED_fixPointers = nullptr;
 EnumFunctionType RESERVED_enum = nullptr;
 DrawFunctionType RESERVED_draw = nullptr;
 OnTouchFunctionType RESERVED_onTouch = nullptr;
@@ -213,6 +211,7 @@ void enumWidgets(AppContext* appContext, EnumWidgetsCallback callback) {
 		return;
 	}
 	WidgetCursor widgetCursor;
+	widgetCursor.assets = g_mainAssets;
 	widgetCursor.appContext = appContext;
 	widgetCursor.widget = getPageWidget(appContext->getActivePageId());
 	enumWidget(widgetCursor, callback);

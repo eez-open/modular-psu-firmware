@@ -26,15 +26,11 @@
 namespace eez {
 namespace gui {
 
-FixPointersFunctionType BUTTON_fixPointers = [](Widget *widget, Assets *assets) {
-    Text_fixPointer(&ButtonWidget::text, widget, assets);
-};
-
 EnumFunctionType BUTTON_enum = nullptr;
 
 DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const ButtonWidget *button_widget = GET_WIDGET_PROPERTY(widget, specific, const ButtonWidget *);
+    auto button_widget = (ButtonWidget *)widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.enabled = get(widgetCursor.cursor, button_widget->enabled).getInt() ? 1 : 0;
@@ -59,12 +55,12 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
                          widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
             } else {
-                drawText(GET_WIDGET_PROPERTY(button_widget, text, const char *), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                drawText(button_widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                          style, widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
             }
         } else {
-            drawText(GET_WIDGET_PROPERTY(button_widget, text, const char *), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            drawText(button_widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                      style, widgetCursor.currentState->flags.active,
                      widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
         }

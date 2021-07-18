@@ -53,6 +53,7 @@ void updateScreen() {
     g_currentState = (WidgetState *)(&g_stateBuffer[getCurrentStateBufferIndex() == 0 ? 1 : 0][0]);
 
 	WidgetCursor widgetCursor;
+	widgetCursor.assets = g_mainAssets;
 	widgetCursor.appContext = &getRootAppContext();
 	widgetCursor.previousState = g_previousState;
 	widgetCursor.currentState = g_currentState;

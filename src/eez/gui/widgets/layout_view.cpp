@@ -25,12 +25,10 @@
 namespace eez {
 namespace gui {
 
-struct LayoutViewWidgetSpecific {
+struct LayoutViewWidget : public Widget {
     int16_t layout; // page ID
     int16_t context; // data ID
 };
-
-FixPointersFunctionType LAYOUT_VIEW_fixPointers = nullptr;
 
 int getLayoutId(const WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->data) {
@@ -38,14 +36,14 @@ int getLayoutId(const WidgetCursor &widgetCursor) {
         return layoutValue.getInt();
     }
     
-    const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
-    return layoutViewSpecific->layout;
+    auto layoutView = (const LayoutViewWidget *)widgetCursor.widget;
+    return layoutView->layout;
 }
 
 EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     auto cursor = widgetCursor.cursor;
 
-    const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
+	auto layoutView = (const LayoutViewWidget *)widgetCursor.widget;
 
     if (widgetCursor.previousState && (widgetCursor.previousState->data != widgetCursor.currentState->data || ((LayoutViewWidgetState *)widgetCursor.previousState)->context != ((LayoutViewWidgetState *)widgetCursor.currentState)->context)) {
         widgetCursor.previousState = 0;
@@ -53,24 +51,24 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
 
     Value oldContext;
     Value newContext;
-    if (layoutViewSpecific->context) {
-        setContext(widgetCursor.cursor, layoutViewSpecific->context, oldContext, newContext);
+    if (layoutView->context) {
+        setContext(widgetCursor.cursor, layoutView->context, oldContext, newContext);
     }
 
     int layoutId = getLayoutId(widgetCursor);
     const Widget *layout = getPageWidget(layoutId);
 
     if (layout) {
-		auto layoutSpecific = GET_WIDGET_PROPERTY(layout, specific, const PageWidget *);
-		enumContainer(widgetCursor, callback, layoutSpecific->widgets);
+		auto layoutView = (PageWidget *)layout;
+		enumContainer(widgetCursor, callback, layoutView->widgets);
 	} else {
 		if (widgetCursor.currentState) {
 			widgetCursor.currentState->size = 0;
 		}
     }
 
-    if (layoutViewSpecific->context) {
-        restoreContext(widgetCursor.cursor, layoutViewSpecific->context, oldContext);
+    if (layoutView->context) {
+        restoreContext(widgetCursor.cursor, layoutView->context, oldContext);
     }
 
     widgetCursor.cursor = cursor;
@@ -78,12 +76,12 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
 
 DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const LayoutViewWidgetSpecific *layoutViewSpecific = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const LayoutViewWidgetSpecific *);
+	auto layoutView = (const LayoutViewWidget *)widgetCursor.widget;
 
     Value oldContext;
     Value newContext;
-    if (layoutViewSpecific->context) {
-        setContext(((WidgetCursor &)widgetCursor).cursor, layoutViewSpecific->context, oldContext, newContext);
+    if (layoutView->context) {
+        setContext(((WidgetCursor &)widgetCursor).cursor, layoutView->context, oldContext, newContext);
         ((LayoutViewWidgetState *)widgetCursor.currentState)->context = newContext;
     } else {
         ((LayoutViewWidgetState *)widgetCursor.currentState)->context = Value();
@@ -91,8 +89,8 @@ DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->data = getLayoutId(widgetCursor);
 
-    if (layoutViewSpecific->context) {
-        restoreContext(((WidgetCursor &)widgetCursor).cursor, layoutViewSpecific->context, oldContext);
+    if (layoutView->context) {
+        restoreContext(((WidgetCursor &)widgetCursor).cursor, layoutView->context, oldContext);
     }
 
     bool refresh =

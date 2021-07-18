@@ -49,8 +49,6 @@ struct YTGraphWidgetState {
     float valueOffset[MAX_NUM_OF_Y_VALUES];
 };
 
-FixPointersFunctionType YT_GRAPH_fixPointers = nullptr;
-
 EnumFunctionType YT_GRAPH_enum = nullptr;
 
 // used for YT_GRAPH_UPDATE_METHOD_SCROLL and YT_GRAPH_UPDATE_METHOD_SCAN_LINE

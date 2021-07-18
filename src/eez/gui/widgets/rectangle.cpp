@@ -26,8 +26,6 @@
 namespace eez {
 namespace gui {
 
-FixPointersFunctionType RECTANGLE_fixPointers = nullptr;
-
 EnumFunctionType RECTANGLE_enum = nullptr;
 
 DrawFunctionType RECTANGLE_draw = [](const WidgetCursor &widgetCursor) {
@@ -37,7 +35,7 @@ DrawFunctionType RECTANGLE_draw = [](const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         const Widget *widget = widgetCursor.widget;
-        const RectangleWidgetSpecific *rectangle_widget = GET_WIDGET_PROPERTY(widget, specific, const RectangleWidgetSpecific *);
+        auto rectangle_widget = (const RectangleWidget *)widget;
         const Style* style = getStyle(widget->style);
         drawRectangle(
             widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,

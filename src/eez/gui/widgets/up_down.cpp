@@ -27,15 +27,10 @@
 namespace eez {
 namespace gui {
 
-struct UpDownWidget {
-    uint16_t buttonsStyle;
+struct UpDownWidget : public Widget {
     AssetsPtr<const char> downButtonText;
-    AssetsPtr<const char> upButtonText;
-};
-
-FixPointersFunctionType UP_DOWN_fixPointers = [](Widget *widget, Assets *assets) {
-    Text_fixPointer(&UpDownWidget::downButtonText, widget, assets);
-    Text_fixPointer(&UpDownWidget::upButtonText, widget, assets);
+	AssetsPtr<const char> upButtonText;
+    uint16_t buttonsStyle;
 };
 
 EnumFunctionType UP_DOWN_enum = nullptr;
@@ -51,7 +46,7 @@ static WidgetCursor g_selectedWidget;
 
 DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const UpDownWidget *upDownWidget = GET_WIDGET_PROPERTY(widget, specific, const UpDownWidget *);
+    auto upDownWidget = (UpDownWidget *)(widget);
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
@@ -68,7 +63,7 @@ DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
         font::Font buttonsFont = styleGetFont(buttonsStyle);
         int buttonWidth = buttonsFont.getHeight();
 
-        drawText(GET_WIDGET_PROPERTY(upDownWidget, downButtonText, const char *), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
+        drawText(upDownWidget->downButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
                  buttonsStyle,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
@@ -81,7 +76,7 @@ DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
                  (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, false, false,
                  false, nullptr, nullptr, nullptr, nullptr);
 
-        drawText(GET_WIDGET_PROPERTY(upDownWidget, upButtonText, const char *), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
+        drawText(upDownWidget->upButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
                  buttonWidth, (int)widget->h, buttonsStyle,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,

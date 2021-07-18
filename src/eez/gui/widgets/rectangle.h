@@ -26,13 +26,8 @@ struct RectangleFlags {
     unsigned ignoreLuminosity : 1;
 };
 
-struct RectangleWidgetSpecific {
+struct RectangleWidget : public Widget {
     RectangleFlags flags;
-};
-
-struct RectangleWidget {
-    Widget common;
-    RectangleWidgetSpecific specific;
 };
 
 } // namespace gui

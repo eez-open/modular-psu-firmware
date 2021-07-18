@@ -970,9 +970,9 @@ void data_event_queue_event_long_message_overlay(DataOperationEnum operation, Cu
 
                 WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
 
-                const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+                auto containerWidget = (ContainerWidget *)widgetCursor.widget;
 
-                const Widget *multiLineTextWidget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets, MULTI_LINE_TEXT_WIDGET);
+                const Widget *multiLineTextWidget = containerWidget->widgets.item(widgetCursor.assets, MULTI_LINE_TEXT_WIDGET);
 
                 static const int CONF_EVENT_LINE_HEIGHT_PX = 30;
                 static const int CONF_EVENTS_LIST_HEIGHT_PX = 240;

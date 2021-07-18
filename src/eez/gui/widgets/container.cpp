@@ -34,12 +34,7 @@ struct ContainerWidgetState {
     int displayBufferIndex;
 };
 
-FixPointersFunctionType CONTAINER_fixPointers = [](Widget *widget, Assets *assets) {
-    ContainerWidget *containerWidget = (ContainerWidget *)widget->specific;
-    WidgetList_fixPointers(containerWidget->widgets, assets);
-};
-
-void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, const List<const Widget> &widgets) {
+void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, AssetsPtrList<Widget> &widgets) {
     auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 
@@ -76,7 +71,7 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, con
     }
 
     for (uint32_t index = 0; index < widgets.count; ++index) {
-        widgetCursor.widget = GET_WIDGET_LIST_ELEMENT(widgets, index);
+        widgetCursor.widget = widgets.item(widgetCursor.assets, index);
 
         int xSaved = 0;
         int ySaved = 0;
@@ -154,7 +149,7 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCall
         }
     }
 
-    const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+    auto containerWidget = (ContainerWidget *)widgetCursor.widget;
     enumContainer(widgetCursor, callback, containerWidget->widgets);
 
     if (isOverlay(widgetCursor)) {

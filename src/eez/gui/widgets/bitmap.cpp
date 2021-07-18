@@ -28,11 +28,9 @@
 namespace eez {
 namespace gui {
 
-struct BitmapWidget {
+struct BitmapWidget : public Widget {
     int8_t bitmap;
 };
-
-FixPointersFunctionType BITMAP_fixPointers = nullptr;
 
 EnumFunctionType BITMAP_enum = nullptr;
 
@@ -48,7 +46,7 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
 			widgetCursor.currentState->data != widgetCursor.previousState->data;
 
     if (refresh) {
-        const BitmapWidget *display_bitmap_widget = GET_WIDGET_PROPERTY(widget, specific, const BitmapWidget *);
+        auto display_bitmap_widget = (const BitmapWidget *)widget;
         const Style* style = getStyle(widget->style);
 
         const Bitmap *bitmap = nullptr;

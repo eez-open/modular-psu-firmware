@@ -20,44 +20,29 @@
 
 #include <stdint.h>
 
+#include <eez/gui/assets.h>
+
 namespace eez {
 namespace gui {
 namespace font {
 
 static const int GLYPH_HEADER_SIZE = 5;
 
-struct Glyph {
-    const uint8_t *data;
-
-    int8_t dx;
-    int8_t x;
-    int8_t y;
-    uint8_t width;
-    uint8_t height;
-
-    operator bool() {
-        return data != 0;
-    }
-};
-
 struct Font {
-    const uint8_t *fontData;
+    const FontData *fontData;
 
     Font();
-    Font(const uint8_t *data);
+    Font(const FontData *fontData_);
 
-    void getGlyph(uint8_t requested_encoding, Glyph &glyph);
+    const GlyphData *getGlyph(uint8_t encoding);
 
     uint8_t getAscent();
     uint8_t getDescent();
     uint8_t getHeight();
 
-  private:
+private:
     uint8_t getEncodingStart();
     uint8_t getEncodingEnd();
-
-    const uint8_t *findGlyphData(uint8_t requested_encoding);
-    void fillGlyphParameters(Glyph &glyph);
 };
 
 } // namespace font

@@ -39,7 +39,7 @@ enum {
     DISPLAY_OPTION_INTEGER_AND_FRACTION = 5
 };
 
-struct DisplayDataWidget {
+struct DisplayDataWidget : public Widget {
     uint8_t displayOption;
 };
 
@@ -53,8 +53,6 @@ struct DisplayDataState {
     int16_t cursorPosition;
     uint8_t xScroll;
 };
-
-FixPointersFunctionType DISPLAY_DATA_fixPointers = nullptr;
 
 EnumFunctionType DISPLAY_DATA_enum = nullptr;
 
@@ -71,7 +69,7 @@ int findStartOfUnit(char *text, int i) {
 
 DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const DisplayDataWidget *display_data_widget = GET_WIDGET_PROPERTY(widget, specific, const DisplayDataWidget *);
+    auto display_data_widget = (const DisplayDataWidget *)widget;
 
     DisplayDataState *currentState = (DisplayDataState *)widgetCursor.currentState;
     DisplayDataState *previousState = (DisplayDataState *)widgetCursor.previousState;
@@ -190,7 +188,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
 
 int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const DisplayDataWidget *display_data_widget = GET_WIDGET_PROPERTY(widget, specific, const DisplayDataWidget *);
+    auto display_data_widget = (const DisplayDataWidget *)widget;
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
@@ -241,7 +239,7 @@ int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCurs
 
 int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const DisplayDataWidget *display_data_widget = GET_WIDGET_PROPERTY(widget, specific, const DisplayDataWidget *);
+    auto display_data_widget = (const DisplayDataWidget *)widget;
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 

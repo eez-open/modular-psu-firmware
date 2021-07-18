@@ -30,7 +30,7 @@ using namespace eez::mcu;
 namespace eez {
 namespace gui {
 
-struct ListGraphWidget {
+struct ListGraphWidget : public Widget {
     int16_t dwellData;
     int16_t y1Data;
     uint16_t y1Style;
@@ -45,13 +45,11 @@ struct ListGraphWidgetState {
     Value cursorData;
 };
 
-FixPointersFunctionType LIST_GRAPH_fixPointers = nullptr;
-
 EnumFunctionType LIST_GRAPH_enum = nullptr;
 
 DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const ListGraphWidget *listGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const ListGraphWidget *);
+    auto listGraphWidget = (const ListGraphWidget *)widget;
     const Style* style = getStyle(widget->style);
 	const Style* y1Style = getStyle(listGraphWidget->y1Style);
 	const Style* y2Style = getStyle(listGraphWidget->y2Style);
@@ -175,7 +173,7 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
         const Widget *widget = widgetCursor.widget;
-        const ListGraphWidget *listGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const ListGraphWidget *);
+        auto listGraphWidget = (const ListGraphWidget *)widget;
 
         if (touchEvent.x < widgetCursor.x || touchEvent.x >= widgetCursor.x + (int)widget->w) {
             return;

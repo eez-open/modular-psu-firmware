@@ -25,8 +25,6 @@
 namespace eez {
 namespace gui {
 
-FixPointersFunctionType CANVAS_fixPointers = nullptr;
-
 EnumFunctionType CANVAS_enum = nullptr;
 
 DrawFunctionType CANVAS_draw = [](const WidgetCursor &widgetCursor) {

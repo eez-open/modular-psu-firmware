@@ -38,13 +38,13 @@ namespace gui {
 #define BAR_GRAPH_ORIENTATION_MASK 0x0F
 #define BAR_GRAPH_DO_NOT_DISPLAY_VALUE (1 << 4)
 
-struct BarGraphWidget {
-    uint8_t orientation; // BAR_GRAPH_ORIENTATION_...
+struct BarGraphWidget : public Widget {
     uint16_t textStyle;
     int16_t line1Data;
     uint16_t line1Style;
     int16_t line2Data;
     uint16_t line2Style;
+    uint8_t orientation; // BAR_GRAPH_ORIENTATION_...
 };
 
 struct BarGraphWidgetState {
@@ -58,8 +58,6 @@ struct BarGraphWidgetState {
     Value textData;
     uint32_t textDataRefreshLastTime;
 };
-
-FixPointersFunctionType BAR_GRAPH_fixPointers = nullptr;    
 
 EnumFunctionType BAR_GRAPH_enum = nullptr;
 
@@ -96,7 +94,7 @@ void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, uint1
 
 DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const BarGraphWidget *barGraphWidget = GET_WIDGET_PROPERTY(widget, specific, const BarGraphWidget *);
+    auto barGraphWidget = (const BarGraphWidget *)widget;
     const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);

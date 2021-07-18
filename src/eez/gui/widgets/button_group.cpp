@@ -28,11 +28,9 @@ using namespace eez::mcu;
 namespace eez {
 namespace gui {
 
-struct ButtonGroupWidget {
+struct ButtonGroupWidget : public Widget {
     uint16_t selectedStyle;
 };
-
-FixPointersFunctionType BUTTON_GROUP_fixPointers = nullptr;
 
 EnumFunctionType BUTTON_GROUP_enum = nullptr;
 
@@ -98,7 +96,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
 
 DrawFunctionType BUTTON_GROUP_draw = [] (const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const ButtonGroupWidget *buttonGroupWidget = GET_WIDGET_PROPERTY(widget, specific, const ButtonGroupWidget *);
+    auto buttonGroupWidget = (const ButtonGroupWidget *)widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);

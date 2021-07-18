@@ -24,13 +24,8 @@
 namespace eez {
 namespace gui {
 
-struct SelectWidget {
-    List<const Widget> widgets;
-};
-
-FixPointersFunctionType SELECT_fixPointers = [](Widget *widget, Assets *assets) {
-    SelectWidget *selectWidget = (SelectWidget *)widget->specific;
-    WidgetList_fixPointers(selectWidget->widgets, assets);
+struct SelectWidget : public Widget {
+    AssetsPtrList<Widget> widgets;
 };
 
 EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
@@ -60,10 +55,10 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
 
     auto savedWidget = widgetCursor.widget;
 
-	const ContainerWidget *containerWidget = GET_WIDGET_PROPERTY(widgetCursor.widget, specific, const ContainerWidget *);
+	auto containerWidget = (ContainerWidget *)widgetCursor.widget;
 	
-    widgetCursor.widget = GET_WIDGET_LIST_ELEMENT(containerWidget->widgets,
-		indexValue.getInt() < 0 || indexValue.getInt() >= (int)containerWidget->widgets.count ? 0 : indexValue.getInt());
+	auto widgetIndex = indexValue.getInt() < 0 || indexValue.getInt() >= (int)containerWidget->widgets.count ? 0 : indexValue.getInt();
+    widgetCursor.widget = containerWidget->widgets.item(widgetCursor.assets, widgetIndex);
 
     enumWidget(widgetCursor, callback);
 

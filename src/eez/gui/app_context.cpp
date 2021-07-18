@@ -55,7 +55,7 @@ bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     if (widget->action) {
         if (widget->type == WIDGET_TYPE_BUTTON) {
-            const ButtonWidget *buttonWidget = GET_WIDGET_PROPERTY(widget, specific, const ButtonWidget *);
+            auto buttonWidget = (const ButtonWidget *)widget;
             if (!get(widgetCursor.cursor, buttonWidget->enabled).getInt()) {
                 return false;
             }
@@ -277,7 +277,7 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
     int activePageId = getActivePageId();
     if (activePageId != PAGE_ID_NONE && !isPageInternal(activePageId)) {
         auto page = getPageWidget(activePageId);
-		auto pageSpecific = GET_WIDGET_PROPERTY(page, specific, const PageWidget *);
+		auto pageSpecific = (PageWidget *)page;
         if ((pageSpecific->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
             if (!pointInsideRect(touchEvent.x, touchEvent.y, foundWidget.appContext->rect.x + page->x, foundWidget.appContext->rect.y + page->y, page->w, page->h)) {
                 int activePageId = getActivePageId();

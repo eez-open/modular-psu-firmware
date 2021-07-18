@@ -23,10 +23,36 @@
 namespace eez {
 namespace gui {
 
-template <typename T>
-struct List {
-    uint32_t count;
-    AssetsPtr<T> first;
+extern bool g_isMainAssetsLoaded;
+extern Assets *g_mainAssets;
+extern Assets *g_externalAssets;
+
+////////////////////////////////////////////////////////////////////////////////
+
+template<typename T>
+struct AssetsPtr {
+    T* ptr(Assets *assets) {
+        return (T *)((uint8_t *)assets + 4 + offset); // 4 is offset of Assets::pages
+    }
+
+    void operator=(T* ptr) {
+        offset = (uint8_t *)g_mainAssets - (uint8_t *)ptr;
+    }
+
+private:
+    uint32_t offset;
+};
+
+template<typename T>
+struct AssetsPtrList {
+    T* item(Assets *assets, int i) {
+        return (T *)items.ptr(assets)[i].ptr(assets);
+    }
+
+	uint32_t count;
+
+private:
+    AssetsPtr<AssetsPtr<uint32_t>> items;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -34,26 +60,22 @@ struct List {
 #define SHADOW_FLAG 1
 #define CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG 2
 
-struct PageWidget {
-    List<const Widget> widgets;
-    uint16_t overlay;
-    uint8_t flags;
-};
-
 struct Widget {
-    uint8_t type;
-    int16_t data;
-    int16_t action;
-    int16_t x;
-    int16_t y;
-    int16_t w;
-    int16_t h;
-    uint16_t style;
-    AssetsPtr<const void> specific;
+	uint8_t type;
+	uint8_t reserved;
+	int16_t data;
+	int16_t action;
+	int16_t x;
+	int16_t y;
+	int16_t w;
+	int16_t h;
+	uint16_t style;
 };
 
-struct Document {
-	List<const Widget> pages;
+struct PageWidget : public Widget {
+	AssetsPtrList<Widget> widgets;
+    uint16_t overlay;
+    uint16_t flags;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,9 +118,26 @@ struct Style {
     uint8_t margin_left;
 };
 
-struct StyleList {
-    uint32_t count;
-    AssetsPtr<const Style> first;
+////////////////////////////////////////////////////////////////////////////////
+
+struct GlyphData {
+	int8_t dx;         // DWIDTH (-128 indicated empty glyph)
+	uint8_t width;     // BBX width
+	uint8_t height;    // BBX height
+	int8_t x;          // BBX xoffset
+	int8_t y;          // BBX yoffset
+    int8_t reserved1;
+    int8_t reserved2;
+    int8_t reserved3;
+	uint8_t pixels[1];
+};
+
+struct FontData {
+	uint8_t ascent;
+	uint8_t descent;
+	uint8_t encodingStart;
+	uint8_t encodingEnd;
+	AssetsPtr<GlyphData> glyphs[1];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,41 +152,21 @@ struct Bitmap {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct ColorList {
-    uint32_t count;
-    AssetsPtr<const uint16_t> first;
-};
-
 struct Theme {
-    AssetsPtr<const char> name;
-    ColorList colors;
-};
-
-struct ThemeList {
-    uint32_t count;
-    AssetsPtr<const Theme> first;
+	AssetsPtr<const char> name;
+	AssetsPtr<uint16_t> colors;
 };
 
 struct Colors {
-    ThemeList themes;
-    ColorList colors;
+	uint32_t nThemeColors;
+	AssetsPtrList<Theme> themes;
+	AssetsPtr<uint16_t> colors;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-
-struct NameList {
-    uint32_t count;
-    AssetsPtr<AssetsPtr<const char>> first;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-
-struct ComponentInputValue {
-    uint16_t valueIndex;
-};
 
 struct ComponentInput {
-    List<ComponentInputValue> values;
+    uint16_t valueIndex;
 };
 
 struct Connection {
@@ -156,75 +175,52 @@ struct Connection {
 };
 
 struct ComponentOutput {
-    List<Connection> connections;
+	AssetsPtrList<Connection> connections;
 };
 
 struct Component {
     uint16_t type;
-    List<ComponentInput> inputs;
-    List<ComponentOutput> outputs;
-    AssetsPtr<const void> specific;
+    uint16_t reserved;
+	AssetsPtrList<ComponentInput> inputs;
+	AssetsPtrList<ComponentOutput> outputs;
 };
 
 struct Flow {
-    List<const Component> components;
+	AssetsPtrList<Component> components;
 };
 
 struct FlowDefinition {
-    List<const Flow> flows;
-    List<gui::Value> flowValues;
-    List<AssetsPtr<ComponentInput>> widgetDataItems;
-    List<AssetsPtr<ComponentOutput>> widgetActions;
+	AssetsPtrList<Flow> flows;
+	AssetsPtrList<Value> flowValues;
+	AssetsPtrList<ComponentInput> widgetDataItems;
+	AssetsPtrList<ComponentOutput> widgetActions;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Assets {
-    uint16_t projectVersion;
-    bool external;
+    uint8_t projectVersion;
+    uint8_t external;
+    uint16_t reserved;
 
-    AssetsPtr<Document> document;
-    AssetsPtr<StyleList> styles;
-    AssetsPtr<uint8_t> fontsData;
-    AssetsPtr<uint8_t> bitmapsData;
-    AssetsPtr<Colors> colorsData;
-
-    AssetsPtr<NameList> actionNames;
-	AssetsPtr<NameList> dataItemNames;
-
-    AssetsPtr<FlowDefinition> flowDefinition;
+	AssetsPtrList<PageWidget> pages;
+	AssetsPtrList<Style> styles;
+	AssetsPtrList<FontData> fonts;
+	AssetsPtrList<Bitmap> bitmaps;
+	AssetsPtr<Colors> colorsDefinition;
+	AssetsPtrList<const char> actionNames;
+	AssetsPtrList<const char> variableNames;
+	AssetsPtr<FlowDefinition> flowDefinition;
 };
-
-////////////////////////////////////////////////////////////////////////////////
-
-void WidgetList_fixPointers(List<const Widget> &list, Assets *assets);
-void Widget_fixPointers(Widget *widget, Assets *assets);
-
-template <typename T>
-void Widget_fixPointers(AssetsPtr<const Widget> T::*widgetProperty, Widget *widget, Assets *assets) {
-    auto specific = (T *)widget->specific;
-    specific->*widgetProperty = (Widget *)((uint8_t *)(void *)assets->document + (uint32_t)(specific->*widgetProperty));
-	Widget_fixPointers((Widget *)&*(specific->*widgetProperty), assets);
-}
-
-template <typename T>
-void Text_fixPointer(AssetsPtr<const char> T::*textProperty, Widget *widget, Assets *assets) {
-	auto specific = (T *)widget->specific;
-	specific->*textProperty = (const char *)((uint8_t *)(void *)assets->document + (uint32_t)(specific->*textProperty));
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void loadMainAssets();
 bool loadExternalAssets(const char *filePath, int *err);
 
-extern bool g_isMainAssetsLoaded;
-extern Assets *g_mainAssets;
-extern Assets *g_externalAssets;
-
 const Widget *getPageWidget(int pageId);
 const Style *getStyle(int styleID);
-const uint8_t *getFontData(int fontID);
+const FontData *getFontData(int fontID);
 const Bitmap *getBitmap(int bitmapID);
 
 int getThemesCount();
@@ -239,7 +235,6 @@ const char *getActionName(int16_t actionId);
 int16_t getDataIdFromName(const char *name);
 
 #define GET_WIDGET_PROPERTY(widget, propertyName, type) ((type)widget->propertyName)
-#define GET_WIDGET_LIST_ELEMENT(list, index) &((list).first[index])
 
 ////////////////////////////////////////////////////////////////////////////////
 

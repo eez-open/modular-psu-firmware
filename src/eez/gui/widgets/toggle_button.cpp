@@ -25,14 +25,9 @@
 namespace eez {
 namespace gui {
 
-struct ToggleButtonWidget {
+struct ToggleButtonWidget : public Widget {
     AssetsPtr<const char> text1;
-    AssetsPtr<const char> text2;
-};
-
-FixPointersFunctionType TOGGLE_BUTTON_fixPointers = [](Widget *widget, Assets *assets) {
-    Text_fixPointer(&ToggleButtonWidget::text1, widget, assets);
-    Text_fixPointer(&ToggleButtonWidget::text2, widget, assets);
+	AssetsPtr<const char> text2;
 };
 
 EnumFunctionType TOGGLE_BUTTON_enum = nullptr;
@@ -50,12 +45,12 @@ DrawFunctionType TOGGLE_BUTTON_draw = [](const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.enabled != widgetCursor.currentState->flags.enabled;
 
     if (refresh) {
-        const ToggleButtonWidget *toggle_button_widget = GET_WIDGET_PROPERTY(widget, specific, const ToggleButtonWidget *);
+        auto toggle_button_widget = (ToggleButtonWidget *)widget;
         const Style* style = getStyle(widget->style);
         drawText(
             widgetCursor.currentState->flags.enabled ? 
-                GET_WIDGET_PROPERTY(toggle_button_widget, text2, const char *) : 
-                GET_WIDGET_PROPERTY(toggle_button_widget, text1, const char *),
+                toggle_button_widget->text2.ptr(widgetCursor.assets): 
+                toggle_button_widget->text1.ptr(widgetCursor.assets),
             -1,
 			widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
             widgetCursor.currentState->flags.active, false, false, nullptr, nullptr, nullptr, nullptr);

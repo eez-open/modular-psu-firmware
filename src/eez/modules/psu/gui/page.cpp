@@ -289,7 +289,7 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
 }
 
 void ToastMessagePage::updatePage(const WidgetCursor& widgetCursor) {
-    if (actionWidgetIsActive != isActiveWidget(WidgetCursor(appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0))) {
+    if (actionWidgetIsActive != isActiveWidget(WidgetCursor(widgetCursor.assets, appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0))) {
         actionWidgetIsActive = !actionWidgetIsActive;
         refresh(widgetCursor);
     }
@@ -307,10 +307,10 @@ WidgetCursor ToastMessagePage::findWidget(int x, int y, bool clicked) {
             y >= (actionWidget.y - textHeight / 4) &&
             y < (actionWidget.y + actionWidget.h - 1 + textHeight / 4)
         ) {
-            return WidgetCursor(appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0);
+            return WidgetCursor(g_mainAssets, appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0);
         }
         widget.action = ACTION_ID_INTERNAL_DIALOG_CLOSE;
-        return WidgetCursor(appContext, &widget, x, y, -1, 0, 0);
+        return WidgetCursor(g_mainAssets, appContext, &widget, x, y, -1, 0, 0);
     }
     
     return WidgetCursor();
@@ -538,7 +538,7 @@ WidgetCursor SelectFromEnumPage::findWidget(int x, int y, bool clicked) {
 
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
-        		return WidgetCursor(appContext, &widget, x, y, -1, 0, 0);
+        		return WidgetCursor(g_mainAssets, appContext, &widget, x, y, -1, 0, 0);
         	}
         }
     }
@@ -607,34 +607,31 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
     m_appContext = appContext;
     m_callback = callback;
 
-    m_containerRectangleWidget.common.type = WIDGET_TYPE_RECTANGLE;
-    m_containerRectangleWidget.common.data = DATA_ID_NONE;
-    m_containerRectangleWidget.common.action = ACTION_ID_NONE;
-    m_containerRectangleWidget.common.style = STYLE_ID_MENU_WITH_BUTTONS_CONTAINER;
-    m_containerRectangleWidget.common.specific = &m_containerRectangleWidget.specific;
-    m_containerRectangleWidget.specific.flags.invertColors = 1;
-    m_containerRectangleWidget.specific.flags.ignoreLuminosity = 0;
+    m_containerRectangleWidget.type = WIDGET_TYPE_RECTANGLE;
+    m_containerRectangleWidget.data = DATA_ID_NONE;
+    m_containerRectangleWidget.action = ACTION_ID_NONE;
+    m_containerRectangleWidget.style = STYLE_ID_MENU_WITH_BUTTONS_CONTAINER;
+    m_containerRectangleWidget.flags.invertColors = 1;
+    m_containerRectangleWidget.flags.ignoreLuminosity = 0;
 
-    m_messageTextWidget.common.type = WIDGET_TYPE_TEXT;
-    m_messageTextWidget.common.data = DATA_ID_NONE;
-    m_messageTextWidget.common.action = ACTION_ID_NONE;
-    m_messageTextWidget.common.style = STYLE_ID_MENU_WITH_BUTTONS_MESSAGE;
-    m_messageTextWidget.common.specific = &m_messageTextWidget.specific;
-    m_messageTextWidget.specific.text = message;
-    m_messageTextWidget.specific.flags = 0;
-    TextWidget_autoSize(m_messageTextWidget);
+    m_messageTextWidget.type = WIDGET_TYPE_TEXT;
+    m_messageTextWidget.data = DATA_ID_NONE;
+    m_messageTextWidget.action = ACTION_ID_NONE;
+    m_messageTextWidget.style = STYLE_ID_MENU_WITH_BUTTONS_MESSAGE;
+    m_messageTextWidget.text = message;
+    m_messageTextWidget.flags = 0;
+    TextWidget_autoSize(g_mainAssets, m_messageTextWidget);
 
     size_t i;
 
     for (i = 0; menuItems[i]; i++) {
-        m_buttonTextWidgets[i].common.type = WIDGET_TYPE_TEXT;
-        m_buttonTextWidgets[i].common.data = DATA_ID_NONE;
-        m_buttonTextWidgets[i].common.action = ACTION_ID_INTERNAL_MENU_WITH_BUTTONS;
-        m_buttonTextWidgets[i].common.style = STYLE_ID_MENU_WITH_BUTTONS_BUTTON;
-        m_buttonTextWidgets[i].common.specific = &m_buttonTextWidgets[i].specific;
-        m_buttonTextWidgets[i].specific.text = menuItems[i];
-        m_buttonTextWidgets[i].specific.flags = 0;
-        TextWidget_autoSize(m_buttonTextWidgets[i]);
+        m_buttonTextWidgets[i].type = WIDGET_TYPE_TEXT;
+        m_buttonTextWidgets[i].data = DATA_ID_NONE;
+        m_buttonTextWidgets[i].action = ACTION_ID_INTERNAL_MENU_WITH_BUTTONS;
+        m_buttonTextWidgets[i].style = STYLE_ID_MENU_WITH_BUTTONS_BUTTON;
+        m_buttonTextWidgets[i].text = menuItems[i];
+        m_buttonTextWidgets[i].flags = 0;
+        TextWidget_autoSize(g_mainAssets, m_buttonTextWidgets[i]);
     }
 
     m_numButtonTextWidgets = i;
@@ -644,13 +641,13 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
 
     int maxMenuItemWidth = 0;
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
-        maxMenuItemWidth = MAX(maxMenuItemWidth, m_buttonTextWidgets[i].common.w);
+        maxMenuItemWidth = MAX(maxMenuItemWidth, m_buttonTextWidgets[i].w);
     }
 
     int menuItemsWidth = maxMenuItemWidth * m_numButtonTextWidgets + (m_numButtonTextWidgets - 1) * styleButton->padding_left;
 
-    int contentWidth = MAX(m_messageTextWidget.common.w, menuItemsWidth);
-    int contentHeight = m_messageTextWidget.common.h + m_buttonTextWidgets[0].common.h;
+    int contentWidth = MAX(m_messageTextWidget.w, menuItemsWidth);
+    int contentHeight = m_messageTextWidget.h + m_buttonTextWidgets[0].h;
 
     width = styleContainer->border_size_left + styleContainer->padding_left + contentWidth + styleContainer->padding_right + styleContainer->border_size_right;
     height = styleContainer->border_size_top + styleContainer->padding_top + contentHeight + styleContainer->padding_bottom + styleContainer->border_size_bottom;
@@ -658,20 +655,20 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
     x = m_appContext->rect.x + (m_appContext->rect.w - width) / 2;
     y = m_appContext->rect.y + (m_appContext->rect.h - height) / 2;
 
-    m_containerRectangleWidget.common.x = 0;
-    m_containerRectangleWidget.common.y = 0;
-    m_containerRectangleWidget.common.w = width;
-    m_containerRectangleWidget.common.h = height;
+    m_containerRectangleWidget.x = 0;
+    m_containerRectangleWidget.y = 0;
+    m_containerRectangleWidget.w = width;
+    m_containerRectangleWidget.h = height;
 
-    m_messageTextWidget.common.x = styleContainer->border_size_left + styleContainer->padding_left + (contentWidth - m_messageTextWidget.common.w) / 2;
-    m_messageTextWidget.common.y = styleContainer->border_size_top + styleContainer->padding_top;
+    m_messageTextWidget.x = styleContainer->border_size_left + styleContainer->padding_left + (contentWidth - m_messageTextWidget.w) / 2;
+    m_messageTextWidget.y = styleContainer->border_size_top + styleContainer->padding_top;
 
     int xButtonTextWidget = styleContainer->border_size_left + styleContainer->padding_left + (contentWidth - menuItemsWidth) / 2;
-    int yButtonTextWidget = styleContainer->border_size_top + styleContainer->padding_top + m_messageTextWidget.common.h;
+    int yButtonTextWidget = styleContainer->border_size_top + styleContainer->padding_top + m_messageTextWidget.h;
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
-        m_buttonTextWidgets[i].common.x = xButtonTextWidget;
-        m_buttonTextWidgets[i].common.y = yButtonTextWidget;
-        m_buttonTextWidgets[i].common.w = maxMenuItemWidth;
+        m_buttonTextWidgets[i].x = xButtonTextWidget;
+        m_buttonTextWidgets[i].y = yButtonTextWidget;
+        m_buttonTextWidgets[i].w = maxMenuItemWidth;
         xButtonTextWidget += maxMenuItemWidth + styleButton->padding_left;
     }
 
@@ -685,23 +682,23 @@ void MenuWithButtonsPage::refresh(const WidgetCursor &widgetCursor2) {
     widgetCursor.currentState = widgetCursor2.currentState;
 
     if (!widgetCursor.previousState) {
-        widgetCursor.widget = &m_containerRectangleWidget.common;
-        widgetCursor.x = x + m_containerRectangleWidget.common.x;
-        widgetCursor.y = y + m_containerRectangleWidget.common.y;
+        widgetCursor.widget = &m_containerRectangleWidget;
+        widgetCursor.x = x + m_containerRectangleWidget.x;
+        widgetCursor.y = y + m_containerRectangleWidget.y;
         widgetCursor.currentState->flags.active = 0;
         RECTANGLE_draw(widgetCursor);
 
-        widgetCursor.widget = &m_messageTextWidget.common;
-        widgetCursor.x = x + m_messageTextWidget.common.x;
-        widgetCursor.y = y + m_messageTextWidget.common.y;
+        widgetCursor.widget = &m_messageTextWidget;
+        widgetCursor.x = x + m_messageTextWidget.x;
+        widgetCursor.y = y + m_messageTextWidget.y;
         widgetCursor.currentState->flags.active = 0;
         TEXT_draw(widgetCursor);
     }
 
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
-        widgetCursor.widget = &m_buttonTextWidgets[i].common;
-        widgetCursor.x = x + m_buttonTextWidgets[i].common.x;
-        widgetCursor.y = y + m_buttonTextWidgets[i].common.y;
+        widgetCursor.widget = &m_buttonTextWidgets[i];
+        widgetCursor.x = x + m_buttonTextWidgets[i].x;
+        widgetCursor.y = y + m_buttonTextWidgets[i].y;
         widgetCursor.cursor = i;
         widgetCursor.currentState->flags.active = isActiveWidget(widgetCursor);
         TEXT_draw(widgetCursor);
@@ -718,21 +715,21 @@ WidgetCursor MenuWithButtonsPage::findWidget(int x, int y, bool clicked) {
     widgetCursor.appContext = m_appContext;
 
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
-        widgetCursor.widget = &m_buttonTextWidgets[i].common;
-        widgetCursor.x = this->x + m_buttonTextWidgets[i].common.x;
-        widgetCursor.y = this->y + m_buttonTextWidgets[i].common.y;
+        widgetCursor.widget = &m_buttonTextWidgets[i];
+        widgetCursor.x = this->x + m_buttonTextWidgets[i].x;
+        widgetCursor.y = this->y + m_buttonTextWidgets[i].y;
         widgetCursor.cursor = i;
         if (
-            x >= widgetCursor.x && x < widgetCursor.x + m_buttonTextWidgets[i].common.w && 
-            y >= widgetCursor.y && y < widgetCursor.y + m_buttonTextWidgets[i].common.h
+            x >= widgetCursor.x && x < widgetCursor.x + m_buttonTextWidgets[i].w && 
+            y >= widgetCursor.y && y < widgetCursor.y + m_buttonTextWidgets[i].h
         ) {
             return widgetCursor;
         }
     }
 
-    widgetCursor.widget = &m_containerRectangleWidget.common;
-    widgetCursor.x = this->x + m_containerRectangleWidget.common.x;
-    widgetCursor.y = this->y + m_containerRectangleWidget.common.y;
+    widgetCursor.widget = &m_containerRectangleWidget;
+    widgetCursor.x = this->x + m_containerRectangleWidget.x;
+    widgetCursor.y = this->y + m_containerRectangleWidget.y;
     return widgetCursor;
 }
 

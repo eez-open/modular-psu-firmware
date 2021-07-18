@@ -33,11 +33,11 @@ using namespace eez::mcu;
 namespace eez {
 namespace gui {
 
-struct ScrollBarWidget {
+struct ScrollBarWidget : public Widget {
     uint16_t thumbStyle;
     uint16_t buttonsStyle;
     AssetsPtr<const char> leftButtonText;
-    AssetsPtr<const char> rightButtonText;
+	AssetsPtr<const char> rightButtonText;
 };
 
 enum ScrollBarWidgetSegment {
@@ -55,11 +55,6 @@ struct ScrollBarWidgetState {
     int position;
     int pageSize;
     ScrollBarWidgetSegment segment;
-};
-
-FixPointersFunctionType SCROLL_BAR_fixPointers = [](Widget *widget, Assets *assets) {
-    Text_fixPointer(&ScrollBarWidget::leftButtonText, widget, assets);
-    Text_fixPointer(&ScrollBarWidget::rightButtonText, widget, assets);
 };
 
 EnumFunctionType SCROLL_BAR_enum = nullptr;
@@ -99,7 +94,7 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
 
 DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    const ScrollBarWidget *scrollBarWidget = GET_WIDGET_PROPERTY(widget, specific, const ScrollBarWidget *);
+    auto scrollBarWidget = (ScrollBarWidget *)widget;
 
     widgetCursor.currentState->size = sizeof(ScrollBarWidgetState);
     widgetCursor.currentState->flags.active = g_selectedWidget == widgetCursor;
@@ -130,7 +125,7 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
             int buttonSize = isHorizontal ? widget->h : widget->w;
 
             // draw left button
-            drawText(GET_WIDGET_PROPERTY(scrollBarWidget, leftButtonText, const char *), -1, 
+            drawText(scrollBarWidget->leftButtonText.ptr(widgetCursor.assets), -1, 
                 widgetCursor.x, 
                 widgetCursor.y, 
                 isHorizontal ? buttonSize : (int)widget->w, 
@@ -173,7 +168,7 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
             }
 
             // draw right button
-            drawText(GET_WIDGET_PROPERTY(scrollBarWidget, rightButtonText, const char *), -1, 
+            drawText(scrollBarWidget->rightButtonText.ptr(widgetCursor.assets), -1,
                 isHorizontal ? widgetCursor.x + widget->w - buttonSize : widgetCursor.x, 
                 isHorizontal ? widgetCursor.y : widgetCursor.y + widget->h - buttonSize, 
                 isHorizontal ? buttonSize : (int)widget->w, 

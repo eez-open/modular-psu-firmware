@@ -228,8 +228,8 @@ void Keypad::insertChar(char c) {
 }
 
 void Keypad::key() {
-    const TextWidgetSpecific *textWidget = GET_WIDGET_PROPERTY(getFoundWidgetAtDown().widget, specific, const TextWidgetSpecific *);
-    key(GET_WIDGET_PROPERTY(textWidget, text, const char *)[0]);
+    auto textWidget = (TextWidget *)getFoundWidgetAtDown().widget;
+    key(textWidget->text.ptr(getFoundWidgetAtDown().assets)[0]);
 }
 
 void Keypad::key(char ch) {
