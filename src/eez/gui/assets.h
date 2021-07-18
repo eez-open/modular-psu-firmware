@@ -32,7 +32,10 @@ extern Assets *g_externalAssets;
 template<typename T>
 struct AssetsPtr {
     T* ptr(Assets *assets) {
-        return offset ? (T *)((uint8_t *)assets + 4 + offset) : nullptr; // 4 is offset of Assets::pages
+		//if (offset == 0) {
+		//	return nullptr;
+		//}
+        return (T *)((uint8_t *)assets + 4 + offset); // 4 is offset of Assets::pages
     }
 
     void operator=(T* ptr) {
