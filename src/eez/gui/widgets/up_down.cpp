@@ -45,8 +45,7 @@ static UpDownWidgetSegment g_segment;
 static WidgetCursor g_selectedWidget;
 
 DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    auto upDownWidget = (UpDownWidget *)(widget);
+    auto widget = (const UpDownWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
@@ -58,12 +57,12 @@ DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
-        const Style *buttonsStyle = getStyle(upDownWidget->buttonsStyle);
+        const Style *buttonsStyle = getStyle(widget->buttonsStyle);
 
         font::Font buttonsFont = styleGetFont(buttonsStyle);
         int buttonWidth = buttonsFont.getHeight();
 
-        drawText(upDownWidget->downButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
+        drawText(widget->downButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
                  buttonsStyle,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
@@ -76,7 +75,7 @@ DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
                  (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, false, false,
                  false, nullptr, nullptr, nullptr, nullptr);
 
-        drawText(upDownWidget->upButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
+        drawText(widget->upButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
                  buttonWidth, (int)widget->h, buttonsStyle,
                  widgetCursor.currentState->flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,

@@ -34,7 +34,7 @@ struct MultilineTextWidget : public Widget {
 EnumFunctionType MULTILINE_TEXT_enum = nullptr;
 
 DrawFunctionType MULTILINE_TEXT_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
+    auto widget = (const MultilineTextWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->data =
@@ -48,28 +48,26 @@ DrawFunctionType MULTILINE_TEXT_draw = [](const WidgetCursor &widgetCursor) {
     if (refresh) {
         const Style* style = getStyle(widget->style);
 
-        MultilineTextWidget *display_string_widget = (MultilineTextWidget *)widget;
-
         if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
                 drawMultilineText(widgetCursor.currentState->data.getString(), widgetCursor.x,
                     widgetCursor.y, (int)widget->w, (int)widget->h, style,
                     widgetCursor.currentState->flags.active,
-                    display_string_widget->firstLineIndent, display_string_widget->hangingIndent);
+                    widget->firstLineIndent, widget->hangingIndent);
             } else {
                 char text[64];
                 widgetCursor.currentState->data.toText(text, sizeof(text));
                 drawMultilineText(text, widgetCursor.x, widgetCursor.y, (int)widget->w,
                     (int)widget->h, style,
                     widgetCursor.currentState->flags.active,
-                    display_string_widget->firstLineIndent, display_string_widget->hangingIndent);
+                    widget->firstLineIndent, widget->hangingIndent);
             }
         } else {
             drawMultilineText(
-                display_string_widget->text.ptr(widgetCursor.assets), 
+                widget->text.ptr(widgetCursor.assets), 
                 widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                 style, widgetCursor.currentState->flags.active,
-                display_string_widget->firstLineIndent, display_string_widget->hangingIndent);
+                widget->firstLineIndent, widget->hangingIndent);
         }
     }
 };

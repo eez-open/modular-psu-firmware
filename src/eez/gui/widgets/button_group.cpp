@@ -95,8 +95,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
 }
 
 DrawFunctionType BUTTON_GROUP_draw = [] (const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    auto buttonGroupWidget = (const ButtonGroupWidget *)widget;
+    auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
@@ -108,7 +107,7 @@ DrawFunctionType BUTTON_GROUP_draw = [] (const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         const Style* style = getStyle(widget->style);
-        const Style* selectedStyle = getStyle(buttonGroupWidget->selectedStyle);
+        const Style* selectedStyle = getStyle(widget->selectedStyle);
 
         drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, widgetCursor.currentState->data.getInt(), count(widget->data));
     }

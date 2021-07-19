@@ -34,7 +34,7 @@ struct ContainerWidgetState {
     int displayBufferIndex;
 };
 
-void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, AssetsPtrList<Widget> &widgets) {
+void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, ListOfAssetsPtr<Widget> &widgets) {
     auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 
@@ -149,8 +149,8 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCall
         }
     }
 
-    auto containerWidget = (ContainerWidget *)widgetCursor.widget;
-    enumContainer(widgetCursor, callback, containerWidget->widgets);
+    auto widget = ((ContainerWidget *)widgetCursor.widget);
+    enumContainer(widgetCursor, callback, widget->widgets);
 
     if (isOverlay(widgetCursor)) {
         auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
@@ -161,7 +161,17 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCall
 
             const Style *style = getStyle(widgetCursor.widget->style);
 
-            mcu::display::setBufferBounds(currentState->displayBufferIndex, widgetCursor.x, widgetCursor.y, overlay ? overlay->width: widgetCursor.widget->w, overlay ? overlay->height : widgetCursor.widget->h, (containerWidget->flags & SHADOW_FLAG) != 0, style->opacity, xOffset, yOffset, nullptr);
+            mcu::display::setBufferBounds(currentState->displayBufferIndex,
+				widgetCursor.x,
+				widgetCursor.y,
+				overlay ? overlay->width: widgetCursor.widget->w,
+				overlay ? overlay->height : widgetCursor.widget->h,
+				(widget->flags & SHADOW_FLAG) != 0, 
+				style->opacity,
+				xOffset,
+				yOffset, 
+				nullptr
+			);
         }
     }
 };

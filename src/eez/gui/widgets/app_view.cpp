@@ -49,20 +49,19 @@ EnumFunctionType APP_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallb
 DrawFunctionType APP_VIEW_draw = [](const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->size = sizeof(WidgetState);
 
-    const Widget *widget = widgetCursor.widget;
     Value appContextValue;
-    DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
+    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
     bool refresh = !widgetCursor.previousState;
     if (refresh && !appContext->isActivePageInternal() && appContext->getActivePageId() != PAGE_ID_NONE) {
         appContext->rect.x = widgetCursor.x;
         appContext->rect.y = widgetCursor.y;
-        appContext->rect.w = widget->w;
-        appContext->rect.h = widget->h;
+        appContext->rect.w = widgetCursor.widget->w;
+        appContext->rect.h = widgetCursor.widget->h;
 
         // clear background
-		const Widget *page = getPageWidget(appContext->getActivePageId());
+		auto page = getPageAsset(appContext->getActivePageId());
         const Style* style = getStyle(page->style);
         mcu::display::setColor(style->background_color);
 

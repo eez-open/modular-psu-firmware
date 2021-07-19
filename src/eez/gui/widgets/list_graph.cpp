@@ -48,16 +48,16 @@ struct ListGraphWidgetState {
 EnumFunctionType LIST_GRAPH_enum = nullptr;
 
 DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    auto listGraphWidget = (const ListGraphWidget *)widget;
-    const Style* style = getStyle(widget->style);
-	const Style* y1Style = getStyle(listGraphWidget->y1Style);
-	const Style* y2Style = getStyle(listGraphWidget->y2Style);
-	const Style* cursorStyle = getStyle(listGraphWidget->cursorStyle);
+    auto widget = (const ListGraphWidget *)widgetCursor.widget;
+
+	const Style* style = getStyle(widget->style);
+	const Style* y1Style = getStyle(widget->y1Style);
+	const Style* y2Style = getStyle(widget->y2Style);
+	const Style* cursorStyle = getStyle(widget->cursorStyle);
 
     widgetCursor.currentState->size = sizeof(ListGraphWidgetState);
     widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
-    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData = get(widgetCursor.cursor, listGraphWidget->cursorData);
+    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData = get(widgetCursor.cursor, widget->cursorData);
 
     int iPrevCursor = -1;
     if (widgetCursor.previousState) {
@@ -77,26 +77,26 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
         display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1,
                             widgetCursor.y + (int)widget->h - 1);
 
-        int dwellListLength = getFloatListLength(listGraphWidget->dwellData);
+        int dwellListLength = getFloatListLength(widget->dwellData);
         if (dwellListLength > 0) {
-            float *dwellList = getFloatList(listGraphWidget->dwellData);
+            float *dwellList = getFloatList(widget->dwellData);
 
             const Style *styles[2] = { y1Style, y2Style };
 
-            int listLength[2] = { getFloatListLength(listGraphWidget->y1Data),
-                                  getFloatListLength(listGraphWidget->y2Data) };
+            int listLength[2] = { getFloatListLength(widget->y1Data),
+                                  getFloatListLength(widget->y2Data) };
 
-            float *list[2] = { getFloatList(listGraphWidget->y1Data),
-                               getFloatList(listGraphWidget->y2Data) };
+            float *list[2] = { getFloatList(widget->y1Data),
+                               getFloatList(widget->y2Data) };
 
             float min[2] = {
-                getMin(widgetCursor.cursor, listGraphWidget->y1Data).getFloat(),
-                getMin(widgetCursor.cursor, listGraphWidget->y2Data).getFloat()
+                getMin(widgetCursor.cursor, widget->y1Data).getFloat(),
+                getMin(widgetCursor.cursor, widget->y2Data).getFloat()
             };
 
             float max[2] = {
-                getMax(widgetCursor.cursor, listGraphWidget->y1Data).getFloat(),
-                getMax(widgetCursor.cursor, listGraphWidget->y2Data).getFloat()
+                getMax(widgetCursor.cursor, widget->y1Data).getFloat(),
+                getMax(widgetCursor.cursor, widget->y2Data).getFloat()
             };
 
             int maxListLength = getFloatListLength(widget->data);
@@ -172,8 +172,7 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 
 OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-        const Widget *widget = widgetCursor.widget;
-        auto listGraphWidget = (const ListGraphWidget *)widget;
+        auto widget = (const ListGraphWidget *)widgetCursor.widget;
 
         if (touchEvent.x < widgetCursor.x || touchEvent.x >= widgetCursor.x + (int)widget->w) {
             return;
@@ -182,11 +181,11 @@ OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Ev
             return;
         }
 
-        int dwellListLength = getFloatListLength(listGraphWidget->dwellData);
+        int dwellListLength = getFloatListLength(widget->dwellData);
         if (dwellListLength > 0) {
             int iCursor = -1;
 
-            float *dwellList = getFloatList(listGraphWidget->dwellData);
+            float *dwellList = getFloatList(widget->dwellData);
 
             int maxListLength = getFloatListLength(widget->data);
 
@@ -218,14 +217,14 @@ OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Ev
 
                 if (touchEvent.x >= x1 && touchEvent.x < x2) {
                     int iCurrentCursor =
-                        get(widgetCursor.cursor, listGraphWidget->cursorData).getInt();
+                        get(widgetCursor.cursor, widget->cursorData).getInt();
                     iCursor = i * 3 + iCurrentCursor % 3;
                     break;
                 }
             }
 
             if (iCursor >= 0) {
-                set(widgetCursor.cursor, listGraphWidget->cursorData, Value(iCursor));
+                set(widgetCursor.cursor, widget->cursorData, Value(iCursor));
                 if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                     sound::playClick();
                 }

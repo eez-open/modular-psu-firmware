@@ -93,8 +93,7 @@ void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, uint1
 }
 
 DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    auto barGraphWidget = (const BarGraphWidget *)widget;
+    auto widget = (const BarGraphWidget *)widgetCursor.widget;
     const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
@@ -110,8 +109,8 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     currentState->activeColor = getActiveColor(widgetCursor.cursor, widget->data, style);
     currentState->activeBackgroundColor = getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
 
-    currentState->line1Data = get(widgetCursor.cursor, barGraphWidget->line1Data);
-    currentState->line2Data = get(widgetCursor.cursor, barGraphWidget->line2Data);
+    currentState->line1Data = get(widgetCursor.cursor, widget->line1Data);
+    currentState->line2Data = get(widgetCursor.cursor, widget->line2Data);
 
     uint32_t currentTime = millis();
     currentState->textData = widgetCursor.currentState->data;
@@ -162,8 +161,8 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
         }
 
         bool horizontal = 
-            (barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_LEFT_RIGHT || 
-            (barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_RIGHT_LEFT;
+            (widget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_LEFT_RIGHT ||
+            (widget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_RIGHT_LEFT;
 
         int d = horizontal ? w : h;
 
@@ -192,7 +191,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
         }
 
         Style textStyle;
-        memcpy(&textStyle, barGraphWidget->textStyle ? getStyle(barGraphWidget->textStyle) : style, sizeof(Style));
+        memcpy(&textStyle, widget->textStyle ? getStyle(widget->textStyle) : style, sizeof(Style));
         if (style->color != currentState->color) {
             textStyle.color = widgetCursor.currentState->flags.active || widgetCursor.currentState->flags.blinking ? currentState->activeColor : currentState->color;
         }
@@ -205,8 +204,8 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             char valueText[64];
             int pText = 0;
             int wText = 0;
-            if (!(barGraphWidget->orientation & BAR_GRAPH_DO_NOT_DISPLAY_VALUE)) {
-                if (barGraphWidget->textStyle) {
+            if (!(widget->orientation & BAR_GRAPH_DO_NOT_DISPLAY_VALUE)) {
+                if (widget->textStyle) {
                     font::Font font = styleGetFont(&textStyle);
 
                     currentState->textData.toText(valueText, sizeof(valueText));
@@ -229,14 +228,14 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                 pText = pValue;
             }
 
-            if ((barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_LEFT_RIGHT) {
+            if ((widget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_LEFT_RIGHT) {
                 // draw bar
                 if (pText > 0) {
                     display::setColor(fg);
                     display::fillRect(x, y, x + pText - 1, y + h - 1);
                 }
 
-                if (!(barGraphWidget->orientation & BAR_GRAPH_DO_NOT_DISPLAY_VALUE)) {
+                if (!(widget->orientation & BAR_GRAPH_DO_NOT_DISPLAY_VALUE)) {
                     drawText(valueText, -1, x + pText, y, wText, h, &textStyle, false, false, false, nullptr, nullptr, nullptr, nullptr);
                 }
 
@@ -275,7 +274,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                     display::fillRect(x - (pText - 1), y, x, y + h - 1);
                 }
 
-                if (!(barGraphWidget->orientation & BAR_GRAPH_DO_NOT_DISPLAY_VALUE)) {
+                if (!(widget->orientation & BAR_GRAPH_DO_NOT_DISPLAY_VALUE)) {
                     drawText(valueText, -1, x - (pText + wText - 1), y, wText, h, &textStyle, false, false, false, nullptr, nullptr, nullptr, nullptr);
                 }
 
@@ -308,17 +307,17 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             }
 
             if (drawLine1) {
-                drawLineInBarGraphWidget(barGraphWidget, pLine1, barGraphWidget->line1Style, x, y, w, h);
+                drawLineInBarGraphWidget(widget, pLine1, widget->line1Style, x, y, w, h);
             }
             if (drawLine2) {
-                drawLineInBarGraphWidget(barGraphWidget, pLine2, barGraphWidget->line2Style, x, y, w, h);
+                drawLineInBarGraphWidget(widget, pLine2, widget->line2Style, x, y, w, h);
             }
         } else {
             // calc text position
             char valueText[64];
             int pText = 0;
             int hText = 0;
-            if (barGraphWidget->textStyle) {
+            if (widget->textStyle) {
                 font::Font font = styleGetFont(&textStyle);
 
                 currentState->textData.toText(valueText, sizeof(valueText));
@@ -338,7 +337,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                 }
             }
 
-            if ((barGraphWidget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_TOP_BOTTOM) {
+            if ((widget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_TOP_BOTTOM) {
                 // draw bar
                 if (pText > 0) {
                     display::setColor(fg);
@@ -413,10 +412,10 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             }
 
             if (drawLine1) {
-                drawLineInBarGraphWidget(barGraphWidget, pLine1, barGraphWidget->line1Style, x, y, w, h);
+                drawLineInBarGraphWidget(widget, pLine1, widget->line1Style, x, y, w, h);
             }
             if (drawLine2) {
-                drawLineInBarGraphWidget(barGraphWidget, pLine2, barGraphWidget->line2Style, x, y, w, h);
+                drawLineInBarGraphWidget(widget, pLine2, widget->line2Style, x, y, w, h);
             }
         }
     }

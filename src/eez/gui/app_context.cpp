@@ -276,9 +276,8 @@ bool AppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int 
 void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
     int activePageId = getActivePageId();
     if (activePageId != PAGE_ID_NONE && !isPageInternal(activePageId)) {
-        auto page = getPageWidget(activePageId);
-		auto pageSpecific = (PageWidget *)page;
-        if ((pageSpecific->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
+        auto page = getPageAsset(activePageId);
+        if ((page->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
             if (!pointInsideRect(touchEvent.x, touchEvent.y, foundWidget.appContext->rect.x + page->x, foundWidget.appContext->rect.y + page->y, page->w, page->h)) {
                 int activePageId = getActivePageId();
                 
@@ -333,7 +332,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
             height = internalPage->height;
             withShadow = true;
         } else {
-            const Widget *page = getPageWidget(m_pageNavigationStack[i].pageId);
+            auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
 
             auto savedPreviousState = widgetCursor.previousState;
             auto savedWidget = widgetCursor.widget;
@@ -382,7 +381,7 @@ void getPageRect(int pageId, Page *page, int &x, int &y, int &w, int &h) {
         w = ((InternalPage *)page)->width;
         h = ((InternalPage *)page)->height;
     } else {
-        const Widget *page = getPageWidget(pageId);
+        auto page = getPageAsset(pageId);
         x = page->x;
         y = page->y;
         w = page->w;

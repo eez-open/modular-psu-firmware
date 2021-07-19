@@ -45,7 +45,7 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
     auto parentWidget = savedWidget;
 
-    ListWidget *listWidget = (ListWidget *)widgetCursor.widget;
+    auto listWidget = (const ListWidget *)widgetCursor.widget;
 
     int startPosition = ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 

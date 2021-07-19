@@ -56,10 +56,10 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
     }
 
     int layoutId = getLayoutId(widgetCursor);
-    const Widget *layout = getPageWidget(layoutId);
+    auto layout = getPageAsset(layoutId);
 
     if (layout) {
-		auto layoutView = (PageWidget *)layout;
+		auto layoutView = (PageAsset *)layout;
 		enumContainer(widgetCursor, callback, layoutView->widgets);
 	} else {
 		if (widgetCursor.currentState) {
@@ -75,13 +75,12 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
 };
 
 DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-	auto layoutView = (const LayoutViewWidget *)widgetCursor.widget;
+	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
     Value oldContext;
     Value newContext;
-    if (layoutView->context) {
-        setContext(((WidgetCursor &)widgetCursor).cursor, layoutView->context, oldContext, newContext);
+    if (widget->context) {
+        setContext(((WidgetCursor &)widgetCursor).cursor, widget->context, oldContext, newContext);
         ((LayoutViewWidgetState *)widgetCursor.currentState)->context = newContext;
     } else {
         ((LayoutViewWidgetState *)widgetCursor.currentState)->context = Value();
@@ -89,8 +88,8 @@ DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->data = getLayoutId(widgetCursor);
 
-    if (layoutView->context) {
-        restoreContext(((WidgetCursor &)widgetCursor).cursor, layoutView->context, oldContext);
+    if (widget->context) {
+        restoreContext(((WidgetCursor &)widgetCursor).cursor, widget->context, oldContext);
     }
 
     bool refresh =

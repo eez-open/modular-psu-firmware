@@ -44,7 +44,7 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
     auto parentWidget = savedWidget;
 
-    auto gridWidget = (GridWidget *)widgetCursor.widget;
+    auto gridWidget = (const GridWidget *)widgetCursor.widget;
 
     int startPosition = ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
 

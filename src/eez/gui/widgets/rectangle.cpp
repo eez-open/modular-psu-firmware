@@ -34,15 +34,14 @@ DrawFunctionType RECTANGLE_draw = [](const WidgetCursor &widgetCursor) {
     bool refresh = !widgetCursor.previousState || widgetCursor.previousState->flags.active !=widgetCursor.currentState->flags.active;
 
     if (refresh) {
-        const Widget *widget = widgetCursor.widget;
-        auto rectangle_widget = (const RectangleWidget *)widget;
+        auto widget = (const RectangleWidget *)widgetCursor.widget;
         const Style* style = getStyle(widget->style);
         drawRectangle(
             widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
             style, 
             widgetCursor.currentState->flags.active, 
-            rectangle_widget->flags.ignoreLuminosity,
-            rectangle_widget->flags.invertColors);
+			widget->flags.ignoreLuminosity,
+			widget->flags.invertColors);
     }
 };
 

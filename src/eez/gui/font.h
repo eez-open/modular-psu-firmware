@@ -37,10 +37,6 @@ struct Font {
     uint8_t getAscent();
     uint8_t getDescent();
     uint8_t getHeight();
-
-private:
-    uint8_t getEncodingStart();
-    uint8_t getEncodingEnd();
 };
 
 } // namespace font

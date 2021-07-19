@@ -93,8 +93,7 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
 }
 
 DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    auto scrollBarWidget = (ScrollBarWidget *)widget;
+    auto widget = (const ScrollBarWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(ScrollBarWidgetState);
     widgetCursor.currentState->flags.active = g_selectedWidget == widgetCursor;
@@ -119,13 +118,13 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         if (currentState->pageSize < currentState->size) {
-            const Style *buttonsStyle = getStyle(scrollBarWidget->buttonsStyle);
+            const Style *buttonsStyle = getStyle(widget->buttonsStyle);
             auto isHorizontal = widget->w > widget->h;
 
             int buttonSize = isHorizontal ? widget->h : widget->w;
 
             // draw left button
-            drawText(scrollBarWidget->leftButtonText.ptr(widgetCursor.assets), -1, 
+            drawText(widget->leftButtonText.ptr(widgetCursor.assets), -1, 
                 widgetCursor.x, 
                 widgetCursor.y, 
                 isHorizontal ? buttonSize : (int)widget->w, 
@@ -155,7 +154,7 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
             display::fillRect(xTrack, yTrack, xTrack + wTrack - 1, yTrack + hTrack - 1, 0);
 
             // draw thumb
-            const Style *thumbStyle = getStyle(scrollBarWidget->thumbStyle);
+            const Style *thumbStyle = getStyle(widget->thumbStyle);
             display::setColor(thumbStyle->color);
             if (isHorizontal) {
                 int xThumb, wThumb;
@@ -168,7 +167,7 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
             }
 
             // draw right button
-            drawText(scrollBarWidget->rightButtonText.ptr(widgetCursor.assets), -1,
+            drawText(widget->rightButtonText.ptr(widgetCursor.assets), -1,
                 isHorizontal ? widgetCursor.x + widget->w - buttonSize : widgetCursor.x, 
                 isHorizontal ? widgetCursor.y : widgetCursor.y + widget->h - buttonSize, 
                 isHorizontal ? buttonSize : (int)widget->w, 

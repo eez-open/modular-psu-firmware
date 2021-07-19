@@ -29,13 +29,13 @@ namespace eez {
 namespace gui {
 
 struct BitmapWidget : public Widget {
-    int8_t bitmap;
+    int16_t bitmap;
 };
 
 EnumFunctionType BITMAP_enum = nullptr;
 
 DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
-	const Widget *widget = widgetCursor.widget;
+	auto widget = (const BitmapWidget *)widgetCursor.widget;
 
 	widgetCursor.currentState->size = sizeof(WidgetState);
 
@@ -46,7 +46,6 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
 			widgetCursor.currentState->data != widgetCursor.previousState->data;
 
     if (refresh) {
-        auto display_bitmap_widget = (const BitmapWidget *)widget;
         const Style* style = getStyle(widget->style);
 
         const Bitmap *bitmap = nullptr;
@@ -64,8 +63,8 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
                 DATA_OPERATION_FUNCTION(widget->data,  DATA_OPERATION_GET, widgetCursor.cursor, valueBitmapId);
                 bitmap = getBitmap(valueBitmapId.getInt());
             }
-        } else if (display_bitmap_widget->bitmap != 0) {
-            bitmap = getBitmap(display_bitmap_widget->bitmap);
+        } else if (widget->bitmap != 0) {
+            bitmap = getBitmap(widget->bitmap);
         }
 
         if (bitmap) {

@@ -40,15 +40,14 @@ void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
 }
 
 DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    auto textWidget = (TextWidget *)widget;
+    auto widget = (const TextWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
     
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
-    const char *text = textWidget->text.ptr(widgetCursor.assets);
+    const char *text = widget->text.ptr(widgetCursor.assets);
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
     widgetCursor.currentState->data = !(text && text[0]) && widget->data ? get(widgetCursor.cursor, widget->data) : 0;
@@ -68,7 +67,7 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
         uint16_t overrideActiveColor =  widgetCursor.currentState->flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
         uint16_t overrideActiveBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : style->active_background_color;
 
-        bool ignoreLuminosity = (textWidget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
+        bool ignoreLuminosity = (widget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
         if (text && text[0]) {
             drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                 style, widgetCursor.currentState->flags.active,

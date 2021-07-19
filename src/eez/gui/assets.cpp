@@ -42,6 +42,8 @@ bool g_isMainAssetsLoaded;
 Assets *g_mainAssets = (Assets *)DECOMPRESSED_ASSETS_START_ADDRESS;
 Assets *g_externalAssets = (Assets *)EXTERNAL_ASSETS_BUFFER;
 
+////////////////////////////////////////////////////////////////////////////////
+
 static const uint32_t HEADER_TAG = 0x7A65657E;
 
 struct Header {
@@ -53,40 +55,57 @@ struct Header {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void loadMainAssets() {
-    uint16_t projectVersion;
-
-	int compressedSize;
-	uint32_t decompressedSize;
+bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, Assets *decompressedAssets, uint32_t maxDecompressedAssetsSize, int *err) {
 	uint32_t compressedDataOffset;
+	uint32_t decompressedSize;
 
-	auto header = (Header *)assets;
-	if (header->tag == HEADER_TAG) {
-		// project version >= 3
-        projectVersion = header->projectVersion;
+	auto header = (Header *)assetsData;
 
-		compressedSize = sizeof(assets) - sizeof(Header);
-		decompressedSize = header->decompressedSize;
-		compressedDataOffset = sizeof(Header);
-	} else {
-		// project version < 3,
-        projectVersion = 2;
-
-		// first 4 bytes (uint32_t) are decompressed size
-		compressedSize = sizeof(assets) - 4;
-		decompressedSize = ((uint32_t *)header)[0];
-		compressedDataOffset = 4;
+	if (header->tag != HEADER_TAG) {
+		if (err) {
+			*err = SCPI_ERROR_INVALID_BLOCK_DATA;
+		}
+		return false;
 	}
 
-    assert(decompressedSize + ((uint8_t *)(&g_mainAssets->pages) - (uint8_t *)g_mainAssets) <= DECOMPRESSED_ASSETS_SIZE);
+	decompressedAssets->projectVersion = header->projectVersion;
 
-    g_mainAssets->projectVersion = projectVersion;
-    g_mainAssets->external = false;
+	compressedDataOffset = sizeof(Header);
+	decompressedSize = header->decompressedSize;
 
-    int result = LZ4_decompress_safe((const char *)(assets + compressedDataOffset), (char *)&g_mainAssets->pages, compressedSize, (int)decompressedSize);
-    assert(result == (int)decompressedSize);
+	auto decompressedDataOffset = offsetof(Assets, pages);
 
-    g_isMainAssetsLoaded = true;
+	if (decompressedDataOffset + decompressedSize > maxDecompressedAssetsSize) {
+		if (err) {
+			*err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
+		}
+		return false;
+	}
+
+	int compressedSize = assetsDataSize - compressedDataOffset;
+
+    int decompressResult = LZ4_decompress_safe(
+		(const char *)(assetsData + compressedDataOffset),
+		(char *)decompressedAssets + decompressedDataOffset,
+		compressedSize,
+		decompressedSize
+	);
+	
+	if (decompressResult != decompressedSize) {
+		if (err) {
+			*err = SCPI_ERROR_INVALID_BLOCK_DATA;
+		}
+		return false;
+	}
+	
+	return true;
+}
+
+void loadMainAssets() {
+	g_mainAssets->external = false;
+	auto decompressResult = decompressAssetsData(assets, sizeof(assets), g_mainAssets, MAX_DECOMPRESSED_ASSETS_SIZE, nullptr);
+	assert(decompressResult);
+	g_isMainAssetsLoaded = true;
 }
 
 bool loadExternalAssets(const char *filePath, int *err) {
@@ -125,57 +144,14 @@ bool loadExternalAssets(const char *filePath, int *err) {
         return false;
     }
 
-    uint16_t projectVersion;
+	g_externalAssets->external = true;
 
-    int compressedSize;
-    uint32_t decompressedSize;
-	uint32_t compressedDataOffset;
-
-	auto header = (Header *)fileData;
-	if (header->tag == HEADER_TAG) {
-		// project version >= 3
-        projectVersion = header->projectVersion;
-
-		compressedSize = fileSize - sizeof(Header);
-		decompressedSize = header->decompressedSize;
-		compressedDataOffset = sizeof(Header);
-	} else {
-		// project version < 3,
-        projectVersion = 2;
-
-		// first 4 bytes (uint32_t) are decompressed size
-		compressedSize = fileSize - 4;
-		decompressedSize = ((uint32_t *)header)[0];
-		compressedDataOffset = 4;
-	}
-
-	uint32_t availableDecompressedSize = (uint32_t)(fileData - EXTERNAL_ASSETS_BUFFER - (((uint8_t *)(&g_externalAssets->pages) - (uint8_t *)g_externalAssets)));
-    if (decompressedSize > availableDecompressedSize) {
-        if (err) {
-            *err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
-        }
-        return false;
-    }
-
-    g_externalAssets->projectVersion = projectVersion;
-    g_externalAssets->external = true;
-
-    int result = LZ4_decompress_safe((const char *)fileData + compressedDataOffset, (char *)&g_externalAssets->pages, compressedSize, (int)decompressedSize);
-    if (result != (int)decompressedSize) {
-        if (err) {
-            *err = SCPI_ERROR_INVALID_BLOCK_DATA;
-        }
-        return false;
-    }
-
-    return true;
+	return decompressAssetsData(fileData, fileSize, g_externalAssets, fileData - EXTERNAL_ASSETS_BUFFER, err);
 }
 
-const Style *getStyle(int styleID) {
-	return g_mainAssets->styles.item(g_mainAssets, styleID - 1);
-}
+////////////////////////////////////////////////////////////////////////////////
 
-const Widget* getPageWidget(int pageId) {
+const PageAsset* getPageAsset(int pageId) {
 	if (pageId > 0) {
 		return g_mainAssets->pages.item(g_mainAssets, (pageId - 1));
 	} else if (pageId < 0) {
@@ -184,9 +160,25 @@ const Widget* getPageWidget(int pageId) {
 	return nullptr;
 }
 
+const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor) {
+	if (pageId < 0) {
+		widgetCursor.assets = g_externalAssets;
+	} else {
+	    widgetCursor.assets = g_mainAssets;
+    }
+	return getPageAsset(pageId);
+}
+
+const Style *getStyle(int styleID) {
+	if (styleID <= 0) {
+		return nullptr;
+	}
+	return g_mainAssets->styles.item(g_mainAssets, styleID - 1);
+}
+
 const FontData *getFontData(int fontID) {
-	if (fontID == 0) {
-		return 0;
+	if (fontID <= 0) {
+		return nullptr;
 	}
 	return g_mainAssets->fonts.item(g_mainAssets, fontID - 1);
 }
@@ -212,12 +204,12 @@ const char *getThemeName(int i) {
 	return getTheme(i)->name.ptr(g_mainAssets);
 }
 
-const uint16_t *getThemeColors(int themeIndex) {
-	return getTheme(themeIndex)->colors.ptr(g_mainAssets);
-}
-
 const uint32_t getThemeColorsCount(int themeIndex) {
 	return getTheme(themeIndex)->colors.count;
+}
+
+const uint16_t *getThemeColors(int themeIndex) {
+	return getTheme(themeIndex)->colors.ptr(g_mainAssets);
 }
 
 const uint16_t *getColors() {

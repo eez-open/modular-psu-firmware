@@ -38,7 +38,14 @@ struct AssetsPtr {
         return (T *)((uint8_t *)assets + 4 + offset); // 4 is offset of Assets::pages
     }
 
-    void operator=(T* ptr) {
+	const T* ptr(Assets *assets) const {
+		//if (offset == 0) {
+		//	return nullptr;
+		//}
+		return (const T *)((uint8_t *)assets + 4 + offset); // 4 is offset of Assets::pages
+	}
+	
+	void operator=(T* ptr) {
         offset = (uint8_t *)g_mainAssets - (uint8_t *)ptr;
     }
 
@@ -47,25 +54,27 @@ private:
 };
 
 template<typename T>
-struct AssetsPtrList {
+struct ListOfAssetsPtr {
     T* item(Assets *assets, int i) {
         return (T *)items.ptr(assets)[i].ptr(assets);
     }
 
-	uint32_t count;
+	const T* item(Assets *assets, int i) const {
+		return (const T *)items.ptr(assets)[i].ptr(assets);
+	}
 
+	uint32_t count;
 private:
     AssetsPtr<AssetsPtr<uint32_t>> items;
 };
 
 template<typename T>
-struct SimpleList {
+struct ListOfFundamentalType {
     T *ptr(Assets *assets) {
         return items.ptr(assets);
     }
 
 	uint32_t count;
-
 private:
     AssetsPtr<T> items;
 };
@@ -87,11 +96,13 @@ struct Widget {
 	uint16_t style;
 };
 
-struct PageWidget : public Widget {
-	AssetsPtrList<Widget> widgets;
-    uint16_t overlay;
-    uint16_t flags;
+struct ContainerWidget : public Widget {
+	ListOfAssetsPtr<Widget> widgets;
+	uint16_t flags;
+	int16_t overlay;
 };
+
+typedef ContainerWidget PageAsset;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -152,7 +163,7 @@ struct FontData {
 	uint8_t descent;
 	uint8_t encodingStart;
 	uint8_t encodingEnd;
-	AssetsPtr<GlyphData> glyphs[1];
+	AssetsPtr<const GlyphData> glyphs[1];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,12 +180,12 @@ struct Bitmap {
 
 struct Theme {
 	AssetsPtr<const char> name;
-	SimpleList<uint16_t> colors;
+	ListOfFundamentalType<uint16_t> colors;
 };
 
 struct Colors {
-	AssetsPtrList<Theme> themes;
-	SimpleList<uint16_t> colors;
+	ListOfAssetsPtr<Theme> themes;
+	ListOfFundamentalType<uint16_t> colors;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -189,25 +200,25 @@ struct Connection {
 };
 
 struct ComponentOutput {
-	AssetsPtrList<Connection> connections;
+	ListOfAssetsPtr<Connection> connections;
 };
 
 struct Component {
     uint16_t type;
     uint16_t reserved;
-	AssetsPtrList<ComponentInput> inputs;
-	AssetsPtrList<ComponentOutput> outputs;
+	ListOfAssetsPtr<ComponentInput> inputs;
+	ListOfAssetsPtr<ComponentOutput> outputs;
 };
 
 struct Flow {
-	AssetsPtrList<Component> components;
+	ListOfAssetsPtr<Component> components;
 };
 
 struct FlowDefinition {
-	AssetsPtrList<Flow> flows;
-	AssetsPtrList<Value> flowValues;
-	AssetsPtrList<ComponentInput> widgetDataItems;
-	AssetsPtrList<ComponentOutput> widgetActions;
+	ListOfAssetsPtr<Flow> flows;
+	ListOfAssetsPtr<Value> flowValues;
+	ListOfAssetsPtr<ComponentInput> widgetDataItems;
+	ListOfAssetsPtr<ComponentOutput> widgetActions;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -217,13 +228,13 @@ struct Assets {
     uint8_t external;
     uint16_t reserved;
 
-	AssetsPtrList<PageWidget> pages;
-	AssetsPtrList<Style> styles;
-	AssetsPtrList<FontData> fonts;
-	AssetsPtrList<Bitmap> bitmaps;
+	ListOfAssetsPtr<PageAsset> pages;
+	ListOfAssetsPtr<Style> styles;
+	ListOfAssetsPtr<FontData> fonts;
+	ListOfAssetsPtr<Bitmap> bitmaps;
 	AssetsPtr<Colors> colorsDefinition;
-	AssetsPtrList<const char> actionNames;
-	AssetsPtrList<const char> variableNames;
+	ListOfAssetsPtr<const char> actionNames;
+	ListOfAssetsPtr<const char> variableNames;
 	AssetsPtr<FlowDefinition> flowDefinition;
 };
 
@@ -232,23 +243,25 @@ struct Assets {
 void loadMainAssets();
 bool loadExternalAssets(const char *filePath, int *err);
 
-const Widget *getPageWidget(int pageId);
+////////////////////////////////////////////////////////////////////////////////
+
+const PageAsset *getPageAsset(int pageId);
+const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor);
+
 const Style *getStyle(int styleID);
 const FontData *getFontData(int fontID);
 const Bitmap *getBitmap(int bitmapID);
 
 int getThemesCount();
 const char *getThemeName(int i);
-const uint16_t *getThemeColors(int themeIndex);
 const uint32_t getThemeColorsCount(int themeIndex);
+const uint16_t *getThemeColors(int themeIndex);
 const uint16_t *getColors();
 
 int getExternalAssetsFirstPageId();
 
 const char *getActionName(int16_t actionId);
 int16_t getDataIdFromName(const char *name);
-
-#define GET_WIDGET_PROPERTY(widget, propertyName, type) ((type)widget->propertyName)
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -22,10 +22,14 @@ namespace eez {
 namespace gui {
 namespace font {
 
-Font::Font() : fontData(0) {
+Font::Font()
+	: fontData(0) 
+{
 }
 
-Font::Font(const FontData *fontData_) : fontData(fontData_) {
+Font::Font(const FontData *fontData_)
+	: fontData(fontData_) 
+{
 }
 
 uint8_t Font::getAscent() {
@@ -36,29 +40,21 @@ uint8_t Font::getDescent() {
     return fontData->descent;
 }
 
-uint8_t Font::getEncodingStart() {
-	return fontData->encodingStart;
-;
-}
-
-uint8_t Font::getEncodingEnd() {
-    return fontData->encodingEnd;
-}
-
 uint8_t Font::getHeight() {
-    return getAscent() + getDescent();
+    return fontData->ascent + fontData->descent;
 }
 
 const GlyphData *Font::getGlyph(uint8_t encoding) {
-	auto start = getEncodingStart();
-	auto end = getEncodingEnd();
+	auto start = fontData->encodingStart;
+	auto end = fontData->encodingEnd;
 
 	if (encoding < start || encoding > end) {
 		// Not found!
 		return nullptr;
 	}
 
-	GlyphData *glyphData = ((FontData *)fontData)->glyphs[encoding - start].ptr(g_mainAssets);
+	auto glyphIndex = encoding - start;
+	auto glyphData = fontData->glyphs[glyphIndex].ptr(g_mainAssets);
 
 	if (glyphData->dx == -128) {
 		// empty glyph

@@ -68,8 +68,7 @@ int findStartOfUnit(char *text, int i) {
 }
 
 DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    auto display_data_widget = (const DisplayDataWidget *)widget;
+    auto widget = (const DisplayDataWidget *)widgetCursor.widget;
 
     DisplayDataState *currentState = (DisplayDataState *)widgetCursor.currentState;
     DisplayDataState *previousState = (DisplayDataState *)widgetCursor.previousState;
@@ -131,15 +130,15 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
 
         int length = -1;
 
-        if (display_data_widget->displayOption != DISPLAY_OPTION_ALL) {
+        if (widget->displayOption != DISPLAY_OPTION_ALL) {
 			if (widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT) {
-				if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER) {
+				if (widget->displayOption == DISPLAY_OPTION_INTEGER) {
 					int i = findStartOfFraction(text);
 					text[i] = 0;
-				} else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION) {
+				} else if (widget->displayOption == DISPLAY_OPTION_FRACTION) {
 					int i = findStartOfFraction(text);
 					start = text + i;
-				} else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
+				} else if (widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
 					int i = findStartOfFraction(text);
 					int k = findStartOfUnit(text, i);
 					if (i < k) {
@@ -149,10 +148,10 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
 					else {
 						stringCopy(text, sizeof(text), ".0");
 					}
-				} else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
+				} else if (widget->displayOption == DISPLAY_OPTION_UNIT) {
 					int i = findStartOfUnit(text, 0);
 					start = text + i;
-				} else if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
+				} else if (widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
 					int i = findStartOfUnit(text, 0);
 					text[i] = 0;
 				}
@@ -169,8 +168,8 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
 				}
 			} else {
 				if (
-					display_data_widget->displayOption != DISPLAY_OPTION_INTEGER &&
-					display_data_widget->displayOption != DISPLAY_OPTION_INTEGER_AND_FRACTION
+					widget->displayOption != DISPLAY_OPTION_INTEGER &&
+					widget->displayOption != DISPLAY_OPTION_INTEGER_AND_FRACTION
 				) {
 					*text = 0;
 				}
@@ -187,8 +186,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
 };
 
 int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    auto display_data_widget = (const DisplayDataWidget *)widget;
+    auto widget = (const DisplayDataWidget *)widgetCursor.widget;
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
@@ -198,13 +196,13 @@ int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCurs
 
     char *start = text;
 
-    if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER) {
+    if (widget->displayOption == DISPLAY_OPTION_INTEGER) {
         int i = findStartOfFraction(text);
         text[i] = 0;
-    } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION) {
+    } else if (widget->displayOption == DISPLAY_OPTION_FRACTION) {
         int i = findStartOfFraction(text);
         start = text + i;
-    } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
+    } else if (widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
         int i = findStartOfFraction(text);
         int k = findStartOfUnit(text, i);
         if (i < k) {
@@ -213,10 +211,10 @@ int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCurs
         } else {
             stringCopy(text, sizeof(text), ".0");
         }
-    } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
+    } else if (widget->displayOption == DISPLAY_OPTION_UNIT) {
         int i = findStartOfUnit(text, 0);
         start = text + i;
-    } else if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
+    } else if (widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
         int i = findStartOfUnit(text, 0);
         text[i] = 0;
     }
@@ -238,8 +236,7 @@ int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCurs
 }
 
 int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    auto display_data_widget = (const DisplayDataWidget *)widget;
+    auto widget = (const DisplayDataWidget *)widgetCursor.widget;
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
@@ -249,13 +246,13 @@ int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widg
 
     char *start = text;
 
-    if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER) {
+    if (widget->displayOption == DISPLAY_OPTION_INTEGER) {
         int i = findStartOfFraction(text);
         text[i] = 0;
-    } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION) {
+    } else if (widget->displayOption == DISPLAY_OPTION_FRACTION) {
         int i = findStartOfFraction(text);
         start = text + i;
-    } else if (display_data_widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
+    } else if (widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
         int i = findStartOfFraction(text);
         int k = findStartOfUnit(text, i);
         if (i < k) {
@@ -264,10 +261,10 @@ int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widg
         } else {
             stringCopy(text, sizeof(text), ".0");
         }
-    } else if (display_data_widget->displayOption == DISPLAY_OPTION_UNIT) {
+    } else if (widget->displayOption == DISPLAY_OPTION_UNIT) {
         int i = findStartOfUnit(text, 0);
         start = text + i;
-    } else if (display_data_widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
+    } else if (widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
         int i = findStartOfUnit(text, 0);
         text[i] = 0;
     }

@@ -33,7 +33,7 @@ struct ToggleButtonWidget : public Widget {
 EnumFunctionType TOGGLE_BUTTON_enum = nullptr;
 
 DrawFunctionType TOGGLE_BUTTON_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
+    auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.enabled =
@@ -45,12 +45,11 @@ DrawFunctionType TOGGLE_BUTTON_draw = [](const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.enabled != widgetCursor.currentState->flags.enabled;
 
     if (refresh) {
-        auto toggle_button_widget = (ToggleButtonWidget *)widget;
         const Style* style = getStyle(widget->style);
         drawText(
             widgetCursor.currentState->flags.enabled ? 
-                toggle_button_widget->text2.ptr(widgetCursor.assets): 
-                toggle_button_widget->text1.ptr(widgetCursor.assets),
+                widget->text2.ptr(widgetCursor.assets): 
+                widget->text1.ptr(widgetCursor.assets),
             -1,
 			widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
             widgetCursor.currentState->flags.active, false, false, nullptr, nullptr, nullptr, nullptr);

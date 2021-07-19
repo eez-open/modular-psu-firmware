@@ -29,13 +29,12 @@ namespace gui {
 EnumFunctionType BUTTON_enum = nullptr;
 
 DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    auto button_widget = (ButtonWidget *)widget;
+    auto widget = (const ButtonWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
-    widgetCursor.currentState->flags.enabled = get(widgetCursor.cursor, button_widget->enabled).getInt() ? 1 : 0;
+    widgetCursor.currentState->flags.enabled = get(widgetCursor.cursor, widget->enabled).getInt() ? 1 : 0;
 
-    const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : button_widget->disabledStyle);
+    const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : widget->disabledStyle);
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style));
     widgetCursor.currentState->data = widget->data ? get(widgetCursor.cursor, widget->data) : 0;
@@ -55,12 +54,12 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
                          widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
             } else {
-                drawText(button_widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                          style, widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
             }
         } else {
-            drawText(button_widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                      style, widgetCursor.currentState->flags.active,
                      widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
         }

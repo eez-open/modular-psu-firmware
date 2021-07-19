@@ -28,7 +28,7 @@ namespace gui {
 EnumFunctionType PROGRESS_enum = nullptr;
 
 DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
+    auto widget = widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
 

@@ -201,7 +201,7 @@ void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     }
 
     auto savedWidget = widgetCursor.widget;
-    widgetCursor.widget = getPageWidget(appContext->getActivePageId());
+    widgetCursor.widget = getPageAsset(appContext->getActivePageId(), widgetCursor);
     enumWidget(widgetCursor, callback);
     widgetCursor.widget = savedWidget;
 }
@@ -211,9 +211,8 @@ void enumWidgets(AppContext* appContext, EnumWidgetsCallback callback) {
 		return;
 	}
 	WidgetCursor widgetCursor;
-	widgetCursor.assets = g_mainAssets;
 	widgetCursor.appContext = appContext;
-	widgetCursor.widget = getPageWidget(appContext->getActivePageId());
+	widgetCursor.widget = getPageAsset(appContext->getActivePageId(), widgetCursor);
 	enumWidget(widgetCursor, callback);
 }
 
