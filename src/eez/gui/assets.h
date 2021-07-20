@@ -190,34 +190,55 @@ struct Colors {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct ComponentInput {
-    uint16_t valueIndex;
-};
+// 000<constant_index>   - push constant value on stack (max. no. of constants is 8192)
+// 001<global var index> - push global variable value on stack (max. no. of global variables is 8192)
+// 010<local var index>  - push local variable value on stack (max. no. of local variables is 8192)
+// 011<input index>  - push input value on stack (max. no. of component inputs is 8192)
+// 100<operation type>  - pop values from the stack, do operation and push result on the stack (max. no. of different operations is 8192)
 
-struct Connection {
-    uint16_t targetComponentIndex;
-    uint8_t targetInputIndex;
+static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_MASK  = (7 << 13);
+static const uin16_t EXPR_EVAL_INSTRUCTION_PARAM_MASK = ~EXPR_EVAL_INSTRUCTION_TYPE_MASK;
+
+static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT   = (0 << 13);
+static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR = (1 << 13);
+static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR  = (2 << 13);
+static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT      = (3 << 13);
+static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_DO_OPERATION    = (4 << 13);
+static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_END             = (4 << 13);
+
+static const uin16_t OPERATION_ADD 0
+static const uin16_t OPERATION_SUB 0
+
+struct PropertyValue {
+	uin16_t evalInstructions[1];
 };
 
 struct ComponentOutput {
-	ListOfAssetsPtr<Connection> connections;
+	struct {
+		uint16_t targetComponentIndex;
+		uint8_t targetInputIndex;
+	} connections[1];
 };
 
 struct Component {
     uint16_t type;
     uint16_t reserved;
-	ListOfAssetsPtr<ComponentInput> inputs;
+	ListOfFundamentalType<uin16_t> inputs;
+	ListOfAssetsPtr<PropertyValue> propertyValues;
 	ListOfAssetsPtr<ComponentOutput> outputs;
 };
 
 struct Flow {
 	ListOfAssetsPtr<Component> components;
+	ListOfAssetsPtr<Value> localVariables;
+	uint16_t nInputValues;
 };
 
 struct FlowDefinition {
 	ListOfAssetsPtr<Flow> flows;
-	ListOfAssetsPtr<Value> flowValues;
-	ListOfAssetsPtr<ComponentInput> widgetDataItems;
+	ListOfAssetsPtr<Value> constants;
+	ListOfAssetsPtr<Value> globalVariables;
+	ListOfAssetsPtr<PropertyValue> widgetDataItems;
 	ListOfAssetsPtr<ComponentOutput> widgetActions;
 };
 
