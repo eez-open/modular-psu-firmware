@@ -220,23 +220,24 @@ int getExternalAssetsFirstPageId() {
 	return -1;
 }
 
-const char *getActionName(int16_t actionId) {
-	if (actionId == 0) {
-		return nullptr;
-	}
-	if (actionId < 0) {
-		actionId = -actionId;
-	}
-	actionId--;
-	return g_externalAssets->actionNames.item(g_externalAssets, actionId);
+const char *getActionName(const WidgetCursor& widgetCursor, int16_t actionId) {
+	// if (actionId == 0) {
+	// 	return nullptr;
+	// }
+	// if (actionId < 0) {
+	// 	actionId = -actionId;
+	// }
+	// actionId--;
+	// return g_externalAssets->actionNames.item(g_externalAssets, actionId);
+	return nullptr;
 }
 
-int16_t getDataIdFromName(const char *name) {
-	for (uint32_t i = 0; i < g_externalAssets->variableNames.count; i++) {
-		if (strcmp(g_externalAssets->variableNames.item(g_externalAssets, i), name) == 0) {
-			return -((int16_t)i + 1);
-		}
-	}
+int16_t getDataIdFromName(const WidgetCursor& widgetCursor, const char *name) {
+	// for (uint32_t i = 0; i < g_externalAssets->variableNames.count; i++) {
+	// 	if (strcmp(g_externalAssets->variableNames.item(g_externalAssets, i), name) == 0) {
+	// 		return -((int16_t)i + 1);
+	// 	}
+	// }
 	return 0;
 }
 

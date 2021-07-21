@@ -86,21 +86,23 @@ struct WidgetCursor {
 	Assets *assets;
 	AppContext *appContext;
     const Widget *widget;
-    int16_t x;
-    int16_t y;
     Cursor cursor;
     WidgetState *previousState;
     WidgetState *currentState;
+    int16_t pageId;
+    int16_t x;
+    int16_t y;
 
     WidgetCursor() 
 		: assets(nullptr)
 		, appContext(nullptr)
         , widget(nullptr)
-        , x(0)
-        , y(0)
         , cursor(-1)
         , previousState(nullptr)
         , currentState(nullptr)
+        , pageId(0)
+        , x(0)
+        , y(0)
 	{
     }
 
@@ -108,20 +110,22 @@ struct WidgetCursor {
 		Assets *assets_,
         AppContext *appContext_,
         const Widget *widget_,
-        int x_,
-        int y_,
         const Cursor cursor_,
         WidgetState *previousState_,
-        WidgetState *currentState_
+        WidgetState *currentState_,
+		int16_t pageId_,
+		int16_t x_,
+		int16_t y_
     )
         : assets(assets_)
 		, appContext(appContext_)
         , widget(widget_)
-        , x(x_)
-        , y(y_)
-        , cursor(cursor_)
+		, cursor(cursor_)
         , previousState(previousState_)
         , currentState(currentState_)
+		, pageId(pageId_)
+		, x(x_)
+		, y(y_)
     {
     }
 
@@ -132,7 +136,7 @@ struct WidgetCursor {
     }
 
     bool operator!=(const WidgetCursor &rhs) const {
-        return appContext != rhs.appContext || widget != rhs.widget || cursor != rhs.cursor;
+        return widget != rhs.widget || cursor != rhs.cursor;
     }
 
     bool operator==(const WidgetCursor &rhs) const {

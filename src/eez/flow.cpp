@@ -29,6 +29,8 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
+#if 0
+
 static Assets *g_assets;
 
 static const int UNDEFINED_VALUE_INDEX = 0;
@@ -290,6 +292,8 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 	}
 }
 
+#endif
+
 void dumpFlow(FlowDefinition &flowDefinition) {
 	// printf("Flows:\n");
 	// for (unsigned i = 0; i < flowDefinition.flows.count; i++) {
@@ -320,6 +324,12 @@ void dumpFlow(FlowDefinition &flowDefinition) {
 	//     printf("\t%d: %d\n", i, (int)flowValue.header.type);
 	// }
 }
+
+unsigned start(eez::gui::Assets *assets) { return 0; }
+void tick(unsigned flowHandle) {}
+
+void executeFlowAction(unsigned flowHandle, int16_t actionId) {}
+void dataOperation(unsigned flowHandle, int16_t dataId, gui::DataOperationEnum operation, gui::Cursor cursor, gui::Value &value) {}
 
 } // namespace flow
 } // namespace eez

@@ -85,8 +85,7 @@ private:
 #define CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG 2
 
 struct Widget {
-	uint8_t type;
-	uint8_t reserved1;
+	uint16_t type;
 	int16_t data;
 	int16_t action;
 	int16_t x;
@@ -196,21 +195,18 @@ struct Colors {
 // 011<input index>  - push input value on stack (max. no. of component inputs is 8192)
 // 100<operation type>  - pop values from the stack, do operation and push result on the stack (max. no. of different operations is 8192)
 
-static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_MASK  = (7 << 13);
-static const uin16_t EXPR_EVAL_INSTRUCTION_PARAM_MASK = ~EXPR_EVAL_INSTRUCTION_TYPE_MASK;
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_MASK  = (7 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_PARAM_MASK = ~EXPR_EVAL_INSTRUCTION_TYPE_MASK;
 
-static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT   = (0 << 13);
-static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR = (1 << 13);
-static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR  = (2 << 13);
-static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT      = (3 << 13);
-static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_DO_OPERATION    = (4 << 13);
-static const uin16_t EXPR_EVAL_INSTRUCTION_TYPE_END             = (4 << 13);
-
-static const uin16_t OPERATION_ADD 0
-static const uin16_t OPERATION_SUB 0
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT   = (0 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR = (1 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR  = (2 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT      = (3 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_DO_OPERATION    = (4 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_END             = (4 << 13);
 
 struct PropertyValue {
-	uin16_t evalInstructions[1];
+	uint16_t evalInstructions[1];
 };
 
 struct ComponentOutput {
@@ -223,7 +219,7 @@ struct ComponentOutput {
 struct Component {
     uint16_t type;
     uint16_t reserved;
-	ListOfFundamentalType<uin16_t> inputs;
+	ListOfFundamentalType<uint16_t> inputs;
 	ListOfAssetsPtr<PropertyValue> propertyValues;
 	ListOfAssetsPtr<ComponentOutput> outputs;
 };
@@ -231,6 +227,8 @@ struct Component {
 struct Flow {
 	ListOfAssetsPtr<Component> components;
 	ListOfAssetsPtr<Value> localVariables;
+	ListOfAssetsPtr<PropertyValue> widgetDataItems;
+	ListOfAssetsPtr<ComponentOutput> widgetActions;
 	uint16_t nInputValues;
 };
 
@@ -238,8 +236,6 @@ struct FlowDefinition {
 	ListOfAssetsPtr<Flow> flows;
 	ListOfAssetsPtr<Value> constants;
 	ListOfAssetsPtr<Value> globalVariables;
-	ListOfAssetsPtr<PropertyValue> widgetDataItems;
-	ListOfAssetsPtr<ComponentOutput> widgetActions;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -281,8 +277,8 @@ const uint16_t *getColors();
 
 int getExternalAssetsFirstPageId();
 
-const char *getActionName(int16_t actionId);
-int16_t getDataIdFromName(const char *name);
+const char *getActionName(const WidgetCursor& widgetCursor, int16_t actionId);
+int16_t getDataIdFromName(const WidgetCursor& widgetCursor, const char *name);
 
 ////////////////////////////////////////////////////////////////////////////////
 

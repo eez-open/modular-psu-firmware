@@ -310,6 +310,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
 		m_updatePageIndex = i;
 
+        widgetCursor.pageId = m_pageNavigationStack[i].pageId;
 		widgetCursor.cursor = -1;
 
         int x;

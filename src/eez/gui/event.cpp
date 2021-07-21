@@ -174,7 +174,7 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
             dragOverlay(touchEvent);
             m_activeWidget = widgetCursor;    
         } else if (widgetCursor.appContext->testExecuteActionOnTouchDown(action)) {
-            executeAction(action);
+            executeAction(widgetCursor, action);
             m_touchActionExecutedAtDown = true;
             if (widgetCursor.appContext->isAutoRepeatAction(action)) {
                 m_activeWidget = widgetCursor;    
@@ -191,21 +191,21 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
         int action = widgetCursor.widget->action;
         if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor) && widgetCursor.appContext->isAutoRepeatAction(action)) {
             m_touchActionExecuted = true;
-            executeAction(action);
+            executeAction(widgetCursor, action);
         }
     } else if (touchEvent.type == EVENT_TYPE_LONG_TOUCH) {
         m_touchActionExecuted = true;
         int action = widgetCursor.appContext->getLongTouchActionHook(widgetCursor);
         if (action != ACTION_ID_NONE) {
             g_isLongTouch = true;
-            executeAction(action);
+            executeAction(widgetCursor, action);
             g_isLongTouch = false;
         }
     } else if (touchEvent.type == EVENT_TYPE_EXTRA_LONG_TOUCH) {
         m_touchActionExecuted = true;
         int action = widgetCursor.appContext->getExtraLongTouchActionHook(widgetCursor);
         if (action != ACTION_ID_NONE) {
-            executeAction(action);
+            executeAction(widgetCursor, action);
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         if (!m_touchActionExecutedAtDown) {
@@ -215,7 +215,7 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
                 if (action == ACTION_ID_DRAG_OVERLAY) {
                     dragOverlay(touchEvent);
                 } else {
-                    executeAction(action);
+                    executeAction(widgetCursor, action);
                 }
             }
         }

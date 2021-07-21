@@ -91,6 +91,7 @@ bool isActiveWidget(const WidgetCursor &widgetCursor);
 bool isFocusWidget(const WidgetCursor &widgetCursor);
 void refreshScreen();
 bool isPageInternal(int pageId);
+void executeAction(const WidgetCursor &widgetCursor, int actionId);
 void executeAction(int actionId);
 
 int16_t getAppContextId(AppContext *pAppContext);
@@ -153,7 +154,7 @@ void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, floa
 
 float getDefaultAnimationDurationHook();
 
-void executeExternalActionHook(int16_t actionId);
+void executeExternalActionHook(const WidgetCursor &widgetCursor, int16_t actionId);
 void externalDataHook(int16_t id, DataOperationEnum operation, Cursor cursor, Value &value);
 
 OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor);

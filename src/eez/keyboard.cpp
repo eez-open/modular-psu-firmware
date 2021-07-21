@@ -108,7 +108,7 @@ void onKeyDown(uint16_t param) {
                         if (g_focusWidgetCursor) {
                             if (g_focusWidgetCursor.widget->action) {
                                 setFoundWidgetAtDown(g_focusWidgetCursor);
-                                executeAction(g_focusWidgetCursor.widget->action);
+                                executeAction(g_focusWidgetCursor, g_focusWidgetCursor.widget->action);
                             }
                         }
                     }

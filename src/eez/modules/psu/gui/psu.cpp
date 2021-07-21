@@ -106,6 +106,7 @@ static mcu::Button g_userSwitch(USER_SW_GPIO_Port, USER_SW_Pin, true, true);
 
 Value g_progress;
 
+static WidgetCursor g_externalActionWidgetCursor;
 static int16_t g_externalActionId = ACTION_ID_NONE;
 static const size_t MAX_NUM_EXTERNAL_DATA_ITEM_VALUES = 20;
 static struct {
@@ -992,7 +993,7 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
     }
 
     if (g_externalActionId != ACTION_ID_NONE) {
-        selectedActionName = getActionName(g_externalActionId);
+        selectedActionName = getActionName(g_externalActionWidgetCursor, g_externalActionId);
         g_externalActionId = ACTION_ID_NONE;
         return DIALOG_ACTION_RESULT_SELECTED_ACTION;
     }
@@ -2548,10 +2549,11 @@ float getDefaultAnimationDurationHook() {
     return psu::persist_conf::devConf.animationsDuration;
 }
 
-void executeExternalActionHook(int16_t actionId) {
+void executeExternalActionHook(const WidgetCursor &widgetCursor, int16_t actionId) {
     if (scripting::isFlowRunning()) {
         scripting::executeFlowAction(actionId);
     } else {
+        g_externalActionWidgetCursor = widgetCursor;
         g_externalActionId = actionId;
     }
 }

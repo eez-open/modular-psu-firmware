@@ -289,7 +289,7 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
 }
 
 void ToastMessagePage::updatePage(const WidgetCursor& widgetCursor) {
-    if (actionWidgetIsActive != isActiveWidget(WidgetCursor(widgetCursor.assets, appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0))) {
+    if (actionWidgetIsActive != isActiveWidget(WidgetCursor(widgetCursor.assets, appContext, &actionWidget, -1, 0, 0, INTERNAL_PAGE_ID_TOAST_MESSAGE, actionWidget.x, actionWidget.y))) {
         actionWidgetIsActive = !actionWidgetIsActive;
         refresh(widgetCursor);
     }
@@ -307,10 +307,10 @@ WidgetCursor ToastMessagePage::findWidget(int x, int y, bool clicked) {
             y >= (actionWidget.y - textHeight / 4) &&
             y < (actionWidget.y + actionWidget.h - 1 + textHeight / 4)
         ) {
-            return WidgetCursor(g_mainAssets, appContext, &actionWidget, actionWidget.x, actionWidget.y, -1, 0, 0);
+            return WidgetCursor(g_mainAssets, appContext, &actionWidget, -1, 0, 0, INTERNAL_PAGE_ID_TOAST_MESSAGE, actionWidget.x, actionWidget.y);
         }
         widget.action = ACTION_ID_INTERNAL_DIALOG_CLOSE;
-        return WidgetCursor(g_mainAssets, appContext, &widget, x, y, -1, 0, 0);
+        return WidgetCursor(g_mainAssets, appContext, &widget, -1, 0, 0, INTERNAL_PAGE_ID_TOAST_MESSAGE, x, y);
     }
     
     return WidgetCursor();
@@ -538,7 +538,7 @@ WidgetCursor SelectFromEnumPage::findWidget(int x, int y, bool clicked) {
 
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
-        		return WidgetCursor(g_mainAssets, appContext, &widget, x, y, -1, 0, 0);
+        		return WidgetCursor(g_mainAssets, appContext, &widget, -1, 0, 0, INTERNAL_PAGE_ID_SELECT_FROM_ENUM, x, y);
         	}
         }
     }

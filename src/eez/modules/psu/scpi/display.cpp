@@ -618,8 +618,18 @@ scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
     char dataItemName[128 + 1];
     memcpy(dataItemName, valueText, valueTextLen);
     dataItemName[valueTextLen] = 0;
-    int16_t dataId = eez::gui::getDataIdFromName(dataItemName);
-    if (dataId == 0) {
+
+	using namespace eez::gui;
+	using namespace eez::psu::gui;
+	
+	WidgetCursor widgetCursor;
+	widgetCursor.assets = g_externalAssets;
+	widgetCursor.appContext = &g_psuAppContext;
+	widgetCursor.pageId = getActivePageId();
+    
+	int16_t dataId = getDataIdFromName(widgetCursor, dataItemName);
+    
+	if (dataId == 0) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }

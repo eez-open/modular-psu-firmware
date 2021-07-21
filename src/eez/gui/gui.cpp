@@ -191,7 +191,7 @@ bool isInternalAction(int actionId) {
     return actionId > FIRST_INTERNAL_ACTION_ID;
 }
 
-void executeAction(int actionId) {
+void executeAction(const WidgetCursor &widgetCursor, int actionId) {
     if (actionId == ACTION_ID_NONE) {
         return;
     }
@@ -208,11 +208,15 @@ void executeAction(int actionId) {
         if (actionId >= 0) {
             g_actionExecFunctions[actionId]();
         } else {
-            executeExternalActionHook(actionId);
+            executeExternalActionHook(widgetCursor, actionId);
         }
     }
 }
 
+void executeAction(int actionId) {
+    WidgetCursor widgetCursor;
+    executeAction(widgetCursor, actionId);
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 using namespace mcu::display;
