@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <assert.h>
 
 #include <eez/alloc.h>
 #include <eez/flow.h>
@@ -116,10 +117,184 @@ void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &compo
 	}
 }
 
-static Value eval(uint16_t *instructions) {
-	// todo
-	return Value();
+////////////////////////////////////////////////////////////////////////////////
+
+struct EvalStack {
+	Value stack[100];
+	int sp = 0;
+
+	void push(const Value &value) {
+		stack[sp++] = value;
+	}
+
+	Value pop() {
+		return stack[--sp];
+	}
+
+};
+
+void do_OPERATION_TYPE_ADD(EvalStack &stack) {
+	auto a = stack.pop();
+	auto b = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_FLOAT) {
+		if (b.getType() == VALUE_TYPE_FLOAT) {
+			stack.push(Value(a.getFloat() + b.getFloat(), VALUE_TYPE_FLOAT));
+		} else if (b.getType() == VALUE_TYPE_INT8) {
+			stack.push(Value(a.getFloat() + b.getInt8(), VALUE_TYPE_FLOAT));
+		} else if (b.getType() == VALUE_TYPE_UINT8) {
+			stack.push(Value(a.getFloat() + b.getUInt8(), VALUE_TYPE_FLOAT));
+		} else if (b.getType() == VALUE_TYPE_INT16) {
+			stack.push(Value(a.getFloat() + b.getInt16(), VALUE_TYPE_FLOAT));
+		} else if (b.getType() == VALUE_TYPE_UINT16) {
+			stack.push(Value(a.getFloat() + b.getUInt16(), VALUE_TYPE_FLOAT));
+		} else if (b.getType() == VALUE_TYPE_INT32) {
+			stack.push(Value(a.getFloat() + b.getInt32(), VALUE_TYPE_FLOAT));
+		} else if (b.getType() == VALUE_TYPE_UINT32) {
+			stack.push(Value(a.getFloat() + b.getUInt32(), VALUE_TYPE_FLOAT));
+		} else {
+			stack.push(Value());
+		}
+	}
 }
+
+void do_OPERATION_TYPE_SUB(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_MUL(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_DIV(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_MOD(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_LEFT_SHIFT(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_RIGHT_SHIFT(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_BINARY_AND(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_BINARY_OR(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_BINARY_XOR(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_EQUAL(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_NOT_EQUAL(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_LESS(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_GREATER(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_LESS_OR_EQUAL(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_GREATER_OR_EQUAL(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_NOT(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_MATH_COS(EvalStack &stack) {
+}
+
+void do_OPERATION_TYPE_MATH_LOG(EvalStack &stack) {
+}
+
+typedef void (*EvalOperation)(EvalStack &);
+
+EvalOperation g_evalOperations[] = {
+	do_OPERATION_TYPE_ADD,
+	do_OPERATION_TYPE_SUB,
+	do_OPERATION_TYPE_MUL,
+	do_OPERATION_TYPE_DIV,
+	do_OPERATION_TYPE_MOD,
+	do_OPERATION_TYPE_LEFT_SHIFT,
+	do_OPERATION_TYPE_RIGHT_SHIFT,
+	do_OPERATION_TYPE_BINARY_AND,
+	do_OPERATION_TYPE_BINARY_OR,
+	do_OPERATION_TYPE_BINARY_XOR,
+	do_OPERATION_TYPE_EQUAL,
+	do_OPERATION_TYPE_NOT_EQUAL,
+	do_OPERATION_TYPE_LESS,
+	do_OPERATION_TYPE_GREATER,
+	do_OPERATION_TYPE_LESS_OR_EQUAL,
+	do_OPERATION_TYPE_GREATER_OR_EQUAL,
+	do_OPERATION_TYPE_LOGICAL_AND,
+	do_OPERATION_TYPE_LOGICAL_OR,
+	do_OPERATION_TYPE_UNARY_PLUS,
+	do_OPERATION_TYPE_UNARY_MINUS,
+	do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT,
+	do_OPERATION_TYPE_NOT,
+	do_OPERATION_TYPE_CONDITIONAL,
+	do_OPERATION_TYPE_MATH_SIN,
+	do_OPERATION_TYPE_MATH_COS,
+	do_OPERATION_TYPE_MATH_LOG,
+};
+
+static Value eval(Assets *assets, FlowState *flowState, uint16_t *instructions) {
+	EvalStack stack;
+
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+
+	for (int i = 0; ; i++) {
+		auto instruction = instructions[i];
+		auto instructionType = instruction & EXPR_EVAL_INSTRUCTION_TYPE_MASK;
+		auto instructionArg = instruction & ~EXPR_EVAL_INSTRUCTION_TYPE_MASK;
+		if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT) {
+			stack.push(flowDefinition->constants.item(assets, instructionArg));
+		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT) {
+			stack.push(flowState->values[instructionArg]);
+		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR) {
+			stack.push(flowState->values[flow->nInputValues + instructionArg]);
+		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {
+			stack.push(flowDefinition->globalVariables.item(assets, instructionArg));
+		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
+			g_evalOperations[instructionArg](stack);
+		} else {
+			break;
+		}
+	}
+
+	assert(stack.sp == 1);
+
+	return stack.pop();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 void executeComponent(Assets *assets, FlowState *flowState, unsigned componentIndex) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
@@ -135,7 +310,7 @@ void executeComponent(Assets *assets, FlowState *flowState, unsigned componentIn
 	    //printf("Execute DELAY component at index = %d\n", componentIndex);
 
 		auto propertyValue = component->propertyValues.item(assets, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS);
-		auto value = eval(propertyValue->evalInstructions);
+		auto value = eval(assets, flowState, propertyValue->evalInstructions);
 
 		osDelay(roundf(value.getFloat()));
 
@@ -243,10 +418,10 @@ static FlowState *initFlowState(Assets *assets, int flowIndex) {
 
 	flowState->flowIndex = flowIndex;
 
-	auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
+	auto &undefinedValue = *flowDefinition->constants.item(assets, UNDEFINED_VALUE_INDEX);
 
 	for (unsigned i = 0; i < flow->nInputValues; i++) {
-		flowState->values[i] = nullValue;
+		flowState->values[i] = undefinedValue;
 	}
 
 	for (unsigned i = 0; i < flow->localVariables.count; i++) {
@@ -330,7 +505,7 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 
 	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
 		auto propertyValue = flow->widgetDataItems.item(assets, dataId);
-		value = eval(propertyValue->evalInstructions);
+		value = eval(assets, flowState, propertyValue->evalInstructions);
 	}
 }
 

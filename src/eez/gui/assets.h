@@ -189,21 +189,15 @@ struct Colors {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 000<constant_index>   - push constant value on stack (max. no. of constants is 8192)
-// 001<global var index> - push global variable value on stack (max. no. of global variables is 8192)
-// 010<local var index>  - push local variable value on stack (max. no. of local variables is 8192)
-// 011<input index>  - push input value on stack (max. no. of component inputs is 8192)
-// 100<operation type>  - pop values from the stack, do operation and push result on the stack (max. no. of different operations is 8192)
-
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_MASK  = (7 << 13);
 static const uint16_t EXPR_EVAL_INSTRUCTION_PARAM_MASK = ~EXPR_EVAL_INSTRUCTION_TYPE_MASK;
 
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT   = (0 << 13);
-static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR = (1 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT      = (1 << 13);
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR  = (2 << 13);
-static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT      = (3 << 13);
-static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_DO_OPERATION    = (4 << 13);
-static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_END             = (4 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR = (3 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_OPERATION       = (4 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_END             = (5 << 13);
 
 struct PropertyValue {
 	uint16_t evalInstructions[1];

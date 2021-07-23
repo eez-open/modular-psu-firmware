@@ -205,19 +205,32 @@ struct Value {
     }
 
     int getInt() const;
-    int16_t getInt16() const {
-        return int16_;
-    }
-    uint8_t getUInt8() const {
+
+	int8_t getInt8() const {
+		return int8_;
+	}
+
+	uint8_t getUInt8() const {
         return uint8_;
     }
-    uint16_t getUInt16() const {
+
+	int16_t getInt16() const {
+		return int16_;
+	}
+
+	uint16_t getUInt16() const {
         return uint16_;
     }
-    uint32_t getUInt32() const {
+	
+	int32_t getInt32() const {
+		return uint32_;
+	}
+	
+	uint32_t getUInt32() const {
         return uint32_;
     }
-    uint32_t getAssetObjOffset() const {
+
+	uint32_t getAssetObjOffset() const {
         return uint32_;
     }
 
@@ -298,11 +311,17 @@ struct Value {
     uint16_t options_;
     union {
         int int_;
-        int16_t int16_;
+		
+		uint8_t int8_;
         uint8_t uint8_;
-        uint16_t uint16_;
+		
+		int16_t int16_;
+		uint16_t uint16_;
+		
+		uint16_t int32_;
         uint32_t uint32_;
-        float float_;
+        
+		float float_;
         const char *str_;
         EnumValue enum_;
         uint8_t *puint8_;
