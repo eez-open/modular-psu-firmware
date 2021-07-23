@@ -26,6 +26,7 @@
 #endif
 
 #include <eez/firmware.h>
+#include <eez/alloc.h>
 #include <eez/system.h>
 #include <eez/tasks.h>
 #include <eez/scripting.h>
@@ -95,6 +96,8 @@ bool g_shutdownInProgress;
 bool g_shutdown;
 
 void boot() {
+    initAllocHeap(ALLOC_BUFFER, ALLOC_BUFFER_SIZE);
+
     assert((uint32_t)(MEMORY_END - MEMORY_BEGIN) <= MEMORY_SIZE);
 
     psu::serial::initScpi();

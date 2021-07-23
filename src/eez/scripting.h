@@ -49,8 +49,8 @@ inline bool isIdle() { return g_state == STATE_IDLE; }
 bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen);
 
 bool isFlowRunning();
-void executeFlowAction(int16_t actionId);
-void dataOperation(int16_t dataId, gui::DataOperationEnum operation, gui::Cursor cursor, gui::Value &value);
+void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId);
+void dataOperation(int16_t dataId, gui::DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, gui::Value &value);
 
 void onUncaughtScriptExceptionHook();
 

@@ -595,30 +595,33 @@ void ChSettingsListsPage::nextPage() {
 }
 
 bool ChSettingsListsPage::isFocusedValueEmpty() {
-    Cursor cursor(getCursorIndexWithinPage());
-    Value value = get(cursor, getDataIdAtCursor());
+	WidgetCursor widgetCursor;
+	widgetCursor = getCursorIndexWithinPage();
+    Value value = get(widgetCursor, getDataIdAtCursor());
     return value.getType() == VALUE_TYPE_STRING;
 }
 
 float ChSettingsListsPage::getFocusedValue() {
-    Cursor cursor(getCursorIndexWithinPage());
+	WidgetCursor widgetCursor;
+	widgetCursor = getCursorIndexWithinPage();
 
-    Value value = get(cursor, getDataIdAtCursor());
+	Value value = get(widgetCursor, getDataIdAtCursor());
 
     if (value.getType() == VALUE_TYPE_STRING) {
-        value = getDef(cursor, getDataIdAtCursor());
+        value = getDef(widgetCursor, getDataIdAtCursor());
     }
 
     return value.getFloat();
 }
 
 void ChSettingsListsPage::setFocusedValue(float value) {
-    Cursor cursor(getCursorIndexWithinPage());
+	WidgetCursor widgetCursor;
+	widgetCursor = getCursorIndexWithinPage();
 
     int16_t dataId = getDataIdAtCursor();
 
-    Value min = getMin(cursor, dataId);
-    Value max = getMax(cursor, dataId);
+    Value min = getMin(widgetCursor, dataId);
+    Value max = getMax(widgetCursor, dataId);
 
     if (value >= min.getFloat() && value <= max.getFloat()) {
         int iRow = getRowIndex();
@@ -708,13 +711,14 @@ void ChSettingsListsPage::edit() {
 		options.slotIndex = g_channel->slotIndex;
 		options.subchannelIndex = g_channel->subchannelIndex;
 
-        Cursor cursor(getCursorIndexWithinPage());
+		WidgetCursor widgetCursor;
+		widgetCursor = getCursorIndexWithinPage();
 
         int16_t dataId = getDataIdAtCursor();
 
-        Value value = get(cursor, dataId);
+        Value value = get(widgetCursor, dataId);
 
-        Value def = getDef(cursor, dataId);
+        Value def = getDef(widgetCursor, dataId);
 
         if (value.getType() == VALUE_TYPE_STRING) {
             value = Value();
@@ -723,8 +727,8 @@ void ChSettingsListsPage::edit() {
             options.editValueUnit = value.getUnit();
         }
 
-        Value min = getMin(cursor, dataId);
-        Value max = getMax(cursor, dataId);
+        Value min = getMin(widgetCursor, dataId);
+        Value max = getMax(widgetCursor, dataId);
 
         options.def = def.getFloat();
         options.min = min.getFloat();
@@ -893,23 +897,25 @@ void ChSettingsListsPage::set() {
 
 void ChSettingsListsPage::onEncoder(int counter) {
 #if OPTION_ENCODER
-    Cursor cursor(getCursorIndexWithinPage());
-    int16_t dataId = getDataIdAtCursor();
+	WidgetCursor widgetCursor;
+	widgetCursor = getCursorIndexWithinPage();
+	
+	int16_t dataId = getDataIdAtCursor();
 
-    Value value = get(cursor, dataId);
+    Value value = get(widgetCursor, dataId);
     if (value.getType() == VALUE_TYPE_STRING) {
-        value = getDef(cursor, dataId);
+        value = getDef(widgetCursor, dataId);
     }
 
-    float min = getMin(cursor, dataId).getFloat();
-    float max = getMax(cursor, dataId).getFloat();
+    float min = getMin(widgetCursor, dataId).getFloat();
+    float max = getMax(widgetCursor, dataId).getFloat();
 
     float step = edit_mode_step::getEncoderStepValue();
 
     float newValue = value.getFloat() + step * counter;
     newValue = roundPrec(newValue, step);
 
-    if (getAllowZero(cursor, dataId) && newValue < value.getFloat() && newValue < min) {
+    if (getAllowZero(widgetCursor, dataId) && newValue < value.getFloat() && newValue < min) {
         newValue = 0;
     } else {
         newValue = clamp(newValue, min, max);
@@ -950,12 +956,13 @@ void ChSettingsListsPage::onEncoderClicked() {
 }
 
 Unit ChSettingsListsPage::getEncoderUnit() {
-    Cursor cursor(getCursorIndexWithinPage());
+	WidgetCursor widgetCursor;
+	widgetCursor = getCursorIndexWithinPage();
 
-    Value value = get(cursor, getDataIdAtCursor());
+    Value value = get(widgetCursor, getDataIdAtCursor());
 
     if (value.getType() == VALUE_TYPE_STRING) {
-        value = getDef(cursor, getDataIdAtCursor());
+        value = getDef(widgetCursor, getDataIdAtCursor());
     }
 
     return value.getUnit();

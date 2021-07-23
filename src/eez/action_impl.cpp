@@ -402,7 +402,8 @@ void onChannelCopyDestinationSelected(uint16_t value) {
     }
 }
 
-void channelsEnumDefinition(DataOperationEnum operation, Cursor cursor, Value &value) {
+void channelsEnumDefinition(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (g_channel) {
         int channelIndex = cursor < g_channel->channelIndex ? cursor : cursor + 1;
 
@@ -1060,7 +1061,8 @@ void action_simulator_load() {
 
 #endif
 
-void themesEnumDefinition(DataOperationEnum operation, Cursor cursor, Value &value) {
+void themesEnumDefinition(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET_VALUE) {
         value = (uint8_t)cursor;
     } else if (operation == DATA_OPERATION_GET_LABEL) {
@@ -1351,8 +1353,8 @@ void action_select_mass_storage_device() {
         sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_MASS_STORAGE_DEVICE, value);
 	};
 
-	auto massStorageDeviceEnumDefinition = [] (DataOperationEnum operation, Cursor cursor, Value &value) {
-		int massStorageDevice = fs_driver::getDiskDriveIndex(cursor, true);
+	auto massStorageDeviceEnumDefinition = [] (DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+		int massStorageDevice = fs_driver::getDiskDriveIndex(widgetCursor.cursor, true);
 		if (massStorageDevice >= 0) {
 			if (operation == DATA_OPERATION_GET_VALUE) {
 				value = (uint8_t)massStorageDevice;

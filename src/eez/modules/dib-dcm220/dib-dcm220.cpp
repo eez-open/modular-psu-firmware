@@ -683,15 +683,18 @@ Module *g_module = &g_dcmModule;
 
 namespace gui {
 
-void data_dib_dcm220_slot_2ch_ch1_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_channel_index(Channel::get(cursor), operation, cursor, value);
+void data_dib_dcm220_slot_2ch_ch1_index(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+    data_channel_index(Channel::get(cursor), operation, widgetCursor, value);
 }
 
-void data_dib_dcm220_slot_2ch_ch2_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_channel_index(Channel::get(persist_conf::isMaxView() && cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1 ? cursor - 1 : cursor + 1), operation, cursor, value);
+void data_dib_dcm220_slot_2ch_ch2_index(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+    data_channel_index(Channel::get(persist_conf::isMaxView() && cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1 ? cursor - 1 : cursor + 1), operation, widgetCursor, value);
 }
 
-void data_dib_dcm220_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_dcm220_slot_def_2ch_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
         int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;

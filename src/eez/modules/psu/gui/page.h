@@ -51,8 +51,8 @@ public:
     void onEncoder(int counter);
     void onEncoderClicked();
 
-    void refresh(const WidgetCursor& widgetCursor);
-    void updatePage(const WidgetCursor& widgetCursor);
+    void refresh(const WidgetCursor &widgetCursor);
+    void updatePage(const WidgetCursor &widgetCursor);
     WidgetCursor findWidget(int x, int y, bool clicked);
     bool canClickPassThrough();
 
@@ -99,7 +99,7 @@ public:
     
     void init(
         AppContext *appContext_,
-        void (*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value),
+        void (*enumDefinitionFunc)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value),
         uint16_t currentValue_,
         bool (*disabledCallback_)(uint16_t value),
         void (*onSet_)(uint16_t),
@@ -109,8 +109,8 @@ public:
 
     void init();
 
-    void refresh(const WidgetCursor& widgetCursor);
-    void updatePage(const WidgetCursor& widgetCursor);
+    void refresh(const WidgetCursor &widgetCursor);
+    void updatePage(const WidgetCursor &widgetCursor);
     WidgetCursor findWidget(int x, int y, bool clicked);
 
     void selectEnumItem();
@@ -123,7 +123,7 @@ public:
 
 private:
     const EnumItem *enumDefinition;
-    void (*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value);
+    void (*enumDefinitionFunc)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 
     int numItems;
     int numColumns;
@@ -167,8 +167,8 @@ class MenuWithButtonsPage : public InternalPage {
 public:
     static MenuWithButtonsPage *create(AppContext *appContext, const char *message, const char **menuItems, void (*callback)(int));
 
-    void refresh(const WidgetCursor& widgetCursor);
-    void updatePage(const WidgetCursor& widgetCursor);
+    void refresh(const WidgetCursor &widgetCursor);
+    void updatePage(const WidgetCursor &widgetCursor);
     WidgetCursor findWidget(int x, int y, bool clicked);
 
     static void executeAction();

@@ -25,6 +25,7 @@
 
 #include <eez/firmware.h>
 #include <eez/system.h>
+#include <eez/alloc.h>
 
 #if OPTION_FAN
 #include <eez/modules/aux_ps/fan.h>
@@ -177,6 +178,9 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
             return SCPI_RES_OK;
 		} else if (cmd == 34) {
 			SCPI_ResultUInt32(context, millis() - g_startTime);
+			return SCPI_RES_OK;
+		} else if (cmd == 35) {
+			dumpAlloc(context);
 			return SCPI_RES_OK;
 		} else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

@@ -890,13 +890,13 @@ Value MakeEventValue(event_queue::Event *e) {
     return value;
 }
 
-void data_event_queue_last_event_type(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_event_queue_last_event_type(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(getEventType(getLastErrorEventId()));
     }
 }
 
-void data_event_queue_events(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_event_queue_events(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = (int)g_numEvents;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
@@ -910,27 +910,31 @@ void data_event_queue_events(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
-void data_event_queue_event_type(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_event_queue_event_type(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         event_queue::Event *event = getEvent(cursor);
         value = Value(event ? getEventType(event) : EVENT_TYPE_NONE);
     }
 }
 
-void data_event_queue_event_message(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_event_queue_event_message(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = MakeEventValue(getEvent(cursor));
     }
 }
 
-void data_event_queue_is_long_message_text(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_event_queue_is_long_message_text(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         event_queue::Event *event = getEvent(cursor);
         value = isLongMessageText(event);
     }
 }
 
-void data_event_queue_event_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_event_queue_event_is_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         event_queue::Event *event = getEvent(cursor);
         event_queue::Event *selectedEvent = getSelectedEvent();
@@ -938,7 +942,7 @@ void data_event_queue_event_is_selected(DataOperationEnum operation, Cursor curs
     }
 }
 
-void data_event_queue_selected_event_message(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_event_queue_selected_event_message(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         event_queue::Event *selectedEvent = getSelectedEvent();
         if (selectedEvent) {
@@ -947,7 +951,7 @@ void data_event_queue_selected_event_message(DataOperationEnum operation, Cursor
     }
 }
 
-void data_event_queue_event_long_message_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_event_queue_event_long_message_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     static const int NUM_WIDGETS = 1;
 
     static const int MULTI_LINE_TEXT_WIDGET = 0;

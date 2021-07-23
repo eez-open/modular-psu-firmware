@@ -1782,13 +1782,13 @@ using namespace psu::gui;
 using namespace dlog_record;
 using namespace dlog_view;
 
-void data_dlog_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_state(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = dlog_record::getState();
     }
 }
 
-void data_dlog_toggle_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_toggle_state(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
     	if (DlogParamsPage::getNumDlogResources() == 0) {
             value = 5;
@@ -1823,7 +1823,7 @@ float g_predefinedDlogPeriods[] = {
     1.0f / 32000
 };
 
-void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_period(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(DlogParamsPage::g_parameters.period, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_UNIT) {
@@ -1837,8 +1837,8 @@ void data_dlog_period(DataOperationEnum operation, Cursor cursor, Value &value) 
     }
 }
 
-void data_dlog_period_spec(DataOperationEnum operation, Cursor cursor, Value &value) {
-	data_dlog_period(operation, cursor, value);
+void data_dlog_period_spec(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+	data_dlog_period(operation, widgetCursor, value);
     if (operation == DATA_OPERATION_GET) {
         for (size_t i = 0; i < sizeof(g_predefinedDlogPeriods) / sizeof(float); i++) {
             if (DlogParamsPage::g_parameters.period == g_predefinedDlogPeriods[i]) {
@@ -1848,7 +1848,7 @@ void data_dlog_period_spec(DataOperationEnum operation, Cursor cursor, Value &va
     }
 }
 
-void data_dlog_period_has_predefined_values(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_period_has_predefined_values(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = DlogParamsPage::g_minPeriod < PERIOD_MIN;
     }
@@ -1861,7 +1861,7 @@ void action_dlog_period_select_predefined_value() {
     }, true, false);
 }
 
-void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_duration(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = MakeValue(DlogParamsPage::g_parameters.duration, UNIT_SECOND);
     } else if (operation == DATA_OPERATION_GET_UNIT) {
@@ -1875,7 +1875,7 @@ void data_dlog_duration(DataOperationEnum operation, Cursor cursor, Value &value
     }
 }
 
-void data_dlog_file_name(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_file_name(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         static char filePath[MAX_PATH_LENGTH + 1 + 12];
 
@@ -1891,31 +1891,31 @@ void data_dlog_file_name(DataOperationEnum operation, Cursor cursor, Value &valu
     }
 }
 
-void data_dlog_start_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_start_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = checkDlogParameters(DlogParamsPage::g_parameters, true, false) == SCPI_RES_OK ? 1 : 0;
     }
 }
 
-void data_dlog_view_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_view_state(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = dlog_view::getState();
     }
 }
 
-void data_recording_ready(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_recording_ready(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = isExecuting() || getLatestFilePath() ? 1 : 0;
     }
 }
 
-void data_dlog_items_scrollbar_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_items_scrollbar_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = DlogParamsPage::getNumDlogResources() > DlogParamsPage::PAGE_SIZE;
     }
 }
 
-void data_dlog_items_num_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_items_num_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value.type_ = VALUE_TYPE_NUM_SELECTED;
         value.pairOfUint16_.first = DlogParamsPage::g_parameters.numDlogItems;
@@ -1923,7 +1923,8 @@ void data_dlog_items_num_selected(DataOperationEnum operation, Cursor cursor, Va
     }
 }
 
-void data_dlog_items(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_items(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_COUNT) {
         value = DlogParamsPage::getNumDlogResources();
     } else if (operation == DATA_OPERATION_SELECT) {
@@ -1956,7 +1957,8 @@ void data_dlog_items(DataOperationEnum operation, Cursor cursor, Value &value) {
     }
 }
 
-void data_dlog_item_is_available(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_item_is_available(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex;
         int subchannelIndex;
@@ -1969,7 +1971,8 @@ void data_dlog_item_is_available(DataOperationEnum operation, Cursor cursor, Val
     }
 }
 
-void data_dlog_item_is_checked(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_item_is_checked(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex;
         int subchannelIndex;
@@ -1991,7 +1994,8 @@ void data_dlog_item_is_checked(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
-void data_dlog_item_channel(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_item_channel(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex;
         int subchannelIndex;
@@ -2004,7 +2008,8 @@ void data_dlog_item_channel(DataOperationEnum operation, Cursor cursor, Value &v
     }
 }
 
-void data_dlog_item_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_item_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex;
         int subchannelIndex;
@@ -2033,7 +2038,7 @@ void action_dlog_toggle() {
     }
 }
 
-void data_dlog_trigger_source(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_trigger_source(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = MakeEnumDefinitionValue(DlogParamsPage::g_parameters.triggerSource, ENUM_DEFINITION_TRIGGER_SOURCE);
     }
@@ -2069,7 +2074,7 @@ void action_show_dlog_view() {
     showPage(PAGE_ID_DLOG_VIEW);
 }
 
-void data_dlog_view_is_drawer_open(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_view_is_drawer_open(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = persist_conf::devConf.viewFlags.dlogViewDrawerIsOpen ? 1 : 0;
 	}
@@ -2203,7 +2208,7 @@ void action_dlog_upload() {
     dlog_view::uploadFile();
 }
 
-void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     auto &recording = dlog_view::getRecording();
 
     if (operation == DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER) {
@@ -2285,6 +2290,9 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
 
 		dlog_view::DlogValueParams *dlogValueParams = recording.dlogValues + getSelectedDlogValueIndex(recording, g_focusCursor);
 
+		WidgetCursor focusWidgetCursor;
+		focusWidgetCursor.cursor = g_focusCursor;
+
 		if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
 			static const int CURSOR_REGION_SIZE_WIDTH = 80;
 			static const int CURSOR_REGION_SIZE_HEIGHT = 40;
@@ -2303,7 +2311,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
 				if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET || g_focusDataId == DATA_ID_DLOG_Y_VALUE_OFFSET || g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV || g_focusDataId == DATA_ID_DLOG_Y_VALUE_DIV) {
                     if (dlogValueParams && dlogValueParams->isVisible) {
 					    g_dragState.dragObject = DRAG_VALUE;
-					    g_dragState.valueAtTouchDown = get(g_focusCursor, g_focusDataId).getFloat();
+					    g_dragState.valueAtTouchDown = get(focusWidgetCursor, g_focusDataId).getFloat();
 					    g_dragState.positionAtTouchDown = touchDrag->y;
                     } else {
                         g_dragState.dragObject = DRAG_NONE;
@@ -2314,7 +2322,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
 					}
 
 					g_dragState.dragObject = DRAG_VALUE;
-					g_dragState.valueAtTouchDown = get(g_focusCursor, g_focusDataId).getFloat();
+					g_dragState.valueAtTouchDown = get(focusWidgetCursor, g_focusDataId).getFloat();
 					g_dragState.positionAtTouchDown = touchDrag->x;
 				}
 			}
@@ -2348,10 +2356,10 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
 					value = g_dragState.valueAtTouchDown + recording.xAxisDiv * (g_dragState.positionAtTouchDown - touchDrag->x) * dlog_view::NUM_HORZ_DIVISIONS / dlog_view::VIEW_WIDTH;
 					unit = getXAxisUnit(recording);
 				}
-				float min = getMin(g_focusCursor, g_focusDataId).getFloat();
-				float max = getMax(g_focusCursor, g_focusDataId).getFloat();
+				float min = getMin(focusWidgetCursor, g_focusDataId).getFloat();
+				float max = getMax(focusWidgetCursor, g_focusDataId).getFloat();
 				float value1 = clamp(value, min, max);
-				set(g_focusCursor, g_focusDataId, Value(value1, unit));
+				set(focusWidgetCursor, g_focusDataId, Value(value1, unit));
 			}
 		}
     } else if (operation == DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE) {
@@ -2410,7 +2418,7 @@ void data_recording(DataOperationEnum operation, Cursor cursor, Value &value) {
 
 static const int NUM_VISIBLE_DLOG_VALUES_IN_OVERLAY = 4;
 
-void data_dlog_multiple_values_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_multiple_values_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     static const int NUM_WIDGETS = 2;
 
     static const int LABELS_CONTAINER_WIDGET = 0;
@@ -2468,7 +2476,7 @@ void data_dlog_multiple_values_overlay(DataOperationEnum operation, Cursor curso
     }
 }
 
-void data_dlog_single_value_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_single_value_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     Overlay &overlay = g_singleValueOverlay;
 
     if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
@@ -2488,14 +2496,15 @@ void data_dlog_single_value_overlay(DataOperationEnum operation, Cursor cursor, 
     }
 }
 
-void data_dlog_visible_values(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_visible_values(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         auto &recording = dlog_view::getRecording();
         value = MIN(getNumVisibleDlogValues(recording), NUM_VISIBLE_DLOG_VALUES_IN_OVERLAY);
     }
 }
 
-void data_dlog_visible_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_visible_value_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
         int dlogValueIndex = getSelectedDlogValueIndex(recording, cursor);
@@ -2533,7 +2542,8 @@ void guessStepValues(StepValues *stepValues, Unit unit) {
     stepValues->unit = unit;
 }
 
-void data_dlog_value_div(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_value_div(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	auto &recording = dlog_view::getRecording();
 
 	float minValue;
@@ -2598,13 +2608,16 @@ void data_dlog_value_div(DataOperationEnum operation, Cursor cursor, Value &valu
 	}
 }
 
-void data_dlog_visible_value_div(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_visible_value_div(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     auto &recording = dlog_view::getRecording();
-    int dlogValueIndex = getSelectedDlogValueIndex(recording, cursor);
-	data_dlog_value_div(operation, dlogValueIndex, value);
+	WidgetCursor dlogValueDivWidgetCursor = widgetCursor;
+	dlogValueDivWidgetCursor.cursor = getSelectedDlogValueIndex(recording, cursor);
+	data_dlog_value_div(operation, dlogValueDivWidgetCursor, value);
 }
 
-void data_dlog_value_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_value_offset(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	auto &recording = dlog_view::getRecording();
 
 	float minValue;
@@ -2670,13 +2683,16 @@ void data_dlog_value_offset(DataOperationEnum operation, Cursor cursor, Value &v
 	}
 }
 
-void data_dlog_visible_value_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_visible_value_offset(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     auto &recording = dlog_view::getRecording();
-    int dlogValueIndex = getSelectedDlogValueIndex(recording, cursor);
-	data_dlog_value_offset(operation, dlogValueIndex, value);
+	WidgetCursor dlogValueOffsetWidgetCursor = widgetCursor;
+	dlogValueOffsetWidgetCursor = getSelectedDlogValueIndex(recording, cursor);
+	data_dlog_value_offset(operation, dlogValueOffsetWidgetCursor, value);
 }
 
-void data_dlog_x_axis_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_x_axis_offset(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     auto &recording = dlog_view::getRecording();
 
     if (operation == DATA_OPERATION_GET) {
@@ -2708,7 +2724,8 @@ void data_dlog_x_axis_offset(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
-void data_dlog_x_axis_div(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_x_axis_div(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     auto &recording = dlog_view::getRecording();
 
     if (operation == DATA_OPERATION_GET) {
@@ -2744,7 +2761,7 @@ void data_dlog_x_axis_div(DataOperationEnum operation, Cursor cursor, Value &val
     }
 }
 
-void data_dlog_x_axis_max_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_x_axis_max_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
 
@@ -2758,7 +2775,7 @@ void data_dlog_x_axis_max_value(DataOperationEnum operation, Cursor cursor, Valu
     }
 }
 
-void data_dlog_x_axis_max_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_x_axis_max_value_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto &recording = dlog_view::getRecording();
         if (recording.parameters.xAxis.unit == UNIT_SECOND) {
@@ -2769,59 +2786,62 @@ void data_dlog_x_axis_max_value_label(DataOperationEnum operation, Cursor cursor
     }
 }
 
-void data_dlog_value_cursor(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_value_cursor(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		auto &recording = dlog_view::getRecording();
-		auto ytDataGetValue = ytDataGetGetValueFunc(cursor, DATA_ID_RECORDING);
+		auto ytDataGetValue = ytDataGetGetValueFunc(widgetCursor, DATA_ID_RECORDING);
 		float max;
-		float min = ytDataGetValue(ytDataGetPosition(cursor, DATA_ID_RECORDING) + recording.cursorOffset / recording.parameters.period, cursor, &max);
+		float min = ytDataGetValue(ytDataGetPosition(widgetCursor, DATA_ID_RECORDING) + recording.cursorOffset / recording.parameters.period, widgetCursor.cursor, &max);
 		float cursorValue = (min + max) / 2;
 		if (recording.parameters.yAxisScaleType == dlog_file::SCALE_LOGARITHMIC) {
-			float logOffset = 1 - recording.parameters.yAxes[cursor].range.min;
+			float logOffset = 1 - recording.parameters.yAxes[widgetCursor.cursor].range.min;
 			cursorValue = powf(10, cursorValue) - logOffset;
 		}
-		value = Value(cursorValue, recording.parameters.yAxes[cursor].unit);
+		value = Value(cursorValue, recording.parameters.yAxes[widgetCursor.cursor].unit);
 
 	}
 }
 
-void data_dlog_visible_value_cursor(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_visible_value_cursor(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     auto &recording = dlog_view::getRecording();
-    int dlogValueIndex = getSelectedDlogValueIndex(recording, cursor);
-	data_dlog_value_cursor(operation, dlogValueIndex, value);
+	WidgetCursor dlogValueCursorWidgetCursor = widgetCursor;
+	dlogValueCursorWidgetCursor.cursor = getSelectedDlogValueIndex(recording, cursor);
+	data_dlog_value_cursor(operation, dlogValueCursorWidgetCursor, value);
 }
 
-void data_dlog_current_time(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_current_time(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(0, VALUE_TYPE_DLOG_CURRENT_TIME);
     }
 }
 
-void data_dlog_file_length(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_file_length(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(dlog_record::getFileLength(), VALUE_TYPE_FILE_LENGTH);
     }
 }
 
-void data_dlog_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_value_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = Value(cursor, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 
-void data_dlog_view_legend_view_option(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_view_legend_view_option(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::devConf.viewFlags.dlogViewLegendViewOption;
     }
 }
 
-void data_dlog_view_show_labels(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_view_show_labels(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = (int)persist_conf::devConf.viewFlags.dlogViewShowLabels;
     }
 }
 
-void data_dlog_preview_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_preview_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     static Overlay overlay;
 
     if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
@@ -2842,7 +2862,7 @@ void data_dlog_preview_overlay(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
-void data_dlog_view_selected_tab(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_view_selected_tab(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_selectedTab;
 	}
@@ -2866,19 +2886,19 @@ void action_dlog_view_select_options_tab() {
 	g_selectedTab = TAB_OPTIONS;
 }
 
-void data_dlog_has_bookmark(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_has_bookmark(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
         value = getRecording().parameters.bookmarksSize > 0;
     }
 }
 
-void data_dlog_bookmarks_is_scrollbar_visible(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_bookmarks_is_scrollbar_visible(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
         value = &getRecording() == &g_dlogFile ? getRecording().parameters.bookmarksSize > BOOKMARKS_PER_PAGE : 0;
     }
 }
 
-void data_dlog_bookmarks(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_bookmarks(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	auto bookmarksSize = getRecording().parameters.bookmarksSize;
     if (&getRecording() != &g_dlogFile) {
         bookmarksSize = MIN(bookmarksSize, BOOKMARKS_PER_PAGE);
@@ -2922,7 +2942,8 @@ void data_dlog_bookmarks(DataOperationEnum operation, Cursor cursor, Value &valu
 	}
 }
 
-void data_dlog_bookmark_x_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_bookmark_x_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		auto i = cursor - g_bookmarksScrollPosition;
 		if (i >= 0 && i < BOOKMARKS_PER_PAGE) {
@@ -2932,7 +2953,8 @@ void data_dlog_bookmark_x_value(DataOperationEnum operation, Cursor cursor, Valu
 	}
 }
 
-void data_dlog_bookmark_text(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_bookmark_text(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		auto i = cursor - g_bookmarksScrollPosition;
 		if (i >= 0 && i < BOOKMARKS_PER_PAGE) {
@@ -2941,7 +2963,8 @@ void data_dlog_bookmark_text(DataOperationEnum operation, Cursor cursor, Value &
 	}
 }
 
-void data_dlog_bookmark_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_bookmark_is_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		value = (uint32_t)cursor == g_selectedBookmarkIndex;
 	}
@@ -2968,7 +2991,7 @@ void action_dlog_view_select_bookmark() {
 	setFocusCursor(Cursor(-1), DATA_ID_DLOG_BOOKMARKS);
 }
 
-void data_dlog_view_is_zoom_in_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_view_is_zoom_in_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		if (&getRecording() == &g_dlogFile) {
 			value = g_dlogFile.xAxisDiv > g_dlogFile.xAxisDivMin;
@@ -2984,7 +3007,7 @@ void action_dlog_view_zoom_in() {
 	}
 }
 
-void data_dlog_view_is_zoom_out_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_view_is_zoom_out_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		if (&getRecording() == &g_dlogFile) {
 			value = g_dlogFile.xAxisDiv < g_dlogFile.xAxisDivMax;
@@ -3000,7 +3023,7 @@ void action_dlog_view_zoom_out() {
 	}
 }
 
-void data_dlog_y_values_is_scrollbar_visible(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_y_values_is_scrollbar_visible(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
         value = getRecording().parameters.numYAxes > Y_VALUES_PER_PAGE;
     }
@@ -3016,7 +3039,7 @@ void setYValuesScrollPosition(uint32_t scrollPosition) {
     g_yValuesScrollPosition = scrollPosition;
 }
 
-void data_dlog_y_values(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_y_values(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	auto &recording = getRecording();
 	if (operation == DATA_OPERATION_COUNT) {
 		value = (int)(recording.parameters.numYAxes);
@@ -3056,34 +3079,43 @@ void data_dlog_y_values(DataOperationEnum operation, Cursor cursor, Value &value
 	}
 }
 
-void data_dlog_y_value_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_y_value_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = Value(cursor, VALUE_TYPE_DLOG_VALUE_LABEL);
     }
 }
 
-void data_dlog_y_value_is_checked(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_y_value_is_checked(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
 	    value = getRecording().dlogValues[cursor].isVisible;
     }
 }
 
-void data_dlog_y_value_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_y_value_is_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
 	    value = getRecording().selectedValueIndex == cursor;
     }
 }
 
-void data_dlog_y_value_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
-	data_dlog_value_offset(operation, getRecording().selectedValueIndex, value);
+void data_dlog_y_value_offset(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+	WidgetCursor dlogValueOffsetWidgetCursor = widgetCursor;
+	dlogValueOffsetWidgetCursor = getRecording().selectedValueIndex;
+	data_dlog_value_offset(operation, dlogValueOffsetWidgetCursor, value);
 }
 
-void data_dlog_y_value_div(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_dlog_value_div(operation, getRecording().selectedValueIndex, value);
+void data_dlog_y_value_div(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+	WidgetCursor dlogValueDivWidgetCursor = widgetCursor;
+	dlogValueDivWidgetCursor = getRecording().selectedValueIndex;
+	data_dlog_value_div(operation, dlogValueDivWidgetCursor, value);
 }
 
-void data_dlog_y_value_cursor(DataOperationEnum operation, Cursor cursor, Value &value) {
-	data_dlog_value_cursor(operation, getRecording().selectedValueIndex, value);
+void data_dlog_y_value_cursor(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+	WidgetCursor dlogValueCursorWidgetCursor = widgetCursor;
+	dlogValueCursorWidgetCursor.cursor = getRecording().selectedValueIndex;
+	data_dlog_value_cursor(operation, dlogValueCursorWidgetCursor, value);
 }
 
 void action_dlog_view_select_y_value() {
@@ -3095,7 +3127,8 @@ void action_dlog_view_select_y_value() {
     setFocusCursor(Cursor(-1), DATA_ID_DLOG_Y_VALUES);
 }
 
-void data_dlog_y_value_is_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dlog_y_value_is_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
         auto &recording = getRecording();
         value = getNumVisibleDlogValues(recording) < MAX_NUM_OF_Y_VALUES || recording.dlogValues[cursor].isVisible;

@@ -89,7 +89,7 @@ struct WidgetCursor {
     Cursor cursor;
     WidgetState *previousState;
     WidgetState *currentState;
-    int16_t pageId;
+    void *pageState;
     int16_t x;
     int16_t y;
 
@@ -100,7 +100,7 @@ struct WidgetCursor {
         , cursor(-1)
         , previousState(nullptr)
         , currentState(nullptr)
-        , pageId(0)
+        , pageState(0)
         , x(0)
         , y(0)
 	{
@@ -113,7 +113,7 @@ struct WidgetCursor {
         const Cursor cursor_,
         WidgetState *previousState_,
         WidgetState *currentState_,
-		int16_t pageId_,
+		void *pageState,
 		int16_t x_,
 		int16_t y_
     )
@@ -123,11 +123,23 @@ struct WidgetCursor {
 		, cursor(cursor_)
         , previousState(previousState_)
         , currentState(currentState_)
-		, pageId(pageId_)
+		, pageState(pageState)
 		, x(x_)
 		, y(y_)
     {
     }
+
+	WidgetCursor(Cursor cursor_)
+		: assets(nullptr)
+		, appContext(nullptr)
+		, widget(nullptr)
+		, cursor(cursor_)
+		, previousState(nullptr)
+		, currentState(nullptr)
+		, pageState(0)
+		, x(0)
+		, y(0) {
+	}
 
     WidgetCursor &operator=(int) {
         widget = nullptr;

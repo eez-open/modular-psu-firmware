@@ -5941,7 +5941,7 @@ const char *getChannelLabel(int slotIndex, int subchannelIndex) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void data_dib_mio168_din_pins(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_pins(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 8;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -5949,7 +5949,7 @@ void data_dib_mio168_din_pins(DataOperationEnum operation, Cursor cursor, Value 
     }
 }
 
-void data_dib_mio168_din_pins_1_4(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_pins_1_4(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 4;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -5957,7 +5957,7 @@ void data_dib_mio168_din_pins_1_4(DataOperationEnum operation, Cursor cursor, Va
     }
 }
 
-void data_dib_mio168_din_pins_5_8(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_pins_5_8(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 4;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -5965,7 +5965,8 @@ void data_dib_mio168_din_pins_5_8(DataOperationEnum operation, Cursor cursor, Va
     }
 }
 
-void data_dib_mio168_din_no(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_no(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 8 + 1;
     } else if (operation == DATA_OPERATION_GET_COLOR) {
@@ -5975,14 +5976,16 @@ void data_dib_mio168_din_no(DataOperationEnum operation, Cursor cursor, Value &v
     }
 }
 
-void data_dib_mio168_din_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_state(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         auto mio168Module = (Mio168Module *)g_slots[cursor / 8];
         value = mio168Module->dinChannel.getPinState(cursor % 8) ? 1 : 0;
     }
 }
 
-void data_dib_mio168_din_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_range(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = g_dinConfigurationPage.getPinRange(cursor % 8);
     }
@@ -5993,25 +5996,29 @@ void action_dib_mio168_din_select_range() {
     g_dinConfigurationPage.setPinRange(pin, g_dinConfigurationPage.getPinRange(pin) ? 0 : 1);
 }
 
-void data_dib_mio168_din_has_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_has_speed(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 8 < 2;
     }
 }
 
-void data_dib_mio168_din_speed(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_speed(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = g_dinConfigurationPage.getPinSpeed(cursor % 8);
     }
 }
 
-void data_dib_mio168_din_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = getPinLabel(DIN_SUBCHANNEL_INDEX, cursor);
     }
 }
 
-void data_dib_mio168_din_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_din_label_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         static const char *g_dinLabelLabels[8] = {
             "DIN1 label:", "DIN2 label:", "DIN3 label:", "DIN4 label:",
@@ -6091,7 +6098,7 @@ void action_dib_mio168_change_din_label() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void data_dib_mio168_dout_pins(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_pins(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 8;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -6099,7 +6106,7 @@ void data_dib_mio168_dout_pins(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
-void data_dib_mio168_dout_pins_1_4(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_pins_1_4(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 4;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -6107,7 +6114,7 @@ void data_dib_mio168_dout_pins_1_4(DataOperationEnum operation, Cursor cursor, V
     }
 }
 
-void data_dib_mio168_dout_pins_5_8(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_pins_5_8(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 4;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -6115,26 +6122,30 @@ void data_dib_mio168_dout_pins_5_8(DataOperationEnum operation, Cursor cursor, V
     }
 }
 
-void data_dib_mio168_dout_no(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_no(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 8 + 1;
     }
 }
 
-void data_dib_mio168_dout_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_state(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         auto mio168Module = (Mio168Module *)g_slots[cursor / 8];
         value = mio168Module->doutChannel.getPinState(cursor % 8);
     }
 }
 
-void data_dib_mio168_dout_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = getPinLabel(DOUT_SUBCHANNEL_INDEX, cursor);
     }
 }
 
-void data_dib_mio168_dout_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_label_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         static const char *g_doutLabelLabels[8] = {
             "DOUT1 label:", "DOUT2 label:", "DOUT3 label:", "DOUT4 label:",
@@ -6167,7 +6178,8 @@ void action_dib_mio168_dout_show_configuration() {
     pushPage(PAGE_ID_DIB_MIO168_DOUT_CONFIGURATION);
 }
 
-void data_dib_mio168_dout_trigger_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_trigger_mode(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int pin = cursor % 8;
 
@@ -6183,7 +6195,8 @@ void data_dib_mio168_dout_trigger_mode(DataOperationEnum operation, Cursor curso
 	}
 }
 
-void data_dib_mio168_dout_function_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_function_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
         int pin = cursor % 8;
         auto waveformParameters = function_generator::getWaveformParameters(hmi::g_selectedSlotIndex, DOUT_SUBCHANNEL_INDEX, pin);
@@ -6191,7 +6204,8 @@ void data_dib_mio168_dout_function_label(DataOperationEnum operation, Cursor cur
 	}
 }
 
-void data_dib_mio168_dout_trigger_is_initiated(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_dout_trigger_is_initiated(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int pin = cursor % 8;
 
@@ -6269,7 +6283,7 @@ bool isDlogActiveOnAinChannel(int slotIndex, int ainChannelIndex) {
         AIN_1_SUBCHANNEL_INDEX + ainChannelIndex, resourceType);
 }
 
-void data_dib_mio168_ain_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_channels(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 4;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -6277,7 +6291,8 @@ void data_dib_mio168_ain_channels(DataOperationEnum operation, Cursor cursor, Va
     }
 }
 
-void data_dib_mio168_ain_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	int slotIndex = cursor / 4;
 	int ainChannelIndex = cursor % 4;
 	
@@ -6305,7 +6320,8 @@ void data_dib_mio168_ain_label(DataOperationEnum operation, Cursor cursor, Value
 	}
 }
 
-void data_dib_mio168_ain_label_short(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_label_short(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	int slotIndex = cursor / 4;
 	int ainChannelIndex = cursor % 4;
 	
@@ -6318,14 +6334,16 @@ void data_dib_mio168_ain_label_short(DataOperationEnum operation, Cursor cursor,
 	}
 }
 
-void data_dib_mio168_ain_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_label_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         static const char *g_inLabelLabels[4] = { "AIN1 label:", "AIN2 label:", "AIN3 label:", "AIN4 label:" };
         value = g_inLabelLabels[cursor % 4];
     }
 }
 
-void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	int slotIndex = cursor / 4;
 	int ainChannelIndex = cursor % 4;
 	if (operation == DATA_OPERATION_GET) {
@@ -6350,7 +6368,8 @@ void data_dib_mio168_ain_value(DataOperationEnum operation, Cursor cursor, Value
 	}
 }
 
-void data_dib_mio168_ain_is_overflow(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_is_overflow(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	int slotIndex = cursor / 4;
 	int ainChannelIndex = cursor % 4;
 	if (operation == DATA_OPERATION_GET) {
@@ -6359,7 +6378,8 @@ void data_dib_mio168_ain_is_overflow(DataOperationEnum operation, Cursor cursor,
 	}
 }
 
-void data_dib_mio168_ain_is_error(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_is_error(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	int slotIndex = cursor / 4;
 	int ainChannelIndex = cursor % 4;
 	if (operation == DATA_OPERATION_GET) {
@@ -6368,7 +6388,7 @@ void data_dib_mio168_ain_is_error(DataOperationEnum operation, Cursor cursor, Va
 	}
 }
 
-void data_dib_mio168_ain_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_mode(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_ainConfigurationPage.m_mode;
     }
@@ -6378,19 +6398,19 @@ void action_dib_mio168_ain_select_mode() {
     g_ainConfigurationPage.m_mode = g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE ? MEASURE_MODE_CURRENT : MEASURE_MODE_VOLTAGE;
 }
 
-void data_dib_mio168_ain_mode_is_multiple_selection_available(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_mode_is_multiple_selection_available(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_ainConfigurationPage.hasMultipleModes();
     }
 }
 
-void data_dib_mio168_ain_range_is_multiple_selection_available(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_range_is_multiple_selection_available(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_ainConfigurationPage.getRangeEnumDefinition() && g_ainConfigurationPage.getRangeEnumDefinition()[1].menuLabel ? 1 : 0;
     }
 }
 
-void data_dib_mio168_ain_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_range(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getWidgetLabel(g_ainConfigurationPage.getRangeEnumDefinition(),
 			g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE ? g_ainConfigurationPage.m_voltageRange : g_ainConfigurationPage.m_currentRange);
@@ -6412,13 +6432,14 @@ void action_dib_mio168_ain_select_range() {
 		nullptr, onSetAinRange);
 }
 
-void data_dib_mio168_ain_nplc(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_nplc(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_AIN_NPLC;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
+            data_keypad_text(operation, widgetCursor, value);
         } else {
             value = MakeValue(g_ainConfigurationPage.m_nplc, UNIT_UNKNOWN);
         }
@@ -6451,13 +6472,14 @@ void data_dib_mio168_ain_nplc(DataOperationEnum operation, Cursor cursor, Value 
     }
 }
 
-void data_dib_mio168_ain_aperture(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_aperture(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(g_ainConfigurationPage.m_nplc / persist_conf::getPowerLineFrequency(), UNIT_SECOND);
     }
 }
 
-void data_dib_mio168_ain_has_power_column(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_has_power_column(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6480,7 +6502,8 @@ void data_dib_mio168_ain_has_power_column(DataOperationEnum operation, Cursor cu
 	}
 }
 
-void data_dib_mio168_ain_has_p1(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_has_p1(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6502,7 +6525,8 @@ void data_dib_mio168_ain_has_p1(DataOperationEnum operation, Cursor cursor, Valu
 	}
 }
 
-void data_dib_mio168_ain_p1(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_p1(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6528,7 +6552,8 @@ void data_dib_mio168_ain_p1(DataOperationEnum operation, Cursor cursor, Value &v
 	}
 }
 
-void data_dib_mio168_ain_has_p2(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_has_p2(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6550,7 +6575,8 @@ void data_dib_mio168_ain_has_p2(DataOperationEnum operation, Cursor cursor, Valu
 	}
 }
 
-void data_dib_mio168_ain_p2(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_p2(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6576,7 +6602,8 @@ void data_dib_mio168_ain_p2(DataOperationEnum operation, Cursor cursor, Value &v
 	}
 }
 
-void data_dib_mio168_ain_has_efficiency(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_has_efficiency(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6599,7 +6626,8 @@ void data_dib_mio168_ain_has_efficiency(DataOperationEnum operation, Cursor curs
 	}
 }
 
-void data_dib_mio168_ain_efficiency_formula(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_efficiency_formula(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6617,7 +6645,8 @@ void data_dib_mio168_ain_efficiency_formula(DataOperationEnum operation, Cursor 
 	}
 }
 
-void data_dib_mio168_ain_calc_efficiency(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_calc_efficiency(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6646,7 +6675,8 @@ void action_dib_mio168_ain_toggle_efficiency_formula() {
 	mio168Module->efficiencyFormula = (mio168Module->efficiencyFormula + 1) % 3;
 }
 
-void data_dib_mio168_ain_efficiency(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_efficiency(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6685,7 +6715,8 @@ void data_dib_mio168_ain_efficiency(DataOperationEnum operation, Cursor cursor, 
 	}
 }
 
-void data_dib_mio168_ain_is_dlog_active(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_is_dlog_active(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	int slotIndex = cursor / 4;
 	int ainChannelIndex = cursor % 4;
 	if (operation == DATA_OPERATION_GET) {
@@ -6693,13 +6724,14 @@ void data_dib_mio168_ain_is_dlog_active(DataOperationEnum operation, Cursor curs
 	}
 }
 
-void data_dib_mio168_ain_is_auto_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_is_auto_range(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_ainConfigurationPage.isAutoRange();
     }
 }
 
-void data_dib_mio168_ain_mode_and_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_mode_and_range(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     int slotIndex = cursor / 4;
     int ainChannelIndex = cursor % 4;
 	if (operation == DATA_OPERATION_GET) {
@@ -6765,7 +6797,8 @@ void action_dib_mio168_ain_change_label() {
     LabelsAndColorsPage::editChannelLabel(slotIndex, AIN_1_SUBCHANNEL_INDEX + subchannelIndex);
 }
 
-void data_dib_mio168_ain_active_power(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_active_power(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6784,7 +6817,8 @@ void data_dib_mio168_ain_active_power(DataOperationEnum operation, Cursor cursor
 	}
 }
 
-void data_dib_mio168_ain_reactive_power(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_reactive_power(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6803,7 +6837,8 @@ void data_dib_mio168_ain_reactive_power(DataOperationEnum operation, Cursor curs
 	}
 }
 
-void data_dib_mio168_ain_volt_rms(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_volt_rms(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6822,7 +6857,8 @@ void data_dib_mio168_ain_volt_rms(DataOperationEnum operation, Cursor cursor, Va
 	}
 }
 
-void data_dib_mio168_ain_curr_rms(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_curr_rms(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6841,7 +6877,8 @@ void data_dib_mio168_ain_curr_rms(DataOperationEnum operation, Cursor cursor, Va
 	}
 }
 
-void data_dib_mio168_ain_apparent_power(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_apparent_power(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6860,7 +6897,8 @@ void data_dib_mio168_ain_apparent_power(DataOperationEnum operation, Cursor curs
 	}
 }
 
-void data_dib_mio168_ain_power_factor(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ain_power_factor(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -6881,7 +6919,7 @@ void data_dib_mio168_ain_power_factor(DataOperationEnum operation, Cursor cursor
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void data_dib_mio168_aout_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_channels(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 4;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -6889,7 +6927,8 @@ void data_dib_mio168_aout_channels(DataOperationEnum operation, Cursor cursor, V
     }
 }
 
-void data_dib_mio168_aout_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / 4;
         int subchannelIndex = cursor % 4;
@@ -6923,7 +6962,8 @@ void data_dib_mio168_aout_label(DataOperationEnum operation, Cursor cursor, Valu
     }
 }
 
-void data_dib_mio168_aout_label_short(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_label_short(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	int slotIndex = cursor / 4;
 	int ainChannelIndex = cursor % 4;
 	
@@ -6936,14 +6976,16 @@ void data_dib_mio168_aout_label_short(DataOperationEnum operation, Cursor cursor
 	}
 }
 
-void data_dib_mio168_aout_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_label_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         static const char *g_aoutLabelLabels[4] = { "AOUT1 label:", "AOUT2 label:", "AOUT3 label:", "AOUT4 label:" };
         value = g_aoutLabelLabels[cursor % 4];
     }
 }
 
-void data_dib_mio168_aout_value_is_off(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_value_is_off(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	int slotIndex = cursor / 4;
 	int aoutChannelIndex = cursor % 4;
 
@@ -6957,7 +6999,8 @@ void data_dib_mio168_aout_value_is_off(DataOperationEnum operation, Cursor curso
 	}
 }
 
-void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     int slotIndex = cursor / 4;
     int aoutChannelIndex = cursor % 4;
 
@@ -6966,7 +7009,7 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Valu
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
+            data_keypad_text(operation, widgetCursor, value);
         } else {
             if (aoutChannelIndex < 2) {
                 auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
@@ -7035,7 +7078,8 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, Cursor cursor, Valu
 	}
 }
 
-void data_dib_mio168_aout_output_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_output_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         AoutDac7760ConfigurationPage *page = (AoutDac7760ConfigurationPage *)getPage(PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION);
         if (page) {
@@ -7053,7 +7097,7 @@ void data_dib_mio168_aout_output_enabled(DataOperationEnum operation, Cursor cur
     }
 }
 
-void data_dib_mio168_aout_output_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_output_mode(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_aoutDac7760ConfigurationPage.m_mode;
     }
@@ -7068,7 +7112,7 @@ void action_dib_mio168_aout_select_output_mode() {
     g_aoutDac7760ConfigurationPage.m_mode = g_aoutDac7760ConfigurationPage.m_mode == SOURCE_MODE_VOLTAGE ? SOURCE_MODE_CURRENT : SOURCE_MODE_VOLTAGE;
 }
 
-void data_dib_mio168_aout_voltage_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_voltage_range(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getWidgetLabel(::g_aoutVoltageRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_voltageRange);
     }
@@ -7083,7 +7127,7 @@ void action_dib_mio168_aout_select_voltage_range() {
     pushSelectFromEnumPage(g_aoutVoltageRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_voltageRange, nullptr, onSetVoltageRange);
 }
 
-void data_dib_mio168_aout_current_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_current_range(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getWidgetLabel(g_aoutCurrentRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_currentRange);
     }
@@ -7102,7 +7146,8 @@ void action_dib_mio168_aout_toggle_output_enabled() {
     g_aoutDac7760ConfigurationPage.m_outputEnabled = !g_aoutDac7760ConfigurationPage.m_outputEnabled;
 }
 
-void data_dib_mio168_aout_mode_and_range(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_mode_and_range(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / 4;
         int subchannelIndex = AOUT_1_SUBCHANNEL_INDEX + cursor % 4;
@@ -7155,7 +7200,8 @@ void action_dib_mio168_aout_show_configuration() {
     }
 }
 
-void data_dib_mio168_aout_channel_has_settings(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_channel_has_settings(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = cursor % 4 < 2 ? 1 : 0;
     }
@@ -7168,7 +7214,8 @@ void action_dib_mio168_aout_change_label() {
     LabelsAndColorsPage::editChannelLabel(slotIndex, AOUT_1_SUBCHANNEL_INDEX + subchannelIndex);
 }
 
-void data_dib_mio168_aout_trigger_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_trigger_mode(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
 		TriggerMode triggerMode;
         if (getActivePageId() == PAGE_ID_DIB_MIO168_AOUT_DAC7760_CONFIGURATION) {
@@ -7190,7 +7237,8 @@ void data_dib_mio168_aout_trigger_mode(DataOperationEnum operation, Cursor curso
     }
 }
 
-void data_dib_mio168_aout_function_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_function_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / 4;
         int aoutChannelIndex = cursor % 4;
@@ -7199,7 +7247,8 @@ void data_dib_mio168_aout_function_label(DataOperationEnum operation, Cursor cur
 	}
 }
 
-void data_dib_mio168_aout_trigger_is_initiated(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_aout_trigger_is_initiated(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		TriggerMode triggerMode;
 
@@ -7277,7 +7326,7 @@ void action_dib_mio168_aout_show_function() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void data_dib_mio168_pwm_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_pwm_channels(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = 2;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -7285,7 +7334,8 @@ void data_dib_mio168_pwm_channels(DataOperationEnum operation, Cursor cursor, Va
     }
 }
 
-void data_dib_mio168_pwm_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_pwm_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / 2;
         int subchannelIndex = cursor % 2;
@@ -7303,7 +7353,8 @@ void data_dib_mio168_pwm_label(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
-void data_dib_mio168_pwm_label_short(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_pwm_label_short(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / 2;
         int pwmChannelIndex = cursor % 2;
@@ -7311,14 +7362,16 @@ void data_dib_mio168_pwm_label_short(DataOperationEnum operation, Cursor cursor,
     }
 }
 
-void data_dib_mio168_pwm_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_pwm_label_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         static const char *g_pwmLabelLabels[2] = { "PWM1 label:", "PWM2 label:"};
         value = g_pwmLabelLabels[cursor % 2];
     }
 }
 
-void data_dib_mio168_pwm_freq(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_pwm_freq(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     int slotIndex = cursor / 2;
     int pwmChannelIndex = cursor % 2;
 
@@ -7327,7 +7380,7 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, Cursor cursor, Value 
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
+            data_keypad_text(operation, widgetCursor, value);
         } else {
             value = MakeValue(((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_freq, UNIT_HERTZ);
         }
@@ -7368,7 +7421,8 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, Cursor cursor, Value 
     }
 }
 
-void data_dib_mio168_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_pwm_duty(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     int slotIndex = cursor / 2;
     int pwmChannelIndex = cursor % 2;
     
@@ -7377,7 +7431,7 @@ void data_dib_mio168_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
+            data_keypad_text(operation, widgetCursor, value);
         } else {
             value = MakeValue(((Mio168Module *)g_slots[slotIndex])->pwmChannels[pwmChannelIndex].m_duty, UNIT_PERCENT);
         }
@@ -7421,7 +7475,7 @@ void action_dib_mio168_pwm_change_label() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void data_dib_mio168_afe_version(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_afe_version(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		auto module = (Mio168Module *)g_slots[hmi::g_selectedSlotIndex];
 		value = module->afeVersion;
@@ -7468,7 +7522,7 @@ static int g_slotIndex;
 static const int NUM_PAGES_IN_MAX_VIEW = 7;
 static const int NUM_PAGES_IN_DEFAULT_VIEW = 7;
 
-void data_dib_mio168_pager_list(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_pager_list(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = NUM_PAGES_IN_MAX_VIEW;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -7476,14 +7530,16 @@ void data_dib_mio168_pager_list(DataOperationEnum operation, Cursor cursor, Valu
     }
 }
 
-void data_dib_mio168_pager_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_pager_is_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		auto module = (Mio168Module *)g_slots[cursor / NUM_PAGES_IN_MAX_VIEW];
 		value = module->selectedPageInMaxView == cursor % NUM_PAGES_IN_MAX_VIEW ? 1 : 0;
 	}
 }
 
-void data_dib_mio168_pager_selected_page(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_pager_selected_page(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		auto module = (Mio168Module *)g_slots[cursor];
 		value = module->selectedPageInMaxView;
@@ -7506,7 +7562,8 @@ void action_dib_mio168_pager_select_page() {
     }
 }
 
-void data_dib_mio168_is_settings_page_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_is_settings_page_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		auto module = (Mio168Module *)g_slots[cursor];
 		value = module->selectedPageInMaxView == NUM_PAGES_IN_MAX_VIEW;
@@ -7521,7 +7578,8 @@ void action_dib_mio168_show_slot_settings_in_max_view() {
     animateSlideLeftWithoutHeader();
 }
 
-void data_dib_mio168_selected_page_in_default_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_selected_page_in_default_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		auto module = (Mio168Module *)g_slots[cursor];
 		value = module->selectedPageInDefaultView;
@@ -7554,7 +7612,8 @@ void action_dib_mio168_select_page_in_default_view() {
 	pushSelectFromEnumPage(enumItems, ((Mio168Module *)g_slots[g_slotIndex])->selectedPageInDefaultView, NULL, setPageInDefaultView);
 }
 
-void data_dib_mio168_is_no_afe(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_is_no_afe(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		if (getActivePageId() == PAGE_ID_MAIN) {
@@ -7566,13 +7625,15 @@ void data_dib_mio168_is_no_afe(DataOperationEnum operation, Cursor cursor, Value
 	}
 }
 
-void data_dib_mio168_ac_analysis_allowed(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ac_analysis_allowed(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		value = !(dlog_record::isExecuting() && dlog_record::isModuleAtSlotRecording(cursor));
 	}
 }
 
-void data_dib_mio168_ac_analysis_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_ac_analysis_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		auto module = (Mio168Module *)g_slots[cursor];
 		value = module->acAnalysisEnabled && !(dlog_record::isExecuting() && dlog_record::isModuleAtSlotRecording(cursor));
@@ -7603,7 +7664,8 @@ void onSetSimulatorAfeVersion(uint16_t value) {
 #endif
 }
 
-void data_dib_mio168_simulator_afe_version(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mio168_simulator_afe_version(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		value = (int)((Mio168Module *)g_slots[cursor])->simulatorAfeVersion - 1;
 	}

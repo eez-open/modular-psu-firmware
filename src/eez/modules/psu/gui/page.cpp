@@ -146,7 +146,7 @@ void ToastMessagePage::onEncoderClicked() {
     }
 }
 
-void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
+void ToastMessagePage::refresh(const WidgetCursor &widgetCursor) {
     const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
     const Style *actionStyle = getStyle(STYLE_ID_ERROR_ALERT_BUTTON);
 
@@ -288,8 +288,9 @@ void ToastMessagePage::refresh(const WidgetCursor& widgetCursor) {
     }
 }
 
-void ToastMessagePage::updatePage(const WidgetCursor& widgetCursor) {
-    if (actionWidgetIsActive != isActiveWidget(WidgetCursor(widgetCursor.assets, appContext, &actionWidget, -1, 0, 0, INTERNAL_PAGE_ID_TOAST_MESSAGE, actionWidget.x, actionWidget.y))) {
+void ToastMessagePage::updatePage(const WidgetCursor &widgetCursor) {
+	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, -1, 0, 0, nullptr, actionWidget.x, actionWidget.y);
+    if (actionWidgetIsActive != isActiveWidget(toastPageWidgetCursor)) {
         actionWidgetIsActive = !actionWidgetIsActive;
         refresh(widgetCursor);
     }
@@ -307,10 +308,10 @@ WidgetCursor ToastMessagePage::findWidget(int x, int y, bool clicked) {
             y >= (actionWidget.y - textHeight / 4) &&
             y < (actionWidget.y + actionWidget.h - 1 + textHeight / 4)
         ) {
-            return WidgetCursor(g_mainAssets, appContext, &actionWidget, -1, 0, 0, INTERNAL_PAGE_ID_TOAST_MESSAGE, actionWidget.x, actionWidget.y);
+            return WidgetCursor(g_mainAssets, appContext, &actionWidget, -1, 0, 0, nullptr, actionWidget.x, actionWidget.y);
         }
         widget.action = ACTION_ID_INTERNAL_DIALOG_CLOSE;
-        return WidgetCursor(g_mainAssets, appContext, &widget, -1, 0, 0, INTERNAL_PAGE_ID_TOAST_MESSAGE, x, y);
+        return WidgetCursor(g_mainAssets, appContext, &widget, -1, 0, 0, nullptr, x, y);
     }
     
     return WidgetCursor();
@@ -359,7 +360,7 @@ void SelectFromEnumPage::init(
 
 void SelectFromEnumPage::init(
     AppContext *appContext_,
-    void (*enumDefinitionFunc_)(DataOperationEnum operation, Cursor cursor, Value &value),
+    void (*enumDefinitionFunc_)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value),
     uint16_t currentValue_,
     bool (*disabledCallback_)(uint16_t value),
     void (*onSet_)(uint16_t),
@@ -394,8 +395,9 @@ void SelectFromEnumPage::init() {
 uint16_t SelectFromEnumPage::getValue(int i) {
     if (enumDefinitionFunc) {
         Value value;
-        Cursor cursor(i);
-        enumDefinitionFunc(DATA_OPERATION_GET_VALUE, cursor, value);
+		WidgetCursor widgetCursor;
+		widgetCursor.cursor = i;
+        enumDefinitionFunc(DATA_OPERATION_GET_VALUE, widgetCursor, value);
         return value.getUInt8();
     }
     
@@ -405,8 +407,9 @@ uint16_t SelectFromEnumPage::getValue(int i) {
 bool SelectFromEnumPage::getLabel(int i, char *text, int count) {
     if (enumDefinitionFunc) {
         Value value;
-        Cursor cursor(i);
-        enumDefinitionFunc(DATA_OPERATION_GET_LABEL, cursor, value);
+		WidgetCursor widgetCursor;
+		widgetCursor.cursor = i;
+		enumDefinitionFunc(DATA_OPERATION_GET_LABEL, widgetCursor, value);
         if (value.getType() != VALUE_TYPE_UNDEFINED) {
             if (text) {
                 value.toText(text, count);
@@ -495,7 +498,7 @@ void SelectFromEnumPage::findPagePosition() {
     }
 }
 
-void SelectFromEnumPage::refresh(const WidgetCursor& widgetCursor) {
+void SelectFromEnumPage::refresh(const WidgetCursor &widgetCursor) {
     const Style *containerStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 	const Style *itemStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
 	const Style *disabledItemStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
@@ -517,7 +520,7 @@ void SelectFromEnumPage::refresh(const WidgetCursor& widgetCursor) {
     dirty = false;
 }
 
-void SelectFromEnumPage::updatePage(const WidgetCursor& widgetCursor) {
+void SelectFromEnumPage::updatePage(const WidgetCursor &widgetCursor) {
     if (dirty) {
         refresh(widgetCursor);
     }
@@ -538,7 +541,7 @@ WidgetCursor SelectFromEnumPage::findWidget(int x, int y, bool clicked) {
 
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
-        		return WidgetCursor(g_mainAssets, appContext, &widget, -1, 0, 0, INTERNAL_PAGE_ID_SELECT_FROM_ENUM, x, y);
+        		return WidgetCursor(g_mainAssets, appContext, &widget, -1, 0, 0, nullptr, x, y);
         	}
         }
     }

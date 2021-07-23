@@ -1094,15 +1094,18 @@ void DcmModule::tick(uint8_t slotIndex) {
 
 namespace gui {
 
-void data_dib_dcm224_slot_2ch_ch1_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_channel_index(Channel::get(cursor), operation, cursor, value);
+void data_dib_dcm224_slot_2ch_ch1_index(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+    data_channel_index(Channel::get(cursor), operation, widgetCursor, value);
 }
 
-void data_dib_dcm224_slot_2ch_ch2_index(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_channel_index(Channel::get(persist_conf::isMaxView() && cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1 ? cursor - 1 : cursor + 1), operation, cursor, value);
+void data_dib_dcm224_slot_2ch_ch2_index(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+    data_channel_index(Channel::get(persist_conf::isMaxView() && cursor == persist_conf::getMaxChannelIndex() && Channel::get(cursor).subchannelIndex == 1 ? cursor - 1 : cursor + 1), operation, widgetCursor, value);
 }
 
-void data_dib_dcm224_slot_def_2ch_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_dcm224_slot_def_2ch_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         Channel &channel = Channel::get(cursor);
         int isVert = persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC || persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR;
@@ -1118,7 +1121,7 @@ void data_dib_dcm224_slot_def_2ch_view(DataOperationEnum operation, Cursor curso
     }
 }
 
-void data_dib_dcm224_pwm_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_dcm224_pwm_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
         if (page) {
@@ -1130,13 +1133,14 @@ void data_dib_dcm224_pwm_enabled(DataOperationEnum operation, Cursor cursor, Val
     }
 }
 
-void data_dib_dcm224_pwm_frequency(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_dcm224_pwm_frequency(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_DCM224_PWM_FREQUENCY;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
+            data_keypad_text(operation, widgetCursor, value);
         } else {
             ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
             if (page) {
@@ -1192,13 +1196,14 @@ void data_dib_dcm224_pwm_frequency(DataOperationEnum operation, Cursor cursor, V
     }
 }
 
-void data_dib_dcm224_pwm_duty(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_dcm224_pwm_duty(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_IO_PIN_PWM_DUTY;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
+            data_keypad_text(operation, widgetCursor, value);
         } else {
             ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
             if (page) {
@@ -1247,13 +1252,14 @@ void data_dib_dcm224_pwm_duty(DataOperationEnum operation, Cursor cursor, Value 
     }
 }
 
-void data_dib_dcm224_counterphase_frequency(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_dcm224_counterphase_frequency(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_DCM224_COUNTERPHASE_FREQUENCY;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
+            data_keypad_text(operation, widgetCursor, value);
         } else {
             ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
             if (page) {
@@ -1309,7 +1315,7 @@ void data_dib_dcm224_counterphase_frequency(DataOperationEnum operation, Cursor 
     }
 }
 
-void data_dib_dcm224_counterphase_dithering(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_dcm224_counterphase_dithering(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         ChSettingsAdvOptionsPage *page = (ChSettingsAdvOptionsPage *)getPage(PAGE_ID_DIB_DCM224_CH_SETTINGS_ADV_OPTIONS);
         if (page && page->getDirty()) {

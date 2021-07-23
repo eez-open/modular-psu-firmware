@@ -55,25 +55,25 @@ void read(bool &isPressed, int &x, int &y) {
 
 namespace gui {
 
-void data_touch_raw_x(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_touch_raw_x(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_mouseX;
     }
 }
 
-void data_touch_raw_y(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_touch_raw_y(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_mouseY;
     }
 }
 
-void data_touch_raw_z1(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_touch_raw_z1(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = 0;
     }
 }
 
-void data_touch_raw_pressed(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_touch_raw_pressed(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_mouseButton1IsPressed;
     }

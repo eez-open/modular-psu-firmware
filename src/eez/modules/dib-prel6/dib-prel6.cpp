@@ -931,7 +931,7 @@ namespace gui {
 
 using namespace dib_prel6;
 
-void data_dib_prel6_relays(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_prel6_relays(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = NUM_RELAYS;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -939,14 +939,16 @@ void data_dib_prel6_relays(DataOperationEnum operation, Cursor cursor, Value &va
     } 
 }
 
-void data_dib_prel6_is_relay_1_or_6(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_prel6_is_relay_1_or_6(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int subchannelIndex = cursor % NUM_RELAYS;
         value = subchannelIndex == 0 || subchannelIndex == 5;
     }
 }
 
-void data_dib_prel6_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_prel6_relay_is_on(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_RELAYS;
         int subchannelIndex = cursor % NUM_RELAYS;
@@ -954,7 +956,8 @@ void data_dib_prel6_relay_is_on(DataOperationEnum operation, Cursor cursor, Valu
     }
 }
 
-void data_dib_prel6_relay_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_prel6_relay_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_RELAYS;
         int subchannelIndex = cursor % NUM_RELAYS;
@@ -971,7 +974,8 @@ void data_dib_prel6_relay_label(DataOperationEnum operation, Cursor cursor, Valu
     }
 }
 
-void data_dib_prel6_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_prel6_relay_cycles(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = cursor / NUM_RELAYS;
 		int subchannelIndex = cursor % NUM_RELAYS;
@@ -991,7 +995,8 @@ void action_dib_prel6_show_relay_labels() {
     pushPage(PAGE_ID_DIB_PREL6_CHANNEL_LABELS);
 }
 
-void data_dib_prel6_relay_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_prel6_relay_label_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         static const char *g_relayLabelLabels[NUM_RELAYS] = {
             "Relay #1 label:",

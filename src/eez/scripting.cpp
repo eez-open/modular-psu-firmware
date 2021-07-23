@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <eez/alloc.h>
 #include <eez/firmware.h>
 #include <eez/flow.h>
 #include <eez/scripting.h>
@@ -62,6 +63,8 @@ namespace scripting {
 
 void mainLoop(const void *);
 
+////////////////////////////////////////////////////////////////////////////////
+
 osThreadId g_mpTaskHandle;
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -80,12 +83,17 @@ osThreadDef(g_mpTask, mainLoop, osPriorityNormal, 0, 4096);
 osMessageQDef(g_mpMessageQueue, MP_QUEUE_SIZE, uint32_t);
 osMessageQId g_mpMessageQueueId;
 
+////////////////////////////////////////////////////////////////////////////////
+
 State g_state;
 
-char *g_scriptPath = (char *)MP_BUFFER;
-static char *g_scriptSource = g_scriptPath + MAX_PATH_LENGTH + 1;
-static const size_t MAX_SCRIPT_LENGTH = 32 * 1024;
+char *g_scriptPath;
+
+static char *g_scriptSource;
 static size_t g_scriptSourceLength;
+
+static const size_t MP_GC_MEMORY_SIZE = 512 * 1024;
+static uint8_t *g_mpGCMemory;
 
 static struct eez::psu::profile::ScriptingParameters g_scriptingParameters = { "", 1 };
 static uint32_t g_scriptParametersVersion;
@@ -194,17 +202,42 @@ enum {
     QUEUE_MESSAGE_SCPI_RESULT
 };
 
+static void setStateIdle() {
+	g_state = STATE_IDLE;
+	if (g_autoStartScriptIsRunning) {
+		g_autoStartScriptIsRunning = false;
+	}
+
+	if (g_scriptPath) {
+		free(g_scriptPath);
+		g_scriptPath = nullptr;
+	}
+
+	if (g_scriptSource) {
+		free(g_scriptSource);
+		g_scriptSource = nullptr;
+	}
+
+	if (g_mpGCMemory) {
+		free(g_mpGCMemory);
+		g_mpGCMemory = nullptr;
+	}
+
+	flow::stop();
+
+	unloadExternalAssets();
+}
+
 void startMpScript() {
 	char scriptName[64];
 	getFileName(g_scriptPath, scriptName, sizeof(scriptName));
 	InfoTrace("Script started: %s\n", scriptName);
 
-#if 1
 	// this version reinitialise MP every time
 
 	volatile char dummy;
 	mp_stack_set_top((void *)&dummy);
-	gc_init(g_scriptSource + MAX_SCRIPT_LENGTH, MP_BUFFER + MP_BUFFER_SIZE - MAX_SCRIPT_LENGTH);
+	gc_init(g_mpGCMemory, g_mpGCMemory + MP_GC_MEMORY_SIZE);
 	mp_init();
 
 	bool wasException = false;
@@ -226,49 +259,18 @@ void startMpScript() {
 
 	gc_sweep_all();
 	mp_deinit();
-#endif
-
-#if 0
-	// this version doesn't reinitialise MP every time
-
-	static bool g_initialized = false;
-	if (!g_initialized) {
-		volatile char dummy;
-		g_initialized = true;
-		mp_stack_set_top((void *)&dummy);
-		gc_init(g_scriptSource + MAX_SCRIPT_LENGTH, MP_BUFFER + MP_BUFFER_SIZE - MAX_SCRIPT_LENGTH);
-		mp_init();
-	}
-
-	nlr_buf_t nlr;
-	if (nlr_push(&nlr) == 0) {
-		mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, g_scriptSource, g_scriptSourceLength, 0);
-		qstr source_name = lex->source_name;
-		mp_parse_tree_t parse_tree = mp_parse(lex, MP_PARSE_FILE_INPUT);
-		mp_obj_t module_fun = mp_compile(&parse_tree, source_name/*, MP_EMIT_OPT_NONE*/, true);
-		//DebugTrace("T3 %d\n", millis());
-		mp_call_function_0(module_fun);
-		nlr_pop();
-	} else {
-		// uncaught exception
-		mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
-		onUncaughtScriptExceptionHook();
-	}
-#endif
 
 	psu::gui::hideAsyncOperationInProgress();
 	psu::gui::clearTextMessage();
-
-	g_state = STATE_IDLE;
-
-	InfoTrace("Script ended: %s\n", scriptName);
-
 	if (g_autoStartScriptIsRunning) {
-		g_autoStartScriptIsRunning = false;
 		if (wasException) {
 			psu::gui::showMainPage();
 		}
 	}
+
+	setStateIdle();
+
+	InfoTrace("Script ended: %s\n", scriptName);
 }
 
 void startFlowScript() {
@@ -280,14 +282,6 @@ void startFlowScript() {
 	psu::gui::clearTextMessage();
 
 	g_flowHandle = flow::start(g_externalAssets);
-
-	//g_state = STATE_IDLE;
-
-	//InfoTrace("App ended: %s\n", scriptName);
-
-	//if (g_autoStartScriptIsRunning) {
-	//	g_autoStartScriptIsRunning = false;
-	//}
 }
 
 void oneIter() {
@@ -313,15 +307,11 @@ void doStopScript() {
 	psu::gui::hideAsyncOperationInProgress();
 	psu::gui::clearTextMessage();
 
-	g_state = STATE_IDLE;
-
 	char scriptName[64];
 	getFileName(g_scriptPath, scriptName, sizeof(scriptName));
 	InfoTrace("Script stopped: %s\n", scriptName);
 
-	if (g_autoStartScriptIsRunning) {
-		g_autoStartScriptIsRunning = false;
-	}
+	setStateIdle();
 
 	while (psu::gui::isPageOnStack(getExternalAssetsFirstPageId())) {
 		psu::gui::popPage();
@@ -345,7 +335,9 @@ bool loadMpScript(int *err) {
     }
 
     fileSize = file.size();
-    if (fileSize > MAX_SCRIPT_LENGTH) {
+
+	g_scriptSource = (char *)alloc(fileSize);
+    if (!g_scriptSource) {
 		if (err) {
 			*err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
 		} else {
@@ -364,10 +356,22 @@ bool loadMpScript(int *err) {
 		} else {
 			generateError(SCPI_ERROR_MASS_STORAGE_ERROR);
 		}
+
         goto Error;
     }
 
     g_scriptSourceLength = fileSize;
+
+	g_mpGCMemory = (uint8_t *)alloc(MP_GC_MEMORY_SIZE);
+	if (!g_mpGCMemory) {
+		if (err) {
+			*err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
+		} else {
+			generateError(SCPI_ERROR_OUT_OF_DEVICE_MEMORY);
+		}
+
+        goto ErrorNoClose;
+	}
 
     osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_MP_SCRIPT, osWaitForever);
 
@@ -378,12 +382,14 @@ Error:
 
 ErrorNoClose:
     psu::gui::hideAsyncOperationInProgress();
-    g_state = STATE_IDLE;
+
 	if (g_autoStartScriptIsRunning) {
-		g_autoStartScriptIsRunning = false;
 		psu::gui::showMainPage();
 	}
+
 	gui::refreshScreen();
+
+	setStateIdle();
 
     return false;
 }
@@ -399,12 +405,13 @@ bool loadApp(int *err) {
 	ErrorTrace("App error: %s\n", scriptName);
 
 	psu::gui::hideAsyncOperationInProgress();
-	g_state = STATE_IDLE;
 	if (g_autoStartScriptIsRunning) {
-		g_autoStartScriptIsRunning = false;
 		psu::gui::showMainPage();
 	}
 	gui::refreshScreen();
+
+	setStateIdle();
+
 	return false;
 }
 
@@ -419,24 +426,31 @@ bool loadScript(int *err = nullptr) {
 bool startScript(const char *filePath, int *err) {
 	if (g_state == STATE_IDLE) {
 		g_state = STATE_EXECUTING;
-		stringCopy(g_scriptPath, MAX_PATH_LENGTH, filePath);
 
 		int localErr = SCPI_RES_OK;
 		if (!err) {
 			err = &localErr;
 		}
 
-		*err = SCPI_RES_OK;
+		auto scriptPathSize = strlen(filePath) + 1;
+		g_scriptPath = (char *)alloc(scriptPathSize);
+		if (g_scriptPath) {
+			stringCopy(g_scriptPath, scriptPathSize, filePath);
 
-		if (isLowPriorityThread()) {
-			loadScript(err);
-		} else {
-			sendMessageToLowPriorityThread(MP_LOAD_SCRIPT);
 			*err = SCPI_RES_OK;
-		}
 
-		if (*err == SCPI_RES_OK && !g_autoStartScriptIsRunning) {
-			psu::gui::showAsyncOperationInProgress();
+			if (isLowPriorityThread()) {
+				loadScript(err);
+			} else {
+				sendMessageToLowPriorityThread(MP_LOAD_SCRIPT);
+				*err = SCPI_RES_OK;
+			}
+
+			if (*err == SCPI_RES_OK && !g_autoStartScriptIsRunning) {
+				psu::gui::showAsyncOperationInProgress();
+			}
+		} else {
+			*err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
 		}
 
 		return *err == SCPI_RES_OK;
@@ -471,12 +485,12 @@ bool isFlowRunning() {
 	return g_flowHandle != 0;
 }
 
-void executeFlowAction(int16_t actionId) {
-	flow::executeFlowAction(g_flowHandle, actionId);
+void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId) {
+	flow::executeFlowAction(g_flowHandle, widgetCursor, actionId);
 }
 
-void dataOperation(int16_t dataId, DataOperationEnum operation, Cursor cursor, Value &value) {
-	flow::dataOperation(g_flowHandle, dataId, operation, cursor, value);
+void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
+	flow::dataOperation(g_flowHandle, dataId, operation, widgetCursor, value);
 }
 
 static const char *g_commandOrQueryText;
@@ -659,7 +673,7 @@ namespace gui {
 using namespace ::eez::scripting;
 using namespace ::eez::psu::gui;
 
-void data_sys_settings_scripting_auto_start_script(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_sys_settings_scripting_auto_start_script(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
         if (g_scriptingParameters.autoStartScript[0]) {
             static char g_fileName[MAX_PATH_LENGTH + 1];
@@ -671,13 +685,13 @@ void data_sys_settings_scripting_auto_start_script(DataOperationEnum operation, 
 	}
 }
 
-void data_sys_settings_scripting_auto_start_script_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_sys_settings_scripting_auto_start_script_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_scriptingParameters.autoStartScript[0] ? 1 : 0;
 	}
 }
 
-void data_sys_settings_scripting_auto_start_confirmation(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_sys_settings_scripting_auto_start_confirmation(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_scriptingParameters.options.autoStartConfirmation ? 1 : 0;
 	}

@@ -118,7 +118,7 @@ void pushSelectFromEnumPage(
 );
 void pushSelectFromEnumPage(
     AppContext *appContext,
-    void(*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value),
+    void(*enumDefinitionFunc)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),
     void(*onSet)(uint16_t),
@@ -178,7 +178,7 @@ struct SelectParams {
     const char **m_options;
     int m_defaultSelection;
     int m_input;
-    static void enumDefinition(DataOperationEnum operation, Cursor cursor, Value &value);
+    static void enumDefinition(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
     static void onSelect(uint16_t value);
 };
 
@@ -387,7 +387,7 @@ inline void pushSelectFromEnumPage(
 }
 
 inline void pushSelectFromEnumPage(
-    void(*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value),
+    void(*enumDefinitionFunc)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),
     void(*onSet)(uint16_t),

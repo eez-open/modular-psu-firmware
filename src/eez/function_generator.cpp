@@ -2083,7 +2083,8 @@ void action_show_sys_settings_function_generator_select_channel() {
 	selectWaveformParametersForChannel(*channel);
 }
 
-void data_function_generator_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_channels(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
 		if (operation == DATA_OPERATION_COUNT) {
 			value = g_functionGeneratorPage.m_selectedResources.m_numResources;
@@ -2181,7 +2182,7 @@ void data_function_generator_channels(DataOperationEnum operation, Cursor cursor
 	}
 }
 
-void data_function_generator_canvas(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_canvas(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_functionGeneratorPage.getRefreshState();
 	} else if (operation == DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION) {
@@ -2189,7 +2190,8 @@ void data_function_generator_canvas(DataOperationEnum operation, Cursor cursor, 
 	} 
 }
 
-void data_function_generator_channel(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_channel(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
 		if (operation == DATA_OPERATION_GET) {
 			int slotIndex;
@@ -2216,7 +2218,7 @@ void data_function_generator_channel(DataOperationEnum operation, Cursor cursor,
 	}
 }
 
-void data_function_generator_any_channel_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_any_channel_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
 		if (operation == DATA_OPERATION_GET) {
 			value = g_functionGeneratorPage.m_selectedItem >= 0 && 
@@ -2225,7 +2227,8 @@ void data_function_generator_any_channel_selected(DataOperationEnum operation, C
 	}
 }
 
-void data_function_generator_item_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_item_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
 		if (operation == DATA_OPERATION_GET) {
 			int slotIndex;
@@ -2247,7 +2250,7 @@ void data_function_generator_item_label(DataOperationEnum operation, Cursor curs
 		}
 	}
 }
-void data_function_generator_selected_item_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_selected_item_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		int subchannelIndex;
@@ -2262,7 +2265,8 @@ void data_function_generator_selected_item_label(DataOperationEnum operation, Cu
 }
 
 
-void data_function_generator_item_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_item_is_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		value = g_functionGeneratorPage.m_selectedItem == cursor;
 	}
@@ -2279,13 +2283,15 @@ void action_function_generator_toggle_selected_item() {
 	g_functionGeneratorPage.apply();
 }
 
-void data_function_generator_item_is_checked(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_item_is_checked(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		value = g_functionGeneratorSelectChannelsPage.m_selectedChannels & ((uint64_t)1 << cursor) ? 1 : 0;
 	}
 }
 
-void data_function_generator_is_max_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_is_max_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		int subchannelIndex;
@@ -2300,7 +2306,7 @@ void data_function_generator_is_max_selected(DataOperationEnum operation, Cursor
 	}
 }
 
-void data_function_generator_num_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_num_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value.type_ = VALUE_TYPE_NUM_SELECTED;
 		value.pairOfUint16_.first = g_functionGeneratorSelectChannelsPage.getNumSelectedResources();
@@ -2336,19 +2342,19 @@ void action_function_generator_item_toggle_checked() {
 	}
 }
 
-void data_function_generator_waveform(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_waveform(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].waveform;
 	}
 }
 
-void data_function_generator_waveform_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_waveform_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_waveformEnumDefinition[g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].waveform - 1].menuLabel;
 	}
 }
 
-void data_function_generator_waveform_short_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_waveform_short_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_waveformShortLabel[g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].waveform];
 	}
@@ -2429,7 +2435,8 @@ void getPhaseShiftStepValues(StepValues *stepValues) {
 	stepValues->encoderSettings.step = stepValues->values[0];
 }
 
-void data_function_generator_frequency(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_frequency(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
 	int slotIndex;
@@ -2459,7 +2466,7 @@ void data_function_generator_frequency(DataOperationEnum operation, Cursor curso
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
+            data_keypad_text(operation, widgetCursor, value);
         } else {
             value = MakeValue(g_options.isFreq ? waveformParameters.frequency : (1.0f / waveformParameters.frequency), unit);
         }
@@ -2499,7 +2506,8 @@ void data_function_generator_frequency(DataOperationEnum operation, Cursor curso
     }
 }
 
-void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_phase_shift(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
 	float max;
@@ -2518,7 +2526,7 @@ void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cur
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-			data_keypad_text(operation, cursor, value);
+			data_keypad_text(operation, widgetCursor, value);
 		} else {
 			value = MakeValue(g_options.isFreq ? waveformParameters.phaseShift : (waveformParameters.phaseShift * max / 360.0f), unit);
 		}
@@ -2565,7 +2573,8 @@ void data_function_generator_phase_shift(DataOperationEnum operation, Cursor cur
 	}
 }
 
-void data_function_generator_amplitude(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_amplitude(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	// ... or minimum
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
@@ -2595,7 +2604,7 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-			data_keypad_text(operation, cursor, value);
+			data_keypad_text(operation, widgetCursor, value);
 		} else {
 			if (waveformParameters.waveform == WAVEFORM_DC) {
 				value = MakeValue(waveformParameters.amplitude, unit);
@@ -2674,7 +2683,8 @@ void data_function_generator_amplitude(DataOperationEnum operation, Cursor curso
 	}
 }
 
-void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_offset(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	// ... or maximum
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
@@ -2697,7 +2707,7 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-			data_keypad_text(operation, cursor, value);
+			data_keypad_text(operation, widgetCursor, value);
 		} else {
 			if (waveformParameters.waveform == WAVEFORM_HALF_RECTIFIED || waveformParameters.waveform == WAVEFORM_FULL_RECTIFIED) {
 				value = MakeValue(g_options.isAmpl ? waveformParameters.offset : waveformParameters.offset + waveformParameters.amplitude, unit);
@@ -2771,7 +2781,8 @@ void data_function_generator_offset(DataOperationEnum operation, Cursor cursor, 
 	}
 }
 
-void data_function_generator_duty_cycle(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_duty_cycle(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
 	float max;
@@ -2790,7 +2801,7 @@ void data_function_generator_duty_cycle(DataOperationEnum operation, Cursor curs
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-			data_keypad_text(operation, cursor, value);
+			data_keypad_text(operation, widgetCursor, value);
 		} else {
 			value = MakeValue(g_options.isFreq ? waveformParameters.dutyCycle : (waveformParameters.dutyCycle * max / 100.0f), unit);
 		}
@@ -2838,7 +2849,7 @@ void action_function_generator_select_channels() {
 	pushPage(PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR_SELECT_CHANNELS);
 }
 
-void data_function_generator_has_mode_select(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_has_mode_select(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		int subchannelIndex;
@@ -2857,7 +2868,7 @@ void data_function_generator_has_mode_select(DataOperationEnum operation, Cursor
 	}
 }
 
-void data_function_generator_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_mode(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? "Voltage" : "Current";
 	}
@@ -2894,19 +2905,19 @@ void action_function_generator_mode_select_mode() {
 	g_functionGeneratorPage.apply();
 }
 
-void data_function_generator_has_amplitude_and_offset(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_has_amplitude_and_offset(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].resourceType != FUNCTION_GENERATOR_RESOURCE_TYPE_DIGITAL;
 	}
 }
 
-void data_function_generator_has_duty_cycle(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_has_duty_cycle(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].waveform == WAVEFORM_PULSE;
 	}
 }
 
-void data_function_generator_is_freq(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_is_freq(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_options.isFreq ? 1 : 0;
 	}
@@ -2916,7 +2927,7 @@ void action_function_generator_toggle_freq() {
 	g_options.isFreq = !g_options.isFreq;
 }
 
-void data_function_generator_is_ampl(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_is_ampl(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_options.isAmpl ? 1 : 0;
 	}
@@ -2926,13 +2937,13 @@ void action_function_generator_toggle_ampl() {
 	g_options.isAmpl = !g_options.isAmpl;
 }
 
-void data_function_generator_is_dc(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_is_dc(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem].waveform == WAVEFORM_DC;
 	}
 }
 
-void data_function_generator_any_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_any_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR) {
 			value = g_functionGeneratorPage.m_selectedResources.m_numResources > 0;
@@ -2942,7 +2953,7 @@ void data_function_generator_any_selected(DataOperationEnum operation, Cursor cu
 	}
 }
 
-void data_function_generator_is_any_channel_active(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_is_any_channel_active(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_functionGeneratorPage.m_selectedResources.m_numResources > 0;
 	}
@@ -2972,7 +2983,7 @@ void action_function_generator_show_previous_page() {
     }	
 }
 
-void data_function_generator_preview_overlay(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_preview_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     static Overlay overlay;
 
     if (operation == DATA_OPERATION_GET_OVERLAY_DATA) {
@@ -2991,13 +3002,14 @@ void data_function_generator_preview_overlay(DataOperationEnum operation, Cursor
     }
 }
 
-void data_function_generator_preview_period(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_preview_period(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_PHASE_SHIFT;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-			data_keypad_text(operation, cursor, value);
+			data_keypad_text(operation, widgetCursor, value);
 		} else {
 			value = MakeValue(g_previewPeriod, UNIT_SECOND);
 		}
@@ -3048,13 +3060,13 @@ static const float g_previewPeriodZoomLevels[] = {
 	10.0f, 20.0f, 50.0f, 100.0f
 };
 
-void data_function_generator_preview_period_zoom_in_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_preview_period_zoom_in_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_previewPeriod > g_previewPeriodZoomLevels[0];
 	}
 }
 
-void data_function_generator_preview_period_zoom_out_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_function_generator_preview_period_zoom_out_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		value = g_previewPeriod  < g_previewPeriodZoomLevels[sizeof(g_previewPeriodZoomLevels) / sizeof(float) - 1];
 	}

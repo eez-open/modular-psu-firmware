@@ -99,18 +99,18 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
-    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->data = get(widgetCursor, widget->data);
     
     auto currentState = (BarGraphWidgetState *)widgetCursor.currentState;
     auto previousState = (BarGraphWidgetState *)widgetCursor.previousState;
 
-    currentState->color = getColor(widgetCursor.cursor, widget->data, style);
-    currentState->backgroundColor = getBackgroundColor(widgetCursor.cursor, widget->data, style);
-    currentState->activeColor = getActiveColor(widgetCursor.cursor, widget->data, style);
-    currentState->activeBackgroundColor = getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
+    currentState->color = getColor(widgetCursor, widget->data, style);
+    currentState->backgroundColor = getBackgroundColor(widgetCursor, widget->data, style);
+    currentState->activeColor = getActiveColor(widgetCursor, widget->data, style);
+    currentState->activeBackgroundColor = getActiveBackgroundColor(widgetCursor, widget->data, style);
 
-    currentState->line1Data = get(widgetCursor.cursor, widget->line1Data);
-    currentState->line2Data = get(widgetCursor.cursor, widget->line2Data);
+    currentState->line1Data = get(widgetCursor, widget->line1Data);
+    currentState->line2Data = get(widgetCursor, widget->line2Data);
 
     uint32_t currentTime = millis();
     currentState->textData = widgetCursor.currentState->data;
@@ -118,7 +118,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     if (previousState) {
         refreshTextData = currentState->textData != previousState->textData;
         if (refreshTextData) {
-            uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
+            uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
             if (refreshRate != 0) {
                 refreshTextData = (currentTime - previousState->textDataRefreshLastTime) > refreshRate;
                 if (!refreshTextData) {
@@ -150,14 +150,14 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
         const int w = widget->w;
         const int h = widget->h;
 
-        float min = getMin(widgetCursor.cursor, widget->data).getFloat();
+        float min = getMin(widgetCursor, widget->data).getFloat();
 
         float max;
-		Value displayValueRange = getDisplayValueRange(widgetCursor.cursor, widget->data);
+		Value displayValueRange = getDisplayValueRange(widgetCursor, widget->data);
 		if (displayValueRange.getType() == VALUE_TYPE_FLOAT) {
             max = displayValueRange.getFloat();
         } else {
-            max = getMax(widgetCursor.cursor, widget->data).getFloat();
+            max = getMax(widgetCursor, widget->data).getFloat();
         }
 
         bool horizontal = 

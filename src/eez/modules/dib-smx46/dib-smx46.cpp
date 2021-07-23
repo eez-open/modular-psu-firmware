@@ -1542,7 +1542,7 @@ namespace gui {
 
 using namespace eez::dib_smx46;
 
-void data_dib_smx46_routes(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_routes(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = NUM_COLUMNS * NUM_ROWS;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -1550,7 +1550,8 @@ void data_dib_smx46_routes(DataOperationEnum operation, Cursor cursor, Value &va
     }
 }
 
-void data_dib_smx46_route_open(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_route_open(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / (NUM_COLUMNS * NUM_ROWS);
         int i = cursor % (NUM_COLUMNS * NUM_ROWS);
@@ -1565,7 +1566,7 @@ void data_dib_smx46_route_open(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
-void data_dib_smx46_x_labels(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_x_labels(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = NUM_COLUMNS;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -1573,7 +1574,8 @@ void data_dib_smx46_x_labels(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
-void data_dib_smx46_x_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_x_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_COLUMNS;
         int i = cursor % NUM_COLUMNS;
@@ -1586,7 +1588,7 @@ void data_dib_smx46_x_label(DataOperationEnum operation, Cursor cursor, Value &v
     }
 }
 
-void data_dib_smx46_y_labels(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_y_labels(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = NUM_ROWS;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -1594,7 +1596,8 @@ void data_dib_smx46_y_labels(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
-void data_dib_smx46_y_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_y_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_ROWS;
         int i = cursor % NUM_ROWS;
@@ -1607,7 +1610,7 @@ void data_dib_smx46_y_label(DataOperationEnum operation, Cursor cursor, Value &v
     }
 }
 
-void data_dib_smx46_aout_channels(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_aout_channels(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_COUNT) {
 		value = 2;
 	} else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -1615,7 +1618,8 @@ void data_dib_smx46_aout_channels(DataOperationEnum operation, Cursor cursor, Va
 	}
 }
 
-void data_dib_smx46_aout_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_aout_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	int slotIndex = cursor / 2;
 	int subchannelIndex = cursor % 2;
 	
@@ -1624,7 +1628,7 @@ void data_dib_smx46_aout_value(DataOperationEnum operation, Cursor cursor, Value
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-            data_keypad_text(operation, cursor, value);
+            data_keypad_text(operation, widgetCursor, value);
         } else {
             value = MakeValue(((Smx46Module *)g_slots[slotIndex])->aoutValue[subchannelIndex], UNIT_VOLT);
         }
@@ -1657,7 +1661,8 @@ void data_dib_smx46_aout_value(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
-void data_dib_smx46_aout_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_aout_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		int subchannelIndex;
@@ -1693,7 +1698,8 @@ void data_dib_smx46_aout_label(DataOperationEnum operation, Cursor cursor, Value
     }
 }
 
-void data_dib_smx46_aout_trigger_mode(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_aout_trigger_mode(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		int subchannelIndex;
@@ -1715,7 +1721,8 @@ void data_dib_smx46_aout_trigger_mode(DataOperationEnum operation, Cursor cursor
 	}
 }
 
-void data_dib_smx46_aout_trigger_is_initiated(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_aout_trigger_is_initiated(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = cursor / 2;
 		int subchannelIndex = cursor % 2;
@@ -1727,7 +1734,8 @@ void data_dib_smx46_aout_trigger_is_initiated(DataOperationEnum operation, Curso
 	}
 }
 
-void data_dib_smx46_aout_function_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_aout_function_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex;
 		int subchannelIndex;
@@ -1792,13 +1800,15 @@ void action_dib_smx46_aout_show_function() {
 	function_generator::selectWaveformParametersForChannel(g_aoutConfigurationPage.g_slotIndex, g_aoutConfigurationPage.g_subchannelIndex, 0);
 }
 
-void data_dib_smx46_relay_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_relay_on(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = ((Smx46Module *)g_slots[cursor])->relayOn ? 1 : 0;
     }
 }
 
-void data_dib_smx46_signal_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_signal_relay_cycles(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int i = cursor % (NUM_COLUMNS * NUM_ROWS);
         int x = i % NUM_COLUMNS;
@@ -1807,7 +1817,7 @@ void data_dib_smx46_signal_relay_cycles(DataOperationEnum operation, Cursor curs
     }
 }
 
-void data_dib_smx46_power_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_smx46_power_relay_cycles(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(((Smx46Module *)g_slots[hmi::g_selectedSlotIndex])->powerRelayCycles, VALUE_TYPE_UINT32);
     }

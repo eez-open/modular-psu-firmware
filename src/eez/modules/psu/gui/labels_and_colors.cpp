@@ -247,25 +247,26 @@ namespace gui {
 
 using namespace eez::psu::gui;
 
-void data_slot_labels_and_colors_view(int slotIndex, DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_slot_labels_and_colors_view(int slotIndex, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_slots[slotIndex]->getLabelsAndColorsPageId();
     }
 }
 
-void data_slot1_labels_and_colors_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_labels_and_colors_view(0, operation, cursor, value);
+void data_slot1_labels_and_colors_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    data_slot_labels_and_colors_view(0, operation, widgetCursor, value);
 }
 
-void data_slot2_labels_and_colors_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_labels_and_colors_view(1, operation, cursor, value);
+void data_slot2_labels_and_colors_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    data_slot_labels_and_colors_view(1, operation, widgetCursor, value);
 }
 
-void data_slot3_labels_and_colors_view(DataOperationEnum operation, Cursor cursor, Value &value) {
-    data_slot_labels_and_colors_view(2, operation, cursor, value);
+void data_slot3_labels_and_colors_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    data_slot_labels_and_colors_view(2, operation, widgetCursor, value);
 }
 
-void data_colors(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_colors(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_COUNT) {
         value = 24;
     } else if (operation == DATA_OPERATION_SELECT) {
@@ -276,26 +277,28 @@ void data_colors(DataOperationEnum operation, Cursor cursor, Value &value) {
     } 
 }
 
-void data_color_is_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_color_is_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = (eez::mcu::display::transformColorHook(LabelsAndColorsPage::g_colorDataId) - COLOR_ID_CHANNEL1) == cursor;
     } 
 }
 
-void data_labels_and_colors_page_slot_title(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_labels_and_colors_page_slot_title(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = LabelsAndColorsPage::getSlotLabelOrDefault(hmi::g_selectedSlotIndex);
     }
 }
 
-void data_labels_and_colors_page_channel_title(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_labels_and_colors_page_channel_title(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         auto &channel = psu::Channel::get(cursor);
         value = LabelsAndColorsPage::getChannelLabelOrDefault(channel.slotIndex, channel.subchannelIndex);
     }
 }
 
-void data_labels_and_colors_is_color_modified(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_labels_and_colors_is_color_modified(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         if (g_channel) {
             value = LabelsAndColorsPage::isChannelColorModified(g_channel->slotIndex, g_channel->subchannelIndex);

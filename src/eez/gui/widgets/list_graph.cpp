@@ -56,8 +56,8 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 	const Style* cursorStyle = getStyle(widget->cursorStyle);
 
     widgetCursor.currentState->size = sizeof(ListGraphWidgetState);
-    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
-    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData = get(widgetCursor.cursor, widget->cursorData);
+    widgetCursor.currentState->data = get(widgetCursor, widget->data);
+    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData = get(widgetCursor, widget->cursorData);
 
     int iPrevCursor = -1;
     if (widgetCursor.previousState) {
@@ -77,29 +77,29 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
         display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1,
                             widgetCursor.y + (int)widget->h - 1);
 
-        int dwellListLength = getFloatListLength(widget->dwellData);
+        int dwellListLength = getFloatListLength(widgetCursor, widget->dwellData);
         if (dwellListLength > 0) {
-            float *dwellList = getFloatList(widget->dwellData);
+            float *dwellList = getFloatList(widgetCursor, widget->dwellData);
 
             const Style *styles[2] = { y1Style, y2Style };
 
-            int listLength[2] = { getFloatListLength(widget->y1Data),
-                                  getFloatListLength(widget->y2Data) };
+            int listLength[2] = { getFloatListLength(widgetCursor, widget->y1Data),
+                                  getFloatListLength(widgetCursor, widget->y2Data) };
 
-            float *list[2] = { getFloatList(widget->y1Data),
-                               getFloatList(widget->y2Data) };
+            float *list[2] = { getFloatList(widgetCursor, widget->y1Data),
+                               getFloatList(widgetCursor, widget->y2Data) };
 
             float min[2] = {
-                getMin(widgetCursor.cursor, widget->y1Data).getFloat(),
-                getMin(widgetCursor.cursor, widget->y2Data).getFloat()
+                getMin(widgetCursor, widget->y1Data).getFloat(),
+                getMin(widgetCursor, widget->y2Data).getFloat()
             };
 
             float max[2] = {
-                getMax(widgetCursor.cursor, widget->y1Data).getFloat(),
-                getMax(widgetCursor.cursor, widget->y2Data).getFloat()
+                getMax(widgetCursor, widget->y1Data).getFloat(),
+                getMax(widgetCursor, widget->y2Data).getFloat()
             };
 
-            int maxListLength = getFloatListLength(widget->data);
+            int maxListLength = getFloatListLength(widgetCursor, widget->data);
 
             float dwellSum = 0;
             for (int i = 0; i < maxListLength; ++i) {
@@ -181,13 +181,13 @@ OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Ev
             return;
         }
 
-        int dwellListLength = getFloatListLength(widget->dwellData);
+        int dwellListLength = getFloatListLength(widgetCursor, widget->dwellData);
         if (dwellListLength > 0) {
             int iCursor = -1;
 
-            float *dwellList = getFloatList(widget->dwellData);
+            float *dwellList = getFloatList(widgetCursor, widget->dwellData);
 
-            int maxListLength = getFloatListLength(widget->data);
+            int maxListLength = getFloatListLength(widgetCursor, widget->data);
 
             float dwellSum = 0;
             for (int i = 0; i < maxListLength; ++i) {
@@ -217,14 +217,14 @@ OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Ev
 
                 if (touchEvent.x >= x1 && touchEvent.x < x2) {
                     int iCurrentCursor =
-                        get(widgetCursor.cursor, widget->cursorData).getInt();
+                        get(widgetCursor, widget->cursorData).getInt();
                     iCursor = i * 3 + iCurrentCursor % 3;
                     break;
                 }
             }
 
             if (iCursor >= 0) {
-                set(widgetCursor.cursor, widget->cursorData, Value(iCursor));
+                set(widgetCursor, widget->cursorData, Value(iCursor));
                 if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                     sound::playClick();
                 }

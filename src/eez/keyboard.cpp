@@ -282,7 +282,7 @@ using namespace mouse;
 
 namespace gui {
 
-void data_usb_keyboard_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_usb_keyboard_state(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         static const size_t KEYBOARD_INFO_STRING_SIZE = 256;
         static char g_keyboardInfoStr[2][KEYBOARD_INFO_STRING_SIZE] = { 0 };

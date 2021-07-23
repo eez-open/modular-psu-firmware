@@ -50,7 +50,7 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
     const char *text = widget->text.ptr(widgetCursor.assets);
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
-    widgetCursor.currentState->data = !(text && text[0]) && widget->data ? get(widgetCursor.cursor, widget->data) : 0;
+    widgetCursor.currentState->data = !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0;
 
     bool refresh =
         !widgetCursor.previousState ||

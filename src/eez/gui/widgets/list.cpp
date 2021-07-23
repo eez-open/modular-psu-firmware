@@ -47,7 +47,7 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
     auto listWidget = (const ListWidget *)widgetCursor.widget;
 
-    int startPosition = ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    int startPosition = ytDataGetPosition(widgetCursor, widgetCursor.widget->data);
 
     // refresh when startPosition changes
     if (widgetCursor.currentState) {
@@ -75,12 +75,12 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
     auto savedCursor = widgetCursor.cursor;
 
     int offset = 0;
-    int count = eez::gui::count(parentWidget->data);
+    int count = eez::gui::count(widgetCursor, parentWidget->data);
 
     Value oldValue;
 
     for (int index = startPosition; index < count; ++index) {
-        select(widgetCursor.cursor, parentWidget->data, index, oldValue);
+        select(widgetCursor, parentWidget->data, index, oldValue);
 
         if (listWidget->listType == LIST_TYPE_VERTICAL) {
             if (offset < parentWidget->h) {
@@ -124,7 +124,7 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
     }
 
     if (count > 0) {
-        deselect(widgetCursor.cursor, widgetCursor.widget->data, oldValue);
+        deselect(widgetCursor, widgetCursor.widget->data, oldValue);
     }
 
 	widgetCursor.currentState = savedCurrentState;

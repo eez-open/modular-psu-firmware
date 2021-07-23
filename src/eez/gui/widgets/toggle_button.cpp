@@ -37,7 +37,7 @@ DrawFunctionType TOGGLE_BUTTON_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.enabled =
-        get(widgetCursor.cursor, widget->data).getInt() ? 1 : 0;
+        get(widgetCursor, widget->data).getInt() ? 1 : 0;
 
     bool refresh =
         !widgetCursor.previousState ||

@@ -944,13 +944,14 @@ namespace gui {
 using namespace eez::psu;
 using namespace eez::psu::gui;
 
-void data_channel_calibration_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_status(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = calibration::g_viewer.isCalibrationExists();
     }
 }
 
-void data_channel_calibration_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_state(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : -1);
         if (iChannel != -1) {
@@ -963,7 +964,8 @@ void data_channel_calibration_state(DataOperationEnum operation, Cursor cursor, 
     }
 }
 
-void data_channel_calibration_date(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_date(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         uint32_t calibrationDate;
 
@@ -979,7 +981,8 @@ void data_channel_calibration_date(DataOperationEnum operation, Cursor cursor, V
     }
 }
 
-void data_channel_calibration_remark(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_remark(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         const char *calibrationRemark = nullptr;
 
@@ -997,13 +1000,13 @@ void data_channel_calibration_remark(DataOperationEnum operation, Cursor cursor,
     }
 }
 
-void data_channel_calibration_is_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_is_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = calibration::g_editor.isEnabled();
     }
 }
 
-void data_channel_calibration_value_type_is_selectable(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_value_type_is_selectable(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
@@ -1015,7 +1018,7 @@ void data_channel_calibration_value_type_is_selectable(DataOperationEnum operati
     }
 }
 
-void data_channel_calibration_value_type(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_value_type(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
@@ -1043,27 +1046,28 @@ void data_channel_calibration_value_type(DataOperationEnum operation, Cursor cur
     }
 }
 
-void data_channel_calibration_is_power_channel(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_is_power_channel(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = calibration::g_editor.isPowerChannel();
     }
 }
 
-void data_channel_calibration_value_is_voltage(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_value_is_voltage(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         value = page->getCalibrationValueType() == CALIBRATION_VALUE_U;
     }
 }
 
-void data_calibration_point_can_edit_set_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_calibration_point_can_edit_set_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         value = page->canEditSetValue();
     }
 }
 
-void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_calibration_point_set_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
     if (editPage) {
         int slotIndex;
@@ -1076,7 +1080,7 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-                data_keypad_text(operation, cursor, value);
+                data_keypad_text(operation, widgetCursor, value);
             } else {
                 if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
                     value = MakeValue(editPage->getDacValue(), UNIT_VOLT);
@@ -1128,7 +1132,7 @@ void data_calibration_point_set_value(DataOperationEnum operation, Cursor cursor
     }
 }
 
-void data_channel_is_calibration_value_source(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_is_calibration_value_source(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
@@ -1140,7 +1144,8 @@ void data_channel_is_calibration_value_source(DataOperationEnum operation, Curso
     }
 }
 
-void data_calibration_point_measured_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_calibration_point_measured_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
     if (editPage) {
         int slotIndex;
@@ -1153,7 +1158,7 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
-                data_keypad_text(operation, cursor, value);
+                data_keypad_text(operation, widgetCursor, value);
             } else {
                 value = MakeValue(editPage->getMeasuredValue(), editPage->getCalibrationValueType() == CALIBRATION_VALUE_U ? UNIT_VOLT : UNIT_AMPER);
             }
@@ -1205,7 +1210,7 @@ void data_calibration_point_measured_value(DataOperationEnum operation, Cursor c
     }
 }
 
-void data_calibration_point_live_measured_value(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_calibration_point_live_measured_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         float fValue = editPage->getLiveMeasuredValue();
@@ -1217,7 +1222,7 @@ void data_calibration_point_live_measured_value(DataOperationEnum operation, Cur
     }
 }
 
-void data_channel_calibration_point_can_move_to_previous(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_point_can_move_to_previous(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
@@ -1229,7 +1234,7 @@ void data_channel_calibration_point_can_move_to_previous(DataOperationEnum opera
     }
 }
 
-void data_channel_calibration_point_can_move_to_next(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_point_can_move_to_next(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
@@ -1241,14 +1246,14 @@ void data_channel_calibration_point_can_move_to_next(DataOperationEnum operation
     }
 }
 
-void data_channel_calibration_point_can_save(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_point_can_save(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         value = page->canSavePoint();
     }
 }
 
-void data_channel_calibration_point_can_delete(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_point_can_delete(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         value = page->canDeletePoint();
@@ -1263,7 +1268,7 @@ Value MakeCalibrationPointInfoValue(int8_t currentPointIndex, int8_t numPoints) 
     return value;
 }
 
-void data_channel_calibration_point_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_point_info(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
@@ -1275,7 +1280,7 @@ void data_channel_calibration_point_info(DataOperationEnum operation, Cursor cur
     }
 }
 
-void data_channel_calibration_chart(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_chart(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
@@ -1294,7 +1299,7 @@ void data_channel_calibration_chart(DataOperationEnum operation, Cursor cursor, 
     }
 }
 
-void data_channel_calibration_chart_zoom(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_channel_calibration_chart_zoom(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {

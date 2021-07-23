@@ -209,11 +209,13 @@ struct PropertyValue {
 	uint16_t evalInstructions[1];
 };
 
+struct Connection {
+	uint16_t targetComponentIndex;
+	uint8_t targetInputIndex;
+};
+
 struct ComponentOutput {
-	struct {
-		uint16_t targetComponentIndex;
-		uint8_t targetInputIndex;
-	} connections[1];
+	ListOfAssetsPtr<Connection> connections;
 };
 
 struct Component {
@@ -259,6 +261,7 @@ struct Assets {
 
 void loadMainAssets();
 bool loadExternalAssets(const char *filePath, int *err);
+void unloadExternalAssets();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -277,8 +280,8 @@ const uint16_t *getColors();
 
 int getExternalAssetsFirstPageId();
 
-const char *getActionName(const WidgetCursor& widgetCursor, int16_t actionId);
-int16_t getDataIdFromName(const WidgetCursor& widgetCursor, const char *name);
+const char *getActionName(const WidgetCursor &widgetCursor, int16_t actionId);
+int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name);
 
 ////////////////////////////////////////////////////////////////////////////////
 

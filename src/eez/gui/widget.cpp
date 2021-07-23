@@ -268,7 +268,7 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
                 // if found widget is AppView, make sure we set right AppContext
                 if (widget->type == WIDGET_TYPE_APP_VIEW) {
                     Value appContextValue;
-                    DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
+                    DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
                     g_foundWidget.appContext = appContextValue.getAppContext();
                 }
             }

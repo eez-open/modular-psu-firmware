@@ -32,12 +32,12 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const ButtonWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
-    widgetCursor.currentState->flags.enabled = get(widgetCursor.cursor, widget->enabled).getInt() ? 1 : 0;
+    widgetCursor.currentState->flags.enabled = get(widgetCursor, widget->enabled).getInt() ? 1 : 0;
 
     const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : widget->disabledStyle);
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style));
-    widgetCursor.currentState->data = widget->data ? get(widgetCursor.cursor, widget->data) : 0;
+    widgetCursor.currentState->data = widget->data ? get(widgetCursor, widget->data) : 0;
 
     bool refresh =
         !widgetCursor.previousState ||

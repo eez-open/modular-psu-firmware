@@ -155,7 +155,7 @@ void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, floa
 float getDefaultAnimationDurationHook();
 
 void executeExternalActionHook(const WidgetCursor &widgetCursor, int16_t actionId);
-void externalDataHook(int16_t id, DataOperationEnum operation, Cursor cursor, Value &value);
+void externalDataHook(int16_t id, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 
 OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor);
 
@@ -182,4 +182,4 @@ extern const char *g_discardMessage;
 #include <eez/gui/font.h>
 #include <eez/gui/draw.h>
 
-#define DATA_OPERATION_FUNCTION(id, operation, cursor, value) (id >= 0 ? g_dataOperationsFunctions[id](operation, cursor, value) : externalDataHook(id, operation, cursor, value))
+#define DATA_OPERATION_FUNCTION(id, operation, widgetCursor, value) (id >= 0 ? g_dataOperationsFunctions[id](operation, widgetCursor, value) : externalDataHook(id, operation, widgetCursor, value))

@@ -1333,7 +1333,7 @@ namespace gui {
 
 using namespace dib_mux14d;
 
-void data_dib_mux14d_p1_relays(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p1_relays(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = NUM_RELAYS;
     } else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -1341,14 +1341,16 @@ void data_dib_mux14d_p1_relays(DataOperationEnum operation, Cursor cursor, Value
     } 
 }
 
-void data_dib_mux14d_p1_relay_is_first(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p1_relay_is_first(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int subchannelIndex = cursor % NUM_RELAYS;
 		value = subchannelIndex == 0;
 	}
 }
 
-void data_dib_mux14d_p1_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p1_relay_is_on(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_RELAYS;
         int subchannelIndex = cursor % NUM_RELAYS;
@@ -1356,7 +1358,8 @@ void data_dib_mux14d_p1_relay_is_on(DataOperationEnum operation, Cursor cursor, 
     }
 }
 
-void data_dib_mux14d_p1_relay_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p1_relay_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         int slotIndex = cursor / NUM_RELAYS;
         int subchannelIndex = 11 + cursor % NUM_RELAYS - 1;
@@ -1373,7 +1376,8 @@ void data_dib_mux14d_p1_relay_label(DataOperationEnum operation, Cursor cursor, 
     }
 }
 
-void data_dib_mux14d_p1_relay_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p1_relay_label_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         static const char *g_relayLabelLabels[NUM_RELAYS] = {
             "Relay #1 label:",
@@ -1395,7 +1399,8 @@ void action_dib_mux14d_change_p1_relay_label() {
     LabelsAndColorsPage::editChannelLabel(slotIndex, subchannelIndex);
 }
 
-void data_dib_mux14d_p1_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p1_relay_cycles(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = cursor / NUM_RELAYS;
 		int subchannelIndex = cursor % NUM_RELAYS;
@@ -1410,7 +1415,7 @@ void action_dib_mux14d_toggle_p1_relay() {
 	((Mux14DModule *)g_slots[slotIndex])->toggleP1Relay(subchannelIndex);;
 }
 
-void data_dib_mux14d_p2_relays(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p2_relays(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_COUNT) {
 		value = NUM_RELAYS;
 	} else if (operation == DATA_OPERATION_GET_CURSOR_VALUE) {
@@ -1418,14 +1423,16 @@ void data_dib_mux14d_p2_relays(DataOperationEnum operation, Cursor cursor, Value
 	}
 }
 
-void data_dib_mux14d_p2_relay_is_first(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p2_relay_is_first(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int subchannelIndex = cursor % NUM_RELAYS;
 		value = subchannelIndex == 0;
 	}
 }
 
-void data_dib_mux14d_p2_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p2_relay_is_on(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = cursor / NUM_RELAYS;
 		int subchannelIndex = cursor % NUM_RELAYS;
@@ -1433,7 +1440,8 @@ void data_dib_mux14d_p2_relay_is_on(DataOperationEnum operation, Cursor cursor, 
 	}
 }
 
-void data_dib_mux14d_p2_relay_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p2_relay_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = cursor / NUM_RELAYS;
 		int subchannelIndex = 21 + cursor % NUM_RELAYS - 1;
@@ -1450,7 +1458,8 @@ void data_dib_mux14d_p2_relay_label(DataOperationEnum operation, Cursor cursor, 
 	}
 }
 
-void data_dib_mux14d_p2_relay_label_label(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p2_relay_label_label(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         static const char *g_relayLabelLabels[NUM_RELAYS] = {
             "Relay #1 label:",
@@ -1472,7 +1481,8 @@ void action_dib_mux14d_change_p2_relay_label() {
     LabelsAndColorsPage::editChannelLabel(slotIndex, subchannelIndex);
 }
 
-void data_dib_mux14d_p2_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_p2_relay_cycles(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = cursor / NUM_RELAYS;
 		int subchannelIndex = cursor % NUM_RELAYS;
@@ -1488,14 +1498,14 @@ void action_dib_mux14d_toggle_p2_relay() {
 	((Mux14DModule *)g_slots[slotIndex])->toggleP2Relay(subchannelIndex);
 }
 
-void data_dib_mux14d_adib1_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_adib1_relay_is_on(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = hmi::g_selectedSlotIndex;
 		value = ((Mux14DModule *)g_slots[slotIndex])->adib1RelayState ? 1 : 0;
 	}
 }
 
-void data_dib_mux14d_adib1_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_adib1_relay_cycles(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = hmi::g_selectedSlotIndex;
 		value = Value(((Mux14DModule *)g_slots[slotIndex])->adib1RelayCycles, VALUE_TYPE_UINT32);
@@ -1507,14 +1517,14 @@ void action_dib_mux14d_toggle_adib1_relay() {
 	((Mux14DModule *)g_slots[slotIndex])->adib1RelayState = !((Mux14DModule *)g_slots[slotIndex])->adib1RelayState;
 }
 
-void data_dib_mux14d_adib2_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_adib2_relay_is_on(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = hmi::g_selectedSlotIndex;
 		value = ((Mux14DModule *)g_slots[slotIndex])->adib2RelayState ? 1 : 0;
 	}
 }
 
-void data_dib_mux14d_adib2_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_adib2_relay_cycles(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = hmi::g_selectedSlotIndex;
 		value = Value(((Mux14DModule *)g_slots[slotIndex])->adib2RelayCycles, VALUE_TYPE_UINT32);
@@ -1526,14 +1536,14 @@ void action_dib_mux14d_toggle_adib2_relay() {
 	((Mux14DModule *)g_slots[slotIndex])->adib2RelayState = !((Mux14DModule *)g_slots[slotIndex])->adib2RelayState;
 }
 
-void data_dib_mux14d_ext_relay_is_on(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_ext_relay_is_on(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = hmi::g_selectedSlotIndex;
 		value = ((Mux14DModule *)g_slots[slotIndex])->extRelayState ? 1 : 0;
 	}
 }
 
-void data_dib_mux14d_ext_relay_cycles(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_ext_relay_cycles(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = hmi::g_selectedSlotIndex;
 		value = Value(((Mux14DModule *)g_slots[slotIndex])->extRelayCycles, VALUE_TYPE_UINT32);
@@ -1550,7 +1560,7 @@ void action_dib_mux14d_toggle_ext_relay() {
 	}
 }
 
-void data_dib_mux14d_cj_temp(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_cj_temp(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = hmi::g_selectedSlotIndex;
 		value = MakeValue(((Mux14DModule *)g_slots[slotIndex])->cjTemp, UNIT_CELSIUS);
@@ -1570,7 +1580,7 @@ void action_dib_mux14d_show_relay_cycles() {
     pushPage(PAGE_ID_DIB_MUX14D_RELAY_CYCLES);
 }
 
-void data_dib_mux14d_multiple_connections(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_mux14d_multiple_connections(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
 		int slotIndex = hmi::g_selectedSlotIndex;
 		value = ((Mux14DModule *)g_slots[slotIndex])->multipleConnections;

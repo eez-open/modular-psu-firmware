@@ -22,9 +22,11 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#include <eez/alloc.h>
 #include <eez/system.h>
 #include <eez/memory.h>
 #include <eez/debug.h>
+#include <eez/flow.h>
 
 #include <eez/libs/lz4/lz4.h>
 
@@ -40,7 +42,7 @@ namespace gui {
 
 bool g_isMainAssetsLoaded;
 Assets *g_mainAssets = (Assets *)DECOMPRESSED_ASSETS_START_ADDRESS;
-Assets *g_externalAssets = (Assets *)EXTERNAL_ASSETS_BUFFER;
+Assets *g_externalAssets;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -103,12 +105,14 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 
 void loadMainAssets() {
 	g_mainAssets->external = false;
-	auto decompressResult = decompressAssetsData(assets, sizeof(assets), g_mainAssets, MAX_DECOMPRESSED_ASSETS_SIZE, nullptr);
-	assert(decompressResult);
+	auto decompressedSize = decompressAssetsData(assets, sizeof(assets), g_mainAssets, MAX_DECOMPRESSED_ASSETS_SIZE, nullptr);
+	assert(decompressedSize);
 	g_isMainAssetsLoaded = true;
 }
 
 bool loadExternalAssets(const char *filePath, int *err) {
+	unloadExternalAssets();
+
     eez::File file;
     if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
         if (err) {
@@ -126,27 +130,69 @@ bool loadExternalAssets(const char *filePath, int *err) {
         return false;
     }
 
-    if (fileSize > EXTERNAL_ASSETS_BUFFER_SIZE) {
+	uint8_t *fileData = (uint8_t *)alloc(((fileSize + 3) / 4) * 4);
+    if (!fileData) {
         if (err) {
             *err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
         }
         return false;
     }
 
-    uint8_t *fileData = EXTERNAL_ASSETS_BUFFER + EXTERNAL_ASSETS_BUFFER_SIZE - ((fileSize + 3) / 4) * 4;
     uint32_t bytesRead = file.read(fileData, fileSize);
     file.close();
 
     if (bytesRead != fileSize) {
+		free(fileData);
         if (err) {
             *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         }
         return false;
     }
 
+	auto header = (Header *)fileData;
+
+	if (header->tag != HEADER_TAG) {
+		free(fileData);
+		if (err) {
+			*err = SCPI_ERROR_INVALID_BLOCK_DATA;
+		}
+		return false;
+	}
+
+	auto decompressedDataOffset = offsetof(Assets, pages);
+
+	size_t externalAssetsSize = decompressedDataOffset + header->decompressedSize;
+	g_externalAssets = (Assets *)alloc(externalAssetsSize);
+	if (!g_externalAssets) {
+		free(g_externalAssets);
+		g_externalAssets = nullptr;
+
+		if (err) {
+			*err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
+		}
+
+		return false;
+	}
+
 	g_externalAssets->external = true;
 
-	return decompressAssetsData(fileData, fileSize, g_externalAssets, fileData - EXTERNAL_ASSETS_BUFFER, err);
+	auto result = decompressAssetsData(fileData, fileSize, g_externalAssets, externalAssetsSize, err);
+
+	free(fileData);
+
+	if (!result) {
+		free(g_externalAssets);
+		g_externalAssets = nullptr;
+	}
+
+	return true;
+}
+
+void unloadExternalAssets() {
+	if (g_externalAssets) {
+		free(g_externalAssets);
+		g_externalAssets = nullptr;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -163,6 +209,7 @@ const PageAsset* getPageAsset(int pageId) {
 const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor) {
 	if (pageId < 0) {
 		widgetCursor.assets = g_externalAssets;
+		widgetCursor.pageState = flow::getFlowState(pageId);
 	} else {
 	    widgetCursor.assets = g_mainAssets;
     }
@@ -220,24 +267,25 @@ int getExternalAssetsFirstPageId() {
 	return -1;
 }
 
-const char *getActionName(const WidgetCursor& widgetCursor, int16_t actionId) {
-	// if (actionId == 0) {
-	// 	return nullptr;
-	// }
-	// if (actionId < 0) {
-	// 	actionId = -actionId;
-	// }
-	// actionId--;
-	// return g_externalAssets->actionNames.item(g_externalAssets, actionId);
-	return nullptr;
+const char *getActionName(const WidgetCursor &widgetCursor, int16_t actionId) {
+	if (actionId == 0) {
+		return nullptr;
+	}
+
+	if (actionId < 0) {
+		actionId = -actionId;
+	}
+	actionId--;
+
+	return g_externalAssets->actionNames.item(g_externalAssets, actionId);
 }
 
-int16_t getDataIdFromName(const WidgetCursor& widgetCursor, const char *name) {
-	// for (uint32_t i = 0; i < g_externalAssets->variableNames.count; i++) {
-	// 	if (strcmp(g_externalAssets->variableNames.item(g_externalAssets, i), name) == 0) {
-	// 		return -((int16_t)i + 1);
-	// 	}
-	// }
+int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name) {
+	for (uint32_t i = 0; i < g_externalAssets->variableNames.count; i++) {
+		if (strcmp(g_externalAssets->variableNames.item(g_externalAssets, i), name) == 0) {
+			return -((int16_t)i + 1);
+		}
+	}
 	return 0;
 }
 

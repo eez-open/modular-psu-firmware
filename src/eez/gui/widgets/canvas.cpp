@@ -32,13 +32,13 @@ DrawFunctionType CANVAS_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(WidgetState);
 
-    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->data = get(widgetCursor, widget->data);
 
     bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != widgetCursor.currentState->data;
 
     if (refresh) {
         Value value;
-        DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION, widgetCursor.cursor, value);
+        DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION, widgetCursor, value);
         auto drawFunction = (void (*)(const WidgetCursor &widgetCursor))value.getVoidPointer();
         drawFunction(widgetCursor);
     }

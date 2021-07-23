@@ -57,7 +57,7 @@ int FrontPanelAppContext::getLongTouchActionHook(const WidgetCursor &widgetCurso
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void data_main_app_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_main_app_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(&psu::gui::g_psuAppContext);
     }
@@ -97,19 +97,22 @@ int getSlotView(int slotIndex, Cursor cursor) {
     return PAGE_ID_FRONT_PANEL_EMPTY_SLOT;
 }
 
-void data_front_panel_slot1_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_front_panel_slot1_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = getSlotView(0, cursor);
     }
 }
 
-void data_front_panel_slot2_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_front_panel_slot2_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = getSlotView(1, cursor);
     }
 }
 
-void data_front_panel_slot3_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_front_panel_slot3_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = getSlotView(2, cursor);
     }

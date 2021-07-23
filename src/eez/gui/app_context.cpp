@@ -56,7 +56,7 @@ bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
     if (widget->action) {
         if (widget->type == WIDGET_TYPE_BUTTON) {
             auto buttonWidget = (const ButtonWidget *)widget;
-            if (!get(widgetCursor.cursor, buttonWidget->enabled).getInt()) {
+            if (!get(widgetCursor, buttonWidget->enabled).getInt()) {
                 return false;
             }
         }
@@ -310,7 +310,6 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
 		m_updatePageIndex = i;
 
-        widgetCursor.pageId = m_pageNavigationStack[i].pageId;
 		widgetCursor.cursor = -1;
 
         int x;

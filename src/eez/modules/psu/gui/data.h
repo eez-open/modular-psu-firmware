@@ -67,7 +67,7 @@ void eventValueToText(const Value &value, char *text, int count);
 bool compareEventValues(const Value &a, const Value &b);
 Value MakeEventMessageValue(int16_t eventId, int channelIndex);
 
-void data_channel_index(psu::Channel &channel, DataOperationEnum operation, Cursor cursor, Value &value);
+void data_channel_index(psu::Channel &channel, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 
 } // namespace gui
 } // namespace eez

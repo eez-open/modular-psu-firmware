@@ -625,7 +625,7 @@ scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
 	WidgetCursor widgetCursor;
 	widgetCursor.assets = g_externalAssets;
 	widgetCursor.appContext = &g_psuAppContext;
-	widgetCursor.pageId = getActivePageId();
+	getPageAsset(getActivePageId(), widgetCursor);
     
 	int16_t dataId = getDataIdFromName(widgetCursor, dataItemName);
     

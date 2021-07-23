@@ -94,6 +94,7 @@ set(header_files)
 
 set(src_eez
     src/eez/action_impl.cpp
+    src/eez/alloc.cpp
     src/eez/firmware.cpp
     src/eez/debug.cpp
     src/eez/dlog_file.cpp
@@ -119,6 +120,7 @@ set(src_eez
 )
 list (APPEND src_files ${src_eez})
 set(header_eez
+    src/eez/alloc.h
     src/eez/firmware.h
     src/eez/debug.h
     src/eez/dlog_file.h

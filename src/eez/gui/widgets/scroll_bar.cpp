@@ -65,23 +65,23 @@ static int g_dragStartX;
 static int g_dragStartPosition;
 
 int getSize(const WidgetCursor &widgetCursor) {
-    return ytDataGetSize(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    return ytDataGetSize(widgetCursor, widgetCursor.widget->data);
 }
 
 int getPosition(const WidgetCursor &widgetCursor) {
-    return ytDataGetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    return ytDataGetPosition(widgetCursor, widgetCursor.widget->data);
 }
 
 int getPositionIncrement(const WidgetCursor &widgetCursor) {
-    return ytDataGetPositionIncrement(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    return ytDataGetPositionIncrement(widgetCursor, widgetCursor.widget->data);
 }
 
 int getPageSize(const WidgetCursor &widgetCursor) {
-    return ytDataGetPageSize(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data);
+    return ytDataGetPageSize(widgetCursor, widgetCursor.widget->data);
 }
 
 void setPosition(const WidgetCursor &widgetCursor, int position) {
-    ytDataSetPosition(((WidgetCursor &)widgetCursor).cursor, widgetCursor.widget->data, position < 0 ? 0 : position);
+    ytDataSetPosition(widgetCursor, widgetCursor.widget->data, position < 0 ? 0 : position);
 }
 
 void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTrack, int minThumbWidth, int &xThumb, int &widthThumb) {

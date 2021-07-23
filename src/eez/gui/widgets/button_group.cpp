@@ -45,7 +45,9 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
         int h = widget->h;
         for (Cursor i = 0; i < count; i++) {
             char text[32];
-            getLabel(i, widget->data, text, 32);
+			WidgetCursor widgetCursor;
+			widgetCursor = i;
+            getLabel(widgetCursor, widget->data, text, 32);
             drawText(text, -1, x, y, w, h, i == selectedButton ? selectedStyle : style, false, false, false, nullptr, nullptr, nullptr, nullptr);
             x += w;
         }
@@ -67,14 +69,17 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
         int labelHeight = MIN(w, h);
         int yOffset = (h - labelHeight) / 2;
 
-        for (Cursor i = 0; i < count; i++) {
+		WidgetCursor widgetCursor;
+		
+		for (Cursor i = 0; i < count; i++) {
             if (yOffset > 0) {
                 display::setColor(style->background_color);
                 display::fillRect(x, y, x + widget->w - 1, y + yOffset - 1);
             }
 
             char text[32];
-            getLabel(i, widget->data, text, 32);
+			widgetCursor = i;
+            getLabel(widgetCursor, widget->data, text, 32);
             drawText(text, -1, x, y + yOffset, w, labelHeight, i == selectedButton ? selectedStyle: style, false, false, false, nullptr, nullptr, nullptr, nullptr);
 
             int b = y + yOffset + labelHeight;
@@ -98,7 +103,7 @@ DrawFunctionType BUTTON_GROUP_draw = [] (const WidgetCursor &widgetCursor) {
     auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
-    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->data = get(widgetCursor, widget->data);
 
     bool refresh =
         !widgetCursor.previousState ||
@@ -109,7 +114,7 @@ DrawFunctionType BUTTON_GROUP_draw = [] (const WidgetCursor &widgetCursor) {
         const Style* style = getStyle(widget->style);
         const Style* selectedStyle = getStyle(widget->selectedStyle);
 
-        drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, widgetCursor.currentState->data.getInt(), count(widget->data));
+        drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, widgetCursor.currentState->data.getInt(), count(widgetCursor, widget->data));
     }
 };
 
@@ -117,7 +122,7 @@ OnTouchFunctionType BUTTON_GROUP_onTouch = [](const WidgetCursor &widgetCursor, 
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         const Widget *widget = widgetCursor.widget;
 
-        int count_ = count(widget->data);
+        int count_ = count(widgetCursor, widget->data);
 
         int selectedButton;
         if (widget->w > widget->h) {
@@ -132,7 +137,7 @@ OnTouchFunctionType BUTTON_GROUP_onTouch = [](const WidgetCursor &widgetCursor, 
         }
 
         if (selectedButton >= 0 && selectedButton < count_) {
-            set(widgetCursor.cursor, widget->data, selectedButton);
+            set(widgetCursor, widget->data, selectedButton);
             sound::playClick();
         }
     }

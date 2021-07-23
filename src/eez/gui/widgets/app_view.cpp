@@ -27,7 +27,7 @@ namespace gui {
 
 EnumFunctionType APP_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     Value appContextValue;
-    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
+    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
     WidgetCursor savedWidgetCursor = widgetCursor;
@@ -50,7 +50,7 @@ DrawFunctionType APP_VIEW_draw = [](const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->size = sizeof(WidgetState);
 
     Value appContextValue;
-    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor.cursor, appContextValue);
+    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
     bool refresh = !widgetCursor.previousState;

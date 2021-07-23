@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <eez/alloc.h>
 #include <eez/flow.h>
 #include <eez/system.h>
 #include <eez/flow_defs_v3.h>
@@ -34,17 +35,23 @@ static Assets *g_assets;
 static const int UNDEFINED_VALUE_INDEX = 0;
 static const int NULL_VALUE_INDEX = 1;
 
+struct FlowState {
+	unsigned flowIndex;
+	Value values[1];
+};
+FlowState *g_mainPageFlowState;
+
 static const unsigned QUEUE_SIZE = 100;
 static struct {
-    unsigned flowIndex;
+    FlowState *flowState;
 	unsigned componentIndex;
 } g_queue[QUEUE_SIZE];
 static unsigned g_queueHead;
 static unsigned g_queueTail;
 static bool g_queueIsFull = false;
 
-void addToQueue(unsigned flowIndex, unsigned componentIndex) {
-	g_queue[g_queueTail].flowIndex = flowIndex;
+void addToQueue(FlowState *flowState, unsigned componentIndex) {
+	g_queue[g_queueTail].flowState = flowState;
 	g_queue[g_queueTail].componentIndex = componentIndex;
 
 	g_queueTail = (g_queueTail + 1) % QUEUE_SIZE;
@@ -54,12 +61,12 @@ void addToQueue(unsigned flowIndex, unsigned componentIndex) {
 	}
 }
 
-bool removeFromQueue(unsigned &flowIndex, unsigned &componentIndex) {
+bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex) {
 	if (g_queueHead == g_queueTail && !g_queueIsFull) {
 		return false;
 	}
 
-	flowIndex = g_queue[g_queueHead].flowIndex;
+	flowState = g_queue[g_queueHead].flowState;
 	componentIndex = g_queue[g_queueHead].componentIndex;
 
 	g_queueHead = (g_queueHead + 1) % QUEUE_SIZE;
@@ -68,17 +75,15 @@ bool removeFromQueue(unsigned &flowIndex, unsigned &componentIndex) {
 	return true;
 }
 
-bool allInputsDefined(Assets *assets, unsigned flowIndex, unsigned componentIndex) {
+bool allInputsDefined(Assets *assets, FlowState *flowState, unsigned componentIndex) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowIndex);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 	auto component = flow->components.item(assets, componentIndex);
 
 	for (unsigned inputIndex = 0; inputIndex < component->inputs.count; inputIndex++) {
-		auto componentInput = component->inputs.item(assets, inputIndex);
+		auto inputValueIndex = component->inputs.ptr(assets)[inputIndex];
 
-		auto valueIndex = componentInput->valueIndex;
-
-		auto &value = *flowDefinition->flowValues.item(assets, valueIndex);
+		auto &value = flowState->values[inputValueIndex];
 		if (value.type_ == VALUE_TYPE_UNDEFINED) {
 			return false;
 		}
@@ -87,74 +92,55 @@ bool allInputsDefined(Assets *assets, unsigned flowIndex, unsigned componentInde
 	return true;
 }
 
-void pingComponent(Assets *assets, unsigned flowIndex, unsigned componentIndex) {
-    if (allInputsDefined(assets, flowIndex, componentIndex)) {
-        addToQueue(flowIndex, componentIndex);
+void pingComponent(Assets *assets, FlowState *flowState, unsigned componentIndex) {
+    if (allInputsDefined(assets, flowState, componentIndex)) {
+        addToQueue(flowState, componentIndex);
     }
 }
 
-unsigned start(Assets *assets) {
+void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	if (flowDefinition->flows.count == 0) {
-		return 0;
-	}
-
-	g_assets = assets;
-
-	g_queueHead = 0;
-	g_queueTail = 0;
-	g_queueIsFull = false;
-
-	unsigned flowIndex = 0;
-
-	auto flow = flowDefinition->flows.item(assets, flowIndex);
-	for (unsigned componentIndex = 0; componentIndex < flow->components.count; componentIndex++) {
-        pingComponent(assets, flowIndex, componentIndex);
-	}
-
-	return 1;
-}
-
-void propagateValue(Assets *assets, int flowIndex, ComponentOutput &componentOutput, const gui::Value &value) {
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowIndex);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 
 	for (unsigned connectionIndex = 0; connectionIndex < componentOutput.connections.count; connectionIndex++) {
 		auto connection = componentOutput.connections.item(assets, connectionIndex);
 
 		auto targetComponent = flow->components.item(assets, connection->targetComponentIndex);
 
-		auto targetComponentInput = targetComponent->inputs.item(assets, connection->targetInputIndex);
+		auto inputValueIndex = targetComponent->inputs.ptr(assets)[connection->targetInputIndex];
 
-		auto valueIndex = targetComponentInput->valueIndex;
-
-		auto &targetValue = *flowDefinition->flowValues.item(assets, valueIndex);
+		auto &targetValue = flowState->values[inputValueIndex];
 		targetValue = value;
 
-		pingComponent(assets, flowIndex, connection->targetComponentIndex);
+		pingComponent(assets, flowState, connection->targetComponentIndex);
 	}
 }
 
-void executeComponent(Assets *assets, unsigned flowIndex, unsigned componentIndex) {
+static Value eval(uint16_t *instructions) {
+	// todo
+	return Value();
+}
+
+void executeComponent(Assets *assets, FlowState *flowState, unsigned componentIndex) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowIndex);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 	auto component = flow->components.item(assets, componentIndex);
     if (component->type == defs_v3::COMPONENT_TYPE_START_ACTION) {
 	    //printf("Execute START component at index = %d\n", componentIndex);
 
-		auto &nullValue = *flowDefinition->flowValues.item(assets, NULL_VALUE_INDEX);
+		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
 
-		propagateValue(assets, flowIndex, *component->outputs.item(assets, 0), nullValue);
+		propagateValue(assets, flowState, *component->outputs.item(assets, 0), nullValue);
     } else if (component->type == defs_v3::COMPONENT_TYPE_DELAY_ACTION) {
 	    //printf("Execute DELAY component at index = %d\n", componentIndex);
 
-		auto componentInput = component->inputs.item(assets, defs_v3::DELAY_ACTION_COMPONENT_INPUT_MILLISECONDS);
-		auto &value = *flowDefinition->flowValues.item(assets, componentInput->valueIndex);
+		auto propertyValue = component->propertyValues.item(assets, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS);
+		auto value = eval(propertyValue->evalInstructions);
 
 		osDelay(roundf(value.getFloat()));
 
-		auto &nullValue = *flowDefinition->flowValues.item(assets, NULL_VALUE_INDEX);
-		propagateValue(assets, flowIndex, *component->outputs.item(assets, 0), nullValue);
+		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
+		propagateValue(assets, flowState, *component->outputs.item(assets, 0), nullValue);
     } else if (component->type == defs_v3::COMPONENT_TYPE_END_ACTION) {
 	    //printf("Execute END component at index = %d\n", componentIndex);
 
@@ -166,12 +152,12 @@ void executeComponent(Assets *assets, unsigned flowIndex, unsigned componentInde
             uint16_t valueIndex;
         };
         auto constantActionComponent = (ConstantActionComponent *)component;
-		auto &sourceValue = *flowDefinition->flowValues.item(assets, constantActionComponent->valueIndex);
+		auto &sourceValue = *flowDefinition->constants.item(assets, constantActionComponent->valueIndex);
 
 		// TODO ovdje treba poslati null value za 0-ti output
 		for (unsigned outputIndex = 0; outputIndex < component->outputs.count; outputIndex++) {
 			auto &componentOutput = *component->outputs.item(assets, outputIndex);
-			propagateValue(assets, flowIndex, componentOutput, sourceValue);
+			propagateValue(assets, flowState, componentOutput, sourceValue);
 		}
 	} else if (component->type == defs_v3::COMPONENT_TYPE_SCPI_ACTION) {
 	    //printf("Execute SCPI component at index = %d\n", componentIndex);
@@ -224,7 +210,7 @@ void executeComponent(Assets *assets, unsigned flowIndex, unsigned componentInde
 				value.str_ = buffer;
 
 				uint8_t outputIndex = instructions[i++];
-				propagateValue(assets, flowIndex, *component->outputs.item(assets, outputIndex), value);
+				propagateValue(assets, flowState, *component->outputs.item(assets, outputIndex), value);
 				commandOrQueryText[0] = 0;
 			} else if (op == SCPI_PART_QUERY) {
 				//printf("SCPI_PART_QUERY\n");
@@ -242,11 +228,60 @@ void executeComponent(Assets *assets, unsigned flowIndex, unsigned componentInde
 			}
 		}
 
-		auto &nullValue = *flowDefinition->flowValues.item(assets, NULL_VALUE_INDEX);
-		propagateValue(assets, flowIndex, *component->outputs.item(assets, 0), nullValue);
+		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
+		propagateValue(assets, flowState, *component->outputs.item(assets, 0), nullValue);
     } else {
 	    //printf("Unknow component at index = %d, type = %d\n", componentIndex, component.type);
     }
+}
+
+static FlowState *initFlowState(Assets *assets, int flowIndex) {
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto flow = flowDefinition->flows.item(assets, flowIndex);
+
+	FlowState *flowState = (FlowState *)alloc(sizeof(FlowState) + (flow->nInputValues + flow->localVariables.count - 1) * sizeof(Value));
+
+	flowState->flowIndex = flowIndex;
+
+	auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
+
+	for (unsigned i = 0; i < flow->nInputValues; i++) {
+		flowState->values[i] = nullValue;
+	}
+
+	for (unsigned i = 0; i < flow->localVariables.count; i++) {
+		flowState->values[flow->nInputValues + i] = flow->localVariables.item(assets, i);
+	}
+
+	return flowState;
+}
+
+unsigned start(Assets *assets) {
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	if (flowDefinition->flows.count == 0) {
+		return 0;
+	}
+
+	g_assets = assets;
+
+	g_queueHead = 0;
+	g_queueTail = 0;
+	g_queueIsFull = false;
+
+	g_mainPageFlowState = initFlowState(assets, 0);
+
+	auto flowState = g_mainPageFlowState;
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+
+	for (unsigned componentIndex = 0; componentIndex < flow->components.count; componentIndex++) {
+		pingComponent(assets, flowState, componentIndex);
+	}
+
+	return 1;
+}
+
+void stop() {
+	// TODO
 }
 
 void tick(unsigned flowHandle) {
@@ -256,69 +291,47 @@ void tick(unsigned flowHandle) {
 
 	Assets *assets = g_assets;
 
-	unsigned flowIndex;
+	FlowState *flowState;
 	unsigned componentIndex;
-	if (removeFromQueue(flowIndex, componentIndex)) {
-		executeComponent(assets, flowIndex, componentIndex);
+	if (removeFromQueue(flowState, componentIndex)) {
+		executeComponent(assets, flowState, componentIndex);
 	}
 }
 
-void executeFlowAction(unsigned flowHandle, int16_t actionId) {
+FlowState *getFlowState(int16_t pageId) {
+	pageId = -pageId - 1;
+	return g_mainPageFlowState;
+}
+
+void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCursor, int16_t actionId) {
+	auto flowState = (FlowState *)widgetCursor.pageState;
 	actionId = -actionId - 1;
 
 	Assets *assets = g_assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 
-	if (actionId >= 0 && actionId < (int16_t)flowDefinition->widgetActions.count) {
-		auto &componentOutput = *flowDefinition->widgetActions.item(assets, actionId);
-		auto &nullValue = *flowDefinition->flowValues.item(assets, NULL_VALUE_INDEX);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+
+	if (actionId >= 0 && actionId < (int16_t)flow->widgetActions.count) {
+		auto &componentOutput = *flow->widgetActions.item(assets, actionId);
+		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
 		propagateValue(assets, 0, componentOutput, nullValue);
 	}
 }
 
-void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operation, Cursor cursor, Value &value) {
+void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
+	auto flowState = (FlowState *)widgetCursor.pageState;
 	dataId = -dataId - 1;
 
 	Assets *assets = g_assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 
-	if (dataId >= 0 && dataId < (int16_t)flowDefinition->widgetDataItems.count) {
-		auto componentInput = flowDefinition->widgetDataItems.item(assets, dataId);
-		auto valueIndex = componentInput->valueIndex;
-		auto &flowValue = *flowDefinition->flowValues.item(assets, valueIndex);
-		value = flowValue;
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+
+	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
+		auto propertyValue = flow->widgetDataItems.item(assets, dataId);
+		value = eval(propertyValue->evalInstructions);
 	}
-}
-
-void dumpFlow(FlowDefinition &flowDefinition) {
-	// printf("Flows:\n");
-	// for (unsigned i = 0; i < flowDefinition.flows.count; i++) {
-	// 	printf("\t%d:\n", i);
-	// 	const Flow &flow = flowDefinition.flows.first[i];
-	// 	for (unsigned j = 0; j < flow.components.count; j++) {
-	// 		const Component &component = flow.components.first[j];
-	// 		printf("\t\t%d\n", j);
-	//         printf("\t\t\tType: %d\n", (int)component.type);
-
-	//         printf("\t\t\tInputs:\n");
-	//         for (unsigned k = 0; k < component.inputs.count; k++) {
-	//             const ComponentInput &componentInput = component.inputs.first[k];
-	//             printf("\t\t\t\t%d\n", componentInput.values.count);
-	//         }
-
-	//         printf("\t\t\tOutputs:\n");
-	//         for (unsigned k = 0; k < component.outputs.count; k++) {
-	//             const ComponentOutput &componentOutput = component.outputs.first[k];
-	//             printf("\t\t\t\t%d\n", componentOutput.connections.count);
-	//         }
-	// 	}
-	// }
-
-	// printf("Values:\n");
-	// for (unsigned i = 0; i < flowDefinition.flowValues.count; i++) {
-	// 	const FlowValue &flowValue = flowDefinition.flowValues.first[i];
-	//     printf("\t%d: %d\n", i, (int)flowValue.header.type);
-	// }
 }
 
 } // namespace flow

@@ -688,7 +688,9 @@ bool NumericKeypad::isMicroAmperAllowed() {
         return g_slots[m_options.slotIndex]->isMicroAmperAllowed(m_options.subchannelIndex);
     }
 
-    return eez::gui::isMicroAmperAllowed(g_focusCursor, g_focusDataId);
+	WidgetCursor widgetCursor;
+	widgetCursor = g_focusCursor;
+	return eez::gui::isMicroAmperAllowed(widgetCursor, g_focusDataId);
 }
 
 bool NumericKeypad::isAmperAllowed() {
@@ -696,7 +698,9 @@ bool NumericKeypad::isAmperAllowed() {
         return g_slots[m_options.slotIndex]->isAmperAllowed(m_options.subchannelIndex);
     }
 
-    return eez::gui::isAmperAllowed(g_focusCursor, g_focusDataId);
+	WidgetCursor widgetCursor;
+	widgetCursor = g_focusCursor;
+	return eez::gui::isAmperAllowed(widgetCursor, g_focusDataId);
 }
 
 Unit NumericKeypad::getSwitchToUnit() {

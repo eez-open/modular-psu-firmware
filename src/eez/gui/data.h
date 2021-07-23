@@ -409,77 +409,77 @@ enum DataOperationEnum {
 	DATA_OPERATION_IS_AMPER_ALLOWED
 };
 
-int count(int16_t id);
-void select(Cursor &cursor, int16_t id, int index, Value &oldValue);
-void deselect(Cursor &cursor, int16_t id, Value &oldValue);
+int count(const WidgetCursor &widgetCursor, int16_t id);
+void select(WidgetCursor &widgetCursor, int16_t id, int index, Value &oldValue);
+void deselect(WidgetCursor &widgetCursor, int16_t id, Value &oldValue);
 
-void setContext(Cursor &cursor, int16_t id, Value &oldContext, Value &newContext);
-void restoreContext(Cursor &cursor, int16_t id, Value &oldContext);
+void setContext(WidgetCursor &widgetCursor, int16_t id, Value &oldContext, Value &newContext);
+void restoreContext(WidgetCursor &widgetCursor, int16_t id, Value &oldContext);
 
-int getFloatListLength(int16_t id);
-float *getFloatList(int16_t id);
+int getFloatListLength(const WidgetCursor &widgetCursor, int16_t id);
+float *getFloatList(const WidgetCursor &widgetCursor, int16_t id);
 
-bool getAllowZero(Cursor cursor, int16_t id);
-Value getMin(Cursor cursor, int16_t id);
-Value getMax(Cursor cursor, int16_t id);
-Value getDef(Cursor cursor, int16_t id);
-Value getLimit(Cursor cursor, int16_t id);
-const char *getName(Cursor cursor, int16_t id);
-Unit getUnit(Cursor cursor, int16_t id);
-bool isChannelData(Cursor cursor, int16_t id);
+bool getAllowZero(const WidgetCursor &widgetCursor, int16_t id);
+Value getMin(const WidgetCursor &widgetCursor, int16_t id);
+Value getMax(const WidgetCursor &widgetCursor, int16_t id);
+Value getDef(const WidgetCursor &widgetCursor, int16_t id);
+Value getLimit(const WidgetCursor &widgetCursor, int16_t id);
+const char *getName(const WidgetCursor &widgetCursor, int16_t id);
+Unit getUnit(const WidgetCursor &widgetCursor, int16_t id);
+bool isChannelData(const WidgetCursor &widgetCursor, int16_t id);
 
-void getLabel(Cursor cursor, int16_t id, char *text, int count);
+void getLabel(const WidgetCursor &widgetCursor, int16_t id, char *text, int count);
 
-bool getEncoderStepValues(Cursor cursor, int16_t id, StepValues &stepValues);
-void setEncoderMode(Cursor cursor, int16_t id, EncoderMode encoderMode);
+bool getEncoderStepValues(const WidgetCursor &widgetCursor, int16_t id, StepValues &stepValues);
+void setEncoderMode(const WidgetCursor &widgetCursor, int16_t id, EncoderMode encoderMode);
 
-Value get(Cursor cursor, int16_t id);
-const char *isValidValue(Cursor cursor, int16_t id, Value value);
-Value set(Cursor cursor, int16_t id, Value value);
+Value get(const WidgetCursor &widgetCursor, int16_t id);
+const char *isValidValue(const WidgetCursor &widgetCursor, int16_t id, Value value);
+Value set(const WidgetCursor &widgetCursor, int16_t id, Value value);
 
-Value getDisplayValueRange(Cursor cursor, int16_t id);
+Value getDisplayValueRange(const WidgetCursor &widgetCursor, int16_t id);
 
-uint32_t getTextRefreshRate(Cursor cursor, int16_t id);
+uint32_t getTextRefreshRate(const WidgetCursor &widgetCursor, int16_t id);
 
-uint16_t getColor(Cursor cursor, int16_t id, const Style *style);
-uint16_t getBackgroundColor(Cursor cursor, int16_t id, const Style *style);
-uint16_t getActiveColor(Cursor cursor, int16_t id, const Style *style);
-uint16_t getActiveBackgroundColor(Cursor cursor, int16_t id, const Style *style);
+uint16_t getColor(const WidgetCursor &widgetCursor, int16_t id, const Style *style);
+uint16_t getBackgroundColor(const WidgetCursor &widgetCursor, int16_t id, const Style *style);
+uint16_t getActiveColor(const WidgetCursor &widgetCursor, int16_t id, const Style *style);
+uint16_t getActiveBackgroundColor(const WidgetCursor &widgetCursor, int16_t id, const Style *style);
 
 bool isBlinking(const WidgetCursor &widgetCursor, int16_t id);
-Value getEditValue(Cursor cursor, int16_t id);
+Value getEditValue(const WidgetCursor &widgetCursor, int16_t id);
 
-Value getBitmapImage(Cursor cursor, int16_t id);
+Value getBitmapImage(const WidgetCursor &widgetCursor, int16_t id);
 
-uint32_t ytDataGetRefreshCounter(Cursor cursor, int16_t id);
-uint32_t ytDataGetSize(Cursor cursor, int16_t id);
-uint32_t ytDataGetPosition(Cursor cursor, int16_t id);
-void ytDataSetPosition(Cursor cursor, int16_t id, uint32_t newPosition);
-uint32_t ytDataGetPositionIncrement(Cursor cursor, int16_t id);
-uint32_t ytDataGetPageSize(Cursor cursor, int16_t id);
-const Style *ytDataGetStyle(Cursor cursor, int16_t id, uint8_t valueIndex);
-Value ytDataGetMin(Cursor cursor, int16_t id, uint8_t valueIndex);
-Value ytDataGetMax(Cursor cursor, int16_t id, uint8_t valueIndex);
-int ytDataGetVertDivisions(Cursor cursor, int16_t id);
-int ytDataGetHorzDivisions(Cursor cursor, int16_t id);
-float ytDataGetDiv(Cursor cursor, int16_t id, uint8_t valueIndex);
-float ytDataGetOffset(Cursor cursor, int16_t id, uint8_t valueIndex);
-bool ytDataDataValueIsVisible(Cursor cursor, int16_t id, uint8_t valueIndex);
-bool ytDataGetShowLabels(Cursor cursor, int16_t id);
-int8_t ytDataGetSelectedValueIndex(Cursor cursor, int16_t id);
+uint32_t ytDataGetRefreshCounter(const WidgetCursor &widgetCursor, int16_t id);
+uint32_t ytDataGetSize(const WidgetCursor &widgetCursor, int16_t id);
+uint32_t ytDataGetPosition(const WidgetCursor &widgetCursor, int16_t id);
+void ytDataSetPosition(const WidgetCursor &widgetCursor, int16_t id, uint32_t newPosition);
+uint32_t ytDataGetPositionIncrement(const WidgetCursor &widgetCursor, int16_t id);
+uint32_t ytDataGetPageSize(const WidgetCursor &widgetCursor, int16_t id);
+const Style *ytDataGetStyle(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex);
+Value ytDataGetMin(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex);
+Value ytDataGetMax(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex);
+int ytDataGetVertDivisions(const WidgetCursor &widgetCursor, int16_t id);
+int ytDataGetHorzDivisions(const WidgetCursor &widgetCursor, int16_t id);
+float ytDataGetDiv(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex);
+float ytDataGetOffset(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex);
+bool ytDataDataValueIsVisible(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex);
+bool ytDataGetShowLabels(const WidgetCursor &widgetCursor, int16_t id);
+int8_t ytDataGetSelectedValueIndex(const WidgetCursor &widgetCursor, int16_t id);
 struct YtDataGetLabelParams {
     uint8_t valueIndex;
     char *text;
     int count;
 };
-void ytDataGetLabel(Cursor cursor, int16_t id, uint8_t valueIndex, char *text, int count);
-Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(Cursor cursor, int16_t id);
-uint8_t ytDataGetGraphUpdateMethod(Cursor cursor, int16_t id);
-float ytDataGetPeriod(Cursor cursor, int16_t id);
-uint8_t *ytDataGetBookmarks(Cursor cursor, int16_t id);
-bool ytDataIsCursorVisible(Cursor cursor, int16_t id);
-uint32_t ytDataGetCursorOffset(Cursor cursor, int16_t id);
-Value ytDataGetCursorXValue(Cursor cursor, int16_t id);
+void ytDataGetLabel(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex, char *text, int count);
+Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const WidgetCursor &widgetCursor, int16_t id);
+uint8_t ytDataGetGraphUpdateMethod(const WidgetCursor &widgetCursor, int16_t id);
+float ytDataGetPeriod(const WidgetCursor &widgetCursor, int16_t id);
+uint8_t *ytDataGetBookmarks(const WidgetCursor &widgetCursor, int16_t id);
+bool ytDataIsCursorVisible(const WidgetCursor &widgetCursor, int16_t id);
+uint32_t ytDataGetCursorOffset(const WidgetCursor &widgetCursor, int16_t id);
+Value ytDataGetCursorXValue(const WidgetCursor &widgetCursor, int16_t id);
 
 struct TouchDrag {
 	const WidgetCursor &widgetCursor;
@@ -487,15 +487,15 @@ struct TouchDrag {
     int x;
     int y;
 };
-void ytDataTouchDrag(Cursor cursor, int16_t id, TouchDrag *touchDrag);
+void ytDataTouchDrag(const WidgetCursor &widgetCursor, int16_t id, TouchDrag *touchDrag);
 
-int getTextCursorPosition(Cursor cursor, int16_t id);
+int getTextCursorPosition(const WidgetCursor &widgetCursor, int16_t id);
 int getXScroll(const WidgetCursor &widgetCursor);
 
-void getSlotAndSubchannelIndex(Cursor cursor, int16_t id, int &slotIndex, int &subchannelIndex);
+void getSlotAndSubchannelIndex(const WidgetCursor &widgetCursor, int16_t id, int &slotIndex, int &subchannelIndex);
 
-bool isMicroAmperAllowed(Cursor cursor, int16_t id);
-bool isAmperAllowed(Cursor cursor, int16_t id);
+bool isMicroAmperAllowed(const WidgetCursor &widgetCursor, int16_t id);
+bool isAmperAllowed(const WidgetCursor &widgetCursor, int16_t id);
 
 } // namespace gui
 } // namespace eez

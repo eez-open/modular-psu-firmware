@@ -32,7 +32,7 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
 	auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 
-    Value indexValue = get(widgetCursor.cursor, widgetCursor.widget->data);
+    Value indexValue = get(widgetCursor, widgetCursor.widget->data);
     if (indexValue.getType() == VALUE_TYPE_UNDEFINED) {
         indexValue = Value(0);
     }

@@ -81,12 +81,12 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
     
     uint32_t currentTime = millis();
-    widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);
+    widgetCursor.currentState->data = get(widgetCursor, widget->data);
     bool refreshData = false;
     if (widgetCursor.previousState) {
         refreshData = widgetCursor.currentState->data != widgetCursor.previousState->data;
         if (refreshData) {
-            uint32_t refreshRate = getTextRefreshRate(widgetCursor.cursor, widget->data);
+            uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
             if (refreshRate != 0) {
                 refreshData = (currentTime - previousState->dataRefreshLastTime) > refreshRate;
                 if (!refreshData) {
@@ -99,13 +99,13 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     }
     currentState->dataRefreshLastTime = refreshData ? currentTime : previousState->dataRefreshLastTime;
 
-    currentState->color = widgetCursor.currentState->flags.focused ? style->focus_color : getColor(widgetCursor.cursor, widget->data, style);
-    currentState->backgroundColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : getBackgroundColor(widgetCursor.cursor, widget->data, style);
-    currentState->activeColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : getActiveColor(widgetCursor.cursor, widget->data, style);
-    currentState->activeBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : getActiveBackgroundColor(widgetCursor.cursor, widget->data, style);
+    currentState->color = widgetCursor.currentState->flags.focused ? style->focus_color : getColor(widgetCursor, widget->data, style);
+    currentState->backgroundColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : getBackgroundColor(widgetCursor, widget->data, style);
+    currentState->activeColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : getActiveColor(widgetCursor, widget->data, style);
+    currentState->activeBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : getActiveBackgroundColor(widgetCursor, widget->data, style);
 
     bool cursorVisible = millis() % (2 * CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS) < CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS;
-    currentState->cursorPosition = cursorVisible ? getTextCursorPosition(widgetCursor.cursor, widget->data) : -1;
+    currentState->cursorPosition = cursorVisible ? getTextCursorPosition(widgetCursor, widget->data) : -1;
     
     currentState->xScroll = getXScroll(widgetCursor);
 
@@ -191,7 +191,7 @@ int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCurs
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
     char text[64];
-    Value data = get(widgetCursor.cursor, widget->data);
+    Value data = get(widgetCursor, widget->data);
     data.toText(text, sizeof(text));
 
     char *start = text;
@@ -241,7 +241,7 @@ int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widg
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
     char text[64];
-    Value data = get(widgetCursor.cursor, widget->data);
+    Value data = get(widgetCursor, widget->data);
     data.toText(text, sizeof(text));
 
     char *start = text;

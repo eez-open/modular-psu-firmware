@@ -1146,31 +1146,31 @@ void getStorageInfo(Value& value) {
 
 using namespace file_manager;
 
-void data_file_manager_current_directory(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_current_directory(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(g_currentDiskDriveTitleVersion, VALUE_TYPE_CURRENT_DIRECTORY_TITLE);
     }
 }
 
-void data_file_manager_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_state(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getState();
     }
 }
 
-void data_file_manager_has_parent(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_has_parent(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = hasParent() ? 1 : 0;
     }
 }
 
-void data_file_manager_layout(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_layout(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getListViewLayout();
     }
 }
 
-void data_file_manager_files(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_files(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {
         value = (int)MAX(getFilesCount(), getFilesPageSize());
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
@@ -1186,19 +1186,22 @@ void data_file_manager_files(DataOperationEnum operation, Cursor cursor, Value &
     }
 }
 
-void data_file_manager_file_type(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_file_type(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = getFileType(cursor);
     }
 }
 
-void data_file_manager_file_icon(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_file_icon(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = getFileIcon(cursor);
     }
 }
 
-void data_file_manager_file_name(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_file_name(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
@@ -1207,7 +1210,8 @@ void data_file_manager_file_name(DataOperationEnum operation, Cursor cursor, Val
     }
 }
 
-void data_file_manager_file_has_description(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_file_has_description(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
@@ -1216,7 +1220,8 @@ void data_file_manager_file_has_description(DataOperationEnum operation, Cursor 
     }
 }
 
-void data_file_manager_file_description(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_file_description(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
@@ -1225,7 +1230,8 @@ void data_file_manager_file_description(DataOperationEnum operation, Cursor curs
     }
 }
 
-void data_file_manager_file_size(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_file_size(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType == FILE_TYPE_DIRECTORY) {
@@ -1236,7 +1242,8 @@ void data_file_manager_file_size(DataOperationEnum operation, Cursor cursor, Val
     }
 }
 
-void data_file_manager_file_date_time(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_file_date_time(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         auto fileType = getFileType(cursor);
         if (fileType != FILE_TYPE_NONE) {
@@ -1245,38 +1252,39 @@ void data_file_manager_file_date_time(DataOperationEnum operation, Cursor cursor
     }
 }
 
-void data_file_manager_file_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_file_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = isFileSelected(cursor);
     }
 }
 
 
-void data_file_manager_open_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_open_file_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = isOpenFileEnabled();
     }
 }
 
-void data_file_manager_upload_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_upload_file_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = isUploadFileEnabled();
     }
 }
 
-void data_file_manager_rename_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_rename_file_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = isRenameFileEnabled();
     }
 }
 
-void data_file_manager_delete_file_enabled(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_delete_file_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = isDeleteFileEnabled();
     }
 }
 
-void data_file_manager_opened_image(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_opened_image(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET_BITMAP_IMAGE) {
         if (g_openedImage.pixels) {
             value = Value(&g_openedImage, VALUE_TYPE_POINTER);
@@ -1284,55 +1292,55 @@ void data_file_manager_opened_image(DataOperationEnum operation, Cursor cursor, 
     }
 }
 
-void data_file_manager_browser_title(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_browser_title(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_fileBrowserTitle;
     }
 }
 
-void data_file_manager_browser_is_save_dialog(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_browser_is_save_dialog(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = isSaveDialog();
     }
 }
 
-void data_file_manager_storage_alarm(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_storage_alarm(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = isStorageAlarm();
     }
 }
 
-void data_file_manager_storage_info(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_storage_info(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         getStorageInfo(value);
     }
 }
 
-void data_file_manager_is_list_view_option_available(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_is_list_view_option_available(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = !g_showDiskDrives && (isRootDirectory() || isScriptsDirectory());
     }
 }
 
-void data_file_manager_is_sort_files_option_available(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_is_sort_files_option_available(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = !g_showDiskDrives;
     }
 }
 
-void data_file_manager_list_view(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_list_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getListViewOption();
     }
 }
 
-void data_file_manager_sort_files_option(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_sort_files_option(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = getSortFilesOption();
     }
 }
 
-void data_file_manager_image_open_state(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_image_open_state(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         if (g_openedImage.pixels) {
             value = 1;
@@ -1344,7 +1352,7 @@ void data_file_manager_image_open_state(DataOperationEnum operation, Cursor curs
     }
 }
 
-void data_file_manager_image_open_progress(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_file_manager_image_open_progress(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         int progress = ((millis() / 40) * 40 - g_imageLoadStartTime) / 5;
         if (progress > 140) {

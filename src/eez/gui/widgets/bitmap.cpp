@@ -60,7 +60,7 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
                 return;
             } else {
                 Value valueBitmapId;
-                DATA_OPERATION_FUNCTION(widget->data,  DATA_OPERATION_GET, widgetCursor.cursor, valueBitmapId);
+                DATA_OPERATION_FUNCTION(widget->data,  DATA_OPERATION_GET, widgetCursor, valueBitmapId);
                 bitmap = getBitmap(valueBitmapId.getInt());
             }
         } else if (widget->bitmap != 0) {

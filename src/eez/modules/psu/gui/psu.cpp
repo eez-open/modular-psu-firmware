@@ -716,7 +716,7 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
 }
 
 void PsuAppContext::doShowProgressPage() {
-    set(Cursor(-1), DATA_ID_ALERT_MESSAGE, Value(m_progressMessage));
+    set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, Value(m_progressMessage));
     m_dialogCancelCallback = m_progressAbortCallback;
     pushPage(m_progressWithoutAbort ? PAGE_ID_PROGRESS_WITHOUT_ABORT : PAGE_ID_PROGRESS);
     m_pushProgressPage = false;
@@ -788,7 +788,7 @@ void PsuAppContext::showAsyncOperationInProgress(const char *message, void (*che
 }
 
 void PsuAppContext::doShowAsyncOperationInProgress() {
-    set(Cursor(-1), DATA_ID_ALERT_MESSAGE, Value(m_asyncOperationInProgressParams.message));
+    set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, Value(m_asyncOperationInProgressParams.message));
 
     if (getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS) {
         m_asyncOperationInProgressParams.startTime = millis();
@@ -1113,7 +1113,8 @@ int PsuAppContext::select(const char **options, int defaultSelection) {
     return 0;
 }
 
-void SelectParams::enumDefinition(DataOperationEnum operation, Cursor cursor, Value &value) {
+void SelectParams::enumDefinition(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET_VALUE) {
         value = (uint16_t)(cursor + 1);
     } else if (operation == DATA_OPERATION_GET_LABEL) {
@@ -1167,18 +1168,16 @@ void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
     } else if (getActivePageId() == PAGE_ID_TOUCH_TEST) {
         mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
 
-        Cursor cursor(-1);
-
-        if (get(cursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
-            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
+        if (get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
+            int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
             eez::mcu::display::setColor(0, 0, 255);
             eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
 
-        if (get(cursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
-            int x = MIN(MAX(get(cursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(get(cursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
+        if (get(widgetCursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
+            int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
             eez::mcu::display::setColor(0, 255, 0);
             eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
@@ -1679,7 +1678,7 @@ void errorMessageWithAction(const char *message, void (*action)(), const char *a
 ////////////////////////////////////////////////////////////////////////////////
 
 void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)()) {
-    set(Cursor(-1), DATA_ID_ALERT_MESSAGE, Value(message));
+    set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, Value(message));
 
     g_psuAppContext.m_dialogYesCallback = yes_callback;
     g_psuAppContext.m_dialogNoCallback = no_callback;
@@ -1689,7 +1688,7 @@ void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), v
 }
 
 void yesNoDialog(int yesNoPageId, Value value, void(*yes_callback)(), void(*no_callback)(), void(*cancel_callback)()) {
-	set(Cursor(-1), DATA_ID_ALERT_MESSAGE, value);
+	set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, value);
 
 	g_psuAppContext.m_dialogYesCallback = yes_callback;
 	g_psuAppContext.m_dialogNoCallback = no_callback;
@@ -1699,7 +1698,7 @@ void yesNoDialog(int yesNoPageId, Value value, void(*yes_callback)(), void(*no_c
 }
 
 void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*later_callback)()) {
-    set(Cursor(-1), DATA_ID_ALERT_MESSAGE, Value(message));
+    set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, Value(message));
 
     g_psuAppContext.m_dialogYesCallback = yes_callback;
     g_psuAppContext.m_dialogNoCallback = no_callback;
@@ -1792,7 +1791,7 @@ void pushSelectFromEnumPage(
 
 void pushSelectFromEnumPage(
     AppContext *appContext,
-    void(*enumDefinitionFunc)(DataOperationEnum operation, Cursor cursor, Value &value),
+    void(*enumDefinitionFunc)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value),
     uint16_t currentValue,
     bool(*disabledCallback)(uint16_t value),
     void(*onSet)(uint16_t),
@@ -2482,7 +2481,7 @@ uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *s
         auto &recording = psu::dlog_view::getRecording();
         int dlogValueIndex = !psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) || psu::persist_conf::devConf.viewFlags.dlogViewLegendViewOption == psu::persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
             ? recording.selectedValueIndex : psu::dlog_view::getDlogValueIndex(recording, widgetCursor.cursor);
-        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
+        style = ytDataGetStyle(widgetCursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->color;
 }
@@ -2492,7 +2491,7 @@ uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const St
         auto &recording = psu::dlog_view::getRecording();
         int dlogValueIndex = !psu::dlog_view::isMulipleValuesOverlayHeuristic(recording) || psu::persist_conf::devConf.viewFlags.dlogViewLegendViewOption == psu::persist_conf::DLOG_VIEW_LEGEND_VIEW_OPTION_DOCK
             ? recording.selectedValueIndex : psu::dlog_view::getDlogValueIndex(recording, widgetCursor.cursor);
-        style = ytDataGetStyle(widgetCursor.cursor, DATA_ID_RECORDING, dlogValueIndex);
+        style = ytDataGetStyle(widgetCursor, DATA_ID_RECORDING, dlogValueIndex);
     }
     return style->active_color;
 }
@@ -2551,16 +2550,16 @@ float getDefaultAnimationDurationHook() {
 
 void executeExternalActionHook(const WidgetCursor &widgetCursor, int16_t actionId) {
     if (scripting::isFlowRunning()) {
-        scripting::executeFlowAction(actionId);
+        scripting::executeFlowAction(widgetCursor, actionId);
     } else {
         g_externalActionWidgetCursor = widgetCursor;
         g_externalActionId = actionId;
     }
 }
 
-void externalDataHook(int16_t dataId, DataOperationEnum operation, Cursor cursor, Value &value) {
+void externalDataHook(int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (scripting::isFlowRunning()) {
-        scripting::dataOperation(dataId, operation, cursor, value);
+        scripting::dataOperation(dataId, operation, widgetCursor, value);
     } else {
         if (dataId < 0) {
             dataId = -dataId;
@@ -2647,13 +2646,13 @@ using namespace psu::gui;
 
 static int g_selectedMcuRevision; // 0 - None, 1 - R2B4, 2 - R3B3
 
-void data_selected_mcu_revision(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_selected_mcu_revision(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_selectedMcuRevision;
     }
 }
 
-void data_is_mcu_revision_selected(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_is_mcu_revision_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_selectedMcuRevision != 0;
     }
