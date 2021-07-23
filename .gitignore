@@ -11,4 +11,5 @@ scripts/Hello world - EEZ Flow
 
 **/*.eez-project-ui-state
 **/*.eez-project-runtime-settings
+**/*.res.map
 
