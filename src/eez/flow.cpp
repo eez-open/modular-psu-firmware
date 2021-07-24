@@ -157,7 +157,7 @@ bool do_OPERATION_TYPE_SUB(EvalStack &stack) {
 		return true;
 	}
 	if (a.isInteger() && b.isInteger()) {
-		// TODO što ako su oba uint32_t? rezultat bi trebao biti uint32_t
+		// TODO ï¿½to ako su oba uint32_t? rezultat bi trebao biti uint32_t
 		stack.push(a.getInt32() + b.getInt32());
 	}
 
@@ -302,13 +302,13 @@ static bool eval(Assets *assets, FlowState *flowState, uint16_t *instructions, V
 		auto instructionType = instruction & EXPR_EVAL_INSTRUCTION_TYPE_MASK;
 		auto instructionArg = instruction & ~EXPR_EVAL_INSTRUCTION_TYPE_MASK;
 		if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT) {
-			stack.push(flowDefinition->constants.item(assets, instructionArg));
+			stack.push(*flowDefinition->constants.item(assets, instructionArg));
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT) {
 			stack.push(flowState->values[instructionArg]);
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR) {
 			stack.push(flowState->values[flow->nInputValues + instructionArg]);
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {
-			stack.push(flowDefinition->globalVariables.item(assets, instructionArg));
+			stack.push(*flowDefinition->globalVariables.item(assets, instructionArg));
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
 			if (!g_evalOperations[instructionArg](stack)) {
 				result = Value();
@@ -473,7 +473,7 @@ static FlowState *initFlowState(Assets *assets, int flowIndex) {
 	}
 
 	for (unsigned i = 0; i < flow->localVariables.count; i++) {
-		flowState->values[flow->nInputValues + i] = flow->localVariables.item(assets, i);
+		flowState->values[flow->nInputValues + i] = *flow->localVariables.item(assets, i);
 	}
 
 	return flowState;

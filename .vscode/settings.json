@@ -24,7 +24,8 @@
         "istream": "cpp",
         "ostream": "cpp",
         "streambuf": "cpp",
-        "limits": "cpp"
+        "limits": "cpp",
+        "cmath": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": true

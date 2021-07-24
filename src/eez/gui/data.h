@@ -86,18 +86,10 @@ struct Value {
     {
     }
 
-	Value(bool value)
-		: type_(VALUE_TYPE_INT32), unit_(UNIT_UNKNOWN), options_(0), int32_(value ? 1 : 0) {
-	}
-
-	Value(int32_t value)
+	Value(int value)
         : type_(VALUE_TYPE_INT32), unit_(UNIT_UNKNOWN), options_(0), int32_(value)
     {
     }
-
-	Value(float value)
-		: type_(VALUE_TYPE_FLOAT), unit_(UNIT_UNKNOWN), options_(0), float_(value) {
-	}
 
 	Value(const char *str)
         : type_(VALUE_TYPE_STRING), unit_(UNIT_UNKNOWN), options_(0), str_(str)
@@ -114,12 +106,12 @@ struct Value {
     {
     }
 
-    Value(int32_t value, ValueType type)
+    Value(int value, ValueType type)
         : type_(type), unit_(UNIT_UNKNOWN), options_(0), int32_(value)
     {
     }
 
-    Value(int32_t value, ValueType type, uint16_t options)
+    Value(int value, ValueType type, uint16_t options)
         : type_(type), unit_(UNIT_UNKNOWN), options_(options), int32_(value)
     {
     }
@@ -234,8 +226,20 @@ struct Value {
         return uint32_;
     }
 
+	int32_t getInt64() const {
+		return int64_;
+	}
+
+	uint32_t getUInt64() const {
+        return uint64_;
+    }
+
 	float getFloat() const {
 		return float_;
+	}
+
+	double getDouble() const {
+		return double_;
 	}
 
 	const char *getString() const {
@@ -328,6 +332,9 @@ struct Value {
     bool isMega() const;
 
   public:
+	ValueType type_;
+	uint8_t unit_;
+	uint16_t options_;
     union {
 		uint8_t int8_;
         uint8_t uint8_;
@@ -335,11 +342,16 @@ struct Value {
 		int16_t int16_;
 		uint16_t uint16_;
 		
-		uint16_t int32_;
+		uint32_t int32_;
         uint32_t uint32_;
         
-		float float_;
-        const char *str_;
+		uint64_t int64_;
+        uint64_t uint64_;
+
+        float float_;
+		double double_;
+
+		const char *str_;
 
         //
         EnumValue enum_;
@@ -349,13 +361,7 @@ struct Value {
         PairOfUint8Value pairOfUint8_;
         PairOfUint16Value pairOfUint16_;
         PairOfInt16Value pairOfInt16_;
-
-		// new
-		double number_;
     };
-	ValueType type_;
-	uint8_t unit_;
-	uint16_t options_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

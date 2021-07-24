@@ -62,8 +62,12 @@ void stringAppendStringLength(char *str, size_t maxStrLength, const char *value,
 
 void stringAppendInt(char *str, size_t maxStrLength, int value);
 void stringAppendUInt32(char *str, size_t maxStrLength, uint32_t value);
+void stringAppendInt64(char *str, size_t maxStrLength, int64_t value);
+void stringAppendUInt64(char *str, size_t maxStrLength, uint64_t value);
 void stringAppendFloat(char *str, size_t maxStrLength, float value);
 void stringAppendFloat(char *str, size_t maxStrLength, float value, int numDecimalPlaces);
+void stringAppendDouble(char *str, size_t maxStrLength, double value);
+void stringAppendDouble(char *str, size_t maxStrLength, double value, int numDecimalPlaces);
 
 void stringAppendVoltage(char *str, size_t maxStrLength, float value);
 void stringAppendCurrent(char *str, size_t maxStrLength, float value);

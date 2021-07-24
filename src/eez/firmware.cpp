@@ -96,10 +96,6 @@ bool g_shutdownInProgress;
 bool g_shutdown;
 
 void boot() {
-	printf("sizeof(Value) = %d\n", sizeof(Value));
-
-    initAllocHeap(ALLOC_BUFFER, ALLOC_BUFFER_SIZE);
-
     assert((uint32_t)(MEMORY_END - MEMORY_BEGIN) <= MEMORY_SIZE);
 
     psu::serial::initScpi();
@@ -113,6 +109,8 @@ void boot() {
     mcu::sdram::init();
     //mcu::sdram::test();
 #endif
+
+    initAllocHeap(ALLOC_BUFFER, ALLOC_BUFFER_SIZE);
 
 #ifdef EEZ_PLATFORM_SIMULATOR
     eez::psu::simulator::init();
@@ -352,6 +350,7 @@ void boot() {
     }
 
     // DebugTrace("Memory left: %d\n", MEMORY_SIZE - (uint32_t)(MEMORY_END - MEMORY_BEGIN));
+    DebugTrace("sizeof(Value) = %d\n", sizeof(Value));
 }
 
 bool testMaster() {

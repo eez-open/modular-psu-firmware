@@ -115,6 +115,22 @@ void UINT32_value_to_text(const Value &value, char *text, int count) {
     stringAppendUInt32(text, count, value.getUInt32());
 }
 
+bool compare_INT64_value(const Value &a, const Value &b) {
+    return a.getInt64() == b.getInt64();
+}
+
+void INT64_value_to_text(const Value &value, char *text, int count) {
+    stringAppendInt64(text, count, value.getInt64());
+}
+
+bool compare_UINT64_value(const Value &a, const Value &b) {
+    return a.getUInt64() == b.getUInt64();
+}
+
+void UINT64_value_to_text(const Value &value, char *text, int count) {
+    stringAppendUInt64(text, count, value.getUInt64());
+}
+
 bool compare_FLOAT_value(const Value &a, const Value &b) {
     return a.getUnit() == b.getUnit() && a.getFloat() == b.getFloat() && a.getOptions() == b.getOptions();
 }
@@ -266,6 +282,163 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
         }
 
         stringAppendString(text, count, " "); 
+        stringAppendString(text, count, getUnitName(unit));
+    } else {
+        text[0] = 0;
+    }
+}
+
+bool compare_DOUBLE_value(const Value &a, const Value &b) {
+    return a.getUnit() == b.getUnit() && a.getDouble() == b.getDouble() && a.getOptions() == b.getOptions();
+}
+
+void DOUBLE_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
+
+    double doubleValue = value.getDouble();
+
+#if defined(INFINITY_SYMBOL)
+    if (isinf(doubleValue)) {
+        snprintf(text, count, INFINITY_SYMBOL);
+        return;
+    }
+#endif
+
+    Unit unit = value.getUnit();
+
+    bool appendDotZero = unit == UNIT_VOLT || unit == UNIT_VOLT_PP || unit == UNIT_AMPER || unit == UNIT_AMPER_PP || unit == UNIT_WATT;
+
+    uint16_t options = value.getOptions();
+    bool fixedDecimals = (options & FLOAT_OPTIONS_FIXED_DECIMALS) != 0;
+
+    if (doubleValue != 0) {
+        if (!fixedDecimals) {
+            if (unit == UNIT_VOLT) {
+                if (fabs(doubleValue) < 1) {
+                    unit = UNIT_MILLI_VOLT;
+                    doubleValue *= 1E3;
+                }
+            } else if (unit == UNIT_VOLT_PP) {
+				if (fabs(doubleValue) < 1) {
+					unit = UNIT_MILLI_VOLT_PP;
+					doubleValue *= 1E3;
+				}
+			} else if (unit == UNIT_AMPER) {
+                if (fabs(doubleValue) < 0.001 && fabs(doubleValue) != 0.0005) {
+                    unit = UNIT_MICRO_AMPER;
+                    doubleValue *= 1E6;
+                } else if (fabs(doubleValue) < 1) {
+                    unit = UNIT_MILLI_AMPER;
+                    doubleValue *= 1E3;
+                }
+            } else if (unit == UNIT_AMPER_PP) {
+				if (fabs(doubleValue) < 0.001 && fabs(doubleValue) != 0.0005) {
+					unit = UNIT_MICRO_AMPER_PP;
+					doubleValue *= 1E6;
+				} else if (fabs(doubleValue) < 1) {
+					unit = UNIT_MILLI_AMPER_PP;
+					doubleValue *= 1E3;
+				}
+			} else if (unit == UNIT_WATT) {
+                if (fabs(doubleValue) < 1) {
+                    unit = UNIT_MILLI_WATT;
+                    doubleValue *= 1E3;
+                }
+            } else if (unit == UNIT_SECOND) {
+                if (fabs(doubleValue) < 1) {
+                    unit = UNIT_MILLI_SECOND;
+                    doubleValue *= 1E3;
+                }
+            } else if (unit == UNIT_OHM) {
+                if (fabs(doubleValue) >= 1000000) {
+                    unit = UNIT_MOHM;
+                    doubleValue *= 1E-6;
+                } else if (fabs(doubleValue) >= 1000) {
+                    unit = UNIT_KOHM;
+                    doubleValue *= 1E-3;
+                }
+            } else if (unit == UNIT_FARAD) {
+                if (fabs(doubleValue) < 1E-9) {
+                    unit = UNIT_PICO_FARAD;
+                    doubleValue *= 1E12;
+                } else if (fabs(doubleValue) < 1E-6) {
+                    unit = UNIT_NANO_FARAD;
+                    doubleValue *= 1E9;
+                } else if (fabs(doubleValue) < 1E-3) {
+                    unit = UNIT_MICRO_FARAD;
+                    doubleValue *= 1E6;
+                } else if (fabs(doubleValue) < 1) {
+                    unit = UNIT_MILLI_FARAD;
+                    doubleValue *= 1E3;
+                }
+            } else if (unit == UNIT_HERTZ) {
+                if (fabs(doubleValue) >= 1000000) {
+                    unit = UNIT_MHERTZ;
+                    doubleValue *= 1E-6;
+                } else if (fabs(doubleValue) >= 1000) {
+                    unit = UNIT_KHERTZ;
+                    doubleValue *= 1E-3;
+                } else if (fabs(doubleValue) < 1) {
+                    unit = UNIT_MILLI_HERTZ;
+                    doubleValue *= 1E3;
+                }
+            }
+        }
+    } else {
+        doubleValue = 0; // set to zero just in case we have negative zero
+    }
+
+    if (!isNaN(doubleValue)) {
+        if ((value.getOptions() & FLOAT_OPTIONS_LESS_THEN) != 0) {
+            stringAppendString(text, count, "< ");
+			appendDotZero = false;
+        }
+
+        if (fixedDecimals) {
+            stringAppendFloat(text, count, doubleValue, FLOAT_OPTIONS_GET_NUM_FIXED_DECIMALS(options));
+        } else {
+            if (unit == UNIT_WATT || unit == UNIT_MILLI_WATT) {
+                stringAppendDouble(text, count, doubleValue, 2);
+            } else {
+                stringAppendDouble(text, count, doubleValue);
+            }
+
+            int n = strlen(text);
+
+            int decimalPointIndex;
+            for (decimalPointIndex = 0; decimalPointIndex < n; ++decimalPointIndex) {
+                if (text[decimalPointIndex] == '.') {
+                    break;
+                }
+            }
+
+            if (decimalPointIndex == n) {
+                if (appendDotZero) {
+                    // 1 => 1.0
+                    stringAppendString(text, count, ".0");
+                }
+            } else if (decimalPointIndex == n - 1) {
+                if (appendDotZero) {
+                    // 1. => 1.0
+                    stringAppendString(text, count, "0");
+                } else {
+                    text[decimalPointIndex] = 0;
+                }
+            } else {
+                // remove trailing zeros
+                if (appendDotZero) {
+                    for (int j = n - 1; j > decimalPointIndex + 1 && text[j] == '0'; j--) {
+                        text[j] = 0;
+                    }
+                } else {
+                    for (int j = n - 1; j >= decimalPointIndex && (text[j] == '0' || text[j] == '.'); j--) {
+                        text[j] = 0;
+                    }
+                }
+            }
+        }
+
+        stringAppendString(text, count, " ");
         stringAppendString(text, count, getUnitName(unit));
     } else {
         text[0] = 0;
@@ -599,15 +772,15 @@ void restoreContext(WidgetCursor &widgetCursor, int16_t id, Value &oldContext) {
 }
 
 int getFloatListLength(const WidgetCursor &widgetCursor, int16_t id) {
-    Value listLengthValue = 0;
-    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_FLOAT_LIST_LENGTH, widgetCursor, listLengthValue);
-    return listLengthValue.getInt();
+    Value value;
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_FLOAT_LIST_LENGTH, widgetCursor, value);
+    return value.getInt();
 }
 
 float *getFloatList(const WidgetCursor &widgetCursor, int16_t id) {
-    Value floatListValue((float *)0);
-    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_FLOAT_LIST, widgetCursor, floatListValue);
-    return floatListValue.getFloatList();
+    Value value;
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_FLOAT_LIST, widgetCursor, value);
+    return value.getFloatList();
 }
 
 bool getAllowZero(const WidgetCursor &widgetCursor, int16_t id) {

@@ -209,28 +209,24 @@ namespace gui {
 using namespace mcu::touch;
 
 void data_touch_raw_x(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = (int)g_lastXData;
     }
 }
 
 void data_touch_raw_y(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = (int)g_lastYData;
     }
 }
 
 void data_touch_raw_z1(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = (int)g_lastZ1Data;
     }
 }
 
 void data_touch_raw_pressed(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
         value = g_state == STATE_PRESSED;
     }

@@ -189,8 +189,8 @@ struct Colors {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_MASK  = (7 << 13);
-static const uint16_t EXPR_EVAL_INSTRUCTION_PARAM_MASK = ~EXPR_EVAL_INSTRUCTION_TYPE_MASK;
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_MASK  = 0xE000;
+static const uint16_t EXPR_EVAL_INSTRUCTION_PARAM_MASK = 0x1FFF;
 
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT   = (0 << 13);
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT      = (1 << 13);

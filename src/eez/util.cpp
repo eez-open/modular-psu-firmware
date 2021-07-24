@@ -128,12 +128,32 @@ void stringAppendUInt32(char *str, size_t maxStrLength, uint32_t value) {
     snprintf(str + n, maxStrLength - n, "%lu", (unsigned long)value);
 }
 
+void stringAppendInt64(char *str, size_t maxStrLength, int64_t value) {
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%jd", value);
+}
+
+void stringAppendUInt64(char *str, size_t maxStrLength, uint64_t value) {
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%ju", value);
+}
+
 void stringAppendFloat(char *str, size_t maxStrLength, float value) {
     auto n = strlen(str);
     snprintf(str + n, maxStrLength - n, "%g", value);
 }
 
 void stringAppendFloat(char *str, size_t maxStrLength, float value, int numDecimalPlaces) {
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%.*f", numDecimalPlaces, value);
+}
+
+void stringAppendDouble(char *str, size_t maxStrLength, double value) {
+    auto n = strlen(str);
+    snprintf(str + n, maxStrLength - n, "%g", value);
+}
+
+void stringAppendDouble(char *str, size_t maxStrLength, double value, int numDecimalPlaces) {
     auto n = strlen(str);
     snprintf(str + n, maxStrLength - n, "%.*f", numDecimalPlaces, value);
 }
