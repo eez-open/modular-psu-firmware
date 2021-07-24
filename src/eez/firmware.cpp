@@ -96,6 +96,8 @@ bool g_shutdownInProgress;
 bool g_shutdown;
 
 void boot() {
+	printf("sizeof(Value) = %d\n", sizeof(Value));
+
     initAllocHeap(ALLOC_BUFFER, ALLOC_BUFFER_SIZE);
 
     assert((uint32_t)(MEMORY_END - MEMORY_BEGIN) <= MEMORY_SIZE);

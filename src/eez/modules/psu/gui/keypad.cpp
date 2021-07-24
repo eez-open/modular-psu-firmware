@@ -1154,7 +1154,7 @@ void NumericKeypad::onEncoder(int counter) {
             newValue = clamp(newValue, m_options.min, m_options.max);
             m_startValue = MakeValue(newValue, m_startValue.getUnit());
             return;
-        } else if (m_startValue.getType() == VALUE_TYPE_INT) {
+        } else if (m_startValue.getType() == VALUE_TYPE_INT32) {
             int newValue = m_startValue.getInt() + counter;
 
             if (newValue < (int)m_options.min) {

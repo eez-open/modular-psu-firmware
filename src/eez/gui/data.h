@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <assert.h>
 #include <stdint.h>
 #include <eez/unit.h>
 #include <eez/index.h>
@@ -81,26 +82,28 @@ typedef uint8_t ValueType;
 struct Value {
   public:
     Value() 
-        : type_(VALUE_TYPE_UNDEFINED), unit_(UNIT_UNKNOWN), options_(0)
-    {
-        pVoid_ = 0;
-    }
-
-    Value(int value) 
-        : type_(VALUE_TYPE_INT), unit_(UNIT_UNKNOWN), options_(0), int_(value)
+        : type_(VALUE_TYPE_UNDEFINED), unit_(UNIT_UNKNOWN), options_(0), pVoid_(0)
     {
     }
 
-    Value(bool value)
-        : type_(VALUE_TYPE_INT), unit_(UNIT_UNKNOWN), options_(0), int_(value ? 1 : 0)
+	Value(bool value)
+		: type_(VALUE_TYPE_INT32), unit_(UNIT_UNKNOWN), options_(0), int32_(value ? 1 : 0) {
+	}
+
+	Value(int32_t value)
+        : type_(VALUE_TYPE_INT32), unit_(UNIT_UNKNOWN), options_(0), int32_(value)
     {
     }
-    
-    Value(const char *str) 
+
+	Value(float value)
+		: type_(VALUE_TYPE_FLOAT), unit_(UNIT_UNKNOWN), options_(0), float_(value) {
+	}
+
+	Value(const char *str)
         : type_(VALUE_TYPE_STRING), unit_(UNIT_UNKNOWN), options_(0), str_(str)
     {
     }
-    
+
     Value(int version, const char *str) 
         : type_(VALUE_TYPE_VERSIONED_STRING), unit_(version), options_(0), str_(str)
     {
@@ -111,13 +114,13 @@ struct Value {
     {
     }
 
-    Value(int value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), int_(value)
+    Value(int32_t value, ValueType type)
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), int32_(value)
     {
     }
 
-    Value(int value, ValueType type, uint16_t options)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(options), int_(value)
+    Value(int32_t value, ValueType type, uint16_t options)
+        : type_(type), unit_(UNIT_UNKNOWN), options_(options), int32_(value)
     {
     }
 
@@ -182,10 +185,20 @@ struct Value {
     ValueType getType() const {
         return (ValueType)type_;
     }
-    bool isFloat() const {
+
+	bool isInteger() const {
+		return type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_UINT32;
+	}
+
+	bool isFloat() const {
         return type_ == VALUE_TYPE_FLOAT;
     }
-    bool isString() {
+    
+	bool isBoolean() const {
+		return type_ == VALUE_TYPE_BOOLEAN;
+	}
+
+	bool isString() {
         return type_ == VALUE_TYPE_STRING;
     }
 
@@ -193,18 +206,9 @@ struct Value {
         return (Unit)unit_;
     }
 
-    bool isPico() const;
-    bool isNano() const;
-    bool isMicro() const;
-    bool isMilli() const;
-    bool isKilo() const;
-    bool isMega() const;
-
-    float getFloat() const {
-        return float_;
-    }
-
-    int getInt() const;
+	bool getBoolean() const {
+		return int32_;
+	}
 
 	int8_t getInt8() const {
 		return int8_;
@@ -223,20 +227,29 @@ struct Value {
     }
 	
 	int32_t getInt32() const {
-		return uint32_;
+		return int32_;
 	}
 	
 	uint32_t getUInt32() const {
         return uint32_;
     }
 
-	uint32_t getAssetObjOffset() const {
-        return uint32_;
-    }
+	float getFloat() const {
+		return float_;
+	}
 
-    const char *getString() const {
-        return str_;
-    }
+	const char *getString() const {
+		return str_;
+	}
+
+    //////////
+
+	int getInt() const {
+		if (type_ == VALUE_TYPE_ENUM) {
+			return enum_.enumValue;
+		}
+		return int32_;
+	}
 
     const EnumValue &getEnum() const {
         return enum_;
@@ -305,13 +318,17 @@ struct Value {
         return pairOfUint16_.second;
     }
 
+    //////////
+
+    bool isPico() const;
+    bool isNano() const;
+    bool isMicro() const;
+    bool isMilli() const;
+    bool isKilo() const;
+    bool isMega() const;
+
   public:
-    ValueType type_;
-    uint8_t unit_;
-    uint16_t options_;
     union {
-        int int_;
-		
 		uint8_t int8_;
         uint8_t uint8_;
 		
@@ -323,14 +340,22 @@ struct Value {
         
 		float float_;
         const char *str_;
+
+        //
         EnumValue enum_;
-        uint8_t *puint8_;
+        uint8_t *puint8_;   
         float *pFloat_;
         void *pVoid_;
         PairOfUint8Value pairOfUint8_;
         PairOfUint16Value pairOfUint16_;
         PairOfInt16Value pairOfInt16_;
+
+		// new
+		double number_;
     };
+	ValueType type_;
+	uint8_t unit_;
+	uint16_t options_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

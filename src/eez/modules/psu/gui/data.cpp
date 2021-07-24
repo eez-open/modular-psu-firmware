@@ -376,8 +376,8 @@ Value MakeFloatListValue(float *pFloat) {
 
 Value MakeLessThenMinMessageValue(float float_, const Value &value_) {
     Value value;
-    if (value_.getType() == VALUE_TYPE_INT) {
-        value.int_ = int(float_);
+    if (value_.getType() == VALUE_TYPE_INT32) {
+        value.int32_ = int(float_);
         value.type_ = VALUE_TYPE_LESS_THEN_MIN_INT;
     } else if (value_.getType() == VALUE_TYPE_TIME_ZONE) {
         value.type_ = VALUE_TYPE_LESS_THEN_MIN_TIME_ZONE;
@@ -391,8 +391,8 @@ Value MakeLessThenMinMessageValue(float float_, const Value &value_) {
 
 Value MakeGreaterThenMaxMessageValue(float float_, const Value &value_) {
     Value value;
-    if (value_.getType() == VALUE_TYPE_INT) {
-        value.int_ = int(float_);
+    if (value_.getType() == VALUE_TYPE_INT32) {
+        value.int32_ = int(float_);
         value.type_ = VALUE_TYPE_GREATER_THEN_MAX_INT;
     } else if (value_.getType() == VALUE_TYPE_TIME_ZONE) {
         value.type_ = VALUE_TYPE_GREATER_THEN_MAX_TIME_ZONE;

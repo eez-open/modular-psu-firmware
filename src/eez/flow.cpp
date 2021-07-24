@@ -133,107 +133,134 @@ struct EvalStack {
 
 };
 
-void do_OPERATION_TYPE_ADD(EvalStack &stack) {
+bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 	auto a = stack.pop();
 	auto b = stack.pop();
 
-	if (a.getType() == VALUE_TYPE_FLOAT) {
-		if (b.getType() == VALUE_TYPE_FLOAT) {
-			stack.push(Value(a.getFloat() + b.getFloat(), VALUE_TYPE_FLOAT));
-		} else if (b.getType() == VALUE_TYPE_INT8) {
-			stack.push(Value(a.getFloat() + b.getInt8(), VALUE_TYPE_FLOAT));
-		} else if (b.getType() == VALUE_TYPE_UINT8) {
-			stack.push(Value(a.getFloat() + b.getUInt8(), VALUE_TYPE_FLOAT));
-		} else if (b.getType() == VALUE_TYPE_INT16) {
-			stack.push(Value(a.getFloat() + b.getInt16(), VALUE_TYPE_FLOAT));
-		} else if (b.getType() == VALUE_TYPE_UINT16) {
-			stack.push(Value(a.getFloat() + b.getUInt16(), VALUE_TYPE_FLOAT));
-		} else if (b.getType() == VALUE_TYPE_INT32) {
-			stack.push(Value(a.getFloat() + b.getInt32(), VALUE_TYPE_FLOAT));
-		} else if (b.getType() == VALUE_TYPE_UINT32) {
-			stack.push(Value(a.getFloat() + b.getUInt32(), VALUE_TYPE_FLOAT));
-		} else {
-			stack.push(Value());
-		}
+	if (a.isFloat() || b.isFloat()) {
+		stack.push(a.getFloat() + b.getFloat());
+		return true;
 	}
+	if (a.isInteger() || b.isInteger()) {
+		stack.push(a.getInt32() + b.getInt32());
+	}
+
+	return false;
 }
 
-void do_OPERATION_TYPE_SUB(EvalStack &stack) {
+bool do_OPERATION_TYPE_SUB(EvalStack &stack) {
+	auto a = stack.pop();
+	auto b = stack.pop();
+
+	if (a.isFloat() || b.isFloat()) {
+		stack.push(a.getFloat() + b.getFloat());
+		return true;
+	}
+	if (a.isInteger() && b.isInteger()) {
+		// TODO što ako su oba uint32_t? rezultat bi trebao biti uint32_t
+		stack.push(a.getInt32() + b.getInt32());
+	}
+
+	return false;
 }
 
-void do_OPERATION_TYPE_MUL(EvalStack &stack) {
+bool do_OPERATION_TYPE_MUL(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_DIV(EvalStack &stack) {
+bool do_OPERATION_TYPE_DIV(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_MOD(EvalStack &stack) {
+bool do_OPERATION_TYPE_MOD(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_LEFT_SHIFT(EvalStack &stack) {
+bool do_OPERATION_TYPE_LEFT_SHIFT(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_RIGHT_SHIFT(EvalStack &stack) {
+bool do_OPERATION_TYPE_RIGHT_SHIFT(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_BINARY_AND(EvalStack &stack) {
+bool do_OPERATION_TYPE_BINARY_AND(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_BINARY_OR(EvalStack &stack) {
+bool do_OPERATION_TYPE_BINARY_OR(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_BINARY_XOR(EvalStack &stack) {
+bool do_OPERATION_TYPE_BINARY_XOR(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_EQUAL(EvalStack &stack) {
+bool do_OPERATION_TYPE_EQUAL(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_NOT_EQUAL(EvalStack &stack) {
+bool do_OPERATION_TYPE_NOT_EQUAL(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_LESS(EvalStack &stack) {
+bool do_OPERATION_TYPE_LESS(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_GREATER(EvalStack &stack) {
+bool do_OPERATION_TYPE_GREATER(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_LESS_OR_EQUAL(EvalStack &stack) {
+bool do_OPERATION_TYPE_LESS_OR_EQUAL(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_GREATER_OR_EQUAL(EvalStack &stack) {
+bool do_OPERATION_TYPE_GREATER_OR_EQUAL(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
+bool do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {
+bool do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
+bool do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
+bool do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT(EvalStack &stack) {
+bool do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_NOT(EvalStack &stack) {
+bool do_OPERATION_TYPE_NOT(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
+bool do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
+bool do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_MATH_COS(EvalStack &stack) {
+bool do_OPERATION_TYPE_MATH_COS(EvalStack &stack) {
+	return false;
 }
 
-void do_OPERATION_TYPE_MATH_LOG(EvalStack &stack) {
+bool do_OPERATION_TYPE_MATH_LOG(EvalStack &stack) {
+	return false;
 }
 
-typedef void (*EvalOperation)(EvalStack &);
+typedef bool (*EvalOperation)(EvalStack &);
 
 EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_ADD,
@@ -264,7 +291,7 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_MATH_LOG,
 };
 
-static Value eval(Assets *assets, FlowState *flowState, uint16_t *instructions) {
+static bool eval(Assets *assets, FlowState *flowState, uint16_t *instructions, Value &result) {
 	EvalStack stack;
 
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
@@ -283,7 +310,10 @@ static Value eval(Assets *assets, FlowState *flowState, uint16_t *instructions) 
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {
 			stack.push(flowDefinition->globalVariables.item(assets, instructionArg));
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
-			g_evalOperations[instructionArg](stack);
+			if (!g_evalOperations[instructionArg](stack)) {
+				result = Value();
+				return false;
+			}
 		} else {
 			break;
 		}
@@ -291,10 +321,15 @@ static Value eval(Assets *assets, FlowState *flowState, uint16_t *instructions) 
 
 	assert(stack.sp == 1);
 
-	return stack.pop();
+	result = stack.pop();
+	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void throwError() {
+	// TODO
+}
 
 void executeComponent(Assets *assets, FlowState *flowState, unsigned componentIndex) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
@@ -310,9 +345,22 @@ void executeComponent(Assets *assets, FlowState *flowState, unsigned componentIn
 	    //printf("Execute DELAY component at index = %d\n", componentIndex);
 
 		auto propertyValue = component->propertyValues.item(assets, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS);
-		auto value = eval(assets, flowState, propertyValue->evalInstructions);
 
-		osDelay(roundf(value.getFloat()));
+		Value value;
+
+		if (!eval(assets, flowState, propertyValue->evalInstructions, value)) {
+			throwError();
+			return;
+		}
+
+		if (value.isInteger()) {
+			osDelay(value.getInt32());
+		} else if (value.isFloat()) {
+			osDelay(floorf(value.getFloat()));
+		} else {
+			throwError();
+			return;
+		}
 
 		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
 		propagateValue(assets, flowState, *component->outputs.item(assets, 0), nullValue);
@@ -505,7 +553,7 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 
 	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
 		auto propertyValue = flow->widgetDataItems.item(assets, dataId);
-		value = eval(assets, flowState, propertyValue->evalInstructions);
+		eval(assets, flowState, propertyValue->evalInstructions, value);
 	}
 }
 

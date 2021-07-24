@@ -598,7 +598,7 @@ scpi_result_t scpi_cmd_displayWindowDialogActionQ(scpi_t *context) {
 }
 
 scpi_choice_def_t dataTypeChoice[] = {
-    { "INTeger", VALUE_TYPE_INT },
+    { "INTeger", VALUE_TYPE_INT32 },
     { "FLOat", VALUE_TYPE_FLOAT },
     { "STRing", VALUE_TYPE_STRING },
     SCPI_CHOICE_LIST_END /* termination of option list */
@@ -665,13 +665,13 @@ scpi_result_t scpi_cmd_displayWindowDialogData(scpi_t *context) {
 
         Value dataValue = eez::gui::MakeValue(value, (Unit)unit);
         psu::gui::g_psuAppContext.dialogSetDataItemValue(dataId, dataValue);
-    } else if (type == VALUE_TYPE_INT) {
+    } else if (type == VALUE_TYPE_INT32) {
         int32_t value;
         if (!SCPI_ParamInt(context, &value, true)) {
             return SCPI_RES_ERR;
         }
 
-        Value dataValue = (int)value;
+        Value dataValue(value);
         psu::gui::g_psuAppContext.dialogSetDataItemValue(dataId, dataValue);
     } else if (type == VALUE_TYPE_STRING) {
         const char *valueText;

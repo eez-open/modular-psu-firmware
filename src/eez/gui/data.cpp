@@ -68,11 +68,11 @@ void BOOLEAN_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_INT8_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
+    return a.getInt8() == b.getInt8();
 }
 
 void INT8_value_to_text(const Value &value, char *text, int count) {
-    stringAppendInt(text, count, value.getInt());
+    stringAppendInt(text, count, value.getInt8());
 }
 
 bool compare_UINT8_value(const Value &a, const Value &b) {
@@ -84,11 +84,11 @@ void UINT8_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_INT16_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
+    return a.getInt16() == b.getInt16();
 }
 
 void INT16_value_to_text(const Value &value, char *text, int count) {
-    stringAppendInt(text, count, value.getInt());
+    stringAppendInt(text, count, value.getInt16());
 }
 
 bool compare_UINT16_value(const Value &a, const Value &b) {
@@ -100,11 +100,11 @@ void UINT16_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_INT32_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
+    return a.getInt32() == b.getInt32();
 }
 
 void INT32_value_to_text(const Value &value, char *text, int count) {
-    stringAppendInt(text, count, value.getInt());
+    stringAppendInt(text, count, value.getInt32());
 }
 
 bool compare_UINT32_value(const Value &a, const Value &b) {
@@ -293,14 +293,6 @@ void STRING_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
-bool compare_INT_value(const Value &a, const Value &b) {
-    return a.getInt() == b.getInt();
-}
-
-void INT_value_to_text(const Value &value, char *text, int count) {
-    stringAppendInt(text, count, value.getInt());
-}
-
 bool compare_VERSIONED_STRING_value(const Value &a, const Value &b) {
     return a.unit_ == b.unit_; // here unit_ is used as string version
 }
@@ -465,13 +457,6 @@ bool Value::operator==(const Value &other) const {
         return false;
     }
     return g_valueTypeCompareFunctions[type_](*this, other);
-}
-
-int Value::getInt() const {
-    if (type_ == VALUE_TYPE_ENUM) {
-        return enum_.enumValue;
-    }
-    return int_;
 }
 
 bool Value::isPico() const {
@@ -685,11 +670,11 @@ bool getEncoderStepValues(const WidgetCursor &widgetCursor,  int16_t id, StepVal
     if (stepValues.encoderSettings.mode != ENCODER_MODE_AUTO) {
         stepValues.encoderSettings.accelerationEnabled = false;
     }
-    return value.getType() == VALUE_TYPE_INT && value.getInt();
+    return value.getType() == VALUE_TYPE_INT32 && value.getInt();
 }
 
 void setEncoderMode(const WidgetCursor &widgetCursor,  int16_t id, EncoderMode encoderMode) {
-	Value value(encoderMode, VALUE_TYPE_INT);
+	Value value(encoderMode, VALUE_TYPE_INT32);
 	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_SET_ENCODER_MODE, widgetCursor, value);
 }
 
@@ -951,14 +936,14 @@ void ytDataTouchDrag(const WidgetCursor &widgetCursor,  int16_t id, TouchDrag *t
 int getTextCursorPosition(const WidgetCursor &widgetCursor,  int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_TEXT_CURSOR_POSITION, widgetCursor, value);
-    return value.getType() == VALUE_TYPE_INT ? value.getInt() : -1;
+    return value.getType() == VALUE_TYPE_INT32 ? value.getInt() : -1;
 }
 
 int getXScroll(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
     Value value((void *)&widgetCursor, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET_X_SCROLL, widgetCursor, value);
-    return value.getType() == VALUE_TYPE_INT ? value.getInt() : 0;
+    return value.getType() == VALUE_TYPE_INT32 ? value.getInt() : 0;
 }
 
 void getSlotAndSubchannelIndex(const WidgetCursor &widgetCursor,  int16_t id, int &slotIndex, int &subchannelIndex) {
