@@ -26,6 +26,8 @@
 #include <eez/flow_defs_v3.h>
 #include <eez/scripting.h>
 
+#define FLOW_DEBUG 0
+
 using namespace eez::gui;
 
 namespace eez {
@@ -76,11 +78,16 @@ bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex) {
 	return true;
 }
 
-bool allInputsDefined(Assets *assets, FlowState *flowState, unsigned componentIndex) {
+bool isReadyToRun(Assets *assets, FlowState *flowState, unsigned componentIndex) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 	auto component = flow->components.item(assets, componentIndex);
 
+	if (component->type < 1000) {
+		return false;
+	}
+
+	// check if all inputs are defined
 	for (unsigned inputIndex = 0; inputIndex < component->inputs.count; inputIndex++) {
 		auto inputValueIndex = component->inputs.ptr(assets)[inputIndex];
 
@@ -94,7 +101,7 @@ bool allInputsDefined(Assets *assets, FlowState *flowState, unsigned componentIn
 }
 
 void pingComponent(Assets *assets, FlowState *flowState, unsigned componentIndex) {
-    if (allInputsDefined(assets, flowState, componentIndex)) {
+    if (isReadyToRun(assets, flowState, componentIndex)) {
         addToQueue(flowState, componentIndex);
     }
 }
@@ -117,6 +124,10 @@ struct EvalStack {
 		stack[sp++] = value;
 	}
 
+	void push(Value *pValue) {
+		stack[sp++] = Value(pValue, VALUE_TYPE_VALUE_PTR);
+	}
+
 	Value pop() {
 		return stack[--sp];
 	}
@@ -127,30 +138,38 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 	auto a = stack.pop();
 	auto b = stack.pop();
 
-	if (a.isFloat() || b.isFloat()) {
-		stack.push(a.getFloat() + b.getFloat());
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValue_;
+	}
+
+	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
+		b = *b.pValue_;
+	}
+
+	if (a.isDouble() || b.isDouble()) {
+		stack.push(Value(a.toDouble() + b.toDouble(), VALUE_TYPE_DOUBLE));
 		return true;
 	}
-	if (a.isInteger() || b.isInteger()) {
-		stack.push(a.getInt32() + b.getInt32());
+
+	if (a.isFloat() || b.isFloat()) {
+		stack.push(Value(a.toFloat() + b.toFloat(), VALUE_TYPE_FLOAT));
+		return true;
+	}
+
+	if (a.isInt64() || b.isInt64()) {
+		stack.push(Value(a.toInt64() + b.toInt64(), VALUE_TYPE_INT64));
+		return true;
+	}
+
+	if (a.isInt32OrLess() && b.isInt32OrLess()) {
+		stack.push(Value(a.int32_ + b.int32_, VALUE_TYPE_INT32));
+		return true;
 	}
 
 	return false;
 }
 
 bool do_OPERATION_TYPE_SUB(EvalStack &stack) {
-	auto a = stack.pop();
-	auto b = stack.pop();
-
-	if (a.isFloat() || b.isFloat()) {
-		stack.push(a.getFloat() + b.getFloat());
-		return true;
-	}
-	if (a.isInteger() && b.isInteger()) {
-		// TODO �to ako su oba uint32_t? rezultat bi trebao biti uint32_t
-		stack.push(a.getInt32() + b.getInt32());
-	}
-
 	return false;
 }
 
@@ -281,42 +300,93 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_MATH_LOG,
 };
 
-static bool eval(Assets *assets, FlowState *flowState, uint16_t *instructions, Value &result) {
-	EvalStack stack;
-
+static bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 
-	for (int i = 0; ; i++) {
-		auto instruction = instructions[i];
+	int i = 0;
+	while (true) {
+		uint16_t instruction = instructions[i] + (instructions[i + 1] << 8);
 		auto instructionType = instruction & EXPR_EVAL_INSTRUCTION_TYPE_MASK;
-		auto instructionArg = instruction & ~EXPR_EVAL_INSTRUCTION_TYPE_MASK;
+		auto instructionArg = instruction & EXPR_EVAL_INSTRUCTION_PARAM_MASK;
 		if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT) {
 			stack.push(*flowDefinition->constants.item(assets, instructionArg));
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT) {
 			stack.push(flowState->values[instructionArg]);
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR) {
-			stack.push(flowState->values[flow->nInputValues + instructionArg]);
+			stack.push(&flowState->values[flow->nInputValues + instructionArg]);
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {
-			stack.push(*flowDefinition->globalVariables.item(assets, instructionArg));
+			stack.push(flowDefinition->globalVariables.item(assets, instructionArg));
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
 			if (!g_evalOperations[instructionArg](stack)) {
-				result = Value();
 				return false;
 			}
 		} else {
+			i += 2;
 			break;
+		}
+
+		i += 2;
+	}
+
+	if (numInstructionBytes) {
+		*numInstructionBytes = i;
+	}
+
+	return true;
+}
+
+static bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, Value &result) {
+	EvalStack stack;
+
+	if (evalExpression(assets, flowState, instructions, stack)) {
+		if (stack.sp == 1) {
+			auto finalResult = stack.pop();
+
+			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR) {
+				result = *finalResult.pValue_;
+			} else {
+				result = finalResult;
+			}
+
+			return true;
 		}
 	}
 
-	if (stack.sp == 1) {
-		result = stack.pop();
-		return true;
-	}
-
-	// TODO
 	result = Value();
 	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static bool evalAssignableExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, Value **result, int *numInstructionBytes = nullptr) {
+	EvalStack stack;
+
+	if (evalExpression(assets, flowState, instructions, stack, numInstructionBytes)) {
+		if (stack.sp == 1) {
+			auto finalResult = stack.pop();
+			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR) {
+				*result = finalResult.pValue_;
+				return true;
+			}
+		}
+	}
+
+	*result = nullptr;
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void assignValue(Value &dstValue, const Value &srcValue) {
+	if (dstValue.isInt32OrLess()) {
+		dstValue.int32_ = srcValue.toInt32();
+	} else if (dstValue.isFloat()) {
+		dstValue.float_ = srcValue.toFloat();
+	} else if (dstValue.isDouble()) {
+		dstValue.float_ = srcValue.toDouble();
+	}
+	// TODO
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,41 +400,37 @@ void executeComponent(Assets *assets, FlowState *flowState, unsigned componentIn
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 	auto component = flow->components.item(assets, componentIndex);
     if (component->type == defs_v3::COMPONENT_TYPE_START_ACTION) {
-	    //printf("Execute START component at index = %d\n", componentIndex);
-
-		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
-
-		propagateValue(assets, flowState, *component->outputs.item(assets, 0), nullValue);
+#if FLOW_DEBUG
+	    printf("Execute START component at index = %d\n", componentIndex);
+#endif
     } else if (component->type == defs_v3::COMPONENT_TYPE_DELAY_ACTION) {
-	    //printf("Execute DELAY component at index = %d\n", componentIndex);
-
+#if FLOW_DEBUG
+	    printf("Execute DELAY component at index = %d\n", componentIndex);
+#endif
 		auto propertyValue = component->propertyValues.item(assets, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS);
 
 		Value value;
-
-		if (!eval(assets, flowState, propertyValue->evalInstructions, value)) {
+		if (!evalExpression(assets, flowState, propertyValue->evalInstructions, value)) {
 			throwError();
 			return;
 		}
 
-		if (value.isInteger()) {
-			osDelay(value.getInt32());
-		} else if (value.isFloat()) {
-			osDelay(floorf(value.getFloat()));
+		double milliseconds = value.toDouble();
+		if (!isNaN(milliseconds)) {
+			osDelay((uint32_t)floor(milliseconds));
 		} else {
 			throwError();
 			return;
 		}
-
-		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
-		propagateValue(assets, flowState, *component->outputs.item(assets, 0), nullValue);
     } else if (component->type == defs_v3::COMPONENT_TYPE_END_ACTION) {
-	    //printf("Execute END component at index = %d\n", componentIndex);
-
+#if FLOW_DEBUG
+		printf("Execute END component at index = %d\n", componentIndex);
+#endif
 		scripting::stopScript();
     } else if (component->type == defs_v3::COMPONENT_TYPE_CONSTANT_ACTION) {
-	    //printf("Execute CONSTANT component at index = %d\n", componentIndex);
-
+#if FLOW_DEBUG
+		printf("Execute CONSTANT component at index = %d\n", componentIndex);
+#endif
         struct ConstantActionComponent : public Component {
             uint16_t valueIndex;
         };
@@ -377,13 +443,14 @@ void executeComponent(Assets *assets, FlowState *flowState, unsigned componentIn
 			propagateValue(assets, flowState, componentOutput, sourceValue);
 		}
 	} else if (component->type == defs_v3::COMPONENT_TYPE_SCPI_ACTION) {
-	    //printf("Execute SCPI component at index = %d\n", componentIndex);
-
+#if FLOW_DEBUG
+		printf("Execute SCPI component at index = %d\n", componentIndex);
+#endif
 		struct ScpiActionComponent : public Component {
 			uint8_t instructions[1];
 		};
 		auto specific = (ScpiActionComponent *)component;
-		auto instructions = ((ScpiActionComponent *)component)->instructions;
+		auto instructions = specific->instructions;
 
 		static const int SCPI_PART_STRING = 1;
 		static const int SCPI_PART_EXPR = 2;
@@ -401,55 +468,96 @@ void executeComponent(Assets *assets, FlowState *flowState, unsigned componentIn
 			uint8_t op = instructions[i++];
 
 			if (op == SCPI_PART_STRING) {
-				//printf("SCPI_PART_STRING\n");
+#if FLOW_DEBUG
+				printf("SCPI_PART_STRING\n");
+#endif
 				uint16_t sizeLowByte = instructions[i++];
 				uint16_t sizeHighByte = instructions[i++];
 				uint16_t stringLength = sizeLowByte | (sizeHighByte << 8);
-				stringAppendStringLength(commandOrQueryText, sizeof(commandOrQueryText), (const char *)specific + i, (size_t)stringLength);
+				stringAppendStringLength(commandOrQueryText, sizeof(commandOrQueryText), (const char *)instructions + i, (size_t)stringLength);
 				i += stringLength;
 			} else if (op == SCPI_PART_EXPR) {
-				//printf("SCPI_PART_EXPR\n");
+#if FLOW_DEBUG
+				printf("SCPI_PART_EXPR\n");
+#endif
 				//uint8_t inputIndex = specific[i++];
 				// TODO
 			} else if (op == SCPI_PART_QUERY_WITH_ASSIGNMENT) {
-				//printf("SCPI_PART_QUERY_WITH_ASSIGNMENT\n");
+#if FLOW_DEBUG
+				printf("SCPI_PART_QUERY_WITH_ASSIGNMENT\n");
+#endif
 				stringAppendString(commandOrQueryText, sizeof(commandOrQueryText), "\n");
-				scripting::scpi(commandOrQueryText, &resultText, &resultTextLen);
-				
-				// TODO!!!
-				static char buffers[2][256];
-				static int k = 0;
-				char *buffer = &buffers[k][0];
-				k = (k + 1) % 2;
-				stringCopyLength(buffer, 256, resultText, resultTextLen);
-				gui::Value value;
-				value.type_ = VALUE_TYPE_STRING;
-				value.str_ = buffer;
-
-				uint8_t outputIndex = instructions[i++];
-				propagateValue(assets, flowState, *component->outputs.item(assets, outputIndex), value);
+				if (!scripting::scpi(commandOrQueryText, &resultText, &resultTextLen)) {
+					throwError();
+					return;
+				}
 				commandOrQueryText[0] = 0;
+
+				Value *pDstValue;
+				int numInstructionBytes;
+				if (!evalAssignableExpression(assets, flowState, instructions + i, &pDstValue, &numInstructionBytes)) {
+					throwError();
+					return;
+				}
+				i += numInstructionBytes;
+
+				Value srcValue(resultText, resultTextLen);
+
+				assignValue(*pDstValue, srcValue);
 			} else if (op == SCPI_PART_QUERY) {
-				//printf("SCPI_PART_QUERY\n");
+#if FLOW_DEBUG
+				printf("SCPI_PART_QUERY\n");
+#endif
 				stringAppendString(commandOrQueryText, sizeof(commandOrQueryText), "\n");
 				scripting::scpi(commandOrQueryText, &resultText, &resultTextLen);
 				commandOrQueryText[0] = 0;
 			} else if (op == SCPI_PART_COMMAND) {
-				//printf("SCPI_PART_COMMAND\n");
+#if FLOW_DEBUG
+				printf("SCPI_PART_COMMAND\n");
+#endif
 				stringAppendString(commandOrQueryText, sizeof(commandOrQueryText), "\n");
 				scripting::scpi(commandOrQueryText, &resultText, &resultTextLen);
 				commandOrQueryText[0] = 0;
 			} else if (op == SCPI_PART_END) {
-				//printf("SCPI_PART_END\n");
+#if FLOW_DEBUG
+				printf("SCPI_PART_END\n");
+#endif
 				break;
 			}
 		}
 
-		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
-		propagateValue(assets, flowState, *component->outputs.item(assets, 0), nullValue);
+	} else if (component->type == defs_v3::COMPONENT_TYPE_SET_VARIABLE_ACTION) {
+#if FLOW_DEBUG
+		printf("Execute SetVariable component at index = %d\n", componentIndex);
+#endif
+
+        struct SetVariableActionComponent : public Component {
+            uint8_t assignableExpressionEvalInstructions[1];
+        };
+		auto setVariableActionComponent = (SetVariableActionComponent *)component;
+
+		Value *pDstValue;
+		if (!evalAssignableExpression(assets, flowState, setVariableActionComponent->assignableExpressionEvalInstructions, &pDstValue)) {
+			throwError();
+			return;
+		}
+
+		auto propertyValue = component->propertyValues.item(assets, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE);
+		Value srcValue;
+		if (!evalExpression(assets, flowState, propertyValue->evalInstructions, srcValue)) {
+			throwError();
+			return;
+		}
+
+		assignValue(*pDstValue, srcValue);
     } else {
-	    //printf("Unknow component at index = %d, type = %d\n", componentIndex, component.type);
+#if FLOW_DEBUG
+		printf("Unknown component at index = %d, type = %d\n", componentIndex, component->type);
+#endif
     }
+
+	auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
+	propagateValue(assets, flowState, *component->outputs.item(assets, 0), nullValue);
 }
 
 static FlowState *initFlowState(Assets *assets, int flowIndex) {
@@ -479,7 +587,6 @@ unsigned start(Assets *assets) {
 	if (flowDefinition->flows.count == 0) {
 		return 0;
 	}
-
 
 	g_assets = assets;
 
@@ -552,7 +659,7 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
 		auto propertyValue = flow->widgetDataItems.item(assets, dataId);
 		if (propertyValue) {
-			eval(assets, flowState, propertyValue->evalInstructions, value);
+			evalExpression(assets, flowState, propertyValue->evalInstructions, value);
 		} else {
 			value = Value();
 		}

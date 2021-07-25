@@ -2260,9 +2260,9 @@ void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCurso
     } else if (operation == DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS) {
         value = dlog_view::NUM_VERT_DIVISIONS;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_DIV) {
-        value = Value(recording.dlogValues[value.getUInt8()].div, recording.parameters.yAxes[value.getUInt8()].unit);
+        value = Value((float)recording.dlogValues[value.getUInt8()].div, recording.parameters.yAxes[value.getUInt8()].unit);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_OFFSET) {
-        value = Value(recording.dlogValues[value.getUInt8()].offset, recording.parameters.yAxes[value.getUInt8()].unit);
+        value = Value((float)recording.dlogValues[value.getUInt8()].offset, recording.parameters.yAxes[value.getUInt8()].unit);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD) {
         value = YT_GRAPH_UPDATE_METHOD_STATIC;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PERIOD) {
@@ -2369,7 +2369,7 @@ void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCurso
         }
         value = Value(roundValueOnXAxis(recording, xValue), recording.parameters.xAxis.unit);
     } else if (operation == DATA_OPERATION_GET) {
-        value = Value(dlog_view::getPosition(recording) * recording.parameters.period + recording.cursorOffset, dlog_view::getXAxisUnit(recording));
+        value = Value((float)(dlog_view::getPosition(recording) * recording.parameters.period + recording.cursorOffset), dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = Value(0.0f, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MAX) {
@@ -2570,7 +2570,7 @@ void data_dlog_value_div(DataOperationEnum operation, const WidgetCursor &widget
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else {
-            value = Value(recording.dlogValues[cursor].div, getYAxisUnit(recording, cursor));
+            value = Value((float)recording.dlogValues[cursor].div, getYAxisUnit(recording, cursor));
 		}
 	} else if (operation == DATA_OPERATION_GET_MIN) {
         value = Value(minDiv, getYAxisUnit(recording, cursor));
@@ -2652,7 +2652,7 @@ void data_dlog_value_offset(DataOperationEnum operation, const WidgetCursor &wid
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else {
-            value = Value(recording.dlogValues[cursor].offset, getYAxisUnit(recording, cursor));
+            value = Value((float)recording.dlogValues[cursor].offset, getYAxisUnit(recording, cursor));
 		}
 	} else if (operation == DATA_OPERATION_GET_MIN) {
 		value = Value(minOffset, getYAxisUnit(recording, cursor));
@@ -2700,7 +2700,7 @@ void data_dlog_x_axis_offset(DataOperationEnum operation, const WidgetCursor &wi
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else {
-            value = Value(recording.xAxisOffset, dlog_view::getXAxisUnit(recording));
+            value = Value((float)recording.xAxisOffset, dlog_view::getXAxisUnit(recording));
         }
     } else if (operation == DATA_OPERATION_GET_MIN) {
         value = Value(recording.parameters.xAxis.range.min, dlog_view::getXAxisUnit(recording));
@@ -2733,12 +2733,12 @@ void data_dlog_x_axis_div(DataOperationEnum operation, const WidgetCursor &widge
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else {
-            value = Value(recording.xAxisDiv, dlog_view::getXAxisUnit(recording));
+            value = Value((float)recording.xAxisDiv, dlog_view::getXAxisUnit(recording));
         }
     } else if (operation == DATA_OPERATION_GET_MIN || operation == DATA_OPERATION_GET_DEF) {
-        value = Value(recording.xAxisDivMin, dlog_view::getXAxisUnit(recording));
+        value = Value((float)recording.xAxisDivMin, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_GET_MAX) {
-        value = Value(recording.xAxisDivMax, dlog_view::getXAxisUnit(recording));
+        value = Value((float)recording.xAxisDivMax, dlog_view::getXAxisUnit(recording));
     } else if (operation == DATA_OPERATION_SET) {
         dlog_view::changeXAxisDiv(recording, roundPrec(value.getFloat(), 0.001f));
     } else if (operation == DATA_OPERATION_GET_NAME) {

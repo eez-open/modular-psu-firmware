@@ -208,7 +208,7 @@ static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_OPERATION       = (4 << 13);
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_END             = (5 << 13);
 
 struct PropertyValue {
-	uint16_t evalInstructions[1];
+	uint8_t evalInstructions[1];
 };
 
 struct Connection {

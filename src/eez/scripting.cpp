@@ -94,6 +94,7 @@ static size_t g_scriptSourceLength;
 
 static const size_t MP_GC_MEMORY_SIZE = 512 * 1024;
 static uint8_t *g_mpGCMemory;
+static bool g_isMpRunning;
 
 static struct eez::psu::profile::ScriptingParameters g_scriptingParameters = { "", 1 };
 static uint32_t g_scriptParametersVersion;
@@ -102,6 +103,9 @@ static bool g_autoStartConditionIsChecked;
 static bool g_autoStartScriptIsRunning;
 
 static unsigned g_flowHandle;
+
+WidgetCursor g_actionWidgetCursor;
+int16_t g_actionId;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -199,6 +203,8 @@ void mainLoop(const void *) {
 enum {
     QUEUE_MESSAGE_START_MP_SCRIPT,
 	QUEUE_MESSAGE_START_FLOW_SCRIPT,
+	QUEUE_MESSAGE_EXECUTE_FLOW_ACTION,
+	QUEUE_MESSAGE_STOP_FLOW,
     QUEUE_MESSAGE_SCPI_RESULT
 };
 
@@ -235,6 +241,8 @@ void startMpScript() {
 
 	// this version reinitialise MP every time
 
+	g_isMpRunning = true;
+
 	volatile char dummy;
 	mp_stack_set_top((void *)&dummy);
 	gc_init(g_mpGCMemory, g_mpGCMemory + MP_GC_MEMORY_SIZE);
@@ -259,6 +267,8 @@ void startMpScript() {
 
 	gc_sweep_all();
 	mp_deinit();
+
+	g_isMpRunning = false;
 
 	psu::gui::hideAsyncOperationInProgress();
 	psu::gui::clearTextMessage();
@@ -291,6 +301,11 @@ void oneIter() {
 			startMpScript();
 		} else if (event.value.v == QUEUE_MESSAGE_START_FLOW_SCRIPT) {
 			startFlowScript();
+		} else if (event.value.v == QUEUE_MESSAGE_EXECUTE_FLOW_ACTION) {
+			flow::executeFlowAction(g_flowHandle, g_actionWidgetCursor, g_actionId);
+		} else if (event.value.v == QUEUE_MESSAGE_STOP_FLOW) {
+			flow::stop();
+			g_flowHandle = 0;
 		}
 	} else {
 		if (g_flowHandle != 0) {
@@ -300,9 +315,13 @@ void oneIter() {
 }
 
 void doStopScript() {
-	g_flowHandle = 0;
-
-	terminateThread();
+	if (isFlowRunning()) {
+		osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_STOP_FLOW, 100);
+		g_flowHandle = 0;
+	} else {
+		terminateThread();
+		startThread();
+	}
 
 	psu::gui::hideAsyncOperationInProgress();
 	psu::gui::clearTextMessage();
@@ -316,8 +335,6 @@ void doStopScript() {
 	while (psu::gui::isPageOnStack(getExternalAssetsFirstPageId())) {
 		psu::gui::popPage();
 	}
-	
-	startThread();
 }
 
 bool loadMpScript(int *err) {
@@ -495,7 +512,10 @@ bool isFlowRunning() {
 }
 
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId) {
-	flow::executeFlowAction(g_flowHandle, widgetCursor, actionId);
+	// TODO check overwrite
+	g_actionWidgetCursor = widgetCursor;
+	g_actionId = actionId;
+	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_EXECUTE_FLOW_ACTION, 100);
 }
 
 void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
@@ -541,7 +561,12 @@ bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resul
             } else {
                 static char g_scpiError[48];
                 snprintf(g_scpiError, sizeof(g_scpiError), "SCPI timeout");
-                mp_raise_ValueError(g_scpiError);
+				if (!isIdle() && g_isMpRunning) {
+					mp_raise_ValueError(g_scpiError);
+				} else {
+					// TODO
+					return false;
+				}
             }
         }
     } else {

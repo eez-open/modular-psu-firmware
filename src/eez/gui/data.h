@@ -20,8 +20,13 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include <math.h>
+#include <memory.h>
+
 #include <eez/unit.h>
 #include <eez/index.h>
+#include <eez/alloc.h>
+#include <eez/util.h>
 #include <eez/gui/event.h>
 #include <eez/value_types.h>
 
@@ -68,8 +73,6 @@ struct PairOfInt16Value {
     int16_t second;
 };
 
-typedef uint8_t ValueType;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 #define STRING_OPTIONS_FILE_ELLIPSIS (1 << 0)
@@ -78,6 +81,11 @@ typedef uint8_t ValueType;
 #define FLOAT_OPTIONS_FIXED_DECIMALS (1 << 1)
 #define FLOAT_OPTIONS_GET_NUM_FIXED_DECIMALS(options) (((options) >> 2) & 0b111)
 #define FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(n) (FLOAT_OPTIONS_FIXED_DECIMALS | ((n & 0b111) << 2))
+
+struct RefString {
+	uint32_t refCounter;
+	char *str;
+};
 
 struct Value {
   public:
@@ -96,10 +104,24 @@ struct Value {
     {
     }
 
-    Value(int version, const char *str) 
+	Value(const char *str, size_t len)
+		: type_(VALUE_TYPE_STRING_REF), unit_(UNIT_UNKNOWN), options_(0) 
+	{
+		auto newStr = (char *)alloc(len + 1);
+		stringCopyLength(newStr, len + 1, str, len);
+
+		refString_.refCounter = 1;
+		refString_.str = newStr;
+	}
+	
+	Value(int version, const char *str)
         : type_(VALUE_TYPE_VERSIONED_STRING), unit_(version), options_(0), str_(str)
     {
     }
+
+	Value(Value *pValue)
+		: type_(VALUE_TYPE_VALUE_PTR), unit_(UNIT_UNKNOWN), options_(0), pValue_(pValue) {
+	}
 
     Value(const char *str, ValueType type)
         : type_(type), unit_(UNIT_UNKNOWN), options_(0), str_(str)
@@ -146,7 +168,15 @@ struct Value {
     {
     }
 
-    Value(const char *value, ValueType type, int16_t options)
+	Value(double value, ValueType type)
+		: type_(type), unit_(UNIT_UNKNOWN), options_(0), double_(value) {
+	}
+	
+	Value(int64_t value, ValueType type)
+		: type_(type), unit_(UNIT_UNKNOWN), options_(0), int64_(value) {
+	}
+
+	Value(const char *value, ValueType type, int16_t options)
         : type_(type), unit_(UNIT_UNKNOWN), options_(options), str_(value)
     {
     }
@@ -168,6 +198,21 @@ struct Value {
     {
     }
 
+	Value(const Value& value) {
+		memcpy(this, &value, sizeof(Value));
+		if (type_ == VALUE_TYPE_STRING_REF) {
+			refString_.refCounter++;
+		}
+	}
+
+	~Value() {
+		if (type_ == VALUE_TYPE_STRING_REF) {
+			if (--refString_.refCounter == 0) {
+				free((char *)refString_.str);
+			}
+		}
+	}
+
     bool operator==(const Value &other) const;
 
     bool operator!=(const Value &other) const {
@@ -178,14 +223,22 @@ struct Value {
         return (ValueType)type_;
     }
 
-	bool isInteger() const {
-		return type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_UINT32;
+	bool isInt32OrLess() const {
+		return type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_UINT32 || type_ == VALUE_TYPE_BOOLEAN;
+	}
+
+	bool isInt64() const {
+		return type_ == VALUE_TYPE_INT64 || type_ == VALUE_TYPE_UINT64;
 	}
 
 	bool isFloat() const {
         return type_ == VALUE_TYPE_FLOAT;
     }
     
+	bool isDouble() const {
+		return type_ == VALUE_TYPE_DOUBLE;
+	}
+
 	bool isBoolean() const {
 		return type_ == VALUE_TYPE_BOOLEAN;
 	}
@@ -322,7 +375,107 @@ struct Value {
         return pairOfUint16_.second;
     }
 
-    //////////
+	double toDouble() const {
+		if (type_ == VALUE_TYPE_DOUBLE) {
+			return double_;
+		}
+		if (type_ == VALUE_TYPE_FLOAT) {
+			return float_;
+		}
+		if (type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32 || type_ == VALUE_TYPE_BOOLEAN) {
+			return int32_;
+		}
+		if (type_ == VALUE_TYPE_UINT32) {
+			return uint32_;
+		}
+		if (type_ == VALUE_TYPE_INT64) {
+			return (double)int64_;
+		}
+		if (type_ == VALUE_TYPE_UINT64) {
+			return (double)uint64_;
+		}
+		if (type_ == VALUE_TYPE_STRING_REF) {
+			return (double)atof(refString_.str);
+		}
+		return NAN;
+	}
+
+	float toFloat() const {
+		if (type_ == VALUE_TYPE_DOUBLE) {
+			return (float)double_;
+		}
+		if (type_ == VALUE_TYPE_FLOAT) {
+			return float_;
+		}
+		if (type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32 || type_ == VALUE_TYPE_BOOLEAN) {
+			return (float)int32_;
+		}
+		if (type_ == VALUE_TYPE_UINT32) {
+			return (float)uint32_;
+		}
+		if (type_ == VALUE_TYPE_INT64) {
+			return (float)int64_;
+		}
+		if (type_ == VALUE_TYPE_UINT64) {
+			return (float)uint64_;
+		}
+		if (type_ == VALUE_TYPE_STRING_REF) {
+			return (float)atof(refString_.str);
+		}
+		return NAN;
+	}
+
+	int32_t toInt32() const {
+		if (type_ == VALUE_TYPE_DOUBLE) {
+			return (int32_t)double_;
+		}
+		if (type_ == VALUE_TYPE_FLOAT) {
+			return (int32_t)float_;
+		}
+		if (type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32 || type_ == VALUE_TYPE_BOOLEAN) {
+			return (int32_t)int32_;
+		}
+		if (type_ == VALUE_TYPE_UINT32) {
+			return (int32_t)uint32_;
+		}
+		if (type_ == VALUE_TYPE_INT64) {
+			return (int32_t)int64_;
+		}
+		if (type_ == VALUE_TYPE_UINT64) {
+			return (int32_t)uint64_;
+		}
+		if (type_ == VALUE_TYPE_STRING_REF) {
+			return (int64_t)atoi(refString_.str);
+		}
+		return NAN;
+	}
+
+	int64_t toInt64() const {
+		if (type_ == VALUE_TYPE_DOUBLE) {
+			return (int64_t)double_;
+		}
+		if (type_ == VALUE_TYPE_FLOAT) {
+			return (int64_t)float_;
+		}
+		if (type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32 || type_ == VALUE_TYPE_BOOLEAN) {
+			return (int64_t)int32_;
+		}
+		if (type_ == VALUE_TYPE_UINT32) {
+			return (int64_t)uint32_;
+		}
+		if (type_ == VALUE_TYPE_INT64) {
+			return (int64_t)int64_;
+		}
+		if (type_ == VALUE_TYPE_UINT64) {
+			return (int64_t)uint64_;
+		}
+		if (type_ == VALUE_TYPE_STRING_REF) {
+			return (int64_t)atoi(refString_.str);
+		}
+		return NAN;
+	}
+	
+	//////////
 
     bool isPico() const;
     bool isNano() const;
@@ -357,9 +510,11 @@ struct Value {
 		float float_;
 
 		const char *str_;
+		RefString refString_;
 		uint8_t *puint8_;
 		float *pFloat_;
 		void *pVoid_;
+		Value *pValue_;
 
 		uint64_t int64_;
 		uint64_t uint64_;

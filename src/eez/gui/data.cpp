@@ -466,6 +466,14 @@ void STRING_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+bool compare_STRING_REF_value(const Value &a, const Value &b) {
+	return compare_STRING_value(a, b);
+}
+
+void STRING_REF_value_to_text(const Value &value, char *text, int count) {
+	STRING_value_to_text(value, text, count);
+}
+
 bool compare_VERSIONED_STRING_value(const Value &a, const Value &b) {
     return a.unit_ == b.unit_; // here unit_ is used as string version
 }
@@ -477,6 +485,18 @@ void VERSIONED_STRING_value_to_text(const Value &value, char *text, int count) {
     } else {
         text[0] = 0;
     }
+}
+
+bool compare_VALUE_PTR_value(const Value &a, const Value &b) {
+	return a.pValue_ == b.pValue_ || a.pValue_ && b.pValue_ && *a.pValue_ == *b.pValue_;
+}
+
+void VALUE_PTR_value_to_text(const Value &value, char *text, int count) {
+	if (value.pValue_) {
+		value.pValue_->toText(text, count);
+	} else {
+		text[0] = 0;
+	}
 }
 
 bool compare_RANGE_value(const Value &a, const Value &b) {

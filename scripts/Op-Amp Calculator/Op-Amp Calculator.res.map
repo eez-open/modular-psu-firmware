@@ -1,16 +1,13 @@
 {
   "flows": [],
-  "values": [
+  "constants": [
     {
-      "index": 0,
       "type": 0
     },
     {
-      "index": 1,
       "type": 1,
       "value": null
     }
   ],
-  "widgetDataItems": [],
-  "widgetActions": []
+  "globalVariables": []
 }
