@@ -345,12 +345,24 @@ void boot() {
 #endif
 
     if (g_numMasterErrors > 0) {
-
 		ErrorTrace("MCU errors: %s\n", g_masterErrorMessage);
     }
 
     // DebugTrace("Memory left: %d\n", MEMORY_SIZE - (uint32_t)(MEMORY_END - MEMORY_BEGIN));
-    DebugTrace("sizeof(Value) = %d\n", sizeof(Value));
+    // DebugTrace("sizeof(Value) = %d\n", sizeof(Value));
+
+    // Value value;
+    // value.type_ = VALUE_TYPE_NULL;
+    // value.unit_ = 2;
+    // value.options_ = 3;
+    // value.int64_ = 4;
+    // uint8_t *pValue = (uint8_t *)&value;
+    // DebugTrace("%d,%d,%d,%d, %d,%d,%d,%d, %d,%d,%d,%d, %d,%d,%d,%d\n",
+    //     pValue[0], pValue[1], pValue[2], pValue[3],
+    //     pValue[4], pValue[5], pValue[6], pValue[7],
+    //     pValue[8], pValue[9], pValue[10], pValue[11],
+    //     pValue[12], pValue[13], pValue[14], pValue[15]
+    // );
 }
 
 bool testMaster() {

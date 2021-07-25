@@ -395,24 +395,33 @@ ErrorNoClose:
 }
 
 bool loadApp(int *err) {
-	if (eez::gui::loadExternalAssets(g_scriptPath, err) && psu::gui::g_psuAppContext.dialogOpen(err)) {
-		osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_FLOW_SCRIPT, osWaitForever);
-        return true;
-    }
-
-	char scriptName[64];
-	getFileName(g_scriptPath, scriptName, sizeof(scriptName));
-	ErrorTrace("App error: %s\n", scriptName);
-
-	psu::gui::hideAsyncOperationInProgress();
-	if (g_autoStartScriptIsRunning) {
-		psu::gui::showMainPage();
+	int localErr = SCPI_RES_OK;
+	if (!err) {
+		err = &localErr;
 	}
-	gui::refreshScreen();
 
-	setStateIdle();
+	if (!eez::gui::loadExternalAssets(g_scriptPath, err) || !psu::gui::g_psuAppContext.dialogOpen(err)) {
+		char scriptName[64];
+		getFileName(g_scriptPath, scriptName, sizeof(scriptName));
+		ErrorTrace("App error: %s\n", scriptName);
 
-	return false;
+		psu::gui::hideAsyncOperationInProgress();
+		if (g_autoStartScriptIsRunning) {
+			psu::gui::showMainPage();
+		}
+		gui::refreshScreen();
+
+		setStateIdle();
+
+		if (err == &localErr) {
+			generateError(*err);
+		}
+
+		return false;
+	}
+
+	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_FLOW_SCRIPT, osWaitForever);
+	return true;
 }
 
 bool loadScript(int *err = nullptr) {

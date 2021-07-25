@@ -335,32 +335,36 @@ struct Value {
 	ValueType type_;
 	uint8_t unit_;
 	uint16_t options_;
+	uint32_t reserved_;
+
     union {
 		uint8_t int8_;
-        uint8_t uint8_;
-		
+		uint8_t uint8_;
+
+		PairOfUint8Value pairOfUint8_;
+
 		int16_t int16_;
 		uint16_t uint16_;
-		
-		uint32_t int32_;
-        uint32_t uint32_;
-        
-		uint64_t int64_;
-        uint64_t uint64_;
 
-        float float_;
-		double double_;
+		PairOfUint16Value pairOfUint16_;
+		PairOfInt16Value pairOfInt16_;
+
+		EnumValue enum_;
+
+		uint32_t int32_;
+		uint32_t uint32_;
+
+		float float_;
 
 		const char *str_;
+		uint8_t *puint8_;
+		float *pFloat_;
+		void *pVoid_;
 
-        //
-        EnumValue enum_;
-        uint8_t *puint8_;   
-        float *pFloat_;
-        void *pVoid_;
-        PairOfUint8Value pairOfUint8_;
-        PairOfUint16Value pairOfUint16_;
-        PairOfInt16Value pairOfInt16_;
+		uint64_t int64_;
+		uint64_t uint64_;
+
+		double double_;
     };
 };
 

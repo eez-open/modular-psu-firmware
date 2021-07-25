@@ -183,6 +183,7 @@ bool loadExternalAssets(const char *filePath, int *err) {
 	if (!result) {
 		free(g_externalAssets);
 		g_externalAssets = nullptr;
+		return false;
 	}
 
 	return true;

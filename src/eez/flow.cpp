@@ -100,19 +100,9 @@ void pingComponent(Assets *assets, FlowState *flowState, unsigned componentIndex
 }
 
 void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value) {
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-
 	for (unsigned connectionIndex = 0; connectionIndex < componentOutput.connections.count; connectionIndex++) {
 		auto connection = componentOutput.connections.item(assets, connectionIndex);
-
-		auto targetComponent = flow->components.item(assets, connection->targetComponentIndex);
-
-		auto inputValueIndex = targetComponent->inputs.ptr(assets)[connection->targetInputIndex];
-
-		auto &targetValue = flowState->values[inputValueIndex];
-		targetValue = value;
-
+		flowState->values[connection->targetInputIndex] = value;
 		pingComponent(assets, flowState, connection->targetComponentIndex);
 	}
 }
@@ -319,10 +309,14 @@ static bool eval(Assets *assets, FlowState *flowState, uint16_t *instructions, V
 		}
 	}
 
-	assert(stack.sp == 1);
+	if (stack.sp == 1) {
+		result = stack.pop();
+		return true;
+	}
 
-	result = stack.pop();
-	return true;
+	// TODO
+	result = Value();
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -473,7 +467,8 @@ static FlowState *initFlowState(Assets *assets, int flowIndex) {
 	}
 
 	for (unsigned i = 0; i < flow->localVariables.count; i++) {
-		flowState->values[flow->nInputValues + i] = *flow->localVariables.item(assets, i);
+		auto &value = *flow->localVariables.item(assets, i);
+		flowState->values[flow->nInputValues + i] = value;
 	}
 
 	return flowState;
@@ -484,6 +479,7 @@ unsigned start(Assets *assets) {
 	if (flowDefinition->flows.count == 0) {
 		return 0;
 	}
+
 
 	g_assets = assets;
 
@@ -536,9 +532,11 @@ void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCurso
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 
 	if (actionId >= 0 && actionId < (int16_t)flow->widgetActions.count) {
-		auto &componentOutput = *flow->widgetActions.item(assets, actionId);
-		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
-		propagateValue(assets, 0, componentOutput, nullValue);
+		auto componentOutput = flow->widgetActions.item(assets, actionId);
+		if (componentOutput) {
+			auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
+			propagateValue(assets, flowState, *componentOutput, nullValue);
+		}
 	}
 }
 
@@ -553,7 +551,11 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 
 	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
 		auto propertyValue = flow->widgetDataItems.item(assets, dataId);
-		eval(assets, flowState, propertyValue->evalInstructions, value);
+		if (propertyValue) {
+			eval(assets, flowState, propertyValue->evalInstructions, value);
+		} else {
+			value = Value();
+		}
 	}
 }
 

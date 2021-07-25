@@ -32,16 +32,16 @@ extern Assets *g_externalAssets;
 template<typename T>
 struct AssetsPtr {
     T* ptr(Assets *assets) {
-		//if (offset == 0) {
-		//	return nullptr;
-		//}
+		if (offset == 0) {
+			return nullptr;
+		}
         return (T *)((uint8_t *)assets + 4 + offset); // 4 is offset of Assets::pages
     }
 
 	const T* ptr(Assets *assets) const {
-		//if (offset == 0) {
-		//	return nullptr;
-		//}
+		if (offset == 0) {
+			return nullptr;
+		}
 		return (const T *)((uint8_t *)assets + 4 + offset); // 4 is offset of Assets::pages
 	}
 	
@@ -56,11 +56,19 @@ private:
 template<typename T>
 struct ListOfAssetsPtr {
     T* item(Assets *assets, int i) {
-        return (T *)items.ptr(assets)[i].ptr(assets);
+		auto assetPtr = items.ptr(assets);
+		if (assetPtr == 0) {
+			return nullptr;
+		}
+        return (T *)assetPtr[i].ptr(assets);
     }
 
 	const T* item(Assets *assets, int i) const {
-		return (const T *)items.ptr(assets)[i].ptr(assets);
+		auto assetPtr = items.ptr(assets);
+		if (assetPtr == 0) {
+			return nullptr;
+		}
+        return (const T *)assetPtr[i].ptr(assets);
 	}
 
 	uint32_t count;
@@ -189,8 +197,8 @@ struct Colors {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_MASK  = 0xE000;
-static const uint16_t EXPR_EVAL_INSTRUCTION_PARAM_MASK = 0x1FFF;
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_MASK  = 0x0007 << 13;
+static const uint16_t EXPR_EVAL_INSTRUCTION_PARAM_MASK = 0xFFFF >> 3;
 
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT   = (0 << 13);
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT      = (1 << 13);
