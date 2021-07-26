@@ -48,6 +48,7 @@ namespace gui {
     WIDGET_TYPE(SCROLL_BAR, 20) \
     WIDGET_TYPE(PROGRESS, 21) \
     WIDGET_TYPE(CANVAS, 22) \
+    WIDGET_TYPE(GAUGE, 23) \
 
 #define WIDGET_TYPE(NAME, ID) WIDGET_TYPE_##NAME = ID,
 enum WidgetTypes {

@@ -485,7 +485,7 @@ struct Value {
     bool isMega() const;
 
   public:
-	ValueType type_;
+	uint8_t type_;
 	uint8_t unit_;
 	uint16_t options_;
 	uint32_t reserved_;

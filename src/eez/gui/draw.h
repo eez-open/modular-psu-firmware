@@ -38,5 +38,7 @@ void expandRectWithShadow(int &x1, int &y1, int &x2, int &y2);
 void drawLine(int x1, int y1, int x2, int y2);
 void drawAntialiasedLine(int x1, int y1, int x2, int y2);
 
+void fillArcBar(int xCenter, int yCenter, int radius, float fromAngleDeg, float toAngleDeg, int width);
+
 } // namespace gui
 } // namespace eez

@@ -19,6 +19,7 @@
 #if OPTION_DISPLAY
 
 #include <string.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include <eez/util.h>
@@ -702,6 +703,140 @@ void drawAntialiasedLine(int x0, int y0, int x1, int y1) {
             err += dx; y0 += sy;
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int compareInt(const void *a, const void *b) {
+	return (*(const int *)a) - (*(const int *)b);
+}
+
+int fillPolygon(const int16_t *vx, const int16_t *vy, int n, int *polyInts) {
+	int result;
+	int i;
+	int y, xa, xb;
+	int miny, maxy;
+	int x1, y1;
+	int x2, y2;
+	int ind1, ind2;
+	int ints;
+
+	/*
+	* Vertex array NULL check
+	*/
+	if (vx == NULL) {
+		return (-1);
+	}
+	if (vy == NULL) {
+		return (-1);
+	}
+
+	/*
+	* Sanity check number of edges
+	*/
+	if (n < 3) {
+		return -1;
+	}
+
+	/*
+	* Determine Y maxima
+	*/
+	miny = vy[0];
+	maxy = vy[0];
+	for (i = 1; (i < n); i++) {
+		if (vy[i] < miny) {
+			miny = vy[i];
+		} else if (vy[i] > maxy) {
+			maxy = vy[i];
+		}
+	}
+
+	/*
+	* Draw, scanning y
+	*/
+	result = 0;
+	for (y = miny; (y <= maxy); y++) {
+		ints = 0;
+		for (i = 0; (i < n); i++) {
+			if (!i) {
+				ind1 = n - 1;
+				ind2 = 0;
+			} else {
+				ind1 = i - 1;
+				ind2 = i;
+			}
+			y1 = vy[ind1];
+			y2 = vy[ind2];
+			if (y1 < y2) {
+				x1 = vx[ind1];
+				x2 = vx[ind2];
+			} else if (y1 > y2) {
+				y2 = vy[ind1];
+				y1 = vy[ind2];
+				x2 = vx[ind1];
+				x1 = vx[ind2];
+			} else {
+				continue;
+			}
+			if (((y >= y1) && (y < y2)) || ((y == maxy) && (y > y1) && (y <= y2))) {
+				polyInts[ints++] = ((65536 * (y - y1)) / (y2 - y1)) * (x2 - x1) + (65536 * x1);
+			}
+		}
+
+		qsort(polyInts, ints, sizeof(int), compareInt);
+
+		/*
+		* Set color
+		*/
+		for (i = 0; (i < ints); i += 2) {
+			xa = polyInts[i] + 1;
+			xa = (xa >> 16) + ((xa & 32768) >> 15);
+			xb = polyInts[i + 1] - 1;
+			xb = (xb >> 16) + ((xb & 32768) >> 15);
+			mcu::display::drawHLine(xa, y, xb - xa + 1);
+		}
+	}
+
+	return 0;
+}
+
+void arcBarAsPolygon(
+	int xCenter,
+	int yCenter,
+	int radius,
+	float fromAngleDeg,
+	float toAngleDeg,
+	float width,
+	int16_t *vx,
+	int16_t *vy,
+	size_t n
+) {
+	fromAngleDeg *= float(M_PI / 180);
+	toAngleDeg *= float(M_PI / 180);
+
+	n -= 2;
+
+	for (size_t i = 0; i <= n / 2; i++) {
+		auto angle = fromAngleDeg + (i / (n / 2.0f)) * (toAngleDeg - fromAngleDeg);
+		vx[i] = floor(xCenter + (radius + width / 2.0f) * cosf(angle));
+		vy[i] = floor(yCenter - (radius + width / 2.0f) * sinf(angle));
+	}
+
+	for (size_t i = 0; i <= n / 2; i++) {
+		auto angle = toAngleDeg + (i / (n / 2.0f)) * (fromAngleDeg - toAngleDeg);
+		vx[n / 2 + 1 + i] = floor(xCenter + (radius - width / 2.0f) * cosf(angle));
+		vy[n / 2 + 1 + i] = floor(yCenter - (radius - width / 2.0f) * sinf(angle));
+	}
+}
+
+
+void fillArcBar(int xCenter, int yCenter, int radius, float fromAngleDeg, float toAngleDeg, int width) {
+	static const size_t N = 100;
+	int16_t vx[N];
+	int16_t vy[N];
+	int polyInts[N];
+	arcBarAsPolygon(xCenter, yCenter, radius, fromAngleDeg, toAngleDeg, width, vx, vy, N);
+	fillPolygon(vx, vy, N, polyInts);
 }
 
 } // namespace gui

@@ -328,6 +328,7 @@ set(src_eez_gui_widgets
     src/eez/gui/widgets/canvas.cpp
     src/eez/gui/widgets/container.cpp
     src/eez/gui/widgets/display_data.cpp
+    src/eez/gui/widgets/gauge.cpp
     src/eez/gui/widgets/grid.cpp
     src/eez/gui/widgets/layout_view.cpp
     src/eez/gui/widgets/list.cpp
