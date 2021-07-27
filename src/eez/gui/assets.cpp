@@ -218,17 +218,21 @@ const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor) {
 }
 
 const Style *getStyle(int styleID) {
-	if (styleID <= 0) {
-		return nullptr;
+	if (styleID > 0) {
+		return g_mainAssets->styles.item(g_mainAssets, styleID - 1);
+	} else if (styleID < 0) {
+		return g_externalAssets->styles.item(g_externalAssets, -styleID - 1);
 	}
-	return g_mainAssets->styles.item(g_mainAssets, styleID - 1);
+	return nullptr;
 }
 
 const FontData *getFontData(int fontID) {
-	if (fontID <= 0) {
-		return nullptr;
+	if (fontID > 0) {
+		return g_mainAssets->fonts.item(g_mainAssets, fontID - 1);
+	} else if (fontID < 0) {
+		return g_externalAssets->fonts.item(g_externalAssets, -fontID - 1);
 	}
-	return g_mainAssets->fonts.item(g_mainAssets, fontID - 1);
+	return nullptr;
 }
 
 const Bitmap *getBitmap(int bitmapID) {

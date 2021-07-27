@@ -706,13 +706,221 @@ void drawAntialiasedLine(int x0, int y0, int x1, int y1) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// based on SDL2 gfx primitives
+
+void aaLine(int x1, int y1, int x2, int y2, int draw_endpoint) {
+	int xx0, yy0, xx1, yy1;
+	double erracc, erradj;
+	int dx, dy, tmp, xdir, y0p1, x0pxdir;
+
+	/*
+	* Keep on working with 32bit numbers
+	*/
+	xx0 = x1;
+	yy0 = y1;
+	xx1 = x2;
+	yy1 = y2;
+
+	/*
+	* Reorder points to make dy positive
+	*/
+	if (yy0 > yy1) {
+		tmp = yy0;
+		yy0 = yy1;
+		yy1 = tmp;
+		tmp = xx0;
+		xx0 = xx1;
+		xx1 = tmp;
+	}
+
+	/*
+	* Calculate distance
+	*/
+	dx = xx1 - xx0;
+	dy = yy1 - yy0;
+
+	/*
+	* Adjust for negative dx and set xdir
+	*/
+	if (dx >= 0) {
+		xdir = 1;
+	} else {
+		xdir = -1;
+		dx = (-dx);
+	}
+
+	/*
+	* Check for special cases
+	*/
+	if (dx == 0) {
+		/*
+		* Vertical line
+		*/
+		if (draw_endpoint) {
+			mcu::display::drawVLine(x1, y1, y2 - y1 + 1);
+		} else {
+			if (dy > 0) {
+				mcu::display::drawVLine(x1, yy0, yy0 + dy - yy0);
+			} else {
+				mcu::display::drawPixel(x1, y1);
+			}
+		}
+	}
+	
+	if (dy == 0) {
+		/*
+		* Horizontal line
+		*/
+		if (draw_endpoint) {
+			mcu::display::drawHLine(x1, y1, x2 - x1 + 1);
+		} else {
+			if (dx > 0) {
+				if (xdir > 0) {
+					mcu::display::drawHLine(xx0, y1, dx);
+				} else {
+					mcu::display::drawHLine(xx0 - dx, y1, xx0 + dx - xx0);
+				}
+			} else {
+				mcu::display::drawPixel(x1, y1);
+			}
+		}
+		return;
+	}
+	
+//	if ((dx == dy) && (draw_endpoint)) {
+//		/*
+//		* Diagonal line (with endpoint)
+//		*/
+//		drawLine(x1, y1, x2, y2);
+//		return;
+//	}
+
+
+	/*
+	* Zero accumulator
+	*/
+	erracc = 0;
+
+	/*
+	* Draw the initial pixel in the foreground color
+	*/
+	mcu::display::drawPixel(x1, y1);
+
+	/*
+	* x-major or y-major?
+	*/
+	if (dy > dx) {
+
+		/*
+		* y-major.  Calculate 16-bit fixed point fractional part of a pixel that
+		* X advances every time Y advances 1 pixel, truncating the result so that
+		* we won't overrun the endpoint along the X axis
+		*/
+		/*
+		* Not-so-portable version: erradj = ((Uint64)dx << 32) / (Uint64)dy;
+		*/
+		erradj = 1.0 * dx / dy;
+
+		/*
+		* draw all pixels other than the first and last
+		*/
+		x0pxdir = xx0 + xdir;
+		while (--dy) {
+			erracc += erradj;
+			if (erracc >= 1.0) {
+				erracc -= 1.0;
+				/*
+				* rollover in error accumulator, x coord advances
+				*/
+				xx0 = x0pxdir;
+				x0pxdir += xdir;
+			}
+			yy0++;		/* y-major so always advance Y */
+
+			/*
+			* the AAbits most significant bits of erracc give us the intensity
+			* weighting for this pixel, and the complement of the weighting for
+			* the paired pixel.
+			*/
+			auto wgt = (int)(255 * erracc);
+			mcu::display::drawPixel(xx0, yy0, 255 - wgt);
+			mcu::display::drawPixel(x0pxdir, yy0, wgt);
+		}
+
+	} else {
+
+		/*
+		* x-major line.  Calculate 16-bit fixed-point fractional part of a pixel
+		* that Y advances each time X advances 1 pixel, truncating the result so
+		* that we won't overrun the endpoint along the X axis.
+		*/
+		/*
+		* Not-so-portable version: erradj = ((Uint64)dy << 32) / (Uint64)dx;
+		*/
+		erradj = 1.0 * dy / dx;
+
+		/*
+		* draw all pixels other than the first and last
+		*/
+		y0p1 = yy0 + 1;
+		while (--dx) {
+			erracc += erradj;
+			if (erracc >= 1.0) {
+				erracc -= 1.0;
+				/*
+				* Accumulator turned over, advance y
+				*/
+				yy0 = y0p1;
+				y0p1++;
+			}
+			xx0 += xdir;	/* x-major so always advance X */
+			/*
+			* the AAbits most significant bits of erracc give us the intensity
+			* weighting for this pixel, and the complement of the weighting for
+			* the paired pixel.
+			*/
+			auto wgt = (int)(255 * erracc);
+			mcu::display::drawPixel(xx0, yy0, 255 - wgt);
+			mcu::display::drawPixel(xx0, y0p1, wgt);
+		}
+	}
+
+	/*
+	* Do we have to draw the endpoint
+	*/
+	if (draw_endpoint) {
+		/*
+		* Draw final pixel, always exactly intersected by the line and doesn't
+		* need to be weighted.
+		*/
+		mcu::display::drawPixel(x2, y2);
+	}
+}
 
 int compareInt(const void *a, const void *b) {
 	return (*(const int *)a) - (*(const int *)b);
 }
 
+int drawPolygon(const int16_t *vx, const int16_t *vy, int n) {
+	/*
+	* Sanity check number of edges
+	*/
+	if (n < 3) {
+		return -1;
+	}
+
+    for (int i = 1; i < n; i++) {
+        aaLine(vx[i - 1], vy[i - 1], vx[i], vy[i], 0);
+		//drawAntialiasedLine(vx[i - 1], vy[i - 1], vx[i], vy[i]);
+    }
+    
+	aaLine(vx[n - 1], vy[n - 1], vx[0], vy[0], 0);
+	//drawAntialiasedLine(vx[n - 1], vy[n - 1], vx[0], vy[0]);
+
+    return 0;
+}
+
 int fillPolygon(const int16_t *vx, const int16_t *vy, int n, int *polyInts) {
-	int result;
 	int i;
 	int y, xa, xb;
 	int miny, maxy;
@@ -754,7 +962,6 @@ int fillPolygon(const int16_t *vx, const int16_t *vy, int n, int *polyInts) {
 	/*
 	* Draw, scanning y
 	*/
-	result = 0;
 	for (y = miny; (y <= maxy); y++) {
 		ints = 0;
 		for (i = 0; (i < n); i++) {
@@ -809,34 +1016,75 @@ void arcBarAsPolygon(
 	float width,
 	int16_t *vx,
 	int16_t *vy,
-	size_t n
+	size_t &n
 ) {
-	fromAngleDeg *= float(M_PI / 180);
-	toAngleDeg *= float(M_PI / 180);
+	float fromAngle = float(fromAngleDeg * M_PI / 180);
+	float toAngle = float(toAngleDeg * M_PI / 180);
 
-	n -= 2;
+	int j = 0;
 
-	for (size_t i = 0; i <= n / 2; i++) {
-		auto angle = fromAngleDeg + (i / (n / 2.0f)) * (toAngleDeg - fromAngleDeg);
-		vx[i] = floor(xCenter + (radius + width / 2.0f) * cosf(angle));
-		vy[i] = floor(yCenter - (radius + width / 2.0f) * sinf(angle));
+	vx[j] = floor(xCenter + (radius + width / 2.0f) * cosf(fromAngle));
+	vy[j] = floor(yCenter - (radius + width / 2.0f) * sinf(fromAngle));
+	j++;
+
+	for (size_t i = 0; ; i++) {
+		auto angle = i * 2 * M_PI / n;
+		if (angle >= toAngle) {
+			break;
+		}
+		if (angle > fromAngle) {
+			vx[j] = floor(xCenter + (radius + width / 2.0f) * cosf(angle));
+			vy[j] = floor(yCenter - (radius + width / 2.0f) * sinf(angle));
+			j++;
+		}
 	}
 
-	for (size_t i = 0; i <= n / 2; i++) {
-		auto angle = toAngleDeg + (i / (n / 2.0f)) * (fromAngleDeg - toAngleDeg);
-		vx[n / 2 + 1 + i] = floor(xCenter + (radius - width / 2.0f) * cosf(angle));
-		vy[n / 2 + 1 + i] = floor(yCenter - (radius - width / 2.0f) * sinf(angle));
+	vx[j] = floor(xCenter + (radius + width / 2.0f) * cosf(toAngle));
+	vy[j] = floor(yCenter - (radius + width / 2.0f) * sinf(toAngle));
+	j++;
+
+	vx[j] = floor(xCenter + (radius - width / 2.0f) * cosf(toAngle));
+	vy[j] = floor(yCenter - (radius - width / 2.0f) * sinf(toAngle));
+	j++;
+
+	for (size_t i = 0; ; i++) {
+		auto angle = 2 * M_PI - i * 2 * M_PI / n;
+		if (angle <= fromAngle) {
+			break;
+		}
+
+		if (angle < toAngle) {
+			vx[j] = floor(xCenter + (radius - width / 2.0f) * cosf(angle));
+			vy[j] = floor(yCenter - (radius - width / 2.0f) * sinf(angle));
+			j++;
+		}
 	}
+
+	vx[j] = floor(xCenter + (radius - width / 2.0f) * cosf(fromAngle));
+	vy[j] = floor(yCenter - (radius - width / 2.0f) * sinf(fromAngle));
+	j++;
+
+	n = j;
 }
 
+void drawArcBar(int xCenter, int yCenter, int radius, float fromAngleDeg, float toAngleDeg, int width) {
+	static const size_t N = 200;
+	int16_t vx[N + 8];
+	int16_t vy[N + 8];
+	size_t n = N;
+	arcBarAsPolygon(xCenter, yCenter, radius, fromAngleDeg, toAngleDeg, width, vx, vy, n);
+	drawPolygon(vx, vy, n);
+}
 
 void fillArcBar(int xCenter, int yCenter, int radius, float fromAngleDeg, float toAngleDeg, int width) {
-	static const size_t N = 100;
-	int16_t vx[N];
-	int16_t vy[N];
-	int polyInts[N];
-	arcBarAsPolygon(xCenter, yCenter, radius, fromAngleDeg, toAngleDeg, width, vx, vy, N);
-	fillPolygon(vx, vy, N, polyInts);
+	static const size_t N = 200;
+	int16_t vx[N + 8];
+	int16_t vy[N + 8];
+	int polyInts[N + 8];
+	size_t n = N;
+	arcBarAsPolygon(xCenter, yCenter, radius, fromAngleDeg, toAngleDeg, width, vx, vy, n);
+	//drawPolygon(vx, vy, n);
+	fillPolygon(vx, vy, n, polyInts);
 }
 
 } // namespace gui

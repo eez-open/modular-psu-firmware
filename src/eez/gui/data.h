@@ -83,8 +83,8 @@ struct PairOfInt16Value {
 #define FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(n) (FLOAT_OPTIONS_FIXED_DECIMALS | ((n & 0b111) << 2))
 
 struct RefString {
-	uint32_t refCounter;
-	char *str;
+	uint32_t refCounter{0};
+	char *str{nullptr};
 };
 
 struct Value {
@@ -199,7 +199,10 @@ struct Value {
     }
 
 	Value(const Value& value) {
-		memcpy(this, &value, sizeof(Value));
+		type_ = value.type_;
+		unit_ = value.unit_;
+		options_ = value.options_;
+		int64_ = value.int64_;
 		if (type_ == VALUE_TYPE_STRING_REF) {
 			refString_.refCounter++;
 		}
@@ -208,7 +211,9 @@ struct Value {
 	~Value() {
 		if (type_ == VALUE_TYPE_STRING_REF) {
 			if (--refString_.refCounter == 0) {
-				free((char *)refString_.str);
+				if (refString_.str) {
+					free((char *)refString_.str);
+				}
 			}
 		}
 	}
@@ -224,7 +229,7 @@ struct Value {
     }
 
 	bool isInt32OrLess() const {
-		return type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_UINT32 || type_ == VALUE_TYPE_BOOLEAN;
+		return (type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_UINT32) || type_ == VALUE_TYPE_BOOLEAN;
 	}
 
 	bool isInt64() const {
@@ -382,7 +387,7 @@ struct Value {
 		if (type_ == VALUE_TYPE_FLOAT) {
 			return float_;
 		}
-		if (type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32 || type_ == VALUE_TYPE_BOOLEAN) {
+		if ((type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32) || type_ == VALUE_TYPE_BOOLEAN) {
 			return int32_;
 		}
 		if (type_ == VALUE_TYPE_UINT32) {
@@ -407,7 +412,7 @@ struct Value {
 		if (type_ == VALUE_TYPE_FLOAT) {
 			return float_;
 		}
-		if (type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32 || type_ == VALUE_TYPE_BOOLEAN) {
+		if ((type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32) || type_ == VALUE_TYPE_BOOLEAN) {
 			return (float)int32_;
 		}
 		if (type_ == VALUE_TYPE_UINT32) {
@@ -432,7 +437,7 @@ struct Value {
 		if (type_ == VALUE_TYPE_FLOAT) {
 			return (int32_t)float_;
 		}
-		if (type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32 || type_ == VALUE_TYPE_BOOLEAN) {
+		if ((type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32) || type_ == VALUE_TYPE_BOOLEAN) {
 			return (int32_t)int32_;
 		}
 		if (type_ == VALUE_TYPE_UINT32) {
@@ -447,7 +452,7 @@ struct Value {
 		if (type_ == VALUE_TYPE_STRING_REF) {
 			return (int64_t)atoi(refString_.str);
 		}
-		return NAN;
+		return 0;
 	}
 
 	int64_t toInt64() const {
@@ -457,7 +462,7 @@ struct Value {
 		if (type_ == VALUE_TYPE_FLOAT) {
 			return (int64_t)float_;
 		}
-		if (type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32 || type_ == VALUE_TYPE_BOOLEAN) {
+		if ((type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32) || type_ == VALUE_TYPE_BOOLEAN) {
 			return (int64_t)int32_;
 		}
 		if (type_ == VALUE_TYPE_UINT32) {
@@ -472,7 +477,7 @@ struct Value {
 		if (type_ == VALUE_TYPE_STRING_REF) {
 			return (int64_t)atoi(refString_.str);
 		}
-		return NAN;
+		return 0;
 	}
 	
 	//////////

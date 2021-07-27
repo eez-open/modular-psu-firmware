@@ -28,10 +28,18 @@
 namespace eez {
 namespace gui {
 
+struct GaugeWidget : public Widget {
+    int16_t min;
+	int16_t max;
+	int16_t threashold;
+    uint16_t barStyle;
+	uint16_t thresholdStyle;
+};
+
 EnumFunctionType GAUGE_enum = nullptr;
 
 DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
+    auto widget = (const GaugeWidget*)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
 
@@ -42,21 +50,33 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
     if (refresh) {
 		const Style* style = getStyle(widget->style);
 
-		mcu::display::setColor16(RGB_TO_COLOR(255, 0, 0));
+		mcu::display::setColor(style->background_color);
 		mcu::display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1, 0);
 
-		mcu::display::setColor16(RGB_TO_COLOR(0, 255, 0));
-
-		static const int BAR_WIDTH = 20;
+		static const int BORDER_WIDTH = 32;
+		static const int BAR_WIDTH = 16;
 		float min = 0.0f;
 		float max = 40.0f;
+
+		const Style* barStyle = getStyle(widget->barStyle);
+		mcu::display::setColor(barStyle->color);
 		fillArcBar(
 			widgetCursor.x + widget->w / 2,
 			widgetCursor.y + widget->h - 4,
-			(widget->w - 8) / 2 - BAR_WIDTH / 2,
+			(widget->w - 8) / 2 - BORDER_WIDTH / 2,
 			remap(widgetCursor.currentState->data.getFloat(), min, 180.0f, max, 0.0f),
 			180.0f,
 			BAR_WIDTH
+		);
+
+		mcu::display::setColor(style->color);
+		drawArcBar(
+			widgetCursor.x + widget->w / 2,
+			widgetCursor.y + widget->h - 4,
+			(widget->w - 8) / 2 - BORDER_WIDTH / 2,
+			0.0f,
+			180.0f,
+			BORDER_WIDTH
 		);
     }
 };
