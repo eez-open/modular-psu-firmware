@@ -575,8 +575,8 @@ static FlowState *initFlowState(Assets *assets, int flowIndex) {
 	}
 
 	for (unsigned i = 0; i < flow->localVariables.count; i++) {
-		auto &value = *flow->localVariables.item(assets, i);
-		flowState->values[flow->nInputValues + i] = value;
+		auto value = flow->localVariables.item(assets, i);
+		flowState->values[flow->nInputValues + i] = *value;
 	}
 
 	return flowState;

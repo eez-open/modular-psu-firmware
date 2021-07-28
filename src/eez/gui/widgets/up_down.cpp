@@ -30,7 +30,7 @@ namespace gui {
 struct UpDownWidget : public Widget {
     AssetsPtr<const char> downButtonText;
 	AssetsPtr<const char> upButtonText;
-    uint16_t buttonsStyle;
+    int16_t buttonsStyle;
 };
 
 EnumFunctionType UP_DOWN_enum = nullptr;

@@ -24,7 +24,7 @@ namespace gui {
 struct ButtonWidget : public Widget {
     AssetsPtr<const char> text;
     int16_t enabled;
-    uint16_t disabledStyle;
+    int16_t disabledStyle;
 };
 
 } // namespace gui

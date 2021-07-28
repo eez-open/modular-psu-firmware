@@ -34,8 +34,8 @@ namespace eez {
 namespace gui {
 
 struct ScrollBarWidget : public Widget {
-    uint16_t thumbStyle;
-    uint16_t buttonsStyle;
+    int16_t thumbStyle;
+    int16_t buttonsStyle;
     AssetsPtr<const char> leftButtonText;
 	AssetsPtr<const char> rightButtonText;
 };

@@ -39,11 +39,11 @@ namespace gui {
 #define BAR_GRAPH_DO_NOT_DISPLAY_VALUE (1 << 4)
 
 struct BarGraphWidget : public Widget {
-    uint16_t textStyle;
+    int16_t textStyle;
     int16_t line1Data;
-    uint16_t line1Style;
+    int16_t line1Style;
     int16_t line2Data;
-    uint16_t line2Style;
+    int16_t line2Style;
     uint8_t orientation; // BAR_GRAPH_ORIENTATION_...
 };
 

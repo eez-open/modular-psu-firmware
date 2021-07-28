@@ -1077,6 +1077,13 @@ void drawArcBar(int xCenter, int yCenter, int radius, float fromAngleDeg, float 
 }
 
 void fillArcBar(int xCenter, int yCenter, int radius, float fromAngleDeg, float toAngleDeg, int width) {
+	if (isNaN(fromAngleDeg) || fromAngleDeg < 0) {
+		fromAngleDeg = 0;
+	}
+	if (isNaN(toAngleDeg) || toAngleDeg > 360.0f) {
+		toAngleDeg = 360.0f;
+	}
+
 	static const size_t N = 200;
 	int16_t vx[N + 8];
 	int16_t vy[N + 8];

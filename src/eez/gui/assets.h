@@ -100,7 +100,7 @@ struct Widget {
 	int16_t y;
 	int16_t w;
 	int16_t h;
-	uint16_t style;
+	int16_t style;
 };
 
 struct ContainerWidget : public Widget {

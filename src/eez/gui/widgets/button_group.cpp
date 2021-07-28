@@ -29,7 +29,7 @@ namespace eez {
 namespace gui {
 
 struct ButtonGroupWidget : public Widget {
-    uint16_t selectedStyle;
+    int16_t selectedStyle;
 };
 
 EnumFunctionType BUTTON_GROUP_enum = nullptr;

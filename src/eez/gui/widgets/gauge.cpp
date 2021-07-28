@@ -32,8 +32,8 @@ struct GaugeWidget : public Widget {
     int16_t min;
 	int16_t max;
 	int16_t threashold;
-    uint16_t barStyle;
-	uint16_t thresholdStyle;
+    int16_t barStyle;
+	int16_t thresholdStyle;
 };
 
 EnumFunctionType GAUGE_enum = nullptr;
@@ -55,8 +55,8 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 
 		static const int BORDER_WIDTH = 32;
 		static const int BAR_WIDTH = 16;
-		float min = 0.0f;
-		float max = 40.0f;
+		float min = get(widgetCursor, widget->min).toFloat();
+		float max = get(widgetCursor, widget->max).toFloat();
 
 		const Style* barStyle = getStyle(widget->barStyle);
 		mcu::display::setColor(barStyle->color);

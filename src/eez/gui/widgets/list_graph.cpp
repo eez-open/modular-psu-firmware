@@ -33,11 +33,11 @@ namespace gui {
 struct ListGraphWidget : public Widget {
     int16_t dwellData;
     int16_t y1Data;
-    uint16_t y1Style;
+    int16_t y1Style;
     int16_t y2Data;
-    uint16_t y2Style;
+    int16_t y2Style;
     int16_t cursorData;
-    uint16_t cursorStyle;
+    int16_t cursorStyle;
 };
 
 struct ListGraphWidgetState {
