@@ -33,6 +33,8 @@ struct GaugeWidget : public Widget {
 	int16_t max;
 	int16_t threashold;
     int16_t barStyle;
+    int16_t valueStyle;
+    int16_t ticksStyle;
 	int16_t thresholdStyle;
 };
 
