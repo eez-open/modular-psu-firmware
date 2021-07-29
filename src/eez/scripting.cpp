@@ -617,7 +617,7 @@ void resetSettings() {
 
 bool isAutoStartEnabled() {
 	if (!g_autoStartConditionIsChecked) {
-	    sendMessageToLowPriorityThread(THREAD_MESSAGE_AUTO_START_SCRIPT);
+	    sendMessageToLowPriorityThread(THREAD_MESSAGE_AUTO_START_SCRIPT, 0, 1);
 		return true;
 	}
 
@@ -741,7 +741,17 @@ void onAutoStartScriptFileSelected(const char *filePath) {
 }
 
 void action_sys_settings_scripting_select_auto_start_script() {
-	browseForFile("Select auto start script", "/Scripts", FILE_TYPE_MICROPYTHON, file_manager::DIALOG_TYPE_OPEN, onAutoStartScriptFileSelected);
+	browseForFile(
+		"Select auto start script",
+		"/Scripts", 
+		FILE_TYPE_MICROPYTHON,
+		file_manager::DIALOG_TYPE_OPEN,
+		onAutoStartScriptFileSelected,
+		nullptr,
+		[] (FileType type) { 
+			return type == FILE_TYPE_MICROPYTHON || type == FILE_TYPE_APP; 
+		}
+	);
 }
 
 void action_sys_settings_scripting_clear_auto_start_script() {

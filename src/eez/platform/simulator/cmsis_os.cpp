@@ -183,9 +183,14 @@ osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec) {
 }
 
 osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec) {
-    while (queue_id->overflow) {
-        osDelay(0);
+    for (uint32_t i = 0; queue_id->overflow && i < millisec; i++) {
+        osDelay(1);
     }
+    
+    if (queue_id->overflow) {
+        return osOK;
+    }
+
     uint16_t head = queue_id->head + 1;
     if (head >= queue_id->numElements) {
         head = 0;
