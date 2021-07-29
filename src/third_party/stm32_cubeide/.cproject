@@ -269,6 +269,8 @@
                                     									
                                     <listOptionValue builtIn="false" value="${ProjDirPath}/../../eez/platform/stm32/STM32_USB_Device_Library/Class/MSC/Inc"/>
                                     									
+                                    <listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../eez/libs/agg&quot;"/>
+                                    									
                                     <listOptionValue builtIn="false" value="${ProjDirPath}/../../eez/platform/stm32/usbd_storage"/>
                                     									
                                     <listOptionValue builtIn="false" value="${ProjDirPath}/../../eez/platform/stm32/STM32_USB_Host_Library/Class/HID/Inc"/>

@@ -75,6 +75,7 @@ endif()
 
 include_directories(
     src
+    src/eez/libs/agg
     src/eez/libs/mqtt
     src/eez/platform/simulator
     src/eez/scpi
@@ -355,6 +356,16 @@ set(header_eez_gui_widgets
 )
 list (APPEND header_files ${header_eez_gui_widgets})
 source_group("eez\\gui\\widgets" FILES ${src_eez_gui_widgets} ${header_eez_gui_widgets})
+
+file(GLOB src_eez_libs_agg
+    "src/eez/libs/agg/*.cpp"
+)
+list (APPEND src_files ${src_eez_libs_agg})
+file(GLOB header_eez_libs_agg
+    "src/eez/libs/agg/*.h"
+)
+list (APPEND header_files ${header_eez_libs_agg})
+source_group("eez\\libs\\agg" FILES ${src_eez_libs_agg} ${header_eez_libs_agg})
 
 set(src_eez_libs_lz4
     src/eez/libs/lz4/lz4.c
