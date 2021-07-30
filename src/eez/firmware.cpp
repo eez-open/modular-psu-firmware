@@ -29,7 +29,7 @@
 #include <eez/alloc.h>
 #include <eez/system.h>
 #include <eez/tasks.h>
-#include <eez/scripting.h>
+#include <eez/scripting/scripting.h>
 #include <eez/sound.h>
 #include <eez/memory.h>
 #include <eez/uart.h>

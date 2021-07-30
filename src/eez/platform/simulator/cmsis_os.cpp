@@ -188,6 +188,7 @@ osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec) {
     }
     
     if (queue_id->overflow) {
+		printf("overflow\n");
         return osOK;
     }
 

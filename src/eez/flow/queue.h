@@ -18,20 +18,14 @@
 
 #pragma once
 
-#include <eez/gui/assets.h>
+#include <eez/flow/private.h>
 
 namespace eez {
 namespace flow {
 
-unsigned start(eez::gui::Assets *assets);
-void tick(unsigned flowHandle);
-void stop();
-
-struct FlowState;
-
-FlowState *getFlowState(int16_t pageId);
-void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCursor, int16_t actionId);
-void dataOperation(unsigned flowHandle, int16_t dataId, gui::DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, gui::Value &value);
+void queueInit();
+void addToQueue(FlowState *flowState, unsigned componentIndex, ComponenentExecutionState *componentExecutionState);
+bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex, ComponenentExecutionState *&componentExecutionState);
 
 } // flow
 } // eez

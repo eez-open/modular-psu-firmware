@@ -29,7 +29,7 @@
 #include <eez/system.h>
 #include <eez/hmi.h>
 #include <eez/keyboard.h>
-#include <eez/scripting.h>
+#include <eez/scripting/scripting.h>
 #if OPTION_ENCODER
 #include <eez/modules/mcu/encoder.h>
 #endif

@@ -1,6 +1,6 @@
 /*
 * EEZ Generic Firmware
-* Copyright (C) 2021-present, Envox d.o.o.
+* Copyright (C) 2018-present, Envox d.o.o.
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -18,29 +18,12 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <math.h>
-#include <scpi/scpi.h>
-#include <new>
-
 namespace eez {
+namespace scripting {
 
-void initAllocHeap(uint8_t *heap, size_t heapSize);
+void afterScriptCleanup(bool wasException);
+void setStateIdle();
 
-void *alloc(size_t size);
-void free(void *ptr);
-
-template<class T> struct ObjectAllocator {
-	static T *allocate() {
-		auto ptr = alloc(sizeof(T));
-		return new (ptr) T;
-	}
-	static void deallocate(T* ptr) {
-		ptr->~T();
-		free(ptr);
-	}
-};
-
-void dumpAlloc(scpi_t *context);
-
+} // scripting
 } // eez
+

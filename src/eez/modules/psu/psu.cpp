@@ -28,7 +28,7 @@
 #include <eez/sound.h>
 #include <eez/index.h>
 #include <eez/util.h>
-#include <eez/scripting.h>
+#include <eez/scripting/scripting.h>
 
 #include <eez/scpi/scpi.h>
 

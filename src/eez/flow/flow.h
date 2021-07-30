@@ -18,29 +18,19 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <math.h>
-#include <scpi/scpi.h>
-#include <new>
+#include <eez/gui/assets.h>
 
 namespace eez {
+namespace flow {
 
-void initAllocHeap(uint8_t *heap, size_t heapSize);
+unsigned start(eez::gui::Assets *assets);
+void tick(unsigned flowHandle);
+void scpiResultIsReady();
+void stop();
 
-void *alloc(size_t size);
-void free(void *ptr);
+void *getFlowState(int16_t pageId);
+void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCursor, int16_t actionId);
+void dataOperation(unsigned flowHandle, int16_t dataId, gui::DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, gui::Value &value);
 
-template<class T> struct ObjectAllocator {
-	static T *allocate() {
-		auto ptr = alloc(sizeof(T));
-		return new (ptr) T;
-	}
-	static void deallocate(T* ptr) {
-		ptr->~T();
-		free(ptr);
-	}
-};
-
-void dumpAlloc(scpi_t *context);
-
+} // flow
 } // eez

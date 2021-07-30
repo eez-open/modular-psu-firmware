@@ -488,7 +488,7 @@ void VERSIONED_STRING_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_VALUE_PTR_value(const Value &a, const Value &b) {
-	return a.pValue_ == b.pValue_ || a.pValue_ && b.pValue_ && *a.pValue_ == *b.pValue_;
+	return a.pValue_ == b.pValue_ || (a.pValue_ && b.pValue_ && *a.pValue_ == *b.pValue_);
 }
 
 void VALUE_PTR_value_to_text(const Value &value, char *text, int count) {

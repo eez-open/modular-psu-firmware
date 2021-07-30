@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include <eez/index.h>
-#include <eez/scripting.h>
+#include <eez/scripting/scripting.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
@@ -50,7 +50,7 @@ using namespace eez::psu;
 mp_obj_t modeez_scpi(mp_obj_t commandOrQueryText) {
     const char *resultText;
     size_t resultTextLen;
-    if (!scpi(mp_obj_str_get_str(commandOrQueryText), &resultText, &resultTextLen)) {
+    if (!executeScpiFromMP(mp_obj_str_get_str(commandOrQueryText), &resultText, &resultTextLen)) {
         return mp_const_false;
     }
 

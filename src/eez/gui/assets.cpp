@@ -26,7 +26,7 @@
 #include <eez/system.h>
 #include <eez/memory.h>
 #include <eez/debug.h>
-#include <eez/flow.h>
+#include <eez/flow/flow.h>
 
 #include <eez/libs/lz4/lz4.h>
 
@@ -202,6 +202,9 @@ const PageAsset* getPageAsset(int pageId) {
 	if (pageId > 0) {
 		return g_mainAssets->pages.item(g_mainAssets, (pageId - 1));
 	} else if (pageId < 0) {
+		if (g_externalAssets == nullptr) {
+			return nullptr;
+		}
 		return g_externalAssets->pages.item(g_externalAssets, (-pageId - 1));
 	}
 	return nullptr;
@@ -221,6 +224,9 @@ const Style *getStyle(int styleID) {
 	if (styleID > 0) {
 		return g_mainAssets->styles.item(g_mainAssets, styleID - 1);
 	} else if (styleID < 0) {
+		if (g_externalAssets == nullptr) {
+			return nullptr;
+		}
 		return g_externalAssets->styles.item(g_externalAssets, -styleID - 1);
 	}
 	return nullptr;
@@ -230,6 +236,9 @@ const FontData *getFontData(int fontID) {
 	if (fontID > 0) {
 		return g_mainAssets->fonts.item(g_mainAssets, fontID - 1);
 	} else if (fontID < 0) {
+		if (g_externalAssets == nullptr) {
+			return nullptr;
+		}
 		return g_externalAssets->fonts.item(g_externalAssets, -fontID - 1);
 	}
 	return nullptr;
@@ -239,6 +248,9 @@ const Bitmap *getBitmap(int bitmapID) {
 	if (bitmapID > 0) {
 		return g_mainAssets->bitmaps.item(g_mainAssets, bitmapID - 1);
 	} else if (bitmapID < 0) {
+		if (g_externalAssets == nullptr) {
+			return nullptr;
+		}
 		return g_externalAssets->bitmaps.item(g_externalAssets, -bitmapID - 1);
 	}
 	return nullptr;
@@ -281,6 +293,10 @@ const char *getActionName(const WidgetCursor &widgetCursor, int16_t actionId) {
 		actionId = -actionId;
 	}
 	actionId--;
+
+	if (g_externalAssets == nullptr) {
+		return "";
+	}
 
 	return g_externalAssets->actionNames.item(g_externalAssets, actionId);
 }

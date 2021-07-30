@@ -83,8 +83,8 @@ struct PairOfInt16Value {
 #define FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(n) (FLOAT_OPTIONS_FIXED_DECIMALS | ((n & 0b111) << 2))
 
 struct RefString {
-	uint32_t refCounter{0};
-	char *str{nullptr};
+	uint32_t refCounter;
+	char *str;
 };
 
 struct Value {
@@ -211,7 +211,14 @@ struct Value {
 	~Value() {
 		if (type_ == VALUE_TYPE_STRING_REF) {
 			if (--refString_.refCounter == 0) {
+#ifndef _MSC_VER
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 				if (refString_.str) {
+#ifndef _MSC_VER
+#pragma GCC diagnostic pop
+#endif
 					free((char *)refString_.str);
 				}
 			}

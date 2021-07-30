@@ -1,0 +1,192 @@
+/*
+ * EEZ Modular Firmware
+ * Copyright (C) 2021-present, Envox d.o.o.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <stdio.h>
+#include <math.h>
+
+#include <eez/flow/operations.h>
+
+namespace eez {
+namespace flow {
+    
+bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
+	auto a = stack.pop();
+	auto b = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValue_;
+	}
+
+	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
+		b = *b.pValue_;
+	}
+
+	if (a.isDouble() || b.isDouble()) {
+		stack.push(Value(a.toDouble() + b.toDouble(), VALUE_TYPE_DOUBLE));
+		return true;
+	}
+
+	if (a.isFloat() || b.isFloat()) {
+		stack.push(Value(a.toFloat() + b.toFloat(), VALUE_TYPE_FLOAT));
+		return true;
+	}
+
+	if (a.isInt64() || b.isInt64()) {
+		stack.push(Value(a.toInt64() + b.toInt64(), VALUE_TYPE_INT64));
+		return true;
+	}
+
+	if (a.isInt32OrLess() && b.isInt32OrLess()) {
+		stack.push(Value(a.int32_ + b.int32_, VALUE_TYPE_INT32));
+		return true;
+	}
+
+	return false;
+}
+
+bool do_OPERATION_TYPE_SUB(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_MUL(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_DIV(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_MOD(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_LEFT_SHIFT(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_RIGHT_SHIFT(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_BINARY_AND(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_BINARY_OR(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_BINARY_XOR(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_EQUAL(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_NOT_EQUAL(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_LESS(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_GREATER(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_LESS_OR_EQUAL(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_GREATER_OR_EQUAL(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_NOT(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_MATH_COS(EvalStack &stack) {
+	return false;
+}
+
+bool do_OPERATION_TYPE_MATH_LOG(EvalStack &stack) {
+	return false;
+}
+
+EvalOperation g_evalOperations[] = {
+	do_OPERATION_TYPE_ADD,
+	do_OPERATION_TYPE_SUB,
+	do_OPERATION_TYPE_MUL,
+	do_OPERATION_TYPE_DIV,
+	do_OPERATION_TYPE_MOD,
+	do_OPERATION_TYPE_LEFT_SHIFT,
+	do_OPERATION_TYPE_RIGHT_SHIFT,
+	do_OPERATION_TYPE_BINARY_AND,
+	do_OPERATION_TYPE_BINARY_OR,
+	do_OPERATION_TYPE_BINARY_XOR,
+	do_OPERATION_TYPE_EQUAL,
+	do_OPERATION_TYPE_NOT_EQUAL,
+	do_OPERATION_TYPE_LESS,
+	do_OPERATION_TYPE_GREATER,
+	do_OPERATION_TYPE_LESS_OR_EQUAL,
+	do_OPERATION_TYPE_GREATER_OR_EQUAL,
+	do_OPERATION_TYPE_LOGICAL_AND,
+	do_OPERATION_TYPE_LOGICAL_OR,
+	do_OPERATION_TYPE_UNARY_PLUS,
+	do_OPERATION_TYPE_UNARY_MINUS,
+	do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT,
+	do_OPERATION_TYPE_NOT,
+	do_OPERATION_TYPE_CONDITIONAL,
+	do_OPERATION_TYPE_MATH_SIN,
+	do_OPERATION_TYPE_MATH_COS,
+	do_OPERATION_TYPE_MATH_LOG,
+};
+
+} // namespace flow
+} // namespace eez

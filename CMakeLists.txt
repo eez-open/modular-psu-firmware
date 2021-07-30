@@ -100,7 +100,6 @@ set(src_eez
     src/eez/debug.cpp
     src/eez/dlog_file.cpp
     src/eez/file_type.cpp
-    src/eez/flow.cpp
     src/eez/fs_driver.cpp
     src/eez/function_generator.cpp
     src/eez/hmi.cpp
@@ -110,7 +109,6 @@ set(src_eez
     src/eez/memory.cpp
     src/eez/mouse.cpp
     src/eez/mqtt.cpp
-    src/eez/scripting.cpp
     src/eez/sound.cpp
     src/eez/system.cpp
     src/eez/tasks.cpp
@@ -126,8 +124,6 @@ set(header_eez
     src/eez/debug.h
     src/eez/dlog_file.h
     src/eez/file_type.h
-    src/eez/flow.h
-    src/eez/flow_defs_v3.h
     src/eez/fs_driver.h
     src/eez/function_generator.h
     src/eez/hmi.h
@@ -136,7 +132,6 @@ set(header_eez
     src/eez/memory.h
     src/eez/mouse.h
     src/eez/mqtt.h
-    src/eez/scripting.h
     src/eez/sound.h
     src/eez/system.h
     src/eez/tasks.h
@@ -356,6 +351,36 @@ set(header_eez_gui_widgets
 )
 list (APPEND header_files ${header_eez_gui_widgets})
 source_group("eez\\gui\\widgets" FILES ${src_eez_gui_widgets} ${header_eez_gui_widgets})
+
+file(GLOB src_eez_scripting
+    "src/eez/scripting/*.cpp"
+)
+list (APPEND src_files ${src_eez_scripting})
+file(GLOB header_eez_scripting
+    "src/eez/scripting/*.h"
+)
+list (APPEND header_files ${header_eez_scripting})
+source_group("eez\\scripting" FILES ${src_eez_scripting} ${header_eez_scripting})
+
+file(GLOB src_eez_flow
+    "src/eez/flow/*.cpp"
+)
+list (APPEND src_files ${src_eez_flow})
+file(GLOB header_eez_flow
+    "src/eez/flow/*.h"
+)
+list (APPEND header_files ${header_eez_flow})
+source_group("eez\\flow" FILES ${src_eez_flow} ${header_eez_flow})
+
+file(GLOB src_eez_flow_components
+    "src/eez/flow/components/*.cpp"
+)
+list (APPEND src_files ${src_eez_flow_components})
+file(GLOB header_eez_flow_components
+    "src/eez/flow/components/*.h"
+)
+list (APPEND header_files ${header_eez_flow_components})
+source_group("eez\\flow\\components" FILES ${src_eez_flow_components} ${header_eez_flow_components})
 
 file(GLOB src_eez_libs_agg
     "src/eez/libs/agg/*.cpp"

@@ -34,7 +34,11 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void arcBar(Agg2D &graphics, int xCenter, int yCenter, int radOuter, int radInner, float angle) {
+void arcBar(Agg2D &graphics, int xCenter, int yCenter, int radOuter, int radInner, float angleDeg) {
+	auto angle = Agg2D::deg2Rad(angleDeg);
+	auto cosa = cos(angle);
+	auto sina = sin(angle);
+	
 	graphics.moveTo(xCenter - radOuter, yCenter);
 
 	graphics.arcTo(
@@ -43,13 +47,13 @@ void arcBar(Agg2D &graphics, int xCenter, int yCenter, int radOuter, int radInne
 		Agg2D::deg2Rad(0), // angle
 		0, // largeArcFlag
 		1, // sweepFlag
-		xCenter + radOuter * cos(Agg2D::deg2Rad(angle)), // dx
-		yCenter - radOuter * sin(Agg2D::deg2Rad(angle)) // dy
+		xCenter + radOuter * cosa, // dx
+		yCenter - radOuter * sina // dy
 	);
 
 	graphics.lineTo(
-		xCenter + radInner * cos(Agg2D::deg2Rad(angle)),
-		yCenter - radInner * sin(Agg2D::deg2Rad(angle))
+		xCenter + radInner * cosa,
+		yCenter - radInner * sina
 	);
 
 	graphics.arcTo(
@@ -106,7 +110,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		auto colorBar = getColor16FromIndex(barStyle->color);
 
 		auto xCenter = widget->w / 2;
-		auto yCenter = widget->h - 24;
+		auto yCenter = widget->h - 12;
 
 		// init AGG
 		agg::rendering_buffer rbuf;
@@ -122,7 +126,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		graphics.lineWidth(1.5);
 		graphics.lineColor(COLOR_TO_R(colorBorder), COLOR_TO_G(colorBorder), COLOR_TO_B(colorBorder));
 		graphics.noFill();
-		graphics.roundedRect(1, 1, widget->w-2, widget->h-2, 4);
+		graphics.roundedRect(1, 1, widget->w - 2, widget->h - 2, 4);
 
 		// draw border
 		auto radBorderOuter = (widget->w - 12) / 2;
@@ -138,12 +142,14 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		auto radBarOuter = (widget->w - 12) / 2 - (BORDER_WIDTH - BAR_WIDTH) / 2;
 		auto radBarInner = radBarOuter - BAR_WIDTH;
 		auto angle = remap(value, min, 180.0f, max, 0.0f);
-		graphics.resetPath();
-		graphics.noLine();
-		graphics.fillColor(COLOR_TO_R(colorBar), COLOR_TO_G(colorBar), COLOR_TO_B(colorBar));
-		graphics.lineWidth(1.5);
-		arcBar(graphics, xCenter, yCenter, radBarOuter, radBarInner, angle);
-		graphics.drawPath();
+		if (!isNaN(angle)) {
+			graphics.resetPath();
+			graphics.noLine();
+			graphics.fillColor(COLOR_TO_R(colorBar), COLOR_TO_G(colorBar), COLOR_TO_B(colorBar));
+			graphics.lineWidth(1.5);
+			arcBar(graphics, xCenter, yCenter, radBarOuter, radBarInner, angle);
+			graphics.drawPath();
+		}
 
 		// output generated image and free resources
 		Image image;

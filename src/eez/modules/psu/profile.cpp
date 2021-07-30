@@ -20,7 +20,7 @@
 
 #include <eez/file_type.h>
 #include <eez/hmi.h>
-#include <eez/scripting.h>
+#include <eez/scripting/scripting.h>
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>

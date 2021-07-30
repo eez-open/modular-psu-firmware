@@ -31,7 +31,7 @@
 #include <eez/util.h>
 #include <eez/index.h>
 #include <eez/file_type.h>
-#include <eez/scripting.h>
+#include <eez/scripting/scripting.h>
 #include <eez/memory.h>
 #include <eez/hmi.h>
 #include <eez/uart.h>

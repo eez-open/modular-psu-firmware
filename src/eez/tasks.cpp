@@ -23,7 +23,7 @@
 #endif
 
 #include <eez/tasks.h>
-#include <eez/scripting.h>
+#include <eez/scripting/scripting.h>
 #include <eez/sound.h>
 #include <eez/hmi.h>
 #include <eez/uart.h>
@@ -290,7 +290,7 @@ void lowPriorityThreadOneIter() {
         }
 #endif  
         else if (type < MP_LAST_MESSAGE_TYPE) {
-            scripting::onQueueMessage(type, param);
+            scripting::onLowPriorityQueueMessage(type, param);
         }
 
         else {

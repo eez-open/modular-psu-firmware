@@ -32,7 +32,8 @@ namespace scripting {
 enum State {
     STATE_IDLE,
     STATE_STARTING,
-    STATE_EXECUTING
+    STATE_EXECUTING,
+    STATE_STOPPING
 };
 
 extern State g_state;
@@ -41,12 +42,15 @@ extern char *g_scriptPath;
 void initMessageQueue();
 void startThread();
 
-void onQueueMessage(uint32_t type, uint32_t param);
+void onLowPriorityQueueMessage(uint32_t type, uint32_t param);
 
 bool startScript(const char *filePath, int *err = nullptr);
 bool stopScript(int *err = nullptr);
 inline bool isIdle() { return g_state == STATE_IDLE; }
-bool scpi(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen);
+
+bool executeScpiFromMP(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen);
+void executeScpiFromFlow(const char *commandOrQueryText);
+bool getLatestScpiResult(const char **resultText, size_t *resultTextLen, int *err);
 
 bool isFlowRunning();
 void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId);

@@ -18,29 +18,14 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <math.h>
-#include <scpi/scpi.h>
-#include <new>
+#include <eez/flow/private.h>
 
 namespace eez {
+namespace flow {
 
-void initAllocHeap(uint8_t *heap, size_t heapSize);
+typedef bool (*EvalOperation)(EvalStack &);
 
-void *alloc(size_t size);
-void free(void *ptr);
+extern EvalOperation g_evalOperations[];
 
-template<class T> struct ObjectAllocator {
-	static T *allocate() {
-		auto ptr = alloc(sizeof(T));
-		return new (ptr) T;
-	}
-	static void deallocate(T* ptr) {
-		ptr->~T();
-		free(ptr);
-	}
-};
-
-void dumpAlloc(scpi_t *context);
-
+} // flow
 } // eez

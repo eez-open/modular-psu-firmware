@@ -20,6 +20,7 @@
 #include <math.h>
 
 #include <eez/alloc.h>
+#include <eez/system.h>
 
 namespace eez {
 
@@ -34,6 +35,16 @@ struct AllocBlock {
 
 static uint8_t *g_heap;
 
+#if defined(EEZ_PLATFORM_STM32)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wparentheses"
+#endif
+osMutexId(g_mutexId);
+#if defined(EEZ_PLATFORM_STM32)
+#pragma GCC diagnostic pop
+#endif
+osMutexDef(g_mutex);
+
 void initAllocHeap(uint8_t *heap, size_t heapSize) {
     g_heap = heap;
 
@@ -41,6 +52,8 @@ void initAllocHeap(uint8_t *heap, size_t heapSize) {
 	first->next = 0;
 	first->free = 1;
 	first->size = heapSize - sizeof(AllocBlock);
+
+	g_mutexId = osMutexCreate(osMutex(g_mutex));
 }
 
 void *alloc(size_t size) {
@@ -53,28 +66,35 @@ void *alloc(size_t size) {
 	AllocBlock *first = (AllocBlock *)g_heap;
 
 	AllocBlock *block = first;
-	while (block) {
-		if (block->free && block->size >= size) {
-			break;
+
+	if (osMutexWait(g_mutexId, osWaitForever) == osOK) {
+		while (block) {
+			if (block->free && block->size >= size) {
+				break;
+			}
+			block = block->next;
 		}
-		block = block->next;
-	}
 
-	if (!block) {
-		return nullptr;
-	}
+		if (!block) {
+			return nullptr;
+		}
 
-	int nextBlockSize = block->size - size - sizeof(AllocBlock);
-	if (nextBlockSize >= (int)MIN_BLOCK_SIZE) {
-		auto nextBlock = (AllocBlock *)((uint8_t *)block + sizeof(AllocBlock) + size);
-		nextBlock->next = block->next;
-		nextBlock->free = 1;
-		nextBlock->size = nextBlockSize;
-		block->next = nextBlock;
-		block->size = size;
-	}
+		int nextBlockSize = block->size - size - sizeof(AllocBlock);
+		if (nextBlockSize >= (int)MIN_BLOCK_SIZE) {
+			auto nextBlock = (AllocBlock *)((uint8_t *)block + sizeof(AllocBlock) + size);
+			nextBlock->next = block->next;
+			nextBlock->free = 1;
+			nextBlock->size = nextBlockSize;
+			block->next = nextBlock;
+			block->size = size;
+		}
 
-	block->free = 0;
+		block->free = 0;
+
+		osMutexRelease(g_mutexId);
+	} else {
+		osDelay(1);
+	}
 		
 	return block + 1;    
 }
@@ -87,33 +107,50 @@ void free(void *ptr) {
 	AllocBlock *first = (AllocBlock *)g_heap;
 
 	AllocBlock *block = first;
-	AllocBlock *prevBlock = nullptr;
-	while (block && block + 1 < ptr) {
-		prevBlock = block;
-		block = block->next;
-	}
 
-	if (!block || block + 1 != ptr) {
-		// assert(0);
-		return;
-	}
+	if (osMutexWait(g_mutexId, osWaitForever) == osOK) {
+		AllocBlock *prevBlock = nullptr;
+		while (block && block + 1 < ptr) {
+			prevBlock = block;
+			block = block->next;
+		}
 
-	if (block->next && block->next->free) {
-		if (prevBlock && prevBlock->free) {
-			prevBlock->next = block->next->next;
-			prevBlock->size += sizeof(AllocBlock) + block->size + sizeof(AllocBlock) + block->next->size;
+		if (!block || block + 1 != ptr) {
+			// assert(0);
+			return;
+		}
+
+		if (block->next && block->next->free) {
+			if (prevBlock && prevBlock->free) {
+				prevBlock->next = block->next->next;
+				prevBlock->size += sizeof(AllocBlock) + block->size + sizeof(AllocBlock) + block->next->size;
+			} else {
+				block->size += sizeof(AllocBlock) + block->next->size;
+				block->next = block->next->next;
+				block->free = 1;
+			}
+		} else if (prevBlock && prevBlock->free) {
+			prevBlock->next = block->next;
+			prevBlock->size += sizeof(AllocBlock) + block->size;
 		} else {
-			block->size += sizeof(AllocBlock) + block->next->size;
-			block->next = block->next->next;
 			block->free = 1;
 		}
-	} else if (prevBlock && prevBlock->free) {
-		prevBlock->next = block->next;
-		prevBlock->size += sizeof(AllocBlock) + block->size;
-	} else {
 		block->free = 1;
+
+		osMutexRelease(g_mutexId);
+	} else {
+		osDelay(1);
 	}
-	block->free = 1;
+}
+
+template<typename T> T *allocObject() {
+	void *ptr = alloc(sizeof(T));
+	return new (ptr) T;
+}
+
+template<typename T> void freeObject(T *ptr) {
+	ptr->~T();
+	free(ptr);
 }
 
 void dumpAlloc(scpi_t *context) {

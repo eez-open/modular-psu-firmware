@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 #include <eez/system.h>
-#include <eez/scripting.h>
+#include <eez/scripting/scripting.h>
 #include <eez/memory.h>
 #include <eez/fs_driver.h>
 
