@@ -33,6 +33,8 @@
 namespace eez {
 namespace gui {
 
+struct Assets;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 class AppContext;
@@ -486,6 +488,8 @@ struct Value {
 		}
 		return 0;
 	}
+
+	const char *toString(Assets *assets) const;
 	
 	//////////
 
@@ -523,6 +527,8 @@ struct Value {
 
 		const char *str_;
 		RefString refString_;
+        uint32_t assetsString_;
+
 		uint8_t *puint8_;
 		float *pFloat_;
 		void *pVoid_;

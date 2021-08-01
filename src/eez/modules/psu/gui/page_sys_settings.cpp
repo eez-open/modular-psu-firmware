@@ -1361,7 +1361,7 @@ void SysSettingsRampAndDelayPage::setOutputDelayDuration(int channelIndex, float
 }
 
 Value SysSettingsRampAndDelayPage::getRefreshState() {
-    return Value((version << 24) | (g_focusDataId << 8) | (g_focusCursor & 0xFF), VALUE_TYPE_UINT32);
+    return Value((version << 24) | (g_focusDataId << 8) | (g_focusCursor.cursor & 0xFF), VALUE_TYPE_UINT32);
 }
 
 void SysSettingsRampAndDelayPage::draw(const WidgetCursor &widgetCursor) {
@@ -1386,14 +1386,14 @@ void SysSettingsRampAndDelayPage::draw(const WidgetCursor &widgetCursor) {
     limit *= 1.1f;
 
     for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
-        if (page->rampState[channelIndex] && channelIndex != g_focusCursor) {
+        if (page->rampState[channelIndex] && channelIndex != g_focusCursor.cursor) {
             page->drawRamp(widgetCursor, channelIndex, drawVoltageRamps, T, limit);
         }
     }
 
-    if (g_focusCursor != -1 && page->rampState[g_focusCursor]) {
-        page->drawRamp(widgetCursor, g_focusCursor, drawVoltageRamps, T, limit);
-        page->drawRamp(widgetCursor, g_focusCursor, drawVoltageRamps, T, limit, 1);
+    if (g_focusCursor.cursor != -1 && page->rampState[g_focusCursor.cursor]) {
+        page->drawRamp(widgetCursor, g_focusCursor.cursor, drawVoltageRamps, T, limit);
+        page->drawRamp(widgetCursor, g_focusCursor.cursor, drawVoltageRamps, T, limit, 1);
     }
 }
 

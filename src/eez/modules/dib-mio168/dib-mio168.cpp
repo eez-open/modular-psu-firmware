@@ -6433,9 +6433,8 @@ void action_dib_mio168_ain_select_range() {
 }
 
 void data_dib_mio168_ain_nplc(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_AIN_NPLC;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DIB_MIO168_AIN_NPLC;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -7005,7 +7004,7 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, const WidgetCursor 
     int aoutChannelIndex = cursor % 4;
 
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_AOUT_VALUE;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DIB_MIO168_AOUT_VALUE;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -7376,7 +7375,7 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, const WidgetCursor &w
     int pwmChannelIndex = cursor % 2;
 
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_PWM_FREQ;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DIB_MIO168_PWM_FREQ;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -7427,7 +7426,7 @@ void data_dib_mio168_pwm_duty(DataOperationEnum operation, const WidgetCursor &w
     int pwmChannelIndex = cursor % 2;
     
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_PWM_DUTY;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DIB_MIO168_PWM_DUTY;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {

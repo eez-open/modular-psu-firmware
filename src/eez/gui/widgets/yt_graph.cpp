@@ -620,7 +620,8 @@ OnTouchFunctionType YT_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Even
     } else {
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
             if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
-                executeAction(widgetCursor, widgetCursor.widget->action);
+                auto action = getWidgetAction(widgetCursor);        
+                executeAction(widgetCursor, action);
             }
         }
     }

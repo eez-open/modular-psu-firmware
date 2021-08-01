@@ -174,7 +174,8 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
                 isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
                 currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
 
-            if (widgetCursor.currentState->flags.focused && widget->action == ACTION_ID_SCROLL) {
+            auto action = getWidgetAction(widgetCursor);        
+            if (widgetCursor.currentState->flags.focused && action == ACTION_ID_SCROLL) {
 				const Style *style = getStyle(widgetCursor.widget->style);
                 display::setColor(style->focus_color);
                 display::drawRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
@@ -270,8 +271,9 @@ OnTouchFunctionType SCROLL_BAR_onTouch = [](const WidgetCursor &widgetCursor, Ev
             g_segment = SCROLL_BAR_WIDGET_SEGMENT_NONE;
         }
 
-		if (widget->action == ACTION_ID_SCROLL) {
-			psu::gui::setFocusCursor(widgetCursor.cursor, widget->data);
+        auto action = getWidgetAction(widgetCursor);        
+		if (action == ACTION_ID_SCROLL) {
+			psu::gui::setFocusCursor(widgetCursor, widget->data);
 		}
     }
 };

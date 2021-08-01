@@ -60,7 +60,6 @@ static const int NULL_VALUE_INDEX = 1;
 FlowState *initFlowState(Assets *assets, int flowIndex);
 
 void recalcFlowDataItems(Assets *assets, FlowState *flowState);
-void getDataItemValue(Assets *assets, FlowState *flowState, int16_t dataId, Value& value);
 
 void pingComponent(Assets *assets, FlowState *flowState, unsigned componentIndex);
 void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
@@ -71,7 +70,7 @@ bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions,
 bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, Value &result);
 bool evalAssignableExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, Value **result, int *numInstructionBytes = nullptr);
 
-void throwError();
+void throwError(const char *errorMessage);
 
 } // flow
 } // eez

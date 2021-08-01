@@ -213,13 +213,10 @@ Mutex *osMutexCreate(Mutex &mutex) {
 }
 
 osStatus osMutexWait(Mutex *mutex, unsigned int timeout) {
-    while (mutex->locked) {
-    	osDelay(1);
-    }
-    mutex->locked = true;
+	mutex->lock();
     return osOK;
 }
 
 void osMutexRelease(Mutex *mutex) {
-    mutex->locked = false;
+	mutex->unlock();
 }

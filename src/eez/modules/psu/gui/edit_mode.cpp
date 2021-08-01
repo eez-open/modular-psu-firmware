@@ -44,8 +44,12 @@ namespace eez {
 namespace psu {
 namespace gui {
 
-int getFocusCursor() {
-    return g_focusCursor != -1 ? g_focusCursor : g_channel ? g_channel->channelIndex : -1;
+WidgetCursor getFocusCursor() {
+	WidgetCursor widgetCursor = g_focusCursor;
+	if (widgetCursor.cursor == -1 && g_channel) {
+		widgetCursor.cursor = g_channel->channelIndex;
+	}
+    return widgetCursor;
 }
 
 namespace edit_mode {
@@ -73,8 +77,7 @@ bool isActive(AppContext *appContext) {
 }
 
 void initEditValue() {
-	WidgetCursor widgetCursor;
-	widgetCursor.cursor = getFocusCursor();
+	WidgetCursor widgetCursor = getFocusCursor();
     g_editValue = eez::gui::getEditValue(widgetCursor, g_focusDataId);
     g_undoValue = g_editValue;
 }
@@ -83,7 +86,7 @@ void enter(int tabIndex, bool setFocus) {
 #if OPTION_ENCODER
     if (setFocus && !isActive(&g_psuAppContext)) {
         if (!g_psuAppContext.isFocusWidget(getFoundWidgetAtDown()) || g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
-            setFocusCursor(getFoundWidgetAtDown().cursor, getFoundWidgetAtDown().widget->data);
+            setFocusCursor(getFoundWidgetAtDown(), getFoundWidgetAtDown().widget->data);
             return;
         }
     }
@@ -91,9 +94,9 @@ void enter(int tabIndex, bool setFocus) {
 
     if (tabIndex == -1) {
         gui::selectChannelByCursor();
-        Cursor newDataCursor = getFoundWidgetAtDown().cursor;
-        int16_t newDataId = getFoundWidgetAtDown().widget->data;
-        setFocusCursor(newDataCursor, newDataId);
+        auto widgetCursor = getFoundWidgetAtDown();
+        int16_t newDataId = widgetCursor.widget->data;
+        setFocusCursor(widgetCursor, newDataId);
         update();
 
         if (!isActive(&g_psuAppContext)) {
@@ -105,13 +108,12 @@ void enter(int tabIndex, bool setFocus) {
     }
 
     if (g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {
-		WidgetCursor widgetCursor;
-		widgetCursor = getFocusCursor();
+		WidgetCursor widgetCursor = getFocusCursor();
 
         int slotIndex = -1;
         int subchannelIndex = -1;
         if (isChannelData(widgetCursor, g_focusDataId)) {
-            auto &channel = Channel::get(widgetCursor);
+            auto &channel = Channel::get(widgetCursor.cursor);
             slotIndex = channel.slotIndex;
             subchannelIndex = channel.subchannelIndex;
 		} else {
@@ -129,11 +131,10 @@ void exit() {
 }
 
 void nonInteractiveSet() {
-	WidgetCursor widgetCursor;
-	widgetCursor = getFocusCursor();
+	WidgetCursor widgetCursor = getFocusCursor();
 	Value result = set(widgetCursor, g_focusDataId, g_editValue);
     if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
-        psuErrorMessage(getFocusCursor(), result);
+        psuErrorMessage(widgetCursor.cursor, result);
     } else {
         popPage();
     }
@@ -141,8 +142,7 @@ void nonInteractiveSet() {
 
 void nonInteractiveDiscard() {
     g_editValue = g_undoValue;
-	WidgetCursor widgetCursor;
-	widgetCursor = getFocusCursor();
+	WidgetCursor widgetCursor = getFocusCursor();
 	set(widgetCursor, g_focusDataId, g_undoValue);
 }
 
@@ -160,8 +160,7 @@ const Value &getEditValue() {
 }
 
 Value getCurrentValue() {
-	WidgetCursor widgetCursor;
-	widgetCursor = getFocusCursor();
+	WidgetCursor widgetCursor = getFocusCursor();
 	return get(widgetCursor, g_focusDataId);
 }
 
@@ -181,17 +180,16 @@ Unit getUnit() {
 }
 
 bool setValue(float floatValue) {
-	WidgetCursor widgetCursor;
-	widgetCursor = getFocusCursor();
+	WidgetCursor widgetCursor = getFocusCursor();
 	if (isChannelData(widgetCursor, g_focusDataId)) {
-        floatValue = channel_dispatcher::roundChannelValue(Channel::get(getFocusCursor()), getUnit(), floatValue);
+        floatValue = channel_dispatcher::roundChannelValue(Channel::get(widgetCursor.cursor), getUnit(), floatValue);
     }
 
     Value value = MakeValue(floatValue, getUnit());
     if (g_isInteractiveMode || g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {
         Value result = set(widgetCursor, g_focusDataId, value);
         if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
-            psuErrorMessage(getFocusCursor(), result);
+            psuErrorMessage(widgetCursor.cursor, result);
             return false;
         }
     }
@@ -202,8 +200,7 @@ bool setValue(float floatValue) {
 #define NUM_PARTS 15
 
 void getInfoText(char *infoText, int count) {
-	WidgetCursor widgetCursor;
-	widgetCursor = getFocusCursor();
+	WidgetCursor widgetCursor = getFocusCursor();
 	const char *dataName = getName(widgetCursor, g_focusDataId);
     if (!dataName) {
         dataName = "Unknown";
@@ -214,11 +211,11 @@ void getInfoText(char *infoText, int count) {
         getLimit(widgetCursor, g_focusDataId) : eez::gui::getMax(widgetCursor, g_focusDataId);
 
     if (isChannelData(widgetCursor, g_focusDataId)) {
-        Channel& channel = Channel::get(getFocusCursor());
+        Channel& channel = Channel::get(widgetCursor.cursor);
         if ((channel.channelIndex < 2 && channel_dispatcher::getCouplingType() != channel_dispatcher::COUPLING_TYPE_NONE) || channel.flags.trackingEnabled) {
             stringCopy(infoText, count, "Set ");
         } else {
-            snprintf(infoText, count, "Set Ch%d ", getFocusCursor() + 1);
+            snprintf(infoText, count, "Set Ch%d ", widgetCursor.cursor + 1);
         }
         
         stringAppendString(infoText, count, dataName);
@@ -235,8 +232,7 @@ void getInfoText(char *infoText, int count) {
 
 static void update() {
     initEditValue();
-	WidgetCursor widgetCursor;
-	widgetCursor = getFocusCursor();
+	WidgetCursor widgetCursor = getFocusCursor();
 	g_minValue = eez::gui::getMin(widgetCursor, g_focusDataId);
     g_maxValue = eez::gui::getMax(widgetCursor, g_focusDataId);
     if (edit_mode_keypad::g_keypad) {
@@ -326,7 +322,7 @@ void getStepValues(StepValues &stepValues) {
 		widgetCursor.cursor = g_channel->channelIndex;
         getEncoderStepValues(widgetCursor, page->getDataIdAtCursor(), stepValues);
     } else {
-		widgetCursor.cursor = getFocusCursor();
+		widgetCursor = getFocusCursor();
 		getEncoderStepValues(widgetCursor, g_focusDataId, stepValues);
     }
 }

@@ -315,39 +315,12 @@ set(header_eez_gui
 list (APPEND header_files ${header_eez_gui})
 source_group("eez\\gui" FILES ${src_eez_gui} ${header_eez_gui})
 
-set(src_eez_gui_widgets
-    src/eez/gui/widgets/app_view.cpp
-    src/eez/gui/widgets/bar_graph.cpp
-    src/eez/gui/widgets/bitmap.cpp
-    src/eez/gui/widgets/button.cpp
-    src/eez/gui/widgets/button_group.cpp
-    src/eez/gui/widgets/canvas.cpp
-    src/eez/gui/widgets/container.cpp
-    src/eez/gui/widgets/display_data.cpp
-    src/eez/gui/widgets/gauge.cpp
-    src/eez/gui/widgets/grid.cpp
-    src/eez/gui/widgets/layout_view.cpp
-    src/eez/gui/widgets/list.cpp
-    src/eez/gui/widgets/list_graph.cpp
-    src/eez/gui/widgets/multiline_text.cpp
-    src/eez/gui/widgets/progress.cpp
-    src/eez/gui/widgets/rectangle.cpp
-    src/eez/gui/widgets/scroll_bar.cpp
-    src/eez/gui/widgets/select.cpp
-    src/eez/gui/widgets/text.cpp
-    src/eez/gui/widgets/toggle_button.cpp
-    src/eez/gui/widgets/up_down.cpp
-    src/eez/gui/widgets/yt_graph.cpp
+file(GLOB src_eez_gui_widgets
+    "src/eez/gui/widgets/*.cpp"
 )
 list (APPEND src_files ${src_eez_gui_widgets})
-set(header_eez_gui_widgets
-    src/eez/gui/widgets/button.h
-    src/eez/gui/widgets/container.h
-    src/eez/gui/widgets/display_data.h
-    src/eez/gui/widgets/layout_view.h
-    src/eez/gui/widgets/rectangle.h
-    src/eez/gui/widgets/text.h
-    src/eez/gui/widgets/yt_graph.h
+file(GLOB header_eez_gui_widgets
+    "src/eez/gui/widgets/*.h"
 )
 list (APPEND header_files ${header_eez_gui_widgets})
 source_group("eez\\gui\\widgets" FILES ${src_eez_gui_widgets} ${header_eez_gui_widgets})

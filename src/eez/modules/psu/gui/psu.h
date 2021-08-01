@@ -44,10 +44,10 @@ void selectChannelByCursor();
 extern Channel *g_channel;
 extern int g_channelIndex;
 
-extern Cursor g_focusCursor;
+extern WidgetCursor g_focusCursor;
 extern int16_t g_focusDataId;
 extern Value g_focusEditValue;
-void setFocusCursor(const Cursor cursor, int16_t dataId);
+void setFocusCursor(const WidgetCursor& cursor, int16_t dataId);
 bool isFocusChanged();
 
 void changeVoltageLimit(int iChannel);
@@ -202,7 +202,7 @@ public:
 
     bool isFocusWidget(const WidgetCursor &widgetCursor) override;
 
-    bool isBlinking(const Cursor cursor, int16_t id) override;
+    bool isBlinking(const WidgetCursor &widgetCursor, int16_t id) override;
 
     bool isWidgetActionEnabled(const WidgetCursor &widgetCursor) override;
     

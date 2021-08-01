@@ -101,6 +101,17 @@ static const int g_scpiUnits[] = {
 	SCPI_UNIT_AMPER,
 };
 
+Unit getUnitFromName(const char *unitName) {
+	if (unitName) {
+		for (int i = 0; i < sizeof(g_unitNames) / sizeof(const char *); i++) {
+			if (strcmp(g_unitNames[i], unitName) == 0) {
+				return (Unit)i;
+			}
+		}
+	}
+	return UNIT_NONE;
+}
+
 int getScpiUnit(Unit unit) {
     return g_scpiUnits[unit];
 }

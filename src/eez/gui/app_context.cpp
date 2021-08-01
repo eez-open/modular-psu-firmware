@@ -53,7 +53,8 @@ bool AppContext::isActivePageInternal() {
 
 bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
-    if (widget->action) {
+    auto action = getWidgetAction(widgetCursor);
+    if (action) {
         if (widget->type == WIDGET_TYPE_BUTTON) {
             auto buttonWidget = (const ButtonWidget *)widget;
             if (!get(widgetCursor, buttonWidget->enabled).getInt()) {
@@ -261,7 +262,7 @@ bool AppContext::testExecuteActionOnTouchDown(int action) {
     return false;
 }
 
-bool AppContext::isBlinking(const Cursor cursor, int16_t id) {
+bool AppContext::isBlinking(const WidgetCursor &widgetCursor, int16_t id) {
     return false;
 }
 
@@ -285,12 +286,11 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 
                 auto widgetCursor = findWidget(&getRootAppContext(), touchEvent.x, touchEvent.y);
 
-                if (
-                    widgetCursor.widget &&
-                    widgetCursor.widget->action != ACTION_ID_NONE &&
-                    canExecuteActionWhenTouchedOutsideOfActivePage(activePageId, widgetCursor.widget->action)
-                ) {
-                    eventHandling();
+                if (widgetCursor.widget) {
+                    auto action = getWidgetAction(widgetCursor);
+                    if (action != ACTION_ID_NONE && canExecuteActionWhenTouchedOutsideOfActivePage(activePageId, action)) {
+                        eventHandling();
+                    }
                 }
             }
         }

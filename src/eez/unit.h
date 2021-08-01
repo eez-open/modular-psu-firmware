@@ -72,6 +72,8 @@ inline const char *getUnitName(Unit unit) {
     return g_unitNames[unit];
 }
 
+Unit getUnitFromName(const char *unitName);
+
 int getScpiUnit(Unit unit);
 
 } // namespace eez

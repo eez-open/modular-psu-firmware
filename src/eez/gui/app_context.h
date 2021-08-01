@@ -64,7 +64,7 @@ public:
 
     virtual bool isFocusWidget(const WidgetCursor &widgetCursor);
 
-    virtual bool isBlinking(const Cursor cursor, int16_t id);
+    virtual bool isBlinking(const WidgetCursor &widgetCursor, int16_t id);
 
     virtual bool isActiveWidget(const WidgetCursor &widgetCursor);
     virtual void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);

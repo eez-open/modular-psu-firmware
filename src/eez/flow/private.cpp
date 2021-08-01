@@ -18,6 +18,10 @@
 
 #include <stdio.h>
 
+#include <eez/debug.h>
+
+#include <eez/scripting/scripting.h>
+
 #include <eez/flow/flow.h>
 #include <eez/flow/operations.h>
 #include <eez/flow/queue.h>
@@ -59,25 +63,15 @@ void recalcFlowDataItems(Assets *assets, FlowState *flowState) {
 	for (unsigned i = 0; i < flow->widgetDataItems.count; i++) {
 		auto &value = flowState->values[dataItemsOffset + i];
 
-		auto propertyValue = flow->widgetDataItems.item(assets, i);
-		if (propertyValue) {
+		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, i);
+		if (widgetDataItem) {
+			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+			auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
+
 			evalExpression(assets, flowState, propertyValue->evalInstructions, value);
 		} else {
 			value = Value();
 		}
-	}
-}
-
-void getDataItemValue(Assets *assets, FlowState *flowState, int16_t dataId, Value& value) {
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto dataItemsOffset = flow->nInputValues + flow->localVariables.count;
-
-	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
-		value = flowState->values[dataItemsOffset + dataId];
-	} else {
-		// TODO this shouldn't happen
-		value = Value();
 	}
 }
 
@@ -210,8 +204,9 @@ bool evalAssignableExpression(Assets *assets, FlowState *flowState, uint8_t *ins
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void throwError() {
-	// TODO
+void throwError(const char *errorMessage) {
+	ErrorTrace(errorMessage);
+	scripting::stopScript();
 }
 
 } // namespace flow

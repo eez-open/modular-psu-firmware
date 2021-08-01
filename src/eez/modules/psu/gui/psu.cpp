@@ -120,7 +120,7 @@ SelectFromEnumPage g_selectFromEnumPage;
 int g_displayTestColorIndex = 0;
 
 bool g_setFocusCursor = false;
-Cursor g_focusCursorToSet;
+WidgetCursor g_focusCursorToSet;
 int16_t g_focusDataIdToSet;
 
 bool showSetupWizardQuestion();
@@ -597,7 +597,8 @@ bool PsuAppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
         return ((ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS))->isFocusWidget(widgetCursor);
     }
 
-    return (widgetCursor.cursor == -1 || widgetCursor.cursor == g_focusCursor) && widgetCursor.widget->data == g_focusDataId && widgetCursor.widget->action != ACTION_ID_EDIT_NO_FOCUS && isEncoderEnabledInActivePage();
+    auto action = getWidgetAction(widgetCursor);        
+    return (widgetCursor.cursor == -1 || widgetCursor == g_focusCursor) && widgetCursor.widget->data == g_focusDataId && action != ACTION_ID_EDIT_NO_FOCUS && isEncoderEnabledInActivePage();
 }
 
 bool PsuAppContext::isAutoRepeatAction(int action) {
@@ -661,17 +662,17 @@ bool PsuAppContext::testExecuteActionOnTouchDown(int action) {
     return action == ACTION_ID_CHANNEL_TOGGLE_OUTPUT || isAutoRepeatAction(action);
 }
 
-bool PsuAppContext::isBlinking(const Cursor cursor, int16_t id) {
-    if (g_focusCursor == cursor && g_focusDataId == id && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
+bool PsuAppContext::isBlinking(const WidgetCursor &widgetCursor, int16_t id) {
+    if (g_focusCursor == widgetCursor && g_focusDataId == id && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
         return true;
     }
 
-    return AppContext::isBlinking(cursor, id);
+    return AppContext::isBlinking(widgetCursor, id);
 }
 
 bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-    if (widget->action) {
+    auto action = getWidgetAction(widgetCursor);        
+    if (action) {
         if (isFrontPanelLocked()) {
             int activePageId = getActivePageId();
             if (activePageId == PAGE_ID_KEYPAD ||
@@ -682,27 +683,27 @@ bool PsuAppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
                 return true;
             }
             
-            if (widget->action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
+            if (action != ACTION_ID_SYS_FRONT_PANEL_UNLOCK) {
                 return false;
             }
         }
     
-        if (widget->action == ACTION_ID_SHOW_EVENT_QUEUE) {
+        if (action == ACTION_ID_SHOW_EVENT_QUEUE) {
             static const uint32_t CONF_SHOW_EVENT_QUEUE_INACTIVITY_TIMESPAN_SINCE_LAST_SHOW_PAGE_MS = 500;
             if (millis() - m_showPageTime < CONF_SHOW_EVENT_QUEUE_INACTIVITY_TIMESPAN_SINCE_LAST_SHOW_PAGE_MS) {
                 return false;
             }
         }
 
-        if (widget->action == ACTION_ID_FILE_MANAGER_SELECT_FILE) {
+        if (action == ACTION_ID_FILE_MANAGER_SELECT_FILE) {
             return file_manager::isSelectFileActionEnabled(widgetCursor.cursor);
         }
 
         if (
-            widget->action == ACTION_ID_EDIT ||
-            widget->action == ACTION_ID_SCROLL ||
-            widget->action == ACTION_ID_EDIT_NO_FOCUS ||
-            widget->action == ACTION_ID_CH_SETTINGS_PROT_EDIT_LIMIT
+            action == ACTION_ID_EDIT ||
+            action == ACTION_ID_SCROLL ||
+            action == ACTION_ID_EDIT_NO_FOCUS ||
+            action == ACTION_ID_CH_SETTINGS_PROT_EDIT_LIMIT
         ) {
             if (widgetCursor.widget->data == DATA_ID_CALIBRATION_POINT_MEASURED_VALUE) {
                 auto page = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
@@ -1047,12 +1048,13 @@ void PsuAppContext::dialogClose() {
 }
 
 int PsuAppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {
+    auto action = getWidgetAction(widgetCursor);        
     if (
-        widgetCursor.widget->action == ACTION_ID_SYS_FRONT_PANEL_LOCK ||
-        widgetCursor.widget->action == ACTION_ID_SYS_FRONT_PANEL_UNLOCK ||
-        widgetCursor.widget->action == ACTION_ID_HIDE_OVERLAY_LONG_TOUCH
+        action == ACTION_ID_SYS_FRONT_PANEL_LOCK ||
+        action == ACTION_ID_SYS_FRONT_PANEL_UNLOCK ||
+        action == ACTION_ID_HIDE_OVERLAY_LONG_TOUCH
     ) {
-        return widgetCursor.widget->action;
+        return action;
     }    
     return AppContext::getLongTouchActionHook(widgetCursor);
 }
@@ -1484,13 +1486,13 @@ void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)()) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Cursor g_focusCursor = Cursor(0);
+WidgetCursor g_focusCursor;
 int16_t g_focusDataId = DATA_ID_CHANNEL_U_EDIT;
 Value g_focusEditValue;
 
-void setFocusCursor(const Cursor cursor, int16_t dataId) {
+void setFocusCursor(const WidgetCursor &widgetCursor, int16_t dataId) {
     g_setFocusCursor = true;
-	g_focusCursorToSet = cursor;
+	g_focusCursorToSet = widgetCursor;
 	g_focusDataIdToSet = dataId;
 }
 
@@ -1506,7 +1508,8 @@ static bool g_isEncoderEnabledInActivePage;
 uint32_t g_focusEditValueChangedTime;
 
 static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
-    return g_psuAppContext.isWidgetActionEnabled(widgetCursor) && (widgetCursor.widget->action == ACTION_ID_EDIT || widgetCursor.widget->action == ACTION_ID_SCROLL);
+    auto action = getWidgetAction(widgetCursor);        
+    return g_psuAppContext.isWidgetActionEnabled(widgetCursor) && (action == ACTION_ID_EDIT || action == ACTION_ID_SCROLL) || widgetCursor.widget->type == WIDGET_TYPE_INPUT;
 }
 
 static bool g_focusCursorIsEnabled;
@@ -1514,14 +1517,15 @@ static int16_t g_focusCursorAction;
 
 void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
     if (isEncoderEnabledForWidget(widgetCursor)) {
-        if (g_focusCursor == widgetCursor.cursor && g_focusDataId == widgetCursor.widget->data) {
+        if (g_focusCursor == widgetCursor && g_focusDataId == widgetCursor.widget->data) {
             g_focusCursorIsEnabled = true;
-            g_focusCursorAction = widgetCursor.widget->action;
+            auto action = getWidgetAction(widgetCursor);        
+            g_focusCursorAction = action;
         }
     }
 }
 
-bool isEnabledFocusCursor(Cursor cursor, int16_t dataId) {
+bool isEnabledFocusCursor(const WidgetCursor& cursor, int16_t dataId) {
     g_focusCursorIsEnabled = false;
     g_focusCursorAction = ACTION_ID_NONE;
     enumWidgets(&g_psuAppContext, isEnabledFocusCursorStep);
@@ -1840,23 +1844,23 @@ void takeScreenshot() {
 ////////////////////////////////////////////////////////////////////////////////
 
 static int g_findNextFocusCursorState = 0; 
-static Cursor g_nextFocusCursor = Cursor(0);
+static WidgetCursor g_nextFocusCursor = Cursor(0);
 static uint16_t g_nextFocusDataId = DATA_ID_CHANNEL_U_EDIT;
 
 void findNextFocusCursor(const WidgetCursor &widgetCursor) {
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_findNextFocusCursorState == 0) {
-            g_nextFocusCursor = widgetCursor.cursor;
+            g_nextFocusCursor = widgetCursor;
             g_nextFocusDataId = widgetCursor.widget->data;
             g_findNextFocusCursorState = 1;
         }
 
         if (g_findNextFocusCursorState == 1) {
-            if (g_focusCursor == widgetCursor.cursor && g_focusDataId == widgetCursor.widget->data) {
+            if (g_focusCursor == widgetCursor && g_focusDataId == widgetCursor.widget->data) {
                 g_findNextFocusCursorState = 2;
             }
         } else if (g_findNextFocusCursorState == 2) {
-            g_nextFocusCursor = widgetCursor.cursor;
+            g_nextFocusCursor = widgetCursor;
             g_nextFocusDataId = widgetCursor.widget->data;
             g_findNextFocusCursorState = 3;
         }
@@ -1959,7 +1963,7 @@ void onEncoder(int counter, bool clicked) {
             } else {
                 Value result = set(g_focusCursor, g_focusDataId, MakeValue(newValue, value.getUnit()));
                 if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
-                    psuErrorMessage(g_focusCursor, result);
+                    psuErrorMessage(g_focusCursor.cursor, result);
                 }
             }
         } else {
@@ -1998,7 +2002,7 @@ void onEncoder(int counter, bool clicked) {
                 // confirmation
                 Value result = set(g_focusCursor, g_focusDataId, g_focusEditValue);
                 if (result.getType() == VALUE_TYPE_SCPI_ERROR) {
-                    psuErrorMessage(g_focusCursor, result);
+                    psuErrorMessage(g_focusCursor.cursor, result);
                 } else {
                     g_focusEditValue = Value();
                 }
@@ -2426,6 +2430,8 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
     using namespace psu;
     using namespace psu::gui;
 
+    auto action = getWidgetAction(widgetCursor);        
+
     if (widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE1 || widgetCursor.widget->data == DATA_ID_CHANNEL_DISPLAY_VALUE2) {
         if (styleId == STYLE_ID_YT_GRAPH_U_DEFAULT || styleId == STYLE_ID_YT_GRAPH_I_DEFAULT) {
             int iChannel = widgetCursor.cursor >= 0 ? widgetCursor.cursor : (g_channel ? g_channel->channelIndex : 0);
@@ -2464,7 +2470,7 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
             }
             return STYLE_ID_BAR_GRAPH_P_DEFAULT;
         }
-    } else if (widgetCursor.widget->action != ACTION_ID_NONE && !g_psuAppContext.isWidgetActionEnabled(widgetCursor)) {
+    } else if (action != ACTION_ID_NONE && !g_psuAppContext.isWidgetActionEnabled(widgetCursor)) {
         if (styleId == STYLE_ID_ENCODER_CURSOR_14_ENABLED) {
             return STYLE_ID_ENCODER_CURSOR_14_DISABLED;
         } else if (styleId == STYLE_ID_ENCODER_CURSOR_14_RIGHT_ENABLED) {

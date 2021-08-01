@@ -1438,7 +1438,7 @@ void data_channel_u_edit(DataOperationEnum operation, const WidgetCursor &widget
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -1563,7 +1563,7 @@ void data_channel_i_edit(DataOperationEnum operation, const WidgetCursor &widget
     int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
     Channel &channel = Channel::get(iChannel);
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_I_EDIT;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_I_EDIT;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -2424,7 +2424,7 @@ void data_channel_protection_ovp_level(DataOperationEnum operation, const Widget
         if (page) {
             value = page->level;
         } else {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_LEVEL;
+            bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_LEVEL;
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
@@ -2462,7 +2462,7 @@ void data_channel_protection_ovp_delay(DataOperationEnum operation, const Widget
         if (page) {
             value = page->delay;
         } else {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_DELAY;
+            bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_DELAY;
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
@@ -2501,7 +2501,7 @@ void data_channel_protection_ovp_limit(DataOperationEnum operation, const Widget
             if (page) {
                 value = page->limit;
             } else {
-                bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT;
+                bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OVP_LIMIT;
                 if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                     value = g_focusEditValue;
                 } else {
@@ -2554,7 +2554,7 @@ void data_channel_protection_ocp_delay(DataOperationEnum operation, const Widget
         if (page) {
             value = page->delay;
         } else {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OCP_DELAY;
+            bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OCP_DELAY;
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
@@ -2590,7 +2590,7 @@ void data_channel_protection_ocp_limit(DataOperationEnum operation, const Widget
         if (page) {
             value = page->limit;
         } else {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT;
+            bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OCP_LIMIT;
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
@@ -2641,7 +2641,7 @@ void data_channel_protection_opp_level(DataOperationEnum operation, const Widget
         if (page) {
             value = page->level;
         } else {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL;
+            bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_LEVEL;
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
@@ -2677,7 +2677,7 @@ void data_channel_protection_opp_delay(DataOperationEnum operation, const Widget
         if (page) {
             value = page->delay;
         } else {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY;
+            bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_DELAY;
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
@@ -2716,7 +2716,7 @@ void data_channel_protection_opp_limit(DataOperationEnum operation, const Widget
             if (page) {
                 value = page->limit;
             } else {
-                bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT;
+                bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OPP_LIMIT;
                 if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                     value = g_focusEditValue;
                 } else {
@@ -2769,7 +2769,7 @@ void data_channel_protection_otp_level(DataOperationEnum operation, const Widget
         if (page) {
             value = page->level;
         } else {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL;
+            bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OTP_LEVEL;
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
@@ -2816,7 +2816,7 @@ void data_channel_protection_otp_delay(DataOperationEnum operation, const Widget
         if (page) {
             value = page->delay;
         } else {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY;
+            bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_PROTECTION_OTP_DELAY;
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else {
@@ -4656,7 +4656,7 @@ void data_io_pin_state(DataOperationEnum operation, const WidgetCursor &widgetCu
 void data_io_pin_pwm_frequency(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_IO_PIN_PWM_FREQUENCY;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_IO_PIN_PWM_FREQUENCY;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -4715,7 +4715,7 @@ void data_io_pin_pwm_frequency(DataOperationEnum operation, const WidgetCursor &
 void data_io_pin_pwm_duty(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_IO_PIN_PWM_DUTY;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_IO_PIN_PWM_DUTY;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {

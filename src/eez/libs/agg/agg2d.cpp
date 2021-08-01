@@ -48,8 +48,6 @@ Agg2D::Agg2D() :
     m_clipBox(0,0,0,0),
 
     m_blendMode(BlendAlpha),
-    m_imageBlendMode(BlendDst),
-    m_imageBlendColor(0,0,0),
 
     m_scanline(),
     m_rasterizer(),
@@ -73,10 +71,6 @@ Agg2D::Agg2D() :
     m_lineGradientD1(0.0),
     m_fillGradientD2(100.0),
     m_lineGradientD2(100.0),
-
-    m_imageFilter(Bilinear),
-    m_imageResample(NoResample),
-    m_imageFilterLut(agg::image_filter_bilinear(), true),
 
     m_fillGradientInterpolator(m_fillGradientMatrix),
     m_lineGradientInterpolator(m_lineGradientMatrix),
@@ -118,20 +112,12 @@ void Agg2D::attach(unsigned char* buf, unsigned width, unsigned height, int stri
     clipBox(0, 0, width, height);
     lineCap(CapRound);
     lineJoin(JoinRound);
-    imageFilter(Bilinear);
-    imageResample(NoResample);
     m_masterAlpha = 1.0;
     m_antiAliasGamma = 1.0;
     m_rasterizer.gamma(agg::gamma_none());
     m_blendMode = BlendAlpha;
 }
 
-
-//------------------------------------------------------------------------
-void Agg2D::attach(Image& img)
-{
-    attach(img.renBuf.buf(), img.renBuf.width(), img.renBuf.height(), img.renBuf.stride());
-}
 
 //------------------------------------------------------------------------
 void Agg2D::clipBox(double x1, double y1, double x2, double y2)
@@ -162,36 +148,6 @@ void Agg2D::blendMode(BlendMode m)
 Agg2D::BlendMode Agg2D::blendMode() const
 {
     return m_blendMode;
-}
-
-//------------------------------------------------------------------------
-void Agg2D::imageBlendMode(BlendMode m)
-{
-    m_imageBlendMode = m;
-}
-
-//------------------------------------------------------------------------
-Agg2D::BlendMode Agg2D::imageBlendMode() const
-{
-    return m_imageBlendMode;
-}
-
-//------------------------------------------------------------------------
-void Agg2D::imageBlendColor(Color c)
-{
-    m_imageBlendColor = c;
-}
-
-//------------------------------------------------------------------------
-void Agg2D::imageBlendColor(unsigned r, unsigned g, unsigned b, unsigned a)
-{
-    imageBlendColor(Color(r, g, b, a));
-}
-
-//------------------------------------------------------------------------
-Agg2D::Color Agg2D::imageBlendColor() const
-{
-    return m_imageBlendColor;
 }
 
 //------------------------------------------------------------------------
@@ -1038,133 +994,6 @@ void Agg2D::closePolygon()
    m_path.close_polygon();
 }
 
-
-//------------------------------------------------------------------------
-void Agg2D::imageFilter(ImageFilter f)
-{
-    m_imageFilter = f;
-    switch(f)
-    {
-        case NoFilter:    break;
-        case Bilinear:    m_imageFilterLut.calculate(agg::image_filter_bilinear(),    true); break;
-        case Hanning:     m_imageFilterLut.calculate(agg::image_filter_hanning(),     true); break;
-        case Hermite:     m_imageFilterLut.calculate(agg::image_filter_hermite(),     true); break;
-        case Quadric:     m_imageFilterLut.calculate(agg::image_filter_quadric(),     true); break;
-        case Bicubic:     m_imageFilterLut.calculate(agg::image_filter_bicubic(),     true); break;
-        case Catrom:      m_imageFilterLut.calculate(agg::image_filter_catrom(),      true); break;
-        case Spline16:    m_imageFilterLut.calculate(agg::image_filter_spline16(),    true); break;
-        case Spline36:    m_imageFilterLut.calculate(agg::image_filter_spline36(),    true); break;
-        case Blackman144: m_imageFilterLut.calculate(agg::image_filter_blackman144(), true); break;
-    }
-}
-
-
-//------------------------------------------------------------------------
-Agg2D::ImageFilter Agg2D::imageFilter() const
-{
-    return m_imageFilter;
-}
-
-
-//------------------------------------------------------------------------
-void Agg2D::imageResample(ImageResample f)
-{
-    m_imageResample = f;
-}
-
-
-//------------------------------------------------------------------------
-Agg2D::ImageResample Agg2D::imageResample() const
-{
-    return m_imageResample;
-}
-
-
-//------------------------------------------------------------------------
-void Agg2D::transformImage(const Image& img,    int imgX1,    int imgY1,    int imgX2,    int imgY2,
-                                             double dstX1, double dstY1, double dstX2, double dstY2)
-{
-    resetPath();
-    moveTo(dstX1, dstY1);
-    lineTo(dstX2, dstY1);
-    lineTo(dstX2, dstY2);
-    lineTo(dstX1, dstY2);
-    closePolygon();
-    double parallelogram[6] = { dstX1, dstY1, dstX2, dstY1, dstX2, dstY2 };
-    renderImage(img, imgX1, imgY1, imgX2, imgY2, parallelogram);
-}
-
-//------------------------------------------------------------------------
-void Agg2D::transformImage(const Image& img, double dstX1, double dstY1, double dstX2, double dstY2)
-{
-    resetPath();
-    moveTo(dstX1, dstY1);
-    lineTo(dstX2, dstY1);
-    lineTo(dstX2, dstY2);
-    lineTo(dstX1, dstY2);
-    closePolygon();
-    double parallelogram[6] = { dstX1, dstY1, dstX2, dstY1, dstX2, dstY2 };
-    renderImage(img, 0, 0, img.renBuf.width(), img.renBuf.height(), parallelogram);
-}
-
-//------------------------------------------------------------------------
-void Agg2D::transformImage(const Image& img, int imgX1, int imgY1, int imgX2, int imgY2,
-                           const double* parallelogram)
-{
-    resetPath();
-    moveTo(parallelogram[0], parallelogram[1]);
-    lineTo(parallelogram[2], parallelogram[3]);
-    lineTo(parallelogram[4], parallelogram[5]);
-    lineTo(parallelogram[0] + parallelogram[4] - parallelogram[2],
-           parallelogram[1] + parallelogram[5] - parallelogram[3]);
-    closePolygon();
-    renderImage(img, imgX1, imgY1, imgX2, imgY2, parallelogram);
-}
-
-
-//------------------------------------------------------------------------
-void Agg2D::transformImage(const Image& img, const double* parallelogram)
-{
-    resetPath();
-    moveTo(parallelogram[0], parallelogram[1]);
-    lineTo(parallelogram[2], parallelogram[3]);
-    lineTo(parallelogram[4], parallelogram[5]);
-    lineTo(parallelogram[0] + parallelogram[4] - parallelogram[2],
-           parallelogram[1] + parallelogram[5] - parallelogram[3]);
-    closePolygon();
-    renderImage(img, 0, 0, img.renBuf.width(), img.renBuf.height(), parallelogram);
-}
-
-//------------------------------------------------------------------------
-void Agg2D::transformImagePath(const Image& img,    int imgX1,    int imgY1,    int imgX2,    int imgY2,
-                                                 double dstX1, double dstY1, double dstX2, double dstY2)
-{
-    double parallelogram[6] = { dstX1, dstY1, dstX2, dstY1, dstX2, dstY2 };
-    renderImage(img, imgX1, imgY1, imgX2, imgY2, parallelogram);
-}
-
-//------------------------------------------------------------------------
-void Agg2D::transformImagePath(const Image& img, double dstX1, double dstY1, double dstX2, double dstY2)
-{
-    double parallelogram[6] = { dstX1, dstY1, dstX2, dstY1, dstX2, dstY2 };
-    renderImage(img, 0, 0, img.renBuf.width(), img.renBuf.height(), parallelogram);
-}
-
-//------------------------------------------------------------------------
-void Agg2D::transformImagePath(const Image& img, int imgX1, int imgY1, int imgX2, int imgY2,
-                               const double* parallelogram)
-{
-    renderImage(img, imgX1, imgY1, imgX2, imgY2, parallelogram);
-}
-
-//------------------------------------------------------------------------
-void Agg2D::transformImagePath(const Image& img, const double* parallelogram)
-{
-    renderImage(img, 0, 0, img.renBuf.width(), img.renBuf.height(), parallelogram);
-}
-
-
-
 //------------------------------------------------------------------------
 void Agg2D::drawPath(DrawPathFlag flag)
 {
@@ -1300,60 +1129,6 @@ public:
 
 
     //--------------------------------------------------------------------
-    class SpanConvImageBlend
-    {
-    public:
-        SpanConvImageBlend(Agg2D::BlendMode m, Agg2D::Color c) :
-            m_mode(m), m_color(c)
-        {}
-
-        void convert(Agg2D::Color* span, int x, int y, unsigned len) const
-        {
-            unsigned l2;
-            Agg2D::Color* s2;
-            if(m_mode != Agg2D::BlendDst)
-            {
-                l2 = len;
-                s2 = span;
-                typedef agg::comp_op_adaptor_clip_to_dst_rgba_pre<Agg2D::Color, agg::order_rgba> OpType;
-                do
-                {
-                    OpType::blend_pix(m_mode,
-                                      (Agg2D::Color::value_type*)s2,
-                                      m_color.r,
-                                      m_color.g,
-                                      m_color.b,
-                                      Agg2D::Color::full_value(),
-                                      agg::cover_full);
-                    ++s2;
-                }
-                while(--l2);
-            }
-            if(!m_color.is_opaque())
-            {
-                l2 = len;
-                s2 = span;
-                do
-                {
-                    s2->r = Agg2D::Color::multiply(s2->r, m_color.a);
-                    s2->g = Agg2D::Color::multiply(s2->g, m_color.a);
-                    s2->b = Agg2D::Color::multiply(s2->b, m_color.a);
-                    s2->a = Agg2D::Color::multiply(s2->a, m_color.a);
-                    ++s2;
-                }
-                while(--l2);
-            }
-        }
-
-    private:
-        Agg2D::BlendMode m_mode;
-        Agg2D::Color     m_color;
-    };
-
-
-
-
-    //--------------------------------------------------------------------
     template<class BaseRenderer, class SolidRenderer, class Rasterizer, class Scanline>
     void static render(Agg2D& gr, BaseRenderer& renBase, SolidRenderer& renSolid, Rasterizer& ras, Scanline& sl)
     {
@@ -1393,100 +1168,6 @@ public:
             }
         }
     }
-
-
-
-    //--------------------------------------------------------------------
-    //! JME - this is where the bulk of the changes have taken place.
-    template<class BaseRenderer, class Interpolator>
-    static void renderImage(Agg2D& gr, const Agg2D::Image& img,
-                            BaseRenderer& renBase, Interpolator& interpolator)
-    {
-		//! JME - have not quite figured which part of this is not const-correct
-		// hence the cast.
-		Agg2D::Image& imgc = const_cast<Agg2D::Image&>(img);
-		Agg2D::PixFormat img_pixf(imgc.renBuf);
-		typedef agg::image_accessor_clone<Agg2D::PixFormat> img_source_type;
-		img_source_type source(img_pixf);
-
-        SpanConvImageBlend blend(gr.m_imageBlendMode, gr.m_imageBlendColor);
-        if (gr.m_imageFilter == Agg2D::NoFilter)
-        {
-
-			typedef agg::span_image_filter_rgba_nn<img_source_type,Interpolator> SpanGenType;
-			typedef agg::span_converter<SpanGenType,SpanConvImageBlend> SpanConvType;
-			typedef agg::renderer_scanline_aa<BaseRenderer,Agg2D::SpanAllocator,SpanGenType> RendererType;
-
-			SpanGenType sg(source,interpolator);
-			SpanConvType sc(sg, blend);
-			RendererType ri(renBase,gr.m_allocator,sg);
-			agg::render_scanlines(gr.m_rasterizer, gr.m_scanline, ri);
-        }
-        else
-        {
-            bool resample = (gr.m_imageResample == Agg2D::ResampleAlways);
-            if(gr.m_imageResample == Agg2D::ResampleOnZoomOut)
-            {
-                double sx, sy;
-                interpolator.transformer().scaling_abs(&sx,&sy);
-                if (sx > 1.125 || sy > 1.125)
-                {
-					resample = true;
-                }
-            }
-
-            if (resample)
-            {
-                typedef agg::span_image_resample_rgba_affine<img_source_type> SpanGenType;
-                typedef agg::span_converter<SpanGenType,SpanConvImageBlend> SpanConvType;
-                typedef agg::renderer_scanline_aa<BaseRenderer,Agg2D::SpanAllocator,SpanGenType> RendererType;
-
-                SpanGenType sg(source,interpolator,gr.m_imageFilterLut);
-                SpanConvType sc(sg, blend);
-                RendererType ri(renBase,gr.m_allocator,sg);
-                agg::render_scanlines(gr.m_rasterizer, gr.m_scanline, ri);
-            }
-            else
-            {
-				// this is the AGG2D default
-                if (gr.m_imageFilter == Agg2D::Bilinear)
-                {
-                    typedef agg::span_image_filter_rgba_bilinear<img_source_type,Interpolator> SpanGenType;
-                    typedef agg::span_converter<SpanGenType,SpanConvImageBlend> SpanConvType;
-					typedef agg::renderer_scanline_aa<BaseRenderer,Agg2D::SpanAllocator,SpanGenType> RendererType;
-
-					SpanGenType sg(source,interpolator);
-					SpanConvType sc(sg, blend);
-					RendererType ri(renBase,gr.m_allocator,sg);
-					agg::render_scanlines(gr.m_rasterizer, gr.m_scanline, ri);
-                }
-                else
-                {
-                    if(gr.m_imageFilterLut.diameter() == 2)
-                    {
-                        typedef agg::span_image_filter_rgba_2x2<img_source_type,Interpolator> SpanGenType;
-                        typedef agg::span_converter<SpanGenType,SpanConvImageBlend> SpanConvType;
-                        typedef agg::renderer_scanline_aa<BaseRenderer,Agg2D::SpanAllocator,SpanGenType> RendererType;
-
-                        SpanGenType sg(source,interpolator,gr.m_imageFilterLut);
-                        SpanConvType sc(sg,blend);
-                        RendererType ri(renBase,gr.m_allocator,sg);
-                        agg::render_scanlines(gr.m_rasterizer, gr.m_scanline, ri);
-                    }
-                    else
-                    {
-                        typedef agg::span_image_filter_rgba<img_source_type,Interpolator> SpanGenType;
-                        typedef agg::span_converter<SpanGenType,SpanConvImageBlend> SpanConvType;
-						typedef agg::renderer_scanline_aa<BaseRenderer,Agg2D::SpanAllocator,SpanGenType> RendererType;
-                        SpanGenType sg(source,interpolator,gr.m_imageFilterLut);
-                        SpanConvType sc(sg, blend);
-						RendererType ri(renBase,gr.m_allocator,sg);
-                        agg::render_scanlines(gr.m_rasterizer, gr.m_scanline, ri);
-                    }
-                }
-            }
-        }
-    }
 };
 
 
@@ -1500,35 +1181,6 @@ void Agg2D::render(bool fillColor)
     else
     {
         Agg2DRenderer::render(*this, m_renBaseComp, m_renSolidComp, fillColor);
-    }
-}
-
-//------------------------------------------------------------------------
-void Agg2D::renderImage(const Image& img, int x1, int y1, int x2, int y2,
-                        const double* parl)
-{
-    agg::trans_affine mtx((double)x1,
-                          (double)y1,
-                          (double)x2,
-                          (double)y2,
-                          parl);
-    mtx *= m_transform;
-    mtx.invert();
-
-    m_rasterizer.reset();
-    m_rasterizer.add_path(m_pathTransform);
-
-    typedef agg::span_interpolator_linear<agg::trans_affine> Interpolator;
-    Interpolator interpolator(mtx);
-
-    if(m_blendMode == BlendAlpha)
-    {
-		// JME audit -
-        Agg2DRenderer::renderImage(*this,img, m_renBasePre, interpolator);
-    }
-    else
-    {
-        Agg2DRenderer::renderImage(*this,img, m_renBaseCompPre, interpolator);
     }
 }
 
@@ -1552,75 +1204,3 @@ void Agg2D::updateRasterizerGamma()
 {
     m_rasterizer.gamma(Agg2DRasterizerGamma(m_masterAlpha, m_antiAliasGamma));
 }
-
-//------------------------------------------------------------------------
-void Agg2D::blendImage(Image& img,
-                       int imgX1, int imgY1, int imgX2, int imgY2,
-                       double dstX, double dstY, unsigned alpha)
-{
-    worldToScreen(dstX, dstY);
-    PixFormat pixF(img.renBuf);
-    // JME
-    //agg::rect r(imgX1, imgY1, imgX2, imgY2);
-    Rect r(imgX1, imgY1, imgX2, imgY2);
-    if(m_blendMode == BlendAlpha)
-    {
-        m_renBasePre.blend_from(pixF, &r, int(dstX)-imgX1, int(dstY)-imgY1, alpha);
-    }
-    else
-    {
-        m_renBaseCompPre.blend_from(pixF, &r, int(dstX)-imgX1, int(dstY)-imgY1, alpha);
-    }
-}
-
-
-//------------------------------------------------------------------------
-void Agg2D::blendImage(Image& img, double dstX, double dstY, unsigned alpha)
-{
-    worldToScreen(dstX, dstY);
-    PixFormat pixF(img.renBuf);
-    m_renBasePre.blend_from(pixF, 0, int(dstX), int(dstY), alpha);
-    if(m_blendMode == BlendAlpha)
-    {
-        m_renBasePre.blend_from(pixF, 0, int(dstX), int(dstY), alpha);
-    }
-    else
-    {
-        m_renBaseCompPre.blend_from(pixF, 0, int(dstX), int(dstY), alpha);
-    }
-}
-
-
-//------------------------------------------------------------------------
-void Agg2D::copyImage(Image& img,
-                      int imgX1, int imgY1, int imgX2, int imgY2,
-                      double dstX, double dstY)
-{
-    worldToScreen(dstX, dstY);
-    // JME
-    //agg::rect r(imgX1, imgY1, imgX2, imgY2);
-    Rect r(imgX1, imgY1, imgX2, imgY2);
-    m_renBase.copy_from(img.renBuf, &r, int(dstX)-imgX1, int(dstY)-imgY1);
-}
-
-//------------------------------------------------------------------------
-void Agg2D::copyImage(Image& img, double dstX, double dstY)
-{
-    worldToScreen(dstX, dstY);
-    m_renBase.copy_from(img.renBuf, 0, int(dstX), int(dstY));
-}
-
-//------------------------------------------------------------------------
-void Agg2D::Image::premultiply()
-{
-    PixFormat pixf(renBuf);
-    pixf.premultiply();
-}
-
-//------------------------------------------------------------------------
-void Agg2D::Image::demultiply()
-{
-    PixFormat pixf(renBuf);
-    pixf.demultiply();
-}
-

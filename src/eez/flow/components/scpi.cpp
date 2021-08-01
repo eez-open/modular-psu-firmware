@@ -50,7 +50,6 @@ struct ScpiComponentExecutionState : public ComponenentExecutionState {
 	bool scpi() {
 		if (g_waitingForScpiResult) {
 			if (g_waitingForScpiResult == this && g_scpiResultIsReady) {
-				commandOrQueryText[0] = 0;
 				g_waitingForScpiResult = nullptr;
 				return true;
 			}
@@ -138,17 +137,21 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 			size_t resultTextLen;
 			int err;
 			if (!scripting::getLatestScpiResult(&resultText, &resultTextLen, &err)) {
-				throwError();
+				char errorMessage[256];
+				snprintf(errorMessage, sizeof(errorMessage), "scpi component error: '%s', %s", scpiComponentExecutionState->commandOrQueryText, SCPI_ErrorTranslate(err));
+				throwError(errorMessage);
 				return;
 			}
 
 			Value *pDstValue;
 			int numInstructionBytes;
 			if (!evalAssignableExpression(assets, flowState, instructions + scpiComponentExecutionState->instructionIndex, &pDstValue, &numInstructionBytes)) {
-				throwError();
+				throwError("scpi component eval assignable expression");
 				return;
 			}
 			scpiComponentExecutionState->instructionIndex += numInstructionBytes;
+
+			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 
 			Value srcValue(resultText, resultTextLen);
 
@@ -160,6 +163,7 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 			if (!scpiComponentExecutionState->scpi()) {
 				break;
 			}
+			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 		} else if (scpiComponentExecutionState->op == SCPI_PART_COMMAND) {
 #if FLOW_DEBUG
 			printf("SCPI_PART_COMMAND\n");
@@ -167,6 +171,8 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 			if (!scpiComponentExecutionState->scpi()) {
 				break;
 			}
+			scpiComponentExecutionState->commandOrQueryText[0] = 0;
+
 		} else if (scpiComponentExecutionState->op == SCPI_PART_END) {
 #if FLOW_DEBUG
 			printf("SCPI_PART_END\n");

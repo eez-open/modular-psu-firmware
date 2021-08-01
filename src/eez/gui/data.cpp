@@ -474,6 +474,14 @@ void STRING_REF_value_to_text(const Value &value, char *text, int count) {
 	STRING_value_to_text(value, text, count);
 }
 
+bool compare_ASSETS_STRING_value(const Value &a, const Value &b) {
+	return a.getUInt32() == b.getUInt32();
+}
+
+void ASSETS_STRING_value_to_text(const Value &value, char *text, int count) {
+	text[0] = 0;
+}
+
 bool compare_VERSIONED_STRING_value(const Value &a, const Value &b) {
     return a.unit_ == b.unit_; // here unit_ is used as string version
 }
@@ -751,6 +759,17 @@ bool Value::isMega() const {
 
 }
 
+const char *Value::toString(Assets *assets) const {
+	if (type_ == VALUE_TYPE_STRING) {
+		return str_;
+	} else if (type_ == VALUE_TYPE_STRING_REF) {
+		return refString_.str;
+	} else if (type_ == VALUE_TYPE_ASSETS_STRING) {
+		return ((AssetsPtr<const char> *)&assetsString_)->ptr(assets);
+	}
+	return "";
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 int count(const WidgetCursor &widgetCursor, int16_t id) {
@@ -944,7 +963,7 @@ bool isBlinking(const WidgetCursor &widgetCursor, int16_t id) {
         return false;
     }
 
-    if (widgetCursor.appContext->isBlinking(widgetCursor.cursor, id)) {
+    if (widgetCursor.appContext->isBlinking(widgetCursor, id)) {
         return true;
     }
 

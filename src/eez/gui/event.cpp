@@ -134,7 +134,8 @@ static void processTouchEvent(EventType type, int x, int y) {
 
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
     if (widgetCursor) {
-        if (widgetCursor.widget->action && !widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
+        auto action = getWidgetAction(widgetCursor);
+        if (action && !widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
             return nullptr;
         }
 
@@ -165,11 +166,12 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
         return;
     }
 
+    auto action = getWidgetAction(widgetCursor);        
+
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         m_touchActionExecuted = false;
         m_touchActionExecutedAtDown = false;
 
-        int action = widgetCursor.widget->action;
         if (action == ACTION_ID_DRAG_OVERLAY) {
             dragOverlay(touchEvent);
             m_activeWidget = widgetCursor;    
@@ -183,12 +185,10 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
             m_activeWidget = widgetCursor;
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-        int action = widgetCursor.widget->action;
         if (action == ACTION_ID_DRAG_OVERLAY) {
             dragOverlay(touchEvent);
         }
     } else if (touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
-        int action = widgetCursor.widget->action;
         if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor) && widgetCursor.appContext->isAutoRepeatAction(action)) {
             m_touchActionExecuted = true;
             executeAction(widgetCursor, action);
@@ -211,7 +211,6 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
         if (!m_touchActionExecutedAtDown) {
             m_activeWidget = 0;
             if (!m_touchActionExecuted) {
-                int action = widgetCursor.widget->action;
                 if (action == ACTION_ID_DRAG_OVERLAY) {
                     dragOverlay(touchEvent);
                 } else {

@@ -106,9 +106,10 @@ void onKeyDown(uint16_t param) {
                         popPage();
                     } else if (key == KEY_SPACEBAR || key == KEY_ENTER) {
                         if (g_focusWidgetCursor) {
-                            if (g_focusWidgetCursor.widget->action) {
+                            auto action = getWidgetAction(g_focusWidgetCursor);
+                            if (action) {
                                 setFoundWidgetAtDown(g_focusWidgetCursor);
-                                executeAction(g_focusWidgetCursor, g_focusWidgetCursor.widget->action);
+                                executeAction(g_focusWidgetCursor, action);
                             }
                         }
                     }
@@ -203,7 +204,8 @@ static bool isKeyboardEnabledForWidget(const WidgetCursor &widgetCursor) {
         return false;
     }
 
-    if (widgetCursor.widget->action != ACTION_ID_NONE) {
+    auto action = getWidgetAction(widgetCursor);
+    if (action != ACTION_ID_NONE) {
         return true;
     }
 

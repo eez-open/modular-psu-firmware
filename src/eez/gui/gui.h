@@ -91,6 +91,7 @@ bool isActiveWidget(const WidgetCursor &widgetCursor);
 bool isFocusWidget(const WidgetCursor &widgetCursor);
 void refreshScreen();
 bool isPageInternal(int pageId);
+int getWidgetAction(const WidgetCursor &widgetCursor);
 void executeAction(const WidgetCursor &widgetCursor, int actionId);
 void executeAction(int actionId);
 

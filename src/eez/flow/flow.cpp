@@ -16,6 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/input.h>
+
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>
 #include <eez/flow/queue.h>
@@ -106,7 +109,44 @@ void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCurso
 }
 
 void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
-	getDataItemValue(g_assets, (FlowState *)widgetCursor.pageState, -dataId - 1, value);
+	Assets *assets = g_assets;
+	auto flowState = (FlowState *)widgetCursor.pageState;
+
+	dataId = -dataId - 1;
+
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto dataItemsOffset = flow->nInputValues + flow->localVariables.count;
+
+	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
+		if (operation == DATA_OPERATION_GET) {
+			value = flowState->values[dataItemsOffset + dataId];
+		} else {
+			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
+			if (widgetDataItem) {
+				auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+				if (component->type == WIDGET_TYPE_INPUT) {
+					auto widget = (InputWidget *)widgetCursor.widget;
+					
+					auto unitValue = get(widgetCursor, widget->unit);
+					Unit unit = getUnitFromName(unitValue.toString(assets)); 
+					
+					if (operation == DATA_OPERATION_GET_MIN) {
+						value = Value(get(widgetCursor, widget->min).toFloat(), unit);
+					} else if (operation == DATA_OPERATION_GET_MAX) {
+						value = Value(get(widgetCursor, widget->max).toFloat(), unit);
+					} else if (operation == DATA_OPERATION_GET_UNIT) {
+						value = unit;
+					} else if (operation == DATA_OPERATION_SET) {
+						// TODO
+					}
+				}
+			}
+		}
+	} else {
+		// TODO this shouldn't happen
+		value = Value();
+	}
 }
 
 } // namespace flow

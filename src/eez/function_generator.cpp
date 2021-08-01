@@ -2436,7 +2436,6 @@ void getPhaseShiftStepValues(StepValues *stepValues) {
 }
 
 void data_function_generator_frequency(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
 	int slotIndex;
@@ -2462,7 +2461,7 @@ void data_function_generator_frequency(DataOperationEnum operation, const Widget
 	}
 
 	if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_FREQUENCY;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_FREQUENCY;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -2507,7 +2506,6 @@ void data_function_generator_frequency(DataOperationEnum operation, const Widget
 }
 
 void data_function_generator_phase_shift(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
 	float max;
@@ -2522,7 +2520,7 @@ void data_function_generator_phase_shift(DataOperationEnum operation, const Widg
 	}
 
 	if (operation == DATA_OPERATION_GET) {
-		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_PHASE_SHIFT;
+		bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_PHASE_SHIFT;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -2574,7 +2572,6 @@ void data_function_generator_phase_shift(DataOperationEnum operation, const Widg
 }
 
 void data_function_generator_amplitude(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
 	// ... or minimum
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
@@ -2600,7 +2597,7 @@ void data_function_generator_amplitude(DataOperationEnum operation, const Widget
 	}
 
 	if (operation == DATA_OPERATION_GET) {
-		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_AMPLITUDE;
+		bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_AMPLITUDE;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -2684,7 +2681,6 @@ void data_function_generator_amplitude(DataOperationEnum operation, const Widget
 }
 
 void data_function_generator_offset(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
 	// ... or maximum
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
@@ -2703,7 +2699,7 @@ void data_function_generator_offset(DataOperationEnum operation, const WidgetCur
 	Unit unit = waveformParameters.resourceType == FUNCTION_GENERATOR_RESOURCE_TYPE_U ? UNIT_VOLT: UNIT_AMPER;
 
 	if (operation == DATA_OPERATION_GET) {
-		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_OFFSET;
+		bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_OFFSET;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -2782,7 +2778,6 @@ void data_function_generator_offset(DataOperationEnum operation, const WidgetCur
 }
 
 void data_function_generator_duty_cycle(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
 
 	float max;
@@ -2797,7 +2792,7 @@ void data_function_generator_duty_cycle(DataOperationEnum operation, const Widge
 	}
 
 	if (operation == DATA_OPERATION_GET) {
-		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DIB_MIO168_PWM_DUTY;
+		bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DIB_MIO168_PWM_DUTY;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -3003,9 +2998,8 @@ void data_function_generator_preview_overlay(DataOperationEnum operation, const 
 }
 
 void data_function_generator_preview_period(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
 	if (operation == DATA_OPERATION_GET) {
-		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_PHASE_SHIFT;
+		bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_FUNCTION_GENERATOR_PHASE_SHIFT;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {

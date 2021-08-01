@@ -49,6 +49,7 @@ namespace gui {
     WIDGET_TYPE(PROGRESS, 21) \
     WIDGET_TYPE(CANVAS, 22) \
     WIDGET_TYPE(GAUGE, 23) \
+    WIDGET_TYPE(INPUT, 24) \
 
 #define WIDGET_TYPE(NAME, ID) WIDGET_TYPE_##NAME = ID,
 enum WidgetTypes {
@@ -142,12 +143,6 @@ struct WidgetCursor {
 		, y(0) {
 	}
 
-    WidgetCursor &operator=(int) {
-        widget = nullptr;
-        cursor = -1;
-        return *this;
-    }
-
     bool operator!=(const WidgetCursor &rhs) const {
         return widget != rhs.widget || cursor != rhs.cursor;
     }
@@ -156,7 +151,7 @@ struct WidgetCursor {
         return !(*this != rhs);
     }
 
-    operator bool() const {
+    explicit operator bool() const {
         return widget != nullptr;
     }
 

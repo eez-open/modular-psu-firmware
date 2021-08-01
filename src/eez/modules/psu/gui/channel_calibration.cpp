@@ -1067,7 +1067,6 @@ void data_calibration_point_can_edit_set_value(DataOperationEnum operation, cons
 }
 
 void data_calibration_point_set_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
     auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
     if (editPage) {
         int slotIndex;
@@ -1076,7 +1075,7 @@ void data_calibration_point_set_value(DataOperationEnum operation, const WidgetC
         Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
 
         if (operation == DATA_OPERATION_GET) {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
+            bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {
@@ -1145,7 +1144,6 @@ void data_channel_is_calibration_value_source(DataOperationEnum operation, const
 }
 
 void data_calibration_point_measured_value(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
     auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
     if (editPage) {
         int slotIndex;
@@ -1154,7 +1152,7 @@ void data_calibration_point_measured_value(DataOperationEnum operation, const Wi
         Channel *channel = Channel::getBySlotIndex(slotIndex, subchannelIndex);
 
         if (operation == DATA_OPERATION_GET) {
-            bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
+            bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_CHANNEL_U_EDIT;
             if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
                 value = g_focusEditValue;
             } else if (focused && getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD && edit_mode_keypad::g_keypad->isEditing()) {

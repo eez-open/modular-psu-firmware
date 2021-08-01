@@ -109,7 +109,7 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
         mouse::onMouseButtonUp(param);
     } else if (type == GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED) {
         mouse::onMouseDisconnected();
-    }  else if (type == GUI_QUEUE_MESSAGE_REFRESH_SCREEN) {
+    } else if (type == GUI_QUEUE_MESSAGE_REFRESH_SCREEN) {
         refreshScreen();
     } else {
         onGuiQueueMessageHook(type, param);
@@ -189,6 +189,14 @@ bool isPageInternal(int pageId) {
 
 bool isInternalAction(int actionId) {
     return actionId > FIRST_INTERNAL_ACTION_ID;
+}
+
+int getWidgetAction(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.widget->type == WIDGET_TYPE_INPUT) {
+        return ACTION_ID_EDIT;
+    } else {
+		return widgetCursor.widget->action;
+    }
 }
 
 void executeAction(const WidgetCursor &widgetCursor, int actionId) {

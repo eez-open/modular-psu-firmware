@@ -248,7 +248,8 @@ void findWidgetStep(const WidgetCursor &widgetCursor) {
         int dy = g_findWidgetAtY - (y + h / 2);
         int distance = dx * dx + dy * dy;
 
-        if (widget->action == ACTION_ID_DRAG_OVERLAY) {
+        auto action = getWidgetAction(widgetCursor);        
+        if (action == ACTION_ID_DRAG_OVERLAY) {
             if (overlay && !overlay->state) {
                 return;
             }

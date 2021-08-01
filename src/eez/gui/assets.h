@@ -228,10 +228,15 @@ struct Component {
 	ListOfAssetsPtr<ComponentOutput> outputs;
 };
 
+struct WidgetDataItem {
+	uint16_t componentIndex;
+	uint16_t propertyValueIndex;
+};
+
 struct Flow {
 	ListOfAssetsPtr<Component> components;
 	ListOfAssetsPtr<Value> localVariables;
-	ListOfAssetsPtr<PropertyValue> widgetDataItems;
+	ListOfAssetsPtr<WidgetDataItem> widgetDataItems;
 	ListOfAssetsPtr<ComponentOutput> widgetActions;
 	uint16_t nInputValues;
 };

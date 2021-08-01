@@ -47,6 +47,8 @@
 #include "agg_rounded_rect.h"
 
 #include "agg_pixfmt_rgba.h"
+#include "agg_pixfmt_rgb.h"
+#include "agg_pixfmt_rgb_packed.h"
 #include "agg_image_accessors.h"
 
 class Agg2D
@@ -62,7 +64,12 @@ class Agg2D
     typedef agg::blender_rgba_pre<ColorType, ComponentOrder>         BlenderPre;
     typedef agg::comp_op_adaptor_rgba_pre<ColorType, ComponentOrder> BlenderCompPre;
 
-    typedef agg::pixfmt_alpha_blend_rgba<Blender, agg::rendering_buffer>         PixFormat;
+#if defined(EEZ_PLATFORM_STM32)
+	typedef agg::pixfmt_rgb565         PixFormat;
+#else
+	typedef agg::pixfmt_alpha_blend_rgba<Blender, agg::rendering_buffer>         PixFormat;
+#endif
+
     typedef agg::pixfmt_custom_blend_rgba<BlenderComp, agg::rendering_buffer>    PixFormatComp;
     typedef agg::pixfmt_alpha_blend_rgba<BlenderPre, agg::rendering_buffer>      PixFormatPre;
     typedef agg::pixfmt_custom_blend_rgba<BlenderCompPre, agg::rendering_buffer> PixFormatCompPre;
@@ -147,44 +154,6 @@ public:
     };
 
 
-    struct Image
-    {
-        agg::rendering_buffer renBuf;
-
-        Image() {}
-        Image(unsigned char* buf, unsigned width, unsigned height, int stride) :
-            renBuf(buf, width, height, stride) {}
-        void attach(unsigned char* buf, unsigned width, unsigned height, int stride)
-        {
-            renBuf.attach(buf, width, height, stride);
-        }
-        int width()  const { return renBuf.width(); }
-        int height() const { return renBuf.height(); }
-        void premultiply();
-        void demultiply();
-    };
-
-    enum ImageFilter
-    {
-        NoFilter,
-        Bilinear,
-        Hanning,
-        Hermite,
-        Quadric,
-        Bicubic,
-        Catrom,
-        Spline16,
-        Spline36,
-        Blackman144
-    };
-
-    enum ImageResample
-    {
-        NoResample,
-        ResampleAlways,
-        ResampleOnZoomOut
-    };
-
     enum BlendMode
     {
         BlendAlpha      = agg::end_of_comp_op_e,
@@ -225,7 +194,6 @@ public:
     // Setup
     //-----------------------
     void  attach(unsigned char* buf, unsigned width, unsigned height, int stride);
-    void  attach(Image& img);
 
     void  clipBox(double x1, double y1, double x2, double y2);
     RectD clipBox() const;
@@ -249,13 +217,6 @@ public:
     //-----------------------
     void blendMode(BlendMode m);
     BlendMode blendMode() const;
-
-    void imageBlendMode(BlendMode m);
-    BlendMode imageBlendMode() const;
-
-    void imageBlendColor(Color c);
-    void imageBlendColor(unsigned r, unsigned g, unsigned b, unsigned a = 255);
-    Color imageBlendColor() const;
 
     void masterAlpha(double a);
     double masterAlpha() const;
@@ -389,56 +350,6 @@ public:
     void drawPathNoTransform(DrawPathFlag flag = FillAndStroke);
 
 
-    // Image Transformations
-    //-----------------------
-    void imageFilter(ImageFilter f);
-    ImageFilter imageFilter() const;
-
-    void imageResample(ImageResample f);
-    ImageResample imageResample() const;
-
-    void transformImage(const Image& img,
-                           int imgX1,    int imgY1,    int imgX2,    int imgY2,
-                        double dstX1, double dstY1, double dstX2, double dstY2);
-
-    void transformImage(const Image& img,
-                        double dstX1, double dstY1, double dstX2, double dstY2);
-
-    void transformImage(const Image& img,
-                        int imgX1, int imgY1, int imgX2, int imgY2,
-                        const double* parallelogram);
-
-    void transformImage(const Image& img, const double* parallelogram);
-
-
-    void transformImagePath(const Image& img,
-                               int imgX1,    int imgY1,    int imgX2,    int imgY2,
-                            double dstX1, double dstY1, double dstX2, double dstY2);
-
-    void transformImagePath(const Image& img,
-                            double dstX1, double dstY1, double dstX2, double dstY2);
-
-    void transformImagePath(const Image& img,
-                            int imgX1, int imgY1, int imgX2, int imgY2,
-                            const double* parallelogram);
-
-    void transformImagePath(const Image& img, const double* parallelogram);
-
-
-    // Image Blending (no transformations available)
-    void blendImage(Image& img,
-                    int imgX1, int imgY1, int imgX2, int imgY2,
-                    double dstX, double dstY, unsigned alpha=255);
-    void blendImage(Image& img, double dstX, double dstY, unsigned alpha=255);
-
-
-    // Copy image directly, together with alpha-channel
-    void copyImage(Image& img,
-                   int imgX1, int imgY1, int imgX2, int imgY2,
-                   double dstX, double dstY);
-    void copyImage(Image& img, double dstX, double dstY);
-
-
     // Auxiliary
     //-----------------------
     static double pi() { return agg::pi; }
@@ -450,10 +361,11 @@ private:
 
     void addLine(double x1, double y1, double x2, double y2);
     void updateRasterizerGamma();
-    void renderImage(const Image& img, int x1, int y1, int x2, int y2, const double* parl);
 
     agg::rendering_buffer           m_rbuf;
+    public:
     PixFormat                       m_pixFormat;
+    private:
     PixFormatComp                   m_pixFormatComp;
     PixFormatPre                    m_pixFormatPre;
     PixFormatCompPre                m_pixFormatCompPre;
@@ -468,8 +380,6 @@ private:
     RectD                           m_clipBox;
 
     BlendMode                       m_blendMode;
-    BlendMode                       m_imageBlendMode;
-    Color                           m_imageBlendColor;
 
     agg::scanline_u8                m_scanline;
     agg::rasterizer_scanline_aa<>   m_rasterizer;
@@ -493,10 +403,6 @@ private:
     double                          m_lineGradientD1;
     double                          m_fillGradientD2;
     double                          m_lineGradientD2;
-
-    ImageFilter                     m_imageFilter;
-    ImageResample                   m_imageResample;
-    agg::image_filter_lut           m_imageFilterLut;
 
     agg::span_interpolator_linear<> m_fillGradientInterpolator;
     agg::span_interpolator_linear<> m_lineGradientInterpolator;

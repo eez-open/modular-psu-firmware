@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <mutex>
 
 typedef enum {
     osOK = 0,
@@ -113,9 +114,7 @@ uint32_t osMessageWaiting(osMessageQId queue_id);
 
 // Mutex
 
-struct Mutex {
-    bool locked;
-};
+typedef std::mutex Mutex;
 
 #define osMutexDef(mutex) Mutex mutex
 #define osMutexId(mutexId) Mutex *mutexId

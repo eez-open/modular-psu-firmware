@@ -114,13 +114,28 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 
 		// init AGG
 		agg::rendering_buffer rbuf;
-		uint8_t *pixels = (uint8_t *)alloc(widget->w * widget->h * 4);
-		rbuf.attach(pixels, widget->w, widget->h, widget->w * 4);
+
+		// uint8_t *pixels = (uint8_t *)alloc(widget->w * widget->h * 4);
+		// rbuf.attach(pixels, widget->w, widget->h, widget->w * 4);
+
+
+#ifdef EEZ_PLATFORM_STM32
+		rbuf.attach((uint8_t *)getBufferPointer(), getDisplayWidth(), getDisplayHeight(), getDisplayWidth() * 2);
+#else
+		rbuf.attach((uint8_t *)getBufferPointer(), getDisplayWidth(), getDisplayHeight(), getDisplayWidth() * 4);
+#endif
+
 		Agg2D graphics;
 		graphics.attach(rbuf.buf(), rbuf.width(), rbuf.height(), rbuf.stride());
 
+		graphics.clipBox(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w, widgetCursor.y + widget->h);
+		graphics.translate(widgetCursor.x, widgetCursor.y);
+
 		// clear background
-		graphics.clearAll(COLOR_TO_R(colorBackground), COLOR_TO_G(colorBackground), COLOR_TO_B(colorBackground));
+		//graphics.clearClipBox(COLOR_TO_R(colorBackground), COLOR_TO_G(colorBackground), COLOR_TO_B(colorBackground));
+		//graphics.clearAll(COLOR_TO_R(colorBackground), COLOR_TO_G(colorBackground), COLOR_TO_B(colorBackground));
+		setColor(style->background_color);
+		fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1, 0);
 
 		// frame
 		graphics.lineWidth(1.5);
@@ -151,15 +166,15 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 			graphics.drawPath();
 		}
 
-		// output generated image and free resources
-		Image image;
-		image.width = widget->w;
-		image.height = widget->h;
-		image.pixels = pixels;
-		image.bpp = 32;
-		image.lineOffset = 0;
-		mcu::display::drawBitmap(&image, widgetCursor.x, widgetCursor.y);
-		free(pixels);
+		// // output generated image and free resources
+		// Image image;
+		// image.width = widget->w;
+		// image.height = widget->h;
+		// image.pixels = pixels;
+		// image.bpp = 32;
+		// image.lineOffset = 0;
+		// mcu::display::drawBitmap(&image, widgetCursor.x, widgetCursor.y);
+		// free(pixels);
     }
 };
 

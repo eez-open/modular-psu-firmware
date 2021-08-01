@@ -225,11 +225,11 @@ const Style *getStyle(int styleID) {
 		return g_mainAssets->styles.item(g_mainAssets, styleID - 1);
 	} else if (styleID < 0) {
 		if (g_externalAssets == nullptr) {
-			return nullptr;
+			return getStyle(STYLE_ID_DEFAULT);
 		}
 		return g_externalAssets->styles.item(g_externalAssets, -styleID - 1);
 	}
-	return nullptr;
+	return getStyle(STYLE_ID_DEFAULT);
 }
 
 const FontData *getFontData(int fontID) {

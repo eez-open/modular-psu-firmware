@@ -2288,10 +2288,9 @@ void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCurso
 
         TouchDrag *touchDrag = (TouchDrag *)value.getVoidPointer();
 
-		dlog_view::DlogValueParams *dlogValueParams = recording.dlogValues + getSelectedDlogValueIndex(recording, g_focusCursor);
+		dlog_view::DlogValueParams *dlogValueParams = recording.dlogValues + getSelectedDlogValueIndex(recording, g_focusCursor.cursor);
 
-		WidgetCursor focusWidgetCursor;
-		focusWidgetCursor.cursor = g_focusCursor;
+		WidgetCursor focusWidgetCursor = g_focusCursor;
 
 		if (touchDrag->type == EVENT_TYPE_TOUCH_DOWN) {
 			static const int CURSOR_REGION_SIZE_WIDTH = 80;
@@ -2306,7 +2305,7 @@ void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCurso
 			bool dragCursor = (abs((long)g_dragState.positionAtTouchDown) < CURSOR_REGION_SIZE_WIDTH / 2) && (touchDrag->y > (touchDrag->widgetCursor.widget->h - CURSOR_REGION_SIZE_HEIGHT));
 			if (dragCursor) {
 				g_dragState.dragObject = DRAG_CURSOR;
-				setFocusCursor(-1, DATA_ID_RECORDING);
+				setFocusCursor(WidgetCursor(), DATA_ID_RECORDING);
 			} else {
 				if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET || g_focusDataId == DATA_ID_DLOG_Y_VALUE_OFFSET || g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV || g_focusDataId == DATA_ID_DLOG_Y_VALUE_DIV) {
                     if (dlogValueParams && dlogValueParams->isVisible) {
@@ -2318,7 +2317,7 @@ void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCurso
                     }
 				} else {
 					if (g_focusDataId != DATA_ID_DLOG_X_AXIS_DIV) {
-						setFocusCursor(-1, DATA_ID_DLOG_X_AXIS_OFFSET);
+						setFocusCursor(WidgetCursor(), DATA_ID_DLOG_X_AXIS_OFFSET);
 					}
 
 					g_dragState.dragObject = DRAG_VALUE;
@@ -2336,14 +2335,14 @@ void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCurso
 				Unit unit;
 				if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET || g_focusDataId == DATA_ID_DLOG_Y_VALUE_OFFSET) {
 					value = g_dragState.valueAtTouchDown + dlogValueParams->div * (g_dragState.positionAtTouchDown - touchDrag->y) * dlog_view::NUM_VERT_DIVISIONS / dlog_view::VIEW_HEIGHT;
-					unit = getYAxisUnit(recording, g_focusCursor);
+					unit = getYAxisUnit(recording, g_focusCursor.cursor);
 				} else if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV || g_focusDataId == DATA_ID_DLOG_Y_VALUE_DIV) {
 					if (dlog_view::VIEW_HEIGHT - touchDrag->y <= 0) {
 						return;
 					}
 					scale = 1.0f * (dlog_view::VIEW_HEIGHT - g_dragState.positionAtTouchDown) / (dlog_view::VIEW_HEIGHT - touchDrag->y);
 					value = g_dragState.valueAtTouchDown * scale;
-					unit = getYAxisUnit(recording, g_focusCursor);
+					unit = getYAxisUnit(recording, g_focusCursor.cursor);
 				} else if (g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV) {
 					if (dlog_view::VIEW_WIDTH - touchDrag->x <= 0) {
 						return;
@@ -2559,14 +2558,14 @@ void data_dlog_value_div(DataOperationEnum operation, const WidgetCursor &widget
 	float maxDiv = (maxValue - minValue) * 3;
 
 	if (operation == DATA_OPERATION_GET) {
-		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
+		bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else {
             value = Value(dlog_view::roundValueOnYAxis(recording, cursor, recording.dlogValues[cursor].div), getYAxisUnit(recording, cursor));
 		}
 	} else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
-		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
+		bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else {
@@ -2641,14 +2640,14 @@ void data_dlog_value_offset(DataOperationEnum operation, const WidgetCursor &wid
 	}
 
 	if (operation == DATA_OPERATION_GET) {
-		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
+		bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else {
             value = Value(dlog_view::roundValueOnYAxis(recording, cursor, recording.dlogValues[cursor].offset), getYAxisUnit(recording, cursor));
 		}
 	} else if (operation == DATA_OPERATION_GET_EDIT_VALUE) {
-		bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
+		bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET;
 		if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
 			value = g_focusEditValue;
 		} else {
@@ -2692,11 +2691,10 @@ void data_dlog_visible_value_offset(DataOperationEnum operation, const WidgetCur
 }
 
 void data_dlog_x_axis_offset(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
     auto &recording = dlog_view::getRecording();
 
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_OFFSET;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_OFFSET;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else {
@@ -2725,11 +2723,10 @@ void data_dlog_x_axis_offset(DataOperationEnum operation, const WidgetCursor &wi
 }
 
 void data_dlog_x_axis_div(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto cursor = widgetCursor.cursor;
     auto &recording = dlog_view::getRecording();
 
     if (operation == DATA_OPERATION_GET) {
-        bool focused = g_focusCursor == cursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV;
+        bool focused = g_focusCursor == widgetCursor && g_focusDataId == DATA_ID_DLOG_X_AXIS_DIV;
         if (focused && g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
             value = g_focusEditValue;
         } else {
@@ -2871,14 +2868,14 @@ void data_dlog_view_selected_tab(DataOperationEnum operation, const WidgetCursor
 void action_dlog_view_select_y_values_tab() {
 	g_selectedTab = TAB_Y_VALUES;
 
-	setFocusCursor(Cursor(-1), DATA_ID_DLOG_Y_VALUE_OFFSET);
+	setFocusCursor(WidgetCursor(), DATA_ID_DLOG_Y_VALUE_OFFSET);
 }
 
 void action_dlog_view_select_bookmarks_tab() {
 	g_selectedTab = TAB_BOOKMARKS;
 
 	if (getRecording().parameters.bookmarksSize > BOOKMARKS_PER_PAGE) {
-		setFocusCursor(Cursor(-1), DATA_ID_DLOG_BOOKMARKS);
+		setFocusCursor(WidgetCursor(), DATA_ID_DLOG_BOOKMARKS);
 	}
 }
 
@@ -2988,7 +2985,7 @@ void action_dlog_view_select_bookmark() {
         g_dlogFile.cursorOffset = cursorPosition * g_dlogFile.parameters.period;
 	}
 
-	setFocusCursor(Cursor(-1), DATA_ID_DLOG_BOOKMARKS);
+	setFocusCursor(WidgetCursor(), DATA_ID_DLOG_BOOKMARKS);
 }
 
 void data_dlog_view_is_zoom_in_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
@@ -3124,7 +3121,7 @@ void action_dlog_view_select_y_value() {
     if (recording.dlogValues[valueIndex].isVisible) {
         getRecording().selectedValueIndex = getFoundWidgetAtDown().cursor;
     }
-    setFocusCursor(Cursor(-1), DATA_ID_DLOG_Y_VALUES);
+    setFocusCursor(WidgetCursor(), DATA_ID_DLOG_Y_VALUES);
 }
 
 void data_dlog_y_value_is_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {

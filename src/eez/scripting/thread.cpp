@@ -45,7 +45,7 @@ osThreadId g_mpTaskHandle;
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #endif
 
-osThreadDef(g_mpTask, mainLoop, osPriorityNormal, 0, 4096);
+osThreadDef(g_mpTask, mainLoop, osPriorityBelowNormal, 0, 4096);
 
 #if defined(EEZ_PLATFORM_STM32)
 #pragma GCC diagnostic pop
