@@ -27,6 +27,7 @@ struct InputWidget : public Widget {
 	int16_t max;
     int16_t precision;
 	int16_t unit;
+	AssetsPtr<const uint8_t> storeInto; // assignableExpressionEvalInstructions
 };
 
 } // namespace gui
