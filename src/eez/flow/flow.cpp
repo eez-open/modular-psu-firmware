@@ -126,19 +126,27 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 			if (widgetDataItem) {
 				auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 				if (component->type == WIDGET_TYPE_INPUT) {
-					auto widget = (InputWidget *)widgetCursor.widget;
+					auto inputWidget = (InputWidget *)widgetCursor.widget;
 					
-					auto unitValue = get(widgetCursor, widget->unit);
+					auto unitValue = get(widgetCursor, inputWidget->unit);
 					Unit unit = getUnitFromName(unitValue.toString(assets)); 
 					
 					if (operation == DATA_OPERATION_GET_MIN) {
-						value = Value(get(widgetCursor, widget->min).toFloat(), unit);
+						value = Value(get(widgetCursor, inputWidget->min).toFloat(), unit);
 					} else if (operation == DATA_OPERATION_GET_MAX) {
-						value = Value(get(widgetCursor, widget->max).toFloat(), unit);
+						value = Value(get(widgetCursor, inputWidget->max).toFloat(), unit);
+					} else if (operation == DATA_OPERATION_GET_PRECISION) {
+						value = Value(get(widgetCursor, inputWidget->precision).toFloat(), unit);
 					} else if (operation == DATA_OPERATION_GET_UNIT) {
 						value = unit;
 					} else if (operation == DATA_OPERATION_SET) {
-						// TODO
+						Value dstValue;
+						if (!evalAssignableExpression(assets, flowState, inputWidget->storeInto.ptr(assets), dstValue)) {
+							throwError("setvariable component eval dest assignable expression");
+							return;
+						}
+
+						assignValue(assets, flowState, component, dstValue, value);
 					}
 				}
 			}

@@ -457,6 +457,7 @@ static Value getCurrentEncoderStepValue() {
 
 float getEncoderStepValue() {
     StepValues stepValues;
+
     edit_mode_step::getStepValues(stepValues);
 
 	if (stepValues.encoderSettings.mode == ENCODER_MODE_AUTO) {

@@ -4269,6 +4269,8 @@ void data_channel_list_voltage(DataOperationEnum operation, const WidgetCursor &
         stepValues->encoderSettings.range = g_channel->params.U_MAX;
         stepValues->encoderSettings.step = g_channel->params.U_RESOLUTION;
         stepValues->encoderSettings.mode = edit_mode_step::g_listVoltageEncoderMode;
+
+        value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_listVoltageEncoderMode = (EncoderMode)value.getInt();
     }
@@ -4326,6 +4328,8 @@ void data_channel_list_current(DataOperationEnum operation, const WidgetCursor &
         stepValues->encoderSettings.range = g_channel->params.I_MAX;
         stepValues->encoderSettings.step = g_channel->params.I_RESOLUTION;
         stepValues->encoderSettings.mode = edit_mode_step::g_listCurrentEncoderMode;
+
+        value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_listCurrentEncoderMode = (EncoderMode)value.getInt();
     }
@@ -5839,6 +5843,7 @@ void data_channel_voltage_ramp_duration(DataOperationEnum operation, const Widge
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         getRampAndDelayDurationStepValues(value);
+        value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_rampAndDelayDurationEncoderMode = (EncoderMode)value.getInt();
     }    
@@ -5886,6 +5891,7 @@ void data_channel_current_ramp_duration(DataOperationEnum operation, const Widge
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         getRampAndDelayDurationStepValues(value);
+        value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_rampAndDelayDurationEncoderMode = (EncoderMode)value.getInt();
     }
@@ -5933,6 +5939,7 @@ void data_channel_output_delay(DataOperationEnum operation, const WidgetCursor &
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         getRampAndDelayDurationStepValues(value);
+        value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_rampAndDelayDurationEncoderMode = (EncoderMode)value.getInt();
     }

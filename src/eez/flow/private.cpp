@@ -115,20 +115,26 @@ void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &compo
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void assignValue(Value &dstValue, const Value &srcValue) {
-	if (dstValue.isInt32OrLess()) {
-		dstValue.int32_ = srcValue.toInt32();
-	} else if (dstValue.isFloat()) {
-		dstValue.float_ = srcValue.toFloat();
-	} else if (dstValue.isDouble()) {
-		dstValue.float_ = srcValue.toDouble();
+void assignValue(Assets *assets, FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue) {
+	if (dstValue.getType() == VALUE_TYPE_FLOW_OUTPUT) {
+		auto &componentOutput = *component->outputs.item(assets, dstValue.getUInt16());
+		propagateValue(assets, flowState, componentOutput, srcValue);
+	} else {
+		Value *pDstValue = dstValue.pValue_;
+		if (pDstValue->isInt32OrLess()) {
+			pDstValue->int32_ = srcValue.toInt32();
+		} else if (pDstValue->isFloat()) {
+			pDstValue->float_ = srcValue.toFloat();
+		} else if (pDstValue->isDouble()) {
+			pDstValue->float_ = srcValue.toDouble();
+		}
+		// TODO
 	}
-	// TODO
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, EvalStack &stack, int *numInstructionBytes) {
+bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 
@@ -145,6 +151,8 @@ bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions,
 			stack.push(&flowState->values[flow->nInputValues + instructionArg]);
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {
 			stack.push(flowDefinition->globalVariables.item(assets, instructionArg));
+		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_OUTPUT) {
+			stack.push(Value((uint16_t)instructionArg, VALUE_TYPE_FLOW_OUTPUT));
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
 			if (!g_evalOperations[instructionArg](stack)) {
 				return false;
@@ -164,10 +172,10 @@ bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions,
 	return true;
 }
 
-bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, Value &result) {
+bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes) {
 	EvalStack stack;
 
-	if (evalExpression(assets, flowState, instructions, stack)) {
+	if (evalExpression(assets, flowState, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {
 			auto finalResult = stack.pop();
 
@@ -185,20 +193,19 @@ bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions,
 	return false;
 }
 
-bool evalAssignableExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, Value **result, int *numInstructionBytes) {
+bool evalAssignableExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes) {
 	EvalStack stack;
 
 	if (evalExpression(assets, flowState, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {
 			auto finalResult = stack.pop();
-			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR) {
-				*result = finalResult.pValue_;
+			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR || finalResult.getType() == VALUE_TYPE_FLOW_OUTPUT) {
+				result = finalResult;
 				return true;
 			}
 		}
 	}
 
-	*result = nullptr;
 	return false;
 }
 

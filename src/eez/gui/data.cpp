@@ -507,6 +507,14 @@ void VALUE_PTR_value_to_text(const Value &value, char *text, int count) {
 	}
 }
 
+bool compare_FLOW_OUTPUT_value(const Value &a, const Value &b) {
+	return a.getUInt16() == b.getUInt16();
+}
+
+void FLOW_OUTPUT_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
+}
+
 bool compare_RANGE_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
@@ -846,6 +854,12 @@ Value getDef(const WidgetCursor &widgetCursor,  int16_t id) {
     return value;
 }
 
+Value getPrecision(const WidgetCursor &widgetCursor,  int16_t id) {
+    Value value;
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_PRECISION, widgetCursor, value);
+    return value;
+}
+
 Value getLimit(const WidgetCursor &widgetCursor,  int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_LIMIT, widgetCursor, value);
@@ -876,13 +890,21 @@ void getLabel(const WidgetCursor &widgetCursor,  int16_t id, char *text, int cou
     value.toText(text, count);
 }
 
-bool getEncoderStepValues(const WidgetCursor &widgetCursor,  int16_t id, StepValues &stepValues) {
+void getEncoderStepValues(const WidgetCursor &widgetCursor,  int16_t id, StepValues &stepValues) {
     Value value(&stepValues, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_STEP_VALUES, widgetCursor, value);
-    if (stepValues.encoderSettings.mode != ENCODER_MODE_AUTO) {
-        stepValues.encoderSettings.accelerationEnabled = false;
+    if (value.getType() == VALUE_TYPE_INT32 && value.getInt()) {
+        if (stepValues.encoderSettings.mode != ENCODER_MODE_AUTO) {
+            stepValues.encoderSettings.accelerationEnabled = false;
+        }
+    } else {
+        stepValues.count = 0;
+        stepValues.encoderSettings.accelerationEnabled = true;
+        stepValues.encoderSettings.mode = ENCODER_MODE_AUTO;
+        stepValues.encoderSettings.range = getMax(widgetCursor, id).toFloat() - getMin(widgetCursor, id).toFloat();
+        Value precisionValue = getPrecision(widgetCursor, id);
+        stepValues.encoderSettings.step = precisionValue.toFloat();
     }
-    return value.getType() == VALUE_TYPE_INT32 && value.getInt();
 }
 
 void setEncoderMode(const WidgetCursor &widgetCursor,  int16_t id, EncoderMode encoderMode) {

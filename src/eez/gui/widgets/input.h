@@ -22,12 +22,12 @@ namespace eez {
 namespace gui {
 
 struct InputWidget : public Widget {
-    uint16_t flags;
+	AssetsPtr<const uint8_t> storeInto; // assignableExpressionEvalInstructions
+	uint16_t flags;
 	int16_t min;
 	int16_t max;
     int16_t precision;
 	int16_t unit;
-	AssetsPtr<const uint8_t> storeInto; // assignableExpressionEvalInstructions
 };
 
 } // namespace gui

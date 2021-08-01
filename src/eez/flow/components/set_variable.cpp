@@ -44,8 +44,8 @@ void executeSetVariableComponent(Assets *assets, FlowState *flowState, Component
 	};
 	auto setVariableActionComponent = (SetVariableActionComponent *)component;
 
-	Value *pDstValue;
-	if (!evalAssignableExpression(assets, flowState, setVariableActionComponent->assignableExpressionEvalInstructions, &pDstValue)) {
+	Value dstValue;
+	if (!evalAssignableExpression(assets, flowState, setVariableActionComponent->assignableExpressionEvalInstructions, dstValue)) {
 		throwError("setvariable component eval dest assignable expression");
 		return;
 	}
@@ -57,7 +57,7 @@ void executeSetVariableComponent(Assets *assets, FlowState *flowState, Component
 		return;
 	}
 
-	assignValue(*pDstValue, srcValue);
+	assignValue(assets, flowState, component, dstValue, srcValue);
 }
 
 } // namespace flow

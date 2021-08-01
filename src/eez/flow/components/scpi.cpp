@@ -123,8 +123,23 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 #if FLOW_DEBUG
 			printf("SCPI_PART_EXPR\n");
 #endif
-			//uint8_t inputIndex = specific[i++];
-			// TODO
+
+			Value value;
+			int numInstructionBytes;
+			if (!evalExpression(assets, flowState, instructions + scpiComponentExecutionState->instructionIndex, value, &numInstructionBytes)) {
+				throwError("scpi component eval assignable expression");
+				return;
+			}
+			scpiComponentExecutionState->instructionIndex += numInstructionBytes;
+
+			char valueStr[256];
+			value.toText(valueStr, sizeof(valueStr));
+
+			stringAppendString(
+				scpiComponentExecutionState->commandOrQueryText,
+				sizeof(scpiComponentExecutionState->commandOrQueryText),
+				valueStr
+			);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY_WITH_ASSIGNMENT) {
 #if FLOW_DEBUG
 			printf("SCPI_PART_QUERY_WITH_ASSIGNMENT\n");
@@ -143,9 +158,9 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 				return;
 			}
 
-			Value *pDstValue;
+			Value dstValue;
 			int numInstructionBytes;
-			if (!evalAssignableExpression(assets, flowState, instructions + scpiComponentExecutionState->instructionIndex, &pDstValue, &numInstructionBytes)) {
+			if (!evalAssignableExpression(assets, flowState, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
 				throwError("scpi component eval assignable expression");
 				return;
 			}
@@ -155,7 +170,7 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 
 			Value srcValue(resultText, resultTextLen);
 
-			assignValue(*pDstValue, srcValue);
+			assignValue(assets, flowState, component, dstValue, srcValue);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY) {
 #if FLOW_DEBUG
 			printf("SCPI_PART_QUERY\n");

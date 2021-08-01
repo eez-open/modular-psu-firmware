@@ -573,6 +573,7 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_MIN,
     DATA_OPERATION_GET_MAX,
     DATA_OPERATION_GET_DEF,
+    DATA_OPERATION_GET_PRECISION,
     DATA_OPERATION_GET_LIMIT,
     DATA_OPERATION_GET_NAME,
     DATA_OPERATION_GET_UNIT,
@@ -650,6 +651,7 @@ bool getAllowZero(const WidgetCursor &widgetCursor, int16_t id);
 Value getMin(const WidgetCursor &widgetCursor, int16_t id);
 Value getMax(const WidgetCursor &widgetCursor, int16_t id);
 Value getDef(const WidgetCursor &widgetCursor, int16_t id);
+Value getPrecision(const WidgetCursor &widgetCursor, int16_t id);
 Value getLimit(const WidgetCursor &widgetCursor, int16_t id);
 const char *getName(const WidgetCursor &widgetCursor, int16_t id);
 Unit getUnit(const WidgetCursor &widgetCursor, int16_t id);
@@ -657,7 +659,7 @@ bool isChannelData(const WidgetCursor &widgetCursor, int16_t id);
 
 void getLabel(const WidgetCursor &widgetCursor, int16_t id, char *text, int count);
 
-bool getEncoderStepValues(const WidgetCursor &widgetCursor, int16_t id, StepValues &stepValues);
+void getEncoderStepValues(const WidgetCursor &widgetCursor, int16_t id, StepValues &stepValues);
 void setEncoderMode(const WidgetCursor &widgetCursor, int16_t id, EncoderMode encoderMode);
 
 Value get(const WidgetCursor &widgetCursor, int16_t id);

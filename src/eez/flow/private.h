@@ -25,6 +25,7 @@ namespace flow {
 
 using eez::gui::Value;
 using eez::gui::Assets;
+using eez::gui::Component;
 using eez::gui::ComponentOutput;
 
 struct FlowState {
@@ -64,11 +65,11 @@ void recalcFlowDataItems(Assets *assets, FlowState *flowState);
 void pingComponent(Assets *assets, FlowState *flowState, unsigned componentIndex);
 void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
 
-void assignValue(Value &dstValue, const Value &srcValue);
+void assignValue(Assets *assets, FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue);
 
-bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
-bool evalExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, Value &result);
-bool evalAssignableExpression(Assets *assets, FlowState *flowState, uint8_t *instructions, Value **result, int *numInstructionBytes = nullptr);
+bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
+bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
+bool evalAssignableExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
 
 void throwError(const char *errorMessage);
 
