@@ -23,14 +23,16 @@
 namespace eez {
 namespace flow {
 
+using namespace eez::gui;
+
 unsigned start(eez::gui::Assets *assets);
 void tick(unsigned flowHandle);
 void scpiResultIsReady();
 void stop();
 
 void *getFlowState(int16_t pageId);
-void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCursor, int16_t actionId);
-void dataOperation(unsigned flowHandle, int16_t dataId, gui::DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, gui::Value &value);
+void executeFlowAction(unsigned flowHandle, const WidgetCursor &widgetCursor, int16_t actionId);
+void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 
 } // flow
 } // eez

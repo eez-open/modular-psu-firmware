@@ -115,6 +115,24 @@ void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &compo
 
 ////////////////////////////////////////////////////////////////////////////////
 
+struct {
+	Assets *assets;
+	FlowState *flowState;
+	Component *component;
+	uint16_t dataId;
+	Value value;
+} g_setValueFromGuiThreadParams;
+
+void setValueFromGuiThread(Assets *assets, FlowState *flowState, Component *component, uint16_t dataId, const Value& value) {
+	g_setValueFromGuiThreadParams.assets = assets;
+	g_setValueFromGuiThreadParams.flowState = flowState;
+	g_setValueFromGuiThreadParams.component = component;
+	g_setValueFromGuiThreadParams.dataId = dataId;
+	g_setValueFromGuiThreadParams.value = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void assignValue(Assets *assets, FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue) {
 	if (dstValue.getType() == VALUE_TYPE_FLOW_OUTPUT) {
 		auto &componentOutput = *component->outputs.item(assets, dstValue.getUInt16());

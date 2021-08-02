@@ -140,13 +140,7 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 					} else if (operation == DATA_OPERATION_GET_UNIT) {
 						value = unit;
 					} else if (operation == DATA_OPERATION_SET) {
-						Value dstValue;
-						if (!evalAssignableExpression(assets, flowState, inputWidget->storeInto.ptr(assets), dstValue)) {
-							throwError("setvariable component eval dest assignable expression");
-							return;
-						}
-
-						assignValue(assets, flowState, component, dstValue, value);
+						setValueFromGuiThread(assets, flowState, component, dataId, value);
 					}
 				}
 			}

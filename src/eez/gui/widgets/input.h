@@ -22,7 +22,6 @@ namespace eez {
 namespace gui {
 
 struct InputWidget : public Widget {
-	AssetsPtr<const uint8_t> storeInto; // assignableExpressionEvalInstructions
 	uint16_t flags;
 	int16_t min;
 	int16_t max;

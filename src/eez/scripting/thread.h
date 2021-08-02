@@ -25,6 +25,7 @@ void startMpScriptInScriptingThread();
 
 void startFlowScriptInScriptingThread();
 void executeFlowActionInScriptingThread();
+void setFlowValueInScriptingThread();
 void stopFlowInScriptingThread();
 
 void scpiResultIsReady();
