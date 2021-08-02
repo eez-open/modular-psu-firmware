@@ -13,6 +13,8 @@ std::map<DWORD, HANDLE> g_handles;
 #include <time.h>
 #endif
 
+////////////////////////////////////////////////////////////////////////////////
+
 #ifdef __EMSCRIPTEN__
 #define MAX_THREADS 100
 struct Thread {
@@ -72,6 +74,8 @@ osThreadId osThreadGetId() {
     return pthread_self();
 #endif    
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 #ifdef __EMSCRIPTEN__
 void eez_system_tick() {
@@ -134,20 +138,45 @@ uint32_t osKernelSysTick() {
 #endif    
 }
 
-osMessageQId osMessageCreate(osMessageQId queue_id, osThreadId thread_id) {
-    queue_id->tail = 0;
-    queue_id->head = 0;
-    queue_id->overflow = 0;
-    return queue_id;
+////////////////////////////////////////////////////////////////////////////////
+
+Mutex *osMutexCreate(Mutex &mutex) {
+    return &mutex;
 }
 
-osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec) {
+osStatus osMutexWait(Mutex *mutex, unsigned int timeout) {
+#ifndef __EMSCRIPTEN__
+	mutex->lock();
+#endif
+    return osOK;
+}
+
+void osMutexRelease(Mutex *mutex) {
+#ifndef __EMSCRIPTEN__
+	mutex->unlock();
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+osMessageQId osMessageCreate(osMessageQId queue, osThreadId thread_id) {
+    queue->tail = 0;
+    queue->head = 0;
+    queue->overflow = 0;
+    return queue;
+}
+
+osEvent osMessageGet(osMessageQId queue, uint32_t millisec) {
     if (millisec == 0) millisec = 1;
 
-    while (queue_id->tail == queue_id->head) {
-        if (queue_id->overflow) {
-            queue_id->overflow = 0;
+    queue->mutex.lock();
+
+    while (queue->tail == queue->head) {
+        if (queue->overflow) {
+            break;
         }
+
+        queue->mutex.unlock();
 
 #ifdef __EMSCRIPTEN__
         return {
@@ -166,57 +195,53 @@ osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec) {
             };
         }
 #endif
+
+        queue->mutex.lock();
     }
-    uint16_t tail = queue_id->tail + 1;
-    if (tail >= queue_id->numElements) {
+
+    uint16_t tail = queue->tail + 1;
+    if (tail >= queue->numElements) {
         tail = 0;
     }
-    queue_id->tail = tail;
-    uint32_t info = ((uint32_t *)queue_id->data)[tail];
-    if (queue_id->overflow) {
-        queue_id->overflow = 0;
+    queue->tail = tail;
+    uint32_t info = ((uint32_t *)queue->data)[tail];
+    if (queue->overflow) {
+        queue->overflow = 0;
     }
+
+    queue->mutex.unlock();
+
     return {
         osEventMessage,
         info
     };
 }
 
-osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec) {
-    for (uint32_t i = 0; queue_id->overflow && i < millisec; i++) {
+osStatus osMessagePut(osMessageQId queue, uint32_t info, uint32_t millisec) {
+    queue->mutex.lock();
+    for (uint32_t i = 0; queue->overflow && i < millisec; i++) {
+        queue->mutex.unlock();
         osDelay(1);
+        queue->mutex.lock();
     }
     
-    if (queue_id->overflow) {
+    if (queue->overflow) {
+        queue->mutex.unlock();
 		printf("overflow\n");
-        return osOK;
+        return osError;
     }
 
-    uint16_t head = queue_id->head + 1;
-    if (head >= queue_id->numElements) {
+    uint16_t head = queue->head + 1;
+    if (head >= queue->numElements) {
         head = 0;
     }
-    ((uint32_t *)queue_id->data)[head] = info;
-    queue_id->head = head;
-    if (queue_id->head == queue_id->tail) {
-        queue_id->overflow = 1;
+    ((uint32_t *)queue->data)[head] = info;
+    queue->head = head;
+    if (queue->head == queue->tail) {
+        queue->overflow = 1;
     }
+
+    queue->mutex.unlock();
+
     return osOK;
-}
-
-uint32_t osMessageWaiting(osMessageQId queue_id) {
-    return queue_id->head - queue_id->tail;
-}
-
-Mutex *osMutexCreate(Mutex &mutex) {
-    return &mutex;
-}
-
-osStatus osMutexWait(Mutex *mutex, unsigned int timeout) {
-	mutex->lock();
-    return osOK;
-}
-
-void osMutexRelease(Mutex *mutex) {
-	mutex->unlock();
 }

@@ -21,6 +21,7 @@
 #include <eez/debug.h>
 
 #include <eez/scripting/scripting.h>
+#include <eez/scripting/thread.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/operations.h>
@@ -116,19 +117,50 @@ void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &compo
 ////////////////////////////////////////////////////////////////////////////////
 
 struct {
+	bool isActive;
 	Assets *assets;
 	FlowState *flowState;
-	Component *component;
 	uint16_t dataId;
 	Value value;
 } g_setValueFromGuiThreadParams;
 
-void setValueFromGuiThread(Assets *assets, FlowState *flowState, Component *component, uint16_t dataId, const Value& value) {
+void setValueFromGuiThread(Assets *assets, FlowState *flowState, uint16_t dataId, const Value& value) {
+	while (g_setValueFromGuiThreadParams.isActive) {
+		osDelay(1);
+	}
+
+	g_setValueFromGuiThreadParams.isActive = true;
 	g_setValueFromGuiThreadParams.assets = assets;
 	g_setValueFromGuiThreadParams.flowState = flowState;
-	g_setValueFromGuiThreadParams.component = component;
 	g_setValueFromGuiThreadParams.dataId = dataId;
 	g_setValueFromGuiThreadParams.value = value;
+
+	scripting::setFlowValueInScriptingThread();
+}
+
+void doSetFlowValue() {
+	if (scripting::isFlowRunning()) {
+		Assets *assets = g_setValueFromGuiThreadParams.assets;
+		FlowState *flowState = g_setValueFromGuiThreadParams.flowState;
+		uint16_t dataId = g_setValueFromGuiThreadParams.dataId;
+		
+		auto flowDefinition = assets->flowDefinition.ptr(assets);
+		auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+
+		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
+		if (widgetDataItem) {
+			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+			auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
+
+			Value dstValue;
+			if (evalAssignableExpression(assets, flowState, propertyValue->evalInstructions, dstValue)) {
+				assignValue(assets, flowState, component, dstValue, g_setValueFromGuiThreadParams.value);
+			} else {
+				throwError("doSetFlowValue failed");
+			}
+		}
+	}
+	g_setValueFromGuiThreadParams.isActive = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

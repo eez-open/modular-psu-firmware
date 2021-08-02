@@ -31,9 +31,6 @@ namespace scripting {
 
 static unsigned g_flowHandle;
 
-WidgetCursor g_actionWidgetCursor;
-int16_t g_actionId;
-
 bool loadFlowScript(int *err) {
 	int localErr = SCPI_RES_OK;
 	if (!err) {
@@ -90,19 +87,34 @@ void executeScpiFromFlow(const char *commandOrQueryText) {
 	executeScpi(commandOrQueryText, true);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+static struct {
+	bool isActive;
+	WidgetCursor widgetCursor;
+	int16_t actionId;
+} g_executeFlowAction;
+
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId) {
-	// TODO check overwrite
-	g_actionWidgetCursor = widgetCursor;
-	g_actionId = actionId;
+	while (g_executeFlowAction.isActive) {
+		osDelay(1);
+	}
+
+	g_executeFlowAction.isActive = true;
+	g_executeFlowAction.widgetCursor = widgetCursor;
+	g_executeFlowAction.actionId = actionId;
 
 	executeFlowActionInScriptingThread();
 }
 
 void doExecuteFlowAction() {
 	if (isFlowRunning()) {
-		flow::executeFlowAction(g_flowHandle, g_actionWidgetCursor, g_actionId);
+		flow::executeFlowAction(g_flowHandle, g_executeFlowAction.widgetCursor, g_executeFlowAction.actionId);
 	}
+	g_executeFlowAction.isActive = false;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 bool isFlowRunning() {
 	return g_flowHandle != 0;

@@ -32,6 +32,7 @@ void stop();
 
 void *getFlowState(int16_t pageId);
 void executeFlowAction(unsigned flowHandle, const WidgetCursor &widgetCursor, int16_t actionId);
+void doSetFlowValue();
 void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 
 } // flow

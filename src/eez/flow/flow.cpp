@@ -19,6 +19,8 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/input.h>
 
+#include <eez/scripting/scripting.h>
+
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>
 #include <eez/flow/queue.h>
@@ -140,7 +142,8 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 					} else if (operation == DATA_OPERATION_GET_UNIT) {
 						value = unit;
 					} else if (operation == DATA_OPERATION_SET) {
-						setValueFromGuiThread(assets, flowState, component, dataId, value);
+						setValueFromGuiThread(assets, flowState, dataId, value);
+						scripting::executeFlowAction(widgetCursor, inputWidget->action);
 					}
 				}
 			}

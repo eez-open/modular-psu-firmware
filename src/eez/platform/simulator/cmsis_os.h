@@ -1,10 +1,14 @@
 #pragma once
 
 #include <stdint.h>
+
+#ifndef __EMSCRIPTEN__
 #include <mutex>
+#endif
 
 typedef enum {
     osOK = 0,
+    osError = 1,
     osEventMessage = 0x10
 } osStatus;
 
@@ -13,6 +17,8 @@ typedef enum {
     osPriorityNormal = 0,
     osPriorityAboveNormal = 1
 } osPriority;
+
+////////////////////////////////////////////////////////////////////////////////
 
 typedef void (*os_pthread)(void const *argument);
 
@@ -68,6 +74,8 @@ osStatus osThreadTerminate(osThreadId thread_id);
 
 osThreadId osThreadGetId();
 
+////////////////////////////////////////////////////////////////////////////////
+
 osStatus osKernelStart(void);
 
 osStatus osDelay(uint32_t millisec);
@@ -87,11 +95,30 @@ struct osEvent {
     } value;
 };
 
+////////////////////////////////////////////////////////////////////////////////
+// Mutex
+
+#ifdef __EMSCRIPTEN__
+typedef bool Mutex;
+#else
+typedef std::mutex Mutex;
+#endif
+
+#define osMutexDef(mutex) Mutex mutex
+#define osMutexId(mutexId) Mutex *mutexId
+#define osMutex(mutex) mutex
+
+Mutex *osMutexCreate(Mutex &mutex);
+osStatus osMutexWait(Mutex *mutex, unsigned int timeout);
+void osMutexRelease(Mutex *mutex);
+
+////////////////////////////////////////////////////////////////////////////////
 // Message Queue
 
 struct MessageQueue {
     void *data;
     uint8_t numElements;
+    Mutex mutex;
     volatile uint16_t tail;
     volatile uint16_t head;
     volatile uint8_t overflow;
@@ -110,16 +137,4 @@ typedef MessageQueue *osMessageQId;
 osMessageQId osMessageCreate(osMessageQId queue_id, osThreadId thread_id);
 osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec);
 osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec);
-uint32_t osMessageWaiting(osMessageQId queue_id);
 
-// Mutex
-
-typedef std::mutex Mutex;
-
-#define osMutexDef(mutex) Mutex mutex
-#define osMutexId(mutexId) Mutex *mutexId
-#define osMutex(mutex) mutex
-
-Mutex *osMutexCreate(Mutex &mutex);
-osStatus osMutexWait(Mutex *mutex, unsigned int timeout);
-void osMutexRelease(Mutex *mutex);

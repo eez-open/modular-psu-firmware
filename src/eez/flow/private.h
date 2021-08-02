@@ -65,7 +65,7 @@ void recalcFlowDataItems(Assets *assets, FlowState *flowState);
 void pingComponent(Assets *assets, FlowState *flowState, unsigned componentIndex);
 void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
 
-void setValueFromGuiThread(Assets *assets, FlowState *flowState, Component *component, uint16_t dataId, const Value& value);
+void setValueFromGuiThread(Assets *assets, FlowState *flowState, uint16_t dataId, const Value& value);
 void assignValue(Assets *assets, FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue);
 
 bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
