@@ -25,8 +25,8 @@ namespace eez {
 namespace flow {
     
 bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
-	auto a = stack.pop();
 	auto b = stack.pop();
+	auto a = stack.pop();
 
 	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
 		a = *a.pValue_;
@@ -54,6 +54,14 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 	if (a.isInt32OrLess() && b.isInt32OrLess()) {
 		stack.push(Value(a.int32_ + b.int32_, VALUE_TYPE_INT32));
 		return true;
+	}
+
+	if (a.isAnyStringType() && b.isAnyStringType()) {
+		const char *aStr = a.toString(stack.assets);
+		const char *bStr = b.toString(stack.assets);
+		if (aStr && bStr) {
+			stack.push(Value::concatenateString(aStr, bStr));
+		}
 	}
 
 	return false;
@@ -96,15 +104,38 @@ bool do_OPERATION_TYPE_BINARY_XOR(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_EQUAL(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	stack.push(Value(a == b, VALUE_TYPE_BOOLEAN));
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_NOT_EQUAL(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	stack.push(Value(a != b, VALUE_TYPE_BOOLEAN));
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_LESS(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValue_;
+	}
+
+	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
+		b = *b.pValue_;
+	}
+
+	stack.push(Value(a.toDouble() < b.toDouble(), VALUE_TYPE_BOOLEAN));
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_GREATER(EvalStack &stack) {
@@ -132,6 +163,42 @@ bool do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValue_;
+	}
+	if (a.isDouble()) {
+		stack.push(Value(-a.getDouble(), VALUE_TYPE_DOUBLE));
+		return true;
+	}
+
+	if (a.isFloat()) {
+		stack.push(Value(-a.toFloat(), VALUE_TYPE_FLOAT));
+		return true;
+	}
+
+	if (a.isInt64()) {
+		stack.push(Value(-a.getInt64(), VALUE_TYPE_INT64));
+		return true;
+	}
+
+	if (a.isInt32()) {
+		stack.push(Value(-a.getInt32(), VALUE_TYPE_INT32));
+		return true;
+	}
+
+	if (a.isInt16()) {
+		stack.push(Value(-a.getInt16(), VALUE_TYPE_INT16));
+		return true;
+	}
+
+
+	if (a.isInt8()) {
+		stack.push(Value(-a.getInt8(), VALUE_TYPE_INT8));
+		return true;
+	}
+
 	return false;
 }
 
@@ -157,6 +224,34 @@ bool do_OPERATION_TYPE_MATH_COS(EvalStack &stack) {
 
 bool do_OPERATION_TYPE_MATH_LOG(EvalStack &stack) {
 	return false;
+}
+
+bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValue_;
+	}
+
+	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
+		b = *b.pValue_;
+	}
+
+	const char *aStr = a.toString(stack.assets);
+	const char *bStr = b.toString(stack.assets);
+	if (!aStr || !bStr) {
+		stack.push(Value(-1, VALUE_TYPE_INT32));
+	} else {
+		const char *pos = strstr(aStr, bStr);
+		if (!pos) {
+			stack.push(Value(pos - aStr, VALUE_TYPE_INT32));
+		} else {
+			stack.push(Value(-1, VALUE_TYPE_INT32));
+		}
+	}
+
+	return true;
 }
 
 EvalOperation g_evalOperations[] = {
@@ -186,6 +281,7 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_MATH_SIN,
 	do_OPERATION_TYPE_MATH_COS,
 	do_OPERATION_TYPE_MATH_LOG,
+	do_OPERATION_TYPE_STRING_FIND
 };
 
 } // namespace flow

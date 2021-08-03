@@ -27,18 +27,12 @@
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/queue.h>
 
-#define FLOW_DEBUG 0
-
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
 void executeEndComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-#if FLOW_DEBUG
-	printf("Execute END component at index = %d\n", componentIndex);
-#endif
-
 	scripting::stopScript();
 }
 

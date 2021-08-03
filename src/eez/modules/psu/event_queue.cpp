@@ -982,11 +982,14 @@ void data_event_queue_event_long_message_overlay(DataOperationEnum operation, co
                 static const int CONF_EVENTS_LIST_HEIGHT_PX = 240;
 
                 auto style = getStyle(multiLineTextWidget->style);
-                int height = measureMultilineText(
-                    getEventMessage(selectedEvent), 
-                    0, 0, multiLineTextWidget->w, CONF_EVENTS_LIST_HEIGHT_PX,
-                    style, 0, 0
-                ) + style->padding_top + style->padding_bottom + style->border_size_top + style->border_size_bottom;
+                int height = MIN(
+					measureMultilineText(
+						getEventMessage(selectedEvent), 
+						0, 0, multiLineTextWidget->w, INT_MAX,
+						style, 0, 0
+					) + style->padding_top + style->padding_bottom + style->border_size_top + style->border_size_bottom,
+					CONF_EVENTS_LIST_HEIGHT_PX
+				);
                 
                 int y = selectedEventIndexWithinPage * CONF_EVENT_LINE_HEIGHT_PX;
                 if (y + height > CONF_EVENTS_LIST_HEIGHT_PX) {
@@ -996,6 +999,7 @@ void data_event_queue_event_long_message_overlay(DataOperationEnum operation, co
 				auto &overlayYOffset = (overlay.visibility & OVERLAY_MINIMIZED) != 0 ? overlay.yOffsetMinimized : overlay.yOffsetMaximized;
 				overlayYOffset = y;
 
+				overlay.y = overlayYOffset;
                 overlay.width = widgetCursor.widget->w;
                 overlay.height = height;
 

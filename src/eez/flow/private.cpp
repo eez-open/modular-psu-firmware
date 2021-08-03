@@ -156,7 +156,7 @@ void doSetFlowValue() {
 			if (evalAssignableExpression(assets, flowState, propertyValue->evalInstructions, dstValue)) {
 				assignValue(assets, flowState, component, dstValue, g_setValueFromGuiThreadParams.value);
 			} else {
-				throwError("doSetFlowValue failed");
+				throwError("doSetFlowValue failed\n");
 			}
 		}
 	}
@@ -224,6 +224,8 @@ bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instruc
 
 bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes) {
 	EvalStack stack;
+	stack.assets = assets;
+	stack.flowState = flowState;
 
 	if (evalExpression(assets, flowState, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {
@@ -245,6 +247,8 @@ bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instruc
 
 bool evalAssignableExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes) {
 	EvalStack stack;
+	stack.assets = assets;
+	stack.flowState = flowState;
 
 	if (evalExpression(assets, flowState, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {

@@ -340,6 +340,12 @@ struct MultilineTextRender {
             int width = display::measureStr(text + j, i - j, font);
 
             while (lineWidth + (line[0] ? spaceWidth : 0) + width > x2 - x1 + 1) {
+				if (!line[0]) {
+					i--;
+					width = display::measureStr(text + j, i - j, font);
+					continue;
+				}
+
                 flushLine(y, step);
                 
                 y += lineHeight;

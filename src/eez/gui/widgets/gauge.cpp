@@ -105,7 +105,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		const Style* style = getStyle(widget->style);
 		const Style* barStyle = getStyle(widget->barStyle);
 
-		auto colorBackground = getColor16FromIndex(style->background_color);
+		// auto colorBackground = getColor16FromIndex(style->background_color);
 		auto colorBorder = getColor16FromIndex(style->color);
 		auto colorBar = getColor16FromIndex(barStyle->color);
 

@@ -27,8 +27,6 @@
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/queue.h>
 
-#define FLOW_DEBUG 0
-
 using namespace eez::gui;
 
 namespace eez {
@@ -76,10 +74,6 @@ void scpiResultIsReady() {
 }
 
 void executeScpiComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-#if FLOW_DEBUG
-	printf("Execute SCPI component at index = %d\n", componentIndex);
-#endif
-
 	struct ScpiActionComponent : public Component {
 		uint8_t instructions[1];
 	};
@@ -106,9 +100,6 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 
 	while (true) {
 		if (scpiComponentExecutionState->op == SCPI_PART_STRING) {
-#if FLOW_DEBUG
-			printf("SCPI_PART_STRING\n");
-#endif
 			uint16_t sizeLowByte = instructions[scpiComponentExecutionState->instructionIndex++];
 			uint16_t sizeHighByte = instructions[scpiComponentExecutionState->instructionIndex++];
 			uint16_t stringLength = sizeLowByte | (sizeHighByte << 8);
@@ -120,14 +111,10 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 			);
 			scpiComponentExecutionState->instructionIndex += stringLength;
 		} else if (scpiComponentExecutionState->op == SCPI_PART_EXPR) {
-#if FLOW_DEBUG
-			printf("SCPI_PART_EXPR\n");
-#endif
-
 			Value value;
 			int numInstructionBytes;
 			if (!evalExpression(assets, flowState, instructions + scpiComponentExecutionState->instructionIndex, value, &numInstructionBytes)) {
-				throwError("scpi component eval assignable expression");
+				throwError("scpi component eval assignable expression\n");
 				return;
 			}
 			scpiComponentExecutionState->instructionIndex += numInstructionBytes;
@@ -141,9 +128,6 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 				valueStr
 			);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY_WITH_ASSIGNMENT) {
-#if FLOW_DEBUG
-			printf("SCPI_PART_QUERY_WITH_ASSIGNMENT\n");
-#endif
 			if (!scpiComponentExecutionState->scpi()) {
 				break;
 			}
@@ -153,7 +137,7 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 			int err;
 			if (!scripting::getLatestScpiResult(&resultText, &resultTextLen, &err)) {
 				char errorMessage[256];
-				snprintf(errorMessage, sizeof(errorMessage), "scpi component error: '%s', %s", scpiComponentExecutionState->commandOrQueryText, SCPI_ErrorTranslate(err));
+				snprintf(errorMessage, sizeof(errorMessage), "scpi component error: '%s', %s\n", scpiComponentExecutionState->commandOrQueryText, SCPI_ErrorTranslate(err));
 				throwError(errorMessage);
 				return;
 			}
@@ -161,7 +145,7 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 			Value dstValue;
 			int numInstructionBytes;
 			if (!evalAssignableExpression(assets, flowState, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
-				throwError("scpi component eval assignable expression");
+				throwError("scpi component eval assignable expression\n");
 				return;
 			}
 			scpiComponentExecutionState->instructionIndex += numInstructionBytes;
@@ -172,26 +156,17 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 
 			assignValue(assets, flowState, component, dstValue, srcValue);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY) {
-#if FLOW_DEBUG
-			printf("SCPI_PART_QUERY\n");
-#endif
 			if (!scpiComponentExecutionState->scpi()) {
 				break;
 			}
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 		} else if (scpiComponentExecutionState->op == SCPI_PART_COMMAND) {
-#if FLOW_DEBUG
-			printf("SCPI_PART_COMMAND\n");
-#endif
 			if (!scpiComponentExecutionState->scpi()) {
 				break;
 			}
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 
 		} else if (scpiComponentExecutionState->op == SCPI_PART_END) {
-#if FLOW_DEBUG
-			printf("SCPI_PART_END\n");
-#endif
 			ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
 			componentExecutionState = nullptr;
 

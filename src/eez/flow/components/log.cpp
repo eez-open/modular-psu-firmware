@@ -32,7 +32,22 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-void executeStartComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+void executeLogComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+    auto propertyValue = component->propertyValues.item(assets, defs_v3::LOG_ACTION_COMPONENT_PROPERTY_VALUE);
+
+    Value value;
+    if (!evalExpression(assets, flowState, propertyValue->evalInstructions, value)) {
+        throwError("log component value eval error\n");
+        return;
+    }
+
+    const char *valueStr = value.toString(assets);
+    if (valueStr && *valueStr) {
+      DebugTrace(valueStr);
+      if (valueStr[strlen(valueStr) - 1] != '\n') {
+        DebugTrace("\n");
+      }
+    }
 }
 
 } // namespace flow

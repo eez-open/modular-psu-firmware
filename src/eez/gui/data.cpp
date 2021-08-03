@@ -775,8 +775,28 @@ const char *Value::toString(Assets *assets) const {
 	} else if (type_ == VALUE_TYPE_ASSETS_STRING) {
 		return ((AssetsPtr<const char> *)&assetsString_)->ptr(assets);
 	}
-	return "";
+	return nullptr;
 }
+
+Value Value::concatenateString(const char *str1, const char *str2) {
+    Value value;
+
+    auto newStrLen = strlen(str1) + strlen(str2) + 1;
+    auto newStr = (char *)alloc(newStrLen);
+    stringCopy(newStr, newStrLen, str1);
+    stringAppendString(newStr, newStrLen, str2);
+
+    value.type_ = VALUE_TYPE_STRING_REF;
+    value.unit_ = 0;
+    value.options_ = 0;
+    value.reserved_ = 0;
+
+    value.refString_.refCounter = 1;
+    value.refString_.str = newStr;
+
+	return value;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 

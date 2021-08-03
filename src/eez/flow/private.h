@@ -38,6 +38,9 @@ struct ComponenentExecutionState {
 };
 
 struct EvalStack {
+	Assets *assets;
+	FlowState *flowState;
+
 	Value stack[100];
 	int sp = 0;
 

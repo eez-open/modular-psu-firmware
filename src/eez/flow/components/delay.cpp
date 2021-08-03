@@ -27,18 +27,12 @@
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/queue.h>
 
-#define FLOW_DEBUG 0
-
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
 void executeDelayComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-#if FLOW_DEBUG
-	printf("Execute DELAY component at index = %d\n", componentIndex);
-#endif
-
 	struct DelayComponenentExecutionState : public ComponenentExecutionState {
 		uint32_t waitUntil;
 	};
@@ -48,7 +42,7 @@ void executeDelayComponent(Assets *assets, FlowState *flowState, Component *comp
 
 		Value value;
 		if (!evalExpression(assets, flowState, propertyValue->evalInstructions, value)) {
-			throwError("delay component milliseconds eval error");
+			throwError("delay component milliseconds eval error\n");
 			return;
 		}
 
@@ -58,7 +52,7 @@ void executeDelayComponent(Assets *assets, FlowState *flowState, Component *comp
 			delayComponentExecutionState->waitUntil = millis() + (uint32_t)floor(milliseconds);
 			componentExecutionState = delayComponentExecutionState;
 		} else {
-			throwError("delay component milliseconds invalid value");
+			throwError("delay component milliseconds invalid value\n");
 			return;
 		}
 	} else {

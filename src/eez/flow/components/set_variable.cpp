@@ -27,18 +27,12 @@
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/queue.h>
 
-#define FLOW_DEBUG 0
-
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
 void executeSetVariableComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-#if FLOW_DEBUG
-	printf("Execute SetVariable component at index = %d\n", componentIndex);
-#endif
-
 	struct SetVariableActionComponent : public Component {
 		uint8_t assignableExpressionEvalInstructions[1];
 	};
@@ -46,14 +40,14 @@ void executeSetVariableComponent(Assets *assets, FlowState *flowState, Component
 
 	Value dstValue;
 	if (!evalAssignableExpression(assets, flowState, setVariableActionComponent->assignableExpressionEvalInstructions, dstValue)) {
-		throwError("setvariable component eval dest assignable expression");
+		throwError("setvariable component eval dest assignable expression\n");
 		return;
 	}
 
 	auto propertyValue = component->propertyValues.item(assets, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE);
 	Value srcValue;
 	if (!evalExpression(assets, flowState, propertyValue->evalInstructions, srcValue)) {
-		throwError("setvariable component eval src expression");
+		throwError("setvariable component eval src expression\n");
 		return;
 	}
 

@@ -201,13 +201,7 @@ struct Value {
     }
 
 	Value(const Value& value) {
-		type_ = value.type_;
-		unit_ = value.unit_;
-		options_ = value.options_;
-		int64_ = value.int64_;
-		if (type_ == VALUE_TYPE_STRING_REF) {
-			refString_.refCounter++;
-		}
+		*this = value;
 	}
 
 	~Value() {
@@ -227,6 +221,18 @@ struct Value {
 		}
 	}
 
+    const Value& operator = (const Value &value) {
+		type_ = value.type_;
+		unit_ = value.unit_;
+		options_ = value.options_;
+		int64_ = value.int64_;
+		if (type_ == VALUE_TYPE_STRING_REF) {
+			refString_.refCounter++;
+		}
+
+        return *this;
+    }
+
     bool operator==(const Value &other) const;
 
     bool operator!=(const Value &other) const {
@@ -245,6 +251,18 @@ struct Value {
 		return type_ == VALUE_TYPE_INT64 || type_ == VALUE_TYPE_UINT64;
 	}
 
+	bool isInt32() const {
+		return type_ == VALUE_TYPE_INT32 || type_ == VALUE_TYPE_UINT32;
+	}
+
+	bool isInt16() const {
+		return type_ == VALUE_TYPE_INT16 || type_ == VALUE_TYPE_UINT16;
+	}
+
+	bool isInt8() const {
+		return type_ == VALUE_TYPE_INT8 || type_ == VALUE_TYPE_UINT8;
+	}
+
 	bool isFloat() const {
         return type_ == VALUE_TYPE_FLOAT;
     }
@@ -259,6 +277,10 @@ struct Value {
 
 	bool isString() {
         return type_ == VALUE_TYPE_STRING;
+    }
+
+	bool isAnyStringType() {
+        return type_ == VALUE_TYPE_STRING || type_ == VALUE_TYPE_STRING_REF || type_ == VALUE_TYPE_ASSETS_STRING;
     }
 
     Unit getUnit() const {
@@ -393,24 +415,43 @@ struct Value {
 		if (type_ == VALUE_TYPE_DOUBLE) {
 			return double_;
 		}
+
 		if (type_ == VALUE_TYPE_FLOAT) {
 			return float_;
 		}
-		if ((type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32) || type_ == VALUE_TYPE_BOOLEAN) {
+
+		if (type_ == VALUE_TYPE_INT8) {
+			return int8_;
+		}
+		if (type_ == VALUE_TYPE_UINT8) {
+			return uint8_;
+		}
+
+		if (type_ == VALUE_TYPE_INT16) {
+			return int16_;
+		}
+		if (type_ == VALUE_TYPE_UINT16) {
+			return uint16_;
+		}
+
+		if (type_ == VALUE_TYPE_INT32) {
 			return int32_;
 		}
 		if (type_ == VALUE_TYPE_UINT32) {
 			return uint32_;
 		}
+
 		if (type_ == VALUE_TYPE_INT64) {
 			return (double)int64_;
 		}
 		if (type_ == VALUE_TYPE_UINT64) {
 			return (double)uint64_;
 		}
+
 		if (type_ == VALUE_TYPE_STRING_REF) {
 			return (double)atof(refString_.str);
 		}
+
 		return NAN;
 	}
 
@@ -418,24 +459,44 @@ struct Value {
 		if (type_ == VALUE_TYPE_DOUBLE) {
 			return (float)double_;
 		}
+
 		if (type_ == VALUE_TYPE_FLOAT) {
 			return float_;
 		}
-		if ((type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32) || type_ == VALUE_TYPE_BOOLEAN) {
+
+		if (type_ == VALUE_TYPE_INT8) {
+			return int8_;
+		}
+		if (type_ == VALUE_TYPE_UINT8) {
+			return uint8_;
+		}
+
+		if (type_ == VALUE_TYPE_INT16) {
+			return int16_;
+		}
+		if (type_ == VALUE_TYPE_UINT16) {
+			return uint16_;
+		}
+
+		if (type_ == VALUE_TYPE_INT32) {
 			return (float)int32_;
 		}
+
 		if (type_ == VALUE_TYPE_UINT32) {
 			return (float)uint32_;
 		}
+
 		if (type_ == VALUE_TYPE_INT64) {
 			return (float)int64_;
 		}
 		if (type_ == VALUE_TYPE_UINT64) {
 			return (float)uint64_;
 		}
+
 		if (type_ == VALUE_TYPE_STRING_REF) {
 			return (float)atof(refString_.str);
 		}
+
 		return NAN;
 	}
 
@@ -443,24 +504,43 @@ struct Value {
 		if (type_ == VALUE_TYPE_DOUBLE) {
 			return (int32_t)double_;
 		}
+
 		if (type_ == VALUE_TYPE_FLOAT) {
 			return (int32_t)float_;
 		}
-		if ((type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32) || type_ == VALUE_TYPE_BOOLEAN) {
-			return (int32_t)int32_;
+
+		if (type_ == VALUE_TYPE_INT8) {
+			return int8_;
+		}
+		if (type_ == VALUE_TYPE_UINT8) {
+			return uint8_;
+		}
+
+		if (type_ == VALUE_TYPE_INT16) {
+			return int16_;
+		}
+		if (type_ == VALUE_TYPE_UINT16) {
+			return uint16_;
+		}
+
+		if (type_ == VALUE_TYPE_INT32) {
+			return int32_;
 		}
 		if (type_ == VALUE_TYPE_UINT32) {
 			return (int32_t)uint32_;
 		}
+
 		if (type_ == VALUE_TYPE_INT64) {
 			return (int32_t)int64_;
 		}
 		if (type_ == VALUE_TYPE_UINT64) {
 			return (int32_t)uint64_;
 		}
+
 		if (type_ == VALUE_TYPE_STRING_REF) {
 			return (int64_t)atoi(refString_.str);
 		}
+
 		return 0;
 	}
 
@@ -471,26 +551,46 @@ struct Value {
 		if (type_ == VALUE_TYPE_FLOAT) {
 			return (int64_t)float_;
 		}
-		if ((type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_INT32) || type_ == VALUE_TYPE_BOOLEAN) {
-			return (int64_t)int32_;
+
+		if (type_ == VALUE_TYPE_INT8) {
+			return int8_;
+		}
+		if (type_ == VALUE_TYPE_UINT8) {
+			return uint8_;
+		}
+
+		if (type_ == VALUE_TYPE_INT16) {
+			return int16_;
+		}
+		if (type_ == VALUE_TYPE_UINT16) {
+			return uint16_;
+		}
+
+		if (type_ == VALUE_TYPE_INT32) {
+			return int32_;
 		}
 		if (type_ == VALUE_TYPE_UINT32) {
-			return (int64_t)uint32_;
+			return uint32_;
 		}
+
 		if (type_ == VALUE_TYPE_INT64) {
-			return (int64_t)int64_;
+			return int64_;
 		}
 		if (type_ == VALUE_TYPE_UINT64) {
 			return (int64_t)uint64_;
 		}
+
 		if (type_ == VALUE_TYPE_STRING_REF) {
 			return (int64_t)atoi(refString_.str);
 		}
+
 		return 0;
 	}
 
 	const char *toString(Assets *assets) const;
-	
+
+	static Value concatenateString(const char *str1, const char *str2);
+
 	//////////
 
     bool isPico() const;
