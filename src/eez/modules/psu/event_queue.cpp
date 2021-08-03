@@ -999,6 +999,7 @@ void data_event_queue_event_long_message_overlay(DataOperationEnum operation, co
 				auto &overlayYOffset = (overlay.visibility & OVERLAY_MINIMIZED) != 0 ? overlay.yOffsetMinimized : overlay.yOffsetMaximized;
 				overlayYOffset = y;
 
+				overlay.x = 0;
 				overlay.y = overlayYOffset;
                 overlay.width = widgetCursor.widget->w;
                 overlay.height = height;

@@ -37,12 +37,10 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 	}
 
 	if (a.isAnyStringType() || b.isAnyStringType()) {
-		const char *aStr = a.toString(stack.assets).getString();
-		const char *bStr = b.toString(stack.assets).getString();
-		if (aStr && bStr) {
-			stack.push(Value::concatenateString(aStr, bStr));
-			return true;
-		}
+		Value value1 = a.toString(stack.assets);
+		Value value2 = b.toString(stack.assets);
+		stack.push(Value::concatenateString(value1.getString(), value2.getString()));
+		return true;
 	}
 
 	if (a.isDouble() || b.isDouble()) {
@@ -180,23 +178,23 @@ bool do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
 	}
 
 	if (a.isInt64()) {
-		stack.push(Value(-a.getInt64(), VALUE_TYPE_INT64));
+		stack.push(Value((int64_t)-a.getInt64(), VALUE_TYPE_INT64));
 		return true;
 	}
 
 	if (a.isInt32()) {
-		stack.push(Value(-a.getInt32(), VALUE_TYPE_INT32));
+		stack.push(Value((int)-a.getInt32(), VALUE_TYPE_INT32));
 		return true;
 	}
 
 	if (a.isInt16()) {
-		stack.push(Value(-a.getInt16(), VALUE_TYPE_INT16));
+		stack.push(Value((int16_t)-a.getInt16(), VALUE_TYPE_INT16));
 		return true;
 	}
 
 
 	if (a.isInt8()) {
-		stack.push(Value(-a.getInt8(), VALUE_TYPE_INT8));
+		stack.push(Value((int8_t)-a.getInt8(), VALUE_TYPE_INT8));
 		return true;
 	}
 

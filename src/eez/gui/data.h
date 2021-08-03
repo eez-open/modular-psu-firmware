@@ -86,12 +86,12 @@ struct PairOfInt16Value {
 
 struct RefString {
 	uint32_t refCounter;
-	char *str;
+	char str[4];
 };
 
 struct Value {
   public:
-    Value() 
+    Value()
         : type_(VALUE_TYPE_UNDEFINED), unit_(UNIT_UNKNOWN), options_(0), pVoid_(0)
     {
     }
@@ -131,7 +131,7 @@ struct Value {
     }
 
     Value(int8_t value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint8_(value)
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), int8_(value)
     {
     }
 
@@ -189,12 +189,12 @@ struct Value {
     {
     }
 
-    Value(void *value, ValueType type) 
+    Value(void *value, ValueType type)
         : type_(type), unit_(UNIT_UNKNOWN), options_(0), pVoid_(value)
     {
     }
 
-    Value(AppContext *appContext) 
+    Value(AppContext *appContext)
         : type_(VALUE_TYPE_POINTER), unit_(UNIT_UNKNOWN), options_(0), pVoid_(appContext)
     {
     }
@@ -212,17 +212,8 @@ struct Value {
 
 	~Value() {
 		if (type_ == VALUE_TYPE_STRING_REF) {
-			if (--refString_.refCounter == 0) {
-#ifndef _MSC_VER
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
-				if (refString_.str) {
-#ifndef _MSC_VER
-#pragma GCC diagnostic pop
-#endif
-					free((char *)refString_.str);
-				}
+			if (--refString_->refCounter == 0) {
+				free(refString_);
 			}
 		}
 	}
@@ -233,7 +224,7 @@ struct Value {
 		options_ = value.options_;
 		int64_ = value.int64_;
 		if (type_ == VALUE_TYPE_STRING_REF) {
-			refString_.refCounter++;
+			refString_->refCounter++;
 		}
 
         return *this;
@@ -339,7 +330,7 @@ struct Value {
 
 	const char *getString() const {
 		if (type_ == VALUE_TYPE_STRING_REF) {
-			return refString_.str;
+			return refString_->str;
 		}
 		return str_;
 	}
@@ -458,7 +449,7 @@ struct Value {
 		}
 
 		if (type_ == VALUE_TYPE_STRING_REF) {
-			return (double)atof(refString_.str);
+			return (double)atof(refString_->str);
 		}
 
 		return NAN;
@@ -503,7 +494,7 @@ struct Value {
 		}
 
 		if (type_ == VALUE_TYPE_STRING_REF) {
-			return (float)atof(refString_.str);
+			return (float)atof(refString_->str);
 		}
 
 		return NAN;
@@ -547,7 +538,7 @@ struct Value {
 		}
 
 		if (type_ == VALUE_TYPE_STRING_REF) {
-			return (int64_t)atoi(refString_.str);
+			return (int64_t)atoi(refString_->str);
 		}
 
 		return 0;
@@ -590,7 +581,7 @@ struct Value {
 		}
 
 		if (type_ == VALUE_TYPE_STRING_REF) {
-			return (int64_t)atoi(refString_.str);
+			return (int64_t)atoi(refString_->str);
 		}
 
 		return 0;
@@ -637,7 +628,7 @@ struct Value {
 		float float_;
 
 		const char *str_;
-		RefString refString_;
+		RefString *refString_;
         uint32_t assetsString_;
 
 		uint8_t *puint8_;

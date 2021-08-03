@@ -70,21 +70,19 @@
       {
         "name": "channels",
         "description": "list of installed channels",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}, {}, {}, {}, {}]"
       },
       {
         "name": "channel_status",
         "description": "0: not installed\n1: installed and ok\n2: installed and error",
-        "type": "enum",
-        "enum": "Channel_status",
+        "type": "enum:Channel_status",
         "defaultValue": "1"
       },
       {
         "name": "channel_output_state",
         "description": "0: output is off\n1: output is on",
-        "type": "enum",
-        "enum": "Channel_output_state",
+        "type": "enum:Channel_output_state",
         "defaultValue": 1
       },
       {
@@ -220,28 +218,24 @@
       {
         "name": "channels_view_mode",
         "description": "0: Default (Voltage / Current)\n1: Horizontal bar graph\n2: Vertical bar graph\n3: YT",
-        "type": "enum",
-        "enum": "Channels_view_mode",
+        "type": "enum:Channels_view_mode",
         "defaultValue": "0"
       },
       {
         "name": "channels_view_mode_in_default",
         "description": "",
-        "type": "enum",
-        "enum": "Channels_view_mode_in_default",
+        "type": "enum:Channels_view_mode_in_default",
         "defaultValue": "0"
       },
       {
         "name": "channels_view_mode_in_max",
         "description": "",
-        "type": "enum",
-        "enum": "Channels_view_mode_in_max",
+        "type": "enum:Channels_view_mode_in_max",
         "defaultValue": "0"
       },
       {
         "name": "slot_view_type",
-        "type": "enum",
-        "enum": "Slot_view_type",
+        "type": "enum:Slot_view_type",
         "defaultValue": "0"
       },
       {
@@ -278,36 +272,31 @@
       {
         "name": "ovp",
         "description": "scpi: volt:prot:stat? volt:prot:trip?",
-        "type": "enum",
-        "enum": "Ovp",
+        "type": "enum:Ovp",
         "defaultValue": 0
       },
       {
         "name": "ocp",
         "description": "scpi: curr:prot:stat? curr:prot:trip?",
-        "type": "enum",
-        "enum": "Ocp",
+        "type": "enum:Ocp",
         "defaultValue": 0
       },
       {
         "name": "opp",
         "description": "scpi: pow:prot:stat? pow:prot:trip?",
-        "type": "enum",
-        "enum": "Opp",
+        "type": "enum:Opp",
         "defaultValue": "1"
       },
       {
         "name": "otp_ch",
         "description": "scpi: syst:temp:prot:stat? syst:temp:prot:trip?",
-        "type": "enum",
-        "enum": "Otp_ch",
+        "type": "enum:Otp_ch",
         "defaultValue": "2"
       },
       {
         "name": "otp_aux",
         "description": "",
-        "type": "enum",
-        "enum": "Otp_aux",
+        "type": "enum:Otp_aux",
         "defaultValue": "1"
       },
       {
@@ -348,8 +337,7 @@
       {
         "name": "edit_mode_interactive_mode_selector",
         "description": "0: interactive mode\n1: non-interactive mode",
-        "type": "enum",
-        "enum": "Edit_mode_interactive_mode_selector",
+        "type": "enum:Edit_mode_interactive_mode_selector",
         "defaultValue": "1"
       },
       {
@@ -365,8 +353,7 @@
       },
       {
         "name": "master_test_result",
-        "type": "enum",
-        "enum": "Master_test_result",
+        "type": "enum:Master_test_result",
         "defaultValue": "2"
       },
       {
@@ -383,8 +370,7 @@
       {
         "name": "keypad_mode",
         "description": "0 - lower case\n1 - upper case",
-        "type": "enum",
-        "enum": "Keypad_mode",
+        "type": "enum:Keypad_mode",
         "defaultValue": "1"
       },
       {
@@ -450,8 +436,7 @@
       {
         "name": "channel_temp_status",
         "description": "0: invalid (error)\n1: valid\n2: not installed",
-        "type": "enum",
-        "enum": "Channel_temp_status",
+        "type": "enum:Channel_temp_status",
         "defaultValue": "1"
       },
       {
@@ -475,15 +460,13 @@
       {
         "name": "channel_calibration_status",
         "description": "0 - not calibrated\n1 - calibrated",
-        "type": "enum",
-        "enum": "Channel_calibration_status",
+        "type": "enum:Channel_calibration_status",
         "defaultValue": "1"
       },
       {
         "name": "channel_calibration_state",
         "description": "0 - not enabled\n1 - enabled",
-        "type": "enum",
-        "enum": "Channel_calibration_state",
+        "type": "enum:Channel_calibration_state",
         "defaultValue": "0"
       },
       {
@@ -499,7 +482,6 @@
       {
         "name": "channel_protection_status",
         "type": "boolean",
-        "enum": "Channel_protection_status",
         "defaultValue": "1"
       },
       {
@@ -524,14 +506,12 @@
       },
       {
         "name": "channel_protection_ovp_state",
-        "type": "enum",
-        "enum": "Channel_protection_ovp_state",
+        "type": "enum:Channel_protection_ovp_state",
         "defaultValue": "1"
       },
       {
         "name": "channel_protection_ovp_type",
-        "type": "enum",
-        "enum": "Channel_protection_ovp_type",
+        "type": "enum:Channel_protection_ovp_type",
         "defaultValue": "0"
       },
       {
@@ -551,8 +531,7 @@
       },
       {
         "name": "channel_protection_ocp_state",
-        "type": "enum",
-        "enum": "Channel_protection_ocp_state",
+        "type": "enum:Channel_protection_ocp_state",
         "defaultValue": "1"
       },
       {
@@ -568,14 +547,12 @@
       {
         "name": "channel_protection_ocp_max_current_limit_cause",
         "description": "0: no cause\n1: fan\n2: temperature",
-        "type": "enum",
-        "enum": "Channel_protection_ocp_max_current_limit_cause",
+        "type": "enum:Channel_protection_ocp_max_current_limit_cause",
         "defaultValue": "1"
       },
       {
         "name": "channel_protection_opp_state",
-        "type": "enum",
-        "enum": "Channel_protection_opp_state",
+        "type": "enum:Channel_protection_opp_state",
         "defaultValue": "0"
       },
       {
@@ -595,14 +572,12 @@
       },
       {
         "name": "channel_protection_otp_installed",
-        "type": "enum",
-        "enum": "Channel_protection_otp_installed",
+        "type": "enum:Channel_protection_otp_installed",
         "defaultValue": "1"
       },
       {
         "name": "channel_protection_otp_state",
-        "type": "enum",
-        "enum": "Channel_protection_otp_state",
+        "type": "enum:Channel_protection_otp_state",
         "defaultValue": "1"
       },
       {
@@ -617,21 +592,19 @@
       {
         "name": "event_queue_last_event_type",
         "description": "0: none\n1: info\n2: warning\n3: error",
-        "type": "enum",
-        "enum": "Event_queue_last_event_type",
+        "type": "enum:Event_queue_last_event_type",
         "defaultValue": "3"
       },
       {
         "name": "event_queue_events",
         "description": "list of events in event queue",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}, {}, {}, {}, {}, {}, {}]"
       },
       {
         "name": "event_queue_event_type",
         "description": "",
-        "type": "enum",
-        "enum": "Event_queue_event_type",
+        "type": "enum:Event_queue_event_type",
         "defaultValue": "3"
       },
       {
@@ -646,22 +619,19 @@
       },
       {
         "name": "channel_rsense_status",
-        "type": "enum",
-        "enum": "Channel_rsense_status",
+        "type": "enum:Channel_rsense_status",
         "defaultValue": "0"
       },
       {
         "name": "channel_rprog_installed",
         "description": "",
-        "type": "enum",
-        "enum": "Channel_rprog_installed",
+        "type": "enum:Channel_rprog_installed",
         "defaultValue": "1"
       },
       {
         "name": "channel_rprog_status",
         "description": "",
-        "type": "enum",
-        "enum": "Channel_rprog_status",
+        "type": "enum:Channel_rprog_status",
         "defaultValue": "0"
       },
       {
@@ -685,8 +655,7 @@
       {
         "name": "coupling_type",
         "description": "",
-        "type": "enum",
-        "enum": "Coupling_type",
+        "type": "enum:Coupling_type",
         "defaultValue": "1"
       },
       {
@@ -709,14 +678,12 @@
       {
         "name": "sys_temp_aux_status",
         "description": "0: invalid (error)\n1: valid\n2: not installed",
-        "type": "enum",
-        "enum": "Sys_temp_aux_status",
+        "type": "enum:Sys_temp_aux_status",
         "defaultValue": "1"
       },
       {
         "name": "sys_temp_aux_otp_state",
-        "type": "enum",
-        "enum": "Sys_temp_aux_otp_state",
+        "type": "enum:Sys_temp_aux_otp_state",
         "defaultValue": "1"
       },
       {
@@ -761,8 +728,7 @@
       {
         "name": "sys_info_fan_status",
         "description": "",
-        "type": "enum",
-        "enum": "Sys_info_fan_status",
+        "type": "enum:Sys_info_fan_status",
         "defaultValue": "1"
       },
       {
@@ -829,8 +795,7 @@
       },
       {
         "name": "date_time_dst",
-        "type": "enum",
-        "enum": "Date_time_dst",
+        "type": "enum:Date_time_dst",
         "defaultValue": "Europe"
       },
       {
@@ -840,14 +805,13 @@
       },
       {
         "name": "profiles_list",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]"
       },
       {
         "name": "profiles_auto_recall_status",
         "description": "0: disabled\n1: enabled",
-        "type": "enum",
-        "enum": "Profiles_auto_recall_status",
+        "type": "enum:Profiles_auto_recall_status",
         "defaultValue": "1"
       },
       {
@@ -858,8 +822,7 @@
       {
         "name": "profile_status",
         "description": "",
-        "type": "enum",
-        "enum": "Profile_status",
+        "type": "enum:Profile_status",
         "defaultValue": "1"
       },
       {
@@ -875,8 +838,7 @@
       {
         "name": "profile_is_auto_recall_location",
         "description": "0 - no\n1 - yes",
-        "type": "enum",
-        "enum": "Profile_is_auto_recall_location",
+        "type": "enum:Profile_is_auto_recall_location",
         "defaultValue": "1"
       },
       {
@@ -892,22 +854,19 @@
       {
         "name": "profile_channel_output_state",
         "description": "0: output is off\n1: output is on",
-        "type": "enum",
-        "enum": "Profile_channel_output_state",
+        "type": "enum:Profile_channel_output_state",
         "defaultValue": "1"
       },
       {
         "name": "ethernet_installed",
         "description": "0: not installed\n1: installed",
-        "type": "enum",
-        "enum": "Ethernet_installed",
+        "type": "enum:Ethernet_installed",
         "defaultValue": "1"
       },
       {
         "name": "ethernet_enabled",
         "description": "0: disabled\n1: enabled",
-        "type": "enum",
-        "enum": "Ethernet_enabled",
+        "type": "enum:Ethernet_enabled",
         "defaultValue": "1"
       },
       {
@@ -919,22 +878,19 @@
       {
         "name": "ethernet_status",
         "description": "0: failed\n1: ok\n2: skipped\n3: warning",
-        "type": "enum",
-        "enum": "Ethernet_status",
+        "type": "enum:Ethernet_status",
         "defaultValue": "2"
       },
       {
         "name": "ethernet_and_mqtt_status",
         "description": "",
-        "type": "enum",
-        "enum": "Ethernet_and_mqtt_status",
+        "type": "enum:Ethernet_and_mqtt_status",
         "defaultValue": "2"
       },
       {
         "name": "mqtt_connection_state",
         "description": "",
-        "type": "enum",
-        "enum": "Mqtt_connection_state",
+        "type": "enum:Mqtt_connection_state",
         "defaultValue": "2"
       },
       {
@@ -1005,8 +961,7 @@
       },
       {
         "name": "sys_rl_state",
-        "type": "enum",
-        "enum": "Sys_rl_state",
+        "type": "enum:Sys_rl_state",
         "defaultValue": "1"
       },
       {
@@ -1021,26 +976,22 @@
       },
       {
         "name": "sys_sound_enabled",
-        "type": "enum",
-        "enum": "Sys_sound_enabled",
+        "type": "enum:Sys_sound_enabled",
         "defaultValue": "1"
       },
       {
         "name": "channel_display_view_settings_display_values",
-        "type": "list",
-        "enum": "Channel_display_view_settings_display_values",
+        "type": "array",
         "defaultValue": "[{}, {}]"
       },
       {
         "name": "channel_display_view_settings_display_value_label",
         "type": "string",
-        "enum": "Channel_display_view_settings_display_value_label",
         "defaultValue": "Display value #1:"
       },
       {
         "name": "channel_display_view_settings_display_value",
-        "type": "enum",
-        "enum": "Channel_display_view_settings_display_value",
+        "type": "enum:Channel_display_view_settings_display_value",
         "defaultValue": "Voltage (V)"
       },
       {
@@ -1085,8 +1036,7 @@
       {
         "name": "sys_encoder_installed",
         "description": "0: not installed\n1: installed",
-        "type": "enum",
-        "enum": "Sys_encoder_installed",
+        "type": "enum:Sys_encoder_installed",
         "defaultValue": "1"
       },
       {
@@ -1101,14 +1051,12 @@
       },
       {
         "name": "channel_trigger_mode",
-        "type": "enum",
-        "enum": "Channel_trigger_mode",
+        "type": "enum:Channel_trigger_mode",
         "defaultValue": "Function generator"
       },
       {
         "name": "channel_trigger_on_list_stop",
-        "type": "enum",
-        "enum": "Channel_trigger_on_list_stop",
+        "type": "enum:Channel_trigger_on_list_stop",
         "defaultValue": "Output OFF"
       },
       {
@@ -1132,12 +1080,12 @@
       },
       {
         "name": "channel_lists",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}, {}, {}, {}]"
       },
       {
         "name": "ramp_and_delay_list",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}, {}, {}]"
       },
       {
@@ -1217,20 +1165,17 @@
       },
       {
         "name": "channel_coupling_state",
-        "type": "enum",
-        "enum": "Channel_coupling_state",
+        "type": "enum:Channel_coupling_state",
         "defaultValue": "0"
       },
       {
         "name": "trigger_source",
-        "type": "enum",
-        "enum": "Trigger_source",
+        "type": "enum:Trigger_source",
         "defaultValue": "Immediate"
       },
       {
         "name": "dlog_trigger_source",
-        "type": "enum",
-        "enum": "Dlog_trigger_source",
+        "type": "enum:Dlog_trigger_source",
         "defaultValue": "Immediate"
       },
       {
@@ -1250,8 +1195,7 @@
       },
       {
         "name": "trigger_state",
-        "type": "enum",
-        "enum": "Trigger_state",
+        "type": "enum:Trigger_state",
         "defaultValue": "1"
       },
       {
@@ -1271,8 +1215,7 @@
       },
       {
         "name": "channel_ranges_mode",
-        "type": "enum",
-        "enum": "Channel_ranges_mode",
+        "type": "enum:Channel_ranges_mode",
         "defaultValue": "Best"
       },
       {
@@ -1293,8 +1236,7 @@
       {
         "name": "serial_status",
         "description": "0: failed\n1: ok\n2: skipped\n3: warning",
-        "type": "enum",
-        "enum": "Serial_status",
+        "type": "enum:Serial_status",
         "defaultValue": "2"
       },
       {
@@ -1315,13 +1257,12 @@
       {
         "name": "io_pins",
         "description": "",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[\n    {\"io_pin_label\": \"#1 Din1\"}, \n    {\"io_pin_label\": \"#2 Din2\"}, \n    {\"io_pin_label\": \"#3 Dout1\"}, \n    {\"io_pin_label\": \"#4 Dout2\"}\n]"
       },
       {
         "name": "io_pins_inhibit_state",
-        "type": "enum",
-        "enum": "Io_pins_inhibit_state",
+        "type": "enum:Io_pins_inhibit_state",
         "defaultValue": "1"
       },
       {
@@ -1386,8 +1327,7 @@
       },
       {
         "name": "touch_calibration_point",
-        "type": "enum",
-        "enum": "Touch_calibration_point",
+        "type": "enum:Touch_calibration_point",
         "defaultValue": "0"
       },
       {
@@ -1426,8 +1366,7 @@
       },
       {
         "name": "slot_test_result",
-        "type": "enum",
-        "enum": "Slot_test_result",
+        "type": "enum:Slot_test_result",
         "defaultValue": "2"
       },
       {
@@ -1472,14 +1411,12 @@
       },
       {
         "name": "io_pin_state",
-        "type": "enum",
-        "enum": "Io_pin_state",
+        "type": "enum:Io_pin_state",
         "defaultValue": "3"
       },
       {
         "name": "channel_dprog",
-        "type": "enum",
-        "enum": "Channel_dprog",
+        "type": "enum:Channel_dprog",
         "defaultValue": "0"
       },
       {
@@ -1489,8 +1426,7 @@
       },
       {
         "name": "sys_info_sdcard_status",
-        "type": "enum",
-        "enum": "Sys_info_sdcard_status",
+        "type": "enum:Sys_info_sdcard_status",
         "defaultValue": "1"
       },
       {
@@ -1505,20 +1441,17 @@
       },
       {
         "name": "sys_info_battery_status",
-        "type": "enum",
-        "enum": "Sys_info_battery_status",
+        "type": "enum:Sys_info_battery_status",
         "defaultValue": "1"
       },
       {
         "name": "sys_fan_mode",
-        "type": "enum",
-        "enum": "Sys_fan_mode",
+        "type": "enum:Sys_fan_mode",
         "defaultValue": "1"
       },
       {
         "name": "sys_fan_speed",
         "type": "string",
-        "enum": "Sys_fan_speed",
         "defaultValue": "95%"
       },
       {
@@ -1563,8 +1496,7 @@
       },
       {
         "name": "channel_active_coupled_led",
-        "type": "enum",
-        "enum": "Channel_active_coupled_led",
+        "type": "enum:Channel_active_coupled_led",
         "defaultValue": "1"
       },
       {
@@ -1583,30 +1515,28 @@
       {
         "name": "channels_with_list_counter_visible",
         "description": "",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}]"
       },
       {
         "name": "channels_with_ramp_counter_visible",
         "description": "",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}]"
       },
       {
         "name": "dlog_state",
-        "type": "enum",
-        "enum": "Dlog_state",
+        "type": "enum:Dlog_state",
         "defaultValue": "2"
       },
       {
         "name": "dlog_toggle_state",
-        "type": "enum",
-        "enum": "Dlog_toggle_state",
+        "type": "enum:Dlog_toggle_state",
         "defaultValue": "2"
       },
       {
         "name": "recording",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[100, 25, 20]"
       },
       {
@@ -1628,7 +1558,7 @@
       },
       {
         "name": "dlog_visible_values",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}]"
       },
       {
@@ -1691,8 +1621,7 @@
       },
       {
         "name": "dlog_view_state",
-        "type": "enum",
-        "enum": "Dlog_view_state",
+        "type": "enum:Dlog_view_state",
         "defaultValue": "3"
       },
       {
@@ -1722,7 +1651,7 @@
       },
       {
         "name": "file_manager_files",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}, {}, {}, {}, {}]"
       },
       {
@@ -1746,8 +1675,7 @@
       },
       {
         "name": "file_manager_state",
-        "type": "enum",
-        "enum": "File_manager_state",
+        "type": "enum:File_manager_state",
         "defaultValue": "2"
       },
       {
@@ -1762,8 +1690,7 @@
       },
       {
         "name": "file_manager_file_type",
-        "type": "enum",
-        "enum": "File_manager_file_type",
+        "type": "enum:File_manager_file_type",
         "defaultValue": "0"
       },
       {
@@ -1947,8 +1874,7 @@
       },
       {
         "name": "file_manager_sort_files_option",
-        "type": "enum",
-        "enum": "File_manager_sort_files_option",
+        "type": "enum:File_manager_sort_files_option",
         "defaultValue": "0"
       },
       {
@@ -1963,8 +1889,7 @@
       },
       {
         "name": "file_manager_list_view",
-        "type": "enum",
-        "enum": "File_manager_list_view",
+        "type": "enum:File_manager_list_view",
         "defaultValue": "0"
       },
       {
@@ -2049,8 +1974,7 @@
       },
       {
         "name": "file_manager_image_open_state",
-        "type": "enum",
-        "enum": "File_manager_image_open_state",
+        "type": "enum:File_manager_image_open_state",
         "defaultValue": "1"
       },
       {
@@ -2070,8 +1994,7 @@
       },
       {
         "name": "io_pin_function",
-        "type": "enum",
-        "enum": "Io_pin_function",
+        "type": "enum:Io_pin_function",
         "defaultValue": "1"
       },
       {
@@ -2121,8 +2044,7 @@
       },
       {
         "name": "dlog_view_legend_view_option",
-        "type": "enum",
-        "enum": "Dlog_view_legend_view_option",
+        "type": "enum:Dlog_view_legend_view_option",
         "defaultValue": "1"
       },
       {
@@ -2135,8 +2057,7 @@
       },
       {
         "name": "channel_calibration_value_type",
-        "type": "enum",
-        "enum": "Channel_calibration_value_type",
+        "type": "enum:Channel_calibration_value_type",
         "defaultValue": "Current [0 - 50 mA]"
       },
       {
@@ -2166,7 +2087,7 @@
       },
       {
         "name": "channel_calibration_chart",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[]"
       },
       {
@@ -2181,7 +2102,7 @@
       },
       {
         "name": "slots",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}, {}]"
       },
       {
@@ -2216,20 +2137,17 @@
       },
       {
         "name": "usb_mode",
-        "type": "enum",
-        "enum": "Usb_mode",
+        "type": "enum:Usb_mode",
         "defaultValue": "1"
       },
       {
         "name": "usb_current_mode",
-        "type": "enum",
-        "enum": "Usb_current_mode",
+        "type": "enum:Usb_current_mode",
         "defaultValue": "1"
       },
       {
         "name": "usb_device_class",
-        "type": "enum",
-        "enum": "Usb_device_class",
+        "type": "enum:Usb_device_class",
         "defaultValue": "0"
       },
       {
@@ -2244,8 +2162,7 @@
       },
       {
         "name": "display_test_color_index",
-        "type": "enum",
-        "enum": "Display_test_color_index",
+        "type": "enum:Display_test_color_index",
         "defaultValue": "0"
       },
       {
@@ -2328,7 +2245,7 @@
       },
       {
         "name": "colors",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[\n  {}, {}, {}, {}, {}, {},\n  {}, {}, {}, {}, {}, {},\n  {}, {}, {}, {}, {}, {},\n  {}, {}, {}, {}, {}, {}\n]"
       },
       {
@@ -2353,7 +2270,7 @@
       },
       {
         "name": "dlog_items",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[]"
       },
       {
@@ -2364,7 +2281,6 @@
       {
         "name": "dlog_item_is_checked",
         "type": "boolean",
-        "enum": "Dlog_item_is_checked",
         "defaultValue": "1"
       },
       {
@@ -2437,8 +2353,7 @@
       },
       {
         "name": "selected_mcu_revision",
-        "type": "enum",
-        "enum": "Selected_mcu_revision",
+        "type": "enum:Selected_mcu_revision",
         "defaultValue": "0"
       },
       {
@@ -2466,13 +2381,12 @@
       },
       {
         "name": "dlog_view_selected_tab",
-        "type": "enum",
-        "enum": "Dlog_view_selected_tab",
+        "type": "enum:Dlog_view_selected_tab",
         "defaultValue": "0"
       },
       {
         "name": "dlog_bookmarks",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[\n  { \"dlog_bookmark_x_value\": \"1 s\", \"dlog_bookmark_text\": \"Bookmark 1\" },\n  { \"dlog_bookmark_x_value\": \"2 s\", \"dlog_bookmark_text\": \"Bookmark 2\" },\n  { \"dlog_bookmark_x_value\": \"3 s\", \"dlog_bookmark_text\": \"Bookmark 3\" },\n  { \"dlog_bookmark_x_value\": \"4 s\", \"dlog_bookmark_text\": \"Bookmark 4\" },\n  { \"dlog_bookmark_x_value\": \"5 s\", \"dlog_bookmark_text\": \"Bookmark 5\" },\n  { \"dlog_bookmark_x_value\": \"6 s\", \"dlog_bookmark_text\": \"Bookmark 6\" },\n  { \"dlog_bookmark_x_value\": \"7 s\", \"dlog_bookmark_text\": \"Bookmark 7\" },\n  { \"dlog_bookmark_x_value\": \"8 s\", \"dlog_bookmark_text\": \"Bookmark 8\" }\n]"
       },
       {
@@ -2517,7 +2431,7 @@
       },
       {
         "name": "dlog_y_values",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[\n  { \"dlog_y_value_label\": \"DCP405 #1 U\", \"dlog_y_value_is_checked\": 1 },\n  { \"dlog_y_value_label\": \"DCP405 #1 I\", \"dlog_y_value_is_checked\": 1 },\n  { \"dlog_y_value_label\": \"DCP405 #2 U\", \"dlog_y_value_is_checked\": 0 },\n  { \"dlog_y_value_label\": \"DCP405 #2 I\", \"dlog_y_value_is_checked\": 0 },\n  { \"dlog_y_value_label\": \"DCP224 #3 U\", \"dlog_y_value_is_checked\": 1 }\n]"
       },
       {
@@ -2554,13 +2468,12 @@
       },
       {
         "name": "function_generator_channels",
-        "type": "list",
+        "type": "array",
         "defaultValue": "[{}, {}, {}, {}]"
       },
       {
         "name": "function_generator_any_channel_selected",
         "type": "boolean",
-        "enum": "Function_generator_any_channel_selected",
         "defaultValue": "1"
       },
       {
@@ -2581,13 +2494,11 @@
       {
         "name": "function_generator_item_is_checked",
         "type": "boolean",
-        "enum": "Function_generator_item_is_checked",
         "defaultValue": "1"
       },
       {
         "name": "function_generator_is_max_selected",
         "type": "boolean",
-        "enum": "Function_generator_is_max_selected",
         "defaultValue": "1"
       },
       {
@@ -2598,19 +2509,16 @@
       {
         "name": "function_generator_item_is_selected",
         "type": "boolean",
-        "enum": "Function_generator_item_is_selected",
         "defaultValue": "0"
       },
       {
         "name": "function_generator_waveform",
-        "type": "enum",
-        "enum": "Function_generator_waveform",
+        "type": "enum:Function_generator_waveform",
         "defaultValue": "Sine wave"
       },
       {
         "name": "function_generator_waveform_label",
         "type": "string",
-        "enum": "Function_generator_waveform_label",
         "defaultValue": "Sine wave"
       },
       {
@@ -13401,7 +13309,7 @@
           "type": "Container",
           "left": 0,
           "top": 0,
-          "width": 406,
+          "width": 396,
           "height": 109,
           "wireID": "711e038a-0e11-4660-b9d3-051c3f693095",
           "customInputs": [],
@@ -13414,7 +13322,7 @@
               "type": "MultilineText",
               "left": 0,
               "top": 0,
-              "width": 406,
+              "width": 396,
               "height": 109,
               "wireID": "62a0e690-04d2-4919-c3c9-0b901e17115e",
               "customInputs": [],

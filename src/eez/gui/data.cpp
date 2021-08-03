@@ -817,15 +817,18 @@ Value Value::toString(Assets *assets) const {
 Value Value::makeStringRef(const char *str, size_t len) {
     Value value;
 
-    auto newStr = (char *)alloc(len + 1);
-    stringCopyLength(newStr, len + 1, str, len);
+    auto refString = (RefString *)alloc(sizeof(RefString) + MAX(len + 1 - 4, 0));
+
+    stringCopyLength(refString->str, len + 1, str, len);
+	refString->str[len] = 0;
+
+    refString->refCounter = 1;
 
     value.type_ = VALUE_TYPE_STRING_REF;
     value.unit_ = 0;
     value.options_ = 0;
     value.reserved_ = 0;
-    value.refString_.refCounter = 1;
-    value.refString_.str = newStr;
+    value.refString_ = refString;
 
 	return value;
 }
@@ -834,16 +837,19 @@ Value Value::concatenateString(const char *str1, const char *str2) {
     Value value;
 
     auto newStrLen = strlen(str1) + strlen(str2) + 1;
-    auto newStr = (char *)alloc(newStrLen);
-    stringCopy(newStr, newStrLen, str1);
-    stringAppendString(newStr, newStrLen, str2);
+    
+    auto refString = (RefString *)alloc(sizeof(RefString) + MAX(newStrLen - 4, 0));
+    
+    stringCopy(refString->str, newStrLen, str1);
+    stringAppendString(refString->str, newStrLen, str2);
+
+    refString->refCounter = 1;
 
     value.type_ = VALUE_TYPE_STRING_REF;
     value.unit_ = 0;
     value.options_ = 0;
     value.reserved_ = 0;
-    value.refString_.refCounter = 1;
-    value.refString_.str = newStr;
+    value.refString_ = refString;
 
 	return value;
 }

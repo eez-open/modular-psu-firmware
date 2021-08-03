@@ -137,7 +137,10 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 			int err;
 			if (!scripting::getLatestScpiResult(&resultText, &resultTextLen, &err)) {
 				char errorMessage[300];
-				snprintf(errorMessage, sizeof(errorMessage), "scpi component error: '%s', %s\n", scpiComponentExecutionState->commandOrQueryText, SCPI_ErrorTranslate(err));
+				snprintf(errorMessage, sizeof(errorMessage), "SCPI '%s': %s",
+					SCPI_ErrorTranslate(err),
+					scpiComponentExecutionState->commandOrQueryText
+				);
 				throwError(errorMessage);
 				return;
 			}
