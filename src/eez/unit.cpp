@@ -105,7 +105,7 @@ static const int g_scpiUnits[] = {
 
 Unit getUnitFromName(const char *unitName) {
 	if (unitName) {
-		for (int i = 0; i < sizeof(g_unitNames) / sizeof(const char *); i++) {
+		for (unsigned i = 0; i < sizeof(g_unitNames) / sizeof(const char *); i++) {
 			if (strcmp(g_unitNames[i], unitName) == 0) {
 				return (Unit)i;
 			}

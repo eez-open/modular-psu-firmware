@@ -36,6 +36,15 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 		b = *b.pValue_;
 	}
 
+	if (a.isAnyStringType() || b.isAnyStringType()) {
+		const char *aStr = a.toString(stack.assets).getString();
+		const char *bStr = b.toString(stack.assets).getString();
+		if (aStr && bStr) {
+			stack.push(Value::concatenateString(aStr, bStr));
+			return true;
+		}
+	}
+
 	if (a.isDouble() || b.isDouble()) {
 		stack.push(Value(a.toDouble() + b.toDouble(), VALUE_TYPE_DOUBLE));
 		return true;
@@ -54,14 +63,6 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 	if (a.isInt32OrLess() && b.isInt32OrLess()) {
 		stack.push(Value(a.int32_ + b.int32_, VALUE_TYPE_INT32));
 		return true;
-	}
-
-	if (a.isAnyStringType() && b.isAnyStringType()) {
-		const char *aStr = a.toString(stack.assets);
-		const char *bStr = b.toString(stack.assets);
-		if (aStr && bStr) {
-			stack.push(Value::concatenateString(aStr, bStr));
-		}
 	}
 
 	return false;
@@ -238,8 +239,8 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 		b = *b.pValue_;
 	}
 
-	const char *aStr = a.toString(stack.assets);
-	const char *bStr = b.toString(stack.assets);
+	const char *aStr = a.toString(stack.assets).getString();
+	const char *bStr = b.toString(stack.assets).getString();
 	if (!aStr || !bStr) {
 		stack.push(Value(-1, VALUE_TYPE_INT32));
 	} else {

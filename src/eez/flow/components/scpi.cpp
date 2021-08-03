@@ -136,7 +136,7 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 			size_t resultTextLen;
 			int err;
 			if (!scripting::getLatestScpiResult(&resultText, &resultTextLen, &err)) {
-				char errorMessage[256];
+				char errorMessage[300];
 				snprintf(errorMessage, sizeof(errorMessage), "scpi component error: '%s', %s\n", scpiComponentExecutionState->commandOrQueryText, SCPI_ErrorTranslate(err));
 				throwError(errorMessage);
 				return;
@@ -152,7 +152,7 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 
-			Value srcValue(resultText, resultTextLen);
+			Value srcValue = Value::makeStringRef(resultText, resultTextLen);
 
 			assignValue(assets, flowState, component, dstValue, srcValue);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY) {

@@ -34,7 +34,7 @@ namespace flow {
 
 void executeSwitchComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
 	struct SwitchTest {
-        uint16_t outputIndex;
+        uint8_t outputIndex;
 		uint8_t conditionInstructions[1];
 	};
 

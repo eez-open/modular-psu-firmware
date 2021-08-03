@@ -215,6 +215,7 @@ struct PropertyValue {
 struct Connection {
 	uint16_t targetComponentIndex;
 	uint8_t targetInputIndex;
+	uint8_t seqIn;
 };
 
 struct ComponentOutput {

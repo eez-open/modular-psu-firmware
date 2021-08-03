@@ -21,6 +21,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include <eez/util.h>
 
@@ -767,15 +768,66 @@ bool Value::isMega() const {
 
 }
 
-const char *Value::toString(Assets *assets) const {
-	if (type_ == VALUE_TYPE_STRING) {
-		return str_;
-	} else if (type_ == VALUE_TYPE_STRING_REF) {
-		return refString_.str;
-	} else if (type_ == VALUE_TYPE_ASSETS_STRING) {
-		return ((AssetsPtr<const char> *)&assetsString_)->ptr(assets);
+Value Value::toString(Assets *assets) const {
+	if (type_ == VALUE_TYPE_STRING || type_ == VALUE_TYPE_STRING_REF) {
+		return *this;
 	}
-	return nullptr;
+	
+	if (type_ == VALUE_TYPE_ASSETS_STRING) {
+		return Value(((AssetsPtr<const char> *)&assetsString_)->ptr(assets));
+	}
+
+    char tempStr[64];
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4474)
+#endif
+
+    if (type_ == VALUE_TYPE_DOUBLE) {
+        snprintf(tempStr, sizeof(tempStr), "%g", double_);
+    } else if (type_ == VALUE_TYPE_FLOAT) {
+        snprintf(tempStr, sizeof(tempStr), "%g", float_);
+    } else if (type_ == VALUE_TYPE_INT8) {
+        snprintf(tempStr, sizeof(tempStr), PRId8, int8_);
+    } else if (type_ == VALUE_TYPE_UINT8) {
+        snprintf(tempStr, sizeof(tempStr), PRIu8, uint8_);
+    } else if (type_ == VALUE_TYPE_INT16) {
+        snprintf(tempStr, sizeof(tempStr), PRId16, int16_);
+    } else if (type_ == VALUE_TYPE_UINT16) {
+        snprintf(tempStr, sizeof(tempStr), PRIu16, uint16_);
+    } else if (type_ == VALUE_TYPE_INT32) {
+        snprintf(tempStr, sizeof(tempStr), PRId32, int32_);
+    } else if (type_ == VALUE_TYPE_UINT32) {
+        snprintf(tempStr, sizeof(tempStr), PRIu32, uint32_);
+    } else if (type_ == VALUE_TYPE_INT64) {
+        snprintf(tempStr, sizeof(tempStr), PRId64, int64_);
+    } else if (type_ == VALUE_TYPE_UINT64) {
+        snprintf(tempStr, sizeof(tempStr), PRIu64, uint64_);
+    }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+	return makeStringRef(tempStr, strlen(tempStr));
+
+}
+
+Value Value::makeStringRef(const char *str, size_t len) {
+    Value value;
+
+    auto newStr = (char *)alloc(len + 1);
+    stringCopyLength(newStr, len + 1, str, len);
+
+    value.type_ = VALUE_TYPE_STRING_REF;
+    value.unit_ = 0;
+    value.options_ = 0;
+    value.reserved_ = 0;
+    value.refString_.refCounter = 1;
+    value.refString_.str = newStr;
+
+	return value;
 }
 
 Value Value::concatenateString(const char *str1, const char *str2) {
@@ -790,7 +842,6 @@ Value Value::concatenateString(const char *str1, const char *str2) {
     value.unit_ = 0;
     value.options_ = 0;
     value.reserved_ = 0;
-
     value.refString_.refCounter = 1;
     value.refString_.str = newStr;
 

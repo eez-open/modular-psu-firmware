@@ -1509,7 +1509,7 @@ uint32_t g_focusEditValueChangedTime;
 
 static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
     auto action = getWidgetAction(widgetCursor);        
-    return g_psuAppContext.isWidgetActionEnabled(widgetCursor) && (action == ACTION_ID_EDIT || action == ACTION_ID_SCROLL) || widgetCursor.widget->type == WIDGET_TYPE_INPUT;
+    return (g_psuAppContext.isWidgetActionEnabled(widgetCursor) && (action == ACTION_ID_EDIT || action == ACTION_ID_SCROLL)) || widgetCursor.widget->type == WIDGET_TYPE_INPUT;
 }
 
 static bool g_focusCursorIsEnabled;

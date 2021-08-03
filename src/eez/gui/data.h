@@ -106,16 +106,6 @@ struct Value {
     {
     }
 
-	Value(const char *str, size_t len)
-		: type_(VALUE_TYPE_STRING_REF), unit_(UNIT_UNKNOWN), options_(0) 
-	{
-		auto newStr = (char *)alloc(len + 1);
-		stringCopyLength(newStr, len + 1, str, len);
-
-		refString_.refCounter = 1;
-		refString_.str = newStr;
-	}
-	
 	Value(int version, const char *str)
         : type_(VALUE_TYPE_VERSIONED_STRING), unit_(version), options_(0), str_(str)
     {
@@ -140,8 +130,18 @@ struct Value {
     {
     }
 
+    Value(int8_t value, ValueType type)
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint8_(value)
+    {
+    }
+
     Value(uint8_t value, ValueType type)
         : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint8_(value)
+    {
+    }
+
+    Value(int16_t value, ValueType type)
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), int16_(value)
     {
     }
 
@@ -152,6 +152,16 @@ struct Value {
 
     Value(uint32_t value, ValueType type)
         : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint32_(value)
+    {
+    }
+
+    Value(int64_t value, ValueType type)
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), int64_(value)
+    {
+    }
+
+    Value(uint64_t value, ValueType type)
+        : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint64_(value)
     {
     }
 
@@ -174,10 +184,6 @@ struct Value {
 		: type_(type), unit_(UNIT_UNKNOWN), options_(0), double_(value) {
 	}
 	
-	Value(int64_t value, ValueType type)
-		: type_(type), unit_(UNIT_UNKNOWN), options_(0), int64_(value) {
-	}
-
 	Value(const char *value, ValueType type, int16_t options)
         : type_(type), unit_(UNIT_UNKNOWN), options_(options), str_(value)
     {
@@ -275,11 +281,11 @@ struct Value {
 		return type_ == VALUE_TYPE_BOOLEAN;
 	}
 
-	bool isString() {
+	bool isString() const {
         return type_ == VALUE_TYPE_STRING;
     }
 
-	bool isAnyStringType() {
+	bool isAnyStringType() const {
         return type_ == VALUE_TYPE_STRING || type_ == VALUE_TYPE_STRING_REF || type_ == VALUE_TYPE_ASSETS_STRING;
     }
 
@@ -332,6 +338,9 @@ struct Value {
 	}
 
 	const char *getString() const {
+		if (type_ == VALUE_TYPE_STRING_REF) {
+			return refString_.str;
+		}
 		return str_;
 	}
 
@@ -587,8 +596,10 @@ struct Value {
 		return 0;
 	}
 
-	const char *toString(Assets *assets) const;
+	Value toString(Assets *assets) const;
 
+	static Value makeStringRef(const char *str, size_t len);
+	
 	static Value concatenateString(const char *str1, const char *str2);
 
 	//////////

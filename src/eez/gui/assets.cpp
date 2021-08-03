@@ -75,7 +75,18 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 	compressedDataOffset = sizeof(Header);
 	decompressedSize = header->decompressedSize;
 
+// disable warning: offsetof within non-standard-layout type ... is conditionally-supported [-Winvalid-offsetof]
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+#endif
+
 	auto decompressedDataOffset = offsetof(Assets, pages);
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
 
 	if (decompressedDataOffset + decompressedSize > maxDecompressedAssetsSize) {
 		if (err) {
@@ -93,7 +104,7 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 		decompressedSize
 	);
 	
-	if (decompressResult != decompressedSize) {
+	if (decompressResult != (int)decompressedSize) {
 		if (err) {
 			*err = SCPI_ERROR_INVALID_BLOCK_DATA;
 		}
@@ -159,7 +170,17 @@ bool loadExternalAssets(const char *filePath, int *err) {
 		return false;
 	}
 
+// disable warning: offsetof within non-standard-layout type ... is conditionally-supported [-Winvalid-offsetof]
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+#endif
+
 	auto decompressedDataOffset = offsetof(Assets, pages);
+
+ #ifdef __GNUC__
+ #pragma GCC diagnostic pop
+ #endif
 
 	size_t externalAssetsSize = decompressedDataOffset + header->decompressedSize;
 	g_externalAssets = (Assets *)alloc(externalAssetsSize);

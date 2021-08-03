@@ -115,15 +115,18 @@ void getSystemDerivedMacAddress(uint8_t *macAddress) {
     uint32_t idw0 = HAL_GetUIDw0();
     uint32_t idw1 = HAL_GetUIDw1();
     uint32_t idw2 = HAL_GetUIDw2();
+
     uint8_t *pIdw0 = (uint8_t *)&idw0;
     uint8_t *pIdw1 = (uint8_t *)&idw1;
     uint8_t *pIdw2 = (uint8_t *)&idw2;
-    macAddress[0] = pIdw0[0] ^ pIdw1[0] ^ pIdw2[7] ^ pIdw2[0];
-    macAddress[1] = pIdw0[1] ^ pIdw1[7] ^ pIdw2[6] ^ pIdw2[1];
-    macAddress[2] = pIdw0[2] ^ pIdw1[1] ^ pIdw2[5] ^ pIdw0[6];
-    macAddress[3] = pIdw0[3] ^ pIdw1[6] ^ pIdw2[4] ^ pIdw0[7];
-    macAddress[4] = pIdw0[4] ^ pIdw1[2] ^ pIdw2[3] ^ pIdw1[3];
-    macAddress[5] = pIdw0[5] ^ pIdw1[5] ^ pIdw2[2] ^ pIdw1[4];
+
+
+    macAddress[0] = pIdw0[0] ^ pIdw1[0] ^ pIdw2[3] ^ pIdw2[0];
+    macAddress[1] = pIdw0[1] ^ pIdw1[3] ^ pIdw2[2] ^ pIdw2[1];
+    macAddress[2] = pIdw0[2] ^ pIdw1[1] ^ pIdw2[1] ^ pIdw0[2];
+    macAddress[3] = pIdw0[3] ^ pIdw1[2] ^ pIdw2[0] ^ pIdw0[3];
+    macAddress[4] = pIdw0[0] ^ pIdw1[2] ^ pIdw2[3] ^ pIdw1[3];
+    macAddress[5] = pIdw0[1] ^ pIdw1[1] ^ pIdw2[2] ^ pIdw1[0];
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

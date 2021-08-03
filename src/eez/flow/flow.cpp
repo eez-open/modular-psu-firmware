@@ -131,7 +131,7 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 					auto inputWidget = (InputWidget *)widgetCursor.widget;
 					
 					auto unitValue = get(widgetCursor, inputWidget->unit);
-					Unit unit = getUnitFromName(unitValue.toString(assets)); 
+					Unit unit = getUnitFromName(unitValue.toString(assets).getString()); 
 					
 					if (operation == DATA_OPERATION_GET_MIN) {
 						value = Value(get(widgetCursor, inputWidget->min).toFloat(), unit);

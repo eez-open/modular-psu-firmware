@@ -111,6 +111,9 @@ void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &compo
 		auto connection = componentOutput.connections.item(assets, connectionIndex);
 		flowState->values[connection->targetInputIndex] = value;
 		pingComponent(assets, flowState, connection->targetComponentIndex);
+		if (connection->seqIn) {
+			flowState->values[connection->targetInputIndex] = Value();
+		}
 	}
 }
 

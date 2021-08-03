@@ -41,7 +41,7 @@ void executeLogComponent(Assets *assets, FlowState *flowState, Component *compon
         return;
     }
 
-    const char *valueStr = value.toString(assets);
+    const char *valueStr = value.toString(assets).getString();
     if (valueStr && *valueStr) {
       DebugTrace(valueStr);
       if (valueStr[strlen(valueStr) - 1] != '\n') {
