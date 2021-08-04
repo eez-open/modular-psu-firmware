@@ -73,7 +73,7 @@ void scpiResultIsReady() {
 	ScpiComponentExecutionState::g_scpiResultIsReady = true;
 }
 
-void executeScpiComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeScpiComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
 	struct ScpiActionComponent : public Component {
 		uint8_t instructions[1];
 	};
@@ -114,8 +114,8 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 			Value value;
 			int numInstructionBytes;
 			if (!evalExpression(assets, flowState, instructions + scpiComponentExecutionState->instructionIndex, value, &numInstructionBytes)) {
-				throwError("scpi component eval assignable expression\n");
-				return;
+				throwError(assets, flowState, component, "scpi component eval assignable expression\n");
+				return false;
 			}
 			scpiComponentExecutionState->instructionIndex += numInstructionBytes;
 
@@ -141,15 +141,15 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 					SCPI_ErrorTranslate(err),
 					scpiComponentExecutionState->commandOrQueryText
 				);
-				throwError(errorMessage);
-				return;
+				throwError(assets, flowState, component, errorMessage);
+				return false;
 			}
 
 			Value dstValue;
 			int numInstructionBytes;
 			if (!evalAssignableExpression(assets, flowState, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
-				throwError("scpi component eval assignable expression\n");
-				return;
+				throwError(assets, flowState, component, "scpi component eval assignable expression\n");
+				return false;
 			}
 			scpiComponentExecutionState->instructionIndex += numInstructionBytes;
 
@@ -178,6 +178,8 @@ void executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 
 		scpiComponentExecutionState->op = instructions[scpiComponentExecutionState->instructionIndex++];
 	}
+
+	return true;
 }
 
 } // namespace flow

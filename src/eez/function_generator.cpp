@@ -2098,17 +2098,17 @@ void data_function_generator_channels(DataOperationEnum operation, const WidgetC
 					slotIndex, subchannelIndex, resourceIndex
 				)
 			) {
-				value.type_ = VALUE_TYPE_CHANNEL_ID;
-				value.pairOfUint16_.first = slotIndex;
-				value.pairOfUint16_.second = subchannelIndex;
+				value.type = VALUE_TYPE_CHANNEL_ID;
+				value.pairOfUint16Value.first = slotIndex;
+				value.pairOfUint16Value.second = subchannelIndex;
 				
 				hmi::g_selectedSlotIndex = slotIndex;
 				hmi::g_selectedSubchannelIndex = subchannelIndex;
 			}
 		} else if (operation == DATA_OPERATION_DESELECT) {
 			if (value.getType() == VALUE_TYPE_CHANNEL_ID) {
-				hmi::g_selectedSlotIndex = value.pairOfUint16_.first;
-				hmi::g_selectedSubchannelIndex = value.pairOfUint16_.second;
+				hmi::g_selectedSlotIndex = value.pairOfUint16Value.first;
+				hmi::g_selectedSubchannelIndex = value.pairOfUint16Value.second;
 			}
 		} else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
 			value = Value(g_functionGeneratorPage.m_selectedResources.m_numResources, VALUE_TYPE_UINT32);
@@ -2157,16 +2157,16 @@ void data_function_generator_channels(DataOperationEnum operation, const WidgetC
 			int resourceIndex;
 			AllResources::findResource(cursor, slotIndex, subchannelIndex, resourceIndex);
 
-			value.type_ = VALUE_TYPE_CHANNEL_ID;
-			value.pairOfUint16_.first = slotIndex;
-			value.pairOfUint16_.second = subchannelIndex;
+			value.type = VALUE_TYPE_CHANNEL_ID;
+			value.pairOfUint16Value.first = slotIndex;
+			value.pairOfUint16Value.second = subchannelIndex;
 				
 			hmi::g_selectedSlotIndex = slotIndex;
 			hmi::g_selectedSubchannelIndex = subchannelIndex;
 		} else if (operation == DATA_OPERATION_DESELECT) {
 			if (value.getType() == VALUE_TYPE_CHANNEL_ID) {
-				hmi::g_selectedSlotIndex = value.pairOfUint16_.first;
-				hmi::g_selectedSubchannelIndex = value.pairOfUint16_.second;
+				hmi::g_selectedSlotIndex = value.pairOfUint16Value.first;
+				hmi::g_selectedSubchannelIndex = value.pairOfUint16Value.second;
 			}
 		} else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
 			value = Value(AllResources::getNumResources(), VALUE_TYPE_UINT32);
@@ -2201,9 +2201,9 @@ void data_function_generator_channel(DataOperationEnum operation, const WidgetCu
 				g_functionGeneratorPage.m_selectedResources.m_waveformParameters[cursor].absoluteResourceIndex,
 				slotIndex, subchannelIndex, resourceIndex
 			);
-			value.type_ = VALUE_TYPE_CHANNEL_ID;
-			value.pairOfUint16_.first = slotIndex;
-			value.pairOfUint16_.second = subchannelIndex;
+			value.type = VALUE_TYPE_CHANNEL_ID;
+			value.pairOfUint16Value.first = slotIndex;
+			value.pairOfUint16Value.second = subchannelIndex;
 		}
 	} else if (getActivePageId() == PAGE_ID_SYS_SETTINGS_FUNCTION_GENERATOR_SELECT_CHANNELS) {
 		if (operation == DATA_OPERATION_GET) {
@@ -2211,9 +2211,9 @@ void data_function_generator_channel(DataOperationEnum operation, const WidgetCu
 			int subchannelIndex;
 			int resourceIndex;
 			AllResources::findResource(cursor, slotIndex, subchannelIndex, resourceIndex);
-			value.type_ = VALUE_TYPE_CHANNEL_ID;
-			value.pairOfUint16_.first = slotIndex;
-			value.pairOfUint16_.second = subchannelIndex;
+			value.type = VALUE_TYPE_CHANNEL_ID;
+			value.pairOfUint16Value.first = slotIndex;
+			value.pairOfUint16Value.second = subchannelIndex;
 		}
 	}
 }
@@ -2308,9 +2308,9 @@ void data_function_generator_is_max_selected(DataOperationEnum operation, const 
 
 void data_function_generator_num_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-		value.type_ = VALUE_TYPE_NUM_SELECTED;
-		value.pairOfUint16_.first = g_functionGeneratorSelectChannelsPage.getNumSelectedResources();
-		value.pairOfUint16_.second = MIN(MAX_NUM_WAVEFORMS, AllResources::getNumResources());
+		value.type = VALUE_TYPE_NUM_SELECTED;
+		value.pairOfUint16Value.first = g_functionGeneratorSelectChannelsPage.getNumSelectedResources();
+		value.pairOfUint16Value.second = MIN(MAX_NUM_WAVEFORMS, AllResources::getNumResources());
 	}
 }
 
@@ -2610,7 +2610,7 @@ void data_function_generator_amplitude(DataOperationEnum operation, const Widget
 			} else {
 				value = MakeValue(g_options.isAmpl ? waveformParameters.amplitude : (waveformParameters.offset - waveformParameters.amplitude / 2.0f), unit);
 			}
-			value.float_ = roundPrec(value.float_, stepValues.values[0]);
+			value.floatValue = roundPrec(value.floatValue, stepValues.values[0]);
 		}
 	} else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
 		value = 0;
@@ -2710,7 +2710,7 @@ void data_function_generator_offset(DataOperationEnum operation, const WidgetCur
 			} else {
 				value = MakeValue(g_options.isAmpl ? waveformParameters.offset : (waveformParameters.offset + waveformParameters.amplitude / 2.0f), unit);
 			}
-			value.float_ = roundPrec(value.float_, stepValues.values[0]);
+			value.floatValue = roundPrec(value.floatValue, stepValues.values[0]);
 		}
 	} else if (operation == DATA_OPERATION_GET_ALLOW_ZERO) {
 		value = 0;

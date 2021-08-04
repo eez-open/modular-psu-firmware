@@ -1917,9 +1917,9 @@ void data_dlog_items_scrollbar_enabled(DataOperationEnum operation, const Widget
 
 void data_dlog_items_num_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value.type_ = VALUE_TYPE_NUM_SELECTED;
-        value.pairOfUint16_.first = DlogParamsPage::g_parameters.numDlogItems;
-        value.pairOfUint16_.second = DlogParamsPage::getNumDlogResources();
+        value.type = VALUE_TYPE_NUM_SELECTED;
+        value.pairOfUint16Value.first = DlogParamsPage::g_parameters.numDlogItems;
+        value.pairOfUint16Value.second = DlogParamsPage::getNumDlogResources();
     }
 }
 
@@ -1932,17 +1932,17 @@ void data_dlog_items(DataOperationEnum operation, const WidgetCursor &widgetCurs
         int subchannelIndex;
         int resourceIndex;
         if (DlogParamsPage::findResource(cursor, slotIndex, subchannelIndex, resourceIndex)) {
-            value.type_ = VALUE_TYPE_CHANNEL_ID;
-            value.pairOfUint16_.first = slotIndex;
-            value.pairOfUint16_.second = subchannelIndex;
+            value.type = VALUE_TYPE_CHANNEL_ID;
+            value.pairOfUint16Value.first = slotIndex;
+            value.pairOfUint16Value.second = subchannelIndex;
             
             hmi::g_selectedSlotIndex = slotIndex;
             hmi::g_selectedSubchannelIndex = subchannelIndex;
         }
     } else if (operation == DATA_OPERATION_DESELECT) {
         if (value.getType() == VALUE_TYPE_CHANNEL_ID) {
-            hmi::g_selectedSlotIndex = value.pairOfUint16_.first;
-            hmi::g_selectedSubchannelIndex = value.pairOfUint16_.second;
+            hmi::g_selectedSlotIndex = value.pairOfUint16Value.first;
+            hmi::g_selectedSubchannelIndex = value.pairOfUint16Value.second;
         }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_SIZE) {
         value = Value(DlogParamsPage::getNumDlogResources(), VALUE_TYPE_UINT32);
@@ -2001,9 +2001,9 @@ void data_dlog_item_channel(DataOperationEnum operation, const WidgetCursor &wid
         int subchannelIndex;
         int resourceIndex;
         if (DlogParamsPage::findResource(cursor, slotIndex, subchannelIndex, resourceIndex)) {
-            value.type_ = VALUE_TYPE_CHANNEL_ID;
-            value.pairOfUint16_.first = slotIndex;
-            value.pairOfUint16_.second = subchannelIndex;
+            value.type = VALUE_TYPE_CHANNEL_ID;
+            value.pairOfUint16Value.first = slotIndex;
+            value.pairOfUint16Value.second = subchannelIndex;
         }
     }
 }

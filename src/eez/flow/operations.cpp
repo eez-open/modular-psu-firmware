@@ -29,11 +29,11 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 	auto a = stack.pop();
 
 	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValue_;
+		a = *a.pValueValue;
 	}
 
 	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
-		b = *b.pValue_;
+		b = *b.pValueValue;
 	}
 
 	if (a.isAnyStringType() || b.isAnyStringType()) {
@@ -59,7 +59,7 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 	}
 
 	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		stack.push(Value(a.int32_ + b.int32_, VALUE_TYPE_INT32));
+		stack.push(Value(a.int32Value + b.int32Value, VALUE_TYPE_INT32));
 		return true;
 	}
 
@@ -125,11 +125,11 @@ bool do_OPERATION_TYPE_LESS(EvalStack &stack) {
 	auto a = stack.pop();
 
 	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValue_;
+		a = *a.pValueValue;
 	}
 
 	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
-		b = *b.pValue_;
+		b = *b.pValueValue;
 	}
 
 	stack.push(Value(a.toDouble() < b.toDouble(), VALUE_TYPE_BOOLEAN));
@@ -165,7 +165,7 @@ bool do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
 	auto a = stack.pop();
 
 	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValue_;
+		a = *a.pValueValue;
 	}
 	if (a.isDouble()) {
 		stack.push(Value(-a.getDouble(), VALUE_TYPE_DOUBLE));
@@ -230,11 +230,11 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 	auto a = stack.pop();
 
 	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValue_;
+		a = *a.pValueValue;
 	}
 
 	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
-		b = *b.pValue_;
+		b = *b.pValueValue;
 	}
 
 	const char *aStr = a.toString(stack.assets).getString();

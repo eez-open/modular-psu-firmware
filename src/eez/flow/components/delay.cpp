@@ -32,7 +32,7 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-void executeDelayComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeDelayComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
 	struct DelayComponenentExecutionState : public ComponenentExecutionState {
 		uint32_t waitUntil;
 	};
@@ -42,8 +42,8 @@ void executeDelayComponent(Assets *assets, FlowState *flowState, Component *comp
 
 		Value value;
 		if (!evalExpression(assets, flowState, propertyValue->evalInstructions, value)) {
-			throwError("delay component milliseconds eval error\n");
-			return;
+			throwError(assets, flowState, component, "delay component milliseconds eval error\n");
+			return false;
 		}
 
 		double milliseconds = value.toDouble();
@@ -52,8 +52,8 @@ void executeDelayComponent(Assets *assets, FlowState *flowState, Component *comp
 			delayComponentExecutionState->waitUntil = millis() + (uint32_t)floor(milliseconds);
 			componentExecutionState = delayComponentExecutionState;
 		} else {
-			throwError("delay component milliseconds invalid value\n");
-			return;
+			throwError(assets, flowState, component, "delay component milliseconds invalid value\n");
+			return false;
 		}
 	} else {
 		auto delayComponentExecutionState = (DelayComponenentExecutionState *)componentExecutionState;
@@ -62,6 +62,8 @@ void executeDelayComponent(Assets *assets, FlowState *flowState, Component *comp
 			componentExecutionState = nullptr;
 		}
 	}
+
+	return true;
 }
 
 } // namespace flow

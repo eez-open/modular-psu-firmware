@@ -84,6 +84,8 @@ struct WidgetState {
 
 class AppContext;
 
+typedef int Cursor;
+
 struct WidgetCursor {
 	Assets *assets;
 	AppContext *appContext;

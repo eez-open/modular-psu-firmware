@@ -883,10 +883,10 @@ void eventValueToText(const Value &value, char *text, int count) {
 
 Value MakeEventValue(event_queue::Event *e) {
     Value value;
-    value.type_ = VALUE_TYPE_EVENT;
-    value.options_ = 0;
-    value.unit_ = UNIT_UNKNOWN;
-    value.uint32_ = e->logOffset;
+    value.type = VALUE_TYPE_EVENT;
+    value.options = 0;
+    value.unit = UNIT_UNKNOWN;
+    value.uint32Value = e->logOffset;
     return value;
 }
 

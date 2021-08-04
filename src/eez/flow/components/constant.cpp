@@ -32,7 +32,7 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-void executeConstantComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeConstantComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 
 	struct ConstantActionComponent : public Component {
@@ -46,6 +46,8 @@ void executeConstantComponent(Assets *assets, FlowState *flowState, Component *c
 		auto &componentOutput = *component->outputs.item(assets, outputIndex);
 		propagateValue(assets, flowState, componentOutput, sourceValue);
 	}
+
+	return true;
 }
 
 } // namespace flow

@@ -352,9 +352,9 @@ void boot() {
     // DebugTrace("sizeof(Value) = %d\n", sizeof(Value));
 
     // Value value;
-    // value.type_ = VALUE_TYPE_NULL;
-    // value.unit_ = 2;
-    // value.options_ = 3;
+    // value.type = VALUE_TYPE_NULL;
+    // value.unit = 2;
+    // value.options = 3;
     // value.int64_ = 4;
     // uint8_t *pValue = (uint8_t *)&value;
     // DebugTrace("%d,%d,%d,%d, %d,%d,%d,%d, %d,%d,%d,%d, %d,%d,%d,%d\n",

@@ -32,39 +32,48 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-void executeStartComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-void executeEndComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-void executeDelayComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-void executeConstantComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-void executeSetVariableComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-void executeSwitchComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-void executeLogComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-void executeScpiComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
+bool executeStartComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
+bool executeEndComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
+bool executeDelayComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
+bool executeConstantComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
+bool executeSetVariableComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
+bool executeSwitchComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
+bool executeLogComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
+bool executeScpiComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
 
-void executeComponent(Assets *assets, FlowState *flowState, unsigned componentIndex, ComponenentExecutionState *componentExecutionState) {
+bool executeComponent(Assets *assets, FlowState *flowState, unsigned componentIndex, ComponenentExecutionState *componentExecutionState) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 	auto component = flow->components.item(assets, componentIndex);
 
-    if (component->type == defs_v3::COMPONENT_TYPE_START_ACTION) {
-		executeStartComponent(assets, flowState, component, componentExecutionState);
+	bool result;
+    
+	if (component->type == defs_v3::COMPONENT_TYPE_START_ACTION) {
+		result = executeStartComponent(assets, flowState, component, componentExecutionState);
     } else if (component->type == defs_v3::COMPONENT_TYPE_END_ACTION) {
-		executeEndComponent(assets, flowState, component, componentExecutionState);
+		result = executeEndComponent(assets, flowState, component, componentExecutionState);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_DELAY_ACTION) {
-		executeDelayComponent(assets, flowState, component, componentExecutionState);
+		result = executeDelayComponent(assets, flowState, component, componentExecutionState);
     } else if (component->type == defs_v3::COMPONENT_TYPE_CONSTANT_ACTION) {
-		executeConstantComponent(assets, flowState, component, componentExecutionState);
+		result = executeConstantComponent(assets, flowState, component, componentExecutionState);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_SET_VARIABLE_ACTION) {
-		executeSetVariableComponent(assets, flowState, component, componentExecutionState);
+		result = executeSetVariableComponent(assets, flowState, component, componentExecutionState);
     } else if (component->type == defs_v3::COMPONENT_TYPE_SWITCH_ACTION) {
-		executeSwitchComponent(assets, flowState, component, componentExecutionState);
+		result = executeSwitchComponent(assets, flowState, component, componentExecutionState);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_LOG_ACTION) {
-		executeLogComponent(assets, flowState, component, componentExecutionState);
+		result = executeLogComponent(assets, flowState, component, componentExecutionState);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_SCPI_ACTION) {
-		executeScpiComponent(assets, flowState, component, componentExecutionState);
+		result = executeScpiComponent(assets, flowState, component, componentExecutionState);
 	} else {
-		DebugTrace("Unknown component at index = %d, type = %d\n", componentIndex, component->type);
+		char errorMessage[100];
+		snprintf(errorMessage, sizeof(errorMessage), "Unknown component at index = %d, type = %d\n", componentIndex, component->type);
+		throwError(assets, flowState, component, errorMessage);
+		return false;
     }
+
+	if (!result) {
+		return false;
+	}
 
 	if (componentExecutionState) {
 		addToQueue(flowState, componentIndex, componentExecutionState);
@@ -72,6 +81,8 @@ void executeComponent(Assets *assets, FlowState *flowState, unsigned componentIn
 		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
 		propagateValue(assets, flowState, *component->outputs.item(assets, 0), nullValue);
 	}
+	
+	return true;
 }
 
 } // namespace flow

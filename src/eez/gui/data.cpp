@@ -446,6 +446,22 @@ void DOUBLE_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+bool compare_ASSETS_STRING_value(const Value &a, const Value &b) {
+	return a.assetsOffsetValue == b.assetsOffsetValue;
+}
+
+void ASSETS_STRING_value_to_text(const Value &value, char *text, int count) {
+	text[0] = 0;
+}
+
+bool compare_ASSETS_ARRAY_value(const Value &a, const Value &b) {
+    return a.assetsOffsetValue == b.assetsOffsetValue;
+}
+
+void ASSETS_ARRAY_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
+}
+
 bool compare_STRING_value(const Value &a, const Value &b) {
     const char *astr = a.getString();
     const char *bstr = b.getString();
@@ -475,16 +491,16 @@ void STRING_REF_value_to_text(const Value &value, char *text, int count) {
 	STRING_value_to_text(value, text, count);
 }
 
-bool compare_ASSETS_STRING_value(const Value &a, const Value &b) {
-	return a.getUInt32() == b.getUInt32();
+bool compare_ARRAY_REF_value(const Value &a, const Value &b) {
+    return a.refValue == b.refValue;
 }
 
-void ASSETS_STRING_value_to_text(const Value &value, char *text, int count) {
-	text[0] = 0;
+void ARRAY_REF_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
 }
 
 bool compare_VERSIONED_STRING_value(const Value &a, const Value &b) {
-    return a.unit_ == b.unit_; // here unit_ is used as string version
+    return a.unit == b.unit; // here unit is used as string version
 }
 
 void VERSIONED_STRING_value_to_text(const Value &value, char *text, int count) {
@@ -497,12 +513,12 @@ void VERSIONED_STRING_value_to_text(const Value &value, char *text, int count) {
 }
 
 bool compare_VALUE_PTR_value(const Value &a, const Value &b) {
-	return a.pValue_ == b.pValue_ || (a.pValue_ && b.pValue_ && *a.pValue_ == *b.pValue_);
+	return a.pValueValue == b.pValueValue || (a.pValueValue && b.pValueValue && *a.pValueValue == *b.pValueValue);
 }
 
 void VALUE_PTR_value_to_text(const Value &value, char *text, int count) {
-	if (value.pValue_) {
-		value.pValue_->toText(text, count);
+	if (value.pValueValue) {
+		value.pValueValue->toText(text, count);
 	} else {
 		text[0] = 0;
 	}
@@ -641,32 +657,40 @@ uint16_t getNumPagesFromValue(const Value &value) {
 
 Value MakeRangeValue(uint16_t from, uint16_t to) {
     Value value;
-    value.type_ = VALUE_TYPE_RANGE;
-    value.pairOfUint16_.first = from;
-    value.pairOfUint16_.second = to;
+    value.type = VALUE_TYPE_RANGE;
+    value.pairOfUint16Value.first = from;
+    value.pairOfUint16Value.second = to;
     return value;
 }
 
 Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition) {
     Value value;
-    value.type_ = VALUE_TYPE_ENUM;
-    value.enum_.enumValue = enumValue;
-    value.enum_.enumDefinition = enumDefinition;
+    value.type = VALUE_TYPE_ENUM;
+    value.enumValue.enumValue = enumValue;
+    value.enumValue.enumDefinition = enumDefinition;
     return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
+const char *Value::getString() const {
+	if (type == VALUE_TYPE_STRING_REF) {
+		return ((StringRef *)refValue)->str;
+	}
+	return strValue;
+}
+
+
 void Value::toText(char *text, int count) const {
     *text = 0;
-    g_valueTypeToTextFunctions[type_](*this, text, count);
+    g_valueTypeToTextFunctions[type](*this, text, count);
 }
 
 bool Value::operator==(const Value &other) const {
-    if (type_ != other.type_) {
+    if (type != other.type) {
         return false;
     }
-    return g_valueTypeCompareFunctions[type_](*this, other);
+    return g_valueTypeCompareFunctions[type](*this, other);
 }
 
 bool Value::isPico() const {
@@ -768,13 +792,189 @@ bool Value::isMega() const {
 
 }
 
+double Value::toDouble() const {
+	if (type == VALUE_TYPE_DOUBLE) {
+		return doubleValue;
+	}
+
+	if (type == VALUE_TYPE_FLOAT) {
+		return floatValue;
+	}
+
+	if (type == VALUE_TYPE_INT8) {
+		return int8Value;
+	}
+	if (type == VALUE_TYPE_UINT8) {
+		return uint8Value;
+	}
+
+	if (type == VALUE_TYPE_INT16) {
+		return int16Value;
+	}
+	if (type == VALUE_TYPE_UINT16) {
+		return uint16Value;
+	}
+
+	if (type == VALUE_TYPE_INT32) {
+		return int32Value;
+	}
+	if (type == VALUE_TYPE_UINT32) {
+		return uint32Value;
+	}
+
+	if (type == VALUE_TYPE_INT64) {
+		return (double)int64Value;
+	}
+	if (type == VALUE_TYPE_UINT64) {
+		return (double)uint64Value;
+	}
+
+	if (type == VALUE_TYPE_STRING_REF) {
+		return (double)atof(((StringRef *)refValue)->str);
+	}
+
+	return NAN;
+}
+
+float Value::toFloat() const {
+	if (type == VALUE_TYPE_DOUBLE) {
+		return (float)doubleValue;
+	}
+
+	if (type == VALUE_TYPE_FLOAT) {
+		return floatValue;
+	}
+
+	if (type == VALUE_TYPE_INT8) {
+		return int8Value;
+	}
+	if (type == VALUE_TYPE_UINT8) {
+		return uint8Value;
+	}
+
+	if (type == VALUE_TYPE_INT16) {
+		return int16Value;
+	}
+	if (type == VALUE_TYPE_UINT16) {
+		return uint16Value;
+	}
+
+	if (type == VALUE_TYPE_INT32) {
+		return (float)int32Value;
+	}
+
+	if (type == VALUE_TYPE_UINT32) {
+		return (float)uint32Value;
+	}
+
+	if (type == VALUE_TYPE_INT64) {
+		return (float)int64Value;
+	}
+	if (type == VALUE_TYPE_UINT64) {
+		return (float)uint64Value;
+	}
+
+	if (type == VALUE_TYPE_STRING_REF) {
+		return (float)atof(((StringRef *)refValue)->str);
+	}
+
+	return NAN;
+}
+
+int32_t Value::toInt32() const {
+	if (type == VALUE_TYPE_DOUBLE) {
+		return (int32_t)doubleValue;
+	}
+
+	if (type == VALUE_TYPE_FLOAT) {
+		return (int32_t)floatValue;
+	}
+
+	if (type == VALUE_TYPE_INT8) {
+		return int8Value;
+	}
+	if (type == VALUE_TYPE_UINT8) {
+		return uint8Value;
+	}
+
+	if (type == VALUE_TYPE_INT16) {
+		return int16Value;
+	}
+	if (type == VALUE_TYPE_UINT16) {
+		return uint16Value;
+	}
+
+	if (type == VALUE_TYPE_INT32) {
+		return int32Value;
+	}
+	if (type == VALUE_TYPE_UINT32) {
+		return (int32_t)uint32Value;
+	}
+
+	if (type == VALUE_TYPE_INT64) {
+		return (int32_t)int64Value;
+	}
+	if (type == VALUE_TYPE_UINT64) {
+		return (int32_t)uint64Value;
+	}
+
+	if (type == VALUE_TYPE_STRING_REF) {
+		return (int64_t)atoi(((StringRef *)refValue)->str);
+	}
+
+	return 0;
+}
+
+int64_t Value::toInt64() const {
+	if (type == VALUE_TYPE_DOUBLE) {
+		return (int64_t)doubleValue;
+	}
+	if (type == VALUE_TYPE_FLOAT) {
+		return (int64_t)floatValue;
+	}
+
+	if (type == VALUE_TYPE_INT8) {
+		return int8Value;
+	}
+	if (type == VALUE_TYPE_UINT8) {
+		return uint8Value;
+	}
+
+	if (type == VALUE_TYPE_INT16) {
+		return int16Value;
+	}
+	if (type == VALUE_TYPE_UINT16) {
+		return uint16Value;
+	}
+
+	if (type == VALUE_TYPE_INT32) {
+		return int32Value;
+	}
+	if (type == VALUE_TYPE_UINT32) {
+		return uint32Value;
+	}
+
+	if (type == VALUE_TYPE_INT64) {
+		return int64Value;
+	}
+	if (type == VALUE_TYPE_UINT64) {
+		return (int64_t)uint64Value;
+	}
+
+	if (type == VALUE_TYPE_STRING_REF) {
+		return (int64_t)atoi(((StringRef *)refValue)->str);
+	}
+
+	return 0;
+}
+
 Value Value::toString(Assets *assets) const {
-	if (type_ == VALUE_TYPE_STRING || type_ == VALUE_TYPE_STRING_REF) {
+	if (type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_REF) {
 		return *this;
 	}
 	
-	if (type_ == VALUE_TYPE_ASSETS_STRING) {
-		return Value(((AssetsPtr<const char> *)&assetsString_)->ptr(assets));
+	if (type == VALUE_TYPE_ASSETS_STRING) {
+		return Value(((AssetsPtr<AssetsString> *)&assetsOffsetValue)->ptr(assets));
 	}
 
     char tempStr[64];
@@ -784,26 +984,26 @@ Value Value::toString(Assets *assets) const {
 #pragma warning(disable : 4474)
 #endif
 
-    if (type_ == VALUE_TYPE_DOUBLE) {
-        snprintf(tempStr, sizeof(tempStr), "%g", double_);
-    } else if (type_ == VALUE_TYPE_FLOAT) {
-        snprintf(tempStr, sizeof(tempStr), "%g", float_);
-    } else if (type_ == VALUE_TYPE_INT8) {
-        snprintf(tempStr, sizeof(tempStr), PRId8, int8_);
-    } else if (type_ == VALUE_TYPE_UINT8) {
-        snprintf(tempStr, sizeof(tempStr), PRIu8, uint8_);
-    } else if (type_ == VALUE_TYPE_INT16) {
-        snprintf(tempStr, sizeof(tempStr), PRId16, int16_);
-    } else if (type_ == VALUE_TYPE_UINT16) {
-        snprintf(tempStr, sizeof(tempStr), PRIu16, uint16_);
-    } else if (type_ == VALUE_TYPE_INT32) {
-        snprintf(tempStr, sizeof(tempStr), PRId32, int32_);
-    } else if (type_ == VALUE_TYPE_UINT32) {
-        snprintf(tempStr, sizeof(tempStr), PRIu32, uint32_);
-    } else if (type_ == VALUE_TYPE_INT64) {
-        snprintf(tempStr, sizeof(tempStr), PRId64, int64_);
-    } else if (type_ == VALUE_TYPE_UINT64) {
-        snprintf(tempStr, sizeof(tempStr), PRIu64, uint64_);
+    if (type == VALUE_TYPE_DOUBLE) {
+        snprintf(tempStr, sizeof(tempStr), "%g", doubleValue);
+    } else if (type == VALUE_TYPE_FLOAT) {
+        snprintf(tempStr, sizeof(tempStr), "%g", floatValue);
+    } else if (type == VALUE_TYPE_INT8) {
+        snprintf(tempStr, sizeof(tempStr), PRId8, int8Value);
+    } else if (type == VALUE_TYPE_UINT8) {
+        snprintf(tempStr, sizeof(tempStr), PRIu8, uint8Value);
+    } else if (type == VALUE_TYPE_INT16) {
+        snprintf(tempStr, sizeof(tempStr), PRId16, int16Value);
+    } else if (type == VALUE_TYPE_UINT16) {
+        snprintf(tempStr, sizeof(tempStr), PRIu16, uint16Value);
+    } else if (type == VALUE_TYPE_INT32) {
+        snprintf(tempStr, sizeof(tempStr), PRId32, int32Value);
+    } else if (type == VALUE_TYPE_UINT32) {
+        snprintf(tempStr, sizeof(tempStr), PRIu32, uint32Value);
+    } else if (type == VALUE_TYPE_INT64) {
+        snprintf(tempStr, sizeof(tempStr), PRId64, int64Value);
+    } else if (type == VALUE_TYPE_UINT64) {
+        snprintf(tempStr, sizeof(tempStr), PRIu64, uint64Value);
     }
 
 #ifdef _MSC_VER
@@ -817,18 +1017,18 @@ Value Value::toString(Assets *assets) const {
 Value Value::makeStringRef(const char *str, size_t len) {
     Value value;
 
-    auto refString = (RefString *)alloc(sizeof(RefString) + MAX(len + 1 - 4, 0));
+    auto stringRef = (StringRef *)alloc(sizeof(StringRef) + MAX(len + 1 - 4, 0));
 
-    stringCopyLength(refString->str, len + 1, str, len);
-	refString->str[len] = 0;
+    stringCopyLength(stringRef->str, len + 1, str, len);
+	stringRef->str[len] = 0;
 
-    refString->refCounter = 1;
+    stringRef->refCounter = 1;
 
-    value.type_ = VALUE_TYPE_STRING_REF;
-    value.unit_ = 0;
-    value.options_ = 0;
-    value.reserved_ = 0;
-    value.refString_ = refString;
+    value.type = VALUE_TYPE_STRING_REF;
+    value.unit = 0;
+    value.options = VALUE_OPTIONS_REF;
+    value.reserved = 0;
+    value.refValue = stringRef;
 
 	return value;
 }
@@ -838,22 +1038,21 @@ Value Value::concatenateString(const char *str1, const char *str2) {
 
     auto newStrLen = strlen(str1) + strlen(str2) + 1;
     
-    auto refString = (RefString *)alloc(sizeof(RefString) + MAX(newStrLen - 4, 0));
+    auto stringRef = (StringRef *)alloc(sizeof(StringRef) + MAX(newStrLen - 4, 0));
     
-    stringCopy(refString->str, newStrLen, str1);
-    stringAppendString(refString->str, newStrLen, str2);
+    stringCopy(stringRef->str, newStrLen, str1);
+    stringAppendString(stringRef->str, newStrLen, str2);
 
-    refString->refCounter = 1;
+    stringRef->refCounter = 1;
 
-    value.type_ = VALUE_TYPE_STRING_REF;
-    value.unit_ = 0;
-    value.options_ = 0;
-    value.reserved_ = 0;
-    value.refString_ = refString;
+    value.type = VALUE_TYPE_STRING_REF;
+    value.unit = 0;
+    value.options = VALUE_OPTIONS_REF;
+    value.reserved = 0;
+    value.refValue = stringRef;
 
 	return value;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 

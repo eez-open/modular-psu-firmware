@@ -32,7 +32,8 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-void executeStartComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeStartComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+    return true;
 }
 
 } // namespace flow

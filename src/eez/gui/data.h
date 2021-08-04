@@ -60,6 +60,17 @@ const char *getWidgetLabel(EnumItem *enumDefinition, uint16_t value);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#define VALUE_OPTIONS_REF (1 << 0)
+
+#define STRING_OPTIONS_FILE_ELLIPSIS (1 << 1)
+
+#define FLOAT_OPTIONS_LESS_THEN (1 << 1)
+#define FLOAT_OPTIONS_FIXED_DECIMALS (1 << 2)
+#define FLOAT_OPTIONS_GET_NUM_FIXED_DECIMALS(options) (((options) >> 3) & 0b111)
+#define FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(n) (FLOAT_OPTIONS_FIXED_DECIMALS | ((n & 0b111) << 3))
+
+////////////////////////////////////////////////////////////////////////////////
+
 struct PairOfUint8Value {
     uint8_t first;
     uint8_t second;
@@ -75,134 +86,126 @@ struct PairOfInt16Value {
     int16_t second;
 };
 
-////////////////////////////////////////////////////////////////////////////////
-
-#define STRING_OPTIONS_FILE_ELLIPSIS (1 << 0)
-
-#define FLOAT_OPTIONS_LESS_THEN (1 << 0)
-#define FLOAT_OPTIONS_FIXED_DECIMALS (1 << 1)
-#define FLOAT_OPTIONS_GET_NUM_FIXED_DECIMALS(options) (((options) >> 2) & 0b111)
-#define FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(n) (FLOAT_OPTIONS_FIXED_DECIMALS | ((n & 0b111) << 2))
-
-struct RefString {
+struct Ref {
 	uint32_t refCounter;
-	char str[4];
 };
+
+////////////////////////////////////////////////////////////////////////////////
 
 struct Value {
   public:
     Value()
-        : type_(VALUE_TYPE_UNDEFINED), unit_(UNIT_UNKNOWN), options_(0), pVoid_(0)
+        : type(VALUE_TYPE_UNDEFINED), unit(UNIT_UNKNOWN), options(0), pVoidValue(0)
     {
     }
 
 	Value(int value)
-        : type_(VALUE_TYPE_INT32), unit_(UNIT_UNKNOWN), options_(0), int32_(value)
+        : type(VALUE_TYPE_INT32), unit(UNIT_UNKNOWN), options(0), int32Value(value)
     {
     }
 
 	Value(const char *str)
-        : type_(VALUE_TYPE_STRING), unit_(UNIT_UNKNOWN), options_(0), str_(str)
+        : type(VALUE_TYPE_STRING), unit(UNIT_UNKNOWN), options(0), strValue(str)
     {
     }
 
 	Value(int version, const char *str)
-        : type_(VALUE_TYPE_VERSIONED_STRING), unit_(version), options_(0), str_(str)
+        : type(VALUE_TYPE_VERSIONED_STRING), unit(version), options(0), strValue(str)
     {
     }
 
 	Value(Value *pValue)
-		: type_(VALUE_TYPE_VALUE_PTR), unit_(UNIT_UNKNOWN), options_(0), pValue_(pValue) {
+		: type(VALUE_TYPE_VALUE_PTR), unit(UNIT_UNKNOWN), options(0), pValueValue(pValue) {
 	}
 
     Value(const char *str, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), str_(str)
+        : type(type), unit(UNIT_UNKNOWN), options(0), strValue(str)
     {
     }
 
     Value(int value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), int32_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(0), int32Value(value)
     {
     }
 
     Value(int value, ValueType type, uint16_t options)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(options), int32_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(options), int32Value(value)
     {
     }
 
     Value(int8_t value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), int8_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(0), int8Value(value)
     {
     }
 
     Value(uint8_t value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint8_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(0), uint8Value(value)
     {
     }
 
     Value(int16_t value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), int16_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(0), int16Value(value)
     {
     }
 
     Value(uint16_t value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint16_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(0), uint16Value(value)
     {
     }
 
     Value(uint32_t value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint32_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(0), uint32Value(value)
     {
     }
 
     Value(int64_t value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), int64_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(0), int64Value(value)
     {
     }
 
     Value(uint64_t value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), uint64_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(0), uint64Value(value)
     {
     }
 
     Value(float value, Unit unit)
-        : type_(VALUE_TYPE_FLOAT), unit_(unit), options_(0), float_(value)
+        : type(VALUE_TYPE_FLOAT), unit(unit), options(0), floatValue(value)
     {
     }
 
     Value(float value, Unit unit, uint16_t options)
-        : type_(VALUE_TYPE_FLOAT), unit_(unit), options_(options), float_(value)
+        : type(VALUE_TYPE_FLOAT), unit(unit), options(options), floatValue(value)
     {
     }
 
     Value(float value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), float_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(0), floatValue(value)
     {
     }
 
 	Value(double value, ValueType type)
-		: type_(type), unit_(UNIT_UNKNOWN), options_(0), double_(value) {
+		: type(type), unit(UNIT_UNKNOWN), options(0), doubleValue(value) {
 	}
 	
 	Value(const char *value, ValueType type, int16_t options)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(options), str_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(options), strValue(value)
     {
     }
 
     Value(void *value, ValueType type)
-        : type_(type), unit_(UNIT_UNKNOWN), options_(0), pVoid_(value)
+        : type(type), unit(UNIT_UNKNOWN), options(0), pVoidValue(value)
     {
     }
 
     Value(AppContext *appContext)
-        : type_(VALUE_TYPE_POINTER), unit_(UNIT_UNKNOWN), options_(0), pVoid_(appContext)
+        : type(VALUE_TYPE_POINTER), unit(UNIT_UNKNOWN), options(0), pVoidValue(appContext)
     {
     }
 
     typedef float (*YtDataGetValueFunctionPointer)(uint32_t rowIndex, uint8_t columnIndex, float *max);
 
     Value(YtDataGetValueFunctionPointer ytDataGetValueFunctionPointer)
-        : type_(VALUE_TYPE_YT_DATA_GET_VALUE_FUNCTION_POINTER), unit_(UNIT_UNKNOWN), options_(0), pVoid_((void *)ytDataGetValueFunctionPointer)
+        : type(VALUE_TYPE_YT_DATA_GET_VALUE_FUNCTION_POINTER), unit(UNIT_UNKNOWN), options(0), pVoidValue((void *)ytDataGetValueFunctionPointer)
     {
     }
 
@@ -211,20 +214,20 @@ struct Value {
 	}
 
 	~Value() {
-		if (type_ == VALUE_TYPE_STRING_REF) {
-			if (--refString_->refCounter == 0) {
-				free(refString_);
+		if (options & VALUE_OPTIONS_REF) {
+			if (--refValue->refCounter == 0) {
+				free(refValue);
 			}
 		}
 	}
 
     const Value& operator = (const Value &value) {
-		type_ = value.type_;
-		unit_ = value.unit_;
-		options_ = value.options_;
-		int64_ = value.int64_;
-		if (type_ == VALUE_TYPE_STRING_REF) {
-			refString_->refCounter++;
+		type = value.type;
+		unit = value.unit;
+		options = value.options;
+		int64Value = value.int64Value;
+		if (options & VALUE_OPTIONS_REF) {
+			refValue->refCounter++;
 		}
 
         return *this;
@@ -237,360 +240,182 @@ struct Value {
     }
 
     ValueType getType() const {
-        return (ValueType)type_;
+        return (ValueType)type;
     }
 
 	bool isInt32OrLess() const {
-		return (type_ >= VALUE_TYPE_INT8 && type_ <= VALUE_TYPE_UINT32) || type_ == VALUE_TYPE_BOOLEAN;
+		return (type >= VALUE_TYPE_INT8 && type <= VALUE_TYPE_UINT32) || type == VALUE_TYPE_BOOLEAN;
 	}
 
 	bool isInt64() const {
-		return type_ == VALUE_TYPE_INT64 || type_ == VALUE_TYPE_UINT64;
+		return type == VALUE_TYPE_INT64 || type == VALUE_TYPE_UINT64;
 	}
 
 	bool isInt32() const {
-		return type_ == VALUE_TYPE_INT32 || type_ == VALUE_TYPE_UINT32;
+		return type == VALUE_TYPE_INT32 || type == VALUE_TYPE_UINT32;
 	}
 
 	bool isInt16() const {
-		return type_ == VALUE_TYPE_INT16 || type_ == VALUE_TYPE_UINT16;
+		return type == VALUE_TYPE_INT16 || type == VALUE_TYPE_UINT16;
 	}
 
 	bool isInt8() const {
-		return type_ == VALUE_TYPE_INT8 || type_ == VALUE_TYPE_UINT8;
+		return type == VALUE_TYPE_INT8 || type == VALUE_TYPE_UINT8;
 	}
 
 	bool isFloat() const {
-        return type_ == VALUE_TYPE_FLOAT;
+        return type == VALUE_TYPE_FLOAT;
     }
     
 	bool isDouble() const {
-		return type_ == VALUE_TYPE_DOUBLE;
+		return type == VALUE_TYPE_DOUBLE;
 	}
 
 	bool isBoolean() const {
-		return type_ == VALUE_TYPE_BOOLEAN;
+		return type == VALUE_TYPE_BOOLEAN;
 	}
 
 	bool isString() const {
-        return type_ == VALUE_TYPE_STRING;
+        return type == VALUE_TYPE_STRING;
     }
 
 	bool isAnyStringType() const {
-        return type_ == VALUE_TYPE_STRING || type_ == VALUE_TYPE_STRING_REF || type_ == VALUE_TYPE_ASSETS_STRING;
+        return type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_REF || type == VALUE_TYPE_ASSETS_STRING;
     }
 
     Unit getUnit() const {
-        return (Unit)unit_;
+        return (Unit)unit;
     }
 
 	bool getBoolean() const {
-		return int32_;
+		return int32Value;
 	}
 
 	int8_t getInt8() const {
-		return int8_;
+		return int8Value;
 	}
 
 	uint8_t getUInt8() const {
-        return uint8_;
+        return uint8Value;
     }
 
 	int16_t getInt16() const {
-		return int16_;
+		return int16Value;
 	}
 
 	uint16_t getUInt16() const {
-        return uint16_;
+        return uint16Value;
     }
 	
 	int32_t getInt32() const {
-		return int32_;
+		return int32Value;
 	}
 	
 	uint32_t getUInt32() const {
-        return uint32_;
+        return uint32Value;
     }
 
 	int32_t getInt64() const {
-		return int64_;
+		return int64Value;
 	}
 
 	uint32_t getUInt64() const {
-        return uint64_;
+        return uint64Value;
     }
 
 	float getFloat() const {
-		return float_;
+		return floatValue;
 	}
 
 	double getDouble() const {
-		return double_;
+		return doubleValue;
 	}
 
-	const char *getString() const {
-		if (type_ == VALUE_TYPE_STRING_REF) {
-			return refString_->str;
-		}
-		return str_;
-	}
+	const char *getString() const;
 
     //////////
 
 	int getInt() const {
-		if (type_ == VALUE_TYPE_ENUM) {
-			return enum_.enumValue;
+		if (type == VALUE_TYPE_ENUM) {
+			return enumValue.enumValue;
 		}
-		return int32_;
+		return int32Value;
 	}
 
     const EnumValue &getEnum() const {
-        return enum_;
+        return enumValue;
     }
 
     int16_t getScpiError() const {
-        return int16_;
+        return int16Value;
     }
 
     uint8_t *getPUint8() const {
-        return puint8_;
+        return puint8Value;
     }
     
     StepValues *getStepValues() const {
-        return (StepValues *)pVoid_;
+        return (StepValues *)pVoidValue;
     }
 
     float *getFloatList() const {
-        return pFloat_;
+        return pFloatValue;
     }
 
     void *getVoidPointer() const {
-        return pVoid_;
+        return pVoidValue;
     }
 
     AppContext *getAppContext() const {
-        return (AppContext *)pVoid_;
+        return (AppContext *)pVoidValue;
     }
 
     YtDataGetValueFunctionPointer getYtDataGetValueFunctionPointer() const {
-        return (YtDataGetValueFunctionPointer)pVoid_;
+        return (YtDataGetValueFunctionPointer)pVoidValue;
     }
 
     uint8_t getFirstUInt8() const {
-        return pairOfUint8_.first;
+        return pairOfUint8Value.first;
     }
     uint8_t getSecondUInt8() const {
-        return pairOfUint8_.second;
+        return pairOfUint8Value.second;
     }
 
     uint16_t getFirstUInt16() const {
-        return pairOfUint16_.first;
+        return pairOfUint16Value.first;
     }
     uint16_t getSecondUInt16() const {
-        return pairOfUint16_.second;
+        return pairOfUint16Value.second;
     }
 
     int16_t getFirstInt16() const {
-        return pairOfInt16_.first;
+        return pairOfInt16Value.first;
     }
     int16_t getSecondInt16() const {
-        return pairOfInt16_.second;
+        return pairOfInt16Value.second;
     }
 
     void toText(char *text, int count) const;
 
     uint16_t getOptions() const {
-        return options_;
+        return options;
     }
 
     uint16_t getRangeFrom() {
-        return pairOfUint16_.first;
+        return pairOfUint16Value.first;
     }
 
     uint16_t getRangeTo() {
-        return pairOfUint16_.second;
+        return pairOfUint16Value.second;
     }
 
-	double toDouble() const {
-		if (type_ == VALUE_TYPE_DOUBLE) {
-			return double_;
-		}
-
-		if (type_ == VALUE_TYPE_FLOAT) {
-			return float_;
-		}
-
-		if (type_ == VALUE_TYPE_INT8) {
-			return int8_;
-		}
-		if (type_ == VALUE_TYPE_UINT8) {
-			return uint8_;
-		}
-
-		if (type_ == VALUE_TYPE_INT16) {
-			return int16_;
-		}
-		if (type_ == VALUE_TYPE_UINT16) {
-			return uint16_;
-		}
-
-		if (type_ == VALUE_TYPE_INT32) {
-			return int32_;
-		}
-		if (type_ == VALUE_TYPE_UINT32) {
-			return uint32_;
-		}
-
-		if (type_ == VALUE_TYPE_INT64) {
-			return (double)int64_;
-		}
-		if (type_ == VALUE_TYPE_UINT64) {
-			return (double)uint64_;
-		}
-
-		if (type_ == VALUE_TYPE_STRING_REF) {
-			return (double)atof(refString_->str);
-		}
-
-		return NAN;
-	}
-
-	float toFloat() const {
-		if (type_ == VALUE_TYPE_DOUBLE) {
-			return (float)double_;
-		}
-
-		if (type_ == VALUE_TYPE_FLOAT) {
-			return float_;
-		}
-
-		if (type_ == VALUE_TYPE_INT8) {
-			return int8_;
-		}
-		if (type_ == VALUE_TYPE_UINT8) {
-			return uint8_;
-		}
-
-		if (type_ == VALUE_TYPE_INT16) {
-			return int16_;
-		}
-		if (type_ == VALUE_TYPE_UINT16) {
-			return uint16_;
-		}
-
-		if (type_ == VALUE_TYPE_INT32) {
-			return (float)int32_;
-		}
-
-		if (type_ == VALUE_TYPE_UINT32) {
-			return (float)uint32_;
-		}
-
-		if (type_ == VALUE_TYPE_INT64) {
-			return (float)int64_;
-		}
-		if (type_ == VALUE_TYPE_UINT64) {
-			return (float)uint64_;
-		}
-
-		if (type_ == VALUE_TYPE_STRING_REF) {
-			return (float)atof(refString_->str);
-		}
-
-		return NAN;
-	}
-
-	int32_t toInt32() const {
-		if (type_ == VALUE_TYPE_DOUBLE) {
-			return (int32_t)double_;
-		}
-
-		if (type_ == VALUE_TYPE_FLOAT) {
-			return (int32_t)float_;
-		}
-
-		if (type_ == VALUE_TYPE_INT8) {
-			return int8_;
-		}
-		if (type_ == VALUE_TYPE_UINT8) {
-			return uint8_;
-		}
-
-		if (type_ == VALUE_TYPE_INT16) {
-			return int16_;
-		}
-		if (type_ == VALUE_TYPE_UINT16) {
-			return uint16_;
-		}
-
-		if (type_ == VALUE_TYPE_INT32) {
-			return int32_;
-		}
-		if (type_ == VALUE_TYPE_UINT32) {
-			return (int32_t)uint32_;
-		}
-
-		if (type_ == VALUE_TYPE_INT64) {
-			return (int32_t)int64_;
-		}
-		if (type_ == VALUE_TYPE_UINT64) {
-			return (int32_t)uint64_;
-		}
-
-		if (type_ == VALUE_TYPE_STRING_REF) {
-			return (int64_t)atoi(refString_->str);
-		}
-
-		return 0;
-	}
-
-	int64_t toInt64() const {
-		if (type_ == VALUE_TYPE_DOUBLE) {
-			return (int64_t)double_;
-		}
-		if (type_ == VALUE_TYPE_FLOAT) {
-			return (int64_t)float_;
-		}
-
-		if (type_ == VALUE_TYPE_INT8) {
-			return int8_;
-		}
-		if (type_ == VALUE_TYPE_UINT8) {
-			return uint8_;
-		}
-
-		if (type_ == VALUE_TYPE_INT16) {
-			return int16_;
-		}
-		if (type_ == VALUE_TYPE_UINT16) {
-			return uint16_;
-		}
-
-		if (type_ == VALUE_TYPE_INT32) {
-			return int32_;
-		}
-		if (type_ == VALUE_TYPE_UINT32) {
-			return uint32_;
-		}
-
-		if (type_ == VALUE_TYPE_INT64) {
-			return int64_;
-		}
-		if (type_ == VALUE_TYPE_UINT64) {
-			return (int64_t)uint64_;
-		}
-
-		if (type_ == VALUE_TYPE_STRING_REF) {
-			return (int64_t)atoi(refString_->str);
-		}
-
-		return 0;
-	}
-
+	double toDouble() const;
+	float toFloat() const;
+	int32_t toInt32() const;
+	int64_t toInt64() const;
 	Value toString(Assets *assets) const;
 
 	static Value makeStringRef(const char *str, size_t len);
-	
 	static Value concatenateString(const char *str1, const char *str2);
 
 	//////////
@@ -603,44 +428,62 @@ struct Value {
     bool isMega() const;
 
   public:
-	uint8_t type_;
-	uint8_t unit_;
-	uint16_t options_;
-	uint32_t reserved_;
+	uint8_t type;
+	uint8_t unit;
+	uint16_t options;
+	uint32_t reserved;
 
     union {
-		uint8_t int8_;
-		uint8_t uint8_;
+		uint8_t int8Value;
+		uint8_t uint8Value;
 
-		PairOfUint8Value pairOfUint8_;
+		PairOfUint8Value pairOfUint8Value;
 
-		int16_t int16_;
-		uint16_t uint16_;
+		int16_t int16Value;
+		uint16_t uint16Value;
 
-		PairOfUint16Value pairOfUint16_;
-		PairOfInt16Value pairOfInt16_;
+		PairOfUint16Value pairOfUint16Value;
+		PairOfInt16Value pairOfInt16Value;
 
-		EnumValue enum_;
+		EnumValue enumValue;
 
-		uint32_t int32_;
-		uint32_t uint32_;
+		uint32_t int32Value;
+		uint32_t uint32Value;
 
-		float float_;
+		float floatValue;
 
-		const char *str_;
-		RefString *refString_;
-        uint32_t assetsString_;
+		uint32_t assetsOffsetValue;
 
-		uint8_t *puint8_;
-		float *pFloat_;
-		void *pVoid_;
-		Value *pValue_;
+		const char *strValue;
 
-		uint64_t int64_;
-		uint64_t uint64_;
+		Ref *refValue;
 
-		double double_;
+		uint8_t *puint8Value;
+		float *pFloatValue;
+		void *pVoidValue;
+		Value *pValueValue;
+
+		uint64_t int64Value;
+		uint64_t uint64Value;
+
+		double doubleValue;
     };
+};
+
+typedef const char *AssetsString;
+
+struct AssetsArray {
+	uint32_t arraySize;
+	Value values[1];
+};
+
+struct StringRef : public Ref {
+	char str[4];
+};
+
+struct ArrayRef : public Ref {
+	uint32_t arraySize;
+	Value values[1];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -660,10 +503,6 @@ uint16_t getNumPagesFromValue(const Value &value);
 
 Value MakeRangeValue(uint16_t from, uint16_t to);
 Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition);
-
-////////////////////////////////////////////////////////////////////////////////
-
-typedef int Cursor;
 
 ////////////////////////////////////////////////////////////////////////////////
 

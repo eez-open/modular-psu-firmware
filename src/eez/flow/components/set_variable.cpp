@@ -32,7 +32,7 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-void executeSetVariableComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeSetVariableComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
 	struct SetVariableActionComponent : public Component {
 		uint8_t assignableExpressionEvalInstructions[1];
 	};
@@ -40,18 +40,19 @@ void executeSetVariableComponent(Assets *assets, FlowState *flowState, Component
 
 	Value dstValue;
 	if (!evalAssignableExpression(assets, flowState, setVariableActionComponent->assignableExpressionEvalInstructions, dstValue)) {
-		throwError("setvariable component eval dest assignable expression\n");
-		return;
+		throwError(assets, flowState, component, "setvariable component eval dest assignable expression\n");
+		return false;
 	}
 
 	auto propertyValue = component->propertyValues.item(assets, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE);
 	Value srcValue;
 	if (!evalExpression(assets, flowState, propertyValue->evalInstructions, srcValue)) {
-		throwError("setvariable component eval src expression\n");
-		return;
+		throwError(assets, flowState, component, "setvariable component eval src expression\n");
+		return false;
 	}
 
 	assignValue(assets, flowState, component, dstValue, srcValue);
+	return true;
 }
 
 } // namespace flow

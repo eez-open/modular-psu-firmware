@@ -32,13 +32,13 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-void executeLogComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeLogComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
     auto propertyValue = component->propertyValues.item(assets, defs_v3::LOG_ACTION_COMPONENT_PROPERTY_VALUE);
 
     Value value;
     if (!evalExpression(assets, flowState, propertyValue->evalInstructions, value)) {
-        throwError("log component value eval error\n");
-        return;
+        throwError(assets, flowState, component, "log component value eval error\n");
+        return false;
     }
 
     const char *valueStr = value.toString(assets).getString();
@@ -48,6 +48,8 @@ void executeLogComponent(Assets *assets, FlowState *flowState, Component *compon
         DebugTrace("\n");
       }
     }
+
+    return true;
 }
 
 } // namespace flow

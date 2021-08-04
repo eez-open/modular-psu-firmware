@@ -75,7 +75,7 @@ bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instruc
 bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
 bool evalAssignableExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
 
-void throwError(const char *errorMessage);
+void throwError(Assets *assets, FlowState *flowState, Component *component, const char *errorMessage);
 
 } // flow
 } // eez

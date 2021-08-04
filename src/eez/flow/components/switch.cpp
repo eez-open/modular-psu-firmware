@@ -32,7 +32,7 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-void executeSwitchComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeSwitchComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
 	struct SwitchTest {
         uint8_t outputIndex;
 		uint8_t conditionInstructions[1];
@@ -49,8 +49,8 @@ void executeSwitchComponent(Assets *assets, FlowState *flowState, Component *com
 
         Value conditionValue;
         if (!evalExpression(assets, flowState, test->conditionInstructions, conditionValue)) {
-            throwError("switch component eval src expression\n");
-            return;
+            throwError(assets, flowState, component, "switch component eval src expression\n");
+            return false;
         }
 
         if (conditionValue.getBoolean()) {
@@ -61,6 +61,8 @@ void executeSwitchComponent(Assets *assets, FlowState *flowState, Component *com
 			break;
         }
     }
+
+    return true;
 }
 
 } // namespace flow

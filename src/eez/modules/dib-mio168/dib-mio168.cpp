@@ -7071,9 +7071,9 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, const WidgetCursor 
             channel.m_value = roundPrec(value.getFloat(), channel.getResolution());
         }
 	} else if (operation == DATA_OPERATION_GET_SLOT_AND_SUBCHANNEL_INDEX) {
-		value.pairOfInt16_.first = slotIndex;
-		value.pairOfInt16_.second = AOUT_1_SUBCHANNEL_INDEX +  aoutChannelIndex;
-		value.type_ = VALUE_TYPE_UINT32;
+		value.pairOfInt16Value.first = slotIndex;
+		value.pairOfInt16Value.second = AOUT_1_SUBCHANNEL_INDEX +  aoutChannelIndex;
+		value.type = VALUE_TYPE_UINT32;
 	}
 }
 

@@ -358,33 +358,33 @@ Value MakeValue(float value, Unit unit, uint16_t options) {
 
 Value MakeStepValuesValue(const StepValues *stepValues) {
     Value value;
-    value.type_ = VALUE_TYPE_STEP_VALUES;
-    value.options_ = 0;
-    value.unit_ = UNIT_UNKNOWN;
-    value.pVoid_ = (void *)stepValues;
+    value.type = VALUE_TYPE_STEP_VALUES;
+    value.options = 0;
+    value.unit = UNIT_UNKNOWN;
+    value.pVoidValue = (void *)stepValues;
     return value;
 }
 
 Value MakeFloatListValue(float *pFloat) {
     Value value;
-    value.type_ = VALUE_TYPE_FLOAT_LIST;
-    value.options_ = 0;
-    value.unit_ = UNIT_UNKNOWN;
-    value.pFloat_ = pFloat;
+    value.type = VALUE_TYPE_FLOAT_LIST;
+    value.options = 0;
+    value.unit = UNIT_UNKNOWN;
+    value.pFloatValue = pFloat;
     return value;
 }
 
 Value MakeLessThenMinMessageValue(float float_, const Value &value_) {
     Value value;
     if (value_.getType() == VALUE_TYPE_INT32) {
-        value.int32_ = int(float_);
-        value.type_ = VALUE_TYPE_LESS_THEN_MIN_INT;
+        value.int32Value = int(float_);
+        value.type = VALUE_TYPE_LESS_THEN_MIN_INT;
     } else if (value_.getType() == VALUE_TYPE_TIME_ZONE) {
-        value.type_ = VALUE_TYPE_LESS_THEN_MIN_TIME_ZONE;
+        value.type = VALUE_TYPE_LESS_THEN_MIN_TIME_ZONE;
     } else {
-        value.float_ = float_;
-        value.unit_ = value_.getUnit();
-        value.type_ = VALUE_TYPE_LESS_THEN_MIN_FLOAT;
+        value.floatValue = float_;
+        value.unit = value_.getUnit();
+        value.type = VALUE_TYPE_LESS_THEN_MIN_FLOAT;
     }
     return value;
 }
@@ -392,46 +392,46 @@ Value MakeLessThenMinMessageValue(float float_, const Value &value_) {
 Value MakeGreaterThenMaxMessageValue(float float_, const Value &value_) {
     Value value;
     if (value_.getType() == VALUE_TYPE_INT32) {
-        value.int32_ = int(float_);
-        value.type_ = VALUE_TYPE_GREATER_THEN_MAX_INT;
+        value.int32Value = int(float_);
+        value.type = VALUE_TYPE_GREATER_THEN_MAX_INT;
     } else if (value_.getType() == VALUE_TYPE_TIME_ZONE) {
-        value.type_ = VALUE_TYPE_GREATER_THEN_MAX_TIME_ZONE;
+        value.type = VALUE_TYPE_GREATER_THEN_MAX_TIME_ZONE;
     } else {
-        value.float_ = float_;
-        value.unit_ = value_.getUnit();
-        value.type_ = VALUE_TYPE_GREATER_THEN_MAX_FLOAT;
+        value.floatValue = float_;
+        value.unit = value_.getUnit();
+        value.type = VALUE_TYPE_GREATER_THEN_MAX_FLOAT;
     }
     return value;
 }
 
 Value MakeMacAddressValue(uint8_t *macAddress) {
     Value value;
-    value.type_ = VALUE_TYPE_MAC_ADDRESS;
-    value.puint8_ = macAddress;
+    value.type = VALUE_TYPE_MAC_ADDRESS;
+    value.puint8Value = macAddress;
     return value;
 }
 
 Value MakeFirmwareVersionValue(uint8_t majorVersion, uint8_t minorVersion) {
     Value value;
-    value.type_ = VALUE_TYPE_FIRMWARE_VERSION;
-    value.uint16_ = (majorVersion << 8) | minorVersion;
+    value.type = VALUE_TYPE_FIRMWARE_VERSION;
+    value.uint16Value = (majorVersion << 8) | minorVersion;
     return value;
 }
 
 Value MakeScpiErrorValue(int16_t errorCode) {
     Value value;
-    value.pairOfInt16_.first = errorCode;
-    value.pairOfInt16_.second = g_errorChannelIndex;
+    value.pairOfInt16Value.first = errorCode;
+    value.pairOfInt16Value.second = g_errorChannelIndex;
     g_errorChannelIndex = -1;
-    value.type_ = VALUE_TYPE_SCPI_ERROR;
+    value.type = VALUE_TYPE_SCPI_ERROR;
     return value;
 }
 
 Value MakeEventMessageValue(int16_t eventId, int channelIndex) {
     Value value;
-    value.pairOfInt16_.first = eventId;
-    value.pairOfInt16_.second = channelIndex;
-    value.type_ = VALUE_TYPE_EVENT_MESSAGE;
+    value.pairOfInt16Value.first = eventId;
+    value.pairOfInt16Value.second = channelIndex;
+    value.type = VALUE_TYPE_EVENT_MESSAGE;
     return value;
 }
 
@@ -1714,9 +1714,9 @@ void data_slot_is_dcpsupply_module(DataOperationEnum operation, const WidgetCurs
 void data_channel_index(Channel &channel, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_SET_CONTEXT) {
         // save currently selected channel and slot index
-        value.pairOfInt16_.first = g_channelIndex;
-        value.pairOfInt16_.second = hmi::g_selectedSlotIndex;
-        value.type_ = VALUE_TYPE_UINT32;
+        value.pairOfInt16Value.first = g_channelIndex;
+        value.pairOfInt16Value.second = hmi::g_selectedSlotIndex;
+        value.type = VALUE_TYPE_UINT32;
 
         selectChannel(&channel);
     } else if (operation == DATA_OPERATION_GET_CONTEXT) {
@@ -1725,8 +1725,8 @@ void data_channel_index(Channel &channel, DataOperationEnum operation, const Wid
         value = channel.channelIndex;
     } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
         // restore channel and slot index
-        auto channelIndex = value.pairOfInt16_.first;
-        auto slotIndex = value.pairOfInt16_.second;
+        auto channelIndex = value.pairOfInt16Value.first;
+        auto slotIndex = value.pairOfInt16Value.second;
         selectChannel(channelIndex != -1 ? &Channel::get(channelIndex) : nullptr);
         hmi::selectSlot(slotIndex);
     }
@@ -1735,9 +1735,9 @@ void data_channel_index(Channel &channel, DataOperationEnum operation, const Wid
 void data_no_channel_index(int slotIndex, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_SET_CONTEXT) {
         // save currently selected channel and slot index
-        value.pairOfInt16_.first = g_channelIndex;
-        value.pairOfInt16_.second = hmi::g_selectedSlotIndex;
-        value.type_ = VALUE_TYPE_UINT32;
+        value.pairOfInt16Value.first = g_channelIndex;
+        value.pairOfInt16Value.second = hmi::g_selectedSlotIndex;
+        value.type = VALUE_TYPE_UINT32;
 
         selectChannel(nullptr);
         hmi::g_selectedSlotIndex = slotIndex;
@@ -1747,8 +1747,8 @@ void data_no_channel_index(int slotIndex, DataOperationEnum operation, const Wid
         value = slotIndex;
     } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
         // restore channel and slot index
-        auto channelIndex = value.pairOfInt16_.first;
-        auto slotIndex = value.pairOfInt16_.second;
+        auto channelIndex = value.pairOfInt16Value.first;
+        auto slotIndex = value.pairOfInt16Value.second;
         selectChannel(channelIndex != -1 ? &Channel::get(channelIndex) : nullptr);
         hmi::selectSlot(slotIndex);
     }
@@ -2540,8 +2540,8 @@ void data_channel_protection_ocp_state(DataOperationEnum operation, const Widget
 
 void data_channel_ocp_trip_level_info(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-        value.float_ = g_channel->params.OCP_TRIP_LEVEL_PERCENT;
-        value.type_ = VALUE_TYPE_OCP_TRIP_LEVEL_INFO;
+        value.floatValue = g_channel->params.OCP_TRIP_LEVEL_PERCENT;
+        value.type = VALUE_TYPE_OCP_TRIP_LEVEL_INFO;
 	}
 }
 

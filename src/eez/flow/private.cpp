@@ -92,7 +92,7 @@ bool isComponentReadyToRun(Assets *assets, FlowState *flowState, unsigned compon
 		auto inputValueIndex = component->inputs.ptr(assets)[inputIndex];
 
 		auto &value = flowState->values[inputValueIndex];
-		if (value.type_ == VALUE_TYPE_UNDEFINED) {
+		if (value.type == VALUE_TYPE_UNDEFINED) {
 			return false;
 		}
 	}
@@ -159,7 +159,7 @@ void doSetFlowValue() {
 			if (evalAssignableExpression(assets, flowState, propertyValue->evalInstructions, dstValue)) {
 				assignValue(assets, flowState, component, dstValue, g_setValueFromGuiThreadParams.value);
 			} else {
-				throwError("doSetFlowValue failed\n");
+				throwError(assets, flowState, component, "doSetFlowValue failed\n");
 			}
 		}
 	}
@@ -173,13 +173,13 @@ void assignValue(Assets *assets, FlowState *flowState, Component *component, Val
 		auto &componentOutput = *component->outputs.item(assets, dstValue.getUInt16());
 		propagateValue(assets, flowState, componentOutput, srcValue);
 	} else {
-		Value *pDstValue = dstValue.pValue_;
+		Value *pDstValue = dstValue.pValueValue;
 		if (pDstValue->isInt32OrLess()) {
-			pDstValue->int32_ = srcValue.toInt32();
+			pDstValue->int32Value = srcValue.toInt32();
 		} else if (pDstValue->isFloat()) {
-			pDstValue->float_ = srcValue.toFloat();
+			pDstValue->floatValue = srcValue.toFloat();
 		} else if (pDstValue->isDouble()) {
-			pDstValue->float_ = srcValue.toDouble();
+			pDstValue->floatValue = srcValue.toDouble();
 		}
 		// TODO
 	}
@@ -235,7 +235,7 @@ bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instruc
 			auto finalResult = stack.pop();
 
 			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR) {
-				result = *finalResult.pValue_;
+				result = *finalResult.pValueValue;
 			} else {
 				result = finalResult;
 			}
@@ -268,9 +268,18 @@ bool evalAssignableExpression(Assets *assets, FlowState *flowState, const uint8_
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void throwError(const char *errorMessage) {
-	ErrorTrace(errorMessage);
-	scripting::stopScript();
+void throwError(Assets *assets, FlowState *flowState, Component *component, const char *errorMessage) {
+	if (component->logError) {
+		ErrorTrace(errorMessage);
+	}
+
+	if (component->errorCatchOutput != -1) {
+		auto flowDefinition = assets->flowDefinition.ptr(assets);
+		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
+		propagateValue(assets, flowState, *component->outputs.item(assets, component->errorCatchOutput), nullValue);
+	} else {
+		scripting::stopScript();
+	}
 }
 
 } // namespace flow

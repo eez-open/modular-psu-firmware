@@ -1260,9 +1260,9 @@ void data_channel_calibration_point_can_delete(DataOperationEnum operation, cons
 
 Value MakeCalibrationPointInfoValue(int8_t currentPointIndex, int8_t numPoints) {
     Value value;
-    value.type_ = VALUE_TYPE_CALIBRATION_POINT_INFO;
-    value.pairOfInt16_.first = currentPointIndex;
-    value.pairOfInt16_.second = numPoints;
+    value.type = VALUE_TYPE_CALIBRATION_POINT_INFO;
+    value.pairOfInt16Value.first = currentPointIndex;
+    value.pairOfInt16Value.second = numPoints;
     return value;
 }
 

@@ -228,6 +228,8 @@ struct Component {
 	ListOfFundamentalType<uint16_t> inputs;
 	ListOfAssetsPtr<PropertyValue> propertyValues;
 	ListOfAssetsPtr<ComponentOutput> outputs;
+	int16_t errorCatchOutput;
+	uint16_t logError;
 };
 
 struct WidgetDataItem {
