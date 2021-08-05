@@ -470,7 +470,7 @@ struct Value {
     };
 };
 
-typedef const char *AssetsString;
+typedef const char AssetsString;
 
 struct AssetsArray {
 	uint32_t arraySize;
