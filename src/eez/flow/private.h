@@ -29,8 +29,9 @@ using eez::gui::Component;
 using eez::gui::ComponentOutput;
 
 struct FlowState {
-	unsigned flowIndex;
-	eez::gui::Value values[1];
+	uint32_t flowIndex;
+	uint32_t error;
+	eez::gui::Value values[100];
 };
 
 struct ComponenentExecutionState {
@@ -71,9 +72,9 @@ void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &compo
 void setValueFromGuiThread(Assets *assets, FlowState *flowState, uint16_t dataId, const Value& value);
 void assignValue(Assets *assets, FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue);
 
-bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
-bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
-bool evalAssignableExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
+bool evalExpression(Assets *assets, FlowState *flowState, Component *component, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
+bool evalExpression(Assets *assets, FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
+bool evalAssignableExpression(Assets *assets, FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
 
 void throwError(Assets *assets, FlowState *flowState, Component *component, const char *errorMessage);
 

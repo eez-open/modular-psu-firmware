@@ -22,6 +22,14 @@
 #include <string.h>
 #include <memory.h>
 
+//#define BACKDROP_BLUR
+
+#ifdef BACKDROP_BLUR
+#include <agg2d.h>
+#include <agg_rendering_buffer.h>
+#include <agg_blur.h>
+#endif
+
 #include <eez/util.h>
 #include <eez/keyboard.h>
 #include <eez/mouse.h>
@@ -556,17 +564,51 @@ void endBuffersDrawing() {
             int y2 = y1 + buffer.height - 1;
 
             if (buffer.backdrop) {
+#ifdef BACKDROP_BLUR
+                // blur backdrop
+				typedef agg::rgba8  ColorType;
+				typedef agg::order_bgra ComponentOrder; // Platform dependent!
+				typedef agg::blender_rgba<ColorType, ComponentOrder>             Blender;
+
+		        agg::rendering_buffer rbuf;
+
+#ifdef EEZ_PLATFORM_STM32
+	            typedef agg::pixfmt_rgb565 PixFormat;
+		        rbuf.attach(
+                    (uint8_t *)getBufferPointer(),
+                    getDisplayWidth(),
+                    getDisplayHeight(),
+                    getDisplayWidth() * 2
+                );
+#else
+	            typedef agg::pixfmt_alpha_blend_rgba<Blender, agg::rendering_buffer> PixFormat;
+		        rbuf.attach(
+                    (uint8_t *)getBufferPointer() + buffer.backdrop->y * getDisplayWidth() * 4 + buffer.backdrop->x * 4,
+                    buffer.backdrop->w,
+                    buffer.backdrop->h,
+                    getDisplayWidth() * 4
+                );
+#endif
+
+                PixFormat pixFormat(rbuf);
+                agg::stack_blur<ColorType, agg::stack_blur_calc_rgb<> > stack_blur;
+                stack_blur.blur(pixFormat, 40);
+#else
+                // opacity backdrop
                 auto savedOpacity = setOpacity(CONF_BACKDROP_OPACITY);
                 setColor(COLOR_ID_BACKDROP);
                 fillRect(buffer.backdrop->x, buffer.backdrop->y, buffer.backdrop->x + buffer.backdrop->w - 1, buffer.backdrop->y + buffer.backdrop->h - 1);
                 setOpacity(savedOpacity);
+#endif
             }
 
+#ifndef BACKDROP_BLUR
             if (buffer.withShadow) {
                 // if (x1 > g_dirtyY1 || y1 > g_dirtyY1 || x2 < g_dirtyX2 || y2 < g_dirtyY2) {
                     drawShadow(x1, y1, x2, y2);
                 // }
             }
+#endif
 
             // if (x1 < g_dirtyX1) {
             //     int xd = g_dirtyX1 - x1;

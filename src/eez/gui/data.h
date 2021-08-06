@@ -409,10 +409,12 @@ struct Value {
         return pairOfUint16Value.second;
     }
 
-	double toDouble() const;
-	float toFloat() const;
-	int32_t toInt32() const;
-	int64_t toInt64() const;
+	double toDouble(int *err = nullptr) const;
+	float toFloat(int *err = nullptr) const;
+	int32_t toInt32(int *err = nullptr) const;
+	int64_t toInt64(int *err = nullptr) const;
+    bool toBool(Assets *assets, int *err = nullptr) const;
+
 	Value toString(Assets *assets) const;
 
 	static Value makeStringRef(const char *str, size_t len);
@@ -474,7 +476,8 @@ typedef const char AssetsString;
 
 struct AssetsArray {
 	uint32_t arraySize;
-	Value values[1];
+    uint32_t reserved;
+	Value values[10];
 };
 
 struct StringRef : public Ref {

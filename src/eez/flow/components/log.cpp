@@ -36,7 +36,7 @@ bool executeLogComponent(Assets *assets, FlowState *flowState, Component *compon
     auto propertyValue = component->propertyValues.item(assets, defs_v3::LOG_ACTION_COMPONENT_PROPERTY_VALUE);
 
     Value value;
-    if (!evalExpression(assets, flowState, propertyValue->evalInstructions, value)) {
+    if (!evalExpression(assets, flowState, component, propertyValue->evalInstructions, value)) {
         throwError(assets, flowState, component, "log component value eval error\n");
         return false;
     }

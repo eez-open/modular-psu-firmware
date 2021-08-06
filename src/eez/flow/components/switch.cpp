@@ -48,7 +48,7 @@ bool executeSwitchComponent(Assets *assets, FlowState *flowState, Component *com
         auto test = switchActionComponent->tests.item(assets, testIndex);
 
         Value conditionValue;
-        if (!evalExpression(assets, flowState, test->conditionInstructions, conditionValue)) {
+        if (!evalExpression(assets, flowState, component, test->conditionInstructions, conditionValue)) {
             throwError(assets, flowState, component, "switch component eval src expression\n");
             return false;
         }

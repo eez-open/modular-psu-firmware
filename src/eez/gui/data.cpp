@@ -792,7 +792,15 @@ bool Value::isMega() const {
 
 }
 
-double Value::toDouble() const {
+double Value::toDouble(int *err) const {
+	if (type == VALUE_TYPE_VALUE_PTR) {
+		return pValueValue->toDouble(err);
+	}
+
+	if (err) {
+		*err = 0;
+	}
+
 	if (type == VALUE_TYPE_DOUBLE) {
 		return doubleValue;
 	}
@@ -815,7 +823,7 @@ double Value::toDouble() const {
 		return uint16Value;
 	}
 
-	if (type == VALUE_TYPE_INT32) {
+	if (type == VALUE_TYPE_INT32 || type == VALUE_TYPE_BOOLEAN) {
 		return int32Value;
 	}
 	if (type == VALUE_TYPE_UINT32) {
@@ -833,10 +841,21 @@ double Value::toDouble() const {
 		return (double)atof(((StringRef *)refValue)->str);
 	}
 
+    if (err) {
+        *err = 1;
+    }
 	return NAN;
 }
 
-float Value::toFloat() const {
+float Value::toFloat(int *err) const {
+	if (type == VALUE_TYPE_VALUE_PTR) {
+		return pValueValue->toFloat(err);
+	}
+
+	if (err) {
+		*err = 0;
+	}
+
 	if (type == VALUE_TYPE_DOUBLE) {
 		return (float)doubleValue;
 	}
@@ -859,7 +878,7 @@ float Value::toFloat() const {
 		return uint16Value;
 	}
 
-	if (type == VALUE_TYPE_INT32) {
+	if (type == VALUE_TYPE_INT32 || type == VALUE_TYPE_BOOLEAN) {
 		return (float)int32Value;
 	}
 
@@ -878,10 +897,21 @@ float Value::toFloat() const {
 		return (float)atof(((StringRef *)refValue)->str);
 	}
 
+    if (err) {
+        *err = 1;
+    }
 	return NAN;
 }
 
-int32_t Value::toInt32() const {
+int32_t Value::toInt32(int *err) const {
+	if (type == VALUE_TYPE_VALUE_PTR) {
+		return pValueValue->toInt32(err);
+	}
+
+	if (err) {
+		*err = 0;
+	}
+
 	if (type == VALUE_TYPE_DOUBLE) {
 		return (int32_t)doubleValue;
 	}
@@ -904,7 +934,7 @@ int32_t Value::toInt32() const {
 		return uint16Value;
 	}
 
-	if (type == VALUE_TYPE_INT32) {
+	if (type == VALUE_TYPE_INT32 || type == VALUE_TYPE_BOOLEAN) {
 		return int32Value;
 	}
 	if (type == VALUE_TYPE_UINT32) {
@@ -922,10 +952,21 @@ int32_t Value::toInt32() const {
 		return (int64_t)atoi(((StringRef *)refValue)->str);
 	}
 
+    if (err) {
+        *err = 1;
+    }
 	return 0;
 }
 
-int64_t Value::toInt64() const {
+int64_t Value::toInt64(int *err) const {
+	if (type == VALUE_TYPE_VALUE_PTR) {
+		return pValueValue->toInt64(err);
+	}
+
+	if (err) {
+		*err = 0;
+	}
+
 	if (type == VALUE_TYPE_DOUBLE) {
 		return (int64_t)doubleValue;
 	}
@@ -947,7 +988,7 @@ int64_t Value::toInt64() const {
 		return uint16Value;
 	}
 
-	if (type == VALUE_TYPE_INT32) {
+	if (type == VALUE_TYPE_INT32 || type == VALUE_TYPE_BOOLEAN) {
 		return int32Value;
 	}
 	if (type == VALUE_TYPE_UINT32) {
@@ -965,10 +1006,73 @@ int64_t Value::toInt64() const {
 		return (int64_t)atoi(((StringRef *)refValue)->str);
 	}
 
+    if (err) {
+        *err = 1;
+    }
 	return 0;
 }
 
+bool Value::toBool(Assets *assets, int *err) const {
+	if (type == VALUE_TYPE_VALUE_PTR) {
+		return pValueValue->toBool(assets, err);
+	}
+
+	if (err) {
+		*err = 0;
+	}
+
+	if (type == VALUE_TYPE_DOUBLE) {
+		return doubleValue != 0;
+	}
+	if (type == VALUE_TYPE_FLOAT) {
+		return floatValue != 0;
+	}
+
+	if (type == VALUE_TYPE_INT8) {
+		return int8Value != 0;
+	}
+	if (type == VALUE_TYPE_UINT8) {
+		return uint8Value != 0;
+	}
+
+	if (type == VALUE_TYPE_INT16) {
+		return int16Value != 0;
+	}
+	if (type == VALUE_TYPE_UINT16) {
+		return uint16Value != 0;
+	}
+
+	if (type == VALUE_TYPE_INT32 || type == VALUE_TYPE_BOOLEAN) {
+		return int32Value != 0;
+	}
+	if (type == VALUE_TYPE_UINT32) {
+		return uint32Value != 0;
+	}
+
+	if (type == VALUE_TYPE_INT64) {
+		return int64Value != 0;
+	}
+	if (type == VALUE_TYPE_UINT64) {
+		return uint64Value != 0;
+	}
+
+	if (type == VALUE_TYPE_STRING_REF) {
+        auto strValue = toString(assets);
+		const char *str = strValue.getString();
+		return str && *str;
+	}
+
+    if (err) {
+        *err = 1;
+    }
+	return false;
+}
+
 Value Value::toString(Assets *assets) const {
+	if (type == VALUE_TYPE_VALUE_PTR) {
+		return pValueValue->toString(assets);
+	}
+
 	if (type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_REF) {
 		return *this;
 	}
@@ -996,7 +1100,7 @@ Value Value::toString(Assets *assets) const {
         snprintf(tempStr, sizeof(tempStr), PRId16, int16Value);
     } else if (type == VALUE_TYPE_UINT16) {
         snprintf(tempStr, sizeof(tempStr), PRIu16, uint16Value);
-    } else if (type == VALUE_TYPE_INT32) {
+    } else if (type == VALUE_TYPE_INT32 || type == VALUE_TYPE_BOOLEAN) {
         snprintf(tempStr, sizeof(tempStr), PRId32, int32Value);
     } else if (type == VALUE_TYPE_UINT32) {
         snprintf(tempStr, sizeof(tempStr), PRIu32, uint32Value);

@@ -205,8 +205,9 @@ static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT      = (1 << 13);
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR  = (2 << 13);
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR = (3 << 13);
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_PUSH_OUTPUT     = (4 << 13);
-static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_OPERATION       = (5 << 13);
-static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_END             = (6 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_ARRAY_ELEMENT        = (5 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_OPERATION       = (6 << 13);
+static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_END             = (7 << 13);
 
 struct PropertyValue {
 	uint8_t evalInstructions[1];

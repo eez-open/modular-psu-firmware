@@ -41,7 +41,7 @@ bool executeDelayComponent(Assets *assets, FlowState *flowState, Component *comp
 		auto propertyValue = component->propertyValues.item(assets, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS);
 
 		Value value;
-		if (!evalExpression(assets, flowState, propertyValue->evalInstructions, value)) {
+		if (!evalExpression(assets, flowState, component, propertyValue->evalInstructions, value)) {
 			throwError(assets, flowState, component, "delay component milliseconds eval error\n");
 			return false;
 		}

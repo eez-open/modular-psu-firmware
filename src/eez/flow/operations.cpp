@@ -150,7 +150,20 @@ bool do_OPERATION_TYPE_GREATER_OR_EQUAL(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	}
+
+	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
+		b = *b.pValueValue;
+	}
+
+	stack.push(Value(a.toBool(stack.assets) && b.toBool(stack.assets), VALUE_TYPE_BOOLEAN));
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {

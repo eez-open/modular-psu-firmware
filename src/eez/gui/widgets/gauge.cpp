@@ -100,7 +100,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
     if (refresh) {
 		float min = get(widgetCursor, widget->min).toFloat();
 		float max = get(widgetCursor, widget->max).toFloat();
-		float value = widgetCursor.currentState->data.getFloat();
+		float value = widgetCursor.currentState->data.toFloat();
 
 		const Style* style = getStyle(widget->style);
 		const Style* barStyle = getStyle(widget->barStyle);
@@ -156,6 +156,11 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		// draw bar
 		auto radBarOuter = (widget->w - 12) / 2 - (BORDER_WIDTH - BAR_WIDTH) / 2;
 		auto radBarInner = radBarOuter - BAR_WIDTH;
+		if (value < min) {
+			value = min;
+		} else if (value > max) {
+			value = max;
+		}
 		auto angle = remap(value, min, 180.0f, max, 0.0f);
 		if (!isNaN(angle)) {
 			graphics.resetPath();

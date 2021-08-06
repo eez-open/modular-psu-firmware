@@ -36,9 +36,11 @@ FlowState *initFlowState(Assets *assets, int flowIndex) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowIndex);
 
-	FlowState *flowState = (FlowState *)alloc(sizeof(FlowState) + (flow->nInputValues + flow->localVariables.count + flow->widgetDataItems.count - 1) * sizeof(Value));
+	// TODO this is invalid size
+	FlowState *flowState = (FlowState *)alloc(sizeof(FlowState) + (flow->nInputValues + flow->localVariables.count + flow->widgetDataItems.count) * sizeof(Value));
 
 	flowState->flowIndex = flowIndex;
+	flowState->error = false;
 
 	auto &undefinedValue = *flowDefinition->constants.item(assets, UNDEFINED_VALUE_INDEX);
 
@@ -69,7 +71,10 @@ void recalcFlowDataItems(Assets *assets, FlowState *flowState) {
 			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
 
-			evalExpression(assets, flowState, propertyValue->evalInstructions, value);
+			evalExpression(assets, flowState, component, propertyValue->evalInstructions, value);
+			if (flowState->error) {
+				break;
+			}
 		} else {
 			value = Value();
 		}
@@ -156,7 +161,7 @@ void doSetFlowValue() {
 			auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
 
 			Value dstValue;
-			if (evalAssignableExpression(assets, flowState, propertyValue->evalInstructions, dstValue)) {
+			if (evalAssignableExpression(assets, flowState, component, propertyValue->evalInstructions, dstValue)) {
 				assignValue(assets, flowState, component, dstValue, g_setValueFromGuiThreadParams.value);
 			} else {
 				throwError(assets, flowState, component, "doSetFlowValue failed\n");
@@ -174,12 +179,13 @@ void assignValue(Assets *assets, FlowState *flowState, Component *component, Val
 		propagateValue(assets, flowState, componentOutput, srcValue);
 	} else {
 		Value *pDstValue = dstValue.pValueValue;
+		
 		if (pDstValue->isInt32OrLess()) {
 			pDstValue->int32Value = srcValue.toInt32();
 		} else if (pDstValue->isFloat()) {
 			pDstValue->floatValue = srcValue.toFloat();
 		} else if (pDstValue->isDouble()) {
-			pDstValue->floatValue = srcValue.toDouble();
+			pDstValue->doubleValue = srcValue.toDouble();
 		}
 		// TODO
 	}
@@ -187,7 +193,7 @@ void assignValue(Assets *assets, FlowState *flowState, Component *component, Val
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes) {
+bool evalExpression(Assets *assets, FlowState *flowState, Component *component, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 
@@ -206,6 +212,38 @@ bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instruc
 			stack.push(flowDefinition->globalVariables.item(assets, instructionArg));
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_OUTPUT) {
 			stack.push(Value((uint16_t)instructionArg, VALUE_TYPE_FLOW_OUTPUT));
+		} else if (instructionType == EXPR_EVAL_INSTRUCTION_ARRAY_ELEMENT) {
+			auto elementIndexValue = stack.pop();
+			auto arrayValue = stack.pop();
+
+			if (arrayValue.getType() == VALUE_TYPE_VALUE_PTR) {
+				arrayValue = *arrayValue.pValueValue;
+			}
+
+			if (elementIndexValue.getType() == VALUE_TYPE_VALUE_PTR) {
+				elementIndexValue = *elementIndexValue.pValueValue;
+			}
+
+			if (arrayValue.type != VALUE_TYPE_ASSETS_ARRAY) {
+				throwError(assets, flowState, component, "Array value expected\n");
+				return false;
+			}
+
+			auto assetsArray = ((AssetsPtr<AssetsArray> *)&arrayValue.assetsOffsetValue)->ptr(assets);
+
+			int err;
+			auto elementIndex = elementIndexValue.toInt32(&err);
+			if (err) {
+				throwError(assets, flowState, component, "Integer value expected for array element index\n");
+				return false;
+			}
+		
+			if (elementIndex < 0 || elementIndex >= (int)assetsArray->arraySize) {
+				throwError(assets, flowState, component, "Array element index out of bounds\n");
+				return false;
+			}
+
+			stack.push(&assetsArray->values[elementIndex]);
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
 			if (!g_evalOperations[instructionArg](stack)) {
 				return false;
@@ -225,12 +263,12 @@ bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instruc
 	return true;
 }
 
-bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes) {
+bool evalExpression(Assets *assets, FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes) {
 	EvalStack stack;
 	stack.assets = assets;
 	stack.flowState = flowState;
 
-	if (evalExpression(assets, flowState, instructions, stack, numInstructionBytes)) {
+	if (evalExpression(assets, flowState, component, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {
 			auto finalResult = stack.pop();
 
@@ -248,12 +286,12 @@ bool evalExpression(Assets *assets, FlowState *flowState, const uint8_t *instruc
 	return false;
 }
 
-bool evalAssignableExpression(Assets *assets, FlowState *flowState, const uint8_t *instructions, Value &result, int *numInstructionBytes) {
+bool evalAssignableExpression(Assets *assets, FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes) {
 	EvalStack stack;
 	stack.assets = assets;
 	stack.flowState = flowState;
 
-	if (evalExpression(assets, flowState, instructions, stack, numInstructionBytes)) {
+	if (evalExpression(assets, flowState, component, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {
 			auto finalResult = stack.pop();
 			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR || finalResult.getType() == VALUE_TYPE_FLOW_OUTPUT) {
@@ -278,6 +316,7 @@ void throwError(Assets *assets, FlowState *flowState, Component *component, cons
 		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
 		propagateValue(assets, flowState, *component->outputs.item(assets, component->errorCatchOutput), nullValue);
 	} else {
+		flowState->error = true;
 		scripting::stopScript();
 	}
 }

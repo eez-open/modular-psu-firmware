@@ -39,14 +39,14 @@ bool executeSetVariableComponent(Assets *assets, FlowState *flowState, Component
 	auto setVariableActionComponent = (SetVariableActionComponent *)component;
 
 	Value dstValue;
-	if (!evalAssignableExpression(assets, flowState, setVariableActionComponent->assignableExpressionEvalInstructions, dstValue)) {
+	if (!evalAssignableExpression(assets, flowState, component, setVariableActionComponent->assignableExpressionEvalInstructions, dstValue)) {
 		throwError(assets, flowState, component, "setvariable component eval dest assignable expression\n");
 		return false;
 	}
 
 	auto propertyValue = component->propertyValues.item(assets, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE);
 	Value srcValue;
-	if (!evalExpression(assets, flowState, propertyValue->evalInstructions, srcValue)) {
+	if (!evalExpression(assets, flowState, component, propertyValue->evalInstructions, srcValue)) {
 		throwError(assets, flowState, component, "setvariable component eval src expression\n");
 		return false;
 	}

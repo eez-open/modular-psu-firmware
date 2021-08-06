@@ -1942,7 +1942,7 @@ void onEncoder(int counter, bool clicked) {
             
             float step = edit_mode_step::getEncoderStepValue();
 
-            float newValue = roundPrec(value.getFloat() + counter * step, step);
+            float newValue = roundPrec(value.toFloat() + counter * step, step);
             if (getAllowZero(g_focusCursor, g_focusDataId) && newValue < value.getFloat() && newValue < min) {
                 newValue = 0;
             } else {

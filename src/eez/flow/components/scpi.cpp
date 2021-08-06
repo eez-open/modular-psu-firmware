@@ -113,7 +113,7 @@ bool executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 		} else if (scpiComponentExecutionState->op == SCPI_PART_EXPR) {
 			Value value;
 			int numInstructionBytes;
-			if (!evalExpression(assets, flowState, instructions + scpiComponentExecutionState->instructionIndex, value, &numInstructionBytes)) {
+			if (!evalExpression(assets, flowState, component, instructions + scpiComponentExecutionState->instructionIndex, value, &numInstructionBytes)) {
 				throwError(assets, flowState, component, "scpi component eval assignable expression\n");
 				return false;
 			}
@@ -147,7 +147,7 @@ bool executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 
 			Value dstValue;
 			int numInstructionBytes;
-			if (!evalAssignableExpression(assets, flowState, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
+			if (!evalAssignableExpression(assets, flowState, component, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
 				throwError(assets, flowState, component, "scpi component eval assignable expression\n");
 				return false;
 			}
