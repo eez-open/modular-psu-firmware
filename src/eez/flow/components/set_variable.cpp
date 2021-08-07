@@ -25,28 +25,34 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool executeSetVariableComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-	struct SetVariableActionComponent : public Component {
-		uint8_t assignableExpressionEvalInstructions[1];
-	};
+struct SetVariableActionComponent : public Component {
+	uint8_t assignableExpressionEvalInstructions[1];
+};
+
+void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex) {
+    auto assets = flowState->assets;
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto component = flow->components.item(assets, componentIndex);
+
 	auto setVariableActionComponent = (SetVariableActionComponent *)component;
 
 	Value dstValue;
 	if (!evalAssignableExpression(flowState, component, setVariableActionComponent->assignableExpressionEvalInstructions, dstValue)) {
 		throwError(flowState, component, "setvariable component eval dest assignable expression\n");
-		return false;
+		return;
 	}
 
-	auto assets = flowState->assets;
 	auto propertyValue = component->propertyValues.item(assets, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE);
 	Value srcValue;
 	if (!evalExpression(flowState, component, propertyValue->evalInstructions, srcValue)) {
 		throwError(flowState, component, "setvariable component eval src expression\n");
-		return false;
+		return;
 	}
 
 	assignValue(flowState, component, dstValue, srcValue);
-	return true;
+	
+	propagateValue(flowState, componentIndex);
 }
 
 } // namespace flow

@@ -28,6 +28,10 @@ using eez::gui::Assets;
 using eez::gui::Component;
 using eez::gui::ComponentOutput;
 
+struct ComponenentExecutionState {
+	virtual ~ComponenentExecutionState() {}
+};
+
 struct FlowState {
 	Assets *assets;
 	uint16_t flowIndex;
@@ -35,11 +39,8 @@ struct FlowState {
 	uint32_t numActiveComponents;
 	FlowState *parentFlowState;
 	Component *parentComponent;
-	eez::gui::Value values[1];
-};
-
-struct ComponenentExecutionState {
-	virtual ~ComponenentExecutionState() {}
+	Value *values;
+	ComponenentExecutionState **componenentExecutionStates;
 };
 
 static const int UNDEFINED_VALUE_INDEX = 0;
@@ -51,6 +52,8 @@ void freeFlowState(FlowState *flowState);
 void recalcFlowDataItems(FlowState *flowState);
 
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
+void propagateValue(FlowState *flowState, ComponentOutput &componentOutput); // propagates null value
+void propagateValue(FlowState *flowState, unsigned componentIndex); // propagates null value through @seqout (0-th output)
 
 void setValueFromGuiThread(FlowState *flowState, uint16_t dataId, const Value& value);
 void assignValue(FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue);

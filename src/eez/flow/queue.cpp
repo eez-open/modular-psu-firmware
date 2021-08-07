@@ -25,7 +25,6 @@ static const unsigned QUEUE_SIZE = 100;
 static struct {
 	FlowState *flowState;
 	unsigned componentIndex;
-	ComponenentExecutionState *componentExecutionState;
 } g_queue[QUEUE_SIZE];
 static unsigned g_queueHead;
 static unsigned g_queueTail;
@@ -37,10 +36,9 @@ void queueInit() {
 	g_queueIsFull = false;
 }
 
-void addToQueue(FlowState *flowState, unsigned componentIndex, ComponenentExecutionState *componentExecutionState) {
+void addToQueue(FlowState *flowState, unsigned componentIndex) {
 	g_queue[g_queueTail].flowState = flowState;
 	g_queue[g_queueTail].componentIndex = componentIndex;
-	g_queue[g_queueTail].componentExecutionState = componentExecutionState;
 
 	g_queueTail = (g_queueTail + 1) % QUEUE_SIZE;
 
@@ -51,14 +49,13 @@ void addToQueue(FlowState *flowState, unsigned componentIndex, ComponenentExecut
 	flowState->numActiveComponents++;
 }
 
-bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex, ComponenentExecutionState *&componentExecutionState) {
+bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex) {
 	if (g_queueHead == g_queueTail && !g_queueIsFull) {
 		return false;
 	}
 
 	flowState = g_queue[g_queueHead].flowState;
 	componentIndex = g_queue[g_queueHead].componentIndex;
-	componentExecutionState = g_queue[g_queueHead].componentExecutionState;
 
 	g_queueHead = (g_queueHead + 1) % QUEUE_SIZE;
 	g_queueIsFull = false;

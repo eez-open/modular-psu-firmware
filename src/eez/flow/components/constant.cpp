@@ -23,13 +23,16 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool executeConstantComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
+struct ConstantActionComponent : public Component {
+	uint16_t valueIndex;
+};
 
-	struct ConstantActionComponent : public Component {
-		uint16_t valueIndex;
-	};
+void executeConstantComponent(FlowState *flowState, unsigned componentIndex) {
+ 	auto assets = flowState->assets;
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto component = flow->components.item(assets, componentIndex);
+
 	auto constantActionComponent = (ConstantActionComponent *)component;
 	auto &sourceValue = *flowDefinition->constants.item(assets, constantActionComponent->valueIndex);
 
@@ -39,7 +42,7 @@ bool executeConstantComponent(FlowState *flowState, Component *component, Compon
 		propagateValue(flowState, componentOutput, sourceValue);
 	}
 
-	return true;
+	propagateValue(flowState, componentIndex);
 }
 
 } // namespace flow

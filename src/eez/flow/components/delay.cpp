@@ -22,45 +22,55 @@
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
+#include <eez/flow/queue.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-bool executeDelayComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-	struct DelayComponenentExecutionState : public ComponenentExecutionState {
-		uint32_t waitUntil;
-	};
+struct DelayComponenentExecutionState : public ComponenentExecutionState {
+	uint32_t waitUntil;
+};
 
-	if (!componentExecutionState) {
+void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
+ 	auto assets = flowState->assets;
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto component = flow->components.item(assets, componentIndex);
+
+	auto delayComponentExecutionState = (DelayComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
+
+	if (!delayComponentExecutionState) {
 		auto assets = flowState->assets;
 		auto propertyValue = component->propertyValues.item(assets, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS);
 
 		Value value;
 		if (!evalExpression(flowState, component, propertyValue->evalInstructions, value)) {
 			throwError(flowState, component, "delay component milliseconds eval error\n");
-			return false;
+			return;
 		}
 
 		double milliseconds = value.toDouble();
 		if (!isNaN(milliseconds)) {
-			auto delayComponentExecutionState = ObjectAllocator<DelayComponenentExecutionState>::allocate(0x28969c75);
+			delayComponentExecutionState = ObjectAllocator<DelayComponenentExecutionState>::allocate(0x28969c75);
 			delayComponentExecutionState->waitUntil = millis() + (uint32_t)floor(milliseconds);
-			componentExecutionState = delayComponentExecutionState;
+			flowState->componenentExecutionStates[componentIndex] = delayComponentExecutionState;
 		} else {
 			throwError(flowState, component, "delay component milliseconds invalid value\n");
-			return false;
+			return;
 		}
+
+		addToQueue(flowState, componentIndex);
 	} else {
-		auto delayComponentExecutionState = (DelayComponenentExecutionState *)componentExecutionState;
 		if (millis() >= delayComponentExecutionState->waitUntil) {
 			ObjectAllocator<DelayComponenentExecutionState>::deallocate(delayComponentExecutionState);
-			componentExecutionState = nullptr;
+			flowState->componenentExecutionStates[componentIndex] = nullptr;
+			propagateValue(flowState, componentIndex);
+		} else {
+			addToQueue(flowState, componentIndex);
 		}
 	}
-
-	return true;
 }
 
 } // namespace flow

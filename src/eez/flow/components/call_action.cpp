@@ -25,14 +25,17 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool executeCallActionComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-	struct CallActionActionComponent : public Component {
-		int16_t actionFlowIndex;
-	};
-	auto callActionActionComponent = (CallActionActionComponent *)component;
+struct CallActionActionComponent : public Component {
+	int16_t actionFlowIndex;
+};
 
-	auto assets = flowState->assets;
+void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
+ 	auto assets = flowState->assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto component = flow->components.item(assets, componentIndex);
+
+	auto callActionActionComponent = (CallActionActionComponent *)component;
 
 	auto actionFlowIndex = callActionActionComponent->actionFlowIndex;
 
@@ -47,12 +50,10 @@ bool executeCallActionComponent(FlowState *flowState, Component *component, Comp
 
 	if (actionFlowState->numActiveComponents == 0) {
 		freeFlowState(actionFlowState);
-		return true;
+		propagateValue(flowState, componentIndex);
+	} else {
+		flowState->numActiveComponents++;
 	}
-
-	flowState->numActiveComponents++;
-
-	return false;
 }
 
 } // namespace flow

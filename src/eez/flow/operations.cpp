@@ -23,47 +23,91 @@
 
 namespace eez {
 namespace flow {
-    
+
+Value op_add(Assets *assets, const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	if (a.isAnyStringType() || b.isAnyStringType()) {
+		Value value1 = a.toString(assets, 0x84eafaa8);
+		Value value2 = b.toString(assets, 0xd273cab6);
+		return Value::concatenateString(value1.getString(), value2.getString());
+	}
+
+	if (a.isDouble() || b.isDouble()) {
+		return Value(a.toDouble() + b.toDouble(), VALUE_TYPE_DOUBLE);
+	}
+
+	if (a.isFloat() || b.isFloat()) {
+		return Value(a.toFloat() + b.toFloat(), VALUE_TYPE_FLOAT);
+	}
+
+	if (a.isInt64() || b.isInt64()) {
+		return Value(a.toInt64() + b.toInt64(), VALUE_TYPE_INT64);
+	}
+
+	if (a.isInt32OrLess() && b.isInt32OrLess()) {
+		return Value(a.int32Value + b.int32Value, VALUE_TYPE_INT32);
+	}
+
+	return Value();
+}
+
+Value op_eq(const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	return Value(a == b, VALUE_TYPE_BOOLEAN);
+}
+
+Value op_neq(const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	return Value(a != b, VALUE_TYPE_BOOLEAN);
+}
+
+Value op_less(const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	return Value(a.toDouble() < b.toDouble(), VALUE_TYPE_BOOLEAN);
+}
+
+Value op_great(const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	return Value(a.toDouble() > b.toDouble(), VALUE_TYPE_BOOLEAN);
+}
+
+Value op_less_eq(const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	return Value(a.toDouble() <= b.toDouble(), VALUE_TYPE_BOOLEAN);
+}
+
+Value op_great_eq(const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	return Value(a.toDouble() >= b.toDouble(), VALUE_TYPE_BOOLEAN);
+}
+
 bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
 
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
+	auto result = op_add(stack.assets, a, b);
+
+	if (result.getType() == VALUE_TYPE_UNDEFINED) {
+		return false;
 	}
 
-	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
-		b = *b.pValueValue;
-	}
+	stack.push(result);
 
-	if (a.isAnyStringType() || b.isAnyStringType()) {
-		Value value1 = a.toString(stack.assets, 0x84eafaa8);
-		Value value2 = b.toString(stack.assets, 0xd273cab6);
-		stack.push(Value::concatenateString(value1.getString(), value2.getString()));
-		return true;
-	}
-
-	if (a.isDouble() || b.isDouble()) {
-		stack.push(Value(a.toDouble() + b.toDouble(), VALUE_TYPE_DOUBLE));
-		return true;
-	}
-
-	if (a.isFloat() || b.isFloat()) {
-		stack.push(Value(a.toFloat() + b.toFloat(), VALUE_TYPE_FLOAT));
-		return true;
-	}
-
-	if (a.isInt64() || b.isInt64()) {
-		stack.push(Value(a.toInt64() + b.toInt64(), VALUE_TYPE_INT64));
-		return true;
-	}
-
-	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		stack.push(Value(a.int32Value + b.int32Value, VALUE_TYPE_INT32));
-		return true;
-	}
-
-	return false;
+	return true;
 }
 
 bool do_OPERATION_TYPE_SUB(EvalStack &stack) {
@@ -105,48 +149,42 @@ bool do_OPERATION_TYPE_BINARY_XOR(EvalStack &stack) {
 bool do_OPERATION_TYPE_EQUAL(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
-
-	stack.push(Value(a == b, VALUE_TYPE_BOOLEAN));
-
+	stack.push(op_eq(a, b));
 	return true;
 }
 
 bool do_OPERATION_TYPE_NOT_EQUAL(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
-
-	stack.push(Value(a != b, VALUE_TYPE_BOOLEAN));
-
-	return true;
-}
+	stack.push(a != b);
+	return true;}
 
 bool do_OPERATION_TYPE_LESS(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	}
-
-	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
-		b = *b.pValueValue;
-	}
-
-	stack.push(Value(a.toDouble() < b.toDouble(), VALUE_TYPE_BOOLEAN));
-
+	stack.push(op_less(a, b));
 	return true;
 }
 
 bool do_OPERATION_TYPE_GREATER(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+	stack.push(op_great(a, b));
+	return true;
 }
 
 bool do_OPERATION_TYPE_LESS_OR_EQUAL(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+	stack.push(op_less_eq(a, b));
+	return true;
 }
 
 bool do_OPERATION_TYPE_GREATER_OR_EQUAL(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+	stack.push(op_great_eq(a, b));
+	return true;
 }
 
 bool do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {

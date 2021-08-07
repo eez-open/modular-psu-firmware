@@ -25,18 +25,12 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool executeEndComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+void executeEndComponent(FlowState *flowState, unsigned componentIndex) {
 	if (flowState->parentFlowState) {
 		flowState->parentFlowState->numActiveComponents--;
-
-		auto assets = flowState->assets;
-		auto flowDefinition = assets->flowDefinition.ptr(assets);
-		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
-		propagateValue(flowState->parentFlowState, *flowState->parentComponent->outputs.item(assets, 0), nullValue);
-		return true;
+		propagateValue(flowState->parentFlowState, *flowState->parentComponent->outputs.item(flowState->assets, 0));
 	} else {
 		scripting::stopScript();
-		return false;
 	}
 }
 

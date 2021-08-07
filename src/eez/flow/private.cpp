@@ -57,7 +57,7 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 
 void pingComponent(FlowState *flowState, unsigned componentIndex) {
 	if (isComponentReadyToRun(flowState, componentIndex)) {
-		addToQueue(flowState, componentIndex, nullptr);
+		addToQueue(flowState, componentIndex);
 	}
 }
 
@@ -69,7 +69,7 @@ FlowState *initFlowState(Assets *assets, int flowIndex) {
 	auto nValues = flow->nInputValues + flow->localVariables.count + flow->widgetDataItems.count;
 
 	FlowState *flowState = (FlowState *)alloc(
-		sizeof(FlowState) + (nValues - 1) * sizeof(Value),
+		sizeof(FlowState) + nValues * sizeof(Value) + flow->components.count * sizeof(ComponenentExecutionState),
 		0x4c3b6ef5
 	);
 
@@ -79,13 +79,14 @@ FlowState *initFlowState(Assets *assets, int flowIndex) {
 	flowState->numActiveComponents = 0;
 	flowState->parentFlowState = nullptr;
 	flowState->parentComponent = nullptr;
-
-	auto &undefinedValue = *flowDefinition->constants.item(assets, UNDEFINED_VALUE_INDEX);
+	flowState->values = (Value *)(flowState + 1);
+	flowState->componenentExecutionStates = (ComponenentExecutionState **)(flowState->values + nValues);
 
 	for (unsigned i = 0; i < nValues; i++) {
 		flowState->values[i].clear();
 	}
 
+	auto &undefinedValue = *flowDefinition->constants.item(assets, UNDEFINED_VALUE_INDEX);
 	for (unsigned i = 0; i < flow->nInputValues; i++) {
 		flowState->values[i] = undefinedValue;
 	}
@@ -93,6 +94,10 @@ FlowState *initFlowState(Assets *assets, int flowIndex) {
 	for (unsigned i = 0; i < flow->localVariables.count; i++) {
 		auto value = flow->localVariables.item(assets, i);
 		flowState->values[flow->nInputValues + i] = *value;
+	}
+
+	for (unsigned i = 0; i < flow->components.count; i++) {
+		flowState->componenentExecutionStates[i] = nullptr;
 	}
 
 	recalcFlowDataItems(flowState);
@@ -114,6 +119,14 @@ void freeFlowState(FlowState *flowState) {
 	for (unsigned int i = 0; i < valuesCount; i++) {
 		(flowState->values + i)->~Value();
 	}
+
+	for (unsigned i = 0; i < flow->components.count; i++) {
+		auto componentExecutionState = flowState->componenentExecutionStates[i];
+		if (componentExecutionState) {
+			ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
+		}
+	}
+
 
 	free(flowState);
 }
@@ -152,6 +165,22 @@ void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, cons
 			flowState->values[connection->targetInputIndex] = Value();
 		}
 	}
+}
+
+void propagateValue(FlowState *flowState, ComponentOutput &componentOutput) {
+	auto assets = flowState->assets;
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
+	propagateValue(flowState, componentOutput, nullValue);
+}
+
+void propagateValue(FlowState *flowState, unsigned componentIndex) {
+	auto assets = flowState->assets;
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto component = flow->components.item(assets, componentIndex);
+	auto &componentOutput = *component->outputs.item(assets, 0);
+	propagateValue(flowState, componentOutput);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -232,10 +261,7 @@ void throwError(FlowState *flowState, Component *component, const char *errorMes
 	}
 
 	if (component->errorCatchOutput != -1) {
-		auto assets = flowState->assets;
-		auto flowDefinition = assets->flowDefinition.ptr(assets);
-		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
-		propagateValue(flowState, *component->outputs.item(assets, component->errorCatchOutput), nullValue);
+		propagateValue(flowState, *component->outputs.item(flowState->assets, component->errorCatchOutput));
 	} else {
 		flowState->error = true;
 		scripting::stopScript();

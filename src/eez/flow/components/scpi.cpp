@@ -24,6 +24,7 @@
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
+#include <eez/flow/queue.h>
 
 using namespace eez::gui;
 
@@ -71,10 +72,15 @@ void scpiResultIsReady() {
 	ScpiComponentExecutionState::g_scpiResultIsReady = true;
 }
 
-bool executeScpiComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-	struct ScpiActionComponent : public Component {
-		uint8_t instructions[1];
-	};
+struct ScpiActionComponent : public Component {
+	uint8_t instructions[1];
+};
+
+void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
+    auto assets = flowState->assets;
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto component = flow->components.item(assets, componentIndex);
 
 	auto specific = (ScpiActionComponent *)component;
 	auto instructions = specific->instructions;
@@ -86,14 +92,13 @@ bool executeScpiComponent(FlowState *flowState, Component *component, Componenen
 	static const int SCPI_PART_COMMAND = 5;
 	static const int SCPI_PART_END = 6;
 
-	ScpiComponentExecutionState *scpiComponentExecutionState;
-	if (componentExecutionState) {
-		scpiComponentExecutionState = (ScpiComponentExecutionState *)componentExecutionState;
-	} else {
+	auto scpiComponentExecutionState = (ScpiComponentExecutionState *)flowState->componenentExecutionStates[componentIndex];
+
+	if (!scpiComponentExecutionState) {
 		scpiComponentExecutionState = ObjectAllocator<ScpiComponentExecutionState>::allocate(0x38e134d2);
 		scpiComponentExecutionState->op = instructions[scpiComponentExecutionState->instructionIndex++];
 
-		componentExecutionState = scpiComponentExecutionState;
+		flowState->componenentExecutionStates[componentIndex] = scpiComponentExecutionState;
 	}
 
 	while (true) {
@@ -115,9 +120,9 @@ bool executeScpiComponent(FlowState *flowState, Component *component, Componenen
 				throwError(flowState, component, "scpi component eval assignable expression\n");
 
 				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
-				componentExecutionState = nullptr;
+				flowState->componenentExecutionStates[componentIndex] = nullptr;
 
-				return false;
+				return;
 			}
 			scpiComponentExecutionState->instructionIndex += numInstructionBytes;
 
@@ -131,7 +136,8 @@ bool executeScpiComponent(FlowState *flowState, Component *component, Componenen
 			);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY_WITH_ASSIGNMENT) {
 			if (!scpiComponentExecutionState->scpi()) {
-				break;
+				addToQueue(flowState, componentIndex);
+				return;
 			}
 
 			const char *resultText;
@@ -147,9 +153,9 @@ bool executeScpiComponent(FlowState *flowState, Component *component, Componenen
 				throwError(flowState, component, errorMessage);
 
 				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
-				componentExecutionState = nullptr;
+				flowState->componenentExecutionStates[componentIndex] = nullptr;
 
-				return false;
+				return;
 			}
 
 			Value dstValue;
@@ -158,9 +164,9 @@ bool executeScpiComponent(FlowState *flowState, Component *component, Componenen
 				throwError(flowState, component, "scpi component eval assignable expression\n");
 
 				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
-				componentExecutionState = nullptr;
+				flowState->componenentExecutionStates[componentIndex] = nullptr;
 
-				return false;
+				return;
 			}
 			scpiComponentExecutionState->instructionIndex += numInstructionBytes;
 
@@ -171,26 +177,27 @@ bool executeScpiComponent(FlowState *flowState, Component *component, Componenen
 			assignValue(flowState, component, dstValue, srcValue);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY) {
 			if (!scpiComponentExecutionState->scpi()) {
-				break;
+				addToQueue(flowState, componentIndex);
+				return;
 			}
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 		} else if (scpiComponentExecutionState->op == SCPI_PART_COMMAND) {
 			if (!scpiComponentExecutionState->scpi()) {
-				break;
+				addToQueue(flowState, componentIndex);
+				return;
 			}
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 
 		} else if (scpiComponentExecutionState->op == SCPI_PART_END) {
 			ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
-			componentExecutionState = nullptr;
+			flowState->componenentExecutionStates[componentIndex] = nullptr;
 
-			break;
+			propagateValue(flowState, componentIndex);
+			return;
 		}
 
 		scpiComponentExecutionState->op = instructions[scpiComponentExecutionState->instructionIndex++];
 	}
-
-	return true;
 }
 
 } // namespace flow

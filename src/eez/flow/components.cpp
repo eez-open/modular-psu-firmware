@@ -31,61 +31,48 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool executeStartComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-bool executeEndComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-bool executeDelayComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-bool executeConstantComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-bool executeSetVariableComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-bool executeSwitchComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-bool executeLogComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-bool executeScpiComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
-bool executeCallActionComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState);
+void executeStartComponent(FlowState *flowState, unsigned componentIndex);
+void executeEndComponent(FlowState *flowState, unsigned componentIndex);
+void executeDelayComponent(FlowState *flowState, unsigned componentIndex);
+void executeConstantComponent(FlowState *flowState, unsigned componentIndex);
+void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex);
+void executeLoopComponent(FlowState *flowState, unsigned componentIndex);
+void executeSwitchComponent(FlowState *flowState, unsigned componentIndex);
+void executeLogComponent(FlowState *flowState, unsigned componentIndex);
+void executeScpiComponent(FlowState *flowState, unsigned componentIndex);
+void executeCallActionComponent(FlowState *flowState, unsigned componentIndex);
 
-bool executeComponent(FlowState *flowState, unsigned componentIndex, ComponenentExecutionState *componentExecutionState) {
+void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	auto assets = flowState->assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 	auto component = flow->components.item(assets, componentIndex);
 
-	bool result;
-    
 	if (component->type == defs_v3::COMPONENT_TYPE_START_ACTION) {
-		result = executeStartComponent(flowState, component, componentExecutionState);
+		executeStartComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_END_ACTION) {
-		result = executeEndComponent(flowState, component, componentExecutionState);
+		executeEndComponent(flowState, componentIndex);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_DELAY_ACTION) {
-		result = executeDelayComponent(flowState, component, componentExecutionState);
+		executeDelayComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_CONSTANT_ACTION) {
-		result = executeConstantComponent(flowState, component, componentExecutionState);
+		executeConstantComponent(flowState, componentIndex);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_SET_VARIABLE_ACTION) {
-		result = executeSetVariableComponent(flowState, component, componentExecutionState);
+		executeSetVariableComponent(flowState, componentIndex);
+    } else if (component->type == defs_v3::COMPONENT_TYPE_LOOP_ACTION) {
+		executeLoopComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_SWITCH_ACTION) {
-		result = executeSwitchComponent(flowState, component, componentExecutionState);
+		executeSwitchComponent(flowState, componentIndex);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_LOG_ACTION) {
-		result = executeLogComponent(flowState, component, componentExecutionState);
+		executeLogComponent(flowState, componentIndex);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_SCPI_ACTION) {
-		result = executeScpiComponent(flowState, component, componentExecutionState);
+		executeScpiComponent(flowState, componentIndex);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_CALL_ACTION_ACTION) {
-		result = executeCallActionComponent(flowState, component, componentExecutionState);
+		executeCallActionComponent(flowState, componentIndex);
 	} else {
 		char errorMessage[100];
 		snprintf(errorMessage, sizeof(errorMessage), "Unknown component at index = %d, type = %d\n", componentIndex, component->type);
 		throwError(flowState, component, errorMessage);
-		return false;
     }
-
-	if (!result) {
-		return false;
-	}
-
-	if (componentExecutionState) {
-		addToQueue(flowState, componentIndex, componentExecutionState);
-	} else {
-		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
-		propagateValue(flowState, *component->outputs.item(assets, 0), nullValue);
-	}
-	
-	return true;
 }
 
 } // namespace flow

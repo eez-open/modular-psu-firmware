@@ -56,27 +56,21 @@ void tick(unsigned flowHandle) {
 
 	FlowState *flowState;
 	unsigned componentIndex;
-	ComponenentExecutionState *componentExecutionState;
-	if (removeFromQueue(flowState, componentIndex, componentExecutionState)) {
-		executeComponent(flowState, componentIndex, componentExecutionState);
+	if (removeFromQueue(flowState, componentIndex)) {
+		executeComponent(flowState, componentIndex);
 
 		if (--flowState->numActiveComponents == 0) {
 			freeFlowState(flowState);
 		}
-	}
 
-	recalcFlowDataItems(flowState);
+		recalcFlowDataItems(flowState);
+	}
 }
 
 void stop() {
 	FlowState *flowState;
 	unsigned componentIndex;
-	ComponenentExecutionState *componentExecutionState;
-	while (removeFromQueue(flowState, componentIndex, componentExecutionState)) {
-		if (componentExecutionState) {
-			ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
-		}
-
+	while (removeFromQueue(flowState, componentIndex)) {
 		if (--flowState->numActiveComponents == 0) {
 			freeFlowState(flowState);
 		}
@@ -94,14 +88,12 @@ void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCurso
 
 	Assets *assets = flowState->assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
-
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 
 	if (actionId >= 0 && actionId < (int16_t)flow->widgetActions.count) {
 		auto componentOutput = flow->widgetActions.item(assets, actionId);
 		if (componentOutput) {
-			auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
-			propagateValue(flowState, *componentOutput, nullValue);
+			propagateValue(flowState, *componentOutput);
 		}
 	}
 }

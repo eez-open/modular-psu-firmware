@@ -23,8 +23,8 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool executeStartComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-    return true;
+void executeStartComponent(FlowState *flowState, unsigned componentIndex) {
+    propagateValue(flowState, componentIndex);
 }
 
 } // namespace flow

@@ -27,14 +27,18 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool executeLogComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-	auto assets = flowState->assets;
+void executeLogComponent(FlowState *flowState, unsigned componentIndex) {
+    auto assets = flowState->assets;
+    auto flowDefinition = assets->flowDefinition.ptr(assets);
+    auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+    auto component = flow->components.item(assets, componentIndex);
+
     auto propertyValue = component->propertyValues.item(assets, defs_v3::LOG_ACTION_COMPONENT_PROPERTY_VALUE);
 
     Value value;
     if (!evalExpression(flowState, component, propertyValue->evalInstructions, value)) {
         throwError(flowState, component, "log component value eval error\n");
-        return false;
+        return;
     }
 
     const char *valueStr = value.toString(assets, 0x0f9812ee).getString();
@@ -45,7 +49,7 @@ bool executeLogComponent(FlowState *flowState, Component *component, Componenent
       }
     }
 
-    return true;
+    propagateValue(flowState, componentIndex);
 }
 
 } // namespace flow

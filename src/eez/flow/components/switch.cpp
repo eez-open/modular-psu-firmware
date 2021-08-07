@@ -25,17 +25,21 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool executeSwitchComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-	struct SwitchTest {
-        uint8_t outputIndex;
-		uint8_t conditionInstructions[1];
-	};
+struct SwitchTest {
+    uint8_t outputIndex;
+    uint8_t conditionInstructions[1];
+};
 
-	struct SwitchActionComponent : public Component {
-        ListOfAssetsPtr<SwitchTest> tests;
-	};
+struct SwitchActionComponent : public Component {
+    ListOfAssetsPtr<SwitchTest> tests;
+};
 
-	auto assets = flowState->assets;
+void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
+    auto assets = flowState->assets;
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto component = flow->components.item(assets, componentIndex);
+
 	auto switchActionComponent = (SwitchActionComponent *)component;
 
     for (uint32_t testIndex = 0; testIndex < switchActionComponent->tests.count; testIndex++) {
@@ -44,19 +48,17 @@ bool executeSwitchComponent(FlowState *flowState, Component *component, Componen
         Value conditionValue;
         if (!evalExpression(flowState, component, test->conditionInstructions, conditionValue)) {
             throwError(flowState, component, "switch component eval src expression\n");
-            return false;
+            return;
         }
 
         if (conditionValue.getBoolean()) {
-	        auto flowDefinition = assets->flowDefinition.ptr(assets);
-			auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
 			auto &componentOutput = *component->outputs.item(assets, test->outputIndex);
-            propagateValue(flowState, componentOutput, nullValue);
+            propagateValue(flowState, componentOutput);
 			break;
         }
     }
 
-    return true;
+    propagateValue(flowState, componentIndex);
 }
 
 } // namespace flow

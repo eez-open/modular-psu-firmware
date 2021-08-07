@@ -27,5 +27,14 @@ typedef bool (*EvalOperation)(EvalStack &);
 
 extern EvalOperation g_evalOperations[];
 
+Value op_add(Assets *assets, const Value& a1, const Value& b1);
+
+Value op_eq(const Value& a1, const Value& b1);
+Value op_neq(const Value& a1, const Value& b1);
+Value op_less(const Value& a1, const Value& b1);
+Value op_great(const Value& a1, const Value& b1);
+Value op_less_eq(const Value& a1, const Value& b1);
+Value op_great_eq(const Value& a1, const Value& b1);
+
 } // flow
 } // eez
