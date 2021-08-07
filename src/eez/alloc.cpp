@@ -77,6 +77,7 @@ void *alloc(size_t size, uint32_t id) {
 		}
 
 		if (!block) {
+			osMutexRelease(g_mutexId);
 			return nullptr;
 		}
 
@@ -94,8 +95,6 @@ void *alloc(size_t size, uint32_t id) {
 		block->id = id;
 
 		osMutexRelease(g_mutexId);
-	} else {
-		osDelay(1);
 	}
 		
 	return block + 1;    
@@ -119,6 +118,7 @@ void free(void *ptr) {
 
 		if (!block || block + 1 != ptr) {
 			// assert(0);
+			osMutexRelease(g_mutexId);
 			return;
 		}
 
@@ -140,14 +140,7 @@ void free(void *ptr) {
 		block->free = 1;
 
 		osMutexRelease(g_mutexId);
-	} else {
-		osDelay(1);
 	}
-}
-
-template<typename T> T *allocObject() {
-	void *ptr = alloc(sizeof(T));
-	return new (ptr) T;
 }
 
 template<typename T> void freeObject(T *ptr) {
@@ -163,7 +156,7 @@ void dumpAlloc(scpi_t *context) {
 		if (block->free) {
 			snprintf(buffer, sizeof(buffer), "FREE: %d", block->size);
 		} else {
-			snprintf(buffer, sizeof(buffer), "ALOC (0x%08x): %d", block->id, block->size);
+			snprintf(buffer, sizeof(buffer), "ALOC (0x%08x): %d", block->id, (unsigned int)block->size);
 		}
 		SCPI_ResultText(context, buffer);
 		block = block->next;
