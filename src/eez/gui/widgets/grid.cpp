@@ -50,6 +50,7 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
     // refresh when startPosition changes
     if (widgetCursor.currentState) {
+        widgetCursor.currentState->data.clear();
 		widgetCursor.currentState->data = startPosition;
 
         if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {

@@ -18,14 +18,35 @@
 
 #pragma once
 
-#include <eez/flow/expression.h>
+#include <eez/flow/private.h>
 
 namespace eez {
 namespace flow {
 
-typedef bool (*EvalOperation)(EvalStack &);
+struct EvalStack {
+	Assets *assets;
+	FlowState *flowState;
 
-extern EvalOperation g_evalOperations[];
+	Value stack[100];
+	int sp = 0;
+
+	void push(const Value &value) {
+		stack[sp++] = value;
+	}
+
+	void push(Value *pValue) {
+		stack[sp++] = Value(pValue, VALUE_TYPE_VALUE_PTR);
+	}
+
+	Value pop() {
+		return stack[--sp];
+	}
+
+};
+
+bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
+bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
+bool evalAssignableExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
 
 } // flow
 } // eez

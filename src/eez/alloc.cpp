@@ -31,6 +31,7 @@ struct AllocBlock {
 	AllocBlock *next;
 	int free;
 	size_t size;
+	uint32_t id;
 };
 
 static uint8_t *g_heap;
@@ -56,7 +57,7 @@ void initAllocHeap(uint8_t *heap, size_t heapSize) {
 	g_mutexId = osMutexCreate(osMutex(g_mutex));
 }
 
-void *alloc(size_t size) {
+void *alloc(size_t size, uint32_t id) {
 	if (size == 0) {
 		return nullptr;
 	}
@@ -90,6 +91,7 @@ void *alloc(size_t size) {
 		}
 
 		block->free = 0;
+		block->id = id;
 
 		osMutexRelease(g_mutexId);
 	} else {
@@ -158,7 +160,11 @@ void dumpAlloc(scpi_t *context) {
 	AllocBlock *block = first;
 	while (block) {
 		char buffer[100];
-		snprintf(buffer, sizeof(buffer), "%s: %d", block->free ? "FREE" : "ALOC", block->size);
+		if (block->free) {
+			snprintf(buffer, sizeof(buffer), "FREE: %d", block->size);
+		} else {
+			snprintf(buffer, sizeof(buffer), "ALOC (0x%08x): %d", block->id, block->size);
+		}
 		SCPI_ResultText(context, buffer);
 		block = block->next;
 	}

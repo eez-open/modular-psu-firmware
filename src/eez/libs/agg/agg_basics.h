@@ -39,7 +39,7 @@ namespace agg
     {
         static T*   allocate(unsigned num) { 
             //return new T [num]; 
-            return (T*) eez::alloc(num * sizeof(T));
+            return (T*) eez::alloc(num * sizeof(T), 0xf1522a42);
         }
         static void deallocate(T* ptr, unsigned) {
             //delete [] ptr;
@@ -59,7 +59,7 @@ namespace agg
     {
         static T*   allocate() {
             // return new T;
-            auto ptr = eez::alloc(sizeof(T));
+            auto ptr = eez::alloc(sizeof(T), 0x338f85b9);
             return new (ptr) T;
         }
         static void deallocate(T* ptr) {

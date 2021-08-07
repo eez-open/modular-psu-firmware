@@ -16,32 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <math.h>
-
-#include <eez/alloc.h>
-#include <eez/system.h>
-#include <eez/scripting/scripting.h>
+#include <eez/debug.h>
 
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
-#include <eez/flow/queue.h>
+#include <eez/flow/expression.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-bool executeLogComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeLogComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+	auto assets = flowState->assets;
     auto propertyValue = component->propertyValues.item(assets, defs_v3::LOG_ACTION_COMPONENT_PROPERTY_VALUE);
 
     Value value;
-    if (!evalExpression(assets, flowState, component, propertyValue->evalInstructions, value)) {
-        throwError(assets, flowState, component, "log component value eval error\n");
+    if (!evalExpression(flowState, component, propertyValue->evalInstructions, value)) {
+        throwError(flowState, component, "log component value eval error\n");
         return false;
     }
 
-    const char *valueStr = value.toString(assets).getString();
+    const char *valueStr = value.toString(assets, 0x0f9812ee).getString();
     if (valueStr && *valueStr) {
       DebugTrace(valueStr);
       if (valueStr[strlen(valueStr) - 1] != '\n') {

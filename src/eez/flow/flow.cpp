@@ -30,7 +30,6 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-static Assets *g_assets;
 static FlowState *g_mainPageFlowState;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,20 +40,11 @@ unsigned start(Assets *assets) {
 		return 0;
 	}
 
-	g_assets = assets;
-
 	queueInit();
 
 	scpiComponentInit();
 
 	g_mainPageFlowState = initFlowState(assets, 0);
-
-	auto flowState = g_mainPageFlowState;
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-
-	for (unsigned componentIndex = 0; componentIndex < flow->components.count; componentIndex++) {
-		pingComponent(assets, flowState, componentIndex);
-	}
 
 	return 1;
 }
@@ -64,16 +54,18 @@ void tick(unsigned flowHandle) {
 		return;
 	}
 
-	Assets *assets = g_assets;
-
 	FlowState *flowState;
 	unsigned componentIndex;
 	ComponenentExecutionState *componentExecutionState;
 	if (removeFromQueue(flowState, componentIndex, componentExecutionState)) {
-		executeComponent(assets, flowState, componentIndex, componentExecutionState);
+		executeComponent(flowState, componentIndex, componentExecutionState);
 
-		recalcFlowDataItems(assets, flowState);
+		if (--flowState->numActiveComponents == 0) {
+			freeFlowState(flowState);
+		}
 	}
+
+	recalcFlowDataItems(flowState);
 }
 
 void stop() {
@@ -83,6 +75,10 @@ void stop() {
 	while (removeFromQueue(flowState, componentIndex, componentExecutionState)) {
 		if (componentExecutionState) {
 			ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
+		}
+
+		if (--flowState->numActiveComponents == 0) {
+			freeFlowState(flowState);
 		}
 	}
 }
@@ -96,7 +92,7 @@ void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCurso
 	auto flowState = (FlowState *)widgetCursor.pageState;
 	actionId = -actionId - 1;
 
-	Assets *assets = g_assets;
+	Assets *assets = flowState->assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
@@ -105,17 +101,17 @@ void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCurso
 		auto componentOutput = flow->widgetActions.item(assets, actionId);
 		if (componentOutput) {
 			auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
-			propagateValue(assets, flowState, *componentOutput, nullValue);
+			propagateValue(flowState, *componentOutput, nullValue);
 		}
 	}
 }
 
 void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
-	Assets *assets = g_assets;
 	auto flowState = (FlowState *)widgetCursor.pageState;
 
 	dataId = -dataId - 1;
 
+	auto assets = flowState->assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 	auto dataItemsOffset = flow->nInputValues + flow->localVariables.count;
@@ -131,7 +127,7 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 					auto inputWidget = (InputWidget *)widgetCursor.widget;
 					
 					auto unitValue = get(widgetCursor, inputWidget->unit);
-					Unit unit = getUnitFromName(unitValue.toString(assets).getString()); 
+					Unit unit = getUnitFromName(unitValue.toString(assets, 0x5049bd52).getString()); 
 					
 					if (operation == DATA_OPERATION_GET_MIN) {
 						value = Value(get(widgetCursor, inputWidget->min).toFloat(), unit);
@@ -142,7 +138,7 @@ void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operat
 					} else if (operation == DATA_OPERATION_GET_UNIT) {
 						value = unit;
 					} else if (operation == DATA_OPERATION_SET) {
-						setValueFromGuiThread(assets, flowState, dataId, value);
+						setValueFromGuiThread(flowState, dataId, value);
 						scripting::executeFlowAction(widgetCursor, inputWidget->action);
 					}
 				}

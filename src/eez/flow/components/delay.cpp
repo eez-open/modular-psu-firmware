@@ -16,43 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <math.h>
-
 #include <eez/alloc.h>
 #include <eez/system.h>
-#include <eez/scripting/scripting.h>
 
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
-#include <eez/flow/queue.h>
+#include <eez/flow/expression.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-bool executeDelayComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeDelayComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
 	struct DelayComponenentExecutionState : public ComponenentExecutionState {
 		uint32_t waitUntil;
 	};
 
 	if (!componentExecutionState) {
+		auto assets = flowState->assets;
 		auto propertyValue = component->propertyValues.item(assets, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS);
 
 		Value value;
-		if (!evalExpression(assets, flowState, component, propertyValue->evalInstructions, value)) {
-			throwError(assets, flowState, component, "delay component milliseconds eval error\n");
+		if (!evalExpression(flowState, component, propertyValue->evalInstructions, value)) {
+			throwError(flowState, component, "delay component milliseconds eval error\n");
 			return false;
 		}
 
 		double milliseconds = value.toDouble();
 		if (!isNaN(milliseconds)) {
-			auto delayComponentExecutionState = ObjectAllocator<DelayComponenentExecutionState>::allocate();
+			auto delayComponentExecutionState = ObjectAllocator<DelayComponenentExecutionState>::allocate(0x28969c75);
 			delayComponentExecutionState->waitUntil = millis() + (uint32_t)floor(milliseconds);
 			componentExecutionState = delayComponentExecutionState;
 		} else {
-			throwError(assets, flowState, component, "delay component milliseconds invalid value\n");
+			throwError(flowState, component, "delay component milliseconds invalid value\n");
 			return false;
 		}
 	} else {

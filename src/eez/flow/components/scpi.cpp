@@ -16,16 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <math.h>
-
 #include <eez/alloc.h>
-#include <eez/system.h>
 #include <eez/scripting/scripting.h>
 
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
-#include <eez/flow/queue.h>
+#include <eez/flow/expression.h>
 
 using namespace eez::gui;
 
@@ -73,7 +69,7 @@ void scpiResultIsReady() {
 	ScpiComponentExecutionState::g_scpiResultIsReady = true;
 }
 
-bool executeScpiComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeScpiComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
 	struct ScpiActionComponent : public Component {
 		uint8_t instructions[1];
 	};
@@ -92,7 +88,7 @@ bool executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 	if (componentExecutionState) {
 		scpiComponentExecutionState = (ScpiComponentExecutionState *)componentExecutionState;
 	} else {
-		scpiComponentExecutionState = ObjectAllocator<ScpiComponentExecutionState>::allocate();
+		scpiComponentExecutionState = ObjectAllocator<ScpiComponentExecutionState>::allocate(0x38e134d2);
 		scpiComponentExecutionState->op = instructions[scpiComponentExecutionState->instructionIndex++];
 
 		componentExecutionState = scpiComponentExecutionState;
@@ -113,8 +109,12 @@ bool executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 		} else if (scpiComponentExecutionState->op == SCPI_PART_EXPR) {
 			Value value;
 			int numInstructionBytes;
-			if (!evalExpression(assets, flowState, component, instructions + scpiComponentExecutionState->instructionIndex, value, &numInstructionBytes)) {
-				throwError(assets, flowState, component, "scpi component eval assignable expression\n");
+			if (!evalExpression(flowState, component, instructions + scpiComponentExecutionState->instructionIndex, value, &numInstructionBytes)) {
+				throwError(flowState, component, "scpi component eval assignable expression\n");
+
+				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
+				componentExecutionState = nullptr;
+
 				return false;
 			}
 			scpiComponentExecutionState->instructionIndex += numInstructionBytes;
@@ -141,23 +141,32 @@ bool executeScpiComponent(Assets *assets, FlowState *flowState, Component *compo
 					SCPI_ErrorTranslate(err),
 					scpiComponentExecutionState->commandOrQueryText
 				);
-				throwError(assets, flowState, component, errorMessage);
+
+				throwError(flowState, component, errorMessage);
+
+				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
+				componentExecutionState = nullptr;
+
 				return false;
 			}
 
 			Value dstValue;
 			int numInstructionBytes;
-			if (!evalAssignableExpression(assets, flowState, component, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
-				throwError(assets, flowState, component, "scpi component eval assignable expression\n");
+			if (!evalAssignableExpression(flowState, component, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
+				throwError(flowState, component, "scpi component eval assignable expression\n");
+
+				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
+				componentExecutionState = nullptr;
+
 				return false;
 			}
 			scpiComponentExecutionState->instructionIndex += numInstructionBytes;
 
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 
-			Value srcValue = Value::makeStringRef(resultText, resultTextLen);
+			Value srcValue = Value::makeStringRef(resultText, resultTextLen, 0x09143fa4);
 
-			assignValue(assets, flowState, component, dstValue, srcValue);
+			assignValue(flowState, component, dstValue, srcValue);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY) {
 			if (!scpiComponentExecutionState->scpi()) {
 				break;

@@ -16,23 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <math.h>
-
-#include <eez/alloc.h>
-#include <eez/system.h>
-#include <eez/scripting/scripting.h>
-
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
-#include <eez/flow/queue.h>
+#include <eez/flow/expression.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-bool executeSwitchComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeSwitchComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
 	struct SwitchTest {
         uint8_t outputIndex;
 		uint8_t conditionInstructions[1];
@@ -42,14 +35,15 @@ bool executeSwitchComponent(Assets *assets, FlowState *flowState, Component *com
         ListOfAssetsPtr<SwitchTest> tests;
 	};
 
+	auto assets = flowState->assets;
 	auto switchActionComponent = (SwitchActionComponent *)component;
 
     for (uint32_t testIndex = 0; testIndex < switchActionComponent->tests.count; testIndex++) {
         auto test = switchActionComponent->tests.item(assets, testIndex);
 
         Value conditionValue;
-        if (!evalExpression(assets, flowState, component, test->conditionInstructions, conditionValue)) {
-            throwError(assets, flowState, component, "switch component eval src expression\n");
+        if (!evalExpression(flowState, component, test->conditionInstructions, conditionValue)) {
+            throwError(flowState, component, "switch component eval src expression\n");
             return false;
         }
 
@@ -57,7 +51,7 @@ bool executeSwitchComponent(Assets *assets, FlowState *flowState, Component *com
 	        auto flowDefinition = assets->flowDefinition.ptr(assets);
 			auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
 			auto &componentOutput = *component->outputs.item(assets, test->outputIndex);
-            propagateValue(assets, flowState, componentOutput, nullValue);
+            propagateValue(flowState, componentOutput, nullValue);
 			break;
         }
     }

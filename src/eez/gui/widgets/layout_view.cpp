@@ -77,6 +77,8 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
 DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
 	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
+	((LayoutViewWidgetState *)widgetCursor.currentState)->context.clear();
+
     Value oldContext;
     Value newContext;
     if (widget->context) {
@@ -86,6 +88,7 @@ DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
         ((LayoutViewWidgetState *)widgetCursor.currentState)->context = Value();
     }
 
+    widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = getLayoutId(widgetCursor);
 
     if (widget->context) {

@@ -209,7 +209,9 @@ struct Value {
     {
     }
 
-	Value(const Value& value) {
+	Value(const Value& value)
+		: type(VALUE_TYPE_UNDEFINED), unit(UNIT_UNKNOWN), options(0), pVoidValue(0) 
+	{
 		*this = value;
 	}
 
@@ -221,7 +223,20 @@ struct Value {
 		}
 	}
 
+	void clear() {
+		type = VALUE_TYPE_UNDEFINED;
+		unit = UNIT_UNKNOWN;
+		options = 0;
+		pVoidValue = 0;
+	}
+
     const Value& operator = (const Value &value) {
+		if (options & VALUE_OPTIONS_REF) {
+			if (--refValue->refCounter == 0) {
+				free(refValue);
+			}
+		}
+
 		type = value.type;
 		unit = value.unit;
 		options = value.options;
@@ -415,9 +430,9 @@ struct Value {
 	int64_t toInt64(int *err = nullptr) const;
     bool toBool(Assets *assets, int *err = nullptr) const;
 
-	Value toString(Assets *assets) const;
+	Value toString(Assets *assets, uint32_t id) const;
 
-	static Value makeStringRef(const char *str, size_t len);
+	static Value makeStringRef(const char *str, size_t len, uint32_t id);
 	static Value concatenateString(const char *str1, const char *str2);
 
 	//////////

@@ -22,14 +22,6 @@
 #include <string.h>
 #include <memory.h>
 
-//#define BACKDROP_BLUR
-
-#ifdef BACKDROP_BLUR
-#include <agg2d.h>
-#include <agg_rendering_buffer.h>
-#include <agg_blur.h>
-#endif
-
 #include <eez/util.h>
 #include <eez/keyboard.h>
 #include <eez/mouse.h>
@@ -39,6 +31,16 @@
 // TODO
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/persist_conf.h>
+
+//#define BACKDROP_BLUR
+
+#ifdef BACKDROP_BLUR
+#include <agg2d.h>
+#include <agg_rendering_buffer.h>
+#include <agg_blur.h>
+
+#define BACKDROP_BLUR_RADIUS 90
+#endif
 
 #define CONF_BACKDROP_OPACITY 128
 
@@ -592,7 +594,7 @@ void endBuffersDrawing() {
 
                 PixFormat pixFormat(rbuf);
                 agg::stack_blur<ColorType, agg::stack_blur_calc_rgb<> > stack_blur;
-                stack_blur.blur(pixFormat, 40);
+                stack_blur.blur(pixFormat, BACKDROP_BLUR_RADIUS);
 #else
                 // opacity backdrop
                 auto savedOpacity = setOpacity(CONF_BACKDROP_OPACITY);

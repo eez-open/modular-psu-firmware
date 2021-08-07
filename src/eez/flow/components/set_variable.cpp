@@ -16,42 +16,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <math.h>
-
-#include <eez/alloc.h>
-#include <eez/system.h>
-#include <eez/scripting/scripting.h>
-
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
-#include <eez/flow/queue.h>
+#include <eez/flow/expression.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-bool executeSetVariableComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeSetVariableComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
 	struct SetVariableActionComponent : public Component {
 		uint8_t assignableExpressionEvalInstructions[1];
 	};
 	auto setVariableActionComponent = (SetVariableActionComponent *)component;
 
 	Value dstValue;
-	if (!evalAssignableExpression(assets, flowState, component, setVariableActionComponent->assignableExpressionEvalInstructions, dstValue)) {
-		throwError(assets, flowState, component, "setvariable component eval dest assignable expression\n");
+	if (!evalAssignableExpression(flowState, component, setVariableActionComponent->assignableExpressionEvalInstructions, dstValue)) {
+		throwError(flowState, component, "setvariable component eval dest assignable expression\n");
 		return false;
 	}
 
+	auto assets = flowState->assets;
 	auto propertyValue = component->propertyValues.item(assets, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE);
 	Value srcValue;
-	if (!evalExpression(assets, flowState, component, propertyValue->evalInstructions, srcValue)) {
-		throwError(assets, flowState, component, "setvariable component eval src expression\n");
+	if (!evalExpression(flowState, component, propertyValue->evalInstructions, srcValue)) {
+		throwError(flowState, component, "setvariable component eval src expression\n");
 		return false;
 	}
 
-	assignValue(assets, flowState, component, dstValue, srcValue);
+	assignValue(flowState, component, dstValue, srcValue);
 	return true;
 }
 

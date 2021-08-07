@@ -48,6 +48,7 @@ DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const UpDownWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
+    widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
     widgetCursor.currentState->flags.active = g_selectedWidget == widgetCursor;
 

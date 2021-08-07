@@ -81,7 +81,8 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
     
     uint32_t currentTime = millis();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
+	widgetCursor.currentState->data.clear();
+	widgetCursor.currentState->data = get(widgetCursor, widget->data);
     bool refreshData = false;
     if (widgetCursor.previousState) {
         refreshData = widgetCursor.currentState->data != widgetCursor.previousState->data;
@@ -90,6 +91,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
             if (refreshRate != 0) {
                 refreshData = (currentTime - previousState->dataRefreshLastTime) > refreshRate;
                 if (!refreshData) {
+                    widgetCursor.currentState->data.clear();
                     widgetCursor.currentState->data = widgetCursor.previousState->data;
                 }
             }

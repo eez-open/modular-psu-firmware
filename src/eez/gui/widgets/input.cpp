@@ -55,6 +55,7 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 
 	widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
+	widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
 	
     bool refresh =
@@ -65,6 +66,7 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 		widgetCursor.previousState->data != widgetCursor.currentState->data;
 
 	if (widget->type & INPUT_WIDGET_TYPE_NUMBER) {
+		currentState->unit.clear();
 		currentState->unit = get(widgetCursor, widget->unit);
 		if (!refresh) {
 			refresh |= 

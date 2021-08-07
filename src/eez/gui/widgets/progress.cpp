@@ -32,6 +32,7 @@ DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(WidgetState);
 
+    widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
 
     bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != widgetCursor.currentState->data;

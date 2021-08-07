@@ -16,23 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <math.h>
-
-#include <eez/alloc.h>
-#include <eez/system.h>
-#include <eez/scripting/scripting.h>
-
 #include <eez/flow/components.h>
-#include <eez/flow/flow_defs_v3.h>
-#include <eez/flow/queue.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-bool executeStartComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeStartComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
     return true;
 }
 

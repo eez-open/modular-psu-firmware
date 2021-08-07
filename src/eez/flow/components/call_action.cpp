@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 #include <eez/flow/components.h>
 
 using namespace eez::gui;
@@ -23,23 +25,34 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool executeConstantComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+bool executeCallActionComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+	struct CallActionActionComponent : public Component {
+		int16_t actionFlowIndex;
+	};
+	auto callActionActionComponent = (CallActionActionComponent *)component;
+
 	auto assets = flowState->assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 
-	struct ConstantActionComponent : public Component {
-		uint16_t valueIndex;
-	};
-	auto constantActionComponent = (ConstantActionComponent *)component;
-	auto &sourceValue = *flowDefinition->constants.item(assets, constantActionComponent->valueIndex);
+	auto actionFlowIndex = callActionActionComponent->actionFlowIndex;
 
-	// TODO ovdje treba poslati null value za 0-ti output
-	for (unsigned outputIndex = 0; outputIndex < component->outputs.count; outputIndex++) {
-		auto &componentOutput = *component->outputs.item(assets, outputIndex);
-		propagateValue(flowState, componentOutput, sourceValue);
+	if (actionFlowIndex < 0 || actionFlowIndex >= (int)flowDefinition->flows.count) {
+		throwError(flowState, component, "Invalid action flow index in CallAction component\n");
 	}
 
-	return true;
+	FlowState *actionFlowState = initFlowState(assets, actionFlowIndex);
+
+	actionFlowState->parentFlowState = flowState;
+	actionFlowState->parentComponent = component;
+
+	if (actionFlowState->numActiveComponents == 0) {
+		freeFlowState(actionFlowState);
+		return true;
+	}
+
+	flowState->numActiveComponents++;
+
+	return false;
 }
 
 } // namespace flow

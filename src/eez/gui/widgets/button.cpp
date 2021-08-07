@@ -37,6 +37,7 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
     const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : widget->disabledStyle);
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style));
+    widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = widget->data ? get(widgetCursor, widget->data) : 0;
 
     bool refresh =

@@ -73,7 +73,7 @@ bool startScript(const char *filePath, int *err) {
 		}
 
 		auto scriptPathSize = strlen(filePath) + 1;
-		g_scriptPath = (char *)alloc(scriptPathSize);
+		g_scriptPath = (char *)alloc(scriptPathSize, 0xc4b6e523);
 		if (g_scriptPath) {
 			stringCopy(g_scriptPath, scriptPathSize, filePath);
 

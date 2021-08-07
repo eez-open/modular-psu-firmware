@@ -16,25 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <math.h>
-
-#include <eez/alloc.h>
-#include <eez/system.h>
 #include <eez/scripting/scripting.h>
 
 #include <eez/flow/components.h>
-#include <eez/flow/flow_defs_v3.h>
-#include <eez/flow/queue.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-bool executeEndComponent(Assets *assets, FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
-	scripting::stopScript();
-	return false;
+bool executeEndComponent(FlowState *flowState, Component *component, ComponenentExecutionState *&componentExecutionState) {
+	if (flowState->parentFlowState) {
+		flowState->parentFlowState->numActiveComponents--;
+
+		auto assets = flowState->assets;
+		auto flowDefinition = assets->flowDefinition.ptr(assets);
+		auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
+		propagateValue(flowState->parentFlowState, *flowState->parentComponent->outputs.item(assets, 0), nullValue);
+		return true;
+	} else {
+		scripting::stopScript();
+		return false;
+	}
 }
 
 } // namespace flow

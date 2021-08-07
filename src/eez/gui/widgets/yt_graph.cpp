@@ -508,6 +508,7 @@ DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(YTGraphWidgetState);
     widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
+    widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
 
     currentState->refreshCounter = ytDataGetRefreshCounter(widgetCursor, widget->data);

@@ -141,7 +141,7 @@ bool loadExternalAssets(const char *filePath, int *err) {
         return false;
     }
 
-	uint8_t *fileData = (uint8_t *)alloc(((fileSize + 3) / 4) * 4);
+	uint8_t *fileData = (uint8_t *)alloc(((fileSize + 3) / 4) * 4, 202);
     if (!fileData) {
         if (err) {
             *err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
@@ -183,7 +183,7 @@ bool loadExternalAssets(const char *filePath, int *err) {
  #endif
 
 	size_t externalAssetsSize = decompressedDataOffset + header->decompressedSize;
-	g_externalAssets = (Assets *)alloc(externalAssetsSize);
+	g_externalAssets = (Assets *)alloc(externalAssetsSize, 301);
 	if (!g_externalAssets) {
 		free(g_externalAssets);
 		g_externalAssets = nullptr;

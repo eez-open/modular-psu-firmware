@@ -1057,7 +1057,7 @@ bool Value::toBool(Assets *assets, int *err) const {
 	}
 
 	if (type == VALUE_TYPE_STRING_REF) {
-        auto strValue = toString(assets);
+        auto strValue = toString(assets, 0xdbb61edf);
 		const char *str = strValue.getString();
 		return str && *str;
 	}
@@ -1068,9 +1068,9 @@ bool Value::toBool(Assets *assets, int *err) const {
 	return false;
 }
 
-Value Value::toString(Assets *assets) const {
+Value Value::toString(Assets *assets, uint32_t id) const {
 	if (type == VALUE_TYPE_VALUE_PTR) {
-		return pValueValue->toString(assets);
+		return pValueValue->toString(assets, id);
 	}
 
 	if (type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_REF) {
@@ -1114,14 +1114,14 @@ Value Value::toString(Assets *assets) const {
 #pragma warning(pop)
 #endif
 
-	return makeStringRef(tempStr, strlen(tempStr));
+	return makeStringRef(tempStr, strlen(tempStr), id);
 
 }
 
-Value Value::makeStringRef(const char *str, size_t len) {
+Value Value::makeStringRef(const char *str, size_t len, uint32_t id) {
     Value value;
 
-    auto stringRef = (StringRef *)alloc(sizeof(StringRef) + MAX(len + 1 - 4, 0));
+    auto stringRef = (StringRef *)alloc(sizeof(StringRef) + MAX(len + 1 - 4, 0), id);
 
     stringCopyLength(stringRef->str, len + 1, str, len);
 	stringRef->str[len] = 0;
@@ -1142,7 +1142,7 @@ Value Value::concatenateString(const char *str1, const char *str2) {
 
     auto newStrLen = strlen(str1) + strlen(str2) + 1;
     
-    auto stringRef = (StringRef *)alloc(sizeof(StringRef) + MAX(newStrLen - 4, 0));
+    auto stringRef = (StringRef *)alloc(sizeof(StringRef) + MAX(newStrLen - 4, 0), 0x66fa4fbf);
     
     stringCopy(stringRef->str, newStrLen, str1);
     stringAppendString(stringRef->str, newStrLen, str2);

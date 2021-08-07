@@ -39,6 +39,7 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
 
 	widgetCursor.currentState->size = sizeof(WidgetState);
 
+    widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = widget->data ? getBitmapImage(widgetCursor.cursor, widget->data) : 0;
 
     bool refresh = !widgetCursor.previousState ||

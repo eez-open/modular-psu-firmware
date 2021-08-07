@@ -47,6 +47,8 @@ void addToQueue(FlowState *flowState, unsigned componentIndex, ComponenentExecut
 	if (g_queueHead == g_queueTail) {
 		g_queueIsFull = true;
 	}
+
+	flowState->numActiveComponents++;
 }
 
 bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex, ComponenentExecutionState *&componentExecutionState) {

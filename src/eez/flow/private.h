@@ -29,54 +29,33 @@ using eez::gui::Component;
 using eez::gui::ComponentOutput;
 
 struct FlowState {
-	uint32_t flowIndex;
-	uint32_t error;
-	eez::gui::Value values[100];
+	Assets *assets;
+	uint16_t flowIndex;
+	uint16_t error;
+	uint32_t numActiveComponents;
+	FlowState *parentFlowState;
+	Component *parentComponent;
+	eez::gui::Value values[1];
 };
 
 struct ComponenentExecutionState {
 	virtual ~ComponenentExecutionState() {}
 };
 
-struct EvalStack {
-	Assets *assets;
-	FlowState *flowState;
-
-	Value stack[100];
-	int sp = 0;
-
-	void push(const Value &value) {
-		stack[sp++] = value;
-	}
-
-	void push(Value *pValue) {
-		stack[sp++] = Value(pValue, VALUE_TYPE_VALUE_PTR);
-	}
-
-	Value pop() {
-		return stack[--sp];
-	}
-
-};
-
 static const int UNDEFINED_VALUE_INDEX = 0;
 static const int NULL_VALUE_INDEX = 1;
 
 FlowState *initFlowState(Assets *assets, int flowIndex);
+void freeFlowState(FlowState *flowState);
 
-void recalcFlowDataItems(Assets *assets, FlowState *flowState);
+void recalcFlowDataItems(FlowState *flowState);
 
-void pingComponent(Assets *assets, FlowState *flowState, unsigned componentIndex);
-void propagateValue(Assets *assets, FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
+void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
 
-void setValueFromGuiThread(Assets *assets, FlowState *flowState, uint16_t dataId, const Value& value);
-void assignValue(Assets *assets, FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue);
+void setValueFromGuiThread(FlowState *flowState, uint16_t dataId, const Value& value);
+void assignValue(FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue);
 
-bool evalExpression(Assets *assets, FlowState *flowState, Component *component, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
-bool evalExpression(Assets *assets, FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
-bool evalAssignableExpression(Assets *assets, FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr);
-
-void throwError(Assets *assets, FlowState *flowState, Component *component, const char *errorMessage);
+void throwError(FlowState *flowState, Component *component, const char *errorMessage);
 
 } // flow
 } // eez

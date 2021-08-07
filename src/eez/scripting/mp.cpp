@@ -139,7 +139,7 @@ bool loadMpScript(int *err) {
 
 	fileSize = file.size();
 
-	g_scriptSource = (char *)alloc(fileSize);
+	g_scriptSource = (char *)alloc(fileSize, 0x186d4c0e);
 	if (!g_scriptSource) {
 		if (err) {
 			*err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
@@ -165,7 +165,7 @@ bool loadMpScript(int *err) {
 
 	g_scriptSourceLength = fileSize;
 
-	g_mpGCMemory = (uint8_t *)alloc(MP_GC_MEMORY_SIZE);
+	g_mpGCMemory = (uint8_t *)alloc(MP_GC_MEMORY_SIZE, 0x77250f2d);
 	if (!g_mpGCMemory) {
 		if (err) {
 			*err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;

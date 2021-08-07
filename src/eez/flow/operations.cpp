@@ -37,8 +37,8 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 	}
 
 	if (a.isAnyStringType() || b.isAnyStringType()) {
-		Value value1 = a.toString(stack.assets);
-		Value value2 = b.toString(stack.assets);
+		Value value1 = a.toString(stack.assets, 0x84eafaa8);
+		Value value2 = b.toString(stack.assets, 0xd273cab6);
 		stack.push(Value::concatenateString(value1.getString(), value2.getString()));
 		return true;
 	}
@@ -250,8 +250,8 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 		b = *b.pValueValue;
 	}
 
-	const char *aStr = a.toString(stack.assets).getString();
-	const char *bStr = b.toString(stack.assets).getString();
+	const char *aStr = a.toString(stack.assets, 0xf616bf4d).getString();
+	const char *bStr = b.toString(stack.assets, 0x81229133).getString();
 	if (!aStr || !bStr) {
 		stack.push(Value(-1, VALUE_TYPE_INT32));
 	} else {

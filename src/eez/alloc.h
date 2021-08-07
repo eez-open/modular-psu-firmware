@@ -27,12 +27,12 @@ namespace eez {
 
 void initAllocHeap(uint8_t *heap, size_t heapSize);
 
-void *alloc(size_t size);
+void *alloc(size_t size, uint32_t id);
 void free(void *ptr);
 
 template<class T> struct ObjectAllocator {
-	static T *allocate() {
-		auto ptr = alloc(sizeof(T));
+	static T *allocate(uint32_t id) {
+		auto ptr = alloc(sizeof(T), id);
 		return new (ptr) T;
 	}
 	static void deallocate(T* ptr) {

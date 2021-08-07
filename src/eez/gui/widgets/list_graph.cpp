@@ -57,6 +57,7 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(ListGraphWidgetState);
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
+    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.clear();
     ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData = get(widgetCursor, widget->cursorData);
 
     int iPrevCursor = -1;

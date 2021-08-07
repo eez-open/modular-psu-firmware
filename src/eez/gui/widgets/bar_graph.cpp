@@ -98,11 +98,17 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 
     widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
 
+    widgetCursor.currentState->data.clear();
+
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
     
     auto currentState = (BarGraphWidgetState *)widgetCursor.currentState;
     auto previousState = (BarGraphWidgetState *)widgetCursor.previousState;
+
+	currentState->line1Data.clear();
+	currentState->line2Data.clear();
+	currentState->textData.clear();
 
     currentState->color = getColor(widgetCursor, widget->data, style);
     currentState->backgroundColor = getBackgroundColor(widgetCursor, widget->data, style);
@@ -110,6 +116,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     currentState->activeBackgroundColor = getActiveBackgroundColor(widgetCursor, widget->data, style);
 
     currentState->line1Data = get(widgetCursor, widget->line1Data);
+    
     currentState->line2Data = get(widgetCursor, widget->line2Data);
 
     uint32_t currentTime = millis();

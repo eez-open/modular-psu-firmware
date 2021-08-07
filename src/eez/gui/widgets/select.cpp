@@ -38,6 +38,7 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
     }
 
     if (widgetCursor.currentState) {
+		widgetCursor.currentState->data.clear();
 		widgetCursor.currentState->data = indexValue;
 
         if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {

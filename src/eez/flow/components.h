@@ -25,7 +25,7 @@ namespace flow {
 
 void scpiComponentInit();
 	
-bool executeComponent(eez::gui::Assets *assets, FlowState *flowState, unsigned componentIndex, ComponenentExecutionState *componentExecutionState);
+bool executeComponent(FlowState *flowState, unsigned componentIndex, ComponenentExecutionState *componentExecutionState);
 
 } // flow
 } // eez
