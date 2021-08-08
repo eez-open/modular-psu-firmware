@@ -39,6 +39,7 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	auto component = flow->components.item(assets, componentIndex);
 
 	if (component->type < 1000) {
+		recalcFlowDataItems(flowState, componentIndex);
 		return false;
 	}
 
@@ -55,10 +56,12 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	return true;
 }
 
-void pingComponent(FlowState *flowState, unsigned componentIndex) {
+bool pingComponent(FlowState *flowState, unsigned componentIndex) {
 	if (isComponentReadyToRun(flowState, componentIndex)) {
 		addToQueue(flowState, componentIndex);
+		return true;
 	}
+	return false;
 }
 
 
@@ -131,28 +134,39 @@ void freeFlowState(FlowState *flowState) {
 	free(flowState);
 }
 
-void recalcFlowDataItems(FlowState *flowState) {
+static void recalcFlowDataItems(FlowState *flowState, bool allComponents, unsigned componentIndex) {
 	auto assets = flowState->assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 	auto dataItemsOffset = flow->nInputValues + flow->localVariables.count;
 
 	for (unsigned i = 0; i < flow->widgetDataItems.count; i++) {
-		auto &value = flowState->values[dataItemsOffset + i];
-
 		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, i);
-		if (widgetDataItem) {
-			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
-			auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
 
-			evalExpression(flowState, component, propertyValue->evalInstructions, value);
-			if (flowState->error) {
-				break;
+		if (allComponents || widgetDataItem->componentIndex == componentIndex) {
+			auto &value = flowState->values[dataItemsOffset + i];
+
+			if (widgetDataItem) {
+				auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+				auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
+
+				evalExpression(flowState, component, propertyValue->evalInstructions, value);
+				if (flowState->error) {
+					break;
+				}
+			} else {
+				value = Value();
 			}
-		} else {
-			value = Value();
 		}
 	}
+}
+
+void recalcFlowDataItems(FlowState *flowState) {
+	recalcFlowDataItems(flowState, true, 0);
+}
+
+void recalcFlowDataItems(FlowState *flowState, unsigned componentIndex) {
+	recalcFlowDataItems(flowState, false, componentIndex);
 }
 
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value) {
@@ -160,8 +174,7 @@ void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, cons
 	for (unsigned connectionIndex = 0; connectionIndex < componentOutput.connections.count; connectionIndex++) {
 		auto connection = componentOutput.connections.item(assets, connectionIndex);
 		flowState->values[connection->targetInputIndex] = value;
-		pingComponent(flowState, connection->targetComponentIndex);
-		if (connection->seqIn) {
+		if (pingComponent(flowState, connection->targetComponentIndex) && connection->seqIn) {
 			flowState->values[connection->targetInputIndex] = Value();
 		}
 	}

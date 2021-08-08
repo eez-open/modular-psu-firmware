@@ -21,8 +21,13 @@
 namespace eez {
 namespace gui {
 
-struct LayoutViewWidgetState {
-    WidgetState genericState;
+struct LayoutViewWidget : public Widget {
+    int16_t layout; // page ID
+    int16_t context; // data ID
+	uint16_t componentIndex;
+};
+
+struct LayoutViewWidgetState : public WidgetState {
     Value context;
 };
 

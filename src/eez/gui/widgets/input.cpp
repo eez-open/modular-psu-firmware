@@ -36,8 +36,7 @@ static const uint16_t INPUT_WIDGET_PASSWORD_FLAG = 0x0100;
 
 static const size_t MAX_TEXT_LEN = 128;
 
-struct InputWidgetState {
-    WidgetState genericState;
+struct InputWidgetState : public WidgetState {
 	Value unit;
 };
 

@@ -33,9 +33,12 @@ namespace flow {
 
 void executeStartComponent(FlowState *flowState, unsigned componentIndex);
 void executeEndComponent(FlowState *flowState, unsigned componentIndex);
+void executeInputComponent(FlowState *flowState, unsigned componentIndex);
+void executeOutputComponent(FlowState *flowState, unsigned componentIndex);
 void executeDelayComponent(FlowState *flowState, unsigned componentIndex);
 void executeConstantComponent(FlowState *flowState, unsigned componentIndex);
 void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex);
+void executeEvalComponent(FlowState *flowState, unsigned componentIndex);
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex);
 void executeSwitchComponent(FlowState *flowState, unsigned componentIndex);
 void executeLogComponent(FlowState *flowState, unsigned componentIndex);
@@ -52,12 +55,18 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 		executeStartComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_END_ACTION) {
 		executeEndComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_DELAY_ACTION) {
+	} else if (component->type == defs_v3::COMPONENT_TYPE_INPUT_ACTION) {
+		executeInputComponent(flowState, componentIndex);
+	} else if (component->type == defs_v3::COMPONENT_TYPE_OUTPUT_ACTION) {
+		executeOutputComponent(flowState, componentIndex);
+    } else if (component->type == defs_v3::COMPONENT_TYPE_DELAY_ACTION) {
 		executeDelayComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_CONSTANT_ACTION) {
 		executeConstantComponent(flowState, componentIndex);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_SET_VARIABLE_ACTION) {
 		executeSetVariableComponent(flowState, componentIndex);
+    } else if (component->type == defs_v3::COMPONENT_TYPE_EVAL_ACTION) {
+		executeEvalComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_LOOP_ACTION) {
 		executeLoopComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_SWITCH_ACTION) {

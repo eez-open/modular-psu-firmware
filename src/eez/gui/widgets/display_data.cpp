@@ -43,8 +43,7 @@ struct DisplayDataWidget : public Widget {
     uint8_t displayOption;
 };
 
-struct DisplayDataState {
-    WidgetState genericState;
+struct DisplayDataState : public WidgetState {
     uint16_t color;
     uint16_t backgroundColor;
     uint16_t activeColor;

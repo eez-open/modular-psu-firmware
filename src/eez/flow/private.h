@@ -50,6 +50,7 @@ FlowState *initFlowState(Assets *assets, int flowIndex);
 void freeFlowState(FlowState *flowState);
 
 void recalcFlowDataItems(FlowState *flowState);
+void recalcFlowDataItems(FlowState *flowState, unsigned componentIndex);
 
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput); // propagates null value

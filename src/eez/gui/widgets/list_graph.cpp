@@ -40,8 +40,7 @@ struct ListGraphWidget : public Widget {
     int16_t cursorStyle;
 };
 
-struct ListGraphWidgetState {
-    WidgetState genericState;
+struct ListGraphWidgetState : public WidgetState {
     Value cursorData;
 };
 

@@ -49,8 +49,7 @@ enum ScrollBarWidgetSegment {
     SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON
 };
 
-struct ScrollBarWidgetState {
-    WidgetState genericState;
+struct ScrollBarWidgetState : public WidgetState {
     int size;
     int position;
     int pageSize;

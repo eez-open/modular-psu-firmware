@@ -19,15 +19,12 @@
 #include <stdio.h>
 
 #include <eez/flow/components.h>
+#include <eez/flow/components/call_action.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
-
-struct CallActionActionComponent : public Component {
-	int16_t actionFlowIndex;
-};
 
 void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
  	auto assets = flowState->assets;
@@ -37,13 +34,13 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 
 	auto callActionActionComponent = (CallActionActionComponent *)component;
 
-	auto actionFlowIndex = callActionActionComponent->actionFlowIndex;
+	auto flowIndex = callActionActionComponent->flowIndex;
 
-	if (actionFlowIndex < 0 || actionFlowIndex >= (int)flowDefinition->flows.count) {
+	if (flowIndex < 0 || flowIndex >= (int)flowDefinition->flows.count) {
 		throwError(flowState, component, "Invalid action flow index in CallAction component\n");
 	}
 
-	FlowState *actionFlowState = initFlowState(assets, actionFlowIndex);
+	FlowState *actionFlowState = initFlowState(assets, flowIndex);
 
 	actionFlowState->parentFlowState = flowState;
 	actionFlowState->parentComponent = component;

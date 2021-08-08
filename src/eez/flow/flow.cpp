@@ -19,6 +19,8 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/input.h>
 
+#include <eez/gui/widgets/layout_view.h>
+
 #include <eez/scripting/scripting.h>
 
 #include <eez/flow/flow.h>
@@ -77,8 +79,44 @@ void stop() {
 	}
 }
 
-void *getFlowState(int16_t pageId) {
+void *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 	pageId = -pageId - 1;
+
+	if (widgetCursor.widget && widgetCursor.widget->type == WIDGET_TYPE_LAYOUT_VIEW) {
+		if (widgetCursor.pageState) {
+			auto layoutViewWidget = (LayoutViewWidget *)widgetCursor.widget;
+
+			auto flowState = (FlowState *)widgetCursor.pageState;
+
+			struct LayoutViewWidgetExecutionState : public ComponenentExecutionState {
+				FlowState *flowState;
+			};
+
+			auto layoutViewWidgetComponentIndex = layoutViewWidget->componentIndex;
+
+			auto layoutViewWidgetExecutionState = (LayoutViewWidgetExecutionState *)flowState->componenentExecutionStates[layoutViewWidgetComponentIndex];
+			if (!layoutViewWidgetExecutionState) {
+				layoutViewWidgetExecutionState =  ObjectAllocator<LayoutViewWidgetExecutionState>::allocate(0xa570ccad);
+				flowState->componenentExecutionStates[layoutViewWidgetComponentIndex] = layoutViewWidgetExecutionState;
+
+				auto layoutViewFlowState = initFlowState(flowState->assets, pageId);
+
+				layoutViewFlowState->parentFlowState = flowState;
+
+				auto assets = flowState->assets;
+				auto flowDefinition = assets->flowDefinition.ptr(assets);
+				auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+				auto component = flow->components.item(assets, layoutViewWidgetComponentIndex);
+
+				layoutViewFlowState->parentComponent = component;
+
+				layoutViewWidgetExecutionState->flowState = layoutViewFlowState;
+			}
+
+			return layoutViewWidgetExecutionState->flowState;
+		}
+	}
+	
 	return g_mainPageFlowState;
 }
 

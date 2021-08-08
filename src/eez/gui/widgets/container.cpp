@@ -28,8 +28,7 @@
 namespace eez {
 namespace gui {
 
-struct ContainerWidgetState {
-    WidgetState genericState;
+struct ContainerWidgetState : public WidgetState {
     int overlayState;
     int displayBufferIndex;
 };

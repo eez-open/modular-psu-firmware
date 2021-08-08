@@ -25,11 +25,6 @@
 namespace eez {
 namespace gui {
 
-struct LayoutViewWidget : public Widget {
-    int16_t layout; // page ID
-    int16_t context; // data ID
-};
-
 int getLayoutId(const WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->data) {
         auto layoutValue = get(widgetCursor, widgetCursor.widget->data);
@@ -56,7 +51,8 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
     }
 
     int layoutId = getLayoutId(widgetCursor);
-    auto layout = getPageAsset(layoutId);
+	auto pageState = widgetCursor.pageState;
+    auto layout = getPageAsset(layoutId, widgetCursor);
 
     if (layout) {
 		auto layoutView = (PageAsset *)layout;
@@ -71,7 +67,9 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
         restoreContext(widgetCursor, layoutView->context, oldContext);
     }
 
+	widgetCursor.pageState = pageState;
     widgetCursor.cursor = cursor;
+
 };
 
 DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {

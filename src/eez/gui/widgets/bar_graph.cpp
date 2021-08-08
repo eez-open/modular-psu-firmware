@@ -47,8 +47,7 @@ struct BarGraphWidget : public Widget {
     uint8_t orientation; // BAR_GRAPH_ORIENTATION_...
 };
 
-struct BarGraphWidgetState {
-    WidgetState genericState;
+struct BarGraphWidgetState : public WidgetState {
     uint16_t color;
     uint16_t backgroundColor;
     uint16_t activeColor;

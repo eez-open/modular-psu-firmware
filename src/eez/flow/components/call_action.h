@@ -18,22 +18,18 @@
 
 #pragma once
 
-#include <eez/gui/assets.h>
+#include <eez/flow/private.h>
 
 namespace eez {
 namespace flow {
 
-using namespace eez::gui;
+struct CallActionActionComponent : public Component {
+	int16_t flowIndex;
+	uint8_t inputsStartIndex;
+	uint8_t outputsStartIndex;
+};
 
-unsigned start(eez::gui::Assets *assets);
-void tick(unsigned flowHandle);
-void scpiResultIsReady();
-void stop();
-
-void *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor);
-void executeFlowAction(unsigned flowHandle, const WidgetCursor &widgetCursor, int16_t actionId);
-void doSetFlowValue();
-void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
+typedef CallActionActionComponent LayoutViewWidgetComponent;
 
 } // flow
 } // eez

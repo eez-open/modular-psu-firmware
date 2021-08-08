@@ -33,8 +33,7 @@ using namespace eez::mcu;
 namespace eez {
 namespace gui {
 
-struct YTGraphWidgetState {
-    WidgetState genericState;
+struct YTGraphWidgetState : public WidgetState {
     uint32_t refreshCounter;
     uint8_t iChannel;
     uint32_t numHistoryValues;

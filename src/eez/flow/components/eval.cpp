@@ -17,28 +17,30 @@
  */
 
 #include <eez/flow/components.h>
+#include <eez/flow/flow_defs_v3.h>
+#include <eez/flow/expression.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-struct ConstantActionComponent : public Component {
-	uint16_t valueIndex;
-};
-
-void executeConstantComponent(FlowState *flowState, unsigned componentIndex) {
- 	auto assets = flowState->assets;
+void executeEvalComponent(FlowState *flowState, unsigned componentIndex) {
+    auto assets = flowState->assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 	auto component = flow->components.item(assets, componentIndex);
 
-	auto constantActionComponent = (ConstantActionComponent *)component;
-	auto &sourceValue = *flowDefinition->constants.item(assets, constantActionComponent->valueIndex);
+	auto expressionPropertyValue = component->propertyValues.item(assets, defs_v3::EVAL_ACTION_COMPONENT_PROPERTY_EXPRESSION);
+	Value value;
+	if (!evalExpression(flowState, component, expressionPropertyValue->evalInstructions, value)) {
+		throwError(flowState, component, "Eval component eval src expression\n");
+		return;
+	}
 
-	auto &componentOutput = *component->outputs.item(assets, 1);
-	propagateValue(flowState, componentOutput, sourceValue);
-
+    auto &componentOutput = *component->outputs.item(assets, 1);
+	propagateValue(flowState, componentOutput, value);
+	
 	propagateValue(flowState, componentIndex);
 }
 
