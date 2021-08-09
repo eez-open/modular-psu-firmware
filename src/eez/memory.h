@@ -80,14 +80,16 @@ static const uint32_t DISPLAY_HEIGHT = 480;
 static const uint32_t DISPLAY_WIDTH = 480;
 static const uint32_t DISPLAY_HEIGHT = 272;
 #endif
-static const uint32_t VRAM_BUFFER_SIZE = DISPLAY_WIDTH * DISPLAY_HEIGHT * 2; // RGB565
+static const uint32_t DISPLAY_BPP = 16; // RGB565
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 static const uint32_t DISPLAY_WIDTH = 1396;
 static const uint32_t DISPLAY_HEIGHT = 563;
-static const uint32_t VRAM_BUFFER_SIZE = DISPLAY_WIDTH * DISPLAY_HEIGHT * 4; // RGBA8888
+static const uint32_t DISPLAY_BPP = 32;  // RGBA8888
 #endif
+
+static const uint32_t VRAM_BUFFER_SIZE = DISPLAY_WIDTH * DISPLAY_HEIGHT * DISPLAY_BPP / 8;
 
 static uint8_t * const VRAM_BUFFER1_START_ADDRESS = SCREENSHOOT_BUFFER_START_ADDRESS + SCREENSHOOT_BUFFER_SIZE;
 static uint8_t * const VRAM_BUFFER2_START_ADDRESS = VRAM_BUFFER1_START_ADDRESS + VRAM_BUFFER_SIZE;

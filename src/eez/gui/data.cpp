@@ -1078,7 +1078,10 @@ Value Value::toString(Assets *assets, uint32_t id) const {
 	}
 	
 	if (type == VALUE_TYPE_ASSETS_STRING) {
-		return Value(((AssetsPtr<AssetsString> *)&assetsOffsetValue)->ptr(assets));
+		if (assets) {
+			return Value(((AssetsPtr<AssetsString> *)&assetsOffsetValue)->ptr(assets));
+		}
+		return "";
 	}
 
     char tempStr[64];

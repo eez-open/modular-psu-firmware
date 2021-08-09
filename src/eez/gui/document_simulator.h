@@ -2005,18 +2005,17 @@ extern ActionExecFunc g_actionExecFunctions[];
 
 enum FontsEnum {
     FONT_ID_NONE = 0,
-    FONT_ID_OSWALD12 = 1,
-    FONT_ID_SHADOW = 2,
-    FONT_ID_OSWALD24 = 3,
+    FONT_ID_ROBOTO_CONDENSED_REGULAR = 1,
+    FONT_ID_OSWALD12 = 2,
+    FONT_ID_OSWALD14 = 3,
     FONT_ID_OSWALD17 = 4,
-    FONT_ID_OSWALD14 = 5,
-    FONT_ID_HEYDINGS14 = 6,
-    FONT_ID_ROBOTO_CONDENSED_REGULAR = 7,
-    FONT_ID_OSWALD20 = 8,
-    FONT_ID_OSWALD48 = 9,
+    FONT_ID_OSWALD20 = 5,
+    FONT_ID_OSWALD24 = 6,
+    FONT_ID_OSWALD38 = 7,
+    FONT_ID_OSWALD48 = 8,
+    FONT_ID_HEYDINGS14 = 9,
     FONT_ID_WEB_HOSTING_HUB24 = 10,
-    FONT_ID_OSWALD38 = 11,
-    FONT_ID_DIB_MUX14D_IMAGES = 12
+    FONT_ID_SHADOW = 11
 };
 
 enum BitmapsEnum {
@@ -2835,4 +2834,4 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_RELAY_CYCLES = 243
 };
 
-extern const uint8_t assets[630649];
+extern const uint8_t assets[627514];
