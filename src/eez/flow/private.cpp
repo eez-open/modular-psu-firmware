@@ -189,43 +189,10 @@ void propagateValue(FlowState *flowState, unsigned componentIndex) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct {
-	bool isActive;
-	Assets *assets;
-	FlowState *flowState;
-	int32_t iterators[MAX_ITERATORS];
-	uint16_t dataId;
-	Value value;
-} g_getValueFromGuiThreadParams;
-
-void getValueFromGuiThread(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value) {
-	while (g_getValueFromGuiThreadParams.isActive) {
-		osDelay(0);
-	}
-
-	g_getValueFromGuiThreadParams.isActive = true;
-	g_getValueFromGuiThreadParams.assets = widgetCursor.flowState->assets;
-	g_getValueFromGuiThreadParams.flowState = widgetCursor.flowState;
-	for (size_t i = 0; i < MAX_ITERATORS; i++) {
-		g_getValueFromGuiThreadParams.iterators[i] = widgetCursor.iterators[i];
-	}
-	g_getValueFromGuiThreadParams.dataId = dataId;
-
-	scripting::getFlowValueInScriptingThread();
-
-	while (g_getValueFromGuiThreadParams.isActive) {
-		osDelay(0);
-	}
-
-	value = g_getValueFromGuiThreadParams.value;
-}
-
-void doGetFlowValue() {
+void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value) {
 	if (scripting::isFlowRunning()) {
-		Assets *assets = g_getValueFromGuiThreadParams.assets;
-		FlowState *flowState = g_getValueFromGuiThreadParams.flowState;
-		uint16_t dataId = g_getValueFromGuiThreadParams.dataId;
-		
+		Assets *assets = widgetCursor.flowState->assets;
+		FlowState *flowState = widgetCursor.flowState;
 		auto flowDefinition = assets->flowDefinition.ptr(assets);
 		auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
 
@@ -234,51 +201,17 @@ void doGetFlowValue() {
 			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
 
-			if (!evalExpression(flowState, component, propertyValue->evalInstructions, g_getValueFromGuiThreadParams.value, nullptr, g_getValueFromGuiThreadParams.iterators)) {
+			if (!evalExpression(flowState, component, propertyValue->evalInstructions, value, nullptr, widgetCursor.iterators)) {
 				throwError(flowState, component, "doGetFlowValue failed\n");
 			}
 		}
 	}
-	g_getValueFromGuiThreadParams.isActive = false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-struct {
-	bool isActive;
-	Assets *assets;
-	FlowState *flowState;
-	int32_t iterators[MAX_ITERATORS];
-	uint16_t dataId;
-	Value value;
-} g_setValueFromGuiThreadParams;
-
-void setValueFromGuiThread(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value) {
-	while (g_setValueFromGuiThreadParams.isActive) {
-		osDelay(0);
-	}
-
-	g_setValueFromGuiThreadParams.isActive = true;
-	g_setValueFromGuiThreadParams.assets = widgetCursor.flowState->assets;
-	g_setValueFromGuiThreadParams.flowState = widgetCursor.flowState;
-	for (size_t i = 0; i < MAX_ITERATORS; i++) {
-		g_getValueFromGuiThreadParams.iterators[i] = widgetCursor.iterators[i];
-	}
-	g_setValueFromGuiThreadParams.dataId = dataId;
-	g_setValueFromGuiThreadParams.value = value;
-
-	scripting::setFlowValueInScriptingThread();
-
-	while (g_setValueFromGuiThreadParams.isActive) {
-		osDelay(0);
-	}
-}
-
-void doSetFlowValue() {
+void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value) {
 	if (scripting::isFlowRunning()) {
-		Assets *assets = g_setValueFromGuiThreadParams.assets;
-		FlowState *flowState = g_setValueFromGuiThreadParams.flowState;
-		uint16_t dataId = g_setValueFromGuiThreadParams.dataId;
+		Assets *assets = widgetCursor.flowState->assets;
+		FlowState *flowState = widgetCursor.flowState;
 		
 		auto flowDefinition = assets->flowDefinition.ptr(assets);
 		auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
@@ -289,14 +222,13 @@ void doSetFlowValue() {
 			auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
 
 			Value dstValue;
-			if (evalAssignableExpression(flowState, component, propertyValue->evalInstructions, dstValue, nullptr, g_setValueFromGuiThreadParams.iterators)) {
-				assignValue(flowState, component, dstValue, g_setValueFromGuiThreadParams.value);
+			if (evalAssignableExpression(flowState, component, propertyValue->evalInstructions, dstValue, nullptr, widgetCursor.iterators)) {
+				assignValue(flowState, component, dstValue, value);
 			} else {
 				throwError(flowState, component, "doSetFlowValue failed\n");
 			}
 		}
 	}
-	g_setValueFromGuiThreadParams.isActive = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

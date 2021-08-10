@@ -31,6 +31,8 @@
 
 #include <eez/gui/gui.h>
 
+#include <eez/scripting/flow.h>
+
 #define CONF_GUI_BLINK_TIME 400 // 400ms
 
 namespace eez {
@@ -111,6 +113,10 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
         mouse::onMouseDisconnected();
     } else if (type == GUI_QUEUE_MESSAGE_REFRESH_SCREEN) {
         refreshScreen();
+    } else if (type == GUI_QUEUE_MESSAGE_FLOW_START) {
+        scripting::startFlowScript();
+    } else if (type == GUI_QUEUE_MESSAGE_FLOW_STOP) {
+        scripting::stopFlowScript();
     } else {
         onGuiQueueMessageHook(type, param);
     }
@@ -171,6 +177,8 @@ void oneIter() {
         updateScreen();
         mcu::display::endBuffersDrawing();
     }
+
+    scripting::flowTick();
 }
 
 void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam, uint32_t timeoutMillisec) {

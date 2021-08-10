@@ -56,9 +56,14 @@ void tick(unsigned flowHandle) {
 		return;
 	}
 
-	FlowState *flowState;
-	unsigned componentIndex;
-	if (removeFromQueue(flowState, componentIndex)) {
+	auto queueSize = getQueueSize();
+	for (size_t i = 0; i < queueSize; i++) {
+		FlowState *flowState;
+		unsigned componentIndex;
+		if (!removeFromQueue(flowState, componentIndex)) {
+			break;
+		}
+
 		executeComponent(flowState, componentIndex);
 
 		if (--flowState->numActiveComponents == 0 && flowState->isAction) {
@@ -118,7 +123,7 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 	return g_mainPageFlowState;
 }
 
-void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCursor, int16_t actionId) {
+void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) {
 	auto flowState = widgetCursor.flowState;
 	actionId = -actionId - 1;
 
@@ -145,10 +150,10 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 
 	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
 		if (operation == DATA_OPERATION_GET) {
-			getValueFromGuiThread(dataId, widgetCursor, value);
+			getValue(dataId, widgetCursor, value);
 		} else if (operation == DATA_OPERATION_COUNT) {
 			Value arrayValue;
-			getValueFromGuiThread(dataId, widgetCursor, arrayValue);
+			getValue(dataId, widgetCursor, arrayValue);
 			if (arrayValue.getType() == VALUE_TYPE_ARRAY_REF) {
 				value = ((ArrayRef *)arrayValue.refValue)->arraySize;
 			} else if (arrayValue.getType() == VALUE_TYPE_ASSETS_ARRAY) {
@@ -194,7 +199,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 				value = unit;
 			}
 		} else if (operation == DATA_OPERATION_SET) {
-			setValueFromGuiThread(dataId, widgetCursor, value);
+			setValue(dataId, widgetCursor, value);
 
 			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
 			auto component = flow->components.item(assets, widgetDataItem->componentIndex);

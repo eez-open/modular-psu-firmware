@@ -2547,7 +2547,7 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param) {
         g_psuAppContext.doHideAsyncOperationInProgress();
     } else if (type == GUI_QUEUE_MESSAGE_KEY_DOWN) {
         keyboard::onKeyDown((uint16_t)param);
-    } 
+    }
 }
 
 float getDefaultAnimationDurationHook() {

@@ -52,12 +52,17 @@ bool loadFlowScript(int *err) {
 		return false;
 	}
 
-	startFlowScriptInScriptingThread();
+	startFlowScript();
 	return true;
 
 }
 
 void startFlowScript() {
+	if (osThreadGetId() != g_guiTaskHandle) {
+		sendMessageToGuiThread(GUI_QUEUE_MESSAGE_FLOW_START);
+		return;
+	}
+
 	char scriptName[64];
 	getFileName(g_scriptPath, scriptName, sizeof(scriptName));
 	InfoTrace("App started: %s\n", scriptName);
@@ -68,8 +73,13 @@ void startFlowScript() {
 }
 
 void stopFlowScript() {
+	if (osThreadGetId() != g_guiTaskHandle) {
+		sendMessageToGuiThread(GUI_QUEUE_MESSAGE_FLOW_STOP);
+		return;
+	}
+
 	g_flowHandle = 0;
-	stopFlowInScriptingThread();
+	flow::stop();
 }
 
 void freeFlowMemory() {
@@ -89,29 +99,10 @@ void executeScpiFromFlow(const char *commandOrQueryText) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static struct {
-	bool isActive;
-	WidgetCursor widgetCursor;
-	int16_t actionId;
-} g_executeFlowAction;
-
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId) {
-	while (g_executeFlowAction.isActive) {
-		osDelay(1);
-	}
-
-	g_executeFlowAction.isActive = true;
-	g_executeFlowAction.widgetCursor = widgetCursor;
-	g_executeFlowAction.actionId = actionId;
-
-	executeFlowActionInScriptingThread();
-}
-
-void doExecuteFlowAction() {
 	if (isFlowRunning()) {
-		flow::executeFlowAction(g_flowHandle, g_executeFlowAction.widgetCursor, g_executeFlowAction.actionId);
+		flow::executeFlowAction(widgetCursor, actionId);
 	}
-	g_executeFlowAction.isActive = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

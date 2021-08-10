@@ -476,6 +476,10 @@ bool do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_FLOW_IT(EvalStack &stack) {
+	if (!stack.iterators) {
+		return false;
+	}
+
 	auto a = stack.pop();
 	
 	int err;
@@ -488,7 +492,7 @@ bool do_OPERATION_TYPE_FLOW_IT(EvalStack &stack) {
 	if (iteratorIndex < 0 || iteratorIndex >= (int)MAX_ITERATORS) {
 		return false;
 	}
-	
+
 	stack.push(stack.iterators[iteratorIndex]);
 	
 	return true;

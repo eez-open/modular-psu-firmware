@@ -56,8 +56,8 @@ void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, cons
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput); // propagates null value
 void propagateValue(FlowState *flowState, unsigned componentIndex); // propagates null value through @seqout (0-th output)
 
-void getValueFromGuiThread(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value);
-void setValueFromGuiThread(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value);
+void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value);
+void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value);
 
 void assignValue(FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue);
 

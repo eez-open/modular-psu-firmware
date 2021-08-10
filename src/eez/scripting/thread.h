@@ -23,12 +23,6 @@ namespace scripting {
 
 void startMpScriptInScriptingThread();
 
-void startFlowScriptInScriptingThread();
-void executeFlowActionInScriptingThread();
-void getFlowValueInScriptingThread();
-void setFlowValueInScriptingThread();
-void stopFlowInScriptingThread();
-
 void scpiResultIsReady();
 
 bool waitScpiResult();

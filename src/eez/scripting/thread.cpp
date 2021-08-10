@@ -30,11 +30,6 @@ namespace scripting {
 
 enum {
 	QUEUE_MESSAGE_START_MP_SCRIPT,
-	QUEUE_MESSAGE_START_FLOW_SCRIPT,
-	QUEUE_MESSAGE_EXECUTE_FLOW_ACTION,
-	QUEUE_MESSAGE_GET_FLOW_VALUE,
-	QUEUE_MESSAGE_SET_FLOW_VALUE,
-	QUEUE_MESSAGE_STOP_FLOW,
 	QUEUE_MESSAGE_SCPI_RESULT
 };
 	
@@ -77,26 +72,6 @@ void startMpScriptInScriptingThread() {
 	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_MP_SCRIPT, osWaitForever);
 }
 
-void startFlowScriptInScriptingThread() {
-	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_FLOW_SCRIPT, osWaitForever);
-}
-
-void executeFlowActionInScriptingThread() {
-	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_EXECUTE_FLOW_ACTION, 500);
-}
-
-void getFlowValueInScriptingThread() {
-	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_GET_FLOW_VALUE, 500);
-}
-
-void setFlowValueInScriptingThread() {
-	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_SET_FLOW_VALUE, 500);
-}
-
-void stopFlowInScriptingThread() {
-	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_STOP_FLOW, 100);
-}
-
 void scpiResultIsReady() {
 	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_SCPI_RESULT, osWaitForever);
 }
@@ -118,21 +93,11 @@ void oneIter() {
     if (event.status == osEventMessage) {
 		if (event.value.v == QUEUE_MESSAGE_START_MP_SCRIPT) {
 			startMpScript();
-		} else if (event.value.v == QUEUE_MESSAGE_START_FLOW_SCRIPT) {
-			startFlowScript();
-		} else if (event.value.v == QUEUE_MESSAGE_EXECUTE_FLOW_ACTION) {
-			doExecuteFlowAction();
-		} else if (event.value.v == QUEUE_MESSAGE_GET_FLOW_VALUE) {
-			flow::doGetFlowValue();
-		} else if (event.value.v == QUEUE_MESSAGE_SET_FLOW_VALUE) {
-			flow::doSetFlowValue();
-		} else if (event.value.v == QUEUE_MESSAGE_STOP_FLOW) {
-			flow::stop();
 		} else if (event.value.v == QUEUE_MESSAGE_SCPI_RESULT) {
 			flow::scpiResultIsReady();
 		}
 	} else {
-		flowTick();
+		//flowTick();
 	}
 }
 

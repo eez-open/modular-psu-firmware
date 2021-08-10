@@ -36,6 +36,21 @@ void queueInit() {
 	g_queueIsFull = false;
 }
 
+size_t getQueueSize() {
+	if (g_queueHead == g_queueTail) {
+		if (g_queueIsFull) {
+			return QUEUE_SIZE;
+		}
+		return 0;
+	}
+	
+	if (g_queueHead < g_queueTail) {
+		return g_queueTail - g_queueHead;
+	}
+
+	return QUEUE_SIZE - g_queueHead + g_queueTail;
+}
+
 void addToQueue(FlowState *flowState, unsigned componentIndex) {
 	g_queue[g_queueTail].flowState = flowState;
 	g_queue[g_queueTail].componentIndex = componentIndex;

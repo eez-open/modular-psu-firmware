@@ -28,7 +28,7 @@ using eez::gui::MAX_ITERATORS;
 struct EvalStack {
 	Assets *assets;
 	FlowState *flowState;
-	int32_t iterators[MAX_ITERATORS];
+	const int32_t *iterators;
 
 	Value stack[100];
 	int sp = 0;
@@ -48,8 +48,8 @@ struct EvalStack {
 };
 
 bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
-bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, int32_t *iterators = nullptr);
-bool evalAssignableExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, int32_t *iterators = nullptr);
+bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
+bool evalAssignableExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
 
 } // flow
 } // eez

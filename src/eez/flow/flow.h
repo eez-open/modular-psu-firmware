@@ -33,7 +33,7 @@ void scpiResultIsReady();
 void stop();
 
 FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor);
-void executeFlowAction(unsigned flowHandle, const WidgetCursor &widgetCursor, int16_t actionId);
+void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId);
 void doGetFlowValue();
 void doSetFlowValue();
 void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
