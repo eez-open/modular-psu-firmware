@@ -46,7 +46,7 @@ unsigned start(Assets *assets) {
 
 	scpiComponentInit();
 
-	g_mainPageFlowState = initFlowState(assets, 0);
+	g_mainPageFlowState = initPageFlowState(assets, 0);
 
 	return 1;
 }
@@ -61,11 +61,9 @@ void tick(unsigned flowHandle) {
 	if (removeFromQueue(flowState, componentIndex)) {
 		executeComponent(flowState, componentIndex);
 
-		if (--flowState->numActiveComponents == 0) {
+		if (--flowState->numActiveComponents == 0 && flowState->isAction) {
 			freeFlowState(flowState);
 		}
-
-		recalcFlowDataItems(flowState);
 	}
 }
 
@@ -79,14 +77,14 @@ void stop() {
 	}
 }
 
-void *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
+FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 	pageId = -pageId - 1;
 
 	if (widgetCursor.widget && widgetCursor.widget->type == WIDGET_TYPE_LAYOUT_VIEW) {
-		if (widgetCursor.pageState) {
+		if (widgetCursor.flowState) {
 			auto layoutViewWidget = (LayoutViewWidget *)widgetCursor.widget;
 
-			auto flowState = (FlowState *)widgetCursor.pageState;
+			auto flowState = widgetCursor.flowState;
 
 			struct LayoutViewWidgetExecutionState : public ComponenentExecutionState {
 				FlowState *flowState;
@@ -99,7 +97,7 @@ void *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 				layoutViewWidgetExecutionState =  ObjectAllocator<LayoutViewWidgetExecutionState>::allocate(0xa570ccad);
 				flowState->componenentExecutionStates[layoutViewWidgetComponentIndex] = layoutViewWidgetExecutionState;
 
-				auto layoutViewFlowState = initFlowState(flowState->assets, pageId);
+				auto layoutViewFlowState = initPageFlowState(flowState->assets, pageId);
 
 				layoutViewFlowState->parentFlowState = flowState;
 
@@ -121,7 +119,7 @@ void *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 }
 
 void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCursor, int16_t actionId) {
-	auto flowState = (FlowState *)widgetCursor.pageState;
+	auto flowState = widgetCursor.flowState;
 	actionId = -actionId - 1;
 
 	Assets *assets = flowState->assets;
@@ -131,47 +129,78 @@ void executeFlowAction(unsigned flowHandle, const gui::WidgetCursor &widgetCurso
 	if (actionId >= 0 && actionId < (int16_t)flow->widgetActions.count) {
 		auto componentOutput = flow->widgetActions.item(assets, actionId);
 		if (componentOutput) {
-			propagateValue(flowState, *componentOutput);
+			propagateValue(flowState, *componentOutput, widgetCursor.cursor);
 		}
 	}
 }
 
-void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
-	auto flowState = (FlowState *)widgetCursor.pageState;
+void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
+	auto flowState = widgetCursor.flowState;
 
 	dataId = -dataId - 1;
 
 	auto assets = flowState->assets;
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto dataItemsOffset = flow->nInputValues + flow->localVariables.count;
 
 	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
 		if (operation == DATA_OPERATION_GET) {
-			value = flowState->values[dataItemsOffset + dataId];
-		} else {
+			getValueFromGuiThread(dataId, widgetCursor, value);
+		} else if (operation == DATA_OPERATION_COUNT) {
+			Value arrayValue;
+			getValueFromGuiThread(dataId, widgetCursor, arrayValue);
+			if (arrayValue.getType() == VALUE_TYPE_ARRAY_REF) {
+				value = ((ArrayRef *)arrayValue.refValue)->arraySize;
+			} else if (arrayValue.getType() == VALUE_TYPE_ASSETS_ARRAY) {
+				auto assetsArray = ((AssetsPtr<AssetsArray> *)&arrayValue.assetsOffsetValue)->ptr(widgetCursor.assets);
+				value = assetsArray->arraySize;
+			} else {
+				value = 0;
+			}
+		} if (operation == DATA_OPERATION_GET_MIN) {
 			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
-			if (widgetDataItem) {
-				auto component = flow->components.item(assets, widgetDataItem->componentIndex);
-				if (component->type == WIDGET_TYPE_INPUT) {
-					auto inputWidget = (InputWidget *)widgetCursor.widget;
-					
-					auto unitValue = get(widgetCursor, inputWidget->unit);
-					Unit unit = getUnitFromName(unitValue.toString(assets, 0x5049bd52).getString()); 
-					
-					if (operation == DATA_OPERATION_GET_MIN) {
-						value = Value(get(widgetCursor, inputWidget->min).toFloat(), unit);
-					} else if (operation == DATA_OPERATION_GET_MAX) {
-						value = Value(get(widgetCursor, inputWidget->max).toFloat(), unit);
-					} else if (operation == DATA_OPERATION_GET_PRECISION) {
-						value = Value(get(widgetCursor, inputWidget->precision).toFloat(), unit);
-					} else if (operation == DATA_OPERATION_GET_UNIT) {
-						value = unit;
-					} else if (operation == DATA_OPERATION_SET) {
-						setValueFromGuiThread(flowState, dataId, value);
-						scripting::executeFlowAction(widgetCursor, inputWidget->action);
-					}
-				}
+			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+			if (component->type == WIDGET_TYPE_INPUT) {
+				auto inputWidget = (InputWidget *)widgetCursor.widget;
+				auto unitValue = get(widgetCursor, inputWidget->unit);
+				Unit unit = getUnitFromName(unitValue.toString(assets, 0x5049bd52).getString());
+				value = Value(get(widgetCursor, inputWidget->min).toFloat(), unit);
+			}
+		} else if (operation == DATA_OPERATION_GET_MAX) {
+			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
+			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+			if (component->type == WIDGET_TYPE_INPUT) {
+				auto inputWidget = (InputWidget *)widgetCursor.widget;
+				auto unitValue = get(widgetCursor, inputWidget->unit);
+				Unit unit = getUnitFromName(unitValue.toString(assets, 0x5049bd52).getString());
+				value = Value(get(widgetCursor, inputWidget->max).toFloat(), unit);
+			}
+		} else if (operation == DATA_OPERATION_GET_PRECISION) {
+			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
+			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+			if (component->type == WIDGET_TYPE_INPUT) {
+				auto inputWidget = (InputWidget *)widgetCursor.widget;
+				auto unitValue = get(widgetCursor, inputWidget->unit);
+				Unit unit = getUnitFromName(unitValue.toString(assets, 0x5049bd52).getString());
+				value = Value(get(widgetCursor, inputWidget->precision).toFloat(), unit);
+			}
+		} else if (operation == DATA_OPERATION_GET_UNIT) {
+			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
+			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+			if (component->type == WIDGET_TYPE_INPUT) {
+				auto inputWidget = (InputWidget *)widgetCursor.widget;
+				auto unitValue = get(widgetCursor, inputWidget->unit);
+				Unit unit = getUnitFromName(unitValue.toString(assets, 0x5049bd52).getString());
+				value = unit;
+			}
+		} else if (operation == DATA_OPERATION_SET) {
+			setValueFromGuiThread(dataId, widgetCursor, value);
+
+			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
+			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+			if (component->type == WIDGET_TYPE_INPUT) {
+				auto inputWidget = (InputWidget *)widgetCursor.widget;
+				scripting::executeFlowAction(widgetCursor, inputWidget->action);
 			}
 		}
 	} else {

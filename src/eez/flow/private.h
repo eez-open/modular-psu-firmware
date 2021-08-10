@@ -27,6 +27,10 @@ using eez::gui::Value;
 using eez::gui::Assets;
 using eez::gui::Component;
 using eez::gui::ComponentOutput;
+using eez::gui::WidgetCursor;
+
+static const int UNDEFINED_VALUE_INDEX = 0;
+static const int NULL_VALUE_INDEX = 1;
 
 struct ComponenentExecutionState {
 	virtual ~ComponenentExecutionState() {}
@@ -35,6 +39,7 @@ struct ComponenentExecutionState {
 struct FlowState {
 	Assets *assets;
 	uint16_t flowIndex;
+	bool isAction;
 	uint16_t error;
 	uint32_t numActiveComponents;
 	FlowState *parentFlowState;
@@ -43,20 +48,17 @@ struct FlowState {
 	ComponenentExecutionState **componenentExecutionStates;
 };
 
-static const int UNDEFINED_VALUE_INDEX = 0;
-static const int NULL_VALUE_INDEX = 1;
-
-FlowState *initFlowState(Assets *assets, int flowIndex);
+FlowState *initActionFlowState(Assets *assets, int flowIndex);
+FlowState *initPageFlowState(Assets *assets, int flowIndex);
 void freeFlowState(FlowState *flowState);
-
-void recalcFlowDataItems(FlowState *flowState);
-void recalcFlowDataItems(FlowState *flowState, unsigned componentIndex);
 
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput); // propagates null value
 void propagateValue(FlowState *flowState, unsigned componentIndex); // propagates null value through @seqout (0-th output)
 
-void setValueFromGuiThread(FlowState *flowState, uint16_t dataId, const Value& value);
+void getValueFromGuiThread(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value);
+void setValueFromGuiThread(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value);
+
 void assignValue(FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue);
 
 void throwError(FlowState *flowState, Component *component, const char *errorMessage);

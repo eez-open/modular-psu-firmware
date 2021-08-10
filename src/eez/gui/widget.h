@@ -22,6 +22,11 @@
 #include <eez/memory.h>
 
 namespace eez {
+
+namespace flow {
+	struct FlowState;
+}
+
 namespace gui {
 
 #define WIDGET_TYPES \
@@ -86,14 +91,17 @@ class AppContext;
 
 typedef int Cursor;
 
+static const size_t MAX_ITERATORS = 4;
+
 struct WidgetCursor {
 	Assets *assets;
 	AppContext *appContext;
     const Widget *widget;
     Cursor cursor;
+	int32_t iterators[MAX_ITERATORS];
     WidgetState *previousState;
     WidgetState *currentState;
-    void *pageState;
+    flow::FlowState *flowState;
     int16_t x;
     int16_t y;
 
@@ -104,10 +112,13 @@ struct WidgetCursor {
         , cursor(-1)
         , previousState(nullptr)
         , currentState(nullptr)
-        , pageState(0)
+        , flowState(0)
         , x(0)
         , y(0)
 	{
+		for (size_t i = 0; i < MAX_ITERATORS; i++) {
+			iterators[i] = -1;
+		}
     }
 
     WidgetCursor(
@@ -115,9 +126,10 @@ struct WidgetCursor {
         AppContext *appContext_,
         const Widget *widget_,
         const Cursor cursor_,
+		int32_t *iterators_,
         WidgetState *previousState_,
         WidgetState *currentState_,
-		void *pageState,
+		flow::FlowState *flowState,
 		int16_t x_,
 		int16_t y_
     )
@@ -127,11 +139,20 @@ struct WidgetCursor {
 		, cursor(cursor_)
         , previousState(previousState_)
         , currentState(currentState_)
-		, pageState(pageState)
+		, flowState(flowState)
 		, x(x_)
 		, y(y_)
     {
-    }
+		if (iterators_) {
+			for (size_t i = 0; i < MAX_ITERATORS; i++) {
+				iterators[i] = iterators_[i];
+			}
+		} else {
+			for (size_t i = 0; i < MAX_ITERATORS; i++) {
+				iterators[i] = -1;
+			}
+		}
+	}
 
 	WidgetCursor(Cursor cursor_)
 		: assets(nullptr)
@@ -140,14 +161,26 @@ struct WidgetCursor {
 		, cursor(cursor_)
 		, previousState(nullptr)
 		, currentState(nullptr)
-		, pageState(0)
+		, flowState(0)
 		, x(0)
-		, y(0) {
+		, y(0) 
+	{
+		for (size_t i = 0; i < MAX_ITERATORS; i++) {
+			iterators[i] = -1;
+		}
 	}
 
     bool operator!=(const WidgetCursor &rhs) const {
-        return widget != rhs.widget || cursor != rhs.cursor;
-    }
+		if (widget != rhs.widget || cursor != rhs.cursor) {
+			return true;
+		}
+		for (size_t i = 0; i < MAX_ITERATORS; i++) {
+			if (iterators[i] != rhs.iterators[i]) {
+				return true;
+			}
+		}
+		return false;
+	}
 
     bool operator==(const WidgetCursor &rhs) const {
         return !(*this != rhs);
@@ -158,6 +191,20 @@ struct WidgetCursor {
     }
 
     void nextState();
+
+	void pushIterator(int32_t it) {
+		for (size_t i = MAX_ITERATORS - 1; i > 0; i--) {
+			iterators[i] = iterators[i - 1];
+		}
+		iterators[0] = it;
+	}
+
+	void popIterator() {
+		for (size_t i = 1; i < MAX_ITERATORS; i++) {
+			iterators[i - 1] = iterators[i];
+		}
+		iterators[MAX_ITERATORS - 1] = -1;
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////

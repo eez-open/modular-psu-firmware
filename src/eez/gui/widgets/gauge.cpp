@@ -118,8 +118,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		float max = get(widgetCursor, widget->max).toFloat();
 		float value = widgetCursor.currentState->data.toFloat();
 
-		auto flowState = (flow::FlowState *)widgetCursor.pageState;
-		auto unit = get(widgetCursor, widget->unit).toString(flowState ? flowState->assets: nullptr, 0xa9ddede3).getString();
+		auto unit = get(widgetCursor, widget->unit).toString(widgetCursor.flowState ? widgetCursor.flowState->assets: nullptr, 0xa9ddede3).getString();
 
 		if (isNaN(min) || isNaN(max) || isNaN(value) || isinf(min) || isinf(max) || isinf(value) || min >= max) {
 			min = 0.0;

@@ -22,6 +22,8 @@
 
 #include <eez/util.h>
 
+#include <eez/flow/private.h>
+
 #include <eez/gui/gui.h>
 #include <eez/gui/data.h>
 
@@ -64,8 +66,8 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
 		widgetCursor.previousState->data != widgetCursor.currentState->data;
 
-	if (widget->type & INPUT_WIDGET_TYPE_NUMBER) {
-		currentState->unit.clear();
+	currentState->unit.clear();
+	if (widget->flags & INPUT_WIDGET_TYPE_NUMBER) {
 		currentState->unit = get(widgetCursor, widget->unit);
 		if (!refresh) {
 			refresh |= 
@@ -82,9 +84,10 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 		char text[MAX_TEXT_LEN + 1];
 		widgetCursor.currentState->data.toText(text, sizeof(text));
 
-		if (currentState->unit.isString()) {
+		Value unit = currentState->unit.toString(widgetCursor.flowState ? widgetCursor.flowState->assets : nullptr, 0x5f8feae3);
+		if (unit.isString()) {
 			stringAppendString(text, sizeof(text), " ");
-			stringAppendString(text, sizeof(text), currentState->unit.getString());
+			stringAppendString(text, sizeof(text), unit.getString());
 		}
 
 		drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,

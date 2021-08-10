@@ -95,10 +95,21 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 	return true;
 }
 
-bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes) {
+bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes, int32_t *iterators) {
 	EvalStack stack;
+
 	stack.assets = flowState->assets;
 	stack.flowState = flowState;
+
+	if (iterators) {
+		for (size_t i = 0; i < MAX_ITERATORS; i++) {
+			stack.iterators[i] = iterators[i];
+		}
+	} else {
+		for (size_t i = 0; i < MAX_ITERATORS; i++) {
+			stack.iterators[i] = -1;
+		}
+	}
 
 	if (evalExpression(flowState, component, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {
@@ -118,10 +129,22 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 	return false;
 }
 
-bool evalAssignableExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes) {
+bool evalAssignableExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes, int32_t *iterators) {
 	EvalStack stack;
+
 	stack.assets = flowState->assets;
 	stack.flowState = flowState;
+	
+	if (iterators) {
+		for (size_t i = 0; i < MAX_ITERATORS; i++) {
+			stack.iterators[i] = iterators[i];
+		}
+	} else {
+		for (size_t i = 0; i < MAX_ITERATORS; i++) {
+			stack.iterators[i] = -1;
+		}
+	}
+
 
 	if (evalExpression(flowState, component, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {

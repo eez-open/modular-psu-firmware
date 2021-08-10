@@ -25,15 +25,18 @@ namespace flow {
 
 using namespace eez::gui;
 
+struct FlowState;
+
 unsigned start(eez::gui::Assets *assets);
 void tick(unsigned flowHandle);
 void scpiResultIsReady();
 void stop();
 
-void *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor);
+FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor);
 void executeFlowAction(unsigned flowHandle, const WidgetCursor &widgetCursor, int16_t actionId);
+void doGetFlowValue();
 void doSetFlowValue();
-void dataOperation(unsigned flowHandle, int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
+void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 
 } // flow
 } // eez

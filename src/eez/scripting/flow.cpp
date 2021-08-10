@@ -122,7 +122,7 @@ bool isFlowRunning() {
 
 void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
 	if (isFlowRunning()) {
-		flow::dataOperation(g_flowHandle, dataId, operation, widgetCursor, value);
+		flow::dataOperation(dataId, operation, widgetCursor, value);
 	}
 }
 

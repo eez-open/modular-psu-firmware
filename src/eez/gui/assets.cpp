@@ -234,7 +234,7 @@ const PageAsset* getPageAsset(int pageId) {
 const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor) {
 	if (pageId < 0) {
 		widgetCursor.assets = g_externalAssets;
-		widgetCursor.pageState = flow::getFlowState(pageId, widgetCursor);
+		widgetCursor.flowState = flow::getFlowState(pageId, widgetCursor);
 	} else {
 	    widgetCursor.assets = g_mainAssets;
     }

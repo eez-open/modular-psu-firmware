@@ -86,7 +86,9 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
         if (listWidget->listType == LIST_TYPE_VERTICAL) {
             if (offset < parentWidget->h) {
 				widgetCursor.y = savedY + offset;
-                enumWidget(widgetCursor, callback);
+				widgetCursor.pushIterator(index);
+				enumWidget(widgetCursor, callback);
+				widgetCursor.popIterator();
 				offset += childWidget->h + listWidget->gap;
             } else {
                 break;
@@ -94,7 +96,9 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
         } else {
             if (offset < parentWidget->w) {
 				widgetCursor.x = savedX + offset;
+				widgetCursor.pushIterator(index);
 				enumWidget(widgetCursor, callback);
+				widgetCursor.popIterator();
 				offset += childWidget->w + listWidget->gap;
             } else {
                 break;

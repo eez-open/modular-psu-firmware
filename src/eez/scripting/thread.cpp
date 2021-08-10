@@ -32,6 +32,7 @@ enum {
 	QUEUE_MESSAGE_START_MP_SCRIPT,
 	QUEUE_MESSAGE_START_FLOW_SCRIPT,
 	QUEUE_MESSAGE_EXECUTE_FLOW_ACTION,
+	QUEUE_MESSAGE_GET_FLOW_VALUE,
 	QUEUE_MESSAGE_SET_FLOW_VALUE,
 	QUEUE_MESSAGE_STOP_FLOW,
 	QUEUE_MESSAGE_SCPI_RESULT
@@ -84,6 +85,10 @@ void executeFlowActionInScriptingThread() {
 	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_EXECUTE_FLOW_ACTION, 500);
 }
 
+void getFlowValueInScriptingThread() {
+	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_GET_FLOW_VALUE, 500);
+}
+
 void setFlowValueInScriptingThread() {
 	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_SET_FLOW_VALUE, 500);
 }
@@ -117,6 +122,8 @@ void oneIter() {
 			startFlowScript();
 		} else if (event.value.v == QUEUE_MESSAGE_EXECUTE_FLOW_ACTION) {
 			doExecuteFlowAction();
+		} else if (event.value.v == QUEUE_MESSAGE_GET_FLOW_VALUE) {
+			flow::doGetFlowValue();
 		} else if (event.value.v == QUEUE_MESSAGE_SET_FLOW_VALUE) {
 			flow::doSetFlowValue();
 		} else if (event.value.v == QUEUE_MESSAGE_STOP_FLOW) {

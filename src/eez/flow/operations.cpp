@@ -53,6 +53,90 @@ Value op_add(Assets *assets, const Value& a1, const Value& b1) {
 	return Value();
 }
 
+Value op_sub(Assets *assets, const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	if (a.isDouble() || b.isDouble()) {
+		return Value(a.toDouble() - b.toDouble(), VALUE_TYPE_DOUBLE);
+	}
+
+	if (a.isFloat() || b.isFloat()) {
+		return Value(a.toFloat() - b.toFloat(), VALUE_TYPE_FLOAT);
+	}
+
+	if (a.isInt64() || b.isInt64()) {
+		return Value(a.toInt64() - b.toInt64(), VALUE_TYPE_INT64);
+	}
+
+	if (a.isInt32OrLess() && b.isInt32OrLess()) {
+		return Value(a.int32Value - b.int32Value, VALUE_TYPE_INT32);
+	}
+
+	return Value();
+}
+
+Value op_mul(Assets *assets, const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	if (a.isDouble() || b.isDouble()) {
+		return Value(a.toDouble() * b.toDouble(), VALUE_TYPE_DOUBLE);
+	}
+
+	if (a.isFloat() || b.isFloat()) {
+		return Value(a.toFloat() * b.toFloat(), VALUE_TYPE_FLOAT);
+	}
+
+	if (a.isInt64() || b.isInt64()) {
+		return Value(a.toInt64() * b.toInt64(), VALUE_TYPE_INT64);
+	}
+
+	if (a.isInt32OrLess() && b.isInt32OrLess()) {
+		return Value(a.int32Value * b.int32Value, VALUE_TYPE_INT32);
+	}
+
+	return Value();
+}
+
+Value op_div(Assets *assets, const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	if (a.isDouble() || b.isDouble()) {
+		return Value(a.toDouble() / b.toDouble(), VALUE_TYPE_DOUBLE);
+	}
+
+	if (a.isFloat() || b.isFloat()) {
+		return Value(a.toFloat() / b.toFloat(), VALUE_TYPE_FLOAT);
+	}
+
+	if (a.isInt64() || b.isInt64()) {
+		return Value(a.toInt64() / b.toInt64(), VALUE_TYPE_INT64);
+	}
+
+	if (a.isInt32OrLess() && b.isInt32OrLess()) {
+		return Value(a.int32Value / b.int32Value, VALUE_TYPE_INT32);
+	}
+
+	return Value();
+}
+
+Value op_mod(Assets *assets, const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	if (a.isInt64() || b.isInt64()) {
+		return Value(a.toInt64() % b.toInt64(), VALUE_TYPE_INT64);
+	}
+
+	if (a.isInt32OrLess() && b.isInt32OrLess()) {
+		return Value(a.int32Value % b.int32Value, VALUE_TYPE_INT32);
+	}
+
+	return Value();
+}
+
 Value op_eq(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
@@ -111,19 +195,63 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_SUB(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	auto result = op_sub(stack.assets, a, b);
+
+	if (result.getType() == VALUE_TYPE_UNDEFINED) {
+		return false;
+	}
+
+	stack.push(result);
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_MUL(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	auto result = op_mul(stack.assets, a, b);
+
+	if (result.getType() == VALUE_TYPE_UNDEFINED) {
+		return false;
+	}
+
+	stack.push(result);
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_DIV(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	auto result = op_div(stack.assets, a, b);
+
+	if (result.getType() == VALUE_TYPE_UNDEFINED) {
+		return false;
+	}
+
+	stack.push(result);
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_MOD(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	auto result = op_mod(stack.assets, a, b);
+
+	if (result.getType() == VALUE_TYPE_UNDEFINED) {
+		return false;
+	}
+
+	stack.push(result);
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_LEFT_SHIFT(EvalStack &stack) {
@@ -209,6 +337,42 @@ bool do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	}
+	if (a.isDouble()) {
+		stack.push(Value(a.getDouble(), VALUE_TYPE_DOUBLE));
+		return true;
+	}
+
+	if (a.isFloat()) {
+		stack.push(Value(a.toFloat(), VALUE_TYPE_FLOAT));
+		return true;
+	}
+
+	if (a.isInt64()) {
+		stack.push(Value((int64_t)a.getInt64(), VALUE_TYPE_INT64));
+		return true;
+	}
+
+	if (a.isInt32()) {
+		stack.push(Value((int)a.getInt32(), VALUE_TYPE_INT32));
+		return true;
+	}
+
+	if (a.isInt16()) {
+		stack.push(Value((int16_t)a.getInt16(), VALUE_TYPE_INT16));
+		return true;
+	}
+
+
+	if (a.isInt8()) {
+		stack.push(Value((int8_t)a.getInt8(), VALUE_TYPE_INT8));
+		return true;
+	}
+
 	return false;
 }
 
@@ -253,15 +417,81 @@ bool do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT(EvalStack &stack) {
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	}
+	if (a.isInt64()) {
+		stack.push(Value(~a.uint64Value, VALUE_TYPE_UINT64));
+		return true;
+	}
+
+	if (a.isInt32()) {
+		stack.push(Value(~a.uint32Value, VALUE_TYPE_UINT32));
+		return true;
+	}
+
+	if (a.isInt16()) {
+		stack.push(Value(~a.uint16Value, VALUE_TYPE_UINT16));
+		return true;
+	}
+
+
+	if (a.isInt8()) {
+		stack.push(Value(~a.uint8Value, VALUE_TYPE_UINT8));
+		return true;
+	}
+
 	return false;
 }
 
 bool do_OPERATION_TYPE_NOT(EvalStack &stack) {
-	return false;
+	auto aValue = stack.pop();
+
+	int err;
+	auto a = aValue.toBool(stack.assets, &err);
+	if (err != 0) {
+		return false;
+	}
+
+	stack.push(Value(!a, VALUE_TYPE_BOOLEAN));
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
-	return false;
+	auto alternate = stack.pop();
+	auto consequent = stack.pop();
+	auto conditionValue = stack.pop();
+
+	int err;
+	auto condition = conditionValue.toBool(stack.assets, &err);
+	if (err != 0) {
+		return false;
+	}
+
+	stack.push(condition ? consequent : alternate);
+	return true;
+}
+
+bool do_OPERATION_TYPE_FLOW_IT(EvalStack &stack) {
+	auto a = stack.pop();
+	
+	int err;
+	auto iteratorIndex = a.toInt32(&err);
+	if (err != 0) {
+		return false;
+	}
+	
+	iteratorIndex = -iteratorIndex;
+	if (iteratorIndex < 0 || iteratorIndex >= (int)MAX_ITERATORS) {
+		return false;
+	}
+	
+	stack.push(stack.iterators[iteratorIndex]);
+	
+	return true;
 }
 
 bool do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
@@ -328,6 +558,7 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT,
 	do_OPERATION_TYPE_NOT,
 	do_OPERATION_TYPE_CONDITIONAL,
+	do_OPERATION_TYPE_FLOW_IT,
 	do_OPERATION_TYPE_MATH_SIN,
 	do_OPERATION_TYPE_MATH_COS,
 	do_OPERATION_TYPE_MATH_LOG,

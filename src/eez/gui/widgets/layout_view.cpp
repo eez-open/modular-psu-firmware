@@ -51,7 +51,7 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
     }
 
     int layoutId = getLayoutId(widgetCursor);
-	auto pageState = widgetCursor.pageState;
+	auto flowState = widgetCursor.flowState;
     auto layout = getPageAsset(layoutId, widgetCursor);
 
     if (layout) {
@@ -67,7 +67,7 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
         restoreContext(widgetCursor, layoutView->context, oldContext);
     }
 
-	widgetCursor.pageState = pageState;
+	widgetCursor.flowState = flowState;
     widgetCursor.cursor = cursor;
 
 };

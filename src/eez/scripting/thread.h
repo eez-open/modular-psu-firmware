@@ -25,6 +25,7 @@ void startMpScriptInScriptingThread();
 
 void startFlowScriptInScriptingThread();
 void executeFlowActionInScriptingThread();
+void getFlowValueInScriptingThread();
 void setFlowValueInScriptingThread();
 void stopFlowInScriptingThread();
 

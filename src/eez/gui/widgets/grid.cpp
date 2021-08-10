@@ -86,7 +86,9 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 		widgetCursor.x = savedX + xOffset;
 		widgetCursor.y = savedY + yOffset;
 
+		widgetCursor.pushIterator(index);
 		enumWidget(widgetCursor, callback);
+		widgetCursor.popIterator();
 
         if (widgetCursor.previousState) {
 			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);

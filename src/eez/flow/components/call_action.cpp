@@ -40,7 +40,7 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 		throwError(flowState, component, "Invalid action flow index in CallAction component\n");
 	}
 
-	FlowState *actionFlowState = initFlowState(assets, flowIndex);
+	FlowState *actionFlowState = initActionFlowState(assets, flowIndex);
 
 	actionFlowState->parentFlowState = flowState;
 	actionFlowState->parentComponent = component;

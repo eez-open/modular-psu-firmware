@@ -26,7 +26,7 @@ namespace eez {
 namespace flow {
 
 void executeEndComponent(FlowState *flowState, unsigned componentIndex) {
-	if (flowState->parentFlowState) {
+	if (flowState->parentFlowState && flowState->isAction) {
 		flowState->parentFlowState->numActiveComponents--;
 		propagateValue(flowState->parentFlowState, *flowState->parentComponent->outputs.item(flowState->assets, 0));
 	} else {
