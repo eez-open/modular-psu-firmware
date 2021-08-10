@@ -26,11 +26,14 @@
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>
 #include <eez/flow/queue.h>
+#include <eez/flow/flow_defs_v3.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
+
+static const uint32_t FLOW_TICK_MAX_DURATION_MS = 500;
 
 static FlowState *g_mainPageFlowState;
 
@@ -56,8 +59,9 @@ void tick(unsigned flowHandle) {
 		return;
 	}
 
-	auto queueSize = getQueueSize();
-	for (size_t i = 0; i < queueSize; i++) {
+	uint32_t startTickCount = millis();
+
+	while (true) {
 		FlowState *flowState;
 		unsigned componentIndex;
 		if (!removeFromQueue(flowState, componentIndex)) {
@@ -68,6 +72,18 @@ void tick(unsigned flowHandle) {
 
 		if (--flowState->numActiveComponents == 0 && flowState->isAction) {
 			freeFlowState(flowState);
+		}
+
+		auto assets = flowState->assets;
+		auto flowDefinition = assets->flowDefinition.ptr(assets);
+		auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+		auto component = flow->components.item(assets, componentIndex);
+		if (component->type == defs_v3::COMPONENT_TYPE_DELAY_ACTION) {
+			break;
+		}
+
+		if (millis() - startTickCount >= FLOW_TICK_MAX_DURATION_MS) {
+			break;
 		}
 	}
 }
