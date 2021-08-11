@@ -28,7 +28,7 @@ using namespace eez::gui;
 struct FlowState;
 
 unsigned start(eez::gui::Assets *assets);
-void tick(unsigned flowHandle);
+void tick();
 void scpiResultIsReady();
 void stop();
 

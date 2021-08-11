@@ -71,6 +71,8 @@ DrawFunctionType MULTILINE_TEXT_draw = [](const WidgetCursor &widgetCursor) {
                 widget->firstLineIndent, widget->hangingIndent);
         }
     }
+
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType MULTILINE_TEXT_onTouch = nullptr;

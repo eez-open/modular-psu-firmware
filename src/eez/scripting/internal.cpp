@@ -29,9 +29,6 @@ static bool g_autoStartScriptIsRunning;
 void afterScriptCleanup(bool wasException) {
 	psu::gui::hideAsyncOperationInProgress();
 	psu::gui::clearTextMessage();
-
-	psu::gui::hideAsyncOperationInProgress();
-	psu::gui::clearTextMessage();
 	if (g_autoStartScriptIsRunning) {
 		if (wasException) {
 			psu::gui::showMainPage();

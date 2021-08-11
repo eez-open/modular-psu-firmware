@@ -142,7 +142,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		auto colorBar = getColor16FromIndex(barStyle->color);
 
 		auto xCenter = widget->w / 2;
-		auto yCenter = widget->h - 12;
+		auto yCenter = widget->h - 8;
 
 		// clear background
 		setColor(style->background_color);
@@ -350,6 +350,8 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 			nullptr
 		);
     }
+
+	widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType GAUGE_onTouch = nullptr;

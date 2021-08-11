@@ -156,7 +156,7 @@ void dumpAlloc(scpi_t *context) {
 		if (block->free) {
 			snprintf(buffer, sizeof(buffer), "FREE: %d", block->size);
 		} else {
-			snprintf(buffer, sizeof(buffer), "ALOC (0x%08x): %d", block->id, (int)block->size);
+			snprintf(buffer, sizeof(buffer), "ALOC (0x%08x): %d", (unsigned int)block->id, (int)block->size);
 		}
 		SCPI_ResultText(context, buffer);
 		block = block->next;

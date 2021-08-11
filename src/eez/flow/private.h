@@ -25,6 +25,8 @@ namespace flow {
 
 using eez::gui::Value;
 using eez::gui::Assets;
+using eez::gui::FlowDefinition;
+using eez::gui::Flow;
 using eez::gui::Component;
 using eez::gui::ComponentOutput;
 using eez::gui::WidgetCursor;
@@ -38,12 +40,15 @@ struct ComponenentExecutionState {
 
 struct FlowState {
 	Assets *assets;
+	FlowDefinition *flowDefinition;
+	Flow *flow;
 	uint16_t flowIndex;
 	bool isAction;
 	uint16_t error;
 	uint32_t numActiveComponents;
 	FlowState *parentFlowState;
 	Component *parentComponent;
+	uint16_t parentComponentIndex;
 	Value *values;
 	ComponenentExecutionState **componenentExecutionStates;
 };

@@ -29,12 +29,9 @@ struct ConstantActionComponent : public Component {
 
 void executeConstantComponent(FlowState *flowState, unsigned componentIndex) {
  	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto component = flow->components.item(assets, componentIndex);
+	auto component = (ConstantActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
-	auto constantActionComponent = (ConstantActionComponent *)component;
-	auto &sourceValue = *flowDefinition->constants.item(assets, constantActionComponent->valueIndex);
+	auto &sourceValue = *flowState->flowDefinition->constants.item(assets, component->valueIndex);
 
 	auto &componentOutput = *component->outputs.item(assets, 1);
 	propagateValue(flowState, componentOutput, sourceValue);

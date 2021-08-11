@@ -52,7 +52,7 @@ void setStateIdle() {
 
 	freeFlowMemory();
 
-	unloadExternalAssets();
+	sendMessageToGuiThread(GUI_QUEUE_MESSAGE_UNLOAD_EXTERNAL_ASSETS);
 }
 
 bool loadScript(int *err = nullptr) {

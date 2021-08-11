@@ -31,14 +31,10 @@ struct SetVariableActionComponent : public Component {
 
 void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex) {
     auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto component = flow->components.item(assets, componentIndex);
-
-	auto setVariableActionComponent = (SetVariableActionComponent *)component;
+    auto component = (SetVariableActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
 	Value dstValue;
-	if (!evalAssignableExpression(flowState, component, setVariableActionComponent->assignableExpressionEvalInstructions, dstValue)) {
+	if (!evalAssignableExpression(flowState, component, component->assignableExpressionEvalInstructions, dstValue)) {
 		throwError(flowState, component, "setvariable component eval dest assignable expression\n");
 		return;
 	}

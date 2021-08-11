@@ -38,17 +38,13 @@ struct LoopComponenentExecutionState : public ComponenentExecutionState {
 
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
     auto assets = flowState->assets;
-    auto flowDefinition = assets->flowDefinition.ptr(assets);
-    auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-    auto component = flow->components.item(assets, componentIndex);
-
-	auto loopActionComponent = (LoopActionComponent *)component;
+    auto component = (LoopActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
     auto loopComponentExecutionState = (LoopComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
 
     if (!loopComponentExecutionState) {
         Value dstValue;
-        if (!evalAssignableExpression(flowState, component, loopActionComponent->assignableExpressionEvalInstructions, dstValue)) {
+        if (!evalAssignableExpression(flowState, component, component->assignableExpressionEvalInstructions, dstValue)) {
             throwError(flowState, component, "loop component eval dest assignable expression\n");
             return;
         }

@@ -425,6 +425,11 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             }
         }
     }
+
+    widgetCursor.currentState->data.freeRef();
+	currentState->line1Data.freeRef();
+	currentState->line2Data.freeRef();
+	currentState->textData.freeRef();
 };
 
 OnTouchFunctionType BAR_GRAPH_onTouch = nullptr;

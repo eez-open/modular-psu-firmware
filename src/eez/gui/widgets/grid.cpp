@@ -143,6 +143,10 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
 	widgetCursor.currentState = savedCurrentState;
 	widgetCursor.previousState = savedPreviousState;
+
+    if (widgetCursor.currentState) {
+        widgetCursor.currentState->data.freeRef();
+    }
 };
 
 DrawFunctionType GRID_draw = nullptr;

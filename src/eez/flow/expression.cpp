@@ -26,8 +26,8 @@ namespace flow {
 
 bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes) {
 	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto flowDefinition = flowState->flowDefinition;
+	auto flow = flowState->flow;
 
 	int i = 0;
 	while (true) {
@@ -35,15 +35,25 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 		auto instructionType = instruction & EXPR_EVAL_INSTRUCTION_TYPE_MASK;
 		auto instructionArg = instruction & EXPR_EVAL_INSTRUCTION_PARAM_MASK;
 		if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT) {
-			stack.push(*flowDefinition->constants.item(assets, instructionArg));
+			if (!stack.push(*flowDefinition->constants.item(assets, instructionArg))) {
+				return false;
+			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT) {
-			stack.push(flowState->values[instructionArg]);
+			if (!stack.push(flowState->values[instructionArg])) {
+				return false;
+			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR) {
-			stack.push(&flowState->values[flow->nInputValues + instructionArg]);
+			if (!stack.push(&flowState->values[flow->nInputValues + instructionArg])) {
+				return false;
+			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {
-			stack.push(flowDefinition->globalVariables.item(assets, instructionArg));
+			if (!stack.push(flowDefinition->globalVariables.item(assets, instructionArg))) {
+				return false;
+			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_OUTPUT) {
-			stack.push(Value((uint16_t)instructionArg, VALUE_TYPE_FLOW_OUTPUT));
+			if (!stack.push(Value((uint16_t)instructionArg, VALUE_TYPE_FLOW_OUTPUT))) {
+				return false;
+			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_ARRAY_ELEMENT) {
 			auto elementIndexValue = stack.pop();
 			auto arrayValue = stack.pop();
@@ -75,7 +85,9 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 				return false;
 			}
 
-			stack.push(&assetsArray->values[elementIndex]);
+			if (!stack.push(&assetsArray->values[elementIndex])) {
+				return false;
+			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
 			if (!g_evalOperations[instructionArg](stack)) {
 				return false;
@@ -100,6 +112,7 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 
 	stack.assets = flowState->assets;
 	stack.flowState = flowState;
+	stack.component = component;
 	stack.iterators = iterators;
 
 	if (evalExpression(flowState, component, instructions, stack, numInstructionBytes)) {
@@ -125,6 +138,7 @@ bool evalAssignableExpression(FlowState *flowState, Component *component, const 
 
 	stack.assets = flowState->assets;
 	stack.flowState = flowState;
+	stack.component = component;
 	stack.iterators = iterators;
 
 	if (evalExpression(flowState, component, instructions, stack, numInstructionBytes)) {

@@ -32,21 +32,9 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wparentheses"
-#endif
-osMutexId(g_mutexId);
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic pop
-#endif
-osMutexDef(g_mutex);
-
 bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto component = flow->components.item(assets, componentIndex);
+	auto component = flowState->flow->components.item(assets, componentIndex);
 
 	if (component->type < 1000) {
 		return false;
@@ -67,7 +55,11 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 
 bool pingComponent(FlowState *flowState, unsigned componentIndex) {
 	if (isComponentReadyToRun(flowState, componentIndex)) {
-		addToQueue(flowState, componentIndex);
+		if (!addToQueue(flowState, componentIndex)) {
+			auto component = flowState->flow->components.item(flowState->assets, componentIndex);
+			throwError(flowState, component, "Execution queue is full\n");
+			return false;
+		}
 		return true;
 	}
 	return false;
@@ -75,20 +67,19 @@ bool pingComponent(FlowState *flowState, unsigned componentIndex) {
 
 
 static FlowState *initFlowState(Assets *assets, int flowIndex) {
-	if (!g_mutexId) {
-		g_mutexId = osMutexCreate(osMutex(g_mutex));		
-	}
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowIndex);
 
 	auto nValues = flow->nInputValues + flow->localVariables.count;
 
 	FlowState *flowState = (FlowState *)alloc(
-		sizeof(FlowState) + nValues * sizeof(Value) + flow->components.count * sizeof(ComponenentExecutionState),
+		sizeof(FlowState) + nValues * sizeof(Value) + flow->components.count * sizeof(ComponenentExecutionState *),
 		0x4c3b6ef5
 	);
 
 	flowState->assets = assets;
+	flowState->flowDefinition = assets->flowDefinition.ptr(assets);
+	flowState->flow = flowDefinition->flows.item(assets, flowIndex);
 	flowState->flowIndex = flowIndex;
 	flowState->error = false;
 	flowState->numActiveComponents = 0;
@@ -139,9 +130,7 @@ FlowState *initPageFlowState(Assets *assets, int flowIndex) {
 }
 
 void freeFlowState(FlowState *flowState) {
-	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto flow = flowState->flow;
 
 	auto valuesCount = flow->nInputValues + flow->localVariables.count;
 
@@ -153,6 +142,7 @@ void freeFlowState(FlowState *flowState) {
 		auto componentExecutionState = flowState->componenentExecutionStates[i];
 		if (componentExecutionState) {
 			ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
+			flowState->componenentExecutionStates[i] = nullptr;
 		}
 	}
 
@@ -172,18 +162,13 @@ void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, cons
 }
 
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput) {
-	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto &nullValue = *flowDefinition->constants.item(assets, NULL_VALUE_INDEX);
+	auto &nullValue = *flowState->flowDefinition->constants.item(flowState->assets, NULL_VALUE_INDEX);
 	propagateValue(flowState, componentOutput, nullValue);
 }
 
 void propagateValue(FlowState *flowState, unsigned componentIndex) {
-	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto component = flow->components.item(assets, componentIndex);
-	auto &componentOutput = *component->outputs.item(assets, 0);
+	auto component = flowState->flow->components.item(flowState->assets, componentIndex);
+	auto &componentOutput = *component->outputs.item(flowState->assets, 0);
 	propagateValue(flowState, componentOutput);
 }
 
@@ -191,10 +176,9 @@ void propagateValue(FlowState *flowState, unsigned componentIndex) {
 
 void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value) {
 	if (scripting::isFlowRunning()) {
-		Assets *assets = widgetCursor.flowState->assets;
 		FlowState *flowState = widgetCursor.flowState;
-		auto flowDefinition = assets->flowDefinition.ptr(assets);
-		auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+		auto assets = flowState->assets;
+		auto flow = flowState->flow;
 
 		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
 		if (widgetDataItem) {
@@ -210,11 +194,9 @@ void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value) {
 
 void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value) {
 	if (scripting::isFlowRunning()) {
-		Assets *assets = widgetCursor.flowState->assets;
 		FlowState *flowState = widgetCursor.flowState;
-		
-		auto flowDefinition = assets->flowDefinition.ptr(assets);
-		auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+		auto assets = flowState->assets;
+		auto flow = flowState->flow;
 
 		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
 		if (widgetDataItem) {
@@ -260,7 +242,11 @@ void throwError(FlowState *flowState, Component *component, const char *errorMes
 	}
 
 	if (component->errorCatchOutput != -1) {
-		propagateValue(flowState, *component->outputs.item(flowState->assets, component->errorCatchOutput));
+		propagateValue(
+			flowState,
+			*component->outputs.item(flowState->assets, component->errorCatchOutput),
+			Value::makeStringRef(errorMessage, strlen(errorMessage), 0xef6f8414)
+		);
 	} else {
 		flowState->error = true;
 		scripting::stopScript();

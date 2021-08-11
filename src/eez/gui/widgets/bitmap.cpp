@@ -80,6 +80,8 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
             drawBitmap(&image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active);
         }
     }
+
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType BITMAP_onTouch = nullptr;

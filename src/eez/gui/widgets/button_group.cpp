@@ -117,6 +117,8 @@ DrawFunctionType BUTTON_GROUP_draw = [] (const WidgetCursor &widgetCursor) {
 
         drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, widgetCursor.currentState->data.getInt(), count(widgetCursor, widget->data));
     }
+
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType BUTTON_GROUP_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {

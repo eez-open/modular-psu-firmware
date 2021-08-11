@@ -47,7 +47,7 @@ namespace encoder {
 static Button g_encoderSwitch(ENC_SW_GPIO_Port, ENC_SW_Pin, true, false);
 #endif	
 
-static volatile int16_t g_counter;
+static volatile int g_counter;
 
 bool g_accelerationEnabled = false;
 float g_range;
@@ -184,7 +184,7 @@ static int getCounter() {
     taskENTER_CRITICAL();
 #endif
 
-    int16_t counter = g_counter;
+    int counter = g_counter;
     g_counter = 0;
 
 #if defined(EEZ_PLATFORM_STM32)

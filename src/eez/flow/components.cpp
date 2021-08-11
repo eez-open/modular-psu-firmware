@@ -46,10 +46,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex);
 void executeCallActionComponent(FlowState *flowState, unsigned componentIndex);
 
 void executeComponent(FlowState *flowState, unsigned componentIndex) {
-	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto component = flow->components.item(assets, componentIndex);
+	auto component = flowState->flow->components.item(flowState->assets, componentIndex);
 
 	if (component->type == defs_v3::COMPONENT_TYPE_START_ACTION) {
 		executeStartComponent(flowState, componentIndex);

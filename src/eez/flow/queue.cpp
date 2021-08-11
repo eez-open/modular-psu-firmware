@@ -51,7 +51,11 @@ size_t getQueueSize() {
 	return QUEUE_SIZE - g_queueHead + g_queueTail;
 }
 
-void addToQueue(FlowState *flowState, unsigned componentIndex) {
+bool addToQueue(FlowState *flowState, unsigned componentIndex) {
+	if (g_queueIsFull) {
+		return false;
+	}
+
 	g_queue[g_queueTail].flowState = flowState;
 	g_queue[g_queueTail].componentIndex = componentIndex;
 
@@ -62,6 +66,7 @@ void addToQueue(FlowState *flowState, unsigned componentIndex) {
 	}
 
 	flowState->numActiveComponents++;
+	return true;
 }
 
 bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex) {

@@ -35,9 +35,7 @@ struct DelayComponenentExecutionState : public ComponenentExecutionState {
 
 void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
  	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto component = flow->components.item(assets, componentIndex);
+	auto component = flowState->flow->components.item(assets, componentIndex);
 
 	auto delayComponentExecutionState = (DelayComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
 
@@ -61,14 +59,20 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 			return;
 		}
 
-		addToQueue(flowState, componentIndex);
+		if (!addToQueue(flowState, componentIndex)) {
+			throwError(flowState, component, "Execution queue is full\n");
+			return;
+		}
 	} else {
 		if (millis() >= delayComponentExecutionState->waitUntil) {
 			ObjectAllocator<DelayComponenentExecutionState>::deallocate(delayComponentExecutionState);
 			flowState->componenentExecutionStates[componentIndex] = nullptr;
 			propagateValue(flowState, componentIndex);
 		} else {
-			addToQueue(flowState, componentIndex);
+			if (!addToQueue(flowState, componentIndex)) {
+				throwError(flowState, component, "Execution queue is full\n");
+				return;
+			}
 		}
 	}
 }

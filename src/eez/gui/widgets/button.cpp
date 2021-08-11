@@ -65,6 +65,8 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
                      widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
         }
     }
+
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType BUTTON_onTouch = nullptr;

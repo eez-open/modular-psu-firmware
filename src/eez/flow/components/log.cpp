@@ -29,9 +29,7 @@ namespace flow {
 
 void executeLogComponent(FlowState *flowState, unsigned componentIndex) {
     auto assets = flowState->assets;
-    auto flowDefinition = assets->flowDefinition.ptr(assets);
-    auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-    auto component = flow->components.item(assets, componentIndex);
+    auto component = flowState->flow->components.item(assets, componentIndex);
 
     auto propertyValue = component->propertyValues.item(assets, defs_v3::LOG_ACTION_COMPONENT_PROPERTY_VALUE);
 

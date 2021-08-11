@@ -32,10 +32,6 @@
 namespace eez {
 namespace gui {
 
-static const uint16_t INPUT_WIDGET_TYPE_TEXT = 0x0001;
-static const uint16_t INPUT_WIDGET_TYPE_NUMBER = 0x0002;
-static const uint16_t INPUT_WIDGET_PASSWORD_FLAG = 0x0100;
-
 static const size_t MAX_TEXT_LEN = 128;
 
 struct InputWidgetState : public WidgetState {
@@ -96,6 +92,9 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 			false, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,
 			false);
     }
+
+	widgetCursor.currentState->data.freeRef();
+	currentState->unit.freeRef();
 };
 
 OnTouchFunctionType INPUT_onTouch = nullptr;

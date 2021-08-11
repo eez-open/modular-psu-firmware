@@ -117,13 +117,15 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
         scripting::startFlowScript();
     } else if (type == GUI_QUEUE_MESSAGE_FLOW_STOP) {
         scripting::stopFlowScript();
+    } else if (type == GUI_QUEUE_MESSAGE_UNLOAD_EXTERNAL_ASSETS) {
+        unloadExternalAssets();
     } else {
         onGuiQueueMessageHook(type, param);
     }
 }
 
 void oneIter() {
-    uint32_t timeout = 5;
+    uint32_t timeout = 0;
 
     // static uint32_t lastTime;
     // uint32_t tickCount = millis();

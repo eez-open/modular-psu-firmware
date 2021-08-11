@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/util.h>
+
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/input.h>
 
@@ -54,8 +56,8 @@ unsigned start(Assets *assets) {
 	return 1;
 }
 
-void tick(unsigned flowHandle) {
-	if (flowHandle != 1) {
+void tick() {
+	if (!g_mainPageFlowState) {
 		return;
 	}
 
@@ -70,14 +72,19 @@ void tick(unsigned flowHandle) {
 
 		executeComponent(flowState, componentIndex);
 
+		auto component = flowState->flow->components.item(flowState->assets, componentIndex);
+
 		if (--flowState->numActiveComponents == 0 && flowState->isAction) {
-			freeFlowState(flowState);
+			auto componentExecutionState = flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex];
+			if (componentExecutionState) {
+				ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
+				flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex] = nullptr;
+			} else {
+				throwError(flowState, component, "Unexpected: no CallAction component state\n");
+				return;
+			}
 		}
 
-		auto assets = flowState->assets;
-		auto flowDefinition = assets->flowDefinition.ptr(assets);
-		auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-		auto component = flow->components.item(assets, componentIndex);
 		if (component->type == defs_v3::COMPONENT_TYPE_DELAY_ACTION) {
 			break;
 		}
@@ -89,12 +96,9 @@ void tick(unsigned flowHandle) {
 }
 
 void stop() {
-	FlowState *flowState;
-	unsigned componentIndex;
-	while (removeFromQueue(flowState, componentIndex)) {
-		if (--flowState->numActiveComponents == 0) {
-			freeFlowState(flowState);
-		}
+	if (g_mainPageFlowState) {
+		freeFlowState(g_mainPageFlowState);
+		g_mainPageFlowState = nullptr;
 	}
 }
 
@@ -109,6 +113,10 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 
 			struct LayoutViewWidgetExecutionState : public ComponenentExecutionState {
 				FlowState *flowState;
+
+				~LayoutViewWidgetExecutionState() {
+					freeFlowState(flowState);
+				}
 			};
 
 			auto layoutViewWidgetComponentIndex = layoutViewWidget->componentIndex;
@@ -122,12 +130,10 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 
 				layoutViewFlowState->parentFlowState = flowState;
 
-				auto assets = flowState->assets;
-				auto flowDefinition = assets->flowDefinition.ptr(assets);
-				auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-				auto component = flow->components.item(assets, layoutViewWidgetComponentIndex);
+				auto component = flowState->flow->components.item(flowState->assets, layoutViewWidgetComponentIndex);
 
 				layoutViewFlowState->parentComponent = component;
+				layoutViewFlowState->parentComponentIndex = layoutViewWidgetComponentIndex;
 
 				layoutViewWidgetExecutionState->flowState = layoutViewFlowState;
 			}
@@ -143,15 +149,18 @@ void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) 
 	auto flowState = widgetCursor.flowState;
 	actionId = -actionId - 1;
 
-	Assets *assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto assets = flowState->assets;
+	auto flow = flowState->flow;
 
 	if (actionId >= 0 && actionId < (int16_t)flow->widgetActions.count) {
 		auto componentOutput = flow->widgetActions.item(assets, actionId);
 		if (componentOutput) {
 			propagateValue(flowState, *componentOutput, widgetCursor.cursor);
 		}
+	}
+
+	for (int i = 0; i < 3; i++) {
+		tick();
 	}
 }
 
@@ -161,8 +170,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 	dataId = -dataId - 1;
 
 	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
+	auto flow = flowState->flow;
 
 	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
 		if (operation == DATA_OPERATION_GET) {
@@ -173,7 +181,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			if (arrayValue.getType() == VALUE_TYPE_ARRAY_REF) {
 				value = ((ArrayRef *)arrayValue.refValue)->arraySize;
 			} else if (arrayValue.getType() == VALUE_TYPE_ASSETS_ARRAY) {
-				auto assetsArray = ((AssetsPtr<AssetsArray> *)&arrayValue.assetsOffsetValue)->ptr(widgetCursor.assets);
+				auto assetsArray = ((AssetsPtr<AssetsArray> *)&arrayValue.assetsOffsetValue)->ptr(assets);
 				value = assetsArray->arraySize;
 			} else {
 				value = 0;
@@ -215,13 +223,22 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 				value = unit;
 			}
 		} else if (operation == DATA_OPERATION_SET) {
-			setValue(dataId, widgetCursor, value);
-
 			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
 			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
+
+				if (inputWidget->flags & INPUT_WIDGET_TYPE_NUMBER) {
+					float precision = get(widgetCursor, inputWidget->precision).toFloat();
+					float valueFloat = value.toFloat();
+					setValue(dataId, widgetCursor, Value(roundPrec(valueFloat, precision), VALUE_TYPE_FLOAT));
+				} else {
+					setValue(dataId, widgetCursor, value);
+				}
+
 				scripting::executeFlowAction(widgetCursor, inputWidget->action);
+			} else {
+				setValue(dataId, widgetCursor, value);
 			}
 		}
 	} else {

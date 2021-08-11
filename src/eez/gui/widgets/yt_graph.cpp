@@ -604,6 +604,8 @@ DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             }
         }
     }
+
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType YT_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {

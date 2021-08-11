@@ -63,6 +63,8 @@ DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
             drawRectangle(widgetCursor.x, widgetCursor.y - yFrom, yTo - yFrom, (int)widget->h, getStyle(widget->style), true, false, true);
         }
     }
+
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType PROGRESS_onTouch = nullptr;

@@ -56,6 +56,10 @@ struct ScpiComponentExecutionState : public ComponenentExecutionState {
 
 			stringAppendString(commandOrQueryText, sizeof(commandOrQueryText), "\n");
 			scripting::executeScpiFromFlow(commandOrQueryText);
+
+			g_scpiResultIsReady = true;
+			g_waitingForScpiResult = nullptr;
+			return true;
 		}
 		return false;
 	}
@@ -78,12 +82,9 @@ struct ScpiActionComponent : public Component {
 
 void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
     auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto component = flow->components.item(assets, componentIndex);
+    auto component = (ScpiActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
-	auto specific = (ScpiActionComponent *)component;
-	auto instructions = specific->instructions;
+	auto instructions = component->instructions;
 
 	static const int SCPI_PART_STRING = 1;
 	static const int SCPI_PART_EXPR = 2;
@@ -136,7 +137,9 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 			);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY_WITH_ASSIGNMENT) {
 			if (!scpiComponentExecutionState->scpi()) {
-				addToQueue(flowState, componentIndex);
+				if (!addToQueue(flowState, componentIndex)) {
+					throwError(flowState, component, "Execution queue is full\n");
+				}
 				return;
 			}
 
@@ -145,10 +148,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 			int err;
 			if (!scripting::getLatestScpiResult(&resultText, &resultTextLen, &err)) {
 				char errorMessage[300];
-				snprintf(errorMessage, sizeof(errorMessage), "SCPI '%s': %s",
-					SCPI_ErrorTranslate(err),
-					scpiComponentExecutionState->commandOrQueryText
-				);
+				snprintf(errorMessage, sizeof(errorMessage), "%s\n", SCPI_ErrorTranslate(err));
 
 				throwError(flowState, component, errorMessage);
 
@@ -177,17 +177,52 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 			assignValue(flowState, component, dstValue, srcValue);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY) {
 			if (!scpiComponentExecutionState->scpi()) {
-				addToQueue(flowState, componentIndex);
+				if (!addToQueue(flowState, componentIndex)) {
+					throwError(flowState, component, "Execution queue is full\n");
+				}
 				return;
 			}
+
+			const char *resultText;
+			size_t resultTextLen;
+			int err;
+			if (!scripting::getLatestScpiResult(&resultText, &resultTextLen, &err)) {
+				char errorMessage[300];
+				snprintf(errorMessage, sizeof(errorMessage), "%s\n", SCPI_ErrorTranslate(err));
+
+				throwError(flowState, component, errorMessage);
+
+				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
+				flowState->componenentExecutionStates[componentIndex] = nullptr;
+
+				return;
+			}
+
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 		} else if (scpiComponentExecutionState->op == SCPI_PART_COMMAND) {
 			if (!scpiComponentExecutionState->scpi()) {
-				addToQueue(flowState, componentIndex);
+				if (!addToQueue(flowState, componentIndex)) {
+					throwError(flowState, component, "Execution queue is full\n");
+				}
 				return;
 			}
-			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 
+			const char *resultText;
+			size_t resultTextLen;
+			int err;
+			if (!scripting::getLatestScpiResult(&resultText, &resultTextLen, &err)) {
+				char errorMessage[300];
+				snprintf(errorMessage, sizeof(errorMessage), "%s\n", SCPI_ErrorTranslate(err));
+
+				throwError(flowState, component, errorMessage);
+
+				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
+				flowState->componenentExecutionStates[componentIndex] = nullptr;
+
+				return;
+			}
+
+			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 		} else if (scpiComponentExecutionState->op == SCPI_PART_END) {
 			ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
 			flowState->componenentExecutionStates[componentIndex] = nullptr;

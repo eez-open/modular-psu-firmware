@@ -65,12 +65,14 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
 
     widgetCursor.widget = savedWidget;
 
-    if (widgetCursor.currentState) {
-        savedCurrentState->size = sizeof(WidgetState) + widgetCursor.currentState->size;
-    }
-
 	widgetCursor.currentState = savedCurrentState;
 	widgetCursor.previousState = savedPreviousState;
+
+	if (widgetCursor.currentState) {
+		widgetCursor.currentState->data.freeRef();
+
+		savedCurrentState->size = sizeof(WidgetState) + widgetCursor.currentState->size;
+	}
 };
 
 DrawFunctionType SELECT_draw = nullptr;

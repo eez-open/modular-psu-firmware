@@ -29,7 +29,7 @@
 namespace eez {
 namespace scripting {
 
-static unsigned g_flowHandle;
+static unsigned g_flowIsRunning;
 
 bool loadFlowScript(int *err) {
 	int localErr = SCPI_RES_OK;
@@ -69,7 +69,8 @@ void startFlowScript() {
 
     afterScriptCleanup(false);
 
-	g_flowHandle = flow::start(g_externalAssets);
+	flow::start(g_externalAssets);
+	g_flowIsRunning = true;
 }
 
 void stopFlowScript() {
@@ -78,7 +79,7 @@ void stopFlowScript() {
 		return;
 	}
 
-	g_flowHandle = 0;
+	g_flowIsRunning = false;
 	flow::stop();
 }
 
@@ -87,14 +88,14 @@ void freeFlowMemory() {
 }
 
 void flowTick() {
-	if (g_flowHandle != 0 && g_state != STATE_STOPPING) {
-		flow::tick(g_flowHandle);
+	if (g_flowIsRunning && g_state != STATE_STOPPING) {
+		flow::tick();
 	}
 }
 
 void executeScpiFromFlow(const char *commandOrQueryText) {
 	// DebugTrace("> %s\n", commandOrQueryText);
-	executeScpi(commandOrQueryText, true);
+	executeScpi(commandOrQueryText, false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +109,7 @@ void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool isFlowRunning() {
-	return g_flowHandle != 0;
+	return g_flowIsRunning;
 }
 
 void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {

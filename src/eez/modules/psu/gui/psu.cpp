@@ -781,11 +781,7 @@ void PsuAppContext::showAsyncOperationInProgress(const char *message, void (*che
     m_asyncOperationInProgressParams.message = message;
     m_asyncOperationInProgressParams.checkStatus = checkStatus;
 
-    if (osThreadGetId() == g_guiTaskHandle) {
-        doShowAsyncOperationInProgress();
-    } else {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_SHOW_ASYNC_OPERATION_IN_PROGRESS);
-    }
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_SHOW_ASYNC_OPERATION_IN_PROGRESS);
 }
 
 void PsuAppContext::doShowAsyncOperationInProgress() {
@@ -798,11 +794,7 @@ void PsuAppContext::doShowAsyncOperationInProgress() {
 }
 
 void PsuAppContext::hideAsyncOperationInProgress() {
-    if (osThreadGetId() == g_guiTaskHandle) {
-        doHideAsyncOperationInProgress();
-    } else {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS);
-    }
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_HIDE_ASYNC_OPERATION_IN_PROGRESS);
 }
 
 void PsuAppContext::doHideAsyncOperationInProgress() {
@@ -2426,7 +2418,7 @@ void executeInternalActionHook(int actionId) {
     g_internalActionExecFunctions[actionId - FIRST_INTERNAL_ACTION_ID]();
 }
 
-uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
+int overrideStyleHook(const WidgetCursor &widgetCursor, int styleId) {
     using namespace psu;
     using namespace psu::gui;
 

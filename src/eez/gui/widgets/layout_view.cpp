@@ -103,6 +103,9 @@ DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
         const Style* style = getStyle(widget->style);
         drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, false, true);
     }
+
+	((LayoutViewWidgetState *)widgetCursor.currentState)->context.freeRef();
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType LAYOUT_VIEW_onTouch = nullptr;

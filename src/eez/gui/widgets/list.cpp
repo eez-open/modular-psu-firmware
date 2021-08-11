@@ -134,6 +134,10 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
 	widgetCursor.currentState = savedCurrentState;
 	widgetCursor.previousState = savedPreviousState;
+
+    if (widgetCursor.currentState) {
+        widgetCursor.currentState->data.freeRef();
+    }
 };
 
 DrawFunctionType LIST_draw = nullptr;

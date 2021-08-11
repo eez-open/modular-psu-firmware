@@ -21,6 +21,10 @@
 namespace eez {
 namespace gui {
 
+static const uint16_t INPUT_WIDGET_TYPE_TEXT = 0x0001;
+static const uint16_t INPUT_WIDGET_TYPE_NUMBER = 0x0002;
+static const uint16_t INPUT_WIDGET_PASSWORD_FLAG = 0x0100;
+
 struct InputWidget : public Widget {
 	uint16_t flags;
 	int16_t min;

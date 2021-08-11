@@ -144,6 +144,8 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
             }
         }
     }
+
+	widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType TEXT_onTouch = nullptr;

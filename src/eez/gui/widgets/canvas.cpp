@@ -43,6 +43,8 @@ DrawFunctionType CANVAS_draw = [](const WidgetCursor &widgetCursor) {
         auto drawFunction = (void (*)(const WidgetCursor &widgetCursor))value.getVoidPointer();
         drawFunction(widgetCursor);
     }
+
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType CANVAS_onTouch = nullptr;

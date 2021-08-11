@@ -55,6 +55,7 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 	const Style* cursorStyle = getStyle(widget->cursorStyle);
 
     widgetCursor.currentState->size = sizeof(ListGraphWidgetState);
+	widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
     ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.clear();
     ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData = get(widgetCursor, widget->cursorData);
@@ -168,6 +169,10 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             }
         }
     }
+
+	widgetCursor.currentState->data.freeRef();
+    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.freeRef();
+
 };
 
 OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {

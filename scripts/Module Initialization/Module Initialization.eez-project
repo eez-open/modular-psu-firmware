@@ -1,8 +1,11 @@
 {
+  "fullyLoaded": true,
   "settings": {
     "general": {
-      "projectVersion": "v2",
-      "masterProject": "..\\..\\modular-psu-firmware.eez-project"
+      "projectVersion": "v3",
+      "projectType": "resource",
+      "masterProject": "..\\..\\modular-psu-firmware.eez-project",
+      "imports": []
     },
     "build": {
       "configurations": [
@@ -14,707 +17,897 @@
       "destinationFolder": "."
     }
   },
-  "data": [
-    {
-      "name": "slot1_model",
-      "type": "string",
-      "defaultValue": "DCP405"
-    },
-    {
-      "name": "slot1_version_r",
-      "type": "float",
-      "defaultValue": "2"
-    },
-    {
-      "name": "slot1_version_b",
-      "type": "float",
-      "defaultValue": "7"
-    },
-    {
-      "name": "slot1_can_init",
-      "type": "boolean",
-      "defaultValue": "1"
-    },
-    {
-      "name": "slot2_model",
-      "type": "string",
-      "defaultValue": "DCP405"
-    },
-    {
-      "name": "slot2_version_r",
-      "type": "float",
-      "defaultValue": "1"
-    },
-    {
-      "name": "slot2_version_b",
-      "type": "float",
-      "defaultValue": "11"
-    },
-    {
-      "name": "slot2_can_init",
-      "type": "boolean",
-      "defaultValue": "1"
-    },
-    {
-      "name": "slot3_model",
-      "type": "string",
-      "defaultValue": "DCM220"
-    },
-    {
-      "name": "slot3_version_r",
-      "type": "float",
-      "defaultValue": "2"
-    },
-    {
-      "name": "slot3_version_b",
-      "type": "float",
-      "defaultValue": "4"
-    },
-    {
-      "name": "slot3_can_init",
-      "type": "boolean",
-      "defaultValue": "1"
-    },
-    {
-      "name": "can_restart",
-      "type": "boolean",
-      "defaultValue": "1"
-    }
-  ],
+  "variables": {
+    "globalVariables": [
+      {
+        "name": "slot1_model",
+        "type": "string",
+        "defaultValue": "DCP405"
+      },
+      {
+        "name": "slot1_version_r",
+        "type": "float",
+        "defaultValue": "2"
+      },
+      {
+        "name": "slot1_version_b",
+        "type": "float",
+        "defaultValue": "7"
+      },
+      {
+        "name": "slot1_can_init",
+        "type": "boolean",
+        "defaultValue": "1"
+      },
+      {
+        "name": "slot2_model",
+        "type": "string",
+        "defaultValue": "DCP405"
+      },
+      {
+        "name": "slot2_version_r",
+        "type": "float",
+        "defaultValue": "1"
+      },
+      {
+        "name": "slot2_version_b",
+        "type": "float",
+        "defaultValue": "11"
+      },
+      {
+        "name": "slot2_can_init",
+        "type": "boolean",
+        "defaultValue": "1"
+      },
+      {
+        "name": "slot3_model",
+        "type": "string",
+        "defaultValue": "DCM220"
+      },
+      {
+        "name": "slot3_version_r",
+        "type": "float",
+        "defaultValue": "2"
+      },
+      {
+        "name": "slot3_version_b",
+        "type": "float",
+        "defaultValue": "4"
+      },
+      {
+        "name": "slot3_can_init",
+        "type": "boolean",
+        "defaultValue": "1"
+      },
+      {
+        "name": "can_restart",
+        "type": "boolean",
+        "defaultValue": "1"
+      }
+    ],
+    "structures": [],
+    "enums": []
+  },
   "actions": [
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot1_select_model"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot1_input_version_r"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot1_input_version_b"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot1_init"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot2_select_model"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot2_input_version_r"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot2_input_version_b"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot2_init"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot3_select_model"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot3_input_version_r"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot3_input_version_b"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "slot3_init"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "restart"
     },
     {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "close"
     }
   ],
-  "gui": {
-    "pages": [
-      {
-        "name": "main",
-        "widgets": [
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 10,
-            "top": 10,
-            "width": 142,
-            "height": 222,
-            "name": "Slot 1",
-            "widgets": [
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 2,
-                "height": 222
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 2,
-                "top": 0,
-                "width": 138,
-                "height": 2
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 140,
-                "top": 0,
-                "width": 2,
-                "height": 222
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 2,
-                "top": 220,
-                "width": 138,
-                "height": 2
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 2,
-                "top": 2,
-                "width": 138,
-                "height": 36,
-                "text": "Slot 1"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 2,
-                "top": 38,
-                "width": 138,
-                "height": 32,
-                "text": "Model"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_center"
-                },
-                "data": "slot1_model",
-                "action": "slot1_select_model",
-                "left": 7,
-                "top": 70,
-                "width": 128,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 2,
-                "top": 102,
-                "width": 138,
-                "height": 32,
-                "text": "Version"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 7,
-                "top": 134,
-                "width": 28,
-                "height": 32,
-                "text": "R"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_left"
-                },
-                "data": "slot1_version_r",
-                "action": "slot1_input_version_r",
-                "left": 35,
-                "top": 134,
-                "width": 32,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 67,
-                "top": 133,
-                "width": 28,
-                "height": 32,
-                "text": "B"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_left"
-                },
-                "data": "slot1_version_b",
-                "action": "slot1_input_version_b",
-                "left": 95,
-                "top": 134,
-                "width": 32,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Button",
-                "style": {
-                  "inheritFrom": "button_M"
-                },
-                "action": "slot1_init",
-                "left": 7,
-                "top": 176,
-                "width": 128,
-                "height": 38,
-                "text": "Init",
-                "enabled": "slot1_can_init",
-                "disabledStyle": {
-                  "inheritFrom": "button_M_disabled"
-                }
-              }
-            ]
+  "pages": [
+    {
+      "components": [
+        {
+          "type": "Container",
+          "left": 10,
+          "top": 10,
+          "width": 142,
+          "height": 222,
+          "wireID": "bcc0b848-9176-4097-8f4a-19137d6ed6a4",
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "inheritFrom": "default"
           },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 170,
-            "top": 10,
-            "width": 142,
-            "height": 222,
-            "name": "Slot 2",
-            "widgets": [
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 2,
-                "height": 222
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 2,
-                "top": 0,
-                "width": 138,
-                "height": 2
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 140,
-                "top": 0,
-                "width": 2,
-                "height": 222
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 2,
-                "top": 220,
-                "width": 138,
-                "height": 2
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 2,
-                "top": 2,
-                "width": 138,
-                "height": 36,
-                "text": "Slot 2"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 2,
-                "top": 38,
-                "width": 138,
-                "height": 32,
-                "text": "Model"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_center"
-                },
-                "data": "slot2_model",
-                "action": "slot2_select_model",
-                "left": 7,
-                "top": 70,
-                "width": 128,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 2,
-                "top": 102,
-                "width": 138,
-                "height": 32,
-                "text": "Version"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 7,
-                "top": 134,
-                "width": 28,
-                "height": 32,
-                "text": "R"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_left"
-                },
-                "data": "slot2_version_r",
-                "action": "slot2_input_version_r",
-                "left": 35,
-                "top": 134,
-                "width": 32,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 67,
-                "top": 133,
-                "width": 28,
-                "height": 32,
-                "text": "B"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_left"
-                },
-                "data": "slot2_version_b",
-                "action": "slot2_input_version_b",
-                "left": 95,
-                "top": 134,
-                "width": 32,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Button",
-                "style": {
-                  "inheritFrom": "button_M"
-                },
-                "action": "slot2_init",
-                "left": 7,
-                "top": 176,
-                "width": 128,
-                "height": 38,
-                "text": "Init",
-                "enabled": "slot2_can_init",
-                "disabledStyle": {
-                  "inheritFrom": "button_M_disabled"
-                }
+          "name": "Slot 1",
+          "widgets": [
+            {
+              "type": "Rectangle",
+              "left": 0,
+              "top": 0,
+              "width": 2,
+              "height": 222,
+              "wireID": "62abbb0b-0189-4a43-a4f3-9214e6b35df5",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
               }
-            ]
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
             },
-            "left": 330,
-            "top": 10,
-            "width": 142,
-            "height": 222,
-            "name": "Slot 3",
-            "widgets": [
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 2,
-                "height": 222
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 2,
-                "top": 0,
-                "width": 138,
-                "height": 2
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 140,
-                "top": 0,
-                "width": 2,
-                "height": 222
-              },
-              {
-                "type": "Rectangle",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 2,
-                "top": 220,
-                "width": 138,
-                "height": 2
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 2,
-                "top": 2,
-                "width": 138,
-                "height": 36,
-                "text": "Slot 3"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 2,
-                "top": 38,
-                "width": 138,
-                "height": 32,
-                "text": "Model"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_center"
-                },
-                "data": "slot3_model",
-                "action": "slot3_select_model",
-                "left": 7,
-                "top": 70,
-                "width": 128,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 2,
-                "top": 102,
-                "width": 138,
-                "height": 32,
-                "text": "Version"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 7,
-                "top": 134,
-                "width": 28,
-                "height": 32,
-                "text": "R"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_left"
-                },
-                "data": "slot3_version_r",
-                "action": "slot3_input_version_r",
-                "left": 35,
-                "top": 134,
-                "width": 32,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 67,
-                "top": 133,
-                "width": 28,
-                "height": 32,
-                "text": "B"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_left"
-                },
-                "data": "slot3_version_b",
-                "action": "slot3_input_version_b",
-                "left": 95,
-                "top": 134,
-                "width": 32,
-                "height": 32,
-                "text": ""
-              },
-              {
-                "type": "Button",
-                "style": {
-                  "inheritFrom": "button_M"
-                },
-                "action": "slot3_init",
-                "left": 7,
-                "top": 176,
-                "width": 128,
-                "height": 38,
-                "text": "Init",
-                "enabled": "slot3_can_init",
-                "disabledStyle": {
-                  "inheritFrom": "button_M_disabled"
-                }
+            {
+              "type": "Rectangle",
+              "left": 2,
+              "top": 0,
+              "width": 138,
+              "height": 2,
+              "wireID": "bdb6de47-b25c-49f0-df22-b718da9c4394",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
               }
-            ]
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
             },
-            "left": 0,
-            "top": 240,
-            "width": 480,
-            "height": 32,
-            "name": "Status line",
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "status_icon_enabled"
-                },
-                "action": "close",
-                "left": 0,
-                "top": 0,
-                "width": 41,
-                "height": 32,
-                "text": "E"
+            {
+              "type": "Rectangle",
+              "left": 140,
+              "top": 0,
+              "width": 2,
+              "height": 222,
+              "wireID": "f35478e0-f88e-4476-ebf4-b5ea00f9ed4b",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              }
+            },
+            {
+              "type": "Rectangle",
+              "left": 2,
+              "top": 220,
+              "width": 138,
+              "height": 2,
+              "wireID": "b39a180a-0eaf-432c-9b9d-6984c20e6a52",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              }
+            },
+            {
+              "type": "Text",
+              "left": 2,
+              "top": 2,
+              "width": 138,
+              "height": 36,
+              "wireID": "0da50165-5bd5-4eb2-aa92-09e6314f355d",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
               },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "status_title"
-                },
-                "data": "",
-                "left": 41,
-                "top": 0,
-                "width": 349,
-                "height": 32,
-                "text": "Module initialization"
+              "text": "Slot 1"
+            },
+            {
+              "type": "Text",
+              "left": 2,
+              "top": 38,
+              "width": 138,
+              "height": 32,
+              "wireID": "49d25a99-2010-47bf-87e8-75853aab63dc",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
               },
-              {
-                "type": "Select",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "data": "can_restart",
-                "left": 390,
-                "top": 0,
-                "width": 90,
-                "height": 32,
-                "widgets": [
-                  {
-                    "type": "Rectangle",
-                    "style": {
-                      "inheritFrom": "status_title"
-                    },
-                    "left": 0,
-                    "top": 0,
-                    "width": 90,
-                    "height": 32,
-                    "invertColors": true
+              "text": "Model"
+            },
+            {
+              "type": "Text",
+              "left": 7,
+              "top": 70,
+              "width": 128,
+              "height": 32,
+              "wireID": "81554bcd-df78-402d-c8cf-d3b622c7e22a",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "slot1_model",
+              "action": "slot1_select_model",
+              "style": {
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 2,
+              "top": 102,
+              "width": 138,
+              "height": 32,
+              "wireID": "bb41613b-6e83-4094-b9c5-4182dfef28be",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "Version"
+            },
+            {
+              "type": "Text",
+              "left": 7,
+              "top": 134,
+              "width": 28,
+              "height": 32,
+              "wireID": "f2268a12-546c-49fb-c7c4-65858315087e",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "R"
+            },
+            {
+              "type": "Text",
+              "left": 35,
+              "top": 134,
+              "width": 32,
+              "height": 32,
+              "wireID": "9e7687a3-1148-4c2f-8344-fe3e5142700d",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "slot1_version_r",
+              "action": "slot1_input_version_r",
+              "style": {
+                "inheritFrom": "edit_value_active_S_left"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 67,
+              "top": 133,
+              "width": 28,
+              "height": 32,
+              "wireID": "39307c7e-cbc4-4ff6-a678-0754acb4ad1b",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "B"
+            },
+            {
+              "type": "Text",
+              "left": 95,
+              "top": 134,
+              "width": 32,
+              "height": 32,
+              "wireID": "8487252c-ce96-4471-965b-a586e5127c0f",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "slot1_version_b",
+              "action": "slot1_input_version_b",
+              "style": {
+                "inheritFrom": "edit_value_active_S_left"
+              },
+              "text": ""
+            },
+            {
+              "type": "Button",
+              "left": 7,
+              "top": 176,
+              "width": 128,
+              "height": 38,
+              "wireID": "49ace6b9-fa17-48e4-81b9-1d362285ccdd",
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "slot1_init",
+              "style": {
+                "inheritFrom": "button_M"
+              },
+              "text": "Init",
+              "enabled": "slot1_can_init",
+              "disabledStyle": {
+                "inheritFrom": "button_M_disabled"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 170,
+          "top": 10,
+          "width": 142,
+          "height": 222,
+          "wireID": "4cf1a239-d237-4574-c8e6-b01f926d62af",
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Slot 2",
+          "widgets": [
+            {
+              "type": "Rectangle",
+              "left": 0,
+              "top": 0,
+              "width": 2,
+              "height": 222,
+              "wireID": "037b0b86-62ed-4957-d606-ffca726f96ca",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              }
+            },
+            {
+              "type": "Rectangle",
+              "left": 2,
+              "top": 0,
+              "width": 138,
+              "height": 2,
+              "wireID": "c4d165b8-e879-4173-ff98-68e83d78e614",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              }
+            },
+            {
+              "type": "Rectangle",
+              "left": 140,
+              "top": 0,
+              "width": 2,
+              "height": 222,
+              "wireID": "788f29e6-781e-417b-e5de-9ba8c7835ca9",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              }
+            },
+            {
+              "type": "Rectangle",
+              "left": 2,
+              "top": 220,
+              "width": 138,
+              "height": 2,
+              "wireID": "5d399f06-1a37-4452-bcdb-03383d2f5d4d",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              }
+            },
+            {
+              "type": "Text",
+              "left": 2,
+              "top": 2,
+              "width": 138,
+              "height": 36,
+              "wireID": "487f54a1-0d74-4ed4-856a-6135e5aa82f3",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              },
+              "text": "Slot 2"
+            },
+            {
+              "type": "Text",
+              "left": 2,
+              "top": 38,
+              "width": 138,
+              "height": 32,
+              "wireID": "7d21b21c-f7d6-4471-b7a2-f6ba6868c15f",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "Model"
+            },
+            {
+              "type": "Text",
+              "left": 7,
+              "top": 70,
+              "width": 128,
+              "height": 32,
+              "wireID": "4b089152-664c-4387-ecf9-ac6f5c3a9181",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "slot2_model",
+              "action": "slot2_select_model",
+              "style": {
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 2,
+              "top": 102,
+              "width": 138,
+              "height": 32,
+              "wireID": "cbc32561-0283-4975-cec3-940a7bc3e41c",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "Version"
+            },
+            {
+              "type": "Text",
+              "left": 7,
+              "top": 134,
+              "width": 28,
+              "height": 32,
+              "wireID": "a85b3e2a-01fc-4920-f195-80b2422b2b1c",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "R"
+            },
+            {
+              "type": "Text",
+              "left": 35,
+              "top": 134,
+              "width": 32,
+              "height": 32,
+              "wireID": "3631469e-9629-4c53-cdca-3c3d8b07eaea",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "slot2_version_r",
+              "action": "slot2_input_version_r",
+              "style": {
+                "inheritFrom": "edit_value_active_S_left"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 67,
+              "top": 133,
+              "width": 28,
+              "height": 32,
+              "wireID": "67f40701-d090-43fb-c6f7-ba9f0194f941",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "B"
+            },
+            {
+              "type": "Text",
+              "left": 95,
+              "top": 134,
+              "width": 32,
+              "height": 32,
+              "wireID": "15b62342-4c9c-4863-fb06-8490d539ff66",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "slot2_version_b",
+              "action": "slot2_input_version_b",
+              "style": {
+                "inheritFrom": "edit_value_active_S_left"
+              },
+              "text": ""
+            },
+            {
+              "type": "Button",
+              "left": 7,
+              "top": 176,
+              "width": 128,
+              "height": 38,
+              "wireID": "d15f1192-a43d-4fc4-c3d9-77680695a8c0",
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "slot2_init",
+              "style": {
+                "inheritFrom": "button_M"
+              },
+              "text": "Init",
+              "enabled": "slot2_can_init",
+              "disabledStyle": {
+                "inheritFrom": "button_M_disabled"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 330,
+          "top": 10,
+          "width": 142,
+          "height": 222,
+          "wireID": "c1675d42-bbe1-4140-ff5e-1ca188ece3ae",
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Slot 3",
+          "widgets": [
+            {
+              "type": "Rectangle",
+              "left": 0,
+              "top": 0,
+              "width": 2,
+              "height": 222,
+              "wireID": "d08e52ed-427b-4dad-97c4-a35df2dbf655",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              }
+            },
+            {
+              "type": "Rectangle",
+              "left": 2,
+              "top": 0,
+              "width": 138,
+              "height": 2,
+              "wireID": "c4e3c5d7-8b23-426a-fe6f-c1d4b8a7c2db",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              }
+            },
+            {
+              "type": "Rectangle",
+              "left": 140,
+              "top": 0,
+              "width": 2,
+              "height": 222,
+              "wireID": "65fbc7c6-0b33-455f-bcdd-7afdb72eddde",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              }
+            },
+            {
+              "type": "Rectangle",
+              "left": 2,
+              "top": 220,
+              "width": 138,
+              "height": 2,
+              "wireID": "246212eb-a5c0-488e-b696-38db6a03602c",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              }
+            },
+            {
+              "type": "Text",
+              "left": 2,
+              "top": 2,
+              "width": 138,
+              "height": 36,
+              "wireID": "04c96a4d-e3f8-438d-a2a8-d183070a893a",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              },
+              "text": "Slot 3"
+            },
+            {
+              "type": "Text",
+              "left": 2,
+              "top": 38,
+              "width": 138,
+              "height": 32,
+              "wireID": "22cddbaf-1711-403c-a8e0-e28766d525d5",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "Model"
+            },
+            {
+              "type": "Text",
+              "left": 7,
+              "top": 70,
+              "width": 128,
+              "height": 32,
+              "wireID": "7a72e95a-d6c6-47c3-be28-01aee4a15478",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "slot3_model",
+              "action": "slot3_select_model",
+              "style": {
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 2,
+              "top": 102,
+              "width": 138,
+              "height": 32,
+              "wireID": "f3dadde8-1d1d-4fbb-e2b9-e576cf41a44d",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "Version"
+            },
+            {
+              "type": "Text",
+              "left": 7,
+              "top": 134,
+              "width": 28,
+              "height": 32,
+              "wireID": "f691503c-db16-44ca-c6d3-7b7a6f49eb5e",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "R"
+            },
+            {
+              "type": "Text",
+              "left": 35,
+              "top": 134,
+              "width": 32,
+              "height": 32,
+              "wireID": "db70d669-ad07-4fc2-b1e2-3ee87a976bdf",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "slot3_version_r",
+              "action": "slot3_input_version_r",
+              "style": {
+                "inheritFrom": "edit_value_active_S_left"
+              },
+              "text": ""
+            },
+            {
+              "type": "Text",
+              "left": 67,
+              "top": 133,
+              "width": 28,
+              "height": 32,
+              "wireID": "50951b1b-8f31-4a14-99c4-441c60180928",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_S"
+              },
+              "text": "B"
+            },
+            {
+              "type": "Text",
+              "left": 95,
+              "top": 134,
+              "width": 32,
+              "height": 32,
+              "wireID": "87db8434-b499-49b6-ac7b-02eb19513171",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "slot3_version_b",
+              "action": "slot3_input_version_b",
+              "style": {
+                "inheritFrom": "edit_value_active_S_left"
+              },
+              "text": ""
+            },
+            {
+              "type": "Button",
+              "left": 7,
+              "top": 176,
+              "width": 128,
+              "height": 38,
+              "wireID": "59273be0-a5fc-4ae2-99d0-311ead9c39a2",
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "slot3_init",
+              "style": {
+                "inheritFrom": "button_M"
+              },
+              "text": "Init",
+              "enabled": "slot3_can_init",
+              "disabledStyle": {
+                "inheritFrom": "button_M_disabled"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 240,
+          "width": 480,
+          "height": 32,
+          "wireID": "b7f1c17e-5137-49ae-a48e-6382f16147ae",
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "inheritFrom": "default"
+          },
+          "name": "Status line",
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 41,
+              "height": 32,
+              "wireID": "a122d636-d6a4-4df6-ddec-b9c918594730",
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "close",
+              "style": {
+                "inheritFrom": "status_icon_enabled"
+              },
+              "text": "E"
+            },
+            {
+              "type": "Text",
+              "left": 41,
+              "top": 0,
+              "width": 349,
+              "height": 32,
+              "wireID": "cb970c81-8f83-4d72-ea54-cb648d1eaceb",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "",
+              "style": {
+                "inheritFrom": "status_title"
+              },
+              "text": "Module initialization"
+            },
+            {
+              "type": "Select",
+              "left": 390,
+              "top": 0,
+              "width": 90,
+              "height": 32,
+              "wireID": "987cc722-1c0c-4c2a-9569-1a38e484fbe8",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "can_restart",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Rectangle",
+                  "left": 0,
+                  "top": 0,
+                  "width": 90,
+                  "height": 32,
+                  "wireID": "5539281d-51b2-425e-a549-b3a05bbc1536",
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "inheritFrom": "status_title"
                   },
-                  {
-                    "type": "Text",
-                    "style": {
-                      "inheritFrom": "status_action"
-                    },
-                    "data": "",
-                    "action": "restart",
-                    "left": 0,
-                    "top": 0,
-                    "width": 90,
-                    "height": 32,
-                    "text": "Restart"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 480,
-        "height": 272
-      }
-    ],
-    "styles": [],
-    "fonts": [],
-    "bitmaps": [
-      {
-        "name": "background",
-        "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOYAAADmCAYAAADBavm7AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAABnbSURBVHic7d17XFTVogfw38wI8lBGUAcQBQQ0UCGNDwEK+SBOySF7aXa047XER/nAW2jHPpavY560tEt2MzN81bXypEfNo+mJ9Bg+UFNATRREChANeQkIysy6f8xx5zSAw/Ba6u/7+fBh9tprr70G/bH2XnvPRiWEECAiqajbugNEZI7BJJIQg0kkIQaTSEIMJpGEGEwiCTGYRBJiMIkkxGASSYjBJJIQg0kkIQaTSEIMJpGEGEwiCTGYRBJiMIkkxGASSYjBJJIQg0kkIQaTSEIMJpGEGEwiCTGYRBJiMIkkxGASSYjBJJJQuya3UF4O7NwJHD0KFBUBHToAffoAI0YAnp6/1duxw1i2Zg0wYYLl7RcXA8eOARcvGpcnTWpyl4lk17RgbtgAvPoqcPUq0L49oNMBlZXGMMXHA//1X0BSknVtX70KhIQAOTmm5a0YzPLyctjY2MDe3r7V9kkENOVQ9uOPjcFzcAC++gooLQV+/tkYqHPngBkzgM2bre9ZbS2g1QJxccBHHwHe3o1v49Il4J13gMxMize5du0a3njjDXh4eECr1cLBwQEPPvggtm3b1vj9E1lLWCMnR4j27YVwcRHi4sX66x0+/Nvr7duFAIRYs8a4XFQkxMGDQpw5I4TBcOd9BgYat2+M1FTjNn//u0XVi4qKRGBgoABQ59fEiROFwZK+EjWRdSPm//4vUFMDvP464OVVf73QUPMyvd54mOvuDgwcaDwfHTDAONq2sQkTJiAjIwMA4OrqivHjx2PkyJGwsbEBAHzyySdYuXJlW3aR7hPWnWN+953x+1NPNX7bpUuNE0Tr1gFubsD27cD//I9xQmjvXqu60xzOnj2rHK4GBQVh3759cHZ2BgCkpqZi2LBhqKysxJIlSzBq1CioVKo266uMhBAoLS0FALi4uECn07Vxj+5yVo2znToJoVYLoddbvs2tQ1lPTyEqK03XRUcLoVIJUVpa//YtfCi7evVq5ZD173XUnzJlSr2HuPwy/RowYEDj/p3IjHUjZmUlYG8PqK04En7hBeOE0e0iIoyj5cWLwIMPWtUl/PILsGuXadmtSyx79xonpW4XGQkEBCiLFRUVymtXV1ez5t3c3KzrF5EVrAumVmv8j37zJvCf8y+L1XVO2qmT8XtJiVXdAQCcOgVMnlz3uo8/Ni9btcokmL169VJeb9u2DREREcqyXq/Hjh07AABqtRovvfQSbG1tre/rPaiyshLr168HALi7u7dxb+5+1gUzIAA4cADIyAAeeqhx22o0Vu3yjgYPBrKzTcvS04GnnwY+/BB4/HHTdV26mCxGRUXB1dUVly9fxvLly9GhQwe88MILKCsrw7x583D8+HEAwJNPPolPPvmkZd7DXaygoEAJpq+vbxv35u5nXTBjYozB/L//a3wwW4qDA+DjY1p26/DV1dV83e/Y29vjgw8+wOjRo2EwGDB//nzMnz/fpI6LiwuWLVvWjJ0mqpt1l0smTTKOOB98AKSk1F9v3TrretVGRo0ahY0bNyqzsbcLCwvDwYMHORpQq7BuxHRxAT77zHi5JDoa+O//Bp591nj+WFkJpKYar3UePAiMH29977791ngvLgCUlRm/33430ciRQDNfthg7dixiYmKwbds2ZGRkwMHBAQ8//DBiYmKgaanDcKLfsf5e2cceA/btA6ZPB95+2/h1O3d34N13m9a7114DTp82LXvuud9e6/XNHkwAcHZ2xvim/EIhaqKm3cQeGmocHX/6yfjpkl9/Nd480LcvEBYGtLut+UceMX5KpK5Z2eefBwYNAnr3Ni3/6ivg+vX693+nyzV9+hj3eYfzSyLZNP1jX4Bxlva2Sw910mqB4OC61+l0xq/f69Onaf1ydKx/n0QS4weliSTEYBJJiMEkkhCDSSQhBpNIQgwmkYQYTCIJMZhEEmIwiSTEYBJJiMEkkhCDSSQhBpNIQgwmkYQYTCIJMZhEEmIwiSTEYBJJiMEkkhCDSSQhBpNIQgwmkYQYTCIJMZhEEmIwiSTEYBJJiMEkkhCDSSQhBpNIQgwmkYQYTCIJMZhEEmIwiSTUPH9RmsgK5eXl+Oqrr5CWlgYA6NmzJ2JjY9G7d2+L26itrcW1a9eg1WqhVv82ziQmJmLXrl3YtWtXs/cbAAYOHIgpU6Zg3LhxLdI+R0xqE8nJyfD19cXcuXNRWloKvV6Pf/7znwgMDMSyZcssbic1NRUuLi64fPmySXlJSQny8vKau9uKn3/+GWVlZS3WPkdManXZ2dl46qmnEB0djY0bN8LBwUFZl5mZieTk5DbsnRw4YlKrW7p0Kdq1a4d169aZhBIAHnjgAbz88ssAgIqKCkydOhWBgYHo3Lkz+vXrh4SEBFRXVwMAsrKyMHPmTADA6NGjER0djSlTppi0t2fPHgQHB0On0+EPf/gDzp07Z7I+KysLzzzzDHQ6HVxdXTFmzBizkfbHH39EZGQkXFxcEBwcjL1795q9J71ej3feeQcBAQHo2rUrwsPD8dlnn1n9M+KISa1uz549iIyMRMeOHRusV1lZCbVajWXLlsHNzQ1nzpzBrFmzUF1djZUrV8LV1RUvvPACjh49imnTpsHFxcWkzby8PLz11luYP38+HBwcMGfOHDz//PM4fvw4VCoViouLMWTIEHh6euLLL7/EzZs3MWvWLAwdOhRpaWlwcHBAWVkZHnvsMYSGhuKbb77B1atXER8fj5KSEpO+Tp8+HVu3bsWSJUsQFBSEAwcOIC4uDi4uLoiJiWn8D0kQNYP8/HwBQAAQ06dPb7CujY2NiI+Pt2o/69evFzqdTllOSUkRAERBQYFJvfnz54t27dqJ3NxcpWz//v0CgMjLyxNCCLFixQphb28vCgsLlTpZWVlCo9GIdevWCSGEWLp0qejcubOoqKhQ6iQnJwsAIjExUQghRE5OjlCr1WLnzp0mfXj11VdFRESEVe+TIya1OrVajZs3b1pUd//+/VizZg0uXryI69evo6KiAleuXEFlZSUcHR0b3NbT0xOenp7Kso+PDwCgoKAAHh4eOH36NB566CG4uroqdXx9fdG7d29kZGQAANLS0hAeHm6yr8GDB8PW1lZZTktLg8FgwLFjx5TtACA/Px+nTp2y6H3+HoNJrc7HxwfZ2dl3rPftt9/iiSeewKxZszB27Fh06tQJJ06cwCuvvILq6uo7BvP3568ajQaA8XwQAMrKyuo8nHZyclJmXOuqo1arTfZdUFAAjUaDyspKVFVVKeXe3t6YPHnyHd9nXRhManVPPvkk3n//feTn58PDw8NsvRACKpUKX375JYYPH47Fixcr606ePGlS99a1SyFEo/vh7e2NLVu2KPsDjNdFs7OzMWLECACAl5cXUlNTTbYrKioyOcf09PSEXq9HXFwcevXq1eh+1IWzstTqXnvtNXTu3BlPP/00Ll68qJQLIbB9+3bMmzcPAGBjY4O8vDwYDAYAxkCsWLHCpC13d3cAxtnVxho+fDiys7Px+eefK2UffvghiouLlQmb5557DkePHjWZiX377bdN2omKioKnpycSEhJMRsybN28iPT290f0COGJSG+jSpQuSk5Pxpz/9CX5+fggMDIRWq8W5c+dQW1uL999/HwDwyiuvICIiAoGBgfDz80Nqair++Mc/mlzy8PLywjPPPIPo6Gh0794dAQEB+Oabbyzqx9ChQ/H6669j/PjxWL16NWpra3HkyBEsXrwY/fv3BwA88sgjmDBhAmJjYzFkyBAUFxejc+fOcHNzU9qxs7PD1q1b8dRTT8HX1xfBwcGoqqrCqVOnEBUVhU2bNjX6Z6QS1hwDEP3OrQkVwHjpIDEx8Y7bCCGQmpqKkydPQq/Xw8/PD4MGDTI5f8vPz8fu3btx48YNDBs2DK6urjh27BgGDx4MGxsbpd758+dRUFAAOzs7hIaG4sKFC7hy5QrCwsKUOjU1NThw4ABCQkKg1WqV8vT0dBw4cABqtRpDhw6Fv7+/WV+Tk5ORkZGBnj17IiYmBocOHYK3tzd69Oih1KmursaePXuQnZ0NZ2dn+Pv74+GHHza5VdBSDCY1C2uCSfXjOSaRhBhMIgkxmEQSYjCJJMRgkpljx45h4cKFZp9xpNbD65hk5umnn0ZeXh5ycnKwdu3atu7OfYkjJpkpKioy+U6tj8EkkhCDSSQhBpNIQrwlj8zY29ujuroaDg4OJjdrN0Sv1yM3NxcAoNVq0blzZ4v3Z2tri1GjRmHhwoVW9fdexGCSGa1Wi/Ly8lbdp0qlQkVFhdmHm+9XvFxCZhYvXoz169c36sPHNTU1ymM0unTpAi8vL4u2y83NRVFREYQQFj9u5H7AEZOaxYwZM/DBBx8AAAICAnDmzBmLtouLi8Onn34KACgtLTX5ONb9jJM/1GRZWVn4+OOPleWffvoJhw4dasMe3f0YTGqyqVOn4saNG2Zltx56RY3HYFKTfP3119izZ49Z+YkTJ0xGUWocBpOsVlVVhYSEhHrXz507F1euXGmwja5duwIAHB0dOSN7G87KktX++te/mjzl7vdKSkowZ84cZXKnLnPmzIFWq0VERITJM3zud5yVJatkZWWhX79+qKmpabCeSqVCSkoKwsPDW6ln9wYeypJVZsyYccdQAsYn4XEiqPEYTGq0r7/+ulF/qZkTQY3HQ1lqlKqqKvTt27fBc8u6ODs74+zZs9DpdC3TsXsMR0xqlDtN+NTn1kQQWYYjJlnM0gmf+nAiyHIcMclilk741IcTQZZjMMkijZ3wqQ8ngizDQ1m6I2snfOrj7OyMzMxM5a4fMscRk+7I2gmf+nAi6M44YlKDmjrhUx9OBDWMIyY1qKkTPvURQmDatGmcCKoHg0n1aq4Jn/r8+OOPWL16dYu1fzfjoSzVqbknfOrDiaC6ccSkOjX3hE99OBFUN46YZObcuXMICgpqkXPLuqjVaqSkpCAsLKxV9nc34IhJZhYsWNBqoQQAg8GAN998s9X2dzdgMMmMr6/vfbFPmfFQlupUWVlp9uS7hhQWFqJPnz4AgEmTJuFvf/ubxdva2NigQ4cOje7jvYzP/KE6OTo6wtHR0eL6169fV163b98ezs7OLdGt+wYPZYkkxGASSYjBJJIQg0kkIQaTSEIMJpGEGEwiCTGYRBJiMIkkxGDSfa2kpKRRtx62FgaT2lx8fDzGjBnTqp9oucXd3R1btmxp9f3eCYNJberUqVNITEzE5s2bsW3btrbujjQYTGpTSUlJ6N+/P0aOHIm1a9c2WLe8vBy//PILDAZDnev1ej1ycnKQl5dXbxtVVVW4cOECqqurG9xXSUkJfv755zZ7WBiDSW3mxo0b+Pzzz/HnP/8Z48aNw969e81CNX36dAwdOhRz585F165d4enpiR49euDQoUMm9TZv3gwPDw/4+fmhR48eCAoKQlpamkmdVatWQafTwd/fHzqdrs5fBIWFhYiJiUGXLl3g4+MDJycnzJs3D6396UgGk9rMzp07UVxcjDFjxiA6Oho6nQ4bNmwwq3f48GFcvnwZ+fn5KCoqQr9+/TBp0iRl/YkTJzBmzBiMHTsWZWVluHTpEnQ6HWJiYlBRUQEAyMjIwNSpU/HWW2+hoqICGRkZ+Oijj3Dz5k2lHYPBgNjYWFRUVODcuXO4ceMG/vGPf2D58uV3HM2bnSBqBvn5+QKAACCmT59u0TaxsbEiJiZGWU5ISBB+fn7CYDAoZdOmTRNdu3YVNTU1Stm3334rAIiysjIhhBAzZswQ3t7eora2VqmTk5Mj1Gq12LRpkxBCiMmTJ4sBAwaY7H/fvn0CgFInOTlZABA5OTkm9WbOnCmioqIsek/NhR+UpjZx6dIl7N69G5999plSNm7cOLz77rs4cOAAHnnkEaW8d+/esLW1VZbd3NwAAL/++iucnJxw/vx5hISEQKPRKHW8vb3h7u6OzMxMAMDZs2cREhJi0oeQkBCoVCpl+cyZM7CxscHs2bNN6mVlZeHq1avN8K4tx2BSm9i4cSNqa2sxa9YsvPHGG0q5SqXC2rVrTYJpY2Njsu2tMIn/nPfV1taahPIWjUajTN7o9XqzOmq16ZlcaWkp7OzsMGrUKLO22rdv35i312QMJrWJtWvXIjY2FuPGjTMp379/P9atW4fExER07NjRorb8/Pzw/fffQwihhLawsBD5+fno1asXAKBXr144efKkyXZpaWkmkzp9+vTBtWvXMGDAAPj5+TXl7TVdqx440z2rMeeYKSkpAoD47rvvzNYVFhaKdu3aiU8//VQIYTzHHDJkiEmd9PR0AUCcP39eCCHEDz/8IFQqlVi6dKkwGAyiqqpKjBw5Uri4uIji4mIhhBCHDh0SAMT69euFEEKUlpaKwYMHC5VKpZxj1tTUCH9/fzFw4EBx8eJFZX8ZGRlix44dVv5krMNZWWp1SUlJ8PDwwJAhQ8zWubq6IioqCklJSRa3N2jQIHz44YdYsGABnJ2d4eLigkOHDmHLli3KQ8HCwsKwcOFCvPTSS9DpdHB3d0dMTIzJuautrS127doFjUYDb29vdOvWDY6OjggNDVXOVVsLH19JzaKgoAAeHh4AjNceExMT661bXl4OtVpd7yMrr1+/jpqaGnTq1AlVVVXQ6/Umh7V6vR7l5eXQarUm54kVFRVIT0+HnZ0dgoKC0K6d+ZlaYWEhsrOz4evrCzc3N5SUlMDR0dEkoACQm5uLX375Bc7OzvDx8YG9vX2jfh5NxXNManVOTk4Nrre3t1eC4ODgYLZeo9HU+XjMDh06YODAgQ227ebmpszqAqj3MZteXl7w8vJqsK2WxENZIgkxmEQSYjCJJMRgEkmIwSSSEINJJCEGk0hCDCaRhBhMIgkxmEQSYjCJJMRgEkmIwSSSEINJJCEGk0hCDCaRhBhMIgkxmEQSYjCJJMRgEkmIwSSSEINJJCEGk0hCDCaRhBhMIgkxmEQSYjCJJMRgEkmIf1SImoVKpUL//v0B1P+HeshyDCY1CyGE8hebIyMj27g3dz8eyhJJiMEkkhCDSSQhBpNIQgwmkYQYTCIJMZhEEmq1YJaVleHChQsoLy+vc/2RI0fwzjvvoKCgoLW6RCStFg1mUVERZs2aBS8vL3Tq1Am+vr7QarXw8fHB66+/jitXrih19+/fj7/85S/Izc21qO3i4mKsWbMGL7/8MkJCQuDr64vHHnuspd4KUatqsTt/MjIyMHz4cOTn5yM8PBwTJ06ETqdDaWkp9u/fj/feew/ff/89UlNTrWr/5MmTmDhxIgCge/fuyM/Ph52dXbP0vbi4GFu3bsXp06dhZ2eH0NBQxMbGQqPRNEv7RHfSIsEsLS3FE088gUuXLiEpKQkvvviiyfrZs2fj9OnTePfdd63exwMPPICdO3ciODgYrq6usLGxaWq3AQAbNmzAjBkzUFZWZlIeGhqKtWvXIiAgoFn2Q9SQFglmYmIicnNzMXPmTLNQ3tK3b18kJSXVuS4tLQ2rVq1CTk4Ounfvjri4OISFhZnU8fDwgIeHR7P2+4svvsD48eMhhDBbd+TIEQwaNAipqanw8/Nr1v0S/V6LnGNu2rQJABAfH99gPZVKZVa2Y8cOhIWF4d///jdKS0uxceNGREZGYu/evS3RVUVVVRXi4+MhhIBGo8HChQuRk5ODkydPYsSIEQCAkpISJCQktGg/iIAWGDHLy8uRmZmJbt26wdvbu9Hbr1y5Ert378bgwYMBAIcPH0ZERAQWLFiA6OjoZu7tb7777jtlMiohIQFvvvmmsm7Lli0IDw/H0aNHsWPHDkycOBG2trYt1pe7UWVlpfI6Ozu7DXtyb2j2YF69ehVCCLi5uVm1/cyZM5VQAkBYWBiGDh2Kw4cPN1cX65SVlaW8jo2NNVmn0WgQGxuLo0ePwmAwYM2aNS3al7vdpUuX2roLd71mD6ZabTw61uv1Vm0fHh5uVubl5YV//etfKCkpsepDuCUlJSgpKTEp69KlC5ycnJTlDh06KK8LCwvN2uD1VWpNzR7Mrl27QqPRID8/36rtO3XqZFZ267Dx5s2bVrW5YsUKLFq0yKRs1apVmDx5srIcGRkJlUoFIQTmzp2LYcOGwcXFBQBw8OBBrFu3DgDQrVs3HD9+vM7z4/uZwWDA1atXARh/6VHTNHswHRwc0L9/fxw/fhzp6ekICgpq7l002ujRoxEYGGhSFhwcbLLs7++PCRMmYM2aNcjMzERAQAAef/xxVFRUYPv27aitrQUALF++3OrD9Hudu7t7W3fhntEil0tefPFFHD9+HEuWLFFmaOtSWVkJR0fHluiCib59+6Jv3753rPfee+8hNTUV6enpuHLlCjZs2GCyfurUqRg9enRLdZNI0SKXS+Li4hAcHIwvvvgCs2fPRnV1tcl6IQS2bNmCZ599tiV2bzUnJyekpKRg7ty56N69u1Lev39/bNu2DStXrmzD3tH9pEVGzPbt22P79u0YMWIEli1bhg0bNiAqKgpubm4oKirCDz/8gAsXLuDxxx9v0n569eoFg8EAwDjZlJWVBV9fXwCAr68v9uzZ0+g2O3TogEWLFmHRokW4du0abGxsmu1WPyJLtdi9st26dcPhw4exceNGbN68Gfv27UNZWRk6duyI4OBgLFiwAM8//7xS39vbG48++ii0Wq1ZW/7+/nj00UfNrh327NlTuUvHx8fHZN3tI561Onbs2OQ2iKyhEnXdf0ZEbYoflCaSEINJJCEGk0hCDCaRhBhMIgkxmEQSYjCJJMRgEkmIwSSSEINJJCEGk0hCDCaRhBhMIgkxmEQSYjCJJMRgEkmIwSSSEINJJCEGk0hCDCaRhBhMIgkxmEQSYjCJJMRgEkmIwSSSEINJJKH/B+pAmXZNy36nAAAAAElFTkSuQmCC",
-        "bpp": 16
-      }
-    ],
-    "colors": [],
-    "themes": [
-      {
-        "name": "main",
-        "colors": []
-      }
-    ]
-  }
+                  "invertColors": true
+                },
+                {
+                  "type": "Text",
+                  "left": 0,
+                  "top": 0,
+                  "width": 90,
+                  "height": 32,
+                  "wireID": "66c7283a-71da-4598-bb29-bdf4ffc6d6d6",
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "data": "",
+                  "action": "restart",
+                  "style": {
+                    "inheritFrom": "status_action"
+                  },
+                  "text": "Restart"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "main",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272
+    }
+  ],
+  "styles": [],
+  "fonts": [],
+  "bitmaps": [
+    {
+      "name": "background",
+      "image": "data:image/png;base64,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",
+      "bpp": 16
+    }
+  ],
+  "colors": [],
+  "themes": [
+    {
+      "name": "main",
+      "colors": []
+    }
+  ]
 }

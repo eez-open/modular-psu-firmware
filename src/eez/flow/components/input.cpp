@@ -30,9 +30,7 @@ struct InputActionComponent : public Component {
 
 void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
  	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto component = flow->components.item(assets, componentIndex);
+	auto component = (InputActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
 	if (!flowState->parentFlowState) {
 		throwError(flowState, component, "Input action component, no parentFlowState\n");
@@ -44,10 +42,9 @@ void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
 		return;
 	}
 
-	auto inputActionComponent = (InputActionComponent *)component;
     auto callActionComponent = (CallActionActionComponent *)flowState->parentComponent;
 
-    uint8_t parentComponentInputIndex = callActionComponent->inputsStartIndex + inputActionComponent->inputIndex;
+    uint8_t parentComponentInputIndex = callActionComponent->inputsStartIndex + component->inputIndex;
     
     if (parentComponentInputIndex >= flowState->parentComponent->inputs.count) {
         throwError(flowState, component, "Input action component, invalid input index\n");
@@ -57,7 +54,7 @@ void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
     auto parentComponentInputs = flowState->parentComponent->inputs.ptr(assets);
     auto flowInputIndex = parentComponentInputs[parentComponentInputIndex];
 
-    auto parentFlow = flowDefinition->flows.item(assets, flowState->parentFlowState->flowIndex);
+    auto parentFlow = flowState->flowDefinition->flows.item(assets, flowState->parentFlowState->flowIndex);
     if (flowInputIndex >= parentFlow->nInputValues) {
         throwError(flowState, component, "Input action component, invalid input index of parent component\n");
         return;

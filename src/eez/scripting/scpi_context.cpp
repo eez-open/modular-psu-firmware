@@ -55,7 +55,9 @@ int SCPI_Error(scpi_t *context, int_fast16_t err) {
     g_lastError = err;
 
     if (err != 0) {
-        sound::playBeep();
+		if (!isFlowRunning()) {
+        	sound::playBeep();
+		}
         
         DebugTrace("**ERROR");
 

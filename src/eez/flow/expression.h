@@ -25,20 +25,32 @@ namespace flow {
 
 using eez::gui::MAX_ITERATORS;
 
+static const size_t STACK_SIZE = 20;
+
 struct EvalStack {
 	Assets *assets;
 	FlowState *flowState;
+	Component *component;
 	const int32_t *iterators;
 
-	Value stack[100];
-	int sp = 0;
+	Value stack[STACK_SIZE];
+	size_t sp = 0;
 
-	void push(const Value &value) {
+	bool push(const Value &value) {
+		if (sp >= STACK_SIZE) {
+			throwError(flowState, component, "Evaluation stack is full\n");
+			return false;
+		}
 		stack[sp++] = value;
+		return true;
 	}
 
-	void push(Value *pValue) {
+	bool push(Value *pValue) {
+		if (sp >= STACK_SIZE) {
+			return false;
+		}
 		stack[sp++] = Value(pValue, VALUE_TYPE_VALUE_PTR);
+		return true;
 	}
 
 	Value pop() {

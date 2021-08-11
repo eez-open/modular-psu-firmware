@@ -26,30 +26,45 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
+struct CallActionComponenentExecutionState : public ComponenentExecutionState {
+	FlowState *flowState;
+
+	~CallActionComponenentExecutionState() {
+		freeFlowState(flowState);
+	}
+};
+
 void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
- 	auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto component = flow->components.item(assets, componentIndex);
+	auto assets = flowState->assets;
+	auto component = (CallActionActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
-	auto callActionActionComponent = (CallActionActionComponent *)component;
-
-	auto flowIndex = callActionActionComponent->flowIndex;
-
-	if (flowIndex < 0 || flowIndex >= (int)flowDefinition->flows.count) {
+	auto flowIndex = component->flowIndex;
+	if (flowIndex < 0 || flowIndex >= (int)flowState->flowDefinition->flows.count) {
 		throwError(flowState, component, "Invalid action flow index in CallAction component\n");
+		return;
+	}
+
+	auto callActionComponenentExecutionState = (CallActionComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
+	if (callActionComponenentExecutionState) {
+		throwError(flowState, component, "CallAction component is already running\n");
+		return;
 	}
 
 	FlowState *actionFlowState = initActionFlowState(assets, flowIndex);
 
 	actionFlowState->parentFlowState = flowState;
 	actionFlowState->parentComponent = component;
+	actionFlowState->parentComponentIndex = componentIndex;
 
 	if (actionFlowState->numActiveComponents == 0) {
 		freeFlowState(actionFlowState);
 		propagateValue(flowState, componentIndex);
 	} else {
 		flowState->numActiveComponents++;
+
+		callActionComponenentExecutionState = ObjectAllocator<CallActionComponenentExecutionState>::allocate(0x4c669d4b);
+		callActionComponenentExecutionState->flowState = actionFlowState;
+		flowState->componenentExecutionStates[componentIndex] = callActionComponenentExecutionState;
 	}
 }
 

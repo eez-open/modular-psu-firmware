@@ -82,6 +82,8 @@ DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
                      g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
                  false, false, nullptr, nullptr, nullptr, nullptr);
     }
+
+    widgetCursor.currentState->data.freeRef();
 };
 
 void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {

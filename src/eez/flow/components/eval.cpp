@@ -26,10 +26,8 @@ namespace eez {
 namespace flow {
 
 void executeEvalComponent(FlowState *flowState, unsigned componentIndex) {
-    auto assets = flowState->assets;
-	auto flowDefinition = assets->flowDefinition.ptr(assets);
-	auto flow = flowDefinition->flows.item(assets, flowState->flowIndex);
-	auto component = flow->components.item(assets, componentIndex);
+ 	auto assets = flowState->assets;
+	auto component = flowState->flow->components.item(assets, componentIndex);
 
 	auto expressionPropertyValue = component->propertyValues.item(assets, defs_v3::EVAL_ACTION_COMPONENT_PROPERTY_EXPRESSION);
 	Value value;

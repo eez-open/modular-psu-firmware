@@ -189,7 +189,9 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 		return false;
 	}
 
-	stack.push(result);
+	if (!stack.push(result)) {
+		return false;
+	}
 
 	return true;
 }
@@ -204,7 +206,9 @@ bool do_OPERATION_TYPE_SUB(EvalStack &stack) {
 		return false;
 	}
 
-	stack.push(result);
+	if (!stack.push(result)) {
+		return false;
+	}
 
 	return true;
 }
@@ -219,7 +223,9 @@ bool do_OPERATION_TYPE_MUL(EvalStack &stack) {
 		return false;
 	}
 
-	stack.push(result);
+	if (!stack.push(result)) {
+		return false;
+	}
 
 	return true;
 }
@@ -234,7 +240,9 @@ bool do_OPERATION_TYPE_DIV(EvalStack &stack) {
 		return false;
 	}
 
-	stack.push(result);
+	if (!stack.push(result)) {
+		return false;
+	}
 
 	return true;
 }
@@ -249,7 +257,9 @@ bool do_OPERATION_TYPE_MOD(EvalStack &stack) {
 		return false;
 	}
 
-	stack.push(result);
+	if (!stack.push(result)) {
+		return false;
+	}
 
 	return true;
 }
@@ -277,41 +287,53 @@ bool do_OPERATION_TYPE_BINARY_XOR(EvalStack &stack) {
 bool do_OPERATION_TYPE_EQUAL(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
-	stack.push(op_eq(a, b));
+	if (!stack.push(op_eq(a, b))) {
+		return false;
+	}
 	return true;
 }
 
 bool do_OPERATION_TYPE_NOT_EQUAL(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
-	stack.push(a != b);
+	if (!stack.push(a != b)) {
+		return false;
+	}
 	return true;}
 
 bool do_OPERATION_TYPE_LESS(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
-	stack.push(op_less(a, b));
+	if (!stack.push(op_less(a, b))) {
+		return false;
+	}
 	return true;
 }
 
 bool do_OPERATION_TYPE_GREATER(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
-	stack.push(op_great(a, b));
+	if (!stack.push(op_great(a, b))) {
+		return false;
+	}
 	return true;
 }
 
 bool do_OPERATION_TYPE_LESS_OR_EQUAL(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
-	stack.push(op_less_eq(a, b));
+	if (!stack.push(op_less_eq(a, b))) {
+		return false;
+	}
 	return true;
 }
 
 bool do_OPERATION_TYPE_GREATER_OR_EQUAL(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
-	stack.push(op_great_eq(a, b));
+	if (!stack.push(op_great_eq(a, b))) {
+		return false;
+	}
 	return true;
 }
 
@@ -327,7 +349,9 @@ bool do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
 		b = *b.pValueValue;
 	}
 
-	stack.push(Value(a.toBool(stack.assets) && b.toBool(stack.assets), VALUE_TYPE_BOOLEAN));
+	if (!stack.push(Value(a.toBool(stack.assets) && b.toBool(stack.assets), VALUE_TYPE_BOOLEAN))) {
+		return false;
+	}
 
 	return true;
 }
@@ -343,33 +367,45 @@ bool do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
 		a = *a.pValueValue;
 	}
 	if (a.isDouble()) {
-		stack.push(Value(a.getDouble(), VALUE_TYPE_DOUBLE));
+		if (!stack.push(Value(a.getDouble(), VALUE_TYPE_DOUBLE))) {
+			return false;
+		}
 		return true;
 	}
 
 	if (a.isFloat()) {
-		stack.push(Value(a.toFloat(), VALUE_TYPE_FLOAT));
+		if (!stack.push(Value(a.toFloat(), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
 		return true;
 	}
 
 	if (a.isInt64()) {
-		stack.push(Value((int64_t)a.getInt64(), VALUE_TYPE_INT64));
+		if (!stack.push(Value((int64_t)a.getInt64(), VALUE_TYPE_INT64))) {
+			return false;
+		}
 		return true;
 	}
 
 	if (a.isInt32()) {
-		stack.push(Value((int)a.getInt32(), VALUE_TYPE_INT32));
+		if (!stack.push(Value((int)a.getInt32(), VALUE_TYPE_INT32))) {
+			return false;
+		}
 		return true;
 	}
 
 	if (a.isInt16()) {
-		stack.push(Value((int16_t)a.getInt16(), VALUE_TYPE_INT16));
+		if (!stack.push(Value((int16_t)a.getInt16(), VALUE_TYPE_INT16))) {
+			return false;
+		}
 		return true;
 	}
 
 
 	if (a.isInt8()) {
-		stack.push(Value((int8_t)a.getInt8(), VALUE_TYPE_INT8));
+		if (!stack.push(Value((int8_t)a.getInt8(), VALUE_TYPE_INT8))) {
+			return false;
+		}
 		return true;
 	}
 
@@ -383,33 +419,45 @@ bool do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
 		a = *a.pValueValue;
 	}
 	if (a.isDouble()) {
-		stack.push(Value(-a.getDouble(), VALUE_TYPE_DOUBLE));
+		if (!stack.push(Value(-a.getDouble(), VALUE_TYPE_DOUBLE))) {
+			return false;
+		}
 		return true;
 	}
 
 	if (a.isFloat()) {
-		stack.push(Value(-a.toFloat(), VALUE_TYPE_FLOAT));
+		if (!stack.push(Value(-a.toFloat(), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
 		return true;
 	}
 
 	if (a.isInt64()) {
-		stack.push(Value((int64_t)-a.getInt64(), VALUE_TYPE_INT64));
+		if (!stack.push(Value((int64_t)-a.getInt64(), VALUE_TYPE_INT64))) {
+			return false;
+		}
 		return true;
 	}
 
 	if (a.isInt32()) {
-		stack.push(Value((int)-a.getInt32(), VALUE_TYPE_INT32));
+		if (!stack.push(Value((int)-a.getInt32(), VALUE_TYPE_INT32))) {
+			return false;
+		}
 		return true;
 	}
 
 	if (a.isInt16()) {
-		stack.push(Value((int16_t)-a.getInt16(), VALUE_TYPE_INT16));
+		if (!stack.push(Value((int16_t)-a.getInt16(), VALUE_TYPE_INT16))) {
+			return false;
+		}
 		return true;
 	}
 
 
 	if (a.isInt8()) {
-		stack.push(Value((int8_t)-a.getInt8(), VALUE_TYPE_INT8));
+		if (!stack.push(Value((int8_t)-a.getInt8(), VALUE_TYPE_INT8))) {
+			return false;
+		}
 		return true;
 	}
 
@@ -423,23 +471,31 @@ bool do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT(EvalStack &stack) {
 		a = *a.pValueValue;
 	}
 	if (a.isInt64()) {
-		stack.push(Value(~a.uint64Value, VALUE_TYPE_UINT64));
+		if (!stack.push(Value(~a.uint64Value, VALUE_TYPE_UINT64))) {
+			return false;
+		}
 		return true;
 	}
 
 	if (a.isInt32()) {
-		stack.push(Value(~a.uint32Value, VALUE_TYPE_UINT32));
+		if (!stack.push(Value(~a.uint32Value, VALUE_TYPE_UINT32))) {
+			return false;
+		}
 		return true;
 	}
 
 	if (a.isInt16()) {
-		stack.push(Value(~a.uint16Value, VALUE_TYPE_UINT16));
+		if (!stack.push(Value(~a.uint16Value, VALUE_TYPE_UINT16))) {
+			return false;
+		}
 		return true;
 	}
 
 
 	if (a.isInt8()) {
-		stack.push(Value(~a.uint8Value, VALUE_TYPE_UINT8));
+		if (!stack.push(Value(~a.uint8Value, VALUE_TYPE_UINT8))) {
+			return false;
+		}
 		return true;
 	}
 
@@ -455,7 +511,9 @@ bool do_OPERATION_TYPE_NOT(EvalStack &stack) {
 		return false;
 	}
 
-	stack.push(Value(!a, VALUE_TYPE_BOOLEAN));
+	if (!stack.push(Value(!a, VALUE_TYPE_BOOLEAN))) {
+		return false;
+	}
 
 	return true;
 }
@@ -471,7 +529,10 @@ bool do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
 		return false;
 	}
 
-	stack.push(condition ? consequent : alternate);
+	if (!stack.push(condition ? consequent : alternate)) {
+		return false;
+	}
+
 	return true;
 }
 
@@ -493,7 +554,9 @@ bool do_OPERATION_TYPE_FLOW_IT(EvalStack &stack) {
 		return false;
 	}
 
-	stack.push(stack.iterators[iteratorIndex]);
+	if (!stack.push(stack.iterators[iteratorIndex])) {
+		return false;
+	}
 	
 	return true;
 }
@@ -525,13 +588,19 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 	const char *aStr = a.toString(stack.assets, 0xf616bf4d).getString();
 	const char *bStr = b.toString(stack.assets, 0x81229133).getString();
 	if (!aStr || !bStr) {
-		stack.push(Value(-1, VALUE_TYPE_INT32));
+		if (!stack.push(Value(-1, VALUE_TYPE_INT32))) {
+			return false;
+		}
 	} else {
 		const char *pos = strstr(aStr, bStr);
 		if (!pos) {
-			stack.push(Value(pos - aStr, VALUE_TYPE_INT32));
+			if (!stack.push(Value(pos - aStr, VALUE_TYPE_INT32))) {
+				return false;
+			}
 		} else {
-			stack.push(Value(-1, VALUE_TYPE_INT32));
+			if (!stack.push(Value(-1, VALUE_TYPE_INT32))) {
+				return false;
+			}
 		}
 	}
 
