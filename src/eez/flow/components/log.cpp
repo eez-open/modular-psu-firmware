@@ -39,7 +39,7 @@ void executeLogComponent(FlowState *flowState, unsigned componentIndex) {
         return;
     }
 
-    const char *valueStr = value.toString(assets, 0x0f9812ee).getString();
+    const char *valueStr = value.toString(0x0f9812ee).getString();
     if (valueStr && *valueStr) {
       DebugTrace(valueStr);
       if (valueStr[strlen(valueStr) - 1] != '\n') {

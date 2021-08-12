@@ -66,12 +66,12 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 				elementIndexValue = *elementIndexValue.pValueValue;
 			}
 
-			if (arrayValue.type != VALUE_TYPE_ASSETS_ARRAY) {
+			if (arrayValue.type != VALUE_TYPE_ARRAY) {
 				throwError(flowState, component, "Array value expected\n");
 				return false;
 			}
 
-			auto assetsArray = ((AssetsPtr<AssetsArray> *)&arrayValue.assetsOffsetValue)->ptr(assets);
+			auto array = arrayValue.arrayValue;
 
 			int err;
 			auto elementIndex = elementIndexValue.toInt32(&err);
@@ -80,12 +80,12 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 				return false;
 			}
 		
-			if (elementIndex < 0 || elementIndex >= (int)assetsArray->arraySize) {
+			if (elementIndex < 0 || elementIndex >= (int)array->arraySize) {
 				throwError(flowState, component, "Array element index out of bounds\n");
 				return false;
 			}
 
-			if (!stack.push(&assetsArray->values[elementIndex])) {
+			if (!stack.push(&array->values[elementIndex])) {
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
@@ -110,7 +110,6 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes, const int32_t *iterators) {
 	EvalStack stack;
 
-	stack.assets = flowState->assets;
 	stack.flowState = flowState;
 	stack.component = component;
 	stack.iterators = iterators;
@@ -136,7 +135,6 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 bool evalAssignableExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes, const int32_t *iterators) {
 	EvalStack stack;
 
-	stack.assets = flowState->assets;
 	stack.flowState = flowState;
 	stack.component = component;
 	stack.iterators = iterators;

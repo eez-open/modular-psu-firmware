@@ -91,7 +91,7 @@ float firstTick(float n) {
 struct GaugeWidget : public Widget {
     int16_t min;
 	int16_t max;
-	int16_t threashold;
+	int16_t threshold;
 	int16_t unit;
     int16_t barStyle;
 	int16_t valueStyle;
@@ -111,14 +111,18 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 	widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
 
-    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != widgetCursor.currentState->data;
+    bool refresh = 
+		!widgetCursor.previousState || 
+		widgetCursor.previousState->data != widgetCursor.currentState->data ||
+		widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
 
     if (refresh) {
 		float min = get(widgetCursor, widget->min).toFloat();
 		float max = get(widgetCursor, widget->max).toFloat();
 		float value = widgetCursor.currentState->data.toFloat();
+		float threshold = get(widgetCursor, widget->threshold).toFloat();
 
-		auto unit = get(widgetCursor, widget->unit).toString(widgetCursor.flowState ? widgetCursor.flowState->assets: nullptr, 0xa9ddede3).getString();
+		auto unit = get(widgetCursor, widget->unit).toString(0xa9ddede3).getString();
 
 		if (isNaN(min) || isNaN(max) || isNaN(value) || isinf(min) || isinf(max) || isinf(value) || min >= max) {
 			min = 0.0;
@@ -136,16 +140,19 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		const Style* barStyle = getStyle(widget->barStyle);
 		const Style* valueStyle = getStyle(widget->valueStyle);
 		const Style* ticksStyle = getStyle(widget->ticksStyle);
+		const Style* thresholdStyle = getStyle(widget->thresholdStyle);
+
+		auto isActive = widgetCursor.currentState->flags.active;
 
 		// auto colorBackground = getColor16FromIndex(style->background_color);
-		auto colorBorder = getColor16FromIndex(style->color);
-		auto colorBar = getColor16FromIndex(barStyle->color);
+		auto colorBorder = getColor16FromIndex(isActive ? style->active_color : style->color);
+		auto colorBar = getColor16FromIndex(isActive ? barStyle->active_color : barStyle->color);
 
 		auto xCenter = widget->w / 2;
 		auto yCenter = widget->h - 8;
 
 		// clear background
-		setColor(style->background_color);
+		setColor(isActive ? style->active_background_color : style->background_color);
 		fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1, 0);
 
 		// init AGG
@@ -174,6 +181,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		static const int TICK_LINE_LENGTH = 5;
 		static const int TICK_LINE_WIDTH = 1;
 		static const int TICK_TEXT_GAP = 1;
+		static const int THRESHOLD_LINE_WIDTH = 2;
 
 		// draw border
 		auto radBorderOuter = (widget->w - PADDING_HORZ) / 2;
@@ -200,6 +208,27 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		arcBar(graphics, xCenter, yCenter, radBarOuter, radBarInner, angle);
 		graphics.drawPath();
 
+		// draw threshold
+		auto thresholdAngleDeg = remap(threshold, min, 180.0f, max, 0);
+		if (thresholdAngleDeg >= 0 && thresholdAngleDeg <= 180.0f) {
+			auto thresholdAngle = Agg2D::deg2Rad(thresholdAngleDeg);
+			float acos = cosf(thresholdAngle);
+			float asin = sinf(thresholdAngle);
+			int x1 = floorf(xCenter + radBarInner * acos);
+			int y1 = floorf(yCenter - radBarInner * asin);
+			int x2 = floorf(xCenter + radBarOuter * acos);
+			int y2 = floorf(yCenter - radBarOuter * asin);
+
+			graphics.resetPath();
+			graphics.noFill();
+			auto thresholdColor = getColor16FromIndex(isActive ? thresholdStyle->active_color : thresholdStyle->color);
+			graphics.lineColor(COLOR_TO_R(thresholdColor), COLOR_TO_G(thresholdColor), COLOR_TO_B(thresholdColor));
+			graphics.lineWidth(THRESHOLD_LINE_WIDTH);
+			graphics.moveTo(x1, y1);
+			graphics.lineTo(x2, y2);
+			graphics.drawPath();
+		}
+
 		// draw ticks
 		font::Font ticksFont = styleGetFont(ticksStyle);
 		auto ft = firstTick(max - min);
@@ -217,7 +246,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 
 				graphics.resetPath();
 				graphics.noFill();
-				auto tickColor = getColor16FromIndex(ticksStyle->color);
+				auto tickColor = getColor16FromIndex(isActive ? ticksStyle->active_color : ticksStyle->color);
 				graphics.lineColor(COLOR_TO_R(tickColor), COLOR_TO_G(tickColor), COLOR_TO_B(tickColor));
 				graphics.lineWidth(TICK_LINE_WIDTH);
 				graphics.moveTo(x1, y1);
@@ -244,7 +273,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 						tickTextWidth,
 						ticksFont.getAscent(),
 						ticksStyle,
-						false,
+						isActive,
 						false,
 						false,
 						nullptr,
@@ -261,7 +290,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 						tickTextWidth,
 						ticksFont.getAscent(),
 						ticksStyle,
-						false,
+						isActive,
 						false,
 						false,
 						nullptr,
@@ -278,7 +307,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 						tickTextWidth,
 						ticksFont.getAscent(),
 						ticksStyle,
-						false,
+						isActive,
 						false,
 						false,
 						nullptr,
@@ -295,7 +324,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 						tickTextWidth,
 						ticksFont.getAscent(),
 						ticksStyle,
-						false,
+						isActive,
 						false,
 						false,
 						nullptr,
@@ -312,7 +341,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 						tickTextWidth,
 						ticksFont.getAscent(),
 						ticksStyle,
-						false,
+						isActive,
 						false,
 						false,
 						nullptr,
@@ -341,7 +370,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 			valueTextWidth,
 			valueFont.getHeight(),
 			valueStyle,
-			false,
+			isActive,
 			false,
 			false,
 			nullptr,

@@ -33,8 +33,6 @@
 namespace eez {
 namespace gui {
 
-struct Assets;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 class AppContext;
@@ -89,6 +87,8 @@ struct PairOfInt16Value {
 struct Ref {
 	uint32_t refCounter;
 };
+
+struct ArrayValue;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -304,7 +304,7 @@ struct Value {
     }
 
 	bool isAnyStringType() const {
-        return type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_REF || type == VALUE_TYPE_ASSETS_STRING;
+        return type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_REF;
     }
 
     Unit getUnit() const {
@@ -437,9 +437,9 @@ struct Value {
 	float toFloat(int *err = nullptr) const;
 	int32_t toInt32(int *err = nullptr) const;
 	int64_t toInt64(int *err = nullptr) const;
-    bool toBool(Assets *assets, int *err = nullptr) const;
+    bool toBool(int *err = nullptr) const;
 
-	Value toString(Assets *assets, uint32_t id) const;
+	Value toString(uint32_t id) const;
 
 	static Value makeStringRef(const char *str, size_t len, uint32_t id);
 	static Value concatenateString(const char *str1, const char *str2);
@@ -478,10 +478,8 @@ struct Value {
 
 		float floatValue;
 
-		uint32_t assetsOffsetValue;
-
 		const char *strValue;
-
+        ArrayValue *arrayValue;
 		Ref *refValue;
 
 		uint8_t *puint8Value;
@@ -496,12 +494,10 @@ struct Value {
     };
 };
 
-typedef const char AssetsString;
-
-struct AssetsArray {
+struct ArrayValue {
 	uint32_t arraySize;
     uint32_t reserved;
-	Value values[10];
+	Value values[1];
 };
 
 struct StringRef : public Ref {
@@ -510,6 +506,7 @@ struct StringRef : public Ref {
 
 struct ArrayRef : public Ref {
 	uint32_t arraySize;
+    uint32_t reserved;
 	Value values[1];
 };
 

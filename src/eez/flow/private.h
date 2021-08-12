@@ -53,6 +53,8 @@ struct FlowState {
 	ComponenentExecutionState **componenentExecutionStates;
 };
 
+void fixAssetValues(Assets *assets);
+
 FlowState *initActionFlowState(Assets *assets, int flowIndex);
 FlowState *initPageFlowState(Assets *assets, int flowIndex);
 void freeFlowState(FlowState *flowState);

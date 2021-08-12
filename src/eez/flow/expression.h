@@ -28,7 +28,6 @@ using eez::gui::MAX_ITERATORS;
 static const size_t STACK_SIZE = 20;
 
 struct EvalStack {
-	Assets *assets;
 	FlowState *flowState;
 	Component *component;
 	const int32_t *iterators;

@@ -51,6 +51,8 @@ unsigned start(Assets *assets) {
 
 	scpiComponentInit();
 
+	fixAssetValues(assets);
+
 	g_mainPageFlowState = initPageFlowState(assets, 0);
 
 	return 1;
@@ -180,9 +182,8 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			getValue(dataId, widgetCursor, arrayValue);
 			if (arrayValue.getType() == VALUE_TYPE_ARRAY_REF) {
 				value = ((ArrayRef *)arrayValue.refValue)->arraySize;
-			} else if (arrayValue.getType() == VALUE_TYPE_ASSETS_ARRAY) {
-				auto assetsArray = ((AssetsPtr<AssetsArray> *)&arrayValue.assetsOffsetValue)->ptr(assets);
-				value = assetsArray->arraySize;
+			} else if (arrayValue.getType() == VALUE_TYPE_ARRAY) {
+				value = arrayValue.arrayValue->arraySize;
 			} else {
 				value = 0;
 			}
@@ -192,7 +193,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
 				auto unitValue = get(widgetCursor, inputWidget->unit);
-				Unit unit = getUnitFromName(unitValue.toString(assets, 0x5049bd52).getString());
+				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
 				value = Value(get(widgetCursor, inputWidget->min).toFloat(), unit);
 			}
 		} else if (operation == DATA_OPERATION_GET_MAX) {
@@ -201,7 +202,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
 				auto unitValue = get(widgetCursor, inputWidget->unit);
-				Unit unit = getUnitFromName(unitValue.toString(assets, 0x5049bd52).getString());
+				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
 				value = Value(get(widgetCursor, inputWidget->max).toFloat(), unit);
 			}
 		} else if (operation == DATA_OPERATION_GET_PRECISION) {
@@ -210,7 +211,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
 				auto unitValue = get(widgetCursor, inputWidget->unit);
-				Unit unit = getUnitFromName(unitValue.toString(assets, 0x5049bd52).getString());
+				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
 				value = Value(get(widgetCursor, inputWidget->precision).toFloat(), unit);
 			}
 		} else if (operation == DATA_OPERATION_GET_UNIT) {
@@ -219,7 +220,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
 				auto unitValue = get(widgetCursor, inputWidget->unit);
-				Unit unit = getUnitFromName(unitValue.toString(assets, 0x5049bd52).getString());
+				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
 				value = unit;
 			}
 		} else if (operation == DATA_OPERATION_SET) {

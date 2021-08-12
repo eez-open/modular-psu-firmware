@@ -446,22 +446,6 @@ void DOUBLE_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
-bool compare_ASSETS_STRING_value(const Value &a, const Value &b) {
-	return a.assetsOffsetValue == b.assetsOffsetValue;
-}
-
-void ASSETS_STRING_value_to_text(const Value &value, char *text, int count) {
-	text[0] = 0;
-}
-
-bool compare_ASSETS_ARRAY_value(const Value &a, const Value &b) {
-    return a.assetsOffsetValue == b.assetsOffsetValue;
-}
-
-void ASSETS_ARRAY_value_to_text(const Value &value, char *text, int count) {
-    text[0] = 0;
-}
-
 bool compare_STRING_value(const Value &a, const Value &b) {
     const char *astr = a.getString();
     const char *bstr = b.getString();
@@ -481,6 +465,14 @@ void STRING_value_to_text(const Value &value, char *text, int count) {
     } else {
         text[0] = 0;
     }
+}
+
+bool compare_ARRAY_value(const Value &a, const Value &b) {
+    return a.arrayValue == b.arrayValue;
+}
+
+void ARRAY_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
 }
 
 bool compare_STRING_REF_value(const Value &a, const Value &b) {
@@ -1012,9 +1004,9 @@ int64_t Value::toInt64(int *err) const {
 	return 0;
 }
 
-bool Value::toBool(Assets *assets, int *err) const {
+bool Value::toBool(int *err) const {
 	if (type == VALUE_TYPE_VALUE_PTR) {
-		return pValueValue->toBool(assets, err);
+		return pValueValue->toBool(err);
 	}
 
 	if (err) {
@@ -1057,7 +1049,7 @@ bool Value::toBool(Assets *assets, int *err) const {
 	}
 
 	if (type == VALUE_TYPE_STRING_REF) {
-        auto strValue = toString(assets, 0xdbb61edf);
+        auto strValue = toString(0xdbb61edf);
 		const char *str = strValue.getString();
 		return str && *str;
 	}
@@ -1068,22 +1060,15 @@ bool Value::toBool(Assets *assets, int *err) const {
 	return false;
 }
 
-Value Value::toString(Assets *assets, uint32_t id) const {
+Value Value::toString(uint32_t id) const {
 	if (type == VALUE_TYPE_VALUE_PTR) {
-		return pValueValue->toString(assets, id);
+		return pValueValue->toString(id);
 	}
 
 	if (type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_REF) {
 		return *this;
 	}
 	
-	if (type == VALUE_TYPE_ASSETS_STRING) {
-		if (assets) {
-			return Value(((AssetsPtr<AssetsString> *)&assetsOffsetValue)->ptr(assets));
-		}
-		return "";
-	}
-
     char tempStr[64];
 
 #ifdef _MSC_VER

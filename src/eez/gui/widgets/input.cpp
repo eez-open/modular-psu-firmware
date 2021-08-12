@@ -80,7 +80,7 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 		char text[MAX_TEXT_LEN + 1];
 		widgetCursor.currentState->data.toText(text, sizeof(text));
 
-		Value unit = currentState->unit.toString(widgetCursor.flowState ? widgetCursor.flowState->assets : nullptr, 0x5f8feae3);
+		Value unit = currentState->unit.toString(0x5f8feae3);
 		if (unit.isString()) {
 			stringAppendString(text, sizeof(text), " ");
 			stringAppendString(text, sizeof(text), unit.getString());

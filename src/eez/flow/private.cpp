@@ -32,6 +32,36 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
+void fixValue(Assets *assets, Value &value) {
+	if (value.getType() == VALUE_TYPE_STRING) {
+		value.strValue = ((AssetsPtr<const char> *)&value.uint32Value)->ptr(assets);
+	} else if (value.getType() == VALUE_TYPE_ARRAY) {
+		value.arrayValue = ((AssetsPtr<ArrayValue> *)&value.uint32Value)->ptr(assets);
+		for (uint32_t i = 0; i < value.arrayValue->arraySize; i++) {
+			fixValue(assets, value.arrayValue->values[i]);
+		}
+	}
+}
+
+void fixValues(Assets *assets, ListOfAssetsPtr<Value> &values) {
+	for (uint32_t i = 0; i < values.count; i++) {
+		auto value = values.item(assets, i);
+		fixValue(assets, *value);
+	}
+}
+
+void fixAssetValues(Assets *assets) {
+	auto flowDefinition = assets->flowDefinition.ptr(assets);
+
+	fixValues(assets, flowDefinition->constants);
+	fixValues(assets, flowDefinition->globalVariables);
+
+	for (uint32_t i = 0; i < flowDefinition->flows.count; i++) {
+		auto flow = flowDefinition->flows.item(assets, i);
+		fixValues(assets, flow->localVariables);
+	}
+}
+
 bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	auto assets = flowState->assets;
 	auto component = flowState->flow->components.item(assets, componentIndex);

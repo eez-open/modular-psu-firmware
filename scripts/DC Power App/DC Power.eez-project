@@ -1,0 +1,1816 @@
+{
+  "fullyLoaded": true,
+  "settings": {
+    "general": {
+      "projectVersion": "v3",
+      "projectType": "applet",
+      "masterProject": "..\\..\\modular-psu-firmware.eez-project",
+      "imports": []
+    },
+    "build": {
+      "configurations": [
+        {
+          "name": "Default"
+        }
+      ],
+      "files": []
+    }
+  },
+  "variables": {
+    "globalVariables": [
+      {
+        "name": "settings",
+        "type": "struct:Settings",
+        "defaultValue": "{\n    channel: 1,\n    displayValue1: DisplayValue.Voltage,\n    displayValue2: DisplayValue.Current\n}"
+      },
+      {
+        "name": "ch",
+        "type": "array:struct:Channel",
+        "defaultValue": "[\n  {is_power_channel: false, oe: false, u: {set: 0, mon: 0, min: 0, max: 0}, i: {set: 0, mon: 0, min: 0, max: 0}},\n  {is_power_channel: false, oe: false, u: {set: 0, mon: 0, min: 0, max: 0}, i: {set: 0, mon: 0, min: 0, max: 0}},\n  {is_power_channel: false, oe: false, u: {set: 0, mon: 0, min: 0, max: 0}, i: {set: 0, mon: 0, min: 0, max: 0}},\n  {is_power_channel: false, oe: false, u: {set: 0, mon: 0, min: 0, max: 0}, i: {set: 0, mon: 0, min: 0, max: 0}},\n  {is_power_channel: false, oe: false, u: {set: 0, mon: 0, min: 0, max: 0}, i: {set: 0, mon: 0, min: 0, max: 0}},\n  {is_power_channel: false, oe: false, u: {set: 0, mon: 0, min: 0, max: 0}, i: {set: 0, mon: 0, min: 0, max: 0}},\n]"
+      }
+    ],
+    "structures": [
+      {
+        "name": "Settings",
+        "fields": [
+          {
+            "name": "channel",
+            "type": "integer"
+          },
+          {
+            "name": "displayValue1",
+            "type": "enum:DisplayValue"
+          },
+          {
+            "name": "displayValue2",
+            "type": "enum:DisplayValue"
+          }
+        ]
+      },
+      {
+        "name": "Channel",
+        "fields": [
+          {
+            "name": "is_power_channel",
+            "type": "boolean"
+          },
+          {
+            "name": "oe",
+            "type": "boolean"
+          },
+          {
+            "name": "u",
+            "type": "struct:ChannelValue"
+          },
+          {
+            "name": "i",
+            "type": "struct:ChannelValue"
+          }
+        ]
+      },
+      {
+        "name": "ChannelValue",
+        "fields": [
+          {
+            "name": "set",
+            "type": "float"
+          },
+          {
+            "name": "mon",
+            "type": "float"
+          },
+          {
+            "name": "min",
+            "type": "float"
+          },
+          {
+            "name": "max",
+            "type": "float"
+          }
+        ]
+      }
+    ],
+    "enums": [
+      {
+        "name": "DisplayValue",
+        "members": [
+          {
+            "name": "Voltage",
+            "value": 0
+          },
+          {
+            "name": "Current",
+            "value": 1
+          },
+          {
+            "name": "Power",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "name": "State",
+        "members": [
+          {
+            "name": "Loading",
+            "value": 0
+          },
+          {
+            "name": "NoPowerChannel",
+            "value": 1
+          },
+          {
+            "name": "Ready",
+            "value": 2
+          }
+        ]
+      }
+    ]
+  },
+  "actions": [
+    {
+      "components": [
+        {
+          "type": "StartActionComponent",
+          "left": -687,
+          "top": 17,
+          "width": 78,
+          "height": 31,
+          "wireID": "33a7da7a-645d-43cc-a391-4f31636cb85c",
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": -245,
+          "top": -145,
+          "width": 436,
+          "height": 87,
+          "wireID": "9a5fc5c4-c7a6-4257-c380-281d79c76fa4",
+          "customInputs": [],
+          "customOutputs": [
+            {
+              "name": "channel_options"
+            }
+          ],
+          "catchError": true,
+          "logError": false,
+          "scpi": "{channel_options} = SYST:CHAN:OPT? CH{idx + 1}"
+        },
+        {
+          "type": "SwitchActionComponent",
+          "left": -245,
+          "top": -29,
+          "width": 610,
+          "height": 98,
+          "wireID": "614718bd-2a71-4db1-b7bd-7a3d34ca9fb9",
+          "customInputs": [
+            {
+              "name": "channel_options",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "tests": [
+            {
+              "condition": "String.find(channel_options, \"power\") != -1",
+              "outputName": "is_a_power_ch"
+            },
+            {
+              "condition": "true",
+              "outputName": "not_a_power_ch"
+            }
+          ]
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": 409,
+          "top": 17,
+          "width": 245,
+          "height": 70,
+          "wireID": "9de50f96-88d6-4a51-c978-f15cfef2b442",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "ch[idx].is_power_channel",
+          "value": "true"
+        },
+        {
+          "type": "EndActionComponent",
+          "left": 424,
+          "top": 243,
+          "width": 64,
+          "height": 31,
+          "wireID": "6c0d00c0-76b9-41c9-c7f3-86f914ccd122",
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "type": "LoopActionComponent",
+          "left": -533,
+          "top": 17,
+          "width": 196,
+          "height": 70,
+          "wireID": "71acb5a9-df39-48cb-b0f6-6ce84d5cdaa9",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "idx",
+          "from": "0",
+          "to": "6",
+          "step": "1"
+        }
+      ],
+      "connectionLines": [
+        {
+          "source": "9a5fc5c4-c7a6-4257-c380-281d79c76fa4",
+          "output": "channel_options",
+          "target": "614718bd-2a71-4db1-b7bd-7a3d34ca9fb9",
+          "input": "channel_options"
+        },
+        {
+          "source": "614718bd-2a71-4db1-b7bd-7a3d34ca9fb9",
+          "output": "is_a_power_ch",
+          "target": "9de50f96-88d6-4a51-c978-f15cfef2b442",
+          "input": "@seqin"
+        },
+        {
+          "source": "9a5fc5c4-c7a6-4257-c380-281d79c76fa4",
+          "output": "@error",
+          "target": "6c0d00c0-76b9-41c9-c7f3-86f914ccd122",
+          "input": "@seqin"
+        },
+        {
+          "source": "614718bd-2a71-4db1-b7bd-7a3d34ca9fb9",
+          "output": "not_a_power_ch",
+          "target": "6c0d00c0-76b9-41c9-c7f3-86f914ccd122",
+          "input": "@seqin"
+        },
+        {
+          "source": "9de50f96-88d6-4a51-c978-f15cfef2b442",
+          "output": "@seqout",
+          "target": "71acb5a9-df39-48cb-b0f6-6ce84d5cdaa9",
+          "input": "@seqin"
+        },
+        {
+          "source": "71acb5a9-df39-48cb-b0f6-6ce84d5cdaa9",
+          "output": "done",
+          "target": "6c0d00c0-76b9-41c9-c7f3-86f914ccd122",
+          "input": "@seqin"
+        },
+        {
+          "source": "71acb5a9-df39-48cb-b0f6-6ce84d5cdaa9",
+          "output": "@seqout",
+          "target": "9a5fc5c4-c7a6-4257-c380-281d79c76fa4",
+          "input": "@seqin"
+        },
+        {
+          "source": "33a7da7a-645d-43cc-a391-4f31636cb85c",
+          "output": "@seqout",
+          "target": "71acb5a9-df39-48cb-b0f6-6ce84d5cdaa9",
+          "input": "@seqin"
+        }
+      ],
+      "localVariables": [
+        {
+          "name": "idx",
+          "type": "integer",
+          "defaultValue": "0"
+        }
+      ],
+      "name": "enum_power_channels",
+      "implementationType": "flow"
+    },
+    {
+      "components": [
+        {
+          "type": "SwitchActionComponent",
+          "left": -95,
+          "top": -98,
+          "width": 324,
+          "height": 98,
+          "wireID": "2ea4bf9b-4718-4dd4-dac6-16d94e9e52cf",
+          "customInputs": [],
+          "customOutputs": [],
+          "tests": [
+            {
+              "condition": "ch[idx].is_power_channel",
+              "outputName": "continue"
+            },
+            {
+              "condition": "true",
+              "outputName": "done"
+            }
+          ]
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": 301,
+          "top": -98,
+          "width": 236,
+          "height": 153,
+          "wireID": "61a121d1-7d28-4ba1-ce14-2c16e4241bfe",
+          "customInputs": [],
+          "customOutputs": [],
+          "instrument": "null",
+          "scpi": "{ch[idx].u.min} = sour:volt? MIN\n{ch[idx].u.max} = sour:volt? MAX\n{ch[idx].i.min} = sour:curr? MIN\n{ch[idx].i.max} = sour:curr? MAX\n{ch[idx].u.set} = sour:volt?\n{ch[idx].i.set} = sour:curr?"
+        },
+        {
+          "type": "StartActionComponent",
+          "left": -463,
+          "top": -98,
+          "width": 78,
+          "height": 31,
+          "wireID": "c8fae56f-f0e1-411a-dc28-98028ba46a40",
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "type": "EndActionComponent",
+          "left": 382,
+          "top": 127,
+          "width": 64,
+          "height": 31,
+          "wireID": "6913dc22-04a7-48a9-819f-2758c0a8f595",
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "type": "LoopActionComponent",
+          "left": -362,
+          "top": -98,
+          "width": 196,
+          "height": 70,
+          "wireID": "ab1654cb-0106-4b17-e919-7336cedf39fb",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "idx",
+          "from": "0",
+          "to": "6",
+          "step": "1"
+        }
+      ],
+      "connectionLines": [
+        {
+          "source": "2ea4bf9b-4718-4dd4-dac6-16d94e9e52cf",
+          "output": "continue",
+          "target": "61a121d1-7d28-4ba1-ce14-2c16e4241bfe",
+          "input": "@seqin"
+        },
+        {
+          "source": "2ea4bf9b-4718-4dd4-dac6-16d94e9e52cf",
+          "output": "done",
+          "target": "6913dc22-04a7-48a9-819f-2758c0a8f595",
+          "input": "@seqin"
+        },
+        {
+          "source": "c8fae56f-f0e1-411a-dc28-98028ba46a40",
+          "output": "@seqout",
+          "target": "ab1654cb-0106-4b17-e919-7336cedf39fb",
+          "input": "@seqin"
+        },
+        {
+          "source": "ab1654cb-0106-4b17-e919-7336cedf39fb",
+          "output": "@seqout",
+          "target": "2ea4bf9b-4718-4dd4-dac6-16d94e9e52cf",
+          "input": "@seqin"
+        },
+        {
+          "source": "61a121d1-7d28-4ba1-ce14-2c16e4241bfe",
+          "output": "@seqout",
+          "target": "ab1654cb-0106-4b17-e919-7336cedf39fb",
+          "input": "@seqin"
+        },
+        {
+          "source": "ab1654cb-0106-4b17-e919-7336cedf39fb",
+          "output": "done",
+          "target": "6913dc22-04a7-48a9-819f-2758c0a8f595",
+          "input": "@seqin"
+        }
+      ],
+      "localVariables": [
+        {
+          "name": "idx",
+          "type": "integer",
+          "defaultValue": "0"
+        }
+      ],
+      "name": "get_power_channels_params",
+      "implementationType": "flow"
+    }
+  ],
+  "pages": [
+    {
+      "components": [
+        {
+          "type": "Select",
+          "left": 0,
+          "top": 0,
+          "width": 480,
+          "height": 272,
+          "wireID": "a34ba41f-5ec5-41c4-e2b6-88e809995c53",
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "state",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "LayoutView",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 272,
+              "wireID": "3436da3f-a640-452e-d0a7-1b8bb44358f6",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              },
+              "layout": "Loading"
+            },
+            {
+              "type": "LayoutView",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 272,
+              "wireID": "09331829-44a8-42ea-c75e-dc0215282729",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              },
+              "layout": "NoPowerChannel"
+            },
+            {
+              "type": "LayoutView",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 272,
+              "wireID": "ceeacfc0-be5e-4baa-870a-cb54218407b0",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              },
+              "layout": "Power"
+            }
+          ]
+        },
+        {
+          "type": "StartActionComponent",
+          "left": -316,
+          "top": -415,
+          "width": 78,
+          "height": 31,
+          "wireID": "893eaddc-bd44-49ae-a10c-e42d30b0bef6",
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "type": "CallActionActionComponent",
+          "left": 115,
+          "top": -234,
+          "width": 199,
+          "height": 31,
+          "wireID": "2cd29848-92bb-40a0-b0ba-eb36a43ffeac",
+          "customInputs": [],
+          "customOutputs": [],
+          "action": "enum_power_channels"
+        },
+        {
+          "type": "CallActionActionComponent",
+          "left": 96,
+          "top": -189,
+          "width": 235,
+          "height": 31,
+          "wireID": "2f216a66-9bca-4e49-b0b2-5c8676b89c6d",
+          "customInputs": [],
+          "customOutputs": [],
+          "action": "get_power_channels_params"
+        },
+        {
+          "type": "SwitchActionComponent",
+          "left": -81,
+          "top": -134,
+          "width": 434,
+          "height": 98,
+          "wireID": "647469f9-dc20-48ca-dfd2-9a416417b36b",
+          "customInputs": [],
+          "customOutputs": [],
+          "tests": [
+            {
+              "condition": "ch[0].is_power_channel",
+              "outputName": "has_power_channel"
+            },
+            {
+              "condition": "true",
+              "outputName": "no_power_channel"
+            }
+          ]
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": 413,
+          "top": -80,
+          "width": 224,
+          "height": 70,
+          "wireID": "f9eee325-1dcb-4b59-eee2-9b7d0fcbfd54",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "state",
+          "value": "State.NoPowerChannel"
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": 413,
+          "top": -158,
+          "width": 164,
+          "height": 70,
+          "wireID": "325648f9-4477-4b33-bd1e-b71cabc3e2ba",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "state",
+          "value": "State.Ready"
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": -128,
+          "top": -415,
+          "width": 77,
+          "height": 63,
+          "wireID": "6ac29f52-f18d-49b2-9539-666ff93968a0",
+          "customInputs": [],
+          "customOutputs": [],
+          "instrument": "null",
+          "scpi": "*RST"
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": -140,
+          "top": -563,
+          "width": 435,
+          "height": 134,
+          "wireID": "1f02f0da-0170-4a0f-afe6-d73d32e4c9c6",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->Call *RST on start.</div>"
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": 66,
+          "top": -384,
+          "width": 435,
+          "height": 134,
+          "wireID": "fee72627-e368-408e-f78b-4c4ee1314bc9",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->Get informations about power channels. How many they are and what are the ranges for the U and I.</div>"
+        }
+      ],
+      "connectionLines": [
+        {
+          "source": "2cd29848-92bb-40a0-b0ba-eb36a43ffeac",
+          "output": "@seqout",
+          "target": "2f216a66-9bca-4e49-b0b2-5c8676b89c6d",
+          "input": "@seqin"
+        },
+        {
+          "source": "647469f9-dc20-48ca-dfd2-9a416417b36b",
+          "output": "no_power_channel",
+          "target": "f9eee325-1dcb-4b59-eee2-9b7d0fcbfd54",
+          "input": "@seqin"
+        },
+        {
+          "source": "647469f9-dc20-48ca-dfd2-9a416417b36b",
+          "output": "has_power_channel",
+          "target": "325648f9-4477-4b33-bd1e-b71cabc3e2ba",
+          "input": "@seqin"
+        },
+        {
+          "source": "2f216a66-9bca-4e49-b0b2-5c8676b89c6d",
+          "output": "@seqout",
+          "target": "647469f9-dc20-48ca-dfd2-9a416417b36b",
+          "input": "@seqin"
+        },
+        {
+          "source": "893eaddc-bd44-49ae-a10c-e42d30b0bef6",
+          "output": "@seqout",
+          "target": "6ac29f52-f18d-49b2-9539-666ff93968a0",
+          "input": "@seqin"
+        },
+        {
+          "source": "6ac29f52-f18d-49b2-9539-666ff93968a0",
+          "output": "@seqout",
+          "target": "2cd29848-92bb-40a0-b0ba-eb36a43ffeac",
+          "input": "@seqin"
+        }
+      ],
+      "localVariables": [
+        {
+          "name": "state",
+          "type": "enum:State",
+          "defaultValue": "State.Loading"
+        }
+      ],
+      "name": "Main",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272,
+      "dataContextOverrides": "{\n    \"ch\": [\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": false,\n          \"oe\": false,\n          \"u\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0},\n          \"i\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0}\n      },\n      {\n          \"is_power_channel\": false,\n          \"oe\": false,\n          \"u\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0},\n          \"i\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0}\n      }\n    ],\n    \"idx\": 0,\n    \"state\": 2,\n    \"hardware_missing\": 0\n}\n"
+    },
+    {
+      "components": [
+        {
+          "type": "TextWidget",
+          "left": 0,
+          "top": 0,
+          "width": 480,
+          "height": 272,
+          "wireID": "6902461d-3251-44ca-917e-022762d23869",
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "inheritFrom": "default"
+          },
+          "text": "Loading ..."
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": 18,
+          "top": -159,
+          "width": 435,
+          "height": 134,
+          "wireID": "132fec3a-ea72-4a78-9f3f-cd88bce3cd3c",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->Display this during initialization phase.</div>"
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "Loading",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272
+    },
+    {
+      "components": [
+        {
+          "type": "TextWidget",
+          "left": 0,
+          "top": 0,
+          "width": 480,
+          "height": 232,
+          "wireID": "200e5aa8-bfd2-4a53-e8cb-9ed0c73a997c",
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "inheritFrom": "default"
+          },
+          "text": "No power channel found"
+        },
+        {
+          "type": "EndActionComponent",
+          "left": 528,
+          "top": 222,
+          "width": 64,
+          "height": 31,
+          "wireID": "edc07cd3-6a2b-40eb-d82f-cd2d8221ac38",
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": 14,
+          "top": -169,
+          "width": 435,
+          "height": 134,
+          "wireID": "42ba4753-3578-4a47-8c9f-b1a16e7ef9fb",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->Display this if no power channel has been found.</div>"
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 232,
+          "width": 480,
+          "height": 40,
+          "wireID": "8aa3a9ef-ae8b-4af4-87bf-4eb98b9f46e7",
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "inheritFrom": "status_bgnd"
+          },
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 40,
+              "height": 40,
+              "wireID": "b2106d5c-6172-4ca4-98c5-7989b5984640",
+              "customInputs": [],
+              "customOutputs": [],
+              "asOutputProperties": [
+                "action"
+              ],
+              "style": {
+                "inheritFrom": "status_icon_enabled"
+              },
+              "text": "E"
+            }
+          ]
+        }
+      ],
+      "connectionLines": [
+        {
+          "source": "b2106d5c-6172-4ca4-98c5-7989b5984640",
+          "output": "action",
+          "target": "edc07cd3-6a2b-40eb-d82f-cd2d8221ac38",
+          "input": "@seqin"
+        }
+      ],
+      "localVariables": [],
+      "name": "NoPowerChannel",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272
+    },
+    {
+      "components": [
+        {
+          "type": "Select",
+          "left": 0,
+          "top": 0,
+          "width": 480,
+          "height": 232,
+          "wireID": "57742c85-3e05-44b8-da99-406d2cb8bcd0",
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "hardware_missing",
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 232,
+              "wireID": "df9e9a79-1f2a-4682-8c73-43224dbb0ab2",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default"
+              },
+              "widgets": [
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 0,
+                  "width": 480,
+                  "height": 40,
+                  "wireID": "5e01ca3e-faaf-4b6a-dafd-ccb22a12697c",
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "TextWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 240,
+                      "height": 40,
+                      "wireID": "6f59877c-d507-4557-fc08-96bc22ec3cd1",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "inheritFrom": "default_S"
+                      },
+                      "text": "VOLTAGE"
+                    },
+                    {
+                      "type": "TextWidget",
+                      "left": 240,
+                      "top": 0,
+                      "width": 240,
+                      "height": 40,
+                      "wireID": "bf7987cd-f827-4bb1-a467-09430cf8db1e",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "inheritFrom": "default_S"
+                      },
+                      "text": "CURRENT"
+                    }
+                  ]
+                },
+                {
+                  "type": "Select",
+                  "left": 0,
+                  "top": 40,
+                  "width": 480,
+                  "height": 132,
+                  "wireID": "3e404c03-5c46-4153-aea2-5802216c8f6d",
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "asOutputProperties": [
+                    "action"
+                  ],
+                  "data": "ch[idx].oe",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "Container",
+                      "left": 0,
+                      "top": 0,
+                      "width": 480,
+                      "height": 132,
+                      "wireID": "6309f3ed-c374-4e01-cca9-a105f291c1ed",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "Text",
+                          "left": 4,
+                          "top": 4,
+                          "width": 472,
+                          "height": 124,
+                          "wireID": "10b1d8da-284f-441f-e29a-44ac6088e21f",
+                          "customInputs": [],
+                          "customOutputs": [],
+                          "data": "",
+                          "action": "",
+                          "style": {
+                            "inheritFrom": "button_M",
+                            "font": "Oswald48",
+                            "color": "status_warning",
+                            "activeBackgroundColor": "text_regular"
+                          },
+                          "text": "OFF"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Container",
+                      "left": 0,
+                      "top": 0,
+                      "width": 480,
+                      "height": 132,
+                      "wireID": "51ee4878-0f57-4f2b-a0e5-7bc017456dfe",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "widgets": [
+                        {
+                          "type": "GaugeEmbeddedWidget",
+                          "left": 4,
+                          "top": 4,
+                          "width": 234,
+                          "height": 124,
+                          "wireID": "f1d93bc5-1692-4084-8936-89bc7dd3f6f1",
+                          "customInputs": [],
+                          "customOutputs": [],
+                          "data": "ch[idx].u.mon",
+                          "style": {
+                            "inheritFrom": "gauge_style"
+                          },
+                          "min": "ch[idx].u.min",
+                          "max": "ch[idx].u.max",
+                          "threshold": "ch[idx].u.set",
+                          "unit": "\"V\"",
+                          "barStyle": {
+                            "inheritFrom": "gauge_bar_voltage"
+                          },
+                          "valueStyle": {
+                            "inheritFrom": "gauge_value"
+                          },
+                          "ticksStyle": {
+                            "inheritFrom": "gauge_ticks"
+                          },
+                          "thresholdStyle": {
+                            "inheritFrom": "gauge_threshold"
+                          }
+                        },
+                        {
+                          "type": "GaugeEmbeddedWidget",
+                          "left": 242,
+                          "top": 4,
+                          "width": 234,
+                          "height": 124,
+                          "wireID": "fdd8a456-dd37-46ce-bb6f-6e53f19a740f",
+                          "customInputs": [],
+                          "customOutputs": [],
+                          "data": "ch[idx].i.mon",
+                          "style": {
+                            "inheritFrom": "gauge_style"
+                          },
+                          "min": "ch[idx].i.min",
+                          "max": "ch[idx].i.max",
+                          "threshold": "ch[idx].i.set",
+                          "unit": "\"A\"",
+                          "barStyle": {
+                            "inheritFrom": "gauge_bar_current"
+                          },
+                          "valueStyle": {
+                            "inheritFrom": "gauge_value"
+                          },
+                          "ticksStyle": {
+                            "inheritFrom": "gauge_ticks"
+                          },
+                          "thresholdStyle": {
+                            "inheritFrom": "gauge_threshold"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Container",
+                  "left": 0,
+                  "top": 172,
+                  "width": 479,
+                  "height": 60,
+                  "wireID": "a59e7454-f9e5-4fe5-a04d-83d4343bc71d",
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "widgets": [
+                    {
+                      "type": "TextWidget",
+                      "left": 16,
+                      "top": 14,
+                      "width": 50,
+                      "height": 32,
+                      "wireID": "ad47dfa7-b5fc-45bd-b796-338ab217ccef",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "inheritFrom": "default_S_left"
+                      },
+                      "text": "U set:"
+                    },
+                    {
+                      "type": "InputEmbeddedWidget",
+                      "left": 66,
+                      "top": 14,
+                      "width": 150,
+                      "height": 32,
+                      "wireID": "7e882d1c-c85b-4b72-835b-c51d82dcaa8a",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "asOutputProperties": [
+                        "action"
+                      ],
+                      "data": "ch[idx].u.set",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_left",
+                        "alignHorizontal": "center"
+                      },
+                      "inputType": "number",
+                      "min": "ch[idx].u.min",
+                      "max": "ch[idx].u.max",
+                      "precision": "0.005",
+                      "unit": "\"V\""
+                    },
+                    {
+                      "type": "TextWidget",
+                      "left": 258,
+                      "top": 14,
+                      "width": 50,
+                      "height": 32,
+                      "wireID": "44a26fc3-46b7-4cd1-e2da-017a356b1731",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "inheritFrom": "default_S_left"
+                      },
+                      "text": "I set:"
+                    },
+                    {
+                      "type": "InputEmbeddedWidget",
+                      "left": 308,
+                      "top": 14,
+                      "width": 150,
+                      "height": 32,
+                      "wireID": "f4b51125-3f14-45a5-b26d-807a94dd491e",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "asOutputProperties": [
+                        "action"
+                      ],
+                      "data": "ch[idx].i.set",
+                      "style": {
+                        "inheritFrom": "edit_value_active_M_left",
+                        "alignHorizontal": "center"
+                      },
+                      "inputType": "number",
+                      "min": "ch[idx].i.min",
+                      "max": "ch[idx].i.max",
+                      "precision": "0.001",
+                      "unit": "\"A\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 232,
+              "wireID": "5e92dbec-b5a9-4094-9554-d0f7d235616d",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default",
+                "color": "status_warning",
+                "activeBackgroundColor": "status_warning"
+              },
+              "text": "ERROR"
+            }
+          ]
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": 404,
+          "top": 464,
+          "width": 243,
+          "height": 63,
+          "wireID": "5693c38e-f63f-4110-87b3-1f4bb6f1330c",
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "null",
+          "scpi": "sour:volt {ch[idx].u.set}\n"
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": 703,
+          "top": 439,
+          "width": 243,
+          "height": 63,
+          "wireID": "3e219de4-77f5-40fb-87a7-50004d9760d8",
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "null",
+          "scpi": "sour:curr {ch[idx].i.set}\n"
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": 538,
+          "top": 91,
+          "width": 196,
+          "height": 63,
+          "wireID": "dc8ff753-e716-4a75-b0da-9c49864521f4",
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "null",
+          "scpi": "outp {!ch[idx].oe}"
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": 64,
+          "top": -105,
+          "width": 209,
+          "height": 81,
+          "wireID": "57560a06-4bc3-4752-94ac-953c770bb4d3",
+          "customInputs": [],
+          "customOutputs": [],
+          "instrument": "null",
+          "scpi": "{ch[idx].u.mon} = meas:volt?\n{ch[idx].i.mon} = meas:curr?"
+        },
+        {
+          "type": "DelayActionComponent",
+          "left": 302,
+          "top": -105,
+          "width": 85,
+          "height": 67,
+          "wireID": "c15725e9-edd3-44ef-8ae8-c3f2a2007aad",
+          "customInputs": [],
+          "customOutputs": [],
+          "milliseconds": 100
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": 320,
+          "top": -393,
+          "width": 169,
+          "height": 63,
+          "wireID": "71051c82-2c99-4192-de08-50d74fdb5f24",
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "null",
+          "scpi": "inst CH{idx+1}"
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": 135,
+          "top": -393,
+          "width": 131,
+          "height": 70,
+          "wireID": "7e96a386-870e-448d-ce3f-6f887af57a7e",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "idx",
+          "value": "0"
+        },
+        {
+          "type": "StartActionComponent",
+          "left": 0,
+          "top": -393,
+          "width": 78,
+          "height": 31,
+          "wireID": "51729823-7f8c-48e7-8c40-576ebe0d741b",
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "type": "EndActionComponent",
+          "left": 29,
+          "top": 364,
+          "width": 64,
+          "height": 31,
+          "wireID": "44668f64-bcc8-4859-8ab0-6b70f386c956",
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": -580,
+          "top": 154,
+          "width": 131,
+          "height": 70,
+          "wireID": "3d6870b3-5e3a-481c-c2b8-f52c23a527bc",
+          "customInputs": [
+            {
+              "name": "it",
+              "type": "integer"
+            }
+          ],
+          "customOutputs": [],
+          "variable": "idx",
+          "value": "it"
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": 915,
+          "top": -393,
+          "width": 150,
+          "height": 70,
+          "wireID": "9b838883-1886-4d47-ff4e-d3a1a41397c1",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "ch[idx].oe",
+          "value": "true"
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": -437,
+          "top": 154,
+          "width": 169,
+          "height": 63,
+          "wireID": "ee836869-778e-4e60-fef2-12868fe57a8d",
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "null",
+          "scpi": "inst CH{idx+1}"
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": 712,
+          "top": 544,
+          "width": 320,
+          "height": 117,
+          "wireID": "3d9b086b-9fba-46ec-f74c-fd2d0d4bb6d8",
+          "customInputs": [
+            {
+              "name": "error",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "null",
+          "scpi": "{ch[idx].u.set} = sour:volt?\n{ch[idx].i.set} = sour:curr?\nDISP:ERROR {'\"' + error + '\"'}\nSYST:ERR?"
+        },
+        {
+          "type": "LogActionComponent",
+          "left": 1116,
+          "top": 592,
+          "width": 74,
+          "height": 61,
+          "wireID": "0df7e175-e9af-41fa-d796-ea7a23ec440f",
+          "customInputs": [
+            {
+              "name": "value",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "value": "value"
+        },
+        {
+          "type": "Container",
+          "left": 0,
+          "top": 232,
+          "width": 480,
+          "height": 40,
+          "wireID": "b691e8ad-60a8-45b5-d229-99411fc145ab",
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "inheritFrom": "default"
+          },
+          "widgets": [
+            {
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 40,
+              "height": 40,
+              "wireID": "b2106d5c-6172-4ca4-98c5-7989b5984640",
+              "customInputs": [],
+              "customOutputs": [],
+              "asOutputProperties": [
+                "action"
+              ],
+              "style": {
+                "inheritFrom": "unsel_tab_icon"
+              },
+              "text": "E"
+            },
+            {
+              "type": "RectangleWidget",
+              "left": 40,
+              "top": 0,
+              "width": 50,
+              "height": 40,
+              "wireID": "e151bb2d-88dc-4193-c123-534dbb2c45cd",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "unsel_tab"
+              },
+              "invertColors": true
+            },
+            {
+              "type": "ListWidget",
+              "left": 90,
+              "top": 0,
+              "width": 300,
+              "height": 40,
+              "wireID": "b7c24599-a99c-4e16-ed15-0ab3b40d47e3",
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "ch",
+              "style": {
+                "inheritFrom": "default"
+              },
+              "itemWidget": {
+                "type": "Select",
+                "left": 0,
+                "top": 0,
+                "width": 50,
+                "height": 40,
+                "wireID": "c1a744d1-4f9a-441d-b969-adae9bd530aa",
+                "customInputs": [],
+                "customOutputs": [],
+                "data": "ch[Flow.it(0)].is_power_channel",
+                "style": {
+                  "inheritFrom": "default"
+                },
+                "widgets": [
+                  {
+                    "type": "RectangleWidget",
+                    "left": 0,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "wireID": "dfbe59c7-a7cb-47e9-bc1e-c35f12685c40",
+                    "customInputs": [],
+                    "customOutputs": [],
+                    "style": {
+                      "inheritFrom": "unsel_tab"
+                    },
+                    "invertColors": true
+                  },
+                  {
+                    "type": "Select",
+                    "left": 0,
+                    "top": 0,
+                    "width": 50,
+                    "height": 40,
+                    "wireID": "bcaac96a-deca-4b8b-f54b-fddd502dc112",
+                    "customInputs": [],
+                    "customOutputs": [],
+                    "data": "idx == Flow.it(0)",
+                    "style": {
+                      "inheritFrom": "default"
+                    },
+                    "widgets": [
+                      {
+                        "type": "TextWidget",
+                        "left": 0,
+                        "top": 0,
+                        "width": 50,
+                        "height": 40,
+                        "wireID": "a2575a43-6507-4093-f6f3-f2345f904ed3",
+                        "customInputs": [],
+                        "customOutputs": [],
+                        "asOutputProperties": [
+                          "action"
+                        ],
+                        "data": "\"CH\" + (Flow.it(0) + 1)",
+                        "style": {
+                          "inheritFrom": "unsel_tab"
+                        },
+                        "text": ""
+                      },
+                      {
+                        "type": "TextWidget",
+                        "left": 0,
+                        "top": 0,
+                        "width": 50,
+                        "height": 40,
+                        "wireID": "717e4971-b5b8-4cd0-fd0c-b788918e9584",
+                        "customInputs": [],
+                        "customOutputs": [],
+                        "asOutputProperties": [],
+                        "data": "\"CH\" + (Flow.it(0) + 1)",
+                        "style": {
+                          "inheritFrom": "sel_tab"
+                        },
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              "listType": "horizontal",
+              "gap": 0
+            },
+            {
+              "type": "RectangleWidget",
+              "left": 390,
+              "top": 0,
+              "width": 90,
+              "height": 40,
+              "wireID": "4f7561f5-3699-4231-f82b-a9acccdc7c52",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "unsel_tab"
+              },
+              "invertColors": true
+            }
+          ]
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": -580,
+          "top": 0,
+          "width": 435,
+          "height": 134,
+          "wireID": "cd4d0af7-4eef-4b2c-c1c7-9e3e9d5a31a0",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->Select channel when tab is pressed.</div>"
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": 537,
+          "top": -59,
+          "width": 435,
+          "height": 134,
+          "wireID": "d4258e75-fae6-418d-ae6b-9c9f213c2b0a",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->Toggle Output Enable</div>"
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": 176,
+          "top": -542,
+          "width": 435,
+          "height": 134,
+          "wireID": "8d1dbae4-2bd2-4eed-bec5-3a8afc896aa5",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->Select 1st channel and enable output.</div>"
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": 64,
+          "top": -253,
+          "width": 435,
+          "height": 134,
+          "wireID": "0bda16d9-ffdf-4657-aa08-7b1e200316a3",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->Read U mon and I mon in the loop with 100 ms delay.</div>"
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": 214,
+          "top": 316,
+          "width": 435,
+          "height": 134,
+          "wireID": "b5069284-9d10-4240-c821-a267b5dad3f0",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->Change U set</div>"
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": 703,
+          "top": 293,
+          "width": 435,
+          "height": 134,
+          "wireID": "1d261fed-9952-46b3-a7b5-a0b92324d9f7",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->Change I set</div>"
+        },
+        {
+          "type": "CommentActionComponent",
+          "left": 712,
+          "top": 680,
+          "width": 435,
+          "height": 134,
+          "wireID": "b785e18d-621c-49e0-ca30-a3e7f44ed63d",
+          "customInputs": [],
+          "customOutputs": [],
+          "text": "<div><!--block-->In case of error display error message.</div>"
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": -199,
+          "top": 154,
+          "width": 171,
+          "height": 70,
+          "wireID": "cd6ae4ab-e39a-447f-dd6a-5b6fb0345f9e",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "hardware_missing",
+          "value": "0"
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": -199,
+          "top": 246,
+          "width": 171,
+          "height": 70,
+          "wireID": "153c29ca-1732-43e5-ca1c-3a6e78056da3",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "hardware_missing",
+          "value": "1"
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": 554,
+          "top": -393,
+          "width": 171,
+          "height": 70,
+          "wireID": "349a0e58-1464-45f9-8bc7-68e30ced77d8",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "hardware_missing",
+          "value": "0"
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": 554,
+          "top": -312,
+          "width": 171,
+          "height": 70,
+          "wireID": "dd9016d2-a256-4dd1-d6f1-86e2e2f24943",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "hardware_missing",
+          "value": "1"
+        },
+        {
+          "type": "SetVariableActionComponent",
+          "left": 775,
+          "top": 91,
+          "width": 197,
+          "height": 70,
+          "wireID": "a947bb32-6192-4c28-d05a-4bd52251dad4",
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "ch[idx].oe",
+          "value": "!ch[idx].oe"
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": 766,
+          "top": -393,
+          "width": 115,
+          "height": 63,
+          "wireID": "26c96cdf-b093-4373-8d94-3df1914cac15",
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "null",
+          "scpi": "outp 1"
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": 915,
+          "top": -312,
+          "width": 265,
+          "height": 63,
+          "wireID": "72dee286-bcc3-4077-f59d-1982af18f2c8",
+          "customInputs": [
+            {
+              "name": "error",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "catchError": false,
+          "instrument": "null",
+          "scpi": "DISP:ERROR {'\"' + error + '\"'}"
+        },
+        {
+          "type": "ScpiActionComponent",
+          "left": 775,
+          "top": 183,
+          "width": 265,
+          "height": 63,
+          "wireID": "7bb34731-ede7-4bce-f390-9d7f5a7c00a9",
+          "customInputs": [
+            {
+              "name": "error",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "catchError": false,
+          "instrument": "null",
+          "scpi": "DISP:ERROR {'\"' + error + '\"'}"
+        }
+      ],
+      "connectionLines": [
+        {
+          "source": "c15725e9-edd3-44ef-8ae8-c3f2a2007aad",
+          "output": "@seqout",
+          "target": "57560a06-4bc3-4752-94ac-953c770bb4d3",
+          "input": "@seqin"
+        },
+        {
+          "source": "57560a06-4bc3-4752-94ac-953c770bb4d3",
+          "output": "@seqout",
+          "target": "c15725e9-edd3-44ef-8ae8-c3f2a2007aad",
+          "input": "@seqin"
+        },
+        {
+          "source": "7e96a386-870e-448d-ce3f-6f887af57a7e",
+          "output": "@seqout",
+          "target": "71051c82-2c99-4192-de08-50d74fdb5f24",
+          "input": "@seqin"
+        },
+        {
+          "source": "51729823-7f8c-48e7-8c40-576ebe0d741b",
+          "output": "@seqout",
+          "target": "7e96a386-870e-448d-ce3f-6f887af57a7e",
+          "input": "@seqin"
+        },
+        {
+          "source": "e3c1ef21-075d-49fc-aa3b-84e346e23490",
+          "output": "action",
+          "target": "dc8ff753-e716-4a75-b0da-9c49864521f4",
+          "input": "@seqin"
+        },
+        {
+          "source": "7e882d1c-c85b-4b72-835b-c51d82dcaa8a",
+          "output": "action",
+          "target": "5693c38e-f63f-4110-87b3-1f4bb6f1330c",
+          "input": "@seqin"
+        },
+        {
+          "source": "f4b51125-3f14-45a5-b26d-807a94dd491e",
+          "output": "action",
+          "target": "3e219de4-77f5-40fb-87a7-50004d9760d8",
+          "input": "@seqin"
+        },
+        {
+          "source": "a2575a43-6507-4093-f6f3-f2345f904ed3",
+          "output": "action",
+          "target": "3d6870b3-5e3a-481c-c2b8-f52c23a527bc",
+          "input": "it"
+        },
+        {
+          "source": "9b838883-1886-4d47-ff4e-d3a1a41397c1",
+          "output": "@seqout",
+          "target": "57560a06-4bc3-4752-94ac-953c770bb4d3",
+          "input": "@seqin"
+        },
+        {
+          "source": "3d6870b3-5e3a-481c-c2b8-f52c23a527bc",
+          "output": "@seqout",
+          "target": "ee836869-778e-4e60-fef2-12868fe57a8d",
+          "input": "@seqin"
+        },
+        {
+          "source": "5693c38e-f63f-4110-87b3-1f4bb6f1330c",
+          "output": "@error",
+          "target": "3d9b086b-9fba-46ec-f74c-fd2d0d4bb6d8",
+          "input": "error"
+        },
+        {
+          "source": "3e219de4-77f5-40fb-87a7-50004d9760d8",
+          "output": "@error",
+          "target": "3d9b086b-9fba-46ec-f74c-fd2d0d4bb6d8",
+          "input": "error"
+        },
+        {
+          "source": "3d9b086b-9fba-46ec-f74c-fd2d0d4bb6d8",
+          "output": "@error",
+          "target": "0df7e175-e9af-41fa-d796-ea7a23ec440f",
+          "input": "value"
+        },
+        {
+          "source": "b2106d5c-6172-4ca4-98c5-7989b5984640",
+          "output": "action",
+          "target": "44668f64-bcc8-4859-8ab0-6b70f386c956",
+          "input": "@seqin"
+        },
+        {
+          "source": "ee836869-778e-4e60-fef2-12868fe57a8d",
+          "output": "@error",
+          "target": "153c29ca-1732-43e5-ca1c-3a6e78056da3",
+          "input": "@seqin"
+        },
+        {
+          "source": "ee836869-778e-4e60-fef2-12868fe57a8d",
+          "output": "@seqout",
+          "target": "cd6ae4ab-e39a-447f-dd6a-5b6fb0345f9e",
+          "input": "@seqin"
+        },
+        {
+          "source": "71051c82-2c99-4192-de08-50d74fdb5f24",
+          "output": "@error",
+          "target": "dd9016d2-a256-4dd1-d6f1-86e2e2f24943",
+          "input": "@seqin"
+        },
+        {
+          "source": "71051c82-2c99-4192-de08-50d74fdb5f24",
+          "output": "@seqout",
+          "target": "349a0e58-1464-45f9-8bc7-68e30ced77d8",
+          "input": "@seqin"
+        },
+        {
+          "source": "3e404c03-5c46-4153-aea2-5802216c8f6d",
+          "output": "action",
+          "target": "dc8ff753-e716-4a75-b0da-9c49864521f4",
+          "input": "@seqin"
+        },
+        {
+          "source": "dc8ff753-e716-4a75-b0da-9c49864521f4",
+          "output": "@seqout",
+          "target": "a947bb32-6192-4c28-d05a-4bd52251dad4",
+          "input": "@seqin"
+        },
+        {
+          "source": "349a0e58-1464-45f9-8bc7-68e30ced77d8",
+          "output": "@seqout",
+          "target": "26c96cdf-b093-4373-8d94-3df1914cac15",
+          "input": "@seqin"
+        },
+        {
+          "source": "26c96cdf-b093-4373-8d94-3df1914cac15",
+          "output": "@seqout",
+          "target": "9b838883-1886-4d47-ff4e-d3a1a41397c1",
+          "input": "@seqin"
+        },
+        {
+          "source": "26c96cdf-b093-4373-8d94-3df1914cac15",
+          "output": "@error",
+          "target": "72dee286-bcc3-4077-f59d-1982af18f2c8",
+          "input": "error"
+        },
+        {
+          "source": "dc8ff753-e716-4a75-b0da-9c49864521f4",
+          "output": "@error",
+          "target": "7bb34731-ede7-4bce-f390-9d7f5a7c00a9",
+          "input": "error"
+        }
+      ],
+      "localVariables": [
+        {
+          "name": "idx",
+          "type": "integer",
+          "defaultValue": "0"
+        },
+        {
+          "name": "hardware_missing",
+          "type": "boolean",
+          "defaultValue": "0"
+        }
+      ],
+      "name": "Power",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272,
+      "dataContextOverrides": "{\n    \"ch\": [\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": false,\n          \"oe\": false,\n          \"u\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0},\n          \"i\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0}\n      },\n      {\n          \"is_power_channel\": false,\n          \"oe\": false,\n          \"u\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0},\n          \"i\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0}\n      }\n    ],\n    \"idx\": 1,\n    \"hardware_missing\": 0\n}\n"
+    }
+  ],
+  "styles": [
+    {
+      "name": "gauge_style",
+      "inheritFrom": "default",
+      "backgroundColor": "text_enable_background",
+      "activeColor": "text_enable_background"
+    },
+    {
+      "name": "gauge_bar",
+      "inheritFrom": "gauge_style"
+    },
+    {
+      "name": "gauge_bar_voltage",
+      "inheritFrom": "gauge_bar",
+      "color": "bar_graph_voltage",
+      "activeColor": "bar_graph_voltage",
+      "activeBackgroundColor": "text_enable_background"
+    },
+    {
+      "name": "gauge_bar_current",
+      "inheritFrom": "gauge_bar_voltage",
+      "color": "bar_graph_current",
+      "activeColor": "bar_graph_current"
+    },
+    {
+      "name": "gauge_bar_power",
+      "inheritFrom": "gauge_bar_voltage",
+      "color": "bar_graph_power",
+      "activeColor": "bar_graph_power"
+    },
+    {
+      "name": "gauge_threshold",
+      "inheritFrom": "gauge_style"
+    },
+    {
+      "name": "gauge_ticks",
+      "inheritFrom": "gauge_style",
+      "font": "RobotoCondensed-Regular"
+    },
+    {
+      "name": "gauge_value",
+      "inheritFrom": "gauge_style",
+      "font": "Oswald17"
+    },
+    {
+      "name": "sel_tab",
+      "inheritFrom": "default_S_left",
+      "alignHorizontal": "center",
+      "borderSize": "0 2 2 2",
+      "borderColor": "text_regular"
+    },
+    {
+      "name": "unsel_tab",
+      "inheritFrom": "status_icon_enabled",
+      "font": "Oswald14",
+      "borderSize": "2 0  0  0",
+      "borderColor": "text_regular"
+    },
+    {
+      "name": "unsel_tab_icon",
+      "inheritFrom": "unsel_tab",
+      "font": "Heydings14",
+      "borderSize": "2 0  0  0",
+      "borderColor": "text_regular"
+    }
+  ],
+  "fonts": [],
+  "bitmaps": [],
+  "colors": [],
+  "themes": []
+}

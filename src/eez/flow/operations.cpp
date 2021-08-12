@@ -24,13 +24,13 @@
 namespace eez {
 namespace flow {
 
-Value op_add(Assets *assets, const Value& a1, const Value& b1) {
+Value op_add(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
 
 	if (a.isAnyStringType() || b.isAnyStringType()) {
-		Value value1 = a.toString(assets, 0x84eafaa8);
-		Value value2 = b.toString(assets, 0xd273cab6);
+		Value value1 = a.toString(0x84eafaa8);
+		Value value2 = b.toString(0xd273cab6);
 		return Value::concatenateString(value1.getString(), value2.getString());
 	}
 
@@ -53,7 +53,7 @@ Value op_add(Assets *assets, const Value& a1, const Value& b1) {
 	return Value();
 }
 
-Value op_sub(Assets *assets, const Value& a1, const Value& b1) {
+Value op_sub(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
 
@@ -76,7 +76,7 @@ Value op_sub(Assets *assets, const Value& a1, const Value& b1) {
 	return Value();
 }
 
-Value op_mul(Assets *assets, const Value& a1, const Value& b1) {
+Value op_mul(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
 
@@ -99,7 +99,7 @@ Value op_mul(Assets *assets, const Value& a1, const Value& b1) {
 	return Value();
 }
 
-Value op_div(Assets *assets, const Value& a1, const Value& b1) {
+Value op_div(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
 
@@ -122,7 +122,7 @@ Value op_div(Assets *assets, const Value& a1, const Value& b1) {
 	return Value();
 }
 
-Value op_mod(Assets *assets, const Value& a1, const Value& b1) {
+Value op_mod(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
 
@@ -183,7 +183,7 @@ bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
 
-	auto result = op_add(stack.assets, a, b);
+	auto result = op_add(a, b);
 
 	if (result.getType() == VALUE_TYPE_UNDEFINED) {
 		return false;
@@ -200,7 +200,7 @@ bool do_OPERATION_TYPE_SUB(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
 
-	auto result = op_sub(stack.assets, a, b);
+	auto result = op_sub(a, b);
 
 	if (result.getType() == VALUE_TYPE_UNDEFINED) {
 		return false;
@@ -217,7 +217,7 @@ bool do_OPERATION_TYPE_MUL(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
 
-	auto result = op_mul(stack.assets, a, b);
+	auto result = op_mul(a, b);
 
 	if (result.getType() == VALUE_TYPE_UNDEFINED) {
 		return false;
@@ -234,7 +234,7 @@ bool do_OPERATION_TYPE_DIV(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
 
-	auto result = op_div(stack.assets, a, b);
+	auto result = op_div(a, b);
 
 	if (result.getType() == VALUE_TYPE_UNDEFINED) {
 		return false;
@@ -251,7 +251,7 @@ bool do_OPERATION_TYPE_MOD(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
 
-	auto result = op_mod(stack.assets, a, b);
+	auto result = op_mod(a, b);
 
 	if (result.getType() == VALUE_TYPE_UNDEFINED) {
 		return false;
@@ -349,7 +349,7 @@ bool do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
 		b = *b.pValueValue;
 	}
 
-	if (!stack.push(Value(a.toBool(stack.assets) && b.toBool(stack.assets), VALUE_TYPE_BOOLEAN))) {
+	if (!stack.push(Value(a.toBool() && b.toBool(), VALUE_TYPE_BOOLEAN))) {
 		return false;
 	}
 
@@ -506,7 +506,7 @@ bool do_OPERATION_TYPE_NOT(EvalStack &stack) {
 	auto aValue = stack.pop();
 
 	int err;
-	auto a = aValue.toBool(stack.assets, &err);
+	auto a = aValue.toBool(&err);
 	if (err != 0) {
 		return false;
 	}
@@ -524,7 +524,7 @@ bool do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
 	auto conditionValue = stack.pop();
 
 	int err;
-	auto condition = conditionValue.toBool(stack.assets, &err);
+	auto condition = conditionValue.toBool(&err);
 	if (err != 0) {
 		return false;
 	}
@@ -585,8 +585,8 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 		b = *b.pValueValue;
 	}
 
-	const char *aStr = a.toString(stack.assets, 0xf616bf4d).getString();
-	const char *bStr = b.toString(stack.assets, 0x81229133).getString();
+	const char *aStr = a.toString(0xf616bf4d).getString();
+	const char *bStr = b.toString(0x81229133).getString();
 	if (!aStr || !bStr) {
 		if (!stack.push(Value(-1, VALUE_TYPE_INT32))) {
 			return false;
