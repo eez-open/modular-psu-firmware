@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <limits.h>
+
 #include <eez/modules/psu/psu.h>
 
 #include <scpi/scpi.h>
