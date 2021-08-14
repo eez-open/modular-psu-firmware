@@ -187,39 +187,72 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			} else {
 				value = 0;
 			}
-		} if (operation == DATA_OPERATION_GET_MIN) {
+		} else if (operation == DATA_OPERATION_GET_MIN) {
 			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
 			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
-				auto unitValue = get(widgetCursor, inputWidget->unit);
+				auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[inputWidget->componentIndex];
+				Value unitValue;
+				Value minValue;
+				if (inputWidgetExecutionState) {
+					unitValue = inputWidgetExecutionState->unit;
+					minValue = inputWidgetExecutionState->min;
+				} else {
+					unitValue = get(widgetCursor, inputWidget->unit);
+					minValue = get(widgetCursor, inputWidget->min);
+				}
 				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
-				value = Value(get(widgetCursor, inputWidget->min).toFloat(), unit);
+				value = Value(minValue.toFloat(), unit);
 			}
 		} else if (operation == DATA_OPERATION_GET_MAX) {
 			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
 			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
-				auto unitValue = get(widgetCursor, inputWidget->unit);
+				auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[inputWidget->componentIndex];
+				Value unitValue;
+				Value maxValue;
+				if (inputWidgetExecutionState) {
+					unitValue = inputWidgetExecutionState->unit;
+					maxValue = inputWidgetExecutionState->max;
+				} else {
+					unitValue = get(widgetCursor, inputWidget->unit);
+					maxValue = get(widgetCursor, inputWidget->max);
+				}
 				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
-				value = Value(get(widgetCursor, inputWidget->max).toFloat(), unit);
+				value = Value(maxValue.toFloat(), unit);
 			}
 		} else if (operation == DATA_OPERATION_GET_PRECISION) {
 			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
 			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
-				auto unitValue = get(widgetCursor, inputWidget->unit);
+				auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[inputWidget->componentIndex];
+				Value unitValue;
+				Value precisionValue;
+				if (inputWidgetExecutionState) {
+					unitValue = inputWidgetExecutionState->unit;
+					precisionValue = inputWidgetExecutionState->precision;
+				} else {
+					unitValue = get(widgetCursor, inputWidget->unit);
+					precisionValue = get(widgetCursor, inputWidget->precision);
+				}
 				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
-				value = Value(get(widgetCursor, inputWidget->precision).toFloat(), unit);
+				value = Value(precisionValue.toFloat(), unit);
 			}
 		} else if (operation == DATA_OPERATION_GET_UNIT) {
 			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
 			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
-				auto unitValue = get(widgetCursor, inputWidget->unit);
+				auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[inputWidget->componentIndex];
+				Value unitValue;
+				if (inputWidgetExecutionState) {
+					unitValue = inputWidgetExecutionState->unit;
+				} else {
+					unitValue = get(widgetCursor, inputWidget->unit);
+				}
 				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
 				value = unit;
 			}
@@ -228,9 +261,16 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
-
 				if (inputWidget->flags & INPUT_WIDGET_TYPE_NUMBER) {
-					float precision = get(widgetCursor, inputWidget->precision).toFloat();
+					auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[inputWidget->componentIndex];
+					Value precisionValue;
+					if (inputWidgetExecutionState) {
+						precisionValue = inputWidgetExecutionState->precision;
+					} else {
+						precisionValue = get(widgetCursor, inputWidget->precision);
+					}
+
+					float precision = precisionValue.toFloat();
 					float valueFloat = value.toFloat();
 					setValue(dataId, widgetCursor, Value(roundPrec(valueFloat, precision), VALUE_TYPE_FLOAT));
 				} else {

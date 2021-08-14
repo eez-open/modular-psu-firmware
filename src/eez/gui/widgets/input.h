@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <eez/flow/private.h>
+
 namespace eez {
 namespace gui {
 
@@ -31,7 +33,16 @@ struct InputWidget : public Widget {
 	int16_t max;
     int16_t precision;
 	int16_t unit;
+	uint16_t componentIndex;
 };
+
+struct InputWidgetExecutionState : public flow::ComponenentExecutionState {
+	Value min;
+	Value max;
+    Value precision;
+	Value unit;
+};
+
 
 } // namespace gui
 } // namespace eez

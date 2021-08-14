@@ -306,12 +306,12 @@
           "left": 301,
           "top": -98,
           "width": 236,
-          "height": 153,
+          "height": 171,
           "wireID": "61a121d1-7d28-4ba1-ce14-2c16e4241bfe",
           "customInputs": [],
           "customOutputs": [],
           "instrument": "null",
-          "scpi": "{ch[idx].u.min} = sour:volt? MIN\n{ch[idx].u.max} = sour:volt? MAX\n{ch[idx].i.min} = sour:curr? MIN\n{ch[idx].i.max} = sour:curr? MAX\n{ch[idx].u.set} = sour:volt?\n{ch[idx].i.set} = sour:curr?"
+          "scpi": "inst CH{idx+1}\n{ch[idx].u.min} = sour:volt? MIN\n{ch[idx].u.max} = sour:volt? MAX\n{ch[idx].i.min} = sour:curr? MIN\n{ch[idx].i.max} = sour:curr? MAX\n{ch[idx].u.set} = sour:volt?\n{ch[idx].i.set} = sour:curr?"
         },
         {
           "type": "StartActionComponent",

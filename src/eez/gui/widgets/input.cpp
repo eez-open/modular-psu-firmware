@@ -20,6 +20,7 @@
 
 #include <math.h>
 
+#include <eez/alloc.h>
 #include <eez/util.h>
 
 #include <eez/flow/private.h>
@@ -42,6 +43,19 @@ EnumFunctionType INPUT_enum = nullptr;
 
 DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 	auto widget = (const InputWidget*)widgetCursor.widget;
+
+	if (widgetCursor.flowState) {
+		auto inputWidgetExecutionState = (InputWidgetExecutionState *)widgetCursor.flowState->componenentExecutionStates[widget->componentIndex];
+		if (!inputWidgetExecutionState) {
+			inputWidgetExecutionState = ObjectAllocator<InputWidgetExecutionState>::allocate(0xa570ccad);
+			widgetCursor.flowState->componenentExecutionStates[widget->componentIndex] = inputWidgetExecutionState;
+		}
+
+		inputWidgetExecutionState->min = get(widgetCursor, widget->min);
+		inputWidgetExecutionState->max = get(widgetCursor, widget->max);
+		inputWidgetExecutionState->precision = get(widgetCursor, widget->precision);
+		inputWidgetExecutionState->unit = get(widgetCursor, widget->unit);
+	}
 
     InputWidgetState *currentState = (InputWidgetState *)widgetCursor.currentState;
     InputWidgetState *previousState = (InputWidgetState *)widgetCursor.previousState;
