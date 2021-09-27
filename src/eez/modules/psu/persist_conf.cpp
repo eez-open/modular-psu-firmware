@@ -49,7 +49,7 @@ using namespace eez::mcu::display;
 #endif
 
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #include <eez/mqtt.h>
 #endif
 

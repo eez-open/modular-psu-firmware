@@ -47,6 +47,9 @@ unsigned start(Assets *assets) {
 		return 0;
 	}
 
+
+	g_lastFlowStateIndex = 0;
+
 	queueInit();
 
 	scpiComponentInit();
@@ -54,6 +57,7 @@ unsigned start(Assets *assets) {
 	fixAssetValues(assets);
 
 	g_mainPageFlowState = initPageFlowState(assets, 0);
+	onFlowStateCreated(g_mainPageFlowState);
 
 	return 1;
 }
@@ -138,6 +142,8 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 				layoutViewFlowState->parentComponentIndex = layoutViewWidgetComponentIndex;
 
 				layoutViewWidgetExecutionState->flowState = layoutViewFlowState;
+
+				onFlowStateCreated(layoutViewFlowState);
 			}
 
 			return layoutViewWidgetExecutionState->flowState;

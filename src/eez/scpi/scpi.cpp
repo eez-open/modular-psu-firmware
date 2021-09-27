@@ -22,7 +22,7 @@
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/serial_psu.h>
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #endif
 #include <scpi/scpi.h>
 

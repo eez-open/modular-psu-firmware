@@ -26,7 +26,7 @@
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/serial_psu.h>
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 
 #include <eez/modules/mcu/ethernet.h>
 
@@ -53,7 +53,7 @@ static char g_outputBuffer[OUTPUT_BUFFER_MAX_SIZE];
 
 size_t ethernetClientWrite(const char *data, size_t len) {
     g_messageAvailable = true;
-    return eez::mcu::ethernet::writeBuffer(data, len);
+    return eez::mcu::ethernet::writeScpiBuffer(data, len);
 }
 
 static OutputBufferWriter g_outputBufferWriter(&g_outputBuffer[0], OUTPUT_BUFFER_MAX_SIZE, ethernetClientWrite);
@@ -160,10 +160,10 @@ void onQueueMessage(uint32_t type, uint32_t param) {
     } else if (type == ETHERNET_INPUT_AVAILABLE) {
         char *buffer;
         uint32_t length;
-        eez::mcu::ethernet::getInputBuffer(param, &buffer, &length);
+        eez::mcu::ethernet::getScpiInputBuffer(param, &buffer, &length);
         if (buffer && length) {
             input(g_scpiContext, (const char *)buffer, length);
-            eez::mcu::ethernet::releaseInputBuffer();
+            eez::mcu::ethernet::releaseScpiInputBuffer();
         }
     }
 }
@@ -189,7 +189,7 @@ void update() {
         }
     } else {
         if (g_isConnected) {
-            eez::mcu::ethernet::disconnectClient();
+            eez::mcu::ethernet::disconnectClients();
             g_isConnected = false;
         }
 

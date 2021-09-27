@@ -35,7 +35,7 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/serial_psu.h>
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #include <eez/modules/psu/ntp.h>
 #endif
 #include <eez/modules/psu/board.h>

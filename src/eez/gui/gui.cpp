@@ -32,6 +32,7 @@
 #include <eez/gui/gui.h>
 
 #include <eez/scripting/flow.h>
+#include <eez/flow/flow.h>
 
 #define CONF_GUI_BLINK_TIME 400 // 400ms
 
@@ -119,6 +120,12 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
         scripting::stopFlowScript();
     } else if (type == GUI_QUEUE_MESSAGE_UNLOAD_EXTERNAL_ASSETS) {
         unloadExternalAssets();
+    } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_CONNECTED) {
+        flow::onDebuggerClientConnected();
+    } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_DISCONNECTED) {
+        flow::onDebuggerClientDisconnected();
+    } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE) {
+        flow::onDebuggerInputAvailable();
     } else {
         onGuiQueueMessageHook(type, param);
     }

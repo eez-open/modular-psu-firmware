@@ -26,7 +26,7 @@
 #include <eez/modules/mcu/eeprom.h>
 
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #endif
 
 #include <eez/modules/psu/datetime.h>

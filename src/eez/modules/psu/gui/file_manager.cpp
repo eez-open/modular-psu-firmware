@@ -32,7 +32,7 @@
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/serial_psu.h>
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #endif
 #include <eez/modules/psu/sd_card.h>
 #include <eez/modules/psu/persist_conf.h>

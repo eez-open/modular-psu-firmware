@@ -66,7 +66,7 @@ extern ip4_addr_t gw;
 #include <eez/system.h>
 #include <eez/modules/mcu/ethernet.h>
 #include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #include <eez/modules/psu/persist_conf.h>
 
 #include <eez/mqtt.h>
@@ -74,6 +74,9 @@ extern ip4_addr_t gw;
 
 using namespace eez::psu::ethernet;
 using namespace eez::scpi;
+
+#include <eez/gui/gui.h>
+using namespace eez::gui;
 
 #define CONF_CONNECT_TIMEOUT 30000
 #define ACCEPT_CLIENT_TIMEOUT 1000
@@ -117,8 +120,8 @@ enum {
 	QUEUE_MESSAGE_CONNECT,
 	QUEUE_MESSAGE_CREATE_TCP_SERVER,
     QUEUE_MESSAGE_DESTROY_TCP_SERVER,
-	QUEUE_MESSAGE_ACCEPT_CLIENT,
-	QUEUE_MESSAGE_CLIENT_MESSAGE,
+	QUEUE_MESSAGE_ACCEPT_SCPI_CLIENT,
+    QUEUE_MESSAGE_ACCEPT_DEBUGGER_CLIENT,
     QUEUE_MESSAGE_PUSH_EVENT,
     QUEUE_MESSAGE_NTP_STATE_TRANSITION
 };
@@ -136,27 +139,45 @@ enum ConnectionState {
 };
 
 static ConnectionState g_connectionState = CONNECTION_STATE_INITIALIZED;
-static uint16_t g_port;
-struct netconn *g_tcpListenConnection;
-struct netconn *g_tcpClientConnection;
-static netbuf *g_inbuf;
+static uint16_t g_scpiPort;
+
+struct netconn *g_scpiListenConnection;
+struct netconn *g_scpiClientConnection;
+static netbuf *g_scpiInbuf;
+static bool g_acceptScpiClientIsDone;
+
+struct netconn *g_debuggerListenConnection;
+struct netconn *g_debuggerClientConnection;
+static netbuf *g_debuggerInbuf;
+static bool g_acceptDebuggerClientIsDone;
+
 static bool g_checkLinkWhileIdle = false;
-static bool g_acceptClientIsDone;
 
 static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t len) {
 	switch (evt) {
 	case NETCONN_EVT_RCVPLUS:
-		if (conn == g_tcpListenConnection) {
-            g_acceptClientIsDone = false;
-			osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_ACCEPT_CLIENT, osWaitForever);
+		if (conn == g_scpiListenConnection) {
+            g_acceptScpiClientIsDone = false;
+			osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_ACCEPT_SCPI_CLIENT, osWaitForever);
             for (int i = 0; i < ACCEPT_CLIENT_TIMEOUT; i++) {
-                if (g_acceptClientIsDone) {
+                if (g_acceptScpiClientIsDone) {
                     break;
                 }
                 osDelay(1);
             }
-		} else if (conn == g_tcpClientConnection) {
+		} else if (conn == g_scpiClientConnection) {
 			sendMessageToLowPriorityThread(ETHERNET_INPUT_AVAILABLE);
+		} else if (conn == g_debuggerListenConnection) {
+            g_acceptDebuggerClientIsDone = false;
+			osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_ACCEPT_DEBUGGER_CLIENT, osWaitForever);
+            for (int i = 0; i < ACCEPT_CLIENT_TIMEOUT; i++) {
+                if (g_acceptDebuggerClientIsDone) {
+                    break;
+                }
+                osDelay(1);
+            }
+		} else if (conn == g_debuggerClientConnection) {
+			sendMessageToGuiThread(GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE);
 		}
 		break;
 
@@ -202,14 +223,29 @@ static void dhcpStart() {
     return;
 }
 
-void destroyTcpServer() {
-    if (g_tcpListenConnection) {
-        auto tmp = g_tcpListenConnection;
-        g_tcpListenConnection = nullptr;
+void destroyScpiTcpServer() {
+    if (g_scpiListenConnection) {
+        auto tmp = g_scpiListenConnection;
+        g_scpiListenConnection = nullptr;
         netconn_close(tmp);
         //netconn_shutdown(tmp, true, true);
         netconn_delete(tmp);
     }
+}
+
+void destroyDebuggerTcpServer() {
+    if (g_debuggerListenConnection) {
+        auto tmp = g_debuggerListenConnection;
+        g_debuggerListenConnection = nullptr;
+        netconn_close(tmp);
+        //netconn_shutdown(tmp, true, true);
+        netconn_delete(tmp);
+    }
+}
+
+void destroyTcpServer() {
+    destroyScpiTcpServer();
+    destroyDebuggerTcpServer();
 }
 
 static void onEvent(uint8_t eventType) {
@@ -258,51 +294,91 @@ static void onEvent(uint8_t eventType) {
 		break;
 
 	case QUEUE_MESSAGE_CREATE_TCP_SERVER:
-	    if (g_tcpClientConnection) {
-	        auto tmp = g_tcpClientConnection;
-		    g_tcpClientConnection = nullptr;
+	    if (g_scpiClientConnection) {
+	        auto tmp = g_scpiClientConnection;
+		    g_scpiClientConnection = nullptr;
 		    netconn_delete(tmp);
 		    sendMessageToLowPriorityThread(ETHERNET_CLIENT_DISCONNECTED);
 	    }
 
-	    if (g_tcpListenConnection) {
+	    if (g_debuggerClientConnection) {
+	        auto tmp = g_debuggerClientConnection;
+		    g_debuggerClientConnection = nullptr;
+		    netconn_delete(tmp);
+            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_DISCONNECTED);
+	    }
+
+	    if (g_scpiListenConnection) {
 			break;
 		}
 
-		g_tcpListenConnection = netconn_new_with_callback(NETCONN_TCP, netconnCallback);
-		if (g_tcpListenConnection == nullptr) {
+        // create SCPI server
+		g_scpiListenConnection = netconn_new_with_callback(NETCONN_TCP, netconnCallback);
+		if (g_scpiListenConnection == nullptr) {
 			break;
 		}
 
-		if (netconn_bind(g_tcpListenConnection, nullptr, g_port) != ERR_OK) {
+		if (netconn_bind(g_scpiListenConnection, nullptr, g_scpiPort) != ERR_OK) {
 		    destroyTcpServer();
 			break;
 		}
 
-		netconn_listen(g_tcpListenConnection);
+		netconn_listen(g_scpiListenConnection);
+
+        // create debugger server
+		g_debuggerListenConnection = netconn_new_with_callback(NETCONN_TCP, netconnCallback);
+		if (g_debuggerListenConnection != nullptr) {
+            if (netconn_bind(g_debuggerListenConnection, nullptr, DEBUGGER_TCP_PORT) == ERR_OK) {
+		        netconn_listen(g_debuggerListenConnection);
+            } else {
+                destroyDebuggerTcpServer();
+            }
+        }
+
 		break;
 
     case QUEUE_MESSAGE_DESTROY_TCP_SERVER:
         destroyTcpServer();
         break;
 
-	case QUEUE_MESSAGE_ACCEPT_CLIENT:
+	case QUEUE_MESSAGE_ACCEPT_SCPI_CLIENT:
 		{
 			struct netconn *newConnection;
-			if (netconn_accept(g_tcpListenConnection, &newConnection) == ERR_OK) {
-				if (g_tcpClientConnection) {
+			if (netconn_accept(g_scpiListenConnection, &newConnection) == ERR_OK) {
+				if (g_scpiClientConnection) {
 					// there is a client already connected, close this connection
-                    g_acceptClientIsDone = true;
+                    g_acceptScpiClientIsDone = true;
                     osDelay(10);
 					netconn_delete(newConnection);
 				} else {
 					// connection with the client established
-					g_tcpClientConnection = newConnection;
+					g_scpiClientConnection = newConnection;
 					sendMessageToLowPriorityThread(ETHERNET_CLIENT_CONNECTED);
-                    g_acceptClientIsDone = true;
+                    g_acceptScpiClientIsDone = true;
 				}
 			}  else {
-                g_acceptClientIsDone = true;
+                g_acceptScpiClientIsDone = true;
+            }
+		}
+        break;
+
+    case QUEUE_MESSAGE_ACCEPT_DEBUGGER_CLIENT:
+		{
+			struct netconn *newConnection;
+			if (netconn_accept(g_debuggerListenConnection, &newConnection) == ERR_OK) {
+				if (g_debuggerClientConnection) {
+					// there is a client already connected, close this connection
+                    g_acceptDebuggerClientIsDone = true;
+                    osDelay(10);
+					netconn_delete(newConnection);
+				} else {
+					// connection with the client established
+					g_debuggerClientConnection = newConnection;
+					sendMessageToGuiThread(GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_CONNECTED);
+                    g_acceptDebuggerClientIsDone = true;
+				}
+			}  else {
+                g_acceptDebuggerClientIsDone = true;
             }
 		}
 		break;
@@ -337,26 +413,31 @@ void onIdle() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
 #define INPUT_BUFFER_SIZE 1024
 
-static uint16_t g_port;
-static char g_inputBuffer[INPUT_BUFFER_SIZE];
-static uint32_t g_inputBufferLength;
+static uint16_t g_scpiPort;
+static char g_scpiInputBuffer[INPUT_BUFFER_SIZE];
+static uint32_t g_scpiInputBufferLength;
+
+static char g_debuggerInputBuffer[INPUT_BUFFER_SIZE];
+static uint32_t g_debuggerInputBufferLength;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool bind(int port);
-bool client_available();
-bool connected();
-int available();
-int read(char *buffer, int buffer_size);
-int write(const char *buffer, int buffer_size);
-void stop();
-
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-static SOCKET listen_socket = INVALID_SOCKET;
-static SOCKET client_socket = INVALID_SOCKET;
+static SOCKET g_scpiListenSocket = INVALID_SOCKET;
+static SOCKET g_scpiClientSocket = INVALID_SOCKET;
+
+static SOCKET g_debuggerListenSocket = INVALID_SOCKET;
+static SOCKET g_debuggerClientSocket = INVALID_SOCKET;
+
+typedef SOCKET SocketType;
 #else
-static int listen_socket = -1;
-static int client_socket = -1;
+static int g_scpiListenSocket = -1;
+static int g_scpiClientSocket = -1;
+
+static int g_debuggerListenSocket = -1;
+static int g_debuggerClientSocket = -1;
+
+typedef int SocketType;
 
 bool enable_non_blocking(int fd) {
     int flags = fcntl(fd, F_GETFL, 0);
@@ -369,10 +450,17 @@ bool enable_non_blocking(int fd) {
     }
     return true;
 }
-
 #endif
 
-bool bind(int port) {
+bool bind(int port, SocketType &listenSocket);
+bool client_available(SocketType &listenSocket, SocketType &clientSocket);
+bool connected(SocketType &listenSocket);
+int available(SocketType &listenSocket);
+int read(SocketType &listenSocket, char *buffer, int buffer_size);
+int write(SocketType &listenSocket, const char *buffer, int buffer_size);
+void stop(SocketType &listenSocket);
+
+bool bind(int port, SocketType &listenSocket) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     WSADATA wsaData;
     int iResult;
@@ -407,56 +495,56 @@ bool bind(int port) {
     }
 
     // Create a SOCKET for connecting to server
-    listen_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (listen_socket == INVALID_SOCKET) {
+    listenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (listenSocket == INVALID_SOCKET) {
         DebugTrace("EHTERNET: socket failed with error %d\n", WSAGetLastError());
         freeaddrinfo(result);
         return false;
     }
 
     u_long iMode = 1;
-    iResult = ioctlsocket(listen_socket, FIONBIO, &iMode);
+    iResult = ioctlsocket(listenSocket, FIONBIO, &iMode);
     if (iResult != NO_ERROR) {
         DebugTrace("EHTERNET: ioctlsocket failed with error %d\n", iResult);
         freeaddrinfo(result);
-        closesocket(listen_socket);
-        listen_socket = INVALID_SOCKET;
+        closesocket(listenSocket);
+        listenSocket = INVALID_SOCKET;
         return false;
     }
 
     // Setup the TCP listening socket
-    iResult = ::bind(listen_socket, result->ai_addr, (int)result->ai_addrlen);
+    iResult = ::bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
     if (iResult == SOCKET_ERROR) {
         DebugTrace("EHTERNET: bind failed with error %d\n", WSAGetLastError());
         freeaddrinfo(result);
-        closesocket(listen_socket);
-        listen_socket = INVALID_SOCKET;
+        closesocket(listenSocket);
+        listenSocket = INVALID_SOCKET;
         return false;
     }
 
     freeaddrinfo(result);
 
-    iResult = listen(listen_socket, SOMAXCONN);
+    iResult = listen(listenSocket, SOMAXCONN);
     if (iResult == SOCKET_ERROR) {
         DebugTrace("EHTERNET listen failed with error %d\n", WSAGetLastError());
-        closesocket(listen_socket);
-        listen_socket = INVALID_SOCKET;
+        closesocket(listenSocket);
+        listenSocket = INVALID_SOCKET;
         return false;
     }
 
     return true;
 #else
     sockaddr_in serv_addr;
-    listen_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (listen_socket < 0) {
+    listenSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (listenSocket < 0) {
         DebugTrace("EHTERNET: socket failed with error %d", errno);
         return false;
     }
 
-    if (!enable_non_blocking(listen_socket)) {
+    if (!enable_non_blocking(listenSocket)) {
         DebugTrace("EHTERNET: ioctl on listen socket failed with error %d", errno);
-        close(listen_socket);
-        listen_socket = -1;
+        close(listenSocket);
+        listenSocket = -1;
         return false;
     }
 
@@ -464,17 +552,17 @@ bool bind(int port) {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(port);
-    if (::bind(listen_socket, (sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+    if (::bind(listenSocket, (sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
         DebugTrace("EHTERNET: bind failed with error %d", errno);
-        close(listen_socket);
-        listen_socket = -1;
+        close(listenSocket);
+        listenSocket = -1;
         return false;
     }
 
-    if (listen(listen_socket, 5) < 0) {
+    if (listen(listenSocket, 5) < 0) {
         DebugTrace("EHTERNET: listen failed with error %d", errno);
-        close(listen_socket);
-        listen_socket = -1;
+        close(listenSocket);
+        listenSocket = -1;
         return false;
     }
 
@@ -482,25 +570,25 @@ bool bind(int port) {
 #endif    
 }
 
-bool client_available() {
+bool client_available(SocketType &listenSocket, SocketType &clientSocket) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    if (connected())
+    if (connected(clientSocket))
         return true;
 
-    if (listen_socket == INVALID_SOCKET) {
+    if (listenSocket == INVALID_SOCKET) {
         return false;
     }
 
     // Accept a client socket
-    client_socket = accept(listen_socket, NULL, NULL);
-    if (client_socket == INVALID_SOCKET) {
+    clientSocket = accept(listenSocket, NULL, NULL);
+    if (clientSocket == INVALID_SOCKET) {
         if (WSAGetLastError() == WSAEWOULDBLOCK) {
             return false;
         }
 
         DebugTrace("EHTERNET accept failed with error %d\n", WSAGetLastError());
-        closesocket(listen_socket);
-        listen_socket = INVALID_SOCKET;
+        closesocket(listenSocket);
+        listenSocket = INVALID_SOCKET;
         return false;
     }
 
@@ -509,28 +597,28 @@ bool client_available() {
     if (connected())
         return true;
 
-    if (listen_socket == -1) {
+    if (listenSocket == -1) {
         return 0;
     }
 
     sockaddr_in cli_addr;
     socklen_t clilen = sizeof(cli_addr);
-    client_socket = accept(listen_socket, (sockaddr *)&cli_addr, &clilen);
-    if (client_socket < 0) {
+    clientSocket = accept(listenSocket, (sockaddr *)&cli_addr, &clilen);
+    if (clientSocket < 0) {
         if (errno == EWOULDBLOCK) {
             return false;
         }
 
         DebugTrace("EHTERNET: accept failed with error %d", errno);
-        close(listen_socket);
-        listen_socket = -1;
+        close(listenSocket);
+        listenSocket = -1;
         return false;
     }
 
-    if (!enable_non_blocking(client_socket)) {
+    if (!enable_non_blocking(clientSocket)) {
         DebugTrace("EHTERNET: ioctl on client socket failed with error %d", errno);
-        close(client_socket);
-        listen_socket = -1;
+        close(clientSocket);
+        listenSocket = -1;
         return false;
     }
 
@@ -538,20 +626,20 @@ bool client_available() {
 #endif    
 }
 
-bool connected() {
+bool connected(SocketType &clientSocket) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    return client_socket != INVALID_SOCKET;
+    return clientSocket != INVALID_SOCKET;
 #else
-    return client_socket != -1;
+    return clientSocket != -1;
 #endif    
 }
 
-int available() {
+int available(SocketType &clientSocket, char *inputBuffer) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    if (client_socket == INVALID_SOCKET)
+    if (clientSocket == INVALID_SOCKET)
         return 0;
 
-    int iResult = ::recv(client_socket, g_inputBuffer, INPUT_BUFFER_SIZE, MSG_PEEK);
+    int iResult = ::recv(clientSocket, inputBuffer, INPUT_BUFFER_SIZE, MSG_PEEK);
     if (iResult > 0) {
         return iResult;
     }
@@ -560,15 +648,15 @@ int available() {
         return 0;
     }
 
-    stop();
+    stop(clientSocket);
 
     return 0;
 #else
-    if (client_socket == -1)
+    if (clientSocket == -1)
         return 0;
 
     char buffer[1000];
-    int iResult = ::recv(client_socket, buffer, 1000, MSG_PEEK);
+    int iResult = ::recv(clientSocket, buffer, 1000, MSG_PEEK);
     if (iResult > 0) {
         return iResult;
     }
@@ -583,9 +671,9 @@ int available() {
 #endif        
 }
 
-int read(char *buffer, int buffer_size) {
+int read(SocketType &clientSocket, char *buffer, int buffer_size) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    int iResult = ::recv(client_socket, buffer, buffer_size, 0);
+    int iResult = ::recv(clientSocket, buffer, buffer_size, 0);
     if (iResult > 0) {
         return iResult;
     }
@@ -594,11 +682,11 @@ int read(char *buffer, int buffer_size) {
         return 0;
     }
 
-    stop();
+    stop(clientSocket);
 
     return 0;
 #else
-    int n = ::read(client_socket, buffer, buffer_size);
+    int n = ::read(clientSocket, buffer, buffer_size);
     if (n > 0) {
         return n;
     }
@@ -613,17 +701,17 @@ int read(char *buffer, int buffer_size) {
 #endif    
 }
 
-int write(const char *buffer, int buffer_size) {
+int write(SocketType &clientSocket, const char *buffer, int buffer_size) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     int iSendResult;
 
-    if (client_socket != INVALID_SOCKET) {
+    if (clientSocket != INVALID_SOCKET) {
         // Echo the buffer back to the sender
-        iSendResult = ::send(client_socket, buffer, buffer_size, 0);
+        iSendResult = ::send(clientSocket, buffer, buffer_size, 0);
         if (iSendResult == SOCKET_ERROR) {
             DebugTrace("send failed with error: %d\n", WSAGetLastError());
-            closesocket(client_socket);
-            client_socket = INVALID_SOCKET;
+            closesocket(clientSocket);
+            clientSocket = INVALID_SOCKET;
             return 0;
         }
         return iSendResult;
@@ -631,11 +719,11 @@ int write(const char *buffer, int buffer_size) {
 
     return 0;
 #else
-    if (client_socket != -1) {
-        int n = ::write(client_socket, buffer, buffer_size);
+    if (clientSocket != -1) {
+        int n = ::write(clientSocket, buffer, buffer_size);
         if (n < 0) {
-            close(client_socket);
-            client_socket = -1;
+            close(clientSocket);
+            clientSocket = -1;
             return 0;
         }
         return n;
@@ -645,23 +733,23 @@ int write(const char *buffer, int buffer_size) {
 #endif    
 }
 
-void stop() {
+void stop(SocketType &clientSocket) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    if (client_socket != INVALID_SOCKET) {
-        int iResult = ::shutdown(client_socket, SD_SEND);
+    if (clientSocket != INVALID_SOCKET) {
+        int iResult = ::shutdown(clientSocket, SD_SEND);
         if (iResult == SOCKET_ERROR) {
             DebugTrace("EHTERNET shutdown failed with error %d\n", WSAGetLastError());
         }
-        closesocket(client_socket);
-        client_socket = INVALID_SOCKET;
+        closesocket(clientSocket);
+        clientSocket = INVALID_SOCKET;
     }
 #else
-    int result = ::shutdown(client_socket, SHUT_WR);
+    int result = ::shutdown(clientSocket, SHUT_WR);
     if (result < 0) {
         DebugTrace("ETHERNET shutdown failed with error %d\n", errno);
     }
-    close(client_socket);
-    client_socket = -1;
+    close(clientSocket);
+    clientSocket = -1;
 #endif    
 }
 
@@ -672,40 +760,68 @@ void onEvent(uint8_t eventType) {
         break;
 
     case QUEUE_MESSAGE_CREATE_TCP_SERVER:
-        bind(g_port);
+        bind(g_scpiPort, g_scpiListenSocket);
+        bind(DEBUGGER_TCP_PORT, g_debuggerListenSocket);
         break;
 
     case QUEUE_MESSAGE_DESTROY_TCP_SERVER:
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-        if (listen_socket != INVALID_SOCKET) {
-            closesocket(listen_socket);
-            listen_socket = INVALID_SOCKET;
+        if (g_scpiListenSocket != INVALID_SOCKET) {
+            closesocket(g_scpiListenSocket);
+			g_scpiListenSocket = INVALID_SOCKET;
+        }
+
+        if (g_debuggerListenSocket != INVALID_SOCKET) {
+            closesocket(g_debuggerListenSocket);
+			g_debuggerListenSocket = INVALID_SOCKET;
         }
 #else
-        close(listen_socket);
-        listen_socket = -1;
+        close(scpiListenSocket);
+        scpiListenSocket = -1;
+
+        close(debuggerListenSocket);
+        debuggerListenSocket = -1;
 #endif    
         break;
     }
 }
 
 void onIdle() {
-    static bool wasConnected = false;
+    static bool wasScpiConnected = false;
 
-    if (wasConnected) {
-        if (connected()) {
-            if (!g_inputBufferLength && available()) {
-                g_inputBufferLength = read(g_inputBuffer, INPUT_BUFFER_SIZE);
+    if (wasScpiConnected) {
+        if (connected(g_scpiClientSocket)) {
+            if (!g_scpiInputBufferLength && available(g_scpiClientSocket, g_scpiInputBuffer)) {
+                g_scpiInputBufferLength = read(g_scpiClientSocket, g_scpiInputBuffer, INPUT_BUFFER_SIZE);
                 sendMessageToLowPriorityThread(ETHERNET_INPUT_AVAILABLE);
             }
         } else {
             sendMessageToLowPriorityThread(ETHERNET_CLIENT_DISCONNECTED);
-            wasConnected = false;
+            wasScpiConnected = false;
         }
     } else {
-        if (client_available()) {
-            wasConnected = true;
+        if (client_available(g_scpiListenSocket, g_scpiClientSocket)) {
+            wasScpiConnected = true;
             sendMessageToLowPriorityThread(ETHERNET_CLIENT_CONNECTED);
+        }
+    }
+
+    static bool wasDebuggerConnected = false;
+
+    if (wasDebuggerConnected) {
+        if (connected(g_debuggerClientSocket)) {
+            if (!g_debuggerInputBufferLength && available(g_debuggerClientSocket, g_debuggerInputBuffer)) {
+                g_debuggerInputBufferLength = read(g_debuggerClientSocket, g_debuggerInputBuffer, INPUT_BUFFER_SIZE);
+                sendMessageToGuiThread(GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE);
+            }
+        } else {
+            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_DISCONNECTED);
+            wasDebuggerConnected = false;
+        }
+    } else {
+        if (client_available(g_debuggerListenSocket, g_debuggerClientSocket)) {
+            wasDebuggerConnected = true;
+            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_CONNECTED);
         }
     }
 }
@@ -783,7 +899,7 @@ IPAddress dnsServerIP() {
 }
 
 void beginServer(uint16_t port) {
-    g_port = port;
+    g_scpiPort = port;
     osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_CREATE_TCP_SERVER, osWaitForever);
 }
 
@@ -791,30 +907,38 @@ void endServer() {
     osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_DESTROY_TCP_SERVER, osWaitForever);
 }
 
-void getInputBuffer(int bufferPosition, char **buffer, uint32_t *length) {
+void getInputBuffer(
 #if defined(EEZ_PLATFORM_STM32)
-	if (!g_tcpClientConnection) {
+	netbuf *&inbuf,
+	netconn *&clientConnection,
+#else
+	char *inputBuffer, uint32_t &inputBufferLength, 
+#endif
+    int bufferPosition, char **buffer, uint32_t *length
+) {
+#if defined(EEZ_PLATFORM_STM32)
+	if (!clientConnection) {
 		return;
 	}
 
-	if (netconn_recv(g_tcpClientConnection, &g_inbuf) != ERR_OK) {
+	if (netconn_recv(clientConnection, &inbuf) != ERR_OK) {
 		goto fail1;
 	}
 
-	if (netconn_err(g_tcpClientConnection) != ERR_OK) {
+	if (netconn_err(clientConnection) != ERR_OK) {
 		goto fail2;
 	}
 
 	uint8_t* data;
 	u16_t dataLength;
-	netbuf_data(g_inbuf, (void**)&data, &dataLength);
+	netbuf_data(inbuf, (void**)&data, &dataLength);
 
     if (dataLength > 0) {
     	*buffer = (char *)data;
     	*length = dataLength;
     } else {
-        netbuf_delete(g_inbuf);
-        g_inbuf = nullptr;
+        netbuf_delete(inbuf);
+        inbuf = nullptr;
     	*buffer = nullptr;
     	*length = 0;
     }
@@ -822,56 +946,125 @@ void getInputBuffer(int bufferPosition, char **buffer, uint32_t *length) {
     return;
 
 fail2:
-	netbuf_delete(g_inbuf);
-	g_inbuf = nullptr;
+	netbuf_delete(inbuf);
+	inbuf = nullptr;
 
 fail1:
-	netconn_delete(g_tcpClientConnection);
-	g_tcpClientConnection = nullptr;
-	sendMessageToLowPriorityThread(ETHERNET_CLIENT_DISCONNECTED);
+	netconn_delete(clientConnection);
+	clientConnection = nullptr;
+	if (clientConnection == g_scpiClientConnection) {
+		sendMessageToLowPriorityThread(ETHERNET_CLIENT_DISCONNECTED);
+	} else if (clientConnection == g_debuggerClientConnection) {
+        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_DISCONNECTED);
+    }
 
 	*buffer = nullptr;
 	length = 0;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    *buffer = g_inputBuffer;
-    *length = g_inputBufferLength;
+    *buffer = inputBuffer;
+    *length = inputBufferLength;
 #endif
 }
 
-void releaseInputBuffer() {
+void releaseInputBuffer(
 #if defined(EEZ_PLATFORM_STM32)
-	netbuf_delete(g_inbuf);
-	g_inbuf = nullptr;
+	netbuf *&inbuf
+#else
+	char *inputBuffer, uint32_t &inputBufferLength
+#endif
+) {
+#if defined(EEZ_PLATFORM_STM32)
+	netbuf_delete(inbuf);
+	inbuf = nullptr;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    g_inputBufferLength = 0;
+    inputBufferLength = 0;
 #endif
 }
 
-int writeBuffer(const char *buffer, uint32_t length) {
+void getScpiInputBuffer(int bufferPosition, char **buffer, uint32_t *length) {
+	getInputBuffer(
 #if defined(EEZ_PLATFORM_STM32)
-    netconn_write(g_tcpClientConnection, (void *)buffer, (uint16_t)length, NETCONN_COPY);
+		g_scpiInbuf,
+		g_scpiClientConnection,
+#else
+		g_scpiInputBuffer, g_scpiInputBufferLength,
+#endif
+        bufferPosition, buffer, length);
+}
+
+void releaseScpiInputBuffer() {
+    releaseInputBuffer(
+#if defined(EEZ_PLATFORM_STM32)
+		g_scpiInbuf
+#else
+		g_scpiInputBuffer, g_scpiInputBufferLength
+#endif
+    );
+}
+
+int writeScpiBuffer(const char *buffer, uint32_t length) {
+#if defined(EEZ_PLATFORM_STM32)
+    netconn_write(g_scpiClientConnection, (void *)buffer, (uint16_t)length, NETCONN_COPY);
     return length;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    int numWritten = write(buffer, length);
+    int numWritten = write(g_scpiClientSocket, buffer, length);
     osDelay(1);
     return numWritten;
 #endif
 }
 
-void disconnectClient() {
+void getDebuggerInputBuffer(int bufferPosition, char **buffer, uint32_t *length) {
+	getInputBuffer(
 #if defined(EEZ_PLATFORM_STM32)
-	netconn_delete(g_tcpClientConnection);
-	g_tcpClientConnection = nullptr;
+		g_debuggerInbuf,
+		g_debuggerClientConnection,
+#else
+		g_debuggerInputBuffer, g_debuggerInputBufferLength,
+#endif
+        bufferPosition, buffer, length);
+}
+
+void releaseDebuggerInputBuffer() {
+    releaseInputBuffer(
+#if defined(EEZ_PLATFORM_STM32)
+		g_debuggerInbuf
+#else
+		g_debuggerInputBuffer, g_debuggerInputBufferLength
+#endif
+    );
+}
+
+int writeDebuggerBuffer(const char *buffer, uint32_t length) {
+#if defined(EEZ_PLATFORM_STM32)
+    netconn_write(g_debuggerClientConnection, (void *)buffer, (uint16_t)length, NETCONN_COPY);
+    return length;
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    stop();
+    int numWritten = write(g_debuggerClientSocket, buffer, length);
+    osDelay(1);
+    return numWritten;
+#endif
+}
+
+void disconnectClients() {
+#if defined(EEZ_PLATFORM_STM32)
+	netconn_delete(g_scpiClientConnection);
+	g_scpiClientConnection = nullptr;
+
+	netconn_delete(g_debuggerClientConnection);
+	g_debuggerClientConnection = nullptr;
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    stop(g_scpiClientSocket);
+    stop(g_debuggerClientSocket);
 #endif    
 }
 

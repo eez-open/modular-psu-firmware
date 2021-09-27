@@ -28,9 +28,10 @@
 #include <eez/modules/psu/scpi/psu.h>
 #include <eez/modules/psu/serial_psu.h>
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #include <eez/modules/psu/ntp.h>
 #include <eez/mqtt.h>
+#include <eez/modules/mcu/ethernet.h>
 #endif
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/datetime.h>
@@ -1311,7 +1312,7 @@ scpi_result_t scpi_cmd_systemCommunicateEthernetPort(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    if (port < 0 && port > 65535) {
+    if ((port < 0 && port > 65535) || port == DEBUGGER_TCP_PORT) {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
         return SCPI_RES_ERR;
     }

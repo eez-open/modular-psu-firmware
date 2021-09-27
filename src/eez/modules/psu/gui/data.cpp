@@ -60,7 +60,7 @@
 #endif
 #include <eez/modules/mcu/battery.h>
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #include <eez/mqtt.h>
 #endif
 #include <eez/modules/psu/event_queue.h>

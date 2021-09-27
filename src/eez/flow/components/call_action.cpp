@@ -56,6 +56,8 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 	actionFlowState->parentComponent = component;
 	actionFlowState->parentComponentIndex = componentIndex;
 
+	onFlowStateCreated(actionFlowState);
+
 	if (actionFlowState->numActiveComponents == 0) {
 		freeFlowState(actionFlowState);
 		propagateValue(flowState, componentIndex);

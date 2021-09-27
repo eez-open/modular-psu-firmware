@@ -38,5 +38,9 @@ void doGetFlowValue();
 void doSetFlowValue();
 void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 
+void onDebuggerClientConnected();
+void onDebuggerClientDisconnected();
+void onDebuggerInputAvailable();
+
 } // flow
 } // eez

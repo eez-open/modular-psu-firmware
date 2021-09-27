@@ -36,7 +36,7 @@
 #include <eez/modules/psu/gui/animations.h>
 #include <eez/modules/psu/gui/edit_mode.h>
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #endif
 
 #include <eez/gui/gui.h>

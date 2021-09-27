@@ -27,12 +27,13 @@
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/channel_dispatcher.h>
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/profile.h>
 #include <eez/modules/psu/temperature.h>
 #if OPTION_ETHERNET
 #include <eez/modules/psu/ntp.h>
+#include <eez/modules/mcu/ethernet.h>
 #endif
 
 #include <eez/modules/psu/gui/psu.h>
@@ -375,6 +376,12 @@ void SysSettingsEthernetPage::editStaticAddress() {
 }
 
 void SysSettingsEthernetPage::onSetScpiPort(float value) {
+    auto port = (uint16_t)value;
+    if (port == DEBUGGER_TCP_PORT) {
+		errorMessage("Port " QUOTE(DEBUGGER_TCP_PORT) " is reserved!");
+        return;
+    }
+
     popPage();
     SysSettingsEthernetPage *page = (SysSettingsEthernetPage *)getActivePage();
     page->m_scpiPort = (uint16_t)value;

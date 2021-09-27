@@ -25,6 +25,7 @@
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
 #include <eez/flow/queue.h>
+#include <eez/flow/debugger.h>
 
 using namespace eez::gui;
 
@@ -136,6 +137,8 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 				valueStr
 			);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY_WITH_ASSIGNMENT) {
+			logScpiQuery(flowState, componentIndex, scpiComponentExecutionState->commandOrQueryText);
+
 			if (!scpiComponentExecutionState->scpi()) {
 				if (!addToQueue(flowState, componentIndex)) {
 					throwError(flowState, component, "Execution queue is full\n");
@@ -158,6 +161,8 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 				return;
 			}
 
+			logScpiQueryResult(flowState, componentIndex, resultText, resultTextLen);
+
 			Value dstValue;
 			int numInstructionBytes;
 			if (!evalAssignableExpression(flowState, component, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
@@ -176,6 +181,8 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			assignValue(flowState, component, dstValue, srcValue);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY) {
+			logScpiQuery(flowState, componentIndex, scpiComponentExecutionState->commandOrQueryText);
+
 			if (!scpiComponentExecutionState->scpi()) {
 				if (!addToQueue(flowState, componentIndex)) {
 					throwError(flowState, component, "Execution queue is full\n");
@@ -200,6 +207,8 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 		} else if (scpiComponentExecutionState->op == SCPI_PART_COMMAND) {
+			logScpiCommand(flowState, componentIndex, scpiComponentExecutionState->commandOrQueryText);
+
 			if (!scpiComponentExecutionState->scpi()) {
 				if (!addToQueue(flowState, componentIndex)) {
 					throwError(flowState, component, "Execution queue is full\n");

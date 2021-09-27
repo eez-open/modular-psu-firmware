@@ -26,11 +26,14 @@
 #include <eez/flow/flow.h>
 #include <eez/flow/operations.h>
 #include <eez/flow/queue.h>
+#include <eez/flow/debugger.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
+
+uint32_t g_lastFlowStateIndex = 0;
 
 void fixValue(Assets *assets, Value &value) {
 	if (value.getType() == VALUE_TYPE_STRING) {
@@ -107,6 +110,7 @@ static FlowState *initFlowState(Assets *assets, int flowIndex) {
 		0x4c3b6ef5
 	);
 
+	flowState->flowStateIndex = ++g_lastFlowStateIndex;
 	flowState->assets = assets;
 	flowState->flowDefinition = assets->flowDefinition.ptr(assets);
 	flowState->flow = flowDefinition->flows.item(assets, flowIndex);
@@ -176,6 +180,7 @@ void freeFlowState(FlowState *flowState) {
 		}
 	}
 
+	onFlowStateDestroyed(flowState);
 
 	free(flowState);
 }

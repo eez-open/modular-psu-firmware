@@ -39,6 +39,7 @@ struct ComponenentExecutionState {
 };
 
 struct FlowState {
+	uint32_t flowStateIndex;
 	Assets *assets;
 	FlowDefinition *flowDefinition;
 	Flow *flow;
@@ -53,11 +54,19 @@ struct FlowState {
 	ComponenentExecutionState **componenentExecutionStates;
 };
 
+extern uint32_t g_lastFlowStateIndex;
+
 void fixAssetValues(Assets *assets);
 
 FlowState *initActionFlowState(Assets *assets, int flowIndex);
 FlowState *initPageFlowState(Assets *assets, int flowIndex);
+
+void onFlowStateCreated(FlowState *flowState);
+void onFlowStateDestroyed(FlowState *flowState);
+
 void freeFlowState(FlowState *flowState);
+
+void onFlowStateDestroyed(FlowState *flowState);
 
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput); // propagates null value

@@ -54,7 +54,7 @@
 #include <eez/modules/psu/list_program.h>
 #include <eez/modules/psu/trigger.h>
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #include <eez/modules/psu/ntp.h>
 #endif
 #include <eez/modules/psu/gui/psu.h>

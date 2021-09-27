@@ -153,7 +153,7 @@ set(src_eez_modules_psu
     src/eez/modules/psu/devices.cpp
     src/eez/modules/psu/dlog_record.cpp
     src/eez/modules/psu/dlog_view.cpp
-    src/eez/modules/psu/ethernet.cpp
+    src/eez/modules/psu/ethernet_scpi.cpp
     src/eez/modules/psu/event_queue.cpp
     src/eez/modules/psu/io_pins.cpp
     src/eez/modules/psu/list_program.cpp
@@ -185,7 +185,7 @@ set(header_eez_modules_psu
     src/eez/modules/psu/devices.h
     src/eez/modules/psu/dlog_record.h
     src/eez/modules/psu/dlog_view.h
-    src/eez/modules/psu/ethernet.h
+    src/eez/modules/psu/ethernet_scpi.h
     src/eez/modules/psu/event_queue.h
     src/eez/modules/psu/io_pins.h
     src/eez/modules/psu/list_program.h

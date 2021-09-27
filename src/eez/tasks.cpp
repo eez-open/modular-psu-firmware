@@ -35,7 +35,7 @@
 #include <eez/modules/psu/dlog_record.h>
 #include <eez/modules/psu/dlog_view.h>
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #endif
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/list_program.h>

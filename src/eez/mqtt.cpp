@@ -48,7 +48,7 @@ extern "C" {
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/trigger.h>
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #include <eez/modules/psu/channel_dispatcher.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/profile.h>

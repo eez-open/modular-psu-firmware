@@ -22,6 +22,8 @@
 #include <api.h>
 #endif
 
+#define DEBUGGER_TCP_PORT 3333
+
 namespace eez {
 namespace mcu {
 namespace ethernet {
@@ -58,11 +60,17 @@ IPAddress dnsServerIP();
 void beginServer(uint16_t port);
 void endServer();
 
-void getInputBuffer(int bufferPosition, char **buffer, uint32_t *length);
-void releaseInputBuffer();
+void getScpiInputBuffer(int bufferPosition, char **buffer, uint32_t *length);
+void releaseScpiInputBuffer();
 
-int writeBuffer(const char *buffer, uint32_t length);
-void disconnectClient();
+int writeScpiBuffer(const char *buffer, uint32_t length);
+
+void getDebuggerInputBuffer(int bufferPosition, char **buffer, uint32_t *length);
+void releaseDebuggerInputBuffer();
+
+int writeDebuggerBuffer(const char *buffer, uint32_t length);
+
+void disconnectClients();
 
 void pushEvent(int16_t eventId, int8_t channelIndex);
 

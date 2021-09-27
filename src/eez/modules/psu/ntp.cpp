@@ -28,7 +28,7 @@
 
 #include <eez/modules/psu/psu.h>
 #include <eez/modules/psu/datetime.h>
-#include <eez/modules/psu/ethernet.h>
+#include <eez/modules/psu/ethernet_scpi.h>
 #include <eez/modules/psu/event_queue.h>
 #include <eez/modules/psu/ntp.h>
 #include <eez/modules/psu/persist_conf.h>
