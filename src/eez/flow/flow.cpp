@@ -29,6 +29,7 @@
 #include <eez/flow/components.h>
 #include <eez/flow/queue.h>
 #include <eez/flow/flow_defs_v3.h>
+#include <eez/flow/debugger.h>
 
 using namespace eez::gui;
 
@@ -70,6 +71,14 @@ void tick() {
 	uint32_t startTickCount = millis();
 
 	while (true) {
+		if (getQueueSize() == 0) {
+			break;
+		}
+
+		if (!canExecuteStep()) {
+			break;
+		}
+
 		FlowState *flowState;
 		unsigned componentIndex;
 		if (!removeFromQueue(flowState, componentIndex)) {

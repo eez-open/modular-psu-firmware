@@ -20,6 +20,7 @@
 
 #include <eez/flow/components.h>
 #include <eez/flow/components/call_action.h>
+#include <eez/flow/debugger.h>
 
 using namespace eez::gui;
 

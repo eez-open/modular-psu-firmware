@@ -18,6 +18,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/private.h>
@@ -28,9 +29,20 @@ namespace eez {
 namespace flow {
 
 enum MessagesToDebugger {
+	MESSAGE_TO_DEBUGGER_STATE_CHANGED,
+    MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE,
+    MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE,
+    MESSAGE_TO_DEBUGGER_INPUT_CHANGED,
 	MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED,
 	MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED,
     MESSAGE_TO_DEBUGGER_LOG,
+};
+
+enum MessagesFromDebugger {
+    MESSAGE_FROM_DEBUGGER_RESUME,
+    MESSAGE_FROM_DEBUGGER_PAUSE,
+	MESSAGE_FROM_DEBUGGER_SINGLE_STEP,
+	MESSAGE_FREM_DEBUGGER_RESTART
 };
 
 enum LogItemType {
@@ -42,16 +54,38 @@ enum LogItemType {
     LOG_ITEM_TYPE_DEBUG
 };
 
+enum DebuggerState {
+    DEBUGGER_STATE_RESUMED,
+    DEBUGGER_STATE_PAUSED,
+    DEBUGGER_STATE_SINGLE_STEP,
+};
+
 static bool g_debuggerIsConnected;
+static DebuggerState g_debuggerState;
 
 static void processDebuggerInput(char *buffer, uint32_t length);
 
+static void setDebuggerState(DebuggerState newState) {
+	if (newState != g_debuggerState) {
+		g_debuggerState = newState;
+
+		char buffer[100];
+		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
+			MESSAGE_TO_DEBUGGER_STATE_CHANGED,
+			g_debuggerState
+		);
+		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+	}
+}
+
 void onDebuggerClientConnected() {
     g_debuggerIsConnected = true;
+    setDebuggerState(DEBUGGER_STATE_PAUSED);
 }
 
 void onDebuggerClientDisconnected() {
     g_debuggerIsConnected = false;
+    setDebuggerState(DEBUGGER_STATE_RESUMED);
 }
 
 void onDebuggerInputAvailable() {
@@ -65,7 +99,176 @@ void onDebuggerInputAvailable() {
 }
 
 static void processDebuggerInput(char *buffer, uint32_t length) {
-	
+    int messageFromDebugger = buffer[0] - '0';
+    if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_RESUME) {
+        setDebuggerState(DEBUGGER_STATE_RESUMED);
+    } else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_PAUSE) {
+		setDebuggerState(DEBUGGER_STATE_PAUSED);
+    } else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_SINGLE_STEP) {
+		setDebuggerState(DEBUGGER_STATE_SINGLE_STEP);
+    }
+}
+
+bool canExecuteStep() {
+    if (!g_debuggerIsConnected) {
+        return true;
+    }
+
+    if (g_debuggerState == DEBUGGER_STATE_RESUMED) {
+        return true;
+    }
+
+    if (g_debuggerState == DEBUGGER_STATE_PAUSED) {
+        return false;
+    }
+
+	setDebuggerState(DEBUGGER_STATE_PAUSED);
+
+    return true;
+}
+
+void writeString(const char *str) {
+	char tempStr[64];
+	int i = 0;
+
+#define WRITE_CH(CH) \
+	tempStr[i++] = CH; \
+	if (i == sizeof(tempStr)) { \
+		eez::mcu::ethernet::writeDebuggerBuffer(tempStr, i); \
+		i = 0; \
+	}
+
+	WRITE_CH('"');
+
+	for (const char *p = str; *p; p++) {
+		if (*p == '"') {
+			WRITE_CH('\\');
+			WRITE_CH('"');
+		} else if (*p == '\t') {
+			WRITE_CH('\\');
+			WRITE_CH('t');
+		} else if (*p == '\n') {
+			WRITE_CH('\\');
+			WRITE_CH('n');
+		} else {
+			WRITE_CH(*p);
+		}
+	}
+
+	WRITE_CH('"');
+
+	WRITE_CH('\n');
+
+	if (i > 0) {
+		eez::mcu::ethernet::writeDebuggerBuffer(tempStr, i);
+	}
+}
+
+void writeValue(const Value &value) {
+    char tempStr[64];
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4474)
+#endif
+
+    switch (value.getType()) {
+        case VALUE_TYPE_STRING:
+        case VALUE_TYPE_STRING_REF:
+            writeString(value.getString());
+            return;
+
+        case VALUE_TYPE_BOOLEAN:
+            stringCopy(tempStr, sizeof(tempStr) - 1, value.getBoolean() ? "true" : "false");
+            break;
+
+        case VALUE_TYPE_DOUBLE:
+            snprintf(tempStr, sizeof(tempStr) - 1, "%g", value.doubleValue);
+            break;
+
+        case VALUE_TYPE_FLOAT:
+            snprintf(tempStr, sizeof(tempStr) - 1, "%g", value.floatValue);
+            break;
+
+        case VALUE_TYPE_INT8:
+            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId8 "", value.int8Value);
+            break;
+
+        case VALUE_TYPE_UINT8:
+            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu8 "", value.uint8Value);
+            break;
+
+        case VALUE_TYPE_INT16:
+            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId16 "", value.int16Value);
+            break;
+
+        case VALUE_TYPE_UINT16:
+            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu16 "", value.uint16Value);
+            break;
+
+        case VALUE_TYPE_INT32:
+            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId32 "", value.int32Value);
+            break;
+
+        case VALUE_TYPE_UINT32:
+            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu32 "", value.uint32Value);
+            break;
+
+        case VALUE_TYPE_INT64:
+            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId64 "", value.int64Value);
+            break;
+
+        case VALUE_TYPE_UINT64:
+            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu64 "", value.uint64Value);
+            break;
+
+        default:
+            stringCopy(tempStr, sizeof(tempStr) - 1, "\"TODO!\"\n");
+            break;
+    }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+    stringAppendString(tempStr, sizeof(tempStr), "\n");
+
+    eez::mcu::ethernet::writeDebuggerBuffer(tempStr, strlen(tempStr));
+}
+
+void onAddToQueue(FlowState *flowState, unsigned componentIndex) {
+    if (g_debuggerIsConnected) {
+        char buffer[100];
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\n",
+			MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE,
+			(int)flowState->flowStateIndex,
+			componentIndex
+		);
+        eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+    }
+}
+
+void onRemoveFromQueue() {
+    if (g_debuggerIsConnected) {
+        char buffer[100];
+		snprintf(buffer, sizeof(buffer), "%d\n",
+			MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE
+		);
+        eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+    }
+}
+
+void onInputChanged(FlowState *flowState, uint16_t inputIndex, const Value& value) {
+    if (g_debuggerIsConnected) {
+        char buffer[100];
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t",
+			MESSAGE_TO_DEBUGGER_INPUT_CHANGED,
+            (int)flowState->flowStateIndex,
+            inputIndex
+		);
+        eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+        writeValue(value);
+    }
 }
 
 void onFlowStateCreated(FlowState *flowState) {
@@ -73,9 +276,9 @@ void onFlowStateCreated(FlowState *flowState) {
         char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED,
-			flowState->flowStateIndex,
+			(int)flowState->flowStateIndex,
 			flowState->flowIndex,
-			flowState->parentFlowState ? flowState->parentFlowState->flowStateIndex : 0
+			(int)(flowState->parentFlowState ? flowState->parentFlowState->flowStateIndex : 0)
 		);
         eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
     }
@@ -86,7 +289,7 @@ void onFlowStateDestroyed(FlowState *flowState) {
 		char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED,
-			flowState->flowStateIndex
+			(int)flowState->flowStateIndex
 		);
 		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
 	}
@@ -98,7 +301,7 @@ void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *c
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\tSCPI COMMAND: %s\n",
 			MESSAGE_TO_DEBUGGER_LOG,
             LOG_ITEM_TYPE_SCPI,
-            flowState->flowStateIndex,
+            (int)flowState->flowStateIndex,
 			componentIndex,
             cmd
 		);
@@ -123,13 +326,13 @@ void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *que
 void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const char *resultText, size_t resultTextLen) {
 	if (g_debuggerIsConnected) {
 		char buffer[256];
-		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\tSCPI QUERY RESULT: ",
+		snprintf(buffer, sizeof(buffer) - 1, "%d\t%d\t%d\t%d\tSCPI QUERY RESULT: ",
 			MESSAGE_TO_DEBUGGER_LOG,
             LOG_ITEM_TYPE_SCPI,
             (int)flowState->flowStateIndex,
 			componentIndex
 		);
-        stringAppendStringLength(buffer, sizeof(buffer), resultText, resultTextLen);
+        stringAppendStringLength(buffer, sizeof(buffer) - 1, resultText, resultTextLen);
         stringAppendString(buffer, sizeof(buffer), "\n");
 		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
     }

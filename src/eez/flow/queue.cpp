@@ -17,6 +17,7 @@
  */
 
 #include <eez/flow/queue.h>
+#include <eez/flow/debugger.h>
 
 namespace eez {
 namespace flow {
@@ -66,6 +67,9 @@ bool addToQueue(FlowState *flowState, unsigned componentIndex) {
 	}
 
 	flowState->numActiveComponents++;
+
+	onAddToQueue(flowState, componentIndex);
+
 	return true;
 }
 
@@ -79,6 +83,8 @@ bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex) {
 
 	g_queueHead = (g_queueHead + 1) % QUEUE_SIZE;
 	g_queueIsFull = false;
+
+	onRemoveFromQueue();
 
 	return true;
 }

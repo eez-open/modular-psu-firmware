@@ -21,6 +21,16 @@
 namespace eez {
 namespace flow {
 
+bool canExecuteStep();
+
+void onAddToQueue(FlowState *flowState, unsigned componentIndex);
+void onRemoveFromQueue();
+
+void onInputChanged(FlowState *flowState, uint16_t inputIndex, const Value& value);
+
+void onFlowStateCreated(FlowState *flowState);
+void onFlowStateDestroyed(FlowState *flowState);
+
 void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *cmd);
 void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *query);
 void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const char *resultText, size_t resultTextLen);

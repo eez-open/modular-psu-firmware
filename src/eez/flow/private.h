@@ -61,12 +61,7 @@ void fixAssetValues(Assets *assets);
 FlowState *initActionFlowState(Assets *assets, int flowIndex);
 FlowState *initPageFlowState(Assets *assets, int flowIndex);
 
-void onFlowStateCreated(FlowState *flowState);
-void onFlowStateDestroyed(FlowState *flowState);
-
 void freeFlowState(FlowState *flowState);
-
-void onFlowStateDestroyed(FlowState *flowState);
 
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
 void propagateValue(FlowState *flowState, ComponentOutput &componentOutput); // propagates null value

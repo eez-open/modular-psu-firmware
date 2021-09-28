@@ -190,6 +190,7 @@ void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, cons
 	for (unsigned connectionIndex = 0; connectionIndex < componentOutput.connections.count; connectionIndex++) {
 		auto connection = componentOutput.connections.item(assets, connectionIndex);
 		flowState->values[connection->targetInputIndex] = value;
+		onInputChanged(flowState, connection->targetInputIndex, value);
 		if (pingComponent(flowState, connection->targetComponentIndex) && connection->seqIn) {
 			flowState->values[connection->targetInputIndex] = Value();
 		}
@@ -265,6 +266,7 @@ void assignValue(FlowState *flowState, Component *component, Value &dstValue, co
 		} else if (pDstValue->isDouble()) {
 			pDstValue->doubleValue = srcValue.toDouble();
 		}
+		
 		// TODO
 	}
 }
