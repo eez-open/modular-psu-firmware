@@ -483,14 +483,6 @@ void STRING_REF_value_to_text(const Value &value, char *text, int count) {
 	STRING_value_to_text(value, text, count);
 }
 
-bool compare_ARRAY_REF_value(const Value &a, const Value &b) {
-    return a.refValue == b.refValue;
-}
-
-void ARRAY_REF_value_to_text(const Value &value, char *text, int count) {
-    text[0] = 0;
-}
-
 bool compare_VERSIONED_STRING_value(const Value &a, const Value &b) {
     return a.unit == b.unit; // here unit is used as string version
 }

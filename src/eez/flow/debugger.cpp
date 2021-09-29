@@ -16,12 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
 #include <string.h>
 #include <stdio.h>
 #include <inttypes.h>
 
+#include <eez/debug.h>
+
 #include <eez/flow/flow.h>
 #include <eez/flow/private.h>
+#include <eez/flow/debugger.h>
 
 #include <eez/modules/mcu/ethernet.h>
 
@@ -29,20 +33,34 @@ namespace eez {
 namespace flow {
 
 enum MessagesToDebugger {
-	MESSAGE_TO_DEBUGGER_STATE_CHANGED,
-    MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE,
-    MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE,
-    MESSAGE_TO_DEBUGGER_INPUT_CHANGED,
-	MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED,
-	MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED,
-    MESSAGE_TO_DEBUGGER_LOG,
+    MESSAGE_TO_DEBUGGER_STATE_CHANGED, // STATE
+
+    MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE, // FLOW_STATE_INDEX, COMPONENT_INDEX
+    MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE, // no params
+
+    MESSAGE_TO_DEBUGGER_GLOBAL_VARIABLE_INIT, // GLOBAL_VARIABLE_INDEX, VALUE_ADDR, VALUE
+    MESSAGE_TO_DEBUGGER_LOCAL_VARIABLE_INIT, // FLOW_STATE_INDEX, LOCAL_VARIABLE_INDEX, VALUE_ADDR, VALUE
+    MESSAGE_TO_DEBUGGER_COMPONENT_INPUT_INIT, // FLOW_STATE_INDEX, COMPONENT_INPUT_INDEX, VALUE_ADDR, VALUE
+
+    MESSAGE_TO_DEBUGGER_VALUE_CHANGED, // VALUE_ADDR, VALUE
+
+    MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED, // FLOW_STATE_INDEX, FLOW_INDEX, PARENT_FLOW_STATE_INDEX (0 - NO PARENT)
+    MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED, // FLOW_STATE_INDEX
+
+    MESSAGE_TO_DEBUGGER_LOG // LOG_ITEM_TYPE, FLOW_STATE_INDEX, COMPONENT_INDEX, MESSAGE
+
 };
 
 enum MessagesFromDebugger {
-    MESSAGE_FROM_DEBUGGER_RESUME,
-    MESSAGE_FROM_DEBUGGER_PAUSE,
-	MESSAGE_FROM_DEBUGGER_SINGLE_STEP,
-	MESSAGE_FREM_DEBUGGER_RESTART
+    MESSAGE_FROM_DEBUGGER_RESUME, // no params
+    MESSAGE_FROM_DEBUGGER_PAUSE, // no params
+    MESSAGE_FROM_DEBUGGER_SINGLE_STEP, // no params
+    MESSAGE_FROM_DEBUGGER_RESTART, // no params
+
+    MESSAGE_FROM_DEBUGGER_ADD_BREAKPOINT, // FLOW_INDEX, COMPONENT_INDEX
+    MESSAGE_FROM_DEBUGGER_REMOVE_BREAKPOINT, // FLOW_INDEX, COMPONENT_INDEX
+    MESSAGE_FROM_DEBUGGER_ENABLE_BREAKPOINT, // FLOW_INDEX, COMPONENT_INDEX
+    MESSAGE_FROM_DEBUGGER_DISABLE_BREAKPOINT, // FLOW_INDEX, COMPONENT_INDEX
 };
 
 enum LogItemType {
@@ -62,6 +80,10 @@ enum DebuggerState {
 
 static bool g_debuggerIsConnected;
 static DebuggerState g_debuggerState;
+static bool g_skipNextBreakpoint;
+
+static char g_inputFromDebugger[64];
+static int g_inputFromDebuggerPosition;
 
 static void processDebuggerInput(char *buffer, uint32_t length);
 
@@ -78,8 +100,14 @@ static void setDebuggerState(DebuggerState newState) {
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 void onDebuggerClientConnected() {
     g_debuggerIsConnected = true;
+
+	g_skipNextBreakpoint = false;
+	g_inputFromDebuggerPosition = 0;
+
     setDebuggerState(DEBUGGER_STATE_PAUSED);
 }
 
@@ -98,23 +126,61 @@ void onDebuggerInputAvailable() {
     }    
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 static void processDebuggerInput(char *buffer, uint32_t length) {
-    int messageFromDebugger = buffer[0] - '0';
-    if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_RESUME) {
-        setDebuggerState(DEBUGGER_STATE_RESUMED);
-    } else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_PAUSE) {
-		setDebuggerState(DEBUGGER_STATE_PAUSED);
-    } else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_SINGLE_STEP) {
-		setDebuggerState(DEBUGGER_STATE_SINGLE_STEP);
-    }
+	for (uint32_t i = 0; i < length; i++) {
+		if (buffer[i] == '\n') {
+			int messageFromDebugger = g_inputFromDebugger[0] - '0';
+			
+			if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_RESUME) {
+				setDebuggerState(DEBUGGER_STATE_RESUMED);
+			} else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_PAUSE) {
+				setDebuggerState(DEBUGGER_STATE_PAUSED);
+			} else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_SINGLE_STEP) {
+				setDebuggerState(DEBUGGER_STATE_SINGLE_STEP);
+			} else {
+				assert(
+					messageFromDebugger >= MESSAGE_FROM_DEBUGGER_ADD_BREAKPOINT &&
+					messageFromDebugger <= MESSAGE_FROM_DEBUGGER_DISABLE_BREAKPOINT
+				);
+
+				char *p;
+				auto flowIndex = (uint32_t)strtol(g_inputFromDebugger + 2, &p, 10);
+				auto componentIndex = (uint32_t)strtol(p + 1, nullptr, 10);
+
+				auto assets = g_mainPageFlowState->assets;
+				auto flowDefinition = assets->flowDefinition.ptr(assets);
+				if (flowIndex >= 0 && flowIndex < flowDefinition->flows.count) {
+					auto flow = flowDefinition->flows.item(assets, flowIndex);
+					if (componentIndex >= 0 && componentIndex < flow->components.count) {
+						auto component = flow->components.item(assets, componentIndex);
+						
+						component->breakpoint = messageFromDebugger == MESSAGE_FROM_DEBUGGER_ADD_BREAKPOINT ||
+							messageFromDebugger == MESSAGE_FROM_DEBUGGER_ENABLE_BREAKPOINT ? 1 : 0;
+					} else {
+						ErrorTrace("Invalid breakpoint component index\n");
+					}
+				} else {
+					ErrorTrace("Invalid breakpoint flow index\n");
+				}
+			}
+
+			g_inputFromDebuggerPosition = 0;
+		} else {
+			if (g_inputFromDebuggerPosition < sizeof(g_inputFromDebugger)) {
+				g_inputFromDebugger[g_inputFromDebuggerPosition++] = buffer[i];
+			} else if (g_inputFromDebuggerPosition == sizeof(g_inputFromDebugger)) {
+				ErrorTrace("Input from debugger buffer overflow\n");
+			}
+		}
+	}
 }
 
-bool canExecuteStep() {
-    if (!g_debuggerIsConnected) {
-        return true;
-    }
+////////////////////////////////////////////////////////////////////////////////
 
-    if (g_debuggerState == DEBUGGER_STATE_RESUMED) {
+bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex) {
+    if (!g_debuggerIsConnected) {
         return true;
     }
 
@@ -122,118 +188,198 @@ bool canExecuteStep() {
         return false;
     }
 
-	setDebuggerState(DEBUGGER_STATE_PAUSED);
+    if (g_debuggerState == DEBUGGER_STATE_SINGLE_STEP) {
+        g_skipNextBreakpoint = false;
+	    setDebuggerState(DEBUGGER_STATE_PAUSED);
+        return true;
+    }
+
+    // g_debuggerState == DEBUGGER_STATE_RESUMED
+
+    if (g_skipNextBreakpoint) {
+        g_skipNextBreakpoint = false;
+    } else {
+        auto component = flowState->flow->components.item(flowState->assets, componentIndex);
+        if (component->breakpoint) {
+            g_skipNextBreakpoint = true;
+			setDebuggerState(DEBUGGER_STATE_PAUSED);
+            return false;
+        }
+    }
 
     return true;
 }
 
-void writeString(const char *str) {
-	char tempStr[64];
-	int i = 0;
+////////////////////////////////////////////////////////////////////////////////
 
-#define WRITE_CH(CH) \
-	tempStr[i++] = CH; \
-	if (i == sizeof(tempStr)) { \
-		eez::mcu::ethernet::writeDebuggerBuffer(tempStr, i); \
-		i = 0; \
+char outputBuffer[64];
+int outputBufferPosition = 0;
+
+#define WRITE_TO_OUTPUT_BUFFER(ch) \
+	outputBuffer[outputBufferPosition++] = ch; \
+	if (outputBufferPosition == sizeof(outputBuffer)) { \
+		eez::mcu::ethernet::writeDebuggerBuffer(outputBuffer, outputBufferPosition); \
+		outputBufferPosition = 0; \
 	}
 
-	WRITE_CH('"');
+#define FLUSH_OUTPUT_BUFFER() \
+	if (outputBufferPosition > 0) { \
+		eez::mcu::ethernet::writeDebuggerBuffer(outputBuffer, outputBufferPosition); \
+		outputBufferPosition = 0; \
+	}
+
+void writeValueAddr(const Value *pValue) {
+	char tmpStr[32];
+	snprintf(tmpStr, sizeof(tmpStr), "%d", (int)pValue);
+	auto len = strlen(tmpStr);
+	for (size_t i = 0; i < len; i++) {
+		WRITE_TO_OUTPUT_BUFFER(tmpStr[i]);
+	}
+}
+
+void writeString(const char *str) {
+	WRITE_TO_OUTPUT_BUFFER('"');
 
 	for (const char *p = str; *p; p++) {
 		if (*p == '"') {
-			WRITE_CH('\\');
-			WRITE_CH('"');
+			WRITE_TO_OUTPUT_BUFFER('\\');
+			WRITE_TO_OUTPUT_BUFFER('"');
 		} else if (*p == '\t') {
-			WRITE_CH('\\');
-			WRITE_CH('t');
+			WRITE_TO_OUTPUT_BUFFER('\\');
+			WRITE_TO_OUTPUT_BUFFER('t');
 		} else if (*p == '\n') {
-			WRITE_CH('\\');
-			WRITE_CH('n');
+			WRITE_TO_OUTPUT_BUFFER('\\');
+			WRITE_TO_OUTPUT_BUFFER('n');
 		} else {
-			WRITE_CH(*p);
+			WRITE_TO_OUTPUT_BUFFER(*p);
 		}
 	}
 
-	WRITE_CH('"');
+	WRITE_TO_OUTPUT_BUFFER('"');
+	WRITE_TO_OUTPUT_BUFFER('\n');
+	FLUSH_OUTPUT_BUFFER();
+}
 
-	WRITE_CH('\n');
+void writeArray(ArrayValue *arrayValue) {
+	WRITE_TO_OUTPUT_BUFFER('{');
 
-	if (i > 0) {
-		eez::mcu::ethernet::writeDebuggerBuffer(tempStr, i);
+	for (uint32_t i = 0; i < arrayValue->arraySize; i++) {
+		if (i > 0) {
+			WRITE_TO_OUTPUT_BUFFER(',');
+		}
+		writeValueAddr(&arrayValue->values[i]);
+	}
+
+	WRITE_TO_OUTPUT_BUFFER('}');
+	WRITE_TO_OUTPUT_BUFFER('\n');
+	FLUSH_OUTPUT_BUFFER();
+
+	for (uint32_t i = 0; i < arrayValue->arraySize; i++) {
+		onValueChanged(&arrayValue->values[i]);
 	}
 }
 
 void writeValue(const Value &value) {
-    char tempStr[64];
+	char tempStr[64];
 
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4474)
 #endif
 
-    switch (value.getType()) {
-        case VALUE_TYPE_STRING:
-        case VALUE_TYPE_STRING_REF:
-            writeString(value.getString());
-            return;
+	switch (value.getType()) {
+	case VALUE_TYPE_UNDEFINED:
+		stringCopy(tempStr, sizeof(tempStr) - 1, "undefined\n");
+		break;
 
-        case VALUE_TYPE_BOOLEAN:
-            stringCopy(tempStr, sizeof(tempStr) - 1, value.getBoolean() ? "true" : "false");
-            break;
+	case VALUE_TYPE_NULL:
+		stringCopy(tempStr, sizeof(tempStr) - 1, "null\n");
+		break;
 
-        case VALUE_TYPE_DOUBLE:
-            snprintf(tempStr, sizeof(tempStr) - 1, "%g", value.doubleValue);
-            break;
+	case VALUE_TYPE_BOOLEAN:
+		stringCopy(tempStr, sizeof(tempStr) - 1, value.getBoolean() ? "true" : "false");
+		break;
 
-        case VALUE_TYPE_FLOAT:
-            snprintf(tempStr, sizeof(tempStr) - 1, "%g", value.floatValue);
-            break;
+	case VALUE_TYPE_INT8:
+		snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId8 "", value.int8Value);
+		break;
 
-        case VALUE_TYPE_INT8:
-            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId8 "", value.int8Value);
-            break;
+	case VALUE_TYPE_UINT8:
+		snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu8 "", value.uint8Value);
+		break;
 
-        case VALUE_TYPE_UINT8:
-            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu8 "", value.uint8Value);
-            break;
+	case VALUE_TYPE_INT16:
+		snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId16 "", value.int16Value);
+		break;
 
-        case VALUE_TYPE_INT16:
-            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId16 "", value.int16Value);
-            break;
+	case VALUE_TYPE_UINT16:
+		snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu16 "", value.uint16Value);
+		break;
 
-        case VALUE_TYPE_UINT16:
-            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu16 "", value.uint16Value);
-            break;
+	case VALUE_TYPE_INT32:
+		snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId32 "", value.int32Value);
+		break;
 
-        case VALUE_TYPE_INT32:
-            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId32 "", value.int32Value);
-            break;
+	case VALUE_TYPE_UINT32:
+		snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu32 "", value.uint32Value);
+		break;
 
-        case VALUE_TYPE_UINT32:
-            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu32 "", value.uint32Value);
-            break;
+	case VALUE_TYPE_INT64:
+		snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId64 "", value.int64Value);
+		break;
 
-        case VALUE_TYPE_INT64:
-            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRId64 "", value.int64Value);
-            break;
+	case VALUE_TYPE_UINT64:
+		snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu64 "", value.uint64Value);
+		break;
 
-        case VALUE_TYPE_UINT64:
-            snprintf(tempStr, sizeof(tempStr) - 1, "%" PRIu64 "", value.uint64Value);
-            break;
+	case VALUE_TYPE_DOUBLE:
+		snprintf(tempStr, sizeof(tempStr) - 1, "%g", value.doubleValue);
+		break;
 
-        default:
-            stringCopy(tempStr, sizeof(tempStr) - 1, "\"TODO!\"\n");
-            break;
-    }
+	case VALUE_TYPE_FLOAT:
+		snprintf(tempStr, sizeof(tempStr) - 1, "%g", value.floatValue);
+		break;
+
+	case VALUE_TYPE_STRING:
+	case VALUE_TYPE_STRING_REF:
+		writeString(value.getString());
+		return;
+
+	case VALUE_TYPE_ARRAY:
+		writeArray(value.arrayValue);
+		return;
+
+	}
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
-    stringAppendString(tempStr, sizeof(tempStr), "\n");
+	stringAppendString(tempStr, sizeof(tempStr), "\n");
 
-    eez::mcu::ethernet::writeDebuggerBuffer(tempStr, strlen(tempStr));
+	eez::mcu::ethernet::writeDebuggerBuffer(tempStr, strlen(tempStr));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void onStarted(Assets *assets) {
+    if (g_debuggerIsConnected) {
+		auto flowDefinition = assets->flowDefinition.ptr(assets);
+
+		for (uint32_t i = 0; i < flowDefinition->globalVariables.count; i++) {
+			auto pValue = flowDefinition->globalVariables.item(assets, i);
+
+            char buffer[100];
+            snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t",
+                MESSAGE_TO_DEBUGGER_GLOBAL_VARIABLE_INIT,
+				(int)i,
+                (int)pValue
+            );
+            eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+
+			writeValue(*pValue);
+        }
+    }
 }
 
 void onAddToQueue(FlowState *flowState, unsigned componentIndex) {
@@ -258,16 +404,16 @@ void onRemoveFromQueue() {
     }
 }
 
-void onInputChanged(FlowState *flowState, uint16_t inputIndex, const Value& value) {
+void onValueChanged(const Value *pValue) {
     if (g_debuggerIsConnected) {
         char buffer[100];
-		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t",
-			MESSAGE_TO_DEBUGGER_INPUT_CHANGED,
-            (int)flowState->flowStateIndex,
-            inputIndex
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t",
+			MESSAGE_TO_DEBUGGER_VALUE_CHANGED,
+            (int)pValue
 		);
         eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
-        writeValue(value);
+        
+		writeValue(*pValue);
     }
 }
 
@@ -281,7 +427,39 @@ void onFlowStateCreated(FlowState *flowState) {
 			(int)(flowState->parentFlowState ? flowState->parentFlowState->flowStateIndex : 0)
 		);
         eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
-    }
+		
+		auto flow = flowState->flow;
+
+		for (uint32_t i = 0; i < flow->localVariables.count; i++) {
+			auto pValue = &flowState->values[flow->nInputValues + i];
+
+            char buffer[100];
+            snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
+                MESSAGE_TO_DEBUGGER_LOCAL_VARIABLE_INIT,
+				(int)flowState->flowStateIndex,
+				(int)i,
+                (int)pValue
+            );
+            eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+
+			writeValue(*pValue);
+        }
+
+		for (uint32_t i = 0; i < flow->nInputValues; i++) {
+			auto pValue = &flowState->values[i];
+
+            char buffer[100];
+            snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
+                MESSAGE_TO_DEBUGGER_COMPONENT_INPUT_INIT,
+				(int)flowState->flowStateIndex,
+				(int)i,
+                (int)pValue
+            );
+            eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+
+			writeValue(*pValue);
+        }
+	}
 }
 
 void onFlowStateDestroyed(FlowState *flowState) {

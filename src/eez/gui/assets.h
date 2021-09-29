@@ -224,9 +224,12 @@ struct ComponentOutput {
 	ListOfAssetsPtr<Connection> connections;
 };
 
+static const uint16_t BREAKPOINT_ENABLED = 1;
+static const uint16_t BREAKPOINT_DISABLED = 2;
+
 struct Component {
     uint16_t type;
-    uint16_t reserved;
+    uint16_t breakpoint;
 	ListOfFundamentalType<uint16_t> inputs;
 	ListOfAssetsPtr<PropertyValue> propertyValues;
 	ListOfAssetsPtr<ComponentOutput> outputs;

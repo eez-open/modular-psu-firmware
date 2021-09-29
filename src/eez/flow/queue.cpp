@@ -73,7 +73,7 @@ bool addToQueue(FlowState *flowState, unsigned componentIndex) {
 	return true;
 }
 
-bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex) {
+bool peekNextTaskFromQueue(FlowState *&flowState, unsigned &componentIndex) {
 	if (g_queueHead == g_queueTail && !g_queueIsFull) {
 		return false;
 	}
@@ -81,12 +81,14 @@ bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex) {
 	flowState = g_queue[g_queueHead].flowState;
 	componentIndex = g_queue[g_queueHead].componentIndex;
 
+	return true;
+}
+
+void removeNextTaskFromQueue() {
 	g_queueHead = (g_queueHead + 1) % QUEUE_SIZE;
 	g_queueIsFull = false;
 
 	onRemoveFromQueue();
-
-	return true;
 }
 
 } // namespace flow

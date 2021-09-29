@@ -54,12 +54,14 @@ struct FlowState {
 	ComponenentExecutionState **componenentExecutionStates;
 };
 
+extern FlowState *g_mainPageFlowState;
+
 extern uint32_t g_lastFlowStateIndex;
 
 void fixAssetValues(Assets *assets);
 
-FlowState *initActionFlowState(Assets *assets, int flowIndex);
-FlowState *initPageFlowState(Assets *assets, int flowIndex);
+FlowState *initActionFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState);
+FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState);
 
 void freeFlowState(FlowState *flowState);
 

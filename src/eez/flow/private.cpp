@@ -99,7 +99,7 @@ bool pingComponent(FlowState *flowState, unsigned componentIndex) {
 }
 
 
-static FlowState *initFlowState(Assets *assets, int flowIndex) {
+static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowIndex);
 
@@ -117,7 +117,7 @@ static FlowState *initFlowState(Assets *assets, int flowIndex) {
 	flowState->flowIndex = flowIndex;
 	flowState->error = false;
 	flowState->numActiveComponents = 0;
-	flowState->parentFlowState = nullptr;
+	flowState->parentFlowState = parentFlowState;
 	flowState->parentComponent = nullptr;
 	flowState->values = (Value *)(flowState + 1);
 	flowState->componenentExecutionStates = (ComponenentExecutionState **)(flowState->values + nValues);
@@ -140,6 +140,8 @@ static FlowState *initFlowState(Assets *assets, int flowIndex) {
 		flowState->componenentExecutionStates[i] = nullptr;
 	}
 
+	onFlowStateCreated(flowState);
+
 	for (unsigned componentIndex = 0; componentIndex < flow->components.count; componentIndex++) {
 		pingComponent(flowState, componentIndex);
 	}
@@ -147,16 +149,16 @@ static FlowState *initFlowState(Assets *assets, int flowIndex) {
 	return flowState;
 }
 
-FlowState *initActionFlowState(Assets *assets, int flowIndex) {
-	auto flowState = initFlowState(assets, flowIndex);
+FlowState *initActionFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState) {
+	auto flowState = initFlowState(assets, flowIndex, parentFlowState);
 	if (flowState) {
 		flowState->isAction = true;
 	}
 	return flowState;
 }
 
-FlowState *initPageFlowState(Assets *assets, int flowIndex) {
-	auto flowState = initFlowState(assets, flowIndex);
+FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState) {
+	auto flowState = initFlowState(assets, flowIndex, parentFlowState);
 	if (flowState) {
 		flowState->isAction = false;
 	}
@@ -189,8 +191,13 @@ void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, cons
 	auto assets = flowState->assets;
 	for (unsigned connectionIndex = 0; connectionIndex < componentOutput.connections.count; connectionIndex++) {
 		auto connection = componentOutput.connections.item(assets, connectionIndex);
-		flowState->values[connection->targetInputIndex] = value;
-		onInputChanged(flowState, connection->targetInputIndex, value);
+		
+		auto pValue = &flowState->values[connection->targetInputIndex];
+
+		*pValue = value;
+		
+		onValueChanged(pValue);
+		
 		if (pingComponent(flowState, connection->targetComponentIndex) && connection->seqIn) {
 			flowState->values[connection->targetInputIndex] = Value();
 		}
@@ -266,8 +273,10 @@ void assignValue(FlowState *flowState, Component *component, Value &dstValue, co
 		} else if (pDstValue->isDouble()) {
 			pDstValue->doubleValue = srcValue.toDouble();
 		}
-		
+
 		// TODO
+		
+		onValueChanged(pDstValue);
 	}
 }
 

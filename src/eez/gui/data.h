@@ -504,12 +504,6 @@ struct StringRef : public Ref {
 	char str[4];
 };
 
-struct ArrayRef : public Ref {
-	uint32_t arraySize;
-    uint32_t reserved;
-	Value values[1];
-};
-
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef bool (*CompareValueFunction)(const Value &a, const Value &b);

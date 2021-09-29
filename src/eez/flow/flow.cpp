@@ -38,7 +38,7 @@ namespace flow {
 
 static const uint32_t FLOW_TICK_MAX_DURATION_MS = 500;
 
-static FlowState *g_mainPageFlowState;
+FlowState *g_mainPageFlowState;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -57,8 +57,9 @@ unsigned start(Assets *assets) {
 
 	fixAssetValues(assets);
 
-	g_mainPageFlowState = initPageFlowState(assets, 0);
-	onFlowStateCreated(g_mainPageFlowState);
+	onStarted(assets);
+
+	g_mainPageFlowState = initPageFlowState(assets, 0, nullptr);
 
 	return 1;
 }
@@ -71,19 +72,17 @@ void tick() {
 	uint32_t startTickCount = millis();
 
 	while (true) {
-		if (getQueueSize() == 0) {
-			break;
-		}
-
-		if (!canExecuteStep()) {
-			break;
-		}
-
 		FlowState *flowState;
 		unsigned componentIndex;
-		if (!removeFromQueue(flowState, componentIndex)) {
+		if (!peekNextTaskFromQueue(flowState, componentIndex)) {
 			break;
 		}
+
+		if (!canExecuteStep(flowState, componentIndex)) {
+			break;
+		}
+
+		removeNextTaskFromQueue();
 
 		executeComponent(flowState, componentIndex);
 
@@ -141,9 +140,7 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 				layoutViewWidgetExecutionState =  ObjectAllocator<LayoutViewWidgetExecutionState>::allocate(0xa570ccad);
 				flowState->componenentExecutionStates[layoutViewWidgetComponentIndex] = layoutViewWidgetExecutionState;
 
-				auto layoutViewFlowState = initPageFlowState(flowState->assets, pageId);
-
-				layoutViewFlowState->parentFlowState = flowState;
+				auto layoutViewFlowState = initPageFlowState(flowState->assets, pageId, flowState);
 
 				auto component = flowState->flow->components.item(flowState->assets, layoutViewWidgetComponentIndex);
 
@@ -151,8 +148,6 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 				layoutViewFlowState->parentComponentIndex = layoutViewWidgetComponentIndex;
 
 				layoutViewWidgetExecutionState->flowState = layoutViewFlowState;
-
-				onFlowStateCreated(layoutViewFlowState);
 			}
 
 			return layoutViewWidgetExecutionState->flowState;
@@ -195,9 +190,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 		} else if (operation == DATA_OPERATION_COUNT) {
 			Value arrayValue;
 			getValue(dataId, widgetCursor, arrayValue);
-			if (arrayValue.getType() == VALUE_TYPE_ARRAY_REF) {
-				value = ((ArrayRef *)arrayValue.refValue)->arraySize;
-			} else if (arrayValue.getType() == VALUE_TYPE_ARRAY) {
+			if (arrayValue.getType() == VALUE_TYPE_ARRAY) {
 				value = arrayValue.arrayValue->arraySize;
 			} else {
 				value = 0;

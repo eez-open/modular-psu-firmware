@@ -26,7 +26,8 @@ namespace flow {
 void queueInit();
 size_t getQueueSize();
 bool addToQueue(FlowState *flowState, unsigned componentIndex);
-bool removeFromQueue(FlowState *&flowState, unsigned &componentIndex);
+bool peekNextTaskFromQueue(FlowState *&flowState, unsigned &componentIndex);
+void removeNextTaskFromQueue();
 
 } // flow
 } // eez

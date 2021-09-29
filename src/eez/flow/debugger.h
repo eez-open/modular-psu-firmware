@@ -21,12 +21,14 @@
 namespace eez {
 namespace flow {
 
-bool canExecuteStep();
+bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex);
+
+void onStarted(Assets *assets);
 
 void onAddToQueue(FlowState *flowState, unsigned componentIndex);
 void onRemoveFromQueue();
 
-void onInputChanged(FlowState *flowState, uint16_t inputIndex, const Value& value);
+void onValueChanged(const Value *pValue);
 
 void onFlowStateCreated(FlowState *flowState);
 void onFlowStateDestroyed(FlowState *flowState);
