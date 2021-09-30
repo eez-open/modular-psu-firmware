@@ -33,8 +33,7 @@ void executeConstantComponent(FlowState *flowState, unsigned componentIndex) {
 
 	auto &sourceValue = *flowState->flowDefinition->constants.item(assets, component->valueIndex);
 
-	auto &componentOutput = *component->outputs.item(assets, 1);
-	propagateValue(flowState, componentOutput, sourceValue);
+	propagateValue(flowState, componentIndex, 1, sourceValue);
 
 	propagateValue(flowState, componentIndex);
 }

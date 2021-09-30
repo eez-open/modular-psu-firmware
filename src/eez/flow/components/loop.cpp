@@ -44,33 +44,33 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
 
     if (!loopComponentExecutionState) {
         Value dstValue;
-        if (!evalAssignableExpression(flowState, component, component->assignableExpressionEvalInstructions, dstValue)) {
-            throwError(flowState, component, "loop component eval dest assignable expression\n");
+        if (!evalAssignableExpression(flowState, componentIndex, component->assignableExpressionEvalInstructions, dstValue)) {
+            throwError(flowState, componentIndex, "loop component eval dest assignable expression\n");
             return;
         }
 
         auto fromPropertyValue = component->propertyValues.item(assets, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_FROM);
         Value fromValue;
-        if (!evalExpression(flowState, component, fromPropertyValue->evalInstructions, fromValue)) {
-            throwError(flowState, component, "loop component eval 'from' expression\n");
+        if (!evalExpression(flowState, componentIndex, fromPropertyValue->evalInstructions, fromValue)) {
+            throwError(flowState, componentIndex, "loop component eval 'from' expression\n");
             return;
         }
 
         auto toPropertyValue = component->propertyValues.item(assets, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_TO);
         Value toValue;
-        if (!evalExpression(flowState, component, toPropertyValue->evalInstructions, toValue)) {
-            throwError(flowState, component, "loop component eval 'to' expression\n");
+        if (!evalExpression(flowState, componentIndex, toPropertyValue->evalInstructions, toValue)) {
+            throwError(flowState, componentIndex, "loop component eval 'to' expression\n");
             return;
         }
 
         auto stepPropertyValue = component->propertyValues.item(assets, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_STEP);
         Value stepValue;
-        if (!evalExpression(flowState, component, stepPropertyValue->evalInstructions, stepValue)) {
-            throwError(flowState, component, "loop component eval 'step' expression\n");
+        if (!evalExpression(flowState, componentIndex, stepPropertyValue->evalInstructions, stepValue)) {
+            throwError(flowState, componentIndex, "loop component eval 'step' expression\n");
             return;
         }
 
-        assignValue(flowState, component, dstValue, fromValue);
+        assignValue(flowState, componentIndex, dstValue, fromValue);
 
         loopComponentExecutionState = ObjectAllocator<LoopComponenentExecutionState>::allocate(0xd33c9288);
         loopComponentExecutionState->dstValue = dstValue;
@@ -85,9 +85,9 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
 			ObjectAllocator<LoopComponenentExecutionState>::deallocate(loopComponentExecutionState);
 			flowState->componenentExecutionStates[componentIndex] = nullptr;
 
-		    propagateValue(flowState, *component->outputs.item(assets, 1));
+		    propagateValue(flowState, componentIndex, 1);
 		} else {
-			assignValue(flowState, component, loopComponentExecutionState->dstValue, value);
+			assignValue(flowState, componentIndex, loopComponentExecutionState->dstValue, value);
             propagateValue(flowState, componentIndex);
 		}
     }

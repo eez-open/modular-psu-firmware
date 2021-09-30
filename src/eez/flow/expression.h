@@ -29,7 +29,7 @@ static const size_t STACK_SIZE = 20;
 
 struct EvalStack {
 	FlowState *flowState;
-	Component *component;
+	int componentIndex;
 	const int32_t *iterators;
 
 	Value stack[STACK_SIZE];
@@ -37,7 +37,7 @@ struct EvalStack {
 
 	bool push(const Value &value) {
 		if (sp >= STACK_SIZE) {
-			throwError(flowState, component, "Evaluation stack is full\n");
+			throwError(flowState, componentIndex, "Evaluation stack is full\n");
 			return false;
 		}
 		stack[sp++] = value;
@@ -58,9 +58,9 @@ struct EvalStack {
 
 };
 
-bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
-bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
-bool evalAssignableExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
+bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
+bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
+bool evalAssignableExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
 
 } // flow
 } // eez

@@ -44,8 +44,8 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 		auto propertyValue = component->propertyValues.item(assets, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS);
 
 		Value value;
-		if (!evalExpression(flowState, component, propertyValue->evalInstructions, value)) {
-			throwError(flowState, component, "delay component milliseconds eval error\n");
+		if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, value)) {
+			throwError(flowState, componentIndex, "delay component milliseconds eval error\n");
 			return;
 		}
 
@@ -55,12 +55,12 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 			delayComponentExecutionState->waitUntil = millis() + (uint32_t)floor(milliseconds);
 			flowState->componenentExecutionStates[componentIndex] = delayComponentExecutionState;
 		} else {
-			throwError(flowState, component, "delay component milliseconds invalid value\n");
+			throwError(flowState, componentIndex, "delay component milliseconds invalid value\n");
 			return;
 		}
 
 		if (!addToQueue(flowState, componentIndex)) {
-			throwError(flowState, component, "Execution queue is full\n");
+			throwError(flowState, componentIndex, "Execution queue is full\n");
 			return;
 		}
 	} else {
@@ -70,7 +70,7 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 			propagateValue(flowState, componentIndex);
 		} else {
 			if (!addToQueue(flowState, componentIndex)) {
-				throwError(flowState, component, "Execution queue is full\n");
+				throwError(flowState, componentIndex, "Execution queue is full\n");
 				return;
 			}
 		}

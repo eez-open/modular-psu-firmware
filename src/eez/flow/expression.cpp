@@ -24,7 +24,7 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes) {
+bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes) {
 	auto assets = flowState->assets;
 	auto flowDefinition = flowState->flowDefinition;
 	auto flow = flowState->flow;
@@ -67,7 +67,7 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 			}
 
 			if (arrayValue.type != VALUE_TYPE_ARRAY) {
-				throwError(flowState, component, "Array value expected\n");
+				throwError(flowState, componentIndex, "Array value expected\n");
 				return false;
 			}
 
@@ -76,12 +76,12 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 			int err;
 			auto elementIndex = elementIndexValue.toInt32(&err);
 			if (err) {
-				throwError(flowState, component, "Integer value expected for array element index\n");
+				throwError(flowState, componentIndex, "Integer value expected for array element index\n");
 				return false;
 			}
 		
 			if (elementIndex < 0 || elementIndex >= (int)array->arraySize) {
-				throwError(flowState, component, "Array element index out of bounds\n");
+				throwError(flowState, componentIndex, "Array element index out of bounds\n");
 				return false;
 			}
 
@@ -107,14 +107,14 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 	return true;
 }
 
-bool evalExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes, const int32_t *iterators) {
+bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes, const int32_t *iterators) {
 	EvalStack stack;
 
 	stack.flowState = flowState;
-	stack.component = component;
+	stack.componentIndex = componentIndex;
 	stack.iterators = iterators;
 
-	if (evalExpression(flowState, component, instructions, stack, numInstructionBytes)) {
+	if (evalExpression(flowState, componentIndex, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {
 			auto finalResult = stack.pop();
 
@@ -132,14 +132,14 @@ bool evalExpression(FlowState *flowState, Component *component, const uint8_t *i
 	return false;
 }
 
-bool evalAssignableExpression(FlowState *flowState, Component *component, const uint8_t *instructions, Value &result, int *numInstructionBytes, const int32_t *iterators) {
+bool evalAssignableExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes, const int32_t *iterators) {
 	EvalStack stack;
 
 	stack.flowState = flowState;
-	stack.component = component;
+	stack.componentIndex = componentIndex;
 	stack.iterators = iterators;
 
-	if (evalExpression(flowState, component, instructions, stack, numInstructionBytes)) {
+	if (evalExpression(flowState, componentIndex, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {
 			auto finalResult = stack.pop();
 			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR || finalResult.getType() == VALUE_TYPE_FLOW_OUTPUT) {

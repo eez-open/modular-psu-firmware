@@ -77,7 +77,7 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	} else {
 		char errorMessage[100];
 		snprintf(errorMessage, sizeof(errorMessage), "Unknown component at index = %d, type = %d\n", componentIndex, component->type);
-		throwError(flowState, component, errorMessage);
+		throwError(flowState, componentIndex, errorMessage);
     }
 }
 

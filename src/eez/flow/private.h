@@ -65,16 +65,16 @@ FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlo
 
 void freeFlowState(FlowState *flowState);
 
-void propagateValue(FlowState *flowState, ComponentOutput &componentOutput, const gui::Value &value);
-void propagateValue(FlowState *flowState, ComponentOutput &componentOutput); // propagates null value
+void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const gui::Value &value);
+void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex); // propagates null value
 void propagateValue(FlowState *flowState, unsigned componentIndex); // propagates null value through @seqout (0-th output)
 
 void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value);
 void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value);
 
-void assignValue(FlowState *flowState, Component *component, Value &dstValue, const Value &srcValue);
+void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, const Value &srcValue);
 
-void throwError(FlowState *flowState, Component *component, const char *errorMessage);
+void throwError(FlowState *flowState, int componentIndex, const char *errorMessage);
 
 } // flow
 } // eez

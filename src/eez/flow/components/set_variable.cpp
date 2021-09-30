@@ -34,19 +34,19 @@ void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex) 
     auto component = (SetVariableActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
 	Value dstValue;
-	if (!evalAssignableExpression(flowState, component, component->assignableExpressionEvalInstructions, dstValue)) {
-		throwError(flowState, component, "setvariable component eval dest assignable expression\n");
+	if (!evalAssignableExpression(flowState, componentIndex, component->assignableExpressionEvalInstructions, dstValue)) {
+		throwError(flowState, componentIndex, "setvariable component eval dest assignable expression\n");
 		return;
 	}
 
 	auto propertyValue = component->propertyValues.item(assets, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE);
 	Value srcValue;
-	if (!evalExpression(flowState, component, propertyValue->evalInstructions, srcValue)) {
-		throwError(flowState, component, "setvariable component eval src expression\n");
+	if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, srcValue)) {
+		throwError(flowState, componentIndex, "setvariable component eval src expression\n");
 		return;
 	}
 
-	assignValue(flowState, component, dstValue, srcValue);
+	assignValue(flowState, componentIndex, dstValue, srcValue);
 	
 	propagateValue(flowState, componentIndex);
 }

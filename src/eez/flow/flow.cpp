@@ -94,7 +94,7 @@ void tick() {
 				ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
 				flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex] = nullptr;
 			} else {
-				throwError(flowState, component, "Unexpected: no CallAction component state\n");
+				throwError(flowState, componentIndex, "Unexpected: no CallAction component state\n");
 				return;
 			}
 		}
@@ -166,8 +166,8 @@ void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) 
 
 	if (actionId >= 0 && actionId < (int16_t)flow->widgetActions.count) {
 		auto componentOutput = flow->widgetActions.item(assets, actionId);
-		if (componentOutput) {
-			propagateValue(flowState, *componentOutput, widgetCursor.cursor);
+		if (componentOutput->componentIndex != -1 && componentOutput->componentOutputIndex != -1) {
+			propagateValue(flowState, componentOutput->componentIndex, componentOutput->componentOutputIndex, widgetCursor.cursor);
 		}
 	}
 

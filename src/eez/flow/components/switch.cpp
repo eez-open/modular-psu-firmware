@@ -42,14 +42,13 @@ void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
         auto test = component->tests.item(assets, testIndex);
 
         Value conditionValue;
-        if (!evalExpression(flowState, component, test->conditionInstructions, conditionValue)) {
-            throwError(flowState, component, "switch component eval src expression\n");
+        if (!evalExpression(flowState, componentIndex, test->conditionInstructions, conditionValue)) {
+            throwError(flowState, componentIndex, "switch component eval src expression\n");
             return;
         }
 
         if (conditionValue.getBoolean()) {
-			auto &componentOutput = *component->outputs.item(assets, test->outputIndex);
-            propagateValue(flowState, componentOutput);
+            propagateValue(flowState, componentIndex, test->outputIndex);
 			break;
         }
     }

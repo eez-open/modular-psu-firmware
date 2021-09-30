@@ -118,8 +118,8 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 		} else if (scpiComponentExecutionState->op == SCPI_PART_EXPR) {
 			Value value;
 			int numInstructionBytes;
-			if (!evalExpression(flowState, component, instructions + scpiComponentExecutionState->instructionIndex, value, &numInstructionBytes)) {
-				throwError(flowState, component, "scpi component eval assignable expression\n");
+			if (!evalExpression(flowState, componentIndex, instructions + scpiComponentExecutionState->instructionIndex, value, &numInstructionBytes)) {
+				throwError(flowState, componentIndex, "scpi component eval assignable expression\n");
 
 				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
 				flowState->componenentExecutionStates[componentIndex] = nullptr;
@@ -141,7 +141,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			if (!scpiComponentExecutionState->scpi()) {
 				if (!addToQueue(flowState, componentIndex)) {
-					throwError(flowState, component, "Execution queue is full\n");
+					throwError(flowState, componentIndex, "Execution queue is full\n");
 				}
 				return;
 			}
@@ -153,7 +153,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 				char errorMessage[300];
 				snprintf(errorMessage, sizeof(errorMessage), "%s\n", SCPI_ErrorTranslate(err));
 
-				throwError(flowState, component, errorMessage);
+				throwError(flowState, componentIndex, errorMessage);
 
 				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
 				flowState->componenentExecutionStates[componentIndex] = nullptr;
@@ -165,8 +165,8 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			Value dstValue;
 			int numInstructionBytes;
-			if (!evalAssignableExpression(flowState, component, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
-				throwError(flowState, component, "scpi component eval assignable expression\n");
+			if (!evalAssignableExpression(flowState, componentIndex, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
+				throwError(flowState, componentIndex, "scpi component eval assignable expression\n");
 
 				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
 				flowState->componenentExecutionStates[componentIndex] = nullptr;
@@ -179,13 +179,13 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			Value srcValue = Value::makeStringRef(resultText, resultTextLen, 0x09143fa4);
 
-			assignValue(flowState, component, dstValue, srcValue);
+			assignValue(flowState, componentIndex, dstValue, srcValue);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY) {
 			logScpiQuery(flowState, componentIndex, scpiComponentExecutionState->commandOrQueryText);
 
 			if (!scpiComponentExecutionState->scpi()) {
 				if (!addToQueue(flowState, componentIndex)) {
-					throwError(flowState, component, "Execution queue is full\n");
+					throwError(flowState, componentIndex, "Execution queue is full\n");
 				}
 				return;
 			}
@@ -197,7 +197,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 				char errorMessage[300];
 				snprintf(errorMessage, sizeof(errorMessage), "%s\n", SCPI_ErrorTranslate(err));
 
-				throwError(flowState, component, errorMessage);
+				throwError(flowState, componentIndex, errorMessage);
 
 				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
 				flowState->componenentExecutionStates[componentIndex] = nullptr;
@@ -211,7 +211,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			if (!scpiComponentExecutionState->scpi()) {
 				if (!addToQueue(flowState, componentIndex)) {
-					throwError(flowState, component, "Execution queue is full\n");
+					throwError(flowState, componentIndex, "Execution queue is full\n");
 				}
 				return;
 			}
@@ -223,7 +223,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 				char errorMessage[300];
 				snprintf(errorMessage, sizeof(errorMessage), "%s\n", SCPI_ErrorTranslate(err));
 
-				throwError(flowState, component, errorMessage);
+				throwError(flowState, componentIndex, errorMessage);
 
 				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
 				flowState->componenentExecutionStates[componentIndex] = nullptr;

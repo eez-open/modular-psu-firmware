@@ -31,13 +31,12 @@ void executeEvalComponent(FlowState *flowState, unsigned componentIndex) {
 
 	auto expressionPropertyValue = component->propertyValues.item(assets, defs_v3::EVAL_ACTION_COMPONENT_PROPERTY_EXPRESSION);
 	Value value;
-	if (!evalExpression(flowState, component, expressionPropertyValue->evalInstructions, value)) {
-		throwError(flowState, component, "Eval component eval src expression\n");
+	if (!evalExpression(flowState, componentIndex, expressionPropertyValue->evalInstructions, value)) {
+		throwError(flowState, componentIndex, "Eval component eval src expression\n");
 		return;
 	}
 
-    auto &componentOutput = *component->outputs.item(assets, 1);
-	propagateValue(flowState, componentOutput, value);
+	propagateValue(flowState, componentIndex, 1, value);
 	
 	propagateValue(flowState, componentIndex);
 }

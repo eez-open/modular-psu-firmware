@@ -25,7 +25,7 @@ bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex);
 
 void onStarted(Assets *assets);
 
-void onAddToQueue(FlowState *flowState, unsigned componentIndex);
+void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutputIndex, unsigned targetComponentIndex, int targetInputIndex);
 void onRemoveFromQueue();
 
 void onValueChanged(const Value *pValue);
