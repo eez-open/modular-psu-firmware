@@ -51,10 +51,7 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 		return;
 	}
 
-	FlowState *actionFlowState = initActionFlowState(assets, flowIndex, flowState);
-
-	actionFlowState->parentComponent = component;
-	actionFlowState->parentComponentIndex = componentIndex;
+	FlowState *actionFlowState = initActionFlowState(assets, flowIndex, flowState, componentIndex);
 
 	if (actionFlowState->numActiveComponents == 0) {
 		freeFlowState(actionFlowState);

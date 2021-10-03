@@ -49,7 +49,7 @@ struct FlowState {
 	uint32_t numActiveComponents;
 	FlowState *parentFlowState;
 	Component *parentComponent;
-	uint16_t parentComponentIndex;
+	int parentComponentIndex;
 	Value *values;
 	ComponenentExecutionState **componenentExecutionStates;
 };
@@ -60,8 +60,8 @@ extern uint32_t g_lastFlowStateIndex;
 
 void fixAssetValues(Assets *assets);
 
-FlowState *initActionFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState);
-FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState);
+FlowState *initActionFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState, int parentComponentIndex);
+FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState, int parentComponentIndex);
 
 void freeFlowState(FlowState *flowState);
 

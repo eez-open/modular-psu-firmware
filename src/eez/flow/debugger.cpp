@@ -44,7 +44,7 @@ enum MessagesToDebugger {
 
     MESSAGE_TO_DEBUGGER_VALUE_CHANGED, // VALUE_ADDR, VALUE
 
-    MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED, // FLOW_STATE_INDEX, FLOW_INDEX, PARENT_FLOW_STATE_INDEX (0 - NO PARENT)
+    MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED, // FLOW_STATE_INDEX, FLOW_INDEX, PARENT_FLOW_STATE_INDEX (-1 - NO PARENT), PARENT_COMPONENT_INDEX (-1 - NO PARENT COMPONENT)
     MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED, // FLOW_STATE_INDEX
 
     MESSAGE_TO_DEBUGGER_LOG // LOG_ITEM_TYPE, FLOW_STATE_INDEX, COMPONENT_INDEX, MESSAGE
@@ -423,11 +423,12 @@ void onValueChanged(const Value *pValue) {
 void onFlowStateCreated(FlowState *flowState) {
     if (g_debuggerIsConnected) {
         char buffer[100];
-		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\n",
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED,
 			(int)flowState->flowStateIndex,
 			flowState->flowIndex,
-			(int)(flowState->parentFlowState ? flowState->parentFlowState->flowStateIndex : 0)
+			(int)(flowState->parentFlowState ? flowState->parentFlowState->flowStateIndex : -1),
+			flowState->parentComponentIndex
 		);
         eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
 		

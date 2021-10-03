@@ -59,7 +59,7 @@ unsigned start(Assets *assets) {
 
 	onStarted(assets);
 
-	g_mainPageFlowState = initPageFlowState(assets, 0, nullptr);
+	g_mainPageFlowState = initPageFlowState(assets, 0, nullptr, 0);
 
 	return 1;
 }
@@ -140,12 +140,7 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 				layoutViewWidgetExecutionState =  ObjectAllocator<LayoutViewWidgetExecutionState>::allocate(0xa570ccad);
 				flowState->componenentExecutionStates[layoutViewWidgetComponentIndex] = layoutViewWidgetExecutionState;
 
-				auto layoutViewFlowState = initPageFlowState(flowState->assets, pageId, flowState);
-
-				auto component = flowState->flow->components.item(flowState->assets, layoutViewWidgetComponentIndex);
-
-				layoutViewFlowState->parentComponent = component;
-				layoutViewFlowState->parentComponentIndex = layoutViewWidgetComponentIndex;
+				auto layoutViewFlowState = initPageFlowState(flowState->assets, pageId, flowState, layoutViewWidgetComponentIndex);
 
 				layoutViewWidgetExecutionState->flowState = layoutViewFlowState;
 			}

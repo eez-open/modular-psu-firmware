@@ -98,7 +98,7 @@ static bool pingComponent(FlowState *flowState, unsigned componentIndex, int sou
 }
 
 
-static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState) {
+static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState, int parentComponentIndex) {
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowIndex);
 
@@ -117,7 +117,13 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 	flowState->error = false;
 	flowState->numActiveComponents = 0;
 	flowState->parentFlowState = parentFlowState;
-	flowState->parentComponent = nullptr;
+	if (parentFlowState) {
+		flowState->parentComponentIndex = parentComponentIndex;
+		flowState->parentComponent = parentFlowState->flow->components.item(assets, parentComponentIndex);
+	} else {
+		flowState->parentComponentIndex = -1;
+		flowState->parentComponent = nullptr;
+	}
 	flowState->values = (Value *)(flowState + 1);
 	flowState->componenentExecutionStates = (ComponenentExecutionState **)(flowState->values + nValues);
 
@@ -148,16 +154,16 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 	return flowState;
 }
 
-FlowState *initActionFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState) {
-	auto flowState = initFlowState(assets, flowIndex, parentFlowState);
+FlowState *initActionFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState, int parentComponentIndex) {
+	auto flowState = initFlowState(assets, flowIndex, parentFlowState, parentComponentIndex);
 	if (flowState) {
 		flowState->isAction = true;
 	}
 	return flowState;
 }
 
-FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState) {
-	auto flowState = initFlowState(assets, flowIndex, parentFlowState);
+FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState, int parentComponentIndex) {
+	auto flowState = initFlowState(assets, flowIndex, parentFlowState, parentComponentIndex);
 	if (flowState) {
 		flowState->isAction = false;
 	}
