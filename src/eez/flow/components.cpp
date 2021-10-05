@@ -38,7 +38,6 @@ void executeOutputComponent(FlowState *flowState, unsigned componentIndex);
 void executeDelayComponent(FlowState *flowState, unsigned componentIndex);
 void executeConstantComponent(FlowState *flowState, unsigned componentIndex);
 void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex);
-void executeEvalComponent(FlowState *flowState, unsigned componentIndex);
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex);
 void executeSwitchComponent(FlowState *flowState, unsigned componentIndex);
 void executeLogComponent(FlowState *flowState, unsigned componentIndex);
@@ -62,8 +61,6 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 		executeConstantComponent(flowState, componentIndex);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_SET_VARIABLE_ACTION) {
 		executeSetVariableComponent(flowState, componentIndex);
-    } else if (component->type == defs_v3::COMPONENT_TYPE_EVAL_ACTION) {
-		executeEvalComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_LOOP_ACTION) {
 		executeLoopComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_SWITCH_ACTION) {

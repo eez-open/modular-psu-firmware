@@ -499,8 +499,8 @@
         },
         {
           "type": "SwitchActionComponent",
-          "left": -81,
-          "top": -134,
+          "left": -80,
+          "top": -136,
           "width": 434,
           "height": 98,
           "wireID": "647469f9-dc20-48ca-dfd2-9a416417b36b",
