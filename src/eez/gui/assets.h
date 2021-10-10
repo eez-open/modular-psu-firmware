@@ -234,7 +234,7 @@ struct Component {
 	ListOfAssetsPtr<PropertyValue> propertyValues;
 	ListOfAssetsPtr<ComponentOutput> outputs;
 	int16_t errorCatchOutput;
-	uint16_t logError;
+	uint16_t reserved;
 };
 
 struct WidgetDataItem {

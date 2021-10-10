@@ -536,7 +536,7 @@ bool do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
 	return true;
 }
 
-bool do_OPERATION_TYPE_FLOW_IT(EvalStack &stack) {
+bool do_OPERATION_TYPE_FLOW_INDEX(EvalStack &stack) {
 	if (!stack.iterators) {
 		return false;
 	}
@@ -549,7 +549,7 @@ bool do_OPERATION_TYPE_FLOW_IT(EvalStack &stack) {
 		return false;
 	}
 	
-	iteratorIndex = -iteratorIndex;
+	iteratorIndex = iteratorIndex;
 	if (iteratorIndex < 0 || iteratorIndex >= (int)MAX_ITERATORS) {
 		return false;
 	}
@@ -562,14 +562,22 @@ bool do_OPERATION_TYPE_FLOW_IT(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
+	// TODO
 	return false;
 }
 
 bool do_OPERATION_TYPE_MATH_COS(EvalStack &stack) {
+	// TODO
 	return false;
 }
 
 bool do_OPERATION_TYPE_MATH_LOG(EvalStack &stack) {
+	// TODO
+	return false;
+}
+
+bool do_OPERATION_TYPE_MATH_ABS(EvalStack &stack) {
+	// TODO
 	return false;
 }
 
@@ -607,6 +615,11 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 	return true;
 }
 
+bool do_OPERATION_TYPE_ARRAY_SLICE(EvalStack &stack) {
+	// TODO
+	return false;
+}
+
 EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_ADD,
 	do_OPERATION_TYPE_SUB,
@@ -631,11 +644,12 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT,
 	do_OPERATION_TYPE_NOT,
 	do_OPERATION_TYPE_CONDITIONAL,
-	do_OPERATION_TYPE_FLOW_IT,
+	do_OPERATION_TYPE_FLOW_INDEX,
 	do_OPERATION_TYPE_MATH_SIN,
 	do_OPERATION_TYPE_MATH_COS,
 	do_OPERATION_TYPE_MATH_LOG,
-	do_OPERATION_TYPE_STRING_FIND
+	do_OPERATION_TYPE_STRING_FIND,
+	do_OPERATION_TYPE_ARRAY_SLICE
 };
 
 } // namespace flow

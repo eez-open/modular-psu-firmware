@@ -82,7 +82,7 @@ static DebuggerState g_debuggerState;
 static bool g_skipNextBreakpoint;
 
 static char g_inputFromDebugger[64];
-static int g_inputFromDebuggerPosition;
+static unsigned g_inputFromDebuggerPosition;
 
 static void processDebuggerInput(char *buffer, uint32_t length);
 
@@ -348,6 +348,9 @@ void writeValue(const Value &value) {
 		writeArray(value.arrayValue);
 		return;
 
+	default:
+		tempStr[0] = 0;
+		break;
 	}
 
 #ifdef _MSC_VER

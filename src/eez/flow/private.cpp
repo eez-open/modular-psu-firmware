@@ -297,10 +297,6 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
     auto assets = flowState->assets;
     auto component = flowState->flow->components.item(assets, componentIndex);
 
-	if (component->logError) {
-		ErrorTrace(errorMessage);
-	}
-
 	if (component->errorCatchOutput != -1) {
 		propagateValue(
 			flowState,
