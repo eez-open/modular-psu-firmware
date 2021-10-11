@@ -33,6 +33,10 @@ void onValueChanged(const Value *pValue);
 void onFlowStateCreated(FlowState *flowState);
 void onFlowStateDestroyed(FlowState *flowState);
 
+void onFlowError(FlowState *flowState, int componentIndex, const char *errorMessage);
+
+void logInfo(FlowState *flowState, unsigned componentIndex, const char *message);
+
 void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *cmd);
 void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *query);
 void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const char *resultText, size_t resultTextLen);

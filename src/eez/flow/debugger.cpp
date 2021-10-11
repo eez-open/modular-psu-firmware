@@ -47,6 +47,8 @@ enum MessagesToDebugger {
     MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED, // FLOW_STATE_INDEX, FLOW_INDEX, PARENT_FLOW_STATE_INDEX (-1 - NO PARENT), PARENT_COMPONENT_INDEX (-1 - NO PARENT COMPONENT)
     MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED, // FLOW_STATE_INDEX
 
+	MESSAGE_TO_DEBUGGER_FLOW_STATE_ERROR, // FLOW_STATE_INDEX, COMPONENT_INDEX, ERROR_MESSAGE
+
     MESSAGE_TO_DEBUGGER_LOG // LOG_ITEM_TYPE, FLOW_STATE_INDEX, COMPONENT_INDEX, MESSAGE
 
 };
@@ -479,31 +481,92 @@ void onFlowStateDestroyed(FlowState *flowState) {
 	}
 }
 
+void onFlowError(FlowState *flowState, int componentIndex, const char *errorMessage) {
+	if (g_debuggerIsConnected) {
+		char buffer[100];
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t",
+			MESSAGE_TO_DEBUGGER_FLOW_STATE_ERROR,
+			(int)flowState->flowStateIndex,
+			componentIndex
+		);
+		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeString(errorMessage);
+	}
+}
+
+void writeLogMessage(const char *str) {
+	for (const char *p = str; *p; p++) {
+		if (*p == '\t') {
+			WRITE_TO_OUTPUT_BUFFER('\\');
+			WRITE_TO_OUTPUT_BUFFER('t');
+		} if (*p == '\n') {
+			WRITE_TO_OUTPUT_BUFFER('\\');
+			WRITE_TO_OUTPUT_BUFFER('n');
+		} else {
+			WRITE_TO_OUTPUT_BUFFER(*p);
+		}
+	}
+
+	WRITE_TO_OUTPUT_BUFFER('\n');
+	FLUSH_OUTPUT_BUFFER();
+}
+
+void writeLogMessage(const char *str, size_t len) {
+	for (size_t i = 0; i < len; i++) {
+		if (str[i] == '\t') {
+			WRITE_TO_OUTPUT_BUFFER('\\');
+			WRITE_TO_OUTPUT_BUFFER('t');
+		} if (str[i] == '\n') {
+			WRITE_TO_OUTPUT_BUFFER('\\');
+			WRITE_TO_OUTPUT_BUFFER('n');
+		} else {
+			WRITE_TO_OUTPUT_BUFFER(str[i]);
+		}
+	}
+
+	WRITE_TO_OUTPUT_BUFFER('\n');
+	FLUSH_OUTPUT_BUFFER();
+}
+
+void logInfo(FlowState *flowState, unsigned componentIndex, const char *message) {
+	if (g_debuggerIsConnected) {
+		char buffer[256];
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
+			MESSAGE_TO_DEBUGGER_LOG,
+            LOG_ITEM_TYPE_INFO,
+            (int)flowState->flowStateIndex,
+			componentIndex
+		);
+		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeLogMessage(message);
+    }
+}
+
 void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *cmd) {
 	if (g_debuggerIsConnected) {
 		char buffer[256];
-		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\tSCPI COMMAND: %s\n",
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\tSCPI COMMAND: ",
 			MESSAGE_TO_DEBUGGER_LOG,
             LOG_ITEM_TYPE_SCPI,
             (int)flowState->flowStateIndex,
-			componentIndex,
-            cmd
+			componentIndex
 		);
 		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeLogMessage(cmd);
     }
 }
 
 void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *query) {
 	if (g_debuggerIsConnected) {
 		char buffer[256];
-		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\tSCPI QUERY: %s\n",
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\tSCPI QUERY: ",
 			MESSAGE_TO_DEBUGGER_LOG,
             LOG_ITEM_TYPE_SCPI,
             (int)flowState->flowStateIndex,
-			componentIndex,
-            query
+			componentIndex
 		);
 		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeLogMessage(query);
     }
 }
 
@@ -516,9 +579,8 @@ void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const cha
             (int)flowState->flowStateIndex,
 			componentIndex
 		);
-        stringAppendStringLength(buffer, sizeof(buffer) - 1, resultText, resultTextLen);
-        stringAppendString(buffer, sizeof(buffer), "\n");
 		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeLogMessage(resultText, resultTextLen);
     }
 }
 

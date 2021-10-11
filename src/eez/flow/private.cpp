@@ -306,6 +306,7 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
 		);
 	} else {
 		flowState->error = true;
+		onFlowError(flowState, componentIndex, errorMessage);
 		scripting::stopScript();
 	}
 }

@@ -21,6 +21,7 @@
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
+#include <eez/flow/debugger.h>
 
 using namespace eez::gui;
 
@@ -41,10 +42,7 @@ void executeLogComponent(FlowState *flowState, unsigned componentIndex) {
 
     const char *valueStr = value.toString(0x0f9812ee).getString();
     if (valueStr && *valueStr) {
-      DebugTrace(valueStr);
-      if (valueStr[strlen(valueStr) - 1] != '\n') {
-        DebugTrace("\n");
-      }
+      logInfo(flowState, componentIndex, valueStr);
     }
 
     propagateValue(flowState, componentIndex);
