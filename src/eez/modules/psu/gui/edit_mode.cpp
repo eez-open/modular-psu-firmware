@@ -60,7 +60,7 @@ static bool g_isInteractiveMode = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void update();
+static void update(Cursor cursor, int16_t dataId);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -72,8 +72,8 @@ bool isActive(AppContext *appContext) {
            appContext->getActivePageId() == PAGE_ID_EDIT_MODE_SLIDER;
 }
 
-void initEditValue() {
-    g_editValue = eez::gui::getEditValue(getFocusCursor(), g_focusDataId);
+void initEditValue(Cursor cursor, int16_t dataId) {
+    g_editValue = eez::gui::getEditValue(cursor, dataId);
     g_undoValue = g_editValue;
 }
 
@@ -92,7 +92,7 @@ void enter(int tabIndex, bool setFocus) {
         Cursor newDataCursor = getFoundWidgetAtDown().cursor;
         int16_t newDataId = getFoundWidgetAtDown().widget->data;
         setFocusCursor(newDataCursor, newDataId);
-        update();
+        update(newDataCursor, newDataId);
 
         if (!isActive(&g_psuAppContext)) {
             pushPage(g_tabIndex);
@@ -144,7 +144,7 @@ bool isInteractiveMode() {
 
 void toggleInteractiveMode() {
     g_isInteractiveMode = !g_isInteractiveMode;
-    initEditValue();
+    initEditValue(getFocusCursor(), g_focusDataId);
 }
 
 const Value &getEditValue() {
@@ -219,10 +219,10 @@ void getInfoText(char *infoText, int count) {
     stringAppendString(infoText, count, "]");
 }
 
-static void update() {
-    initEditValue();
-    g_minValue = eez::gui::getMin(getFocusCursor(), g_focusDataId);
-    g_maxValue = eez::gui::getMax(getFocusCursor(), g_focusDataId);
+static void update(Cursor cursor, int16_t dataId) {
+    initEditValue(cursor, dataId);
+    g_minValue = eez::gui::getMin(cursor, dataId);
+    g_maxValue = eez::gui::getMax(cursor, dataId);
     if (edit_mode_keypad::g_keypad) {
         edit_mode_keypad::g_keypad->m_options.editValueUnit = g_editValue.getUnit();
     }
