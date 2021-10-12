@@ -4682,7 +4682,9 @@ public:
 
     bool isCurrentCalibrationExists(int subchannelIndex) override {
         if (getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_I_HI_RANGE) {
-            if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+                return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf().state.calState;
+            } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
                 return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf().state.calState;
             }            
         }
@@ -4691,7 +4693,9 @@ public:
 
     bool isCurrentCalibrationEnabled(int subchannelIndex) override {
         if (getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_I_HI_RANGE) {
-            if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+                return aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf().state.calEnabled;
+            } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
                 return ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf().state.calEnabled;
             }
         }
@@ -4700,7 +4704,9 @@ public:
     
     void enableCurrentCalibration(int subchannelIndex, bool enabled) override {
         if (getCalibrationValueType(subchannelIndex) == CALIBRATION_VALUE_I_HI_RANGE) {
-            if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
+            if (subchannelIndex >= AOUT_1_SUBCHANNEL_INDEX && subchannelIndex <= AOUT_2_SUBCHANNEL_INDEX) {
+                aoutDac7760Channels[subchannelIndex - AOUT_1_SUBCHANNEL_INDEX].getCalConf().state.calEnabled = enabled;
+            } else if (subchannelIndex >= AIN_1_SUBCHANNEL_INDEX && subchannelIndex <= AIN_4_SUBCHANNEL_INDEX) {
                 ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getCalConf().state.calEnabled = enabled;
             } else {
                 return;
