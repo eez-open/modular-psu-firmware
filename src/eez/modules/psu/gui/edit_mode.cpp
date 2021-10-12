@@ -64,9 +64,7 @@ static bool g_isInteractiveMode = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void update();
-
-////////////////////////////////////////////////////////////////////////////////
+static void update(WidgetCursor &cursor, int16_t dataId);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -76,9 +74,8 @@ bool isActive(AppContext *appContext) {
            appContext->getActivePageId() == PAGE_ID_EDIT_MODE_SLIDER;
 }
 
-void initEditValue() {
-	WidgetCursor widgetCursor = getFocusCursor();
-    g_editValue = eez::gui::getEditValue(widgetCursor, g_focusDataId);
+void initEditValue(WidgetCursor &widgetCursor, int16_t dataId) {
+    g_editValue = eez::gui::getEditValue(widgetCursor, dataId);
     g_undoValue = g_editValue;
 }
 
@@ -97,7 +94,7 @@ void enter(int tabIndex, bool setFocus) {
         auto widgetCursor = getFoundWidgetAtDown();
         int16_t newDataId = widgetCursor.widget->data;
         setFocusCursor(widgetCursor, newDataId);
-        update();
+        update(widgetCursor, newDataId);
 
         if (!isActive(&g_psuAppContext)) {
             pushPage(g_tabIndex);
@@ -152,7 +149,8 @@ bool isInteractiveMode() {
 
 void toggleInteractiveMode() {
     g_isInteractiveMode = !g_isInteractiveMode;
-    initEditValue();
+	WidgetCursor widgetCursor = getFocusCursor();
+    initEditValue(widgetCursor, g_focusDataId);
 }
 
 const Value &getEditValue() {
@@ -230,11 +228,10 @@ void getInfoText(char *infoText, int count) {
     stringAppendString(infoText, count, "]");
 }
 
-static void update() {
-    initEditValue();
-	WidgetCursor widgetCursor = getFocusCursor();
-	g_minValue = eez::gui::getMin(widgetCursor, g_focusDataId);
-    g_maxValue = eez::gui::getMax(widgetCursor, g_focusDataId);
+static void update(WidgetCursor &widgetCursor, int16_t dataId) {
+    initEditValue(widgetCursor, dataId);
+	g_minValue = eez::gui::getMin(widgetCursor, dataId);
+    g_maxValue = eez::gui::getMax(widgetCursor, dataId);
     if (edit_mode_keypad::g_keypad) {
         edit_mode_keypad::g_keypad->m_options.editValueUnit = g_editValue.getUnit();
     }
