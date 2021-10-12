@@ -347,7 +347,7 @@ public:
         routes = params.routes;
 		relayOn = params.relayOn ? true : false;
 
-        return bp3c::comm::updateParamsFinish(&params, &lastTransferredRelayParams, sizeof(RelayParams), 100, err);
+        return bp3c::comm::updateParamsFinish(&params, &lastTransferredRelayParams, sizeof(RelayParams), 200, err);
     }
 
 	void fillSetParams(SetParams &params) {
