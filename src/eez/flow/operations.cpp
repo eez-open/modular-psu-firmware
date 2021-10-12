@@ -615,6 +615,11 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 	return true;
 }
 
+bool do_OPERATION_TYPE_STRING_PAD_START(EvalStack &stack) {
+	// TODO
+	return false;
+}
+
 bool do_OPERATION_TYPE_ARRAY_SLICE(EvalStack &stack) {
 	// TODO
 	return false;
@@ -650,6 +655,7 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_MATH_LOG,
 	do_OPERATION_TYPE_MATH_ABS,
 	do_OPERATION_TYPE_STRING_FIND,
+	do_OPERATION_TYPE_STRING_PAD_START,
 	do_OPERATION_TYPE_ARRAY_SLICE
 };
 
