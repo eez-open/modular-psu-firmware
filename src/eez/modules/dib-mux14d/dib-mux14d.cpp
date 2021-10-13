@@ -326,7 +326,7 @@ public:
         adib2RelayState = params.adib2RelayState;
 		extRelayState = params.extRelayState;
 
-        return bp3c::comm::updateParamsFinish(&params, &lastTransferredParams, sizeof(SetParams), 200, err);
+        return bp3c::comm::updateParamsFinish(&params, &lastTransferredParams, sizeof(SetParams), TIMEOUT_UNTIL_OUT_OF_SYNC_MS, err);
     }
 
 	void fillSetParams(SetParams &params) {
