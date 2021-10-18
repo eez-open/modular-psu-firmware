@@ -55,7 +55,7 @@ void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
     auto flowInputIndex = parentComponentInputs[parentComponentInputIndex];
 
     auto parentFlow = flowState->flowDefinition->flows.item(assets, flowState->parentFlowState->flowIndex);
-    if (flowInputIndex >= parentFlow->nInputValues) {
+    if (flowInputIndex >= parentFlow->componentInputs.count) {
         throwError(flowState, componentIndex, "Input action component, invalid input index of parent component\n");
         return;
     }

@@ -88,6 +88,15 @@ void tick() {
 
 		auto component = flowState->flow->components.item(flowState->assets, componentIndex);
 
+		auto assets = flowState->assets;
+
+		for (uint32_t i = 0; i < component->inputs.count; i++) {
+			auto inputIndex = component->inputs.ptr(flowState->assets)[i];
+			if (flowState->flow->componentInputs.item(assets, inputIndex)->flags & COMPONENT_INPUT_FLAG_IS_ACTION) {
+				flowState->values[inputIndex] = Value();
+			}
+		}
+
 		if (--flowState->numActiveComponents == 0 && flowState->isAction) {
 			auto componentExecutionState = flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex];
 			if (componentExecutionState) {

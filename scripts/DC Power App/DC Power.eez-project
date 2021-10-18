@@ -1,5 +1,4 @@
 {
-  "fullyLoaded": true,
   "settings": {
     "general": {
       "projectVersion": "v3",
@@ -132,9 +131,9 @@
       "components": [
         {
           "type": "StartActionComponent",
-          "left": -687,
-          "top": 17,
-          "width": 78,
+          "left": -679,
+          "top": 8,
+          "width": 89,
           "height": 31,
           "wireID": "33a7da7a-645d-43cc-a391-4f31636cb85c",
           "customInputs": [],
@@ -144,8 +143,8 @@
           "type": "SCPIActionComponent",
           "left": -245,
           "top": -145,
-          "width": 437,
-          "height": 87,
+          "width": 434,
+          "height": 83,
           "wireID": "9a5fc5c4-c7a6-4257-c380-281d79c76fa4",
           "customInputs": [],
           "customOutputs": [
@@ -160,7 +159,7 @@
           "type": "SwitchActionComponent",
           "left": -245,
           "top": -29,
-          "width": 610,
+          "width": 609,
           "height": 98,
           "wireID": "614718bd-2a71-4db1-b7bd-7a3d34ca9fb9",
           "customInputs": [
@@ -183,8 +182,8 @@
         },
         {
           "type": "SetVariableActionComponent",
-          "left": 409,
-          "top": 17,
+          "left": 447,
+          "top": 132,
           "width": 245,
           "height": 70,
           "wireID": "9de50f96-88d6-4a51-c978-f15cfef2b442",
@@ -197,7 +196,7 @@
           "type": "EndActionComponent",
           "left": 424,
           "top": 243,
-          "width": 64,
+          "width": 89,
           "height": 31,
           "wireID": "6c0d00c0-76b9-41c9-c7f3-86f914ccd122",
           "customInputs": [],
@@ -207,8 +206,8 @@
           "type": "LoopActionComponent",
           "left": -533,
           "top": 17,
-          "width": 197,
-          "height": 70,
+          "width": 232,
+          "height": 83,
           "wireID": "71acb5a9-df39-48cb-b0f6-6ce84d5cdaa9",
           "customInputs": [],
           "customOutputs": [],
@@ -244,12 +243,6 @@
           "input": "@seqin"
         },
         {
-          "source": "9de50f96-88d6-4a51-c978-f15cfef2b442",
-          "output": "@seqout",
-          "target": "71acb5a9-df39-48cb-b0f6-6ce84d5cdaa9",
-          "input": "@seqin"
-        },
-        {
           "source": "71acb5a9-df39-48cb-b0f6-6ce84d5cdaa9",
           "output": "done",
           "target": "6c0d00c0-76b9-41c9-c7f3-86f914ccd122",
@@ -265,7 +258,13 @@
           "source": "33a7da7a-645d-43cc-a391-4f31636cb85c",
           "output": "@seqout",
           "target": "71acb5a9-df39-48cb-b0f6-6ce84d5cdaa9",
-          "input": "@seqin"
+          "input": "start"
+        },
+        {
+          "source": "9de50f96-88d6-4a51-c978-f15cfef2b442",
+          "output": "@seqout",
+          "target": "71acb5a9-df39-48cb-b0f6-6ce84d5cdaa9",
+          "input": "next"
         }
       ],
       "localVariables": [
@@ -282,9 +281,9 @@
       "components": [
         {
           "type": "SwitchActionComponent",
-          "left": -95,
+          "left": -70,
           "top": -98,
-          "width": 324,
+          "width": 320,
           "height": 98,
           "wireID": "2ea4bf9b-4718-4dd4-dac6-16d94e9e52cf",
           "customInputs": [],
@@ -304,7 +303,7 @@
           "type": "SCPIActionComponent",
           "left": -232,
           "top": 114,
-          "width": 290,
+          "width": 288,
           "height": 171,
           "wireID": "61a121d1-7d28-4ba1-ce14-2c16e4241bfe",
           "customInputs": [],
@@ -317,7 +316,7 @@
           "type": "StartActionComponent",
           "left": -463,
           "top": -98,
-          "width": 78,
+          "width": 89,
           "height": 31,
           "wireID": "c8fae56f-f0e1-411a-dc28-98028ba46a40",
           "customInputs": [],
@@ -327,7 +326,7 @@
           "type": "EndActionComponent",
           "left": 411,
           "top": 130,
-          "width": 64,
+          "width": 89,
           "height": 31,
           "wireID": "6913dc22-04a7-48a9-819f-2758c0a8f595",
           "customInputs": [],
@@ -337,8 +336,8 @@
           "type": "LoopActionComponent",
           "left": -337,
           "top": -98,
-          "width": 196,
-          "height": 70,
+          "width": 232,
+          "height": 83,
           "wireID": "ab1654cb-0106-4b17-e919-7336cedf39fb",
           "customInputs": [],
           "customOutputs": [],
@@ -362,21 +361,9 @@
           "input": "@seqin"
         },
         {
-          "source": "c8fae56f-f0e1-411a-dc28-98028ba46a40",
-          "output": "@seqout",
-          "target": "ab1654cb-0106-4b17-e919-7336cedf39fb",
-          "input": "@seqin"
-        },
-        {
           "source": "ab1654cb-0106-4b17-e919-7336cedf39fb",
           "output": "@seqout",
           "target": "2ea4bf9b-4718-4dd4-dac6-16d94e9e52cf",
-          "input": "@seqin"
-        },
-        {
-          "source": "61a121d1-7d28-4ba1-ce14-2c16e4241bfe",
-          "output": "@seqout",
-          "target": "ab1654cb-0106-4b17-e919-7336cedf39fb",
           "input": "@seqin"
         },
         {
@@ -386,10 +373,22 @@
           "input": "@seqin"
         },
         {
+          "source": "c8fae56f-f0e1-411a-dc28-98028ba46a40",
+          "output": "@seqout",
+          "target": "ab1654cb-0106-4b17-e919-7336cedf39fb",
+          "input": "start"
+        },
+        {
+          "source": "61a121d1-7d28-4ba1-ce14-2c16e4241bfe",
+          "output": "@seqout",
+          "target": "ab1654cb-0106-4b17-e919-7336cedf39fb",
+          "input": "next"
+        },
+        {
           "source": "61a121d1-7d28-4ba1-ce14-2c16e4241bfe",
           "output": "@error",
           "target": "ab1654cb-0106-4b17-e919-7336cedf39fb",
-          "input": "@seqin"
+          "input": "next"
         }
       ],
       "localVariables": [
@@ -1059,8 +1058,8 @@
         },
         {
           "type": "SCPIActionComponent",
-          "left": 404,
-          "top": 464,
+          "left": 408,
+          "top": 466,
           "width": 241,
           "height": 63,
           "wireID": "5693c38e-f63f-4110-87b3-1f4bb6f1330c",
@@ -1606,12 +1605,6 @@
           "source": "51729823-7f8c-48e7-8c40-576ebe0d741b",
           "output": "@seqout",
           "target": "7e96a386-870e-448d-ce3f-6f887af57a7e",
-          "input": "@seqin"
-        },
-        {
-          "source": "e3c1ef21-075d-49fc-aa3b-84e346e23490",
-          "output": "action",
-          "target": "dc8ff753-e716-4a75-b0da-9c49864521f4",
           "input": "@seqin"
         },
         {

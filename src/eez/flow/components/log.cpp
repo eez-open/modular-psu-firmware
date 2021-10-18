@@ -45,7 +45,7 @@ void executeLogComponent(FlowState *flowState, unsigned componentIndex) {
       logInfo(flowState, componentIndex, valueStr);
     }
 
-    propagateValue(flowState, componentIndex);
+	propagateValueThroughSeqout(flowState, componentIndex);
 }
 
 } // namespace flow

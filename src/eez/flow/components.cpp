@@ -67,7 +67,7 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 		executeSwitchComponent(flowState, componentIndex);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_LOG_ACTION) {
 		executeLogComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_SCPI_ACTION) {
+	} else if (component->type == defs_v3::COMPONENT_TYPE_SCPIACTION) {
 		executeScpiComponent(flowState, componentIndex);
 	} else if (component->type == defs_v3::COMPONENT_TYPE_CALL_ACTION_ACTION) {
 		executeCallActionComponent(flowState, componentIndex);

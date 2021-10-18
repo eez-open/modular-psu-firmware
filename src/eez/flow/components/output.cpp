@@ -42,7 +42,7 @@ void executeOutputComponent(FlowState *flowState, unsigned componentIndex) {
 	}
 
     auto inputIndex = component->inputs.ptr(assets)[0];
-    if (inputIndex >= flowState->flow->nInputValues) {
+    if (inputIndex >= flowState->flow->componentInputs.count) {
         throwError(flowState, componentIndex, "Output action component, invalid input index\n");
 		return;
 	}

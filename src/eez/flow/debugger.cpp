@@ -439,7 +439,7 @@ void onFlowStateCreated(FlowState *flowState) {
 		auto flow = flowState->flow;
 
 		for (uint32_t i = 0; i < flow->localVariables.count; i++) {
-			auto pValue = &flowState->values[flow->nInputValues + i];
+			auto pValue = &flowState->values[flow->componentInputs.count + i];
 
             char buffer[100];
             snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
@@ -453,7 +453,7 @@ void onFlowStateCreated(FlowState *flowState) {
 			writeValue(*pValue);
         }
 
-		for (uint32_t i = 0; i < flow->nInputValues; i++) {
+		for (uint32_t i = 0; i < flow->componentInputs.count; i++) {
 			auto pValue = &flowState->values[i];
 
             char buffer[100];

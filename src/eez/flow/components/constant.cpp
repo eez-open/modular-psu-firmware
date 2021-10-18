@@ -35,7 +35,7 @@ void executeConstantComponent(FlowState *flowState, unsigned componentIndex) {
 
 	propagateValue(flowState, componentIndex, 1, sourceValue);
 
-	propagateValue(flowState, componentIndex);
+	propagateValueThroughSeqout(flowState, componentIndex);
 }
 
 } // namespace flow

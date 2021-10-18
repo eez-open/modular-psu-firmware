@@ -48,7 +48,7 @@ void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex) 
 
 	assignValue(flowState, componentIndex, dstValue, srcValue);
 	
-	propagateValue(flowState, componentIndex);
+	propagateValueThroughSeqout(flowState, componentIndex);
 }
 
 } // namespace flow

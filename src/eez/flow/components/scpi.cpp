@@ -236,7 +236,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 			ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
 			flowState->componenentExecutionStates[componentIndex] = nullptr;
 
-			propagateValue(flowState, componentIndex);
+			propagateValueThroughSeqout(flowState, componentIndex);
 			return;
 		}
 

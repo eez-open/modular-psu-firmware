@@ -53,7 +53,7 @@ void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
         }
     }
 
-    propagateValue(flowState, componentIndex);
+	propagateValueThroughSeqout(flowState, componentIndex);
 }
 
 } // namespace flow

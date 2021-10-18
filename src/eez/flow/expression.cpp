@@ -43,7 +43,7 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR) {
-			if (!stack.push(&flowState->values[flow->nInputValues + instructionArg])) {
+			if (!stack.push(&flowState->values[flow->componentInputs.count + instructionArg])) {
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {

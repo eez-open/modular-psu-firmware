@@ -55,7 +55,7 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 
 	if (actionFlowState->numActiveComponents == 0) {
 		freeFlowState(actionFlowState);
-		propagateValue(flowState, componentIndex);
+		propagateValueThroughSeqout(flowState, componentIndex);
 	} else {
 		flowState->numActiveComponents++;
 

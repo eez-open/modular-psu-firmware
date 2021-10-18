@@ -67,7 +67,7 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 		if (millis() >= delayComponentExecutionState->waitUntil) {
 			ObjectAllocator<DelayComponenentExecutionState>::deallocate(delayComponentExecutionState);
 			flowState->componenentExecutionStates[componentIndex] = nullptr;
-			propagateValue(flowState, componentIndex);
+			propagateValueThroughSeqout(flowState, componentIndex);
 		} else {
 			if (!addToQueue(flowState, componentIndex)) {
 				throwError(flowState, componentIndex, "Execution queue is full\n");

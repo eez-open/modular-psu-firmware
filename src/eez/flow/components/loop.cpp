@@ -42,6 +42,16 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
 
     auto loopComponentExecutionState = (LoopComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
 
+    // restart loop if entered through "start" input
+    static const unsigned START_INPUT_INDEX = 0;
+    auto startInputIndex = component->inputs.ptr(assets)[START_INPUT_INDEX];
+    if (flowState->values[startInputIndex].type != VALUE_TYPE_UNDEFINED) {
+        if (loopComponentExecutionState) {
+            ObjectAllocator<LoopComponenentExecutionState>::deallocate(loopComponentExecutionState);
+            loopComponentExecutionState = nullptr;
+        }
+    }
+
     if (!loopComponentExecutionState) {
         Value dstValue;
         if (!evalAssignableExpression(flowState, componentIndex, component->assignableExpressionEvalInstructions, dstValue)) {
@@ -78,7 +88,7 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
         loopComponentExecutionState->stepValue = stepValue;
         flowState->componenentExecutionStates[componentIndex] = loopComponentExecutionState;
 
-        propagateValue(flowState, componentIndex);
+		propagateValueThroughSeqout(flowState, componentIndex);
     } else {
         auto value = op_add(loopComponentExecutionState->dstValue, loopComponentExecutionState->stepValue);
         if (op_great_eq(value, loopComponentExecutionState->toValue).toBool()) {
@@ -88,7 +98,7 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
 		    propagateValue(flowState, componentIndex, 1);
 		} else {
 			assignValue(flowState, componentIndex, loopComponentExecutionState->dstValue, value);
-            propagateValue(flowState, componentIndex);
+			propagateValueThroughSeqout(flowState, componentIndex);
 		}
     }
 }

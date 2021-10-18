@@ -73,14 +73,36 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 		return false;
 	}
 
-	// check if all inputs are defined
+	// check if required inputs are defined:
+	//   - at least 1 seq input must be defined
+	//   - all non optional data inputs must be defined
+	int numSeqInputs = 0;
+	int numDefinedSeqInputs = 0;
 	for (unsigned inputIndex = 0; inputIndex < component->inputs.count; inputIndex++) {
 		auto inputValueIndex = component->inputs.ptr(assets)[inputIndex];
 
-		auto &value = flowState->values[inputValueIndex];
-		if (value.type == VALUE_TYPE_UNDEFINED) {
-			return false;
+		auto input = flowState->flow->componentInputs.item(assets, inputValueIndex);
+
+		if (input->flags & COMPONENT_INPUT_FLAG_IS_ACTION) {
+			numSeqInputs++;
+			auto &value = flowState->values[inputValueIndex];
+			if (value.type != VALUE_TYPE_UNDEFINED) {
+				numDefinedSeqInputs++;
+			}
+		} else {
+			if (!(input->flags & COMPONENT_INPUT_FLAG_IS_OPTIONAL)) {
+				auto &value = flowState->values[inputValueIndex];
+				if (value.type == VALUE_TYPE_UNDEFINED) {
+					// non optional data input is undefined
+					return false;
+				}
+			}
 		}
+	}
+
+	if (numSeqInputs && !numDefinedSeqInputs) {
+		// no seq input is defined
+		return false;
 	}
 
 	return true;
@@ -102,7 +124,7 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 	auto flowDefinition = assets->flowDefinition.ptr(assets);
 	auto flow = flowDefinition->flows.item(assets, flowIndex);
 
-	auto nValues = flow->nInputValues + flow->localVariables.count;
+	auto nValues = flow->componentInputs.count + flow->localVariables.count;
 
 	FlowState *flowState = (FlowState *)alloc(
 		sizeof(FlowState) + nValues * sizeof(Value) + flow->components.count * sizeof(ComponenentExecutionState *),
@@ -132,13 +154,13 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 	}
 
 	auto &undefinedValue = *flowDefinition->constants.item(assets, UNDEFINED_VALUE_INDEX);
-	for (unsigned i = 0; i < flow->nInputValues; i++) {
+	for (unsigned i = 0; i < flow->componentInputs.count; i++) {
 		flowState->values[i] = undefinedValue;
 	}
 
 	for (unsigned i = 0; i < flow->localVariables.count; i++) {
 		auto value = flow->localVariables.item(assets, i);
-		flowState->values[flow->nInputValues + i] = *value;
+		flowState->values[flow->componentInputs.count + i] = *value;
 	}
 
 	for (unsigned i = 0; i < flow->components.count; i++) {
@@ -173,7 +195,7 @@ FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlo
 void freeFlowState(FlowState *flowState) {
 	auto flow = flowState->flow;
 
-	auto valuesCount = flow->nInputValues + flow->localVariables.count;
+	auto valuesCount = flow->componentInputs.count + flow->localVariables.count;
 
 	for (unsigned int i = 0; i < valuesCount; i++) {
 		(flowState->values + i)->~Value();
@@ -205,17 +227,12 @@ void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outp
 		if (*pValue != value) {
 			*pValue = value;
 
-			if (!connection->seqIn) {
+			if (!(flowState->flow->componentInputs.item(assets, connection->targetInputIndex)->flags & COMPONENT_INPUT_FLAG_IS_ACTION)) {
 				onValueChanged(pValue);
 			}
 		}
 		
-		if (
-			pingComponent(flowState, connection->targetComponentIndex, componentIndex, outputIndex, connection->targetInputIndex) && 
-			connection->seqIn
-		) {
-			flowState->values[connection->targetInputIndex] = Value();
-		}
+		pingComponent(flowState, connection->targetComponentIndex, componentIndex, outputIndex, connection->targetInputIndex);
 	}
 }
 
@@ -224,8 +241,17 @@ void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outp
 	propagateValue(flowState, componentIndex, outputIndex, nullValue);
 }
 
-void propagateValue(FlowState *flowState, unsigned componentIndex) {
-	propagateValue(flowState, componentIndex, 0);
+void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex) {
+	// find @seqout output
+	// TODO optimization hint: always place @seqout at 0-th index
+	auto assets = flowState->assets;
+	auto component = flowState->flow->components.item(assets, componentIndex);
+	for (uint32_t i = 0; i < component->outputs.count; i++) {
+		if (component->outputs.item(assets, i)->isSeqOut) {
+			propagateValue(flowState, componentIndex, i);
+			return;
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

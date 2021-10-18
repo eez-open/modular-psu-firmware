@@ -67,7 +67,7 @@ void freeFlowState(FlowState *flowState);
 
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const gui::Value &value);
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex); // propagates null value
-void propagateValue(FlowState *flowState, unsigned componentIndex); // propagates null value through @seqout (0-th output)
+void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex); // propagates null value through @seqout (0-th output)
 
 void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value);
 void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value);

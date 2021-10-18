@@ -216,12 +216,11 @@ struct PropertyValue {
 struct Connection {
 	uint16_t targetComponentIndex;
 	uint16_t targetInputIndex;
-	uint8_t seqIn;
-	uint8_t reserved;
 };
 
 struct ComponentOutput {
 	ListOfAssetsPtr<Connection> connections;
+	uint32_t isSeqOut;
 };
 
 static const uint16_t BREAKPOINT_ENABLED = 1;
@@ -247,12 +246,19 @@ struct WidgetActionItem {
 	int16_t componentOutputIndex;
 };
 
+#define COMPONENT_INPUT_FLAG_IS_ACTION   (1 << 0)
+#define COMPONENT_INPUT_FLAG_IS_OPTIONAL (1 << 1)
+
+struct ComponentInput {
+	uint8_t flags;
+};
+
 struct Flow {
 	ListOfAssetsPtr<Component> components;
 	ListOfAssetsPtr<Value> localVariables;
+	ListOfAssetsPtr<ComponentInput> componentInputs;
 	ListOfAssetsPtr<WidgetDataItem> widgetDataItems;
 	ListOfAssetsPtr<WidgetActionItem> widgetActions;
-	uint16_t nInputValues;
 };
 
 struct FlowDefinition {

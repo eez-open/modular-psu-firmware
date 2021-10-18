@@ -28,7 +28,7 @@ namespace flow {
 void executeEndComponent(FlowState *flowState, unsigned componentIndex) {
 	if (flowState->parentFlowState && flowState->isAction) {
 		flowState->parentFlowState->numActiveComponents--;
-		propagateValue(flowState->parentFlowState, flowState->parentComponentIndex);
+		propagateValueThroughSeqout(flowState->parentFlowState, flowState->parentComponentIndex);
 	} else {
 		scripting::stopScript();
 	}
