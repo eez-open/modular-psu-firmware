@@ -26,7 +26,6 @@
 			.scpi0 { text-align: left; }
 			.scpi1 { text-align: left; margin-left: 4.99mm; }
 			.scpi2 { text-align: left; margin-left: 10mm; }
-			.scpi3 { text-align: left; margin-left: 14.99mm; }
 			.table_header { text-align: center; }
 			
 			/* Footnotes & endnotes */
@@ -47,7 +46,7 @@
 		<p class="Heading_2">5.11. <a name="_mmemory"></a>MMEMory</p>
 		<p>The MMEMory commands are used to create, write, read or delete files on the BB3’s SD card. It can also query SD card information. In addition it is used for storing and recalling values used by [SOURce[&lt;n&gt;]]:LIST subsystem. File and directory (folder) names cannot contain the following characters:\&#160;/&#160;:&#160;*&#160;?&#160;&quot;&#160;&lt;&#160;&gt;&#160;|</p>
 		<p>&#160;</p>
-		<table style="border-collapse: collapse; background: transparent; width: 175.02mm;">
+		<table style="border-collapse: collapse; background: transparent; width: 170mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 1px solid #000000; border-bottom: 1px solid #000000; vertical-align: top; background: transparent; width: 41%;">
 					<p class="table_header">SCPI command</p>
@@ -61,7 +60,7 @@
 					<p class="scpi0">MMEMory</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>&#160;</p>
+					<p class="scpi0">&#160;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -69,7 +68,7 @@
 					<p class="scpi1"><a href="#mmem_cat"><span style="text-decoration: underline;">:CATalog [&lt;directory&gt;]</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Returns a list of items in the specified directory (folder)</p>
+					<p class="scpi1">Returns a list of items in the specified directory (folder)</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -77,7 +76,7 @@
 					<p class="scpi2"><a href="#mmem_cat_len"><span style="text-decoration: underline;">:LENgth [&lt;directory&gt;]</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Returns the number of items in the specified directory</p>
+					<p class="scpi2">Returns the number of items in the specified directory</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -85,7 +84,7 @@
 					<p class="scpi1"><a href="#mmem_cdir"><span style="text-decoration: underline;">:CDIRectory {&lt;directory&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Changes the current directory</p>
+					<p class="scpi1">Changes the current directory</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -93,7 +92,7 @@
 					<p class="scpi1"><a href="#mmem_clos"><span style="text-decoration: underline;">:CLOSe</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Closes the file specified in NAME</p>
+					<p class="scpi1">Closes the file specified in NAME</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -101,7 +100,7 @@
 					<p class="scpi1"><a href="#mmem_copy"><span style="text-decoration: underline;">:COPY {&lt;source&gt;}, {&lt;destination&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Copies &lt;source&gt; to &lt;destination&gt;</p>
+					<p class="scpi1">Copies &lt;source&gt; to &lt;destination&gt;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -109,7 +108,7 @@
 					<p class="scpi1"><a href="#mmem_date"><span style="text-decoration: underline;">:DATE? {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Returns date that the specified file was last saved</p>
+					<p class="scpi1">Returns date that the specified file was last saved</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -117,7 +116,7 @@
 					<p class="scpi1"><a href="#mmem_del"><span style="text-decoration: underline;">:DELete {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Deletes an existing file</p>
+					<p class="scpi1">Deletes an existing file</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -125,7 +124,7 @@
 					<p class="scpi1">:DOWNload</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">&#160;</p>
+					<p class="scpi1">&#160;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -133,7 +132,7 @@
 					<p class="scpi2"><a href="#mmem_abor"><span style="text-decoration: underline;">:</span></a><a href="#mmem_abor"><span style="text-decoration: underline;">ABORt</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Aborts current download session</p>
+					<p class="scpi2">Aborts current download session</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -141,7 +140,7 @@
 					<p class="scpi2"><a href="#mmem_down_data"><span style="text-decoration: underline;">:DATA {&lt;block&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Downloads data from the host computer or script</p>
+					<p class="scpi2">Downloads data from the host computer or script</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -149,7 +148,7 @@
 					<p class="scpi2"><a href="#mmem_down_fnam"><span style="text-decoration: underline;">:FNAMe {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Creates or opens the specified filename for download data</p>
+					<p class="scpi2">Creates or opens the specified filename for download data</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -157,7 +156,7 @@
 					<p class="scpi2"><a href="#mmem_down_size"><span style="text-decoration: underline;">:</span></a><a href="#mmem_down_size"><span style="text-decoration: underline;">SIZE {&lt;filesize&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Sets information about file size used for progress bar</p>
+					<p class="scpi2">Sets information about file size used for progress bar</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -165,7 +164,7 @@
 					<p class="scpi1"><a href="#mmem_feed"><span style="text-decoration: underline;">:FEED</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Sets data handle used to feed data into the file</p>
+					<p class="scpi1">Sets data handle used to feed data into the file</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -173,7 +172,7 @@
 					<p class="scpi1"><a href="#mmem_info"><span style="text-decoration: underline;">:</span></a><a href="#mmem_info"><span style="text-decoration: underline;">INFOrmation?</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Returns used and free space</p>
+					<p class="scpi1">Returns used and free space</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -181,7 +180,7 @@
 					<p class="scpi1">:LOAD</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>&#160;</p>
+					<p class="scpi1">&#160;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -189,7 +188,7 @@
 					<p class="scpi2"><a href="#mmem_load_list"><span style="text-decoration: underline;">:LIST&lt;n&gt; {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Loads stored LIST to the specified channel</p>
+					<p class="scpi2">Loads stored LIST to the specified channel</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -197,7 +196,7 @@
 					<p class="scpi2"><a href="#mmem_load_prof"><span style="text-decoration: underline;">:</span></a><a href="#mmem_load_prof"><span style="text-decoration: underline;">PROFile {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Loads stored user profile</p>
+					<p class="scpi2">Loads stored user profile</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -205,7 +204,7 @@
 					<p class="scpi1"><a href="#mmem_lock"><span style="text-decoration: underline;">:LOCK {&lt;password&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Sets write protection</p>
+					<p class="scpi1">Sets write protection</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -213,7 +212,7 @@
 					<p class="scpi1"><a href="#mmem_mdir"><span style="text-decoration: underline;">:MDIRectory {&lt;directory&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Makes a new directory</p>
+					<p class="scpi1">Makes a new directory</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -221,7 +220,7 @@
 					<p class="scpi1"><a href="#mmem_move"><span style="text-decoration: underline;">:MOVE {&lt;source&gt;}, {&lt;destination&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Moves or renames &lt;source&gt; to &lt;destination&gt;</p>
+					<p class="scpi1">Moves or renames &lt;source&gt; to &lt;destination&gt;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -229,7 +228,7 @@
 					<p class="scpi1"><a href="#mmem_name"><span style="text-decoration: underline;">:NAME</span></a><a href="#mmem_name"><span style="text-decoration: underline;"> {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Sets the file name ro be opened or closed</p>
+					<p class="scpi1">Sets the file name ro be opened or closed</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -237,7 +236,7 @@
 					<p class="scpi1"><a href="#mmem_open"><span style="text-decoration: underline;">:OPEN</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Opens the file specified in NAME</p>
+					<p class="scpi1">Opens the file specified in NAME</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -245,7 +244,7 @@
 					<p class="scpi1"><a href="#mmem_rdir"><span style="text-decoration: underline;">:RDIRectory {&lt;directory&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Removes the specified directory</p>
+					<p class="scpi1">Removes the specified directory</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -253,7 +252,7 @@
 					<p class="scpi1">:STORe</p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">&#160;</p>
+					<p class="scpi1">&#160;</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -261,7 +260,7 @@
 					<p class="scpi2"><a href="#mmem_stor_list"><span style="text-decoration: underline;">:LIST&lt;n&gt; {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Saves specified channel LIST </p>
+					<p class="scpi2">Saves specified channel LIST </p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -269,7 +268,7 @@
 					<p class="scpi2"><a href="#mmem_stor_prof"><span style="text-decoration: underline;">:</span></a><a href="#mmem_stor_prof"><span style="text-decoration: underline;">PROFile {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Saves specified user profile</p>
+					<p class="scpi2">Saves specified user profile</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -277,7 +276,7 @@
 					<p class="scpi1"><a href="#mmem_time"><span style="text-decoration: underline;">:TIME? {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p>Returns time that the specified file was last saved</p>
+					<p class="scpi1">Returns time that the specified file was last saved</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -285,7 +284,7 @@
 					<p class="scpi1"><a href="#mmem_unl"><span style="text-decoration: underline;">:UNLock {&lt;password&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Clears write protection</p>
+					<p class="scpi1">Clears write protection</p>
 				</td>
 			</tr>
 			<tr style="background: transparent;">
@@ -293,10 +292,11 @@
 					<p class="scpi1"><a href="#mmem_upl"><span style="text-decoration: underline;">:UPLoad? {&lt;filename&gt;}</span></a></p>
 				</td>
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 59%;">
-					<p class="scpi3" style="margin-left: 0;">Uploads data to the host computer or script</p>
+					<p class="scpi1">Uploads data to the host computer or script</p>
 				</td>
 			</tr>
 		</table>
+		<p>&#160;</p>
 		<p class="Heading_3">5.11.1. <a name="mmem_cat"></a>MMEMory:CATalog</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
@@ -1735,7 +1735,7 @@
 				</td>
 			</tr>
 		</table>
-		<p class="Heading_3">5.11.20. <a name="mmem_rdir"></a><a name="mmem_name"></a>MMEMory:NAME</p>
+		<p class="Heading_3">5.11.20. <a name="mmem_name"></a><a name="mmem_rdir"></a>MMEMory:NAME</p>
 		<table style="border-collapse: collapse; background: transparent; width: 169.92mm;">
 			<tr style="background: transparent;">
 				<td style="border-left: 0; border-right: 0; border-top: 0; border-bottom: 0; vertical-align: top; background: transparent; width: 13%;">
