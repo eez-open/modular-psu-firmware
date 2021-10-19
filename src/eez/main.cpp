@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
     MX_SPI5_Init();
     // MX_TIM3_Init();
     MX_TIM6_Init();
-    //MX_TIM8_Init();
+    MX_TIM8_Init();
 
     MX_TIM7_Init();
     HAL_TIM_Base_Start_IT(&htim7);

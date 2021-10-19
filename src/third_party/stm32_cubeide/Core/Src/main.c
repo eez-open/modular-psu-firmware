@@ -249,6 +249,7 @@ void SystemClock_Config_R2B4(void)
 }
 
 void PSU_IncTick();
+void Encoder_OnDebounceTimer();
 /* USER CODE END 4 */
 
  /**
@@ -270,6 +271,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 1 */
   else if (htim->Instance == TIM7) {
     PSU_IncTick();
+  }
+  else if (htim->Instance == TIM8) {
+	  Encoder_OnDebounceTimer();
   }
   /* USER CODE END Callback 1 */
 }
