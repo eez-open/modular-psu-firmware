@@ -315,16 +315,20 @@ const char *getActionName(const WidgetCursor &widgetCursor, int16_t actionId) {
 	}
 	actionId--;
 
-	if (g_externalAssets == nullptr) {
+	if (!widgetCursor.assets) {
 		return "";
 	}
 
-	return g_externalAssets->actionNames.item(g_externalAssets, actionId);
+	return widgetCursor.assets->actionNames.item(widgetCursor.assets, actionId);
 }
 
 int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name) {
-	for (uint32_t i = 0; i < g_externalAssets->variableNames.count; i++) {
-		if (strcmp(g_externalAssets->variableNames.item(g_externalAssets, i), name) == 0) {
+	if (!widgetCursor.assets) {
+		return 0;
+	}
+
+	for (uint32_t i = 0; i < widgetCursor.assets->variableNames.count; i++) {
+		if (strcmp(widgetCursor.assets->variableNames.item(widgetCursor.assets, i), name) == 0) {
 			return -((int16_t)i + 1);
 		}
 	}
