@@ -28,6 +28,7 @@
 #include <eez/modules/mcu/encoder.h>
 
 #if defined(EEZ_PLATFORM_STM32)	
+#include <tim.h>
 #include <eez/modules/mcu/button.h>
 #endif
 
@@ -84,7 +85,30 @@ void write(int counter, bool clicked) {
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
+bool g_debounceTimerStarted = false;
+volatile uint8_t g_pinState;
+
+#define READ_ENC_PIN_STATE (HAL_GPIO_ReadPin(ENC_B_GPIO_Port, ENC_B_Pin) << 1) | HAL_GPIO_ReadPin(ENC_A_GPIO_Port, ENC_A_Pin)
+
 void onPinInterrupt() {
+    if (!g_debounceTimerStarted) {
+        g_pinState = READ_ENC_PIN_STATE;
+        TIM8->ARR = 500;
+        HAL_TIM_Base_Start_IT(&htim8);
+		g_debounceTimerStarted = true;
+    }
+}
+
+void onDebounceTimer() {
+	HAL_TIM_Base_Stop_IT(&htim8);
+    g_debounceTimerStarted = false;
+
+    uint8_t pinState = READ_ENC_PIN_STATE;
+    if (pinState != g_pinState) {
+        // debounce
+        return;
+    }
+
     // https://github.com/buxtronix/arduino/blob/master/libraries/Rotary/Rotary.cpp
     // static const uint8_t DIR_NONE = 0x0; // No complete step yet.
     static const uint8_t DIR_CW = 0x10; // Clockwise step.
@@ -145,7 +169,6 @@ void onPinInterrupt() {
 
     static volatile uint8_t g_rotationState = R_START;
     
-    uint8_t pinState = (HAL_GPIO_ReadPin(ENC_B_GPIO_Port, ENC_B_Pin) << 1) | HAL_GPIO_ReadPin(ENC_A_GPIO_Port, ENC_A_Pin);
     g_rotationState = g_ttable[g_rotationState & 0xf][pinState];
     
     uint8_t dir = g_rotationState & 0x30;
@@ -242,4 +265,10 @@ static int getAcceleratedCounter(int increment) {
 } // namespace mcu
 } // namespace eez
 
+#endif
+
+#if defined(EEZ_PLATFORM_STM32)
+extern "C" void Encoder_OnDebounceTimer() {
+    eez::mcu::encoder::onDebounceTimer();
+}
 #endif
