@@ -177,7 +177,25 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 
-			Value srcValue = Value::makeStringRef(resultText, resultTextLen, 0x09143fa4);
+			Value srcValue;
+			if (resultTextLen >= 2 && resultText[0] == '"' && resultText[resultTextLen-1] == '"') {
+				resultText++;
+				resultTextLen -= 2;
+				srcValue = Value::makeStringRef(resultText, resultTextLen, 0x09143fa4);
+			} else {
+				char *strEnd;
+				long num = strtol(resultText, &strEnd, 10);
+				if (*strEnd == 0) {
+					srcValue = Value(num);
+				} else {
+					float fnum = strtof(resultText, &strEnd);
+					if (*strEnd == 0) {
+						srcValue = Value(fnum);
+					} else {
+						srcValue = Value::makeStringRef(resultText, resultTextLen, 0x09143fa4);
+					}
+				}
+			}
 
 			assignValue(flowState, componentIndex, dstValue, srcValue);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY) {
