@@ -57,11 +57,11 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
     auto savedWidget = widgetCursor.widget;
 
 	auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
-	
-	auto widgetIndex = indexValue.getInt() < 0 || indexValue.getInt() >= (int)containerWidget->widgets.count ? 0 : indexValue.getInt();
-    widgetCursor.widget = containerWidget->widgets.item(widgetCursor.assets, widgetIndex);
-
-    enumWidget(widgetCursor, callback);
+    if (containerWidget->widgets.count > 0) {
+	    auto widgetIndex = indexValue.getInt() < 0 || indexValue.getInt() >= (int)containerWidget->widgets.count ? 0 : indexValue.getInt();
+        widgetCursor.widget = containerWidget->widgets.item(widgetCursor.assets, widgetIndex);
+        enumWidget(widgetCursor, callback);
+    }
 
     widgetCursor.widget = savedWidget;
 
