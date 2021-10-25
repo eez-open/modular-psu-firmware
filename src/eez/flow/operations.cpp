@@ -137,46 +137,63 @@ Value op_mod(const Value& a1, const Value& b1) {
 	return Value();
 }
 
-Value op_eq(const Value& a1, const Value& b1) {
+bool is_equal(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
 
-	return Value(a == b, VALUE_TYPE_BOOLEAN);
+	if (a.isAnyStringType() && b.isAnyStringType()) {
+		const char *aStr = a.getString();
+		const char *bStr = b.getString();
+		if (!aStr && !aStr) {
+			return true;
+		}
+		if (!aStr || !bStr) {
+			return false;
+		}
+		return strcmp(aStr, bStr) == 0;
+	}
+
+	return a.toDouble() == b.toDouble();
+}
+
+bool is_less(const Value& a1, const Value& b1) {
+	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
+	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
+
+	if (a.isAnyStringType() && b.isAnyStringType()) {
+		const char *aStr = a.getString();
+		const char *bStr = b.getString();
+		if (!aStr || !bStr) {
+			return false;
+		}
+		return strcmp(aStr, bStr) < 0;
+	}
+
+	return a.toDouble() < b.toDouble();
+}
+
+Value op_eq(const Value& a1, const Value& b1) {
+	return Value(is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_neq(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
-
-	return Value(a != b, VALUE_TYPE_BOOLEAN);
+	return Value(!is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_less(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
-
-	return Value(a.toDouble() < b.toDouble(), VALUE_TYPE_BOOLEAN);
+	return Value(is_less(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_great(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
-
-	return Value(a.toDouble() > b.toDouble(), VALUE_TYPE_BOOLEAN);
+	return Value(!is_less(a1, b1) && !is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_less_eq(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
-
-	return Value(a.toDouble() <= b.toDouble(), VALUE_TYPE_BOOLEAN);
+	return Value(is_less(a1, b1) || is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_great_eq(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1;
-
-	return Value(a.toDouble() >= b.toDouble(), VALUE_TYPE_BOOLEAN);
+	return Value(!is_less(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 bool do_OPERATION_TYPE_ADD(EvalStack &stack) {
@@ -296,7 +313,7 @@ bool do_OPERATION_TYPE_EQUAL(EvalStack &stack) {
 bool do_OPERATION_TYPE_NOT_EQUAL(EvalStack &stack) {
 	auto b = stack.pop();
 	auto a = stack.pop();
-	if (!stack.push(a != b)) {
+	if (!stack.push(op_neq(a, b))) {
 		return false;
 	}
 	return true;}

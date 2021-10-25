@@ -821,6 +821,10 @@ double Value::toDouble(int *err) const {
 		return (double)uint64Value;
 	}
 
+	if (type == VALUE_TYPE_STRING) {
+		return (double)atof(strValue);
+	}
+
 	if (type == VALUE_TYPE_STRING_REF) {
 		return (double)atof(((StringRef *)refValue)->str);
 	}
@@ -875,6 +879,10 @@ float Value::toFloat(int *err) const {
 	}
 	if (type == VALUE_TYPE_UINT64) {
 		return (float)uint64Value;
+	}
+
+	if (type == VALUE_TYPE_STRING) {
+		return (float)atof(strValue);
 	}
 
 	if (type == VALUE_TYPE_STRING_REF) {
@@ -932,6 +940,10 @@ int32_t Value::toInt32(int *err) const {
 		return (int32_t)uint64Value;
 	}
 
+	if (type == VALUE_TYPE_STRING) {
+		return (int64_t)atoi(strValue);
+	}
+
 	if (type == VALUE_TYPE_STRING_REF) {
 		return (int64_t)atoi(((StringRef *)refValue)->str);
 	}
@@ -986,6 +998,10 @@ int64_t Value::toInt64(int *err) const {
 		return (int64_t)uint64Value;
 	}
 
+	if (type == VALUE_TYPE_STRING) {
+		return (int64_t)atoi(strValue);
+	}
+
 	if (type == VALUE_TYPE_STRING_REF) {
 		return (int64_t)atoi(((StringRef *)refValue)->str);
 	}
@@ -1038,6 +1054,10 @@ bool Value::toBool(int *err) const {
 	}
 	if (type == VALUE_TYPE_UINT64) {
 		return uint64Value != 0;
+	}
+
+	if (type == VALUE_TYPE_STRING) {
+		return strValue && *strValue;
 	}
 
 	if (type == VALUE_TYPE_STRING_REF) {
