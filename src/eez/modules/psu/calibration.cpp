@@ -109,11 +109,15 @@ void Value::setDacValue(float value) {
         }
     } else {
         if (channel) {
-            channel_dispatcher::setCurrent(*channel, value);
             if (type == CALIBRATION_VALUE_I_HI_RANGE) {
+                channel_dispatcher::setCurrent(*channel, value);
                 channel_dispatcher::setVoltage(*channel, channel->params.I_CAL_U_SET);
             } else {
+                // prevent false power fault detection (#275)
+                channel_dispatcher::setCurrent(*channel, 0.015);
                 channel_dispatcher::setVoltage(*channel, channel->params.I_LOW_RANGE_CAL_U_SET);
+                osDelay(3);
+                channel_dispatcher::setCurrent(*channel, value);
             }
         } else {
             channel_dispatcher::setCurrent(editor.m_slotIndex, editor.m_subchannelIndex, value, nullptr);
@@ -375,6 +379,7 @@ void CalibrationEditor::doStart() {
         channel_dispatcher::outputEnable(*channel, false);
         channel_dispatcher::setVoltage(*channel, channel->u.min);
         channel_dispatcher::setCurrent(*channel, channel->i.min);
+        m_savedCurrentRangeSelectionMode = channel->getCurrentRangeSelectionMode();
     } else {
         g_slots[m_slotIndex]->outputEnable(m_subchannelIndex, false, nullptr);
         channel_dispatcher::setVoltage(m_slotIndex, m_subchannelIndex, channel_dispatcher::getVoltageMinValue(m_slotIndex, m_subchannelIndex), nullptr);
@@ -457,6 +462,7 @@ void CalibrationEditor::stop() {
         channel_dispatcher::outputEnable(*channel, false);
         channel_dispatcher::setVoltage(*channel, channel->u.min);
         channel_dispatcher::setCurrent(*channel, channel->i.min);
+        channel->setCurrentRangeSelectionMode(m_savedCurrentRangeSelectionMode);
     } else {
         if (g_slots[m_slotIndex]->isVoltageCalibrationExists(m_subchannelIndex)) {
             g_slots[m_slotIndex]->enableVoltageCalibration(m_subchannelIndex, true);
