@@ -508,9 +508,11 @@ struct StringRef : public Ref {
 
 typedef bool (*CompareValueFunction)(const Value &a, const Value &b);
 typedef void (*ValueToTextFunction)(const Value &value, char *text, int count);
+typedef const char * (*ValueTypeNameFunction)(const Value &value);
 
 extern CompareValueFunction g_valueTypeCompareFunctions[];
 extern ValueToTextFunction g_valueTypeToTextFunctions[];
+extern ValueTypeNameFunction g_valueTypeNames[];
 
 ////////////////////////////////////////////////////////////////////////////////
 

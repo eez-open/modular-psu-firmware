@@ -52,12 +52,20 @@ void UNDEFINED_value_to_text(const Value &value, char *text, int count) {
     *text = 0;
 }
 
+const char *UNDEFINED_value_type_name(const Value &value) {
+    return "undefined";
+}
+
 bool compare_NULL_value(const Value &a, const Value &b) {
     return true;
 }
 
 void NULL_value_to_text(const Value &value, char *text, int count) {
     *text = 0;
+}
+
+const char *NULL_value_type_name(const Value &value) {
+    return "null";
 }
 
 bool compare_BOOLEAN_value(const Value &a, const Value &b) {
@@ -68,12 +76,20 @@ void BOOLEAN_value_to_text(const Value &value, char *text, int count) {
     stringAppendInt(text, count, value.getInt());
 }
 
+const char *BOOLEAN_value_type_name(const Value &value) {
+    return "boolean";
+}
+
 bool compare_INT8_value(const Value &a, const Value &b) {
     return a.getInt8() == b.getInt8();
 }
 
 void INT8_value_to_text(const Value &value, char *text, int count) {
     stringAppendInt(text, count, value.getInt8());
+}
+
+const char *INT8_value_type_name(const Value &value) {
+    return "int8";
 }
 
 bool compare_UINT8_value(const Value &a, const Value &b) {
@@ -84,12 +100,20 @@ void UINT8_value_to_text(const Value &value, char *text, int count) {
     stringAppendUInt32(text, count, value.getUInt8());
 }
 
+const char *UINT8_value_type_name(const Value &value) {
+    return "uint8";
+}
+
 bool compare_INT16_value(const Value &a, const Value &b) {
     return a.getInt16() == b.getInt16();
 }
 
 void INT16_value_to_text(const Value &value, char *text, int count) {
     stringAppendInt(text, count, value.getInt16());
+}
+
+const char *INT16_value_type_name(const Value &value) {
+    return "int16";
 }
 
 bool compare_UINT16_value(const Value &a, const Value &b) {
@@ -100,12 +124,20 @@ void UINT16_value_to_text(const Value &value, char *text, int count) {
     stringAppendUInt32(text, count, value.getUInt16());
 }
 
+const char *UINT16_value_type_name(const Value &value) {
+    return "uint16";
+}
+
 bool compare_INT32_value(const Value &a, const Value &b) {
     return a.getInt32() == b.getInt32();
 }
 
 void INT32_value_to_text(const Value &value, char *text, int count) {
     stringAppendInt(text, count, value.getInt32());
+}
+
+const char *INT32_value_type_name(const Value &value) {
+    return "int32";
 }
 
 bool compare_UINT32_value(const Value &a, const Value &b) {
@@ -116,6 +148,10 @@ void UINT32_value_to_text(const Value &value, char *text, int count) {
     stringAppendUInt32(text, count, value.getUInt32());
 }
 
+const char *UINT32_value_type_name(const Value &value) {
+    return "uint32";
+}
+
 bool compare_INT64_value(const Value &a, const Value &b) {
     return a.getInt64() == b.getInt64();
 }
@@ -124,12 +160,20 @@ void INT64_value_to_text(const Value &value, char *text, int count) {
     stringAppendInt64(text, count, value.getInt64());
 }
 
+const char *INT64_value_type_name(const Value &value) {
+    return "int64";
+}
+
 bool compare_UINT64_value(const Value &a, const Value &b) {
     return a.getUInt64() == b.getUInt64();
 }
 
 void UINT64_value_to_text(const Value &value, char *text, int count) {
     stringAppendUInt64(text, count, value.getUInt64());
+}
+
+const char *UINT64_value_type_name(const Value &value) {
+    return "uint64";
 }
 
 bool compare_FLOAT_value(const Value &a, const Value &b) {
@@ -289,6 +333,10 @@ void FLOAT_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+const char *FLOAT_value_type_name(const Value &value) {
+    return "float";
+}
+
 bool compare_DOUBLE_value(const Value &a, const Value &b) {
     return a.getUnit() == b.getUnit() && a.getDouble() == b.getDouble() && a.getOptions() == b.getOptions();
 }
@@ -446,6 +494,10 @@ void DOUBLE_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+const char *DOUBLE_value_type_name(const Value &value) {
+    return "double";
+}
+
 bool compare_STRING_value(const Value &a, const Value &b) {
     const char *astr = a.getString();
     const char *bstr = b.getString();
@@ -467,6 +519,10 @@ void STRING_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+const char *STRING_value_type_name(const Value &value) {
+    return "string";
+}
+
 bool compare_ARRAY_value(const Value &a, const Value &b) {
     return a.arrayValue == b.arrayValue;
 }
@@ -475,12 +531,20 @@ void ARRAY_value_to_text(const Value &value, char *text, int count) {
     text[0] = 0;
 }
 
+const char *ARRAY_value_type_name(const Value &value) {
+    return "array";
+}
+
 bool compare_STRING_REF_value(const Value &a, const Value &b) {
 	return compare_STRING_value(a, b);
 }
 
 void STRING_REF_value_to_text(const Value &value, char *text, int count) {
 	STRING_value_to_text(value, text, count);
+}
+
+const char *STRING_REF_value_type_name(const Value &value) {
+    return "string";
 }
 
 bool compare_VERSIONED_STRING_value(const Value &a, const Value &b) {
@@ -496,6 +560,10 @@ void VERSIONED_STRING_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+const char *VERSIONED_STRING_value_type_name(const Value &value) {
+    return "versioned-string";
+}
+
 bool compare_VALUE_PTR_value(const Value &a, const Value &b) {
 	return a.pValueValue == b.pValueValue || (a.pValueValue && b.pValueValue && *a.pValueValue == *b.pValueValue);
 }
@@ -508,6 +576,14 @@ void VALUE_PTR_value_to_text(const Value &value, char *text, int count) {
 	}
 }
 
+const char *VALUE_PTR_value_type_name(const Value &value) {
+	if (value.pValueValue) {
+		return g_valueTypeNames[value.pValueValue->type](value.pValueValue);
+	} else {
+		return "null";
+	}
+}
+
 bool compare_FLOW_OUTPUT_value(const Value &a, const Value &b) {
 	return a.getUInt16() == b.getUInt16();
 }
@@ -516,12 +592,20 @@ void FLOW_OUTPUT_value_to_text(const Value &value, char *text, int count) {
     text[0] = 0;
 }
 
+const char *FLOW_OUTPUT_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_RANGE_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
 
 void RANGE_value_to_text(const Value &value, char *text, int count) {
     text[0] = 0;
+}
+
+const char *RANGE_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_PASSWORD_value(const Value &a, const Value &b) {
@@ -535,6 +619,10 @@ void PASSWORD_value_to_text(const Value &value, char *text, int count) {
         text[i] = '*';
     }
     text[i] = 0;
+}
+
+const char *PASSWORD_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_ENUM_value(const Value &a, const Value &b) {
@@ -556,6 +644,10 @@ void ENUM_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+const char *ENUM_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_PERCENTAGE_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -563,6 +655,10 @@ bool compare_PERCENTAGE_value(const Value &a, const Value &b) {
 void PERCENTAGE_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count - 1, "%d%%", value.getInt());
     text[count - 1] = 0;
+}
+
+const char *PERCENTAGE_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_SIZE_value(const Value &a, const Value &b) {
@@ -574,12 +670,20 @@ void SIZE_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
+const char *SIZE_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_POINTER_value(const Value &a, const Value &b) {
     return a.getVoidPointer() == b.getVoidPointer();
 }
 
 void POINTER_value_to_text(const Value &value, char *text, int count) {
     text[0] = 0;
+}
+
+const char *POINTER_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_TIME_SECONDS_value(const Value &a, const Value &b) {
@@ -596,12 +700,20 @@ void TIME_SECONDS_value_to_text(const Value &value, char *text, int count) {
     text[count - 1] = 0;
 }
 
+const char *TIME_SECONDS_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_YT_DATA_GET_VALUE_FUNCTION_POINTER_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
 
 void YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text(const Value &value, char *text, int count) {
     text[0] = 0;
+}
+
+const char *YT_DATA_GET_VALUE_FUNCTION_POINTER_value_type_name(const Value &value) {
+    return "internal";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -623,6 +735,16 @@ VALUE_TYPES
 
 #define VALUE_TYPE(NAME) NAME##_value_to_text,
 ValueToTextFunction g_valueTypeToTextFunctions[] = {
+	VALUE_TYPES
+};
+#undef VALUE_TYPE
+
+#define VALUE_TYPE(NAME) const char * NAME##_value_type_name(const Value &value);
+VALUE_TYPES
+#undef VALUE_TYPE
+
+#define VALUE_TYPE(NAME) NAME##_value_type_name,
+ValueTypeNameFunction g_valueTypeNames[] = {
 	VALUE_TYPES
 };
 #undef VALUE_TYPE

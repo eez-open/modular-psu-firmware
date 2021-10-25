@@ -309,9 +309,15 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 			pDstValue->floatValue = srcValue.toFloat();
 		} else if (pDstValue->isDouble()) {
 			pDstValue->doubleValue = srcValue.toDouble();
+		} else if (pDstValue->isAnyStringType()) {
+			*pDstValue = srcValue.toString(0x30a91156);
+		} else {
+			char errorMessage[100];
+			snprintf(errorMessage, sizeof(errorMessage), "Can not assign %s to %s\n",
+				g_valueTypeNames[pDstValue->type](*pDstValue), g_valueTypeNames[srcValue.type](srcValue)
+			);
+			throwError(flowState, componentIndex, errorMessage);
 		}
-
-		// TODO
 		
 		onValueChanged(pDstValue);
 	}

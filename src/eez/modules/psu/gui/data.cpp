@@ -486,6 +486,10 @@ void LESS_THEN_MIN_FLOAT_value_to_text(const Value &value, char *text, int count
     snprintf(text, count, "Value is less then %s", valueText);
 }
 
+const char *LESS_THEN_MIN_FLOAT_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_GREATER_THEN_MAX_FLOAT_value(const Value &a, const Value &b) {
     return a.getUnit() == b.getUnit() && a.getFloat() == b.getFloat();
 }
@@ -496,12 +500,20 @@ void GREATER_THEN_MAX_FLOAT_value_to_text(const Value &value, char *text, int co
     snprintf(text, count, "Value is greater then %s", valueText);
 }
 
+const char *GREATER_THEN_MAX_FLOAT_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_CHANNEL_LABEL_value(const Value &a, const Value &b) {
     return a.getUInt8() == b.getUInt8();
 }
 
 void CHANNEL_LABEL_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "Channel %d:", value.getUInt8());
+}
+
+const char *CHANNEL_LABEL_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_CHANNEL_SHORT_LABEL_value(const Value &a, const Value &b) {
@@ -516,12 +528,20 @@ void CHANNEL_SHORT_LABEL_value_to_text(const Value &value, char *text, int count
     }
 }
 
+const char *CHANNEL_SHORT_LABEL_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value(const Value &a, const Value &b) {
     return a.getUInt8() == b.getUInt8();
 }
 
 void CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "Ch. %d", value.getUInt8() + 1);
+}
+
+const char *CHANNEL_SHORT_LABEL_WITHOUT_COLUMN_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_CHANNEL_BOARD_INFO_LABEL_value(const Value &a, const Value &b) {
@@ -532,12 +552,20 @@ void CHANNEL_BOARD_INFO_LABEL_value_to_text(const Value &value, char *text, int 
     snprintf(text, count, "CH%d board:", value.getInt() + 1);
 }
 
+const char *CHANNEL_BOARD_INFO_LABEL_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_LESS_THEN_MIN_INT_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
 
 void LESS_THEN_MIN_INT_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "Value is less then %d", value.getInt());
+}
+
+const char *LESS_THEN_MIN_INT_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_LESS_THEN_MIN_TIME_ZONE_value(const Value &a, const Value &b) {
@@ -548,12 +576,20 @@ void LESS_THEN_MIN_TIME_ZONE_value_to_text(const Value &value, char *text, int c
     stringCopy(text, count, "Value is less then -12:00");
 }
 
+const char *LESS_THEN_MIN_TIME_ZONE_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_GREATER_THEN_MAX_INT_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
 
 void GREATER_THEN_MAX_INT_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "Value is greater then %d", value.getInt());
+}
+
+const char *GREATER_THEN_MAX_INT_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_GREATER_THEN_MAX_TIME_ZONE_value(const Value &a, const Value &b) {
@@ -564,12 +600,20 @@ void GREATER_THEN_MAX_TIME_ZONE_value_to_text(const Value &value, char *text, in
     stringCopy(text, count, "Value is greater then +14:00");
 }
 
+const char *GREATER_THEN_MAX_TIME_ZONE_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_EVENT_value(const Value &a, const Value &b) {
     return compareEventValues(a, b);
 }
 
 void EVENT_value_to_text(const Value &value, char *text, int count) {
     eventValueToText(value, text, count);
+}
+
+const char *EVENT_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_EVENT_MESSAGE_value(const Value &a, const Value &b) {
@@ -580,12 +624,20 @@ void EVENT_MESSAGE_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, event_queue::getEventMessage(value.getFirstInt16()), value.getSecondInt16() + 1);
 }
 
+const char *EVENT_MESSAGE_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_ON_TIME_COUNTER_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
 
 void ON_TIME_COUNTER_value_to_text(const Value &value, char *text, int count) {
     ontime::counterToString(text, count, value.getUInt32());
+}
+
+const char *ON_TIME_COUNTER_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_COUNTDOWN_value(const Value &a, const Value &b) {
@@ -596,12 +648,20 @@ void COUNTDOWN_value_to_text(const Value &value, char *text, int count) {
     printTime(value.getUInt32(), text, count);
 }
 
+const char *COUNTDOWN_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_TIME_ZONE_value(const Value &a, const Value &b) {
     return a.getInt16() == b.getInt16();
 }
 
 void TIME_ZONE_value_to_text(const Value &value, char *text, int count) {
     formatTimeZone(value.getInt16(), text, count);
+}
+
+const char *TIME_ZONE_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_DATE_DMY_value(const Value &a, const Value &b) {
@@ -614,6 +674,10 @@ void DATE_DMY_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%02d - %02d - %d", day, month, year);
 }
 
+const char *DATE_DMY_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_DATE_MDY_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
@@ -624,12 +688,20 @@ void DATE_MDY_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%02d - %02d - %d", month, day, year);
 }
 
+const char *DATE_MDY_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_YEAR_value(const Value &a, const Value &b) {
     return a.getUInt16() == b.getUInt16();
 }
 
 void YEAR_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%d", value.getUInt16());
+}
+
+const char *YEAR_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_MONTH_value(const Value &a, const Value &b) {
@@ -640,12 +712,20 @@ void MONTH_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%02d", value.getUInt8());
 }
 
+const char *MONTH_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_DAY_value(const Value &a, const Value &b) {
     return a.getUInt8() == b.getUInt8();
 }
 
 void DAY_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%02d", value.getUInt8());
+}
+
+const char *DAY_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_TIME_value(const Value &a, const Value &b) {
@@ -656,6 +736,10 @@ void TIME_value_to_text(const Value &value, char *text, int count) {
     int year, month, day, hour, minute, second;
     datetime::breakTime(value.getUInt32(), year, month, day, hour, minute, second);
     snprintf(text, count, "%02d : %02d : %02d", hour, minute, second);
+}
+
+const char *TIME_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_TIME12_value(const Value &a, const Value &b) {
@@ -670,12 +754,20 @@ void TIME12_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%02d : %02d : %02d %s", hour, minute, second, am ? "AM" : "PM");
 }
 
+const char *TIME12_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_HOUR_value(const Value &a, const Value &b) {
     return a.getUInt8() == b.getUInt8();
 }
 
 void HOUR_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%02d", value.getUInt8());
+}
+
+const char *HOUR_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_MINUTE_value(const Value &a, const Value &b) {
@@ -686,12 +778,20 @@ void MINUTE_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%02d", value.getUInt8());
 }
 
+const char *MINUTE_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_SECOND_value(const Value &a, const Value &b) {
     return a.getUInt8() == b.getUInt8();
 }
 
 void SECOND_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%02d", value.getUInt8());
+}
+
+const char *SECOND_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_USER_PROFILE_LABEL_value(const Value &a, const Value &b) {
@@ -702,12 +802,20 @@ void USER_PROFILE_LABEL_value_to_text(const Value &value, char *text, int count)
     snprintf(text, count, "[ %d ]", value.getInt());
 }
 
+const char *USER_PROFILE_LABEL_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_USER_PROFILE_REMARK_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
 
 void USER_PROFILE_REMARK_value_to_text(const Value &value, char *text, int count) {
     profile::getName(value.getInt(), text, count);
+}
+
+const char *USER_PROFILE_REMARK_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_EDIT_INFO_value(const Value &a, const Value &b) {
@@ -718,12 +826,20 @@ void EDIT_INFO_value_to_text(const Value &value, char *text, int count) {
     edit_mode::getInfoText(text, count);
 }
 
+const char *EDIT_INFO_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_MAC_ADDRESS_value(const Value &a, const Value &b) {
     return memcmp(a.getPUint8(), b.getPUint8(), 6) == 0;
 }
 
 void MAC_ADDRESS_value_to_text(const Value &value, char *text, int count) {
     macAddressToString(value.getPUint8(), text);
+}
+
+const char *MAC_ADDRESS_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_IP_ADDRESS_value(const Value &a, const Value &b) {
@@ -734,6 +850,10 @@ void IP_ADDRESS_value_to_text(const Value &value, char *text, int count) {
     ipAddressToString(value.getUInt32(), text, count);
 }
 
+const char *IP_ADDRESS_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_PORT_value(const Value &a, const Value &b) {
     return a.getUInt16() == b.getUInt16();
 }
@@ -742,12 +862,20 @@ void PORT_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%d", value.getUInt16());
 }
 
+const char *PORT_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_TEXT_MESSAGE_value(const Value &a, const Value &b) {
     return a.getUInt8() == b.getUInt8();
 }
 
 void TEXT_MESSAGE_value_to_text(const Value &value, char *text, int count) {
     stringCopy(text, count, getTextMessage());
+}
+
+const char *TEXT_MESSAGE_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_STEP_VALUES_value(const Value &a, const Value &b) {
@@ -774,11 +902,19 @@ bool compare_STEP_VALUES_value(const Value &a, const Value &b) {
 void STEP_VALUES_value_to_text(const Value &value, char *text, int count) {
 }
 
+const char *STEP_VALUES_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_FLOAT_LIST_value(const Value &a, const Value &b) {
     return a.getFloatList() == b.getFloatList();
 }
 
 void FLOAT_LIST_value_to_text(const Value &value, char *text, int count) {
+}
+
+const char *FLOAT_LIST_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_CHANNEL_TITLE_value(const Value &a, const Value &b) {
@@ -796,6 +932,10 @@ void CHANNEL_TITLE_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+const char *CHANNEL_TITLE_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_CHANNEL_SHORT_TITLE_value(const Value &a, const Value &b) {
     Channel &aChannel = Channel::get(a.getInt());
     Channel &bChannel = Channel::get(b.getInt());
@@ -811,6 +951,10 @@ void CHANNEL_SHORT_TITLE_value_to_text(const Value &value, char *text, int count
     }
 }
 
+const char *CHANNEL_SHORT_TITLE_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -818,6 +962,10 @@ bool compare_CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value(const Value &a, con
 void CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_to_text(const Value &value, char *text, int count) {
     Channel &channel = Channel::get(value.getInt());
     snprintf(text, count, "#%d", channel.channelIndex + 1);
+}
+
+const char *CHANNEL_SHORT_TITLE_WITHOUT_TRACKING_ICON_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_CHANNEL_LONG_TITLE_value(const Value &a, const Value &b) {
@@ -840,12 +988,20 @@ void CHANNEL_LONG_TITLE_value_to_text(const Value &value, char *text, int count)
     }
 }
 
+const char *CHANNEL_LONG_TITLE_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_CHANNEL_ID_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
 
 void CHANNEL_ID_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%d%02d", (int)value.getFirstUInt16() + 1, (int)value.getSecondUInt16() + 1);
+}
+
+const char *CHANNEL_ID_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_DLOG_VALUE_LABEL_value(const Value &a, const Value &b) {
@@ -856,6 +1012,10 @@ void DLOG_VALUE_LABEL_value_to_text(const Value &value, char *text, int count) {
     dlog_view::getLabel(dlog_view::getRecording(), value.getInt(), text, count);
 }
 
+const char *DLOG_VALUE_LABEL_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_FIRMWARE_VERSION_value(const Value &a, const Value &b) {
     return a.getUInt16() == b.getUInt16();
 }
@@ -864,6 +1024,10 @@ void FIRMWARE_VERSION_value_to_text(const Value &value, char *text, int count) {
     uint8_t majorVersion = value.getUInt16() >> 8;
     uint8_t minorVersion = value.getUInt16() & 0xFF;
     snprintf(text, count, "%d.%d", (int)majorVersion, (int)minorVersion);
+}
+
+const char *FIRMWARE_VERSION_value_type_name(const Value &value) {
+    return "internal";
 }
 
 static double g_savedCurrentTime;
@@ -879,12 +1043,20 @@ void DLOG_CURRENT_TIME_value_to_text(const Value &value, char *text, int count) 
     printTime(g_savedCurrentTime, text, count);
 }
 
+const char *DLOG_CURRENT_TIME_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_FILE_LENGTH_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
 
 void FILE_LENGTH_value_to_text(const Value &value, char *text, int count) {
     formatBytes(value.getUInt32(), text, count);
+}
+
+const char *FILE_LENGTH_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_FILE_DATE_TIME_value(const Value &a, const Value &b) {
@@ -915,12 +1087,20 @@ void FILE_DATE_TIME_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+const char *FILE_DATE_TIME_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_SLOT_INDEX_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
 
 void SLOT_INDEX_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "Slot #%d:", value.getInt() + 1);
+}
+
+const char *SLOT_INDEX_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_SLOT_INFO_value(const Value &a, const Value &b) {
@@ -935,6 +1115,10 @@ void SLOT_INFO_value_to_text(const Value &value, char *text, int count) {
     } else {
         stringCopy(text, count, "Not installed");
     }
+}
+
+const char *SLOT_INFO_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_SLOT_INFO_WITH_FW_VER_value(const Value &a, const Value &b) {
@@ -957,6 +1141,10 @@ void SLOT_INFO_WITH_FW_VER_value_to_text(const Value &value, char *text, int cou
     }
 }
 
+const char *SLOT_INFO_WITH_FW_VER_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_SLOT_TITLE_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -965,6 +1153,10 @@ void SLOT_TITLE_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt() & 0xFF;
     auto &slot = *g_slots[slotIndex];
     snprintf(text, count, "%s #%d", slot.getLabelOrDefault(), slotIndex + 1);
+}
+
+const char *SLOT_TITLE_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_SLOT_TITLE_DEF_value(const Value &a, const Value &b) {
@@ -977,6 +1169,10 @@ void SLOT_TITLE_DEF_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%s", slot.getLabelOrDefault());
 }
 
+const char *SLOT_TITLE_DEF_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_SLOT_TITLE_MAX_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -985,6 +1181,10 @@ void SLOT_TITLE_MAX_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt();
     auto &slot = *g_slots[slotIndex];
     snprintf(text, count, "%s #%d", slot.getLabelOrDefault(), slotIndex + 1);
+}
+
+const char *SLOT_TITLE_MAX_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_SLOT_TITLE_SETTINGS_value(const Value &a, const Value &b) {
@@ -1003,6 +1203,10 @@ void SLOT_TITLE_SETTINGS_value_to_text(const Value &value, char *text, int count
     }
 }
 
+const char *SLOT_TITLE_SETTINGS_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_SLOT_SHORT_TITLE_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
@@ -1010,6 +1214,10 @@ bool compare_SLOT_SHORT_TITLE_value(const Value &a, const Value &b) {
 void SLOT_SHORT_TITLE_value_to_text(const Value &value, char *text, int count) {
     int slotIndex = value.getInt() & 0xFF;
     snprintf(text, count, "#%d", slotIndex + 1);
+}
+
+const char *SLOT_SHORT_TITLE_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_MASTER_INFO_value(const Value &a, const Value &b) {
@@ -1020,12 +1228,20 @@ void MASTER_INFO_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%s R%dB%d", MCU_NAME, g_mcuRevision >> 8, g_mcuRevision & 0xFF);
 }
 
+const char *MASTER_INFO_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_MASTER_INFO_WITH_FW_VER_value(const Value &a, const Value &b) {
     return true;
 }
 
 void MASTER_INFO_WITH_FW_VER_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "%s R%dB%d v%s", MCU_NAME, g_mcuRevision >> 8, g_mcuRevision & 0xFF, MCU_FIRMWARE);
+}
+
+const char *MASTER_INFO_WITH_FW_VER_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_TEST_RESULT_value(const Value &a, const Value &b) {
@@ -1049,6 +1265,10 @@ void TEST_RESULT_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+const char *TEST_RESULT_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_SCPI_ERROR_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
@@ -1060,6 +1280,10 @@ void SCPI_ERROR_value_to_text(const Value &value, char *text, int count) {
     } else {
         snprintf(text, count, "%s", scpiErrorMessage);
     }
+}
+
+const char *SCPI_ERROR_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_STORAGE_INFO_value(const Value &a, const Value &b) {
@@ -1092,6 +1316,10 @@ void STORAGE_INFO_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+const char *STORAGE_INFO_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_FOLDER_INFO_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
@@ -1104,6 +1332,9 @@ void FOLDER_INFO_value_to_text(const Value &value, char *text, int count) {
     }
 }
 
+const char *FOLDER_INFO_value_type_name(const Value &value) {
+    return "internal";
+}
 
 bool compare_MODULE_SERIAL_INFO_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
@@ -1113,12 +1344,20 @@ void MODULE_SERIAL_INFO_value_to_text(const Value &value, char *text, int count)
     getModuleSerialInfo(value.getInt(), text);
 }
 
+const char *MODULE_SERIAL_INFO_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_CALIBRATION_VALUE_TYPE_INFO_value(const Value &a, const Value &b) {
     return true;
 }
 
 void CALIBRATION_VALUE_TYPE_INFO_value_to_text(const Value &value, char *text, int count) {
     getCalibrationValueTypeInfo(text, count);
+}
+
+const char *CALIBRATION_VALUE_TYPE_INFO_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_CALIBRATION_POINT_INFO_value(const Value &a, const Value &b) {
@@ -1140,12 +1379,20 @@ void CALIBRATION_POINT_INFO_value_to_text(const Value &value, char *text, int co
     }
 }
 
+const char *CALIBRATION_POINT_INFO_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_ZOOM_value(const Value &a, const Value &b) {
     return a.getInt() == b.getInt();
 }
 
 void ZOOM_value_to_text(const Value &value, char *text, int count) {
     snprintf(text, count, "\xb8 x%d", value.getInt());
+}
+
+const char *ZOOM_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_NUM_SELECTED_value(const Value &a, const Value &b) {
@@ -1156,12 +1403,20 @@ void NUM_SELECTED_value_to_text(const Value &value, char *text, int count) {
 	snprintf(text, count, "%d of %d selected", (int)value.getFirstUInt16(), (int)value.getSecondUInt16());
 }
 
+const char *NUM_SELECTED_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_CURRENT_DIRECTORY_TITLE_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
 
 void CURRENT_DIRECTORY_TITLE_value_to_text(const Value &value, char *text, int count) {
 	file_manager::getCurrentDirectoryTitle(text, count);
+}
+
+const char *CURRENT_DIRECTORY_TITLE_value_type_name(const Value &value) {
+    return "internal";
 }
 
 bool compare_MASS_STORAGE_DEVICE_LABEL_value(const Value &a, const Value &b) {
@@ -1178,6 +1433,10 @@ void MASS_STORAGE_DEVICE_LABEL_value_to_text(const Value &value, char *text, int
 	}
 }
 
+const char *MASS_STORAGE_DEVICE_LABEL_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_OCP_TRIP_LEVEL_INFO_value(const Value &a, const Value &b) {
     return a.getFloat() == b.getFloat();
 }
@@ -1186,12 +1445,20 @@ void OCP_TRIP_LEVEL_INFO_value_to_text(const Value &value, char *text, int count
     snprintf(text, count, "Trip level = %g%% of Iset", value.getFloat());
 }
 
+const char *OCP_TRIP_LEVEL_INFO_value_type_name(const Value &value) {
+    return "internal";
+}
+
 bool compare_AUTO_START_SCRIPT_CONFIRMATION_MESSAGE_value(const Value &a, const Value &b) {
 	return a.getInt() == b.getInt();
 }
 
 void AUTO_START_SCRIPT_CONFIRMATION_MESSAGE_value_to_text(const Value &value, char *text, int count) {
 	scripting::getAutoStartConfirmationMessage(text, count);
+}
+
+const char *AUTO_START_SCRIPT_CONFIRMATION_MESSAGE_value_type_name(const Value &value) {
+    return "internal";
 }
 
 static Cursor g_editValueCursor(-1);
