@@ -136,6 +136,7 @@ private:
 
     Value m_voltageValue = Value(*this, CALIBRATION_VALUE_U);
 
+    CurrentRangeSelectionMode m_savedCurrentRangeSelectionMode;
     int8_t m_currentRangeSelected = 0;
     Value m_currentsValue[2] = {
         Value(*this, CALIBRATION_VALUE_I_HI_RANGE),

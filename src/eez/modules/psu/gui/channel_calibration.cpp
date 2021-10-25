@@ -421,6 +421,8 @@ void ChSettingsCalibrationEditPage::setCalibrationValueType(CalibrationValueType
                     channel_dispatcher::setVoltage(*channel, g_channel->params.I_CAL_U_SET);
                 } else {
                     channel_dispatcher::setVoltage(*channel, g_channel->params.I_LOW_RANGE_CAL_U_SET);
+                    // prevent false power fault detection (#275)
+                    osDelay(3);
                 }
             }
         }
