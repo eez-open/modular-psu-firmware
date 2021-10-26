@@ -652,6 +652,15 @@ scpi_result_t scpi_cmd_scriptRun(scpi_t *context) {
 	return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_scriptRunQ(scpi_t *context) {
+	if (!isIdle()) {
+		SCPI_ResultText(context, g_scriptPath);
+	} else {
+		SCPI_ResultText(context, "");
+	}
+	return SCPI_RES_OK;
+}
+
 scpi_result_t scpi_cmd_scriptStop(scpi_t *context) {
 	int err;
 
