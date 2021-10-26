@@ -190,7 +190,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 				} else {
 					float fnum = strtof(resultText, &strEnd);
 					if (*strEnd == 0) {
-						srcValue = Value(fnum);
+						srcValue = Value(fnum, VALUE_TYPE_FLOAT);
 					} else {
 						srcValue = Value::makeStringRef(resultText, resultTextLen, 0x09143fa4);
 					}
