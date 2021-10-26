@@ -244,6 +244,8 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
         if (rampOption != FROM_RAMP) {
             m_uIsRampActive = false;
         }
+
+        m_uLastValue = value;
     } 
     else {
         if (
@@ -262,6 +264,8 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
         if (rampOption != FROM_RAMP) {
             m_iIsRampActive = false;
         }
+
+        m_iLastValue = value;
     }
 
     uint8_t data[3];

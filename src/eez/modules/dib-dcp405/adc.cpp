@@ -342,8 +342,10 @@ float AnalogDigitalConverter::read() {
         channel.i.mon_adc = value;
     } else if (adcDataType == ADC_DATA_TYPE_U_MON_DAC) {
         value = remapAdcDataToVoltage(channel, adcDataType, adcValue);
+        m_uLastMonDac = adcValue;
     } else {
         value = remapAdcDataToCurrent(channel, adcDataType, adcValue);
+        m_iLastMonDac = adcValue;
     }
 
     return value;

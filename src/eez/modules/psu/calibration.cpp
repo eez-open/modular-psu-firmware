@@ -114,7 +114,7 @@ void Value::setDacValue(float value) {
                 channel_dispatcher::setVoltage(*channel, channel->params.I_CAL_U_SET);
             } else {
                 // prevent false power fault detection (#275)
-                channel_dispatcher::setCurrent(*channel, 0.015);
+                channel_dispatcher::setCurrent(*channel, 0.015f);
                 channel_dispatcher::setVoltage(*channel, channel->params.I_LOW_RANGE_CAL_U_SET);
                 osDelay(3);
                 channel_dispatcher::setCurrent(*channel, value);

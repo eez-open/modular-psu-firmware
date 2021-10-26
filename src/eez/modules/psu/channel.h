@@ -24,6 +24,8 @@
 #include <eez/modules/psu/persist_conf.h>
 #include <eez/modules/psu/temp_sensor.h>
 
+#include <scpi/types.h>
+
 #define IS_OVP_VALUE(channel, cpv) (&cpv == &channel->ovp)
 #define IS_OCP_VALUE(channel, cpv) (&cpv == &channel->ocp)
 #define IS_OPP_VALUE(channel, cpv) (&cpv == &channel->opp)
@@ -705,6 +707,8 @@ public:
     const char *getLabel();
     const char *getDefaultLabel();
     const char *getLabelOrDefault() { return *label ? label : getDefaultLabel(); }
+
+    virtual void dumpDebugVariables(scpi_t *context) = 0;
 
     //
     //

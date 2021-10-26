@@ -34,6 +34,9 @@ public:
     uint8_t channelIndex;
     TestResult testResult;
 
+	uint16_t m_uLastValue;
+	uint16_t m_iLastValue;
+
     void init();
     bool test(IOExpander &ioexp, AnalogDigitalConverter &adc);
 

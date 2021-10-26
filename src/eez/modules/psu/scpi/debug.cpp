@@ -188,8 +188,6 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
         }
     }
 
-    static char buffer[2048];
-
 #ifndef __EMSCRIPTEN__
     for (int i = 0; i < CH_NUM; i++) {
         if (!measureAllAdcValuesOnChannel(i)) {
@@ -199,7 +197,10 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
     }
 #endif
 
-    SCPI_ResultCharacters(context, buffer, strlen(buffer));
+    for (int i = 0; i < CH_NUM; i++) {
+        Channel &channel = Channel::get(i);
+        channel.dumpDebugVariables(context);
+    }
 
     return SCPI_RES_OK;
 #else
