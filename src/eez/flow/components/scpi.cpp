@@ -32,6 +32,37 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
+// When passed quoted string as '"str"' it will return unquoted string as 'str'.
+// Returns false if passed value is not a valid string.
+bool parseScpiString(const char *&textArg, size_t &textLenArg) {
+	const char *text = textArg;
+	size_t textLen = textLenArg;
+
+	if (textLen < 2 || text[0] != '"' && text[textLen - 1] != '"') {
+		return false;
+	}
+
+	text++;
+	textLen -= 2;
+
+	// make sure there is no single quote (") inside
+	// scpi can return list of strings as "str1","str2","str3",...
+	// and we don't want to recognize this as string
+	for (size_t i = 0; i < textLen; i++) {
+		if (text[i] == '"') {
+			if (i == textLen - 1 || text[i + 1] != '"') {
+				return false;
+			}
+			i++;
+		}
+	}
+
+	textArg = text;
+	textLenArg = textLen;
+	return true;
+}
+
+
 struct ScpiComponentExecutionState : public ComponenentExecutionState {
 	uint8_t op;
 	int instructionIndex;
@@ -178,9 +209,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 
 			Value srcValue;
-			if (resultTextLen >= 2 && resultText[0] == '"' && resultText[resultTextLen-1] == '"') {
-				resultText++;
-				resultTextLen -= 2;
+			if (parseScpiString(resultText, resultTextLen)) {
 				srcValue = Value::makeStringRef(resultText, resultTextLen, 0x09143fa4);
 			} else {
 				char *strEnd;
