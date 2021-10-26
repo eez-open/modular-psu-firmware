@@ -38,7 +38,7 @@ bool parseScpiString(const char *&textArg, size_t &textLenArg) {
 	const char *text = textArg;
 	size_t textLen = textLenArg;
 
-	if (textLen < 2 || text[0] != '"' && text[textLen - 1] != '"') {
+	if (textLen < 2 || text[0] != '"' || text[textLen - 1] != '"') {
 		return false;
 	}
 
