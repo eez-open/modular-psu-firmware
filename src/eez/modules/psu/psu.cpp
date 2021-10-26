@@ -859,17 +859,10 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         dcp405::tickDacRamp();
         function_generator::tick();
 
-        if (g_tickCount % 5 == 0) {
-            tick0();
-        } else if (g_tickCount % 5 == 1) {
-            tick1();
-        } else if (g_tickCount % 5 == 2) {
-            tick2();
-        } else if (g_tickCount % 5 == 3) {
-            tick3();
-        } else if (g_tickCount % 5 == 4) {
-            tick4();
-        }
+        static uint32_t g_tick = 0;
+        typedef void (*TickFunc)();
+        static const TickFunc g_tickFuncs[] = { tick0, tick1, tick2, tick3, tick4 };
+        g_tickFuncs[g_tick++ % 5]();
 #endif
     } else if (type == PSU_MESSAGE_CHANGE_POWER_STATE) {
         changePowerState(param ? true : false);
