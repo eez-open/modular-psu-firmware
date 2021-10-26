@@ -18,6 +18,8 @@
 
 #include <new>
 #include <assert.h>
+#include <string.h>
+#include <stdio.h>
 
 #include <eez/modules/dib-dcp405/dib-dcp405.h>
 #include <eez/modules/dib-dcp405/adc.h>
@@ -969,6 +971,28 @@ struct DcpChannel : public Channel {
 
 	int getAdvancedOptionsPageId() override {
 		return eez::gui::PAGE_ID_CH_SETTINGS_ADV_OPTIONS;
+	}
+
+	void dumpDebugVariables(scpi_t *context) override {
+		char buffer[100];
+
+		snprintf(buffer, sizeof(buffer), "CH%d U_DAC = %d", channelIndex + 1, (int)dac.m_uLastValue);
+		SCPI_ResultText(context, buffer);
+
+		snprintf(buffer, sizeof(buffer), "CH%d U_MON = %d", channelIndex + 1, (int)u.mon_adc);
+		SCPI_ResultText(context, buffer);
+
+		snprintf(buffer, sizeof(buffer), "CH%d U_MON_DAC = %d", channelIndex + 1, (int)adc.m_uLastMonDac);
+		SCPI_ResultText(context, buffer);
+
+		snprintf(buffer, sizeof(buffer), "CH%d I_DAC = %d", channelIndex + 1, (int)dac.m_iLastValue);
+		SCPI_ResultText(context, buffer);
+
+		snprintf(buffer, sizeof(buffer), "CH%d I_MON = %d", channelIndex + 1, (int)i.mon_adc);
+		SCPI_ResultText(context, buffer);
+
+		snprintf(buffer, sizeof(buffer), "CH%d I_MON_DAC = %d", channelIndex + 1, (int)adc.m_iLastMonDac);
+		SCPI_ResultText(context, buffer);
 	}
 };
 

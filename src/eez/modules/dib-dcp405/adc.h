@@ -37,6 +37,9 @@ public:
     
     AdcDataType adcDataType;
 
+    int16_t m_uLastMonDac;
+    int16_t m_iLastMonDac;
+
     void init();
     bool test();
 

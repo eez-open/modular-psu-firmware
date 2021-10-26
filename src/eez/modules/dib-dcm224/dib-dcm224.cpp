@@ -119,6 +119,9 @@ struct DcmChannel : public Channel {
     float iSet;
 #endif
 
+    uint16_t uMonAdc = 0;
+    uint16_t iMonAdc = 0;
+
     float temperature = 25.0f;
 
 	float I_MAX_FOR_REMAP;
@@ -447,6 +450,22 @@ struct DcmChannel : public Channel {
 			}
 		}
 	}    
+
+	void dumpDebugVariables(scpi_t *context) override {
+		char buffer[100];
+
+		snprintf(buffer, sizeof(buffer), "CH%d U_DAC = %d", channelIndex + 1, (int)uSet);
+		SCPI_ResultText(context, buffer);
+
+		snprintf(buffer, sizeof(buffer), "CH%d U_MON = %d", channelIndex + 1, (int)uMonAdc);
+		SCPI_ResultText(context, buffer);
+
+		snprintf(buffer, sizeof(buffer), "CH%d I_DAC = %d", channelIndex + 1, (int)iSet);
+		SCPI_ResultText(context, buffer);
+
+		snprintf(buffer, sizeof(buffer), "CH%d I_MON = %d", channelIndex + 1, (int)iMonAdc);
+		SCPI_ResultText(context, buffer);
+	}
 };
 
 static const float DEFAULT_COUNTERPHASE_FREQUENCY = 500000.0f;
@@ -1066,10 +1085,12 @@ void DcmModule::tick(uint8_t slotIndex) {
             channel.ccMode = (input[0] & (subchannelIndex == 0 ? REG0_CC1_MASK : REG0_CC2_MASK)) != 0;
 
             uint16_t uMonAdc = inputSetValues[offset];
+            channel.uMonAdc = uMonAdc;
             float uMon = remap(uMonAdc, (float)ADC_MIN, 0, (float)ADC_MAX, channel.params.U_MAX);
             channel.onAdcData(ADC_DATA_TYPE_U_MON, uMon);
 
             uint16_t iMonAdc = inputSetValues[offset + 1];
+            channel.iMonAdc = iMonAdc;
             const float FULL_SCALE = 2.0F;
             const float U_REF = 2.5F;
             float iMon = remap(iMonAdc, (float)ADC_MIN, 0, FULL_SCALE * ADC_MAX / U_REF, /*params.I_MAX*/ channel.I_MAX_FOR_REMAP);
