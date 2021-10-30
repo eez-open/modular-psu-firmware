@@ -229,7 +229,7 @@ int outputBufferPosition = 0;
 		outputBufferPosition = 0; \
 	}
 
-void writeValueAddr(const Value *pValue) {
+void writeValueAddr(const void *pValue) {
 	char tmpStr[32];
 	snprintf(tmpStr, sizeof(tmpStr), "%d", (int)pValue);
 	auto len = strlen(tmpStr);
@@ -264,10 +264,10 @@ void writeString(const char *str) {
 void writeArray(ArrayValue *arrayValue) {
 	WRITE_TO_OUTPUT_BUFFER('{');
 
+	writeValueAddr(arrayValue);
+
 	for (uint32_t i = 0; i < arrayValue->arraySize; i++) {
-		if (i > 0) {
-			WRITE_TO_OUTPUT_BUFFER(',');
-		}
+		WRITE_TO_OUTPUT_BUFFER(',');
 		writeValueAddr(&arrayValue->values[i]);
 	}
 
@@ -454,18 +454,21 @@ void onFlowStateCreated(FlowState *flowState) {
         }
 
 		for (uint32_t i = 0; i < flow->componentInputs.count; i++) {
-			auto pValue = &flowState->values[i];
+			auto input = flow->componentInputs.item(flowState->assets, i);
+			if (!(input->flags & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
+				auto pValue = &flowState->values[i];
 
-            char buffer[100];
-            snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
-                MESSAGE_TO_DEBUGGER_COMPONENT_INPUT_INIT,
-				(int)flowState->flowStateIndex,
-				(int)i,
-                (int)pValue
-            );
-            eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+				char buffer[100];
+				snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
+					MESSAGE_TO_DEBUGGER_COMPONENT_INPUT_INIT,
+					(int)flowState->flowStateIndex,
+					(int)i,
+					(int)pValue
+				);
+				eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
 
-			writeValue(*pValue);
+				writeValue(*pValue);
+			}
         }
 	}
 }
