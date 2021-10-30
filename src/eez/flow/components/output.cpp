@@ -58,7 +58,7 @@ void executeOutputComponent(FlowState *flowState, unsigned componentIndex) {
 		return;
     }
 
-    propagateValue(flowState->parentFlowState, componentIndex, parentComponentOutputIndex, value);
+    propagateValue(flowState->parentFlowState, flowState->parentComponentIndex, parentComponentOutputIndex, value);
 }
 
 } // namespace flow
