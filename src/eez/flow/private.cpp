@@ -83,7 +83,7 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 
 		auto input = flowState->flow->componentInputs.item(assets, inputValueIndex);
 
-		if (input->flags & COMPONENT_INPUT_FLAG_IS_ACTION) {
+		if (input->flags & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT) {
 			numSeqInputs++;
 			auto &value = flowState->values[inputValueIndex];
 			if (value.type != VALUE_TYPE_UNDEFINED) {
@@ -227,7 +227,7 @@ void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outp
 		if (*pValue != value) {
 			*pValue = value;
 
-			if (!(flowState->flow->componentInputs.item(assets, connection->targetInputIndex)->flags & COMPONENT_INPUT_FLAG_IS_ACTION)) {
+			if (!(flowState->flow->componentInputs.item(assets, connection->targetInputIndex)->flags & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
 				onValueChanged(pValue);
 			}
 		}

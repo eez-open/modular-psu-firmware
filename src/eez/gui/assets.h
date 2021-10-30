@@ -246,7 +246,7 @@ struct WidgetActionItem {
 	int16_t componentOutputIndex;
 };
 
-#define COMPONENT_INPUT_FLAG_IS_ACTION   (1 << 0)
+#define COMPONENT_INPUT_FLAG_IS_SEQ_INPUT   (1 << 0)
 #define COMPONENT_INPUT_FLAG_IS_OPTIONAL (1 << 1)
 
 struct ComponentInput {
