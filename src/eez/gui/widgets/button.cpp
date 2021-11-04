@@ -47,6 +47,8 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
         widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
         widgetCursor.previousState->data != widgetCursor.currentState->data;
 
+	static const size_t MAX_TEXT_LEN = 128;
+
     if (refresh) {
         if (widget->data) {
             if (widgetCursor.currentState->data.isString()) {
@@ -55,7 +57,10 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
                          widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
             } else {
-                drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+				char text[MAX_TEXT_LEN + 1];
+				widgetCursor.currentState->data.toText(text, sizeof(text));
+
+                drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
                          style, widgetCursor.currentState->flags.active,
                          widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
             }
