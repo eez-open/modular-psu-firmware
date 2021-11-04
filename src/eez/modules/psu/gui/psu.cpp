@@ -1593,8 +1593,8 @@ void loadCustomLogo() {
     }
 #endif
 
-    if (!imageDecode("/logo.jpg", &g_customLogo) || g_customLogo.width > CONF_MAX_LOGO_WIDTH || g_customLogo.height > CONF_MAX_LOGO_HEIGHT) {
-        if (!imageDecode("/logo.bmp", &g_customLogo) || g_customLogo.width > CONF_MAX_LOGO_WIDTH || g_customLogo.height > CONF_MAX_LOGO_HEIGHT) {
+    if (imageDecode("/logo.jpg", &g_customLogo) != IMAGE_DECODE_OK || g_customLogo.width > CONF_MAX_LOGO_WIDTH || g_customLogo.height > CONF_MAX_LOGO_HEIGHT) {
+        if (imageDecode("/logo.bmp", &g_customLogo) != IMAGE_DECODE_OK || g_customLogo.width > CONF_MAX_LOGO_WIDTH || g_customLogo.height > CONF_MAX_LOGO_HEIGHT) {
             g_customLogo.pixels = nullptr;
         }
     }

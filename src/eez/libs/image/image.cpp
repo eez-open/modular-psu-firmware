@@ -22,7 +22,7 @@
 #include <eez/libs/image/bitmap.h>
 #include <eez/libs/image/jpeg.h>
 
-bool imageDecode(const char *filePath, Image *image) {
+ImageDecodeResult imageDecode(const char *filePath, Image *image) {
     if (eez::endsWithNoCase(filePath, ".bmp")) {
         return bitmapDecode(filePath, image);
     }

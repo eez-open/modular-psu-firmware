@@ -22,4 +22,4 @@
 
 int jpegEncode(const uint8_t *screenshotPixels, unsigned char **imageData, size_t *imageDataSize);
 
-bool jpegDecode(const char *filePath, Image *image);
+ImageDecodeResult jpegDecode(const char *filePath, Image *image);

@@ -20,4 +20,4 @@
 
 #include <eez/libs/image/image.h>
 
-bool bitmapDecode(const char *filePath, Image *image);
+ImageDecodeResult bitmapDecode(const char *filePath, Image *image);

@@ -70,10 +70,10 @@ uint16_t readUint16(const uint8_t *bytes) {
     return bytes[0] | (bytes[1] << 8);
 }
 
-bool bitmapDecode(const char *filePath, Image *image) {
+ImageDecodeResult bitmapDecode(const char *filePath, Image *image) {
     eez::File file;
     if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        return false;
+        return IMAGE_DECODE_ERR_FILE_NOT_FOUND;
     }
 
     uint32_t bytesRead;
@@ -83,7 +83,7 @@ bool bitmapDecode(const char *filePath, Image *image) {
     bytesRead = file.read(bmpHeader, sizeof(bmpHeader));
     if (bytesRead != sizeof(bmpHeader)) {
         file.close();
-        return false;
+        return IMAGE_DECODE_ERR_FILE_READ;
     }
 
     uint8_t dibHeader[40];
@@ -91,7 +91,7 @@ bool bitmapDecode(const char *filePath, Image *image) {
     bytesRead = file.read(dibHeader, sizeof(dibHeader));
     if (bytesRead != sizeof(dibHeader)) {
         file.close();
-        return false;
+        return IMAGE_DECODE_ERR_FILE_READ;
     }
 
     uint32_t offset = readUint32(bmpHeader + 10);
@@ -99,25 +99,25 @@ bool bitmapDecode(const char *filePath, Image *image) {
     uint32_t width = readUint32(dibHeader + 4);
     if (width > 480) {
         file.close();
-        return false;
+        return IMAGE_DECODE_ERR_FILE_READ;
     }
 
     uint32_t height = readUint32(dibHeader + 8);
     if (height > 272) {
         file.close();
-        return false;
+        return IMAGE_DECODE_ERR_FILE_READ;
     }
 
     uint16_t numColorPlanes = readUint16(dibHeader + 12);
     if (numColorPlanes != 1) {
         file.close();
-        return false;
+        return IMAGE_DECODE_ERR_FILE_READ;
     }
 
     uint16_t bitsPerPixel = readUint16(dibHeader + 14);
     if (bitsPerPixel != 24) {
         file.close();
-        return false;
+        return IMAGE_DECODE_ERR_FILE_READ;
     }
 
     uint32_t lineBytes = width * 3;
@@ -130,13 +130,13 @@ bool bitmapDecode(const char *filePath, Image *image) {
         offset -= lineBytes;
         if (!file.seek(offset)) {
             file.close();
-            return false;
+            return IMAGE_DECODE_ERR_FILE_READ;
         }
 
         bytesRead = file.read(lineBuffer, lineBytes);
         if (bytesRead != lineBytes) {
             file.close();
-            return false;
+            return IMAGE_DECODE_ERR_FILE_READ;
         }
 
         for (uint32_t i = 0; i < lineBytes; i += 3) {
@@ -156,5 +156,5 @@ bool bitmapDecode(const char *filePath, Image *image) {
     image->lineOffset = 0;
     image->pixels = FILE_VIEW_BUFFER;
 
-    return true;
+    return IMAGE_DECODE_OK;
 }

@@ -48,14 +48,14 @@ static const uint32_t DLOG_RECORD_BUFFER_SIZE = 512 * 1024;
 
 static uint8_t * const FILE_VIEW_BUFFER = DLOG_RECORD_BUFFER + DLOG_RECORD_BUFFER_SIZE;
 #if defined(EEZ_PLATFORM_STM32)
-static const uint32_t FILE_VIEW_BUFFER_SIZE = 512 * 1024;
+static const uint32_t FILE_VIEW_BUFFER_SIZE = 768 * 1024;
 #endif
 #if defined(EEZ_PLATFORM_SIMULATOR)
 static const uint32_t FILE_VIEW_BUFFER_SIZE = 3 * 512 * 1024;
 #endif
 
 static uint8_t * const ALLOC_BUFFER = FILE_VIEW_BUFFER + FILE_VIEW_BUFFER_SIZE;
-static const uint32_t ALLOC_BUFFER_SIZE = (768 + 512) * 1024;
+static const uint32_t ALLOC_BUFFER_SIZE = 1024 * 1024;
 
 static uint8_t * const SOUND_TUNES_MEMORY = ALLOC_BUFFER + ALLOC_BUFFER_SIZE;
 static const uint32_t SOUND_TUNES_MEMORY_SIZE = 32 * 1024;

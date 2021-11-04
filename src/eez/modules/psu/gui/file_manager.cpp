@@ -89,7 +89,7 @@ uint32_t g_savedFilesStartPosition;
 int32_t g_selectedFileIndex = -1;
 
 uint32_t g_imageLoadStartTime;
-bool g_imageLoadFailed;
+ImageDecodeResult g_imageLoadResult;
 Image g_openedImage;
 
 bool g_fileBrowserMode;
@@ -846,16 +846,14 @@ static char g_imageFilePath[MAX_PATH_LENGTH + 1];
 void openImageFile(const char *filePath, int pageId) {
     stringCopy(g_imageFilePath, MAX_PATH_LENGTH + 1, filePath);
     g_imageLoadStartTime = millis();
-    g_imageLoadFailed = false;
+    g_imageLoadResult = IMAGE_DECODE_OK;
     g_openedImage.pixels = nullptr;
     pushPage(pageId);
     sendMessageToLowPriorityThread(THREAD_MESSAGE_FILE_MANAGER_OPEN_IMAGE_FILE);
 }
 
 void openImageFile() {
-    if (!imageDecode(g_imageFilePath, &g_openedImage)) {
-        g_imageLoadFailed = true;
-    }
+    g_imageLoadResult = imageDecode(g_imageFilePath, &g_openedImage);
 }
 
 void openBitFile() {
@@ -1358,8 +1356,8 @@ void data_file_manager_image_open_state(DataOperationEnum operation, const Widge
     if (operation == DATA_OPERATION_GET) {
         if (g_openedImage.pixels) {
             value = 1;
-        } else if (g_imageLoadFailed) {
-            value = 2;
+        } else if (g_imageLoadResult != IMAGE_DECODE_OK) {
+            value = 1 + g_imageLoadResult;
         } else {
             value = 0;
         }

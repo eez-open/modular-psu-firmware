@@ -100,25 +100,30 @@ extern "C" void njCopyMem(void* dest, const void* src, int size) {
 
 #endif
 
-bool jpegDecode(const char *filePath, Image *image) {
+ImageDecodeResult jpegDecode(const char *filePath, Image *image) {
     eez::File file;
     if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        return false;
+        return IMAGE_DECODE_ERR_FILE_NOT_FOUND;
     }
 
     uint32_t fileSize = file.size();
 
-    if (fileSize == 0 || fileSize > FILE_VIEW_BUFFER_SIZE) {
+    if (fileSize == 0) {
         file.close();
-        return false;
+        return IMAGE_DECODE_ERR_FILE_READ;
     }
+
+    if (fileSize > FILE_VIEW_BUFFER_SIZE) {
+        file.close();
+        return IMAGE_DECODE_ERR_NOT_ENOUGH_MEMORY;
+    }    
 
     g_fileData = FILE_VIEW_BUFFER + FILE_VIEW_BUFFER_SIZE - ((fileSize + 3) / 4) * 4;
     uint32_t bytesRead = file.read(g_fileData, fileSize);
     file.close();
 
     if (bytesRead != fileSize) {
-        return false;
+        return IMAGE_DECODE_ERR_FILE_READ;
     }
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -131,19 +136,21 @@ bool jpegDecode(const char *filePath, Image *image) {
     	g_jpegInitialized = true;
     }
 
-    if (HAL_JPEG_Decode(&hjpeg, g_fileData, fileSize, FILE_VIEW_BUFFER, g_fileData - FILE_VIEW_BUFFER, 5000) != HAL_OK) {
-        return false;
+    uint32_t availableMemoryForDecode = g_fileData - FILE_VIEW_BUFFER;
+
+    if (HAL_JPEG_Decode(&hjpeg, g_fileData, fileSize, FILE_VIEW_BUFFER, availableMemoryForDecode, 5000) != HAL_OK) {
+        return IMAGE_DECODE_ERR_DECODE;
     }
 
     JPEG_ConfTypeDef jpegInfo;
 	if (HAL_JPEG_GetInfo(&hjpeg, &jpegInfo) != HAL_OK) {
-        return false;
+        return IMAGE_DECODE_ERR_DECODE;
 	}
 
     uint32_t width = jpegInfo.ImageWidth;
     uint32_t height = jpegInfo.ImageHeight;
     if (width > 480 || height > 272) {
-        return false;
+        return IMAGE_DECODE_ERR_IMAGE_SIZE_UNSUPPORTED;
     }
 
     uint32_t blockSize;
@@ -181,11 +188,16 @@ bool jpegDecode(const char *filePath, Image *image) {
     JPEG_YCbCrToRGB_Convert_Function convertFunction;
     uint32_t numMCUs;
     if (JPEG_GetDecodeColorConvertFunc(&jpegInfo, &convertFunction, &numMCUs) != HAL_OK) {
-        return false;
+        return IMAGE_DECODE_ERR_DECODE;
     }
 
     uint32_t inputBufferSize = numMCUs * blockSize;
     uint8_t *outputBuffer = FILE_VIEW_BUFFER + inputBufferSize;
+
+    if (inputBufferSize + width * height * 2 > availableMemoryForDecode) {
+        // not enough memory to decode JPEG
+        return IMAGE_DECODE_ERR_NOT_ENOUGH_MEMORY;
+    }
 
     uint32_t convertedDataCount;
     convertFunction(FILE_VIEW_BUFFER, outputBuffer, 0, inputBufferSize, &convertedDataCount);
@@ -196,7 +208,7 @@ bool jpegDecode(const char *filePath, Image *image) {
     image->lineOffset = lineOffset;
     image->pixels = outputBuffer;
 
-    return true;
+    return IMAGE_DECODE_OK;
 
 #else
 
@@ -205,11 +217,11 @@ bool jpegDecode(const char *filePath, Image *image) {
     njInit();
 
     if (njDecode(g_fileData, fileSize) != NJ_OK) {
-        return false;
+        return IMAGE_DECODE_ERR_DECODE;
     }
 
     if (njGetWidth() > 480 || njGetHeight() > 272 || !njIsColor() || njGetImageSize() > 480 * 272 * 3) {
-        return false;
+        return IMAGE_DECODE_ERR_IMAGE_SIZE_UNSUPPORTED;
     }
 
     image->width = njGetWidth();
@@ -218,7 +230,7 @@ bool jpegDecode(const char *filePath, Image *image) {
     image->lineOffset = 0;
     image->pixels = njGetImage();
 
-    return true;
+    return IMAGE_DECODE_OK;
 
 #endif
 }

@@ -1,5 +1,4 @@
 {
-  "fullyLoaded": true,
   "settings": {
     "general": {
       "projectVersion": "v3",
@@ -4131,8 +4130,24 @@
             "value": 1
           },
           {
-            "name": "failed",
+            "name": "err_file_not_found",
             "value": 2
+          },
+          {
+            "name": "err_file_read",
+            "value": 3
+          },
+          {
+            "name": "err_not_enough_memory",
+            "value": 4
+          },
+          {
+            "name": "err_decode",
+            "value": 5
+          },
+          {
+            "name": "err_image_size_unsupported",
+            "value": 6
           }
         ]
       },
@@ -49956,13 +49971,81 @@
               "customOutputs": [],
               "action": "show_previous_page",
               "style": {
-                "inheritFrom": "default",
+                "inheritFrom": "default_M_warning",
                 "font": "Oswald17",
                 "color": "status_warning",
                 "activeColor": "status_warning",
                 "activeBackgroundColor": "background"
               },
               "text": "Failed to load image!"
+            },
+            {
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 272,
+              "wireID": "34bc9734-b886-4cb6-ae1c-1fd3550da331",
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "default_M_warning",
+                "activeColor": "status_warning",
+                "activeBackgroundColor": "background"
+              },
+              "text": "File read error!"
+            },
+            {
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 272,
+              "wireID": "74946914-08f7-400a-ca68-dbf84efe49ab",
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "default_M_warning",
+                "activeColor": "status_warning",
+                "activeBackgroundColor": "background"
+              },
+              "text": "Not enough memory to display image!"
+            },
+            {
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 272,
+              "wireID": "55e67e15-fb8f-4fe2-c055-dcb066efc964",
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "default_M_warning",
+                "activeColor": "status_warning",
+                "activeBackgroundColor": "background"
+              },
+              "text": "Image decode error!"
+            },
+            {
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 272,
+              "wireID": "2f82f192-6d38-4edd-d0b6-3b94c44a69d4",
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "show_previous_page",
+              "style": {
+                "inheritFrom": "default_M_warning",
+                "activeColor": "status_warning",
+                "activeBackgroundColor": "background"
+              },
+              "text": "Image size is not supported!"
             }
           ]
         }
@@ -50031,7 +50114,7 @@
               "customInputs": [],
               "customOutputs": [],
               "data": "file_manager_opened_image",
-              "action": "show_previous_page",
+              "action": "",
               "style": {
                 "inheritFrom": "default",
                 "activeColor": "text_regular",
@@ -50081,6 +50164,62 @@
                   "text": "Use EEZ Studio to upload pinout images."
                 }
               ]
+            },
+            {
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 240,
+              "wireID": "ea4a6e4c-db4d-4669-8fcc-29777488503f",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_M_warning"
+              },
+              "text": "File read error!"
+            },
+            {
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 240,
+              "wireID": "911d7507-7f2a-45ad-989e-e59bc1905f6f",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_M_warning"
+              },
+              "text": "Not enough memory to display image!"
+            },
+            {
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 240,
+              "wireID": "326817a2-708d-482c-cb8a-e7a2cd3ba813",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_M_warning"
+              },
+              "text": "Image decode error!"
+            },
+            {
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 240,
+              "wireID": "3c0f45c5-57e4-43b9-97b3-019ba7dbef4f",
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "inheritFrom": "default_M_warning"
+              },
+              "text": "Image size is not supported!"
             }
           ]
         },
