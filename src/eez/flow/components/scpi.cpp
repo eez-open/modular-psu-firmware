@@ -215,7 +215,13 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 				char *strEnd;
 				long num = strtol(resultText, &strEnd, 10);
 				if (*strEnd == 0) {
-					srcValue = Value(num);
+					if (num >= INT32_MIN && num <= INT32_MAX) {
+						srcValue = Value(num, VALUE_TYPE_INT32);
+					} else if (num >= 0 && num <= UINT32_MAX) {
+						srcValue = Value(num, VALUE_TYPE_UINT32);
+					} else {
+						srcValue = Value(num, VALUE_TYPE_INT64);
+					}
 				} else {
 					float fnum = strtof(resultText, &strEnd);
 					if (*strEnd == 0) {
