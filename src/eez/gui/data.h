@@ -460,7 +460,7 @@ struct Value {
 	uint32_t reserved;
 
     union {
-		uint8_t int8Value;
+		int8_t int8Value;
 		uint8_t uint8Value;
 
 		PairOfUint8Value pairOfUint8Value;
@@ -473,7 +473,7 @@ struct Value {
 
 		EnumValue enumValue;
 
-		uint32_t int32Value;
+		int32_t int32Value;
 		uint32_t uint32Value;
 
 		float floatValue;
