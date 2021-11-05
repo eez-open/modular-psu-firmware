@@ -47,7 +47,7 @@ Value op_add(const Value& a1, const Value& b1) {
 	}
 
 	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		return Value(a.int32Value + b.int32Value, VALUE_TYPE_INT32);
+		return Value((int)(a.int32Value + b.int32Value), VALUE_TYPE_INT32);
 	}
 
 	return Value();
@@ -70,7 +70,7 @@ Value op_sub(const Value& a1, const Value& b1) {
 	}
 
 	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		return Value(a.int32Value - b.int32Value, VALUE_TYPE_INT32);
+		return Value((int)(a.int32Value - b.int32Value), VALUE_TYPE_INT32);
 	}
 
 	return Value();
@@ -93,7 +93,7 @@ Value op_mul(const Value& a1, const Value& b1) {
 	}
 
 	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		return Value(a.int32Value * b.int32Value, VALUE_TYPE_INT32);
+		return Value((int)(a.int32Value * b.int32Value), VALUE_TYPE_INT32);
 	}
 
 	return Value();
@@ -116,7 +116,7 @@ Value op_div(const Value& a1, const Value& b1) {
 	}
 
 	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		return Value(a.int32Value / b.int32Value, VALUE_TYPE_INT32);
+		return Value((int)(a.int32Value / b.int32Value), VALUE_TYPE_INT32);
 	}
 
 	return Value();
@@ -131,7 +131,7 @@ Value op_mod(const Value& a1, const Value& b1) {
 	}
 
 	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		return Value(a.int32Value % b.int32Value, VALUE_TYPE_INT32);
+		return Value((int)(a.int32Value % b.int32Value), VALUE_TYPE_INT32);
 	}
 
 	return Value();
