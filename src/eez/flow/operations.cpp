@@ -768,14 +768,14 @@ bool do_OPERATION_TYPE_MATH_ABS(EvalStack &stack) {
 	}
 
 	if (a.isInt64()) {
-		if (!stack.push(Value(abs(a.getInt64()), VALUE_TYPE_INT64))) {
+		if (!stack.push(Value((int64_t)abs(a.getInt64()), VALUE_TYPE_INT64))) {
 			return false;
 		}
 		return true;
 	}
 
 	if (a.isInt32()) {
-		if (!stack.push(Value(abs(a.getInt32()), VALUE_TYPE_INT32))) {
+		if (!stack.push(Value((int)abs(a.getInt32()), VALUE_TYPE_INT32))) {
 			return false;
 		}
 		return true;

@@ -53,6 +53,10 @@ DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
         }
 
 		percentFrom = clamp(percentFrom, 0, 100.0f);
+		percentTo = clamp(percentTo, 0, 100.0f);
+		if (percentFrom > percentTo) {
+			percentFrom = percentTo;
+		}
 
         auto isHorizontal = widget->w > widget->h;
         if (isHorizontal) {
