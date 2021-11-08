@@ -41,13 +41,13 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 
 	auto flowIndex = component->flowIndex;
 	if (flowIndex < 0 || flowIndex >= (int)flowState->flowDefinition->flows.count) {
-		throwError(flowState, componentIndex, "Invalid action flow index in CallAction component\n");
+		throwError(flowState, componentIndex, "Invalid action flow index in CallAction\n");
 		return;
 	}
 
 	auto callActionComponenentExecutionState = (CallActionComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
 	if (callActionComponenentExecutionState) {
-		throwError(flowState, componentIndex, "CallAction component is already running\n");
+		throwError(flowState, componentIndex, "CallAction is already running\n");
 		return;
 	}
 

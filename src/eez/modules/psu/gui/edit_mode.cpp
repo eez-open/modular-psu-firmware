@@ -89,9 +89,11 @@ void enter(int tabIndex, bool setFocus) {
     }
 #endif
 
+	WidgetCursor widgetCursor;
+
     if (tabIndex == -1) {
         gui::selectChannelByCursor();
-        auto widgetCursor = getFoundWidgetAtDown();
+        widgetCursor = getFoundWidgetAtDown();
         int16_t newDataId = widgetCursor.widget->data;
         setFocusCursor(widgetCursor, newDataId);
         update(widgetCursor, newDataId);
@@ -102,11 +104,11 @@ void enter(int tabIndex, bool setFocus) {
     } else {
         g_tabIndex = tabIndex;
         replacePage(g_tabIndex);
+
+		widgetCursor = getFocusCursor();
     }
 
     if (g_tabIndex == PAGE_ID_EDIT_MODE_KEYPAD) {
-		WidgetCursor widgetCursor = getFocusCursor();
-
         int slotIndex = -1;
         int subchannelIndex = -1;
         if (isChannelData(widgetCursor, g_focusDataId)) {

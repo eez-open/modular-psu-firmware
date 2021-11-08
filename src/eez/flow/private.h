@@ -38,6 +38,10 @@ struct ComponenentExecutionState {
 	virtual ~ComponenentExecutionState() {}
 };
 
+struct CatchErrorComponenentExecutionState : public ComponenentExecutionState {
+	Value message;
+};
+
 struct FlowState {
 	uint32_t flowStateIndex;
 	Assets *assets;

@@ -1244,6 +1244,9 @@ Value Value::makeStringRef(const char *str, size_t len, uint32_t id) {
     Value value;
 
     auto stringRef = (StringRef *)alloc(sizeof(StringRef) + MAX(len + 1 - 4, 0), id);
+	if (stringRef == nullptr) {
+		return Value(VALUE_TYPE_NULL);
+	}
 
     stringCopyLength(stringRef->str, len + 1, str, len);
 	stringRef->str[len] = 0;
@@ -1265,7 +1268,10 @@ Value Value::concatenateString(const char *str1, const char *str2) {
     auto newStrLen = strlen(str1) + strlen(str2) + 1;
     
     auto stringRef = (StringRef *)alloc(sizeof(StringRef) + MAX(newStrLen - 4, 0), 0x66fa4fbf);
-    
+	if (stringRef == nullptr) {
+		return Value(VALUE_TYPE_NULL);
+	}
+
     stringCopy(stringRef->str, newStrLen, str1);
     stringAppendString(stringRef->str, newStrLen, str2);
 

@@ -25,34 +25,29 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-struct SwitchTest {
-    uint8_t outputIndex;
-    uint8_t conditionInstructions[1];
-};
-
-struct SwitchActionComponent : public Component {
-    ListOfAssetsPtr<SwitchTest> tests;
-};
-
-void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
+void executeIsTrueComponent(FlowState *flowState, unsigned componentIndex) {
     auto assets = flowState->assets;
-    auto component = (SwitchActionComponent *)flowState->flow->components.item(assets, componentIndex);
+    auto component = (Component *)flowState->flow->components.item(assets, componentIndex);
 
-    for (uint32_t testIndex = 0; testIndex < component->tests.count; testIndex++) {
-        auto test = component->tests.item(assets, testIndex);
+	auto propertyValue = component->propertyValues.item(assets, defs_v3::IS_TRUE_ACTION_COMPONENT_PROPERTY_VALUE);
+	Value srcValue;
+	if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, srcValue)) {
+		throwError(flowState, componentIndex, "Failed to evaluate Value in IsTrue\n");
+		return;
+	}
 
-        Value conditionValue;
-        if (!evalExpression(flowState, componentIndex, test->conditionInstructions, conditionValue)) {
-            throwError(flowState, componentIndex, "Failed to evaluate test condition in Switch\n");
-            return;
+    int err;
+    bool result = srcValue.toBool(&err);
+    if (err == 0) {
+        if (result) {
+            propagateValue(flowState, componentIndex, 1, Value(true, VALUE_TYPE_BOOLEAN));
+        } else {
+            propagateValue(flowState, componentIndex, 2, Value(false, VALUE_TYPE_BOOLEAN));
         }
-
-        if (conditionValue.getBoolean()) {
-            propagateValue(flowState, componentIndex, test->outputIndex);
-			break;
-        }
+    } else {
+        throwError(flowState, componentIndex, "Failed to convert Value to boolean in IsTrue\n");
     }
-
+	
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
 

@@ -32,18 +32,18 @@ void executeOutputComponent(FlowState *flowState, unsigned componentIndex) {
     auto component = (OutputActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
 	if (!flowState->parentFlowState) {
-		throwError(flowState, componentIndex, "Output action component, no parentFlowState\n");
+		throwError(flowState, componentIndex, "No parentFlowState in Output\n");
 		return;
 	}
 
 	if (!flowState->parentComponent) {
-		throwError(flowState, componentIndex, "Output action component, no parentComponent\n");
+		throwError(flowState, componentIndex, "No parentComponent in Output\n");
 		return;
 	}
 
     auto inputIndex = component->inputs.ptr(assets)[0];
     if (inputIndex >= flowState->flow->componentInputs.count) {
-        throwError(flowState, componentIndex, "Output action component, invalid input index\n");
+        throwError(flowState, componentIndex, "Invalid input index in Output\n");
 		return;
 	}
 

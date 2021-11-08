@@ -16,36 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/debug.h>
-
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
-#include <eez/flow/debugger.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-void executeLogComponent(FlowState *flowState, unsigned componentIndex) {
+void executeErrorComponent(FlowState *flowState, unsigned componentIndex) {
     auto assets = flowState->assets;
-    auto component = flowState->flow->components.item(assets, componentIndex);
+    auto component = (Component *)flowState->flow->components.item(assets, componentIndex);
 
-    auto propertyValue = component->propertyValues.item(assets, defs_v3::LOG_ACTION_COMPONENT_PROPERTY_VALUE);
+	if (flowState->parentFlowState && flowState->isAction) {
+		flowState->parentFlowState->numActiveComponents--;
+	}
 
-    Value value;
-    if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, value)) {
-        throwError(flowState, componentIndex, "Failed to evaluate Message in Log\n");
-        return;
-    }
+	auto propertyValue = component->propertyValues.item(assets, defs_v3::EVAL_EXPR_ACTION_COMPONENT_PROPERTY_EXPRESSION);
+	Value expressionValue;
+	if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, expressionValue)) {
+		throwError(flowState, componentIndex, "Failed to evaluate Message in Error\n");
+		return;
+	}
 
-    const char *valueStr = value.toString(0x0f9812ee).getString();
-    if (valueStr && *valueStr) {
-      logInfo(flowState, componentIndex, valueStr);
-    }
-
-	propagateValueThroughSeqout(flowState, componentIndex);
+	throwError(flowState, componentIndex, expressionValue.getString());
 }
 
 } // namespace flow

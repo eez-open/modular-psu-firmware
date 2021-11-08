@@ -25,33 +25,13 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-struct SwitchTest {
-    uint8_t outputIndex;
-    uint8_t conditionInstructions[1];
-};
+void executeCatchErrorComponent(FlowState *flowState, unsigned componentIndex) {
+	auto catchErrorComponentExecutionState = (CatchErrorComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
 
-struct SwitchActionComponent : public Component {
-    ListOfAssetsPtr<SwitchTest> tests;
-};
+	propagateValue(flowState, componentIndex, 1, catchErrorComponentExecutionState->message);
 
-void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
-    auto assets = flowState->assets;
-    auto component = (SwitchActionComponent *)flowState->flow->components.item(assets, componentIndex);
-
-    for (uint32_t testIndex = 0; testIndex < component->tests.count; testIndex++) {
-        auto test = component->tests.item(assets, testIndex);
-
-        Value conditionValue;
-        if (!evalExpression(flowState, componentIndex, test->conditionInstructions, conditionValue)) {
-            throwError(flowState, componentIndex, "Failed to evaluate test condition in Switch\n");
-            return;
-        }
-
-        if (conditionValue.getBoolean()) {
-            propagateValue(flowState, componentIndex, test->outputIndex);
-			break;
-        }
-    }
+    ObjectAllocator<CatchErrorComponenentExecutionState>::deallocate(catchErrorComponentExecutionState);
+    flowState->componenentExecutionStates[componentIndex] = nullptr;
 
 	propagateValueThroughSeqout(flowState, componentIndex);
 }

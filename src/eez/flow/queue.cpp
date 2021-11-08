@@ -91,5 +91,33 @@ void removeNextTaskFromQueue() {
 	onRemoveFromQueue();
 }
 
+void removeQueueTasksForFlowState(FlowState *flowState) {
+	if (g_queueHead == g_queueTail && !g_queueIsFull) {
+		return;
+	}
+
+	unsigned int it = g_queueHead;
+	while (it < g_queueTail) {
+		auto itNext = (it + 1) % QUEUE_SIZE;
+
+		if (g_queue[it].flowState == flowState) {
+			if (it == g_queueHead) {
+				g_queueHead = (g_queueHead + 1) % QUEUE_SIZE;
+			} else {
+				unsigned int itMovePrev = it;
+				unsigned int itMove = itNext;
+				while (itMove < g_queueTail) {
+					g_queue[itMovePrev] = g_queue[itMove];
+					itMovePrev = itMove;
+					itMove = (itMove + 1) % QUEUE_SIZE;
+				}
+				g_queueTail = itMovePrev;
+			}
+		}
+
+		it = itNext;
+	}
+}
+
 } // namespace flow
 } // namespace eez

@@ -150,7 +150,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 			Value value;
 			int numInstructionBytes;
 			if (!evalExpression(flowState, componentIndex, instructions + scpiComponentExecutionState->instructionIndex, value, &numInstructionBytes)) {
-				throwError(flowState, componentIndex, "scpi component eval assignable expression\n");
+				throwError(flowState, componentIndex, "Failed to evaluate assignable expression in SCPI\n");
 
 				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
 				flowState->componenentExecutionStates[componentIndex] = nullptr;
@@ -197,7 +197,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 			Value dstValue;
 			int numInstructionBytes;
 			if (!evalAssignableExpression(flowState, componentIndex, instructions + scpiComponentExecutionState->instructionIndex, dstValue, &numInstructionBytes)) {
-				throwError(flowState, componentIndex, "scpi component eval assignable expression\n");
+				throwError(flowState, componentIndex, "Failed to evaluate assignable expression in SCPI\n");
 
 				ObjectAllocator<ScpiComponentExecutionState>::deallocate(scpiComponentExecutionState);
 				flowState->componenentExecutionStates[componentIndex] = nullptr;

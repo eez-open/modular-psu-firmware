@@ -53563,26 +53563,15 @@
     {
       "id": 5,
       "name": "edit_value_active_S_left",
-      "inheritFrom": "default",
+      "inheritFrom": "edit_value_active_M_left",
       "font": "Oswald14",
-      "alignHorizontal": "left",
-      "alignVertical": "center",
-      "color": "action_color",
-      "backgroundColor": "text_enable_background",
-      "activeColor": "text_enable_background",
-      "activeBackgroundColor": "action_color",
-      "borderSize": "0",
       "padding": "0 0 0 2"
     },
     {
       "id": 6,
       "name": "edit_value_active_S_center",
-      "inheritFrom": "default",
-      "font": "Oswald14",
-      "color": "action_color",
-      "backgroundColor": "text_enable_background",
-      "activeColor": "text_enable_background",
-      "activeBackgroundColor": "action_color"
+      "inheritFrom": "edit_value_active_M_center",
+      "font": "Oswald14"
     },
     {
       "id": 18,
@@ -54321,17 +54310,8 @@
     {
       "id": 4,
       "name": "edit_value_active_M_left",
-      "inheritFrom": "default",
-      "font": "Oswald17",
+      "inheritFrom": "edit_value_active_M_center",
       "alignHorizontal": "left",
-      "alignVertical": "center",
-      "color": "action_color",
-      "backgroundColor": "text_enable_background",
-      "activeColor": "text_enable_background",
-      "activeBackgroundColor": "action_color",
-      "focusColor": "text_enable_background",
-      "focusBackgroundColor": "action_color",
-      "borderSize": "0",
       "padding": "0 0 0 4"
     },
     {
@@ -54377,6 +54357,8 @@
       "backgroundColor": "text_enable_background",
       "activeColor": "text_enable_background",
       "activeBackgroundColor": "action_color",
+      "focusColor": "text_enable_background",
+      "focusBackgroundColor": "action_color",
       "borderSize": "0",
       "padding": "0"
     },

@@ -33,12 +33,12 @@ void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
 	auto component = (InputActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
 	if (!flowState->parentFlowState) {
-		throwError(flowState, componentIndex, "Input action component, no parentFlowState\n");
+		throwError(flowState, componentIndex, "No parentFlowState in Input\n");
 		return;
 	}
 
 	if (!flowState->parentComponent) {
-		throwError(flowState, componentIndex, "Input action component, no parentComponent\n");
+		throwError(flowState, componentIndex, "No parentComponent in Input\n");
 		return;
 	}
 
@@ -47,7 +47,7 @@ void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
     uint8_t parentComponentInputIndex = callActionComponent->inputsStartIndex + component->inputIndex;
     
     if (parentComponentInputIndex >= flowState->parentComponent->inputs.count) {
-        throwError(flowState, componentIndex, "Input action component, invalid input index\n");
+        throwError(flowState, componentIndex, "Invalid input index in Input\n");
         return;
     }
 
@@ -56,7 +56,7 @@ void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
 
     auto parentFlow = flowState->flowDefinition->flows.item(assets, flowState->parentFlowState->flowIndex);
     if (flowInputIndex >= parentFlow->componentInputs.count) {
-        throwError(flowState, componentIndex, "Input action component, invalid input index of parent component\n");
+        throwError(flowState, componentIndex, "Invalid input index of parent component in Input\n");
         return;
     }
 

@@ -27,6 +27,7 @@
 #include <eez/flow/operations.h>
 #include <eez/flow/queue.h>
 #include <eez/flow/debugger.h>
+#include <eez/flow/flow_defs_v3.h>
 
 using namespace eez::gui;
 
@@ -70,6 +71,10 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components.item(assets, componentIndex);
 
 	if (component->type < 1000) {
+		return false;
+	}
+
+	if (component->type == defs_v3::COMPONENT_TYPE_CATCH_ERROR_ACTION) {
 		return false;
 	}
 
@@ -325,6 +330,23 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool findCatchErrorComponent(FlowState *flowState, FlowState *&catchErrorFlowState, int &catchErrorComponentIndex) {
+	for (unsigned componentIndex = 0; componentIndex < flowState->flow->components.count; componentIndex++) {
+		auto component = flowState->flow->components.item(flowState->assets, componentIndex);
+		if (component->type == defs_v3::COMPONENT_TYPE_CATCH_ERROR_ACTION) {
+			catchErrorFlowState = flowState;
+			catchErrorComponentIndex = componentIndex;
+			return true;
+		}
+	}
+
+	if (flowState->parentFlowState) {
+		return findCatchErrorComponent(flowState->parentFlowState, catchErrorFlowState, catchErrorComponentIndex);
+	}
+
+	return false;
+}
+
 void throwError(FlowState *flowState, int componentIndex, const char *errorMessage) {
     auto assets = flowState->assets;
     auto component = flowState->flow->components.item(assets, componentIndex);
@@ -337,9 +359,25 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
 			Value::makeStringRef(errorMessage, strlen(errorMessage), 0xef6f8414)
 		);
 	} else {
-		flowState->error = true;
-		onFlowError(flowState, componentIndex, errorMessage);
-		scripting::stopScript();
+		FlowState *catchErrorFlowState;
+		int catchErrorComponentIndex;
+		if (findCatchErrorComponent(flowState, catchErrorFlowState, catchErrorComponentIndex)) {
+			removeQueueTasksForFlowState(flowState);
+
+			auto catchErrorComponentExecutionState = ObjectAllocator<CatchErrorComponenentExecutionState>::allocate(0xe744a4ec);
+			catchErrorComponentExecutionState->message = Value::makeStringRef(errorMessage, strlen(errorMessage), 0x9473eef2);
+			catchErrorFlowState->componenentExecutionStates[catchErrorComponentIndex] = catchErrorComponentExecutionState;
+
+			if (!addToQueue(catchErrorFlowState, catchErrorComponentIndex, -1, -1, -1)) {
+				catchErrorFlowState->error = true;
+				onFlowError(catchErrorFlowState, catchErrorComponentIndex, "Execution queue is full\n");
+				scripting::stopScript();
+			}
+		} else {
+			flowState->error = true;
+			onFlowError(flowState, componentIndex, errorMessage);
+			scripting::stopScript();
+		}
 	}
 }
 

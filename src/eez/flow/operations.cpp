@@ -20,6 +20,7 @@
 #include <math.h>
 
 #include <eez/flow/operations.h>
+#include <eez/gui/data.h>
 
 namespace eez {
 namespace flow {
@@ -374,7 +375,22 @@ bool do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {
-	return false;
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	}
+
+	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
+		b = *b.pValueValue;
+	}
+
+	if (!stack.push(Value(a.toBool() || b.toBool(), VALUE_TYPE_BOOLEAN))) {
+		return false;
+	}
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
@@ -579,22 +595,207 @@ bool do_OPERATION_TYPE_FLOW_INDEX(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
-	// TODO
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	}
+
+	if (a.isDouble()) {
+		if (!stack.push(Value(sin(a.getDouble()), VALUE_TYPE_DOUBLE))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isFloat()) {
+		if (!stack.push(Value(sinf(a.toFloat()), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt64()) {
+		if (!stack.push(Value(sin(a.toInt64()), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt32OrLess()) {
+		if (!stack.push(Value(sinf(a.int32Value), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
 	return false;
 }
 
 bool do_OPERATION_TYPE_MATH_COS(EvalStack &stack) {
-	// TODO
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	}
+
+	if (a.isDouble()) {
+		if (!stack.push(Value(cos(a.getDouble()), VALUE_TYPE_DOUBLE))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isFloat()) {
+		if (!stack.push(Value(cosf(a.toFloat()), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt64()) {
+		if (!stack.push(Value(cos(a.toInt64()), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt32OrLess()) {
+		if (!stack.push(Value(cosf(a.int32Value), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
 	return false;
 }
 
 bool do_OPERATION_TYPE_MATH_LOG(EvalStack &stack) {
-	// TODO
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	}
+
+	if (a.isDouble()) {
+		if (!stack.push(Value(log(a.getDouble()), VALUE_TYPE_DOUBLE))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isFloat()) {
+		if (!stack.push(Value(logf(a.toFloat()), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt64()) {
+		if (!stack.push(Value(log(a.toInt64()), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt32OrLess()) {
+		if (!stack.push(Value(logf(a.int32Value), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
+	return false;
+}
+
+bool do_OPERATION_TYPE_MATH_LOG10(EvalStack &stack) {
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	}
+
+	if (a.isDouble()) {
+		if (!stack.push(Value(log10(a.getDouble()), VALUE_TYPE_DOUBLE))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isFloat()) {
+		if (!stack.push(Value(log10f(a.toFloat()), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt64()) {
+		if (!stack.push(Value(log10(a.toInt64()), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt32OrLess()) {
+		if (!stack.push(Value(log10f(a.int32Value), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
 	return false;
 }
 
 bool do_OPERATION_TYPE_MATH_ABS(EvalStack &stack) {
-	// TODO
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	}
+
+	if (a.isDouble()) {
+		if (!stack.push(Value(abs(a.getDouble()), VALUE_TYPE_DOUBLE))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isFloat()) {
+		if (!stack.push(Value(abs(a.toFloat()), VALUE_TYPE_FLOAT))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt64()) {
+		if (!stack.push(Value(abs(a.getInt64()), VALUE_TYPE_INT64))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt32()) {
+		if (!stack.push(Value(abs(a.getInt32()), VALUE_TYPE_INT32))) {
+			return false;
+		}
+		return true;
+	}
+
+	if (a.isInt16()) {
+		if (!stack.push(Value(abs(a.getInt16()), VALUE_TYPE_INT16))) {
+			return false;
+		}
+		return true;
+	}
+
+
+	if (a.isInt8()) {
+		if (!stack.push(Value(abs(a.getInt8()), VALUE_TYPE_INT8))) {
+			return false;
+		}
+		return true;
+	}
+
 	return false;
 }
 
@@ -633,8 +834,62 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_STRING_PAD_START(EvalStack &stack) {
-	// TODO
-	return false;
+	auto c = stack.pop();
+	auto b = stack.pop();
+	auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	}
+
+	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
+		b = *b.pValueValue;
+	}
+
+	if (c.getType() == VALUE_TYPE_VALUE_PTR) {
+		c = *c.pValueValue;
+	}
+
+	const char *str = a.toString(0xcf6aabe6).getString();
+	if (!str) {
+		return false;
+	}
+	int strLen = strlen(str);
+
+	int targetLength;
+	if (b.isInt32OrLess()) {
+		targetLength = b.int32Value;
+		if (targetLength < strLen) {
+			targetLength = strLen;
+		}
+	} else {
+		return false;
+	}
+
+	const char *padStr = c.toString(0x81353bd7).getString();
+	if (!padStr) {
+		return false;
+	}
+	int padStrLen = strlen(padStr);
+
+	Value resultValue = eez::gui::Value::makeStringRef("", targetLength, 0xf43b14dd);
+	if (resultValue.type == VALUE_TYPE_NULL) {
+		return false;
+	}
+	char *resultStr = (char *)resultValue.getString();
+
+	auto n = targetLength - strLen;
+	stringCopy(resultStr + (targetLength - strLen), targetLength, str);
+
+	for (int i = 0; i < n; i++) {
+		resultStr[i] = padStr[i % padStrLen];
+	}
+
+	if (!stack.push(resultValue)) {
+		return false;
+	}
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_STRING_SPLIT(EvalStack &stack) {
@@ -675,6 +930,7 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_MATH_SIN,
 	do_OPERATION_TYPE_MATH_COS,
 	do_OPERATION_TYPE_MATH_LOG,
+	do_OPERATION_TYPE_MATH_LOG10,
 	do_OPERATION_TYPE_MATH_ABS,
 	do_OPERATION_TYPE_STRING_FIND,
 	do_OPERATION_TYPE_STRING_PAD_START,

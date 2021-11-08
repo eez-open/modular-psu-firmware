@@ -25,32 +25,24 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-struct SwitchTest {
-    uint8_t outputIndex;
-    uint8_t conditionInstructions[1];
+struct CompareActionComponent : public Component {
+	uint8_t conditionInstructions[1];
 };
 
-struct SwitchActionComponent : public Component {
-    ListOfAssetsPtr<SwitchTest> tests;
-};
-
-void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
+void executeCompareComponent(FlowState *flowState, unsigned componentIndex) {
     auto assets = flowState->assets;
-    auto component = (SwitchActionComponent *)flowState->flow->components.item(assets, componentIndex);
+    auto component = (CompareActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
-    for (uint32_t testIndex = 0; testIndex < component->tests.count; testIndex++) {
-        auto test = component->tests.item(assets, testIndex);
+    Value conditionValue;
+    if (!evalExpression(flowState, componentIndex, component->conditionInstructions, conditionValue)) {
+        throwError(flowState, componentIndex, "Failed to evaluate Condition in Compare\n");
+        return;
+    }
 
-        Value conditionValue;
-        if (!evalExpression(flowState, componentIndex, test->conditionInstructions, conditionValue)) {
-            throwError(flowState, componentIndex, "Failed to evaluate test condition in Switch\n");
-            return;
-        }
-
-        if (conditionValue.getBoolean()) {
-            propagateValue(flowState, componentIndex, test->outputIndex);
-			break;
-        }
+    if (conditionValue.getBoolean()) {
+        propagateValue(flowState, componentIndex, 1, Value(true, VALUE_TYPE_BOOLEAN));
+    } else {
+        propagateValue(flowState, componentIndex, 2, Value(false, VALUE_TYPE_BOOLEAN));
     }
 
 	propagateValueThroughSeqout(flowState, componentIndex);
