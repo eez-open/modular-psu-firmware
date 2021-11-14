@@ -594,7 +594,7 @@ bool client_available(SocketType &listenSocket, SocketType &clientSocket) {
 
     return true;
 #else
-    if (connected())
+    if (connected(clientSocket))
         return true;
 
     if (listenSocket == -1) {
@@ -665,7 +665,7 @@ int available(SocketType &clientSocket, char *inputBuffer) {
         return 0;
     }
 
-    stop();
+    stop(clientSocket);
 
     return 0;
 #endif        
@@ -695,7 +695,7 @@ int read(SocketType &clientSocket, char *buffer, int buffer_size) {
         return 0;
     }
 
-    stop();
+    stop(clientSocket);
 
     return 0;
 #endif    
@@ -776,11 +776,11 @@ void onEvent(uint8_t eventType) {
 			g_debuggerListenSocket = INVALID_SOCKET;
         }
 #else
-        close(scpiListenSocket);
-        scpiListenSocket = -1;
+        close(g_scpiListenSocket);
+        g_scpiListenSocket = -1;
 
-        close(debuggerListenSocket);
-        debuggerListenSocket = -1;
+        close(g_debuggerListenSocket);
+        g_debuggerListenSocket = -1;
 #endif    
         break;
     }
