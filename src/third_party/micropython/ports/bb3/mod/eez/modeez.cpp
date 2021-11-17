@@ -19,13 +19,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <eez/index.h>
+#include <bb3/index.h>
 #include <eez/scripting/scripting.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/channel_dispatcher.h>
-#include <eez/modules/psu/trigger.h>
-#include <eez/modules/psu/dlog_record.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/channel_dispatcher.h>
+#include <bb3/psu/trigger.h>
+#include <bb3/psu/dlog_record.h>
 
 #include <scpi/scpi.h>
 

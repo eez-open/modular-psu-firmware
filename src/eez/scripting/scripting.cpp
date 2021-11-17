@@ -18,9 +18,9 @@
 
 #include <stdio.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/file_manager.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/gui/psu.h>
+#include <bb3/psu/gui/file_manager.h>
 
 #include <eez/scripting/auto_start.h>
 #include <eez/scripting/flow.h>

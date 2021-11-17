@@ -20,7 +20,7 @@
 #include <eez/keyboard.h>
 #include <eez/system.h>
 #include <eez/gui/gui.h>
-#include <eez/modules/mcu/display.h>
+#include <bb3/mcu/display.h>
 
 using namespace eez::gui;
 using namespace eez::mcu::display;

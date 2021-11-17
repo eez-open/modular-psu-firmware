@@ -20,7 +20,7 @@
 
 #include <eez/system.h>
 #include <eez/firmware.h>
-#include <eez/modules/psu/conf_advanced.h>
+#include <bb3/psu/conf_advanced.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>

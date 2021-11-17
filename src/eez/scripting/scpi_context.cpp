@@ -18,9 +18,9 @@
 
 #include <eez/sound.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/datetime.h>
-#include <eez/modules/psu/scpi/psu.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/datetime.h>
+#include <bb3/psu/scpi/psu.h>
 
 #include <eez/scripting/scripting.h>
 #include <eez/scripting/thread.h>

@@ -21,12 +21,12 @@
 #include <spi.h>
 #include <cmsis_os.h>
 
-#include <eez/index.h>
+#include <bb3/index.h>
 #include <eez/tasks.h>
 #include <eez/firmware.h>
-#include <eez/modules/psu/conf_advanced.h>
+#include <bb3/psu/conf_advanced.h>
 #include <eez/platform/stm32/spi.h>
-#include <eez/modules/bp3c/comm.h>
+#include <bb3/bp3c/comm.h>
 
 namespace eez {
 namespace spi {

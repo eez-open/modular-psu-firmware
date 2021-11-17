@@ -78,7 +78,7 @@ include_directories(
     src/eez/libs/agg
     src/eez/libs/mqtt
     src/eez/platform/simulator
-    src/eez/scpi
+    src/bb3/scpi
 )
 
 include_directories(SYSTEM
@@ -94,27 +94,20 @@ set(src_files)
 set(header_files)
 
 set(src_eez
-    src/eez/action_impl.cpp
     src/eez/alloc.cpp
     src/eez/firmware.cpp
     src/eez/debug.cpp
     src/eez/dlog_file.cpp
     src/eez/file_type.cpp
-    src/eez/fs_driver.cpp
     src/eez/function_generator.cpp
     src/eez/hmi.cpp
-    src/eez/index.cpp
     src/eez/keyboard.cpp
-    src/eez/main.cpp
     src/eez/memory.cpp
     src/eez/mouse.cpp
-    src/eez/mqtt.cpp
     src/eez/sound.cpp
     src/eez/system.cpp
     src/eez/tasks.cpp
-    src/eez/uart.cpp
     src/eez/unit.cpp
-    src/eez/usb.cpp
     src/eez/util.cpp
 )
 list (APPEND src_files ${src_eez})
@@ -124,156 +117,171 @@ set(header_eez
     src/eez/debug.h
     src/eez/dlog_file.h
     src/eez/file_type.h
-    src/eez/fs_driver.h
     src/eez/function_generator.h
     src/eez/hmi.h
-    src/eez/index.h
     src/eez/keyboard.h
     src/eez/memory.h
     src/eez/mouse.h
-    src/eez/mqtt.h
     src/eez/sound.h
     src/eez/system.h
     src/eez/tasks.h
-    src/eez/uart.h
     src/eez/unit.h
-    src/eez/usb.h
     src/eez/util.h
     src/eez/value_types.h
 )
 list (APPEND header_files ${header_eez})
 source_group("eez" FILES ${src_eez} ${header_eez})
 
-set(src_eez_modules_psu
-    src/eez/modules/psu/board.cpp
-    src/eez/modules/psu/calibration.cpp
-    src/eez/modules/psu/channel.cpp
-    src/eez/modules/psu/channel_dispatcher.cpp
-    src/eez/modules/psu/datetime.cpp
-    src/eez/modules/psu/devices.cpp
-    src/eez/modules/psu/dlog_record.cpp
-    src/eez/modules/psu/dlog_view.cpp
-    src/eez/modules/psu/ethernet_scpi.cpp
-    src/eez/modules/psu/event_queue.cpp
-    src/eez/modules/psu/io_pins.cpp
-    src/eez/modules/psu/list_program.cpp
-    src/eez/modules/psu/ntp.cpp
-    src/eez/modules/psu/ontime.cpp
-    src/eez/modules/psu/persist_conf.cpp
-    src/eez/modules/psu/profile.cpp
-    src/eez/modules/psu/psu.cpp
-    src/eez/modules/psu/ramp.cpp
-    src/eez/modules/psu/rtc.cpp
-    src/eez/modules/psu/sd_card.cpp
-    src/eez/modules/psu/serial.cpp
-    src/eez/modules/psu/serial_psu.cpp
-    src/eez/modules/psu/temp_sensor.cpp
-    src/eez/modules/psu/temperature.cpp
-    src/eez/modules/psu/timer.cpp
-    src/eez/modules/psu/trigger.cpp
+set(src_bb3
+    src/bb3/action_impl.cpp
+    src/bb3/fs_driver.cpp
+    src/bb3/index.cpp
+    src/bb3/main.cpp
+    src/bb3/mqtt.cpp
+    src/bb3/uart.cpp
+    src/bb3/usb.cpp
 )
-list (APPEND src_files ${src_eez_modules_psu})
-set(header_eez_modules_psu
-    src/eez/modules/psu/board.h
-    src/eez/modules/psu/calibration.h
-    src/eez/modules/psu/channel.h
-    src/eez/modules/psu/channel_dispatcher.h
-    src/eez/modules/psu/conf.h
-    src/eez/modules/psu/conf_advanced.h
-    src/eez/modules/psu/conf_user.h
-    src/eez/modules/psu/datetime.h
-    src/eez/modules/psu/devices.h
-    src/eez/modules/psu/dlog_record.h
-    src/eez/modules/psu/dlog_view.h
-    src/eez/modules/psu/ethernet_scpi.h
-    src/eez/modules/psu/event_queue.h
-    src/eez/modules/psu/io_pins.h
-    src/eez/modules/psu/list_program.h
-    src/eez/modules/psu/ntp.h
-    src/eez/modules/psu/ontime.h
-    src/eez/modules/psu/persist_conf.h
-    src/eez/modules/psu/profile.h
-    src/eez/modules/psu/psu.h
-    src/eez/modules/psu/ramp.h
-    src/eez/modules/psu/rtc.h
-    src/eez/modules/psu/sd_card.h
-    src/eez/modules/psu/serial_psu.h
-    src/eez/modules/psu/temp_sensor.h
-    src/eez/modules/psu/temperature.h
-    src/eez/modules/psu/timer.h
-    src/eez/modules/psu/trigger.h
+list (APPEND src_files ${src_bb3})
+set(header_bb3
+    src/bb3/fs_driver.h
+    src/bb3/index.h
+    src/bb3/mqtt.h
+    src/bb3/uart.h
+    src/bb3/usb.h
 )
-list (APPEND header_files ${header_eez_modules_psu})
-source_group("eez\\modules\\psu" FILES ${src_eez_modules_psu} ${header_eez_modules_psu})
+list (APPEND header_files ${header_bb3})
+source_group("bb3" FILES ${src_bb3} ${header_bb3})
 
-set(src_eez_modules_psu_gui
-    src/eez/modules/psu/gui/animations.cpp
-    src/eez/modules/psu/gui/channel_calibration.cpp
-    src/eez/modules/psu/gui/data.cpp
-    src/eez/modules/psu/gui/edit_mode.cpp
-    src/eez/modules/psu/gui/file_manager.cpp
-    src/eez/modules/psu/gui/keypad.cpp
-    src/eez/modules/psu/gui/labels_and_colors.cpp
-    src/eez/modules/psu/gui/page.cpp
-    src/eez/modules/psu/gui/page_ch_settings.cpp
-    src/eez/modules/psu/gui/page_event_queue.cpp
-    src/eez/modules/psu/gui/page_sys_settings.cpp
-    src/eez/modules/psu/gui/page_user_profiles.cpp
-    src/eez/modules/psu/gui/password.cpp
-    src/eez/modules/psu/gui/psu.cpp
-    src/eez/modules/psu/gui/touch_calibration.cpp
+set(src_bb3_psu
+    src/bb3/psu/board.cpp
+    src/bb3/psu/calibration.cpp
+    src/bb3/psu/channel.cpp
+    src/bb3/psu/channel_dispatcher.cpp
+    src/bb3/psu/datetime.cpp
+    src/bb3/psu/devices.cpp
+    src/bb3/psu/dlog_record.cpp
+    src/bb3/psu/dlog_view.cpp
+    src/bb3/psu/ethernet_scpi.cpp
+    src/bb3/psu/event_queue.cpp
+    src/bb3/psu/io_pins.cpp
+    src/bb3/psu/list_program.cpp
+    src/bb3/psu/ntp.cpp
+    src/bb3/psu/ontime.cpp
+    src/bb3/psu/persist_conf.cpp
+    src/bb3/psu/profile.cpp
+    src/bb3/psu/psu.cpp
+    src/bb3/psu/ramp.cpp
+    src/bb3/psu/rtc.cpp
+    src/bb3/psu/sd_card.cpp
+    src/bb3/psu/serial.cpp
+    src/bb3/psu/serial_psu.cpp
+    src/bb3/psu/temp_sensor.cpp
+    src/bb3/psu/temperature.cpp
+    src/bb3/psu/timer.cpp
+    src/bb3/psu/trigger.cpp
 )
-list (APPEND src_files ${src_eez_modules_psu_gui})
-set(header_eez_modules_psu_gui
-    src/eez/modules/psu/gui/animations.h
-    src/eez/modules/psu/gui/channel_calibration.h
-    src/eez/modules/psu/gui/data.h
-    src/eez/modules/psu/gui/edit_mode.h
-    src/eez/modules/psu/gui/file_manager.h
-    src/eez/modules/psu/gui/keypad.h
-    src/eez/modules/psu/gui/labels_and_colors.h
-    src/eez/modules/psu/gui/page.h
-    src/eez/modules/psu/gui/page_ch_settings.h
-    src/eez/modules/psu/gui/page_event_queue.h
-    src/eez/modules/psu/gui/page_sys_settings.h
-    src/eez/modules/psu/gui/page_user_profiles.h
-    src/eez/modules/psu/gui/password.h
-    src/eez/modules/psu/gui/psu.h
-    src/eez/modules/psu/gui/touch_calibration.h
+list (APPEND src_files ${src_bb3_psu})
+set(header_bb3_psu
+    src/bb3/psu/board.h
+    src/bb3/psu/calibration.h
+    src/bb3/psu/channel.h
+    src/bb3/psu/channel_dispatcher.h
+    src/bb3/psu/conf.h
+    src/bb3/psu/conf_advanced.h
+    src/bb3/psu/conf_user.h
+    src/bb3/psu/datetime.h
+    src/bb3/psu/devices.h
+    src/bb3/psu/dlog_record.h
+    src/bb3/psu/dlog_view.h
+    src/bb3/psu/ethernet_scpi.h
+    src/bb3/psu/event_queue.h
+    src/bb3/psu/io_pins.h
+    src/bb3/psu/list_program.h
+    src/bb3/psu/ntp.h
+    src/bb3/psu/ontime.h
+    src/bb3/psu/persist_conf.h
+    src/bb3/psu/profile.h
+    src/bb3/psu/psu.h
+    src/bb3/psu/ramp.h
+    src/bb3/psu/rtc.h
+    src/bb3/psu/sd_card.h
+    src/bb3/psu/serial_psu.h
+    src/bb3/psu/temp_sensor.h
+    src/bb3/psu/temperature.h
+    src/bb3/psu/timer.h
+    src/bb3/psu/trigger.h
 )
-list (APPEND header_files ${header_eez_modules_psu_gui})
-source_group("eez\\modules\\psu\\gui" FILES ${src_eez_modules_psu_gui} ${header_eez_modules_psu_gui})
+list (APPEND header_files ${header_bb3_psu})
+source_group("bb3\\psu" FILES ${src_bb3_psu} ${header_bb3_psu})
 
-set(src_eez_modules_psu_scpi
-    src/eez/modules/psu/scpi/appl.cpp
-    src/eez/modules/psu/scpi/cal.cpp
-    src/eez/modules/psu/scpi/core.cpp
-    src/eez/modules/psu/scpi/debug.cpp
-    src/eez/modules/psu/scpi/diag.cpp
-    src/eez/modules/psu/scpi/display.cpp
-    src/eez/modules/psu/scpi/dlog.cpp
-    src/eez/modules/psu/scpi/inst.cpp
-    src/eez/modules/psu/scpi/meas.cpp
-    src/eez/modules/psu/scpi/mem.cpp
-    src/eez/modules/psu/scpi/mmem.cpp
-    src/eez/modules/psu/scpi/outp.cpp
-    src/eez/modules/psu/scpi/params.cpp
-    src/eez/modules/psu/scpi/psu.cpp
-    src/eez/modules/psu/scpi/route.cpp
-    src/eez/modules/psu/scpi/sense.cpp
-    src/eez/modules/psu/scpi/simu.cpp
-    src/eez/modules/psu/scpi/sour.cpp
-    src/eez/modules/psu/scpi/stat.cpp
-    src/eez/modules/psu/scpi/syst.cpp
-    src/eez/modules/psu/scpi/trigger.cpp
+set(src_bb3_psu_gui
+    src/bb3/psu/gui/animations.cpp
+    src/bb3/psu/gui/channel_calibration.cpp
+    src/bb3/psu/gui/data.cpp
+    src/bb3/psu/gui/edit_mode.cpp
+    src/bb3/psu/gui/file_manager.cpp
+    src/bb3/psu/gui/keypad.cpp
+    src/bb3/psu/gui/labels_and_colors.cpp
+    src/bb3/psu/gui/page.cpp
+    src/bb3/psu/gui/page_ch_settings.cpp
+    src/bb3/psu/gui/page_event_queue.cpp
+    src/bb3/psu/gui/page_sys_settings.cpp
+    src/bb3/psu/gui/page_user_profiles.cpp
+    src/bb3/psu/gui/password.cpp
+    src/bb3/psu/gui/psu.cpp
+    src/bb3/psu/gui/touch_calibration.cpp
 )
-list (APPEND src_files ${src_eez_modules_psu_scpi})
-set(header_eez_modules_psu_scpi
-    src/eez/modules/psu/scpi/params.h
-    src/eez/modules/psu/scpi/psu.h
+list (APPEND src_files ${src_bb3_psu_gui})
+set(header_bb3_psu_gui
+    src/bb3/psu/gui/animations.h
+    src/bb3/psu/gui/channel_calibration.h
+    src/bb3/psu/gui/data.h
+    src/bb3/psu/gui/edit_mode.h
+    src/bb3/psu/gui/file_manager.h
+    src/bb3/psu/gui/keypad.h
+    src/bb3/psu/gui/labels_and_colors.h
+    src/bb3/psu/gui/page.h
+    src/bb3/psu/gui/page_ch_settings.h
+    src/bb3/psu/gui/page_event_queue.h
+    src/bb3/psu/gui/page_sys_settings.h
+    src/bb3/psu/gui/page_user_profiles.h
+    src/bb3/psu/gui/password.h
+    src/bb3/psu/gui/psu.h
+    src/bb3/psu/gui/touch_calibration.h
 )
-list (APPEND header_files ${header_eez_modules_psu_scpi})
-source_group("eez\\modules\\psu\\scpi" FILES ${src_eez_modules_psu_scpi} ${header_eez_modules_psu_scpi})
+list (APPEND header_files ${header_bb3_psu_gui})
+source_group("bb3\\psu\\gui" FILES ${src_bb3_psu_gui} ${header_bb3_psu_gui})
+
+set(src_bb3_psu_scpi
+    src/bb3/psu/scpi/appl.cpp
+    src/bb3/psu/scpi/cal.cpp
+    src/bb3/psu/scpi/core.cpp
+    src/bb3/psu/scpi/debug.cpp
+    src/bb3/psu/scpi/diag.cpp
+    src/bb3/psu/scpi/display.cpp
+    src/bb3/psu/scpi/dlog.cpp
+    src/bb3/psu/scpi/inst.cpp
+    src/bb3/psu/scpi/meas.cpp
+    src/bb3/psu/scpi/mem.cpp
+    src/bb3/psu/scpi/mmem.cpp
+    src/bb3/psu/scpi/outp.cpp
+    src/bb3/psu/scpi/params.cpp
+    src/bb3/psu/scpi/psu.cpp
+    src/bb3/psu/scpi/route.cpp
+    src/bb3/psu/scpi/sense.cpp
+    src/bb3/psu/scpi/simu.cpp
+    src/bb3/psu/scpi/sour.cpp
+    src/bb3/psu/scpi/stat.cpp
+    src/bb3/psu/scpi/syst.cpp
+    src/bb3/psu/scpi/trigger.cpp
+)
+list (APPEND src_files ${src_bb3_psu_scpi})
+set(header_bb3_psu_scpi
+    src/bb3/psu/scpi/params.h
+    src/bb3/psu/scpi/psu.h
+)
+list (APPEND header_files ${header_bb3_psu_scpi})
+source_group("bb3\\psu\\scpi" FILES ${src_bb3_psu_scpi} ${header_bb3_psu_scpi})
 
 set(src_eez_gui
     src/eez/gui/app_context.cpp
@@ -417,146 +425,146 @@ list (APPEND header_files ${header_eez_libs_mqtt})
 source_group("eez\\libs\\mqtt" FILES ${src_eez_libs_mqtt} ${header_eez_libs_mqtt})
 
 
-set(src_eez_modules_aux_ps
-    src/eez/modules/aux_ps/fan.cpp
-    src/eez/modules/aux_ps/pid.cpp
+set(src_bb3_aux_ps
+    src/bb3/aux_ps/fan.cpp
+    src/bb3/aux_ps/pid.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_aux_ps})
-set(header_eez_modules_aux_ps
-    src/eez/modules/aux_ps/fan.h
-    src/eez/modules/aux_ps/pid.h
+list (APPEND src_files ${src_bb3_aux_ps})
+set(header_bb3_aux_ps
+    src/bb3/aux_ps/fan.h
+    src/bb3/aux_ps/pid.h
 ) 
-list (APPEND header_files ${header_eez_modules_aux_ps})
-source_group("eez\\modules\\aux_ps" FILES ${src_eez_modules_aux_ps} ${header_eez_modules_aux_ps})
+list (APPEND header_files ${header_bb3_aux_ps})
+source_group("bb3\\aux_ps" FILES ${src_bb3_aux_ps} ${header_bb3_aux_ps})
 
-set(src_eez_modules_bp3c
-    src/eez/modules/bp3c/comm.cpp
-    src/eez/modules/bp3c/eeprom.cpp
-    src/eez/modules/bp3c/io_exp.cpp
-    src/eez/modules/bp3c/flash_slave.cpp
+set(src_bb3_bp3c
+    src/bb3/bp3c/comm.cpp
+    src/bb3/bp3c/eeprom.cpp
+    src/bb3/bp3c/io_exp.cpp
+    src/bb3/bp3c/flash_slave.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_bp3c})
-set(header_eez_modules_bp3c
-    src/eez/modules/bp3c/comm.h
-    src/eez/modules/bp3c/eeprom.h
-    src/eez/modules/bp3c/io_exp.h
-    src/eez/modules/bp3c/flash_slave.h
+list (APPEND src_files ${src_bb3_bp3c})
+set(header_bb3_bp3c
+    src/bb3/bp3c/comm.h
+    src/bb3/bp3c/eeprom.h
+    src/bb3/bp3c/io_exp.h
+    src/bb3/bp3c/flash_slave.h
 ) 
-list (APPEND header_files ${header_eez_modules_bp3c})
-source_group("eez\\modules\\bp3c" FILES ${src_eez_modules_bp3c} ${header_eez_modules_bp3c})
+list (APPEND header_files ${header_bb3_bp3c})
+source_group("bb3\\bp3c" FILES ${src_bb3_bp3c} ${header_bb3_bp3c})
 
-set(src_eez_modules_fpga
-    src/eez/modules/fpga/prog.cpp
+set(src_bb3_fpga
+    src/bb3/fpga/prog.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_fpga})
-set(header_eez_modules_fpga
-    src/eez/modules/fpga/prog.h
+list (APPEND src_files ${src_bb3_fpga})
+set(header_bb3_fpga
+    src/bb3/fpga/prog.h
 ) 
-list (APPEND header_files ${header_eez_modules_fpga})
-source_group("eez\\modules\\fpga" FILES ${src_eez_modules_fpga} ${header_eez_modules_fpga})
+list (APPEND header_files ${header_bb3_fpga})
+source_group("bb3\\fpga" FILES ${src_bb3_fpga} ${header_bb3_fpga})
 
-set(src_eez_modules_mcu
-    src/eez/modules/mcu/battery.cpp
-    src/eez/modules/mcu/display.cpp
-    src/eez/modules/mcu/eeprom.cpp
-    src/eez/modules/mcu/ethernet.cpp
-    src/eez/modules/mcu/encoder.cpp
-    src/eez/modules/mcu/sdram.cpp) 
-list (APPEND src_files ${src_eez_modules_mcu})
-set(header_eez_modules_mcu
-    src/eez/modules/mcu/battery.h
-    src/eez/modules/mcu/display.h
-    src/eez/modules/mcu/eeprom.h
-    src/eez/modules/mcu/encoder.h
-    src/eez/modules/mcu/ethernet.h
-    src/eez/modules/mcu/sdram.h
-    src/eez/modules/mcu/touch.h) 
-list (APPEND header_files ${header_eez_modules_mcu})
-source_group("eez\\modules\\mcu" FILES ${src_eez_modules_mcu} ${header_eez_modules_mcu})
+set(src_bb3_mcu
+    src/bb3/mcu/battery.cpp
+    src/bb3/mcu/display.cpp
+    src/bb3/mcu/eeprom.cpp
+    src/bb3/mcu/ethernet.cpp
+    src/bb3/mcu/encoder.cpp
+    src/bb3/mcu/sdram.cpp) 
+list (APPEND src_files ${src_bb3_mcu})
+set(header_bb3_mcu
+    src/bb3/mcu/battery.h
+    src/bb3/mcu/display.h
+    src/bb3/mcu/eeprom.h
+    src/bb3/mcu/encoder.h
+    src/bb3/mcu/ethernet.h
+    src/bb3/mcu/sdram.h
+    src/bb3/mcu/touch.h) 
+list (APPEND header_files ${header_bb3_mcu})
+source_group("bb3\\mcu" FILES ${src_bb3_mcu} ${header_bb3_mcu})
 
-set(src_eez_modules_mcu_simulator
-    src/eez/modules/mcu/simulator/display.cpp
-    src/eez/modules/mcu/simulator/touch.cpp
+set(src_bb3_mcu_simulator
+    src/bb3/mcu/simulator/display.cpp
+    src/bb3/mcu/simulator/touch.cpp
 
 ) 
-list (APPEND src_files ${src_eez_modules_mcu_simulator})
-source_group("eez\\modules\\mcu\\simulator" FILES ${src_eez_modules_mcu_simulator})
+list (APPEND src_files ${src_bb3_mcu_simulator})
+source_group("bb3\\mcu\\simulator" FILES ${src_bb3_mcu_simulator})
 
-set(src_eez_modules_dib_dcp405
-    src/eez/modules/dib-dcp405/adc.cpp
-    src/eez/modules/dib-dcp405/dib-dcp405.cpp
-    src/eez/modules/dib-dcp405/dac.cpp
-    src/eez/modules/dib-dcp405/ioexp.cpp
+set(src_bb3_dib_dcp405
+    src/bb3/dib-dcp405/adc.cpp
+    src/bb3/dib-dcp405/dib-dcp405.cpp
+    src/bb3/dib-dcp405/dac.cpp
+    src/bb3/dib-dcp405/ioexp.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_dib_dcp405})
-set(header_eez_modules_dib_dcp405
-    src/eez/modules/dib-dcp405/adc.h
-    src/eez/modules/dib-dcp405/dib-dcp405.h
-    src/eez/modules/dib-dcp405/dac.h
-    src/eez/modules/dib-dcp405/ioexp.h
+list (APPEND src_files ${src_bb3_dib_dcp405})
+set(header_bb3_dib_dcp405
+    src/bb3/dib-dcp405/adc.h
+    src/bb3/dib-dcp405/dib-dcp405.h
+    src/bb3/dib-dcp405/dac.h
+    src/bb3/dib-dcp405/ioexp.h
 ) 
-list (APPEND header_files ${header_eez_modules_dib_dcp405})
-source_group("eez\\modules\\dib-dcp405" FILES ${src_eez_modules_dib_dcp405} ${header_eez_modules_dib_dcp405})
+list (APPEND header_files ${header_bb3_dib_dcp405})
+source_group("bb3\\dib-dcp405" FILES ${src_bb3_dib_dcp405} ${header_bb3_dib_dcp405})
 
-set(src_eez_modules_dib_dcm220
-    src/eez/modules/dib-dcm220/dib-dcm220.cpp
+set(src_bb3_dib_dcm220
+    src/bb3/dib-dcm220/dib-dcm220.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_dib_dcm220})
-set(header_eez_modules_dib_dcm220
-    src/eez/modules/dib-dcm220/dib-dcm220.h
+list (APPEND src_files ${src_bb3_dib_dcm220})
+set(header_bb3_dib_dcm220
+    src/bb3/dib-dcm220/dib-dcm220.h
 ) 
-list (APPEND header_files ${header_eez_modules_dib_dcm220})
-source_group("eez\\modules\\dib-dcm220" FILES ${src_eez_modules_dib_dcm220} ${header_eez_modules_dib_dcm220})
+list (APPEND header_files ${header_bb3_dib_dcm220})
+source_group("bb3\\dib-dcm220" FILES ${src_bb3_dib_dcm220} ${header_bb3_dib_dcm220})
 
-set(src_eez_modules_dib_dcm224
-    src/eez/modules/dib-dcm224/dib-dcm224.cpp
+set(src_bb3_dib_dcm224
+    src/bb3/dib-dcm224/dib-dcm224.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_dib_dcm224})
-set(header_eez_modules_dib_dcm224
-    src/eez/modules/dib-dcm224/dib-dcm224.h
+list (APPEND src_files ${src_bb3_dib_dcm224})
+set(header_bb3_dib_dcm224
+    src/bb3/dib-dcm224/dib-dcm224.h
 ) 
-list (APPEND header_files ${header_eez_modules_dib_dcm224})
-source_group("eez\\modules\\dib-dcm224" FILES ${src_eez_modules_dib_dcm224} ${header_eez_modules_dib_dcm224})
+list (APPEND header_files ${header_bb3_dib_dcm224})
+source_group("bb3\\dib-dcm224" FILES ${src_bb3_dib_dcm224} ${header_bb3_dib_dcm224})
 
-set(src_eez_modules_dib_mio168
-    src/eez/modules/dib-mio168/dib-mio168.cpp
+set(src_bb3_dib_mio168
+    src/bb3/dib-mio168/dib-mio168.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_dib_mio168})
-set(header_eez_modules_dib_mio168
-    src/eez/modules/dib-mio168/dib-mio168.h
+list (APPEND src_files ${src_bb3_dib_mio168})
+set(header_bb3_dib_mio168
+    src/bb3/dib-mio168/dib-mio168.h
 ) 
-list (APPEND header_files ${header_eez_modules_dib_mio168})
-source_group("eez\\modules\\dib-mio168" FILES ${src_eez_modules_dib_mio168} ${header_eez_modules_dib_mio168})
+list (APPEND header_files ${header_bb3_dib_mio168})
+source_group("bb3\\dib-mio168" FILES ${src_bb3_dib_mio168} ${header_bb3_dib_mio168})
 
-set(src_eez_modules_dib_prel6
-    src/eez/modules/dib-prel6/dib-prel6.cpp
+set(src_bb3_dib_prel6
+    src/bb3/dib-prel6/dib-prel6.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_dib_prel6})
-set(header_eez_modules_dib_prel6
-    src/eez/modules/dib-prel6/dib-prel6.h
+list (APPEND src_files ${src_bb3_dib_prel6})
+set(header_bb3_dib_prel6
+    src/bb3/dib-prel6/dib-prel6.h
 ) 
-list (APPEND header_files ${header_eez_modules_dib_prel6})
-source_group("eez\\modules\\dib-prel6" FILES ${src_eez_modules_dib_prel6} ${header_eez_modules_dib_prel6})
+list (APPEND header_files ${header_bb3_dib_prel6})
+source_group("bb3\\dib-prel6" FILES ${src_bb3_dib_prel6} ${header_bb3_dib_prel6})
 
-set(src_eez_modules_dib_mux14d
-    src/eez/modules/dib-mux14d/dib-mux14d.cpp
+set(src_bb3_dib_mux14d
+    src/bb3/dib-mux14d/dib-mux14d.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_dib_mux14d})
-set(header_eez_modules_dib_mux14d
-    src/eez/modules/dib-mux14d/dib-mux14d.h
+list (APPEND src_files ${src_bb3_dib_mux14d})
+set(header_bb3_dib_mux14d
+    src/bb3/dib-mux14d/dib-mux14d.h
 ) 
-list (APPEND header_files ${header_eez_modules_dib_mux14d})
-source_group("eez\\modules\\dib-mux14d" FILES ${src_eez_modules_dib_mux14d} ${header_eez_modules_dib_mux14d})
+list (APPEND header_files ${header_bb3_dib_mux14d})
+source_group("bb3\\dib-mux14d" FILES ${src_bb3_dib_mux14d} ${header_bb3_dib_mux14d})
 
-set(src_eez_modules_dib_smx46
-    src/eez/modules/dib-smx46/dib-smx46.cpp
+set(src_bb3_dib_smx46
+    src/bb3/dib-smx46/dib-smx46.cpp
 ) 
-list (APPEND src_files ${src_eez_modules_dib_smx46})
-set(header_eez_modules_dib_smx46
-    src/eez/modules/dib-smx46/dib-smx46.h
+list (APPEND src_files ${src_bb3_dib_smx46})
+set(header_bb3_dib_smx46
+    src/bb3/dib-smx46/dib-smx46.h
 ) 
-list (APPEND header_files ${header_eez_modules_dib_smx46})
-source_group("eez\\modules\\dib-smx46" FILES ${src_eez_modules_dib_smx46} ${header_eez_modules_dib_smx46})
+list (APPEND header_files ${header_bb3_dib_smx46})
+source_group("bb3\\dib-smx46" FILES ${src_bb3_dib_smx46} ${header_bb3_dib_smx46})
 
 set(src_eez_platform_simulator
     src/eez/platform/simulator/cmsis_os.cpp
@@ -572,21 +580,21 @@ set(header_eez_platform_simulator
 list (APPEND header_files ${header_eez_platform_simulator})
 source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator} ${header_eez_platform_simulator})
 
-set(src_eez_scpi
-    src/eez/scpi/regs.cpp
-    src/eez/scpi/scpi.cpp
+set(src_bb3_scpi
+    src/bb3/scpi/regs.cpp
+    src/bb3/scpi/scpi.cpp
 ) 
-list (APPEND src_files ${src_eez_scpi})
-set(header_eez_scpi
-    src/eez/scpi/commands.h
-    src/eez/scpi/commands_simulator.h
-    src/eez/scpi/commands_stm32.h
-    src/eez/scpi/regs.h
-    src/eez/scpi/scpi.h
-    src/eez/scpi/scpi_user_config.h
+list (APPEND src_files ${src_bb3_scpi})
+set(header_bb3_scpi
+    src/bb3/scpi/commands.h
+    src/bb3/scpi/commands_simulator.h
+    src/bb3/scpi/commands_stm32.h
+    src/bb3/scpi/regs.h
+    src/bb3/scpi/scpi.h
+    src/bb3/scpi/scpi_user_config.h
 ) 
-list (APPEND header_files ${header_eez_scpi})
-source_group("eez\\scpi" FILES ${src_eez_scpi} ${header_eez_scpi})
+list (APPEND header_files ${header_bb3_scpi})
+source_group("bb3\\scpi" FILES ${src_bb3_scpi} ${header_bb3_scpi})
 
 set(src_third_party_scpi
     src/third_party/libscpi/src/error.c

@@ -32,47 +32,47 @@
 #include <eez/scripting/scripting.h>
 #include <eez/sound.h>
 #include <eez/memory.h>
-#include <eez/uart.h>
-#include <eez/usb.h>
-#include <eez/modules/aux_ps/fan.h>
+#include <bb3/uart.h>
+#include <bb3/usb.h>
+#include <bb3/aux_ps/fan.h>
 
 #include <eez/gui/gui.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/channel_dispatcher.h>
-#include <eez/modules/psu/sd_card.h>
-#include <eez/modules/psu/serial_psu.h>
-#include <eez/modules/psu/sd_card.h>
-#include <eez/modules/psu/ontime.h>
-#include <eez/modules/psu/persist_conf.h>
-#include <eez/modules/psu/serial_psu.h>
-#include <eez/modules/psu/rtc.h>
-#include <eez/modules/psu/datetime.h>
-#include <eez/modules/psu/event_queue.h>
-#include <eez/modules/psu/io_pins.h>
-#include <eez/modules/psu/profile.h>
-#include <eez/modules/psu/list_program.h>
-#include <eez/modules/psu/trigger.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/channel_dispatcher.h>
+#include <bb3/psu/sd_card.h>
+#include <bb3/psu/serial_psu.h>
+#include <bb3/psu/sd_card.h>
+#include <bb3/psu/ontime.h>
+#include <bb3/psu/persist_conf.h>
+#include <bb3/psu/serial_psu.h>
+#include <bb3/psu/rtc.h>
+#include <bb3/psu/datetime.h>
+#include <bb3/psu/event_queue.h>
+#include <bb3/psu/io_pins.h>
+#include <bb3/psu/profile.h>
+#include <bb3/psu/list_program.h>
+#include <bb3/psu/trigger.h>
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet_scpi.h>
-#include <eez/modules/psu/ntp.h>
+#include <bb3/psu/ethernet_scpi.h>
+#include <bb3/psu/ntp.h>
 #endif
-#include <eez/modules/psu/gui/psu.h>
+#include <bb3/psu/gui/psu.h>
 
 #if OPTION_FAN
-#include <eez/modules/aux_ps/fan.h>
+#include <bb3/aux_ps/fan.h>
 #endif
 
-#include <eez/modules/mcu/battery.h>
-#include <eez/modules/mcu/eeprom.h>
-#include <eez/modules/mcu/sdram.h>
-#include <eez/modules/mcu/ethernet.h>
+#include <bb3/mcu/battery.h>
+#include <bb3/mcu/eeprom.h>
+#include <bb3/mcu/sdram.h>
+#include <bb3/mcu/ethernet.h>
 #if OPTION_ENCODER
-#include <eez/modules/mcu/encoder.h>
+#include <bb3/mcu/encoder.h>
 #endif
 
-#include <eez/modules/bp3c/eeprom.h>
-#include <eez/modules/bp3c/io_exp.h>
+#include <bb3/bp3c/eeprom.h>
+#include <bb3/bp3c/io_exp.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -23,9 +23,9 @@
 #include <eez/keyboard.h>
 #include <eez/mouse.h>
 #include <eez/gui/gui.h>
-#include <eez/modules/mcu/display.h>
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/gui/psu.h>
+#include <bb3/mcu/display.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/gui/psu.h>
 
 using namespace eez::gui;
 using namespace eez::psu;

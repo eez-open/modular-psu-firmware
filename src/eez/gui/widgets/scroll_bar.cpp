@@ -22,11 +22,10 @@
 
 #include <eez/util.h>
 #include <eez/sound.h>
-#include <eez/debug.h>
 #include <eez/keyboard.h>
 
 #include <eez/gui/gui.h>
-#include <eez/modules/psu/gui/psu.h>
+#include <bb3/psu/gui/psu.h>
 
 using namespace eez::mcu;
 

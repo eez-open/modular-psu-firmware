@@ -27,10 +27,7 @@
 #include <eez/system.h>
 #include <eez/util.h>
 
-// TODO these includes should not be inside apps/psu
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/event_queue.h>
-#include <eez/modules/psu/datetime.h>
+#include <bb3/psu/event_queue.h>
 
 using namespace eez::psu;
 

@@ -27,7 +27,7 @@
 #include <eez/flow/private.h>
 #include <eez/flow/debugger.h>
 
-#include <eez/modules/mcu/ethernet.h>
+#include <bb3/mcu/ethernet.h>
 
 namespace eez {
 namespace flow {
@@ -120,7 +120,7 @@ void onDebuggerClientDisconnected() {
 void onDebuggerInputAvailable() {
     char *buffer;
     uint32_t length;
-    eez::mcu::ethernet::getDebuggerInputBuffer(0, &buffer, &length);
+    eez::mcu::ethernet::getDebuggerInputBuffer(&buffer, &length);
     if (buffer && length) {
         processDebuggerInput(buffer, length);
         eez::mcu::ethernet::releaseDebuggerInputBuffer();

@@ -27,19 +27,19 @@
 
 #include <eez/function_generator.h>
 
-#include <eez/index.h>
+#include <bb3/index.h>
 #include <eez/hmi.h>
 #include <eez/util.h>
 #include <eez/system.h>
 #include <eez/gui/gui.h>
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/channel_dispatcher.h>
-#include <eez/modules/psu/profile.h>
-#include <eez/modules/psu/trigger.h>
-#include <eez/modules/psu/gui/psu.h>
-#include "eez/modules/psu/gui/edit_mode.h"
+#include <bb3/psu/psu.h>
+#include <bb3/psu/channel_dispatcher.h>
+#include <bb3/psu/profile.h>
+#include <bb3/psu/trigger.h>
+#include <bb3/psu/gui/psu.h>
+#include <bb3/psu/gui/edit_mode.h>
 
-#include <eez/modules/psu/scpi/psu.h>
+#include <bb3/psu/scpi/psu.h>
 
 #define M_PI_F ((float)M_PI)
 

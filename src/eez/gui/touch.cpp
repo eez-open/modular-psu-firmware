@@ -19,7 +19,7 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/touch_filter.h>
 
-#include <eez/modules/mcu/touch.h>
+#include <bb3/mcu/touch.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 

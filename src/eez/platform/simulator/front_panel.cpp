@@ -22,8 +22,8 @@
 
 #include <eez/gui/gui.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/gui/psu.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/gui/psu.h>
 
 namespace eez {
 namespace gui {

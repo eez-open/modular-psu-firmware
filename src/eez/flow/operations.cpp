@@ -569,6 +569,11 @@ bool do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
 	return true;
 }
 
+bool do_OPERATION_TYPE_SYSTEM_GET_TICK(EvalStack &stack) {
+	// TODO
+	return false;
+}
+
 bool do_OPERATION_TYPE_FLOW_INDEX(EvalStack &stack) {
 	if (!stack.iterators) {
 		return false;
@@ -897,6 +902,11 @@ bool do_OPERATION_TYPE_STRING_SPLIT(EvalStack &stack) {
 	return false;
 }
 
+bool do_OPERATION_TYPE_ARRAY_LENGTH(EvalStack &stack) {
+	// TODO
+	return false;
+}
+
 bool do_OPERATION_TYPE_ARRAY_SLICE(EvalStack &stack) {
 	// TODO
 	return false;
@@ -926,6 +936,7 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT,
 	do_OPERATION_TYPE_NOT,
 	do_OPERATION_TYPE_CONDITIONAL,
+	do_OPERATION_TYPE_SYSTEM_GET_TICK,
 	do_OPERATION_TYPE_FLOW_INDEX,
 	do_OPERATION_TYPE_MATH_SIN,
 	do_OPERATION_TYPE_MATH_COS,
@@ -935,6 +946,7 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_STRING_FIND,
 	do_OPERATION_TYPE_STRING_PAD_START,
 	do_OPERATION_TYPE_STRING_SPLIT,
+	do_OPERATION_TYPE_ARRAY_LENGTH,
 	do_OPERATION_TYPE_ARRAY_SLICE
 };
 

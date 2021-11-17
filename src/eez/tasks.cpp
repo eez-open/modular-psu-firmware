@@ -26,35 +26,35 @@
 #include <eez/scripting/scripting.h>
 #include <eez/sound.h>
 #include <eez/hmi.h>
-#include <eez/uart.h>
-#include <eez/usb.h>
-#include <eez/fs_driver.h>
+#include <bb3/uart.h>
+#include <bb3/usb.h>
+#include <bb3/fs_driver.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/datetime.h>
-#include <eez/modules/psu/dlog_record.h>
-#include <eez/modules/psu/dlog_view.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/datetime.h>
+#include <bb3/psu/dlog_record.h>
+#include <bb3/psu/dlog_view.h>
 #if OPTION_ETHERNET
-#include <eez/modules/psu/ethernet_scpi.h>
+#include <bb3/psu/ethernet_scpi.h>
 #endif
-#include <eez/modules/psu/event_queue.h>
-#include <eez/modules/psu/list_program.h>
-#include <eez/modules/psu/ontime.h>
-#include <eez/modules/psu/profile.h>
-#include <eez/modules/psu/sd_card.h>
-#include <eez/modules/psu/serial_psu.h>
-#include <eez/modules/psu/ramp.h>
-#include <eez/modules/dib-dcp405/dib-dcp405.h>
+#include <bb3/psu/event_queue.h>
+#include <bb3/psu/list_program.h>
+#include <bb3/psu/ontime.h>
+#include <bb3/psu/profile.h>
+#include <bb3/psu/sd_card.h>
+#include <bb3/psu/serial_psu.h>
+#include <bb3/psu/ramp.h>
+#include <bb3/dib-dcp405/dib-dcp405.h>
 #include <eez/function_generator.h>
 
-#include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/gui/file_manager.h>
-#include <eez/modules/psu/gui/page_ch_settings.h>
-#include <eez/modules/psu/gui/page_user_profiles.h>
+#include <bb3/psu/gui/psu.h>
+#include <bb3/psu/gui/file_manager.h>
+#include <bb3/psu/gui/page_ch_settings.h>
+#include <bb3/psu/gui/page_user_profiles.h>
 
-#include <eez/modules/bp3c/flash_slave.h>
+#include <bb3/bp3c/flash_slave.h>
 
-#include <eez/modules/mcu/battery.h>
+#include <bb3/mcu/battery.h>
 
 #include <eez/libs/sd_fat/sd_fat.h>
 #include <eez/libs/image/jpeg.h>

@@ -22,7 +22,6 @@
 #include <assert.h>
 #include <memory.h>
 
-#include <eez/index.h>
 #include <eez/sound.h>
 #include <eez/system.h>
 #include <eez/hmi.h>

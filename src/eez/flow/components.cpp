@@ -20,7 +20,6 @@
 #include <math.h>
 
 #include <eez/system.h>
-#include <eez/scripting/scripting.h>
 
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>

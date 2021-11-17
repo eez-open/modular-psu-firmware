@@ -20,7 +20,7 @@
 
 #include <eez/libs/sd_fat/sd_fat.h>
 
-#include <eez/modules/psu/gui/psu.h>
+#include <bb3/psu/gui/psu.h>
 
 #include <eez/memory.h>
 

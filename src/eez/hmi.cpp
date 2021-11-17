@@ -19,11 +19,11 @@
 #include <eez/hmi.h>
 #include <eez/system.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/gui/psu.h>
-#include <eez/modules/psu/event_queue.h>
-#include <eez/modules/psu/rtc.h>
-#include <eez/modules/psu/scpi/psu.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/gui/psu.h>
+#include <bb3/psu/event_queue.h>
+#include <bb3/psu/rtc.h>
+#include <bb3/psu/scpi/psu.h>
 
 using namespace eez::psu;
 using namespace eez::psu::gui;

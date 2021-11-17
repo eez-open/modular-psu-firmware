@@ -23,8 +23,6 @@
 #include <eez/alloc.h>
 #include <eez/util.h>
 
-#include <eez/flow/private.h>
-
 #include <eez/gui/gui.h>
 #include <eez/gui/data.h>
 

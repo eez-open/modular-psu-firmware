@@ -24,7 +24,7 @@
 #include <eez/system.h>
 #include <eez/keyboard.h>
 
-#include <eez/modules/mcu/encoder.h>
+#include <bb3/mcu/encoder.h>
 #include <eez/gui/gui.h>
 
 extern void shutdown();

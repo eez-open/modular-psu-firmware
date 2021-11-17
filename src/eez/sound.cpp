@@ -39,8 +39,8 @@
 #include <eez/firmware.h>
 #include <eez/system.h>
 #include <eez/memory.h>
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/persist_conf.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/persist_conf.h>
 
 #define NOTE_B0 31.0f
 #define NOTE_C1 33.0f

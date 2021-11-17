@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/profile.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/profile.h>
 
 namespace eez {
 namespace scripting {

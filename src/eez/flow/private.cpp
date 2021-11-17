@@ -21,7 +21,6 @@
 #include <eez/debug.h>
 
 #include <eez/scripting/scripting.h>
-#include <eez/scripting/thread.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/operations.h>

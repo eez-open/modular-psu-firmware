@@ -18,9 +18,9 @@
 
 #include <stdio.h>
 
-#include <eez/modules/psu/gui/psu.h>
+#include <bb3/psu/gui/psu.h>
 
-#include <eez/modules/mcu/encoder.h>
+#include <bb3/mcu/encoder.h>
 
 #include <eez/scripting/scripting.h>
 #include <eez/scripting/flow.h>

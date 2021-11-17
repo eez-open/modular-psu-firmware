@@ -27,8 +27,6 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/data.h>
 
-#include <eez/flow/private.h>
-
 #include <agg2d.h>
 #include <agg_rendering_buffer.h>
 

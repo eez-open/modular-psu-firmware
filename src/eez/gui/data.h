@@ -23,8 +23,10 @@
 #include <math.h>
 #include <memory.h>
 
+// struct StepValues
+#include <bb3/index.h>
+
 #include <eez/unit.h>
-#include <eez/index.h>
 #include <eez/alloc.h>
 #include <eez/util.h>
 #include <eez/gui/event.h>

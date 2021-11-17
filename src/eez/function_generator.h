@@ -22,9 +22,9 @@
 
 #include <eez/gui/gui.h>
 
-#include <eez/modules/psu/psu.h>
-#include <eez/modules/psu/channel.h>
-#include <eez/modules/psu/profile.h>
+#include <bb3/psu/psu.h>
+#include <bb3/psu/channel.h>
+#include <bb3/psu/profile.h>
 
 namespace eez {
 namespace function_generator {

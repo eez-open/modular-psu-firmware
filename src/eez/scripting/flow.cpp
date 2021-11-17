@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <eez/modules/psu/gui/psu.h>
+#include <bb3/psu/gui/psu.h>
 
 #include <eez/scripting/scripting.h>
 #include <eez/scripting/flow.h>

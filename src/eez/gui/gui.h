@@ -25,7 +25,7 @@
 #include <eez/gui/assets.h>
 #include <eez/gui/page.h>
 
-#include <eez/modules/mcu/display.h>
+#include <bb3/mcu/display.h>
 
 enum {
     FIRST_INTERNAL_PAGE_ID = 32000,
