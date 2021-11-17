@@ -56,7 +56,8 @@ bool AppContext::isWidgetActionEnabled(const WidgetCursor &widgetCursor) {
     if (action) {
         if (widget->type == WIDGET_TYPE_BUTTON) {
             auto buttonWidget = (const ButtonWidget *)widget;
-            if (!get(widgetCursor, buttonWidget->enabled).getInt()) {
+			auto enabled = get(widgetCursor, buttonWidget->enabled);
+            if (!(enabled.getType() == VALUE_TYPE_UNDEFINED || enabled.getInt() ? 1 : 0)) {
                 return false;
             }
         }

@@ -1018,20 +1018,16 @@ float Value::toFloat(int *err) const {
 }
 
 int32_t Value::toInt32(int *err) const {
-	if (type == VALUE_TYPE_VALUE_PTR) {
-		return pValueValue->toInt32(err);
-	}
-
 	if (err) {
 		*err = 0;
 	}
 
-	if (type == VALUE_TYPE_DOUBLE) {
-		return (int32_t)doubleValue;
+	if (type == VALUE_TYPE_INT32 || type == VALUE_TYPE_BOOLEAN) {
+		return int32Value;
 	}
 
-	if (type == VALUE_TYPE_FLOAT) {
-		return (int32_t)floatValue;
+	if (type == VALUE_TYPE_UINT32) {
+		return (int32_t)uint32Value;
 	}
 
 	if (type == VALUE_TYPE_INT8) {
@@ -1048,18 +1044,23 @@ int32_t Value::toInt32(int *err) const {
 		return uint16Value;
 	}
 
-	if (type == VALUE_TYPE_INT32 || type == VALUE_TYPE_BOOLEAN) {
-		return int32Value;
-	}
-	if (type == VALUE_TYPE_UINT32) {
-		return (int32_t)uint32Value;
-	}
-
 	if (type == VALUE_TYPE_INT64) {
 		return (int32_t)int64Value;
 	}
 	if (type == VALUE_TYPE_UINT64) {
 		return (int32_t)uint64Value;
+	}
+
+	if (type == VALUE_TYPE_VALUE_PTR) {
+		return pValueValue->toInt32(err);
+	}
+
+	if (type == VALUE_TYPE_DOUBLE) {
+		return (int32_t)doubleValue;
+	}
+
+	if (type == VALUE_TYPE_FLOAT) {
+		return (int32_t)floatValue;
 	}
 
 	if (type == VALUE_TYPE_STRING) {
@@ -1143,6 +1144,10 @@ bool Value::toBool(int *err) const {
 		*err = 0;
 	}
 
+	if (type == VALUE_TYPE_UNDEFINED || type == VALUE_TYPE_NULL) {
+		return false;
+	}
+
 	if (type == VALUE_TYPE_DOUBLE) {
 		return doubleValue != 0;
 	}
@@ -1191,6 +1196,7 @@ bool Value::toBool(int *err) const {
     if (err) {
         *err = 1;
     }
+
 	return false;
 }
 

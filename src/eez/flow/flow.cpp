@@ -36,7 +36,7 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-static const uint32_t FLOW_TICK_MAX_DURATION_MS = 500;
+static const uint32_t FLOW_TICK_MAX_DURATION_MS = 20;
 
 FlowState *g_mainPageFlowState;
 
@@ -183,115 +183,60 @@ void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) 
 void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
 	auto flowState = widgetCursor.flowState;
 
-	dataId = -dataId - 1;
+	auto flowDataId = -dataId - 1;
 
 	auto assets = flowState->assets;
 	auto flow = flowState->flow;
 
-	if (dataId >= 0 && dataId < (int16_t)flow->widgetDataItems.count) {
+	if (flowDataId >= 0 && flowDataId < (int16_t)flow->widgetDataItems.count) {
+		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, flowDataId);
+		auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+
 		if (operation == DATA_OPERATION_GET) {
-			getValue(dataId, widgetCursor, value);
+			getValue(flowDataId, widgetCursor, value);
+			if (component->type == WIDGET_TYPE_INPUT && dataId == widgetCursor.widget->data) {
+				value = getInputWidgetData(widgetCursor, value);
+			}
 		} else if (operation == DATA_OPERATION_COUNT) {
 			Value arrayValue;
-			getValue(dataId, widgetCursor, arrayValue);
+			getValue(flowDataId, widgetCursor, arrayValue);
 			if (arrayValue.getType() == VALUE_TYPE_ARRAY) {
 				value = arrayValue.arrayValue->arraySize;
 			} else {
 				value = 0;
 			}
 		} else if (operation == DATA_OPERATION_GET_MIN) {
-			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
-			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
-				auto inputWidget = (InputWidget *)widgetCursor.widget;
-				auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[inputWidget->componentIndex];
-				Value unitValue;
-				Value minValue;
-				if (inputWidgetExecutionState) {
-					unitValue = inputWidgetExecutionState->unit;
-					minValue = inputWidgetExecutionState->min;
-				} else {
-					unitValue = get(widgetCursor, inputWidget->unit);
-					minValue = get(widgetCursor, inputWidget->min);
-				}
-				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
-				value = Value(minValue.toFloat(), unit);
+				value = getInputWidgetMin(widgetCursor);
 			}
 		} else if (operation == DATA_OPERATION_GET_MAX) {
-			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
-			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
-				auto inputWidget = (InputWidget *)widgetCursor.widget;
-				auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[inputWidget->componentIndex];
-				Value unitValue;
-				Value maxValue;
-				if (inputWidgetExecutionState) {
-					unitValue = inputWidgetExecutionState->unit;
-					maxValue = inputWidgetExecutionState->max;
-				} else {
-					unitValue = get(widgetCursor, inputWidget->unit);
-					maxValue = get(widgetCursor, inputWidget->max);
-				}
-				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
-				value = Value(maxValue.toFloat(), unit);
+				value = getInputWidgetMax(widgetCursor);
 			}
 		} else if (operation == DATA_OPERATION_GET_PRECISION) {
-			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
-			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
-				auto inputWidget = (InputWidget *)widgetCursor.widget;
-				auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[inputWidget->componentIndex];
-				Value unitValue;
-				Value precisionValue;
-				if (inputWidgetExecutionState) {
-					unitValue = inputWidgetExecutionState->unit;
-					precisionValue = inputWidgetExecutionState->precision;
-				} else {
-					unitValue = get(widgetCursor, inputWidget->unit);
-					precisionValue = get(widgetCursor, inputWidget->precision);
-				}
-				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
-				value = Value(precisionValue.toFloat(), unit);
+				value = getInputWidgetPrecision(widgetCursor);
 			}
 		} else if (operation == DATA_OPERATION_GET_UNIT) {
-			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
-			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
-				auto inputWidget = (InputWidget *)widgetCursor.widget;
-				auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[inputWidget->componentIndex];
-				Value unitValue;
-				if (inputWidgetExecutionState) {
-					unitValue = inputWidgetExecutionState->unit;
-				} else {
-					unitValue = get(widgetCursor, inputWidget->unit);
-				}
-				Unit unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
-				value = unit;
+				value = getBaseUnit(getInputWidgetUnit(widgetCursor));
 			}
 		} else if (operation == DATA_OPERATION_SET) {
-			WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, dataId);
-			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
 				if (inputWidget->flags & INPUT_WIDGET_TYPE_NUMBER) {
-					auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[inputWidget->componentIndex];
-					Value precisionValue;
-					if (inputWidgetExecutionState) {
-						precisionValue = inputWidgetExecutionState->precision;
-					} else {
-						precisionValue = get(widgetCursor, inputWidget->precision);
-					}
-
+					Value precisionValue = getInputWidgetPrecision(widgetCursor);
 					float precision = precisionValue.toFloat();
 					float valueFloat = value.toFloat();
-					setValue(dataId, widgetCursor, Value(roundPrec(valueFloat, precision), VALUE_TYPE_FLOAT));
+					Unit unit = getInputWidgetUnit(widgetCursor);
+					setValue(flowDataId, widgetCursor, Value(roundPrec(valueFloat, precision) / getUnitBase10(unit), VALUE_TYPE_FLOAT));
 				} else {
-					setValue(dataId, widgetCursor, value);
+					setValue(flowDataId, widgetCursor, value);
 				}
 
 				scripting::executeFlowAction(widgetCursor, inputWidget->action);
 			} else {
-				setValue(dataId, widgetCursor, value);
+				setValue(flowDataId, widgetCursor, value);
 			}
 		}
 	} else {

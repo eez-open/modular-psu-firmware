@@ -32,7 +32,8 @@ DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const ButtonWidget *)widgetCursor.widget;
 
     widgetCursor.currentState->size = sizeof(WidgetState);
-    widgetCursor.currentState->flags.enabled = get(widgetCursor, widget->enabled).getInt() ? 1 : 0;
+    auto enabled = get(widgetCursor, widget->enabled);
+    widgetCursor.currentState->flags.enabled = enabled.getType() == VALUE_TYPE_UNDEFINED  || get(widgetCursor, widget->enabled).getInt() ? 1 : 0;
 
     const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : widget->disabledStyle);
 

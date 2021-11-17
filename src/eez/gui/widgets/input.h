@@ -40,9 +40,15 @@ struct InputWidgetExecutionState : public flow::ComponenentExecutionState {
 	Value min;
 	Value max;
     Value precision;
-	Value unit;
+	Unit unit;
 };
 
+Value getInputWidgetMin(const gui::WidgetCursor &widgetCursor);
+Value getInputWidgetMax(const gui::WidgetCursor &widgetCursor);
+Value getInputWidgetPrecision(const gui::WidgetCursor &widgetCursor);
+Unit getInputWidgetUnit(const gui::WidgetCursor &widgetCursor);
+
+Value getInputWidgetData(const gui::WidgetCursor &widgetCursor, const Value &dataValue);
 
 } // namespace gui
 } // namespace eez

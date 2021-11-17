@@ -76,4 +76,8 @@ Unit getUnitFromName(const char *unitName);
 
 int getScpiUnit(Unit unit);
 
+Unit getBaseUnit(Unit unit);
+
+float getUnitBase10(Unit unit);
+
 } // namespace eez

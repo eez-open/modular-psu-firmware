@@ -6,31 +6,31 @@
       "scpiDocFolder": "docs\\SCPI reference guide\\Commands",
       "imports": [
         {
-          "projectFilePath": "src\\eez\\modules\\psu\\psu.eez-project"
+          "projectFilePath": "src\\bb3\\psu\\psu.eez-project"
         },
         {
-          "projectFilePath": "src\\eez\\modules\\simulator\\simulator.eez-project"
+          "projectFilePath": "src\\bb3\\simulator\\simulator.eez-project"
         },
         {
-          "projectFilePath": "src\\eez\\modules\\dib-dcp405\\dib-dcp405.eez-project"
+          "projectFilePath": "src\\bb3\\dib-dcp405\\dib-dcp405.eez-project"
         },
         {
-          "projectFilePath": "src\\eez\\modules\\dib-dcm220\\dib-dcm220.eez-project"
+          "projectFilePath": "src\\bb3\\dib-dcm220\\dib-dcm220.eez-project"
         },
         {
-          "projectFilePath": "src\\eez\\modules\\dib-dcm224\\dib-dcm224.eez-project"
+          "projectFilePath": "src\\bb3\\dib-dcm224\\dib-dcm224.eez-project"
         },
         {
-          "projectFilePath": "src\\eez\\modules\\dib-mio168\\dib-mio168.eez-project"
+          "projectFilePath": "src\\bb3\\dib-mio168\\dib-mio168.eez-project"
         },
         {
-          "projectFilePath": "src\\eez\\modules\\dib-smx46\\dib-smx46.eez-project"
+          "projectFilePath": "src\\bb3\\dib-smx46\\dib-smx46.eez-project"
         },
         {
-          "projectFilePath": "src\\eez\\modules\\dib-prel6\\dib-prel6.eez-project"
+          "projectFilePath": "src\\bb3\\dib-prel6\\dib-prel6.eez-project"
         },
         {
-          "projectFilePath": "src\\eez\\modules\\dib-mux14d\\dib-mux14d.eez-project"
+          "projectFilePath": "src\\bb3\\dib-mux14d\\dib-mux14d.eez-project"
         }
       ]
     },

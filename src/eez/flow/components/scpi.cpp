@@ -88,10 +88,6 @@ struct ScpiComponentExecutionState : public ComponenentExecutionState {
 
 			stringAppendString(commandOrQueryText, sizeof(commandOrQueryText), "\n");
 			scripting::executeScpiFromFlow(commandOrQueryText);
-
-			g_scpiResultIsReady = true;
-			g_waitingForScpiResult = nullptr;
-			return true;
 		}
 		return false;
 	}
@@ -168,7 +164,9 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 				valueStr
 			);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY_WITH_ASSIGNMENT) {
-			logScpiQuery(flowState, componentIndex, scpiComponentExecutionState->commandOrQueryText);
+			if (!scpiComponentExecutionState->g_waitingForScpiResult) {
+				logScpiQuery(flowState, componentIndex, scpiComponentExecutionState->commandOrQueryText);
+			}
 
 			if (!scpiComponentExecutionState->scpi()) {
 				if (!addToQueue(flowState, componentIndex)) {
@@ -228,7 +226,9 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			assignValue(flowState, componentIndex, dstValue, srcValue);
 		} else if (scpiComponentExecutionState->op == SCPI_PART_QUERY) {
-			logScpiQuery(flowState, componentIndex, scpiComponentExecutionState->commandOrQueryText);
+			if (!scpiComponentExecutionState->g_waitingForScpiResult) {
+				logScpiQuery(flowState, componentIndex, scpiComponentExecutionState->commandOrQueryText);
+			}
 
 			if (!scpiComponentExecutionState->scpi()) {
 				if (!addToQueue(flowState, componentIndex)) {
@@ -254,7 +254,9 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			scpiComponentExecutionState->commandOrQueryText[0] = 0;
 		} else if (scpiComponentExecutionState->op == SCPI_PART_COMMAND) {
-			logScpiCommand(flowState, componentIndex, scpiComponentExecutionState->commandOrQueryText);
+			if (!scpiComponentExecutionState->g_waitingForScpiResult) {
+				logScpiCommand(flowState, componentIndex, scpiComponentExecutionState->commandOrQueryText);
+			}
 
 			if (!scpiComponentExecutionState->scpi()) {
 				if (!addToQueue(flowState, componentIndex)) {

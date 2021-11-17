@@ -33,9 +33,6 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
 	auto savedPreviousState = widgetCursor.previousState;
 
     Value indexValue = get(widgetCursor, widgetCursor.widget->data);
-    if (indexValue.getType() == VALUE_TYPE_UNDEFINED) {
-        indexValue = Value(0);
-    }
 
     if (widgetCursor.currentState) {
 		widgetCursor.currentState->data.clear();
@@ -58,7 +55,8 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
 
 	auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
     if (containerWidget->widgets.count > 0) {
-	    auto widgetIndex = indexValue.getInt() < 0 || indexValue.getInt() >= (int)containerWidget->widgets.count ? 0 : indexValue.getInt();
+		int index = indexValue.toInt32();
+	    auto widgetIndex = index < 0 || index >= (int)containerWidget->widgets.count ? 0 : index;
         widgetCursor.widget = containerWidget->widgets.item(widgetCursor.assets, widgetIndex);
         enumWidget(widgetCursor, callback);
     }

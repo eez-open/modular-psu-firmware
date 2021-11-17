@@ -33,11 +33,117 @@ namespace gui {
 
 static const size_t MAX_TEXT_LEN = 128;
 
-struct InputWidgetState : public WidgetState {
-	Value unit;
-};
-
 EnumFunctionType INPUT_enum = nullptr;
+
+void getInputWidgetParams(const gui::WidgetCursor &widgetCursor, Value &min, Value &max, Value &precision, Unit &unit) {
+	auto widget = (const InputWidget*)widgetCursor.widget;
+
+	auto unitValue = get(widgetCursor, widget->unit);
+	unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
+
+	auto minValue = get(widgetCursor, widget->min);
+	auto maxValue = get(widgetCursor, widget->max);
+	auto precisionValue = get(widgetCursor, widget->precision);
+
+	float base10 = getUnitBase10(unit);
+	auto baseUnit = getBaseUnit(unit);
+
+	min = Value(minValue.toFloat() * base10, baseUnit);
+	max = Value(maxValue.toFloat() * base10, baseUnit);
+	precision = Value(precisionValue.toFloat() * base10, baseUnit);
+}
+
+Value getInputWidgetMin(const gui::WidgetCursor &widgetCursor) {
+	auto widget = (const InputWidget*)widgetCursor.widget;
+
+	auto flowState = widgetCursor.flowState;
+	if (flowState) {
+		auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[widget->componentIndex];
+		if (inputWidgetExecutionState) {
+			return inputWidgetExecutionState->min;
+		}
+	}
+
+	auto unitValue = get(widgetCursor, widget->unit);
+	auto unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
+	auto baseUnit = getBaseUnit(unit);
+
+	auto value = get(widgetCursor, widget->min);
+	float base10 = getUnitBase10(unit);
+	return Value(value.toFloat() * base10, baseUnit);
+}
+
+Value getInputWidgetMax(const gui::WidgetCursor &widgetCursor) {
+	auto widget = (const InputWidget*)widgetCursor.widget;
+
+	auto flowState = widgetCursor.flowState;
+	if (flowState) {
+		auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[widget->componentIndex];
+		if (inputWidgetExecutionState) {
+			return inputWidgetExecutionState->max;
+		}
+	}
+
+	auto unitValue = get(widgetCursor, widget->unit);
+	auto unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
+	auto baseUnit = getBaseUnit(unit);
+
+	auto value = get(widgetCursor, widget->max);
+	float base10 = getUnitBase10(unit);
+	return Value(value.toFloat() * base10, baseUnit);
+}
+
+Value getInputWidgetPrecision(const gui::WidgetCursor &widgetCursor) {
+	auto widget = (const InputWidget*)widgetCursor.widget;
+
+	auto flowState = widgetCursor.flowState;
+	if (flowState) {
+		auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[widget->componentIndex];
+		if (inputWidgetExecutionState) {
+			return inputWidgetExecutionState->precision;
+		}
+	}
+
+	auto unitValue = get(widgetCursor, widget->unit);
+	auto unit = getUnitFromName(unitValue.toString(0x5049bd52).getString());
+	auto baseUnit = getBaseUnit(unit);
+
+	auto value = get(widgetCursor, widget->precision);
+	float base10 = getUnitBase10(unit);
+	return Value(value.toFloat() * base10, baseUnit);
+}
+
+Unit getInputWidgetUnit(const gui::WidgetCursor &widgetCursor) {
+	auto widget = (const InputWidget*)widgetCursor.widget;
+
+	auto flowState = widgetCursor.flowState;
+	if (flowState) {
+		auto inputWidgetExecutionState = (InputWidgetExecutionState *)flowState->componenentExecutionStates[widget->componentIndex];
+		if (inputWidgetExecutionState) {
+			return inputWidgetExecutionState->unit;
+		}
+	}
+
+	auto unitValue = get(widgetCursor, widget->unit);
+	if (unitValue.isString()) {
+		return getUnitFromName(unitValue.toString(0x5049bd52).getString());
+	} else {
+		return UNIT_NONE;
+	}
+}
+
+Value getInputWidgetData(const gui::WidgetCursor &widgetCursor, const Value &dataValue) {
+	auto widget = (const InputWidget*)widgetCursor.widget;
+
+	if (widget->flags & INPUT_WIDGET_TYPE_NUMBER) {
+		auto unit = getInputWidgetUnit(widgetCursor);
+		float base10 = getUnitBase10(unit);
+		auto baseUnit = getBaseUnit(unit);
+    	return Value(dataValue.toFloat() * base10, baseUnit);
+	} else {
+		return get(widgetCursor, widget->data);
+	}
+}
 
 DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 	auto widget = (const InputWidget*)widgetCursor.widget;
@@ -49,39 +155,30 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 			widgetCursor.flowState->componenentExecutionStates[widget->componentIndex] = inputWidgetExecutionState;
 		}
 
-		inputWidgetExecutionState->min = get(widgetCursor, widget->min);
-		inputWidgetExecutionState->max = get(widgetCursor, widget->max);
-		inputWidgetExecutionState->precision = get(widgetCursor, widget->precision);
-		inputWidgetExecutionState->unit = get(widgetCursor, widget->unit);
+		getInputWidgetParams(
+			widgetCursor,
+			inputWidgetExecutionState->min,
+			inputWidgetExecutionState->max,
+			inputWidgetExecutionState->precision,
+			inputWidgetExecutionState->unit
+		);
 	}
 
-    InputWidgetState *currentState = (InputWidgetState *)widgetCursor.currentState;
-    InputWidgetState *previousState = (InputWidgetState *)widgetCursor.previousState;
-
-    widgetCursor.currentState->size = sizeof(InputWidgetState);
+    widgetCursor.currentState->size = sizeof(WidgetState);
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
 	widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
 	widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
-	
+	widgetCursor.currentState->data = get(widgetCursor, widget->data);
+
     bool refresh =
 		!widgetCursor.previousState ||
         widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
         widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
         widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
 		widgetCursor.previousState->data != widgetCursor.currentState->data;
-
-	currentState->unit.clear();
-	if (widget->flags & INPUT_WIDGET_TYPE_NUMBER) {
-		currentState->unit = get(widgetCursor, widget->unit);
-		if (!refresh) {
-			refresh |= 
-				previousState->unit != currentState->unit;
-		}
-	}
 
     if (refresh) {
         uint16_t overrideColor = widgetCursor.currentState->flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
@@ -92,12 +189,6 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 		char text[MAX_TEXT_LEN + 1];
 		widgetCursor.currentState->data.toText(text, sizeof(text));
 
-		Value unit = currentState->unit.toString(0x5f8feae3);
-		if (unit.isString()) {
-			stringAppendString(text, sizeof(text), " ");
-			stringAppendString(text, sizeof(text), unit.getString());
-		}
-
 		drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
 			style, widgetCursor.currentState->flags.active,
 			widgetCursor.currentState->flags.blinking,
@@ -106,7 +197,6 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
     }
 
 	widgetCursor.currentState->data.freeRef();
-	currentState->unit.freeRef();
 };
 
 OnTouchFunctionType INPUT_onTouch = nullptr;

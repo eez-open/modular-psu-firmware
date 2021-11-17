@@ -1094,20 +1094,29 @@ void NumericKeypad::ok() {
 
             return;
         } else {
-            double value = getValue();
+            float value = (float)getValue();
             if (isNaN(value)) {
                 sound::playBeep();
                 return;
             }
 
-            if (!isNaN(m_options.min) && (float)value < m_options.min && !(value == 0 && m_options.allowZero)) {
-                psuErrorMessage(0, MakeLessThenMinMessageValue(m_options.min, m_startValue));
+            float EPSILON = 1E-9f;
+
+            if (!isNaN(m_options.min) && value < m_options.min && !(value == 0 && m_options.allowZero)) {
+                if (value < m_options.min - EPSILON) {
+                    psuErrorMessage(0, MakeLessThenMinMessageValue(m_options.min, m_startValue));
+                    return;
+                }
+                value = m_options.min;
             } else if (!isNaN(m_options.max) && value > m_options.max) {
-                psuErrorMessage(0, MakeGreaterThenMaxMessageValue(m_options.max, m_startValue));
-            } else {
-                m_okFloatCallback((float)value);
-                return;
+                if (value > m_options.max + EPSILON) {
+                    psuErrorMessage(0, MakeGreaterThenMaxMessageValue(m_options.max, m_startValue));
+                    return;
+                }
+                value = m_options.max;
             }
+
+            m_okFloatCallback((float)value);
 
             return;
         }
