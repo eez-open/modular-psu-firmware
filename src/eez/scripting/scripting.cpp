@@ -106,7 +106,7 @@ bool startScript(const char *filePath, int *err) {
 void doStopScript() {
 	g_state = STATE_STOPPING;
 
-	while (psu::gui::isPageOnStack(getExternalAssetsFirstPageId())) {
+	while (psu::gui::isExternalPageActive()) {
 		psu::gui::popPage();
 		osDelay(5);
 	}

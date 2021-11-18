@@ -305,7 +305,7 @@ const uint32_t getThemeColorsCount(int themeIndex);
 const uint16_t *getThemeColors(int themeIndex);
 const uint16_t *getColors();
 
-int getExternalAssetsFirstPageId();
+int getExternalAssetsMainPageId();
 
 const char *getActionName(const WidgetCursor &widgetCursor, int16_t actionId);
 int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name);

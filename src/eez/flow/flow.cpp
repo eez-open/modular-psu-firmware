@@ -40,6 +40,9 @@ static const uint32_t FLOW_TICK_MAX_DURATION_MS = 20;
 
 FlowState *g_mainPageFlowState;
 
+static const uint32_t MAX_PAGES = 10;
+FlowState *g_pagesFlowState[MAX_PAGES];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned start(Assets *assets) {
@@ -47,7 +50,6 @@ unsigned start(Assets *assets) {
 	if (flowDefinition->flows.count == 0) {
 		return 0;
 	}
-
 
 	g_lastFlowStateIndex = 0;
 
@@ -59,7 +61,10 @@ unsigned start(Assets *assets) {
 
 	onStarted(assets);
 
-	g_mainPageFlowState = initPageFlowState(assets, 0, nullptr, 0);
+	for (uint32_t i = 0; i < assets->pages.count; i++) {
+		g_pagesFlowState[i] = initPageFlowState(assets, i, nullptr, 0);
+	}
+	g_mainPageFlowState = g_pagesFlowState[0];
 
 	return 1;
 }
@@ -120,12 +125,18 @@ void tick() {
 
 void stop() {
 	if (g_mainPageFlowState) {
-		freeFlowState(g_mainPageFlowState);
+		for (unsigned i = 0; i < MAX_PAGES && g_pagesFlowState[i]; i++) {
+			freeFlowState(g_pagesFlowState[i]);
+		}
 		g_mainPageFlowState = nullptr;
 	}
 }
 
 FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
+	if (!g_mainPageFlowState) {
+		return nullptr;
+	}
+
 	pageId = -pageId - 1;
 
 	if (widgetCursor.widget && widgetCursor.widget->type == WIDGET_TYPE_LAYOUT_VIEW) {
@@ -157,8 +168,8 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 			return layoutViewWidgetExecutionState->flowState;
 		}
 	}
-	
-	return g_mainPageFlowState;
+
+	return g_pagesFlowState[pageId];
 }
 
 void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) {

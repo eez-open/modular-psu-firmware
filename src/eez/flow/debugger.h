@@ -41,5 +41,7 @@ void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *c
 void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *query);
 void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const char *resultText, size_t resultTextLen);
 
+void onPageChanged(int pageId);
+
 } // flow
 } // eez

@@ -308,6 +308,10 @@ inline int getActivePageId() {
     return g_psuAppContext.getActivePageId();
 }
 
+inline bool isExternalPageActive() {
+    return getActivePageId() < 0;
+}
+
 inline Page *getActivePage() {
     return g_psuAppContext.getActivePage();
 }

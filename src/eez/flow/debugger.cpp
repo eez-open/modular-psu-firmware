@@ -49,8 +49,9 @@ enum MessagesToDebugger {
 
 	MESSAGE_TO_DEBUGGER_FLOW_STATE_ERROR, // FLOW_STATE_INDEX, COMPONENT_INDEX, ERROR_MESSAGE
 
-    MESSAGE_TO_DEBUGGER_LOG // LOG_ITEM_TYPE, FLOW_STATE_INDEX, COMPONENT_INDEX, MESSAGE
+    MESSAGE_TO_DEBUGGER_LOG, // LOG_ITEM_TYPE, FLOW_STATE_INDEX, COMPONENT_INDEX, MESSAGE
 
+	MESSAGE_TO_DEBUGGER_PAGE_CHANGED // PAGE_ID
 };
 
 enum MessagesFromDebugger {
@@ -585,6 +586,17 @@ void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const cha
 		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
 		writeLogMessage(resultText, resultTextLen);
     }
+}
+
+void onPageChanged(int pageId) {
+	if (g_debuggerIsConnected) {
+		char buffer[100];
+		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
+			MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
+			-pageId - 1
+		);
+		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+	}
 }
 
 } // namespace flow

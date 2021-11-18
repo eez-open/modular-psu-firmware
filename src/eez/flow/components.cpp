@@ -47,6 +47,7 @@ void executeErrorComponent(FlowState *flowState, unsigned componentIndex);
 void executeCatchErrorComponent(FlowState *flowState, unsigned componentIndex);
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex);
 void executeScpiComponent(FlowState *flowState, unsigned componentIndex);
+void executeShowPageComponent(FlowState *flowState, unsigned componentIndex);
 
 void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components.item(flowState->assets, componentIndex);
@@ -85,6 +86,8 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 		executeLoopComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_SCPIACTION) {
 		executeScpiComponent(flowState, componentIndex);
+	}  else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_PAGE_ACTION) {
+		executeShowPageComponent(flowState, componentIndex);
 	} else {
 		char errorMessage[100];
 		snprintf(errorMessage, sizeof(errorMessage), "Unknown component at index = %d, type = %d\n", componentIndex, component->type);

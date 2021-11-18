@@ -956,15 +956,15 @@ void PsuAppContext::doShowIntegerInput() {
 
 bool PsuAppContext::dialogOpen(int *err) {
     if (osThreadGetId() == g_guiTaskHandle) {
-        if (!isPageOnStack(getExternalAssetsFirstPageId())) {
+        if (!isExternalPageActive()) {
             dialogResetDataItemValues();
-            pushPage(getExternalAssetsFirstPageId());
+            pushPage(getExternalAssetsMainPageId());
         }
     } else {
         sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN);
         do {
             osDelay(1);
-        } while (!isPageOnStack(getExternalAssetsFirstPageId()));
+        } while (!isExternalPageActive());
     }
     return true;
 }
@@ -980,7 +980,7 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
     while (
         (timeoutMs == 0 || (int32_t)(millis() - timeoutMs) < 0) &&
         g_externalActionId == ACTION_ID_NONE &&
-        isPageOnStack(getExternalAssetsFirstPageId())
+        isExternalPageActive()
     ) {
         osDelay(5);
     }
@@ -991,7 +991,7 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
         return DIALOG_ACTION_RESULT_SELECTED_ACTION;
     }
 
-    return isPageOnStack(getExternalAssetsFirstPageId()) ? DIALOG_ACTION_RESULT_TIMEOUT : DIALOG_ACTION_RESULT_EXIT;
+    return isExternalPageActive() ? DIALOG_ACTION_RESULT_TIMEOUT : DIALOG_ACTION_RESULT_EXIT;
 }
 
 
@@ -1031,8 +1031,8 @@ void PsuAppContext::dialogSetDataItemValue(int16_t dataId, const char *str) {
 
 void PsuAppContext::dialogClose() {
     if (osThreadGetId() == g_guiTaskHandle) {
-        if (isPageOnStack(getExternalAssetsFirstPageId())) {
-            removePageFromStack(getExternalAssetsFirstPageId());
+        if (isExternalPageActive()) {
+            removePageFromStack(getExternalAssetsMainPageId());
         }
     } else {
         sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DIALOG_CLOSE);

@@ -301,7 +301,7 @@ const uint16_t *getColors() {
 	return g_mainAssets->colorsDefinition.ptr(g_mainAssets)->colors.ptr(g_mainAssets);
 }
 
-int getExternalAssetsFirstPageId() {
+int getExternalAssetsMainPageId() {
 	return -1;
 }
 
