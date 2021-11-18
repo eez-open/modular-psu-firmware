@@ -1131,7 +1131,7 @@
           "type": "SetVariableActionComponent",
           "left": 135,
           "top": -393,
-          "width": 106,
+          "width": 105,
           "height": 62,
           "wireID": "7e96a386-870e-448d-ce3f-6f887af57a7e",
           "customInputs": [],
@@ -1731,7 +1731,7 @@
       "width": 480,
       "height": 272,
       "isUsedAsCustomWidget": true,
-      "dataContextOverrides": "{\n    \"ch\": [\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 30.0, \"mon\": 20.0, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 1.1, \"mon\": 0, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": false,\n          \"oe\": false,\n          \"u\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0},\n          \"i\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0}\n      },\n      {\n          \"is_power_channel\": false,\n          \"oe\": false,\n          \"u\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0},\n          \"i\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0}\n      }\n    ],\n    \"idx\": 1,\n    \"hardware_missing\": 0\n}\n"
+      "dataContextOverrides": "{\n    \"ch\": [\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 30.0, \"mon\": 20.0, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 1.1, \"mon\": 0.25, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": true,\n          \"oe\": true,\n          \"u\": {\"set\": 31.3, \"mon\": 31.3, \"min\": 0, \"max\": 40.0},\n          \"i\": {\"set\": 3.0, \"mon\": 1.5, \"min\": 0, \"max\": 5.0}\n      },\n      {\n          \"is_power_channel\": false,\n          \"oe\": false,\n          \"u\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0},\n          \"i\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0}\n      },\n      {\n          \"is_power_channel\": false,\n          \"oe\": false,\n          \"u\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0},\n          \"i\": {\"set\": 0, \"mon\": 0, \"min\": 0, \"max\": 0}\n      }\n    ],\n    \"idx\": 1,\n    \"hardware_missing\": 0\n}\n"
     }
   ],
   "styles": [
