@@ -49,7 +49,6 @@ bool stopScript(int *err = nullptr);
 inline bool isIdle() { return g_state == STATE_IDLE; }
 
 bool executeScpiFromMP(const char *commandOrQueryText, const char **resultText, size_t *resultTextLen);
-void executeScpiFromFlow(const char *commandOrQueryText);
 bool getLatestScpiResult(const char **resultText, size_t *resultTextLen, int *err);
 
 bool isFlowRunning();

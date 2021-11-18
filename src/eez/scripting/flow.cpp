@@ -93,11 +93,6 @@ void flowTick() {
 	}
 }
 
-void executeScpiFromFlow(const char *commandOrQueryText) {
-	// DebugTrace("> %s\n", commandOrQueryText);
-	executeScpi(commandOrQueryText, true);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId) {

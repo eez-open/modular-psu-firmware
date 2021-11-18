@@ -93,8 +93,6 @@ void oneIter() {
     if (event.status == osEventMessage) {
 		if (event.value.v == QUEUE_MESSAGE_START_MP_SCRIPT) {
 			startMpScript();
-		} else if (event.value.v == QUEUE_MESSAGE_SCPI_RESULT) {
-			flow::scpiResultIsReady();
 		}
 	} else {
 		//flowTick();

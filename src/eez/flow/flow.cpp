@@ -62,7 +62,12 @@ unsigned start(Assets *assets) {
 	onStarted(assets);
 
 	for (uint32_t i = 0; i < assets->pages.count; i++) {
-		g_pagesFlowState[i] = initPageFlowState(assets, i, nullptr, 0);
+		auto page = assets->pages.item(assets, i);
+		if (!(page->flags & PAGE_IS_USED_AS_CUSTOM_WIDGET)) {
+			g_pagesFlowState[i] = initPageFlowState(assets, i, nullptr, 0);
+		} else {
+			g_pagesFlowState[i] = nullptr;
+		}
 	}
 	g_mainPageFlowState = g_pagesFlowState[0];
 

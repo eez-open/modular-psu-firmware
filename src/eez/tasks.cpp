@@ -23,6 +23,7 @@
 #endif
 
 #include <eez/tasks.h>
+#include <eez/flow/flow.h>
 #include <eez/scripting/scripting.h>
 #include <eez/sound.h>
 #include <eez/hmi.h>
@@ -291,6 +292,10 @@ void lowPriorityThreadOneIter() {
 #endif  
         else if (type < MP_LAST_MESSAGE_TYPE) {
             scripting::onLowPriorityQueueMessage(type, param);
+        }
+
+        else if (type == FLOW_EXECUTE_SCPI ) {
+            flow::executeScpi();
         }
 
         else {

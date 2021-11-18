@@ -29,7 +29,6 @@ struct FlowState;
 
 unsigned start(eez::gui::Assets *assets);
 void tick();
-void scpiResultIsReady();
 void stop();
 
 FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor);
@@ -41,6 +40,8 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCurs
 void onDebuggerClientConnected();
 void onDebuggerClientDisconnected();
 void onDebuggerInputAvailable();
+
+void executeScpi();
 
 } // flow
 } // eez
