@@ -298,6 +298,10 @@ void lowPriorityThreadOneIter() {
             flow::executeScpi();
         }
 
+        else if (type == FLOW_FLUSH_TO_DEBUGGER_MESSAGE) {
+            flow::flushToDebuggerMessage();
+        }
+
         else {
             if (type == THREAD_MESSAGE_SAVE_LIST) {
                 int err;

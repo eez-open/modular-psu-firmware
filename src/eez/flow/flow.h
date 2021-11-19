@@ -42,6 +42,7 @@ void onDebuggerClientDisconnected();
 void onDebuggerInputAvailable();
 
 void executeScpi();
+void flushToDebuggerMessage();
 
 } // flow
 } // eez

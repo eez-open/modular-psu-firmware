@@ -22,6 +22,8 @@
 #include <inttypes.h>
 
 #include <eez/debug.h>
+#include <eez/system.h>
+#include <eez/tasks.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/private.h>
@@ -89,16 +91,61 @@ static unsigned g_inputFromDebuggerPosition;
 
 static void processDebuggerInput(char *buffer, uint32_t length);
 
+////////////////////////////////////////////////////////////////////////////////
+
+char *g_toDebuggerMessage = (char *)FLOW_TO_DEBUGGER_MESSAGE_BUFFER;
+uint32_t g_toDebuggerMessagePosition = 0;
+
+void startToDebuggerMessage() {
+}
+
+void flushToDebuggerMessageBuffer() {
+	if (g_toDebuggerMessagePosition != 0) {
+		sendMessageToLowPriorityThread(FLOW_FLUSH_TO_DEBUGGER_MESSAGE);
+
+		while (g_toDebuggerMessagePosition != 0 && g_debuggerIsConnected) {
+			osDelay(1);
+			WATCHDOG_RESET(WATCHDOG_GUI_THREAD);
+		}
+	}
+}
+
+void flushToDebuggerMessage() {
+	eez::mcu::ethernet::writeDebuggerBuffer(g_toDebuggerMessage, g_toDebuggerMessagePosition);
+	g_toDebuggerMessagePosition = 0;
+}
+
+void writeDebuggerBuffer(const char *buffer, uint32_t length) {
+	if (g_toDebuggerMessagePosition + length > FLOW_TO_DEBUGGER_MESSAGE_BUFFER_SIZE) {
+		flushToDebuggerMessageBuffer();
+	}
+
+	memcpy(g_toDebuggerMessage + g_toDebuggerMessagePosition, buffer, length);
+	g_toDebuggerMessagePosition += length;
+}
+
+void finishToDebuggerMessage() {
+	flushToDebuggerMessageBuffer();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 static void setDebuggerState(DebuggerState newState) {
 	if (newState != g_debuggerState) {
 		g_debuggerState = newState;
 
-		char buffer[100];
-		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
-			MESSAGE_TO_DEBUGGER_STATE_CHANGED,
-			g_debuggerState
-		);
-		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		if (g_debuggerIsConnected) {
+			startToDebuggerMessage();
+
+			char buffer[100];
+			snprintf(buffer, sizeof(buffer), "%d\t%d\n",
+				MESSAGE_TO_DEBUGGER_STATE_CHANGED,
+				g_debuggerState
+			);
+			writeDebuggerBuffer(buffer, strlen(buffer));
+
+			finishToDebuggerMessage();
+		}
 	}
 }
 
@@ -220,13 +267,13 @@ int outputBufferPosition = 0;
 #define WRITE_TO_OUTPUT_BUFFER(ch) \
 	outputBuffer[outputBufferPosition++] = ch; \
 	if (outputBufferPosition == sizeof(outputBuffer)) { \
-		eez::mcu::ethernet::writeDebuggerBuffer(outputBuffer, outputBufferPosition); \
+		writeDebuggerBuffer(outputBuffer, outputBufferPosition); \
 		outputBufferPosition = 0; \
 	}
 
 #define FLUSH_OUTPUT_BUFFER() \
 	if (outputBufferPosition > 0) { \
-		eez::mcu::ethernet::writeDebuggerBuffer(outputBuffer, outputBufferPosition); \
+		writeDebuggerBuffer(outputBuffer, outputBufferPosition); \
 		outputBufferPosition = 0; \
 	}
 
@@ -362,13 +409,15 @@ void writeValue(const Value &value) {
 
 	stringAppendString(tempStr, sizeof(tempStr), "\n");
 
-	eez::mcu::ethernet::writeDebuggerBuffer(tempStr, strlen(tempStr));
+	writeDebuggerBuffer(tempStr, strlen(tempStr));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void onStarted(Assets *assets) {
     if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+
 		auto flowDefinition = assets->flowDefinition.ptr(assets);
 
 		for (uint32_t i = 0; i < flowDefinition->globalVariables.count; i++) {
@@ -380,15 +429,19 @@ void onStarted(Assets *assets) {
 				(int)i,
                 (int)pValue
             );
-            eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+            writeDebuggerBuffer(buffer, strlen(buffer));
 
 			writeValue(*pValue);
         }
+
+		finishToDebuggerMessage();
     }
 }
 
 void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutputIndex, unsigned targetComponentIndex, int targetInputIndex) {
     if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+
         char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE,
@@ -398,35 +451,47 @@ void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutp
 			targetComponentIndex,
 			targetInputIndex
 		);
-        eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+        writeDebuggerBuffer(buffer, strlen(buffer));
+
+		finishToDebuggerMessage();
     }
 }
 
 void onRemoveFromQueue() {
     if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+
         char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\n",
 			MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE
 		);
-        eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+        writeDebuggerBuffer(buffer, strlen(buffer));
+
+		finishToDebuggerMessage();
     }
 }
 
 void onValueChanged(const Value *pValue) {
     if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+
         char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t",
 			MESSAGE_TO_DEBUGGER_VALUE_CHANGED,
             (int)pValue
 		);
-        eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+        writeDebuggerBuffer(buffer, strlen(buffer));
         
 		writeValue(*pValue);
+
+		finishToDebuggerMessage();
     }
 }
 
 void onFlowStateCreated(FlowState *flowState) {
     if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+
         char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED,
@@ -435,7 +500,7 @@ void onFlowStateCreated(FlowState *flowState) {
 			(int)(flowState->parentFlowState ? flowState->parentFlowState->flowStateIndex : -1),
 			flowState->parentComponentIndex
 		);
-        eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+        writeDebuggerBuffer(buffer, strlen(buffer));
 		
 		auto flow = flowState->flow;
 
@@ -449,7 +514,7 @@ void onFlowStateCreated(FlowState *flowState) {
 				(int)i,
                 (int)pValue
             );
-            eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+            writeDebuggerBuffer(buffer, strlen(buffer));
 
 			writeValue(*pValue);
         }
@@ -466,35 +531,45 @@ void onFlowStateCreated(FlowState *flowState) {
 					(int)i,
 					(int)pValue
 				);
-				eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+				writeDebuggerBuffer(buffer, strlen(buffer));
 
 				writeValue(*pValue);
 			}
         }
+
+		finishToDebuggerMessage();
 	}
 }
 
 void onFlowStateDestroyed(FlowState *flowState) {
 	if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+
 		char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED,
 			(int)flowState->flowStateIndex
 		);
-		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBuffer(buffer, strlen(buffer));
+
+		finishToDebuggerMessage();
 	}
 }
 
 void onFlowError(FlowState *flowState, int componentIndex, const char *errorMessage) {
 	if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+		
 		char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_ERROR,
 			(int)flowState->flowStateIndex,
 			componentIndex
 		);
-		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBuffer(buffer, strlen(buffer));
 		writeString(errorMessage);
+
+		finishToDebuggerMessage();
 	}
 }
 
@@ -534,6 +609,8 @@ void writeLogMessage(const char *str, size_t len) {
 
 void logInfo(FlowState *flowState, unsigned componentIndex, const char *message) {
 	if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+				
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
 			MESSAGE_TO_DEBUGGER_LOG,
@@ -541,13 +618,17 @@ void logInfo(FlowState *flowState, unsigned componentIndex, const char *message)
             (int)flowState->flowStateIndex,
 			componentIndex
 		);
-		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBuffer(buffer, strlen(buffer));
 		writeLogMessage(message);
+
+		finishToDebuggerMessage();
     }
 }
 
 void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *cmd) {
 	if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\tSCPI COMMAND: ",
 			MESSAGE_TO_DEBUGGER_LOG,
@@ -555,13 +636,17 @@ void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *c
             (int)flowState->flowStateIndex,
 			componentIndex
 		);
-		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBuffer(buffer, strlen(buffer));
 		writeLogMessage(cmd);
+
+		finishToDebuggerMessage();
     }
 }
 
 void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *query) {
 	if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\tSCPI QUERY: ",
 			MESSAGE_TO_DEBUGGER_LOG,
@@ -569,13 +654,17 @@ void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *que
             (int)flowState->flowStateIndex,
 			componentIndex
 		);
-		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBuffer(buffer, strlen(buffer));
 		writeLogMessage(query);
+
+		finishToDebuggerMessage();
     }
 }
 
 void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const char *resultText, size_t resultTextLen) {
 	if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer) - 1, "%d\t%d\t%d\t%d\tSCPI QUERY RESULT: ",
 			MESSAGE_TO_DEBUGGER_LOG,
@@ -583,19 +672,25 @@ void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const cha
             (int)flowState->flowStateIndex,
 			componentIndex
 		);
-		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBuffer(buffer, strlen(buffer));
 		writeLogMessage(resultText, resultTextLen);
+
+		finishToDebuggerMessage();
     }
 }
 
 void onPageChanged(int pageId) {
 	if (g_debuggerIsConnected) {
+		startToDebuggerMessage();
+
 		char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
 			-pageId - 1
 		);
-		eez::mcu::ethernet::writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBuffer(buffer, strlen(buffer));
+
+		finishToDebuggerMessage();
 	}
 }
 
