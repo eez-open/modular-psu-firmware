@@ -38,7 +38,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
     if (widget->w > widget->h) {
         // horizontal orientation
         display::setColor(style->background_color);
-        display::fillRect(x, y, x + widget->w - 1, y + widget->h - 1);
+        display::fillRect(x, y, widget->w, widget->h);
 
         int w = widget->w / count;
         x += (widget->w - w * count) / 2;
@@ -61,7 +61,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
 
         if (topPadding > 0) {
             display::setColor(style->background_color);
-            display::fillRect(x, y, x + widget->w - 1, y + topPadding - 1);
+            display::fillRect(x, y, widget->w, topPadding);
 
             y += topPadding;
         }
@@ -74,7 +74,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
 		for (Cursor i = 0; i < count; i++) {
             if (yOffset > 0) {
                 display::setColor(style->background_color);
-                display::fillRect(x, y, x + widget->w - 1, y + yOffset - 1);
+                display::fillRect(x, y, widget->w, yOffset);
             }
 
             char text[32];
@@ -88,13 +88,13 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
 
             if (b < y) {
                 display::setColor(style->background_color);
-                display::fillRect(x, b, x + widget->w - 1, y - 1);
+                display::fillRect(x, b, widget->w, y - b);
             }
         }
 
         if (y <= bottom) {
             display::setColor(style->background_color);
-            display::fillRect(x, y, x + widget->w - 1, bottom);
+            display::fillRect(x, y, widget->w, bottom - y + 1);
         }
     }
 }
@@ -102,23 +102,12 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
 DrawFunctionType BUTTON_GROUP_draw = [] (const WidgetCursor &widgetCursor) {
     auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
+    auto data = get(widgetCursor, widget->data);
 
-    bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data;
+    const Style* style = getStyle(widget->style);
+    const Style* selectedStyle = getStyle(widget->selectedStyle);
 
-    if (refresh) {
-        const Style* style = getStyle(widget->style);
-        const Style* selectedStyle = getStyle(widget->selectedStyle);
-
-        drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, widgetCursor.currentState->data.getInt(), count(widgetCursor, widget->data));
-    }
-
-    widgetCursor.currentState->data.freeRef();
+    drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, data.getInt(), count(widgetCursor, widget->data));
 };
 
 OnTouchFunctionType BUTTON_GROUP_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {

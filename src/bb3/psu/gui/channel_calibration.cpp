@@ -53,7 +53,7 @@ enum Align {
     ALIGN_BOTTOM = 2,
 };
 
-void drawGlyph(font::Font &font, const GlyphData &glyph, uint8_t encoding, int x, int y, Align horz, Align vert, int clip_x1, int clip_y1, int clip_x2, int clip_y2) {
+void drawGlyph(font::Font &font, const GlyphData &glyph, uint8_t encoding, int x, int y, Align horz, Align vert, int clip_x, int clip_y, int clip_w, int clip_h) {
     x -= glyph.x;
     y -= font.getAscent() - (glyph.y + glyph.height);
 
@@ -71,7 +71,7 @@ void drawGlyph(font::Font &font, const GlyphData &glyph, uint8_t encoding, int x
 
     char str[2] = { (char)encoding, 0 };
 
-    mcu::display::drawStr(str, 1, x, y, clip_x1, clip_y1, clip_x2, clip_y2, font, -1);
+    mcu::display::drawStr(str, 1, x, y, clip_x, clip_y, clip_w, clip_h, font, -1);
 }
 
 void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const WidgetCursor &widgetCursor) {
@@ -155,7 +155,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     mcu::display::drawStr(text, -1,
         xLabelText,
         y + h - MARGIN + GAP_BETWEEN_LABEL_AND_AXIS - (font.getAscent() - glyphLabel->height),
-        x, y, x + w - 1, y + w - 1,
+        x, y, w, w,
         font, -1);
 
     // max
@@ -169,7 +169,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     mcu::display::drawStr(text, -1,
         xLabelText,
         y + h - MARGIN + GAP_BETWEEN_LABEL_AND_AXIS - (font.getAscent() - glyphLabel->height),
-        x, y, x + w - 1, y + w - 1,
+        x, y, w, w,
         font, -1);
 
     // draw diagonal line from (min, min) to (max, max)
@@ -223,14 +223,14 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
                 y + h - MARGIN - 1 - (int)roundf(yPoints[i + 1]),
                 ALIGN_CENTER,
                 ALIGN_CENTER,
-                x, y, x + w - 1, y + w - 1
+                x, y, w, w
             );
         }
     }
 
     // draw frame
     mcu::display::setColor(style->color);
-    mcu::display::drawRect(x + MARGIN, y + MARGIN, x + w - MARGIN - 1, y + h - MARGIN - 1);
+    mcu::display::drawRect(x + MARGIN, y + MARGIN, w - 2 * MARGIN, h - 2 * MARGIN);
 
     // draw DAC value
     auto x1 = (w - 2 * MARGIN - 1) * scale(dacValue);
@@ -240,7 +240,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
         mcu::display::drawVLine(
             x + MARGIN + (int)roundf(x1),
             y + MARGIN + 1,
-            h - 2 * MARGIN - 3
+            h - 2 * MARGIN - 2
         );
 
         auto y1 = (h - 2 * MARGIN - 1) * scale(remapDacValue(calibrationBase, configuration, unit, dacValue));
@@ -250,7 +250,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
                 y + h - MARGIN - 1 - (int)roundf(y1),
                 ALIGN_CENTER,
                 ALIGN_CENTER,
-                x, y, x + w - 1, y + w - 1
+                x, y, w, w
             );
         }
     }

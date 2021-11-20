@@ -31,7 +31,6 @@
 namespace eez {
 namespace keyboard {
 
-bool isDisplayDirty();
 void updateDisplay();
 
 void onPageChanged();

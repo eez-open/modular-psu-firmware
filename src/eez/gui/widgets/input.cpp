@@ -164,39 +164,25 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 		);
 	}
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
-
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
-	widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
-	widgetCursor.currentState->data.clear();
-	widgetCursor.currentState->data = get(widgetCursor, widget->data);
+	auto focused = isFocusWidget(widgetCursor);
+    auto blinking = g_isBlinkTime && styleIsBlink(style);
+	auto data = get(widgetCursor, widget->data);
 
-    bool refresh =
-		!widgetCursor.previousState ||
-        widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
-		widgetCursor.previousState->data != widgetCursor.currentState->data;
+	uint16_t overrideColor = focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
+	uint16_t overrideBackgroundColor = focused ? style->focus_background_color : style->background_color;
+	uint16_t overrideActiveColor =  focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
+	uint16_t overrideActiveBackgroundColor = focused ? style->focus_color : style->active_background_color;
 
-    if (refresh) {
-        uint16_t overrideColor = widgetCursor.currentState->flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
-        uint16_t overrideBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : style->background_color;
-        uint16_t overrideActiveColor =  widgetCursor.currentState->flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
-        uint16_t overrideActiveBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : style->active_background_color;
+	char text[MAX_TEXT_LEN + 1];
+	data.toText(text, sizeof(text));
 
-		char text[MAX_TEXT_LEN + 1];
-		widgetCursor.currentState->data.toText(text, sizeof(text));
-
-		drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-			style, widgetCursor.currentState->flags.active,
-			widgetCursor.currentState->flags.blinking,
-			false, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,
-			false);
-    }
-
-	widgetCursor.currentState->data.freeRef();
+	drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+		style, g_isActiveWidget,
+		blinking,
+		false, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,
+		false);
 };
 
 OnTouchFunctionType INPUT_onTouch = nullptr;

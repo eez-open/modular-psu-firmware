@@ -49,6 +49,8 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void initDrawWidgetFunctions();
+
 #if OPTION_GUI_THREAD
 
 void startThread();
@@ -99,7 +101,6 @@ void setFoundWidgetAtDown(WidgetCursor &widgetCursor);
 void clearFoundWidgetAtDown();
 bool isActiveWidget(const WidgetCursor &widgetCursor);
 bool isFocusWidget(const WidgetCursor &widgetCursor);
-void refreshScreen();
 bool isPageInternal(int pageId);
 int getWidgetAction(const WidgetCursor &widgetCursor);
 void executeAction(const WidgetCursor &widgetCursor, int actionId);
@@ -171,9 +172,6 @@ void externalDataHook(int16_t id, DataOperationEnum operation, const WidgetCurso
 OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor);
 
 ////////////////////////////////////////////////////////////////////////////////
-
-int getCurrentStateBufferIndex();
-uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor);
 
 Page *getPageFromIdHook(int pageId);
 

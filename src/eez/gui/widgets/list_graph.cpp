@@ -54,125 +54,105 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 	const Style* y2Style = getStyle(widget->y2Style);
 	const Style* cursorStyle = getStyle(widget->cursorStyle);
 
-    widgetCursor.currentState->size = sizeof(ListGraphWidgetState);
-	widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
-    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.clear();
-    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData = get(widgetCursor, widget->cursorData);
+    auto data = get(widgetCursor, widget->data);
+    auto cursorData = get(widgetCursor, widget->cursorData);
 
-    int iPrevCursor = -1;
-    if (widgetCursor.previousState) {
-        iPrevCursor = ((ListGraphWidgetState *)widgetCursor.previousState)->cursorData.getInt();
-    }
-
-    int iCursor = ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.getInt();
+    int iCursor = cursorData.getInt();
     int iRow = iCursor / 3;
 
-    bool refresh = !widgetCursor.previousState ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data ||
-        iCursor != iPrevCursor;
+    // draw background
+    display::setColor(style->background_color);
+    display::fillRect(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h);
 
-    if (refresh) {
-        // draw background
-        display::setColor(style->background_color);
-        display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1,
-                            widgetCursor.y + (int)widget->h - 1);
+    int dwellListLength = getFloatListLength(widgetCursor, widget->dwellData);
+    if (dwellListLength > 0) {
+        float *dwellList = getFloatList(widgetCursor, widget->dwellData);
 
-        int dwellListLength = getFloatListLength(widgetCursor, widget->dwellData);
-        if (dwellListLength > 0) {
-            float *dwellList = getFloatList(widgetCursor, widget->dwellData);
+        const Style *styles[2] = { y1Style, y2Style };
 
-            const Style *styles[2] = { y1Style, y2Style };
+        int listLength[2] = { getFloatListLength(widgetCursor, widget->y1Data),
+                                getFloatListLength(widgetCursor, widget->y2Data) };
 
-            int listLength[2] = { getFloatListLength(widgetCursor, widget->y1Data),
-                                  getFloatListLength(widgetCursor, widget->y2Data) };
+        float *list[2] = { getFloatList(widgetCursor, widget->y1Data),
+                            getFloatList(widgetCursor, widget->y2Data) };
 
-            float *list[2] = { getFloatList(widgetCursor, widget->y1Data),
-                               getFloatList(widgetCursor, widget->y2Data) };
+        float min[2] = {
+            getMin(widgetCursor, widget->y1Data).getFloat(),
+            getMin(widgetCursor, widget->y2Data).getFloat()
+        };
 
-            float min[2] = {
-                getMin(widgetCursor, widget->y1Data).getFloat(),
-                getMin(widgetCursor, widget->y2Data).getFloat()
-            };
+        float max[2] = {
+            getMax(widgetCursor, widget->y1Data).getFloat(),
+            getMax(widgetCursor, widget->y2Data).getFloat()
+        };
 
-            float max[2] = {
-                getMax(widgetCursor, widget->y1Data).getFloat(),
-                getMax(widgetCursor, widget->y2Data).getFloat()
-            };
+        int maxListLength = getFloatListLength(widgetCursor, widget->data);
 
-            int maxListLength = getFloatListLength(widgetCursor, widget->data);
-
-            float dwellSum = 0;
-            for (int i = 0; i < maxListLength; ++i) {
-                if (i < dwellListLength) {
-                    dwellSum += dwellList[i];
-                } else {
-                    dwellSum += dwellList[dwellListLength - 1];
-                }
-            }
-
-            float currentDwellSum = 0;
-            int xPrev = widgetCursor.x;
-            int yPrev[2];
-            for (int i = 0; i < maxListLength; ++i) {
-                currentDwellSum +=
-                    i < dwellListLength ? dwellList[i] : dwellList[dwellListLength - 1];
-                int x1 = xPrev;
-                int x2;
-                if (i == maxListLength - 1) {
-                    x2 = widgetCursor.x + (int)widget->w - 1;
-                } else {
-                    x2 = widgetCursor.x + int(currentDwellSum * (int)widget->w / dwellSum);
-                }
-                if (x2 < x1)
-                    x2 = x1;
-                if (x2 >= widgetCursor.x + (int)widget->w)
-                    x2 = widgetCursor.x + (int)widget->w - 1;
-
-                if (i == iRow) {
-                    display::setColor(cursorStyle->background_color);
-                    display::fillRect(x1, widgetCursor.y, x2 - 1,
-                        widgetCursor.y + (int)widget->h - 1);
-                }
-
-
-                for (int k = 0; k < 2; ++k) {
-                    int j = iCursor % 3 == 2 ? k : 1 - k;
-
-                    if (listLength[j] > 0) {
-                        display::setColor(styles[j]->color);
-
-                        float value = i < listLength[j] ? list[j][i] : list[j][listLength[j] - 1];
-                        int y = int((value - min[j]) * widget->h / (max[j] - min[j]));
-                        if (y < 0)
-                            y = 0;
-                        if (y >= (int)widget->h)
-                            y = (int)widget->h - 1;
-
-                        y = widgetCursor.y + ((int)widget->h - 1) - y;
-
-                        if (i > 0 && abs(yPrev[j] - y) > 1) {
-                            if (yPrev[j] < y) {
-                                display::drawVLine(x1, yPrev[j] + 1, y - yPrev[j] - 1);
-                            } else {
-                                display::drawVLine(x1, y, yPrev[j] - y - 1);
-                            }
-                        }
-
-                        yPrev[j] = y;
-
-                        display::drawHLine(x1, y, x2 - x1);
-                    }
-                }
-
-                xPrev = x2;
+        float dwellSum = 0;
+        for (int i = 0; i < maxListLength; ++i) {
+            if (i < dwellListLength) {
+                dwellSum += dwellList[i];
+            } else {
+                dwellSum += dwellList[dwellListLength - 1];
             }
         }
+
+        float currentDwellSum = 0;
+        int xPrev = widgetCursor.x;
+        int yPrev[2];
+        for (int i = 0; i < maxListLength; ++i) {
+            currentDwellSum +=
+                i < dwellListLength ? dwellList[i] : dwellList[dwellListLength - 1];
+            int x1 = xPrev;
+            int x2;
+            if (i == maxListLength - 1) {
+                x2 = widgetCursor.x + (int)widget->w - 1;
+            } else {
+                x2 = widgetCursor.x + int(currentDwellSum * (int)widget->w / dwellSum);
+            }
+            if (x2 < x1)
+                x2 = x1;
+            if (x2 >= widgetCursor.x + (int)widget->w)
+                x2 = widgetCursor.x + (int)widget->w - 1;
+
+            if (i == iRow) {
+                display::setColor(cursorStyle->background_color);
+                display::fillRect(x1, widgetCursor.y, x2 - x1, (int)widget->h);
+            }
+
+
+            for (int k = 0; k < 2; ++k) {
+                int j = iCursor % 3 == 2 ? k : 1 - k;
+
+                if (listLength[j] > 0) {
+                    display::setColor(styles[j]->color);
+
+                    float value = i < listLength[j] ? list[j][i] : list[j][listLength[j] - 1];
+                    int y = int((value - min[j]) * widget->h / (max[j] - min[j]));
+                    if (y < 0)
+                        y = 0;
+                    if (y >= (int)widget->h)
+                        y = (int)widget->h - 1;
+
+                    y = widgetCursor.y + ((int)widget->h - 1) - y;
+
+                    if (i > 0 && abs(yPrev[j] - y) > 1) {
+                        if (yPrev[j] < y) {
+                            display::drawVLine(x1, yPrev[j] + 1, y - yPrev[j]);
+                        } else {
+                            display::drawVLine(x1, y, yPrev[j] - y);
+                        }
+                    }
+
+                    yPrev[j] = y;
+
+                    display::drawHLine(x1, y, x2 - x1 + 1);
+                }
+            }
+
+            xPrev = x2;
+        }
     }
-
-	widgetCursor.currentState->data.freeRef();
-    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.freeRef();
-
 };
 
 OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {

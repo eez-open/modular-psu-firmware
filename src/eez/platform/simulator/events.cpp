@@ -65,8 +65,6 @@ void readEvents() {
             yMouseWheel += event.wheel.y;
         } else if (event.type == SDL_KEYDOWN) {
             keyboard::onKeyboardEvent(&event.key);
-        } else if (event.type == SDL_WINDOWEVENT)  {
-            eez::gui::refreshScreen();
         }
 
         if (event.type == SDL_QUIT) {

@@ -23,7 +23,6 @@
 #include <bb3/mcu/display.h>
 
 using namespace eez::gui;
-using namespace eez::mcu::display;
 
 #define CONF_GUI_MOUSE_TIMEOUT_MS 10 * 1000
 
@@ -44,17 +43,11 @@ static int g_mouseWasCursorY;
 static WidgetCursor m_foundWidgetAtMouse;
 static OnTouchFunctionType m_onTouchFunctionAtMouse;
 
-static bool g_lastMouseCursorVisible;
-static int g_lastMouseCursorX;
-static int g_lastMouseCursorY;
-static WidgetCursor g_lastFoundWidgetAtMouse;
-static OnTouchFunctionType g_lastOnTouchFunctionAtMouse;
-
 MouseInfo g_mouseInfo;
 
 void init() {
-    g_mouseCursorX = getDisplayWidth() / 2;
-    g_mouseCursorY = getDisplayHeight() / 2;
+    g_mouseCursorX = mcu::display::getDisplayWidth() / 2;
+    g_mouseCursorY = mcu::display::getDisplayHeight() / 2;
 }
 
 void getEvent(bool &mouseCursorVisible, EventType &mouseEventType, int &mouseX, int &mouseY) {
@@ -104,31 +97,11 @@ void getEvent(bool &mouseCursorVisible, EventType &mouseEventType, int &mouseX, 
     }
 }
 
-bool isDisplayDirty() {
-    if (
-        g_lastMouseCursorVisible != g_mouseCursorVisible ||
-        g_lastMouseCursorX != g_mouseCursorX ||
-        g_lastMouseCursorY != g_mouseCursorY ||
-        g_lastFoundWidgetAtMouse != m_foundWidgetAtMouse ||
-        g_lastOnTouchFunctionAtMouse != m_onTouchFunctionAtMouse
-    ) {
-    	g_lastMouseCursorVisible = g_mouseCursorVisible;
-    	g_lastMouseCursorX = g_mouseCursorX;
-    	g_lastMouseCursorY = g_mouseCursorY;
-        g_lastFoundWidgetAtMouse = m_foundWidgetAtMouse;
-        g_lastOnTouchFunctionAtMouse = m_onTouchFunctionAtMouse;
-
-    	return true;
-    }
-
-    return false;
-}
-
 void updateDisplay() {
     using namespace gui;
 
-    if (g_lastMouseCursorVisible) {
-        if (g_lastMouseCursorX < getDisplayWidth() && g_lastMouseCursorY < getDisplayHeight()) {
+    if (g_mouseCursorVisible) {
+        if (g_mouseCursorX < mcu::display::getDisplayWidth() && g_mouseCursorY < mcu::display::getDisplayHeight()) {
             auto bitmap = getBitmap(BITMAP_ID_MOUSE_CURSOR);
 
             Image image;
@@ -139,13 +112,13 @@ void updateDisplay() {
             image.lineOffset = 0;
             image.pixels = (uint8_t *)bitmap->pixels;
 
-            if (g_lastMouseCursorX + (int)image.width > getDisplayWidth()) {
-                image.width = getDisplayWidth() - g_lastMouseCursorX;
+            if (g_mouseCursorX + (int)image.width > mcu::display::getDisplayWidth()) {
+                image.width = mcu::display::getDisplayWidth() - g_mouseCursorX;
                 image.lineOffset = bitmap->w - image.width;
             }
 
-            if (g_lastMouseCursorY + (int)image.height > getDisplayHeight()) {
-                image.height = getDisplayHeight() - g_lastMouseCursorY;
+            if (g_mouseCursorY + (int)image.height > mcu::display::getDisplayHeight()) {
+                image.height = mcu::display::getDisplayHeight() - g_mouseCursorY;
             }
 
             if (m_foundWidgetAtMouse && m_onTouchFunctionAtMouse) {
@@ -161,10 +134,10 @@ void updateDisplay() {
                     }
                 }
 
-                drawFocusFrame(m_foundWidgetAtMouse.x, m_foundWidgetAtMouse.y, w, h);
+				mcu::display::drawFocusFrame(m_foundWidgetAtMouse.x, m_foundWidgetAtMouse.y, w, h);
             }
 
-            mcu::display::drawBitmap(&image, g_lastMouseCursorX, g_lastMouseCursorY);
+            mcu::display::drawBitmap(&image, g_mouseCursorX, g_mouseCursorY);
         }
     }
 }
@@ -212,28 +185,28 @@ void onMouseEvent(USBH_HandleTypeDef *phost) {
 
     if (info->x != 0) {
         if (g_xMouse == -1) {
-            g_xMouse = getDisplayWidth() / 2;
+            g_xMouse = mcu::display::getDisplayWidth() / 2;
         }
         g_xMouse += (int8_t)info->x;
         if (g_xMouse < 0) {
             g_xMouse = 0;
         }
-        if (g_xMouse >= getDisplayWidth()) {
-            g_xMouse = getDisplayWidth() - 1;
+        if (g_xMouse >= mcu::display::getDisplayWidth()) {
+            g_xMouse = mcu::display::getDisplayWidth() - 1;
         }
         sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_X_MOVE, g_xMouse, 10);
     }
 
     if (info->y != 0) {
         if (g_yMouse == -1) {
-            g_yMouse = getDisplayHeight() / 2;
+            g_yMouse = mcu::display::getDisplayHeight() / 2;
         }
         g_yMouse += (int8_t)info->y;
         if (g_yMouse < 0) {
             g_yMouse = 0;
         }
-        if (g_yMouse >= getDisplayHeight()) {
-            g_yMouse = getDisplayHeight() - 1;
+        if (g_yMouse >= mcu::display::getDisplayHeight()) {
+            g_yMouse = mcu::display::getDisplayHeight() - 1;
         }
         sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE, g_yMouse, 10);
     }

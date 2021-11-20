@@ -1,6 +1,6 @@
 /*
  * EEZ Modular Firmware
- * Copyright (C) 2020-present, Envox d.o.o.
+ * Copyright (C) 2015-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,31 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
+#pragma once
 
-#include <eez/util.h>
-
-#include <eez/gui/gui.h>
+#include <eez/gui/font.h>
 
 namespace eez {
-namespace gui {
+namespace mcu {
+namespace display {
 
-EnumFunctionType CANVAS_enum = nullptr;
+extern uint16_t g_fc, g_bc;
+extern uint8_t g_opacity;
 
-DrawFunctionType CANVAS_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
+extern gui::font::Font g_font;
 
-    Value value;
-    DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION, widgetCursor, value);
-    auto drawFunction = (void (*)(const WidgetCursor &widgetCursor))value.getVoidPointer();
-    drawFunction(widgetCursor);
-};
+void setBufferPointer(void *buffer);
 
-OnTouchFunctionType CANVAS_onTouch = nullptr;
-
-OnKeyboardFunctionType CANVAS_onKeyboard = nullptr;
-
-} // namespace gui
+} // namespace display
+} // namespace mcu
 } // namespace eez
-
-#endif

@@ -16,23 +16,22 @@
 * along with this program.  If not, see http://www.gnu.org/licenses.
 */
 
-#pragma once
+#if OPTION_DISPLAY
 
-#include <eez/gui/data.h>
-#include <eez/gui/widget.h>
+#include <bb3/gui/document.h>
+
+#include <eez/system.h>
 
 namespace eez {
-
-typedef void (*ActionExecFunc)();
-
 namespace gui {
-
+    
 #if defined(EEZ_PLATFORM_STM32)
-#include <eez/gui/document_stm32.h>
+#include <bb3/gui/document_stm32.cpp>
 #elif defined(EEZ_PLATFORM_SIMULATOR)
-#include <eez/gui/document_simulator.h>
+#include <bb3/gui/document_simulator.cpp>
 #endif
 
 } // namespace gui
 } // namespace eez
 
+#endif

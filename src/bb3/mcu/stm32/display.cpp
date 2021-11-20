@@ -37,7 +37,9 @@
 #include <eez/memory.h>
 
 #include <eez/gui/gui.h>
+
 #include <bb3/mcu/display.h>
+#include <bb3/mcu/display-private.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/persist_conf.h>
@@ -146,9 +148,8 @@ void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color
 	}
 }
 
-void fillRect(void *dst, int x1, int y1, int x2, int y2) {
-	fillRect((uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
-    markDirty(x1, y1, x2, y2);
+void fillRect(void *dst, int x, int y, int w, int h) {
+	fillRect((uint16_t *)dst, x, y, w, h, g_fc);
 }
 
 void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width, int height) {
@@ -202,9 +203,8 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
     }
 }
 
-void bitBlt(void *src, int x1, int y1, int x2, int y2) {
-    bitBlt(src, g_buffer, x1, y1, x2, y2);
-    markDirty(x1, y1, x2, y2);
+void bitBlt(void *src, int x, int y, int w, int h) {
+    bitBlt(src, g_buffer, x, y, w, h);
 }
 
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
@@ -244,9 +244,8 @@ void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, int heig
     hdma2d.Init.RedBlueSwap = DMA2D_RB_REGULAR;
 }
 
-void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
-    bitBlt((uint16_t *)src, (uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1);
-    markDirty(x1, y1, x2, y2);
+void bitBlt(void *src, void *dst, int x, int y, int w, int h) {
+    bitBlt((uint16_t *)src, (uint16_t *)dst, x, y, w, h);
 }
 
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, int dstx, int dsty) {
@@ -398,12 +397,12 @@ void turnOn() {
         g_bufferNew = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
         g_buffer = g_bufferNew;
 
-		g_buffers[0].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER1_START_ADDRESS);
-		g_buffers[1].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER2_START_ADDRESS);
-		g_buffers[2].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER3_START_ADDRESS);
-		g_buffers[3].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER4_START_ADDRESS);
-		g_buffers[4].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER5_START_ADDRESS);
-		g_buffers[5].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER6_START_ADDRESS);
+		g_buffers[0].bufferPointer = VRAM_AUX_BUFFER1_START_ADDRESS;
+		g_buffers[1].bufferPointer = VRAM_AUX_BUFFER2_START_ADDRESS;
+		g_buffers[2].bufferPointer = VRAM_AUX_BUFFER3_START_ADDRESS;
+		g_buffers[3].bufferPointer = VRAM_AUX_BUFFER4_START_ADDRESS;
+		g_buffers[4].bufferPointer = VRAM_AUX_BUFFER5_START_ADDRESS;
+		g_buffers[5].bufferPointer = VRAM_AUX_BUFFER6_START_ADDRESS;
 
         fillRect(g_bufferOld, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
         fillRect(g_bufferNew, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
@@ -533,16 +532,10 @@ void sync() {
         if (!g_animationState.enabled) {
             finishAnimation();
         }
-        clearDirty();
-        // clearDirty();
         return;
     }
 
-    if (isDirty()) {
-        clearDirty();
-
         swapBuffers();
-    }
 
     if (g_takeScreenshot) {
     	bitBltRGB888(g_bufferOld, SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
@@ -554,7 +547,7 @@ void sync() {
 void finishAnimation() {
     auto oldBuffer = g_buffer;
     swapBuffers();
-    bitBlt(oldBuffer, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
+    bitBlt(oldBuffer, 0, 0, getDisplayWidth(), getDisplayHeight());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -580,8 +573,7 @@ const uint8_t *takeScreenshot() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, int clip_y2,
-                        uint8_t encoding) {
+static int8_t drawGlyph(int x1, int y1, int clip_x, int clip_y, int clip_w, int clip_h, uint8_t encoding) {
     auto glyph = g_font.getGlyph(encoding);
     if (!glyph) {
         return 0;
@@ -592,34 +584,34 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
 
     // draw glyph pixels
     int iStartByte = 0;
-    if (x_glyph < clip_x1) {
-        int dx_off = clip_x1 - x_glyph;
+    if (x_glyph < clip_x) {
+        int dx_off = clip_x - x_glyph;
         iStartByte = dx_off;
         if (iStartByte >= glyph->width) {
             return glyph->dx;
         }
-        x_glyph = clip_x1;
+        x_glyph = clip_x;
     }
 
     int offset = 0;
     int glyphHeight = glyph->height;
-    if (y_glyph < clip_y1) {
-        int dy_off = clip_y1 - y_glyph;
+    if (y_glyph < clip_y) {
+        int dy_off = clip_y - y_glyph;
         offset += dy_off * glyph->width;
         glyphHeight -= dy_off;
-        y_glyph = clip_y1;
+        y_glyph = clip_y;
     }
 
     int width;
-    if (x_glyph + (glyph->width - iStartByte) - 1 > clip_x2) {
-    	width = clip_x2 - x_glyph + 1;
+    if (x_glyph + (glyph->width - iStartByte) - 1 >= clip_x + clip_w) {
+    	width = clip_x + clip_w - x_glyph;
     } else {
         width = (glyph->width - iStartByte);
     }
 
     int height;
-    if (y_glyph + glyphHeight - 1 > clip_y2) {
-        height = clip_y2 - y_glyph + 1;
+    if (y_glyph + glyphHeight - 1 >= clip_y + clip_h) {
+        height = clip_y + clip_h - y_glyph;
     } else {
         height = glyphHeight;
     }
@@ -636,8 +628,6 @@ static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, i
 void drawPixel(int x, int y) {
     DMA2D_WAIT;
     *(g_buffer + y * DISPLAY_WIDTH + x) = g_fc;
-
-    markDirty(x, y, x, y);
 }
 
 void drawPixel(int x, int y, uint8_t opacity) {
@@ -650,60 +640,33 @@ void drawPixel(int x, int y, uint8_t opacity) {
 			color16to32(*dest, 255 - opacity)
 		)
 	);
-
-    markDirty(x, y, x, y);
 }
 
-void drawRect(int x1, int y1, int x2, int y2) {
-    if (x1 > x2) {
-        std::swap<int>(x1, x2);
-    }
-    if (y1 > y2) {
-        std::swap<int>(y1, y2);
-    }
-
-    drawHLine(x1, y1, x2 - x1);
-    drawHLine(x1, y2, x2 - x1);
-    drawVLine(x1, y1, y2 - y1);
-    drawVLine(x2, y1, y2 - y1);
-
-    markDirty(x1, y1, x2, y2);
-}
-
-void fillRect(int x1, int y1, int x2, int y2, int r) {
+void fillRect(int x, int y, int w, int h, int r) {
     if (r == 0) {
-        fillRect(g_buffer, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
+        fillRect(g_buffer, x, y, w, h, g_fc);
     } else {
-        fillRoundedRect(x1, y1, x2, y2, r);
+        fillRoundedRect(x, y, w, h, r);
     }
-
-    markDirty(x1, y1, x2, y2);
 }
 
 void drawHLine(int x, int y, int l) {
-    fillRect(x, y, x + l, y);
-
-    markDirty(x, y, x + l, y);
+    fillRect(x, y, l, 1);
 }
 
 void drawVLine(int x, int y, int l) {
-    fillRect(x, y, x, y + l);
-
-    markDirty(x, y, x, y + l);
+    fillRect(x, y, 1, l);
 }
 
-void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
-    bitBlt(g_buffer, g_buffer, x1, y1, x2-x1+1, y2-y1+1, dstx, dsty);
-
-    markDirty(dstx, dsty, dstx + x2 - x1, dsty + y2 - y1);
+void bitBlt(int x, int y, int w, int h, int dstx, int dsty) {
+    bitBlt(g_buffer, g_buffer, x, y, w, h, dstx, dsty);
 }
 
 void drawBitmap(Image *image, int x, int y) {
     bitBlt(image->pixels, image->bpp, image->lineOffset, g_buffer, x, y, image->width, image->height);
-    markDirty(x, y, x + image->width - 1, y + image->height - 1);
 }
 
-void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font, int cursorPosition) {
+void drawStr(const char *text, int textLength, int x, int y, int clip_x, int clip_y, int clip_w, int clip_h, gui::font::Font &font, int cursorPosition) {
     g_font = font;
 
     bitBltA8Init(g_fc);
@@ -721,7 +684,7 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
         if (i == cursorPosition) {
             xCursor = x;
         }
-        x += drawGlyph(x, y, clip_x1, clip_y1, clip_x2, clip_y2, encoding);
+        x += drawGlyph(x, y, clip_x, clip_y, clip_w, clip_h, encoding);
     }
 
     if (i == cursorPosition) {
@@ -729,11 +692,9 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
     }
 
     if (cursorPosition != -1) {
-        auto d = MAX(((clip_y2 - clip_y1) - font.getHeight()) / 2, 0);
-        fillRect(xCursor - CURSOR_WIDTH / 2, clip_y1 + d, xCursor + CURSOR_WIDTH / 2 - 1, clip_y2 - d);
+        auto d = MAX(((clip_h - 1) - font.getHeight()) / 2, 0);
+        fillRect(xCursor - CURSOR_WIDTH / 2, clip_y + d, CURSOR_WIDTH, clip_h - 2 * d);
     }
-
-    markDirty(clip_x1, clip_y1, clip_x2, clip_y2);
 }
 
 } // namespace display

@@ -32,6 +32,7 @@
 #include <bb3/psu/psu.h>
 #include <bb3/psu/persist_conf.h>
 
+#include <bb3/mcu/display-private.h>
 
 #define CONF_BACKDROP_OPACITY 128
 
@@ -283,67 +284,11 @@ uint8_t getOpacity() {
     return g_opacity;
 }
 
-// static int g_prevDirtyX1;
-// static int g_prevDirtyY1;
-// static int g_prevDirtyX2;
-// static int g_prevDirtyY2;
-
-// static int g_nextDirtyX1 = getDisplayWidth();
-// static int g_nextDirtyY1 = getDisplayHeight();
-// static int g_nextDirtyX2 = -1;
-// static int g_nextDirtyY2 = -1;
-
-// static int g_dirtyX1;
-// static int g_dirtyY1;
-// static int g_dirtyX2;
-// static int g_dirtyY2;
-
-bool g_dirty;
-
-void clearDirty() {
-    g_dirty = false;
-
-    // g_prevDirtyX1 = g_nextDirtyX1;
-    // g_prevDirtyY1 = g_nextDirtyY1;
-    // g_prevDirtyX2 = g_nextDirtyX2;
-    // g_prevDirtyY2 = g_nextDirtyY2;
-
-    // g_nextDirtyX1 = getDisplayWidth();
-    // g_nextDirtyY1 = getDisplayHeight();
-    // g_nextDirtyX2 = -1;
-    // g_nextDirtyY2 = -1;
-}
-
-// void markDirty(int x1, int y1, int x2, int y2) {
-//     if (x1 < g_nextDirtyX1) {
-//         g_nextDirtyX1 = x1;
-//     }
-//     if (y1 < g_nextDirtyY1) {
-//         g_nextDirtyY1 = y1;
-//     }
-//     if (x2 > g_nextDirtyX2) {
-//         g_nextDirtyX2 = x2;
-//     }
-//     if (y2 > g_nextDirtyY2) {
-//         g_nextDirtyY2 = y2;
-//     }
-// }
-
-bool isDirty() {
-    // g_dirtyX1 = MIN(g_prevDirtyX1, g_nextDirtyX1);
-    // g_dirtyY1 = MIN(g_prevDirtyY1, g_nextDirtyY1);
-    // g_dirtyX2 = MAX(g_prevDirtyX2, g_nextDirtyX2);
-    // g_dirtyY2 = MAX(g_prevDirtyY2, g_nextDirtyY2);
-
-    // if (g_dirtyX1 <= g_dirtyX2 && g_dirtyY1 <= g_dirtyY2) {
-    //     // char msg[50];
-    //     // snprintf(msg, sizeof(msg), "%d x %d\n", g_dirtyX2 - g_dirtyX1 + 1, g_dirtyY2 - g_dirtyY1 + 1);
-    //     // Serial.println(msg);
-    //     return true;
-    // }
-
-    // return false;
-    return g_dirty;
+void drawRect(int x, int y, int w, int h) {
+    drawHLine(x, y, w);
+    drawHLine(x, y + h - 1, w);
+    drawVLine(x, y, h);
+    drawVLine(x + w - 1, y, h);
 }
 
 void drawFocusFrame(int x, int y, int w, int h) {
@@ -352,31 +297,31 @@ void drawFocusFrame(int x, int y, int w, int h) {
     setColor16(RGB_TO_COLOR(255, 0, 255));
 
     // top
-    fillRect(x, y, x + w - 1, y + lineWidth - 1);
+    fillRect(x, y, w, lineWidth);
 
     // left
-    fillRect(x, y + lineWidth, x + lineWidth - 1, y + h - lineWidth - 1);
+    fillRect(x, y + lineWidth, lineWidth, h - 2 * lineWidth);
 
     // right
-    fillRect(x + w - lineWidth, y + lineWidth, x + w - 1, y + h - lineWidth - 1);
+    fillRect(x + w - lineWidth, y + lineWidth, lineWidth, h - 2 * lineWidth);
 
     // bottom
-    fillRect(x, y + h - lineWidth, x + w - 1, y + h - 1);
+    fillRect(x, y + h - lineWidth, w, lineWidth);
 }
 
-void fillRoundedRect(int x1, int y1, int x2, int y2, int r) {
-    fillRect(x1 + r, y1, x2 - r, y1 + r - 1);
-    fillRect(x1, y1 + r, x1 + r - 1, y2 - r);
-    fillRect(x2 + 1 - r, y1 + r, x2, y2 - r);
-    fillRect(x1 + r, y2 - r + 1, x2 - r, y2);
-    fillRect(x1 + r, y1 + r, x2 - r, y2 - r);
+void fillRoundedRect(int x, int y, int w, int h, int r) {
+    fillRect(x + r, y, w - 2 * r, r);
+    fillRect(x, y + r, r, h - 2 * r);
+    fillRect(x + w - r, y + r, r, h - 2 * r);
+    fillRect(x + r, y + h - r, w - 2 * r, r);
+    fillRect(x + r, y + r, w - 2 * r, h - 2 * r);
 
     for (int ry = 0; ry <= r; ry++) {
         int rx = (int)round(sqrt(r * r - ry * ry));
-        drawHLine(x2 - r, y2 - r + ry, rx);
-        drawHLine(x1 + r - rx, y2 - r + ry, rx);
-        drawHLine(x2 - r, y1 + r - ry, rx);
-        drawHLine(x1 + r - rx, y1 + r - ry, rx);
+        drawHLine(x + w - 1 - r, y + h - 1 - r + ry, rx);
+        drawHLine(x + r - rx, y + h - 1 - r + ry, rx);
+        drawHLine(x + w - 1 - r, y + r - ry, rx);
+        drawHLine(x + r - rx, y + r - ry, rx);
     }
 }
 
@@ -424,179 +369,77 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
     return width;
 }
 
+static void *g_mainBufferPointer;
 Buffer g_buffers[NUM_BUFFERS];
+int g_numBuffersToDraw;
 
-static void *g_bufferPointer;
+void beginDrawing() {
+    g_mainBufferPointer = getBufferPointer();
+    g_numBuffersToDraw = 0;
+}
 
-static int g_bufferToDrawIndexes[NUM_BUFFERS];
-static int g_numBuffersToDraw;
+int beginAuxBufferDrawing() {
+	if (g_numBuffersToDraw == NUM_BUFFERS) {
+		return -1;
+	}
 
-//int getNumFreeBuffers() {
-//    int count = 0;
-//    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-//        if (!g_buffers[bufferIndex].flags.allocated) {
-//            count++;
-//        }
-//    }
-//    return count;
-//}
-
-int allocBuffer() {
-    int bufferIndex;
-
-    for (bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-        if (!g_buffers[bufferIndex].flags.allocated) {
-            // DebugTrace("Buffer %d allocated, %d more left!\n", bufferIndex, getNumFreeBuffers());
-            break;
-        }
-    }
-
-    if (bufferIndex == NUM_BUFFERS) {
-        // DebugTrace("There is no free buffer available!\n");
-        bufferIndex = NUM_BUFFERS - 1;
-    }
-
-    g_buffers[bufferIndex].flags.allocated = true;
-
+	int bufferIndex = g_numBuffersToDraw++;
+    g_buffers[bufferIndex].savedBufferPointer = getBufferPointer();
+    setBufferPointer(g_buffers[bufferIndex].bufferPointer);
     return bufferIndex;
 }
 
-void freeBuffer(int bufferIndex) {
-    g_buffers[bufferIndex].flags.allocated = false;
-    // DebugTrace("Buffer %d freed up, %d buffers available now!\n", bufferIndex, getNumFreeBuffers());
-}
+void endAuxBufferDrawing(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, Rect *backdrop) {
+	if (bufferIndex == -1) {
+		return;
+	}
 
-void selectBuffer(int bufferIndex) {
-    g_buffers[bufferIndex].flags.used = true;
-    g_bufferToDrawIndexes[g_numBuffersToDraw++] = bufferIndex;
-    setBufferPointer(g_buffers[bufferIndex].bufferPointer);
-}
-
-void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, Rect *backdrop) {
     Buffer &buffer = g_buffers[bufferIndex];
     
-    if (buffer.x != x || buffer.y != y || buffer.width != width || buffer.height != height || buffer.withShadow != withShadow || buffer.opacity != opacity || buffer.xOffset != xOffset || buffer.yOffset != yOffset || backdrop != buffer.backdrop) {
-        buffer.x = x;
-        buffer.y = y;
-        buffer.width = width;
-        buffer.height = height;
-        buffer.withShadow = withShadow;
-        buffer.opacity = opacity;
-        buffer.xOffset = xOffset;
-        buffer.yOffset = yOffset;
-        buffer.backdrop = backdrop;
+	buffer.x = x;
+    buffer.y = y;
+    buffer.width = width;
+    buffer.height = height;
+    buffer.withShadow = withShadow;
+    buffer.opacity = opacity;
+    buffer.xOffset = xOffset;
+    buffer.yOffset = yOffset;
+    buffer.backdrop = backdrop;
+    
+    setBufferPointer(buffer.savedBufferPointer);
+}
 
-        int x1 = x + xOffset;
-        int y1 = y + yOffset;
-        int x2 = x1 + width - 1;
-        int y2 = y1 + height - 1;
-
-        if (withShadow) {
-            expandRectWithShadow(x1, y1, x2, y2);
-        }
-
-        markDirty(x1, y1, x2, y2);
-    }
+void endDrawing() {
+	setBufferPointer(g_mainBufferPointer);
 
     for (int i = 0; i < g_numBuffersToDraw; i++) {
-        if (g_bufferToDrawIndexes[i] == bufferIndex) {
-            if (i > 0) {
-                setBufferPointer(g_buffers[g_bufferToDrawIndexes[i - 1]].bufferPointer);
-            }
-            break;
+        Buffer &buffer = g_buffers[i];
+
+        if (buffer.backdrop) {
+            // opacity backdrop
+            auto savedOpacity = setOpacity(CONF_BACKDROP_OPACITY);
+            setColor(COLOR_ID_BACKDROP);
+            fillRect(buffer.backdrop->x, buffer.backdrop->y, buffer.backdrop->w, buffer.backdrop->h);
+            setOpacity(savedOpacity);
         }
-    }
-}
 
-void clearBufferUsage() {
-    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-        g_buffers[bufferIndex].flags.used = false;
-    }
-}
+        int x1 = buffer.x + buffer.xOffset;
+        int y1 = buffer.y + buffer.yOffset;
 
-void freeUnusedBuffers() {
-    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-        if (g_buffers[bufferIndex].flags.allocated && !g_buffers[bufferIndex].flags.used) {
-            g_buffers[bufferIndex].flags.allocated = false;
-            // DebugTrace("Buffer %d allocated but not used!\n", bufferIndex);
-        }
-    }
-    
-    clearBufferUsage();
-}
-
-void beginBuffersDrawing() {
-    g_bufferPointer = getBufferPointer();
-}
-
-void endBuffersDrawing() {
-    setBufferPointer(g_bufferPointer);
-
-    if (keyboard::isDisplayDirty()) {
-    	g_dirty = true;
-    }
-
-    if (mouse::isDisplayDirty()) {
-    	g_dirty = true;
-    }
-
-    if (isDirty()) {
-        for (int i = 0; i < g_numBuffersToDraw; i++) {
-            int bufferIndex = g_bufferToDrawIndexes[i];
-			if (bufferIndex == -1) {
-				continue;
-			}
-            Buffer &buffer = g_buffers[bufferIndex];
-
-            int sx = buffer.x;
-            int sy = buffer.y;
-
-            int x1 = buffer.x + buffer.xOffset;
-            int y1 = buffer.y + buffer.yOffset;
+        if (buffer.withShadow) {
             int x2 = x1 + buffer.width - 1;
             int y2 = y1 + buffer.height - 1;
-
-            if (buffer.backdrop) {
-                // opacity backdrop
-                auto savedOpacity = setOpacity(CONF_BACKDROP_OPACITY);
-                setColor(COLOR_ID_BACKDROP);
-                fillRect(buffer.backdrop->x, buffer.backdrop->y, buffer.backdrop->x + buffer.backdrop->w - 1, buffer.backdrop->y + buffer.backdrop->h - 1);
-                setOpacity(savedOpacity);
-            }
-
-            // if (x1 < g_dirtyX1) {
-            //     int xd = g_dirtyX1 - x1;
-            //     sx += xd;
-            //     x1 += xd;
-            // }
-
-            // if (y1 < g_dirtyY1) {
-            //     int yd = g_dirtyY1 - y1;
-            //     sy += yd;
-            //     y1 += yd;
-            // }
-
-            // if (x2 > g_dirtyX2) {
-            //     x2 = g_dirtyX2;
-            // }
-
-            // if (y2 > g_dirtyY2) {
-            //     y2 = g_dirtyY2;
-            // }
-
-            bitBlt(buffer.bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
+            drawShadow(x1, y1, x2, y2);
         }
 
-        keyboard::updateDisplay();
-        mouse::updateDisplay();
+        bitBlt(buffer.bufferPointer, nullptr, buffer.x, buffer.y, buffer.width, buffer.height, x1, y1, buffer.opacity);
     }
 
-    g_numBuffersToDraw = 0;
-
-    freeUnusedBuffers();
+	keyboard::updateDisplay();
+    mouse::updateDisplay();
 }
 
-int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
+int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x, int clip_y, int clip_w, int clip_h, gui::font::Font &font) {
     if (textLength == -1) {
         textLength = strlen(text);
     }
@@ -619,7 +462,7 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
     return i;
 }
 
-int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
+int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int clip_x, int clip_y, int clip_w, int clip_h, gui::font::Font &font) {
     if (textLength == -1) {
         textLength = strlen(text);
     }

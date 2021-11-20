@@ -5,7 +5,7 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<macros>
 					<stringMacro name="FW_VER_MAJOR" type="VALUE_TEXT" value="1"/>
-					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="8-alpha2"/>
+					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="8-alpha3"/>
 				</macros>
 				<externalSettings/>
 				<extensions>
@@ -328,6 +328,18 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.35672250" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.803673296"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.2131600345" name="dlog_view.cpp" rcbsApplicability="disable" resourcePath="bb3/psu/dlog_view.cpp" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.540423596.598595692">
+						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.540423596.598595692" name="MCU G++ Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.540423596">
+							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level.1856483293" name="Optimization level" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level.value.o2" valueType="enumerated"/>
+							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.input.cpp.1216249783" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.input.cpp"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.989729384" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1142664046" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1302870293" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
 					<folderInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1838364563" name="/" resourcePath="bb3/dib-dcm220">
 						<toolChain id="com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.exe.debug.450540432" name="MCU ARM GCC" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.exe.debug" unusedChildren="">
 							<option id="com.st.stm32cube.ide.mcu.option.internal.toolchain.type.1357444020.1125038569" name="Internal Toolchain Type" superClass="com.st.stm32cube.ide.mcu.option.internal.toolchain.type.1357444020"/>
@@ -463,8 +475,12 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.1895584942" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.803673296"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.883739836" name="document_simulator.cpp" rcbsApplicability="disable" resourcePath="eez/gui/document_simulator.cpp" toolsToInvoke=""/>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.591334363" name="document_stm32.cpp" rcbsApplicability="disable" resourcePath="eez/gui/document_stm32.cpp" toolsToInvoke=""/>
+					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1038385837" name="widget.cpp" rcbsApplicability="disable" resourcePath="eez/gui/widget.cpp" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.1912636967.1869365840">
+						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.1912636967.1869365840" name="MCU G++ Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.1912636967">
+							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level.1801512706" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level.value.o3" valueType="enumerated"/>
+							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.input.cpp.2024648016" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.input.cpp"/>
+						</tool>
+					</fileInfo>
 					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1936890750" name="function_generator.cpp" rcbsApplicability="disable" resourcePath="eez/function_generator.cpp" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.1236660435.752735025">
 						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.1236660435.752735025" name="MCU G++ Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.1236660435">
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level.368739826" name="Optimization level" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level.value.og" valueType="enumerated"/>
@@ -580,7 +596,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
-						<entry excluding="mcu/simulator" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="bb3"/>
+						<entry excluding="gui/document_stm32.cpp|gui/document_simulator.cpp|mcu/simulator" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="bb3"/>
 						<entry excluding="platform/simulator|libs/mqtt|libs/sd_fat/simulator|libs/image/nanojpeg.c|gui/document_stm32.cpp|gui/document_simulator.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libscpi"/>
 						<entry excluding="ports/bare-arm|lib/utils/gchelper_m3.s|lib/utils/gchelper_m0.s|extmod/virtpin.c|extmod/vfs.c|extmod/vfs_reader.c|extmod/vfs_posix.c|extmod/vfs_posix_file.c|extmod/vfs_lfs.c|extmod/vfs_fat.c|extmod/vfs_fat_file.c|extmod/vfs_fat_diskio.c|extmod/vfs_blockdev.c|extmod/uos_dupterm.c|extmod/modwebrepl.c|extmod/moduzlib.c|extmod/moduwebsocket.c|extmod/modutimeq.c|extmod/modussl_mbedtls.c|extmod/modussl_axtls.c|extmod/moduselect.c|extmod/modure.c|extmod/modurandom.c|extmod/modujson.c|extmod/moduheapq.c|extmod/moduhashlib.c|extmod/moductypes.c|extmod/moducryptolib.c|extmod/modubinascii.c|extmod/modframebuf.c|extmod/modbluetooth.c|extmod/machine_spi.c|extmod/machine_signal.c|extmod/machine_pulse.c|extmod/machine_pinbase.c|extmod/machine_mem.c|extmod/machine_i2c.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
@@ -827,8 +843,6 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.2034025105" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1343602219.587843218.eez/gui/document_simulator.cpp" name="document_simulator.cpp" rcbsApplicability="disable" resourcePath="eez/gui/document_simulator.cpp" toolsToInvoke=""/>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1343602219.587843218.eez/gui/document_stm32.cpp" name="document_stm32.cpp" rcbsApplicability="disable" resourcePath="eez/gui/document_stm32.cpp" toolsToInvoke=""/>
 					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1343602219.587843218.Middlewares/Third_Party/LibJPEG/source/jdmainct.c" name="jdmainct.c" rcbsApplicability="disable" resourcePath="Middlewares/Third_Party/LibJPEG/source/jdmainct.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.348953409">
 						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.348953409" name="MCU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.521987178">
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all.1084392495" name="Enable all warnings about questionable constructions (-Wall)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all" useByScannerDiscovery="false" value="false" valueType="boolean"/>
@@ -1094,8 +1108,6 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.111723323" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1701190242.eez/gui/document_simulator.cpp" name="document_simulator.cpp" rcbsApplicability="disable" resourcePath="eez/gui/document_simulator.cpp" toolsToInvoke=""/>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1701190242.eez/gui/document_stm32.cpp" name="document_stm32.cpp" rcbsApplicability="disable" resourcePath="eez/gui/document_stm32.cpp" toolsToInvoke=""/>
 					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1701190242.Middlewares/Third_Party/LibJPEG/source/jdmainct.c" name="jdmainct.c" rcbsApplicability="disable" resourcePath="Middlewares/Third_Party/LibJPEG/source/jdmainct.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1265084485">
 						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1265084485" name="MCU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1022245657">
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all.1819822775" name="Enable all warnings about questionable constructions (-Wall)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all" useByScannerDiscovery="false" value="false" valueType="boolean"/>

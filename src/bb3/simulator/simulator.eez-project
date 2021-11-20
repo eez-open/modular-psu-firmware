@@ -6,7 +6,7 @@
       "namespace": "",
       "imports": [
         {
-          "projectFilePath": "..\\..\\..\\..\\modular-psu-firmware.eez-project"
+          "projectFilePath": "..\\..\\..\\modular-psu-firmware.eez-project"
         }
       ]
     },
@@ -26,79 +26,85 @@
       "files": []
     }
   },
-  "data": [
-    {
-      "name": "front_panel_slot1_view",
-      "type": "string",
-      "defaultValue": "dcp405_front_panel",
-      "usedIn": [
-        "simulator"
-      ]
-    },
-    {
-      "name": "simulator_load_state",
-      "description": "",
-      "type": "boolean",
-      "defaultValue": "1",
-      "usedIn": [
-        "simulator"
-      ]
-    },
-    {
-      "name": "simulator_load_state2",
-      "description": "",
-      "type": "boolean",
-      "defaultValue": "0",
-      "usedIn": [
-        "simulator"
-      ]
-    },
-    {
-      "name": "simulator_load",
-      "description": "",
-      "type": "float",
-      "defaultValue": "10 ohm",
-      "usedIn": [
-        "simulator"
-      ]
-    },
-    {
-      "name": "simulator_load2",
-      "description": "",
-      "type": "float",
-      "defaultValue": "5 ohm",
-      "usedIn": [
-        "simulator"
-      ]
-    },
-    {
-      "name": "main_app_view",
-      "type": "string",
-      "defaultValue": "sys_settings",
-      "usedIn": [
-        "simulator"
-      ]
-    },
-    {
-      "name": "front_panel_slot2_view",
-      "type": "string",
-      "defaultValue": "dcm220_front_panel",
-      "usedIn": [
-        "simulator"
-      ]
-    },
-    {
-      "name": "front_panel_slot3_view",
-      "defaultValue": "front_panel_empty_slot",
-      "usedIn": [
-        "simulator"
-      ]
-    }
-  ],
+  "variables": {
+    "globalVariables": [
+      {
+        "name": "front_panel_slot1_view",
+        "type": "string",
+        "defaultValue": "dcp405_front_panel",
+        "usedIn": [
+          "simulator"
+        ]
+      },
+      {
+        "name": "simulator_load_state",
+        "description": "",
+        "type": "boolean",
+        "defaultValue": "1",
+        "usedIn": [
+          "simulator"
+        ]
+      },
+      {
+        "name": "simulator_load_state2",
+        "description": "",
+        "type": "boolean",
+        "defaultValue": "0",
+        "usedIn": [
+          "simulator"
+        ]
+      },
+      {
+        "name": "simulator_load",
+        "description": "",
+        "type": "float",
+        "defaultValue": "10 ohm",
+        "usedIn": [
+          "simulator"
+        ]
+      },
+      {
+        "name": "simulator_load2",
+        "description": "",
+        "type": "float",
+        "defaultValue": "5 ohm",
+        "usedIn": [
+          "simulator"
+        ]
+      },
+      {
+        "name": "main_app_view",
+        "type": "string",
+        "defaultValue": "sys_settings",
+        "usedIn": [
+          "simulator"
+        ]
+      },
+      {
+        "name": "front_panel_slot2_view",
+        "type": "string",
+        "defaultValue": "dcm220_front_panel",
+        "usedIn": [
+          "simulator"
+        ]
+      },
+      {
+        "name": "front_panel_slot3_view",
+        "type": "any",
+        "defaultValue": "front_panel_empty_slot",
+        "usedIn": [
+          "simulator"
+        ]
+      }
+    ],
+    "structures": [],
+    "enums": []
+  },
   "actions": [
     {
       "components": [],
       "connectionLines": [],
+      "localVariables": [],
       "name": "front_panel_select_slot1",
       "usedIn": [
         "simulator"
@@ -107,6 +113,7 @@
     {
       "components": [],
       "connectionLines": [],
+      "localVariables": [],
       "name": "front_panel_select_slot2",
       "usedIn": [
         "simulator"
@@ -115,6 +122,7 @@
     {
       "components": [],
       "connectionLines": [],
+      "localVariables": [],
       "name": "front_panel_select_slot3",
       "usedIn": [
         "simulator"
@@ -123,6 +131,7 @@
     {
       "components": [],
       "connectionLines": [],
+      "localVariables": [],
       "name": "simulator_load",
       "usedIn": [
         "simulator"
@@ -139,6 +148,8 @@
           "width": 1396,
           "height": 563,
           "wireID": "cada35ec-cdb1-40db-cca0-d7a4cac33cf8",
+          "customInputs": [],
+          "customOutputs": [],
           "action": "",
           "style": {
             "inheritFrom": "front_panel_default",
@@ -154,6 +165,8 @@
           "width": 168,
           "height": 484,
           "wireID": "24229dba-4e11-4d77-c849-4ce9321b5b22",
+          "customInputs": [],
+          "customOutputs": [],
           "data": "front_panel_slot1_view",
           "style": {
             "inheritFrom": "default"
@@ -168,6 +181,8 @@
           "width": 168,
           "height": 484,
           "wireID": "5a84f860-ba0c-4c54-861f-ed22c07b7784",
+          "customInputs": [],
+          "customOutputs": [],
           "data": "front_panel_slot2_view",
           "style": {
             "inheritFrom": "default"
@@ -182,6 +197,8 @@
           "width": 168,
           "height": 484,
           "wireID": "d3b25b44-e420-402a-fb14-9762d8888362",
+          "customInputs": [],
+          "customOutputs": [],
           "data": "front_panel_slot3_view",
           "style": {
             "inheritFrom": "default"
@@ -196,6 +213,8 @@
           "width": 60,
           "height": 28,
           "wireID": "312b5e50-3d2c-47d5-a3e3-82bca80cb370",
+          "customInputs": [],
+          "customOutputs": [],
           "data": "",
           "action": "front_panel_select_slot1",
           "style": {
@@ -219,6 +238,8 @@
           "width": 60,
           "height": 28,
           "wireID": "65a031b8-5656-4ea4-fdda-48b42f8758c6",
+          "customInputs": [],
+          "customOutputs": [],
           "data": "",
           "action": "front_panel_select_slot2",
           "style": {
@@ -242,6 +263,8 @@
           "width": 60,
           "height": 28,
           "wireID": "fd8b064d-14f1-4647-f327-c119e185bb97",
+          "customInputs": [],
+          "customOutputs": [],
           "data": "",
           "action": "front_panel_select_slot3",
           "style": {
@@ -265,6 +288,8 @@
           "width": 57,
           "height": 57,
           "wireID": "c64c2c4e-7073-4ba1-958b-24f29a3ff495",
+          "customInputs": [],
+          "customOutputs": [],
           "action": "user_switch_clicked",
           "style": {
             "inheritFrom": "default",
@@ -282,6 +307,8 @@
           "width": 480,
           "height": 272,
           "wireID": "f5b45364-803b-499c-8a2b-d1b12c8bdc4a",
+          "customInputs": [],
+          "customOutputs": [],
           "data": "main_app_view",
           "style": {
             "inheritFrom": "default",
@@ -291,6 +318,7 @@
         }
       ],
       "connectionLines": [],
+      "localVariables": [],
       "name": "front_panel",
       "style": "default",
       "usedIn": [
@@ -310,6 +338,8 @@
           "width": 168,
           "height": 484,
           "wireID": "76e83f38-9345-4cd0-c69d-d8436c55a9da",
+          "customInputs": [],
+          "customOutputs": [],
           "style": {
             "inheritFrom": "default",
             "color": "#ffffff",
@@ -321,6 +351,7 @@
         }
       ],
       "connectionLines": [],
+      "localVariables": [],
       "name": "front_panel_empty_slot",
       "usedIn": [
         "simulator"
@@ -339,6 +370,8 @@
           "width": 250,
           "height": 249,
           "wireID": "c94fb549-293f-4a20-958c-94543f7142a8",
+          "customInputs": [],
+          "customOutputs": [],
           "style": {
             "inheritFrom": "default",
             "color": "#62563e",
@@ -352,6 +385,8 @@
           "width": 240,
           "height": 32,
           "wireID": "48269cf4-b15e-4373-b28f-251d326da1e1",
+          "customInputs": [],
+          "customOutputs": [],
           "data": "keypad_text",
           "style": {
             "inheritFrom": "edit_value_S_left",
@@ -369,6 +404,8 @@
           "width": 240,
           "height": 174,
           "wireID": "67a806e3-225e-49df-94a5-f4f144884411",
+          "customInputs": [],
+          "customOutputs": [],
           "style": {
             "inheritFrom": "default",
             "backgroundColor": "#555555",
@@ -382,6 +419,8 @@
               "width": 60,
               "height": 43,
               "wireID": "f2ada73b-a214-4bca-8622-08e9f1383861",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -400,6 +439,8 @@
               "width": 60,
               "height": 43,
               "wireID": "2f7a941a-9407-4e11-9f55-4e06601531c8",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -418,6 +459,8 @@
               "width": 60,
               "height": 43,
               "wireID": "970b08bc-4573-4e3a-fc99-eac3326fa839",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -436,6 +479,8 @@
               "width": 60,
               "height": 43,
               "wireID": "e6831e7b-e78d-404d-b86c-e38f720a22c9",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_back",
               "style": {
                 "inheritFrom": "key_icons",
@@ -454,6 +499,8 @@
               "width": 60,
               "height": 43,
               "wireID": "0db0be29-24f6-42a6-be05-458809b671c3",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -472,6 +519,8 @@
               "width": 60,
               "height": 43,
               "wireID": "fe7fc4df-0383-4981-8bd7-7f15f993d4b0",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -490,6 +539,8 @@
               "width": 60,
               "height": 43,
               "wireID": "f04e5c73-8731-4ab1-8015-4d75128c2530",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -508,6 +559,8 @@
               "width": 60,
               "height": 43,
               "wireID": "7da2a022-4c42-4576-91a9-d77c1d24a333",
+              "customInputs": [],
+              "customOutputs": [],
               "data": "edit_unit",
               "action": "keypad_unit",
               "style": {
@@ -536,6 +589,8 @@
               "width": 60,
               "height": 43,
               "wireID": "8064ae82-7498-4459-94a6-91e260b6e161",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -554,6 +609,8 @@
               "width": 60,
               "height": 43,
               "wireID": "a4c60fbc-c235-43c3-ed08-d66b82051da5",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -572,6 +629,8 @@
               "width": 60,
               "height": 43,
               "wireID": "b68aac0c-c443-456a-e2ab-38a427370df9",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -590,6 +649,8 @@
               "width": 60,
               "height": 43,
               "wireID": "e325d654-d1ce-4f79-9ef7-836e05a2f8d4",
+              "customInputs": [],
+              "customOutputs": [],
               "data": "keypad_option1_text",
               "action": "keypad_option1",
               "style": {
@@ -619,6 +680,8 @@
               "width": 60,
               "height": 43,
               "wireID": "a26e4b51-e311-417c-f000-bbb48ecef8d0",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -637,6 +700,8 @@
               "width": 60,
               "height": 43,
               "wireID": "e1558acf-56b8-4141-cd09-d131f99dea31",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_key",
               "style": {
                 "inheritFrom": "key",
@@ -665,6 +730,8 @@
               "width": 60,
               "height": 43,
               "wireID": "6208efcd-9798-4e27-f11c-a13f64bd0b98",
+              "customInputs": [],
+              "customOutputs": [],
               "action": "keypad_sign",
               "style": {
                 "inheritFrom": "key_icons",
@@ -693,6 +760,8 @@
               "width": 60,
               "height": 43,
               "wireID": "1be1172d-fe71-4681-e68a-6c8a6737e78e",
+              "customInputs": [],
+              "customOutputs": [],
               "data": "keypad_option2_text",
               "action": "keypad_option2",
               "style": {
@@ -724,6 +793,8 @@
           "width": 144,
           "height": 36,
           "wireID": "6b76e3e7-5e5d-4cb9-e3ee-03b85a654660",
+          "customInputs": [],
+          "customOutputs": [],
           "style": {
             "inheritFrom": "bottom_button_background",
             "color": "#f2f0ec",
@@ -737,6 +808,8 @@
           "width": 48,
           "height": 36,
           "wireID": "c6c44c38-bd7a-43a5-b944-cd76c0e0aec2",
+          "customInputs": [],
+          "customOutputs": [],
           "action": "keypad_cancel",
           "style": {
             "inheritFrom": "bottom_button",
@@ -754,6 +827,8 @@
           "width": 48,
           "height": 36,
           "wireID": "757c003c-a5c3-4cba-e564-f00a00abffbc",
+          "customInputs": [],
+          "customOutputs": [],
           "action": "keypad_ok",
           "style": {
             "inheritFrom": "bottom_button",
@@ -766,6 +841,7 @@
         }
       ],
       "connectionLines": [],
+      "localVariables": [],
       "name": "front_panel_numeric_keypad",
       "description": "Enter generic numeric value",
       "style": "",

@@ -10,7 +10,7 @@
         {
             "name": "Cortex Debug",
             "cwd": "${workspaceRoot}",
-            "executable": "./src/third_party/stm32_cubeide/Debug/bb3-v1.8-alpha2.elf",
+            "executable": "./src/third_party/stm32_cubeide/Debug/bb3-v1.8-alpha3.elf",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",

@@ -241,8 +241,6 @@ void stateManagment() {
             g_showLatest = true;
             if (!psu::gui::isPageOnStack(PAGE_ID_DLOG_VIEW)) {
                 gui::showPage(PAGE_ID_DLOG_VIEW);
-            } else {
-                eez::gui::refreshScreen();
             }
 		}
     }
@@ -1373,8 +1371,6 @@ eez_err_t Parameters::enableDlogItem(int slotIndex, int subchannelIndex, int res
 			dlogItems[dlogItemIndex].resourceType = g_slots[slotIndex]->getDlogResourceType(subchannelIndex, resourceIndex);
 
 			numDlogItems++;
-
-			refreshScreen();
 		}
 	} else {
 		if (enabled) {
@@ -1388,8 +1384,6 @@ eez_err_t Parameters::enableDlogItem(int slotIndex, int subchannelIndex, int res
 			dlogItems[numDlogItems].subchannelIndex = 0;
 			dlogItems[numDlogItems].resourceIndex = 0;
 			dlogItems[numDlogItems].resourceType = 0;
-
-			refreshScreen();
 		}
 	}
 
@@ -1648,7 +1642,6 @@ public:
         
         if (scrollPosition != DlogParamsPage::g_scrollPosition) {
             DlogParamsPage::g_scrollPosition = scrollPosition;
-            refreshScreen();
         }
 	}
 

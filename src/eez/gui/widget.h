@@ -99,8 +99,6 @@ struct WidgetCursor {
     const Widget *widget;
     Cursor cursor;
 	int32_t iterators[MAX_ITERATORS];
-    WidgetState *previousState;
-    WidgetState *currentState;
     flow::FlowState *flowState;
     int16_t x;
     int16_t y;
@@ -110,8 +108,6 @@ struct WidgetCursor {
 		, appContext(nullptr)
         , widget(nullptr)
         , cursor(-1)
-        , previousState(nullptr)
-        , currentState(nullptr)
         , flowState(0)
         , x(0)
         , y(0)
@@ -137,8 +133,6 @@ struct WidgetCursor {
 		, appContext(appContext_)
         , widget(widget_)
 		, cursor(cursor_)
-        , previousState(previousState_)
-        , currentState(currentState_)
 		, flowState(flowState)
 		, x(x_)
 		, y(y_)
@@ -159,8 +153,6 @@ struct WidgetCursor {
 		, appContext(nullptr)
 		, widget(nullptr)
 		, cursor(cursor_)
-		, previousState(nullptr)
-		, currentState(nullptr)
 		, flowState(0)
 		, x(0)
 		, y(0) 
@@ -189,8 +181,6 @@ struct WidgetCursor {
     explicit operator bool() const {
         return widget != nullptr;
     }
-
-    void nextState();
 
 	void pushIterator(int32_t it) {
 		for (size_t i = MAX_ITERATORS - 1; i > 0; i--) {

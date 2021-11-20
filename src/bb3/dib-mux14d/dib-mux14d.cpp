@@ -31,7 +31,7 @@
 #include <eez/firmware.h>
 #include <eez/system.h>
 #include <eez/hmi.h>
-#include <eez/gui/document.h>
+#include <bb3/gui/document.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/event_queue.h>
 #include <bb3/psu/profile.h>

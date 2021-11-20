@@ -128,8 +128,6 @@ void doStopScript() {
 	InfoTrace("Script stopped: %s\n", scriptName);
 
 	setStateIdle();
-
-	refreshScreen();
 }
 
 bool stopScript(int *err) {

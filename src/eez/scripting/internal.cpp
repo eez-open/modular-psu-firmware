@@ -34,8 +34,6 @@ void afterScriptCleanup(bool wasException) {
 			psu::gui::showMainPage();
 		}
 	}
-
-	gui::refreshScreen();
 }
 
 } // scripting

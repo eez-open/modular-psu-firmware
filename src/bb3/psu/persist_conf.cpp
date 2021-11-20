@@ -45,7 +45,6 @@
 
 #if OPTION_DISPLAY
 #include <bb3/psu/gui/psu.h>
-using namespace eez::mcu::display;
 #endif
 
 #if OPTION_ETHERNET
@@ -459,8 +458,8 @@ void init() {
     memcpy(&g_savedDevConf, &g_devConf, sizeof(DeviceConfiguration));
 
 #if OPTION_DISPLAY
-    onLuminocityChanged();
-    onThemeChanged();
+	mcu::display::onLuminocityChanged();
+	mcu::display::onThemeChanged();
 #endif
 }
 
@@ -959,7 +958,7 @@ void setDisplayBrightness(uint8_t displayBrightness) {
     g_devConf.displayBrightness = displayBrightness;
 
 #if OPTION_DISPLAY
-    updateBrightness();
+	mcu::display::updateBrightness();
 #endif
 }
 
@@ -967,8 +966,7 @@ void setDisplayBackgroundLuminosityStep(uint8_t displayBackgroundLuminosityStep)
     g_devConf.displayBackgroundLuminosityStep = displayBackgroundLuminosityStep;
 
 #if OPTION_DISPLAY
-    onLuminocityChanged();
-    refreshScreen();
+	mcu::display::onLuminocityChanged();
 #endif
 }
 

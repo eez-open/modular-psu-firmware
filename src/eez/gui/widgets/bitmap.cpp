@@ -37,51 +37,40 @@ EnumFunctionType BITMAP_enum = nullptr;
 DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
 	auto widget = (const BitmapWidget *)widgetCursor.widget;
 
-	widgetCursor.currentState->size = sizeof(WidgetState);
+    auto data = widget->data ? getBitmapImage(widgetCursor.cursor, widget->data) : 0;
 
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = widget->data ? getBitmapImage(widgetCursor.cursor, widget->data) : 0;
+    const Style* style = getStyle(widget->style);
 
-    bool refresh = !widgetCursor.previousState ||
-    		widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-			widgetCursor.currentState->data != widgetCursor.previousState->data;
+    const Bitmap *bitmap = nullptr;
 
-    if (refresh) {
-        const Style* style = getStyle(widget->style);
-
-        const Bitmap *bitmap = nullptr;
-
-        if (widget->data) {
-            if (widgetCursor.currentState->data.getType() != VALUE_TYPE_UNDEFINED) {
-                drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, true, true);
-                auto image = (Image *)widgetCursor.currentState->data.getVoidPointer();
-                if (image) {
-                    drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active);
-                }
-                return;
-            } else {
-                Value valueBitmapId;
-                DATA_OPERATION_FUNCTION(widget->data,  DATA_OPERATION_GET, widgetCursor, valueBitmapId);
-                bitmap = getBitmap(valueBitmapId.getInt());
+    if (widget->data) {
+        if (data.getType() != VALUE_TYPE_UNDEFINED) {
+            drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, g_isActiveWidget, true, true);
+            auto image = (Image *)data.getVoidPointer();
+            if (image) {
+                drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, g_isActiveWidget);
             }
-        } else if (widget->bitmap != 0) {
-            bitmap = getBitmap(widget->bitmap);
+            return;
+        } else {
+            Value valueBitmapId;
+            DATA_OPERATION_FUNCTION(widget->data,  DATA_OPERATION_GET, widgetCursor, valueBitmapId);
+            bitmap = getBitmap(valueBitmapId.getInt());
         }
-
-        if (bitmap) {
-            Image image;
-
-            image.width = bitmap->w;
-            image.height = bitmap->h;
-            image.bpp = bitmap->bpp;
-            image.lineOffset = 0;
-            image.pixels = (uint8_t *)bitmap->pixels;
-
-            drawBitmap(&image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active);
-        }
+    } else if (widget->bitmap != 0) {
+        bitmap = getBitmap(widget->bitmap);
     }
 
-    widgetCursor.currentState->data.freeRef();
+    if (bitmap) {
+        Image image;
+
+        image.width = bitmap->w;
+        image.height = bitmap->h;
+        image.bpp = bitmap->bpp;
+        image.lineOffset = 0;
+        image.pixels = (uint8_t *)bitmap->pixels;
+
+        drawBitmap(&image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, g_isActiveWidget);
+    }
 };
 
 OnTouchFunctionType BITMAP_onTouch = nullptr;

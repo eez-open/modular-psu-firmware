@@ -35,7 +35,6 @@ namespace eez {
 namespace keyboard {
 
 static WidgetCursor g_focusWidgetCursor;
-static WidgetCursor g_lastFocusWidgetCursor;
 
 KeyboardInfo g_keyboardInfo;
 
@@ -44,23 +43,13 @@ static void moveToPreviousFocusCursor();
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool isDisplayDirty() {
-
-    if (g_lastFocusWidgetCursor != g_focusWidgetCursor) {
-        g_lastFocusWidgetCursor = g_focusWidgetCursor;
-    	return true;
-    }
-
-    return false;
-}
-
 void updateDisplay() {
     using namespace gui;
 
-    if (g_lastFocusWidgetCursor) {
+    if (g_focusWidgetCursor) {
         mcu::display::drawFocusFrame(
-            g_lastFocusWidgetCursor.x, g_lastFocusWidgetCursor.y, 
-            g_lastFocusWidgetCursor.widget->w, g_lastFocusWidgetCursor.widget->h
+            g_focusWidgetCursor.x, g_focusWidgetCursor.y, 
+            g_focusWidgetCursor.widget->w, g_focusWidgetCursor.widget->h
         );
     }
 }

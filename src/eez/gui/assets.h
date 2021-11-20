@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/gui/document.h>
+#include <bb3/gui/document.h>
 
 namespace eez {
 namespace gui {

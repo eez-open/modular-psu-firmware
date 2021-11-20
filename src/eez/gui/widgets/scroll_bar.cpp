@@ -93,98 +93,82 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
 DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const ScrollBarWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->size = sizeof(ScrollBarWidgetState);
-    widgetCursor.currentState->flags.active = g_selectedWidget == widgetCursor;
-    widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
+    auto focused = isFocusWidget(widgetCursor);
 
-    auto currentState = (ScrollBarWidgetState *)widgetCursor.currentState;
-    auto previousState = (ScrollBarWidgetState *)widgetCursor.previousState;
+    auto size = getSize(widgetCursor);
+    auto position = getPosition(widgetCursor);
+    auto pageSize = getPageSize(widgetCursor);
+    auto segment = g_segment;
 
-    currentState->size = getSize(widgetCursor);
-    currentState->position = getPosition(widgetCursor);
-    currentState->pageSize = getPageSize(widgetCursor);
-    currentState->segment = g_segment;
+    if (pageSize < size) {
+        const Style *buttonsStyle = getStyle(widget->buttonsStyle);
+        auto isHorizontal = widget->w > widget->h;
 
-    bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
-        previousState->size != currentState->size ||
-        previousState->position != currentState->position ||
-        previousState->pageSize != currentState->pageSize ||
-        previousState->segment != currentState->segment;
+        int buttonSize = isHorizontal ? widget->h : widget->w;
 
-    if (refresh) {
-        if (currentState->pageSize < currentState->size) {
-            const Style *buttonsStyle = getStyle(widget->buttonsStyle);
-            auto isHorizontal = widget->w > widget->h;
+        // draw left button
+        drawText(widget->leftButtonText.ptr(widgetCursor.assets), -1, 
+            widgetCursor.x, 
+            widgetCursor.y, 
+            isHorizontal ? buttonSize : (int)widget->w, 
+            isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
+            segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
 
-            int buttonSize = isHorizontal ? widget->h : widget->w;
+        // draw track
+        int xTrack;
+        int yTrack;
+        int wTrack;
+        int hTrack;
 
-            // draw left button
-            drawText(widget->leftButtonText.ptr(widgetCursor.assets), -1, 
-                widgetCursor.x, 
-                widgetCursor.y, 
-                isHorizontal ? buttonSize : (int)widget->w, 
-                isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
-                currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
-
-            // draw track
-            int xTrack;
-            int yTrack;
-            int wTrack;
-            int hTrack;
-
-            if (isHorizontal) {
-                xTrack = widgetCursor.x + buttonSize;
-                yTrack = widgetCursor.y;
-                wTrack = widget->w - 2 * buttonSize;
-                hTrack = widget->h;
-            } else {
-                xTrack = widgetCursor.x;
-                yTrack = widgetCursor.y + buttonSize;
-                wTrack = widget->w;
-                hTrack = widget->h - 2 * buttonSize;
-            }
-
-            const Style *trackStyle = getStyle(widget->style);
-            display::setColor(trackStyle->color);
-            display::fillRect(xTrack, yTrack, xTrack + wTrack - 1, yTrack + hTrack - 1, 0);
-
-            // draw thumb
-            const Style *thumbStyle = getStyle(widget->thumbStyle);
-            display::setColor(thumbStyle->color);
-            if (isHorizontal) {
-                int xThumb, wThumb;
-                getThumbGeometry(currentState->size, currentState->position, currentState->pageSize, xTrack, wTrack, buttonSize, xThumb, wThumb);
-                display::fillRect(xThumb, yTrack, xThumb + wThumb - 1, yTrack + hTrack - 1);
-            } else {
-                int yThumb, hThumb;
-                getThumbGeometry(currentState->size, currentState->position, currentState->pageSize, yTrack, hTrack, buttonSize, yThumb, hThumb);
-                display::fillRect(xTrack, yThumb, xTrack + wTrack - 1, yThumb + hThumb - 1);
-            }
-
-            // draw right button
-            drawText(widget->rightButtonText.ptr(widgetCursor.assets), -1,
-                isHorizontal ? widgetCursor.x + widget->w - buttonSize : widgetCursor.x, 
-                isHorizontal ? widgetCursor.y : widgetCursor.y + widget->h - buttonSize, 
-                isHorizontal ? buttonSize : (int)widget->w, 
-                isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
-                currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
-
-            auto action = getWidgetAction(widgetCursor);        
-            if (widgetCursor.currentState->flags.focused && action == ACTION_ID_SCROLL) {
-				const Style *style = getStyle(widgetCursor.widget->style);
-                display::setColor(style->focus_color);
-                display::drawRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
-                display::drawRect(widgetCursor.x + 1, widgetCursor.y + 1, widgetCursor.x + widget->w - 2, widgetCursor.y + widget->h - 2);
-            }
+        if (isHorizontal) {
+            xTrack = widgetCursor.x + buttonSize;
+            yTrack = widgetCursor.y;
+            wTrack = widget->w - 2 * buttonSize;
+            hTrack = widget->h;
         } else {
-            // scroll bar is hidden
-            const Style *trackStyle = getStyle(widget->style);
-            display::setColor(trackStyle->color);
-            display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1, 0);
+            xTrack = widgetCursor.x;
+            yTrack = widgetCursor.y + buttonSize;
+            wTrack = widget->w;
+            hTrack = widget->h - 2 * buttonSize;
         }
+
+        const Style *trackStyle = getStyle(widget->style);
+        display::setColor(trackStyle->color);
+        display::fillRect(xTrack, yTrack, wTrack, hTrack, 0);
+
+        // draw thumb
+        const Style *thumbStyle = getStyle(widget->thumbStyle);
+        display::setColor(thumbStyle->color);
+        if (isHorizontal) {
+            int xThumb, wThumb;
+            getThumbGeometry(size, position, pageSize, xTrack, wTrack, buttonSize, xThumb, wThumb);
+            display::fillRect(xThumb, yTrack, wThumb, hTrack);
+        } else {
+            int yThumb, hThumb;
+            getThumbGeometry(size, position, pageSize, yTrack, hTrack, buttonSize, yThumb, hThumb);
+            display::fillRect(xTrack, yThumb, wTrack, hThumb);
+        }
+
+        // draw right button
+        drawText(widget->rightButtonText.ptr(widgetCursor.assets), -1,
+            isHorizontal ? widgetCursor.x + widget->w - buttonSize : widgetCursor.x, 
+            isHorizontal ? widgetCursor.y : widgetCursor.y + widget->h - buttonSize, 
+            isHorizontal ? buttonSize : (int)widget->w, 
+            isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
+            segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
+
+        auto action = getWidgetAction(widgetCursor);        
+        if (focused && action == ACTION_ID_SCROLL) {
+            const Style *style = getStyle(widgetCursor.widget->style);
+            display::setColor(style->focus_color);
+            display::drawRect(widgetCursor.x, widgetCursor.y, widget->w, widget->h);
+            display::drawRect(widgetCursor.x + 1, widgetCursor.y + 1, widget->w - 2, widget->h - 2);
+        }
+    } else {
+        // scroll bar is hidden
+        const Style *trackStyle = getStyle(widget->style);
+        display::setColor(trackStyle->color);
+        display::fillRect(widgetCursor.x, widgetCursor.y, widget->w, widget->h, 0);
     }
 };
 

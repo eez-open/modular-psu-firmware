@@ -31,48 +31,32 @@ EnumFunctionType BUTTON_enum = nullptr;
 DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const ButtonWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
-    auto enabled = get(widgetCursor, widget->enabled);
-    widgetCursor.currentState->flags.enabled = enabled.getType() == VALUE_TYPE_UNDEFINED  || get(widgetCursor, widget->enabled).getInt() ? 1 : 0;
+    auto enabledValue = get(widgetCursor, widget->enabled);
+    auto enabled = enabledValue.getType() == VALUE_TYPE_UNDEFINED || enabledValue.getInt() ? 1 : 0;
 
-    const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : widget->disabledStyle);
+    const Style *style = getStyle(enabled ? widget->style : widget->disabledStyle);
 
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style));
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = widget->data ? get(widgetCursor, widget->data) : 0;
-
-    bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->flags.enabled != widgetCursor.currentState->flags.enabled ||
-        widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data;
+    auto blinking = g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style));
+    auto data = widget->data ? get(widgetCursor, widget->data) : 0;
 
 	static const size_t MAX_TEXT_LEN = 128;
 
-    if (refresh) {
-        if (widget->data) {
-            if (widgetCursor.currentState->data.isString()) {
-                drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
-                         widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                         widgetCursor.currentState->flags.active,
-                         widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
-            } else {
-				char text[MAX_TEXT_LEN + 1];
-				widgetCursor.currentState->data.toText(text, sizeof(text));
-
-                drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                         style, widgetCursor.currentState->flags.active,
-                         widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
-            }
+    if (widget->data) {
+        if (data.isString()) {
+            drawText(data.getString(), -1, widgetCursor.x,
+				widgetCursor.y, (int)widget->w, (int)widget->h, style,
+				g_isActiveWidget,blinking, false, nullptr, nullptr, nullptr, nullptr);
         } else {
-            drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                     style, widgetCursor.currentState->flags.active,
-                     widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
-        }
-    }
+            char text[MAX_TEXT_LEN + 1];
+            data.toText(text, sizeof(text));
 
-    widgetCursor.currentState->data.freeRef();
+            drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                style, g_isActiveWidget, blinking, false, nullptr, nullptr, nullptr, nullptr);
+        }
+    } else {
+        drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            style, g_isActiveWidget, blinking, false, nullptr, nullptr, nullptr, nullptr);
+    }
 };
 
 OnTouchFunctionType BUTTON_onTouch = nullptr;
