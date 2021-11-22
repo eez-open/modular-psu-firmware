@@ -1434,15 +1434,15 @@ void SysSettingsRampAndDelayPage::drawRamp(const WidgetCursor &widgetCursor, int
     mcu::display::setColor(COLOR_ID_CHANNEL1);
     g_channelIndex = tmp;
 
-    mcu::display::drawHLine(x1, y1, x2 - x1 + 1);
+    mcu::display::drawHLine(x1, y1, x2 - x1);
     drawLine(x2, y1, x3, y2);
-    mcu::display::drawHLine(x3, y2, x4 - x3 + 1);
+    mcu::display::drawHLine(x3, y2, x4 - x3);
 
     if (yOffset) {
         int textWidth = mcu::display::measureStr(label, -1, font, 0);
         mcu::display::drawStr(label, -1,
             x4 - textWidth, y2 - textHeight > widgetCursor.y ? y2 - textHeight : y2,
-            widgetCursor.x, widgetCursor.y, widget->w, widget->h,
+            widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1,
             font, -1
         );
     }

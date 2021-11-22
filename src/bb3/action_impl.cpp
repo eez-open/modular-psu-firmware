@@ -1076,6 +1076,7 @@ void onSetSelectedThemeIndex(uint16_t value) {
     popPage();
 	persist_conf::setSelectedThemeIndex((uint8_t)value);
     mcu::display::onThemeChanged();
+	refreshScreen();
 }
 
 void action_select_theme() {
@@ -1137,6 +1138,7 @@ void action_user_switch_clicked() {
                 popPage();
             }
             psu::gui::edit_mode_step::switchToNextEncoderMode();
+			refreshScreen();
         }
 #endif
         break;
@@ -1479,6 +1481,8 @@ void action_show_prev_channel_in_max_view() {
 		action_show_prev_channel_in_max_view();
 		return;
 	}
+
+    refreshScreen();
     
     animateSlideRight();
 }
@@ -1503,6 +1507,8 @@ void action_show_next_channel_in_max_view() {
 		action_show_next_channel_in_max_view();
 		return;
 	}
+
+    refreshScreen();
 
     animateSlideLeft();
 }

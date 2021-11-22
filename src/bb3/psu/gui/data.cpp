@@ -4069,12 +4069,14 @@ void data_ethernet_dhcp(DataOperationEnum operation, const WidgetCursor &widgetC
 
 void data_ethernet_mac(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 #if OPTION_ETHERNET
+    static uint8_t s_macAddressData[2][6];
+
     if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetPage *page =
             (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
-            static uint8_t macAddress[6];
-            memcpy(&macAddress, page->m_macAddress, 6);
+            uint8_t *macAddress = &s_macAddressData[getCurrentStateBufferIndex()][0];
+            memcpy(macAddress, page->m_macAddress, 6);
             value = MakeMacAddressValue(macAddress);
         }
     }

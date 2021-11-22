@@ -30,38 +30,47 @@ EnumFunctionType PROGRESS_enum = nullptr;
 DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = widgetCursor.widget;
 
-    auto data = get(widgetCursor, widget->data);
+    widgetCursor.currentState->size = sizeof(WidgetState);
 
-    const Style* style = getStyle(widget->style);
+    widgetCursor.currentState->data.clear();
+    widgetCursor.currentState->data = get(widgetCursor, widget->data);
 
-    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
+    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != widgetCursor.currentState->data;
 
-    int percentFrom;
-    int percentTo;
-    if (data.getType() == VALUE_TYPE_RANGE) {
-        percentFrom = data.getRangeFrom();
-        percentTo = data.getRangeTo();
-    } else {
-        percentFrom = 0;
-        percentTo = data.getInt();
+    if (refresh) {
+        const Style* style = getStyle(widget->style);
+
+        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
+
+        int percentFrom;
+        int percentTo;
+        if (widgetCursor.currentState->data.getType() == VALUE_TYPE_RANGE) {
+            percentFrom = widgetCursor.currentState->data.getRangeFrom();
+            percentTo = widgetCursor.currentState->data.getRangeTo();
+        } else {
+            percentFrom = 0;
+            percentTo = widgetCursor.currentState->data.getInt();
+        }
+
+		percentFrom = clamp(percentFrom, 0, 100.0f);
+		percentTo = clamp(percentTo, 0, 100.0f);
+		if (percentFrom > percentTo) {
+			percentFrom = percentTo;
+		}
+
+        auto isHorizontal = widget->w > widget->h;
+        if (isHorizontal) {
+            auto xFrom = percentFrom * widget->w / 100;
+            auto xTo = percentTo * widget->w / 100;
+            drawRectangle(widgetCursor.x + xFrom, widgetCursor.y, xTo - xFrom, (int)widget->h, style, true, false, true);
+        } else {
+            auto yFrom = percentFrom * widget->h / 100;
+            auto yTo = percentTo * widget->h / 100;
+            drawRectangle(widgetCursor.x, widgetCursor.y - yFrom, yTo - yFrom, (int)widget->h, getStyle(widget->style), true, false, true);
+        }
     }
 
-    percentFrom = clamp(percentFrom, 0, 100.0f);
-    percentTo = clamp(percentTo, 0, 100.0f);
-    if (percentFrom > percentTo) {
-        percentFrom = percentTo;
-    }
-
-    auto isHorizontal = widget->w > widget->h;
-    if (isHorizontal) {
-        auto xFrom = percentFrom * widget->w / 100;
-        auto xTo = percentTo * widget->w / 100;
-        drawRectangle(widgetCursor.x + xFrom, widgetCursor.y, xTo - xFrom, (int)widget->h, style, true, false, true);
-    } else {
-        auto yFrom = percentFrom * widget->h / 100;
-        auto yTo = percentTo * widget->h / 100;
-        drawRectangle(widgetCursor.x, widgetCursor.y - yFrom, yTo - yFrom, (int)widget->h, getStyle(widget->style), true, false, true);
-    }
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType PROGRESS_onTouch = nullptr;

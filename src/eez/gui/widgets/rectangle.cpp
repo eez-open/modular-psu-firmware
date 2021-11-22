@@ -29,15 +29,20 @@ namespace gui {
 EnumFunctionType RECTANGLE_enum = nullptr;
 
 DrawFunctionType RECTANGLE_draw = [](const WidgetCursor &widgetCursor) {
-    auto widget = (const RectangleWidget *)widgetCursor.widget;
-    const Style* style = getStyle(widget->style);
-    drawRectangle(
-        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-        style, 
-		g_isActiveWidget,
-        widget->flags.ignoreLuminosity,
-        widget->flags.invertColors
-	);
+    widgetCursor.currentState->size = sizeof(WidgetState);
+
+    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->flags.active !=widgetCursor.currentState->flags.active;
+
+    if (refresh) {
+        auto widget = (const RectangleWidget *)widgetCursor.widget;
+        const Style* style = getStyle(widget->style);
+        drawRectangle(
+            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            style, 
+            widgetCursor.currentState->flags.active, 
+			widget->flags.ignoreLuminosity,
+			widget->flags.invertColors);
+    }
 };
 
 OnTouchFunctionType RECTANGLE_onTouch = nullptr;

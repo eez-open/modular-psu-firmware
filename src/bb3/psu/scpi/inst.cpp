@@ -301,6 +301,10 @@ scpi_result_t scpi_cmd_instrumentDisplayScale(scpi_t *context) {
 
     channel_dispatcher::setDisplayViewSettings(*channel, displayValues, channel->ytViewRate);
 
+#if OPTION_DISPLAY
+	gui::refreshScreen();
+#endif
+
     return SCPI_RES_OK;
 }
 

@@ -39,27 +39,34 @@ EnumFunctionType APP_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallb
 		enumWidgets(widgetCursor, callback);
     }
 
+    if (widgetCursor.currentState) {
+        savedWidgetCursor.currentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedWidgetCursor.currentState);
+    }
+
     widgetCursor = savedWidgetCursor;
 };
 
 DrawFunctionType APP_VIEW_draw = [](const WidgetCursor &widgetCursor) {
+    widgetCursor.currentState->size = sizeof(WidgetState);
+
     Value appContextValue;
     DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
 
-    appContext->rect.x = widgetCursor.x;
-    appContext->rect.y = widgetCursor.y;
-    appContext->rect.w = widgetCursor.widget->w;
-    appContext->rect.h = widgetCursor.widget->h;
+    bool refresh = !widgetCursor.previousState;
+    if (refresh && !appContext->isActivePageInternal() && appContext->getActivePageId() != PAGE_ID_NONE) {
+        appContext->rect.x = widgetCursor.x;
+        appContext->rect.y = widgetCursor.y;
+        appContext->rect.w = widgetCursor.widget->w;
+        appContext->rect.h = widgetCursor.widget->h;
 
-    // clear background
-    if (!appContext->isActivePageInternal() && appContext->getActivePageId() != PAGE_ID_NONE) {
-        auto page = getPageAsset(appContext->getActivePageId());
-		const Style* style = getStyle(page->style);
-		mcu::display::setColor(style->background_color);
+        // clear background
+		auto page = getPageAsset(appContext->getActivePageId());
+        const Style* style = getStyle(page->style);
+        mcu::display::setColor(style->background_color);
 
-		mcu::display::fillRect(appContext->rect.x, appContext->rect.y, page->w, page->h);
-	}
+		mcu::display::fillRect(appContext->rect.x, appContext->rect.y, appContext->rect.x + page->w - 1, appContext->rect.y + page->h - 1);
+    }
 };
 
 OnTouchFunctionType APP_VIEW_onTouch = nullptr;

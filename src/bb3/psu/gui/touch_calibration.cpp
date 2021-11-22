@@ -35,6 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using namespace eez::gui::touch;
+using namespace eez::mcu::display;
 
 namespace eez {
 namespace psu {
@@ -54,7 +55,7 @@ bool isTouchCalibrated() {
         persist_conf::devConf.touchScreenCalTlx, persist_conf::devConf.touchScreenCalTly,
         persist_conf::devConf.touchScreenCalBrx, persist_conf::devConf.touchScreenCalBry,
         persist_conf::devConf.touchScreenCalTrx, persist_conf::devConf.touchScreenCalTry,
-        CONF_GUI_TOUCH_CALIBRATION_M, mcu::display::getDisplayWidth(), mcu::display::getDisplayHeight());
+        CONF_GUI_TOUCH_CALIBRATION_M, getDisplayWidth(), getDisplayHeight());
     return success;
 }
 
@@ -111,7 +112,7 @@ void selectTouchCalibrationPoint() {
 
         bool success = touch::calibrateTransform(
             g_points[0].x, g_points[0].y, g_points[1].x, g_points[1].y, g_points[2].x,
-            g_points[2].y, CONF_GUI_TOUCH_CALIBRATION_M, mcu::display::getDisplayWidth(), mcu::display::getDisplayHeight());
+            g_points[2].y, CONF_GUI_TOUCH_CALIBRATION_M, getDisplayWidth(), getDisplayHeight());
 
         if (success) {
             yesNoDialog(

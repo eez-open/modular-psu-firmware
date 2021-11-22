@@ -660,9 +660,9 @@ public:
 				mcu::display::drawPixel(xNext, yNext1);
 			} else {
 				if (yNext1 < yNext2) {
-					mcu::display::drawVLine(xNext, yNext1, yNext2 - yNext1);
+					mcu::display::drawVLine(xNext, yNext1, yNext2 - yNext1 - 1);
 				} else {
-					mcu::display::drawVLine(xNext, yNext2, yNext1 - yNext2);
+					mcu::display::drawVLine(xNext, yNext2, yNext1 - yNext2 - 1);
 				}
 			}
 
@@ -682,12 +682,12 @@ public:
 			int y2 = y1 + textHeight - 1;
 
 			mcu::display::setColor(style->background_color);
-			mcu::display::fillRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+			mcu::display::fillRect(x1, y1, x2, y2);
 
 			mcu::display::setColor(COLOR_ID_CHANNEL1);
 			mcu::display::drawStr(label, -1,
 				x1, y1,
-				widgetCursor.x, widgetCursor.y, widget->w, widget->h,
+				widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1,
 				font, -1
 			);
 		}
@@ -710,6 +710,7 @@ public:
 		
 		if (scrollPosition != m_scrollPosition) {
 			m_scrollPosition = scrollPosition;
+			//refreshScreen();
 		}
 	}
 
@@ -850,6 +851,7 @@ public:
 		
 		if (scrollPosition != m_scrollPosition) {
 			m_scrollPosition = scrollPosition;
+			refreshScreen();
 		}
 	}
 
@@ -1107,6 +1109,8 @@ bool addChannelWaveformParameters(int slotIndex, int subchannelIndex, int resour
 
 	g_selectedResources.m_numResources++;
 
+	gui::refreshScreen();
+
 	return true;
 }
 
@@ -1126,10 +1130,14 @@ void removeChannelWaveformParameters(int slotIndex, int subchannelIndex, int res
 	}
 
 	g_selectedResources.m_numResources--;
+
+	gui::refreshScreen();
 }
 
 void removeAllChannels() {
 	g_selectedResources.m_numResources = 0;
+
+	gui::refreshScreen();
 }
 
 void removePowerChannels() {
@@ -3034,6 +3042,7 @@ void data_function_generator_preview_period(DataOperationEnum operation, const W
 		eez::psu::gui::edit_mode_step::g_functionGeneratorPreviewPeriodEncoderMode = (EncoderMode)value.getInt();
 	} else if (operation == DATA_OPERATION_SET) {
 		g_previewPeriod = value.getFloat();
+		refreshScreen();
 	}
 }
 
@@ -3061,6 +3070,7 @@ void action_function_generator_preview_period_zoom_in() {
 	for (unsigned i = sizeof(g_previewPeriodZoomLevels) / sizeof(float) - 1; i >= 0; i--) {
 		if (g_previewPeriod > g_previewPeriodZoomLevels[i]) {
 			g_previewPeriod = g_previewPeriodZoomLevels[i];
+			refreshScreen();
 			break;
 		}
 	}
@@ -3070,6 +3080,7 @@ void action_function_generator_preview_period_zoom_out() {
 	for (unsigned i = 0; i < sizeof(g_previewPeriodZoomLevels) / sizeof(float); i++) {
 		if (g_previewPeriod < g_previewPeriodZoomLevels[i]) {
 			g_previewPeriod = g_previewPeriodZoomLevels[i];
+			refreshScreen();
 			break;
 		}
 	}

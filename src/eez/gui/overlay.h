@@ -62,7 +62,7 @@ struct Overlay {
 
 bool isOverlay(const WidgetCursor &widgetCursor);
 Overlay *getOverlay(const WidgetCursor &widgetCursor);
-void getOverlayOffset(const WidgetCursor &widgetCursor, int &xOffset, int &yOffset);
+void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset);
 void dragOverlay(Event &touchEvent);
 void overlayEnumWidgetHook(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
 

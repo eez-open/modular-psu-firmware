@@ -26,12 +26,12 @@
 #include <eez/platform/stm32/spi.h>
 #endif
 
-#include <eez/debug.h>
-#include <eez/firmware.h>
+#include "eez/debug.h"
+#include "eez/firmware.h"
 #include <eez/system.h>
-#include <eez/hmi.h>
-#include <eez/util.h>
-#include <bb3/gui/document.h>
+#include "eez/hmi.h"
+#include "eez/util.h"
+#include "eez/gui/document.h"
 #include <bb3/psu/timer.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/profile.h>
@@ -1944,6 +1944,8 @@ void action_dib_smx46_clear_all_labels() {
             module->rowLabels[i][2] = 0;
         }
     }
+
+    refreshScreen();
 }
 
 void action_dib_smx46_change_subchannel_label() {

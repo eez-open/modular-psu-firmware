@@ -112,6 +112,8 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
         mouse::onMouseButtonUp(param);
     } else if (type == GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED) {
         mouse::onMouseDisconnected();
+    } else if (type == GUI_QUEUE_MESSAGE_REFRESH_SCREEN) {
+        refreshScreen();
     } else if (type == GUI_QUEUE_MESSAGE_FLOW_START) {
         scripting::startFlowScript();
     } else if (type == GUI_QUEUE_MESSAGE_FLOW_STOP) {
@@ -180,9 +182,9 @@ void oneIter() {
     stateManagmentHook();
 
     if (mcu::display::isOn()) {
-        mcu::display::beginDrawing();
+        mcu::display::beginBuffersDrawing();
         updateScreen();
-        mcu::display::endDrawing();
+        mcu::display::endBuffersDrawing();
     }
 
     scripting::flowTick();
@@ -241,6 +243,8 @@ void executeAction(int actionId) {
     executeAction(widgetCursor, actionId);
 }
 ////////////////////////////////////////////////////////////////////////////////
+
+using namespace mcu::display;
 
 AnimationState g_animationState;
 static bool g_animationStateDirection;
@@ -349,8 +353,8 @@ void animateOpenCloseCallback(float t, void *bufferOld, void *bufferNew, void *b
         }
     }
 
-	mcu::display::bitBlt(bufferOld, bufferDst, 0, 0, mcu::display::getDisplayWidth(), mcu::display::getDisplayHeight());
-	mcu::display::bitBlt(bufferNew, bufferDst, x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+    bitBlt(bufferOld, bufferDst, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
+    bitBlt(bufferNew, bufferDst, x1, y1, x2, y2);
 }
 
 void animate(Buffer startBuffer, void(*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst), float duration = -1) {
@@ -386,8 +390,7 @@ static int g_numRects;
 AnimRect g_animRects[MAX_ANIM_RECTS];
 
 void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst) {
-	mcu::display::bitBlt(g_animationState.startBuffer == BUFFER_OLD ? bufferOld : bufferNew, bufferDst,
-		0, 0, mcu::display::getDisplayWidth(), mcu::display::getDisplayHeight());
+    bitBlt(g_animationState.startBuffer == BUFFER_OLD ? bufferOld : bufferNew, bufferDst, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
 
     float t1 = g_animationState.easingRects(t, 0, 0, 1, 1); // rects
     float t2 = g_animationState.easingOpacity(t, 0, 0, 1, 1); // opacity
@@ -434,8 +437,8 @@ void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst
         }
 
         if (animRect.buffer == BUFFER_SOLID_COLOR) {
-            auto savedOpacity = mcu::display::setOpacity(opacity);
-			mcu::display::setColor(animRect.color);
+            auto savedOpacity = setOpacity(opacity);
+            setColor(animRect.color);
 
             // clip
             if (x < g_clipRect.x) {
@@ -456,9 +459,9 @@ void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst
                 h -= (y + h) - (g_clipRect.y + g_clipRect.y);
             }
 
-			mcu::display::fillRect(bufferDst, x, y, w, h);
+            fillRect(bufferDst, x, y, x + w - 1, y + h - 1);
 
-			mcu::display::setOpacity(savedOpacity);
+            setOpacity(savedOpacity);
         } else {
             void *buffer = animRect.buffer == BUFFER_OLD ? bufferOld : bufferNew;
             Rect &srcRect = animRect.buffer == BUFFER_OLD ? animRect.srcRect : animRect.dstRect;
@@ -560,7 +563,7 @@ void animateRectsStep(float t, void *bufferOld, void *bufferNew, void *bufferDst
                 sy -= (sy + sh) - (g_clipRect.y + g_clipRect.h);
             }
 
-			mcu::display::bitBlt(buffer, bufferDst, sx, sy, sw, sh, dx, dy, opacity);
+            bitBlt(buffer, bufferDst, sx, sy, sw, sh, dx, dy, opacity);
         }
     }
 }

@@ -35,16 +35,25 @@ EnumFunctionType TOGGLE_BUTTON_enum = nullptr;
 DrawFunctionType TOGGLE_BUTTON_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
 
-    auto enabled = get(widgetCursor, widget->data).getInt() ? 1 : 0;
+    widgetCursor.currentState->size = sizeof(WidgetState);
+    widgetCursor.currentState->flags.enabled =
+        get(widgetCursor, widget->data).getInt() ? 1 : 0;
 
-    const Style* style = getStyle(widget->style);
-    drawText(
-        enabled ? 
-            widget->text2.ptr(widgetCursor.assets): 
-            widget->text1.ptr(widgetCursor.assets),
-        -1,
-        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-		style, g_isActiveWidget, false, false, nullptr, nullptr, nullptr, nullptr);
+    bool refresh =
+        !widgetCursor.previousState ||
+        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
+        widgetCursor.previousState->flags.enabled != widgetCursor.currentState->flags.enabled;
+
+    if (refresh) {
+        const Style* style = getStyle(widget->style);
+        drawText(
+            widgetCursor.currentState->flags.enabled ? 
+                widget->text2.ptr(widgetCursor.assets): 
+                widget->text1.ptr(widgetCursor.assets),
+            -1,
+			widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
+            widgetCursor.currentState->flags.active, false, false, nullptr, nullptr, nullptr, nullptr);
+    }
 };
 
 OnTouchFunctionType TOGGLE_BUTTON_onTouch = nullptr;

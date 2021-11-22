@@ -33,6 +33,14 @@ struct ListWidget : public Widget {
 };
 
 EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+	auto savedCurrentState = widgetCursor.currentState;
+	auto savedPreviousState = widgetCursor.previousState;
+	
+    WidgetState *endOfContainerInPreviousState = 0;
+    if (widgetCursor.previousState) {
+        endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
+    }
+
     auto savedWidget = widgetCursor.widget;
 
     auto parentWidget = savedWidget;
@@ -40,6 +48,24 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
     auto listWidget = (const ListWidget *)widgetCursor.widget;
 
     int startPosition = ytDataGetPosition(widgetCursor, widgetCursor.widget->data);
+
+    // refresh when startPosition changes
+    if (widgetCursor.currentState) {
+        widgetCursor.currentState->data.clear();
+		widgetCursor.currentState->data = startPosition;
+
+        if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
+            widgetCursor.previousState = 0;
+        }
+    }
+
+	// move to the first child widget state
+	if (widgetCursor.previousState) {
+		++widgetCursor.previousState;
+	}
+	if (widgetCursor.currentState) {
+		++widgetCursor.currentState;
+	}
 
     const Widget *childWidget = listWidget->itemWidget.ptr(widgetCursor.assets);
     widgetCursor.widget = childWidget;
@@ -78,6 +104,17 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
                 break;
             }
         }
+
+        if (widgetCursor.previousState) {
+			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+            if (widgetCursor.previousState > endOfContainerInPreviousState) {
+				widgetCursor.previousState = 0;
+            }
+        }
+
+        if (widgetCursor.currentState) {
+			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+        }
     }
 
 	widgetCursor.x = savedX;
@@ -87,8 +124,19 @@ EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
     widgetCursor.widget = savedWidget;
 
+    if (widgetCursor.currentState) {
+        savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
+    }
+
     if (count > 0) {
         deselect(widgetCursor, widgetCursor.widget->data, oldValue);
+    }
+
+	widgetCursor.currentState = savedCurrentState;
+	widgetCursor.previousState = savedPreviousState;
+
+    if (widgetCursor.currentState) {
+        widgetCursor.currentState->data.freeRef();
     }
 };
 

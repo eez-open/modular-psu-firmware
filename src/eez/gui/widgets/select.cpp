@@ -29,7 +29,27 @@ struct SelectWidget : public Widget {
 };
 
 EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+	auto savedCurrentState = widgetCursor.currentState;
+	auto savedPreviousState = widgetCursor.previousState;
+
     Value indexValue = get(widgetCursor, widgetCursor.widget->data);
+
+    if (widgetCursor.currentState) {
+		widgetCursor.currentState->data.clear();
+		widgetCursor.currentState->data = indexValue;
+
+        if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
+            widgetCursor.previousState = 0;
+        }
+    }
+
+    // move to the selected widget state
+    if (widgetCursor.previousState) {
+        ++widgetCursor.previousState;
+    }
+    if (widgetCursor.currentState) {
+        ++widgetCursor.currentState;
+    }
 
     auto savedWidget = widgetCursor.widget;
 
@@ -42,6 +62,17 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
     }
 
     widgetCursor.widget = savedWidget;
+
+	if (widgetCursor.currentState) {
+		savedCurrentState->size = sizeof(WidgetState) + widgetCursor.currentState->size;
+	}
+
+	widgetCursor.currentState = savedCurrentState;
+	widgetCursor.previousState = savedPreviousState;
+
+	if (widgetCursor.currentState) {
+		widgetCursor.currentState->data.freeRef();
+	}
 };
 
 DrawFunctionType SELECT_draw = nullptr;

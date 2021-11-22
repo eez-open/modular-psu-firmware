@@ -16,7 +16,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 endif()
 
 add_definitions(-DFIRMWARE_VERSION_MAJOR=1)
-add_definitions(-DFIRMWARE_VERSION_MINOR=8-alpha3)
+add_definitions(-DFIRMWARE_VERSION_MINOR=8-alpha2)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[png]'")
@@ -287,6 +287,7 @@ set(src_eez_gui
     src/eez/gui/app_context.cpp
     src/eez/gui/assets.cpp
     src/eez/gui/data.cpp
+    src/eez/gui/document.cpp
     src/eez/gui/draw.cpp
     src/eez/gui/event.cpp
     src/eez/gui/font.cpp
@@ -304,6 +305,9 @@ set(header_eez_gui
     src/eez/gui/app_context.h
     src/eez/gui/assets.h
     src/eez/gui/data.h
+    src/eez/gui/document.h
+    src/eez/gui/document_simulator.h
+    src/eez/gui/document_stm32.h
     src/eez/gui/draw.h
     src/eez/gui/event.h
     src/eez/gui/font.h
@@ -470,7 +474,6 @@ list (APPEND src_files ${src_bb3_mcu})
 set(header_bb3_mcu
     src/bb3/mcu/battery.h
     src/bb3/mcu/display.h
-    src/bb3/mcu/display-private.h
     src/bb3/mcu/eeprom.h
     src/bb3/mcu/encoder.h
     src/bb3/mcu/ethernet.h
@@ -576,19 +579,6 @@ set(header_eez_platform_simulator
 ) 
 list (APPEND header_files ${header_eez_platform_simulator})
 source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator} ${header_eez_platform_simulator})
-
-
-set(src_bb3_gui
-    src/bb3/gui/document.cpp
-)
-list (APPEND src_files ${src_bb3_gui})
-set(header_bb3_gui
-    src/bb3/gui/document.h
-    src/bb3/gui/document_simulator.h
-    src/bb3/gui/document_stm32.h
-)
-list (APPEND header_files ${header_bb3_gui})
-source_group("eez\\gui" FILES ${src_bb3_gui} ${header_bb3_gui})
 
 set(src_bb3_scpi
     src/bb3/scpi/regs.cpp

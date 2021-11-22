@@ -36,33 +36,43 @@ EnumFunctionType MULTILINE_TEXT_enum = nullptr;
 DrawFunctionType MULTILINE_TEXT_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const MultilineTextWidget *)widgetCursor.widget;
 
-    auto data = widget->data ? get(widgetCursor, widget->data) : 0;
+    widgetCursor.currentState->size = sizeof(WidgetState);
+	widgetCursor.currentState->data.clear();
+    widgetCursor.currentState->data =
+        widget->data ? get(widgetCursor, widget->data) : 0;
 
-    const Style* style = getStyle(widget->style);
+    bool refresh =
+        !widgetCursor.previousState ||
+        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
+        widgetCursor.previousState->data != widgetCursor.currentState->data;
 
-    if (widget->data) {
-        if (data.isString()) {
-            drawMultilineText(
-				data.getString(),
-				widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, 
-				style, g_isActiveWidget, widget->firstLineIndent, widget->hangingIndent
-			);
+    if (refresh) {
+        const Style* style = getStyle(widget->style);
+
+        if (widget->data) {
+            if (widgetCursor.currentState->data.isString()) {
+                drawMultilineText(widgetCursor.currentState->data.getString(), widgetCursor.x,
+                    widgetCursor.y, (int)widget->w, (int)widget->h, style,
+                    widgetCursor.currentState->flags.active,
+                    widget->firstLineIndent, widget->hangingIndent);
+            } else {
+                char text[64];
+                widgetCursor.currentState->data.toText(text, sizeof(text));
+                drawMultilineText(text, widgetCursor.x, widgetCursor.y, (int)widget->w,
+                    (int)widget->h, style,
+                    widgetCursor.currentState->flags.active,
+                    widget->firstLineIndent, widget->hangingIndent);
+            }
         } else {
-            char text[64];
-            data.toText(text, sizeof(text));
             drawMultilineText(
-				text,
-				widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-				style, g_isActiveWidget, widget->firstLineIndent, widget->hangingIndent
-			);
+                widget->text.ptr(widgetCursor.assets), 
+                widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                style, widgetCursor.currentState->flags.active,
+                widget->firstLineIndent, widget->hangingIndent);
         }
-    } else {
-        drawMultilineText(
-            widget->text.ptr(widgetCursor.assets),
-			widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-            style, g_isActiveWidget, widget->firstLineIndent, widget->hangingIndent
-		);
     }
+
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType MULTILINE_TEXT_onTouch = nullptr;

@@ -40,6 +40,10 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
 
 	auto layoutView = (const LayoutViewWidget *)widgetCursor.widget;
 
+    if (widgetCursor.previousState && (widgetCursor.previousState->data != widgetCursor.currentState->data || ((LayoutViewWidgetState *)widgetCursor.previousState)->context != ((LayoutViewWidgetState *)widgetCursor.currentState)->context)) {
+        widgetCursor.previousState = 0;
+    }
+
     Value oldContext;
     Value newContext;
     if (layoutView->context) {
@@ -52,18 +56,12 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
 
     if (layout) {
 		auto layoutView = (PageAsset *)layout;
-
-        ListOfAssetsPtr<Widget> &widgets = layoutView->widgets;
-
-        auto savedWidget = widgetCursor.widget;
-        
-        for (uint32_t index = 0; index < widgets.count; ++index) {
-            widgetCursor.widget = widgets.item(widgetCursor.assets, index);
-            enumWidget(widgetCursor, callback);
-        }
-
-        widgetCursor.widget = savedWidget;        
-	}
+		enumContainer(widgetCursor, callback, layoutView->widgets);
+	} else {
+		if (widgetCursor.currentState) {
+			widgetCursor.currentState->size = 0;
+		}
+    }
 
     if (layoutView->context) {
         restoreContext(widgetCursor, layoutView->context, oldContext);
@@ -74,7 +72,41 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
 
 };
 
-DrawFunctionType LAYOUT_VIEW_draw = nullptr;
+DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
+	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
+
+	((LayoutViewWidgetState *)widgetCursor.currentState)->context.clear();
+
+    Value oldContext;
+    Value newContext;
+    if (widget->context) {
+        setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
+        ((LayoutViewWidgetState *)widgetCursor.currentState)->context = newContext;
+    } else {
+        ((LayoutViewWidgetState *)widgetCursor.currentState)->context = Value();
+    }
+
+    widgetCursor.currentState->data.clear();
+    widgetCursor.currentState->data = getLayoutId(widgetCursor);
+
+    if (widget->context) {
+        restoreContext((WidgetCursor &)widgetCursor, widget->context, oldContext);
+    }
+
+    bool refresh =
+        !widgetCursor.previousState ||
+        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
+        widgetCursor.previousState->data != widgetCursor.currentState->data ||
+        ((LayoutViewWidgetState *)widgetCursor.previousState)->context != ((LayoutViewWidgetState *)widgetCursor.currentState)->context;
+
+    if (refresh) {
+        const Style* style = getStyle(widget->style);
+        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, false, true);
+    }
+
+	((LayoutViewWidgetState *)widgetCursor.currentState)->context.freeRef();
+    widgetCursor.currentState->data.freeRef();
+};
 
 OnTouchFunctionType LAYOUT_VIEW_onTouch = nullptr;
 

@@ -138,9 +138,9 @@ void Keypad::init(AppContext *appContext, const char *label_) {
 }
 
 Value Keypad::getKeypadTextValue() {
-    static char stateText[MAX_KEYPAD_TEXT_LENGTH + 2];
-    getKeypadText(stateText, sizeof(stateText));
-    return Value(stateText);
+    char *text = &m_stateText[getCurrentStateBufferIndex()][0];
+    getKeypadText(text, sizeof(m_stateText[0]));
+    return Value(text);
 }
 
 void Keypad::getKeypadText(char *text, size_t count) {

@@ -27,6 +27,7 @@ namespace gui {
 struct PageOnStack {
     int pageId = PAGE_ID_NONE;
     Page *page = nullptr;
+    int displayBufferIndex = -1;
 };
 
 class AppContext {
@@ -98,8 +99,7 @@ protected:
 
     int getActivePageStackPointer();
 
-    void updatePage(int i, WidgetCursor &widgetCursor);
-    virtual void updatePageHook(int i, WidgetCursor &widgetCursor);
+    virtual void updatePage(int i, WidgetCursor &widgetCursor);
 
     bool isPageFullyCovered(int pageNavigationStackIndex);
     

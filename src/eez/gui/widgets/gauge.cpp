@@ -100,269 +100,285 @@ struct GaugeWidget : public Widget {
 EnumFunctionType GAUGE_enum = nullptr;
 
 DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
+	using namespace mcu::display;
+
 	auto widget = (const GaugeWidget*)widgetCursor.widget;
 
-    auto data = get(widgetCursor, widget->data);
+    widgetCursor.currentState->size = sizeof(WidgetState);
 
-	float min = get(widgetCursor, widget->min).toFloat();
-	float max = get(widgetCursor, widget->max).toFloat();
-	float value = data.toFloat();
-	float threshold = get(widgetCursor, widget->threshold).toFloat();
+	widgetCursor.currentState->data.clear();
+    widgetCursor.currentState->data = get(widgetCursor, widget->data);
 
-	auto unit = get(widgetCursor, widget->unit).toString(0xa9ddede3).getString();
+    bool refresh = 
+		!widgetCursor.previousState || 
+		widgetCursor.previousState->data != widgetCursor.currentState->data ||
+		widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
 
-	if (isNaN(min) || isNaN(max) || isNaN(value) || isinf(min) || isinf(max) || isinf(value) || min >= max) {
-		min = 0.0;
-		max = 1.0f;
-		value = 0.0f;
-	} else {
-		if (value < min) {
-			value = min;
-		} else if (value > max) {
-			value = max;
+    if (refresh) {
+		float min = get(widgetCursor, widget->min).toFloat();
+		float max = get(widgetCursor, widget->max).toFloat();
+		float value = widgetCursor.currentState->data.toFloat();
+		float threshold = get(widgetCursor, widget->threshold).toFloat();
+
+		auto unit = get(widgetCursor, widget->unit).toString(0xa9ddede3).getString();
+
+		if (isNaN(min) || isNaN(max) || isNaN(value) || isinf(min) || isinf(max) || isinf(value) || min >= max) {
+			min = 0.0;
+			max = 1.0f;
+			value = 0.0f;
+		} else {
+			if (value < min) {
+				value = min;
+			} else if (value > max) {
+				value = max;
+			}
 		}
-	}
 
-	const Style* style = getStyle(widget->style);
-	const Style* barStyle = getStyle(widget->barStyle);
-	const Style* valueStyle = getStyle(widget->valueStyle);
-	const Style* ticksStyle = getStyle(widget->ticksStyle);
-	const Style* thresholdStyle = getStyle(widget->thresholdStyle);
+		const Style* style = getStyle(widget->style);
+		const Style* barStyle = getStyle(widget->barStyle);
+		const Style* valueStyle = getStyle(widget->valueStyle);
+		const Style* ticksStyle = getStyle(widget->ticksStyle);
+		const Style* thresholdStyle = getStyle(widget->thresholdStyle);
 
-	// auto colorBackground = getColor16FromIndex(style->background_color);
-	auto colorBorder = mcu::display::getColor16FromIndex(g_isActiveWidget ? style->active_color : style->color);
-	auto colorBar = mcu::display::getColor16FromIndex(g_isActiveWidget ? barStyle->active_color : barStyle->color);
+		auto isActive = widgetCursor.currentState->flags.active;
 
-	auto xCenter = widget->w / 2;
-	auto yCenter = widget->h - 8;
+		// auto colorBackground = getColor16FromIndex(style->background_color);
+		auto colorBorder = getColor16FromIndex(isActive ? style->active_color : style->color);
+		auto colorBar = getColor16FromIndex(isActive ? barStyle->active_color : barStyle->color);
 
-	// clear background
-	mcu::display::setColor(g_isActiveWidget ? style->active_background_color : style->background_color);
-	mcu::display::fillRect(widgetCursor.x, widgetCursor.y, widget->w, widget->h, 0);
+		auto xCenter = widget->w / 2;
+		auto yCenter = widget->h - 8;
 
-	// init AGG
-	agg::rendering_buffer rbuf;
-	rbuf.attach((uint8_t *)mcu::display::getBufferPointer(), mcu::display::getDisplayWidth(), mcu::display::getDisplayHeight(), mcu::display::getDisplayWidth() * DISPLAY_BPP / 8);
-	Agg2D graphics;
-	graphics.attach(rbuf.buf(), rbuf.width(), rbuf.height(), rbuf.stride());
-	graphics.clipBox(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w, widgetCursor.y + widget->h);
-	graphics.translate(widgetCursor.x, widgetCursor.y);
+		// clear background
+		setColor(isActive ? style->active_background_color : style->background_color);
+		fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1, 0);
 
-	// draw frame
-	if (style->border_size_left > 0) {
-		graphics.lineWidth(style->border_size_left);
-		graphics.lineColor(COLOR_TO_R(colorBorder), COLOR_TO_G(colorBorder), COLOR_TO_B(colorBorder));
-		graphics.noFill();
-		graphics.roundedRect(
-			style->border_size_left / 2.0,
-			style->border_size_left / 2.0,
-			widget->w - style->border_size_left,
-			widget->h - style->border_size_left,
-			style->border_radius
-		);
-	}
+		// init AGG
+		agg::rendering_buffer rbuf;
+		rbuf.attach((uint8_t *)getBufferPointer(), getDisplayWidth(), getDisplayHeight(), getDisplayWidth() * DISPLAY_BPP / 8);
+		Agg2D graphics;
+		graphics.attach(rbuf.buf(), rbuf.width(), rbuf.height(), rbuf.stride());
+		graphics.clipBox(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w, widgetCursor.y + widget->h);
+		graphics.translate(widgetCursor.x, widgetCursor.y);
 
-	static const int PADDING_HORZ = 56;
-	static const int TICK_LINE_LENGTH = 5;
-	static const int TICK_LINE_WIDTH = 1;
-	static const int TICK_TEXT_GAP = 1;
-	static const int THRESHOLD_LINE_WIDTH = 2;
+		// draw frame
+		if (style->border_size_left > 0) {
+			graphics.lineWidth(style->border_size_left);
+			graphics.lineColor(COLOR_TO_R(colorBorder), COLOR_TO_G(colorBorder), COLOR_TO_B(colorBorder));
+			graphics.noFill();
+			graphics.roundedRect(
+				style->border_size_left / 2.0,
+				style->border_size_left / 2.0,
+				widget->w - style->border_size_left,
+				widget->h - style->border_size_left,
+				style->border_radius
+			);
+		}
 
-	// draw border
-	auto radBorderOuter = (widget->w - PADDING_HORZ) / 2;
+		static const int PADDING_HORZ = 56;
+		static const int TICK_LINE_LENGTH = 5;
+		static const int TICK_LINE_WIDTH = 1;
+		static const int TICK_TEXT_GAP = 1;
+		static const int THRESHOLD_LINE_WIDTH = 2;
 
-	auto BORDER_WIDTH = radBorderOuter / 3;
-	auto BAR_WIDTH = BORDER_WIDTH / 2;
+		// draw border
+		auto radBorderOuter = (widget->w - PADDING_HORZ) / 2;
 
-	auto radBorderInner = radBorderOuter - BORDER_WIDTH;
-	graphics.resetPath();
-	graphics.noFill();
-	graphics.lineColor(COLOR_TO_R(colorBorder), COLOR_TO_G(colorBorder), COLOR_TO_B(colorBorder));
-	graphics.lineWidth(1.5);
-	arcBar(graphics, xCenter, yCenter, radBorderOuter, radBorderInner, 0);
-	graphics.drawPath();
+		auto BORDER_WIDTH = radBorderOuter / 3;
+		auto BAR_WIDTH = BORDER_WIDTH / 2;
 
-	// draw bar
-	auto radBarOuter = (widget->w - PADDING_HORZ) / 2 - (BORDER_WIDTH - BAR_WIDTH) / 2;
-	auto radBarInner = radBarOuter - BAR_WIDTH;
-	auto angle = remap(value, min, 180.0f, max, 0.0f);
-	graphics.resetPath();
-	graphics.noLine();
-	graphics.fillColor(COLOR_TO_R(colorBar), COLOR_TO_G(colorBar), COLOR_TO_B(colorBar));
-	graphics.lineWidth(1.5);
-	arcBar(graphics, xCenter, yCenter, radBarOuter, radBarInner, angle);
-	graphics.drawPath();
-
-	// draw threshold
-	auto thresholdAngleDeg = remap(threshold, min, 180.0f, max, 0);
-	if (thresholdAngleDeg >= 0 && thresholdAngleDeg <= 180.0f) {
-		auto thresholdAngle = Agg2D::deg2Rad(thresholdAngleDeg);
-		float acos = cosf(thresholdAngle);
-		float asin = sinf(thresholdAngle);
-		int x1 = floorf(xCenter + radBarInner * acos);
-		int y1 = floorf(yCenter - radBarInner * asin);
-		int x2 = floorf(xCenter + radBarOuter * acos);
-		int y2 = floorf(yCenter - radBarOuter * asin);
-
+		auto radBorderInner = radBorderOuter - BORDER_WIDTH;
 		graphics.resetPath();
 		graphics.noFill();
-		auto thresholdColor = mcu::display::getColor16FromIndex(g_isActiveWidget ? thresholdStyle->active_color : thresholdStyle->color);
-		graphics.lineColor(COLOR_TO_R(thresholdColor), COLOR_TO_G(thresholdColor), COLOR_TO_B(thresholdColor));
-		graphics.lineWidth(THRESHOLD_LINE_WIDTH);
-		graphics.moveTo(x1, y1);
-		graphics.lineTo(x2, y2);
+		graphics.lineColor(COLOR_TO_R(colorBorder), COLOR_TO_G(colorBorder), COLOR_TO_B(colorBorder));
+		graphics.lineWidth(1.5);
+		arcBar(graphics, xCenter, yCenter, radBorderOuter, radBorderInner, 0);
 		graphics.drawPath();
-	}
 
-	// draw ticks
-	font::Font ticksFont = styleGetFont(ticksStyle);
-	auto ft = firstTick(max - min);
-	auto ticksRad = radBorderOuter + 1;
-	for (auto tickValue = min; tickValue <= max; tickValue += ft) {
-		auto tickAngleDeg = remap(tickValue, min, 180.0f, max, 0);
-		if (tickAngleDeg <= 180.0) {
-			auto tickAngle = Agg2D::deg2Rad(tickAngleDeg);
-			float acos = cosf(tickAngle);
-			float asin = sinf(tickAngle);
-			int x1 = floorf(xCenter + ticksRad * acos);
-			int y1 = floorf(yCenter - ticksRad * asin);
-			int x2 = floorf(xCenter + (ticksRad + TICK_LINE_LENGTH) * acos);
-			int y2 = floorf(yCenter - (ticksRad + TICK_LINE_LENGTH) * asin);
+		// draw bar
+		auto radBarOuter = (widget->w - PADDING_HORZ) / 2 - (BORDER_WIDTH - BAR_WIDTH) / 2;
+		auto radBarInner = radBarOuter - BAR_WIDTH;
+		auto angle = remap(value, min, 180.0f, max, 0.0f);
+		graphics.resetPath();
+		graphics.noLine();
+		graphics.fillColor(COLOR_TO_R(colorBar), COLOR_TO_G(colorBar), COLOR_TO_B(colorBar));
+		graphics.lineWidth(1.5);
+		arcBar(graphics, xCenter, yCenter, radBarOuter, radBarInner, angle);
+		graphics.drawPath();
+
+		// draw threshold
+		auto thresholdAngleDeg = remap(threshold, min, 180.0f, max, 0);
+		if (thresholdAngleDeg >= 0 && thresholdAngleDeg <= 180.0f) {
+			auto thresholdAngle = Agg2D::deg2Rad(thresholdAngleDeg);
+			float acos = cosf(thresholdAngle);
+			float asin = sinf(thresholdAngle);
+			int x1 = floorf(xCenter + radBarInner * acos);
+			int y1 = floorf(yCenter - radBarInner * asin);
+			int x2 = floorf(xCenter + radBarOuter * acos);
+			int y2 = floorf(yCenter - radBarOuter * asin);
 
 			graphics.resetPath();
 			graphics.noFill();
-			auto tickColor = mcu::display::getColor16FromIndex(g_isActiveWidget ? ticksStyle->active_color : ticksStyle->color);
-			graphics.lineColor(COLOR_TO_R(tickColor), COLOR_TO_G(tickColor), COLOR_TO_B(tickColor));
-			graphics.lineWidth(TICK_LINE_WIDTH);
+			auto thresholdColor = getColor16FromIndex(isActive ? thresholdStyle->active_color : thresholdStyle->color);
+			graphics.lineColor(COLOR_TO_R(thresholdColor), COLOR_TO_G(thresholdColor), COLOR_TO_B(thresholdColor));
+			graphics.lineWidth(THRESHOLD_LINE_WIDTH);
 			graphics.moveTo(x1, y1);
 			graphics.lineTo(x2, y2);
 			graphics.drawPath();
+		}
 
-			char tickText[50];
-			snprintf(tickText, sizeof(tickText), "%g", tickValue);
-			if (unit && *unit) {
-				stringAppendString(tickText, sizeof(tickText), " ");
-				stringAppendString(tickText, sizeof(tickText), unit);
-			}
+		// draw ticks
+		font::Font ticksFont = styleGetFont(ticksStyle);
+		auto ft = firstTick(max - min);
+		auto ticksRad = radBorderOuter + 1;
+		for (auto tickValue = min; tickValue <= max; tickValue += ft) {
+			auto tickAngleDeg = remap(tickValue, min, 180.0f, max, 0);
+			if (tickAngleDeg <= 180.0) {
+				auto tickAngle = Agg2D::deg2Rad(tickAngleDeg);
+				float acos = cosf(tickAngle);
+				float asin = sinf(tickAngle);
+				int x1 = floorf(xCenter + ticksRad * acos);
+				int y1 = floorf(yCenter - ticksRad * asin);
+				int x2 = floorf(xCenter + (ticksRad + TICK_LINE_LENGTH) * acos);
+				int y2 = floorf(yCenter - (ticksRad + TICK_LINE_LENGTH) * asin);
 
-			auto tickTextWidth = mcu::display::measureStr(tickText, -1, ticksFont);
-			if (tickAngleDeg == 180.0) {
-				drawText(
-					tickText,
-					-1,
-					widgetCursor.x + xCenter -
-						radBorderOuter -
-						TICK_TEXT_GAP -
+				graphics.resetPath();
+				graphics.noFill();
+				auto tickColor = getColor16FromIndex(isActive ? ticksStyle->active_color : ticksStyle->color);
+				graphics.lineColor(COLOR_TO_R(tickColor), COLOR_TO_G(tickColor), COLOR_TO_B(tickColor));
+				graphics.lineWidth(TICK_LINE_WIDTH);
+				graphics.moveTo(x1, y1);
+				graphics.lineTo(x2, y2);
+				graphics.drawPath();
+
+				char tickText[50];
+				snprintf(tickText, sizeof(tickText), "%g", tickValue);
+				if (unit && *unit) {
+					stringAppendString(tickText, sizeof(tickText), " ");
+					stringAppendString(tickText, sizeof(tickText), unit);
+				}
+
+				auto tickTextWidth = mcu::display::measureStr(tickText, -1, ticksFont);
+				if (tickAngleDeg == 180.0) {
+					drawText(
+						tickText,
+						-1,
+						widgetCursor.x + xCenter -
+							radBorderOuter -
+							TICK_TEXT_GAP -
+							tickTextWidth,
+						widgetCursor.y + y2 - TICK_TEXT_GAP - ticksFont.getAscent(),
 						tickTextWidth,
-					widgetCursor.y + y2 - TICK_TEXT_GAP - ticksFont.getAscent(),
-					tickTextWidth,
-					ticksFont.getAscent(),
-					ticksStyle,
-					g_isActiveWidget,
-					false,
-					false,
-					nullptr,
-					nullptr,
-					nullptr,
-					nullptr
-				);
-			} else if (tickAngleDeg > 90.0) {
-				drawText(
-					tickText,
-					-1,
-					widgetCursor.x + x2 - TICK_TEXT_GAP - tickTextWidth,
-					widgetCursor.y + y2 - TICK_TEXT_GAP - ticksFont.getAscent(),
-					tickTextWidth,
-					ticksFont.getAscent(),
-					ticksStyle,
-					g_isActiveWidget,
-					false,
-					false,
-					nullptr,
-					nullptr,
-					nullptr,
-					nullptr
-				);
-			} else if (tickAngleDeg == 90.0) {
-				drawText(
-					tickText,
-					-1,
-					widgetCursor.x + x2 - tickTextWidth / 2,
-					widgetCursor.y + y2 - TICK_TEXT_GAP - ticksFont.getAscent(),
-					tickTextWidth,
-					ticksFont.getAscent(),
-					ticksStyle,
-					g_isActiveWidget,
-					false,
-					false,
-					nullptr,
-					nullptr,
-					nullptr,
-					nullptr
-				);
-			} else if (tickAngleDeg > 0) {
-				drawText(
-					tickText,
-					-1,
-					widgetCursor.x + x2 + TICK_TEXT_GAP,
-					widgetCursor.y + y2 - TICK_TEXT_GAP - ticksFont.getAscent(),
-					tickTextWidth,
-					ticksFont.getAscent(),
-					ticksStyle,
-					g_isActiveWidget,
-					false,
-					false,
-					nullptr,
-					nullptr,
-					nullptr,
-					nullptr
-				);
-			} else {
-				drawText(
-					tickText,
-					-1,
-					widgetCursor.x + xCenter + radBorderOuter + TICK_TEXT_GAP,
-					widgetCursor.y + y2 - TICK_TEXT_GAP - ticksFont.getAscent(),
-					tickTextWidth,
-					ticksFont.getAscent(),
-					ticksStyle,
-					g_isActiveWidget,
-					false,
-					false,
-					nullptr,
-					nullptr,
-					nullptr,
-					nullptr
-				);
+						ticksFont.getAscent(),
+						ticksStyle,
+						isActive,
+						false,
+						false,
+						nullptr,
+						nullptr,
+						nullptr,
+						nullptr
+					);
+				} else if (tickAngleDeg > 90.0) {
+					drawText(
+						tickText,
+						-1,
+						widgetCursor.x + x2 - TICK_TEXT_GAP - tickTextWidth,
+						widgetCursor.y + y2 - TICK_TEXT_GAP - ticksFont.getAscent(),
+						tickTextWidth,
+						ticksFont.getAscent(),
+						ticksStyle,
+						isActive,
+						false,
+						false,
+						nullptr,
+						nullptr,
+						nullptr,
+						nullptr
+					);
+				} else if (tickAngleDeg == 90.0) {
+					drawText(
+						tickText,
+						-1,
+						widgetCursor.x + x2 - tickTextWidth / 2,
+						widgetCursor.y + y2 - TICK_TEXT_GAP - ticksFont.getAscent(),
+						tickTextWidth,
+						ticksFont.getAscent(),
+						ticksStyle,
+						isActive,
+						false,
+						false,
+						nullptr,
+						nullptr,
+						nullptr,
+						nullptr
+					);
+				} else if (tickAngleDeg > 0) {
+					drawText(
+						tickText,
+						-1,
+						widgetCursor.x + x2 + TICK_TEXT_GAP,
+						widgetCursor.y + y2 - TICK_TEXT_GAP - ticksFont.getAscent(),
+						tickTextWidth,
+						ticksFont.getAscent(),
+						ticksStyle,
+						isActive,
+						false,
+						false,
+						nullptr,
+						nullptr,
+						nullptr,
+						nullptr
+					);
+				} else {
+					drawText(
+						tickText,
+						-1,
+						widgetCursor.x + xCenter + radBorderOuter + TICK_TEXT_GAP,
+						widgetCursor.y + y2 - TICK_TEXT_GAP - ticksFont.getAscent(),
+						tickTextWidth,
+						ticksFont.getAscent(),
+						ticksStyle,
+						isActive,
+						false,
+						false,
+						nullptr,
+						nullptr,
+						nullptr,
+						nullptr
+					);
+				}
 			}
 		}
-	}
 
-	// draw value
-	font::Font valueFont = styleGetFont(valueStyle);
-	char valueText[50];
-	snprintf(valueText, sizeof(valueText), "%g", value);
-	if (unit && *unit) {
-			stringAppendString(valueText, sizeof(valueText), " ");
-			stringAppendString(valueText, sizeof(valueText), unit);
-	}
-	auto valueTextWidth = mcu::display::measureStr(valueText, -1, valueFont);
-	drawText(
-		valueText,
-		-1,
-		widgetCursor.x + xCenter - valueTextWidth / 2,
-		widgetCursor.y + yCenter - valueFont.getHeight(),
-		valueTextWidth,
-		valueFont.getHeight(),
-		valueStyle,
-		g_isActiveWidget,
-		false,
-		false,
-		nullptr,
-		nullptr,
-		nullptr,
-		nullptr
-	);
+		// draw value
+		font::Font valueFont = styleGetFont(valueStyle);
+		char valueText[50];
+		snprintf(valueText, sizeof(valueText), "%g", value);
+		if (unit && *unit) {
+			 stringAppendString(valueText, sizeof(valueText), " ");
+			 stringAppendString(valueText, sizeof(valueText), unit);
+		}
+		auto valueTextWidth = mcu::display::measureStr(valueText, -1, valueFont);
+		drawText(
+			valueText,
+			-1,
+			widgetCursor.x + xCenter - valueTextWidth / 2,
+			widgetCursor.y + yCenter - valueFont.getHeight(),
+			valueTextWidth,
+			valueFont.getHeight(),
+			valueStyle,
+			isActive,
+			false,
+			false,
+			nullptr,
+			nullptr,
+			nullptr,
+			nullptr
+		);
+    }
+
+	widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType GAUGE_onTouch = nullptr;

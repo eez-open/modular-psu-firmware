@@ -94,9 +94,9 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
     if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
         display::setColor(style->border_color);
         if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
-            display::drawRect(x, y, w, h);
+            display::drawRect(x1, y1, x2, y2);
         } else {
-            display::fillRect(x, y, w, h, style->border_radius);
+            display::fillRect(x1, y1, x2, y2, style->border_radius);
 			borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
         }
         x1 += style->border_size_left;
@@ -151,7 +151,7 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
             display::setColor(style->background_color, ignoreLuminocity);
         }
     }
-    display::fillRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1, borderRadius);
+    display::fillRect(x1, y1, x2, y2, borderRadius);
 
     // draw text
     if (active || blink) {
@@ -167,7 +167,7 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
             display::setColor(style->color, ignoreLuminocity);
         }
     }
-    display::drawStr(text, textLength, x_offset - xScroll, y_offset, x1, y1, x2 - x1 + 1, y2 - y1 + 1, font, cursorPosition);
+    display::drawStr(text, textLength, x_offset - xScroll, y_offset, x1, y1, x2, y2, font, cursorPosition);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -214,7 +214,7 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
         y_offset = y1;
     }
 
-    return display::getCharIndexAtPosition(xPos, text, textLength, x_offset, y_offset, x1, y1, x2 - x1 + 1, y2 - y1 + 1, font);
+    return display::getCharIndexAtPosition(xPos, text, textLength, x_offset, y_offset, x1, y1, x2, y2, font);
 }
 
 int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int w, int h, const Style *style) {
@@ -259,7 +259,7 @@ int getCursorXPosition(int cursorPosition, const char *text, int textLength, int
         y_offset = y1;
     }
 
-    return display::getCursorXPosition(cursorPosition, text, textLength, x_offset, y_offset, x1, y1, x2 - x1 + 1, y2 - y1 + 1, font);
+    return display::getCursorXPosition(cursorPosition, text, textLength, x_offset, y_offset, x1, y1, x2, y2, font);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -313,7 +313,7 @@ struct MultilineTextRender {
                     x = x1 + int((x2 - x1 + 1 - lineWidth) / 2);
                 }
 
-                display::drawStr(line, -1, x + lineIndent, y, x, y, lineWidth, font.getHeight(), font, -1);
+                display::drawStr(line, -1, x + lineIndent, y, x, y, x + lineWidth - 1, y + font.getHeight() - 1, font, -1);
             } else {
                 textHeight = MAX(textHeight, y + lineHeight - y1);
             }
@@ -425,9 +425,9 @@ struct MultilineTextRender {
         if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
             display::setColor(style->border_color);
             if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
-                display::drawRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+                display::drawRect(x1, y1, x2, y2);
             } else {
-                display::fillRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1, style->border_radius);
+                display::fillRect(x1, y1, x2, y2, style->border_radius);
                 borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
             }
             x1 += style->border_size_left;
@@ -439,7 +439,7 @@ struct MultilineTextRender {
         // fill background
         uint16_t background_color = active ? style->active_background_color : style->background_color;
         display::setColor(background_color);
-        display::fillRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1, borderRadius);
+        display::fillRect(x1, y1, x2, y2, borderRadius);
 
         //
         font = styleGetFont(style);
@@ -517,10 +517,10 @@ void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bo
 	if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
 		display::setColor(style->border_color);
 		if (style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) {
-			display::drawRect(x, y, w, h);
+			display::drawRect(x1, y1, x2, y2);
 		}
 		else {
-			display::fillRect(x, y, w, h, 0);
+			display::fillRect(x1, y1, x2, y2, 0);
 		}
 		x1 += style->border_size_left;
 		y1 += style->border_size_top;
@@ -583,9 +583,9 @@ void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, 
 		if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
             display::setColor(style->border_color);
 			if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
-                display::drawRect(x, y, w, h);
+                display::drawRect(x1, y1, x2, y2);
             } else {
-                display::fillRect(x, y, w, h, style->border_radius);
+                display::fillRect(x1, y1, x2, y2, style->border_radius);
 				borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
             }
 			x1 += style->border_size_left;
@@ -600,7 +600,7 @@ void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, 
             display::setColor(active ? style->active_color : style->color, ignoreLuminocity);
         }
         
-        display::fillRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1, borderRadius);
+        display::fillRect(x1, y1, x2, y2, borderRadius);
     }
 }
 
@@ -622,7 +622,7 @@ void drawShadowGlyph(char glyph, int x, int y, int xClip = -1, int yClip = -1) {
         yClip = y + H - 1;
     }
     font::Font font(getFontData(FONT_ID_SHADOW));
-    eez::mcu::display::drawStr(&glyph, 1, x, y, x, y, xClip - x + 1, yClip - y + 1, font, -1);
+    eez::mcu::display::drawStr(&glyph, 1, x, y, x, y, xClip, yClip, font, -1);
 }
 
 void drawShadow(int x1, int y1, int x2, int y2) {

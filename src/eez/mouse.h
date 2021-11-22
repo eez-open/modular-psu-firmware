@@ -30,6 +30,7 @@ namespace mouse {
 void init();
 void getEvent(bool &mouseCursorVisible, gui::EventType &mouseEventType, int &mouseX, int &mouseY);
 
+bool isDisplayDirty();
 void updateDisplay();
 
 void onPageChanged();

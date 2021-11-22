@@ -30,10 +30,21 @@ EnumFunctionType CANVAS_enum = nullptr;
 DrawFunctionType CANVAS_draw = [](const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
-    Value value;
-    DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION, widgetCursor, value);
-    auto drawFunction = (void (*)(const WidgetCursor &widgetCursor))value.getVoidPointer();
-    drawFunction(widgetCursor);
+    widgetCursor.currentState->size = sizeof(WidgetState);
+
+    widgetCursor.currentState->data.clear();
+    widgetCursor.currentState->data = get(widgetCursor, widget->data);
+
+    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != widgetCursor.currentState->data;
+
+    if (refresh) {
+        Value value;
+        DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION, widgetCursor, value);
+        auto drawFunction = (void (*)(const WidgetCursor &widgetCursor))value.getVoidPointer();
+        drawFunction(widgetCursor);
+    }
+
+    widgetCursor.currentState->data.freeRef();
 };
 
 OnTouchFunctionType CANVAS_onTouch = nullptr;

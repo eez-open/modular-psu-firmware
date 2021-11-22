@@ -93,21 +93,49 @@ OnKeyboardFunctionType *g_onKeyboardWidgetFunctions[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-DrawFunctionType defaultWidgetDraw = [](const WidgetCursor &widgetCursor) {
-	const Widget *widget = widgetCursor.widget;
-	drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, getStyle(widget->style), isActiveWidget(widgetCursor), false, true);
-};
+void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
+    widgetCursor.currentState->size = sizeof(WidgetState);
 
-void initDrawWidgetFunctions() {
-    for (unsigned int i = 0; i < sizeof(g_drawWidgetFunctions) / sizeof(DrawFunctionType); i++) {
-        if (!*g_drawWidgetFunctions[i]) {
-            g_drawWidgetFunctions[i] = &defaultWidgetDraw;
-        }
+    const Widget *widget = widgetCursor.widget;
+
+    bool refresh =
+        !widgetCursor.previousState ||
+        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
+
+    if (refresh) {
+        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, getStyle(widget->style), widgetCursor.currentState->flags.active, false, true);
     }
 }
 
-void drawWidgetCallback(const WidgetCursor &widgetCursor) {
-    (*g_drawWidgetFunctions[widgetCursor.widget->type])(widgetCursor);
+void drawWidgetCallback(const WidgetCursor &widgetCursor_) {
+    WidgetCursor widgetCursor = widgetCursor_;
+
+    uint16_t stateSize = getCurrentStateBufferSize(widgetCursor);
+    assert(stateSize <= CONF_MAX_STATE_SIZE);
+
+    widgetCursor.currentState->flags.active = g_isActiveWidget;
+
+    const Widget *widget = widgetCursor.widget;
+    if (*g_drawWidgetFunctions[widget->type]) {
+        (*g_drawWidgetFunctions[widget->type])(widgetCursor);
+    } else {
+        defaultWidgetDraw(widgetCursor);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+WidgetState *nextWidgetState(WidgetState *p) {
+    return (WidgetState *)(((uint8_t *)p) + p->size);
+}
+
+void WidgetCursor::nextState() {
+    if (previousState) {
+        previousState = nextWidgetState(previousState);
+    }
+    if (currentState) {
+        currentState = nextWidgetState(currentState);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

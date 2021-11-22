@@ -147,7 +147,6 @@ void boot() {
 
     psu::persist_conf::init();
 
-    gui::initDrawWidgetFunctions();
     gui::startThread();
 
 #if !CONF_SURVIVE_MODE

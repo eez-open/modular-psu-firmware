@@ -830,6 +830,10 @@ scpi_result_t scpi_cmd_systemPasswordCalibrationReset(scpi_t *context) {
 scpi_result_t scpi_cmd_systemKlock(scpi_t *context) {
     persist_conf::lockFrontPanel(true);
 
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
+
     return SCPI_RES_OK;
 }
 
@@ -847,6 +851,10 @@ scpi_result_t scpi_cmd_systemCommunicateRlstate(scpi_t *context) {
     }
 
     g_rlState = (RLState)rlState;
+
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
 
     return SCPI_RES_OK;
 }
@@ -911,17 +919,29 @@ scpi_result_t scpi_cmd_systemCommunicateUsbClassQ(scpi_t *context) {
 scpi_result_t scpi_cmd_systemLocal(scpi_t *context) {
     g_rlState = RL_STATE_LOCAL;
 
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
+
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemRemote(scpi_t *context) {
     g_rlState = RL_STATE_REMOTE;
 
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
+
     return SCPI_RES_OK;
 }
 
 scpi_result_t scpi_cmd_systemRwlock(scpi_t *context) {
     g_rlState = RL_STATE_RW_LOCK;
+
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
 
     return SCPI_RES_OK;
 }
@@ -2098,6 +2118,10 @@ scpi_result_t scpi_cmd_systemSlotLabel(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
+
     return SCPI_RES_OK;
 }
 
@@ -2153,6 +2177,10 @@ scpi_result_t scpi_cmd_systemSlotColor(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
+
     return SCPI_RES_OK;
 }
 
@@ -2191,6 +2219,10 @@ scpi_result_t scpi_cmd_systemChannelLabel(scpi_t *context) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
+
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
 
     return SCPI_RES_OK;
 }
@@ -2236,6 +2268,10 @@ scpi_result_t scpi_cmd_systemChannelColor(scpi_t *context) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
+
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
 
     return SCPI_RES_OK;
 }
@@ -2284,6 +2320,10 @@ scpi_result_t scpi_cmd_systemChannelPinLabel(scpi_t *context) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }
+
+#if OPTION_DISPLAY
+    refreshScreen();
+#endif
 
     return SCPI_RES_OK;
 }

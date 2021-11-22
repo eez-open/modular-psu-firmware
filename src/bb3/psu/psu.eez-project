@@ -1,12 +1,10 @@
 {
   "settings": {
     "general": {
-      "projectVersion": "v3",
-      "projectType": "master",
       "namespace": "",
       "imports": [
         {
-          "projectFilePath": "..\\..\\..\\modular-psu-firmware.eez-project"
+          "projectFilePath": "..\\..\\..\\..\\modular-psu-firmware.eez-project"
         }
       ]
     },
@@ -26,16 +24,14 @@
       "files": []
     }
   },
-  "variables": {
-    "globalVariables": [],
-    "structures": [],
-    "enums": []
-  },
+  "data": [],
   "actions": [],
-  "pages": [],
-  "styles": [],
-  "fonts": [],
-  "bitmaps": [],
-  "colors": [],
-  "themes": []
+  "gui": {
+    "pages": [],
+    "styles": [],
+    "fonts": [],
+    "bitmaps": [],
+    "colors": [],
+    "themes": []
+  }
 }

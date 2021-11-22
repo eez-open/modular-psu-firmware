@@ -214,9 +214,9 @@ void ToastMessagePage::refresh(const WidgetCursor &widgetCursor) {
     if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
         display::setColor(style->border_color);
         if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
-            display::drawRect(x, y, width, height);
+            display::drawRect(x, y, x2, y2);
         } else {
-            display::fillRect(x, y, width, height, style->border_radius);
+            display::fillRect(x1, y1, x2, y2, style->border_radius);
 			borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
         }
         x1 += style->border_size_left;
@@ -227,7 +227,7 @@ void ToastMessagePage::refresh(const WidgetCursor &widgetCursor) {
 
     // draw background
     display::setColor(style->background_color);
-    display::fillRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1, borderRadius);
+    display::fillRect(x1, y1, x2, y2, borderRadius);
 
     // draw text message
     display::setColor(style->color);
@@ -237,7 +237,7 @@ void ToastMessagePage::refresh(const WidgetCursor &widgetCursor) {
     display::drawStr(message1, message1Len, 
         x1 + style->padding_left + (textWidth - textWidth1) / 2, 
         yText, 
-        x1, y1, x2 - x1 + 1, y2 - y1 + 1, font, -1);
+        x1, y1, x2, y2, font, -1);
 
     yText += textHeight;
 
@@ -245,7 +245,7 @@ void ToastMessagePage::refresh(const WidgetCursor &widgetCursor) {
         display::drawStr(message2, message2Len,
             x1 + style->padding_left + (textWidth - textWidth2) / 2,
             yText,
-            x1, y1, x2 - x1 + 1, y2 - y1 + 1, font, -1);
+            x1, y1, x2, y2, font, -1);
 
         yText += textHeight;
     }
@@ -254,7 +254,7 @@ void ToastMessagePage::refresh(const WidgetCursor &widgetCursor) {
         display::drawStr(message3, message3Len, 
             x1 + style->padding_left + (textWidth - textWidth2) / 2, 
             yText, 
-            x1, y1, x2 - x1 + 1, y2 - y1 + 1, font, -1);
+            x1, y1, x2, y2, font, -1);
 
         yText += textHeight;
     }
@@ -271,8 +271,8 @@ void ToastMessagePage::refresh(const WidgetCursor &widgetCursor) {
             display::fillRect(
                 actionWidget.x,
                 actionWidget.y - textHeight / 4,
-                actionWidget.w,
-                actionWidget.h + textHeight / 2,
+                actionWidget.x + actionWidget.w - 1,
+                actionWidget.y + actionWidget.h - 1 + textHeight / 4,
                 0);
 
             display::setBackColor(actionStyle->color);
@@ -284,7 +284,7 @@ void ToastMessagePage::refresh(const WidgetCursor &widgetCursor) {
 
         display::drawStr(actionLabel, -1,
             actionWidget.x + actionStyle->padding_left, actionWidget.y,
-            x1, y1, x2 - x1 + 1, y2 - y1 + 1, font, -1);
+            x1, y1, x2, y2, font, -1);
     }
 }
 
@@ -505,7 +505,7 @@ void SelectFromEnumPage::refresh(const WidgetCursor &widgetCursor) {
 
     // draw background
     display::setColor(containerStyle->background_color);
-    display::fillRect(x, y, width, height);
+    display::fillRect(x, y, x + width - 1, y + height - 1);
 
     // draw labels
     char text[64];
@@ -681,22 +681,29 @@ void MenuWithButtonsPage::refresh(const WidgetCursor &widgetCursor2) {
     WidgetCursor widgetCursor;
 
     widgetCursor.appContext = m_appContext;
+    widgetCursor.previousState = widgetCursor2.previousState;
+    widgetCursor.currentState = widgetCursor2.currentState;
 
-    widgetCursor.widget = &m_containerRectangleWidget;
-    widgetCursor.x = x + m_containerRectangleWidget.x;
-    widgetCursor.y = y + m_containerRectangleWidget.y;
-    RECTANGLE_draw(widgetCursor);
+    if (!widgetCursor.previousState) {
+        widgetCursor.widget = &m_containerRectangleWidget;
+        widgetCursor.x = x + m_containerRectangleWidget.x;
+        widgetCursor.y = y + m_containerRectangleWidget.y;
+        widgetCursor.currentState->flags.active = 0;
+        RECTANGLE_draw(widgetCursor);
 
-    widgetCursor.widget = &m_messageTextWidget;
-    widgetCursor.x = x + m_messageTextWidget.x;
-    widgetCursor.y = y + m_messageTextWidget.y;
-    TEXT_draw(widgetCursor);
+        widgetCursor.widget = &m_messageTextWidget;
+        widgetCursor.x = x + m_messageTextWidget.x;
+        widgetCursor.y = y + m_messageTextWidget.y;
+        widgetCursor.currentState->flags.active = 0;
+        TEXT_draw(widgetCursor);
+    }
 
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
         widgetCursor.widget = &m_buttonTextWidgets[i];
         widgetCursor.x = x + m_buttonTextWidgets[i].x;
         widgetCursor.y = y + m_buttonTextWidgets[i].y;
         widgetCursor.cursor = i;
+        widgetCursor.currentState->flags.active = isActiveWidget(widgetCursor);
         TEXT_draw(widgetCursor);
     }
 }

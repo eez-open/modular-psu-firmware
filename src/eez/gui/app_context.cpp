@@ -114,6 +114,7 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
 
     m_pageNavigationStack[m_pageNavigationStackPointer].page = page;
     m_pageNavigationStack[m_pageNavigationStackPointer].pageId = pageId;
+    m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = mcu::display::allocBuffer();
 
     if (page) {
         page->pageWillAppear();
@@ -122,6 +123,8 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
     m_showPageTime = millis();
 
     onPageChanged(previousPageId, pageId);
+
+    refreshScreen();
 }
 
 void AppContext::setPage(int pageId) {
@@ -211,6 +214,7 @@ void AppContext::removePageFromStack(int pageId) {
 
                 --m_pageNavigationStackPointer;
             }
+            refreshScreen();
             break;
         }
     }
@@ -297,7 +301,12 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 
 void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
     if (!isPageFullyCovered(i)) {
-        int bufferIndex = mcu::display::beginAuxBufferDrawing();
+        if (m_pageNavigationStack[i].displayBufferIndex == -1) {
+            m_pageNavigationStack[i].displayBufferIndex = mcu::display::allocBuffer();
+            widgetCursor.previousState = nullptr;
+        }
+
+		mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
 
 		m_updatePageIndex = i;
 
@@ -312,7 +321,9 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         if (isPageInternal(m_pageNavigationStack[i].pageId)) {
             InternalPage *internalPage = ((InternalPage *)m_pageNavigationStack[i].page);
             
-            internalPage->refresh(widgetCursor);
+            if (!widgetCursor.previousState) {
+                internalPage->refresh(widgetCursor);
+            }
             internalPage->updatePage(widgetCursor);
 
             x = internalPage->x;
@@ -323,6 +334,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         } else {
             auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
 
+            auto savedPreviousState = widgetCursor.previousState;
             auto savedWidget = widgetCursor.widget;
 
             x = widgetCursor.x + page->x;
@@ -331,26 +343,28 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
             height = page->h;
             withShadow = page->x > 0;
 
-            // clear background
-            const Style* style = getStyle(page->style);
-            mcu::display::setColor(style->background_color);
-            mcu::display::fillRect(x, y, width, height);
+            if (!widgetCursor.previousState) {
+                // clear background
+                const Style* style = getStyle(page->style);
+                mcu::display::setColor(style->background_color);
+                mcu::display::fillRect(x, y, x + width - 1, y + height - 1);
+            }
 
             widgetCursor.widget = page;
             enumWidget(widgetCursor, drawWidgetCallback);
 
             widgetCursor.widget = savedWidget;
+            widgetCursor.previousState = savedPreviousState;
         }
-
-        updatePageHook(i, widgetCursor);
 		
-		mcu::display::endAuxBufferDrawing(bufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+		mcu::display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+
+		widgetCursor.nextState();
 
 		m_updatePageIndex = -1;
-	}
-}
-
-void AppContext::updatePageHook(int i, WidgetCursor &widgetCursor) {
+	} else {
+        m_pageNavigationStack[i].displayBufferIndex = -1;
+    }
 }
 
 bool isRect1FullyCoveredByRect2(int xRect1, int yRect1, int wRect1, int hRect1, int xRect2, int yRect2, int wRect2, int hRect2) {
