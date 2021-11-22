@@ -21,7 +21,5 @@
 namespace eez {
 namespace gui {
 
-void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, ListOfAssetsPtr<Widget> &widgets);
-
 } // namespace gui
 } // namespace eez

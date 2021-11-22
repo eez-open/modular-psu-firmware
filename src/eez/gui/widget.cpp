@@ -43,6 +43,10 @@ bool g_isActiveWidget;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static void findWidgetStep(const WidgetCursor &widgetCursor);
+
+////////////////////////////////////////////////////////////////////////////////
+
 EnumFunctionType NONE_enum = nullptr;
 DrawFunctionType NONE_draw = nullptr;
 OnTouchFunctionType NONE_onTouch = nullptr;
@@ -147,7 +151,20 @@ void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     widgetCursor.x += widgetCursor.widget->x;
     widgetCursor.y += widgetCursor.widget->y;
 
-    overlayEnumWidgetHook(widgetCursor, callback);
+    if (isOverlay(widgetCursor)) {
+        // update overlay data
+        auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
+        Value widgetCursorValue((void *)&widgetCursor, VALUE_TYPE_POINTER);
+        DATA_OPERATION_FUNCTION(containerWidget->overlay, DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor, widgetCursorValue);
+
+        if (callback == findWidgetStep) {
+            int xOverlayOffset = 0;
+            int yOverlayOffset = 0;
+            getOverlayOffset(widgetCursor, xOverlayOffset, yOverlayOffset);
+            widgetCursor.x += xOverlayOffset;
+            widgetCursor.y += yOverlayOffset;
+        }
+    }
 
     bool savedIsActiveWidget = g_isActiveWidget;
     g_isActiveWidget = g_isActiveWidget || isActiveWidget(widgetCursor);
@@ -218,7 +235,7 @@ void enumWidgets(AppContext* appContext, EnumWidgetsCallback callback) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void findWidgetStep(const WidgetCursor &widgetCursor) {
+static void findWidgetStep(const WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
     Overlay *overlay = getOverlay(widgetCursor);

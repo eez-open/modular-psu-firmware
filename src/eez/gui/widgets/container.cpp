@@ -33,7 +33,34 @@ struct ContainerWidgetState : public WidgetState {
     int displayBufferIndex;
 };
 
-void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, ListOfAssetsPtr<Widget> &widgets) {
+EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+    Overlay *overlay = nullptr;
+    if (isOverlay(widgetCursor)) {
+        overlay = getOverlay(widgetCursor);
+
+        auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
+        auto previousState = (ContainerWidgetState *)widgetCursor.previousState;
+
+        if (currentState) {
+            currentState->overlayState = overlay ? overlay->state : 1;
+
+            if (previousState && previousState->overlayState != currentState->overlayState) {
+                widgetCursor.previousState = 0;
+            }
+        }
+
+        if (overlay && !overlay->state) {
+            if (widgetCursor.currentState) {
+                widgetCursor.currentState->size = sizeof(ContainerWidgetState);
+            }
+            return;
+        }
+    }
+
+    auto widget = ((ContainerWidget *)widgetCursor.widget);
+
+    auto &widgets = widget->widgets;
+
     auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 
@@ -44,30 +71,15 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, Lis
 
     // move to the first child widget state
     if (widgetCursor.previousState) {
-        if (widgetCursor.widget->type == WIDGET_TYPE_CONTAINER) {
-            widgetCursor.previousState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.previousState) + 1);
-        } else if (widgetCursor.widget->type == WIDGET_TYPE_LAYOUT_VIEW) {
-            widgetCursor.previousState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.previousState) + 1);
-        } else {
-            ++widgetCursor.previousState;
-        }
+        widgetCursor.previousState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.previousState) + 1);
     }
     if (widgetCursor.currentState) {
-        if (widgetCursor.widget->type == WIDGET_TYPE_CONTAINER) {
-            widgetCursor.currentState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.currentState) + 1);
-        } else if (widgetCursor.widget->type == WIDGET_TYPE_LAYOUT_VIEW) {
-            widgetCursor.currentState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.currentState) + 1);
-        } else {
-            ++widgetCursor.currentState;
-        }
+        widgetCursor.currentState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.currentState) + 1);
     }
 
     auto savedWidget = widgetCursor.widget;
 
-    Overlay *overlay = nullptr;
-    if (isOverlay(widgetCursor)) {
-        overlay = getOverlay(widgetCursor);
-    }
+    auto widgetOverrides = overlay && overlay->widgetOverrides;
 
     for (uint32_t index = 0; index < widgets.count; ++index) {
         widgetCursor.widget = widgets.item(widgetCursor.assets, index);
@@ -77,7 +89,7 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, Lis
         int wSaved = 0;
         int hSaved = 0;
 
-        if (overlay && overlay->widgetOverrides) {
+        if (widgetOverrides) {
             if (!overlay->widgetOverrides[index].isVisible) {
                 continue;
             }
@@ -95,7 +107,7 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, Lis
 
         enumWidget(widgetCursor, callback);
 
-        if (overlay && overlay->widgetOverrides) {
+        if (widgetOverrides) {
             ((Widget*)widgetCursor.widget)->x = xSaved;
             ((Widget*)widgetCursor.widget)->y = ySaved;
             ((Widget*)widgetCursor.widget)->w = wSaved;
@@ -122,34 +134,6 @@ void enumContainer(WidgetCursor &widgetCursor, EnumWidgetsCallback callback, Lis
 
 	widgetCursor.currentState = savedCurrentState;
 	widgetCursor.previousState = savedPreviousState;
-}
-
-EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    Overlay *overlay = nullptr;
-    if (isOverlay(widgetCursor)) {
-        overlay = getOverlay(widgetCursor);
-
-        auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
-        auto previousState = (ContainerWidgetState *)widgetCursor.previousState;
-
-        if (currentState) {
-            currentState->overlayState = overlay ? overlay->state : 1;
-
-            if (previousState && previousState->overlayState != currentState->overlayState) {
-                widgetCursor.previousState = 0;
-            }
-        }
-
-        if (overlay && !overlay->state) {
-            if (widgetCursor.currentState) {
-                widgetCursor.currentState->size = sizeof(ContainerWidgetState);
-            }
-            return;
-        }
-    }
-
-    auto widget = ((ContainerWidget *)widgetCursor.widget);
-    enumContainer(widgetCursor, callback, widget->widgets);
 
     if (isOverlay(widgetCursor)) {
         auto currentState = (ContainerWidgetState *)widgetCursor.currentState;

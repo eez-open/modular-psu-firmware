@@ -107,25 +107,6 @@ void dragOverlay(Event &touchEvent) {
     }
 }
 
-void overlayEnumWidgetHook(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    if (!isOverlay(widgetCursor)) {
-        return;
-    }
-
-    // update overlay data
-    auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
-    Value widgetCursorValue((void *)&widgetCursor, VALUE_TYPE_POINTER);
-    DATA_OPERATION_FUNCTION(containerWidget->overlay, DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor, widgetCursorValue);
-
-    if (callback == findWidgetStep) {
-        int xOverlayOffset = 0;
-        int yOverlayOffset = 0;
-        getOverlayOffset(widgetCursor, xOverlayOffset, yOverlayOffset);
-        widgetCursor.x += xOverlayOffset;
-        widgetCursor.y += yOverlayOffset;
-    }
-}
-
 } // namespace gui
 } // namespace eez
 

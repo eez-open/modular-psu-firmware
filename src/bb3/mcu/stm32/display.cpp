@@ -37,7 +37,9 @@
 #include <eez/memory.h>
 
 #include <eez/gui/gui.h>
+
 #include <bb3/mcu/display.h>
+#include <bb3/mcu/display-private.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/persist_conf.h>
@@ -148,7 +150,7 @@ void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color
 
 void fillRect(void *dst, int x1, int y1, int x2, int y2) {
 	fillRect((uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
-    markDirty(x1, y1, x2, y2);
+    setDirty();
 }
 
 void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x, int y, int width, int height) {
@@ -204,7 +206,7 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
 
 void bitBlt(void *src, int x1, int y1, int x2, int y2) {
     bitBlt(src, g_buffer, x1, y1, x2, y2);
-    markDirty(x1, y1, x2, y2);
+    setDirty();
 }
 
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
@@ -246,7 +248,7 @@ void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, int heig
 
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
     bitBlt((uint16_t *)src, (uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1);
-    markDirty(x1, y1, x2, y2);
+    setDirty();
 }
 
 void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, int dstx, int dsty) {
@@ -311,53 +313,6 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
 		HAL_DMA2D_ConfigLayer(&hdma2d, 0);
 		HAL_DMA2D_BlendingStart(&hdma2d, srcOffset, dstOffset, dstOffset, sw, sh);
 	}
-}
-
-void bitBltA8Init(uint16_t color) {
-    // initialize everything except lineOffset
-
-    hdma2d.Init.Mode = DMA2D_M2M_BLEND;
-    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
-    hdma2d.Init.OutputOffset = 0;
-
-    // background
-    hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
-    hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
-    hdma2d.LayerCfg[0].InputAlpha = 0;
-    hdma2d.LayerCfg[0].InputOffset = 0;
-
-    // foreground
-    uint32_t colorBGRA;
-    uint8_t *pcolorBGRA = (uint8_t *)&colorBGRA;
-    pcolorBGRA[0] = COLOR_TO_B(color);
-    pcolorBGRA[1] = COLOR_TO_G(color);
-    pcolorBGRA[2] = COLOR_TO_R(color);
-    pcolorBGRA[3] = 255;
-
-    hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_A8;
-    hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
-    hdma2d.LayerCfg[1].InputAlpha = colorBGRA;
-    hdma2d.LayerCfg[1].InputOffset = 0;
-
-    DMA2D_WAIT;
-
-    HAL_DMA2D_Init(&hdma2d);
-    HAL_DMA2D_ConfigLayer(&hdma2d, 0);
-    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-}
-
-void bitBltA8(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int width, int height) {
-    uint32_t lineOffset = DISPLAY_WIDTH - width;
-    uint32_t dst = vramOffset(g_buffer, x, y);
-
-    DMA2D_WAIT;
-
-    // initialize lineOffset
-    WRITE_REG(hdma2d.Instance->OOR, lineOffset);
-    WRITE_REG(hdma2d.Instance->BGOR, lineOffset);
-    WRITE_REG(hdma2d.Instance->FGOR, srcLineOffset);
-
-    HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t)src, dst, dst, width, height);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -580,64 +535,11 @@ const uint8_t *takeScreenshot() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, int clip_y2,
-                        uint8_t encoding) {
-    auto glyph = g_font.getGlyph(encoding);
-    if (!glyph) {
-        return 0;
-    }
-
-    int x_glyph = x1 + glyph->x;
-    int y_glyph = y1 + g_font.getAscent() - (glyph->y + glyph->height);
-
-    // draw glyph pixels
-    int iStartByte = 0;
-    if (x_glyph < clip_x1) {
-        int dx_off = clip_x1 - x_glyph;
-        iStartByte = dx_off;
-        if (iStartByte >= glyph->width) {
-            return glyph->dx;
-        }
-        x_glyph = clip_x1;
-    }
-
-    int offset = 0;
-    int glyphHeight = glyph->height;
-    if (y_glyph < clip_y1) {
-        int dy_off = clip_y1 - y_glyph;
-        offset += dy_off * glyph->width;
-        glyphHeight -= dy_off;
-        y_glyph = clip_y1;
-    }
-
-    int width;
-    if (x_glyph + (glyph->width - iStartByte) - 1 > clip_x2) {
-    	width = clip_x2 - x_glyph + 1;
-    } else {
-        width = (glyph->width - iStartByte);
-    }
-
-    int height;
-    if (y_glyph + glyphHeight - 1 > clip_y2) {
-        height = clip_y2 - y_glyph + 1;
-    } else {
-        height = glyphHeight;
-    }
-
-    if (width > 0 && height > 0) {
-        bitBltA8(glyph->pixels + offset + iStartByte, glyph->width - width, x_glyph, y_glyph, width,height);
-    }
-
-    return glyph->dx;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void drawPixel(int x, int y) {
     DMA2D_WAIT;
     *(g_buffer + y * DISPLAY_WIDTH + x) = g_fc;
 
-    markDirty(x, y, x, y);
+    setDirty();
 }
 
 void drawPixel(int x, int y, uint8_t opacity) {
@@ -651,7 +553,7 @@ void drawPixel(int x, int y, uint8_t opacity) {
 		)
 	);
 
-    markDirty(x, y, x, y);
+    setDirty();
 }
 
 void drawRect(int x1, int y1, int x2, int y2) {
@@ -667,7 +569,7 @@ void drawRect(int x1, int y1, int x2, int y2) {
     drawVLine(x1, y1, y2 - y1);
     drawVLine(x2, y1, y2 - y1);
 
-    markDirty(x1, y1, x2, y2);
+    setDirty();
 }
 
 void fillRect(int x1, int y1, int x2, int y2, int r) {
@@ -677,63 +579,81 @@ void fillRect(int x1, int y1, int x2, int y2, int r) {
         fillRoundedRect(x1, y1, x2, y2, r);
     }
 
-    markDirty(x1, y1, x2, y2);
+    setDirty();
 }
 
 void drawHLine(int x, int y, int l) {
     fillRect(x, y, x + l, y);
 
-    markDirty(x, y, x + l, y);
+    setDirty();
 }
 
 void drawVLine(int x, int y, int l) {
     fillRect(x, y, x, y + l);
 
-    markDirty(x, y, x, y + l);
+    setDirty();
 }
 
 void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     bitBlt(g_buffer, g_buffer, x1, y1, x2-x1+1, y2-y1+1, dstx, dsty);
 
-    markDirty(dstx, dsty, dstx + x2 - x1, dsty + y2 - y1);
+    setDirty();
 }
 
 void drawBitmap(Image *image, int x, int y) {
     bitBlt(image->pixels, image->bpp, image->lineOffset, g_buffer, x, y, image->width, image->height);
-    markDirty(x, y, x + image->width - 1, y + image->height - 1);
+
+    setDirty();
 }
 
-void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font, int cursorPosition) {
-    g_font = font;
+void drawStrInit() {
+    auto color = g_fc;
 
-    bitBltA8Init(g_fc);
+    // initialize everything except lineOffset
 
-    if (textLength == -1) {
-        textLength = strlen(text);
-    }
+    hdma2d.Init.Mode = DMA2D_M2M_BLEND;
+    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+    hdma2d.Init.OutputOffset = 0;
 
-    int xCursor = x;
+    // background
+    hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
+    hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+    hdma2d.LayerCfg[0].InputAlpha = 0;
+    hdma2d.LayerCfg[0].InputOffset = 0;
 
-    int i;
+    // foreground
+    uint32_t colorBGRA;
+    uint8_t *pcolorBGRA = (uint8_t *)&colorBGRA;
+    pcolorBGRA[0] = COLOR_TO_B(color);
+    pcolorBGRA[1] = COLOR_TO_G(color);
+    pcolorBGRA[2] = COLOR_TO_R(color);
+    pcolorBGRA[3] = 255;
 
-    for (i = 0; i < textLength && text[i]; ++i) {
-        char encoding = text[i];
-        if (i == cursorPosition) {
-            xCursor = x;
-        }
-        x += drawGlyph(x, y, clip_x1, clip_y1, clip_x2, clip_y2, encoding);
-    }
+    hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_A8;
+    hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+    hdma2d.LayerCfg[1].InputAlpha = colorBGRA;
+    hdma2d.LayerCfg[1].InputOffset = 0;
 
-    if (i == cursorPosition) {
-        xCursor = x;
-    }
+    DMA2D_WAIT;
 
-    if (cursorPosition != -1) {
-        auto d = MAX(((clip_y2 - clip_y1) - font.getHeight()) / 2, 0);
-        fillRect(xCursor - CURSOR_WIDTH / 2, clip_y1 + d, xCursor + CURSOR_WIDTH / 2 - 1, clip_y2 - d);
-    }
+    HAL_DMA2D_Init(&hdma2d);
+    HAL_DMA2D_ConfigLayer(&hdma2d, 0);
+    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
 
-    markDirty(clip_x1, clip_y1, clip_x2, clip_y2);
+}
+
+void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int width, int height) {
+    uint32_t lineOffset = DISPLAY_WIDTH - width;
+    uint32_t dst = vramOffset(g_buffer, x, y);
+
+    DMA2D_WAIT;
+
+    // initialize lineOffset
+    WRITE_REG(hdma2d.Instance->OOR, lineOffset);
+    WRITE_REG(hdma2d.Instance->BGOR, lineOffset);
+    WRITE_REG(hdma2d.Instance->FGOR, srcLineOffset);
+
+    HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t)src, dst, dst, width, height);
 }
 
 } // namespace display

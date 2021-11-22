@@ -31,6 +31,7 @@
 #include <cmsis_os.h>
 
 #include <bb3/mcu/display.h>
+#include <bb3/mcu/display-private.h>
 
 #include <bb3/psu/gui/psu.h>
 #include <eez/debug.h>
@@ -293,7 +294,6 @@ void sync() {
             finishAnimation();
         }
         clearDirty();
-        // clearDirty();
         return;
     }
 
@@ -357,83 +357,10 @@ const uint8_t *takeScreenshot() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void doDrawGlyph(const gui::GlyphData &glyph, int x_glyph, int y_glyph, int width, int height, int offset, int iStartByte) {
-    uint32_t pixel;
-    ((uint8_t *)&pixel)[0] = COLOR_TO_B(g_fc);
-    ((uint8_t *)&pixel)[1] = COLOR_TO_G(g_fc);
-    ((uint8_t *)&pixel)[2] = COLOR_TO_R(g_fc);
-    uint8_t *pixelAlpha = ((uint8_t *)&pixel) + 3;
-
-    const uint8_t *src = glyph.pixels + offset + iStartByte;
-    int nlSrc = glyph.width - width;
-
-    uint32_t *dst = g_buffer + y_glyph * DISPLAY_WIDTH + x_glyph;
-    int nlDst = DISPLAY_WIDTH - width;
-
-    for (const uint8_t *srcEnd = src + height * glyph.width; src != srcEnd; src += nlSrc, dst += nlDst) {
-        for (uint32_t *dstEnd = dst + width; dst != dstEnd; src++, dst++) {
-            *pixelAlpha = *src;
-            *dst = blendColor(pixel, *dst);
-        }
-    }
-}
-
-static int8_t drawGlyph(int x1, int y1, int clip_x1, int clip_y1, int clip_x2, int clip_y2, uint8_t encoding) {
-    auto glyph = g_font.getGlyph(encoding);
-    if (!glyph) {
-        return 0;
-    }
-
-    int x_glyph = x1 + glyph->x;
-    int y_glyph = y1 + g_font.getAscent() - (glyph->y + glyph->height);
-
-    // draw glyph pixels
-    int iStartByte = 0;
-    if (x_glyph < clip_x1) {
-        int dx_off = clip_x1 - x_glyph;
-        iStartByte = dx_off;
-        if (iStartByte >= glyph->width) {
-            return glyph->dx;
-        }
-        x_glyph = clip_x1;
-    }
-
-    int offset = 0;
-	int glyphHeight = glyph->height;
-    if (y_glyph < clip_y1) {
-        int dy_off = clip_y1 - y_glyph;
-        offset += dy_off * glyph->width;
-		glyphHeight -= dy_off;
-        y_glyph = clip_y1;
-    }
-
-    int width;
-    if (x_glyph + (glyph->width - iStartByte) - 1 > clip_x2) {
-        width = clip_x2 - x_glyph + 1;
-    } else {
-        width = (glyph->width - iStartByte);
-    }
-
-    int height;
-    if (y_glyph + glyphHeight - 1 > clip_y2) {
-        height = clip_y2 - y_glyph + 1;
-    } else {
-        height = glyphHeight;
-    }
-
-    if (width > 0 && height > 0) {
-        doDrawGlyph(*glyph, x_glyph, y_glyph, width, height, offset, iStartByte);
-    }
-
-    return glyph->dx;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void drawPixel(int x, int y) {
     *(g_buffer + y * DISPLAY_WIDTH + x) = color16to32(g_fc);
 
-    markDirty(x, y, x, y);;
+    setDirty();
 }
 
 void drawPixel(int x, int y, uint8_t opacity) {
@@ -443,7 +370,7 @@ void drawPixel(int x, int y, uint8_t opacity) {
         color16to32(g_fc, opacity), 
         color16to32(RGB_TO_COLOR(destUint8[0], destUint8[1], destUint8[2]), 255 - opacity));
 
-    markDirty(x, y, x, y);;
+    setDirty();
 }
 
 void drawRect(int x1, int y1, int x2, int y2) {
@@ -459,7 +386,7 @@ void drawRect(int x1, int y1, int x2, int y2) {
     drawVLine(x1, y1, y2 - y1);
     drawVLine(x2, y1, y2 - y1);
 
-    markDirty(x1, y1, x2, y2);
+    setDirty();
 }
 
 void fillRect(int x1, int y1, int x2, int y2, int r) {
@@ -486,7 +413,7 @@ void fillRect(int x1, int y1, int x2, int y2, int r) {
         fillRoundedRect(x1, y1, x2, y2, r);
     }
 
-    markDirty(x1, y1, x2, y2);
+    setDirty();
 }
 
 void fillRect(void *dstBuffer, int x1, int y1, int x2, int y2) {
@@ -500,7 +427,7 @@ void fillRect(void *dstBuffer, int x1, int y1, int x2, int y2) {
         dst += nl;
     }
 
-    markDirty(x1, y1, x2, y2);
+    setDirty();
 }
 
 void drawHLine(int x, int y, int l) {
@@ -512,7 +439,7 @@ void drawHLine(int x, int y, int l) {
         *dst++ = color32;
     }
 
-    markDirty(x, y, x + l, y);
+    setDirty();
 }
 
 void drawVLine(int x, int y, int l) {
@@ -526,7 +453,7 @@ void drawVLine(int x, int y, int l) {
         dst += DISPLAY_WIDTH;
     }
 
-    markDirty(x, y, x, y + l);
+    setDirty();
 }
 
 void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
@@ -543,12 +470,12 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
         }
     }
 
-    markDirty(dstx, dsty, dstx + x2 - x1, dsty + y2 - y1);
+    setDirty();
 }
 
 void bitBlt(void *src, int x1, int y1, int x2, int y2) {
     bitBlt(src, g_buffer, x1, y1, x2, y2);
-    markDirty(x1, y1, x2, y2);
+    setDirty();
 }
 
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
@@ -559,7 +486,7 @@ void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
         }
     }
 
-    markDirty(x1, y1, x2, y2);
+    setDirty();
 }
 
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
@@ -628,38 +555,35 @@ void drawBitmap(Image *image, int x, int y) {
         }
     }
 
-    markDirty(x, y, x + image->width - 1, y + image->height - 1);
+    setDirty();
 }
 
-void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font, int cursorPosition) {
-    g_font = font;
+void drawStrInit() {
+}
 
-    if (textLength == -1) {
-        textLength = strlen(text);
-    }
+void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x_glyph, int y_glyph, int width, int height) {
+    // glyph->pixels + offset + iStartByte, glyph->width - width, x_glyph, y_glyph, width,height
+    // const gui::GlyphData &glyph, int x_glyph, int y_glyph, int width, int height, int offset, int iStartByte
 
-    int xCursor = x;
+    uint32_t pixel;
+    ((uint8_t *)&pixel)[0] = COLOR_TO_B(g_fc);
+    ((uint8_t *)&pixel)[1] = COLOR_TO_G(g_fc);
+    ((uint8_t *)&pixel)[2] = COLOR_TO_R(g_fc);
+    uint8_t *pixelAlpha = ((uint8_t *)&pixel) + 3;
 
-    int i;
+    uint32_t *dst = g_buffer + y_glyph * DISPLAY_WIDTH + x_glyph;
+    int nlDst = DISPLAY_WIDTH - width;
 
-    for (i = 0; i < textLength && text[i]; ++i) {
-        char encoding = text[i];
-        if (i == cursorPosition) {
-            xCursor = x;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            *pixelAlpha = *src;
+            *dst = blendColor(pixel, *dst);
+            src++;
+            dst++;
         }
-        x += drawGlyph(x, y, clip_x1, clip_y1, clip_x2, clip_y2, encoding);
+        src += srcLineOffset;
+        dst += nlDst;
     }
-
-    if (i <= cursorPosition) {
-        xCursor = x;
-    }
-
-    if (cursorPosition != -1) {
-        auto d = MAX(((clip_y2 - clip_y1) - font.getHeight()) / 2, 0);
-        fillRect(xCursor - CURSOR_WIDTH / 2, clip_y1 + d, xCursor + CURSOR_WIDTH / 2 - 1, clip_y2 - d);
-    }
-
-    markDirty(clip_x1, clip_y1, clip_x2, clip_y2);
 }
 
 } // namespace display

@@ -56,7 +56,52 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
 
     if (layout) {
 		auto layoutView = (PageAsset *)layout;
-		enumContainer(widgetCursor, callback, layoutView->widgets);
+
+        auto &widgets = layoutView->widgets;
+
+        auto savedCurrentState = widgetCursor.currentState;
+        auto savedPreviousState = widgetCursor.previousState;
+
+        WidgetState *endOfContainerInPreviousState = 0;
+        if (widgetCursor.previousState) {
+            endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
+        }
+
+        // move to the first child widget state
+        if (widgetCursor.previousState) {
+            widgetCursor.previousState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.previousState) + 1);
+        }
+        if (widgetCursor.currentState) {
+            widgetCursor.currentState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.currentState) + 1);
+        }
+
+        auto savedWidget = widgetCursor.widget;
+
+        for (uint32_t index = 0; index < widgets.count; ++index) {
+            widgetCursor.widget = widgets.item(widgetCursor.assets, index);
+
+            enumWidget(widgetCursor, callback);
+
+            if (widgetCursor.previousState) {
+                widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
+                if (widgetCursor.previousState > endOfContainerInPreviousState) {
+                    widgetCursor.previousState = 0;
+                }
+            }
+
+            if (widgetCursor.currentState) {
+                widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+            }
+        }
+
+        widgetCursor.widget = savedWidget;
+
+        if (widgetCursor.currentState) {
+            savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
+        }
+
+        widgetCursor.currentState = savedCurrentState;
+        widgetCursor.previousState = savedPreviousState;
 	} else {
 		if (widgetCursor.currentState) {
 			widgetCursor.currentState->size = 0;

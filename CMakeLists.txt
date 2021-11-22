@@ -16,7 +16,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 endif()
 
 add_definitions(-DFIRMWARE_VERSION_MAJOR=1)
-add_definitions(-DFIRMWARE_VERSION_MINOR=8-alpha2)
+add_definitions(-DFIRMWARE_VERSION_MINOR=8-alpha3)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[png]'")
@@ -474,6 +474,7 @@ list (APPEND src_files ${src_bb3_mcu})
 set(header_bb3_mcu
     src/bb3/mcu/battery.h
     src/bb3/mcu/display.h
+    src/bb3/mcu/display-private.h
     src/bb3/mcu/eeprom.h
     src/bb3/mcu/encoder.h
     src/bb3/mcu/ethernet.h

@@ -55,7 +55,12 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
 
 	auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
     if (containerWidget->widgets.count > 0) {
-		int index = indexValue.toInt32();
+        int err;
+		int index = indexValue.toInt32(&err);
+        if (err) {
+            index = indexValue.getInt();
+        }
+
 	    auto widgetIndex = index < 0 || index >= (int)containerWidget->widgets.count ? 0 : index;
         widgetCursor.widget = containerWidget->widgets.item(widgetCursor.assets, widgetIndex);
         enumWidget(widgetCursor, callback);

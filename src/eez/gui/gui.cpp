@@ -36,6 +36,8 @@
 
 #define CONF_GUI_BLINK_TIME 400 // 400ms
 
+volatile float g_debugFPS;
+
 namespace eez {
 namespace gui {
 
@@ -134,18 +136,10 @@ void onGuiQueueMessage(uint8_t type, int16_t param) {
 void oneIter() {
     uint32_t timeout = 0;
 
-    // static uint32_t lastTime;
-    // uint32_t tickCount = millis();
-    // if (lastTime != 0) {
-    //     uint32_t diff = tickCount - lastTime;
-    //     if (diff < 40) {
-    //         timeout = 40 - diff;
-    //     }
-    // }
-    // lastTime = tickCount;
-    // if (lastTime == 0) {
-    //     lastTime = 1;
-    // }
+    static uint32_t lastTime;
+    uint32_t tickCount = millis();
+    g_debugFPS = 1000.0f / (tickCount - lastTime);
+    lastTime = tickCount;
 
     while (true) {
         osEvent event = osMessageGet(g_guiMessageQueueId, timeout);

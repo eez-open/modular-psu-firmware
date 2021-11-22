@@ -5,7 +5,7 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<macros>
 					<stringMacro name="FW_VER_MAJOR" type="VALUE_TEXT" value="1"/>
-					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="8-alpha2"/>
+					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="8-alpha3"/>
 				</macros>
 				<externalSettings/>
 				<extensions>
@@ -228,7 +228,7 @@
 								<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.script.1111067067" name="Linker Script (-T)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.script" useByScannerDiscovery="false" value="${workspace_loc:/${ProjName}/STM32F769IGTX_FLASH.ld}" valueType="string"/>
 								<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.systemcalls.1787977707" name="System calls" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.systemcalls" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.systemcalls.value.minimalimplementation" valueType="enumerated"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.otherflags.1951275891" name="Other flags" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.otherflags" useByScannerDiscovery="false" valueType="stringList">
-									<listOptionValue builtIn="false" value="-Wl,-Map=bb3-v1.7.map"/>
+									<listOptionValue builtIn="false" value="-Wl,-Map=bb3-v1.8-alpha3.map"/>
 								</option>
 								<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.map.1545217104" name="Generate map file (-Wl,-Map=)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.map" useByScannerDiscovery="false" value="false" valueType="boolean"/>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.input.2005699527" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.input">
@@ -593,7 +593,7 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1343602219.587843218" moduleId="org.eclipse.cdt.core.settings" name="Debug (FPGA)">
 				<macros>
 					<stringMacro name="FW_VER_MAJOR" type="VALUE_TEXT" value="1"/>
-					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="8-alpha"/>
+					<stringMacro name="FW_VER_MINOR" type="VALUE_PATH_ANY" value="8-alpha3"/>
 				</macros>
 				<externalSettings/>
 				<extensions>
@@ -862,7 +862,7 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1701190242" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<macros>
 					<stringMacro name="FW_VER_MAJOR" type="VALUE_TEXT" value="1"/>
-					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="8-alpha"/>
+					<stringMacro name="FW_VER_MINOR" type="VALUE_TEXT" value="8-alpha3"/>
 				</macros>
 				<externalSettings/>
 				<extensions>

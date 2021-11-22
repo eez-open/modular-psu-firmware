@@ -32,6 +32,7 @@
 #include <bb3/psu/psu.h>
 #include <bb3/psu/persist_conf.h>
 
+#include <bb3/mcu/display-private.h>
 
 #define CONF_BACKDROP_OPACITY 128
 
@@ -55,6 +56,17 @@ static uint8_t g_colorCache[256][4];
 static const uint16_t *g_themeColors;
 static uint32_t g_themeColorsCount;
 static const uint16_t *g_colors;
+
+bool g_dirty;
+
+Buffer g_buffers[NUM_BUFFERS];
+
+static void *g_bufferPointer;
+
+static int g_bufferToDrawIndexes[NUM_BUFFERS];
+static int g_numBuffersToDraw;
+
+////////////////////////////////////////////////////////////////////////////////
 
 uint32_t color16to32(uint16_t color, uint8_t opacity) {
     uint32_t color32;
@@ -283,69 +295,6 @@ uint8_t getOpacity() {
     return g_opacity;
 }
 
-// static int g_prevDirtyX1;
-// static int g_prevDirtyY1;
-// static int g_prevDirtyX2;
-// static int g_prevDirtyY2;
-
-// static int g_nextDirtyX1 = getDisplayWidth();
-// static int g_nextDirtyY1 = getDisplayHeight();
-// static int g_nextDirtyX2 = -1;
-// static int g_nextDirtyY2 = -1;
-
-// static int g_dirtyX1;
-// static int g_dirtyY1;
-// static int g_dirtyX2;
-// static int g_dirtyY2;
-
-bool g_dirty;
-
-void clearDirty() {
-    g_dirty = false;
-
-    // g_prevDirtyX1 = g_nextDirtyX1;
-    // g_prevDirtyY1 = g_nextDirtyY1;
-    // g_prevDirtyX2 = g_nextDirtyX2;
-    // g_prevDirtyY2 = g_nextDirtyY2;
-
-    // g_nextDirtyX1 = getDisplayWidth();
-    // g_nextDirtyY1 = getDisplayHeight();
-    // g_nextDirtyX2 = -1;
-    // g_nextDirtyY2 = -1;
-}
-
-// void markDirty(int x1, int y1, int x2, int y2) {
-//     if (x1 < g_nextDirtyX1) {
-//         g_nextDirtyX1 = x1;
-//     }
-//     if (y1 < g_nextDirtyY1) {
-//         g_nextDirtyY1 = y1;
-//     }
-//     if (x2 > g_nextDirtyX2) {
-//         g_nextDirtyX2 = x2;
-//     }
-//     if (y2 > g_nextDirtyY2) {
-//         g_nextDirtyY2 = y2;
-//     }
-// }
-
-bool isDirty() {
-    // g_dirtyX1 = MIN(g_prevDirtyX1, g_nextDirtyX1);
-    // g_dirtyY1 = MIN(g_prevDirtyY1, g_nextDirtyY1);
-    // g_dirtyX2 = MAX(g_prevDirtyX2, g_nextDirtyX2);
-    // g_dirtyY2 = MAX(g_prevDirtyY2, g_nextDirtyY2);
-
-    // if (g_dirtyX1 <= g_dirtyX2 && g_dirtyY1 <= g_dirtyY2) {
-    //     // char msg[50];
-    //     // snprintf(msg, sizeof(msg), "%d x %d\n", g_dirtyX2 - g_dirtyX1 + 1, g_dirtyY2 - g_dirtyY1 + 1);
-    //     // Serial.println(msg);
-    //     return true;
-    // }
-
-    // return false;
-    return g_dirty;
-}
-
 void drawFocusFrame(int x, int y, int w, int h) {
     int lineWidth = MIN(MIN(3, w), h);
 
@@ -424,23 +373,6 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
     return width;
 }
 
-Buffer g_buffers[NUM_BUFFERS];
-
-static void *g_bufferPointer;
-
-static int g_bufferToDrawIndexes[NUM_BUFFERS];
-static int g_numBuffersToDraw;
-
-//int getNumFreeBuffers() {
-//    int count = 0;
-//    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-//        if (!g_buffers[bufferIndex].flags.allocated) {
-//            count++;
-//        }
-//    }
-//    return count;
-//}
-
 int allocBuffer() {
     int bufferIndex;
 
@@ -494,8 +426,6 @@ void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool 
         if (withShadow) {
             expandRectWithShadow(x1, y1, x2, y2);
         }
-
-        markDirty(x1, y1, x2, y2);
     }
 
     for (int i = 0; i < g_numBuffersToDraw; i++) {
@@ -564,25 +494,9 @@ void endBuffersDrawing() {
                 setOpacity(savedOpacity);
             }
 
-            // if (x1 < g_dirtyX1) {
-            //     int xd = g_dirtyX1 - x1;
-            //     sx += xd;
-            //     x1 += xd;
-            // }
-
-            // if (y1 < g_dirtyY1) {
-            //     int yd = g_dirtyY1 - y1;
-            //     sy += yd;
-            //     y1 += yd;
-            // }
-
-            // if (x2 > g_dirtyX2) {
-            //     x2 = g_dirtyX2;
-            // }
-
-            // if (y2 > g_dirtyY2) {
-            //     y2 = g_dirtyY2;
-            // }
+            if (buffer.withShadow) {
+                drawShadow(x1, y1, x2, y2);
+            }
 
             bitBlt(buffer.bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
         }
@@ -594,6 +508,86 @@ void endBuffersDrawing() {
     g_numBuffersToDraw = 0;
 
     freeUnusedBuffers();
+}
+
+void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font, int cursorPosition) {
+    g_font = font;
+
+    drawStrInit();
+
+    if (textLength == -1) {
+        textLength = strlen(text);
+    }
+
+    int xCursor = x;
+
+    int i;
+
+    for (i = 0; i < textLength && text[i]; ++i) {
+        char encoding = text[i];
+        if (i == cursorPosition) {
+            xCursor = x;
+        }
+
+        auto x1 = x;
+        auto y1 = y;
+
+        auto glyph = g_font.getGlyph(encoding);
+        if (glyph) {
+            int x_glyph = x1 + glyph->x;
+            int y_glyph = y1 + g_font.getAscent() - (glyph->y + glyph->height);
+
+            // draw glyph pixels
+            int iStartByte = 0;
+            if (x_glyph < clip_x1) {
+                int dx_off = clip_x1 - x_glyph;
+                iStartByte = dx_off;
+                x_glyph = clip_x1;
+            }
+
+			if (iStartByte < glyph->width) {
+				int offset = 0;
+				int glyphHeight = glyph->height;
+				if (y_glyph < clip_y1) {
+					int dy_off = clip_y1 - y_glyph;
+					offset += dy_off * glyph->width;
+					glyphHeight -= dy_off;
+					y_glyph = clip_y1;
+				}
+
+				int width;
+				if (x_glyph + (glyph->width - iStartByte) - 1 > clip_x2) {
+					width = clip_x2 - x_glyph + 1;
+				} else {
+					width = (glyph->width - iStartByte);
+				}
+
+				int height;
+				if (y_glyph + glyphHeight - 1 > clip_y2) {
+					height = clip_y2 - y_glyph + 1;
+				} else {
+					height = glyphHeight;
+				}
+
+				if (width > 0 && height > 0) {
+					drawGlyph(glyph->pixels + offset + iStartByte, glyph->width - width, x_glyph, y_glyph, width, height);
+				}
+			}
+			
+			x += glyph->dx;
+		}
+    }
+
+    if (i == cursorPosition) {
+        xCursor = x;
+    }
+
+    if (cursorPosition != -1) {
+        auto d = MAX(((clip_y2 - clip_y1) - font.getHeight()) / 2, 0);
+        fillRect(xCursor - CURSOR_WIDTH / 2, clip_y1 + d, xCursor + CURSOR_WIDTH / 2 - 1, clip_y2 - d);
+    }
+
+    setDirty();
 }
 
 int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {

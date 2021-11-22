@@ -68,7 +68,7 @@
     <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_START_MODE" value="remote"/>
     <booleanAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN" value="false"/>
     <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN_SYMBOL" value="main"/>
-    <stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="C:\work\eez\modular-psu-firmware\src\third_party\stm32_cubeide\Debug\bb3-v1.7.2.elf"/>
+    <stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="C:\work\eez\modular-psu-firmware\src\third_party\stm32_cubeide\Debug\bb3-v1.8-alpha3.elf"/>
     <stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="bb3"/>
     <booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="false"/>
     <stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value=""/>
