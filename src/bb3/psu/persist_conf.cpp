@@ -23,9 +23,11 @@
 #include <main.h>
 #endif
 
-#include <eez/system.h>
+#include <eez/conf.h>
+
+#include <bb3/system.h>
 #include <bb3/usb.h>
-#include <eez/tasks.h>
+#include <bb3/tasks.h>
 
 #include <bb3/psu/psu.h>
 
@@ -45,7 +47,7 @@
 
 #if OPTION_DISPLAY
 #include <bb3/psu/gui/psu.h>
-using namespace eez::mcu::display;
+using namespace eez::display;
 #endif
 
 #if OPTION_ETHERNET

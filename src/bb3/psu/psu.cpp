@@ -23,14 +23,16 @@
 #include <tim.h>
 #endif
 
-#include <eez/firmware.h>
-#include <eez/system.h>
+#include <bb3/firmware.h>
+#include <bb3/system.h>
 #include <eez/sound.h>
 #include <bb3/index.h>
 #include <eez/util.h>
-#include <eez/scripting/scripting.h>
+#include <bb3/scripting/scripting.h>
 
 #include <bb3/scpi/scpi.h>
+
+#include <bb3/gui/touch.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/serial_psu.h>
@@ -52,7 +54,7 @@
 #include <bb3/psu/io_pins.h>
 #include <bb3/psu/list_program.h>
 #include <bb3/psu/ramp.h>
-#include <eez/function_generator.h>
+#include <bb3/function_generator.h>
 #include <bb3/psu/trigger.h>
 #include <bb3/psu/ontime.h>
 

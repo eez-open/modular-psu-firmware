@@ -16,8 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/scripting/scripting.h>
-
+#include <eez/flow/flow.h>
 #include <eez/flow/components.h>
 
 using namespace eez::gui;
@@ -30,7 +29,7 @@ void executeEndComponent(FlowState *flowState, unsigned componentIndex) {
 		flowState->parentFlowState->numActiveComponents--;
 		propagateValueThroughSeqout(flowState->parentFlowState, flowState->parentComponentIndex);
 	} else {
-		scripting::stopScript();
+		stopScriptHook();
 	}
 }
 

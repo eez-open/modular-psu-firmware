@@ -42,8 +42,8 @@
 #include <usb_device.h>
 #endif
 
-#include <eez/firmware.h>
-#include <eez/tasks.h>
+#include <bb3/firmware.h>
+#include <bb3/tasks.h>
 
 #include <bb3/mcu/encoder.h>
 

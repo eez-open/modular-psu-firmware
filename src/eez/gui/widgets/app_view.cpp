@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <assert.h>
 
 #include <eez/gui/gui.h>
@@ -63,9 +61,9 @@ DrawFunctionType APP_VIEW_draw = [](const WidgetCursor &widgetCursor) {
         // clear background
 		auto page = getPageAsset(appContext->getActivePageId());
         const Style* style = getStyle(page->style);
-        mcu::display::setColor(style->background_color);
+        display::setColor(style->background_color);
 
-		mcu::display::fillRect(appContext->rect.x, appContext->rect.y, appContext->rect.x + page->w - 1, appContext->rect.y + page->h - 1);
+		display::fillRect(appContext->rect.x, appContext->rect.y, appContext->rect.x + page->w - 1, appContext->rect.y + page->h - 1);
     }
 };
 
@@ -75,5 +73,3 @@ OnKeyboardFunctionType APP_VIEW_onKeyboard = nullptr;
 
 } // namespace gui
 } // namespace eez
-
-#endif

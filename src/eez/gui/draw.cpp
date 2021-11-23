@@ -16,17 +16,14 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if OPTION_DISPLAY
-
 #include <string.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include <eez/gui_conf.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
-
-using namespace eez::mcu;
 
 namespace eez {
 namespace gui {
@@ -51,27 +48,6 @@ bool styleIsVertAlignBottom(const Style *style) {
 
 font::Font styleGetFont(const Style *style) {
     return font::Font(getFontData(style->font));
-}
-
-bool styleGetSmallerFont(font::Font &font) {
-    if (font.fontData == getFontData(FONT_ID_OSWALD48)) {
-        font.fontData = getFontData(FONT_ID_OSWALD38);
-    } else if (font.fontData == getFontData(FONT_ID_OSWALD38)) {
-        font.fontData = getFontData(FONT_ID_OSWALD24);
-    } else if (font.fontData == getFontData(FONT_ID_OSWALD24)) {
-        font.fontData = getFontData(FONT_ID_OSWALD20);
-    } else if (font.fontData == getFontData(FONT_ID_OSWALD20)) {
-        font.fontData = getFontData(FONT_ID_OSWALD17);
-    } else if (font.fontData == getFontData(FONT_ID_OSWALD17)) {
-        font.fontData = getFontData(FONT_ID_OSWALD14);
-    } else if (font.fontData == getFontData(FONT_ID_OSWALD14)) {
-        font.fontData = getFontData(FONT_ID_OSWALD12);
-    } else if (font.fontData == getFontData(FONT_ID_OSWALD12)) {
-        font.fontData = getFontData(FONT_ID_ROBOTO_CONDENSED_REGULAR);
-    } else {
-        return false;
-    }
-    return true;
 }
 
 bool styleIsBlink(const Style *style) {
@@ -108,7 +84,7 @@ void drawText(const char *text, int textLength, int x, int y, int w, int h, cons
     font::Font font = styleGetFont(style);
 
     int width = display::measureStr(text, textLength, font, 0);
-    while (useSmallerFontIfDoesNotFit && width > x2 - x1 + 1 && styleGetSmallerFont(font)) {
+    while (useSmallerFontIfDoesNotFit && width > x2 - x1 + 1 && styleGetSmallerFontHook(font)) {
         width = display::measureStr(text, textLength, font, 0);
     }
     int height = font.getHeight();
@@ -604,7 +580,18 @@ void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, 
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+enum ShadowGlpyh {
+	SHADOW_GLYPH_TOP_LEFT,
+	SHADOW_GLYPH_TOP,
+	SHADOW_GLYPH_TOP_RIGHT,
+	SHADOW_GLYPH_LEFT,
+	SHADOW_GLYPH_RIGHT,
+	SHADOW_GLYPH_BOTTOM_LEFT,
+	SHADOW_GLYPH_BOTTOM,
+	SHADOW_GLYPH_BOTTOM_RIGHT,
+};
 
 static const int T = 4;
 static const int R = 7;
@@ -614,57 +601,54 @@ static const int L = 7;
 static const int W = 20;
 static const int H = 20;
 
-void drawShadowGlyph(char glyph, int x, int y, int xClip = -1, int yClip = -1) {
-    if (xClip == -1) {
-        xClip = x + W - 1;
-    }
-    if (yClip == -1) {
-        yClip = y + H - 1;
-    }
-    font::Font font(getFontData(FONT_ID_SHADOW));
-    eez::mcu::display::drawStr(&glyph, 1, x, y, x, y, xClip, yClip, font, -1);
+void drawShadowGlyph(ShadowGlpyh shadowGlyph, int x, int y, int xClip = -1, int yClip = -1) {
+	font::Font font(getFontData(EEZ_CONF_FONT_ID_SHADOW));
+
+	if (xClip == -1) {
+		xClip = x + W - 1;
+	}
+	if (yClip == -1) {
+		yClip = y + H - 1;
+	}
+	char glyph = 32 + shadowGlyph;
+	display::drawStr(&glyph, 1, x, y, x, y, xClip, yClip, font, -1);
 }
 
 void drawShadow(int x1, int y1, int x2, int y2) {
-    mcu::display::setColor(64, 64, 64);
+	display::setColor(64, 64, 64);
 
-    int left = x1 - L;
-    int top = y1 - T;
+	int left = x1 - L;
+	int top = y1 - T;
 
-    int right = x2 + R - (W - 1);
-    int bottom = y2 + B - (H - 1);
+	int right = x2 + R - (W - 1);
+	int bottom = y2 + B - (H - 1);
 
-    drawShadowGlyph(32, left, top);
-
-    for (int x = left + W; x < right; x += W) {
-        drawShadowGlyph(33, x, top, right - 1);
-    }
-
-    drawShadowGlyph(34, right, top);
-
-    for (int y = top + H; y < bottom; y += H) {
-        drawShadowGlyph(35, left, y, -1, bottom - 1);
-    }
-
-    for (int y = top + H; y < bottom; y += H) {
-        drawShadowGlyph(36, right, y, -1, bottom - 1);
-    }
-
-    drawShadowGlyph(37, left, bottom);
-
-    for (int x = left + W; x < right; x += W) {
-        drawShadowGlyph(38, x, bottom, right - 1);
-    }
-
-    drawShadowGlyph(39, right, bottom);
+	drawShadowGlyph(SHADOW_GLYPH_TOP_LEFT, left, top);
+	for (int x = left + W; x < right; x += W) {
+		drawShadowGlyph(SHADOW_GLYPH_TOP, x, top, right - 1);
+	}
+	drawShadowGlyph(SHADOW_GLYPH_TOP_RIGHT, right, top);
+	for (int y = top + H; y < bottom; y += H) {
+		drawShadowGlyph(SHADOW_GLYPH_LEFT, left, y, -1, bottom - 1);
+	}
+	for (int y = top + H; y < bottom; y += H) {
+		drawShadowGlyph(SHADOW_GLYPH_RIGHT, right, y, -1, bottom - 1);
+	}
+	drawShadowGlyph(SHADOW_GLYPH_BOTTOM_LEFT, left, bottom);
+	for (int x = left + W; x < right; x += W) {
+		drawShadowGlyph(SHADOW_GLYPH_BOTTOM, x, bottom, right - 1);
+	}
+	drawShadowGlyph(SHADOW_GLYPH_BOTTOM_RIGHT, right, bottom);
 }
 
 void expandRectWithShadow(int &x1, int &y1, int &x2, int &y2) {
-    x1 -= L;
-    y1 -= T;
-    x2 += R;
-    y2 += B;
+	x1 -= L;
+	y1 -= T;
+	x2 += R;
+	y2 += B;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void drawLine(int x1, int y1, int x2, int y2) {
    int dx = x2 - x1;
@@ -682,7 +666,7 @@ void drawLine(int x1, int y1, int x2, int y2) {
    float x = (float)x1;
    float y = (float)y1;
    for (int i = 0; i < length; i++) {
-       mcu::display::drawPixel((int)roundf(x), (int)roundf(y));
+       display::drawPixel((int)roundf(x), (int)roundf(y));
        x += xinc;
        y += yinc;
    }
@@ -696,16 +680,16 @@ void drawAntialiasedLine(int x0, int y0, int x1, int y1) {
     int ed = dx + dy == 0 ? 1 : (int)sqrt((float)dx*dx + (float)dy*dy);
 
     for (; ; ) {                                         /* pixel loop */
-        mcu::display::drawPixel(x0, y0, 255 - 255 * abs(err - dx + dy) / ed);
+        display::drawPixel(x0, y0, 255 - 255 * abs(err - dx + dy) / ed);
         e2 = err; x2 = x0;
         if (2 * e2 >= -dx) {                                    /* x step */
             if (x0 == x1) break;
-            if (e2 + dy < ed) mcu::display::drawPixel(x0, y0 + sy, 255 - 255 * (e2 + dy) / ed);
+            if (e2 + dy < ed) display::drawPixel(x0, y0 + sy, 255 - 255 * (e2 + dy) / ed);
             err -= dy; x0 += sx;
         }
         if (2 * e2 <= dy) {                                     /* y step */
             if (y0 == y1) break;
-            if (dx - e2 < ed) mcu::display::drawPixel(x2 + sx, y0, 255 - 255 * (dx - e2) / ed);
+            if (dx - e2 < ed) display::drawPixel(x2 + sx, y0, 255 - 255 * (dx - e2) / ed);
             err += dx; y0 += sy;
         }
     }
@@ -763,12 +747,12 @@ void aaLine(int x1, int y1, int x2, int y2, int draw_endpoint) {
 		* Vertical line
 		*/
 		if (draw_endpoint) {
-			mcu::display::drawVLine(x1, y1, y2 - y1 + 1);
+			display::drawVLine(x1, y1, y2 - y1 + 1);
 		} else {
 			if (dy > 0) {
-				mcu::display::drawVLine(x1, yy0, yy0 + dy - yy0);
+				display::drawVLine(x1, yy0, yy0 + dy - yy0);
 			} else {
-				mcu::display::drawPixel(x1, y1);
+				display::drawPixel(x1, y1);
 			}
 		}
 	}
@@ -778,16 +762,16 @@ void aaLine(int x1, int y1, int x2, int y2, int draw_endpoint) {
 		* Horizontal line
 		*/
 		if (draw_endpoint) {
-			mcu::display::drawHLine(x1, y1, x2 - x1 + 1);
+			display::drawHLine(x1, y1, x2 - x1 + 1);
 		} else {
 			if (dx > 0) {
 				if (xdir > 0) {
-					mcu::display::drawHLine(xx0, y1, dx);
+					display::drawHLine(xx0, y1, dx);
 				} else {
-					mcu::display::drawHLine(xx0 - dx, y1, xx0 + dx - xx0);
+					display::drawHLine(xx0 - dx, y1, xx0 + dx - xx0);
 				}
 			} else {
-				mcu::display::drawPixel(x1, y1);
+				display::drawPixel(x1, y1);
 			}
 		}
 		return;
@@ -810,7 +794,7 @@ void aaLine(int x1, int y1, int x2, int y2, int draw_endpoint) {
 	/*
 	* Draw the initial pixel in the foreground color
 	*/
-	mcu::display::drawPixel(x1, y1);
+	display::drawPixel(x1, y1);
 
 	/*
 	* x-major or y-major?
@@ -849,8 +833,8 @@ void aaLine(int x1, int y1, int x2, int y2, int draw_endpoint) {
 			* the paired pixel.
 			*/
 			auto wgt = (int)(255 * erracc);
-			mcu::display::drawPixel(xx0, yy0, 255 - wgt);
-			mcu::display::drawPixel(x0pxdir, yy0, wgt);
+			display::drawPixel(xx0, yy0, 255 - wgt);
+			display::drawPixel(x0pxdir, yy0, wgt);
 		}
 
 	} else {
@@ -886,8 +870,8 @@ void aaLine(int x1, int y1, int x2, int y2, int draw_endpoint) {
 			* the paired pixel.
 			*/
 			auto wgt = (int)(255 * erracc);
-			mcu::display::drawPixel(xx0, yy0, 255 - wgt);
-			mcu::display::drawPixel(xx0, y0p1, wgt);
+			display::drawPixel(xx0, yy0, 255 - wgt);
+			display::drawPixel(xx0, y0p1, wgt);
 		}
 	}
 
@@ -899,7 +883,7 @@ void aaLine(int x1, int y1, int x2, int y2, int draw_endpoint) {
 		* Draw final pixel, always exactly intersected by the line and doesn't
 		* need to be weighted.
 		*/
-		mcu::display::drawPixel(x2, y2);
+		display::drawPixel(x2, y2);
 	}
 }
 
@@ -1006,7 +990,7 @@ int fillPolygon(const int16_t *vx, const int16_t *vy, int n, int *polyInts) {
 			xa = (xa >> 16) + ((xa & 32768) >> 15);
 			xb = polyInts[i + 1] - 1;
 			xb = (xb >> 16) + ((xb & 32768) >> 15);
-			mcu::display::drawHLine(xa, y, xb - xa + 1);
+			display::drawHLine(xa, y, xb - xa + 1);
 		}
 	}
 
@@ -1102,5 +1086,3 @@ void fillArcBar(int xCenter, int yCenter, int radius, float fromAngleDeg, float 
 
 } // namespace gui
 } // namespace eez
-
-#endif

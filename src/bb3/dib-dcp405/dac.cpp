@@ -20,10 +20,10 @@
 
 #include <scpi/scpi.h>
 
-#include <eez/system.h>
+#include <bb3/system.h>
 
 #if defined(EEZ_PLATFORM_STM32)
-#include <eez/platform/stm32/spi.h>
+#include <bb3/platform/stm32/spi.h>
 #endif
 
 #include <bb3/psu/psu.h>

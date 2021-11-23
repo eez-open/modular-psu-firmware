@@ -18,10 +18,20 @@
 
 #pragma once
 
-#include <eez/gui/document.h>
+#include <eez/gui/data.h>
+#include <eez/gui/widget.h>
 
 namespace eez {
 namespace gui {
+
+static const uint32_t HEADER_TAG = 0x7A65657E;
+
+struct Header {
+	uint32_t tag; // HEADER_TAG
+	uint16_t projectVersion;
+	uint16_t assetsType;
+	uint32_t decompressedSize;
+};
 
 extern bool g_isMainAssetsLoaded;
 extern Assets *g_mainAssets;
@@ -287,7 +297,11 @@ struct Assets {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void loadMainAssets();
+bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, Assets *decompressedAssets, uint32_t maxDecompressedAssetsSize, int *err);
+
+////////////////////////////////////////////////////////////////////////////////
+
+void loadMainAssets(const uint8_t *assets, uint32_t assetsSize);
 bool loadExternalAssets(const char *filePath, int *err);
 void unloadExternalAssets();
 

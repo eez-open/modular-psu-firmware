@@ -8,7 +8,7 @@
 #include <bb3/psu/psu.h>
 
 #include <bb3/aux_ps/pid.h>
-#include <eez/system.h>
+#include <bb3/system.h>
 
 /*Constructor (...)*********************************************************
  *    The parameters specified here are those for for which we can't set up

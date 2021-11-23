@@ -20,8 +20,8 @@
 
 #include <string.h>
 
-#include <eez/system.h>
-#include <eez/hmi.h>
+#include <bb3/system.h>
+#include <bb3/hmi.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/channel_dispatcher.h>
@@ -40,7 +40,7 @@
 
 #include <bb3/mcu/encoder.h>
 
-#include <eez/function_generator.h>
+#include <bb3/function_generator.h>
 
 #include <scpi/scpi.h>
 

@@ -24,14 +24,14 @@
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
 #include <crc.h>
-#include <eez/platform/stm32/spi.h>
+#include <bb3/platform/stm32/spi.h>
 #include <memory.h>
 #include <stdlib.h>
 #endif
 
-#include <eez/firmware.h>
-#include <eez/system.h>
-#include <eez/hmi.h>
+#include <bb3/firmware.h>
+#include <bb3/system.h>
+#include <bb3/hmi.h>
 
 #include <bb3/scpi/regs.h>
 

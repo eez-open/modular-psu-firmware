@@ -23,8 +23,8 @@
 #include <main.h>
 #endif
 
-#include <eez/firmware.h>
-#include <eez/system.h>
+#include <bb3/firmware.h>
+#include <bb3/system.h>
 #include <eez/alloc.h>
 
 #if OPTION_FAN

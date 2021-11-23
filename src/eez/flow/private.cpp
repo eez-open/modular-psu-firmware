@@ -20,8 +20,6 @@
 
 #include <eez/debug.h>
 
-#include <eez/scripting/scripting.h>
-
 #include <eez/flow/flow.h>
 #include <eez/flow/operations.h>
 #include <eez/flow/queue.h>
@@ -261,7 +259,7 @@ void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex) 
 ////////////////////////////////////////////////////////////////////////////////
 
 void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value) {
-	if (scripting::isFlowRunning()) {
+	if (isFlowRunningHook()) {
 		FlowState *flowState = widgetCursor.flowState;
 		auto assets = flowState->assets;
 		auto flow = flowState->flow;
@@ -279,7 +277,7 @@ void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value) {
 }
 
 void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value) {
-	if (scripting::isFlowRunning()) {
+	if (isFlowRunningHook()) {
 		FlowState *flowState = widgetCursor.flowState;
 		auto assets = flowState->assets;
 		auto flow = flowState->flow;
@@ -370,12 +368,12 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
 			if (!addToQueue(catchErrorFlowState, catchErrorComponentIndex, -1, -1, -1)) {
 				catchErrorFlowState->error = true;
 				onFlowError(catchErrorFlowState, catchErrorComponentIndex, "Execution queue is full\n");
-				scripting::stopScript();
+				stopScriptHook();
 			}
 		} else {
 			flowState->error = true;
 			onFlowError(flowState, componentIndex, errorMessage);
-			scripting::stopScript();
+			stopScriptHook();
 		}
 	}
 }

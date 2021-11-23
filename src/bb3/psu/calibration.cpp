@@ -21,8 +21,8 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <eez/firmware.h>
-#include <eez/hmi.h>
+#include <bb3/firmware.h>
+#include <bb3/hmi.h>
 
 #include <bb3/psu/calibration.h>
 #include <bb3/psu/channel_dispatcher.h>

@@ -26,7 +26,7 @@
 #include <stdio.h>
 #endif
 
-#include <eez/system.h>
+#include <bb3/system.h>
 #include <bb3/index.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/persist_conf.h>

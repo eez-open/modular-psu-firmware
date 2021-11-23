@@ -21,7 +21,7 @@
 #include <bb3/psu/psu.h>
 
 #if defined(EEZ_PLATFORM_STM32)
-#include <eez/system.h>
+#include <bb3/system.h>
 #include <eez/util.h>
 
 #include <adc.h>

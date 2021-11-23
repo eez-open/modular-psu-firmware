@@ -18,9 +18,9 @@
 
 #pragma once
 
-//#include <eez/libs/sd_fat/sd_fat.h>
+//#include <bb3/fs/fs.h>
 
-#include <eez/file_type.h>
+#include <bb3/file_type.h>
 
 namespace eez {
 

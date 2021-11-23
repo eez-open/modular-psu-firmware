@@ -18,11 +18,11 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/system.h>
+#include <bb3/system.h>
 #include <eez/sound.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/touch_filter.h>
+#include <bb3/gui/touch_filter.h>
 
 #include <bb3/psu/psu.h>
 
@@ -35,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using namespace eez::gui::touch;
-using namespace eez::mcu::display;
+using namespace eez::display;
 
 namespace eez {
 namespace psu {

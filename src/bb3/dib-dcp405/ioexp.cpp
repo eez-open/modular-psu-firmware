@@ -24,8 +24,8 @@
 #if defined(EEZ_PLATFORM_STM32)
 #include <scpi/scpi.h>
 #include <main.h>
-#include <eez/platform/stm32/spi.h>
-#include <eez/system.h>
+#include <bb3/platform/stm32/spi.h>
+#include <bb3/system.h>
 #include <bb3/index.h>
 #include <bb3/psu/event_queue.h>
 #endif

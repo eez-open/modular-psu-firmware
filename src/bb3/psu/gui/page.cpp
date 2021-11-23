@@ -29,8 +29,6 @@
 
 #include <scpi/scpi.h>
 
-using namespace eez::mcu;
-
 namespace eez {
 namespace gui {
 

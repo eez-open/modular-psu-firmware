@@ -23,8 +23,7 @@
 #include <math.h>
 #include <memory.h>
 
-// struct StepValues
-#include <bb3/index.h>
+#include <eez/step_values.h>
 
 #include <eez/unit.h>
 #include <eez/alloc.h>
@@ -688,6 +687,12 @@ void getSlotAndSubchannelIndex(const WidgetCursor &widgetCursor, int16_t id, int
 
 bool isMicroAmperAllowed(const WidgetCursor &widgetCursor, int16_t id);
 bool isAmperAllowed(const WidgetCursor &widgetCursor, int16_t id);
+
+typedef void(*DataOperationsFunction)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
+extern DataOperationsFunction g_dataOperationsFunctions[];
+
+typedef void (*ActionExecFunc)();
+extern ActionExecFunc g_actionExecFunctions[];
 
 } // namespace gui
 } // namespace eez

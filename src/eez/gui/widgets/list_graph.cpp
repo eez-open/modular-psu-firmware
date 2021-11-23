@@ -16,16 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <math.h>
 #include <stdlib.h>
 
 #include <eez/sound.h>
 
 #include <eez/gui/gui.h>
-
-using namespace eez::mcu;
 
 namespace eez {
 namespace gui {
@@ -242,5 +238,3 @@ OnKeyboardFunctionType LIST_GRAPH_onKeyboard;
 
 } // namespace gui
 } // namespace eez
-
-#endif

@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <math.h>
 
 #include <eez/alloc.h>
@@ -205,5 +203,3 @@ OnKeyboardFunctionType INPUT_onKeyboard = nullptr;
 
 } // namespace gui
 } // namespace eez
-
-#endif

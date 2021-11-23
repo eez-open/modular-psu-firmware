@@ -23,15 +23,15 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <spi.h>
-#include <eez/platform/stm32/spi.h>
+#include <bb3/platform/stm32/spi.h>
 #endif
 
 #include "eez/debug.h"
-#include "eez/firmware.h"
-#include <eez/system.h>
-#include "eez/hmi.h"
+#include "bb3/firmware.h"
+#include <bb3/system.h>
+#include "bb3/hmi.h"
 #include "eez/util.h"
-#include "eez/gui/document.h"
+#include "bb3/gui/document.h"
 #include <bb3/psu/timer.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/profile.h>
@@ -47,7 +47,7 @@
 #include <bb3/bp3c/flash_slave.h>
 #include <bb3/psu/gui/edit_mode.h>
 
-#include "eez/function_generator.h"
+#include "bb3/function_generator.h"
 
 #include "scpi/scpi.h"
 

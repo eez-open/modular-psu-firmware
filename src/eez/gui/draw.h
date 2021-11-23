@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <eez/libs/image/image.h>
-
 namespace eez {
 namespace gui {
 
@@ -40,6 +38,8 @@ void drawAntialiasedLine(int x1, int y1, int x2, int y2);
 
 void drawArcBar(int xCenter, int yCenter, int radius, float fromAngleDeg, float toAngleDeg, int width);
 void fillArcBar(int xCenter, int yCenter, int radius, float fromAngleDeg, float toAngleDeg, int width);
+
+bool styleGetSmallerFontHook(font::Font &font);
 
 } // namespace gui
 } // namespace eez

@@ -22,7 +22,7 @@
 
 #include <bb3/psu/ontime.h>
 #include <bb3/psu/persist_conf.h>
-#include <eez/system.h>
+#include <bb3/system.h>
 
 #define MIN_TO_MS (60L * 1000L)
 

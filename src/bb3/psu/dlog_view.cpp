@@ -22,8 +22,8 @@
 #include <float.h>
 #include <assert.h>
 
-#include <eez/system.h>
-#include <eez/hmi.h>
+#include <bb3/system.h>
+#include <bb3/hmi.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/channel_dispatcher.h>
@@ -42,7 +42,7 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/container.h>
 
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <bb3/fs/fs.h>
 
 #include <eez/memory.h>
 
@@ -650,7 +650,7 @@ void initDlogValues(Recording &recording) {
         }
     }
 
-    for (; yAxisIndex < dlog_file::MAX_NUM_OF_Y_AXES; yAxisIndex++) {
+    for (; yAxisIndex < MAX_NUM_OF_Y_AXES; yAxisIndex++) {
         recording.dlogValues[yAxisIndex].isVisible = false;
     }
 
@@ -711,7 +711,7 @@ void calcColumnIndexes(Recording &recording) {
 
 static int getNumVisibleDlogValues(const Recording &recording) {
     int count = 0;
-    for (int dlogValueIndex = 0; dlogValueIndex < dlog_file::MAX_NUM_OF_Y_AXES; dlogValueIndex++) {
+    for (int dlogValueIndex = 0; dlogValueIndex < MAX_NUM_OF_Y_AXES; dlogValueIndex++) {
         if (recording.dlogValues[dlogValueIndex].isVisible) {
             count++;
         }
@@ -721,7 +721,7 @@ static int getNumVisibleDlogValues(const Recording &recording) {
 
 int getDlogValueIndex(Recording &recording, int visibleDlogValueIndex) {
     int i = 0;
-    for (int dlogValueIndex = 0; dlogValueIndex < dlog_file::MAX_NUM_OF_Y_AXES; dlogValueIndex++) {
+    for (int dlogValueIndex = 0; dlogValueIndex < MAX_NUM_OF_Y_AXES; dlogValueIndex++) {
         if (recording.dlogValues[dlogValueIndex].isVisible) {
             if (i == visibleDlogValueIndex) {
                 return dlogValueIndex;
@@ -1314,7 +1314,7 @@ bool Parameters::isDlogItemAvailable(int slotIndex, int subchannelIndex, int res
 		return true;
 	}
 
-	if (numDlogItems >= dlog_file::MAX_NUM_OF_Y_AXES) {
+	if (numDlogItems >= MAX_NUM_OF_Y_AXES) {
 		return false;
 	}
 
@@ -1348,7 +1348,7 @@ eez_err_t Parameters::enableDlogItem(int slotIndex, int subchannelIndex, int res
 	bool enabled = findDlogItemIndex(slotIndex, subchannelIndex, resourceIndex, dlogItemIndex);
 	if (enable) {
 		if (!enabled) {
-			if (numDlogItems == dlog_file::MAX_NUM_OF_Y_AXES) {
+			if (numDlogItems == MAX_NUM_OF_Y_AXES) {
 				return SCPI_ERROR_TOO_MUCH_DATA;
 			}
 
@@ -1980,7 +1980,7 @@ void data_dlog_item_is_checked(DataOperationEnum operation, const WidgetCursor &
         if (DlogParamsPage::findResource(cursor, slotIndex, subchannelIndex, resourceIndex)) {
             bool enabled = DlogParamsPage::g_parameters.isDlogItemEnabled(slotIndex, subchannelIndex, resourceIndex);
             if (!enabled && (
-				DlogParamsPage::g_parameters.numDlogItems >= dlog_file::MAX_NUM_OF_Y_AXES || 
+				DlogParamsPage::g_parameters.numDlogItems >= MAX_NUM_OF_Y_AXES || 
 				DlogParamsPage::getResourceMinPeriod(slotIndex, subchannelIndex, resourceIndex)
 					> DlogParamsPage::g_parameters.period
 			)) {

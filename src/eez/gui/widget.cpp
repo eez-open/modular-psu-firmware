@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if OPTION_DISPLAY
-
 #include <assert.h>
 #include <cstddef>
 #include <limits.h>
@@ -25,8 +23,7 @@
 #include <eez/system.h>
 
 #include <eez/gui/gui.h>
-
-using namespace eez::mcu;
+#include <eez/gui_conf.h>
 
 namespace eez {
 namespace gui {
@@ -266,7 +263,7 @@ static void findWidgetStep(const WidgetCursor &widgetCursor) {
         int distance = dx * dx + dy * dy;
 
         auto action = getWidgetAction(widgetCursor);        
-        if (action == ACTION_ID_DRAG_OVERLAY) {
+        if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
             if (overlay && !overlay->state) {
                 return;
             }
@@ -330,5 +327,3 @@ WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y, bool click
 
 } // namespace gui
 } // namespace eez
-
-#endif

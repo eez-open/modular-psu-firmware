@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <eez/firmware.h>
+#include <bb3/firmware.h>
 #include <eez/util.h>
 
 #include <bb3/psu/psu.h>
@@ -1431,16 +1431,16 @@ void SysSettingsRampAndDelayPage::drawRamp(const WidgetCursor &widgetCursor, int
 
     auto tmp = g_channelIndex;
     g_channelIndex = channelIndex;
-    mcu::display::setColor(COLOR_ID_CHANNEL1);
+    display::setColor(COLOR_ID_CHANNEL1);
     g_channelIndex = tmp;
 
-    mcu::display::drawHLine(x1, y1, x2 - x1);
+    display::drawHLine(x1, y1, x2 - x1);
     drawLine(x2, y1, x3, y2);
-    mcu::display::drawHLine(x3, y2, x4 - x3);
+    display::drawHLine(x3, y2, x4 - x3);
 
     if (yOffset) {
-        int textWidth = mcu::display::measureStr(label, -1, font, 0);
-        mcu::display::drawStr(label, -1,
+        int textWidth = display::measureStr(label, -1, font, 0);
+        display::drawStr(label, -1,
             x4 - textWidth, y2 - textHeight > widgetCursor.y ? y2 - textHeight : y2,
             widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1,
             font, -1

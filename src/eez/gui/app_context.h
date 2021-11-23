@@ -80,14 +80,14 @@ public:
     virtual int getLongTouchActionHook(const WidgetCursor &widgetCursor);
     virtual int getExtraLongTouchActionHook(const WidgetCursor &widgetCursor);
 
+    int m_pageIdToSetOnNextIter;
+    Page *m_pageToSetOnNextIter;
+
 protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
     int m_activePageIndex;
     int m_updatePageIndex;
-
-    int m_pageIdToSetOnNextIter;
-    Page *m_pageToSetOnNextIter;
 
     uint32_t m_showPageTime;
 

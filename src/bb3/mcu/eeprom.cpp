@@ -18,7 +18,7 @@
 
 #include <memory.h>
 
-#include <eez/system.h>
+#include <bb3/system.h>
 #include <bb3/psu/psu.h>
 #include <bb3/mcu/eeprom.h>
 
@@ -33,7 +33,7 @@
 #endif
 
 #if !USE_EEPROM
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <bb3/fs/fs.h>
 #endif
 
 #include <scpi/scpi.h>

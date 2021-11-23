@@ -16,27 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <math.h>
 #include <string.h>
+
+#include <eez/conf.h>
 #include <eez/system.h>
-#if OPTION_GUI_THREAD
-#include <eez/firmware.h>
-#endif
+
+#if OPTION_MOUSE
 #include <eez/mouse.h>
+#endif
 
 #include <eez/sound.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui_conf.h>
 
-#include <eez/scripting/flow.h>
 #include <eez/flow/flow.h>
 
 #define CONF_GUI_BLINK_TIME 400 // 400ms
-
-volatile float g_debugFPS;
 
 namespace eez {
 namespace gui {
@@ -46,149 +44,30 @@ static bool g_wasBlinkTime;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_GUI_THREAD
+void guiTick() {
+	display::sync();
 
-void mainLoop(const void *);
+	g_wasBlinkTime = g_isBlinkTime;
+	g_isBlinkTime = (millis() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME;
 
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif
+	touch::tick();
 
-osThreadDef(g_guiTask, mainLoop, osPriorityNormal, 0, 4096);
+	AppContext *appContext = &getRootAppContext();
 
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic pop
-#endif
+	appContext->rect.x = 0;
+	appContext->rect.y = 0;
+	appContext->rect.w = display::getDisplayWidth();
+	appContext->rect.h = display::getDisplayHeight();
 
-osThreadId g_guiTaskHandle;
+	eventHandling();
+	stateManagmentHook();
 
-#define GUI_QUEUE_SIZE 10
-
-osMessageQDef(g_guiMessageQueue, GUI_QUEUE_SIZE, uint32_t);
-osMessageQId g_guiMessageQueueId;
-
-#define GUI_QUEUE_MESSAGE(type, param) ((((uint32_t)(uint16_t)(int16_t)param) << 8) | (type))
-#define GUI_QUEUE_MESSAGE_TYPE(message) ((message) & 0xFF)
-#define GUI_QUEUE_MESSAGE_PARAM(param) ((int16_t)(message >> 8))
-
-void startThread() {
-    loadMainAssets();
-    mcu::display::onThemeChanged();
-    mouse::init();
-    g_guiMessageQueueId = osMessageCreate(osMessageQ(g_guiMessageQueue), 0);
-    g_guiTaskHandle = osThreadCreate(osThread(g_guiTask), nullptr);
+	if (display::isOn()) {
+		display::beginBuffersDrawing();
+		updateScreen();
+		display::endBuffersDrawing();
+	}
 }
-
-void oneIter();
-
-void mainLoop(const void *) {
-#ifdef __EMSCRIPTEN__
-	oneIter();
-#else
-    while (1) {
-
-#ifdef EEZ_PLATFORM_SIMULATOR
-    if (g_shutdown) {
-        break;
-    }
-#endif
-
-        oneIter();
-    }
-#endif
-}
-
-void onGuiQueueMessage(uint8_t type, int16_t param) {
-    if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE) {
-        getAppContextFromId(param)->doShowPage();
-    } else if (type == GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE) {
-        getAppContextFromId(param)->doPushPage();
-    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_X_MOVE) {
-        mouse::onMouseXMove(param);
-    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE) {
-        mouse::onMouseYMove(param);
-    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN) {
-        mouse::onMouseButtonDown(param);
-    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP) {
-        mouse::onMouseButtonUp(param);
-    } else if (type == GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED) {
-        mouse::onMouseDisconnected();
-    } else if (type == GUI_QUEUE_MESSAGE_REFRESH_SCREEN) {
-        refreshScreen();
-    } else if (type == GUI_QUEUE_MESSAGE_FLOW_START) {
-        scripting::startFlowScript();
-    } else if (type == GUI_QUEUE_MESSAGE_FLOW_STOP) {
-        scripting::stopFlowScript();
-    } else if (type == GUI_QUEUE_MESSAGE_UNLOAD_EXTERNAL_ASSETS) {
-        unloadExternalAssets();
-    } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_CONNECTED) {
-        flow::onDebuggerClientConnected();
-    } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_DISCONNECTED) {
-        flow::onDebuggerClientDisconnected();
-    } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE) {
-        flow::onDebuggerInputAvailable();
-    } else {
-        onGuiQueueMessageHook(type, param);
-    }
-}
-
-void oneIter() {
-    uint32_t timeout = 0;
-
-    static uint32_t lastTime;
-    uint32_t tickCount = millis();
-    g_debugFPS = 1000.0f / (tickCount - lastTime);
-    lastTime = tickCount;
-
-    while (true) {
-        osEvent event = osMessageGet(g_guiMessageQueueId, timeout);
-
-        timeout = 0;
-
-        if (event.status != osEventMessage) {
-            break;
-        }
-
-        uint32_t message = event.value.v;
-        uint8_t type = GUI_QUEUE_MESSAGE_TYPE(message);
-        int16_t param = GUI_QUEUE_MESSAGE_PARAM(message);
-        onGuiQueueMessage(type, param);
-    }
-
-    WATCHDOG_RESET(WATCHDOG_GUI_THREAD);
-
-    mcu::display::sync();
-
-    g_wasBlinkTime = g_isBlinkTime;
-    g_isBlinkTime = (millis() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME;
-
-    touch::tick();
-
-    AppContext *appContext = &getRootAppContext();
-
-    appContext->rect.x = 0;
-    appContext->rect.y = 0;
-    appContext->rect.w = mcu::display::getDisplayWidth();
-    appContext->rect.h = mcu::display::getDisplayHeight();
-
-    eventHandling();
-    stateManagmentHook();
-
-    if (mcu::display::isOn()) {
-        mcu::display::beginBuffersDrawing();
-        updateScreen();
-        mcu::display::endBuffersDrawing();
-    }
-
-    scripting::flowTick();
-}
-
-void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam, uint32_t timeoutMillisec) {
-    osMessagePut(g_guiMessageQueueId, GUI_QUEUE_MESSAGE(messageType, messageParam), timeoutMillisec);
-}
-
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -204,7 +83,7 @@ bool isInternalAction(int actionId) {
 
 int getWidgetAction(const WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->type == WIDGET_TYPE_INPUT) {
-        return ACTION_ID_EDIT;
+        return EEZ_CONF_ACTION_ID_EDIT;
     } else {
 		return widgetCursor.widget->action;
     }
@@ -217,9 +96,7 @@ void executeAction(const WidgetCursor &widgetCursor, int actionId) {
 
     sound::playClick();
 
-#if OPTION_GUI_THREAD
-    osDelay(1);
-#endif
+    executeActionThreadHook();
 
     if (isInternalAction(actionId)) {
         executeInternalActionHook(actionId);
@@ -238,7 +115,7 @@ void executeAction(int actionId) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-using namespace mcu::display;
+using namespace display;
 
 AnimationState g_animationState;
 static bool g_animationStateDirection;
@@ -353,7 +230,7 @@ void animateOpenCloseCallback(float t, void *bufferOld, void *bufferNew, void *b
 
 void animate(Buffer startBuffer, void(*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst), float duration = -1) {
     if (g_animationState.enabled) {
-        mcu::display::finishAnimation();
+        display::finishAnimation();
     }
     g_animationState.enabled = true;
     g_animationState.startTime = millis();
@@ -597,5 +474,3 @@ void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, floa
 
 } // namespace gui
 } // namespace eez
-
-#endif

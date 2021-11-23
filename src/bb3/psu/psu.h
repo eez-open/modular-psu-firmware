@@ -24,14 +24,14 @@
 #define EEZ_PLATFORM_STM32
 #endif
 
-#include <eez/tasks.h>
+#include <bb3/tasks.h>
 
 #include <bb3/psu/conf.h>
 #include <bb3/psu/conf_advanced.h>
 #include <bb3/psu/conf_user.h>
 
 #include <bb3/index.h>
-#include <eez/firmware.h>
+#include <bb3/firmware.h>
 #include <eez/util.h>
 #include <eez/debug.h>
 

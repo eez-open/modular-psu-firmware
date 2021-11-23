@@ -18,14 +18,16 @@
 
 #pragma once
 
-#if OPTION_GUI_THREAD
-#include <cmsis_os.h>
-#endif
-
 #include <eez/gui/assets.h>
 #include <eez/gui/page.h>
 
-#include <bb3/mcu/display.h>
+#include <eez/gui/display.h>
+
+enum {
+	PAGE_ID_NONE = 0,
+	DATA_ID_NONE = 0,
+	ACTION_ID_NONE = 0
+};
 
 enum {
     FIRST_INTERNAL_PAGE_ID = 32000,
@@ -49,49 +51,11 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_GUI_THREAD
-
-void startThread();
-
-extern osThreadId g_guiTaskHandle;
-extern osMessageQId g_guiMessageQueueId;
-
-enum {
-    GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE = 1,
-    GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE,
-
-    GUI_QUEUE_MESSAGE_MOUSE_X_MOVE,
-    GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE,
-    GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN,
-    GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP,
-    GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED,
-
-    GUI_QUEUE_MESSAGE_REFRESH_SCREEN,
-
-    GUI_QUEUE_MESSAGE_FLOW_START,
-    GUI_QUEUE_MESSAGE_FLOW_STOP,
-
-    GUI_QUEUE_MESSAGE_UNLOAD_EXTERNAL_ASSETS,
-
-    GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_CONNECTED,
-    GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_DISCONNECTED,
-    GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE,
-
-    GUI_QUEUE_MESSAGE_KEY_DOWN,
-
-};
-
-void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam = 0, uint32_t timeoutMillisec = osWaitForever);
-
-void onGuiQueueMessageHook(uint8_t type, int16_t param);
-
-#endif
-
-////////////////////////////////////////////////////////////////////////////////
-
 extern bool g_isBlinkTime;
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void guiTick();
 
 void stateManagmentHook();
 WidgetCursor &getFoundWidgetAtDown();
@@ -183,14 +147,20 @@ bool activePageHasBackdropHook();
 
 extern const char *g_discardMessage;
 
+bool pushPageThreadHook(AppContext *appContext, int pageId, Page *page);
+bool showPageThreadHook(AppContext *appContext, int pageId);
+void executeActionThreadHook();
+
+void setFocusCursor(const WidgetCursor& cursor, int16_t dataId);
+
 } // namespace gui
 } // namespace eez
 
 #include <eez/gui/app_context.h>
 #include <eez/gui/update.h>
-#include <eez/gui/touch.h>
 #include <eez/gui/overlay.h>
 #include <eez/gui/font.h>
 #include <eez/gui/draw.h>
+#include <eez/gui/touch.h>
 
 #define DATA_OPERATION_FUNCTION(id, operation, widgetCursor, value) (id >= 0 ? g_dataOperationsFunctions[id](operation, widgetCursor, value) : externalDataHook(id, operation, widgetCursor, value))

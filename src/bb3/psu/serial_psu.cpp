@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-#include <eez/firmware.h>
+#include <bb3/firmware.h>
 #include <bb3/usb.h>
 
 #include <bb3/psu/psu.h>

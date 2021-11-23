@@ -21,7 +21,7 @@
 
 #include <bb3/index.h>
 #include <eez/sound.h>
-#include <eez/system.h>
+#include <bb3/system.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/channel_dispatcher.h>
@@ -36,7 +36,7 @@
 
 #include <eez/gui/widgets/yt_graph.h>
 
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <bb3/fs/fs.h>
 
 #include <eez/memory.h>
 

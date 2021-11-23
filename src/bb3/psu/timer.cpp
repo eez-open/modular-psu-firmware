@@ -19,7 +19,7 @@
 #include <bb3/psu/psu.h>
 
 #include <bb3/psu/timer.h>
-#include <eez/system.h>
+#include <bb3/system.h>
 
 namespace eez {
 namespace psu {

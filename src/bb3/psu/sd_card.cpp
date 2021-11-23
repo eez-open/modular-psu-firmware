@@ -25,7 +25,7 @@
 #include <fatfs.h>
 #endif
 
-#include <eez/firmware.h>
+#include <bb3/firmware.h>
 #include <bb3/usb.h>
 #include <bb3/fs_driver.h>
 
@@ -45,7 +45,7 @@
 #include <bb3/psu/gui/file_manager.h>
 #endif
 
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <bb3/fs/fs.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" int g_sdCardIsPresent;

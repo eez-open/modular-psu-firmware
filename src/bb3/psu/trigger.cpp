@@ -24,10 +24,10 @@
 #include <bb3/psu/persist_conf.h>
 #include <bb3/psu/profile.h>
 #include <bb3/psu/ramp.h>
-#include <eez/function_generator.h>
+#include <bb3/function_generator.h>
 #include <bb3/psu/trigger.h>
 #include <bb3/scpi/regs.h>
-#include <eez/system.h>
+#include <bb3/system.h>
 
 #include <bb3/psu/dlog_record.h>
 

@@ -26,15 +26,15 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <spi.h>
-#include <eez/platform/stm32/spi.h>
+#include <bb3/platform/stm32/spi.h>
 #include <ff_gen_drv.h>
 #include <usbd_def.h>
 #endif
 
 #include <eez/debug.h>
-#include <eez/firmware.h>
+#include <bb3/firmware.h>
 #include <bb3/index.h>
-#include <eez/hmi.h>
+#include <bb3/hmi.h>
 
 #include <bb3/fs_driver.h>
 
@@ -53,10 +53,10 @@
 #include <bb3/bp3c/comm.h>
 #include <bb3/bp3c/flash_slave.h>
 
-#include <eez/function_generator.h>
+#include <bb3/function_generator.h>
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-#include <eez/platform/simulator/front_panel.h>
+#include <bb3/platform/simulator/front_panel.h>
 #endif
 
 #include "./dib-mio168.h"

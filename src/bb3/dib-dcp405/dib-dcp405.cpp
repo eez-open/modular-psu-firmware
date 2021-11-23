@@ -37,7 +37,7 @@
 
 #include <bb3/scpi/regs.h>
 
-#include <eez/system.h>
+#include <bb3/system.h>
 #include <bb3/index.h>
 
 #include <eez/gui/gui.h>

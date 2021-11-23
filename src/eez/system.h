@@ -1,6 +1,6 @@
 /*
 * EEZ Generic Firmware
-* Copyright (C) 2018-present, Envox d.o.o.
+* Copyright (C) 2021-present, Envox d.o.o.
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -18,33 +18,12 @@
 
 #pragma once
 
-#include "cmsis_os.h"
 #include <stdint.h>
-
-#define WATCHDOG_LONG_OPERATION 1
-#define WATCHDOG_HIGH_PRIORITY_THREAD 2
-#define WATCHDOG_GUI_THREAD 3
-
-#if defined(EEZ_PLATFORM_STM32)
-
-void watchdogReset(int fromTask);
-#define WATCHDOG_RESET(fromTask) watchdogReset(fromTask)
-
-extern volatile uint64_t g_tickCount;
-
-#else
-
-#define WATCHDOG_RESET(...) (void)0
-
-#endif
 
 namespace eez {
 
-uint32_t micros();
-uint32_t millis();
-void delay(uint32_t millis);
-void delayMicroseconds(uint32_t microseconds);
+extern bool g_shutdownInProgress;
 
-const char *getSerialNumber();
+uint32_t millis();
 
 } // namespace eez

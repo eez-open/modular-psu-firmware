@@ -16,12 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/flow/flow.h>
 #include <eez/flow/components.h>
 #include <eez/flow/debugger.h>
-
-#include <bb3/psu/gui/psu.h>
-
-using namespace eez::gui;
 
 namespace eez {
 namespace flow {
@@ -34,7 +31,7 @@ void executeShowPageComponent(FlowState *flowState, unsigned componentIndex) {
  	auto assets = flowState->assets;
 	auto component = (ShowPageActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
-	eez::psu::gui::replacePage(component->page);
+	replacePageHook(component->page);
 	onPageChanged(component->page);
 
 	propagateValueThroughSeqout(flowState, componentIndex);

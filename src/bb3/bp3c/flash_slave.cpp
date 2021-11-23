@@ -18,8 +18,8 @@
 
 #include <assert.h>
 
-#include <eez/firmware.h>
-#include <eez/system.h>
+#include <bb3/firmware.h>
+#include <bb3/system.h>
 #include <bb3/uart.h>
 
 #include <bb3/psu/psu.h>
@@ -35,14 +35,14 @@
 #include <bb3/bp3c/io_exp.h>
 #include <bb3/bp3c/eeprom.h>
 
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <bb3/fs/fs.h>
 
 #ifdef EEZ_PLATFORM_STM32
 
 #include <memory.h>
 #include "main.h"
 #include "usart.h"
-#include <eez/platform/stm32/spi.h>
+#include <bb3/platform/stm32/spi.h>
 
 #endif
 

@@ -18,7 +18,7 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/hmi.h>
+#include <bb3/hmi.h>
 #include <eez/gui/gui.h>
 
 #include <bb3/psu/psu.h>

@@ -27,16 +27,17 @@
 #include <iwdg.h>
 #endif
 
-#include <eez/system.h>
+#include <eez/conf.h>
+#include <bb3/system.h>
 #include <eez/util.h>
 #include <bb3/index.h>
-#include <eez/file_type.h>
-#include <eez/scripting/scripting.h>
+#include <bb3/file_type.h>
+#include <bb3/scripting/scripting.h>
 #include <eez/memory.h>
-#include <eez/hmi.h>
+#include <bb3/hmi.h>
 #include <bb3/uart.h>
 #include <bb3/usb.h>
-#include <eez/function_generator.h>
+#include <bb3/function_generator.h>
 
 #include <bb3/fs_driver.h>
 
@@ -475,6 +476,67 @@ void printTime(uint32_t time, char *text, int count) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+bool compare_PASSWORD_value(const Value &a, const Value &b) {
+    return strlen(a.getString()) == strlen(b.getString());
+}
+
+void PASSWORD_value_to_text(const Value &value, char *text, int count) {
+    size_t i;
+    size_t end = MIN(strlen(value.getString()), (size_t)count);
+    for (i = 0; i < end; i++) {
+        text[i] = '*';
+    }
+    text[i] = 0;
+}
+
+const char *PASSWORD_value_type_name(const Value &value) {
+    return "internal";
+}
+
+bool compare_PERCENTAGE_value(const Value &a, const Value &b) {
+    return a.getInt() == b.getInt();
+}
+
+void PERCENTAGE_value_to_text(const Value &value, char *text, int count) {
+    snprintf(text, count - 1, "%d%%", value.getInt());
+    text[count - 1] = 0;
+}
+
+const char *PERCENTAGE_value_type_name(const Value &value) {
+    return "internal";
+}
+
+bool compare_SIZE_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void SIZE_value_to_text(const Value &value, char *text, int count) {
+    snprintf(text, count - 1, "%u", (unsigned int)value.getUInt32());
+    text[count - 1] = 0;
+}
+
+const char *SIZE_value_type_name(const Value &value) {
+    return "internal";
+}
+
+bool compare_TIME_SECONDS_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void TIME_SECONDS_value_to_text(const Value &value, char *text, int count) {
+    uint32_t totalSeconds = (uint32_t)value.getFloat();
+    uint32_t hours = totalSeconds / 3600;
+    uint32_t totalMinutes = totalSeconds - hours * 3600;
+    uint32_t minutes = totalMinutes / 60;
+    uint32_t seconds = totalMinutes % 60;
+    snprintf(text, count - 1, "%02d:%02d:%02d", (int)hours, (int)minutes, (int)seconds);
+    text[count - 1] = 0;
+}
+
+const char *TIME_SECONDS_value_type_name(const Value &value) {
+    return "internal";
+}
 
 bool compare_LESS_THEN_MIN_FLOAT_value(const Value &a, const Value &b) {
     return a.getUnit() == b.getUnit() && a.getFloat() == b.getFloat();

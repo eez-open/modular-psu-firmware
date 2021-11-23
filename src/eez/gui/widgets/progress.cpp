@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
@@ -79,5 +77,3 @@ OnKeyboardFunctionType PROGRESS_onKeyboard = nullptr;
 
 } // namespace gui
 } // namespace eez
-
-#endif

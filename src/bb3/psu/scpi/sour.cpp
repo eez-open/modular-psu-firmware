@@ -25,7 +25,7 @@
 #include <bb3/psu/scpi/psu.h>
 #include <bb3/psu/trigger.h>
 
-#include <eez/function_generator.h>
+#include <bb3/function_generator.h>
 
 #define I_STATE 1
 #define P_STATE 2

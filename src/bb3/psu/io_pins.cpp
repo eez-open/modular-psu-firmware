@@ -24,8 +24,8 @@
 #include <tim.h>
 #endif
 
-#include <eez/firmware.h>
-#include <eez/system.h>
+#include <bb3/firmware.h>
+#include <bb3/system.h>
 
 #include <bb3/psu/psu.h>
 

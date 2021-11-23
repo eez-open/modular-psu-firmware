@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include <bb3/index.h>
-#include <eez/scripting/scripting.h>
+#include <bb3/scripting/scripting.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/channel_dispatcher.h>
@@ -178,9 +178,9 @@ mp_obj_t modeez_dlogTraceData(size_t n_args, const mp_obj_t *args) {
         mp_raise_ValueError("Too many values");
     }
 
-    float values[eez::dlog_file::MAX_NUM_OF_Y_AXES];
+    float values[MAX_NUM_OF_Y_AXES];
 
-    for (size_t i = 0; i < MIN(n_args, eez::dlog_file::MAX_NUM_OF_Y_AXES); i++) {
+    for (size_t i = 0; i < MIN(n_args, MAX_NUM_OF_Y_AXES); i++) {
         if (!mp_obj_is_type(args[i], &mp_type_float)) {
             mp_raise_ValueError("Argument is not float");
         }

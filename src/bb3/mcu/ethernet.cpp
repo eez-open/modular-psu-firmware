@@ -62,8 +62,8 @@ extern ip4_addr_t gw;
 #endif
 #endif // EEZ_PLATFORM_SIMULATOR
 
-#include <eez/firmware.h>
-#include <eez/system.h>
+#include <bb3/firmware.h>
+#include <bb3/system.h>
 #include <bb3/mcu/ethernet.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/ethernet_scpi.h>
@@ -75,7 +75,7 @@ extern ip4_addr_t gw;
 using namespace eez::psu::ethernet;
 using namespace eez::scpi;
 
-#include <eez/gui/gui.h>
+#include <bb3/gui/thread.h>
 using namespace eez::gui;
 
 #define CONF_CONNECT_TIMEOUT 30000

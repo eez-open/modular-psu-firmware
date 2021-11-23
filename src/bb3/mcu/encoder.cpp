@@ -21,7 +21,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <eez/system.h>
+#include <bb3/system.h>
 #include <eez/debug.h>
 #include <eez/util.h>
 
@@ -33,7 +33,7 @@
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)	
-#include <eez/platform/simulator/events.h>
+#include <bb3/platform/simulator/events.h>
 #endif
 
 #include <bb3/psu/psu.h>

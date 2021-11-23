@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-#include <eez/hmi.h>
+#include <bb3/hmi.h>
 #include <eez/memory.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/gui/psu.h>
@@ -280,7 +280,7 @@ void data_colors(DataOperationEnum operation, const WidgetCursor &widgetCursor, 
 void data_color_is_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
-        value = (eez::mcu::display::transformColorHook(LabelsAndColorsPage::g_colorDataId) - COLOR_ID_CHANNEL1) == cursor;
+        value = (eez::display::transformColorHook(LabelsAndColorsPage::g_colorDataId) - COLOR_ID_CHANNEL1) == cursor;
     } 
 }
 

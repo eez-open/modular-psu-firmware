@@ -23,13 +23,6 @@
 #include <string.h>
 
 #include <eez/debug.h>
-#include <eez/memory.h>
-#include <eez/system.h>
-#include <eez/util.h>
-
-#include <bb3/psu/event_queue.h>
-
-using namespace eez::psu;
 
 namespace eez {
 namespace debug {
@@ -47,11 +40,11 @@ void Trace(TraceType traceType, const char *format, ...) {
     va_end(args);
 
     if (traceType == TRACE_TYPE_DEBUG) {
-        event_queue::pushDebugTrace(buffer, strlen(buffer));
+        pushDebugTraceHook(buffer, strlen(buffer));
     } else if (traceType == TRACE_TYPE_INFO) {
-        event_queue::pushInfoTrace(buffer, strlen(buffer));
+        pushInfoTraceHook(buffer, strlen(buffer));
     } else {
-        event_queue::pushErrorTrace(buffer, strlen(buffer));
+        pushErrorTraceHook(buffer, strlen(buffer));
     }
 }
 
@@ -59,7 +52,7 @@ void Trace(TraceType traceType, const char *format, ...) {
 } // namespace eez
 
 extern "C" void debug_trace(const char *str, size_t len) {
-    eez::psu::event_queue::pushDebugTrace(str, len);
+    eez::debug::pushDebugTraceHook(str, len);
 }
 
 #endif // DEBUG

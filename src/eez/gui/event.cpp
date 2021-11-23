@@ -16,17 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <stdio.h>
 
-#include <eez/firmware.h>
+#include <eez/conf.h>
+#include <eez/gui_conf.h>
 #include <eez/system.h>
 #include <eez/hmi.h>
-#include <eez/mouse.h>
+
+#if OPTION_MOUSE
+#include <bb3/mouse.h>
+#endif
+
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui_conf.h>
 
 #define CONF_GUI_LONG_TOUCH_TIMEOUT_MS 1000
 #define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY_MS 300
@@ -59,7 +63,10 @@ void eventHandling() {
     EventType mouseEventType = EVENT_TYPE_TOUCH_NONE;
     int mouseX = 0;
     int mouseY = 0;
+
+#if OPTION_MOUSE
     mouse::getEvent(mouseCursorVisible, mouseEventType, mouseX, mouseY);
+#endif
 
     auto eventType = touch::getEventType();
     
@@ -172,7 +179,7 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
         m_touchActionExecuted = false;
         m_touchActionExecutedAtDown = false;
 
-        if (action == ACTION_ID_DRAG_OVERLAY) {
+        if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
             dragOverlay(touchEvent);
             m_activeWidget = widgetCursor;    
         } else if (widgetCursor.appContext->testExecuteActionOnTouchDown(action)) {
@@ -185,7 +192,7 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
             m_activeWidget = widgetCursor;
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-        if (action == ACTION_ID_DRAG_OVERLAY) {
+        if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
             dragOverlay(touchEvent);
         }
     } else if (touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
@@ -211,7 +218,7 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
         if (!m_touchActionExecutedAtDown) {
             m_activeWidget = 0;
             if (!m_touchActionExecuted) {
-                if (action == ACTION_ID_DRAG_OVERLAY) {
+                if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
                     dragOverlay(touchEvent);
                 } else {
                     executeAction(widgetCursor, action);
@@ -248,5 +255,3 @@ bool isFocusWidget(const WidgetCursor &widgetCursor) {
 
 } // namespace gui
 } // namespace eez
-
-#endif

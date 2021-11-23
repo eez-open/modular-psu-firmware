@@ -18,13 +18,12 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <eez/gui/event.h>
 
 namespace eez {
 namespace gui {
 namespace touch {
 
-void tickHighPriority();
 void tick();
 
 EventType getEventType();

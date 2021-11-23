@@ -16,21 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <math.h>
 #include <assert.h>
 #include <memory.h>
 
+#include <eez/conf.h>
+#include <eez/gui_conf.h>
 #include <eez/sound.h>
 #include <eez/system.h>
-#include <eez/hmi.h>
 #include <eez/util.h>
+
+#if OPTION_KEYBOARD
 #include <eez/keyboard.h>
+#endif
+
+#if OPTION_MOUSE
 #include <eez/mouse.h>
+#endif
 
 #include <eez/gui/gui.h>
+#include <eez/gui_conf.h>
 #include <eez/gui/widgets/button.h>
+
+#include <eez/hmi.h>
 
 namespace eez {
 namespace gui {
@@ -98,10 +106,16 @@ int AppContext::getPreviousPageId() {
 }
 
 void AppContext::onPageChanged(int previousPageId, int activePageId) {
-    eez::mcu::display::turnOn();
-    eez::hmi::noteActivity();
-    eez::mouse::onPageChanged();
-    eez::keyboard::onPageChanged();
+    display::turnOn();
+    hmi::noteActivity();
+
+#if OPTION_MOUSE
+    mouse::onPageChanged();
+#endif
+
+#if OPTION_KEYBOARD
+    keyboard::onPageChanged();
+#endif
 }
 
 void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
@@ -114,7 +128,7 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
 
     m_pageNavigationStack[m_pageNavigationStackPointer].page = page;
     m_pageNavigationStack[m_pageNavigationStackPointer].pageId = pageId;
-    m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = mcu::display::allocBuffer();
+    m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = display::allocBuffer();
 
     if (page) {
         page->pageWillAppear();
@@ -154,19 +168,14 @@ void AppContext::replacePage(int pageId, Page *page) {
 }
 
 void AppContext::pushPage(int pageId, Page *page) {
-#if OPTION_GUI_THREAD
-    if (osThreadGetId() != g_guiTaskHandle) {
-        m_pageIdToSetOnNextIter = pageId;
-        m_pageToSetOnNextIter = page;
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE, getAppContextId(this));
+    if (pushPageThreadHook(this, pageId, page)) {
         return;
     }
-#endif
 
     int previousPageId = getActivePageId();
 
-    // advance stack pointre
-    if (getActivePageId() != PAGE_ID_NONE && getActivePageId() != PAGE_ID_ASYNC_OPERATION_IN_PROGRESS && getActivePageId() != INTERNAL_PAGE_ID_TOAST_MESSAGE) {
+    // advance stack pointer
+    if (getActivePageId() != PAGE_ID_NONE && getActivePageId() != EEZ_CONF_PAGE_ID_ASYNC_OPERATION_IN_PROGRESS && getActivePageId() != INTERNAL_PAGE_ID_TOAST_MESSAGE) {
         m_pageNavigationStackPointer++;
         assert (m_pageNavigationStackPointer < CONF_GUI_PAGE_NAVIGATION_STACK_SIZE);
     }
@@ -177,7 +186,7 @@ void AppContext::pushPage(int pageId, Page *page) {
 void AppContext::doShowPage() {
     setPage(m_pageIdToSetOnNextIter);
     
-    if (m_pageIdToSetOnNextIter == PAGE_ID_WELCOME) {
+    if (m_pageIdToSetOnNextIter == EEZ_CONF_PAGE_ID_WELCOME) {
         playPowerUp(sound::PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE);
     } 
 }
@@ -239,14 +248,10 @@ bool AppContext::isPageOnStack(int pageId) {
 }
 
 void AppContext::showPage(int pageId) {
-#if OPTION_GUI_THREAD    
-    if (osThreadGetId() != g_guiTaskHandle) {
-        m_pageIdToSetOnNextIter = pageId;
-        m_pageToSetOnNextIter = nullptr;
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE, getAppContextId(this));
+    if (showPageThreadHook(this, pageId)) {
         return;
     }
-#endif
+
     if (pageId != getActivePageId()) {
         setPage(pageId);
     }
@@ -302,11 +307,11 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
     if (!isPageFullyCovered(i)) {
         if (m_pageNavigationStack[i].displayBufferIndex == -1) {
-            m_pageNavigationStack[i].displayBufferIndex = mcu::display::allocBuffer();
+            m_pageNavigationStack[i].displayBufferIndex = display::allocBuffer();
             widgetCursor.previousState = nullptr;
         }
 
-		mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
+		display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
 
 		m_updatePageIndex = i;
 
@@ -346,8 +351,8 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
             if (!widgetCursor.previousState) {
                 // clear background
                 const Style* style = getStyle(page->style);
-                mcu::display::setColor(style->background_color);
-                mcu::display::fillRect(x, y, x + width - 1, y + height - 1);
+                display::setColor(style->background_color);
+                display::fillRect(x, y, x + width - 1, y + height - 1);
             }
 
             widgetCursor.widget = page;
@@ -357,7 +362,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
             widgetCursor.previousState = savedPreviousState;
         }
 		
-		mcu::display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+		display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
 
 		widgetCursor.nextState();
 
@@ -425,5 +430,3 @@ int AppContext::getExtraLongTouchActionHook(const WidgetCursor &widgetCursor) {
 
 } // namespace gui
 } // namespace eez
-
-#endif

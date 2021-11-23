@@ -21,8 +21,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <eez/system.h>
-#include <eez/scripting/scripting.h>
+#include <bb3/system.h>
+#include <bb3/scripting/scripting.h>
 #include <eez/memory.h>
 #include <bb3/fs_driver.h>
 
@@ -48,9 +48,9 @@
 #include <bb3/psu/gui/file_manager.h>
 #include <bb3/psu/gui/keypad.h>
 
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <bb3/fs/fs.h>
 
-#include <eez/libs/image/image.h>
+#include <eez/gui/image.h>
 #include <bb3/fpga/prog.h>
 
 using namespace eez::psu::gui;

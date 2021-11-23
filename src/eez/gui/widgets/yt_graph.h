@@ -18,12 +18,8 @@
 
 #pragma once
 
-#include <eez/dlog_file.h>
-
 namespace eez {
 namespace gui {
-
-static const int MAX_NUM_OF_Y_VALUES = dlog_file::MAX_NUM_OF_Y_AXES;
 
 enum {
 	YT_GRAPH_UPDATE_METHOD_SCROLL,

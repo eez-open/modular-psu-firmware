@@ -225,10 +225,6 @@ void setFilter(int filter);
 void pushEvent(int16_t eventId, int channelIndex = -1);
 void pushChannelEvent(int16_t eventId, int channelIndex);
 
-void pushDebugTrace(const char *message, size_t messageLength);
-void pushInfoTrace(const char *message, size_t messageLength);
-void pushErrorTrace(const char *message, size_t messageLength);
-
 void markAsRead();
 void moveToTop();
 

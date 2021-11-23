@@ -24,7 +24,7 @@
 #include <ip_addr.h>
 #endif
 
-#include <eez/system.h>
+#include <bb3/system.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/datetime.h>

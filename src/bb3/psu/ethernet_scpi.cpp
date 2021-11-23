@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include <eez/firmware.h>
+#include <bb3/firmware.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/event_queue.h>

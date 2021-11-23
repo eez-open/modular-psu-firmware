@@ -23,17 +23,17 @@
 #include <usbh_hid.h>
 #endif
 
-#include <eez/keyboard.h>
-#include <eez/mouse.h>
+#include <bb3/keyboard.h>
+#include <bb3/mouse.h>
 #include <bb3/usb.h>
 
-#include <eez/gui/gui.h>
+#include <bb3/gui/thread.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/persist_conf.h>
 #include <bb3/psu/serial_psu.h>
 
-#include <bb3/mcu/display.h>
+#include <eez/gui/display.h>
 
 int g_usbMode = USB_MODE_DISABLED;
 int g_otgMode = USB_MODE_DISABLED;

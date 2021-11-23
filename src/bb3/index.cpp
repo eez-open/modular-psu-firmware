@@ -35,7 +35,7 @@
 #include <bb3/dib-smx46/dib-smx46.h>
 #include <bb3/dib-mux14d/dib-mux14d.h>
 
-#include <eez/gui/gui.h>
+#include <bb3/gui/document.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/profile.h>
 #include <bb3/psu/persist_conf.h>

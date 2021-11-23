@@ -571,7 +571,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYUnit(scpi_t *context) {
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
 
-    if (yAxisIndex < -1 || yAxisIndex >= dlog_file::MAX_NUM_OF_Y_AXES) {
+    if (yAxisIndex < -1 || yAxisIndex >= MAX_NUM_OF_Y_AXES) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
@@ -627,7 +627,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYLabel(scpi_t *context) {
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
 
-    if (yAxisIndex < -1 || yAxisIndex >= dlog_file::MAX_NUM_OF_Y_AXES) {
+    if (yAxisIndex < -1 || yAxisIndex >= MAX_NUM_OF_Y_AXES) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
@@ -688,7 +688,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMin(scpi_t *context) {
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
 
-    if (yAxisIndex < -1 || yAxisIndex >= dlog_file::MAX_NUM_OF_Y_AXES) {
+    if (yAxisIndex < -1 || yAxisIndex >= MAX_NUM_OF_Y_AXES) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
@@ -758,7 +758,7 @@ scpi_result_t scpi_cmd_senseDlogTraceYRangeMax(scpi_t *context) {
     SCPI_CommandNumbers(context, &yAxisIndex, 1, 0);
     yAxisIndex--;
 
-    if (yAxisIndex < -1 || yAxisIndex >= dlog_file::MAX_NUM_OF_Y_AXES) {
+    if (yAxisIndex < -1 || yAxisIndex >= MAX_NUM_OF_Y_AXES) {
         SCPI_ErrorPush(context, SCPI_ERROR_HEADER_SUFFIX_OUTOFRANGE);
         return SCPI_RES_ERR;
     }
@@ -862,7 +862,7 @@ scpi_result_t scpi_cmd_senseDlogTraceData(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    float values[dlog_file::MAX_NUM_OF_Y_AXES];
+    float values[MAX_NUM_OF_Y_AXES];
     for (int yAxisIndex = 0; yAxisIndex < dlog_record::g_activeRecording.parameters.numYAxes; yAxisIndex++) {
         scpi_number_t param;
         if (!SCPI_ParamNumber(context, 0, &param, true)) {

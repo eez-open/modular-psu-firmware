@@ -21,8 +21,8 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <eez/system.h>
-#include <eez/hmi.h>
+#include <bb3/system.h>
+#include <bb3/hmi.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/channel_dispatcher.h>
@@ -71,7 +71,7 @@ void drawGlyph(font::Font &font, const GlyphData &glyph, uint8_t encoding, int x
 
     char str[2] = { (char)encoding, 0 };
 
-    mcu::display::drawStr(str, 1, x, y, clip_x1, clip_y1, clip_x2, clip_y2, font, -1);
+    display::drawStr(str, 1, x, y, clip_x1, clip_y1, clip_x2, clip_y2, font, -1);
 }
 
 void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const WidgetCursor &widgetCursor) {
@@ -138,7 +138,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     };
 
     // draw x axis labels
-    mcu::display::setColor(style->color);
+    display::setColor(style->color);
 
     char text[128];
     int labelTextWidth;
@@ -147,12 +147,12 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     // min
     Value minValue = Value(min, unit);
     minValue.toText(text, sizeof(text));
-    labelTextWidth = mcu::display::measureStr(text, -1, font);
+    labelTextWidth = display::measureStr(text, -1, font);
     xLabelText = x + MARGIN - labelTextWidth / 2;
     if (xLabelText < x) {
         xLabelText = x;
     }
-    mcu::display::drawStr(text, -1,
+    display::drawStr(text, -1,
         xLabelText,
         y + h - MARGIN + GAP_BETWEEN_LABEL_AND_AXIS - (font.getAscent() - glyphLabel->height),
         x, y, x + w - 1, y + w - 1,
@@ -161,12 +161,12 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     // max
     Value maxValue = Value(max, unit);
     maxValue.toText(text, sizeof(text));
-    labelTextWidth = mcu::display::measureStr(text, -1, font);
+    labelTextWidth = display::measureStr(text, -1, font);
     xLabelText = x + w - MARGIN - labelTextWidth / 2;
     if (xLabelText + labelTextWidth > x + w) {
         xLabelText = x + w - labelTextWidth;
     }
-    mcu::display::drawStr(text, -1,
+    display::drawStr(text, -1,
         xLabelText,
         y + h - MARGIN + GAP_BETWEEN_LABEL_AND_AXIS - (font.getAscent() - glyphLabel->height),
         x, y, x + w - 1, y + w - 1,
@@ -176,7 +176,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     drawAntialiasedLine(x + MARGIN, y + h - MARGIN - 1, x + w - MARGIN - 1, y + MARGIN);
 
     // draw points
-    mcu::display::setColor(COLOR_ID_YT_GRAPH_Y1);
+    display::setColor(COLOR_ID_YT_GRAPH_Y1);
 
     float xPoints[MAX_CALIBRATION_POINTS + 2];
     float yPoints[MAX_CALIBRATION_POINTS + 2];
@@ -229,15 +229,15 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     }
 
     // draw frame
-    mcu::display::setColor(style->color);
-    mcu::display::drawRect(x + MARGIN, y + MARGIN, x + w - MARGIN - 1, y + h - MARGIN - 1);
+    display::setColor(style->color);
+    display::drawRect(x + MARGIN, y + MARGIN, x + w - MARGIN - 1, y + h - MARGIN - 1);
 
     // draw DAC value
     auto x1 = (w - 2 * MARGIN - 1) * scale(dacValue);
     if (x1 >= 0.0f && x1 <= 1.0f * (w - 2 * MARGIN - 1)) {
-        mcu::display::setColor(COLOR_ID_YT_GRAPH_Y2);
+        display::setColor(COLOR_ID_YT_GRAPH_Y2);
 
-        mcu::display::drawVLine(
+        display::drawVLine(
             x + MARGIN + (int)roundf(x1),
             y + MARGIN + 1,
             h - 2 * MARGIN - 3

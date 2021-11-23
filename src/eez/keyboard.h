@@ -36,34 +36,6 @@ void updateDisplay();
 
 void onPageChanged();
 
-void onKeyDown(uint16_t param);
-
-#if defined(EEZ_PLATFORM_STM32)
-void onKeyboardEvent(USBH_HandleTypeDef *phost);
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-void onKeyboardEvent(SDL_KeyboardEvent *key);
-#endif
-
-struct KeyboardInfo {
-    uint8_t state;
-    
-    uint8_t lctrl: 1;
-    uint8_t lshift: 1;
-    uint8_t lalt: 1;
-    uint8_t lgui: 1;
-
-    uint8_t rctrl: 1;
-    uint8_t rshift: 1;
-    uint8_t ralt: 1;
-    uint8_t rgui: 1;
-
-    uint8_t keys[6];
-};
-
-extern KeyboardInfo g_keyboardInfo;
-
 static const uint8_t KEY_MOD_LCTRL = 1 << 0;
 static const uint8_t KEY_MOD_LSHIFT = 1 << 1;
 static const uint8_t KEY_MOD_LALT = 1 << 2;
@@ -297,7 +269,7 @@ static const uint8_t KEY_MOD_RGUI = 1 << 7;
 #define KEY_RIGHTSHIFT                         0xE5
 #define KEY_RIGHTALT                           0xE6
 #define KEY_RIGHT_GUI                          0xE7
-#endif
+#endif // EEZ_PLATFORM_STM32
 
 } // keyboard
 } // eez

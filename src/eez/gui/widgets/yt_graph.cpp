@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <math.h>
 #include <limits.h>
 
@@ -25,8 +23,8 @@
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/yt_graph.h>
-
-using namespace eez::mcu;
+#include <eez/conf.h>
+#include <eez/gui_conf.h>
 
 #define CONF_GUI_YT_GRAPH_BLANK_PIXELS_AFTER_CURSOR 10
 
@@ -432,7 +430,7 @@ struct YTGraphStaticDrawHelper {
 		if (bookmarks) {
 			for (int x = 0; x < widget->w; x++) {
 				if (bookmarks[x]) {
-					display::setColor(COLOR_ID_BOOKMARK);
+					display::setColor(EEZ_CONF_COLOR_ID_BOOKMARK);
 					display::drawVLine(startX + x, widgetCursor.y, widget->h - 1);
 				}
 			}
@@ -633,5 +631,3 @@ OnKeyboardFunctionType YT_GRAPH_onKeyboard = nullptr;
 
 } // namespace gui
 } // namespace eez
-
-#endif

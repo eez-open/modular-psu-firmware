@@ -21,13 +21,13 @@
 #include <stdio.h>
 #include <ctype.h> // tolower
 
-#include <eez/firmware.h>
-#include <eez/system.h>
-#include <eez/tasks.h>
+#include <bb3/firmware.h>
+#include <bb3/system.h>
+#include <bb3/tasks.h>
 #include <eez/sound.h>
 #include <bb3/index.h>
 #include <bb3/mqtt.h>
-#include <eez/hmi.h>
+#include <bb3/hmi.h>
 #include <bb3/usb.h>
 
 #include <bb3/fs_driver.h>
@@ -63,7 +63,7 @@
 #include <bb3/bp3c/io_exp.h>
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-#include <eez/platform/simulator/front_panel.h>
+#include <bb3/platform/simulator/front_panel.h>
 #endif
 
 using namespace eez::gui;
@@ -1075,7 +1075,7 @@ void themesEnumDefinition(DataOperationEnum operation, const WidgetCursor &widge
 void onSetSelectedThemeIndex(uint16_t value) {
     popPage();
 	persist_conf::setSelectedThemeIndex((uint8_t)value);
-    mcu::display::onThemeChanged();
+    display::onThemeChanged();
 	refreshScreen();
 }
 

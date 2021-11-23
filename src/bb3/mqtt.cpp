@@ -41,10 +41,10 @@ extern "C" {
 #include <posix_sockets.h>
 #endif
 
-#include <eez/firmware.h>
+#include <bb3/firmware.h>
 #include <eez/debug.h>
 #include <bb3/mqtt.h>
-#include <eez/system.h>
+#include <bb3/system.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/trigger.h>

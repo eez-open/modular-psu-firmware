@@ -18,8 +18,8 @@
 
 #include <stdio.h>
 
-#include <eez/firmware.h>
-#include <eez/tasks.h>
+#include <bb3/firmware.h>
+#include <bb3/tasks.h>
 #include <bb3/uart.h>
 
 #include <bb3/psu/psu.h>

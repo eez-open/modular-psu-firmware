@@ -21,7 +21,7 @@
 #include <cmsis_os.h>
 #endif
 
-#include <eez/system.h>
+#include <bb3/system.h>
 
 // TODO
 #include <bb3/psu/psu.h> // TestResult

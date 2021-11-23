@@ -29,7 +29,7 @@
 
 #include <bb3/dib-dcp405/dib-dcp405.h>
 
-#include <eez/system.h>
+#include <bb3/system.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <i2c.h>

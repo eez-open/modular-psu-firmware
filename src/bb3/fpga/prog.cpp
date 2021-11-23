@@ -18,14 +18,14 @@
 
 #if EEZ_PLATFORM_STM32
 #include <main.h>
-#include <eez/platform/stm32/spi.h>
+#include <bb3/platform/stm32/spi.h>
 #endif
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/scpi/psu.h>
 #include <bb3/psu/gui/psu.h>
 
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <bb3/fs/fs.h>
 
 #include <bb3/fpga/prog.h>
 

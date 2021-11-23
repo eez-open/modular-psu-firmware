@@ -16,11 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <eez/util.h>
 #include <eez/sound.h>
+#include <eez/conf.h>
+
+#if OPTION_KEYBOARD
 #include <eez/keyboard.h>
+#endif
 
 #include <eez/gui/gui.h>
 
@@ -136,6 +138,7 @@ OnTouchFunctionType UP_DOWN_onTouch = [](const WidgetCursor &widgetCursor, Event
     }
 };
 
+#if OPTION_KEYBOARD
 OnKeyboardFunctionType UP_DOWN_onKeyboard = [](const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) {
     if (mod == 0) {
         if (key == KEY_LEFTARROW || key == KEY_DOWNARROW) {
@@ -150,8 +153,9 @@ OnKeyboardFunctionType UP_DOWN_onKeyboard = [](const WidgetCursor &widgetCursor,
     }
     return false;
 };
+#else
+OnKeyboardFunctionType UP_DOWN_onKeyboard = nullptr;
+#endif
 
 } // namespace gui
 } // namespace eez
-
-#endif

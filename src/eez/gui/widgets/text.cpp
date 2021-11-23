@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <string.h>
 
 #include <eez/util.h>
@@ -35,7 +33,7 @@ EnumFunctionType TEXT_enum = nullptr;
 void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
     const Style *style = getStyle(widget.style);
     font::Font font = styleGetFont(style);
-    widget.w = style->border_size_left + style->padding_left + mcu::display::measureStr(widget.text.ptr(assets), -1, font, 0) + style->border_size_right + style->padding_right;
+    widget.w = style->border_size_left + style->padding_left + display::measureStr(widget.text.ptr(assets), -1, font, 0) + style->border_size_right + style->padding_right;
     widget.h = style->border_size_top + style->padding_top + font.getHeight() + style->border_size_bottom + style->padding_bottom;
 }
 
@@ -80,7 +78,7 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
                     const char *fullText = widgetCursor.currentState->data.getString();
                     int fullTextLength = strlen(fullText);
                     font::Font font = styleGetFont(style);
-                    int fullTextWidth = mcu::display::measureStr(fullText, fullTextLength, font);
+                    int fullTextWidth = display::measureStr(fullText, fullTextLength, font);
                     if (fullTextWidth <= widget->w) {
                         drawText(fullText, fullTextLength, widgetCursor.x,
                             widgetCursor.y, (int)widget->w, (int)widget->h, style,
@@ -90,13 +88,13 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
 
                     } else {
                         char text[MAX_TEXT_LEN + 1];
-                        int ellipsisWidth = mcu::display::measureStr("...", 3, font);
+                        int ellipsisWidth = display::measureStr("...", 3, font);
                         int width = ellipsisWidth;
                         int textLength = 3;
                         int iLeft = 0;
                         int iRight = strlen(fullText) - 1;
                         while (iLeft < iRight && textLength < (int)MAX_TEXT_LEN) {
-                            int widthLeft = mcu::display::measureGlyph(fullText[iLeft], font);
+                            int widthLeft = display::measureGlyph(fullText[iLeft], font);
                             if (width + widthLeft > widget->w) {
                                 break;
                             }
@@ -104,7 +102,7 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
                             iLeft++;
                             textLength++;
 
-                            int widthRight = mcu::display::measureGlyph(fullText[iRight], font);
+                            int widthRight = display::measureGlyph(fullText[iRight], font);
                             if (width + widthRight > widget->w) {
                                 break;
                             }
@@ -154,5 +152,3 @@ OnKeyboardFunctionType TEXT_onKeyboard = nullptr;
 
 } // namespace gui
 } // namespace eez
-
-#endif

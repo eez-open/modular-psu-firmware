@@ -21,7 +21,7 @@
 #include <bb3/drivers/tc77.h>
 
 #include <main.h>
-#include <eez/platform/stm32/spi.h>
+#include <bb3/platform/stm32/spi.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/dib-dcp405/ioexp.h>

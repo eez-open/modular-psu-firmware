@@ -44,5 +44,9 @@ void onDebuggerInputAvailable();
 void executeScpi();
 void flushToDebuggerMessage();
 
+bool isFlowRunningHook();
+void replacePageHook(int16_t pageId);
+void stopScriptHook();
+
 } // flow
 } // eez

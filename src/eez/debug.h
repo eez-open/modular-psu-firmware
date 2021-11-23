@@ -18,10 +18,15 @@
 
 #pragma once
 
+#include <stdlib.h>
 #include <stdint.h>
 
 namespace eez {
 namespace debug {
+
+void pushDebugTraceHook(const char *message, size_t messageLength);
+void pushInfoTraceHook(const char *message, size_t messageLength);
+void pushErrorTraceHook(const char *message, size_t messageLength);
 
 enum TraceType {
     TRACE_TYPE_DEBUG,

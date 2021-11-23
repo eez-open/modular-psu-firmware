@@ -22,8 +22,8 @@
 
 #include <scpi/scpi.h>
 
-#include <eez/firmware.h>
-#include <eez/system.h>
+#include <bb3/firmware.h>
+#include <bb3/system.h>
 #include <eez/sound.h>
 
 #include <bb3/mcu/eeprom.h>
@@ -32,7 +32,7 @@
 #include <bb3/psu/event_queue.h>
 #include <bb3/psu/sd_card.h>
 
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <bb3/fs/fs.h>
 
 #if OPTION_ETHERNET
 #include <bb3/mcu/ethernet.h>
@@ -682,7 +682,7 @@ static void updateIsLongMessageText(Event &event) {
     char text[256];
     getEventInfoText(&event, text, sizeof(text));
     eez::gui::font::Font font(getFontData(FONT_ID_OSWALD14));
-    event.isLongMessageText = mcu::display::measureStr(text, -1, font) > CONF_EVENT_LINE_WIDTH_PX;
+    event.isLongMessageText = display::measureStr(text, -1, font) > CONF_EVENT_LINE_WIDTH_PX;
 }
 
 static bool readEvent(File &indexFile, File &logFile, int eventIndex, Event &event) {
@@ -1032,5 +1032,21 @@ void action_event_queue_select_event() {
 }
 
 } // namespace gui
+
+namespace debug {
+
+void pushDebugTraceHook(const char *message, size_t messageLength) {
+    psu::event_queue::pushTraceMessage(EVENT_DEBUG_TRACE, message, messageLength);
+}
+
+void pushInfoTraceHook(const char *message, size_t messageLength) {
+    psu::event_queue::pushTraceMessage(EVENT_INFO_TRACE, message, messageLength);
+}
+
+void pushErrorTraceHook(const char *message, size_t messageLength) {
+    psu::event_queue::pushTraceMessage(EVENT_ERROR_TRACE, message, messageLength);
+}
+
+} // namespace debug
 
 } // namespace eez

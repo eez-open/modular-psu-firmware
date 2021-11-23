@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <math.h>
 #include <stdio.h>
 
@@ -100,7 +98,7 @@ struct GaugeWidget : public Widget {
 EnumFunctionType GAUGE_enum = nullptr;
 
 DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
-	using namespace mcu::display;
+	using namespace display;
 
 	auto widget = (const GaugeWidget*)widgetCursor.widget;
 
@@ -258,7 +256,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 					stringAppendString(tickText, sizeof(tickText), unit);
 				}
 
-				auto tickTextWidth = mcu::display::measureStr(tickText, -1, ticksFont);
+				auto tickTextWidth = display::measureStr(tickText, -1, ticksFont);
 				if (tickAngleDeg == 180.0) {
 					drawText(
 						tickText,
@@ -359,7 +357,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 			 stringAppendString(valueText, sizeof(valueText), " ");
 			 stringAppendString(valueText, sizeof(valueText), unit);
 		}
-		auto valueTextWidth = mcu::display::measureStr(valueText, -1, valueFont);
+		auto valueTextWidth = display::measureStr(valueText, -1, valueFont);
 		drawText(
 			valueText,
 			-1,
@@ -387,5 +385,3 @@ OnKeyboardFunctionType GAUGE_onKeyboard = nullptr;
 
 } // namespace gui
 } // namespace eez
-
-#endif

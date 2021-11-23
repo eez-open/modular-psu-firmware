@@ -25,8 +25,8 @@
 #include <string.h>
 #endif
 
-#include <eez/system.h>
-#include <eez/tasks.h>
+#include <bb3/system.h>
+#include <bb3/tasks.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/serial_psu.h>

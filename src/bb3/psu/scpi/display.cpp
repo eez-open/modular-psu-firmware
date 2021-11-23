@@ -24,14 +24,14 @@
 #if OPTION_DISPLAY
 #include <eez/gui/gui.h>
 #include <bb3/psu/gui/psu.h>
-#include <eez/system.h>
+#include <bb3/system.h>
 #endif
 
 #include <bb3/psu/sd_card.h>
 #include <bb3/psu/dlog_record.h>
 #include <bb3/psu/dlog_view.h>
 
-#include <eez/libs/image/jpeg.h>
+#include <bb3/libs/image/jpeg.h>
 
 namespace eez {
 namespace psu {
@@ -174,7 +174,7 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    const uint8_t *screenshotPixels = mcu::display::takeScreenshot();
+    const uint8_t *screenshotPixels = display::takeScreenshot();
 
     unsigned char* imageData;
     size_t imageDataSize;

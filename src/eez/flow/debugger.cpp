@@ -23,13 +23,10 @@
 
 #include <eez/debug.h>
 #include <eez/system.h>
-#include <eez/tasks.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/private.h>
 #include <eez/flow/debugger.h>
-
-#include <bb3/mcu/ethernet.h>
 
 namespace eez {
 namespace flow {
@@ -82,51 +79,12 @@ enum DebuggerState {
     DEBUGGER_STATE_SINGLE_STEP,
 };
 
-static bool g_debuggerIsConnected;
+bool g_debuggerIsConnected;
 static DebuggerState g_debuggerState;
 static bool g_skipNextBreakpoint;
 
 static char g_inputFromDebugger[64];
 static unsigned g_inputFromDebuggerPosition;
-
-static void processDebuggerInput(char *buffer, uint32_t length);
-
-////////////////////////////////////////////////////////////////////////////////
-
-char *g_toDebuggerMessage = (char *)FLOW_TO_DEBUGGER_MESSAGE_BUFFER;
-uint32_t g_toDebuggerMessagePosition = 0;
-
-void startToDebuggerMessage() {
-}
-
-void flushToDebuggerMessageBuffer() {
-	if (g_toDebuggerMessagePosition != 0) {
-		sendMessageToLowPriorityThread(FLOW_FLUSH_TO_DEBUGGER_MESSAGE);
-
-		while (g_toDebuggerMessagePosition != 0 && g_debuggerIsConnected) {
-			osDelay(1);
-			WATCHDOG_RESET(WATCHDOG_GUI_THREAD);
-		}
-	}
-}
-
-void flushToDebuggerMessage() {
-	eez::mcu::ethernet::writeDebuggerBuffer(g_toDebuggerMessage, g_toDebuggerMessagePosition);
-	g_toDebuggerMessagePosition = 0;
-}
-
-void writeDebuggerBuffer(const char *buffer, uint32_t length) {
-	if (g_toDebuggerMessagePosition + length > FLOW_TO_DEBUGGER_MESSAGE_BUFFER_SIZE) {
-		flushToDebuggerMessageBuffer();
-	}
-
-	memcpy(g_toDebuggerMessage + g_toDebuggerMessagePosition, buffer, length);
-	g_toDebuggerMessagePosition += length;
-}
-
-void finishToDebuggerMessage() {
-	flushToDebuggerMessageBuffer();
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -165,19 +123,9 @@ void onDebuggerClientDisconnected() {
     setDebuggerState(DEBUGGER_STATE_RESUMED);
 }
 
-void onDebuggerInputAvailable() {
-    char *buffer;
-    uint32_t length;
-    eez::mcu::ethernet::getDebuggerInputBuffer(&buffer, &length);
-    if (buffer && length) {
-        processDebuggerInput(buffer, length);
-        eez::mcu::ethernet::releaseDebuggerInputBuffer();
-    }    
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
-static void processDebuggerInput(char *buffer, uint32_t length) {
+void processDebuggerInput(char *buffer, uint32_t length) {
 	for (uint32_t i = 0; i < length; i++) {
 		if (buffer[i] == '\n') {
 			int messageFromDebugger = g_inputFromDebugger[0] - '0';

@@ -31,7 +31,7 @@
 #define CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR  1
 #define CHANNELS_VIEW_MODE_IN_MAX_YT        2
 
-#include <eez/file_type.h>
+#include <bb3/file_type.h>
 
 #define MCU_REVISION_TAG  0xABCD
 

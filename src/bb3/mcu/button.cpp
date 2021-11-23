@@ -22,7 +22,7 @@
 
 #include <gpio.h>
 
-#include <eez/system.h>
+#include <bb3/system.h>
 
 #define CONF_DEBOUNCE_THRESHOLD_TIME 10 // 10 ms
 #define CONF_GUI_LONG_TOUCH_TIMEOUT 1000 // 1 sec

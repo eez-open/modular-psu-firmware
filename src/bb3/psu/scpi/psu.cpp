@@ -23,7 +23,7 @@
 #endif
 
 #include <eez/sound.h>
-#include <eez/system.h>
+#include <bb3/system.h>
 
 #include <bb3/scpi/commands.h>
 

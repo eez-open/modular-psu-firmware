@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-#include <eez/file_type.h>
+#include <bb3/file_type.h>
 
 #include <bb3/psu/psu.h>
 
@@ -34,7 +34,7 @@
 #include <bb3/psu/gui/psu.h>
 #endif
 
-#include <eez/system.h>
+#include <bb3/system.h>
 
 namespace eez {
 

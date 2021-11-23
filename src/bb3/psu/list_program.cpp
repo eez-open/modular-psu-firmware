@@ -22,8 +22,8 @@
 
 #include <scpi/scpi.h>
 
-#include <eez/system.h>
-#include <eez/firmware.h>
+#include <bb3/system.h>
+#include <bb3/firmware.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/channel_dispatcher.h>
@@ -34,7 +34,7 @@
 
 #include <bb3/psu/gui/psu.h>
 
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <bb3/fs/fs.h>
 
 #define CONF_COUNTER_THRESHOLD_IN_SECONDS 5
 #define CONF_SAVE_LIST_TIMEOUT_MS 2000

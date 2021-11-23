@@ -20,9 +20,9 @@
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/yt_graph.h>
-#include <bb3/psu/trigger.h>
 
-#include <eez/dlog_file.h>
+#include <bb3/dlog_file.h>
+#include <bb3/psu/trigger.h>
 
 /* DLOG File Format
 
@@ -89,7 +89,7 @@ struct DlogItem {
 struct Parameters : public dlog_file::Parameters {
 	char filePath[MAX_PATH_LENGTH + 1] = { 0 };
 
-    DlogItem dlogItems[dlog_file::MAX_NUM_OF_Y_AXES];
+    DlogItem dlogItems[MAX_NUM_OF_Y_AXES];
     int numDlogItems = 0;
 
     bool isDlogItemAvailable(int slotIndex, int subchannelIndex, int resourceIndex);
@@ -122,7 +122,7 @@ struct DlogValueParams {
 struct Recording {
     Parameters parameters;
 
-    DlogValueParams dlogValues[dlog_file::MAX_NUM_OF_Y_AXES];
+    DlogValueParams dlogValues[MAX_NUM_OF_Y_AXES];
 
     uint32_t size;
 
@@ -141,8 +141,8 @@ struct Recording {
 
     uint8_t selectedValueIndex;
 
-    uint32_t columnDataIndexes[dlog_file::MAX_NUM_OF_Y_AXES];
-    uint8_t columnBitMask[dlog_file::MAX_NUM_OF_Y_AXES];
+    uint32_t columnDataIndexes[MAX_NUM_OF_Y_AXES];
+    uint8_t columnBitMask[MAX_NUM_OF_Y_AXES];
     uint32_t numBytesPerRow;
 };
 

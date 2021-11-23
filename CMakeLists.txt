@@ -40,7 +40,6 @@ add_definitions(-DHAVE_STDBOOL)
 add_definitions(-DSCPI_USER_CONFIG)
 
 add_definitions(-DOPTION_DISPLAY=1)
-add_definitions(-DOPTION_GUI_THREAD=1)
 add_definitions(-DOPTION_FAN=1)
 add_definitions(-DOPTION_AUX_TEMP_SENSOR=1)
 add_definitions(-DOPTION_EXT_RTC=1)
@@ -76,13 +75,14 @@ endif()
 include_directories(
     src
     src/eez/libs/agg
-    src/eez/libs/mqtt
-    src/eez/platform/simulator
+    src/eez/libs/libscpi/inc
+    src/bb3/libs/mqtt
+    src/bb3/platform/simulator
     src/bb3/scpi
+    src/bb3/conf
 )
 
 include_directories(SYSTEM
-    src/third_party/libscpi/inc
     src/third_party/micropython
     src/third_party/micropython/ports/bb3
 )
@@ -95,36 +95,22 @@ set(header_files)
 
 set(src_eez
     src/eez/alloc.cpp
-    src/eez/firmware.cpp
     src/eez/debug.cpp
-    src/eez/dlog_file.cpp
-    src/eez/file_type.cpp
-    src/eez/function_generator.cpp
-    src/eez/hmi.cpp
-    src/eez/keyboard.cpp
     src/eez/memory.cpp
-    src/eez/mouse.cpp
-    src/eez/sound.cpp
-    src/eez/system.cpp
-    src/eez/tasks.cpp
     src/eez/unit.cpp
     src/eez/util.cpp
 )
 list (APPEND src_files ${src_eez})
 set(header_eez
     src/eez/alloc.h
-    src/eez/firmware.h
     src/eez/debug.h
-    src/eez/dlog_file.h
-    src/eez/file_type.h
-    src/eez/function_generator.h
     src/eez/hmi.h
     src/eez/keyboard.h
     src/eez/memory.h
     src/eez/mouse.h
     src/eez/sound.h
+    src/eez/step_values.h
     src/eez/system.h
-    src/eez/tasks.h
     src/eez/unit.h
     src/eez/util.h
     src/eez/value_types.h
@@ -134,23 +120,70 @@ source_group("eez" FILES ${src_eez} ${header_eez})
 
 set(src_bb3
     src/bb3/action_impl.cpp
+    src/bb3/assets.cpp
+    src/bb3/dlog_file.cpp
+    src/bb3/file_type.cpp
+    src/bb3/firmware.cpp
     src/bb3/fs_driver.cpp
+    src/bb3/function_generator.cpp
+    src/bb3/hmi.cpp
     src/bb3/index.cpp
+    src/bb3/keyboard.cpp
     src/bb3/main.cpp
+    src/bb3/mouse.cpp
     src/bb3/mqtt.cpp
+    src/bb3/sound.cpp
+    src/bb3/system.cpp
+    src/bb3/tasks.cpp
     src/bb3/uart.cpp
     src/bb3/usb.cpp
 )
 list (APPEND src_files ${src_bb3})
 set(header_bb3
     src/bb3/fs_driver.h
+    src/bb3/dlog_file.h
+    src/bb3/file_type.h
+    src/bb3/firmware.h
+    src/bb3/function_generator.h
+    src/bb3/hmi.h
     src/bb3/index.h
+    src/bb3/keyboard.h
+    src/bb3/mouse.h
     src/bb3/mqtt.h
+    src/bb3/system.h
+    src/bb3/tasks.h
     src/bb3/uart.h
     src/bb3/usb.h
 )
 list (APPEND header_files ${header_bb3})
 source_group("bb3" FILES ${src_bb3} ${header_bb3})
+
+set(header_bb3_conf_eez
+    src/bb3/conf/eez/conf.h
+    src/bb3/conf/eez/gui_conf.h
+    src/bb3/conf/eez/system_conf.h
+)
+list (APPEND header_files ${header_bb3_conf_eez})
+source_group("bb3\\conf\\eez" FILES ${header_bb3_conf_eez})
+
+set(src_bb3_gui
+    src/bb3/gui/display.cpp
+    src/bb3/gui/document.cpp
+    src/bb3/gui/thread.cpp
+    src/bb3/gui/touch.cpp
+    src/bb3/gui/touch_filter.cpp
+)
+list (APPEND src_files ${src_bb3_gui})
+set(header_bb3_gui
+    src/bb3/gui/document.h
+    src/bb3/gui/document_simulator.h
+    src/bb3/gui/document_stm32.h
+    src/bb3/gui/thread.h
+    src/bb3/gui/touch.h
+    src/bb3/gui/touch_filter.h
+)
+list (APPEND header_files ${header_bb3_gui})
+source_group("bb3\\gui" FILES ${src_bb3_gui} ${header_bb3_gui})
 
 set(src_bb3_psu
     src/bb3/psu/board.cpp
@@ -287,7 +320,7 @@ set(src_eez_gui
     src/eez/gui/app_context.cpp
     src/eez/gui/assets.cpp
     src/eez/gui/data.cpp
-    src/eez/gui/document.cpp
+    src/eez/gui/display.cpp
     src/eez/gui/draw.cpp
     src/eez/gui/event.cpp
     src/eez/gui/font.cpp
@@ -295,8 +328,6 @@ set(src_eez_gui
     src/eez/gui/gui.cpp
     src/eez/gui/overlay.cpp
     src/eez/gui/page.cpp
-    src/eez/gui/touch.cpp
-    src/eez/gui/touch_filter.cpp
     src/eez/gui/update.cpp
     src/eez/gui/widget.cpp
 )
@@ -305,18 +336,17 @@ set(header_eez_gui
     src/eez/gui/app_context.h
     src/eez/gui/assets.h
     src/eez/gui/data.h
-    src/eez/gui/document.h
-    src/eez/gui/document_simulator.h
-    src/eez/gui/document_stm32.h
+    src/eez/gui/display.h
+    src/eez/gui/display-private.h
     src/eez/gui/draw.h
     src/eez/gui/event.h
     src/eez/gui/font.h
     src/eez/gui/geometry.h
     src/eez/gui/gui.h
+    src/eez/gui/image.h
     src/eez/gui/overlay.h
     src/eez/gui/page.h
     src/eez/gui/touch.h
-    src/eez/gui/touch_filter.h
     src/eez/gui/update.h
     src/eez/gui/widget.h
 )
@@ -333,15 +363,35 @@ file(GLOB header_eez_gui_widgets
 list (APPEND header_files ${header_eez_gui_widgets})
 source_group("eez\\gui\\widgets" FILES ${src_eez_gui_widgets} ${header_eez_gui_widgets})
 
-file(GLOB src_eez_scripting
-    "src/eez/scripting/*.cpp"
+file(GLOB src_bb3_flow
+    "src/bb3/flow/*.cpp"
 )
-list (APPEND src_files ${src_eez_scripting})
-file(GLOB header_eez_scripting
-    "src/eez/scripting/*.h"
+list (APPEND src_files ${src_bb3_flow})
+file(GLOB header_bb3_flow
+    "src/bb3/flow/*.h"
 )
-list (APPEND header_files ${header_eez_scripting})
-source_group("eez\\scripting" FILES ${src_eez_scripting} ${header_eez_scripting})
+list (APPEND header_files ${header_bb3_flow})
+source_group("bb3\\flow" FILES ${src_bb3_flow} ${header_bb3_flow})
+
+file(GLOB src_bb3_flow_components
+    "src/bb3/flow/components/*.cpp"
+)
+list (APPEND src_files ${src_bb3_flow_components})
+file(GLOB header_bb3_flow_components
+    "src/bb3/flow/components/*.h"
+)
+list (APPEND header_files ${header_bb3_flow_components})
+source_group("bb3\\flow\\components" FILES ${src_bb3_flow_components} ${header_bb3_flow_components})
+
+file(GLOB src_bb3_scripting
+    "src/bb3/scripting/*.cpp"
+)
+list (APPEND src_files ${src_bb3_scripting})
+file(GLOB header_bb3_scripting
+    "src/bb3/scripting/*.h"
+)
+list (APPEND header_files ${header_bb3_scripting})
+source_group("bb3\\scripting" FILES ${src_bb3_scripting} ${header_bb3_scripting})
 
 file(GLOB src_eez_flow
     "src/eez/flow/*.cpp"
@@ -383,43 +433,42 @@ set(header_eez_libs_lz4
 list (APPEND header_files ${header_eez_libs_lz4})
 source_group("eez\\libs\\lz4" FILES ${src_eez_libs_lz4} ${header_eez_libs_lz4})
 
-set(src_eez_libs_sd_fat
-    src/eez/libs/sd_fat/simulator/sd_fat.cpp
+set(src_bb3_fs
+    src/bb3/fs/simulator/fs.cpp
 )
-list (APPEND src_files ${src_eez_libs_sd_fat})
-set(header_eez_libs_sd_fat
-    src/eez/libs/sd_fat/sd_fat.h
+list (APPEND src_files ${src_bb3_fs})
+set(header_bb3_fs
+    src/bb3/fs/fs.h
 )
-list (APPEND header_files ${header_eez_libs_sd_fat})
-source_group("eez\\libs\\sd_fat" FILES ${src_eez_libs_sd_fat} ${header_eez_libs_sd_fat})
+list (APPEND header_files ${header_bb3_fs})
+source_group("bb3\\fs" FILES ${src_v} ${header_bb3_fs})
 
-set(src_eez_libs_image
-    src/eez/libs/image/bitmap.cpp
-    src/eez/libs/image/image.cpp
-    src/eez/libs/image/jpeg.cpp
-    src/eez/libs/image/toojpeg.cpp
+set(src_bb3_libs_image
+    src/bb3/libs/image/bitmap.cpp
+    src/bb3/libs/image/image.cpp
+    src/bb3/libs/image/jpeg.cpp
+    src/bb3/libs/image/toojpeg.cpp
 )
-list (APPEND src_files ${src_eez_libs_image})
-set(header_eez_libs_image
-    src/eez/libs/image/bitmap.h
-    src/eez/libs/image/image.h
-    src/eez/libs/image/jpeg.h
-    src/eez/libs/image/toojpeg.h
+list (APPEND src_files ${src_bb3_libs_image})
+set(header_bb3_libs_image
+    src/bb3/libs/image/bitmap.h
+    src/bb3/libs/image/jpeg.h
+    src/bb3/libs/image/toojpeg.h
 )
-list (APPEND header_files ${src_eez_libs_image})
-source_group("eez\\libs\\image" FILES ${src_eez_libs_image} ${header_eez_libs_image})
+list (APPEND header_files ${src_bb3_libs_image})
+source_group("bb3\\libs\\image" FILES ${src_bb3_libs_image} ${header_bb3_libs_image})
 if(MSVC)
-    set_source_files_properties(src/eez/libs/image/toojpeg.cpp PROPERTIES COMPILE_FLAGS /W0)
+    set_source_files_properties(src/bb3/libs/image/toojpeg.cpp PROPERTIES COMPILE_FLAGS /W0)
 endif()
 
-set(src_eez_libs_mqtt
-    src/eez/libs/mqtt/mqtt.c
-    src/eez/libs/mqtt/mqtt_pal.c
+set(src_bb3_libs_mqtt
+    src/bb3/libs/mqtt/mqtt.c
+    src/bb3/libs/mqtt/mqtt_pal.c
 )
-list (APPEND src_files ${src_eez_libs_mqtt})
-set(header_eez_libs_mqtt
-    src/eez/libs/mqtt/mqtt.h
-    src/eez/libs/mqtt/mqtt_pal.h
+list (APPEND src_files ${src_bb3_libs_mqtt})
+set(header_bb3_libs_mqtt
+    src/bb3/libs/mqtt/mqtt.h
+    src/bb3/libs/mqtt/mqtt_pal.h
 )
 list (APPEND header_files ${header_eez_libs_mqtt})
 source_group("eez\\libs\\mqtt" FILES ${src_eez_libs_mqtt} ${header_eez_libs_mqtt})
@@ -465,7 +514,6 @@ source_group("bb3\\fpga" FILES ${src_bb3_fpga} ${header_bb3_fpga})
 
 set(src_bb3_mcu
     src/bb3/mcu/battery.cpp
-    src/bb3/mcu/display.cpp
     src/bb3/mcu/eeprom.cpp
     src/bb3/mcu/ethernet.cpp
     src/bb3/mcu/encoder.cpp
@@ -473,8 +521,6 @@ set(src_bb3_mcu
 list (APPEND src_files ${src_bb3_mcu})
 set(header_bb3_mcu
     src/bb3/mcu/battery.h
-    src/bb3/mcu/display.h
-    src/bb3/mcu/display-private.h
     src/bb3/mcu/eeprom.h
     src/bb3/mcu/encoder.h
     src/bb3/mcu/ethernet.h
@@ -483,13 +529,13 @@ set(header_bb3_mcu
 list (APPEND header_files ${header_bb3_mcu})
 source_group("bb3\\mcu" FILES ${src_bb3_mcu} ${header_bb3_mcu})
 
-set(src_bb3_mcu_simulator
-    src/bb3/mcu/simulator/display.cpp
-    src/bb3/mcu/simulator/touch.cpp
+set(src_eez_platform_simulator
+    src/eez/platform/simulator/display.cpp
+    src/eez/platform/simulator/touch.cpp
 
 ) 
-list (APPEND src_files ${src_bb3_mcu_simulator})
-source_group("bb3\\mcu\\simulator" FILES ${src_bb3_mcu_simulator})
+list (APPEND src_files ${src_eez_platform_simulator})
+source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator})
 
 set(src_bb3_dib_dcp405
     src/bb3/dib-dcp405/adc.cpp
@@ -567,19 +613,19 @@ set(header_bb3_dib_smx46
 list (APPEND header_files ${header_bb3_dib_smx46})
 source_group("bb3\\dib-smx46" FILES ${src_bb3_dib_smx46} ${header_bb3_dib_smx46})
 
-set(src_eez_platform_simulator
-    src/eez/platform/simulator/cmsis_os.cpp
-    src/eez/platform/simulator/events.cpp
-    src/eez/platform/simulator/front_panel.cpp
+set(src_bb3_platform_simulator
+    src/bb3/platform/simulator/cmsis_os.cpp
+    src/bb3/platform/simulator/events.cpp
+    src/bb3/platform/simulator/front_panel.cpp
 ) 
-list (APPEND src_files ${src_eez_platform_simulator})
-set(header_eez_platform_simulator
-    src/eez/platform/simulator/cmsis_os.h
-    src/eez/platform/simulator/events.h
-    src/eez/platform/simulator/front_panel.h
+list (APPEND src_files ${src_bb3_platform_simulator})
+set(header_bb3_platform_simulator
+    src/bb3/platform/simulator/cmsis_os.h
+    src/bb3/platform/simulator/events.h
+    src/bb3/platform/simulator/front_panel.h
 ) 
-list (APPEND header_files ${header_eez_platform_simulator})
-source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator} ${header_eez_platform_simulator})
+list (APPEND header_files ${header_bb3_platform_simulator})
+source_group("bb3\\platform\\simulator" FILES ${src_bb3_platform_simulator} ${header_bb3_platform_simulator})
 
 set(src_bb3_scpi
     src/bb3/scpi/regs.cpp
@@ -597,36 +643,36 @@ set(header_bb3_scpi
 list (APPEND header_files ${header_bb3_scpi})
 source_group("bb3\\scpi" FILES ${src_bb3_scpi} ${header_bb3_scpi})
 
-set(src_third_party_scpi
-    src/third_party/libscpi/src/error.c
-    src/third_party/libscpi/src/expression.c
-    src/third_party/libscpi/src/fifo.c
-    src/third_party/libscpi/src/ieee488.c
-    src/third_party/libscpi/src/lexer.c
-    src/third_party/libscpi/src/minimal.c
-    src/third_party/libscpi/src/parser.c
-    src/third_party/libscpi/src/units.c
-    src/third_party/libscpi/src/utils.c
+set(src_eez_libs_libscpi
+    src/eez/libs/libscpi/src/error.c
+    src/eez/libs/libscpi/src/expression.c
+    src/eez/libs/libscpi/src/fifo.c
+    src/eez/libs/libscpi/src/ieee488.c
+    src/eez/libs/libscpi/src/lexer.c
+    src/eez/libs/libscpi/src/minimal.c
+    src/eez/libs/libscpi/src/parser.c
+    src/eez/libs/libscpi/src/units.c
+    src/eez/libs/libscpi/src/utils.c
 )
-list (APPEND src_files ${src_third_party_scpi})
+list (APPEND src_files ${src_eez_libs_libscpi})
 set(header_third_party_scpi
-    src/third_party/libscpi/inc/scpi/cc.h
-    src/third_party/libscpi/inc/scpi/config.h
-    src/third_party/libscpi/inc/scpi/constants.h
-    src/third_party/libscpi/inc/scpi/error.h
-    src/third_party/libscpi/inc/scpi/expression.h
-    src/third_party/libscpi/inc/scpi/ieee488.h
-    src/third_party/libscpi/inc/scpi/minimal.h
-    src/third_party/libscpi/inc/scpi/parser.h
-    src/third_party/libscpi/inc/scpi/scpi.h
-    src/third_party/libscpi/inc/scpi/types.h
-    src/third_party/libscpi/inc/scpi/units.h
-    src/third_party/libscpi/inc/scpi/utils.h
+    src/eez/libs/libscpi/inc/scpi/cc.h
+    src/eez/libs/libscpi/inc/scpi/config.h
+    src/eez/libs/libscpi/inc/scpi/constants.h
+    src/eez/libs/libscpi/inc/scpi/error.h
+    src/eez/libs/libscpi/inc/scpi/expression.h
+    src/eez/libs/libscpi/inc/scpi/ieee488.h
+    src/eez/libs/libscpi/inc/scpi/minimal.h
+    src/eez/libs/libscpi/inc/scpi/parser.h
+    src/eez/libs/libscpi/inc/scpi/scpi.h
+    src/eez/libs/libscpi/inc/scpi/types.h
+    src/eez/libs/libscpi/inc/scpi/units.h
+    src/eez/libs/libscpi/inc/scpi/utils.h
 )
 list (APPEND header_files ${header_third_party_scpi})
-source_group("third_party\\scpi" FILES ${src_third_party_scpi} ${header_third_party_scpi})
+source_group("eez\\libs\\libscpi" FILES ${src_eez_libs_libscpi} ${header_third_party_scpi})
 if(MSVC)
-    set_source_files_properties(${src_third_party_scpi} PROPERTIES COMPILE_FLAGS /W0)
+    set_source_files_properties(${src_eez_libs_libscpi} PROPERTIES COMPILE_FLAGS /W0)
 endif()
 
 set(src_third_party_micropython_extmod
@@ -872,12 +918,12 @@ endif()
 
 if(WIN32)
     set(src_win32_specific
-        src/eez/platform/simulator/win32/icon.rc
+        src/bb3/platform/simulator/win32/icon.rc
     ) 
     list (APPEND src_files ${src_win32_specific})
-    source_group("eez\\win32" FILES ${src_win32_specific})
+    source_group("bb3\\win32" FILES ${src_win32_specific})
 
-    set(SOURCES src/eez/platform/simulator/win32/icon.rc ${src_files})
+    set(SOURCES src/bb3/platform/simulator/win32/icon.rc ${src_files})
 endif()
 
 add_executable(modular-psu-firmware ${src_files} ${header_files})
@@ -937,6 +983,6 @@ endif()
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     add_custom_command(TARGET modular-psu-firmware POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PROJECT_SOURCE_DIR}/src/eez/platform/simulator/emscripten"
+        "${PROJECT_SOURCE_DIR}/src/bb3/platform/simulator/emscripten"
         $<TARGET_FILE_DIR:modular-psu-firmware>)
 endif()

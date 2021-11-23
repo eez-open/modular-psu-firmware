@@ -29,8 +29,8 @@
 #include <bb3/psu/temperature.h>
 #include <bb3/psu/trigger.h>
 #include <bb3/index.h>
-#include <eez/system.h>
-#include <eez/function_generator.h>
+#include <bb3/system.h>
+#include <bb3/function_generator.h>
 #include <bb3/bp3c/io_exp.h>
 
 namespace eez {

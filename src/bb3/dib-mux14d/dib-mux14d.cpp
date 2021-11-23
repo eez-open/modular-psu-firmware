@@ -24,14 +24,14 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <spi.h>
-#include <eez/platform/stm32/spi.h>
+#include <bb3/platform/stm32/spi.h>
 #endif
 
 #include <eez/debug.h>
-#include <eez/firmware.h>
-#include <eez/system.h>
-#include <eez/hmi.h>
-#include <eez/gui/document.h>
+#include <bb3/firmware.h>
+#include <bb3/system.h>
+#include <bb3/hmi.h>
+#include <bb3/gui/document.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/event_queue.h>
 #include <bb3/psu/profile.h>

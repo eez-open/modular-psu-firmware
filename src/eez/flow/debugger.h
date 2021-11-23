@@ -21,6 +21,8 @@
 namespace eez {
 namespace flow {
 
+extern bool g_debuggerIsConnected;
+
 bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex);
 
 void onStarted(Assets *assets);
@@ -42,6 +44,12 @@ void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *que
 void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const char *resultText, size_t resultTextLen);
 
 void onPageChanged(int pageId);
+
+void startToDebuggerMessage();
+void writeDebuggerBuffer(const char *buffer, uint32_t length);
+void finishToDebuggerMessage();
+
+void processDebuggerInput(char *buffer, uint32_t length);
 
 } // flow
 } // eez

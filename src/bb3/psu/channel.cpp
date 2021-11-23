@@ -26,8 +26,8 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include <eez/firmware.h>
-#include <eez/system.h>
+#include <bb3/firmware.h>
+#include <bb3/system.h>
 #include <bb3/psu/board.h>
 #include <bb3/psu/calibration.h>
 #include <bb3/psu/channel_dispatcher.h>
@@ -42,8 +42,8 @@
 #include <bb3/scpi/regs.h>
 #include <eez/sound.h>
 #include <bb3/index.h>
-#include <eez/function_generator.h>
-#include <eez/gui/gui.h>
+#include <bb3/function_generator.h>
+#include <bb3/gui/document.h>
 
 #include <bb3/bp3c/io_exp.h>
 #include <bb3/bp3c/flash_slave.h>

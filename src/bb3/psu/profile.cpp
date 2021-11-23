@@ -18,9 +18,9 @@
 
 #include <stdio.h>
 
-#include <eez/file_type.h>
-#include <eez/hmi.h>
-#include <eez/scripting/scripting.h>
+#include <bb3/file_type.h>
+#include <bb3/hmi.h>
+#include <bb3/scripting/scripting.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/channel_dispatcher.h>
@@ -36,9 +36,9 @@
 #include <bb3/psu/gui/psu.h>
 #include <bb3/psu/gui/edit_mode.h>
 
-#include <eez/function_generator.h>
+#include <bb3/function_generator.h>
 
-#include <eez/libs/sd_fat/sd_fat.h>
+#include <bb3/fs/fs.h>
 
 #define CONF_AUTO_SAVE_TIMEOUT_MS 60 * 1000
 #define CONF_AUTO_NAME_PREFIX "Saved at "

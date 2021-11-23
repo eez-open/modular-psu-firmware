@@ -24,12 +24,12 @@
 #include <usbh_hid_keybd.h>
 #endif
 
-#include <eez/firmware.h>
+#include <bb3/firmware.h>
 #include <eez/sound.h>
-#include <eez/system.h>
-#include <eez/hmi.h>
-#include <eez/keyboard.h>
-#include <eez/scripting/scripting.h>
+#include <bb3/system.h>
+#include <bb3/hmi.h>
+#include <bb3/keyboard.h>
+#include <bb3/scripting/scripting.h>
 #if OPTION_ENCODER
 #include <bb3/mcu/encoder.h>
 #endif
@@ -61,7 +61,7 @@
 #include <bb3/psu/gui/touch_calibration.h>
 #include <bb3/psu/gui/labels_and_colors.h>
 
-#include <eez/function_generator.h>
+#include <bb3/function_generator.h>
 
 #if OPTION_ENCODER
 #include <bb3/mcu/encoder.h>
@@ -71,7 +71,7 @@
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-#include <eez/platform/simulator/front_panel.h>
+#include <bb3/platform/simulator/front_panel.h>
 #endif
 
 #define CONF_GUI_TOAST_DURATION_MS 1000L
@@ -207,7 +207,7 @@ void PsuAppContext::stateManagment() {
     if (!psu::isPowerUp()) {
     	if (g_isBooted && !g_shutdownInProgress && getActivePageId() != PAGE_ID_NONE) {
     		showPage(PAGE_ID_NONE);
-    		eez::mcu::display::turnOff();
+    		eez::display::turnOff();
     	}
         return;
     }
@@ -220,7 +220,7 @@ void PsuAppContext::stateManagment() {
         showPage(PAGE_ID_DISPLAY_OFF);
         return;
     } else if (psu::persist_conf::devConf.displayState == 1 && activePageId == PAGE_ID_DISPLAY_OFF) {
-        eez::mcu::display::turnOn();
+        eez::display::turnOn();
         showPage(getMainPageId());
         return;
     }
@@ -257,9 +257,9 @@ void PsuAppContext::stateManagment() {
 
     // handling of display off page
     if (activePageId == PAGE_ID_DISPLAY_OFF) {
-        if (eez::mcu::display::isOn()) {
+        if (eez::display::isOn()) {
             if (int32_t(tickCount - m_showPageTime) >= CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT_MS) {
-                eez::mcu::display::turnOff();
+                eez::display::turnOff();
                 m_showPageTime = tickCount;
             }
         }
@@ -1153,27 +1153,27 @@ void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
     if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
         auto eventType = touch::getEventType();
         if (eventType == EVENT_TYPE_TOUCH_DOWN || eventType == EVENT_TYPE_TOUCH_MOVE) {
-            mcu::display::selectBuffer(m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex);
-            int x = MIN(MAX(touch::getX(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(touch::getY(), 1), eez::mcu::display::getDisplayHeight() - 2);
-            eez::mcu::display::setColor(255, 255, 255);
-            eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+            display::selectBuffer(m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex);
+            int x = MIN(MAX(touch::getX(), 1), eez::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(touch::getY(), 1), eez::display::getDisplayHeight() - 2);
+            eez::display::setColor(255, 255, 255);
+            eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
     } else if (getActivePageId() == PAGE_ID_TOUCH_TEST) {
-        mcu::display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
+        display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
 
         if (get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
-            int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
-            eez::mcu::display::setColor(0, 0, 255);
-            eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+            int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::display::getDisplayHeight() - 2);
+            eez::display::setColor(0, 0, 255);
+            eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
 
         if (get(widgetCursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
-            int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::mcu::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::mcu::display::getDisplayHeight() - 2);
-            eez::mcu::display::setColor(0, 255, 0);
-            eez::mcu::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+            int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::display::getDisplayWidth() - 2);
+            int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::display::getDisplayHeight() - 2);
+            eez::display::setColor(0, 255, 0);
+            eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
     }
 }
@@ -1482,11 +1482,20 @@ WidgetCursor g_focusCursor;
 int16_t g_focusDataId = DATA_ID_CHANNEL_U_EDIT;
 Value g_focusEditValue;
 
+} // gui
+} // psu
+namespace gui {
+using namespace psu::gui;
+
 void setFocusCursor(const WidgetCursor &widgetCursor, int16_t dataId) {
     g_setFocusCursor = true;
 	g_focusCursorToSet = widgetCursor;
 	g_focusDataIdToSet = dataId;
 }
+
+} // namespace gui
+namespace psu {
+namespace gui {
 
 bool isFocusChanged() {
     return g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED;
@@ -2142,7 +2151,7 @@ bool isDefaultViewVertical() {
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace eez {
-namespace mcu {
+namespace gui {
 namespace display {
 
 uint16_t transformColorHook(uint16_t color) {
@@ -2208,9 +2217,9 @@ uint16_t transformColorHook(uint16_t color) {
     return color;
 }
 
-}
-}
-}
+} // namespace display
+} // namespace gui
+} // namespace eez
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2231,6 +2240,27 @@ void stateManagmentHook() {
 #endif
 
     g_psuAppContext.stateManagment();
+}
+
+bool styleGetSmallerFontHook(font::Font &font) {
+    if (font.fontData == getFontData(FONT_ID_OSWALD48)) {
+        font.fontData = getFontData(FONT_ID_OSWALD38);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD38)) {
+        font.fontData = getFontData(FONT_ID_OSWALD24);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD24)) {
+        font.fontData = getFontData(FONT_ID_OSWALD20);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD20)) {
+        font.fontData = getFontData(FONT_ID_OSWALD17);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD17)) {
+        font.fontData = getFontData(FONT_ID_OSWALD14);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD14)) {
+        font.fontData = getFontData(FONT_ID_OSWALD12);
+    } else if (font.fontData == getFontData(FONT_ID_OSWALD12)) {
+        font.fontData = getFontData(FONT_ID_ROBOTO_CONDENSED_REGULAR);
+    } else {
+        return false;
+    }
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -16,18 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <math.h>
 
 #include <eez/util.h>
 #include <eez/sound.h>
+#include <eez/conf.h>
+
+#if OPTION_KEYBOARD
 #include <eez/keyboard.h>
+#endif
 
 #include <eez/gui/gui.h>
-#include <bb3/psu/gui/psu.h>
-
-using namespace eez::mcu;
+#include <eez/gui_conf.h>
 
 namespace eez {
 namespace gui {
@@ -173,7 +173,7 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
                 currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
 
             auto action = getWidgetAction(widgetCursor);        
-            if (widgetCursor.currentState->flags.focused && action == ACTION_ID_SCROLL) {
+            if (widgetCursor.currentState->flags.focused && action == EEZ_CONF_ACTION_ID_SCROLL) {
 				const Style *style = getStyle(widgetCursor.widget->style);
                 display::setColor(style->focus_color);
                 display::drawRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
@@ -270,12 +270,13 @@ OnTouchFunctionType SCROLL_BAR_onTouch = [](const WidgetCursor &widgetCursor, Ev
         }
 
         auto action = getWidgetAction(widgetCursor);        
-		if (action == ACTION_ID_SCROLL) {
-			psu::gui::setFocusCursor(widgetCursor, widget->data);
+		if (action == EEZ_CONF_ACTION_ID_SCROLL) {
+			setFocusCursor(widgetCursor, widget->data);
 		}
     }
 };
 
+#if OPTION_KEYBOARD
 OnKeyboardFunctionType SCROLL_BAR_onKeyboard = [](const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) {
     if (mod == 0) {
         int position = getPosition(widgetCursor);
@@ -305,8 +306,10 @@ OnKeyboardFunctionType SCROLL_BAR_onKeyboard = [](const WidgetCursor &widgetCurs
     }
     return false;
 };
+#else
+OnKeyboardFunctionType SCROLL_BAR_onKeyboard = nullptr;
+#endif
+
 
 } // namespace gui
 } // namespace eez
-
-#endif

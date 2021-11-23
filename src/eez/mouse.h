@@ -18,46 +18,16 @@
 
 #pragma once
 
-#if defined(EEZ_PLATFORM_STM32)
-#include <usbh_hid.h>
-#endif
-
-#include <eez/gui/gui.h>
+#include <eez/gui/event.h>
 
 namespace eez {
 namespace mouse {
 
-void init();
-void getEvent(bool &mouseCursorVisible, gui::EventType &mouseEventType, int &mouseX, int &mouseY);
-
 bool isDisplayDirty();
 void updateDisplay();
 
+void getEvent(bool &mouseCursorVisible, gui::EventType &mouseEventType, int &mouseX, int &mouseY);
 void onPageChanged();
-
-void onMouseXMove(int x);
-void onMouseYMove(int y);
-void onMouseButtonDown(int button);
-void onMouseButtonUp(int button);
-void onMouseDisconnected();
-
-#if defined(EEZ_PLATFORM_STM32)
-void onMouseEvent(USBH_HandleTypeDef *phost);
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-void onMouseEvent(bool mouseButton1IsPressed, int mouseX, int mouseY);
-#endif
-
-struct MouseInfo {
-    uint8_t x;
-    uint8_t y;
-    uint8_t button1: 1;
-    uint8_t button2: 1;
-    uint8_t button3: 1;
-};
-
-extern MouseInfo g_mouseInfo;
 
 } // mouse
 } // eez

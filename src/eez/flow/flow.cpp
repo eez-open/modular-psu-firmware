@@ -18,12 +18,12 @@
 
 #include <eez/util.h>
 
+#include <eez/system.h>
+
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/input.h>
 
 #include <eez/gui/widgets/layout_view.h>
-
-#include <eez/scripting/scripting.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>
@@ -178,6 +178,10 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 }
 
 void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) {
+	if (!isFlowRunningHook()) {
+		return;
+	}
+
 	auto flowState = widgetCursor.flowState;
 	actionId = -actionId - 1;
 
@@ -250,7 +254,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 					setValue(flowDataId, widgetCursor, value);
 				}
 
-				scripting::executeFlowAction(widgetCursor, inputWidget->action);
+				executeFlowAction(widgetCursor, inputWidget->action);
 			} else {
 				setValue(flowDataId, widgetCursor, value);
 			}

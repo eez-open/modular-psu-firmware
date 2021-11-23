@@ -20,7 +20,7 @@
 #include <bb3/psu/board.h>
 
 #if defined(EEZ_PLATFORM_STM32)
-#include <eez/system.h>
+#include <bb3/system.h>
 #include <main.h>
 #endif
 

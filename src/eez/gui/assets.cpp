@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <assert.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -32,8 +30,9 @@
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widget.h>
+#include <eez/gui_conf.h>
 
-#include <eez/libs/sd_fat/sd_fat.h>
+//#include <bb3/fs/fs.h>
 
 #include <scpi/scpi.h>
 
@@ -43,17 +42,6 @@ namespace gui {
 bool g_isMainAssetsLoaded;
 Assets *g_mainAssets = (Assets *)DECOMPRESSED_ASSETS_START_ADDRESS;
 Assets *g_externalAssets;
-
-////////////////////////////////////////////////////////////////////////////////
-
-static const uint32_t HEADER_TAG = 0x7A65657E;
-
-struct Header {
-	uint32_t tag; // HEADER_TAG
-	uint16_t projectVersion;
-	uint16_t assetsType;
-	uint32_t decompressedSize;
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -114,100 +102,11 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 	return true;
 }
 
-void loadMainAssets() {
+void loadMainAssets(const uint8_t *assets, uint32_t assetsSize) {
 	g_mainAssets->external = false;
-	auto decompressedSize = decompressAssetsData(assets, sizeof(assets), g_mainAssets, MAX_DECOMPRESSED_ASSETS_SIZE, nullptr);
+	auto decompressedSize = decompressAssetsData(assets, assetsSize, g_mainAssets, MAX_DECOMPRESSED_ASSETS_SIZE, nullptr);
 	assert(decompressedSize);
 	g_isMainAssetsLoaded = true;
-}
-
-bool loadExternalAssets(const char *filePath, int *err) {
-	unloadExternalAssets();
-
-    eez::File file;
-    if (!file.open(filePath, FILE_OPEN_EXISTING | FILE_READ)) {
-        if (err) {
-            *err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
-        }
-        return false;
-    }
-
-    uint32_t fileSize = file.size();
-
-    if (fileSize == 0) {
-        if (err) {
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
-        }
-        return false;
-    }
-
-	uint8_t *fileData = (uint8_t *)alloc(((fileSize + 3) / 4) * 4, 202);
-    if (!fileData) {
-        if (err) {
-            *err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
-        }
-        return false;
-    }
-
-    uint32_t bytesRead = file.read(fileData, fileSize);
-    file.close();
-
-    if (bytesRead != fileSize) {
-		free(fileData);
-        if (err) {
-            *err = SCPI_ERROR_MASS_STORAGE_ERROR;
-        }
-        return false;
-    }
-
-	auto header = (Header *)fileData;
-
-	if (header->tag != HEADER_TAG) {
-		free(fileData);
-		if (err) {
-			*err = SCPI_ERROR_INVALID_BLOCK_DATA;
-		}
-		return false;
-	}
-
-// disable warning: offsetof within non-standard-layout type ... is conditionally-supported [-Winvalid-offsetof]
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Winvalid-offsetof"
-#endif
-
-	auto decompressedDataOffset = offsetof(Assets, pages);
-
- #ifdef __GNUC__
- #pragma GCC diagnostic pop
- #endif
-
-	size_t externalAssetsSize = decompressedDataOffset + header->decompressedSize;
-	g_externalAssets = (Assets *)alloc(externalAssetsSize, 301);
-	if (!g_externalAssets) {
-		free(g_externalAssets);
-		g_externalAssets = nullptr;
-
-		if (err) {
-			*err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
-		}
-
-		return false;
-	}
-
-	g_externalAssets->external = true;
-
-	auto result = decompressAssetsData(fileData, fileSize, g_externalAssets, externalAssetsSize, err);
-
-	free(fileData);
-
-	if (!result) {
-		free(g_externalAssets);
-		g_externalAssets = nullptr;
-		return false;
-	}
-
-	return true;
 }
 
 void unloadExternalAssets() {
@@ -246,11 +145,11 @@ const Style *getStyle(int styleID) {
 		return g_mainAssets->styles.item(g_mainAssets, styleID - 1);
 	} else if (styleID < 0) {
 		if (g_externalAssets == nullptr) {
-			return getStyle(STYLE_ID_DEFAULT);
+			return getStyle(EEZ_CONF_STYLE_ID_DEFAULT);
 		}
 		return g_externalAssets->styles.item(g_externalAssets, -styleID - 1);
 	}
-	return getStyle(STYLE_ID_DEFAULT);
+	return getStyle(EEZ_CONF_STYLE_ID_DEFAULT);
 }
 
 const FontData *getFontData(int fontID) {
@@ -337,5 +236,3 @@ int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name) {
 
 } // namespace gui
 } // namespace eez
-
-#endif

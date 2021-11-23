@@ -19,6 +19,8 @@
 #pragma once
 
 #include <eez/gui/gui.h>
+#include <bb3/gui/document.h>
+#include <bb3/gui/thread.h>
 
 using namespace eez::gui;
 
@@ -47,7 +49,6 @@ extern int g_channelIndex;
 extern WidgetCursor g_focusCursor;
 extern int16_t g_focusDataId;
 extern Value g_focusEditValue;
-void setFocusCursor(const WidgetCursor& cursor, int16_t dataId);
 bool isFocusChanged();
 
 void changeVoltageLimit(int iChannel);
@@ -189,9 +190,7 @@ enum DialogActionResult {
 };
 
 class PsuAppContext : public AppContext {
-#if OPTION_GUI_THREAD
     friend void eez::gui::onGuiQueueMessageHook(uint8_t type, int16_t param);
-#endif
 
 public:
     PsuAppContext();

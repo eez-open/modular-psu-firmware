@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <eez/system.h>
 #include <eez/debug.h>
 
@@ -144,7 +142,7 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCall
 
             const Style *style = getStyle(widgetCursor.widget->style);
 
-            mcu::display::setBufferBounds(currentState->displayBufferIndex,
+            display::setBufferBounds(currentState->displayBufferIndex,
 				widgetCursor.x,
 				widgetCursor.y,
 				overlay ? overlay->width: widgetCursor.widget->w,
@@ -188,12 +186,12 @@ DrawFunctionType CONTAINER_draw = [](const WidgetCursor &widgetCursor) {
         h = overlay ? overlay->height : widget->h;
 
         if (!previousState || previousState->displayBufferIndex == -1) {
-            currentState->displayBufferIndex = mcu::display::allocBuffer();
+            currentState->displayBufferIndex = display::allocBuffer();
             refresh = true;
         } else {
             currentState->displayBufferIndex = previousState->displayBufferIndex;
         }
-        mcu::display::selectBuffer(currentState->displayBufferIndex);
+        display::selectBuffer(currentState->displayBufferIndex);
     }
 
     if (refresh) {
@@ -210,5 +208,3 @@ OnKeyboardFunctionType CONTAINER_onKeyboard = nullptr;
 
 } // namespace gui
 } // namespace eez
-
-#endif

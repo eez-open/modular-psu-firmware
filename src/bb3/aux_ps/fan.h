@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#include <eez/firmware.h>
+#include <bb3/firmware.h>
 
 #define FAN_MODE_AUTO 0
 #define FAN_MODE_MANUAL 1

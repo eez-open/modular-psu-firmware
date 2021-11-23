@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include <eez/sound.h>
-#include <eez/system.h>
+#include <bb3/system.h>
 #include <bb3/index.h>
 
 #include <eez/gui/gui.h>
@@ -38,7 +38,7 @@
 #include <bb3/psu/gui/keypad.h>
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-#include <eez/platform/simulator/front_panel.h>
+#include <bb3/platform/simulator/front_panel.h>
 #endif
 
 #ifdef _MSC_VER

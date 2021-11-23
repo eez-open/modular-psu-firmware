@@ -16,14 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <string.h>
 
 #include <eez/system.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui_conf.h>
 
 #define CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS 500
 
@@ -181,7 +180,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
             style, widgetCursor.currentState->flags.active,
             widgetCursor.currentState->flags.blinking, false,
             &currentState->color, &currentState->backgroundColor, &currentState->activeColor, &currentState->activeBackgroundColor,
-            widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT || widget->data == DATA_ID_EDIT_UNIT,
+            widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT || widget->data == EEZ_CONF_DATA_ID_EDIT_UNIT,
             currentState->cursorPosition, currentState->xScroll);
     }
 
@@ -292,5 +291,3 @@ OnKeyboardFunctionType DISPLAY_DATA_onKeyboard = nullptr;
 
 } // namespace gui
 } // namespace eez
-
-#endif

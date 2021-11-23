@@ -21,14 +21,14 @@
 #if defined(EEZ_PLATFORM_STM32)
 #include <main.h>
 #include <crc.h>
-#include <eez/platform/stm32/spi.h>
+#include <bb3/platform/stm32/spi.h>
 #include <stdlib.h>
 #endif
 
 #include <eez/debug.h>
 #include <bb3/index.h>
-#include <eez/system.h>
-#include <eez/tasks.h>
+#include <bb3/system.h>
+#include <bb3/tasks.h>
 
 #include <bb3/bp3c/comm.h>
 

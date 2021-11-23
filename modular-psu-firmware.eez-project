@@ -61,7 +61,7 @@
           "template": "//${eez-studio SCPI_COMMANDS_DECL}\n"
         }
       ],
-      "destinationFolder": "src\\eez"
+      "destinationFolder": "src\\bb3"
     }
   },
   "variables": {
