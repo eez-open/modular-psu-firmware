@@ -41,7 +41,7 @@ static uint8_t *g_heap;
 #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
-MUTEX_DECLARE(g_mutex, g_mutexId);
+MUTEX_DECLARE(g_allocMutex, g_allocMutexId);
 
 #if defined(EEZ_PLATFORM_STM32)
 #pragma GCC diagnostic pop
@@ -55,7 +55,7 @@ void initAllocHeap(uint8_t *heap, size_t heapSize) {
 	first->free = 1;
 	first->size = heapSize - sizeof(AllocBlock);
 
-	MUTEX_CREATE(g_mutex, g_mutexId);
+	MUTEX_CREATE(g_allocMutex, g_allocMutexId);
 }
 
 void *alloc(size_t size, uint32_t id) {
@@ -69,7 +69,7 @@ void *alloc(size_t size, uint32_t id) {
 
 	AllocBlock *block = first;
 
-	if (MUTEX_WAIT(g_mutexId)) {
+	if (MUTEX_WAIT(g_allocMutexId)) {
 		while (block) {
 			if (block->free && block->size >= size) {
 				break;
@@ -78,7 +78,7 @@ void *alloc(size_t size, uint32_t id) {
 		}
 
 		if (!block) {
-			MUTEX_RELEASE(g_mutexId);
+			MUTEX_RELEASE(g_allocMutexId);
 			return nullptr;
 		}
 
@@ -95,7 +95,7 @@ void *alloc(size_t size, uint32_t id) {
 		block->free = 0;
 		block->id = id;
 
-		MUTEX_RELEASE(g_mutexId);
+		MUTEX_RELEASE(g_allocMutexId);
 	}
 		
 	return block + 1;    
@@ -110,7 +110,7 @@ void free(void *ptr) {
 
 	AllocBlock *block = first;
 
-	if (MUTEX_WAIT(g_mutexId)) {
+	if (MUTEX_WAIT(g_allocMutexId)) {
 		AllocBlock *prevBlock = nullptr;
 		while (block && block + 1 < ptr) {
 			prevBlock = block;
@@ -119,7 +119,7 @@ void free(void *ptr) {
 
 		if (!block || block + 1 != ptr) {
 			// assert(0);
-			MUTEX_RELEASE(g_mutexId);
+			MUTEX_RELEASE(g_allocMutexId);
 			return;
 		}
 
@@ -140,7 +140,7 @@ void free(void *ptr) {
 		}
 		block->free = 1;
 
-		MUTEX_RELEASE(g_mutexId);
+		MUTEX_RELEASE(g_allocMutexId);
 	}
 }
 
