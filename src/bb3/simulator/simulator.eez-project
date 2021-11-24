@@ -2,7 +2,7 @@
   "settings": {
     "general": {
       "projectVersion": "v2",
-      "projectType": "master",
+      "projectType": "firmware-module",
       "namespace": "",
       "imports": [
         {

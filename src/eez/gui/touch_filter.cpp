@@ -18,7 +18,7 @@
 
 #include <eez/util.h>
 
-#include <bb3/gui/touch_filter.h>
+#include <eez/gui/touch_filter.h>
 
 //
 // Thanks to: http://dlbeer.co.nz/articles/tsf.html

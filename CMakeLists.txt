@@ -170,8 +170,6 @@ set(src_bb3_gui
     src/bb3/gui/display.cpp
     src/bb3/gui/document.cpp
     src/bb3/gui/thread.cpp
-    src/bb3/gui/touch.cpp
-    src/bb3/gui/touch_filter.cpp
 )
 list (APPEND src_files ${src_bb3_gui})
 set(header_bb3_gui
@@ -179,8 +177,6 @@ set(header_bb3_gui
     src/bb3/gui/document_simulator.h
     src/bb3/gui/document_stm32.h
     src/bb3/gui/thread.h
-    src/bb3/gui/touch.h
-    src/bb3/gui/touch_filter.h
 )
 list (APPEND header_files ${header_bb3_gui})
 source_group("bb3\\gui" FILES ${src_bb3_gui} ${header_bb3_gui})
@@ -328,6 +324,8 @@ set(src_eez_gui
     src/eez/gui/gui.cpp
     src/eez/gui/overlay.cpp
     src/eez/gui/page.cpp
+    src/eez/gui/touch.cpp
+    src/eez/gui/touch_filter.cpp
     src/eez/gui/update.cpp
     src/eez/gui/widget.cpp
 )
@@ -347,6 +345,7 @@ set(header_eez_gui
     src/eez/gui/overlay.h
     src/eez/gui/page.h
     src/eez/gui/touch.h
+    src/eez/gui/touch_filter.h
     src/eez/gui/update.h
     src/eez/gui/widget.h
 )
@@ -524,18 +523,19 @@ set(header_bb3_mcu
     src/bb3/mcu/eeprom.h
     src/bb3/mcu/encoder.h
     src/bb3/mcu/ethernet.h
-    src/bb3/mcu/sdram.h
-    src/bb3/mcu/touch.h) 
+    src/bb3/mcu/sdram.h) 
 list (APPEND header_files ${header_bb3_mcu})
 source_group("bb3\\mcu" FILES ${src_bb3_mcu} ${header_bb3_mcu})
 
 set(src_eez_platform_simulator
     src/eez/platform/simulator/display.cpp
     src/eez/platform/simulator/touch.cpp
-
 ) 
 list (APPEND src_files ${src_eez_platform_simulator})
-source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator})
+set(header_eez_platform_simulator
+    src/eez/platform/touch.h)
+list (APPEND header_files ${header_eez_platform_simulator})
+source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator} ${header_eez_platform_simulator})
 
 set(src_bb3_dib_dcp405
     src/bb3/dib-dcp405/adc.cpp

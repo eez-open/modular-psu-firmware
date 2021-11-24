@@ -24,6 +24,8 @@ namespace eez {
 namespace gui {
 namespace touch {
 
+void tickHighPriority();
+
 void tick();
 
 EventType getEventType();

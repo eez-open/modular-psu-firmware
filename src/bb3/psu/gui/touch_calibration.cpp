@@ -22,7 +22,7 @@
 #include <eez/sound.h>
 
 #include <eez/gui/gui.h>
-#include <bb3/gui/touch_filter.h>
+#include <eez/gui/touch_filter.h>
 
 #include <bb3/psu/psu.h>
 

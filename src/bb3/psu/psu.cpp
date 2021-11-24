@@ -32,7 +32,7 @@
 
 #include <bb3/scpi/scpi.h>
 
-#include <bb3/gui/touch.h>
+#include <eez/gui/touch.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/serial_psu.h>

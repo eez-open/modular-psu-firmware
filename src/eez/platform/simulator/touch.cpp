@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bb3/mcu/touch.h>
+#include <eez/platform/touch.h>
 
 #include <bb3/platform/simulator/events.h>
 

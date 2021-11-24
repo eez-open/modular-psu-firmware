@@ -32,8 +32,6 @@
 #include <eez/gui/widget.h>
 #include <eez/gui_conf.h>
 
-//#include <bb3/fs/fs.h>
-
 #include <scpi/scpi.h>
 
 namespace eez {
