@@ -164,4 +164,22 @@ void dumpAlloc(scpi_t *context) {
 	}
 }
 
+void getAllocInfo(int &free, int &alloc) {
+	free = 0;
+	alloc = 0;
+	if (EEZ_MUTEX_WAIT(alloc, 0)) {
+		AllocBlock *first = (AllocBlock *)g_heap;
+		AllocBlock *block = first;
+		while (block) {
+			if (block->free) {
+				free += block->size;
+			} else {
+				alloc += block->size;
+			}
+			block = block->next;
+		}
+		EEZ_MUTEX_RELEASE(alloc);
+	}
+}
+
 } // eez
