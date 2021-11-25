@@ -47,7 +47,7 @@ void flushToDebuggerMessage() {
 	
 	eez::mcu::ethernet::writeDebuggerBuffer(g_toDebuggerMessage, toDebuggerMessagePosition);
 
-	if (EEZ_MUTEX_WAIT(flowDebugger, 5)) {
+	if (EEZ_MUTEX_WAIT(flowDebugger, 0)) {
 		auto n = g_toDebuggerMessagePosition - toDebuggerMessagePosition;
 		if (n > 0) {
 			memmove(g_toDebuggerMessage, g_toDebuggerMessage + toDebuggerMessagePosition, n);
@@ -69,7 +69,7 @@ void dealWithCongestedBufferSituation(const char *buffer, uint32_t length) {
 		}
 	} while (g_toDebuggerMessagePosition + length > FLOW_TO_DEBUGGER_MESSAGE_BUFFER_SIZE);
 
-	if (EEZ_MUTEX_WAIT(flowDebugger, 5)) {
+	if (EEZ_MUTEX_WAIT(flowDebugger, 0)) {
 		memcpy(g_toDebuggerMessage + g_toDebuggerMessagePosition, buffer, length);
 		g_toDebuggerMessagePosition += length;
 		EEZ_MUTEX_RELEASE(flowDebugger);
@@ -83,7 +83,7 @@ void writeDebuggerBuffer(const char *buffer, uint32_t length) {
 		return;
 	}
 
-	if (EEZ_MUTEX_WAIT(flowDebugger, 5)) {
+	if (EEZ_MUTEX_WAIT(flowDebugger, 0)) {
 		if (g_toDebuggerMessagePosition + length > FLOW_TO_DEBUGGER_MESSAGE_BUFFER_SIZE) {
 			EEZ_MUTEX_RELEASE(flowDebugger);
 			dealWithCongestedBufferSituation(buffer, length);
