@@ -18,6 +18,8 @@
 
 #include <stdio.h>
 
+#include <eez/os.h>
+
 #include <bb3/system.h>
 #include <bb3/firmware.h>
 #include <bb3/psu/conf_advanced.h>
@@ -80,16 +82,6 @@ void watchdogReset(int fromTask) {
 
 namespace eez {
 
-uint32_t millis() {
-#if defined(EEZ_PLATFORM_STM32)
-	return HAL_GetTick();
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-	return osKernelSysTick();
-#endif
-}
-
 void delay(uint32_t millis) {
 #if defined(EEZ_PLATFORM_STM32)
     HAL_Delay(millis);
@@ -112,7 +104,7 @@ uint32_t micros() {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-	return osKernelSysTick() * 1000;
+	return osKernelGetTickCount() * 1000;
 #endif
 }
 

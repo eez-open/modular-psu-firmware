@@ -41,9 +41,8 @@ extern "C" {
 #pragma warning( pop )
 #endif
 
-#include "cmsis_os.h"
-
 #include <eez/debug.h>
+#include <eez/os.h>
 
 extern"C" void mp_hal_stdout_tx_strn(const char *str, size_t len) {
     DebugTrace("%.*s", len, str);
@@ -58,13 +57,13 @@ extern"C" void mp_hal_delay_us(mp_uint_t us) {
 }
 
 extern"C" mp_uint_t mp_hal_ticks_us(void) {
-    return osKernelSysTick() * 1000;
+    return osKernelGetTickCount() * 1000;
 }
 
 extern"C" mp_uint_t mp_hal_ticks_ms(void) {
-    return osKernelSysTick();
+    return osKernelGetTickCount();
 }
 
 extern"C" mp_uint_t mp_hal_ticks_cpu(void) {
-    return osKernelSysTick();
+    return osKernelGetTickCount();
 }

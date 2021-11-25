@@ -29,7 +29,8 @@
         "functional": "cpp",
         "list": "cpp",
         "xtree": "cpp",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "stddef.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": true

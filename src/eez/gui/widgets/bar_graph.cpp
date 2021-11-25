@@ -19,7 +19,7 @@
 #include <math.h>
 #include <memory.h>
 
-#include <eez/system.h>
+#include <eez/os.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>

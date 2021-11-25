@@ -17,7 +17,7 @@
  */
 
 #include <eez/alloc.h>
-#include <eez/system.h>
+#include <eez/os.h>
 
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>

@@ -18,6 +18,8 @@
 
 #include <limits.h>
 
+#include <eez/os.h>
+
 #include <bb3/psu/psu.h>
 
 #include <scpi/scpi.h>
@@ -87,18 +89,7 @@ static uint8_t g_writeQueueHead = 0;
 static uint8_t g_writeQueueTail = 0;
 static bool g_writeQueueFull;
 
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wparentheses"
-#endif
-
-osMutexId(g_writeQueueMutexId);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic pop
-#endif
-
-osMutexDef(g_writeQueueMutex);
+EEZ_MUTEX_DECLARE(eventQueue)
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -149,7 +140,7 @@ static Event *getEvent(uint32_t eventIndex);
 
 void init() {
     g_refreshEvents = true;
-    g_writeQueueMutexId = osMutexCreate(osMutex(g_writeQueueMutex));
+	EEZ_MUTEX_CREATE(eventQueue);
 }
 
 void tick() {
@@ -374,7 +365,7 @@ void onEncoder(int counter) {
 static bool getEventFromWriteQueue(QueueEvent *queueEvent) {
     bool result = false;
 
-    if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
+    if (EEZ_MUTEX_WAIT(eventQueue, 5)) {
 		if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
 			memcpy(queueEvent, &g_writeQueue[g_writeQueueTail], sizeof(QueueEvent));
 			g_writeQueueTail = (g_writeQueueTail + 1) % WRITE_QUEUE_MAX_SIZE;
@@ -382,14 +373,14 @@ static bool getEventFromWriteQueue(QueueEvent *queueEvent) {
 			result = true;
 		}
 
-		osMutexRelease(g_writeQueueMutexId);
+		EEZ_MUTEX_RELEASE(eventQueue);
     }
 
     return result;
 }
 
 static void addEventToWriteQueue(int16_t eventId, char *message, int channelIndex) {
-    if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
+    if (EEZ_MUTEX_WAIT(eventQueue, 5)) {
         g_writeQueue[g_writeQueueHead].dateTime = datetime::now();
         g_writeQueue[g_writeQueueHead].eventId = eventId;
         g_writeQueue[g_writeQueueHead].channelIndex = channelIndex;
@@ -414,7 +405,7 @@ static void addEventToWriteQueue(int16_t eventId, char *message, int channelInde
             g_refreshEvents = true;
         }
 
-        osMutexRelease(g_writeQueueMutexId);
+		EEZ_MUTEX_RELEASE(eventQueue);
     }
 
     if (isLowPriorityThread()) {
@@ -536,7 +527,7 @@ static void refreshEvents() {
         g_refreshEvents = false;
     } else {
         g_numEvents = 0;
-        if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
+        if (EEZ_MUTEX_WAIT(eventQueue, 5)) {
             if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
                 int i = g_writeQueueFull ? (g_writeQueueHead + 1) % WRITE_QUEUE_MAX_SIZE : g_writeQueueHead;
                 do {
@@ -554,7 +545,7 @@ static void refreshEvents() {
             }
 
             g_refreshEvents = false;
-            osMutexRelease(g_writeQueueMutexId);
+			EEZ_MUTEX_RELEASE(eventQueue);
         }        
     }
 }
@@ -791,7 +782,7 @@ static void readEvents(uint32_t fromPosition) {
             indexFile.close();
         }
     } else {
-        if (osMutexWait(g_writeQueueMutexId, 5) == osOK) {
+        if (EEZ_MUTEX_WAIT(eventQueue, 5)) {
             uint32_t j = 0;
             uint32_t k = 0;
             if (g_writeQueueFull || g_writeQueueTail != g_writeQueueHead) {
@@ -832,7 +823,7 @@ static void readEvents(uint32_t fromPosition) {
                 } while (i != g_writeQueueTail);
             }
 
-            osMutexRelease(g_writeQueueMutexId);
+			EEZ_MUTEX_RELEASE(eventQueue);
         }                
     }
 }

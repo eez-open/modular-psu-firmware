@@ -75,8 +75,6 @@ void setColor16(uint16_t color16);
 void setColor(uint16_t color, bool ignoreLuminocity = false);
 uint16_t getColor();
 
-uint16_t transformColorHook(uint16_t color);
-
 void setBackColor(uint8_t r, uint8_t g, uint8_t b);
 void setBackColor(uint16_t color, bool ignoreLuminocity = false);
 uint16_t getBackColor();

@@ -20,6 +20,8 @@
 
 #include <SDL.h>
 
+#include <eez/os.h>
+
 #include <bb3/firmware.h>
 #include <bb3/system.h>
 #include <bb3/keyboard.h>

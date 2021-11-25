@@ -20,10 +20,10 @@
 
 #include <math.h>
 #include <i2c.h>
-#include <cmsis_os.h>
 #include <bb3/drivers/tmp1075.h>
 #include <eez/debug.h>
 #include <eez/util.h>
+#include <eez/os.h>
 
 // TMP1075 Temperature Sensor With I2C
 // http://www.ti.com/lit/ds/symlink/tmp1075.pdf

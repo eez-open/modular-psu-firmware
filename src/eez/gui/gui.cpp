@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include <eez/conf.h>
-#include <eez/system.h>
+#include <eez/os.h>
 
 #if OPTION_MOUSE
 #include <eez/mouse.h>

@@ -18,10 +18,7 @@
 
 #pragma once
 
-#include "cmsis_os.h"
-#include <stdint.h>
-
-#include <eez/system.h>
+#include <eez/os.h>
 
 #define WATCHDOG_LONG_OPERATION 1
 #define WATCHDOG_HIGH_PRIORITY_THREAD 2

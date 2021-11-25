@@ -27,7 +27,7 @@
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.fpu.1139645084" name="Floating-point unit" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.fpu" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.fpu.value.fpv5-d16" valueType="enumerated"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi.853359009" name="Floating-point ABI" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi.value.hard" valueType="enumerated"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_board.1251445923" name="Board" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_board" useByScannerDiscovery="false" value="genericBoard" valueType="string"/>
-							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults.141834188" name="Defaults" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults" useByScannerDiscovery="false" value="com.st.stm32cube.ide.common.services.build.inputs.revA.1.0.5 || Debug || true || Executable || com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.base.gnu-tools-for-stm32 || STM32F769IGTx || 0 || 0 || arm-none-eabi- || ${gnu_tools_for_stm32_compiler_path} || ../LIBJPEG/Target | ../Middlewares/Third_Party/LwIP/src/include/netif/ppp | ../Middlewares/Third_Party/LwIP/src/include/compat/stdc | ../Drivers/STM32F7xx_HAL_Driver/Inc | ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc | ../Middlewares/Third_Party/LibJPEG/include | ../Middlewares/Third_Party/LwIP/system/arch | ../Middlewares/Third_Party/LwIP/src/include | ../Middlewares/Third_Party/LwIP/src/include/compat/posix | ../LWIP/App | ../Core/Inc | ../Middlewares/Third_Party/LwIP/src/include/lwip | ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS | ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa | ../Middlewares/Third_Party/LwIP/system | ../FATFS/App | ../Middlewares/Third_Party/FreeRTOS/Source/include | ../Middlewares/Third_Party/LwIP/src/include/lwip/priv | ../USB_DEVICE/Target | ../Drivers/CMSIS/Device/ST/STM32F7xx/Include | ../Middlewares/Third_Party/LwIP/src/include/lwip/prot | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/sys | ../Middlewares/Third_Party/LwIP/src/include/lwip/apps | ../Utilities/JPEG | ../LIBJPEG/App | ../Drivers/CMSIS/Include | ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc | ../USB_DEVICE/App | ../LWIP/Target | ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1 | ../FATFS/Target | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/net | ../Middlewares/Third_Party/FatFs/src | ../Middlewares/Third_Party/LwIP/src/include/netif ||  ||  || USE_HAL_DRIVER | STM32F769xx ||  || LWIP | Utilities | Drivers | Core/Startup | LIBJPEG | Middlewares | Core | FATFS | USB_DEVICE ||  ||  || ${workspace_loc:/${ProjName}/STM32F769IGTX_FLASH.ld} || true || NonSecure ||  || secure_nsclib.o ||  || None || " valueType="string"/>
+							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults.141834188" name="Defaults" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults" useByScannerDiscovery="false" value="com.st.stm32cube.ide.common.services.build.inputs.revA.1.0.5 || Debug || true || Executable || com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.base.gnu-tools-for-stm32 || STM32F769IGTx || 0 || 0 || arm-none-eabi- || ${gnu_tools_for_stm32_compiler_path} || ../LIBJPEG/Target | ../Middlewares/Third_Party/LwIP/src/include/netif/ppp | ../Middlewares/Third_Party/LwIP/src/include/compat/stdc | ../Drivers/STM32F7xx_HAL_Driver/Inc | ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc | ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 | ../Middlewares/Third_Party/LibJPEG/include | ../Middlewares/Third_Party/LwIP/system/arch | ../Middlewares/Third_Party/LwIP/src/include | ../Middlewares/Third_Party/LwIP/src/include/compat/posix | ../LWIP/App | ../Core/Inc | ../Middlewares/Third_Party/LwIP/src/include/lwip | ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa | ../Middlewares/Third_Party/LwIP/system | ../FATFS/App | ../Middlewares/Third_Party/FreeRTOS/Source/include | ../Middlewares/Third_Party/LwIP/src/include/lwip/priv | ../USB_DEVICE/Target | ../Drivers/CMSIS/Device/ST/STM32F7xx/Include | ../Middlewares/Third_Party/LwIP/src/include/lwip/prot | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/sys | ../Middlewares/Third_Party/LwIP/src/include/lwip/apps | ../Utilities/JPEG | ../LIBJPEG/App | ../Drivers/CMSIS/Include | ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc | ../USB_DEVICE/App | ../LWIP/Target | ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1 | ../FATFS/Target | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/net | ../Middlewares/Third_Party/FatFs/src | ../Middlewares/Third_Party/LwIP/src/include/netif ||  ||  || USE_HAL_DRIVER | STM32F769xx ||  || LWIP | Utilities | Drivers | Core/Startup | LIBJPEG | Middlewares | Core | FATFS | USB_DEVICE ||  ||  || ${workspace_loc:/${ProjName}/STM32F769IGTX_FLASH.ld} || true || NonSecure ||  || secure_nsclib.o ||  || None || " valueType="string"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat.1803563067" name="Use float with printf from newlib-nano (-u _printf_float)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.converthex.1142233687" name="Convert to Intel Hex file (-O ihex)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.converthex" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.runtimelibrary_cpp.723901740" name="Runtime library" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.runtimelibrary_cpp" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.runtimelibrary_cpp.value.standard_c_standard_cpp" valueType="enumerated"/>
@@ -97,7 +97,6 @@
 									<listOptionValue builtIn="false" value="../LWIP/App"/>
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/lwip"/>
-									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/system"/>
@@ -126,6 +125,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/ports/bb3&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../bb3/scpi&quot;"/>
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.456670798" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -151,7 +151,6 @@
 									<listOptionValue builtIn="false" value="../LWIP/App"/>
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/lwip"/>
-									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/system"/>
@@ -181,6 +180,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../bb3/scpi&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../bb3/conf&quot;"/>
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.definedsymbols.1320901508" name="Define symbols (-D)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.definedsymbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1"/>
@@ -327,6 +327,12 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.35672250" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.803673296"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.907302881" name="dlog_view.cpp" rcbsApplicability="disable" resourcePath="bb3/psu/dlog_view.cpp" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.540423596.1306663570">
+						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.540423596.1306663570" name="MCU G++ Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.540423596">
+							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level.1840528055" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.optimization.level.value.o2" valueType="enumerated"/>
+							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.input.cpp.589941160" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.input.cpp"/>
+						</tool>
+					</fileInfo>
 					<folderInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1838364563" name="/" resourcePath="bb3/dib-dcm220">
 						<toolChain id="com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.exe.debug.450540432" name="MCU ARM GCC" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.exe.debug" unusedChildren="">
 							<option id="com.st.stm32cube.ide.mcu.option.internal.toolchain.type.1357444020.1125038569" name="Internal Toolchain Type" superClass="com.st.stm32cube.ide.mcu.option.internal.toolchain.type.1357444020"/>
@@ -509,31 +515,18 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.348172432" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.803673296"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1153374286" name="jdmainct.c" rcbsApplicability="disable" resourcePath="Middlewares/Third_Party/LibJPEG/source/jdmainct.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2020733480.854389959">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2020733480.854389959" name="MCU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2020733480">
-							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all.653851689" name="Enable all warnings about questionable constructions (-Wall)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all" useByScannerDiscovery="false" value="false" valueType="boolean"/>
-							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.264682929" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
-						</tool>
-					</fileInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1986832102" name="jcmainct.c" rcbsApplicability="disable" resourcePath="Middlewares/Third_Party/LibJPEG/source/jcmainct.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2020733480.1906070424">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2020733480.1906070424" name="MCU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2020733480">
-							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all.548104464" name="Enable all warnings about questionable constructions (-Wall)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all" useByScannerDiscovery="false" value="false" valueType="boolean"/>
-							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.346769590" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
-						</tool>
-					</fileInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
+						<entry excluding="platform/simulator|libs/mqtt|libs/sd_fat/simulator|libs/image/nanojpeg.c|gui/document_stm32.cpp|gui/document_simulator.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LIBJPEG"/>
+						<entry excluding="ports/bare-arm|lib/utils/gchelper_m3.s|lib/utils/gchelper_m0.s|extmod/virtpin.c|extmod/vfs.c|extmod/vfs_reader.c|extmod/vfs_posix.c|extmod/vfs_posix_file.c|extmod/vfs_lfs.c|extmod/vfs_fat.c|extmod/vfs_fat_file.c|extmod/vfs_fat_diskio.c|extmod/vfs_blockdev.c|extmod/uos_dupterm.c|extmod/modwebrepl.c|extmod/moduzlib.c|extmod/moduwebsocket.c|extmod/modutimeq.c|extmod/modussl_mbedtls.c|extmod/modussl_axtls.c|extmod/moduselect.c|extmod/modure.c|extmod/modurandom.c|extmod/modujson.c|extmod/moduheapq.c|extmod/moduhashlib.c|extmod/moductypes.c|extmod/moducryptolib.c|extmod/modubinascii.c|extmod/modframebuf.c|extmod/modbluetooth.c|extmod/machine_spi.c|extmod/machine_signal.c|extmod/machine_pulse.c|extmod/machine_pinbase.c|extmod/machine_mem.c|extmod/machine_i2c.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
+						<entry excluding="gui/document_stm32.cpp|gui/document_simulator.cpp|libs/image/nanojpeg.c|fs/simulator|libs/mqtt|platform/simulator|mcu/simulator" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="bb3"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LWIP"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
-						<entry excluding="gui/document_stm32.cpp|gui/document_simulator.cpp|libs/image/nanojpeg.c|fs/simulator|libs/mqtt|platform/simulator|mcu/simulator" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="bb3"/>
-						<entry excluding="platform/simulator|libs/mqtt|libs/sd_fat/simulator|libs/image/nanojpeg.c|gui/document_stm32.cpp|gui/document_simulator.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libscpi"/>
-						<entry excluding="ports/bare-arm|lib/utils/gchelper_m3.s|lib/utils/gchelper_m0.s|extmod/virtpin.c|extmod/vfs.c|extmod/vfs_reader.c|extmod/vfs_posix.c|extmod/vfs_posix_file.c|extmod/vfs_lfs.c|extmod/vfs_fat.c|extmod/vfs_fat_file.c|extmod/vfs_fat_diskio.c|extmod/vfs_blockdev.c|extmod/uos_dupterm.c|extmod/modwebrepl.c|extmod/moduzlib.c|extmod/moduwebsocket.c|extmod/modutimeq.c|extmod/modussl_mbedtls.c|extmod/modussl_axtls.c|extmod/moduselect.c|extmod/modure.c|extmod/modurandom.c|extmod/modujson.c|extmod/moduheapq.c|extmod/moduhashlib.c|extmod/moductypes.c|extmod/moducryptolib.c|extmod/modubinascii.c|extmod/modframebuf.c|extmod/modbluetooth.c|extmod/machine_spi.c|extmod/machine_signal.c|extmod/machine_pulse.c|extmod/machine_pinbase.c|extmod/machine_mem.c|extmod/machine_i2c.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -567,7 +560,7 @@
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.fpu.988841217" name="Floating-point unit" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.fpu" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.fpu.value.fpv5-d16" valueType="enumerated"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi.784062033" name="Floating-point ABI" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi.value.hard" valueType="enumerated"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_board.1217802370" name="Board" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_board" useByScannerDiscovery="false" value="genericBoard" valueType="string"/>
-							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults.1391344359" name="Defaults" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults" useByScannerDiscovery="false" value="com.st.stm32cube.ide.common.services.build.inputs.revA.1.0.5 || Debug (FPGA) || true || Executable || com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.base.gnu-tools-for-stm32 || STM32F769IGTx || 0 || 0 || arm-none-eabi- || ${gnu_tools_for_stm32_compiler_path} || ../LIBJPEG/Target | ../Middlewares/Third_Party/LwIP/src/include/netif/ppp | ../Middlewares/Third_Party/LwIP/src/include/compat/stdc | ../Drivers/STM32F7xx_HAL_Driver/Inc | ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc | ../Middlewares/Third_Party/LibJPEG/include | ../Middlewares/Third_Party/LwIP/system/arch | ../Middlewares/Third_Party/LwIP/src/include | ../Middlewares/Third_Party/LwIP/src/include/compat/posix | ../LWIP/App | ../Core/Inc | ../Middlewares/Third_Party/LwIP/src/include/lwip | ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS | ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa | ../Middlewares/Third_Party/LwIP/system | ../FATFS/App | ../Middlewares/Third_Party/FreeRTOS/Source/include | ../Middlewares/Third_Party/LwIP/src/include/lwip/priv | ../USB_DEVICE/Target | ../Drivers/CMSIS/Device/ST/STM32F7xx/Include | ../Middlewares/Third_Party/LwIP/src/include/lwip/prot | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/sys | ../Middlewares/Third_Party/LwIP/src/include/lwip/apps | ../Utilities/JPEG | ../LIBJPEG/App | ../Drivers/CMSIS/Include | ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc | ../USB_DEVICE/App | ../LWIP/Target | ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1 | ../FATFS/Target | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/net | ../Middlewares/Third_Party/FatFs/src | ../Middlewares/Third_Party/LwIP/src/include/netif ||  ||  || USE_HAL_DRIVER | STM32F769xx ||  || LWIP | Utilities | Drivers | Core/Startup | LIBJPEG | Middlewares | Core | FATFS | USB_DEVICE ||  ||  || ${workspace_loc:/${ProjName}/STM32F769IGTX_FLASH.ld} || true || NonSecure ||  || secure_nsclib.o ||  || None || " valueType="string"/>
+							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults.1391344359" name="Defaults" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults" useByScannerDiscovery="false" value="com.st.stm32cube.ide.common.services.build.inputs.revA.1.0.5 || Debug (FPGA) || true || Executable || com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.base.gnu-tools-for-stm32 || STM32F769IGTx || 0 || 0 || arm-none-eabi- || ${gnu_tools_for_stm32_compiler_path} || ../LIBJPEG/Target | ../Middlewares/Third_Party/LwIP/src/include/netif/ppp | ../Middlewares/Third_Party/LwIP/src/include/compat/stdc | ../Drivers/STM32F7xx_HAL_Driver/Inc | ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc | ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 | ../Middlewares/Third_Party/LibJPEG/include | ../Middlewares/Third_Party/LwIP/system/arch | ../Middlewares/Third_Party/LwIP/src/include | ../Middlewares/Third_Party/LwIP/src/include/compat/posix | ../LWIP/App | ../Core/Inc | ../Middlewares/Third_Party/LwIP/src/include/lwip | ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa | ../Middlewares/Third_Party/LwIP/system | ../FATFS/App | ../Middlewares/Third_Party/FreeRTOS/Source/include | ../Middlewares/Third_Party/LwIP/src/include/lwip/priv | ../USB_DEVICE/Target | ../Drivers/CMSIS/Device/ST/STM32F7xx/Include | ../Middlewares/Third_Party/LwIP/src/include/lwip/prot | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/sys | ../Middlewares/Third_Party/LwIP/src/include/lwip/apps | ../Utilities/JPEG | ../LIBJPEG/App | ../Drivers/CMSIS/Include | ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc | ../USB_DEVICE/App | ../LWIP/Target | ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1 | ../FATFS/Target | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/net | ../Middlewares/Third_Party/FatFs/src | ../Middlewares/Third_Party/LwIP/src/include/netif ||  ||  || USE_HAL_DRIVER | STM32F769xx ||  || LWIP | Utilities | Drivers | Core/Startup | LIBJPEG | Middlewares | Core | FATFS | USB_DEVICE ||  ||  || ${workspace_loc:/${ProjName}/STM32F769IGTX_FLASH.ld} || true || NonSecure ||  || secure_nsclib.o ||  || None || " valueType="string"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat.957617248" name="Use float with printf from newlib-nano (-u _printf_float)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.converthex.1061717729" name="Convert to Intel Hex file (-O ihex)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.converthex" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.runtimelibrary_cpp.1453542843" name="Runtime library" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.runtimelibrary_cpp" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.runtimelibrary_cpp.value.standard_c_standard_cpp" valueType="enumerated"/>
@@ -633,7 +626,6 @@
 									<listOptionValue builtIn="false" value="../LWIP/App"/>
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/lwip"/>
-									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/system"/>
@@ -662,6 +654,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/ports/bb3&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../bb3/scpi&quot;"/>
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1622225881" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -686,7 +679,6 @@
 									<listOptionValue builtIn="false" value="../LWIP/App"/>
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/lwip"/>
-									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/system"/>
@@ -716,6 +708,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../bb3/scpi&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../bb3/conf&quot;"/>
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.definedsymbols.840891351" name="Define symbols (-D)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.definedsymbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1"/>
@@ -776,30 +769,17 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.2034025105" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1343602219.587843218.Middlewares/Third_Party/LibJPEG/source/jdmainct.c" name="jdmainct.c" rcbsApplicability="disable" resourcePath="Middlewares/Third_Party/LibJPEG/source/jdmainct.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.348953409">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.348953409" name="MCU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.521987178">
-							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all.1084392495" name="Enable all warnings about questionable constructions (-Wall)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all" useByScannerDiscovery="false" value="false" valueType="boolean"/>
-							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.167889338" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
-						</tool>
-					</fileInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1343602219.587843218.Middlewares/Third_Party/LibJPEG/source/jcmainct.c" name="jcmainct.c" rcbsApplicability="disable" resourcePath="Middlewares/Third_Party/LibJPEG/source/jcmainct.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1718498414">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1718498414" name="MCU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.521987178">
-							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all.1039604101" name="Enable all warnings about questionable constructions (-Wall)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all" useByScannerDiscovery="false" value="false" valueType="boolean"/>
-							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1481349118" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
-						</tool>
-					</fileInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
+						<entry excluding="platform/simulator|modules/mcu/simulator|libs/mqtt|libs/sd_fat/simulator|libs/image/nanojpeg.c|gui/document_stm32.cpp|gui/document_simulator.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LIBJPEG"/>
+						<entry excluding="ports/bare-arm|lib/utils/gchelper_m3.s|lib/utils/gchelper_m0.s|extmod/virtpin.c|extmod/vfs.c|extmod/vfs_reader.c|extmod/vfs_posix.c|extmod/vfs_posix_file.c|extmod/vfs_lfs.c|extmod/vfs_fat.c|extmod/vfs_fat_file.c|extmod/vfs_fat_diskio.c|extmod/vfs_blockdev.c|extmod/uos_dupterm.c|extmod/modwebrepl.c|extmod/moduzlib.c|extmod/moduwebsocket.c|extmod/modutimeq.c|extmod/modussl_mbedtls.c|extmod/modussl_axtls.c|extmod/moduselect.c|extmod/modure.c|extmod/modurandom.c|extmod/modujson.c|extmod/moduheapq.c|extmod/moduhashlib.c|extmod/moductypes.c|extmod/moducryptolib.c|extmod/modubinascii.c|extmod/modframebuf.c|extmod/modbluetooth.c|extmod/machine_spi.c|extmod/machine_signal.c|extmod/machine_pulse.c|extmod/machine_pinbase.c|extmod/machine_mem.c|extmod/machine_i2c.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LWIP"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
-						<entry excluding="platform/simulator|modules/mcu/simulator|libs/mqtt|libs/sd_fat/simulator|libs/image/nanojpeg.c|gui/document_stm32.cpp|gui/document_simulator.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libscpi"/>
-						<entry excluding="ports/bare-arm|lib/utils/gchelper_m3.s|lib/utils/gchelper_m0.s|extmod/virtpin.c|extmod/vfs.c|extmod/vfs_reader.c|extmod/vfs_posix.c|extmod/vfs_posix_file.c|extmod/vfs_lfs.c|extmod/vfs_fat.c|extmod/vfs_fat_file.c|extmod/vfs_fat_diskio.c|extmod/vfs_blockdev.c|extmod/uos_dupterm.c|extmod/modwebrepl.c|extmod/moduzlib.c|extmod/moduwebsocket.c|extmod/modutimeq.c|extmod/modussl_mbedtls.c|extmod/modussl_axtls.c|extmod/moduselect.c|extmod/modure.c|extmod/modurandom.c|extmod/modujson.c|extmod/moduheapq.c|extmod/moduhashlib.c|extmod/moductypes.c|extmod/moducryptolib.c|extmod/modubinascii.c|extmod/modframebuf.c|extmod/modbluetooth.c|extmod/machine_spi.c|extmod/machine_signal.c|extmod/machine_pulse.c|extmod/machine_pinbase.c|extmod/machine_mem.c|extmod/machine_i2c.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -833,7 +813,7 @@
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.fpu.643015158" name="Floating-point unit" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.fpu" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.fpu.value.fpv5-d16" valueType="enumerated"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi.1422681280" name="Floating-point ABI" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi.value.hard" valueType="enumerated"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_board.469457810" name="Board" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_board" useByScannerDiscovery="false" value="genericBoard" valueType="string"/>
-							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults.1271793326" name="Defaults" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults" useByScannerDiscovery="false" value="com.st.stm32cube.ide.common.services.build.inputs.revA.1.0.5 || Release || true || Executable || com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.base.gnu-tools-for-stm32 || STM32F769IGTx || 0 || 0 || arm-none-eabi- || ${gnu_tools_for_stm32_compiler_path} || ../LIBJPEG/Target | ../Middlewares/Third_Party/LwIP/src/include/netif/ppp | ../Middlewares/Third_Party/LwIP/src/include/compat/stdc | ../Drivers/STM32F7xx_HAL_Driver/Inc | ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc | ../Middlewares/Third_Party/LibJPEG/include | ../Middlewares/Third_Party/LwIP/system/arch | ../Middlewares/Third_Party/LwIP/src/include | ../Middlewares/Third_Party/LwIP/src/include/compat/posix | ../LWIP/App | ../Core/Inc | ../Middlewares/Third_Party/LwIP/src/include/lwip | ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS | ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa | ../Middlewares/Third_Party/LwIP/system | ../FATFS/App | ../Middlewares/Third_Party/FreeRTOS/Source/include | ../Middlewares/Third_Party/LwIP/src/include/lwip/priv | ../USB_DEVICE/Target | ../Drivers/CMSIS/Device/ST/STM32F7xx/Include | ../Middlewares/Third_Party/LwIP/src/include/lwip/prot | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/sys | ../Middlewares/Third_Party/LwIP/src/include/lwip/apps | ../Utilities/JPEG | ../LIBJPEG/App | ../Drivers/CMSIS/Include | ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc | ../USB_DEVICE/App | ../LWIP/Target | ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1 | ../FATFS/Target | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/net | ../Middlewares/Third_Party/FatFs/src | ../Middlewares/Third_Party/LwIP/src/include/netif ||  ||  || USE_HAL_DRIVER | STM32F769xx ||  || LWIP | Utilities | Drivers | Core/Startup | LIBJPEG | Middlewares | Core | FATFS | USB_DEVICE ||  ||  || ${workspace_loc:/${ProjName}/STM32F769IGTX_FLASH.ld} || true || NonSecure ||  || secure_nsclib.o ||  || None || " valueType="string"/>
+							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults.1271793326" name="Defaults" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults" useByScannerDiscovery="false" value="com.st.stm32cube.ide.common.services.build.inputs.revA.1.0.5 || Release || true || Executable || com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.base.gnu-tools-for-stm32 || STM32F769IGTx || 0 || 0 || arm-none-eabi- || ${gnu_tools_for_stm32_compiler_path} || ../LIBJPEG/Target | ../Middlewares/Third_Party/LwIP/src/include/netif/ppp | ../Middlewares/Third_Party/LwIP/src/include/compat/stdc | ../Drivers/STM32F7xx_HAL_Driver/Inc | ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc | ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 | ../Middlewares/Third_Party/LibJPEG/include | ../Middlewares/Third_Party/LwIP/system/arch | ../Middlewares/Third_Party/LwIP/src/include | ../Middlewares/Third_Party/LwIP/src/include/compat/posix | ../LWIP/App | ../Core/Inc | ../Middlewares/Third_Party/LwIP/src/include/lwip | ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa | ../Middlewares/Third_Party/LwIP/system | ../FATFS/App | ../Middlewares/Third_Party/FreeRTOS/Source/include | ../Middlewares/Third_Party/LwIP/src/include/lwip/priv | ../USB_DEVICE/Target | ../Drivers/CMSIS/Device/ST/STM32F7xx/Include | ../Middlewares/Third_Party/LwIP/src/include/lwip/prot | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/sys | ../Middlewares/Third_Party/LwIP/src/include/lwip/apps | ../Utilities/JPEG | ../LIBJPEG/App | ../Drivers/CMSIS/Include | ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc | ../USB_DEVICE/App | ../LWIP/Target | ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1 | ../FATFS/Target | ../Middlewares/Third_Party/LwIP/src/include/compat/posix/net | ../Middlewares/Third_Party/FatFs/src | ../Middlewares/Third_Party/LwIP/src/include/netif ||  ||  || USE_HAL_DRIVER | STM32F769xx ||  || LWIP | Utilities | Drivers | Core/Startup | LIBJPEG | Middlewares | Core | FATFS | USB_DEVICE ||  ||  || ${workspace_loc:/${ProjName}/STM32F769IGTX_FLASH.ld} || true || NonSecure ||  || secure_nsclib.o ||  || None || " valueType="string"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat.1717004844" name="Use float with printf from newlib-nano (-u _printf_float)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.converthex.1628281307" name="Convert to Intel Hex file (-O ihex)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.converthex" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.runtimelibrary_cpp.860948549" name="Runtime library" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.runtimelibrary_cpp" useByScannerDiscovery="false" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.runtimelibrary_cpp.value.standard_c_standard_cpp" valueType="enumerated"/>
@@ -898,7 +878,6 @@
 									<listOptionValue builtIn="false" value="../LWIP/App"/>
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/lwip"/>
-									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/system"/>
@@ -927,6 +906,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../micropython/ports/bb3&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../bb3/scpi&quot;"/>
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.523720825" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -951,7 +931,6 @@
 									<listOptionValue builtIn="false" value="../LWIP/App"/>
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/lwip"/>
-									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/LwIP/system"/>
@@ -981,6 +960,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/..&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../bb3/scpi&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../bb3/conf&quot;"/>
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.definedsymbols.708007048" name="Define symbols (-D)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.definedsymbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="LODEPNG_NO_COMPILE_ALLOCATORS=1"/>
@@ -1040,30 +1020,17 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.111723323" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1701190242.Middlewares/Third_Party/LibJPEG/source/jdmainct.c" name="jdmainct.c" rcbsApplicability="disable" resourcePath="Middlewares/Third_Party/LibJPEG/source/jdmainct.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1265084485">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1265084485" name="MCU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1022245657">
-							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all.1819822775" name="Enable all warnings about questionable constructions (-Wall)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all" useByScannerDiscovery="false" value="false" valueType="boolean"/>
-							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1795653429" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
-						</tool>
-					</fileInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.1701190242.Middlewares/Third_Party/LibJPEG/source/jcmainct.c" name="jcmainct.c" rcbsApplicability="disable" resourcePath="Middlewares/Third_Party/LibJPEG/source/jcmainct.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.276969795">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.276969795" name="MCU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1022245657">
-							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all.1329473064" name="Enable all warnings about questionable constructions (-Wall)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.warnings.all" useByScannerDiscovery="false" value="false" valueType="boolean"/>
-							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1413577766" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
-						</tool>
-					</fileInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
+						<entry excluding="platform/simulator|modules/mcu/simulator|libs/mqtt|libs/sd_fat/simulator|libs/image/nanojpeg.c|gui/document_stm32.cpp|gui/document_simulator.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LIBJPEG"/>
+						<entry excluding="ports/bare-arm|lib/utils/gchelper_m3.s|lib/utils/gchelper_m0.s|extmod/virtpin.c|extmod/vfs.c|extmod/vfs_reader.c|extmod/vfs_posix.c|extmod/vfs_posix_file.c|extmod/vfs_lfs.c|extmod/vfs_fat.c|extmod/vfs_fat_file.c|extmod/vfs_fat_diskio.c|extmod/vfs_blockdev.c|extmod/uos_dupterm.c|extmod/modwebrepl.c|extmod/moduzlib.c|extmod/moduwebsocket.c|extmod/modutimeq.c|extmod/modussl_mbedtls.c|extmod/modussl_axtls.c|extmod/moduselect.c|extmod/modure.c|extmod/modurandom.c|extmod/modujson.c|extmod/moduheapq.c|extmod/moduhashlib.c|extmod/moductypes.c|extmod/moducryptolib.c|extmod/modubinascii.c|extmod/modframebuf.c|extmod/modbluetooth.c|extmod/machine_spi.c|extmod/machine_signal.c|extmod/machine_pulse.c|extmod/machine_pinbase.c|extmod/machine_mem.c|extmod/machine_i2c.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LWIP"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
-						<entry excluding="platform/simulator|modules/mcu/simulator|libs/mqtt|libs/sd_fat/simulator|libs/image/nanojpeg.c|gui/document_stm32.cpp|gui/document_simulator.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libscpi"/>
-						<entry excluding="ports/bare-arm|lib/utils/gchelper_m3.s|lib/utils/gchelper_m0.s|extmod/virtpin.c|extmod/vfs.c|extmod/vfs_reader.c|extmod/vfs_posix.c|extmod/vfs_posix_file.c|extmod/vfs_lfs.c|extmod/vfs_fat.c|extmod/vfs_fat_file.c|extmod/vfs_fat_diskio.c|extmod/vfs_blockdev.c|extmod/uos_dupterm.c|extmod/modwebrepl.c|extmod/moduzlib.c|extmod/moduwebsocket.c|extmod/modutimeq.c|extmod/modussl_mbedtls.c|extmod/modussl_axtls.c|extmod/moduselect.c|extmod/modure.c|extmod/modurandom.c|extmod/modujson.c|extmod/moduheapq.c|extmod/moduhashlib.c|extmod/moductypes.c|extmod/moducryptolib.c|extmod/modubinascii.c|extmod/modframebuf.c|extmod/modbluetooth.c|extmod/machine_spi.c|extmod/machine_signal.c|extmod/machine_pulse.c|extmod/machine_pinbase.c|extmod/machine_mem.c|extmod/machine_i2c.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

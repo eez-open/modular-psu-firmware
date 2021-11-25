@@ -730,7 +730,7 @@ void PsuAppContext::showProgressPage(const char *message, void (*abortCallback)(
     m_pushProgressPage = true;
     g_progress = Value();
 
-    if (osThreadGetId() == g_guiTaskHandle) {
+    if (isGuiThread()) {
     	doShowProgressPage();
     }
 }
@@ -741,7 +741,7 @@ void PsuAppContext::showProgressPageWithoutAbort(const char *message) {
     m_pushProgressPage = true;
     g_progress = Value();
 
-    if (osThreadGetId() == g_guiTaskHandle) {
+    if (isGuiThread()) {
     	doShowProgressPage();
     }
 }
@@ -772,7 +772,7 @@ void PsuAppContext::hideProgressPage() {
         m_popProgressPage = true;
     }
 
-    if (osThreadGetId() == g_guiTaskHandle) {
+    if (isGuiThread()) {
     	doHideProgressPage();
     }
 }
@@ -955,7 +955,7 @@ void PsuAppContext::doShowIntegerInput() {
 }
 
 bool PsuAppContext::dialogOpen(int *err) {
-    if (osThreadGetId() == g_guiTaskHandle) {
+    if (isGuiThread()) {
         if (!isExternalPageActive()) {
             dialogResetDataItemValues();
             pushPage(getExternalAssetsMainPageId());
@@ -1030,7 +1030,7 @@ void PsuAppContext::dialogSetDataItemValue(int16_t dataId, const char *str) {
 }
 
 void PsuAppContext::dialogClose() {
-    if (osThreadGetId() == g_guiTaskHandle) {
+    if (isGuiThread()) {
         if (isExternalPageActive()) {
             removePageFromStack(getExternalAssetsMainPageId());
         }
@@ -2152,81 +2152,6 @@ bool isDefaultViewVertical() {
 
 namespace eez {
 namespace gui {
-namespace display {
-
-uint16_t transformColorHook(uint16_t color) {
-    if (color == COLOR_ID_CHANNEL1 || color == COLOR_ID_CHANNEL1_TEXT) {
-        if (g_channelIndex >= 0 && g_channelIndex < psu::CH_NUM) {
-            auto &channel = psu::Channel::get(g_channelIndex);
-            if (channel.color) {
-                return color + channel.color - 1;
-            } else {
-                return color + channel.channelIndex;
-            }
-        } else if (hmi::g_selectedSlotIndex >= 0 && hmi::g_selectedSlotIndex < NUM_SLOTS) {
-            if (hmi::g_selectedSubchannelIndex >= 0) {
-                psu::Channel *channel = psu::Channel::getBySlotIndex(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
-                if (channel) {
-                    if (channel->color) {
-                        return color + channel->color - 1;
-                    } else {
-                        return color + channel->channelIndex;
-                    }
-                }
-            }
-            auto slotColor = g_slots[hmi::g_selectedSlotIndex]->getColor();
-            if (slotColor) {
-                return color + slotColor - 1;
-            } else {
-                return color + psu::CH_NUM + hmi::g_selectedSlotIndex;
-            }
-        }
-    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_SLOT_COLOR) {
-        uint8_t color = LabelsAndColorsPage::getSlotColor(hmi::g_selectedSlotIndex);
-        if (color) {
-            return COLOR_ID_CHANNEL1 + color - 1;
-        } else {
-            return COLOR_ID_CHANNEL1 + psu::CH_NUM + hmi::g_selectedSlotIndex;
-        }
-    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_SLOT_COLOR_TEXT) {
-        uint8_t color = LabelsAndColorsPage::getSlotColor(hmi::g_selectedSlotIndex);
-        if (color) {
-            return COLOR_ID_CHANNEL1_TEXT + color - 1;
-        } else {
-            return COLOR_ID_CHANNEL1_TEXT + psu::CH_NUM + hmi::g_selectedSlotIndex;
-        }
-    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_CHANNEL_COLOR) {
-        auto &channel = psu::Channel::get(g_channelIndex);
-        uint8_t color = LabelsAndColorsPage::getChannelColor(channel.slotIndex, channel.subchannelIndex);
-        if (color) {
-            return COLOR_ID_CHANNEL1 + color - 1;
-        } else {
-            return COLOR_ID_CHANNEL1 + g_channelIndex;
-        }
-    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_CHANNEL_COLOR_TEXT) {
-        auto &channel = psu::Channel::get(g_channelIndex);
-        uint8_t color = LabelsAndColorsPage::getChannelColor(channel.slotIndex, channel.subchannelIndex);
-        if (color) {
-            return COLOR_ID_CHANNEL1_TEXT + color - 1;
-        } else {
-            return COLOR_ID_CHANNEL1_TEXT + g_channelIndex;
-        }
-    } else if (color == COLOR_ID_PICK_COLOR) {
-        return COLOR_ID_CHANNEL1 + LabelsAndColorsPage::g_colorIndex;
-    }
-    return color;
-}
-
-} // namespace display
-} // namespace gui
-} // namespace eez
-
-////////////////////////////////////////////////////////////////////////////////
-
-namespace eez {
-namespace gui {
-
-////////////////////////////////////////////////////////////////////////////////
 
 #if EEZ_PLATFORM_STM32
 AppContext &getRootAppContext() {
@@ -2524,6 +2449,69 @@ uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const St
     return style->active_color;
 }
 
+uint16_t transformColorHook(uint16_t color) {
+    if (color == COLOR_ID_CHANNEL1 || color == COLOR_ID_CHANNEL1_TEXT) {
+        if (g_channelIndex >= 0 && g_channelIndex < psu::CH_NUM) {
+            auto &channel = psu::Channel::get(g_channelIndex);
+            if (channel.color) {
+                return color + channel.color - 1;
+            } else {
+                return color + channel.channelIndex;
+            }
+        } else if (hmi::g_selectedSlotIndex >= 0 && hmi::g_selectedSlotIndex < NUM_SLOTS) {
+            if (hmi::g_selectedSubchannelIndex >= 0) {
+                psu::Channel *channel = psu::Channel::getBySlotIndex(hmi::g_selectedSlotIndex, hmi::g_selectedSubchannelIndex);
+                if (channel) {
+                    if (channel->color) {
+                        return color + channel->color - 1;
+                    } else {
+                        return color + channel->channelIndex;
+                    }
+                }
+            }
+            auto slotColor = g_slots[hmi::g_selectedSlotIndex]->getColor();
+            if (slotColor) {
+                return color + slotColor - 1;
+            } else {
+                return color + psu::CH_NUM + hmi::g_selectedSlotIndex;
+            }
+        }
+    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_SLOT_COLOR) {
+        uint8_t color = LabelsAndColorsPage::getSlotColor(hmi::g_selectedSlotIndex);
+        if (color) {
+            return COLOR_ID_CHANNEL1 + color - 1;
+        } else {
+            return COLOR_ID_CHANNEL1 + psu::CH_NUM + hmi::g_selectedSlotIndex;
+        }
+    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_SLOT_COLOR_TEXT) {
+        uint8_t color = LabelsAndColorsPage::getSlotColor(hmi::g_selectedSlotIndex);
+        if (color) {
+            return COLOR_ID_CHANNEL1_TEXT + color - 1;
+        } else {
+            return COLOR_ID_CHANNEL1_TEXT + psu::CH_NUM + hmi::g_selectedSlotIndex;
+        }
+    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_CHANNEL_COLOR) {
+        auto &channel = psu::Channel::get(g_channelIndex);
+        uint8_t color = LabelsAndColorsPage::getChannelColor(channel.slotIndex, channel.subchannelIndex);
+        if (color) {
+            return COLOR_ID_CHANNEL1 + color - 1;
+        } else {
+            return COLOR_ID_CHANNEL1 + g_channelIndex;
+        }
+    } else if (color == COLOR_ID_LABELS_AND_COLORS_PAGE_CHANNEL_COLOR_TEXT) {
+        auto &channel = psu::Channel::get(g_channelIndex);
+        uint8_t color = LabelsAndColorsPage::getChannelColor(channel.slotIndex, channel.subchannelIndex);
+        if (color) {
+            return COLOR_ID_CHANNEL1_TEXT + color - 1;
+        } else {
+            return COLOR_ID_CHANNEL1_TEXT + g_channelIndex;
+        }
+    } else if (color == COLOR_ID_PICK_COLOR) {
+        return COLOR_ID_CHANNEL1 + LabelsAndColorsPage::g_colorIndex;
+    }
+    return color;
+}
+
 int16_t getAppContextId(AppContext *pAppContext) {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     if (pAppContext == &g_frontPanelAppContext) {
@@ -2615,6 +2603,9 @@ OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor)
     return nullptr;
 }
 
+bool isEventHandlingDisabledHook() {
+    return g_shutdownInProgress;
+}
 
 } // namespace gui
 } // namespace eez
@@ -2629,8 +2620,8 @@ void onUncaughtScriptExceptionHook() {
     g_psuAppContext.showUncaughtScriptExceptionMessage();
 }
 
-}
-}
+} // scripting
+} // eez
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -58,7 +58,7 @@ bool loadFlowScript(int *err) {
 }
 
 void startFlowScript() {
-	if (osThreadGetId() != g_guiTaskHandle) {
+	if (!isGuiThread()) {
 		sendMessageToGuiThread(GUI_QUEUE_MESSAGE_FLOW_START);
 		return;
 	}
@@ -80,7 +80,7 @@ void flowTick() {
 }
 
 void stopFlowScript() {
-	if (osThreadGetId() != g_guiTaskHandle) {
+	if (!isGuiThread()) {
 		sendMessageToGuiThread(GUI_QUEUE_MESSAGE_FLOW_STOP);
 		return;
 	}

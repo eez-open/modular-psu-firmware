@@ -18,15 +18,12 @@
 
 #pragma once
 
-#include <cmsis_os.h>
+#include <eez/os.h>
 
 namespace eez {
 namespace gui {
 
 void startThread();
-
-extern osThreadId g_guiTaskHandle;
-extern osMessageQId g_guiMessageQueueId;
 
 enum {
     GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE = 1,
@@ -56,6 +53,10 @@ enum {
 void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam = 0, uint32_t timeoutMillisec = osWaitForever);
 
 void onGuiQueueMessageHook(uint8_t type, int16_t param);
+
+bool isGuiThread();
+
+void processGuiQueue();
 
 } // namespace gui
 } // namespace eez

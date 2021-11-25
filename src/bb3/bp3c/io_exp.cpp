@@ -18,8 +18,9 @@
 
 #ifdef EEZ_PLATFORM_STM32
 #include <i2c.h>
-#include <cmsis_os.h>
 #endif
+
+#include <eez/os.h>
 
 #include <bb3/system.h>
 

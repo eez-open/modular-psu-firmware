@@ -23,12 +23,11 @@
 
 #include <i2c.h>
 
-#include <eez/system_conf.h>
+#include <eez/os.h>
 #include <eez/debug.h>
-#include <eez/gui/gui.h>
 
+#include <eez/gui/gui.h>
 #include <eez/gui/touch.h>
-#include <eez/system.h>
 
 #define TSC2007IPW
 //#define AR1021

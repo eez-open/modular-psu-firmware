@@ -1,4 +1,4 @@
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -18,25 +18,42 @@ std::map<DWORD, HANDLE> g_handles;
 #ifdef __EMSCRIPTEN__
 #define MAX_THREADS 100
 struct Thread {
-    const osThreadDef_t *thread_def;
-    void *argument;
+	osThreadFunc_t func;
 };
 
 static Thread g_threads[MAX_THREADS];
 Thread *g_currentThread;
 #endif
 
-osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *argument) {
+#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
+
+DWORD __stdcall win32_thread_func(void *lpParam) {
+	auto thread_func = (osThreadFunc_t)lpParam;
+	thread_func(nullptr);
+    return 0;
+}
+
+#else
+
+void *posix_thread_func(void *lpParam) {
+	auto thread_func = (osThreadFunc_t)lpParam;
+	thread_func(nullptr);
+	return 0;
+}
+
+#endif
+
+
+osThreadId_t osThreadNew(osThreadFunc_t func, void *, const osThreadAttr_t *attr) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     DWORD threadId;
-    HANDLE handle = CreateThread(NULL, thread_def->stacksize, (LPTHREAD_START_ROUTINE)thread_def->pthread, argument, 0, &threadId);
+    HANDLE handle = CreateThread(NULL, attr->stack_size, win32_thread_func, func, 0, &threadId);
 	g_handles.insert(std::make_pair(threadId, handle));
     return threadId;
 #elif defined(__EMSCRIPTEN__)
     for (int i = 0; i < MAX_THREADS; ++i) {
-        if (!g_threads[i].thread_def) {
-            g_threads[i].thread_def = thread_def;
-            g_threads[i].argument = argument;
+        if (!g_threads[i].func) {
+            g_threads[i].func = func;
             return &g_threads[i];
         }
     }
@@ -44,12 +61,12 @@ osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *argument) {
     return nullptr;
 #else
     pthread_t thread;
-    pthread_create(&thread, 0, thread_def->pthread, 0);
+    pthread_create(&thread, 0, posix_thread_func, func);
     return thread;
 #endif    
 }
 
-osStatus osThreadTerminate(osThreadId thread_id) {
+osStatus osThreadTerminate(osThreadId_t thread_id) {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
 	HANDLE handle = g_handles.at(thread_id);
 	TerminateThread(handle, 1);
@@ -65,7 +82,7 @@ osStatus osThreadTerminate(osThreadId thread_id) {
 #endif    
 }
 
-osThreadId osThreadGetId() {
+osThreadId_t osThreadGetId() {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     return GetCurrentThreadId();
 #elif defined(__EMSCRIPTEN__)
@@ -80,13 +97,17 @@ osThreadId osThreadGetId() {
 #ifdef __EMSCRIPTEN__
 void eez_system_tick() {
     for (int i = 0; i < MAX_THREADS; ++i) {
-        if (g_threads[i].thread_def) {
+        if (g_threads[i].func) {
             g_currentThread = &g_threads[i];
-            g_threads[i].thread_def->pthread(g_threads[i].argument);
+            g_threads[i].func(nullptr);
         }
     }
 }
 #endif
+
+osStatus osKernelInitialize(void) {
+	return osOK;
+}
 
 osStatus osKernelStart(void) {
     return osOK;
@@ -111,7 +132,7 @@ uint32_t osKernelSysTickFrequency;
 uint32_t osKernelSysTickFrequency = 1000000;
 #endif
 
-uint32_t osKernelSysTick() {
+uint32_t osKernelGetTickCount() {
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
     static bool isFirstTime = true;
     static LARGE_INTEGER frequency;
@@ -140,34 +161,39 @@ uint32_t osKernelSysTick() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Mutex *osMutexCreate(Mutex &mutex) {
-    return &mutex;
+osMutexId_t osMutexNew(const osMutexAttr_t *) {
+    return new std::mutex;
 }
 
-osStatus osMutexWait(Mutex *mutex, unsigned int timeout) {
+osStatus osMutexAcquire(osMutexId_t mutex, unsigned int timeout) {
 #ifndef __EMSCRIPTEN__
 	mutex->lock();
 #endif
     return osOK;
 }
 
-void osMutexRelease(Mutex *mutex) {
+osStatus osMutexRelease(osMutexId_t mutex) {
 #ifndef __EMSCRIPTEN__
 	mutex->unlock();
 #endif
+	return osOK;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-osMessageQId osMessageCreate(osMessageQId queue, osThreadId thread_id) {
+osMessageQueueId_t osMessageQueueNew(uint32_t msg_count, uint32_t msg_size, const void *) {
+	auto queue = new MessageQueue();
+	queue->data = new uint8_t[msg_count * msg_size];
+	queue->numElements = msg_count;
+	queue->elementSize = msg_size;
     queue->tail = 0;
     queue->head = 0;
     queue->overflow = 0;
     return queue;
 }
 
-osEvent osMessageGet(osMessageQId queue, uint32_t millisec) {
-    if (millisec == 0) millisec = 1;
+osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, uint32_t timeout) {
+    if (timeout == 0) timeout = 1;
 
     queue->mutex.lock();
 
@@ -186,13 +212,10 @@ osEvent osMessageGet(osMessageQId queue, uint32_t millisec) {
 #else
         
         osDelay(1);
-        millisec -= 1;
+		timeout -= 1;
 
-        if (millisec == 0) {
-            return {
-                osOK,
-                0
-            };
+        if (timeout == 0) {
+            return osError;
         }
 #endif
 
@@ -204,22 +227,21 @@ osEvent osMessageGet(osMessageQId queue, uint32_t millisec) {
         tail = 0;
     }
     queue->tail = tail;
-    uint32_t info = ((uint32_t *)queue->data)[tail];
-    if (queue->overflow) {
+    
+	memcpy(msg_ptr, queue->data + tail * queue->elementSize, queue->elementSize);
+
+	if (queue->overflow) {
         queue->overflow = 0;
     }
 
     queue->mutex.unlock();
 
-    return {
-        osEventMessage,
-        info
-    };
+    return osOK;
 }
 
-osStatus osMessagePut(osMessageQId queue, uint32_t info, uint32_t millisec) {
+osStatus osMessageQueuePut(osMessageQueueId_t queue, const void *msg_ptr, uint8_t, uint32_t timeout) {
     queue->mutex.lock();
-    for (uint32_t i = 0; queue->overflow && i < millisec; i++) {
+    for (uint32_t i = 0; queue->overflow && i < timeout; i++) {
         queue->mutex.unlock();
         osDelay(1);
         queue->mutex.lock();
@@ -235,8 +257,10 @@ osStatus osMessagePut(osMessageQId queue, uint32_t info, uint32_t millisec) {
     if (head >= queue->numElements) {
         head = 0;
     }
-    ((uint32_t *)queue->data)[head] = info;
-    queue->head = head;
+
+	memcpy(queue->data + head * queue->elementSize, msg_ptr, queue->elementSize);
+    
+	queue->head = head;
     if (queue->head == queue->tail) {
         queue->overflow = 1;
     }

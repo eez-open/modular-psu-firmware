@@ -97,6 +97,7 @@ set(src_eez
     src/eez/alloc.cpp
     src/eez/debug.cpp
     src/eez/memory.cpp
+    src/eez/os.cpp
     src/eez/unit.cpp
     src/eez/util.cpp
 )
@@ -108,9 +109,9 @@ set(header_eez
     src/eez/keyboard.h
     src/eez/memory.h
     src/eez/mouse.h
+    src/eez/os.h
     src/eez/sound.h
     src/eez/step_values.h
-    src/eez/system.h
     src/eez/unit.h
     src/eez/util.h
     src/eez/value_types.h
@@ -161,7 +162,6 @@ source_group("bb3" FILES ${src_bb3} ${header_bb3})
 set(header_bb3_conf_eez
     src/bb3/conf/eez/conf.h
     src/bb3/conf/eez/gui_conf.h
-    src/bb3/conf/eez/system_conf.h
 )
 list (APPEND header_files ${header_bb3_conf_eez})
 source_group("bb3\\conf\\eez" FILES ${header_bb3_conf_eez})
@@ -614,13 +614,13 @@ list (APPEND header_files ${header_bb3_dib_smx46})
 source_group("bb3\\dib-smx46" FILES ${src_bb3_dib_smx46} ${header_bb3_dib_smx46})
 
 set(src_bb3_platform_simulator
-    src/bb3/platform/simulator/cmsis_os.cpp
+    src/bb3/platform/simulator/cmsis_os2.cpp
     src/bb3/platform/simulator/events.cpp
     src/bb3/platform/simulator/front_panel.cpp
 ) 
 list (APPEND src_files ${src_bb3_platform_simulator})
 set(header_bb3_platform_simulator
-    src/bb3/platform/simulator/cmsis_os.h
+    src/bb3/platform/simulator/cmsis_os2.h
     src/bb3/platform/simulator/events.h
     src/bb3/platform/simulator/front_panel.h
 ) 

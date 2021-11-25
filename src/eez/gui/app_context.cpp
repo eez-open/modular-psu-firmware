@@ -23,7 +23,7 @@
 #include <eez/conf.h>
 #include <eez/gui_conf.h>
 #include <eez/sound.h>
-#include <eez/system.h>
+#include <eez/os.h>
 #include <eez/util.h>
 
 #if OPTION_KEYBOARD
@@ -50,6 +50,9 @@ AppContext::AppContext() {
 }
 
 void AppContext::stateManagment() {
+    if (getActivePageId() == PAGE_ID_NONE) {
+        showPage(getMainPageId());
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

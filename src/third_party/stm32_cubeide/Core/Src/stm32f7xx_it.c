@@ -476,6 +476,7 @@ void DMA2_Stream6_IRQHandler(void)
   /* USER CODE END DMA2_Stream6_IRQn 1 */
 }
 
+/* USER CODE BEGIN 1 */
 /**
   * @brief This function handles UART7 global interrupt.
   */
@@ -489,7 +490,5 @@ void UART7_IRQHandler(void)
 
   /* USER CODE END UART7_IRQn 1 */
 }
-
-/* USER CODE BEGIN 1 */
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

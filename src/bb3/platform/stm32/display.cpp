@@ -18,7 +18,7 @@
 
 #include <tim.h>
 
-#include <eez/system.h>
+#include <eez/os.h>
 
 #include <eez/platform/stm32/display.h>
 

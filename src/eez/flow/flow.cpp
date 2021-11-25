@@ -18,7 +18,7 @@
 
 #include <eez/util.h>
 
-#include <eez/system.h>
+#include <eez/os.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/input.h>

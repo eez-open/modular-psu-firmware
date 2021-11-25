@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <eez/os.h>
 #include <bb3/system.h>
 
 namespace eez {

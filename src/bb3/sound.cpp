@@ -36,7 +36,7 @@
 #endif
 
 #include <eez/sound.h>
-#include <eez/system.h>
+#include <eez/os.h>
 #include <eez/memory.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/persist_conf.h>

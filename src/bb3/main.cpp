@@ -42,6 +42,8 @@
 #include <usb_device.h>
 #endif
 
+#include <eez/os.h>
+
 #include <bb3/firmware.h>
 #include <bb3/tasks.h>
 
@@ -55,20 +57,9 @@
 
 #if !defined(__EMSCRIPTEN__)
 
-void mainTask(const void *);
+void mainTask(void *);
 
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif
-
-osThreadDef(g_mainTask, mainTask, osPriorityNormal, 0, 2048);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic pop
-#endif
-
-osThreadId g_mainTaskHandle;
+EEZ_THREAD_DECLARE(main, Normal, 8192);
 
 #endif
 
@@ -169,7 +160,9 @@ int main(int argc, char **argv) {
     //SCB_EnableDCache();
 #endif
 
-    g_mainTaskHandle = osThreadCreate(osThread(g_mainTask), nullptr);
+    osKernelInitialize();
+
+	EEZ_THREAD_CREATE(main, mainTask);
 
     osKernelStart();
 
@@ -189,20 +182,19 @@ int main(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-void consoleInputTask(const void *);
-osThreadDef(g_consoleInputTask, consoleInputTask, osPriorityNormal, 0, 1024);
-osThreadId g_consoleInputTaskHandle;
+EEZ_THREAD_DECLARE(consoleInput, Normal, 1024);
+void consoleInputTask(void *);
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
 #if !defined(__EMSCRIPTEN__)
 
-void mainTask(const void *) {
+void mainTask(void *) {
     eez::boot();
 
 #if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-    g_consoleInputTaskHandle = osThreadCreate(osThread(g_consoleInputTask), nullptr);
+	EEZ_THREAD_CREATE(consoleInput, consoleInputTask);
 #endif
 
     while (true) {
@@ -275,7 +267,7 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
-void consoleInputTask(const void *) {
+void consoleInputTask(void *) {
     using namespace eez;
     sendMessageToLowPriorityThread(SERIAL_LINE_STATE_CHANGED, 1);
 

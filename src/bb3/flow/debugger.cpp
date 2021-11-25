@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/os.h>
+
+#include <bb3/gui/thread.h>
+
 #include <eez/flow/private.h>
 #include <eez/flow/debugger.h>
 
@@ -25,39 +29,77 @@
 namespace eez {
 namespace flow {
 
+EEZ_MUTEX_DECLARE(flowDebugger);
+static bool g_mutexInitialized = false;
+
 char *g_toDebuggerMessage = (char *)FLOW_TO_DEBUGGER_MESSAGE_BUFFER;
 uint32_t g_toDebuggerMessagePosition = 0;
 
 void startToDebuggerMessage() {
-}
-
-void flushToDebuggerMessageBuffer() {
-	if (g_toDebuggerMessagePosition != 0) {
-		sendMessageToLowPriorityThread(FLOW_FLUSH_TO_DEBUGGER_MESSAGE);
-
-		while (g_toDebuggerMessagePosition != 0 && g_debuggerIsConnected) {
-			osDelay(1);
-			WATCHDOG_RESET(WATCHDOG_GUI_THREAD);
-		}
+	if (!g_mutexInitialized) {
+		EEZ_MUTEX_CREATE(flowDebugger);
+		g_mutexInitialized = true;
 	}
 }
 
 void flushToDebuggerMessage() {
-	eez::mcu::ethernet::writeDebuggerBuffer(g_toDebuggerMessage, g_toDebuggerMessagePosition);
-	g_toDebuggerMessagePosition = 0;
+	auto toDebuggerMessagePosition = g_toDebuggerMessagePosition;
+	
+	eez::mcu::ethernet::writeDebuggerBuffer(g_toDebuggerMessage, toDebuggerMessagePosition);
+
+	if (EEZ_MUTEX_WAIT(flowDebugger, 5)) {
+		auto n = g_toDebuggerMessagePosition - toDebuggerMessagePosition;
+		if (n > 0) {
+			memmove(g_toDebuggerMessage, g_toDebuggerMessage + toDebuggerMessagePosition, n);
+		}
+		g_toDebuggerMessagePosition = n;
+		EEZ_MUTEX_RELEASE(flowDebugger);
+	}
+}
+
+void dealWithCongestedBufferSituation(const char *buffer, uint32_t length) {
+	sendMessageToLowPriorityThread(FLOW_FLUSH_TO_DEBUGGER_MESSAGE);
+	
+	do {
+		osDelay(1);
+		eez::gui::processGuiQueue();
+
+		if (!g_debuggerIsConnected) {
+			return;
+		}
+	} while (g_toDebuggerMessagePosition + length > FLOW_TO_DEBUGGER_MESSAGE_BUFFER_SIZE);
+
+	if (EEZ_MUTEX_WAIT(flowDebugger, 5)) {
+		memcpy(g_toDebuggerMessage + g_toDebuggerMessagePosition, buffer, length);
+		g_toDebuggerMessagePosition += length;
+		EEZ_MUTEX_RELEASE(flowDebugger);
+	}
+
+	return;
 }
 
 void writeDebuggerBuffer(const char *buffer, uint32_t length) {
-	if (g_toDebuggerMessagePosition + length > FLOW_TO_DEBUGGER_MESSAGE_BUFFER_SIZE) {
-		flushToDebuggerMessageBuffer();
+	if (!g_debuggerIsConnected) {
+		return;
 	}
 
-	memcpy(g_toDebuggerMessage + g_toDebuggerMessagePosition, buffer, length);
-	g_toDebuggerMessagePosition += length;
+	if (EEZ_MUTEX_WAIT(flowDebugger, 5)) {
+		if (g_toDebuggerMessagePosition + length > FLOW_TO_DEBUGGER_MESSAGE_BUFFER_SIZE) {
+			EEZ_MUTEX_RELEASE(flowDebugger);
+			dealWithCongestedBufferSituation(buffer, length);
+			return;
+		}
+
+		memcpy(g_toDebuggerMessage + g_toDebuggerMessagePosition, buffer, length);
+		g_toDebuggerMessagePosition += length;
+		EEZ_MUTEX_RELEASE(flowDebugger);
+	}
 }
 
 void finishToDebuggerMessage() {
-	flushToDebuggerMessageBuffer();
+	if (g_debuggerIsConnected && g_toDebuggerMessagePosition > 0) {
+		sendMessageToLowPriorityThread(FLOW_FLUSH_TO_DEBUGGER_MESSAGE);
+	}
 }
 
 void onDebuggerInputAvailable() {

@@ -19,7 +19,7 @@
 #pragma once
 
 #define CONF_GUI_PAGE_NAVIGATION_STACK_SIZE 10
-#define CONF_MAX_STATE_SIZE (16 * 1024)
+#define CONF_MAX_STATE_SIZE (GUI_STATE_BUFFER_SIZE / 2)
 
 namespace eez {
 namespace gui {

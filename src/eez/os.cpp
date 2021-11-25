@@ -1,6 +1,6 @@
 /*
 * EEZ Generic Firmware
-* Copyright (C) 2021-present, Envox d.o.o.
+* Copyright (C) 2018-present, Envox d.o.o.
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -16,14 +16,22 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#if defined(EEZ_PLATFORM_STM32)
+#include <main.h>
+#endif
 
-#include <stdint.h>
+#include <eez/os.h>
 
 namespace eez {
 
-extern bool g_shutdownInProgress;
+uint32_t millis() {
+#if defined(EEZ_PLATFORM_STM32)
+	return HAL_GetTick();
+#endif
 
-uint32_t millis();
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	return osKernelGetTickCount();
+#endif
+}
 
 } // namespace eez

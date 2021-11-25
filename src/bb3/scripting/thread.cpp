@@ -16,6 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <eez/os.h>
+
 #include <bb3/system.h>
 
 #include <eez/flow/flow.h>
@@ -33,52 +35,47 @@ enum {
 	QUEUE_MESSAGE_SCPI_RESULT
 };
 	
-void mainLoop(const void *);
+void mainLoop(void *);
 
-osThreadId g_mpTaskHandle;
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif
-
-osThreadDef(g_mpTask, mainLoop, osPriorityBelowNormal, 0, 4096);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic pop
-#endif
+EEZ_THREAD_DECLARE(MP, BelowNormal, 4096);
 
 #define MP_QUEUE_SIZE 5
 
-osMessageQDef(g_mpMessageQueue, MP_QUEUE_SIZE, uint32_t);
-osMessageQId g_mpMessageQueueId;
+EEZ_MESSAGE_QUEUE_DECLARE(MP, {
+	uint8_t type;
+	uint32_t param;
+});
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void initMessageQueue() {
     initScpiContext();
-    g_mpMessageQueueId = osMessageCreate(osMessageQ(g_mpMessageQueue), 0);
+	EEZ_MESSAGE_QUEUE_CREATE(MP, MP_QUEUE_SIZE);
 }
 
 void startThread() {
-    g_mpTaskHandle = osThreadCreate(osThread(g_mpTask), nullptr);
+	EEZ_THREAD_CREATE(MP, mainLoop);
 }
 
 void terminateThread() {
-	osThreadTerminate(g_mpTaskHandle);
+	EEZ_THREAD_TERMINATE(MP);
 }
 
 void startMpScriptInScriptingThread() {
-	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_START_MP_SCRIPT, osWaitForever);
+    MPMessageQueueObject obj;
+    obj.type = QUEUE_MESSAGE_START_MP_SCRIPT;
+	EEZ_MESSAGE_QUEUE_PUT(MP, obj, osWaitForever);
 }
 
 void scpiResultIsReady() {
-	osMessagePut(g_mpMessageQueueId, QUEUE_MESSAGE_SCPI_RESULT, osWaitForever);
+    MPMessageQueueObject obj;
+    obj.type = QUEUE_MESSAGE_SCPI_RESULT;
+	EEZ_MESSAGE_QUEUE_PUT(MP, obj, osWaitForever);
 }
 
 void oneIter();
 
-void mainLoop(const void *) {
+void mainLoop(void *) {
 #ifdef __EMSCRIPTEN__
     oneIter();
 #else
@@ -89,9 +86,9 @@ void mainLoop(const void *) {
 }
 
 void oneIter() {
-    osEvent event = osMessageGet(g_mpMessageQueueId, 1);
-    if (event.status == osEventMessage) {
-		if (event.value.v == QUEUE_MESSAGE_START_MP_SCRIPT) {
+    MPMessageQueueObject obj;
+	if (EEZ_MESSAGE_QUEUE_GET(MP, obj, 1)) {
+		if (obj.type == QUEUE_MESSAGE_START_MP_SCRIPT) {
 			startMpScript();
 		}
 	}
@@ -101,9 +98,9 @@ bool waitScpiResult() {
 	static const uint32_t SCPI_TIMEOUT = 60 * 60 * 1000;
 
 	while (true) {
-		osEvent event = osMessageGet(g_mpMessageQueueId, SCPI_TIMEOUT);
-		if (event.status == osEventMessage) {
-			if (event.value.v == QUEUE_MESSAGE_SCPI_RESULT) {
+		MPMessageQueueObject obj;
+		if (EEZ_MESSAGE_QUEUE_GET(MP, obj, SCPI_TIMEOUT)) {
+			if (obj.type == QUEUE_MESSAGE_SCPI_RESULT) {
 				return true;
 			}
 		} else {

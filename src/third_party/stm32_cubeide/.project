@@ -34,19 +34,14 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>eez</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/eez</locationURI>
-		</link>
-		<link>
 			<name>bb3</name>
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC/bb3</locationURI>
 		</link>
 		<link>
-			<name>libscpi</name>
+			<name>eez</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/libscpi</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/eez</locationURI>
 		</link>
 		<link>
 			<name>micropython</name>

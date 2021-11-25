@@ -28,14 +28,13 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-#include <cmsis_os.h>
-
 #include <eez/conf.h>
 #include <eez/debug.h>
 #include <eez/memory.h>
-#include <eez/gui/gui.h>
 #include <eez/util.h>
-#include <eez/system.h>
+#include <eez/os.h>
+
+#include <eez/gui/gui.h>
 
 #include <bb3/psu/gui/psu.h>
 #include <bb3/platform/simulator/front_panel.h>

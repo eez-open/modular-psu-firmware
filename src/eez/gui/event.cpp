@@ -20,7 +20,7 @@
 
 #include <eez/conf.h>
 #include <eez/gui_conf.h>
-#include <eez/system.h>
+#include <eez/os.h>
 #include <eez/hmi.h>
 
 #if OPTION_MOUSE
@@ -55,7 +55,7 @@ static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
 static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 
 void eventHandling() {
-	if (g_shutdownInProgress) {
+	if (isEventHandlingDisabledHook()) {
 		return;
 	}
 

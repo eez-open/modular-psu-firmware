@@ -16,12 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/os.h>
+
 #include <eez/gui/gui.h>
 #include <eez/gui/touch_filter.h>
 
 #include <eez/platform/touch.h>
-
-#include <cmsis_os.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 

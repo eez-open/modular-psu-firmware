@@ -22,7 +22,7 @@
 #include <inttypes.h>
 
 #include <eez/debug.h>
-#include <eez/system.h>
+#include <eez/os.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/private.h>
@@ -137,10 +137,12 @@ void processDebuggerInput(char *buffer, uint32_t length) {
 			} else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_SINGLE_STEP) {
 				setDebuggerState(DEBUGGER_STATE_SINGLE_STEP);
 			} else {
-				assert(
+				if (
 					messageFromDebugger >= MESSAGE_FROM_DEBUGGER_ADD_BREAKPOINT &&
 					messageFromDebugger <= MESSAGE_FROM_DEBUGGER_DISABLE_BREAKPOINT
-				);
+				) {
+					return;
+				}
 
 				char *p;
 				auto flowIndex = (uint32_t)strtol(g_inputFromDebugger + 2, &p, 10);

@@ -70,7 +70,7 @@ void MX_USB_HOST_DeInit(void) {
   }
 
   if (hUsbHostFS.os_event != 0) {
-    osMessageDelete(hUsbHostFS.os_event);
+    osMessageQueueDelete(hUsbHostFS.os_event);
     hUsbHostFS.os_event = 0;
   }
 }

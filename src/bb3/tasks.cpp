@@ -22,6 +22,8 @@
 #include <usbd_msc_bot.h>
 #endif
 
+#include <eez/os.h>
+
 #include <bb3/tasks.h>
 #include <eez/flow/flow.h>
 #include <bb3/scripting/scripting.h>
@@ -86,26 +88,9 @@ namespace eez {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define QUEUE_MESSAGE(type, param) (((param) << 8) | (type))
-#define QUEUE_MESSAGE_TYPE(message) ((message) & 0xFF)
-#define QUEUE_MESSAGE_PARAM(param) ((message) >> 8)
+void highPriorityThreadMainLoop(void *);
 
-////////////////////////////////////////////////////////////////////////////////
-
-void highPriorityThreadMainLoop(const void *);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif
-
-osThreadDef(g_highPriorityThread, highPriorityThreadMainLoop, osPriorityAboveNormal, 0, 2048);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic pop
-#endif
-
-osThreadId g_highPriorityThreadHandle;
+EEZ_THREAD_DECLARE(highPriority, AboveNormal, 4096);
 
 #if defined(EEZ_PLATFORM_STM32)
 #define HIGH_PRIORITY_QUEUE_SIZE 50
@@ -115,28 +100,22 @@ osThreadId g_highPriorityThreadHandle;
 #define HIGH_PRIORITY_QUEUE_SIZE 100
 #endif
 
-osMessageQDef(g_highPriorityMessageQueue, HIGH_PRIORITY_QUEUE_SIZE, uint32_t);
-osMessageQId g_highPriorityMessageQueueId;
+EEZ_MESSAGE_QUEUE_DECLARE(highPriority, {
+	HighPriorityThreadMessage type;
+	uint32_t param;
+});
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void lowPriorityThreadMainLoop(const void *);
+void lowPriorityThreadMainLoop(void *);
 
-osThreadId g_lowPriorityTaskHandle;
+EEZ_THREAD_DECLARE(lowPriority, Normal, 8192);
 
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif
-
-osThreadDef(g_lowPriorityTask, lowPriorityThreadMainLoop, osPriorityNormal, 0, 8192);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic pop
-#endif
-
-osMessageQDef(g_lowPriorityMessageQueue, LOW_PRIORITY_THREAD_QUEUE_SIZE, uint32_t);
-osMessageQId g_lowPriorityMessageQueueId;
+EEZ_MESSAGE_QUEUE_DECLARE(lowPriority, {
+	LowPriorityThreadMessage type;
+	uint32_t param;
+});
 
 static bool g_shutingDown;
 static bool g_isLowPriorityThreadAlive;
@@ -149,11 +128,11 @@ static uint32_t g_timer1LastTickCountMs;
 ////////////////////////////////////////////////////////////////////////////////
 
 void initHighPriorityMessageQueue() {
-    g_highPriorityMessageQueueId = osMessageCreate(osMessageQ(g_highPriorityMessageQueue), 0);
+	EEZ_MESSAGE_QUEUE_CREATE(highPriority, HIGH_PRIORITY_QUEUE_SIZE);
 }
 
 void startHighPriorityThread() {
-	g_highPriorityThreadHandle = osThreadCreate(osThread(g_highPriorityThread), nullptr);
+	EEZ_THREAD_CREATE(highPriority, highPriorityThreadMainLoop);
 }
 
 void highPriorityThreadOneIter();
@@ -162,11 +141,11 @@ void highPriorityThreadOneIter();
 bool g_isForcedPsuThreadMessageHandling = false;
 #endif
 
-void highPriorityThreadMainLoop(const void *) {
+void highPriorityThreadMainLoop(void *) {
 #ifdef __EMSCRIPTEN__
     highPriorityThreadOneIter();
 #else
-    g_highPriorityThreadHandle = osThreadGetId();
+    g_highPriorityTaskHandle = osThreadGetId();
 
     while (1) {
         highPriorityThreadOneIter();
@@ -175,17 +154,13 @@ void highPriorityThreadMainLoop(const void *) {
 }
 
 void highPriorityThreadOneIter() {
-    osEvent event = osMessageGet(g_highPriorityMessageQueueId, 1);
-
 #if defined(EEZ_PLATFORM_STM32)
     static uint32_t g_lastTickCountMs;
 #endif
 
-    if (event.status == osEventMessage) {
-        uint32_t message = event.value.v;
-    	uint8_t type = QUEUE_MESSAGE_TYPE(message);
-        uint32_t param = QUEUE_MESSAGE_PARAM(message);
-        psu::onThreadMessage(type, param);
+    highPriorityMessageQueueObject obj;
+	if (EEZ_MESSAGE_QUEUE_GET(highPriority, obj, 1)) {
+        psu::onThreadMessage(obj.type, obj.param);
 
 #if defined(EEZ_PLATFORM_STM32)
         uint32_t diffMs = millis() - g_lastTickCountMs;
@@ -196,7 +171,7 @@ void highPriorityThreadOneIter() {
             return;
         }
 #endif
-    }
+	}
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
     if (g_isForcedPsuThreadMessageHandling) {
@@ -217,7 +192,7 @@ bool isPsuThread() {
         return true;
     }
 #endif
-    return !g_isBooted || osThreadGetId() == g_highPriorityThreadHandle;
+    return !g_isBooted || osThreadGetId() == g_highPriorityTaskHandle;
 }
 
 void sendMessageToPsu(HighPriorityThreadMessage messageType, uint32_t messageParam, uint32_t timeoutMillisec) {
@@ -225,7 +200,10 @@ void sendMessageToPsu(HighPriorityThreadMessage messageType, uint32_t messagePar
         return;
     }
 
-    osMessagePut(g_highPriorityMessageQueueId, QUEUE_MESSAGE(messageType, messageParam), timeoutMillisec);
+    highPriorityMessageQueueObject obj;
+    obj.type = messageType;
+    obj.param = messageParam;
+	EEZ_MESSAGE_QUEUE_PUT(highPriority, obj, timeoutMillisec);
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
     // In simulator, force handling of PSU/High priority thread messages immediately - in STM32 this will be done automatically by the FreeRTOS.
@@ -238,18 +216,19 @@ void sendMessageToPsu(HighPriorityThreadMessage messageType, uint32_t messagePar
 ////////////////////////////////////////////////////////////////////////////////
 
 void initLowPriorityMessageQueue() {
-    g_lowPriorityMessageQueueId = osMessageCreate(osMessageQ(g_lowPriorityMessageQueue), 0);
+	EEZ_MESSAGE_QUEUE_CREATE(lowPriority, LOW_PRIORITY_THREAD_QUEUE_SIZE);
 }
 
 void startLowPriorityThread() {
     g_isLowPriorityThreadAlive = true;
     g_timer1LastTickCountMs = millis();
-    g_lowPriorityTaskHandle = osThreadCreate(osThread(g_lowPriorityTask), nullptr);
+
+	EEZ_THREAD_CREATE(lowPriority, lowPriorityThreadMainLoop);
 }
 
 void lowPriorityThreadOneIter();
 
-void lowPriorityThreadMainLoop(const void *) {
+void lowPriorityThreadMainLoop(void *) {
 #ifdef __EMSCRIPTEN__
     if (g_isLowPriorityThreadAlive) {
         lowPriorityThreadOneIter();
@@ -271,17 +250,13 @@ void lowPriorityThreadOneIter() {
     using namespace psu;
 
     static const uint32_t INTERVAL = 25;
-
-    osEvent event = osMessageGet(g_lowPriorityMessageQueueId, INTERVAL);
-
     static uint32_t g_lastTickCountMs;
 
-    if (event.status == osEventMessage) {
-    	uint32_t message = event.value.v;
+    lowPriorityMessageQueueObject obj;
+	if (EEZ_MESSAGE_QUEUE_GET(lowPriority, obj, INTERVAL)) {
+        auto type = obj.type;
+        auto param = obj.param;
 
-    	uint32_t type = QUEUE_MESSAGE_TYPE(message);
-    	uint32_t param = QUEUE_MESSAGE_PARAM(message);
-        
         if (type < SERIAL_LAST_MESSAGE_TYPE) {
             serial::onQueueMessage(type, param);
         }
@@ -543,7 +518,11 @@ void sendMessageToLowPriorityThread(LowPriorityThreadMessage messageType, uint32
     if (!g_lowPriorityMessageQueueId) {
         return;
     }
-    osMessagePut(g_lowPriorityMessageQueueId, QUEUE_MESSAGE(messageType, messageParam), timeoutMillisec);
+
+    lowPriorityMessageQueueObject obj;
+    obj.type = messageType;
+    obj.param = messageParam;
+	EEZ_MESSAGE_QUEUE_PUT(lowPriority, obj, timeoutMillisec);
 }
 
 } // namespace eez

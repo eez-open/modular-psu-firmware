@@ -23,13 +23,13 @@
 namespace eez {
 namespace gui {
 
-static uint8_t g_stateBuffer[2][CONF_MAX_STATE_SIZE];
+static uint8_t *g_stateBuffer = GUI_STATE_BUFFER;
 static WidgetState *g_previousState;
 static WidgetState *g_currentState;
 static bool g_refreshScreen;
 
 int getCurrentStateBufferIndex() {
-    return (uint8_t *)g_currentState == &g_stateBuffer[0][0] ? 0 : 1;
+    return (uint8_t *)g_currentState == g_stateBuffer ? 0 : 1;
 }
 
 uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor) {
@@ -48,7 +48,7 @@ void updateScreen() {
 
     g_isActiveWidget = false;
     g_previousState = g_currentState;
-    g_currentState = (WidgetState *)(&g_stateBuffer[getCurrentStateBufferIndex() == 0 ? 1 : 0][0]);
+    g_currentState = (WidgetState *)(g_stateBuffer + CONF_MAX_STATE_SIZE * (getCurrentStateBufferIndex() == 0 ? 1 : 0));
 
 	WidgetCursor widgetCursor;
 	widgetCursor.assets = g_mainAssets;

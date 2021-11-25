@@ -19,7 +19,8 @@
 #if defined(EEZ_PLATFORM_STM32)
 
 #include <spi.h>
-#include <cmsis_os.h>
+
+#include <eez/os.h>
 
 #include <bb3/index.h>
 #include <bb3/tasks.h>

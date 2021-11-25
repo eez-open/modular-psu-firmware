@@ -21,7 +21,7 @@
 #include <memory.h>
 
 #include <eez/alloc.h>
-#include <eez/system.h>
+#include <eez/os.h>
 #include <eez/memory.h>
 #include <eez/debug.h>
 #include <eez/flow/flow.h>

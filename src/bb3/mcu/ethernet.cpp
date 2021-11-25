@@ -62,6 +62,8 @@ extern ip4_addr_t gw;
 #endif
 #endif // EEZ_PLATFORM_SIMULATOR
 
+#include <eez/os.h>
+
 #include <bb3/firmware.h>
 #include <bb3/system.h>
 #include <bb3/mcu/ethernet.h>
@@ -85,35 +87,34 @@ namespace eez {
 namespace mcu {
 namespace ethernet {
 
-static void mainLoop(const void *);
+static void mainLoop(void *);
+
+EEZ_THREAD_DECLARE(ethernet, Normal, 2048);
 
 #if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif
-
-osThreadDef(g_ethernetTask, mainLoop, osPriorityNormal, 0, 1024);
-
-#if defined(EEZ_PLATFORM_STM32)
-#pragma GCC diagnostic pop
-#endif
-
-#if defined(EEZ_PLATFORM_STM32)
-osMessageQDef(g_ethernetMessageQueue, 20, uint32_t);
+#define ETHERNET_MESSAGE_QUEUE_SIZE 20
 #endif
 #if defined(EEZ_PLATFORM_SIMULATOR)
-osMessageQDef(g_ethernetMessageQueue, 100, uint32_t);
+#define ETHERNET_MESSAGE_QUEUE_SIZE 100
 #endif
-osMessageQId g_ethernetMessageQueueId;
 
-static osThreadId g_ethernetTaskHandle;
+EEZ_MESSAGE_QUEUE_DECLARE(ethernet, {
+	uint8_t type;
+	union {
+		struct {
+			int16_t eventId;
+			int8_t channelIndex;
+		} pushEvent;
+		int transition;
+	};
+});
 
 void initMessageQueue() {
-    g_ethernetMessageQueueId = osMessageCreate(osMessageQ(g_ethernetMessageQueue), 0);
+	EEZ_MESSAGE_QUEUE_CREATE(ethernet, ETHERNET_MESSAGE_QUEUE_SIZE);
 }
 
 void startThread() {
-    g_ethernetTaskHandle = osThreadCreate(osThread(g_ethernetTask), nullptr);
+	EEZ_THREAD_CREATE(ethernet, mainLoop);
 }
 
 enum {
@@ -158,8 +159,12 @@ static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t le
 	case NETCONN_EVT_RCVPLUS:
 		if (conn == g_scpiListenConnection) {
             g_acceptScpiClientIsDone = false;
-			osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_ACCEPT_SCPI_CLIENT, osWaitForever);
-            for (int i = 0; i < ACCEPT_CLIENT_TIMEOUT; i++) {
+
+            ethernetMessageQueueObject obj;
+            obj.type = QUEUE_MESSAGE_ACCEPT_SCPI_CLIENT;
+            EEZ_MESSAGE_QUEUE_PUT(ethernet, obj, osWaitForever);
+
+			for (int i = 0; i < ACCEPT_CLIENT_TIMEOUT; i++) {
                 if (g_acceptScpiClientIsDone) {
                     break;
                 }
@@ -169,7 +174,11 @@ static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t le
 			sendMessageToLowPriorityThread(ETHERNET_INPUT_AVAILABLE);
 		} else if (conn == g_debuggerListenConnection) {
             g_acceptDebuggerClientIsDone = false;
-			osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_ACCEPT_DEBUGGER_CLIENT, osWaitForever);
+
+            ethernetMessageQueueObject obj;
+            obj.type = QUEUE_MESSAGE_ACCEPT_DEBUGGER_CLIENT;
+            EEZ_MESSAGE_QUEUE_PUT(ethernet, obj, osWaitForever);
+
             for (int i = 0; i < ACCEPT_CLIENT_TIMEOUT; i++) {
                 if (g_acceptDebuggerClientIsDone) {
                     break;
@@ -827,19 +836,16 @@ void onIdle() {
 }
 #endif
 
-void mainLoop(const void *) {
+void mainLoop(void *) {
     while (1) {
-        osEvent event = osMessageGet(g_ethernetMessageQueueId, 10);
-        if (event.status == osEventMessage) {
-            uint8_t eventType = event.value.v & 0xFF;
-            if (eventType == QUEUE_MESSAGE_PUSH_EVENT) {
-                int16_t eventId = event.value.v >> 16;
-				int8_t channelIndex = (event.value.v >> 8) & 0xFF;
-                mqtt::pushEvent(eventId, channelIndex);
-            } else if (eventType == QUEUE_MESSAGE_NTP_STATE_TRANSITION) {
-                ntp::stateTransition(event.value.v >> 8);
+        ethernetMessageQueueObject obj;
+		if (EEZ_MESSAGE_QUEUE_GET(ethernet, obj, 10)) {
+            if (obj.type == QUEUE_MESSAGE_PUSH_EVENT) {
+                mqtt::pushEvent(obj.pushEvent.eventId, obj.pushEvent.channelIndex);
+            } else if (obj.type == QUEUE_MESSAGE_NTP_STATE_TRANSITION) {
+                ntp::stateTransition(obj.transition);
             } else {
-                onEvent(eventType);
+                onEvent(obj.type);
             }
         } else {
             onIdle();
@@ -855,7 +861,10 @@ void begin() {
 #if defined(EEZ_PLATFORM_STM32)
 	g_connectionState = CONNECTION_STATE_CONNECTING;
 #endif
-    osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_CONNECT, osWaitForever);
+
+    ethernetMessageQueueObject obj;
+    obj.type = QUEUE_MESSAGE_CONNECT;
+	EEZ_MESSAGE_QUEUE_PUT(ethernet, obj, osWaitForever);
 }
 
 IPAddress localIP() {
@@ -900,11 +909,16 @@ IPAddress dnsServerIP() {
 
 void beginServer(uint16_t port) {
     g_scpiPort = port;
-    osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_CREATE_TCP_SERVER, osWaitForever);
+
+    ethernetMessageQueueObject obj;
+    obj.type = QUEUE_MESSAGE_CREATE_TCP_SERVER;
+	EEZ_MESSAGE_QUEUE_PUT(ethernet, obj, osWaitForever);
 }
 
 void endServer() {
-    osMessagePut(g_ethernetMessageQueueId, QUEUE_MESSAGE_DESTROY_TCP_SERVER, osWaitForever);
+    ethernetMessageQueueObject obj;
+    obj.type = QUEUE_MESSAGE_DESTROY_TCP_SERVER;
+	EEZ_MESSAGE_QUEUE_PUT(ethernet, obj, osWaitForever);
 }
 
 void getInputBuffer(
@@ -918,6 +932,8 @@ void getInputBuffer(
 ) {
 #if defined(EEZ_PLATFORM_STM32)
 	if (!clientConnection) {
+        *buffer = nullptr;
+    	*length = 0;
 		return;
 	}
 
@@ -1070,13 +1086,20 @@ void disconnectClients() {
 
 void pushEvent(int16_t eventId, int8_t channelIndex) {
     if (!g_shutdownInProgress) {
-        osMessagePut(g_ethernetMessageQueueId, ((uint32_t)(uint16_t)eventId << 16) | ((uint32_t)(uint8_t)channelIndex << 8) | QUEUE_MESSAGE_PUSH_EVENT, channelIndex);
+        ethernetMessageQueueObject obj;
+        obj.type = QUEUE_MESSAGE_PUSH_EVENT;
+        obj.pushEvent.eventId = eventId;
+        obj.pushEvent.channelIndex = channelIndex;
+		EEZ_MESSAGE_QUEUE_PUT(ethernet, obj, 0);
     }
 }
 
 void ntpStateTransition(int transition) {
     if (!g_shutdownInProgress) {
-        osMessagePut(g_ethernetMessageQueueId, (transition << 8) | QUEUE_MESSAGE_NTP_STATE_TRANSITION, 0);
+        ethernetMessageQueueObject obj;
+        obj.type = QUEUE_MESSAGE_NTP_STATE_TRANSITION;
+        obj.transition = transition;
+		EEZ_MESSAGE_QUEUE_PUT(ethernet, obj, 0);
     }
 }
 

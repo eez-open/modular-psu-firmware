@@ -287,6 +287,9 @@ static void low_level_init(struct netif *netif)
 {
   uint32_t regvalue = 0;
   HAL_StatusTypeDef hal_eth_init_status;
+/* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
+  osThreadAttr_t attributes;
+/* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
 
 /* Init ETH */
 
@@ -349,14 +352,16 @@ static void low_level_init(struct netif *netif)
   #endif /* LWIP_ARP */
 
 /* create a binary semaphore used for informing ethernetif of frame reception */
-  osSemaphoreDef(SEM);
-  s_xSemaphore = osSemaphoreCreate(osSemaphore(SEM), 1);
+  s_xSemaphore = osSemaphoreNew(1, 1, NULL);
 
 /* create the task that handles the ETH_MAC */
-/* USER CODE BEGIN OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
-  osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
-  osThreadCreate (osThread(EthIf), netif);
-/* USER CODE END OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
+/* USER CODE BEGIN OS_THREAD_NEW_CMSIS_RTOS_V2 */
+  memset(&attributes, 0x0, sizeof(osThreadAttr_t));
+  attributes.name = "EthIf";
+  attributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
+  attributes.priority = osPriorityRealtime;
+  osThreadNew(ethernetif_input, netif, &attributes);
+/* USER CODE END OS_THREAD_NEW_CMSIS_RTOS_V2 */
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
 
@@ -581,14 +586,14 @@ static struct pbuf * low_level_input(struct netif *netif)
  *
  * @param netif the lwip network interface structure for this ethernetif
  */
-void ethernetif_input(void const * argument)
+void ethernetif_input(void* argument)
 {
   struct pbuf *p;
   struct netif *netif = (struct netif *) argument;
 
   for( ;; )
   {
-    if (osSemaphoreWait(s_xSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+    if (osSemaphoreAcquire(s_xSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
     {
       do
       {
@@ -710,7 +715,7 @@ u32_t sys_now(void)
   * @param  netif: the network interface
   * @retval None
   */
-void ethernetif_set_link(void const *argument)
+void ethernetif_set_link(void* argument)
 
 {
   uint32_t regvalue = 0;

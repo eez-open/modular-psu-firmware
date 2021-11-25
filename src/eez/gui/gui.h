@@ -57,7 +57,6 @@ extern bool g_isBlinkTime;
 
 void guiTick();
 
-void stateManagmentHook();
 WidgetCursor &getFoundWidgetAtDown();
 void setFoundWidgetAtDown(WidgetCursor &widgetCursor);
 void clearFoundWidgetAtDown();
@@ -71,6 +70,9 @@ void executeAction(int actionId);
 
 int16_t getAppContextId(AppContext *pAppContext);
 AppContext *getAppContextFromId(int16_t id);
+
+int getCurrentStateBufferIndex();
+uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -127,6 +129,8 @@ void animateOpen(const Rect &srcRect, const Rect &dstRect);
 void animateClose(const Rect &srcRect, const Rect &dstRect);
 void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, float duration = -1, const Rect *clipRect = nullptr);
 
+////////////////////////////////////////////////////////////////////////////////
+
 float getDefaultAnimationDurationHook();
 
 void executeExternalActionHook(const WidgetCursor &widgetCursor, int16_t actionId);
@@ -134,24 +138,28 @@ void externalDataHook(int16_t id, DataOperationEnum operation, const WidgetCurso
 
 OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor);
 
-////////////////////////////////////////////////////////////////////////////////
-
-int getCurrentStateBufferIndex();
-uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor);
-
 Page *getPageFromIdHook(int pageId);
+
+void setFocusCursor(const WidgetCursor& cursor, int16_t dataId);
+
+extern const char *g_discardMessage;
 
 void executeInternalActionHook(int actionId);
 
-bool activePageHasBackdropHook();
+void stateManagmentHook();
 
-extern const char *g_discardMessage;
+bool activePageHasBackdropHook();
 
 bool pushPageThreadHook(AppContext *appContext, int pageId, Page *page);
 bool showPageThreadHook(AppContext *appContext, int pageId);
 void executeActionThreadHook();
 
-void setFocusCursor(const WidgetCursor& cursor, int16_t dataId);
+bool isEventHandlingDisabledHook();
+
+int overrideStyleHook(const WidgetCursor &widgetCursor, int styleId);
+uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
+uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
+uint16_t transformColorHook(uint16_t color);
 
 } // namespace gui
 } // namespace eez
