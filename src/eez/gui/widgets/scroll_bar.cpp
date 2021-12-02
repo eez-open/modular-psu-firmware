@@ -71,7 +71,6 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
 DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const ScrollBarWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->size = sizeof(ScrollBarWidgetState);
     widgetCursor.currentState->flags.active = g_selectedWidget == widgetCursor;
     widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
 

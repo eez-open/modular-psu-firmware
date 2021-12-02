@@ -156,7 +156,7 @@ void turnOn() {
     }
 }
 
-void updateScreen(uint32_t *buffer);
+void renderBuffer(uint32_t *buffer);
 
 void turnOff() {
     if (isOn()) {
@@ -167,7 +167,7 @@ void turnOff() {
         // clear screen
         setColor(0, 0, 0);
         fillRect(appContext->rect.x, appContext->rect.y, appContext->rect.x + appContext->rect.w - 1, appContext->rect.y + appContext->rect.h - 1);
-        updateScreen(g_buffer);
+        renderBuffer(g_buffer);
     }
 }
 
@@ -178,7 +178,7 @@ bool isOn() {
 void updateBrightness() {
 }
 
-void updateScreen(uint32_t *buffer) {
+void renderBuffer(uint32_t *buffer) {
     g_lastBuffer = buffer;
 
     if (!isOn()) {
@@ -221,7 +221,7 @@ void animate() {
     float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
     if (t < 1.0f) {
         g_animationState.callback(t, bufferOld, bufferNew, VRAM_ANIMATION_BUFFER1_START_ADDRESS);
-        updateScreen((uint32_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS);
+        renderBuffer((uint32_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS);
     } else {
         g_animationState.enabled = false;
     }
@@ -283,7 +283,7 @@ void sync() {
     }
 
     if (isDirty()) {
-        updateScreen(g_buffer);
+        renderBuffer(g_buffer);
 
         if (g_buffer == (uint32_t *)VRAM_BUFFER1_START_ADDRESS) {
             g_buffer = (uint32_t *)VRAM_BUFFER2_START_ADDRESS;
@@ -297,7 +297,7 @@ void sync() {
 }
 
 void finishAnimation() {
-    updateScreen(g_buffer);
+    renderBuffer(g_buffer);
 
     auto oldBuffer = g_buffer;
 

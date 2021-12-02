@@ -37,7 +37,6 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 	const Style* y2Style = getStyle(widget->y2Style);
 	const Style* cursorStyle = getStyle(widget->cursorStyle);
 
-    widgetCursor.currentState->size = sizeof(ListGraphWidgetState);
 	widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
     ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.clear();

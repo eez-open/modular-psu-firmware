@@ -58,7 +58,6 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     auto currentState = (DisplayDataWidgetState *)widgetCursor.currentState;
     auto previousState = (DisplayDataWidgetState *)widgetCursor.previousState;
 
-    widgetCursor.currentState->size = sizeof(DisplayDataWidgetState);
     widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));

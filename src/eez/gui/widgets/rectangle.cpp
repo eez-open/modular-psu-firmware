@@ -27,8 +27,6 @@ namespace gui {
 EnumFunctionType RECTANGLE_enum = nullptr;
 
 DrawFunctionType RECTANGLE_draw = [](const WidgetCursor &widgetCursor) {
-    widgetCursor.currentState->size = sizeof(WidgetState);
-
     bool refresh = !widgetCursor.previousState || widgetCursor.previousState->flags.active !=widgetCursor.currentState->flags.active;
 
     if (refresh) {

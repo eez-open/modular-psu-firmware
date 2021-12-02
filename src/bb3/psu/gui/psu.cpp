@@ -142,6 +142,8 @@ PsuAppContext::PsuAppContext() {
     m_popProgressPage = false;
 }
 
+void testIsEncoderEnabledInActivePage();
+
 void PsuAppContext::stateManagment() {
     if (m_popProgressPage) {
         doHideProgressPage();
@@ -389,6 +391,8 @@ void PsuAppContext::stateManagment() {
 		g_focusDataId = g_focusDataIdToSet;
 		g_focusEditValue = Value();
 	}
+
+    testIsEncoderEnabledInActivePage();
 
     function_generator::tickGui();
 }
@@ -1516,7 +1520,7 @@ static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
 static bool g_focusCursorIsEnabled;
 static int16_t g_focusCursorAction;
 
-void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
+bool isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_focusCursor == widgetCursor && g_focusDataId == widgetCursor.widget->data) {
             g_focusCursorIsEnabled = true;
@@ -1524,25 +1528,30 @@ void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
             g_focusCursorAction = action;
         }
     }
+    return true;
 }
 
 bool isEnabledFocusCursor(const WidgetCursor& cursor, int16_t dataId) {
     g_focusCursorIsEnabled = false;
     g_focusCursorAction = ACTION_ID_NONE;
-    enumWidgets(&g_psuAppContext, isEnabledFocusCursorStep);
+    forEachWidgetInAppContext(&g_psuAppContext, isEnabledFocusCursorStep);
     return g_focusCursorIsEnabled;
 }
 
-void isEncoderEnabledInActivePageCheckWidget(const WidgetCursor &widgetCursor) {
+bool isEncoderEnabledInActivePageCheckWidget(const WidgetCursor &widgetCursor) {
     if (isEncoderEnabledForWidget(widgetCursor)) {
         g_isEncoderEnabledInActivePage = true;
     }
+    return true;
+}
+
+void testIsEncoderEnabledInActivePage() {
+    // encoder is enabled if active page contains widget with "edit" action
+    g_isEncoderEnabledInActivePage = false;
+    forEachWidgetInAppContext(&g_psuAppContext, isEncoderEnabledInActivePageCheckWidget);
 }
 
 bool isEncoderEnabledInActivePage() {
-    // encoder is enabled if active page contains widget with "edit" action
-    g_isEncoderEnabledInActivePage = false;
-    enumWidgets(&g_psuAppContext, isEncoderEnabledInActivePageCheckWidget);
     return g_isEncoderEnabledInActivePage;
 }
 
@@ -1848,7 +1857,7 @@ static int g_findNextFocusCursorState = 0;
 static WidgetCursor g_nextFocusCursor = Cursor(0);
 static uint16_t g_nextFocusDataId = DATA_ID_CHANNEL_U_EDIT;
 
-void findNextFocusCursor(const WidgetCursor &widgetCursor) {
+bool findNextFocusCursor(const WidgetCursor &widgetCursor) {
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_findNextFocusCursorState == 0) {
             g_nextFocusCursor = widgetCursor;
@@ -1866,11 +1875,12 @@ void findNextFocusCursor(const WidgetCursor &widgetCursor) {
             g_findNextFocusCursorState = 3;
         }
     }
+    return true;
 }
 
 static void moveToNextFocusCursor() {
     g_findNextFocusCursorState = 0;
-    enumWidgets(&g_psuAppContext, findNextFocusCursor);
+    forEachWidgetInAppContext(&g_psuAppContext, findNextFocusCursor);
     if (g_findNextFocusCursorState > 0) {
         g_focusCursor = g_nextFocusCursor;
         g_focusDataId = g_nextFocusDataId;

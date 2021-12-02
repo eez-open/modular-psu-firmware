@@ -162,8 +162,6 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 		);
 	}
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
-
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
 	widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);

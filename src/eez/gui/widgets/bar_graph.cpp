@@ -72,8 +72,6 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const BarGraphWidget *)widgetCursor.widget;
     const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
-    widgetCursor.currentState->size = sizeof(BarGraphWidgetState);
-
     widgetCursor.currentState->data.clear();
 
     widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);

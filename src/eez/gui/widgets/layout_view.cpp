@@ -33,7 +33,7 @@ int getLayoutId(const WidgetCursor &widgetCursor) {
     return layoutView->layout;
 }
 
-EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor) {
     auto cursor = widgetCursor.cursor;
 
 	auto layoutView = (const LayoutViewWidget *)widgetCursor.widget;
@@ -69,16 +69,14 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
         if (widgetCursor.previousState) {
             widgetCursor.previousState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.previousState) + 1);
         }
-        if (widgetCursor.currentState) {
-            widgetCursor.currentState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.currentState) + 1);
-        }
+        widgetCursor.currentState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.currentState) + 1);
 
         auto savedWidget = widgetCursor.widget;
 
         for (uint32_t index = 0; index < widgets.count; ++index) {
             widgetCursor.widget = widgets.item(widgetCursor.assets, index);
 
-            enumWidget(widgetCursor, callback);
+            enumWidget(widgetCursor);
 
             if (widgetCursor.previousState) {
                 widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
@@ -87,24 +85,16 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
                 }
             }
 
-            if (widgetCursor.currentState) {
-                widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
-            }
+            widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
         }
 
         widgetCursor.widget = savedWidget;
 
-        if (widgetCursor.currentState) {
-            savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
-        }
+        savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
 
         widgetCursor.currentState = savedCurrentState;
         widgetCursor.previousState = savedPreviousState;
-	} else {
-		if (widgetCursor.currentState) {
-			widgetCursor.currentState->size = 0;
-		}
-    }
+	}
 
     if (layoutView->context) {
         restoreContext(widgetCursor, layoutView->context, oldContext);
@@ -112,7 +102,6 @@ EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCa
 
 	widgetCursor.flowState = flowState;
     widgetCursor.cursor = cursor;
-
 };
 
 DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {

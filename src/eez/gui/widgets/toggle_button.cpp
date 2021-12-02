@@ -29,7 +29,6 @@ EnumFunctionType TOGGLE_BUTTON_enum = nullptr;
 DrawFunctionType TOGGLE_BUTTON_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.enabled =
         get(widgetCursor, widget->data).getInt() ? 1 : 0;
 

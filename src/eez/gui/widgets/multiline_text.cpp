@@ -29,7 +29,6 @@ EnumFunctionType MULTILINE_TEXT_enum = nullptr;
 DrawFunctionType MULTILINE_TEXT_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const MultilineTextWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
 	widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data =
         widget->data ? get(widgetCursor, widget->data) : 0;

@@ -24,7 +24,7 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType APP_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+EnumFunctionType APP_VIEW_enum = [](WidgetCursor &widgetCursor) {
     Value appContextValue;
     DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();
@@ -32,22 +32,14 @@ EnumFunctionType APP_VIEW_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallb
     WidgetCursor savedWidgetCursor = widgetCursor;
     widgetCursor.appContext = appContext;
 
-    if (callback == drawWidgetCallback) {
-        appContext->updateAppView(widgetCursor);
-    } else {
-		enumWidgets(widgetCursor, callback);
-    }
+    appContext->updateAppView(widgetCursor);
 
-    if (widgetCursor.currentState) {
-        savedWidgetCursor.currentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedWidgetCursor.currentState);
-    }
+    savedWidgetCursor.currentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedWidgetCursor.currentState);
 
     widgetCursor = savedWidgetCursor;
 };
 
 DrawFunctionType APP_VIEW_draw = [](const WidgetCursor &widgetCursor) {
-    widgetCursor.currentState->size = sizeof(WidgetState);
-
     Value appContextValue;
     DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
     AppContext *appContext = appContextValue.getAppContext();

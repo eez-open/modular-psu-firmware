@@ -216,7 +216,7 @@ static bool isKeyboardEnabledForWidget(const WidgetCursor &widgetCursor) {
     return false;
 }
 
-static void findNextFocusCursor(const WidgetCursor &widgetCursor) {
+static bool findNextFocusCursor(const WidgetCursor &widgetCursor) {
     if (isKeyboardEnabledForWidget(widgetCursor)) {
         if (g_findFocusCursorState == 0) {
             g_focusWidgetCursorIter = widgetCursor;
@@ -232,13 +232,15 @@ static void findNextFocusCursor(const WidgetCursor &widgetCursor) {
             g_findFocusCursorState = 3;
         }
     }
+
+    return true;
 }
 
 static void moveToNextFocusCursor() {
     g_findFocusCursorState = 0;
     g_focusWidgetCursorIter = 0;
     
-    enumWidgets(&getRootAppContext(), findNextFocusCursor);
+    forEachWidgetInAppContext(&getRootAppContext(), findNextFocusCursor);
     
     if (g_findFocusCursorState > 0) {
         g_focusWidgetCursor = g_focusWidgetCursorIter;
@@ -247,7 +249,7 @@ static void moveToNextFocusCursor() {
     }
 }
 
-static void findPreviousFocusCursor(const WidgetCursor &widgetCursor) {
+static bool findPreviousFocusCursor(const WidgetCursor &widgetCursor) {
     if (isKeyboardEnabledForWidget(widgetCursor)) {
         if (g_findFocusCursorState == 0) {
             g_focusWidgetCursorIter = widgetCursor;
@@ -260,13 +262,15 @@ static void findPreviousFocusCursor(const WidgetCursor &widgetCursor) {
             }
         }
     }
+
+    return true;
 }
 
 static void moveToPreviousFocusCursor() {
     g_findFocusCursorState = 0;
     g_focusWidgetCursorIter = 0;
     
-    enumWidgets(&getRootAppContext(), findPreviousFocusCursor);
+    forEachWidgetInAppContext(&getRootAppContext(), findPreviousFocusCursor);
     
     if (g_findFocusCursorState > 0) {
         g_focusWidgetCursor = g_focusWidgetCursorIter;

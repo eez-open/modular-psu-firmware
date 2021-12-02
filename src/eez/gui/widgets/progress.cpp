@@ -29,8 +29,6 @@ EnumFunctionType PROGRESS_enum = nullptr;
 DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = widgetCursor.widget;
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
-
     widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
 

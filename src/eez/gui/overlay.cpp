@@ -46,7 +46,7 @@ Overlay *getOverlay(const WidgetCursor &widgetCursor) {
     return (Overlay *)overlayValue.getVoidPointer();
 }
 
-void getOverlayOffset(WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
+void getOverlayOffset(const WidgetCursor &widgetCursor, int &xOffset, int &yOffset) {
     Overlay *overlay = getOverlay(widgetCursor);
     if (overlay) {
 		auto &overlayXOffset = (overlay->visibility & OVERLAY_MINIMIZED) != 0 ? overlay->xOffsetMinimized : overlay->xOffsetMaximized;

@@ -55,6 +55,7 @@ extern bool g_isBlinkTime;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void guiInit();
 void guiTick();
 
 WidgetCursor &getFoundWidgetAtDown();
@@ -72,7 +73,7 @@ int16_t getAppContextId(AppContext *pAppContext);
 AppContext *getAppContextFromId(int16_t id);
 
 int getCurrentStateBufferIndex();
-uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor);
+size_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor);
 
 ////////////////////////////////////////////////////////////////////////////////
 

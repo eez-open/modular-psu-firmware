@@ -40,7 +40,6 @@ void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
 DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const TextWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
     widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
     
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));

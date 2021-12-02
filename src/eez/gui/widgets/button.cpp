@@ -29,7 +29,6 @@ EnumFunctionType BUTTON_enum = nullptr;
 DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const ButtonWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
     auto enabled = get(widgetCursor, widget->enabled);
     widgetCursor.currentState->flags.enabled = enabled.getType() == VALUE_TYPE_UNDEFINED  || get(widgetCursor, widget->enabled).getInt() ? 1 : 0;
 

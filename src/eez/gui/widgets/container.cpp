@@ -25,7 +25,7 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor) {
     Overlay *overlay = nullptr;
     if (isOverlay(widgetCursor)) {
         overlay = getOverlay(widgetCursor);
@@ -42,9 +42,6 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCall
         }
 
         if (overlay && !overlay->state) {
-            if (widgetCursor.currentState) {
-                widgetCursor.currentState->size = sizeof(ContainerWidgetState);
-            }
             return;
         }
     }
@@ -65,9 +62,7 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCall
     if (widgetCursor.previousState) {
         widgetCursor.previousState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.previousState) + 1);
     }
-    if (widgetCursor.currentState) {
-        widgetCursor.currentState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.currentState) + 1);
-    }
+    widgetCursor.currentState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.currentState) + 1);
 
     auto savedWidget = widgetCursor.widget;
 
@@ -97,7 +92,7 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCall
             ((Widget*)widgetCursor.widget)->h = overlay->widgetOverrides[index].h;
         }
 
-        enumWidget(widgetCursor, callback);
+        enumWidget(widgetCursor);
 
         if (widgetOverrides) {
             ((Widget*)widgetCursor.widget)->x = xSaved;
@@ -113,41 +108,37 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCall
             }
         }
 
-        if (widgetCursor.currentState) {
-			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
-        }
+        widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
     }
 
     widgetCursor.widget = savedWidget;
 
-    if (widgetCursor.currentState) {
-        savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
-    }
+    savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
 
 	widgetCursor.currentState = savedCurrentState;
 	widgetCursor.previousState = savedPreviousState;
 
     if (isOverlay(widgetCursor)) {
         auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
-        if (currentState) {
-            int xOffset = 0;
-            int yOffset = 0;
-            getOverlayOffset(widgetCursor, xOffset, yOffset);
+        
+        int xOffset = 0;
+        int yOffset = 0;
+        getOverlayOffset(widgetCursor, xOffset, yOffset);
 
-            const Style *style = getStyle(widgetCursor.widget->style);
+        const Style *style = getStyle(widgetCursor.widget->style);
 
-            display::setBufferBounds(currentState->displayBufferIndex,
-				widgetCursor.x,
-				widgetCursor.y,
-				overlay ? overlay->width: widgetCursor.widget->w,
-				overlay ? overlay->height : widgetCursor.widget->h,
-				(widget->flags & SHADOW_FLAG) != 0, 
-				style->opacity,
-				xOffset,
-				yOffset, 
-				nullptr
-			);
-        }
+        display::setBufferBounds(
+			currentState->displayBufferIndex,
+            widgetCursor.x,
+            widgetCursor.y,
+            overlay->width,
+            overlay->height,
+            (widget->flags & SHADOW_FLAG) != 0, 
+            style->opacity,
+            xOffset,
+            yOffset,
+            nullptr
+        );
     }
 };
 

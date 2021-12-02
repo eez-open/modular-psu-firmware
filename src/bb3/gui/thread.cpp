@@ -47,6 +47,7 @@ void startThread() {
     loadMainAssets(assets, sizeof(assets));
     display::onThemeChanged();
     mouse::init();
+    guiInit();
 	EEZ_MESSAGE_QUEUE_CREATE(gui, 10);
 	EEZ_THREAD_CREATE(gui, mainLoop);
 }

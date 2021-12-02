@@ -62,12 +62,12 @@ enum WidgetTypes {
 };
 #undef WIDGET_TYPE
 
-typedef void (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
+typedef bool (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
 
 struct Widget;
 struct Assets;
 
-typedef void (*EnumFunctionType)(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
+typedef void (*EnumFunctionType)(WidgetCursor &widgetCursor);
 typedef void (*DrawFunctionType)(const WidgetCursor &widgetCursor);
 typedef void (*OnTouchFunctionType)(const WidgetCursor &widgetCursor, Event &touchEvent);
 typedef bool (*OnKeyboardFunctionType)(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod);
@@ -81,24 +81,7 @@ struct WidgetStateFlags {
     unsigned enabled : 1;
 };
 
-struct WidgetState {
-    uint16_t size;
-    WidgetStateFlags flags;
-    Value data;
-
-    WidgetState *next;
-
-    WidgetState() {
-        flags.active = 0;
-        flags.focused = 0;
-        flags.blinking = 0;
-        flags.enabled = 0;
-    }
-    
-    virtual ~WidgetState() {}
-};
-
-void freeWidgetStates(WidgetState* firstWidgetState);
+struct WidgetState;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -222,10 +205,25 @@ struct WidgetCursor {
 	}
 };
 
+struct WidgetState {
+	WidgetCursor widgetCursor;
+	size_t size;
+	WidgetStateFlags flags;
+	Value data;
+
+	WidgetState() {
+		flags.active = 0;
+		flags.focused = 0;
+		flags.blinking = 0;
+		flags.enabled = 0;
+	}
+
+	virtual ~WidgetState() {}
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
-void enumWidgets(AppContext* appContext, EnumWidgetsCallback callback);
-void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
+void forEachWidgetInAppContext(AppContext* appContext, EnumWidgetsCallback callback);
 
 WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y, bool clicked = true);
 
@@ -233,10 +231,9 @@ extern OnTouchFunctionType *g_onTouchWidgetFunctions[];
 extern OnKeyboardFunctionType *g_onKeyboardWidgetFunctions[];
 
 WidgetState *nextWidgetState(WidgetState *p);
-void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback);
+void enumWidget(WidgetCursor &widgetCursor);
 
 extern bool g_isActiveWidget;
-void drawWidgetCallback(const WidgetCursor &widgetCursor);
 
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor);
 

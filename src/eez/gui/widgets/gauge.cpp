@@ -92,8 +92,6 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 
 	auto widget = (const GaugeWidget*)widgetCursor.widget;
 
-    widgetCursor.currentState->size = sizeof(WidgetState);
-
 	widgetCursor.currentState->data.clear();
     widgetCursor.currentState->data = get(widgetCursor, widget->data);
 

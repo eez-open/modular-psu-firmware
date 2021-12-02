@@ -25,7 +25,7 @@ namespace gui {
 #define GRID_FLOW_ROW 1
 #define GRID_FLOW_COLUMN 2
 
-EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor) {
 	auto savedCurrentState = widgetCursor.currentState;
 	auto savedPreviousState = widgetCursor.previousState;
 
@@ -43,22 +43,18 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
     int startPosition = ytDataGetPosition(widgetCursor, widgetCursor.widget->data);
 
     // refresh when startPosition changes
-    if (widgetCursor.currentState) {
-        widgetCursor.currentState->data.clear();
-		widgetCursor.currentState->data = startPosition;
+    widgetCursor.currentState->data.clear();
+    widgetCursor.currentState->data = startPosition;
 
-        if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
-            widgetCursor.previousState = 0;
-        }
+    if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
+        widgetCursor.previousState = 0;
     }
 
 	// move to the first child widget state
 	if (widgetCursor.previousState) {
 		++widgetCursor.previousState;
 	}
-	if (widgetCursor.currentState) {
-		++widgetCursor.currentState;
-	}
+    ++widgetCursor.currentState;
 
 	const Widget *childWidget = gridWidget->itemWidget.ptr(widgetCursor.assets);
     widgetCursor.widget = childWidget;
@@ -81,7 +77,7 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 		widgetCursor.y = savedY + yOffset;
 
 		widgetCursor.pushIterator(index);
-		enumWidget(widgetCursor, callback);
+		enumWidget(widgetCursor);
 		widgetCursor.popIterator();
 
         if (widgetCursor.previousState) {
@@ -91,9 +87,7 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
             }
         }
 
-        if (widgetCursor.currentState) {
-			widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
-        }
+        widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
 
         if (gridWidget->gridFlow == GRID_FLOW_ROW) {
             if (xOffset + childWidget->w < parentWidget->w) {
@@ -127,9 +121,7 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 
     widgetCursor.widget = savedWidget;
 
-    if (widgetCursor.currentState) {
-        savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
-    }
+    savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
 
     if (count > 0) {
         deselect(widgetCursor, widgetCursor.widget->data, oldValue);
@@ -138,9 +130,7 @@ EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback 
 	widgetCursor.currentState = savedCurrentState;
 	widgetCursor.previousState = savedPreviousState;
 
-    if (widgetCursor.currentState) {
-        widgetCursor.currentState->data.freeRef();
-    }
+    widgetCursor.currentState->data.freeRef();
 };
 
 DrawFunctionType GRID_draw = nullptr;

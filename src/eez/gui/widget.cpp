@@ -20,6 +20,7 @@
 #include <cstddef>
 #include <limits.h>
 
+#include <eez/debug.h>
 #include <eez/os.h>
 
 #include <eez/gui_conf.h>
@@ -64,10 +65,6 @@ bool g_isActiveWidget;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void findWidgetStep(const WidgetCursor &widgetCursor);
-
-////////////////////////////////////////////////////////////////////////////////
-
 EnumFunctionType NONE_enum = nullptr;
 DrawFunctionType NONE_draw = nullptr;
 OnTouchFunctionType NONE_onTouch = nullptr;
@@ -92,6 +89,12 @@ typedef void (*WidgetStatePlacementNewFunctionType)(void *ptr);
 
 #define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) NAME##placementNew,
 static WidgetStatePlacementNewFunctionType g_widgetStatePlacementNewFunctions[] = {
+    WIDGET_TYPES
+};
+#undef WIDGET_TYPE
+
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) sizeof(NAME_PASCAL_CASE##WidgetState),
+static size_t g_widgetStateSize[] = {
     WIDGET_TYPES
 };
 #undef WIDGET_TYPE
@@ -137,8 +140,6 @@ OnKeyboardFunctionType *g_onKeyboardWidgetFunctions[] = {
 ////////////////////////////////////////////////////////////////////////////////
 
 void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
-    widgetCursor.currentState->size = sizeof(WidgetState);
-
     const Widget *widget = widgetCursor.widget;
 
     bool refresh =
@@ -147,30 +148,6 @@ void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
 
     if (refresh) {
         drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, getStyle(widget->style), widgetCursor.currentState->flags.active, false, true);
-    }
-}
-
-void drawWidgetCallback(const WidgetCursor &widgetCursor_) {
-    WidgetCursor widgetCursor = widgetCursor_;
-
-    uint16_t stateSize = getCurrentStateBufferSize(widgetCursor);
-    assert(stateSize <= CONF_MAX_STATE_SIZE);
-
-    widgetCursor.currentState->flags.active = g_isActiveWidget;
-
-    const Widget *widget = widgetCursor.widget;
-    if (*g_drawWidgetFunctions[widget->type]) {
-        (*g_drawWidgetFunctions[widget->type])(widgetCursor);
-    } else {
-        defaultWidgetDraw(widgetCursor);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void freeWidgetStates(WidgetState* firstWidgetState) {
-    for (WidgetState* widgetState = firstWidgetState; widgetState; widgetState = widgetState->next) {
-        widgetState->~WidgetState();
     }
 }
 
@@ -184,14 +161,12 @@ void WidgetCursor::nextState() {
     if (previousState) {
         previousState = nextWidgetState(previousState);
     }
-    if (currentState) {
-        currentState = nextWidgetState(currentState);
-    }
+    currentState = nextWidgetState(currentState);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
+void enumWidget(WidgetCursor &widgetCursor) {
     auto xSaved = widgetCursor.x;
     auto ySaved = widgetCursor.y;
     
@@ -203,23 +178,32 @@ void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
         auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
         Value widgetCursorValue((void *)&widgetCursor, VALUE_TYPE_POINTER);
         DATA_OPERATION_FUNCTION(containerWidget->overlay, DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor, widgetCursorValue);
-
-        if (callback == findWidgetStep) {
-            int xOverlayOffset = 0;
-            int yOverlayOffset = 0;
-            getOverlayOffset(widgetCursor, xOverlayOffset, yOverlayOffset);
-            widgetCursor.x += xOverlayOffset;
-            widgetCursor.y += yOverlayOffset;
-        }
     }
 
     bool savedIsActiveWidget = g_isActiveWidget;
     g_isActiveWidget = g_isActiveWidget || isActiveWidget(widgetCursor);
 
-    callback(widgetCursor);
+    auto stateSize = getCurrentStateBufferSize(widgetCursor);
+	static size_t maxStateSize = 0;
+	if (stateSize > maxStateSize) {
+		maxStateSize = stateSize;
+		DebugTrace("max state size: %d\n", maxStateSize);
+	}
+    assert(stateSize <= CONF_MAX_STATE_SIZE);
+
+    const Widget *widget = widgetCursor.widget;
+    widgetCursor.currentState->widgetCursor = widgetCursor;
+	widgetCursor.currentState->size = g_widgetStateSize[widget->type];
+    widgetCursor.currentState->flags.active = g_isActiveWidget;
+
+    if (*g_drawWidgetFunctions[widget->type]) {
+        (*g_drawWidgetFunctions[widget->type])(widgetCursor);
+    } else {
+        defaultWidgetDraw(widgetCursor);
+    }
 
     if (*g_enumWidgetFunctions[widgetCursor.widget->type]) {
-       (*g_enumWidgetFunctions[widgetCursor.widget->type])(widgetCursor, callback);
+       (*g_enumWidgetFunctions[widgetCursor.widget->type])(widgetCursor);
     }
 
     g_isActiveWidget = savedIsActiveWidget;
@@ -228,75 +212,80 @@ void enumWidget(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	widgetCursor.y = ySaved;
 }
 
-void enumWidgets(WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
-    auto appContext = widgetCursor.appContext;
-
-    if (appContext->isActivePageInternal()) {
-    	if (callback != findWidgetStep) {
-    		return;
-    	}
-
-        auto internalPage = ((InternalPage *)appContext->getActivePage());
-
-		const WidgetCursor &foundWidget = internalPage->findWidget(g_findWidgetAtX, g_findWidgetAtY, g_clicked);
-		if (foundWidget) {
-            g_foundWidget = foundWidget;
-            return;
-		}
-
-        if (!g_foundWidget || g_foundWidget.appContext != appContext) {
-            return;
-        }
-
-        bool passThrough = internalPage->canClickPassThrough();
-
-        if (g_clicked) {
-            // clicked outside internal page, close internal page
-            appContext->popPage();
-        }
-
-        if (!passThrough) {
-            return;
-        }
-    }
-
-    if (appContext->getActivePageId() == PAGE_ID_NONE) {
-        return;
-    }
-
-    auto savedWidget = widgetCursor.widget;
-    widgetCursor.widget = getPageAsset(appContext->getActivePageId(), widgetCursor);
-    enumWidget(widgetCursor, callback);
-    widgetCursor.widget = savedWidget;
-}
-
-void enumWidgets(AppContext* appContext, EnumWidgetsCallback callback) {
+void forEachWidgetInAppContext(AppContext* appContext, EnumWidgetsCallback callback) {
 	if (appContext->getActivePageId() == PAGE_ID_NONE || appContext->isActivePageInternal()) {
 		return;
 	}
-	WidgetCursor widgetCursor;
-	widgetCursor.appContext = appContext;
-	widgetCursor.widget = getPageAsset(appContext->getActivePageId(), widgetCursor);
-	enumWidget(widgetCursor, callback);
+
+    if (!g_currentState) {
+        return;
+    }
+
+    WidgetState *currentState = g_currentState;
+    while (currentState != g_currentStateEnd) {
+        if (!callback(currentState->widgetCursor)) {
+            break;
+        }
+        currentState = (WidgetState *)((uint8_t*)currentState + g_widgetStateSize[currentState->widgetCursor.widget->type]);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void findWidgetStep(const WidgetCursor &widgetCursor) {
+static int g_xOverlayOffset = 0;
+static int g_yOverlayOffset = 0;
+static WidgetState *g_widgetStateAfterOverlay = nullptr;
+
+static bool findWidgetStep(const WidgetCursor &widgetCursor) {
+	if (widgetCursor.appContext->isActivePageInternal()) {
+		auto internalPage = ((InternalPage *)widgetCursor.appContext->getActivePage());
+
+		WidgetCursor widgetCursor2 = internalPage->findWidget(g_findWidgetAtX, g_findWidgetAtY, g_clicked);
+
+		if (!widgetCursor2) {
+			bool passThrough = internalPage->canClickPassThrough();
+
+			if (g_clicked) {
+				// clicked outside internal page, close internal page
+				widgetCursor.appContext->popPage();
+			}
+
+			if (!passThrough) {
+				return false;
+			}
+		}
+		else {
+			g_foundWidget = widgetCursor2;
+			return false;
+		}
+	}
+
+
     const Widget *widget = widgetCursor.widget;
 
     Overlay *overlay = getOverlay(widgetCursor);
 
+    if (widgetCursor.currentState == g_widgetStateAfterOverlay) {
+        g_xOverlayOffset = 0;
+        g_yOverlayOffset = 0;
+        g_widgetStateAfterOverlay = nullptr;
+    }
+
+    if (overlay) {
+        getOverlayOffset(widgetCursor, g_xOverlayOffset, g_yOverlayOffset);
+        g_widgetStateAfterOverlay = nextWidgetState(widgetCursor.currentState);
+    }
+
     static const int MIN_SIZE = 50;
         
-    int x = widgetCursor.x;
+    int x = widgetCursor.x + g_xOverlayOffset;
     int w = overlay ? overlay->width : widget->w;
     if (w < MIN_SIZE) {
         x = x - (MIN_SIZE - w) / 2;
         w = MIN_SIZE;
     }
 
-    int y = widgetCursor.y;
+    int y = widgetCursor.y + g_yOverlayOffset;
     int h = overlay ? overlay->height : widget->h;
     if (h < MIN_SIZE) {
         y = y - (MIN_SIZE - h) / 2;
@@ -315,7 +304,7 @@ static void findWidgetStep(const WidgetCursor &widgetCursor) {
         auto action = getWidgetAction(widgetCursor);        
         if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
             if (overlay && !overlay->state) {
-                return;
+                return true;
             }
             g_foundWidget = widgetCursor;
             g_distanceToFoundWidget = INT_MAX;
@@ -339,38 +328,22 @@ static void findWidgetStep(const WidgetCursor &widgetCursor) {
             }
         }
     }
+
+	return true;
 }
 
 WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y, bool clicked) {
     g_foundWidget = 0;
     g_clicked = clicked;
 
-    if (appContext->isActivePageInternal()) {
-        auto internalPage = ((InternalPage *)appContext->getActivePage());
-
-        WidgetCursor widgetCursor = internalPage->findWidget(x, y, clicked);
-
-        if (!widgetCursor) {
-        	bool passThrough = internalPage->canClickPassThrough();
-
-            if (clicked) {
-                // clicked outside internal page, close internal page
-                appContext->popPage();
-            }
-
-            if (!passThrough) {
-    			return g_foundWidget;
-    		}
-        } else {
-            return widgetCursor;
-        }
-    }
-
-
     g_findWidgetAtX = x;
     g_findWidgetAtY = y;
 
-    enumWidgets(appContext, findWidgetStep);
+    g_xOverlayOffset = 0;
+    g_yOverlayOffset = 0;
+    g_widgetStateAfterOverlay = nullptr;
+
+    forEachWidgetInAppContext(appContext, findWidgetStep);
 
     return g_foundWidget;
 }

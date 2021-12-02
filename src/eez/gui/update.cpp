@@ -25,14 +25,15 @@ namespace gui {
 
 static uint8_t *g_stateBuffer = GUI_STATE_BUFFER;
 static WidgetState *g_previousState;
-static WidgetState *g_currentState;
+WidgetState *g_currentState;
+WidgetState *g_currentStateEnd;
 static bool g_refreshScreen;
 
 int getCurrentStateBufferIndex() {
     return (uint8_t *)g_currentState == g_stateBuffer ? 0 : 1;
 }
 
-uint32_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor) {
+size_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor) {
     return (uint8_t *)widgetCursor.currentState - (uint8_t *)g_currentState;
 }
 
@@ -57,6 +58,8 @@ void updateScreen() {
 	widgetCursor.currentState = g_currentState;
 
     widgetCursor.appContext->updateAppView(widgetCursor);
+
+    g_currentStateEnd = widgetCursor.currentState;
 }
 
 } // namespace gui

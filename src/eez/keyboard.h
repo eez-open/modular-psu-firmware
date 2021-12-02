@@ -20,6 +20,8 @@
 
 #include <stdint.h>
 
+#include <eez/conf.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 #if OPTION_KEYBOARD
 #include <usbh_hid.h>

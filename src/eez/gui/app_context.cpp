@@ -336,6 +336,8 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
             width = internalPage->width;
             height = internalPage->height;
             withShadow = true;
+
+			widgetCursor.currentState->size = 0;
         } else {
             auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
 
@@ -356,15 +358,15 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
             }
 
             widgetCursor.widget = page;
-            enumWidget(widgetCursor, drawWidgetCallback);
+            enumWidget(widgetCursor);
 
             widgetCursor.widget = savedWidget;
             widgetCursor.previousState = savedPreviousState;
         }
-		
+
 		display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
 
-		widgetCursor.nextState();
+        widgetCursor.nextState();
 
 		m_updatePageIndex = -1;
 	} else {
