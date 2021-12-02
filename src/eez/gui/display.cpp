@@ -48,6 +48,7 @@ namespace gui {
 namespace display {
 
 uint16_t g_fc, g_bc;
+bool g_fcIsTransparent;
 uint8_t g_opacity = 255;
 
 gui::font::Font g_font;
@@ -130,6 +131,8 @@ void onLuminocityChanged() {
         g_colorCache[i][3] = 0;
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 #define swap(type, i, j) {type t = i; i = j; j = t;}
 
@@ -260,6 +263,7 @@ uint16_t getColor16FromIndex(uint16_t color) {
 
 void setColor(uint8_t r, uint8_t g, uint8_t b) {
     g_fc = RGB_TO_COLOR(r, g, b);
+    g_fcIsTransparent = false;
 	adjustColor(g_fc);
 }
 
@@ -269,8 +273,13 @@ void setColor16(uint16_t color) {
 }
 
 void setColor(uint16_t color, bool ignoreLuminocity) {
-    g_fc = getColor16FromIndex(color);
-	adjustColor(g_fc);
+    if (color == TRANSPARENT_COLOR_INDEX) {
+        g_fcIsTransparent = true;
+    } else {
+        g_fcIsTransparent = false;
+        g_fc = getColor16FromIndex(color);
+	    adjustColor(g_fc);
+    }
 }
 
 uint16_t getColor() {
@@ -299,6 +308,25 @@ uint8_t setOpacity(uint8_t opacity) {
 
 uint8_t getOpacity() {
     return g_opacity;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void drawHLine(int x, int y, int l) {
+    fillRect(x, y, x + l, y);
+}
+
+void drawVLine(int x, int y, int l) {
+    fillRect(x, y, x, y + l);
+}
+
+void drawRect(int x1, int y1, int x2, int y2) {
+    drawHLine(x1, y1, x2 - x1);
+    drawHLine(x1, y2, x2 - x1);
+    drawVLine(x1, y1, y2 - y1);
+    drawVLine(x2, y1, y2 - y1);
+
+    setDirty();
 }
 
 void drawFocusFrame(int x, int y, int w, int h) {
@@ -334,6 +362,8 @@ void fillRoundedRect(int x1, int y1, int x2, int y2, int r) {
         drawHLine(x1 + r - rx, y1 + r - ry, rx);
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 static int8_t measureGlyph(uint8_t encoding) {
     auto glyph = g_font.getGlyph(encoding);
@@ -378,6 +408,130 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
 
     return width;
 }
+
+void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font, int cursorPosition) {
+    g_font = font;
+
+    drawStrInit();
+
+    if (textLength == -1) {
+        textLength = strlen(text);
+    }
+
+    int xCursor = x;
+
+    int i;
+
+    for (i = 0; i < textLength && text[i]; ++i) {
+        char encoding = text[i];
+        if (i == cursorPosition) {
+            xCursor = x;
+        }
+
+        auto x1 = x;
+        auto y1 = y;
+
+        auto glyph = g_font.getGlyph(encoding);
+        if (glyph) {
+            int x_glyph = x1 + glyph->x;
+            int y_glyph = y1 + g_font.getAscent() - (glyph->y + glyph->height);
+
+            // draw glyph pixels
+            int iStartByte = 0;
+            if (x_glyph < clip_x1) {
+                int dx_off = clip_x1 - x_glyph;
+                iStartByte = dx_off;
+                x_glyph = clip_x1;
+            }
+
+			if (iStartByte < glyph->width) {
+				int offset = 0;
+				int glyphHeight = glyph->height;
+				if (y_glyph < clip_y1) {
+					int dy_off = clip_y1 - y_glyph;
+					offset += dy_off * glyph->width;
+					glyphHeight -= dy_off;
+					y_glyph = clip_y1;
+				}
+
+				int width;
+				if (x_glyph + (glyph->width - iStartByte) - 1 > clip_x2) {
+					width = clip_x2 - x_glyph + 1;
+				} else {
+					width = (glyph->width - iStartByte);
+				}
+
+				int height;
+				if (y_glyph + glyphHeight - 1 > clip_y2) {
+					height = clip_y2 - y_glyph + 1;
+				} else {
+					height = glyphHeight;
+				}
+
+				if (width > 0 && height > 0) {
+					drawGlyph(glyph->pixels + offset + iStartByte, glyph->width - width, x_glyph, y_glyph, width, height);
+				}
+			}
+			
+			x += glyph->dx;
+		}
+    }
+
+    if (i == cursorPosition) {
+        xCursor = x;
+    }
+
+    if (cursorPosition != -1) {
+        auto d = MAX(((clip_y2 - clip_y1) - font.getHeight()) / 2, 0);
+        fillRect(xCursor - CURSOR_WIDTH / 2, clip_y1 + d, xCursor + CURSOR_WIDTH / 2 - 1, clip_y2 - d);
+    }
+
+    setDirty();
+}
+
+int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
+    if (textLength == -1) {
+        textLength = strlen(text);
+    }
+
+    int i;
+
+    for (i = 0; i < textLength && text[i]; ++i) {
+        char encoding = text[i];
+        auto glyph = font.getGlyph(encoding);
+        auto dx = 0;
+        if (glyph) {
+            dx = glyph->dx;
+        }
+        if (xPos < x + dx / 2) {
+            return i;
+        }
+        x += dx;
+    }
+
+    return i;
+}
+
+int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
+    if (textLength == -1) {
+        textLength = strlen(text);
+    }
+
+    for (int i = 0; i < textLength && text[i]; ++i) {
+        if (i == cursorPosition) {
+            return x;
+        }
+        char encoding = text[i];
+        auto glyph = font.getGlyph(encoding);
+        if (glyph) {
+            x += glyph->dx;
+        }
+    }
+
+    return x;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 int allocBuffer() {
     int bufferIndex;
@@ -531,128 +685,6 @@ void endBuffersDrawing() {
     g_numBuffersToDraw = 0;
 
     freeUnusedBuffers();
-}
-
-void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font, int cursorPosition) {
-    g_font = font;
-
-    drawStrInit();
-
-    if (textLength == -1) {
-        textLength = strlen(text);
-    }
-
-    int xCursor = x;
-
-    int i;
-
-    for (i = 0; i < textLength && text[i]; ++i) {
-        char encoding = text[i];
-        if (i == cursorPosition) {
-            xCursor = x;
-        }
-
-        auto x1 = x;
-        auto y1 = y;
-
-        auto glyph = g_font.getGlyph(encoding);
-        if (glyph) {
-            int x_glyph = x1 + glyph->x;
-            int y_glyph = y1 + g_font.getAscent() - (glyph->y + glyph->height);
-
-            // draw glyph pixels
-            int iStartByte = 0;
-            if (x_glyph < clip_x1) {
-                int dx_off = clip_x1 - x_glyph;
-                iStartByte = dx_off;
-                x_glyph = clip_x1;
-            }
-
-			if (iStartByte < glyph->width) {
-				int offset = 0;
-				int glyphHeight = glyph->height;
-				if (y_glyph < clip_y1) {
-					int dy_off = clip_y1 - y_glyph;
-					offset += dy_off * glyph->width;
-					glyphHeight -= dy_off;
-					y_glyph = clip_y1;
-				}
-
-				int width;
-				if (x_glyph + (glyph->width - iStartByte) - 1 > clip_x2) {
-					width = clip_x2 - x_glyph + 1;
-				} else {
-					width = (glyph->width - iStartByte);
-				}
-
-				int height;
-				if (y_glyph + glyphHeight - 1 > clip_y2) {
-					height = clip_y2 - y_glyph + 1;
-				} else {
-					height = glyphHeight;
-				}
-
-				if (width > 0 && height > 0) {
-					drawGlyph(glyph->pixels + offset + iStartByte, glyph->width - width, x_glyph, y_glyph, width, height);
-				}
-			}
-			
-			x += glyph->dx;
-		}
-    }
-
-    if (i == cursorPosition) {
-        xCursor = x;
-    }
-
-    if (cursorPosition != -1) {
-        auto d = MAX(((clip_y2 - clip_y1) - font.getHeight()) / 2, 0);
-        fillRect(xCursor - CURSOR_WIDTH / 2, clip_y1 + d, xCursor + CURSOR_WIDTH / 2 - 1, clip_y2 - d);
-    }
-
-    setDirty();
-}
-
-int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
-    if (textLength == -1) {
-        textLength = strlen(text);
-    }
-
-    int i;
-
-    for (i = 0; i < textLength && text[i]; ++i) {
-        char encoding = text[i];
-        auto glyph = font.getGlyph(encoding);
-        auto dx = 0;
-        if (glyph) {
-            dx = glyph->dx;
-        }
-        if (xPos < x + dx / 2) {
-            return i;
-        }
-        x += dx;
-    }
-
-    return i;
-}
-
-int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
-    if (textLength == -1) {
-        textLength = strlen(text);
-    }
-
-    for (int i = 0; i < textLength && text[i]; ++i) {
-        if (i == cursorPosition) {
-            return x;
-        }
-        char encoding = text[i];
-        auto glyph = font.getGlyph(encoding);
-        if (glyph) {
-            x += glyph->dx;
-        }
-    }
-
-    return x;
 }
 
 } // namespace display

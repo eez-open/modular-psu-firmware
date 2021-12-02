@@ -23,10 +23,6 @@
 namespace eez {
 namespace gui {
 
-static const uint16_t INPUT_WIDGET_TYPE_TEXT = 0x0001;
-static const uint16_t INPUT_WIDGET_TYPE_NUMBER = 0x0002;
-static const uint16_t INPUT_WIDGET_PASSWORD_FLAG = 0x0100;
-
 struct InputWidget : public Widget {
 	uint16_t flags;
 	int16_t min;
@@ -36,12 +32,19 @@ struct InputWidget : public Widget {
 	uint16_t componentIndex;
 };
 
+struct InputWidgetState : public WidgetState {
+};
+
 struct InputWidgetExecutionState : public flow::ComponenentExecutionState {
 	Value min;
 	Value max;
     Value precision;
 	Unit unit;
 };
+
+static const uint16_t INPUT_WIDGET_TYPE_TEXT = 0x0001;
+static const uint16_t INPUT_WIDGET_TYPE_NUMBER = 0x0002;
+static const uint16_t INPUT_WIDGET_PASSWORD_FLAG = 0x0100;
 
 Value getInputWidgetMin(const gui::WidgetCursor &widgetCursor);
 Value getInputWidgetMax(const gui::WidgetCursor &widgetCursor);

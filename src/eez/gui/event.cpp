@@ -24,7 +24,7 @@
 #include <eez/hmi.h>
 
 #if OPTION_MOUSE
-#include <bb3/mouse.h>
+#include <eez/mouse.h>
 #endif
 
 #include <eez/util.h>

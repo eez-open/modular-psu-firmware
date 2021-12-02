@@ -1712,7 +1712,7 @@
                   "wireID": "a1ade44d-5851-4c19-d388-f1df4af689ff",
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "trigger_is_initiated",
+                  "data": "",
                   "action": "trigger_generate_manual",
                   "style": {
                     "inheritFrom": "trigger_button_14"
@@ -2321,7 +2321,7 @@
                   "wireID": "812292e9-a2c1-4710-a3ff-2e89ef3a2bdc",
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "trigger_is_initiated",
+                  "data": "",
                   "action": "trigger_generate_manual",
                   "style": {
                     "inheritFrom": "trigger_button_14"
@@ -2904,7 +2904,7 @@
                   "wireID": "b6e0a4a9-c85d-4f4b-8383-d1540eabba0b",
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "trigger_is_initiated",
+                  "data": "",
                   "action": "trigger_generate_manual",
                   "style": {
                     "inheritFrom": "trigger_button_14"
@@ -3487,7 +3487,7 @@
                   "wireID": "84414816-573c-4723-c884-542206284318",
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "trigger_is_initiated",
+                  "data": "",
                   "action": "trigger_generate_manual",
                   "style": {
                     "inheritFrom": "trigger_button_14"
@@ -5402,7 +5402,7 @@
                   "wireID": "4efd022e-a14a-4eb1-e608-6cc5c4d5cf2b",
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "trigger_is_initiated",
+                  "data": "",
                   "action": "trigger_generate_manual",
                   "style": {
                     "inheritFrom": "trigger_button_24"

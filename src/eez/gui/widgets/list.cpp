@@ -17,18 +17,13 @@
  */
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/list.h>
 
 namespace eez {
 namespace gui {
 
 #define LIST_TYPE_VERTICAL 1
 #define LIST_TYPE_HORIZONTAL 2
-
-struct ListWidget : public Widget {
-    AssetsPtr<Widget> itemWidget;
-    uint8_t listType; // LIST_TYPE_VERTICAL or LIST_TYPE_HORIZONTAL
-    uint8_t gap;
-};
 
 EnumFunctionType LIST_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;

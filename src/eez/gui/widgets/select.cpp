@@ -17,14 +17,10 @@
  */
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/container.h>
+#include <eez/gui/widgets/select.h>
 
 namespace eez {
 namespace gui {
-
-struct SelectWidget : public Widget {
-    ListOfAssetsPtr<Widget> widgets;
-};
 
 EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;
@@ -51,16 +47,16 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallbac
 
     auto savedWidget = widgetCursor.widget;
 
-	auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
-    if (containerWidget->widgets.count > 0) {
+	auto selectWidget = (const SelectWidget *)widgetCursor.widget;
+    if (selectWidget->widgets.count > 0) {
         int err;
 		int index = indexValue.toInt32(&err);
         if (err) {
             index = indexValue.getInt();
         }
 
-	    auto widgetIndex = index < 0 || index >= (int)containerWidget->widgets.count ? 0 : index;
-        widgetCursor.widget = containerWidget->widgets.item(widgetCursor.assets, widgetIndex);
+	    auto widgetIndex = index < 0 || index >= (int)selectWidget->widgets.count ? 0 : index;
+        widgetCursor.widget = selectWidget->widgets.item(widgetCursor.assets, widgetIndex);
         enumWidget(widgetCursor, callback);
     }
 

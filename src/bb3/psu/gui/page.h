@@ -51,7 +51,6 @@ public:
     void onEncoder(int counter);
     void onEncoderClicked();
 
-    void refresh(const WidgetCursor &widgetCursor);
     void updatePage(const WidgetCursor &widgetCursor);
     WidgetCursor findWidget(int x, int y, bool clicked);
     bool canClickPassThrough();
@@ -109,7 +108,6 @@ public:
 
     void init();
 
-    void refresh(const WidgetCursor &widgetCursor);
     void updatePage(const WidgetCursor &widgetCursor);
     WidgetCursor findWidget(int x, int y, bool clicked);
 
@@ -167,7 +165,6 @@ class MenuWithButtonsPage : public InternalPage {
 public:
     static MenuWithButtonsPage *create(AppContext *appContext, const char *message, const char **menuItems, void (*callback)(int));
 
-    void refresh(const WidgetCursor &widgetCursor);
     void updatePage(const WidgetCursor &widgetCursor);
     WidgetCursor findWidget(int x, int y, bool clicked);
 

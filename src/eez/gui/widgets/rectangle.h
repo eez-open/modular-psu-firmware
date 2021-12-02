@@ -30,5 +30,8 @@ struct RectangleWidget : public Widget {
     RectangleFlags flags;
 };
 
+struct RectangleWidgetState : public WidgetState {
+};
+
 } // namespace gui
 } // namespace eez

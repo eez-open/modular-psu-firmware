@@ -2,7 +2,7 @@
   "settings": {
     "general": {
       "projectVersion": "v3",
-      "projectType": "master",
+      "projectType": "firmware",
       "scpiDocFolder": "docs\\SCPI reference guide\\Commands",
       "imports": [
         {
@@ -54295,7 +54295,8 @@
       "color": "action_color",
       "backgroundColor": "text_enable_background",
       "activeColor": "text_enable_background",
-      "activeBackgroundColor": "action_color"
+      "activeBackgroundColor": "action_color",
+      "blink": true
     },
     {
       "name": "trigger_button_14",

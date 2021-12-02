@@ -41,10 +41,6 @@ void onMouseDisconnected();
 void onMouseEvent(USBH_HandleTypeDef *phost);
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
-void onMouseEvent(bool mouseButton1IsPressed, int mouseX, int mouseY);
-#endif
-
 struct MouseInfo {
     uint8_t x;
     uint8_t y;

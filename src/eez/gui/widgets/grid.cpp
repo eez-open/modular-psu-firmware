@@ -17,17 +17,13 @@
  */
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/grid.h>
 
 namespace eez {
 namespace gui {
 
 #define GRID_FLOW_ROW 1
 #define GRID_FLOW_COLUMN 2
-
-struct GridWidget : public Widget {
-    AssetsPtr<Widget> itemWidget;
-    uint8_t gridFlow; // GRID_FLOW_ROW or GRID_FLOW_COLUMN
-};
 
 EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
 	auto savedCurrentState = widgetCursor.currentState;

@@ -26,34 +26,12 @@
 #include <eez/keyboard.h>
 #endif
 
-#include <eez/gui/gui.h>
 #include <eez/gui_conf.h>
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/scroll_bar.h>
 
 namespace eez {
 namespace gui {
-
-struct ScrollBarWidget : public Widget {
-    int16_t thumbStyle;
-    int16_t buttonsStyle;
-    AssetsPtr<const char> leftButtonText;
-	AssetsPtr<const char> rightButtonText;
-};
-
-enum ScrollBarWidgetSegment {
-    SCROLL_BAR_WIDGET_SEGMENT_NONE,
-    SCROLL_BAR_WIDGET_SEGMENT_TRACK_LEFT,
-    SCROLL_BAR_WIDGET_SEGMENT_TRACK_RIGHT,
-    SCROLL_BAR_WIDGET_SEGMENT_THUMB,
-    SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON,
-    SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON
-};
-
-struct ScrollBarWidgetState : public WidgetState {
-    int size;
-    int position;
-    int pageSize;
-    ScrollBarWidgetSegment segment;
-};
 
 EnumFunctionType SCROLL_BAR_enum = nullptr;
 

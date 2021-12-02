@@ -27,6 +27,7 @@ namespace gui {
 namespace display {
 
 extern uint16_t g_fc, g_bc;
+extern bool g_fcIsTransparent;
 extern uint8_t g_opacity;
 
 extern gui::font::Font g_font;

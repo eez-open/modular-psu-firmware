@@ -18,12 +18,13 @@
 
 #include <eez/platform/touch.h>
 
-#include <bb3/platform/simulator/events.h>
+#include <eez/platform/simulator/events.h>
 
 #include <eez/gui/gui.h>
 
-#include <bb3/mouse.h>
-#include <bb3/usb.h>
+#if OPTION_MOUSE
+#include <eez/mouse.h>
+#endif
 
 using namespace eez::platform::simulator;
 
@@ -34,20 +35,22 @@ namespace touch {
 void read(bool &isPressed, int &x, int &y) {
     readEvents();
 
-    using namespace eez::usb;
     using namespace eez::gui;
 
-    if (g_usbMode == USB_MODE_HOST || g_usbMode == USB_MODE_OTG) {
+#if OPTION_MOUSE
+    if (mouse::isMouseEnabled()) {
         mouse::onMouseEvent(g_mouseButton1IsPressed, g_mouseX, g_mouseY);
 
         isPressed = false;
         x = 0;
         y = 0;
-    } else {
+    } 
+    else {
         isPressed = g_mouseButton1IsPressed;
         x = g_mouseX;
         y = g_mouseY;
     }
+#endif
 }
 
 } // namespace touch

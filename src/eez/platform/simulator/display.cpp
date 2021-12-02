@@ -16,13 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
 #include <math.h>
 #include <memory.h>
 #include <stdio.h>
 #include <string.h>
-#include <utility>
 #include <string>
 
 #include <SDL.h>
@@ -36,26 +33,20 @@
 
 #include <eez/gui/gui.h>
 
-#include <bb3/psu/gui/psu.h>
-#include <bb3/platform/simulator/front_panel.h>
 #if OPTION_MOUSE
-#include <bb3/usb.h>
+#include <eez/mouse.h>
 #endif
 
 #include <eez/gui/display.h>
 #include <eez/gui/display-private.h>
 
 using namespace eez::gui;
-using namespace eez::psu::gui;
 
 namespace eez {
 namespace gui {
 namespace display {
 
 ////////////////////////////////////////////////////////////////////////////////
-
-static const char *TITLE = "EEZ Modular Firmware Simulator";
-static const char *ICON = "eez.png";
 
 static bool g_isOn;
 
@@ -81,23 +72,6 @@ std::string getFullPath(std::string category, std::string path) {
         fullPath = std::string("../") + fullPath;
     }
     return path;
-}
-
-int getDesktopResolution(int *w, int *h) {
-    SDL_Init(SDL_INIT_VIDEO);
-
-    SDL_DisplayMode dm;
-    if (SDL_GetDesktopDisplayMode(0, &dm) == 0) {
-        *w = dm.w;
-        *h = dm.h;
-
-        return 1;
-    }
-
-    *w = -1;
-    *h = -1;
-
-    return 0;
 }
 
 bool init() {
@@ -144,8 +118,7 @@ bool init() {
     SDL_ShowWindow(g_mainWindow);
 
 #if OPTION_MOUSE
-    using namespace eez::usb;
-    if (g_usbMode == USB_MODE_HOST || g_usbMode == USB_MODE_OTG) {
+    if (mouse::isMouseEnabled()) {
         SDL_ShowCursor(SDL_DISABLE);
         SDL_CaptureMouse(SDL_TRUE);
     }
@@ -189,9 +162,11 @@ void turnOff() {
     if (isOn()) {
         g_isOn = false;
 
+		auto appContext = getAppContextFromId(APP_CONTEXT_ID_DEVICE);
+
         // clear screen
         setColor(0, 0, 0);
-        fillRect(g_psuAppContext.rect.x, g_psuAppContext.rect.y, g_psuAppContext.rect.x + g_psuAppContext.rect.w - 1, g_psuAppContext.rect.y + g_psuAppContext.rect.h - 1);
+        fillRect(appContext->rect.x, appContext->rect.y, appContext->rect.x + appContext->rect.w - 1, appContext->rect.y + appContext->rect.h - 1);
         updateScreen(g_buffer);
     }
 }
@@ -253,7 +228,8 @@ void animate() {
 }
 
 void doTakeScreenshot() {
-    uint8_t *src = (uint8_t *)(g_lastBuffer + g_psuAppContext.rect.y * DISPLAY_WIDTH + g_psuAppContext.rect.x);
+	auto appContext = getAppContextFromId(APP_CONTEXT_ID_DEVICE);
+    uint8_t *src = (uint8_t *)(g_lastBuffer + appContext->rect.y * DISPLAY_WIDTH + appContext->rect.x);
     uint8_t *dst = SCREENSHOOT_BUFFER_START_ADDRESS;
 
     int srcAdvance = (DISPLAY_WIDTH - 480) * 4;
@@ -378,23 +354,10 @@ void drawPixel(int x, int y, uint8_t opacity) {
     setDirty();
 }
 
-void drawRect(int x1, int y1, int x2, int y2) {
-    if (x1 > x2) {
-        std::swap<int>(x1, x2);
-    }
-    if (y1 > y2) {
-        std::swap<int>(y1, y2);
-    }
-
-    drawHLine(x1, y1, x2 - x1);
-    drawHLine(x1, y2, x2 - x1);
-    drawVLine(x1, y1, y2 - y1);
-    drawVLine(x2, y1, y2 - y1);
-
-    setDirty();
-}
-
 void fillRect(int x1, int y1, int x2, int y2, int r) {
+    if (g_fcIsTransparent) {
+        return;
+    }
     if (r == 0) {
         uint32_t color32 = color16to32(g_fc, g_opacity);
         uint32_t *dst = g_buffer + y1 * DISPLAY_WIDTH + x1;
@@ -430,32 +393,6 @@ void fillRect(void *dstBuffer, int x1, int y1, int x2, int y2) {
             *dst++ = color32;
         }
         dst += nl;
-    }
-
-    setDirty();
-}
-
-void drawHLine(int x, int y, int l) {
-    uint32_t color32 = color16to32(g_fc);
-
-    uint32_t *dst = g_buffer + y * DISPLAY_WIDTH + x;
-    uint32_t *dstEnd = dst + l + 1;
-    while (dst < dstEnd) {
-        *dst++ = color32;
-    }
-
-    setDirty();
-}
-
-void drawVLine(int x, int y, int l) {
-    uint32_t color32 = color16to32(g_fc);
-
-    uint32_t *dst = g_buffer + y * DISPLAY_WIDTH + x;
-    uint32_t *dstEnd = dst + (l + 1) * DISPLAY_WIDTH;
-
-    while (dst < dstEnd) {
-        *dst = color32;
-        dst += DISPLAY_WIDTH;
     }
 
     setDirty();
@@ -594,5 +531,3 @@ void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x_glyph, int y_gl
 } // namespace display
 } // namespace gui
 } // namespace eez
-
-#endif

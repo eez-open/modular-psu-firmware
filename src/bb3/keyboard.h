@@ -25,14 +25,6 @@ namespace keyboard {
 
 void onKeyDown(uint16_t param);
 
-#if defined(EEZ_PLATFORM_STM32)
-void onKeyboardEvent(USBH_HandleTypeDef *phost);
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-void onKeyboardEvent(SDL_KeyboardEvent *key);
-#endif
-
 struct KeyboardInfo {
     uint8_t state;
     

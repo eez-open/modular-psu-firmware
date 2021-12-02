@@ -4806,8 +4806,6 @@ void data_trigger_is_initiated(DataOperationEnum operation, const WidgetCursor &
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         Channel &channel = Channel::get(iChannel);
         value = (trigger::isInitiated() || trigger::isTriggered()) && channel_dispatcher::getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED;
-    } else if (operation == DATA_OPERATION_IS_BLINKING) {
-        value = trigger::isInitiated();
     }
 }
 

@@ -66,4 +66,7 @@ namespace eez {
 
 uint32_t millis();
 
+extern bool g_shutdown;
+void shutdown();
+
 } // namespace eez

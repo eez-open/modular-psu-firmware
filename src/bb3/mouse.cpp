@@ -16,12 +16,14 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <bb3/system.h>
 #include <eez/gui/gui.h>
-
-#include <bb3/mouse.h>
-#include <bb3/keyboard.h>
 #include <eez/gui/display.h>
+
+#include <bb3/keyboard.h>
+#include <bb3/mouse.h>
+#include <bb3/system.h>
+#include <bb3/usb.h>
+
 #include <bb3/gui/document.h>
 #include <bb3/gui/thread.h>
 
@@ -298,6 +300,11 @@ void onMouseEvent(bool mouseButton1IsPressed, int mouseX, int mouseY) {
     g_mouseInfo.button3 = 0;
 }
 #endif
+
+bool isMouseEnabled() {
+    using namespace eez::usb;
+    return g_usbMode == USB_MODE_HOST || g_usbMode == USB_MODE_OTG;
+}
 
 } // mouse
 } // eez

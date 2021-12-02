@@ -27,5 +27,8 @@ struct ButtonWidget : public Widget {
     int16_t disabledStyle;
 };
 
+struct ButtonWidgetState : public WidgetState {
+};
+
 } // namespace gui
 } // namespace eez

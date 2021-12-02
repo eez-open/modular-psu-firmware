@@ -1729,8 +1729,6 @@ void data_dib_smx46_aout_trigger_is_initiated(DataOperationEnum operation, const
 		TriggerMode triggerMode = ((Smx46Module *)g_slots[slotIndex])->aoutTriggerMode[subchannelIndex];
 
 		value = (trigger::isInitiated() || trigger::isTriggered()) && triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR;
-	} else if (operation == DATA_OPERATION_IS_BLINKING) {
-		value = trigger::isInitiated();
 	}
 }
 

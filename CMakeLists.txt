@@ -105,6 +105,7 @@ list (APPEND src_files ${src_eez})
 set(header_eez
     src/eez/alloc.h
     src/eez/debug.h
+    src/eez/encoder.h
     src/eez/hmi.h
     src/eez/keyboard.h
     src/eez/memory.h
@@ -529,13 +530,21 @@ source_group("bb3\\mcu" FILES ${src_bb3_mcu} ${header_bb3_mcu})
 
 set(src_eez_platform_simulator
     src/eez/platform/simulator/display.cpp
+    src/eez/platform/simulator/events.cpp
     src/eez/platform/simulator/touch.cpp
 ) 
 list (APPEND src_files ${src_eez_platform_simulator})
 set(header_eez_platform_simulator
-    src/eez/platform/touch.h)
+    src/eez/platform/simulator/events.h
+)
 list (APPEND header_files ${header_eez_platform_simulator})
 source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator} ${header_eez_platform_simulator})
+
+set(header_eez_platform
+    src/eez/platform/touch.h
+)
+list (APPEND header_files ${header_eez_platform})
+source_group("eez\\platform" FILES ${src_eez_platform_simulator} ${header_eez_platform})
 
 set(src_bb3_dib_dcp405
     src/bb3/dib-dcp405/adc.cpp
@@ -615,13 +624,11 @@ source_group("bb3\\dib-smx46" FILES ${src_bb3_dib_smx46} ${header_bb3_dib_smx46}
 
 set(src_bb3_platform_simulator
     src/bb3/platform/simulator/cmsis_os2.cpp
-    src/bb3/platform/simulator/events.cpp
     src/bb3/platform/simulator/front_panel.cpp
 ) 
 list (APPEND src_files ${src_bb3_platform_simulator})
 set(header_bb3_platform_simulator
     src/bb3/platform/simulator/cmsis_os2.h
-    src/bb3/platform/simulator/events.h
     src/bb3/platform/simulator/front_panel.h
 ) 
 list (APPEND header_files ${header_bb3_platform_simulator})

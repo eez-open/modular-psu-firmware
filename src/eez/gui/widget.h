@@ -30,33 +30,33 @@ namespace flow {
 namespace gui {
 
 #define WIDGET_TYPES \
-    WIDGET_TYPE(NONE, 0) \
-    WIDGET_TYPE(CONTAINER, 1) \
-    WIDGET_TYPE(LIST, 2) \
-    WIDGET_TYPE(GRID, 3) \
-    WIDGET_TYPE(SELECT, 4) \
-    WIDGET_TYPE(DISPLAY_DATA, 5) \
-    WIDGET_TYPE(TEXT, 6) \
-    WIDGET_TYPE(MULTILINE_TEXT, 7) \
-    WIDGET_TYPE(RECTANGLE, 8) \
-    WIDGET_TYPE(BITMAP, 9) \
-    WIDGET_TYPE(BUTTON, 10) \
-    WIDGET_TYPE(TOGGLE_BUTTON, 11) \
-    WIDGET_TYPE(BUTTON_GROUP, 12) \
-    WIDGET_TYPE(RESERVED, 13) \
-    WIDGET_TYPE(BAR_GRAPH, 14) \
-    WIDGET_TYPE(LAYOUT_VIEW, 15) \
-    WIDGET_TYPE(YT_GRAPH, 16) \
-    WIDGET_TYPE(UP_DOWN, 17) \
-    WIDGET_TYPE(LIST_GRAPH, 18) \
-    WIDGET_TYPE(APP_VIEW, 19) \
-    WIDGET_TYPE(SCROLL_BAR, 20) \
-    WIDGET_TYPE(PROGRESS, 21) \
-    WIDGET_TYPE(CANVAS, 22) \
-    WIDGET_TYPE(GAUGE, 23) \
-    WIDGET_TYPE(INPUT, 24) \
+    WIDGET_TYPE(None,          NONE,            0) \
+    WIDGET_TYPE(Container,     CONTAINER,       1) \
+    WIDGET_TYPE(List,          LIST,            2) \
+    WIDGET_TYPE(Grid,          GRID,            3) \
+    WIDGET_TYPE(Select,        SELECT,          4) \
+    WIDGET_TYPE(DisplayData,   DISPLAY_DATA,    5) \
+    WIDGET_TYPE(Text,          TEXT,            6) \
+    WIDGET_TYPE(MultilineText, MULTILINE_TEXT,  7) \
+    WIDGET_TYPE(Rectangle,     RECTANGLE,       8) \
+    WIDGET_TYPE(Bitmap,        BITMAP,          9) \
+    WIDGET_TYPE(Button,        BUTTON,         10) \
+    WIDGET_TYPE(ToggleButton,  TOGGLE_BUTTON,  11) \
+    WIDGET_TYPE(ButtonGroup,   BUTTON_GROUP,   12) \
+    WIDGET_TYPE(Reserved,      RESERVED,       13) \
+    WIDGET_TYPE(BarGraph,      BAR_GRAPH,      14) \
+    WIDGET_TYPE(LayoutView,    LAYOUT_VIEW,    15) \
+    WIDGET_TYPE(YTGraph,       YT_GRAPH,       16) \
+    WIDGET_TYPE(UpDown,        UP_DOWN,        17) \
+    WIDGET_TYPE(ListGraph,     LIST_GRAPH,     18) \
+    WIDGET_TYPE(AppView,       APP_VIEW,       19) \
+    WIDGET_TYPE(ScrollBar,     SCROLL_BAR,     20) \
+    WIDGET_TYPE(Progress,      PROGRESS,       21) \
+    WIDGET_TYPE(Canvas,        CANVAS,         22) \
+    WIDGET_TYPE(Gauge,         GAUGE,          23) \
+    WIDGET_TYPE(Input,         INPUT,          24) \
 
-#define WIDGET_TYPE(NAME, ID) WIDGET_TYPE_##NAME = ID,
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) WIDGET_TYPE_##NAME = ID,
 enum WidgetTypes {
 	WIDGET_TYPES
 };
@@ -85,7 +85,22 @@ struct WidgetState {
     uint16_t size;
     WidgetStateFlags flags;
     Value data;
+
+    WidgetState *next;
+
+    WidgetState() {
+        flags.active = 0;
+        flags.focused = 0;
+        flags.blinking = 0;
+        flags.enabled = 0;
+    }
+    
+    virtual ~WidgetState() {}
 };
+
+void freeWidgetStates(WidgetState* firstWidgetState);
+
+////////////////////////////////////////////////////////////////////////////////
 
 class AppContext;
 

@@ -33,7 +33,7 @@
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)	
-#include <bb3/platform/simulator/events.h>
+#include <eez/platform/simulator/events.h>
 #endif
 
 #include <bb3/psu/psu.h>

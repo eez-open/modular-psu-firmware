@@ -24,6 +24,7 @@
 
 #include <eez/gui/gui.h>
 #include <eez/gui/data.h>
+#include <eez/gui/widgets/gauge.h>
 
 #include <agg2d.h>
 #include <agg_rendering_buffer.h>
@@ -83,17 +84,6 @@ float firstTick(float n) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-struct GaugeWidget : public Widget {
-    int16_t min;
-	int16_t max;
-	int16_t threshold;
-	int16_t unit;
-    int16_t barStyle;
-	int16_t valueStyle;
-    int16_t ticksStyle;
-	int16_t thresholdStyle;
-};
 
 EnumFunctionType GAUGE_enum = nullptr;
 

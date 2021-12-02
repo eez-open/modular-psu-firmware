@@ -19,6 +19,7 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/canvas.h>
 
 namespace eez {
 namespace gui {

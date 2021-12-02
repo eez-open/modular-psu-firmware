@@ -19,15 +19,10 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/multiline_text.h>
 
 namespace eez {
 namespace gui {
-
-struct MultilineTextWidget : public Widget {
-    AssetsPtr<const char> text;
-    int16_t firstLineIndent;
-    int16_t hangingIndent;
-};
 
 EnumFunctionType MULTILINE_TEXT_enum = nullptr;
 

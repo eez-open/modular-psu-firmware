@@ -21,8 +21,9 @@
 #include <eez/os.h>
 #include <eez/util.h>
 
-#include <eez/gui/gui.h>
 #include <eez/gui_conf.h>
+#include <eez/gui/gui.h>
+#include <eez/gui/widgets/display_data.h>
 
 #define CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS 500
 
@@ -36,20 +37,6 @@ enum {
     DISPLAY_OPTION_FRACTION_AND_UNIT = 3,
     DISPLAY_OPTION_UNIT = 4,
     DISPLAY_OPTION_INTEGER_AND_FRACTION = 5
-};
-
-struct DisplayDataWidget : public Widget {
-    uint8_t displayOption;
-};
-
-struct DisplayDataState : public WidgetState {
-    uint16_t color;
-    uint16_t backgroundColor;
-    uint16_t activeColor;
-    uint16_t activeBackgroundColor;
-    uint32_t dataRefreshLastTime;
-    int16_t cursorPosition;
-    uint8_t xScroll;
 };
 
 EnumFunctionType DISPLAY_DATA_enum = nullptr;
@@ -68,10 +55,10 @@ int findStartOfUnit(char *text, int i) {
 DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
     auto widget = (const DisplayDataWidget *)widgetCursor.widget;
 
-    DisplayDataState *currentState = (DisplayDataState *)widgetCursor.currentState;
-    DisplayDataState *previousState = (DisplayDataState *)widgetCursor.previousState;
+    auto currentState = (DisplayDataWidgetState *)widgetCursor.currentState;
+    auto previousState = (DisplayDataWidgetState *)widgetCursor.previousState;
 
-    widgetCursor.currentState->size = sizeof(DisplayDataState);
+    widgetCursor.currentState->size = sizeof(DisplayDataWidgetState);
     widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));

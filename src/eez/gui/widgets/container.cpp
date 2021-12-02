@@ -21,15 +21,9 @@
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/container.h>
-#include <eez/gui/widgets/layout_view.h>
 
 namespace eez {
 namespace gui {
-
-struct ContainerWidgetState : public WidgetState {
-    int overlayState;
-    int displayBufferIndex;
-};
 
 EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor, EnumWidgetsCallback callback) {
     Overlay *overlay = nullptr;

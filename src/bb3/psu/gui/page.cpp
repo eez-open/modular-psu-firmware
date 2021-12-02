@@ -144,7 +144,14 @@ void ToastMessagePage::onEncoderClicked() {
     }
 }
 
-void ToastMessagePage::refresh(const WidgetCursor &widgetCursor) {
+void ToastMessagePage::updatePage(const WidgetCursor &widgetCursor) {
+	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, -1, nullptr, 0, 0, nullptr, actionWidget.x, actionWidget.y);
+    if (widgetCursor.previousState && actionWidgetIsActive == isActiveWidget(toastPageWidgetCursor)) {
+        return;
+    }
+
+    actionWidgetIsActive = !actionWidgetIsActive;
+
     const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
     const Style *actionStyle = getStyle(STYLE_ID_ERROR_ALERT_BUTTON);
 
@@ -283,14 +290,6 @@ void ToastMessagePage::refresh(const WidgetCursor &widgetCursor) {
         display::drawStr(actionLabel, -1,
             actionWidget.x + actionStyle->padding_left, actionWidget.y,
             x1, y1, x2, y2, font, -1);
-    }
-}
-
-void ToastMessagePage::updatePage(const WidgetCursor &widgetCursor) {
-	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, -1, nullptr, 0, 0, nullptr, actionWidget.x, actionWidget.y);
-    if (actionWidgetIsActive != isActiveWidget(toastPageWidgetCursor)) {
-        actionWidgetIsActive = !actionWidgetIsActive;
-        refresh(widgetCursor);
     }
 }
 
@@ -496,7 +495,11 @@ void SelectFromEnumPage::findPagePosition() {
     }
 }
 
-void SelectFromEnumPage::refresh(const WidgetCursor &widgetCursor) {
+void SelectFromEnumPage::updatePage(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.previousState && !dirty) {
+		return;
+    }
+
     const Style *containerStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 	const Style *itemStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM);
 	const Style *disabledItemStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
@@ -516,12 +519,6 @@ void SelectFromEnumPage::refresh(const WidgetCursor &widgetCursor) {
     }
 
     dirty = false;
-}
-
-void SelectFromEnumPage::updatePage(const WidgetCursor &widgetCursor) {
-    if (dirty) {
-        refresh(widgetCursor);
-    }
 }
 
 WidgetCursor SelectFromEnumPage::findWidget(int x, int y, bool clicked) {
@@ -675,7 +672,7 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
 
 }
 
-void MenuWithButtonsPage::refresh(const WidgetCursor &widgetCursor2) {
+void MenuWithButtonsPage::updatePage(const WidgetCursor &widgetCursor2) {
     WidgetCursor widgetCursor;
 
     widgetCursor.appContext = m_appContext;
@@ -704,10 +701,6 @@ void MenuWithButtonsPage::refresh(const WidgetCursor &widgetCursor2) {
         widgetCursor.currentState->flags.active = isActiveWidget(widgetCursor);
         TEXT_draw(widgetCursor);
     }
-}
-
-void MenuWithButtonsPage::updatePage(const WidgetCursor &widgetCursor) {
-    refresh(widgetCursor);
 }
 
 WidgetCursor MenuWithButtonsPage::findWidget(int x, int y, bool clicked) {

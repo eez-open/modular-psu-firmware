@@ -20,13 +20,10 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/button_group.h>
 
 namespace eez {
 namespace gui {
-
-struct ButtonGroupWidget : public Widget {
-    int16_t selectedStyle;
-};
 
 EnumFunctionType BUTTON_GROUP_enum = nullptr;
 

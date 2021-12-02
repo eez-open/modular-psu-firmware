@@ -23,11 +23,17 @@
 namespace eez {
 namespace mouse {
 
+bool isMouseEnabled();
+
 bool isDisplayDirty();
 void updateDisplay();
 
 void getEvent(bool &mouseCursorVisible, gui::EventType &mouseEventType, int &mouseX, int &mouseY);
 void onPageChanged();
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+void onMouseEvent(bool mouseButton1IsPressed, int mouseX, int mouseY);
+#endif
 
 } // mouse
 } // eez

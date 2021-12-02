@@ -26,6 +26,9 @@ struct TextWidget : public Widget {
     uint8_t flags;
 }; 
 
+struct TextWidgetState : public WidgetState {
+};
+
 void TextWidget_autoSize(Assets *assets, TextWidget& widget);
 
 } // namespace gui

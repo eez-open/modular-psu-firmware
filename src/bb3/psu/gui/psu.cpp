@@ -2515,15 +2515,15 @@ uint16_t transformColorHook(uint16_t color) {
 int16_t getAppContextId(AppContext *pAppContext) {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     if (pAppContext == &g_frontPanelAppContext) {
-        return 2;
+        return APP_CONTEXT_ID_SIMULATOR_FRONT_PANEL;
     }
 #endif
-    return 1;
+    return APP_CONTEXT_ID_DEVICE;
 }
 
 AppContext *getAppContextFromId(int16_t id) {
 #if defined(EEZ_PLATFORM_SIMULATOR)
-    if (id == 2) {
+    if (id == APP_CONTEXT_ID_SIMULATOR_FRONT_PANEL) {
         return &g_frontPanelAppContext;
     }
 #endif

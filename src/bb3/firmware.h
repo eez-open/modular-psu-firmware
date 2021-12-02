@@ -32,7 +32,6 @@ enum TestResult {
 extern bool g_isBooted;
 extern bool g_bootTestSuccess;
 extern bool g_shutdownInProgress;
-extern bool g_shutdown;
     
 void boot();
 bool test();
@@ -40,7 +39,6 @@ bool testMaster();
 bool reset();
 void standBy();
 void restart();
-void shutdown();
 
 void updateSpiIrqPin(int slotIndex);
 

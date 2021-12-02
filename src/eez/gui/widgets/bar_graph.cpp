@@ -23,6 +23,7 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/bar_graph.h>
 
 namespace eez {
 namespace gui {
@@ -33,26 +34,6 @@ namespace gui {
 #define BAR_GRAPH_ORIENTATION_BOTTOM_TOP 4
 #define BAR_GRAPH_ORIENTATION_MASK 0x0F
 #define BAR_GRAPH_DO_NOT_DISPLAY_VALUE (1 << 4)
-
-struct BarGraphWidget : public Widget {
-    int16_t textStyle;
-    int16_t line1Data;
-    int16_t line1Style;
-    int16_t line2Data;
-    int16_t line2Style;
-    uint8_t orientation; // BAR_GRAPH_ORIENTATION_...
-};
-
-struct BarGraphWidgetState : public WidgetState {
-    uint16_t color;
-    uint16_t backgroundColor;
-    uint16_t activeColor;
-    uint16_t activeBackgroundColor;
-    Value line1Data;
-    Value line2Data;
-    Value textData;
-    uint32_t textDataRefreshLastTime;
-};
 
 EnumFunctionType BAR_GRAPH_enum = nullptr;
 

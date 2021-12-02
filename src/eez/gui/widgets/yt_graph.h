@@ -21,6 +21,25 @@
 namespace eez {
 namespace gui {
 
+struct YTGraphWidget : public Widget {
+};
+
+
+struct YTGraphWidgetState : public WidgetState {
+    uint32_t refreshCounter;
+    uint8_t iChannel;
+    uint32_t numHistoryValues;
+    uint32_t historyValuePosition;
+    uint8_t ytGraphUpdateMethod;
+    uint32_t cursorPosition;
+    uint8_t *bookmarks;
+    bool showLabels;
+    int8_t selectedValueIndex;
+    bool valueIsVisible[MAX_NUM_OF_Y_VALUES];
+    float valueDiv[MAX_NUM_OF_Y_VALUES];
+    float valueOffset[MAX_NUM_OF_Y_VALUES];
+};
+
 enum {
 	YT_GRAPH_UPDATE_METHOD_SCROLL,
 	YT_GRAPH_UPDATE_METHOD_SCAN_LINE,

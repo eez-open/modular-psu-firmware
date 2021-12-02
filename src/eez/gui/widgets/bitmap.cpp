@@ -20,13 +20,10 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/bitmap.h>
 
 namespace eez {
 namespace gui {
-
-struct BitmapWidget : public Widget {
-    int16_t bitmap;
-};
 
 EnumFunctionType BITMAP_enum = nullptr;
 

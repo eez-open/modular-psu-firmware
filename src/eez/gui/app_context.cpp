@@ -329,9 +329,6 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         if (isPageInternal(m_pageNavigationStack[i].pageId)) {
             InternalPage *internalPage = ((InternalPage *)m_pageNavigationStack[i].page);
             
-            if (!widgetCursor.previousState) {
-                internalPage->refresh(widgetCursor);
-            }
             internalPage->updatePage(widgetCursor);
 
             x = internalPage->x;

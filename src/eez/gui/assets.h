@@ -114,13 +114,11 @@ struct Widget {
 	int16_t style;
 };
 
-struct ContainerWidget : public Widget {
+struct PageAsset : public Widget {
 	ListOfAssetsPtr<Widget> widgets;
 	uint16_t flags;
 	int16_t overlay;
 };
-
-typedef ContainerWidget PageAsset;
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -19,6 +19,7 @@
 #include <assert.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/app_view.h>
 
 namespace eez {
 namespace gui {

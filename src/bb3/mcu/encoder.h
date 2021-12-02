@@ -20,6 +20,8 @@
 
 #include <stdint.h>
 
+#include <eez/encoder.h>
+
 namespace eez {
 namespace mcu {
 namespace encoder {

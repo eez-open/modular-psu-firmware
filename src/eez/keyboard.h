@@ -21,7 +21,9 @@
 #include <stdint.h>
 
 #if defined(EEZ_PLATFORM_STM32)
+#if OPTION_KEYBOARD
 #include <usbh_hid.h>
+#endif
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
@@ -30,6 +32,16 @@
 
 namespace eez {
 namespace keyboard {
+
+#if defined(EEZ_PLATFORM_STM32)
+#if OPTION_KEYBOARD
+void onKeyboardEvent(USBH_HandleTypeDef *phost);
+#endif
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+void onKeyboardEvent(SDL_KeyboardEvent *key);
+#endif
 
 bool isDisplayDirty();
 void updateDisplay();
@@ -44,10 +56,6 @@ static const uint8_t KEY_MOD_RCTRL = 1 << 4;
 static const uint8_t KEY_MOD_RSHIFT = 1 << 5;
 static const uint8_t KEY_MOD_RALT = 1 << 6;
 static const uint8_t KEY_MOD_RGUI = 1 << 7;
-
-#if defined(EEZ_PLATFORM_STM32)
-#include <usbh_hid.h>
-#endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 #define KEY_NONE                               0x00

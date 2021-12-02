@@ -16,20 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bb3/platform/simulator/events.h>
-
 #include <SDL.h>
 
+#include <eez/encoder.h>
+#include <eez/keyboard.h>
 #include <eez/os.h>
 
-#include <bb3/firmware.h>
-#include <bb3/system.h>
-#include <bb3/keyboard.h>
-
-#include <bb3/mcu/encoder.h>
 #include <eez/gui/gui.h>
 
-extern void shutdown();
+#include <eez/platform/simulator/events.h>
 
 namespace eez {
 
@@ -83,7 +78,7 @@ void readEvents() {
         yMouseWheel /= 100;
     }
 
-#if OPTION_DISPLAY && OPTION_ENCODER
+#if OPTION_ENCODER
     mcu::encoder::write(yMouseWheel, mouseButton2IsUp);
 #endif
 }

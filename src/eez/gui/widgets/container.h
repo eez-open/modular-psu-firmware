@@ -21,5 +21,16 @@
 namespace eez {
 namespace gui {
 
+struct ContainerWidget : public Widget {
+	ListOfAssetsPtr<Widget> widgets;
+	uint16_t flags;
+	int16_t overlay;
+};
+
+struct ContainerWidgetState : public WidgetState {
+    int overlayState;
+    int displayBufferIndex;
+};
+
 } // namespace gui
 } // namespace eez

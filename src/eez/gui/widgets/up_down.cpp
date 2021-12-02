@@ -25,15 +25,10 @@
 #endif
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/up_down.h>
 
 namespace eez {
 namespace gui {
-
-struct UpDownWidget : public Widget {
-    AssetsPtr<const char> downButtonText;
-	AssetsPtr<const char> upButtonText;
-    int16_t buttonsStyle;
-};
 
 EnumFunctionType UP_DOWN_enum = nullptr;
 

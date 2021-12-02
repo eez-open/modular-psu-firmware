@@ -21,6 +21,20 @@
 namespace eez {
 namespace gui {
 
+struct DisplayDataWidget : public Widget {
+    uint8_t displayOption;
+};
+
+struct DisplayDataWidgetState : public WidgetState {
+    uint16_t color;
+    uint16_t backgroundColor;
+    uint16_t activeColor;
+    uint16_t activeBackgroundColor;
+    uint32_t dataRefreshLastTime;
+    int16_t cursorPosition;
+    uint8_t xScroll;
+};
+
 int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCursor);
 int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widgetCursor);
 

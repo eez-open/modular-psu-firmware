@@ -6224,8 +6224,6 @@ void data_dib_mio168_dout_trigger_is_initiated(DataOperationEnum operation, cons
         }
 
 		value = (trigger::isInitiated() || trigger::isTriggered()) && triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR;
-	} else if (operation == DATA_OPERATION_IS_BLINKING) {
-		value = trigger::isInitiated();
 	}
 }
 
@@ -7268,8 +7266,6 @@ void data_dib_mio168_aout_trigger_is_initiated(DataOperationEnum operation, cons
 		}
 
 		value = (trigger::isInitiated() || trigger::isTriggered()) && triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR;
-	} else if (operation == DATA_OPERATION_IS_BLINKING) {
-		value = trigger::isInitiated();
 	}
 }
 

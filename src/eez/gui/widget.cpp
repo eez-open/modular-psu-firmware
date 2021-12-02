@@ -22,8 +22,32 @@
 
 #include <eez/os.h>
 
-#include <eez/gui/gui.h>
 #include <eez/gui_conf.h>
+#include <eez/gui/gui.h>
+
+#include <eez/gui/widgets/app_view.h>
+#include <eez/gui/widgets/bar_graph.h>
+#include <eez/gui/widgets/bitmap.h>
+#include <eez/gui/widgets/button_group.h>
+#include <eez/gui/widgets/button.h>
+#include <eez/gui/widgets/canvas.h>
+#include <eez/gui/widgets/container.h>
+#include <eez/gui/widgets/display_data.h>
+#include <eez/gui/widgets/gauge.h>
+#include <eez/gui/widgets/grid.h>
+#include <eez/gui/widgets/input.h>
+#include <eez/gui/widgets/layout_view.h>
+#include <eez/gui/widgets/list_graph.h>
+#include <eez/gui/widgets/list.h>
+#include <eez/gui/widgets/multiline_text.h>
+#include <eez/gui/widgets/progress.h>
+#include <eez/gui/widgets/rectangle.h>
+#include <eez/gui/widgets/scroll_bar.h>
+#include <eez/gui/widgets/select.h>
+#include <eez/gui/widgets/text.h>
+#include <eez/gui/widgets/toggle_button.h>
+#include <eez/gui/widgets/up_down.h>
+#include <eez/gui/widgets/yt_graph.h>
 
 namespace eez {
 namespace gui {
@@ -56,37 +80,55 @@ OnKeyboardFunctionType RESERVED_onKeyboard = nullptr;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define WIDGET_TYPE(NAME, ID) extern EnumFunctionType NAME##_enum;
+struct NoneWidgetState : public WidgetState {};
+struct ReservedWidgetState : public WidgetState {};
+
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) \
+void NAME##placementNew(void *ptr) { new (ptr) NAME_PASCAL_CASE##WidgetState; }
 WIDGET_TYPES
 #undef WIDGET_TYPE
-#define WIDGET_TYPE(NAME, ID) &NAME##_enum,
+
+typedef void (*WidgetStatePlacementNewFunctionType)(void *ptr);
+
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) NAME##placementNew,
+static WidgetStatePlacementNewFunctionType g_widgetStatePlacementNewFunctions[] = {
+    WIDGET_TYPES
+};
+#undef WIDGET_TYPE
+
+////////////////////////////////////////////////////////////////////////////////
+
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) extern EnumFunctionType NAME##_enum;
+WIDGET_TYPES
+#undef WIDGET_TYPE
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) &NAME##_enum,
 static EnumFunctionType *g_enumWidgetFunctions[] = {
     WIDGET_TYPES
 };
 #undef WIDGET_TYPE
 
-#define WIDGET_TYPE(NAME, ID) extern DrawFunctionType NAME##_draw;
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) extern DrawFunctionType NAME##_draw;
 WIDGET_TYPES
 #undef WIDGET_TYPE
-#define WIDGET_TYPE(NAME, ID) &NAME##_draw,
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) &NAME##_draw,
 static DrawFunctionType *g_drawWidgetFunctions[] = {
     WIDGET_TYPES
 };
 #undef WIDGET_TYPE
 
-#define WIDGET_TYPE(NAME, ID) extern OnTouchFunctionType NAME##_onTouch;
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) extern OnTouchFunctionType NAME##_onTouch;
 WIDGET_TYPES
 #undef WIDGET_TYPE
-#define WIDGET_TYPE(NAME, ID) &NAME##_onTouch,
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) &NAME##_onTouch,
 OnTouchFunctionType *g_onTouchWidgetFunctions[] = {
     WIDGET_TYPES
 };
 #undef WIDGET_TYPE
 
-#define WIDGET_TYPE(NAME, ID) extern OnKeyboardFunctionType NAME##_onKeyboard;
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) extern OnKeyboardFunctionType NAME##_onKeyboard;
 WIDGET_TYPES
 #undef WIDGET_TYPE
-#define WIDGET_TYPE(NAME, ID) &NAME##_onKeyboard,
+#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) &NAME##_onKeyboard,
 OnKeyboardFunctionType *g_onKeyboardWidgetFunctions[] = {
     WIDGET_TYPES
 };
@@ -121,6 +163,14 @@ void drawWidgetCallback(const WidgetCursor &widgetCursor_) {
         (*g_drawWidgetFunctions[widget->type])(widgetCursor);
     } else {
         defaultWidgetDraw(widgetCursor);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void freeWidgetStates(WidgetState* firstWidgetState) {
+    for (WidgetState* widgetState = firstWidgetState; widgetState; widgetState = widgetState->next) {
+        widgetState->~WidgetState();
     }
 }
 

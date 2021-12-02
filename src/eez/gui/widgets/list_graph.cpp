@@ -22,23 +22,10 @@
 #include <eez/sound.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/list_graph.h>
 
 namespace eez {
 namespace gui {
-
-struct ListGraphWidget : public Widget {
-    int16_t dwellData;
-    int16_t y1Data;
-    int16_t y1Style;
-    int16_t y2Data;
-    int16_t y2Style;
-    int16_t cursorData;
-    int16_t cursorStyle;
-};
-
-struct ListGraphWidgetState : public WidgetState {
-    Value cursorData;
-};
 
 EnumFunctionType LIST_GRAPH_enum = nullptr;
 

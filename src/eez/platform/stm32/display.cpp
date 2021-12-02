@@ -23,7 +23,6 @@
 #include <memory.h>
 #include <stdio.h>
 #include <string>
-#include <utility>
 
 #include <dma2d.h>
 #include <i2c.h>
@@ -73,6 +72,9 @@ uint32_t vramOffset(uint32_t *vram, int x, int y) {
 }
 
 void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color) {
+    if (g_fcIsTransparent) {
+        return;
+    }
 	if (g_opacity == 255) {
 		hdma2d.Init.Mode = DMA2D_R2M;
 		hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
@@ -484,40 +486,12 @@ void drawPixel(int x, int y, uint8_t opacity) {
     setDirty();
 }
 
-void drawRect(int x1, int y1, int x2, int y2) {
-    if (x1 > x2) {
-        std::swap<int>(x1, x2);
-    }
-    if (y1 > y2) {
-        std::swap<int>(y1, y2);
-    }
-
-    drawHLine(x1, y1, x2 - x1);
-    drawHLine(x1, y2, x2 - x1);
-    drawVLine(x1, y1, y2 - y1);
-    drawVLine(x2, y1, y2 - y1);
-
-    setDirty();
-}
-
 void fillRect(int x1, int y1, int x2, int y2, int r) {
     if (r == 0) {
         fillRect(g_buffer, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
     } else {
         fillRoundedRect(x1, y1, x2, y2, r);
     }
-
-    setDirty();
-}
-
-void drawHLine(int x, int y, int l) {
-    fillRect(x, y, x + l, y);
-
-    setDirty();
-}
-
-void drawVLine(int x, int y, int l) {
-    fillRect(x, y, x, y + l);
 
     setDirty();
 }

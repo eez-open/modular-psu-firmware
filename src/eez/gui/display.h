@@ -31,6 +31,8 @@ namespace eez {
 namespace gui {
 namespace display {
 
+#define TRANSPARENT_COLOR_INDEX 0xFFFF
+
 #define COLOR_BLACK 0x0000
 #define COLOR_WHITE 0xFFFF
 #define COLOR_RED 0xF800
@@ -49,9 +51,7 @@ void sync();
 void finishAnimation();
 
 void turnOn();
-
 void turnOff();
-
 bool isOn();
 
 void onThemeChanged();
@@ -82,20 +82,25 @@ uint16_t getBackColor();
 uint8_t setOpacity(uint8_t opacity);
 uint8_t getOpacity();
 
+// these are the basic drawing operations
 void drawPixel(int x, int y);
 void drawPixel(int x, int y, uint8_t opacity);
-void drawRect(int x1, int y1, int x2, int y2);
-void drawFocusFrame(int x, int y, int w, int h);
 void fillRect(int x1, int y1, int x2, int y2, int radius = 0);
-void fillRect(void *dst, int x1, int y1, int x2, int y2);
-void fillRoundedRect(int x1, int y1, int x2, int y2, int r);
-void drawHLine(int x, int y, int l);
-void drawVLine(int x, int y, int l);
 void bitBlt(int x1, int y1, int x2, int y2, int x, int y);
+void drawBitmap(Image *image, int x, int y);
+
+// used by animation
+void fillRect(void *dst, int x1, int y1, int x2, int y2);
 void bitBlt(void *src, int x1, int y1, int x2, int y2);
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2);
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity);
-void drawBitmap(Image *image, int x, int y);
+
+// these are implemented by calling basic drawing operations
+void drawHLine(int x, int y, int l);
+void drawVLine(int x, int y, int l);
+void drawRect(int x1, int y1, int x2, int y2);
+void drawFocusFrame(int x, int y, int w, int h);
+void fillRoundedRect(int x1, int y1, int x2, int y2, int r);
 
 void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font, int cursorPosition);
 int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font);

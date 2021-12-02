@@ -19,14 +19,10 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/toggle_button.h>
 
 namespace eez {
 namespace gui {
-
-struct ToggleButtonWidget : public Widget {
-    AssetsPtr<const char> text1;
-	AssetsPtr<const char> text2;
-};
 
 EnumFunctionType TOGGLE_BUTTON_enum = nullptr;
 
