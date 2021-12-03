@@ -77,9 +77,7 @@ void onKeyDown(uint16_t param) {
         bool handled = false;
 
         if (g_focusWidgetCursor) {
-            if (*g_onKeyboardWidgetFunctions[g_focusWidgetCursor.widget->type]) {
-                handled = (*g_onKeyboardWidgetFunctions[g_focusWidgetCursor.widget->type])(g_focusWidgetCursor, key, mod);
-            }
+            handled = g_focusWidgetCursor.currentState->onKeyboard(key, mod);
         }
 
         if (!handled) {
@@ -209,7 +207,7 @@ static bool isKeyboardEnabledForWidget(const WidgetCursor &widgetCursor) {
         return true;
     }
 
-    if (*g_onKeyboardWidgetFunctions[widgetCursor.widget->type]) {
+    if (widgetCursor.currentState->hasOnKeyboard()) {
         return true;
     }
 
@@ -240,7 +238,7 @@ static void moveToNextFocusCursor() {
     g_findFocusCursorState = 0;
     g_focusWidgetCursorIter = 0;
     
-    forEachWidgetInAppContext(&getRootAppContext(), findNextFocusCursor);
+    forEachWidget(&getRootAppContext(), findNextFocusCursor);
     
     if (g_findFocusCursorState > 0) {
         g_focusWidgetCursor = g_focusWidgetCursorIter;
@@ -270,7 +268,7 @@ static void moveToPreviousFocusCursor() {
     g_findFocusCursorState = 0;
     g_focusWidgetCursorIter = 0;
     
-    forEachWidgetInAppContext(&getRootAppContext(), findPreviousFocusCursor);
+    forEachWidget(&getRootAppContext(), findPreviousFocusCursor);
     
     if (g_findFocusCursorState > 0) {
         g_focusWidgetCursor = g_focusWidgetCursorIter;

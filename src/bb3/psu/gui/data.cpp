@@ -2052,12 +2052,6 @@ void data_channel_index(Channel &channel, DataOperationEnum operation, const Wid
         value = Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
         value = channel.channelIndex;
-    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
-        // restore channel and slot index
-        auto channelIndex = value.pairOfInt16Value.first;
-        auto slotIndex = value.pairOfInt16Value.second;
-        selectChannel(channelIndex != -1 ? &Channel::get(channelIndex) : nullptr);
-        hmi::selectSlot(slotIndex);
     }
 }
 
@@ -2074,12 +2068,6 @@ void data_no_channel_index(int slotIndex, DataOperationEnum operation, const Wid
         value = Value(g_channel, VALUE_TYPE_POINTER);
     } else if (operation == DATA_OPERATION_GET_CONTEXT_CURSOR) {
         value = slotIndex;
-    } else if (operation == DATA_OPERATION_RESTORE_CONTEXT) {
-        // restore channel and slot index
-        auto channelIndex = value.pairOfInt16Value.first;
-        auto slotIndex = value.pairOfInt16Value.second;
-        selectChannel(channelIndex != -1 ? &Channel::get(channelIndex) : nullptr);
-        hmi::selectSlot(slotIndex);
     }
 }
 

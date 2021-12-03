@@ -38,6 +38,10 @@ struct YTGraphWidgetState : public WidgetState {
     bool valueIsVisible[MAX_NUM_OF_Y_VALUES];
     float valueDiv[MAX_NUM_OF_Y_VALUES];
     float valueOffset[MAX_NUM_OF_Y_VALUES];
+
+    void draw() override;
+	bool hasOnTouch() override;
+	void onTouch(Event &touchEvent) override;
 };
 
 enum {

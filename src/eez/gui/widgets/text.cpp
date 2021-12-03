@@ -28,8 +28,6 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType TEXT_enum = nullptr;
-
 void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
     const Style *style = getStyle(widget.style);
     font::Font font = styleGetFont(style);
@@ -37,52 +35,51 @@ void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
     widget.h = style->border_size_top + style->padding_top + font.getHeight() + style->border_size_bottom + style->padding_bottom;
 }
 
-DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
+void TextWidgetState::draw() {
     auto widget = (const TextWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
+    flags.focused = isFocusWidget(widgetCursor);
     
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
     const char *text = widget->text.ptr(widgetCursor.assets);
 
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0;
+    flags.blinking = g_isBlinkTime && styleIsBlink(style);
+    data = !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0;
 
     bool refresh =
         !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data;
+        widgetCursor.previousState->flags.focused != flags.focused ||
+        widgetCursor.previousState->flags.active != flags.active ||
+        widgetCursor.previousState->flags.blinking != flags.blinking ||
+        widgetCursor.previousState->data != data;
 
     static const size_t MAX_TEXT_LEN = 128;
 
     if (refresh) {
-        uint16_t overrideColor = widgetCursor.currentState->flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
-        uint16_t overrideBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : style->background_color;
-        uint16_t overrideActiveColor =  widgetCursor.currentState->flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
-        uint16_t overrideActiveBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : style->active_background_color;
+        uint16_t overrideColor = flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
+        uint16_t overrideBackgroundColor = flags.focused ? style->focus_background_color : style->background_color;
+        uint16_t overrideActiveColor = flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
+        uint16_t overrideActiveBackgroundColor = flags.focused ? style->focus_color : style->active_background_color;
 
         bool ignoreLuminosity = (widget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
         if (text && text[0]) {
             drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                style, widgetCursor.currentState->flags.active,
-                widgetCursor.currentState->flags.blinking,
+                style, flags.active,
+                flags.blinking,
                 ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
         } else if (widget->data) {
-            if (widgetCursor.currentState->data.isString()) {
-                if (widgetCursor.currentState->data.getOptions() & STRING_OPTIONS_FILE_ELLIPSIS) {
-                    const char *fullText = widgetCursor.currentState->data.getString();
+            if (data.isString()) {
+                if (data.getOptions() & STRING_OPTIONS_FILE_ELLIPSIS) {
+                    const char *fullText = data.getString();
                     int fullTextLength = strlen(fullText);
                     font::Font font = styleGetFont(style);
                     int fullTextWidth = display::measureStr(fullText, fullTextLength, font);
                     if (fullTextWidth <= widget->w) {
                         drawText(fullText, fullTextLength, widgetCursor.x,
                             widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                            widgetCursor.currentState->flags.active,
-                            widgetCursor.currentState->flags.blinking,
+                            flags.active,
+                            flags.blinking,
                             ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
 
                     } else {
@@ -117,37 +114,31 @@ DrawFunctionType TEXT_draw = [](const WidgetCursor &widgetCursor) {
 
                         drawText(text, textLength, widgetCursor.x,
                             widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                            widgetCursor.currentState->flags.active,
-                            widgetCursor.currentState->flags.blinking,
+                            flags.active,
+                            flags.blinking,
                             ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
                     }
 
                 } else {
-                    const char *str = widgetCursor.currentState->data.getString();
+                    const char *str = data.getString();
                     drawText(str ? str : "", -1, widgetCursor.x,
                         widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                        widgetCursor.currentState->flags.active,
-                        widgetCursor.currentState->flags.blinking,
+                        flags.active,
+                        flags.blinking,
                         ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
                 }
             } else {
                 char text[MAX_TEXT_LEN + 1];
-                widgetCursor.currentState->data.toText(text, sizeof(text));
+                data.toText(text, sizeof(text));
                 drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                    style, widgetCursor.currentState->flags.active,
-                    widgetCursor.currentState->flags.blinking,
+                    style, flags.active,
+                    flags.blinking,
                     ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,
-                    widgetCursor.currentState->data.getType() == VALUE_TYPE_FLOAT);
+                    data.getType() == VALUE_TYPE_FLOAT);
             }
         }
     }
-
-	widgetCursor.currentState->data.freeRef();
-};
-
-OnTouchFunctionType TEXT_onTouch = nullptr;
-
-OnKeyboardFunctionType TEXT_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

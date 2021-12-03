@@ -27,6 +27,7 @@ struct TextWidget : public Widget {
 }; 
 
 struct TextWidgetState : public WidgetState {
+    void draw() override;
 };
 
 void TextWidget_autoSize(Assets *assets, TextWidget& widget);

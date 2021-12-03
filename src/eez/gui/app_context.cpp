@@ -131,7 +131,7 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
 
     m_pageNavigationStack[m_pageNavigationStackPointer].page = page;
     m_pageNavigationStack[m_pageNavigationStackPointer].pageId = pageId;
-    m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = display::allocBuffer();
+    m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = -1;
 
     if (page) {
         page->pageWillAppear();
@@ -309,7 +309,7 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 
 void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
     if (!isPageFullyCovered(i)) {
-        if (m_pageNavigationStack[i].displayBufferIndex == -1) {
+        if (!widgetCursor.previousState || m_pageNavigationStack[i].displayBufferIndex == -1) {
             m_pageNavigationStack[i].displayBufferIndex = display::allocBuffer();
             widgetCursor.previousState = nullptr;
         }
@@ -318,8 +318,6 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
 		m_updatePageIndex = i;
 
-		widgetCursor.cursor = -1;
-
         int x;
         int y;
         int width;
@@ -327,22 +325,19 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         bool withShadow;
 
         if (isPageInternal(m_pageNavigationStack[i].pageId)) {
-            InternalPage *internalPage = ((InternalPage *)m_pageNavigationStack[i].page);
+            auto internalPage = ((InternalPage *)m_pageNavigationStack[i].page);
             
-            internalPage->updatePage(widgetCursor);
-
             x = internalPage->x;
             y = internalPage->y;
             width = internalPage->width;
             height = internalPage->height;
             withShadow = true;
 
-			widgetCursor.currentState->size = 0;
+            internalPage->updateInternalPage(widgetCursor);
+
+            enumNoneWidget(widgetCursor);
         } else {
             auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
-
-            auto savedPreviousState = widgetCursor.previousState;
-            auto savedWidget = widgetCursor.widget;
 
             x = widgetCursor.x + page->x;
             y = widgetCursor.y + page->y;
@@ -350,23 +345,11 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
             height = page->h;
             withShadow = page->x > 0;
 
-            if (!widgetCursor.previousState) {
-                // clear background
-                const Style* style = getStyle(page->style);
-                display::setColor(style->background_color);
-                display::fillRect(x, y, x + width - 1, y + height - 1);
-            }
-
             widgetCursor.widget = page;
             enumWidget(widgetCursor);
-
-            widgetCursor.widget = savedWidget;
-            widgetCursor.previousState = savedPreviousState;
-        }
+		}
 
 		display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
-
-        widgetCursor.nextState();
 
 		m_updatePageIndex = -1;
 	} else {
@@ -375,10 +358,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 }
 
 bool isRect1FullyCoveredByRect2(int xRect1, int yRect1, int wRect1, int hRect1, int xRect2, int yRect2, int wRect2, int hRect2) {
-    return xRect2 <= xRect1 && 
-        yRect2 <= yRect1 &&
-        xRect2 + wRect2 >= xRect1 + wRect1 &&
-        yRect2 + hRect2 >= yRect1 + hRect1;
+    return xRect2 <= xRect1 && yRect2 <= yRect1 && xRect2 + wRect2 >= xRect1 + wRect1 && yRect2 + hRect2 >= yRect1 + hRect1;
 }
 
 void getPageRect(int pageId, Page *page, int &x, int &y, int &w, int &h) {
@@ -410,16 +390,6 @@ bool AppContext::isPageFullyCovered(int pageNavigationStackIndex) {
     }
 
     return false;
-}
-
-void AppContext::updateAppView(WidgetCursor &widgetCursor) {
-    if (getActivePageId() == PAGE_ID_NONE) {
-        return;
-    }
-
-    for (int i = 0; i <= m_pageNavigationStackPointer; i++) {
-        updatePage(i, widgetCursor);
-    }
 }
 
 int AppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {

@@ -19,6 +19,7 @@
 #include <eez/debug.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/widgets/app_view.h>
 
 namespace eez {
 namespace gui {
@@ -26,7 +27,6 @@ namespace gui {
 static uint8_t *g_stateBuffer = GUI_STATE_BUFFER;
 static WidgetState *g_previousState;
 WidgetState *g_currentState;
-WidgetState *g_currentStateEnd;
 static bool g_refreshScreen;
 
 int getCurrentStateBufferIndex() {
@@ -44,22 +44,42 @@ void refreshScreen() {
 void updateScreen() {
     if (g_refreshScreen) {
         g_refreshScreen = false;
-        g_currentState = 0;
+
+		if (g_currentState != nullptr) {
+			freeWidgetStates(g_currentState);
+			g_currentState = nullptr;
+		}
+
+		display::freeAllBuffers();
     }
 
     g_isActiveWidget = false;
+
+	if (g_previousState) {
+		freeWidgetStates(g_previousState);
+	}
+
     g_previousState = g_currentState;
-    g_currentState = (WidgetState *)(g_stateBuffer + CONF_MAX_STATE_SIZE * (getCurrentStateBufferIndex() == 0 ? 1 : 0));
+    g_currentState = (WidgetState *)(g_stateBuffer + CONF_MAX_STATE_SIZE * (getCurrentStateBufferIndex() == 0 ? 1 : 0));;
+
+	static AppViewWidget widget;
+	widget.type = WIDGET_TYPE_APP_VIEW;
+	widget.data = DATA_ID_NONE;
+	widget.action = ACTION_ID_NONE;
+	widget.x = 0;
+	widget.y = 0;
+	widget.w = display::getDisplayWidth();
+	widget.h = display::getDisplayHeight();
+	widget.style = 0;
 
 	WidgetCursor widgetCursor;
 	widgetCursor.assets = g_mainAssets;
 	widgetCursor.appContext = &getRootAppContext();
+	widgetCursor.widget = &widget;
 	widgetCursor.previousState = g_previousState;
 	widgetCursor.currentState = g_currentState;
 
-    widgetCursor.appContext->updateAppView(widgetCursor);
-
-    g_currentStateEnd = widgetCursor.currentState;
+    enumWidget(widgetCursor);
 }
 
 } // namespace gui

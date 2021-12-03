@@ -35,8 +35,6 @@ namespace gui {
 #define BAR_GRAPH_ORIENTATION_MASK 0x0F
 #define BAR_GRAPH_DO_NOT_DISPLAY_VALUE (1 << 4)
 
-EnumFunctionType BAR_GRAPH_enum = nullptr;
-
 int calcValuePosInBarGraphWidget(Value &value, float min, float max, int d) {
     return (int)roundf((value.getFloat() - min) * d / (max - min));
 }
@@ -68,61 +66,54 @@ void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, uint1
     }
 }
 
-DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
+void BarGraphWidgetState::draw() {
     auto widget = (const BarGraphWidget *)widgetCursor.widget;
     const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
-    widgetCursor.currentState->data.clear();
-
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
+    flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
+    data = get(widgetCursor, widget->data);
     
-    auto currentState = (BarGraphWidgetState *)widgetCursor.currentState;
     auto previousState = (BarGraphWidgetState *)widgetCursor.previousState;
 
-	currentState->line1Data.clear();
-	currentState->line2Data.clear();
-	currentState->textData.clear();
+    color = getColor(widgetCursor, widget->data, style);
+    backgroundColor = getBackgroundColor(widgetCursor, widget->data, style);
+    activeColor = getActiveColor(widgetCursor, widget->data, style);
+    activeBackgroundColor = getActiveBackgroundColor(widgetCursor, widget->data, style);
 
-    currentState->color = getColor(widgetCursor, widget->data, style);
-    currentState->backgroundColor = getBackgroundColor(widgetCursor, widget->data, style);
-    currentState->activeColor = getActiveColor(widgetCursor, widget->data, style);
-    currentState->activeBackgroundColor = getActiveBackgroundColor(widgetCursor, widget->data, style);
-
-    currentState->line1Data = get(widgetCursor, widget->line1Data);
+    line1Data = get(widgetCursor, widget->line1Data);
     
-    currentState->line2Data = get(widgetCursor, widget->line2Data);
+    line2Data = get(widgetCursor, widget->line2Data);
 
     uint32_t currentTime = millis();
-    currentState->textData = widgetCursor.currentState->data;
+    textData = data;
     bool refreshTextData;
     if (previousState) {
-        refreshTextData = currentState->textData != previousState->textData;
+        refreshTextData = textData != previousState->textData;
         if (refreshTextData) {
             uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
             if (refreshRate != 0) {
                 refreshTextData = (currentTime - previousState->textDataRefreshLastTime) > refreshRate;
                 if (!refreshTextData) {
-                    currentState->textData = previousState->textData;
+                    textData = previousState->textData;
                 }
             }
         }
     } else {
         refreshTextData = true;
     }
-    currentState->textDataRefreshLastTime = refreshTextData ? currentTime : previousState->textDataRefreshLastTime;
+    textDataRefreshLastTime = refreshTextData ? currentTime : previousState->textDataRefreshLastTime;
    
     bool refresh =
         !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data ||
-        currentState->color != previousState->color ||
-        currentState->backgroundColor != previousState->backgroundColor ||
-        currentState->activeColor != previousState->activeColor ||
-        currentState->activeBackgroundColor != previousState->activeBackgroundColor ||
-        previousState->line1Data != currentState->line1Data ||
-        previousState->line2Data != currentState->line2Data ||
+        widgetCursor.previousState->flags.active != flags.active ||
+        widgetCursor.previousState->flags.blinking != flags.blinking ||
+        widgetCursor.previousState->data != data ||
+        color != previousState->color ||
+        backgroundColor != previousState->backgroundColor ||
+        activeColor != previousState->activeColor ||
+        activeBackgroundColor != previousState->activeBackgroundColor ||
+        previousState->line1Data != line1Data ||
+        previousState->line2Data != line2Data ||
         refreshTextData;
 
     if (refresh) {
@@ -148,14 +139,14 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
         int d = horizontal ? w : h;
 
         // calc bar position (monitored value)
-        int pValue = calcValuePosInBarGraphWidgetWithClamp(widgetCursor.currentState->data, min, max, d);
+        int pValue = calcValuePosInBarGraphWidgetWithClamp(data, min, max, d);
 
         // calc line 1 position (set value)
-        int pLine1 = calcValuePosInBarGraphWidget(currentState->line1Data, min, max, d);
+        int pLine1 = calcValuePosInBarGraphWidget(line1Data, min, max, d);
         bool drawLine1 = pLine1 >= 0 && pLine1 < d;
 
         // calc line 2 position (limit value)
-        int pLine2 = calcValuePosInBarGraphWidget(currentState->line2Data, min, max, d);
+        int pLine2 = calcValuePosInBarGraphWidget(line2Data, min, max, d);
         bool drawLine2 = pLine2 >= 0 && pLine2 < d;
 
         if (drawLine1 && drawLine2) {
@@ -173,12 +164,12 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 
         Style textStyle;
         memcpy(&textStyle, widget->textStyle ? getStyle(widget->textStyle) : style, sizeof(Style));
-        if (style->color != currentState->color) {
-            textStyle.color = widgetCursor.currentState->flags.active || widgetCursor.currentState->flags.blinking ? currentState->activeColor : currentState->color;
+        if (style->color != color) {
+            textStyle.color = flags.active || flags.blinking ? activeColor : color;
         }
 
-        uint16_t fg = widgetCursor.currentState->flags.active || widgetCursor.currentState->flags.blinking ? currentState->activeColor : currentState->color;
-        uint16_t bg = widgetCursor.currentState->flags.active || widgetCursor.currentState->flags.blinking ? currentState->activeBackgroundColor : currentState->backgroundColor;
+        uint16_t fg = flags.active || flags.blinking ? activeColor : color;
+        uint16_t bg = flags.active || flags.blinking ? activeBackgroundColor : backgroundColor;
 
         if (horizontal) {
             // calc text position
@@ -189,7 +180,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                 if (widget->textStyle) {
                     font::Font font = styleGetFont(&textStyle);
 
-                    currentState->textData.toText(valueText, sizeof(valueText));
+                    textData.toText(valueText, sizeof(valueText));
                     wText = display::measureStr(valueText, -1, font, w);
 
                     int padding = textStyle.padding_left;
@@ -301,7 +292,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             if (widget->textStyle) {
                 font::Font font = styleGetFont(&textStyle);
 
-                currentState->textData.toText(valueText, sizeof(valueText));
+                textData.toText(valueText, sizeof(valueText));
                 hText = font.getHeight();
 
                 int padding = textStyle.padding_top;
@@ -400,16 +391,7 @@ DrawFunctionType BAR_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             }
         }
     }
-
-    widgetCursor.currentState->data.freeRef();
-	currentState->line1Data.freeRef();
-	currentState->line2Data.freeRef();
-	currentState->textData.freeRef();
-};
-
-OnTouchFunctionType BAR_GRAPH_onTouch = nullptr;
-
-OnKeyboardFunctionType BAR_GRAPH_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

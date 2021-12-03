@@ -85,25 +85,22 @@ float firstTick(float n) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-EnumFunctionType GAUGE_enum = nullptr;
-
-DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
+void GaugeWidgetState::draw() {
 	using namespace display;
 
 	auto widget = (const GaugeWidget*)widgetCursor.widget;
 
-	widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
+    data = get(widgetCursor, widget->data);
 
     bool refresh = 
 		!widgetCursor.previousState || 
-		widgetCursor.previousState->data != widgetCursor.currentState->data ||
-		widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
+		widgetCursor.previousState->data != data ||
+		widgetCursor.previousState->flags.active != flags.active;
 
     if (refresh) {
 		float min = get(widgetCursor, widget->min).toFloat();
 		float max = get(widgetCursor, widget->max).toFloat();
-		float value = widgetCursor.currentState->data.toFloat();
+		float value = data.toFloat();
 		float threshold = get(widgetCursor, widget->threshold).toFloat();
 
 		auto unit = get(widgetCursor, widget->unit).toString(0xa9ddede3).getString();
@@ -126,7 +123,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 		const Style* ticksStyle = getStyle(widget->ticksStyle);
 		const Style* thresholdStyle = getStyle(widget->thresholdStyle);
 
-		auto isActive = widgetCursor.currentState->flags.active;
+		auto isActive = flags.active;
 
 		// auto colorBackground = getColor16FromIndex(style->background_color);
 		auto colorBorder = getColor16FromIndex(isActive ? style->active_color : style->color);
@@ -363,13 +360,7 @@ DrawFunctionType GAUGE_draw = [](const WidgetCursor &widgetCursor) {
 			nullptr
 		);
     }
-
-	widgetCursor.currentState->data.freeRef();
-};
-
-OnTouchFunctionType GAUGE_onTouch = nullptr;
-
-OnKeyboardFunctionType GAUGE_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

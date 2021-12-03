@@ -55,7 +55,6 @@ extern bool g_isBlinkTime;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void guiInit();
 void guiTick();
 
 WidgetCursor &getFoundWidgetAtDown();

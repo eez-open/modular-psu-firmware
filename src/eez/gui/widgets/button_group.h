@@ -26,6 +26,9 @@ struct ButtonGroupWidget : public Widget {
 };
 
 struct ButtonGroupWidgetState : public WidgetState {
+    void draw() override;
+	bool hasOnTouch() override;
+	void onTouch(Event &touchEvent) override;
 };
 
 } // namespace gui

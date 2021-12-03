@@ -154,16 +154,16 @@ void updateDisplay() {
             }
 
             if (m_foundWidgetAtMouse && m_onTouchFunctionAtMouse) {
-                auto w = m_foundWidgetAtMouse.widget->w;
-                auto h = m_foundWidgetAtMouse.widget->h;
+                int16_t w;
+                int16_t h;
 
-                Overlay *overlay = nullptr;
-                if (isOverlay(m_foundWidgetAtMouse)) {
-                    overlay = getOverlay(m_foundWidgetAtMouse);
-                    if (overlay && overlay->widgetOverrides) {
-                        w = overlay->width;
-                        h = overlay->height;
-                    }
+                auto overlay = getOverlay(m_foundWidgetAtMouse);
+                if (overlay && overlay->widgetOverrides) {
+                    w = overlay->width;
+                    h = overlay->height;
+                } else {
+                    w = m_foundWidgetAtMouse.widget->w;
+                    h = m_foundWidgetAtMouse.widget->h;
                 }
 
                 drawFocusFrame(m_foundWidgetAtMouse.x, m_foundWidgetAtMouse.y, w, h);

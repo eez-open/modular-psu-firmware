@@ -30,6 +30,8 @@ struct ContainerWidget : public Widget {
 struct ContainerWidgetState : public WidgetState {
     int overlayState;
     int displayBufferIndex;
+
+	void draw() override;
 };
 
 } // namespace gui

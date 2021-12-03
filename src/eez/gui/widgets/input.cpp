@@ -31,8 +31,6 @@ namespace gui {
 
 static const size_t MAX_TEXT_LEN = 128;
 
-EnumFunctionType INPUT_enum = nullptr;
-
 void getInputWidgetParams(const gui::WidgetCursor &widgetCursor, Value &min, Value &max, Value &precision, Unit &unit) {
 	auto widget = (const InputWidget*)widgetCursor.widget;
 
@@ -143,7 +141,7 @@ Value getInputWidgetData(const gui::WidgetCursor &widgetCursor, const Value &dat
 	}
 }
 
-DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
+void InputWidgetState::draw() {
 	auto widget = (const InputWidget*)widgetCursor.widget;
 
 	if (widgetCursor.flowState) {
@@ -164,40 +162,33 @@ DrawFunctionType INPUT_draw = [](const WidgetCursor &widgetCursor) {
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
-	widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && styleIsBlink(style);
-	widgetCursor.currentState->data.clear();
-	widgetCursor.currentState->data = get(widgetCursor, widget->data);
+	flags.focused = isFocusWidget(widgetCursor);
+    flags.blinking = g_isBlinkTime && styleIsBlink(style);
+	data = get(widgetCursor, widget->data);
 
     bool refresh =
 		!widgetCursor.previousState ||
-        widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
-		widgetCursor.previousState->data != widgetCursor.currentState->data;
+        widgetCursor.previousState->flags.focused != flags.focused ||
+        widgetCursor.previousState->flags.active != flags.active ||
+        widgetCursor.previousState->flags.blinking != flags.blinking ||
+		widgetCursor.previousState->data != data;
 
     if (refresh) {
-        uint16_t overrideColor = widgetCursor.currentState->flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
-        uint16_t overrideBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_background_color : style->background_color;
-        uint16_t overrideActiveColor =  widgetCursor.currentState->flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
-        uint16_t overrideActiveBackgroundColor = widgetCursor.currentState->flags.focused ? style->focus_color : style->active_background_color;
+        uint16_t overrideColor = flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
+        uint16_t overrideBackgroundColor = flags.focused ? style->focus_background_color : style->background_color;
+        uint16_t overrideActiveColor = flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
+        uint16_t overrideActiveBackgroundColor = flags.focused ? style->focus_color : style->active_background_color;
 
 		char text[MAX_TEXT_LEN + 1];
-		widgetCursor.currentState->data.toText(text, sizeof(text));
+		data.toText(text, sizeof(text));
 
 		drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-			style, widgetCursor.currentState->flags.active,
-			widgetCursor.currentState->flags.blinking,
+			style, flags.active,
+			flags.blinking,
 			false, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,
 			false);
     }
-
-	widgetCursor.currentState->data.freeRef();
-};
-
-OnTouchFunctionType INPUT_onTouch = nullptr;
-
-OnKeyboardFunctionType INPUT_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

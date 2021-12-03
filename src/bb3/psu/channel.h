@@ -386,7 +386,7 @@ public:
     /// \param channel_index Zero based channel index, greater then or equal to 0 and less then
     /// CH_MAX. \returns Reference to channel.
     static inline Channel &get(int channelIndex) {
-        return *g_channels[channelIndex];
+        return *g_channels[channelIndex < 0 ? 0 : channelIndex >= CH_NUM ? CH_NUM - 1 : channelIndex];
     } 
 
     static inline Channel *getBySlotIndex(uint8_t slotIndex, uint8_t subchannelIndex = 0) {

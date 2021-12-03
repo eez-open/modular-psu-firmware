@@ -25,6 +25,7 @@ struct CanvasWidget : public Widget {
 };
 
 struct CanvasWidgetState : public WidgetState {
+    void draw() override;
 };
 
 } // namespace gui

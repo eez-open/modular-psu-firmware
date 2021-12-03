@@ -29,6 +29,8 @@ struct LayoutViewWidget : public Widget {
 
 struct LayoutViewWidgetState : public WidgetState {
     Value context;
+
+	void draw() override;
 };
 
 } // namespace gui

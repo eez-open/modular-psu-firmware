@@ -25,119 +25,88 @@ namespace gui {
 #define GRID_FLOW_ROW 1
 #define GRID_FLOW_COLUMN 2
 
-EnumFunctionType GRID_enum = [](WidgetCursor &widgetCursor) {
-	auto savedCurrentState = widgetCursor.currentState;
-	auto savedPreviousState = widgetCursor.previousState;
+void GridWidgetState::draw() {
+    auto widget = (const GridWidget *)widgetCursor.widget;
 
-    WidgetState *endOfContainerInPreviousState = 0;
-    if (widgetCursor.previousState) {
-        endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
-    }
-
-	auto savedWidget = widgetCursor.widget;
-
-    auto parentWidget = savedWidget;
-
-    auto gridWidget = (const GridWidget *)widgetCursor.widget;
-
-    int startPosition = ytDataGetPosition(widgetCursor, widgetCursor.widget->data);
+    int startPosition = ytDataGetPosition(widgetCursor, widget->data);
 
     // refresh when startPosition changes
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = startPosition;
+    data = startPosition;
 
-    if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
-        widgetCursor.previousState = 0;
-    }
-
-	// move to the first child widget state
-	if (widgetCursor.previousState) {
-		++widgetCursor.previousState;
-	}
-    ++widgetCursor.currentState;
-
-	const Widget *childWidget = gridWidget->itemWidget.ptr(widgetCursor.assets);
-    widgetCursor.widget = childWidget;
-
-	auto savedX = widgetCursor.x;
-	auto savedY = widgetCursor.y;
-
-    auto savedCursor = widgetCursor.cursor;
-
-    int xOffset = 0;
-    int yOffset = 0;
-    int count = eez::gui::count(widgetCursor, parentWidget->data);
-
-    Value oldValue;
-
-    for (int index = startPosition; index < count; ++index) {
-        select(widgetCursor, parentWidget->data, index, oldValue);
-
-		widgetCursor.x = savedX + xOffset;
-		widgetCursor.y = savedY + yOffset;
-
-		widgetCursor.pushIterator(index);
-		enumWidget(widgetCursor);
-		widgetCursor.popIterator();
-
-        if (widgetCursor.previousState) {
-			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
-            if (widgetCursor.previousState > endOfContainerInPreviousState) {
-				widgetCursor.previousState = 0;
-            }
-        }
-
-        widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
-
-        if (gridWidget->gridFlow == GRID_FLOW_ROW) {
-            if (xOffset + childWidget->w < parentWidget->w) {
-                xOffset += childWidget->w;
-            } else {
-                if (yOffset + childWidget->h < parentWidget->h) {
-                    yOffset += childWidget->h;
-                    xOffset = 0;
-                } else {
-                    break;
-                }
-            }
-        } else {
-            if (yOffset + childWidget->h < parentWidget->h) {
-                yOffset += childWidget->h;
-            } else {
-                if (xOffset + childWidget->w < parentWidget->w) {
-                    yOffset = 0;
-                    xOffset += childWidget->w;
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-
-	widgetCursor.x = savedX;
-	widgetCursor.y = savedY;
-
-    widgetCursor.cursor = savedCursor;
-
-    widgetCursor.widget = savedWidget;
-
-    savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
+    int count = eez::gui::count(widgetCursor, widget->data);
 
     if (count > 0) {
-        deselect(widgetCursor, widgetCursor.widget->data, oldValue);
-    }
+		WidgetCursor childWidgetCursor = getFirstChildWidgetCursor();
 
-	widgetCursor.currentState = savedCurrentState;
-	widgetCursor.previousState = savedPreviousState;
+		if (widgetCursor.previousState && widgetCursor.previousState->data != data) {
+			childWidgetCursor.previousState = 0;
+		}
 
-    widgetCursor.currentState->data.freeRef();
-};
+		WidgetState *endOfContainerInPreviousState = 0;
+        if (widgetCursor.previousState) {
+            endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
+        }
 
-DrawFunctionType GRID_draw = nullptr;
+        const Widget *childWidget = widget->itemWidget.ptr(widgetCursor.assets);
+        childWidgetCursor.widget = childWidget;
 
-OnTouchFunctionType GRID_onTouch = nullptr;
+        auto savedX = widgetCursor.x;
+        auto savedY = widgetCursor.y;
 
-OnKeyboardFunctionType GRID_onKeyboard = nullptr;
+        int xOffset = 0;
+        int yOffset = 0;
+
+        Value oldValue;
+
+        for (int index = startPosition; index < count; ++index) {
+            select(childWidgetCursor, widget->data, index, oldValue);
+
+            childWidgetCursor.x = savedX + xOffset;
+            childWidgetCursor.y = savedY + yOffset;
+
+            childWidgetCursor.pushIterator(index);
+            enumWidget(childWidgetCursor);
+            childWidgetCursor.popIterator();
+
+            if (childWidgetCursor.previousState) {
+                childWidgetCursor.previousState = nextWidgetState(childWidgetCursor.previousState);
+                if (childWidgetCursor.previousState > endOfContainerInPreviousState) {
+                    childWidgetCursor.previousState = 0;
+                }
+            }
+
+            childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
+
+            if (widget->gridFlow == GRID_FLOW_ROW) {
+                if (xOffset + childWidget->w < widget->w) {
+                    xOffset += childWidget->w;
+                } else {
+                    if (yOffset + childWidget->h < widget->h) {
+                        yOffset += childWidget->h;
+                        xOffset = 0;
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                if (yOffset + childWidget->h < widget->h) {
+                    yOffset += childWidget->h;
+                } else {
+                    if (xOffset + childWidget->w < widget->w) {
+                        yOffset = 0;
+                        xOffset += childWidget->w;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        deselect(childWidgetCursor, widget->data, oldValue);
+	
+		widgetStateSize = (uint8_t *)childWidgetCursor.currentState - (uint8_t *)this;
+	}
+}
 
 } // namespace gui
 } // namespace eez

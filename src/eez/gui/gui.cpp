@@ -44,14 +44,6 @@ static bool g_wasBlinkTime;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void guiInit() {
-	AppContext *appContext = &getRootAppContext();
-	appContext->rect.x = 0;
-	appContext->rect.y = 0;
-	appContext->rect.w = display::getDisplayWidth();
-	appContext->rect.h = display::getDisplayHeight();
-}
-
 void guiTick() {
 	display::sync();
 

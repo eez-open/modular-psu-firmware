@@ -24,10 +24,8 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType RECTANGLE_enum = nullptr;
-
-DrawFunctionType RECTANGLE_draw = [](const WidgetCursor &widgetCursor) {
-    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->flags.active !=widgetCursor.currentState->flags.active;
+void RectangleWidgetState::draw() {
+    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->flags.active != flags.active;
 
     if (refresh) {
         auto widget = (const RectangleWidget *)widgetCursor.widget;
@@ -35,15 +33,11 @@ DrawFunctionType RECTANGLE_draw = [](const WidgetCursor &widgetCursor) {
         drawRectangle(
             widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
             style, 
-            widgetCursor.currentState->flags.active, 
+            flags.active, 
 			widget->flags.ignoreLuminosity,
 			widget->flags.invertColors);
     }
-};
-
-OnTouchFunctionType RECTANGLE_onTouch = nullptr;
-
-OnKeyboardFunctionType RECTANGLE_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

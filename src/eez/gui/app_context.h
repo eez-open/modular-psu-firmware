@@ -34,6 +34,8 @@ struct PageOnStack {
 };
 
 class AppContext {
+    friend struct AppViewWidgetState;
+
 public:
 	Rect rect;
 

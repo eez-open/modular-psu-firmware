@@ -24,34 +24,27 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType TOGGLE_BUTTON_enum = nullptr;
-
-DrawFunctionType TOGGLE_BUTTON_draw = [](const WidgetCursor &widgetCursor) {
+void ToggleButtonWidgetState::draw() {
     auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->flags.enabled =
-        get(widgetCursor, widget->data).getInt() ? 1 : 0;
+    flags.enabled = get(widgetCursor, widget->data).getInt() ? 1 : 0;
 
     bool refresh =
         !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->flags.enabled != widgetCursor.currentState->flags.enabled;
+        widgetCursor.previousState->flags.active != flags.active ||
+        widgetCursor.previousState->flags.enabled != flags.enabled;
 
     if (refresh) {
         const Style* style = getStyle(widget->style);
         drawText(
-            widgetCursor.currentState->flags.enabled ? 
+            flags.enabled ? 
                 widget->text2.ptr(widgetCursor.assets): 
                 widget->text1.ptr(widgetCursor.assets),
             -1,
 			widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
-            widgetCursor.currentState->flags.active, false, false, nullptr, nullptr, nullptr, nullptr);
+            flags.active, false, false, nullptr, nullptr, nullptr, nullptr);
     }
-};
-
-OnTouchFunctionType TOGGLE_BUTTON_onTouch = nullptr;
-
-OnKeyboardFunctionType TOGGLE_BUTTON_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

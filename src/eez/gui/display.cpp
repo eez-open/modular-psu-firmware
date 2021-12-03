@@ -538,13 +538,11 @@ int allocBuffer() {
 
     for (bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
         if (!g_buffers[bufferIndex].flags.allocated) {
-            // DebugTrace("Buffer %d allocated, %d more left!\n", bufferIndex, getNumFreeBuffers());
             break;
         }
     }
 
     if (bufferIndex == NUM_BUFFERS) {
-        // DebugTrace("There is no free buffer available!\n");
         bufferIndex = NUM_BUFFERS - 1;
     }
 
@@ -555,7 +553,6 @@ int allocBuffer() {
 
 void freeBuffer(int bufferIndex) {
     g_buffers[bufferIndex].flags.allocated = false;
-    // DebugTrace("Buffer %d freed up, %d buffers available now!\n", bufferIndex, getNumFreeBuffers());
 }
 
 void selectBuffer(int bufferIndex) {
@@ -567,17 +564,15 @@ void selectBuffer(int bufferIndex) {
 void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, Rect *backdrop) {
     Buffer &buffer = g_buffers[bufferIndex];
     
-    if (buffer.x != x || buffer.y != y || buffer.width != width || buffer.height != height || buffer.withShadow != withShadow || buffer.opacity != opacity || buffer.xOffset != xOffset || buffer.yOffset != yOffset || backdrop != buffer.backdrop) {
-        buffer.x = x;
-        buffer.y = y;
-        buffer.width = width;
-        buffer.height = height;
-        buffer.withShadow = withShadow;
-        buffer.opacity = opacity;
-        buffer.xOffset = xOffset;
-        buffer.yOffset = yOffset;
-        buffer.backdrop = backdrop;
-    }
+    buffer.x = x;
+    buffer.y = y;
+    buffer.width = width;
+    buffer.height = height;
+    buffer.withShadow = withShadow;
+    buffer.opacity = opacity;
+    buffer.xOffset = xOffset;
+    buffer.yOffset = yOffset;
+    buffer.backdrop = backdrop;
 
     for (int i = 0; i < g_numBuffersToDraw; i++) {
         if (g_bufferToDrawIndexes[i] == bufferIndex) {
@@ -599,11 +594,16 @@ void freeUnusedBuffers() {
     for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
         if (g_buffers[bufferIndex].flags.allocated && !g_buffers[bufferIndex].flags.used) {
             g_buffers[bufferIndex].flags.allocated = false;
-            // DebugTrace("Buffer %d allocated but not used!\n", bufferIndex);
         }
     }
     
     clearBufferUsage();
+}
+
+void freeAllBuffers() {
+    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
+        g_buffers[bufferIndex].flags.allocated = 0;
+    }
 }
 
 void beginBuffersDrawing() {

@@ -39,6 +39,8 @@ struct BarGraphWidgetState : public WidgetState {
     Value line2Data;
     Value textData;
     uint32_t textDataRefreshLastTime;
+
+    void draw() override;
 };
 
 } // namespace gui

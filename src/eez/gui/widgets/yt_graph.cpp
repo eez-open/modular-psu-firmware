@@ -31,8 +31,6 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType YT_GRAPH_enum = nullptr;
-
 // used for YT_GRAPH_UPDATE_METHOD_SCROLL and YT_GRAPH_UPDATE_METHOD_SCAN_LINE
 struct YTGraphDrawHelper {
     const WidgetCursor &widgetCursor;
@@ -482,35 +480,40 @@ struct YTGraphStaticDrawHelper {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
+void YTGraphWidgetState::draw() {
     const Widget *widget = widgetCursor.widget;
 
-    YTGraphWidgetState *currentState = (YTGraphWidgetState *)widgetCursor.currentState;
     YTGraphWidgetState *previousState = (YTGraphWidgetState *)widgetCursor.previousState;
 
-    widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
+    flags.focused = isFocusWidget(widgetCursor);
+    data = get(widgetCursor, widget->data);
 
-    currentState->refreshCounter = ytDataGetRefreshCounter(widgetCursor, widget->data);
-    currentState->iChannel = widgetCursor.cursor;
-    currentState->numHistoryValues = ytDataGetSize(widgetCursor, widget->data);
-    currentState->historyValuePosition = ytDataGetPosition(widgetCursor, widget->data);
-    currentState->ytGraphUpdateMethod = ytDataGetGraphUpdateMethod(widgetCursor, widget->data);
-    currentState->cursorPosition = currentState->historyValuePosition + ytDataGetCursorOffset(widgetCursor, widget->data);
-    currentState->bookmarks = ytDataGetBookmarks(widgetCursor, widget->data);
+    refreshCounter = ytDataGetRefreshCounter(widgetCursor, widget->data);
+    iChannel = widgetCursor.cursor;
+    numHistoryValues = ytDataGetSize(widgetCursor, widget->data);
+    historyValuePosition = ytDataGetPosition(widgetCursor, widget->data);
+    ytGraphUpdateMethod = ytDataGetGraphUpdateMethod(widgetCursor, widget->data);
+    cursorPosition = historyValuePosition + ytDataGetCursorOffset(widgetCursor, widget->data);
+    bookmarks = ytDataGetBookmarks(widgetCursor, widget->data);
 
     bool visibleValuesChanged = false;
 
-    currentState->showLabels = ytDataGetShowLabels(widgetCursor, widget->data);
-    currentState->selectedValueIndex = ytDataGetSelectedValueIndex(widgetCursor, widget->data);
+    showLabels = ytDataGetShowLabels(widgetCursor, widget->data);
+    selectedValueIndex = ytDataGetSelectedValueIndex(widgetCursor, widget->data);
 
-    if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
+    if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
         for (int valueIndex = 0; valueIndex < MAX_NUM_OF_Y_VALUES; valueIndex++) {
-            currentState->valueIsVisible[valueIndex] = ytDataDataValueIsVisible(widgetCursor, widget->data, valueIndex);
-            currentState->valueDiv[valueIndex] = ytDataGetDiv(widgetCursor, widget->data, valueIndex);
-            currentState->valueOffset[valueIndex] = ytDataGetOffset(widgetCursor, widget->data, valueIndex);
-            if (previousState && (previousState->valueIsVisible[valueIndex] != currentState->valueIsVisible[valueIndex] || previousState->valueDiv[valueIndex] != currentState->valueDiv[valueIndex] || previousState->valueOffset[valueIndex] != currentState->valueOffset[valueIndex])) {
+            valueIsVisible[valueIndex] = ytDataDataValueIsVisible(widgetCursor, widget->data, valueIndex);
+            valueDiv[valueIndex] = ytDataGetDiv(widgetCursor, widget->data, valueIndex);
+            valueOffset[valueIndex] = ytDataGetOffset(widgetCursor, widget->data, valueIndex);
+            if (
+                previousState && 
+                (
+                    previousState->valueIsVisible[valueIndex] != valueIsVisible[valueIndex] || 
+                    previousState->valueDiv[valueIndex] != valueDiv[valueIndex] || 
+                    previousState->valueOffset[valueIndex] != valueOffset[valueIndex]
+                )
+            ) {
                 visibleValuesChanged = true;
             }
         }
@@ -519,37 +522,37 @@ DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 
     uint32_t previousHistoryValuePosition;
     if (widgetCursor.previousState &&
-        previousState->iChannel == currentState->iChannel &&
-        previousState->ytGraphUpdateMethod == currentState->ytGraphUpdateMethod &&
-        previousState->refreshCounter == currentState->refreshCounter)
+        previousState->iChannel == iChannel &&
+        previousState->ytGraphUpdateMethod == ytGraphUpdateMethod &&
+        previousState->refreshCounter == refreshCounter)
     {
         previousHistoryValuePosition = previousState->historyValuePosition;
     } else {
-        previousHistoryValuePosition = currentState->historyValuePosition - graphWidth;
+        previousHistoryValuePosition = historyValuePosition - graphWidth;
     }
 
     bool refreshBackground = !widgetCursor.previousState;
 
     if (
         refreshBackground || 
-        widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
-        currentState->showLabels != previousState->showLabels ||
-        currentState->selectedValueIndex != previousState->selectedValueIndex ||
+        widgetCursor.previousState->flags.focused != flags.focused ||
+        showLabels != previousState->showLabels ||
+        selectedValueIndex != previousState->selectedValueIndex ||
         visibleValuesChanged || 
-        previousHistoryValuePosition != currentState->historyValuePosition || 
+        previousHistoryValuePosition != historyValuePosition || 
         (
             !previousState ||
-            previousState->numHistoryValues != currentState->numHistoryValues ||
-            previousState->cursorPosition != currentState->cursorPosition ||
-            previousState->bookmarks != currentState->bookmarks
+            previousState->numHistoryValues != numHistoryValues ||
+            previousState->cursorPosition != cursorPosition ||
+            previousState->bookmarks != bookmarks
         )
     ) {
-        if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
+        if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
             YTGraphStaticDrawHelper drawHelper(widgetCursor);
 
-            drawHelper.cursorPosition = currentState->cursorPosition;
-            drawHelper.bookmarks = currentState->bookmarks;
-            drawHelper.drawStatic(previousHistoryValuePosition, currentState->historyValuePosition, currentState->numHistoryValues, graphWidth, currentState->showLabels, currentState->selectedValueIndex);
+            drawHelper.cursorPosition = cursorPosition;
+            drawHelper.bookmarks = bookmarks;
+            drawHelper.drawStatic(previousHistoryValuePosition, historyValuePosition, numHistoryValues, graphWidth, showLabels, selectedValueIndex);
         } else {
             const Style* style = getStyle(widget->style);
 
@@ -559,20 +562,20 @@ DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             }
 
             YTGraphDrawHelper drawHelper(widgetCursor);
-            drawHelper.color16 = display::getColor16FromIndex(widgetCursor.currentState->flags.active ? style->color : style->background_color);
-            if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCAN_LINE) {
-                drawHelper.drawScanLine(previousHistoryValuePosition, currentState->historyValuePosition, graphWidth);
+            drawHelper.color16 = display::getColor16FromIndex(flags.active ? style->color : style->background_color);
+            if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCAN_LINE) {
+                drawHelper.drawScanLine(previousHistoryValuePosition, historyValuePosition, graphWidth);
 
                 int x = widgetCursor.x;
 
                 // draw cursor
                 display::setColor(style->color);
-                display::drawVLine(x + currentState->historyValuePosition % graphWidth, widgetCursor.y, (int)widget->h - 1);
-                display::drawVLine(x + (currentState->historyValuePosition + 1) % graphWidth, widgetCursor.y, (int)widget->h - 1);
+                display::drawVLine(x + historyValuePosition % graphWidth, widgetCursor.y, (int)widget->h - 1);
+                display::drawVLine(x + (historyValuePosition + 1) % graphWidth, widgetCursor.y, (int)widget->h - 1);
 
                 // draw blank lines
-                int x1 = x + (currentState->historyValuePosition + 2) % graphWidth;
-                int x2 = x + (currentState->historyValuePosition + CONF_GUI_YT_GRAPH_BLANK_PIXELS_AFTER_CURSOR) % graphWidth;
+                int x1 = x + (historyValuePosition + 2) % graphWidth;
+                int x2 = x + (historyValuePosition + CONF_GUI_YT_GRAPH_BLANK_PIXELS_AFTER_CURSOR) % graphWidth;
 
                 display::setColor(style->background_color);
                 if (x1 < x2) {
@@ -581,16 +584,18 @@ DrawFunctionType YT_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
                     display::fillRect(x1, widgetCursor.y, x + graphWidth - 1, widgetCursor.y + (int)widget->h - 1);
                     display::fillRect(x, widgetCursor.y, x2, widgetCursor.y + (int)widget->h - 1);
                 }
-            } else if (currentState->ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
-                drawHelper.drawScrolling(previousHistoryValuePosition, currentState->historyValuePosition, currentState->numHistoryValues, graphWidth);
+            } else if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
+                drawHelper.drawScrolling(previousHistoryValuePosition, historyValuePosition, numHistoryValues, graphWidth);
             }
         }
     }
+}
 
-    widgetCursor.currentState->data.freeRef();
-};
+bool YTGraphWidgetState::hasOnTouch() {
+    return true;
+}
 
-OnTouchFunctionType YT_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
+void YTGraphWidgetState::onTouch(Event &touchEvent) {
     if (ytDataGetGraphUpdateMethod(widgetCursor, widgetCursor.widget->data) == YT_GRAPH_UPDATE_METHOD_STATIC) {
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
 			TouchDrag touchDrag = {
@@ -609,9 +614,7 @@ OnTouchFunctionType YT_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Even
             }
         }
     }
-};
-
-OnKeyboardFunctionType YT_GRAPH_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

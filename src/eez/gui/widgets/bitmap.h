@@ -26,6 +26,7 @@ struct BitmapWidget : public Widget {
 };
 
 struct BitmapWidgetState : public WidgetState {
+    void draw() override;
 };
 
 } // namespace gui

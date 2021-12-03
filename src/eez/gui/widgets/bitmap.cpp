@@ -25,17 +25,14 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType BITMAP_enum = nullptr;
-
-DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
+void BitmapWidgetState::draw() {
 	auto widget = (const BitmapWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = widget->data ? getBitmapImage(widgetCursor.cursor, widget->data) : 0;
+    data = widget->data ? getBitmapImage(widgetCursor.cursor, widget->data) : 0;
 
     bool refresh = !widgetCursor.previousState ||
-    		widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-			widgetCursor.currentState->data != widgetCursor.previousState->data;
+    		widgetCursor.previousState->flags.active != flags.active ||
+			data != widgetCursor.previousState->data;
 
     if (refresh) {
         const Style* style = getStyle(widget->style);
@@ -43,11 +40,11 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
         const Bitmap *bitmap = nullptr;
 
         if (widget->data) {
-            if (widgetCursor.currentState->data.getType() != VALUE_TYPE_UNDEFINED) {
-                drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, true, true);
-                auto image = (Image *)widgetCursor.currentState->data.getVoidPointer();
+            if (data.getType() != VALUE_TYPE_UNDEFINED) {
+                drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, true, true);
+                auto image = (Image *)data.getVoidPointer();
                 if (image) {
-                    drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active);
+                    drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
                 }
                 return;
             } else {
@@ -68,16 +65,10 @@ DrawFunctionType BITMAP_draw = [](const WidgetCursor &widgetCursor) {
             image.lineOffset = 0;
             image.pixels = (uint8_t *)bitmap->pixels;
 
-            drawBitmap(&image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active);
+            drawBitmap(&image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
         }
     }
-
-    widgetCursor.currentState->data.freeRef();
-};
-
-OnTouchFunctionType BITMAP_onTouch = nullptr;
-
-OnKeyboardFunctionType BITMAP_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

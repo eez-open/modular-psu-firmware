@@ -31,6 +31,7 @@ struct RectangleWidget : public Widget {
 };
 
 struct RectangleWidgetState : public WidgetState {
+    void draw() override;
 };
 
 } // namespace gui

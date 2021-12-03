@@ -30,8 +30,6 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType UP_DOWN_enum = nullptr;
-
 enum UpDownWidgetSegment {
     UP_DOWN_WIDGET_SEGMENT_TEXT,
     UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
@@ -41,17 +39,16 @@ enum UpDownWidgetSegment {
 static UpDownWidgetSegment g_segment;
 static WidgetCursor g_selectedWidget;
 
-DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
+void UpDownWidgetState::draw() {
     auto widget = (const UpDownWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
-    widgetCursor.currentState->flags.active = g_selectedWidget == widgetCursor;
+    data = get(widgetCursor, widget->data);
+    flags.active = g_selectedWidget == widgetCursor;
 
     bool refresh =
         !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data;
+        widgetCursor.previousState->flags.active != flags.active ||
+        widgetCursor.previousState->data != data;
 
     if (refresh) {
         const Style *buttonsStyle = getStyle(widget->buttonsStyle);
@@ -61,12 +58,12 @@ DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
 
         drawText(widget->downButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
                  buttonsStyle,
-                 widgetCursor.currentState->flags.active &&
+                 flags.active &&
                      g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
                  false, false, nullptr, nullptr, nullptr, nullptr);
 
         char text[64];
-        widgetCursor.currentState->data.toText(text, sizeof(text));
+        data.toText(text, sizeof(text));
         const Style *style = getStyle(widget->style);
         drawText(text, -1, widgetCursor.x + buttonWidth, widgetCursor.y,
                  (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, false, false,
@@ -74,13 +71,10 @@ DrawFunctionType UP_DOWN_draw = [](const WidgetCursor &widgetCursor) {
 
         drawText(widget->upButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
                  buttonWidth, (int)widget->h, buttonsStyle,
-                 widgetCursor.currentState->flags.active &&
-                     g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
+                 flags.active && g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
                  false, false, nullptr, nullptr, nullptr, nullptr);
     }
-
-    widgetCursor.currentState->data.freeRef();
-};
+}
 
 void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {
     g_segment = segment;
@@ -112,7 +106,11 @@ void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {
     }
 }
 
-OnTouchFunctionType UP_DOWN_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
+bool UpDownWidgetState::hasOnTouch() {
+    return true;
+}
+
+void UpDownWidgetState::onTouch(Event &touchEvent) {
     const Widget *widget = widgetCursor.widget;
 
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
@@ -130,10 +128,18 @@ OnTouchFunctionType UP_DOWN_onTouch = [](const WidgetCursor &widgetCursor, Event
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         g_selectedWidget = 0;
     }
-};
+}
 
+bool UpDownWidgetState::hasOnKeyboard() {
 #if OPTION_KEYBOARD
-OnKeyboardFunctionType UP_DOWN_onKeyboard = [](const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) {
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool UpDownWidgetState::onKeyboard(uint8_t key, uint8_t mod) {
+#if OPTION_KEYBOARD
     if (mod == 0) {
         if (key == KEY_LEFTARROW || key == KEY_DOWNARROW) {
             upDown(widgetCursor, UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON);
@@ -146,10 +152,10 @@ OnKeyboardFunctionType UP_DOWN_onKeyboard = [](const WidgetCursor &widgetCursor,
         }
     }
     return false;
-};
 #else
-OnKeyboardFunctionType UP_DOWN_onKeyboard = nullptr;
+    return false;
 #endif
+}
 
 } // namespace gui
 } // namespace eez

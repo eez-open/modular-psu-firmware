@@ -24,57 +24,48 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType BUTTON_enum = nullptr;
-
-DrawFunctionType BUTTON_draw = [](const WidgetCursor &widgetCursor) {
+void ButtonWidgetState::draw() {
     auto widget = (const ButtonWidget *)widgetCursor.widget;
 
     auto enabled = get(widgetCursor, widget->enabled);
-    widgetCursor.currentState->flags.enabled = enabled.getType() == VALUE_TYPE_UNDEFINED  || get(widgetCursor, widget->enabled).getInt() ? 1 : 0;
+    flags.enabled = enabled.getType() == VALUE_TYPE_UNDEFINED  || get(widgetCursor, widget->enabled).getInt() ? 1 : 0;
 
-    const Style *style = getStyle(widgetCursor.currentState->flags.enabled ? widget->style : widget->disabledStyle);
+    const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
 
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style));
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = widget->data ? get(widgetCursor, widget->data) : 0;
+    flags.blinking = g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style));
+    data = widget->data ? get(widgetCursor, widget->data) : 0;
 
     bool refresh =
         !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->flags.enabled != widgetCursor.currentState->flags.enabled ||
-        widgetCursor.previousState->flags.blinking != widgetCursor.currentState->flags.blinking ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data;
+        widgetCursor.previousState->flags.active != flags.active ||
+        widgetCursor.previousState->flags.enabled != flags.enabled ||
+        widgetCursor.previousState->flags.blinking != flags.blinking ||
+        widgetCursor.previousState->data != data;
 
 	static const size_t MAX_TEXT_LEN = 128;
 
     if (refresh) {
         if (widget->data) {
-            if (widgetCursor.currentState->data.isString()) {
-                drawText(widgetCursor.currentState->data.getString(), -1, widgetCursor.x,
+            if (data.isString()) {
+                drawText(data.getString(), -1, widgetCursor.x,
                          widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                         widgetCursor.currentState->flags.active,
-                         widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
+                         flags.active,
+                         flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
             } else {
 				char text[MAX_TEXT_LEN + 1];
-				widgetCursor.currentState->data.toText(text, sizeof(text));
+				data.toText(text, sizeof(text));
 
                 drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                         style, widgetCursor.currentState->flags.active,
-                         widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
+                         style, flags.active,
+                         flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
             }
         } else {
             drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                     style, widgetCursor.currentState->flags.active,
-                     widgetCursor.currentState->flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
+                     style, flags.active,
+                     flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
         }
     }
-
-    widgetCursor.currentState->data.freeRef();
-};
-
-OnTouchFunctionType BUTTON_onTouch = nullptr;
-
-OnKeyboardFunctionType BUTTON_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

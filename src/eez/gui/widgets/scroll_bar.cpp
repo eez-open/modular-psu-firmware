@@ -33,8 +33,6 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType SCROLL_BAR_enum = nullptr;
-
 static ScrollBarWidgetSegment g_segment;
 static WidgetCursor g_selectedWidget;
 static int g_dragStartX;
@@ -68,31 +66,30 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
     xThumb = xTrack + (int)round(remap(position, 0, 0, size - pageSize, wTrack - widthThumb));
 }
 
-DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
+void ScrollBarWidgetState::draw() {
     auto widget = (const ScrollBarWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->flags.active = g_selectedWidget == widgetCursor;
-    widgetCursor.currentState->flags.focused = isFocusWidget(widgetCursor);
+    flags.active = g_selectedWidget == widgetCursor;
+    flags.focused = isFocusWidget(widgetCursor);
 
-    auto currentState = (ScrollBarWidgetState *)widgetCursor.currentState;
     auto previousState = (ScrollBarWidgetState *)widgetCursor.previousState;
 
-    currentState->size = getSize(widgetCursor);
-    currentState->position = getPosition(widgetCursor);
-    currentState->pageSize = getPageSize(widgetCursor);
-    currentState->segment = g_segment;
+    size = getSize(widgetCursor);
+    position = getPosition(widgetCursor);
+    pageSize = getPageSize(widgetCursor);
+    segment = g_segment;
 
     bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->flags.focused != widgetCursor.currentState->flags.focused ||
-        previousState->size != currentState->size ||
-        previousState->position != currentState->position ||
-        previousState->pageSize != currentState->pageSize ||
-        previousState->segment != currentState->segment;
+        !previousState ||
+        previousState->flags.active != flags.active ||
+        previousState->flags.focused != flags.focused ||
+        previousState->size != size ||
+        previousState->position != position ||
+        previousState->pageSize != pageSize ||
+        previousState->segment != segment;
 
     if (refresh) {
-        if (currentState->pageSize < currentState->size) {
+        if (pageSize < size) {
             const Style *buttonsStyle = getStyle(widget->buttonsStyle);
             auto isHorizontal = widget->w > widget->h;
 
@@ -104,7 +101,7 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
                 widgetCursor.y, 
                 isHorizontal ? buttonSize : (int)widget->w, 
                 isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
-                currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
+                segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
 
             // draw track
             int xTrack;
@@ -133,11 +130,11 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
             display::setColor(thumbStyle->color);
             if (isHorizontal) {
                 int xThumb, wThumb;
-                getThumbGeometry(currentState->size, currentState->position, currentState->pageSize, xTrack, wTrack, buttonSize, xThumb, wThumb);
+                getThumbGeometry(size, position, pageSize, xTrack, wTrack, buttonSize, xThumb, wThumb);
                 display::fillRect(xThumb, yTrack, xThumb + wThumb - 1, yTrack + hTrack - 1);
             } else {
                 int yThumb, hThumb;
-                getThumbGeometry(currentState->size, currentState->position, currentState->pageSize, yTrack, hTrack, buttonSize, yThumb, hThumb);
+                getThumbGeometry(size, position, pageSize, yTrack, hTrack, buttonSize, yThumb, hThumb);
                 display::fillRect(xTrack, yThumb, xTrack + wTrack - 1, yThumb + hThumb - 1);
             }
 
@@ -147,10 +144,10 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
                 isHorizontal ? widgetCursor.y : widgetCursor.y + widget->h - buttonSize, 
                 isHorizontal ? buttonSize : (int)widget->w, 
                 isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
-                currentState->segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
+                segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
 
             auto action = getWidgetAction(widgetCursor);        
-            if (widgetCursor.currentState->flags.focused && action == EEZ_CONF_ACTION_ID_SCROLL) {
+            if (flags.focused && action == EEZ_CONF_ACTION_ID_SCROLL) {
 				const Style *style = getStyle(widgetCursor.widget->style);
                 display::setColor(style->focus_color);
                 display::drawRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
@@ -163,9 +160,13 @@ DrawFunctionType SCROLL_BAR_draw = [](const WidgetCursor &widgetCursor) {
             display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1, 0);
         }
     }
-};
+}
 
-OnTouchFunctionType SCROLL_BAR_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
+bool ScrollBarWidgetState::hasOnTouch() {
+    return true;
+}
+
+void ScrollBarWidgetState::onTouch(Event &touchEvent) {
     int size = getSize(widgetCursor);
     int pageSize = getPageSize(widgetCursor);
 
@@ -251,10 +252,18 @@ OnTouchFunctionType SCROLL_BAR_onTouch = [](const WidgetCursor &widgetCursor, Ev
 			setFocusCursor(widgetCursor, widget->data);
 		}
     }
-};
+}
 
+bool ScrollBarWidgetState::hasOnKeyboard() {
 #if OPTION_KEYBOARD
-OnKeyboardFunctionType SCROLL_BAR_onKeyboard = [](const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) {
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool ScrollBarWidgetState::onKeyboard(uint8_t key, uint8_t mod) {
+#if OPTION_KEYBOARD
     if (mod == 0) {
         int position = getPosition(widgetCursor);
         int increment = getPositionIncrement(widgetCursor);
@@ -282,10 +291,10 @@ OnKeyboardFunctionType SCROLL_BAR_onKeyboard = [](const WidgetCursor &widgetCurs
         }
     }
     return false;
-};
 #else
-OnKeyboardFunctionType SCROLL_BAR_onKeyboard = nullptr;
+    return false;
 #endif
+}
 
 
 } // namespace gui

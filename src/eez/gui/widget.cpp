@@ -25,6 +25,7 @@
 
 #include <eez/gui_conf.h>
 #include <eez/gui/gui.h>
+#include <eez/gui/assets.h>
 
 #include <eez/gui/widgets/app_view.h>
 #include <eez/gui/widgets/bar_graph.h>
@@ -55,25 +56,7 @@ namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static int g_findWidgetAtX;
-static int g_findWidgetAtY;
-static WidgetCursor g_foundWidget;
-static int g_distanceToFoundWidget;
-static bool g_clicked;
-
 bool g_isActiveWidget;
-
-////////////////////////////////////////////////////////////////////////////////
-
-EnumFunctionType NONE_enum = nullptr;
-DrawFunctionType NONE_draw = nullptr;
-OnTouchFunctionType NONE_onTouch = nullptr;
-OnKeyboardFunctionType NONE_onKeyboard = nullptr;
-
-EnumFunctionType RESERVED_enum = nullptr;
-DrawFunctionType RESERVED_draw = nullptr;
-OnTouchFunctionType RESERVED_onTouch = nullptr;
-OnKeyboardFunctionType RESERVED_onKeyboard = nullptr;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -101,45 +84,25 @@ static size_t g_widgetStateSize[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) extern EnumFunctionType NAME##_enum;
-WIDGET_TYPES
-#undef WIDGET_TYPE
-#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) &NAME##_enum,
-static EnumFunctionType *g_enumWidgetFunctions[] = {
-    WIDGET_TYPES
-};
-#undef WIDGET_TYPE
+WidgetCursor WidgetState::getFirstChildWidgetCursor() {
+    WidgetCursor childWidgetCursor = widgetCursor;
 
-#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) extern DrawFunctionType NAME##_draw;
-WIDGET_TYPES
-#undef WIDGET_TYPE
-#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) &NAME##_draw,
-static DrawFunctionType *g_drawWidgetFunctions[] = {
-    WIDGET_TYPES
-};
-#undef WIDGET_TYPE
+    auto widgetStateSize = g_widgetStateSize[widgetCursor.widget->type];
 
-#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) extern OnTouchFunctionType NAME##_onTouch;
-WIDGET_TYPES
-#undef WIDGET_TYPE
-#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) &NAME##_onTouch,
-OnTouchFunctionType *g_onTouchWidgetFunctions[] = {
-    WIDGET_TYPES
-};
-#undef WIDGET_TYPE
+    if (widgetCursor.previousState) {
+        childWidgetCursor.previousState = (WidgetState *)((uint8_t *)widgetCursor.previousState + widgetStateSize);
+    }
 
-#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) extern OnKeyboardFunctionType NAME##_onKeyboard;
-WIDGET_TYPES
-#undef WIDGET_TYPE
-#define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) &NAME##_onKeyboard,
-OnKeyboardFunctionType *g_onKeyboardWidgetFunctions[] = {
-    WIDGET_TYPES
-};
-#undef WIDGET_TYPE
+    childWidgetCursor.currentState = (WidgetState *)((uint8_t *)widgetCursor.currentState + widgetStateSize);
 
-////////////////////////////////////////////////////////////////////////////////
+    //
+    auto stateSize = getCurrentStateBufferSize(childWidgetCursor);
+    assert(stateSize <= CONF_MAX_STATE_SIZE);
 
-void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
+	return childWidgetCursor;
+}
+
+void WidgetState::draw() {
     const Widget *widget = widgetCursor.widget;
 
     bool refresh =
@@ -151,86 +114,101 @@ void defaultWidgetDraw(const WidgetCursor &widgetCursor) {
     }
 }
 
+bool WidgetState::hasOnTouch() {
+    return false;
+}
+
+void WidgetState::onTouch(Event &touchEvent) {
+}
+
+bool WidgetState::hasOnKeyboard() {
+    return false;
+}
+
+bool WidgetState::onKeyboard(uint8_t key, uint8_t mod) { 
+    return false; 
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 WidgetState *nextWidgetState(WidgetState *p) {
-    return (WidgetState *)(((uint8_t *)p) + p->size);
+    return (WidgetState *)(((uint8_t *)p) + p->widgetStateSize);
 }
 
-void WidgetCursor::nextState() {
-    if (previousState) {
-        previousState = nextWidgetState(previousState);
-    }
-    currentState = nextWidgetState(currentState);
+bool WidgetCursor::isPage() const {
+    return widget->type == WIDGET_TYPE_CONTAINER && ((((ContainerWidget *)widget)->flags & PAGE_CONTAINER) != 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void enumWidget(WidgetCursor &widgetCursor) {
-    auto xSaved = widgetCursor.x;
-    auto ySaved = widgetCursor.y;
-    
-    widgetCursor.x += widgetCursor.widget->x;
-    widgetCursor.y += widgetCursor.widget->y;
-
-    if (isOverlay(widgetCursor)) {
-        // update overlay data
-        auto containerWidget = (const ContainerWidget *)widgetCursor.widget;
-        Value widgetCursorValue((void *)&widgetCursor, VALUE_TYPE_POINTER);
-        DATA_OPERATION_FUNCTION(containerWidget->overlay, DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor, widgetCursorValue);
-    }
+    const Widget *widget = widgetCursor.widget;
 
     bool savedIsActiveWidget = g_isActiveWidget;
     g_isActiveWidget = g_isActiveWidget || isActiveWidget(widgetCursor);
 
-    auto stateSize = getCurrentStateBufferSize(widgetCursor);
-	static size_t maxStateSize = 0;
-	if (stateSize > maxStateSize) {
-		maxStateSize = stateSize;
-		DebugTrace("max state size: %d\n", maxStateSize);
-	}
-    assert(stateSize <= CONF_MAX_STATE_SIZE);
+    auto widgetState = widgetCursor.currentState;
 
-    const Widget *widget = widgetCursor.widget;
-    widgetCursor.currentState->widgetCursor = widgetCursor;
-	widgetCursor.currentState->size = g_widgetStateSize[widget->type];
-    widgetCursor.currentState->flags.active = g_isActiveWidget;
+	g_widgetStatePlacementNewFunctions[widget->type](widgetState);
 
-    if (*g_drawWidgetFunctions[widget->type]) {
-        (*g_drawWidgetFunctions[widget->type])(widgetCursor);
-    } else {
-        defaultWidgetDraw(widgetCursor);
-    }
+    widgetState->widgetCursor = widgetCursor;
+    widgetState->widgetStateSize = g_widgetStateSize[widget->type];
+    widgetState->flags.active = g_isActiveWidget;
+    widgetState->widgetCursor.x += widget->x;
+    widgetState->widgetCursor.y += widget->y;
 
-    if (*g_enumWidgetFunctions[widgetCursor.widget->type]) {
-       (*g_enumWidgetFunctions[widgetCursor.widget->type])(widgetCursor);
-    }
+    widgetState->draw();
 
     g_isActiveWidget = savedIsActiveWidget;
-
-	widgetCursor.x = xSaved;
-	widgetCursor.y = ySaved;
 }
 
-void forEachWidgetInAppContext(AppContext* appContext, EnumWidgetsCallback callback) {
-	if (appContext->getActivePageId() == PAGE_ID_NONE || appContext->isActivePageInternal()) {
-		return;
-	}
+void enumNoneWidget(WidgetCursor &widgetCursor) {
+	static Widget g_noneWidget = { WIDGET_TYPE_NONE };
+	const Widget *widget = &g_noneWidget;
 
+	auto widgetState = widgetCursor.currentState;
+
+	g_widgetStatePlacementNewFunctions[widget->type](widgetState);
+
+	widgetState->widgetCursor = widgetCursor;
+	widgetState->widgetCursor.widget = widget;
+	widgetState->widgetStateSize = g_widgetStateSize[widget->type];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void forEachWidget(AppContext* appContext, EnumWidgetsCallback callback) {
     if (!g_currentState) {
         return;
     }
 
-    WidgetState *currentState = g_currentState;
-    while (currentState != g_currentStateEnd) {
-        if (!callback(currentState->widgetCursor)) {
+    WidgetState *widgetState = g_currentState;
+	WidgetState *widgetStateEnd = nextWidgetState(g_currentState);
+    while (widgetState != widgetStateEnd) {
+        if (!callback(widgetState->widgetCursor)) {
             break;
         }
-        currentState = (WidgetState *)((uint8_t*)currentState + g_widgetStateSize[currentState->widgetCursor.widget->type]);
+        widgetState = (WidgetState *)((uint8_t*)widgetState + g_widgetStateSize[widgetState->widgetCursor.widget->type]);
+    }
+}
+
+void freeWidgetStates(WidgetState *topWidgetState) {
+    WidgetState *widgetState = topWidgetState;
+	WidgetState *widgetStateEnd = nextWidgetState(topWidgetState);
+    while (widgetState != widgetStateEnd) {
+        auto nextWidgetState = (WidgetState *)((uint8_t*)widgetState + g_widgetStateSize[widgetState->widgetCursor.widget->type]);
+        widgetState->~WidgetState();
+        widgetState = nextWidgetState;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+static int g_findWidgetAtX;
+static int g_findWidgetAtY;
+static WidgetCursor g_foundWidget;
+static int g_distanceToFoundWidget;
+static bool g_clicked;
 
 static int g_xOverlayOffset = 0;
 static int g_yOverlayOffset = 0;
@@ -240,26 +218,28 @@ static bool findWidgetStep(const WidgetCursor &widgetCursor) {
 	if (widgetCursor.appContext->isActivePageInternal()) {
 		auto internalPage = ((InternalPage *)widgetCursor.appContext->getActivePage());
 
-		WidgetCursor widgetCursor2 = internalPage->findWidget(g_findWidgetAtX, g_findWidgetAtY, g_clicked);
-
-		if (!widgetCursor2) {
-			bool passThrough = internalPage->canClickPassThrough();
-
-			if (g_clicked) {
-				// clicked outside internal page, close internal page
-				widgetCursor.appContext->popPage();
-			}
-
-			if (!passThrough) {
-				return false;
-			}
-		}
-		else {
-			g_foundWidget = widgetCursor2;
+		WidgetCursor foundWidget = internalPage->findWidgetInternalPage(g_findWidgetAtX, g_findWidgetAtY, g_clicked);
+		if (foundWidget) {
+			g_foundWidget = foundWidget;
 			return false;
-		}
+        }
+
+        if (g_clicked) {
+            // clicked outside internal page, close internal page
+            widgetCursor.appContext->popPage();
+        }
+
+        bool passThrough = internalPage->canClickPassThrough();
+        if (!passThrough) {
+			g_foundWidget = 0;
+            return false;
+        }
 	}
 
+    if (widgetCursor.isPage()) {
+        g_foundWidget = widgetCursor;
+        g_distanceToFoundWidget = INT_MAX;
+    }
 
     const Widget *widget = widgetCursor.widget;
 
@@ -321,9 +301,11 @@ static bool findWidgetStep(const WidgetCursor &widgetCursor) {
 
                 // if found widget is AppView, make sure we set right AppContext
                 if (widget->type == WIDGET_TYPE_APP_VIEW) {
-                    Value appContextValue;
-                    DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
-                    g_foundWidget.appContext = appContextValue.getAppContext();
+                    if (widget->data != DATA_ID_NONE) {
+                        Value appContextValue;
+                        DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
+                        g_foundWidget.appContext = appContextValue.getAppContext();
+                    }
                 }
             }
         }
@@ -343,7 +325,7 @@ WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y, bool click
     g_yOverlayOffset = 0;
     g_widgetStateAfterOverlay = nullptr;
 
-    forEachWidgetInAppContext(appContext, findWidgetStep);
+    forEachWidget(appContext, findWidgetStep);
 
     return g_foundWidget;
 }

@@ -26,6 +26,7 @@ struct SelectWidget : public Widget {
 };
 
 struct SelectWidgetState : public WidgetState {
+    void draw() override;
 };
 
 } // namespace gui

@@ -27,9 +27,7 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType LIST_GRAPH_enum = nullptr;
-
-DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
+void ListGraphWidgetState::draw() {
     auto widget = (const ListGraphWidget *)widgetCursor.widget;
 
 	const Style* style = getStyle(widget->style);
@@ -37,21 +35,19 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
 	const Style* y2Style = getStyle(widget->y2Style);
 	const Style* cursorStyle = getStyle(widget->cursorStyle);
 
-	widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
-    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.clear();
-    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData = get(widgetCursor, widget->cursorData);
+    data = get(widgetCursor, widget->data);
+    cursorData = get(widgetCursor, widget->cursorData);
 
     int iPrevCursor = -1;
     if (widgetCursor.previousState) {
         iPrevCursor = ((ListGraphWidgetState *)widgetCursor.previousState)->cursorData.getInt();
     }
 
-    int iCursor = ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.getInt();
+    int iCursor = cursorData.getInt();
     int iRow = iCursor / 3;
 
     bool refresh = !widgetCursor.previousState ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data ||
+        widgetCursor.previousState->data != data ||
         iCursor != iPrevCursor;
 
     if (refresh) {
@@ -151,13 +147,13 @@ DrawFunctionType LIST_GRAPH_draw = [](const WidgetCursor &widgetCursor) {
             }
         }
     }
+}
 
-	widgetCursor.currentState->data.freeRef();
-    ((ListGraphWidgetState *)widgetCursor.currentState)->cursorData.freeRef();
+bool ListGraphWidgetState::hasOnTouch() {
+    return true;
+}
 
-};
-
-OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
+void ListGraphWidgetState::onTouch(Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
         auto widget = (const ListGraphWidget *)widgetCursor.widget;
 
@@ -218,9 +214,7 @@ OnTouchFunctionType LIST_GRAPH_onTouch = [](const WidgetCursor &widgetCursor, Ev
             }
         }
     }
-};
-
-OnKeyboardFunctionType LIST_GRAPH_onKeyboard;
+}
 
 } // namespace gui
 } // namespace eez

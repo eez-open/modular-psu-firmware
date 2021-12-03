@@ -29,7 +29,7 @@
 #include <bb3/scripting/scripting.h>
 #include <bb3/scripting/flow.h>
 
-volatile float g_debugFPS;
+//volatile float g_debugFPS;
 
 namespace eez {
 namespace gui {
@@ -47,7 +47,6 @@ void startThread() {
     loadMainAssets(assets, sizeof(assets));
     display::onThemeChanged();
     mouse::init();
-    guiInit();
 	EEZ_MESSAGE_QUEUE_CREATE(gui, 10);
 	EEZ_THREAD_CREATE(gui, mainLoop);
 }
@@ -111,7 +110,7 @@ void processGuiQueue() {
 
         guiMessageQueueObject obj;
 		if (!EEZ_MESSAGE_QUEUE_GET(gui, obj, 0)) {
-            break;
+            return;
         }
 
         onGuiQueueMessage(obj.type, obj.param);
@@ -119,10 +118,10 @@ void processGuiQueue() {
 }
 
 void oneIter() {
-	static uint32_t lastTime;
-	uint32_t tickCount = millis();
-	g_debugFPS = 1000.0f / (tickCount - lastTime);
-	lastTime = tickCount;
+	// static uint32_t lastTime;
+	// uint32_t tickCount = millis();
+	// g_debugFPS = 1000.0f / (tickCount - lastTime);
+	// lastTime = tickCount;
 
 	processGuiQueue();
 

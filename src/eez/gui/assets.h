@@ -102,6 +102,7 @@ private:
 #define SHADOW_FLAG (1 << 0)
 #define CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG (1 << 1)
 #define PAGE_IS_USED_AS_CUSTOM_WIDGET (1 << 2)
+#define PAGE_CONTAINER (1 << 3)
 
 struct Widget {
 	uint16_t type;

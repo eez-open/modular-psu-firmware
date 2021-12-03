@@ -22,26 +22,9 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor) {
-	auto savedCurrentState = widgetCursor.currentState;
-	auto savedPreviousState = widgetCursor.previousState;
-
+void SelectWidgetState::draw() {
     Value indexValue = get(widgetCursor, widgetCursor.widget->data);
-
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = indexValue;
-
-    if (widgetCursor.previousState && widgetCursor.previousState->data != widgetCursor.currentState->data) {
-        widgetCursor.previousState = 0;
-    }
-
-    // move to the selected widget state
-    if (widgetCursor.previousState) {
-        ++widgetCursor.previousState;
-    }
-    ++widgetCursor.currentState;
-
-    auto savedWidget = widgetCursor.widget;
+    data = indexValue;
 
 	auto selectWidget = (const SelectWidget *)widgetCursor.widget;
     if (selectWidget->widgets.count > 0) {
@@ -52,25 +35,21 @@ EnumFunctionType SELECT_enum = [](WidgetCursor &widgetCursor) {
         }
 
 	    auto widgetIndex = index < 0 || index >= (int)selectWidget->widgets.count ? 0 : index;
-        widgetCursor.widget = selectWidget->widgets.item(widgetCursor.assets, widgetIndex);
-        enumWidget(widgetCursor);
+
+        WidgetCursor childWidgetCursor = getFirstChildWidgetCursor();
+
+        childWidgetCursor.widget = selectWidget->widgets.item(widgetCursor.assets, widgetIndex);
+
+        if (widgetCursor.previousState && widgetCursor.previousState->data != data) {
+            childWidgetCursor.previousState = 0;
+        }
+
+        enumWidget(childWidgetCursor);
+
+        childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
+        widgetStateSize = (uint8_t *)childWidgetCursor.currentState - (uint8_t *)this;
     }
-
-    widgetCursor.widget = savedWidget;
-
-    savedCurrentState->size = sizeof(WidgetState) + widgetCursor.currentState->size;
-
-	widgetCursor.currentState = savedCurrentState;
-	widgetCursor.previousState = savedPreviousState;
-
-    widgetCursor.currentState->data.freeRef();
-};
-
-DrawFunctionType SELECT_draw = nullptr;
-
-OnTouchFunctionType SELECT_onTouch = nullptr;
-
-OnKeyboardFunctionType SELECT_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

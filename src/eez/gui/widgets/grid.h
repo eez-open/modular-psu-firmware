@@ -27,6 +27,7 @@ struct GridWidget : public Widget {
 };
 
 struct GridWidgetState : public WidgetState {
+    void draw() override;
 };
 
 } // namespace gui

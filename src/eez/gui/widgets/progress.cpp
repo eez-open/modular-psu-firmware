@@ -24,15 +24,12 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType PROGRESS_enum = nullptr;
-
-DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
+void ProgressWidgetState::draw() {
     auto widget = widgetCursor.widget;
 
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
+    data = get(widgetCursor, widget->data);
 
-    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != widgetCursor.currentState->data;
+    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != data;
 
     if (refresh) {
         const Style* style = getStyle(widget->style);
@@ -41,12 +38,12 @@ DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
 
         int percentFrom;
         int percentTo;
-        if (widgetCursor.currentState->data.getType() == VALUE_TYPE_RANGE) {
-            percentFrom = widgetCursor.currentState->data.getRangeFrom();
-            percentTo = widgetCursor.currentState->data.getRangeTo();
+        if (data.getType() == VALUE_TYPE_RANGE) {
+            percentFrom = data.getRangeFrom();
+            percentTo = data.getRangeTo();
         } else {
             percentFrom = 0;
-            percentTo = widgetCursor.currentState->data.getInt();
+            percentTo = data.getInt();
         }
 
 		percentFrom = clamp(percentFrom, 0, 100.0f);
@@ -66,13 +63,7 @@ DrawFunctionType PROGRESS_draw = [](const WidgetCursor &widgetCursor) {
             drawRectangle(widgetCursor.x, widgetCursor.y - yFrom, yTo - yFrom, (int)widget->h, getStyle(widget->style), true, false, true);
         }
     }
-
-    widgetCursor.currentState->data.freeRef();
-};
-
-OnTouchFunctionType PROGRESS_onTouch = nullptr;
-
-OnKeyboardFunctionType PROGRESS_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

@@ -62,7 +62,6 @@ enum WidgetTypes {
 };
 #undef WIDGET_TYPE
 
-typedef bool (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
 
 struct Widget;
 struct Assets;
@@ -119,38 +118,38 @@ struct WidgetCursor {
 		}
     }
 
-    WidgetCursor(
+     WidgetCursor(
 		Assets *assets_,
-        AppContext *appContext_,
-        const Widget *widget_,
-        const Cursor cursor_,
+		AppContext *appContext_,
+		const Widget *widget_,
+		const Cursor cursor_,
 		int32_t *iterators_,
-        WidgetState *previousState_,
-        WidgetState *currentState_,
+		WidgetState *previousState_,
+		WidgetState *currentState_,
 		flow::FlowState *flowState,
 		int16_t x_,
 		int16_t y_
-    )
-        : assets(assets_)
+     )
+		: assets(assets_)
 		, appContext(appContext_)
-        , widget(widget_)
+		, widget(widget_)
 		, cursor(cursor_)
-        , previousState(previousState_)
-        , currentState(currentState_)
+		, previousState(previousState_)
+		, currentState(currentState_)
 		, flowState(flowState)
 		, x(x_)
 		, y(y_)
-    {
-		if (iterators_) {
-			for (size_t i = 0; i < MAX_ITERATORS; i++) {
-				iterators[i] = iterators_[i];
-			}
-		} else {
-			for (size_t i = 0; i < MAX_ITERATORS; i++) {
-				iterators[i] = -1;
-			}
-		}
-	}
+     {
+	 	if (iterators_) {
+	 		for (size_t i = 0; i < MAX_ITERATORS; i++) {
+	 			iterators[i] = iterators_[i];
+	 		}
+	 	} else {
+	 		for (size_t i = 0; i < MAX_ITERATORS; i++) {
+	 			iterators[i] = -1;
+	 		}
+	 	}
+	 }
 
 	WidgetCursor(Cursor cursor_)
 		: assets(nullptr)
@@ -161,7 +160,7 @@ struct WidgetCursor {
 		, currentState(nullptr)
 		, flowState(0)
 		, x(0)
-		, y(0) 
+		, y(0)
 	{
 		for (size_t i = 0; i < MAX_ITERATORS; i++) {
 			iterators[i] = -1;
@@ -188,8 +187,6 @@ struct WidgetCursor {
         return widget != nullptr;
     }
 
-    void nextState();
-
 	void pushIterator(int32_t it) {
 		for (size_t i = MAX_ITERATORS - 1; i > 0; i--) {
 			iterators[i] = iterators[i - 1];
@@ -203,11 +200,13 @@ struct WidgetCursor {
 		}
 		iterators[MAX_ITERATORS - 1] = -1;
 	}
+
+	bool isPage() const;
 };
 
 struct WidgetState {
 	WidgetCursor widgetCursor;
-	size_t size;
+	size_t widgetStateSize;
 	WidgetStateFlags flags;
 	Value data;
 
@@ -219,21 +218,33 @@ struct WidgetState {
 	}
 
 	virtual ~WidgetState() {}
+
+	WidgetCursor getFirstChildWidgetCursor();
+
+	virtual void draw();
+	
+	virtual bool hasOnTouch();
+	virtual void onTouch(Event &touchEvent);
+	
+	virtual bool hasOnKeyboard();
+	virtual bool onKeyboard(uint8_t key, uint8_t mod);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void forEachWidgetInAppContext(AppContext* appContext, EnumWidgetsCallback callback);
-
-WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y, bool clicked = true);
-
-extern OnTouchFunctionType *g_onTouchWidgetFunctions[];
-extern OnKeyboardFunctionType *g_onKeyboardWidgetFunctions[];
+extern bool g_isActiveWidget;
 
 WidgetState *nextWidgetState(WidgetState *p);
-void enumWidget(WidgetCursor &widgetCursor);
 
-extern bool g_isActiveWidget;
+void enumWidget(WidgetCursor &widgetCursor);
+void enumNoneWidget(WidgetCursor &widgetCursor);
+
+typedef bool (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
+void forEachWidget(AppContext* appContext, EnumWidgetsCallback callback);
+
+void freeWidgetStates(WidgetState *topWidgetState);
+
+WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y, bool clicked = true);
 
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor);
 

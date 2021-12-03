@@ -25,8 +25,6 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType BUTTON_GROUP_enum = nullptr;
-
 void drawButtons(const Widget *widget, int x, int y, const Style *style, const Style *selectedStyle, int selectedButton, int count) {
     if (widget->w > widget->h) {
         // horizontal orientation
@@ -92,28 +90,29 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
     }
 }
 
-DrawFunctionType BUTTON_GROUP_draw = [] (const WidgetCursor &widgetCursor) {
+void ButtonGroupWidgetState::draw() {
     auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
 
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
+    data = get(widgetCursor, widget->data);
 
     bool refresh =
         !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data;
+        widgetCursor.previousState->flags.active != flags.active ||
+        widgetCursor.previousState->data != data;
 
     if (refresh) {
         const Style* style = getStyle(widget->style);
         const Style* selectedStyle = getStyle(widget->selectedStyle);
 
-        drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, widgetCursor.currentState->data.getInt(), count(widgetCursor, widget->data));
+        drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, data.getInt(), count(widgetCursor, widget->data));
     }
+}
 
-    widgetCursor.currentState->data.freeRef();
-};
+bool ButtonGroupWidgetState::hasOnTouch() {
+    return true;
+}
 
-OnTouchFunctionType BUTTON_GROUP_onTouch = [](const WidgetCursor &widgetCursor, Event &touchEvent) {
+void ButtonGroupWidgetState::onTouch(Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         const Widget *widget = widgetCursor.widget;
 
@@ -136,9 +135,7 @@ OnTouchFunctionType BUTTON_GROUP_onTouch = [](const WidgetCursor &widgetCursor, 
             sound::playClick();
         }
     }
-};
-
-OnKeyboardFunctionType BUTTON_GROUP_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

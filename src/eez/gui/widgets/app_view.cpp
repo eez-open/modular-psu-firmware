@@ -24,45 +24,56 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType APP_VIEW_enum = [](WidgetCursor &widgetCursor) {
-    Value appContextValue;
-    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
-    AppContext *appContext = appContextValue.getAppContext();
+void AppViewWidgetState::draw() {
+    AppContext *appContext;
+    if (widgetCursor.widget->data != DATA_ID_NONE) {
+        Value appContextValue;
+        DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
+        appContext = appContextValue.getAppContext();
+    } else {
+        appContext = widgetCursor.appContext;
+    }
 
-    WidgetCursor savedWidgetCursor = widgetCursor;
-    widgetCursor.appContext = appContext;
+    bool refresh =
+        !widgetCursor.previousState &&
+        !appContext->isActivePageInternal() &&
+        appContext->getActivePageId() != PAGE_ID_NONE;
 
-    appContext->updateAppView(widgetCursor);
-
-    savedWidgetCursor.currentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedWidgetCursor.currentState);
-
-    widgetCursor = savedWidgetCursor;
-};
-
-DrawFunctionType APP_VIEW_draw = [](const WidgetCursor &widgetCursor) {
-    Value appContextValue;
-    DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
-    AppContext *appContext = appContextValue.getAppContext();
-
-    bool refresh = !widgetCursor.previousState;
-    if (refresh && !appContext->isActivePageInternal() && appContext->getActivePageId() != PAGE_ID_NONE) {
+    if (refresh ) {
         appContext->rect.x = widgetCursor.x;
         appContext->rect.y = widgetCursor.y;
         appContext->rect.w = widgetCursor.widget->w;
         appContext->rect.h = widgetCursor.widget->h;
-
-        // clear background
-		auto page = getPageAsset(appContext->getActivePageId());
-        const Style* style = getStyle(page->style);
-        display::setColor(style->background_color);
-
-		display::fillRect(appContext->rect.x, appContext->rect.y, appContext->rect.x + page->w - 1, appContext->rect.y + page->h - 1);
     }
-};
 
-OnTouchFunctionType APP_VIEW_onTouch = nullptr;
+    WidgetCursor childWidgetCursor = getFirstChildWidgetCursor();
 
-OnKeyboardFunctionType APP_VIEW_onKeyboard = nullptr;
+    childWidgetCursor.appContext = appContext;
+
+    if (appContext->getActivePageId() != PAGE_ID_NONE) {
+        WidgetState *endOfContainerInPreviousState = 0;
+        if (widgetCursor.previousState) {
+            endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
+        }
+
+        for (int i = 0; i <= appContext->m_pageNavigationStackPointer; i++) {
+            appContext->updatePage(i, childWidgetCursor);
+
+            if (childWidgetCursor.previousState) {
+                childWidgetCursor.previousState = nextWidgetState(childWidgetCursor.previousState);
+                if (childWidgetCursor.previousState > endOfContainerInPreviousState) {
+                    childWidgetCursor.previousState = 0;
+                }
+            }
+
+            childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
+        }
+    } else {
+        enumNoneWidget(childWidgetCursor);
+    }
+
+    widgetStateSize = (uint8_t *)childWidgetCursor.currentState - (uint8_t *)this;
+}
 
 } // namespace gui
 } // namespace eez

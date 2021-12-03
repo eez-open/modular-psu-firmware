@@ -1265,10 +1265,6 @@ void setContext(WidgetCursor &widgetCursor, int16_t id, Value &oldContext, Value
     widgetCursor.cursor = cursorValue.getInt();
 }
 
-void restoreContext(WidgetCursor &widgetCursor, int16_t id, Value &oldContext) {
-    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_RESTORE_CONTEXT, widgetCursor, oldContext);
-}
-
 int getFloatListLength(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_FLOAT_LIST_LENGTH, widgetCursor, value);

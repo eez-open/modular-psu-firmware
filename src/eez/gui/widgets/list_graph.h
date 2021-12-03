@@ -33,6 +33,10 @@ struct ListGraphWidget : public Widget {
 
 struct ListGraphWidgetState : public WidgetState {
     Value cursorData;
+
+    void draw() override;
+	bool hasOnTouch() override;
+	void onTouch(Event &touchEvent) override;
 };
 
 } // namespace gui

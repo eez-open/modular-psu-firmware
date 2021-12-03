@@ -52,6 +52,7 @@ bool g_isLongTouch;
 
 static void processTouchEvent(EventType type, int x, int y);
 static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
+static void onWidgetTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 
 void eventHandling() {
@@ -146,8 +147,8 @@ OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
             return nullptr;
         }
 
-        if (*g_onTouchWidgetFunctions[widgetCursor.widget->type]) {
-            return *g_onTouchWidgetFunctions[widgetCursor.widget->type];
+        if (widgetCursor.currentState->hasOnTouch()) {
+            return onWidgetTouch;
         }
 
         if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
@@ -166,6 +167,10 @@ static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
 	} else {
 		getRootAppContext().onPageTouch(foundWidget, touchEvent);
 	}
+}
+
+static void onWidgetTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+    widgetCursor.currentState->onTouch(touchEvent);
 }
 
 static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {

@@ -110,6 +110,7 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
 
 int allocBuffer();
 void freeBuffer(int bufferIndex);
+void freeAllBuffers();
 void selectBuffer(int bufferIndex);
 void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, gui::Rect *backdrop);
 void beginBuffersDrawing();

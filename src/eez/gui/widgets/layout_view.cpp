@@ -33,116 +33,74 @@ int getLayoutId(const WidgetCursor &widgetCursor) {
     return layoutView->layout;
 }
 
-EnumFunctionType LAYOUT_VIEW_enum = [](WidgetCursor &widgetCursor) {
-    auto cursor = widgetCursor.cursor;
-
-	auto layoutView = (const LayoutViewWidget *)widgetCursor.widget;
-
-    if (widgetCursor.previousState && (widgetCursor.previousState->data != widgetCursor.currentState->data || ((LayoutViewWidgetState *)widgetCursor.previousState)->context != ((LayoutViewWidgetState *)widgetCursor.currentState)->context)) {
-        widgetCursor.previousState = 0;
-    }
+void LayoutViewWidgetState::draw() {
+	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
     Value oldContext;
     Value newContext;
-    if (layoutView->context) {
-        setContext(widgetCursor, layoutView->context, oldContext, newContext);
+    if (widget->context) {
+        setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
+        context = newContext;
+    } else {
+        context = Value();
+    }
+
+    data = getLayoutId(widgetCursor);
+
+    bool refresh =
+        !widgetCursor.previousState ||
+        widgetCursor.previousState->flags.active != flags.active ||
+        widgetCursor.previousState->data != data ||
+        ((LayoutViewWidgetState *)widgetCursor.previousState)->context != context;
+
+    if (refresh) {
+        const Style* style = getStyle(widget->style);
+        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, false, true);
     }
 
     int layoutId = getLayoutId(widgetCursor);
-	auto flowState = widgetCursor.flowState;
     auto layout = getPageAsset(layoutId, widgetCursor);
 
     if (layout) {
+        WidgetCursor childWidgetCursor = getFirstChildWidgetCursor();
+        
+        if (
+            widgetCursor.previousState && 
+            (
+                widgetCursor.previousState->data != data || 
+                ((LayoutViewWidgetState *)widgetCursor.previousState)->context != context
+            )
+        ) {
+            childWidgetCursor.previousState = 0;
+        }
+
 		auto layoutView = (PageAsset *)layout;
 
         auto &widgets = layoutView->widgets;
-
-        auto savedCurrentState = widgetCursor.currentState;
-        auto savedPreviousState = widgetCursor.previousState;
 
         WidgetState *endOfContainerInPreviousState = 0;
         if (widgetCursor.previousState) {
             endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
         }
 
-        // move to the first child widget state
-        if (widgetCursor.previousState) {
-            widgetCursor.previousState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.previousState) + 1);
-        }
-        widgetCursor.currentState = (WidgetState *)(((LayoutViewWidgetState *)widgetCursor.currentState) + 1);
-
-        auto savedWidget = widgetCursor.widget;
-
         for (uint32_t index = 0; index < widgets.count; ++index) {
-            widgetCursor.widget = widgets.item(widgetCursor.assets, index);
+            childWidgetCursor.widget = widgets.item(widgetCursor.assets, index);
 
-            enumWidget(widgetCursor);
+            enumWidget(childWidgetCursor);
 
-            if (widgetCursor.previousState) {
-                widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
-                if (widgetCursor.previousState > endOfContainerInPreviousState) {
-                    widgetCursor.previousState = 0;
+            if (childWidgetCursor.previousState) {
+                childWidgetCursor.previousState = nextWidgetState(childWidgetCursor.previousState);
+                if (childWidgetCursor.previousState > endOfContainerInPreviousState) {
+                    childWidgetCursor.previousState = 0;
                 }
             }
 
-            widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+            childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
         }
 
-        widgetCursor.widget = savedWidget;
-
-        savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
-
-        widgetCursor.currentState = savedCurrentState;
-        widgetCursor.previousState = savedPreviousState;
+        widgetStateSize = (uint8_t *)childWidgetCursor.currentState - (uint8_t *)this;
 	}
-
-    if (layoutView->context) {
-        restoreContext(widgetCursor, layoutView->context, oldContext);
-    }
-
-	widgetCursor.flowState = flowState;
-    widgetCursor.cursor = cursor;
-};
-
-DrawFunctionType LAYOUT_VIEW_draw = [](const WidgetCursor &widgetCursor) {
-	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
-
-	((LayoutViewWidgetState *)widgetCursor.currentState)->context.clear();
-
-    Value oldContext;
-    Value newContext;
-    if (widget->context) {
-        setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
-        ((LayoutViewWidgetState *)widgetCursor.currentState)->context = newContext;
-    } else {
-        ((LayoutViewWidgetState *)widgetCursor.currentState)->context = Value();
-    }
-
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = getLayoutId(widgetCursor);
-
-    if (widget->context) {
-        restoreContext((WidgetCursor &)widgetCursor, widget->context, oldContext);
-    }
-
-    bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active ||
-        widgetCursor.previousState->data != widgetCursor.currentState->data ||
-        ((LayoutViewWidgetState *)widgetCursor.previousState)->context != ((LayoutViewWidgetState *)widgetCursor.currentState)->context;
-
-    if (refresh) {
-        const Style* style = getStyle(widget->style);
-        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, widgetCursor.currentState->flags.active, false, true);
-    }
-
-	((LayoutViewWidgetState *)widgetCursor.currentState)->context.freeRef();
-    widgetCursor.currentState->data.freeRef();
-};
-
-OnTouchFunctionType LAYOUT_VIEW_onTouch = nullptr;
-
-OnKeyboardFunctionType LAYOUT_VIEW_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

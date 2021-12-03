@@ -30,15 +30,6 @@
 #include <scpi/scpi.h>
 
 namespace eez {
-namespace gui {
-
-extern DrawFunctionType RECTANGLE_draw;
-extern DrawFunctionType TEXT_draw;
-
-}
-}
-
-namespace eez {
 namespace psu {
 namespace gui {
 
@@ -144,8 +135,8 @@ void ToastMessagePage::onEncoderClicked() {
     }
 }
 
-void ToastMessagePage::updatePage(const WidgetCursor &widgetCursor) {
-	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, -1, nullptr, 0, 0, nullptr, actionWidget.x, actionWidget.y);
+void ToastMessagePage::updateInternalPage(const WidgetCursor &widgetCursor) {
+	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, -1, nullptr, &actionWidgetState, nullptr, nullptr, actionWidget.x, actionWidget.y);
     if (widgetCursor.previousState && actionWidgetIsActive == isActiveWidget(toastPageWidgetCursor)) {
         return;
     }
@@ -293,7 +284,7 @@ void ToastMessagePage::updatePage(const WidgetCursor &widgetCursor) {
     }
 }
 
-WidgetCursor ToastMessagePage::findWidget(int x, int y, bool clicked) {
+WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked) {
     if (x >= this->x && x < this->x + width && y >= this->y && y < this->y + height) {
         const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
         font::Font font = styleGetFont(style);
@@ -305,10 +296,10 @@ WidgetCursor ToastMessagePage::findWidget(int x, int y, bool clicked) {
             y >= (actionWidget.y - textHeight / 4) &&
             y < (actionWidget.y + actionWidget.h - 1 + textHeight / 4)
         ) {
-            return WidgetCursor(g_mainAssets, appContext, &actionWidget, -1, nullptr, 0, 0, nullptr, actionWidget.x, actionWidget.y);
+            return WidgetCursor(g_mainAssets, appContext, &actionWidget, -1, nullptr, nullptr, &actionWidgetState, nullptr, actionWidget.x, actionWidget.y);
         }
         widget.action = ACTION_ID_INTERNAL_DIALOG_CLOSE;
-        return WidgetCursor(g_mainAssets, appContext, &widget, -1, nullptr, 0, 0, nullptr, x, y);
+        return WidgetCursor(g_mainAssets, appContext, &widget, -1, nullptr, nullptr, &widgetState, nullptr, x, y);
     }
     
     return WidgetCursor();
@@ -495,7 +486,7 @@ void SelectFromEnumPage::findPagePosition() {
     }
 }
 
-void SelectFromEnumPage::updatePage(const WidgetCursor &widgetCursor) {
+void SelectFromEnumPage::updateInternalPage(const WidgetCursor &widgetCursor) {
     if (widgetCursor.previousState && !dirty) {
 		return;
     }
@@ -521,7 +512,7 @@ void SelectFromEnumPage::updatePage(const WidgetCursor &widgetCursor) {
     dirty = false;
 }
 
-WidgetCursor SelectFromEnumPage::findWidget(int x, int y, bool clicked) {
+WidgetCursor SelectFromEnumPage::findWidgetInternalPage(int x, int y, bool clicked) {
     for (int i = 0; i < numItems; ++i) {
         int xItem, yItem;
         getItemPosition(i, xItem, yItem);
@@ -536,7 +527,7 @@ WidgetCursor SelectFromEnumPage::findWidget(int x, int y, bool clicked) {
 
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
-        		return WidgetCursor(g_mainAssets, appContext, &widget, -1, nullptr, 0, 0, nullptr, x, y);
+        		return WidgetCursor(g_mainAssets, appContext, &widget, -1, nullptr, nullptr, &widgetState, nullptr, x, y);
         	}
         }
     }
@@ -672,7 +663,7 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
 
 }
 
-void MenuWithButtonsPage::updatePage(const WidgetCursor &widgetCursor2) {
+void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2) {
     WidgetCursor widgetCursor;
 
     widgetCursor.appContext = m_appContext;
@@ -684,13 +675,18 @@ void MenuWithButtonsPage::updatePage(const WidgetCursor &widgetCursor2) {
         widgetCursor.x = x + m_containerRectangleWidget.x;
         widgetCursor.y = y + m_containerRectangleWidget.y;
         widgetCursor.currentState->flags.active = 0;
-        RECTANGLE_draw(widgetCursor);
+
+		RectangleWidgetState rectangleWidgetState;
+		rectangleWidgetState.widgetCursor = widgetCursor;
+		rectangleWidgetState.draw();
 
         widgetCursor.widget = &m_messageTextWidget;
         widgetCursor.x = x + m_messageTextWidget.x;
         widgetCursor.y = y + m_messageTextWidget.y;
         widgetCursor.currentState->flags.active = 0;
-        TEXT_draw(widgetCursor);
+		TextWidgetState textWidgetState;
+		textWidgetState.widgetCursor = widgetCursor;
+		textWidgetState.draw();
     }
 
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
@@ -699,11 +695,13 @@ void MenuWithButtonsPage::updatePage(const WidgetCursor &widgetCursor2) {
         widgetCursor.y = y + m_buttonTextWidgets[i].y;
         widgetCursor.cursor = i;
         widgetCursor.currentState->flags.active = isActiveWidget(widgetCursor);
-        TEXT_draw(widgetCursor);
+		TextWidgetState textWidgetState;
+		textWidgetState.widgetCursor = widgetCursor;
+		textWidgetState.draw();
     }
 }
 
-WidgetCursor MenuWithButtonsPage::findWidget(int x, int y, bool clicked) {
+WidgetCursor MenuWithButtonsPage::findWidgetInternalPage(int x, int y, bool clicked) {
     WidgetCursor widgetCursor;
 
     widgetCursor.appContext = m_appContext;
@@ -717,6 +715,7 @@ WidgetCursor MenuWithButtonsPage::findWidget(int x, int y, bool clicked) {
             x >= widgetCursor.x && x < widgetCursor.x + m_buttonTextWidgets[i].w && 
             y >= widgetCursor.y && y < widgetCursor.y + m_buttonTextWidgets[i].h
         ) {
+			widgetCursor.currentState = &m_buttonTextWidgetStates[i];
             return widgetCursor;
         }
     }
@@ -724,6 +723,7 @@ WidgetCursor MenuWithButtonsPage::findWidget(int x, int y, bool clicked) {
     widgetCursor.widget = &m_containerRectangleWidget;
     widgetCursor.x = this->x + m_containerRectangleWidget.x;
     widgetCursor.y = this->y + m_containerRectangleWidget.y;
+	widgetCursor.currentState = &m_containerRectangleWidgetState;
     return widgetCursor;
 }
 

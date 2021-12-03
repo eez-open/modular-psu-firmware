@@ -28,6 +28,11 @@ struct UpDownWidget : public Widget {
 };
 
 struct UpDownWidgetState : public WidgetState {
+    void draw() override;
+	bool hasOnTouch() override;
+	void onTouch(Event &touchEvent) override;
+	bool hasOnKeyboard() override;
+	bool onKeyboard(uint8_t key, uint8_t mod) override;
 };
 
 } // namespace gui

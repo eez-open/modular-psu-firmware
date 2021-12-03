@@ -25,51 +25,76 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor) {
-    Overlay *overlay = nullptr;
-    if (isOverlay(widgetCursor)) {
-        overlay = getOverlay(widgetCursor);
+void ContainerWidgetState::draw() {
+    auto widget = (const ContainerWidget *)widgetCursor.widget;
 
-        auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
-        auto previousState = (ContainerWidgetState *)widgetCursor.previousState;
+	auto previousState = (ContainerWidgetState *)widgetCursor.previousState;
 
-        if (currentState) {
-            currentState->overlayState = overlay ? overlay->state : 1;
+    bool refresh = 
+        !widgetCursor.previousState ||
+        widgetCursor.previousState->flags.active != flags.active;
 
-            if (previousState && previousState->overlayState != currentState->overlayState) {
-                widgetCursor.previousState = 0;
-            }
-        }
+    int w;
+    int h;
 
-        if (overlay && !overlay->state) {
+    Overlay *overlay = getOverlay(widgetCursor);
+    if (overlay) {
+		// update overlay data
+		auto containerWidget = (const ContainerWidget *)widget;
+		Value widgetCursorValue((void *)&widgetCursor, VALUE_TYPE_POINTER);
+		DATA_OPERATION_FUNCTION(containerWidget->overlay, DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor, widgetCursorValue);
+
+		overlayState = overlay->state;
+		
+        if (overlayState == 0) {
+            displayBufferIndex = -1;
             return;
         }
+
+        if (previousState && overlayState != previousState->overlayState) {
+            refresh = true;
+        }
+
+        w = overlay->width;
+        h = overlay->height;
+
+        if (refresh || previousState->displayBufferIndex == -1) {
+            displayBufferIndex = display::allocBuffer();
+            refresh = true;
+        } else {
+            displayBufferIndex = previousState->displayBufferIndex;
+        }
+        
+        display::selectBuffer(displayBufferIndex);
+    } else {
+        w = (int)widget->w;
+        h = (int)widget->h;
     }
 
-    auto widget = ((ContainerWidget *)widgetCursor.widget);
+    if (refresh) {
+        drawRectangle(
+            widgetCursor.x, widgetCursor.y, w, h, 
+            getStyle(widget->style), flags.active, false, true
+        );
+    }
+
+    WidgetCursor childWidgetCursor = getFirstChildWidgetCursor();
+
+    if (overlay && previousState && previousState->overlayState != overlayState) {
+		childWidgetCursor.previousState = 0;
+    }
 
     auto &widgets = widget->widgets;
-
-    auto savedCurrentState = widgetCursor.currentState;
-	auto savedPreviousState = widgetCursor.previousState;
 
     WidgetState *endOfContainerInPreviousState = 0;
     if (widgetCursor.previousState) {
         endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
     }
 
-    // move to the first child widget state
-    if (widgetCursor.previousState) {
-        widgetCursor.previousState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.previousState) + 1);
-    }
-    widgetCursor.currentState = (WidgetState *)(((ContainerWidgetState *)widgetCursor.currentState) + 1);
-
-    auto savedWidget = widgetCursor.widget;
-
     auto widgetOverrides = overlay && overlay->widgetOverrides;
 
     for (uint32_t index = 0; index < widgets.count; ++index) {
-        widgetCursor.widget = widgets.item(widgetCursor.assets, index);
+        childWidgetCursor.widget = widgets.item(widgetCursor.assets, index);
 
         int xSaved = 0;
         int ySaved = 0;
@@ -81,46 +106,39 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor) {
                 continue;
             }
 
-            xSaved = widgetCursor.widget->x;
-            ySaved = widgetCursor.widget->y;
-            wSaved = widgetCursor.widget->w;
-            hSaved = widgetCursor.widget->h;
+            xSaved = childWidgetCursor.widget->x;
+            ySaved = childWidgetCursor.widget->y;
+            wSaved = childWidgetCursor.widget->w;
+            hSaved = childWidgetCursor.widget->h;
 
-            ((Widget*)widgetCursor.widget)->x = overlay->widgetOverrides[index].x;
-            ((Widget*)widgetCursor.widget)->y = overlay->widgetOverrides[index].y;
-            ((Widget*)widgetCursor.widget)->w = overlay->widgetOverrides[index].w;
-            ((Widget*)widgetCursor.widget)->h = overlay->widgetOverrides[index].h;
+            ((Widget*)childWidgetCursor.widget)->x = overlay->widgetOverrides[index].x;
+            ((Widget*)childWidgetCursor.widget)->y = overlay->widgetOverrides[index].y;
+            ((Widget*)childWidgetCursor.widget)->w = overlay->widgetOverrides[index].w;
+            ((Widget*)childWidgetCursor.widget)->h = overlay->widgetOverrides[index].h;
         }
 
-        enumWidget(widgetCursor);
+        enumWidget(childWidgetCursor);
 
         if (widgetOverrides) {
-            ((Widget*)widgetCursor.widget)->x = xSaved;
-            ((Widget*)widgetCursor.widget)->y = ySaved;
-            ((Widget*)widgetCursor.widget)->w = wSaved;
-            ((Widget*)widgetCursor.widget)->h = hSaved;
+            ((Widget*)childWidgetCursor.widget)->x = xSaved;
+            ((Widget*)childWidgetCursor.widget)->y = ySaved;
+            ((Widget*)childWidgetCursor.widget)->w = wSaved;
+            ((Widget*)childWidgetCursor.widget)->h = hSaved;
         }
 
-        if (widgetCursor.previousState) {
-			widgetCursor.previousState = nextWidgetState(widgetCursor.previousState);
-            if (widgetCursor.previousState > endOfContainerInPreviousState) {
-				widgetCursor.previousState = 0;
+        if (childWidgetCursor.previousState) {
+            childWidgetCursor.previousState = nextWidgetState(childWidgetCursor.previousState);
+            if (childWidgetCursor.previousState > endOfContainerInPreviousState) {
+                childWidgetCursor.previousState = 0;
             }
         }
 
-        widgetCursor.currentState = nextWidgetState(widgetCursor.currentState);
+        childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
     }
 
-    widgetCursor.widget = savedWidget;
+    widgetStateSize = (uint8_t *)childWidgetCursor.currentState - (uint8_t *)this;
 
-    savedCurrentState->size = ((uint8_t *)widgetCursor.currentState) - ((uint8_t *)savedCurrentState);
-
-	widgetCursor.currentState = savedCurrentState;
-	widgetCursor.previousState = savedPreviousState;
-
-    if (isOverlay(widgetCursor)) {
-        auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
-        
+    if (overlay) {
         int xOffset = 0;
         int yOffset = 0;
         getOverlayOffset(widgetCursor, xOffset, yOffset);
@@ -128,7 +146,7 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor) {
         const Style *style = getStyle(widgetCursor.widget->style);
 
         display::setBufferBounds(
-			currentState->displayBufferIndex,
+			displayBufferIndex,
             widgetCursor.x,
             widgetCursor.y,
             overlay->width,
@@ -140,56 +158,7 @@ EnumFunctionType CONTAINER_enum = [](WidgetCursor &widgetCursor) {
             nullptr
         );
     }
-};
-
-DrawFunctionType CONTAINER_draw = [](const WidgetCursor &widgetCursor) {
-    const Widget *widget = widgetCursor.widget;
-
-    bool refresh = 
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
-
-    int w = (int)widget->w;
-    int h = (int)widget->h;
-
-    if (isOverlay(widgetCursor)) {
-        auto currentState = (ContainerWidgetState *)widgetCursor.currentState;
-        auto previousState = (ContainerWidgetState *)widgetCursor.previousState;
-
-        Overlay *overlay = getOverlay(widgetCursor);
-
-        if (overlay && overlay->state == 0) {
-            currentState->displayBufferIndex = -1;
-            return;
-        }
-
-        if (previousState && (overlay ? overlay->state : 1) != previousState->overlayState) {
-            refresh = true;
-        }
-
-        w = overlay ? overlay->width : widget->w;
-        h = overlay ? overlay->height : widget->h;
-
-        if (!previousState || previousState->displayBufferIndex == -1) {
-            currentState->displayBufferIndex = display::allocBuffer();
-            refresh = true;
-        } else {
-            currentState->displayBufferIndex = previousState->displayBufferIndex;
-        }
-        display::selectBuffer(currentState->displayBufferIndex);
-    }
-
-    if (refresh) {
-        drawRectangle(
-            widgetCursor.x, widgetCursor.y, w, h, 
-            getStyle(widget->style), widgetCursor.currentState->flags.active, false, true
-        );
-    }
-};
-
-OnTouchFunctionType CONTAINER_onTouch = nullptr;
-
-OnKeyboardFunctionType CONTAINER_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

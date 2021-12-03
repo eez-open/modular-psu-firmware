@@ -24,15 +24,12 @@
 namespace eez {
 namespace gui {
 
-EnumFunctionType CANVAS_enum = nullptr;
-
-DrawFunctionType CANVAS_draw = [](const WidgetCursor &widgetCursor) {
+void CanvasWidgetState::draw() {
     const Widget *widget = widgetCursor.widget;
 
-    widgetCursor.currentState->data.clear();
-    widgetCursor.currentState->data = get(widgetCursor, widget->data);
+    data = get(widgetCursor, widget->data);
 
-    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != widgetCursor.currentState->data;
+    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != data;
 
     if (refresh) {
         Value value;
@@ -40,13 +37,7 @@ DrawFunctionType CANVAS_draw = [](const WidgetCursor &widgetCursor) {
         auto drawFunction = (void (*)(const WidgetCursor &widgetCursor))value.getVoidPointer();
         drawFunction(widgetCursor);
     }
-
-    widgetCursor.currentState->data.freeRef();
-};
-
-OnTouchFunctionType CANVAS_onTouch = nullptr;
-
-OnKeyboardFunctionType CANVAS_onKeyboard = nullptr;
+}
 
 } // namespace gui
 } // namespace eez

@@ -373,7 +373,7 @@ void animate() {
 
 		// wait for VSYNC
 		while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
-			osDelay(0);
+			//osDelay(0);
 		}
 
 		setAddress(g_animationBuffer);
@@ -385,7 +385,7 @@ void animate() {
 void swapBuffers() {
     // wait for VSYNC
     while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
-    	osDelay(0);
+    	//osDelay(0);
     }
 
     setAddress(g_buffer);

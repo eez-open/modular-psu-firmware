@@ -58,8 +58,8 @@ protected:
 
 class InternalPage : public Page {
 public:
-    virtual void updatePage(const WidgetCursor &widgetCursor) = 0;
-	virtual WidgetCursor findWidget(int x, int y, bool clicked) = 0;
+    virtual void updateInternalPage(const WidgetCursor &widgetCursor) = 0;
+	virtual WidgetCursor findWidgetInternalPage(int x, int y, bool clicked) = 0;
     virtual bool canClickPassThrough();
 
     int x;
@@ -69,6 +69,7 @@ public:
 
 protected:
     Widget widget;
+	WidgetState widgetState;
 };
 
 } // namespace gui

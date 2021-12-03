@@ -25,6 +25,7 @@ struct ProgressWidget : public Widget {
 };
 
 struct ProgressWidgetState : public WidgetState {
+    void draw() override;
 };
 
 } // namespace gui
