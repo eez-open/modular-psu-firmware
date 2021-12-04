@@ -308,53 +308,49 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 ////////////////////////////////////////////////////////////////////////////////
 
 void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
-    if (!isPageFullyCovered(i)) {
-        if (!widgetCursor.previousState || m_pageNavigationStack[i].displayBufferIndex == -1) {
-            m_pageNavigationStack[i].displayBufferIndex = display::allocBuffer();
-            widgetCursor.previousState = nullptr;
-        }
-
-		display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
-
-		m_updatePageIndex = i;
-
-        int x;
-        int y;
-        int width;
-        int height;
-        bool withShadow;
-
-        if (isPageInternal(m_pageNavigationStack[i].pageId)) {
-            auto internalPage = ((InternalPage *)m_pageNavigationStack[i].page);
-            
-            x = internalPage->x;
-            y = internalPage->y;
-            width = internalPage->width;
-            height = internalPage->height;
-            withShadow = true;
-
-            internalPage->updateInternalPage(widgetCursor);
-
-            enumNoneWidget(widgetCursor);
-        } else {
-            auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
-
-            x = widgetCursor.x + page->x;
-            y = widgetCursor.y + page->y;
-            width = page->w;
-            height = page->h;
-            withShadow = page->x > 0;
-
-            widgetCursor.widget = page;
-            enumWidget(widgetCursor);
-		}
-
-		display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
-
-		m_updatePageIndex = -1;
-	} else {
-        m_pageNavigationStack[i].displayBufferIndex = -1;
+    if (!widgetCursor.previousState || m_pageNavigationStack[i].displayBufferIndex == -1) {
+        m_pageNavigationStack[i].displayBufferIndex = display::allocBuffer();
+        widgetCursor.previousState = nullptr;
     }
+
+    display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
+
+    m_updatePageIndex = i;
+
+    int x;
+    int y;
+    int width;
+    int height;
+    bool withShadow;
+
+    if (isPageInternal(m_pageNavigationStack[i].pageId)) {
+        auto internalPage = ((InternalPage *)m_pageNavigationStack[i].page);
+        
+        x = internalPage->x;
+        y = internalPage->y;
+        width = internalPage->width;
+        height = internalPage->height;
+        withShadow = true;
+
+        internalPage->updateInternalPage(widgetCursor);
+
+        enumNoneWidget(widgetCursor);
+    } else {
+        auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
+
+        x = widgetCursor.x + page->x;
+        y = widgetCursor.y + page->y;
+        width = page->w;
+        height = page->h;
+        withShadow = page->x > 0;
+
+        widgetCursor.widget = page;
+        enumWidget(widgetCursor);
+    }
+
+    display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+
+    m_updatePageIndex = -1;
 }
 
 bool isRect1FullyCoveredByRect2(int xRect1, int yRect1, int wRect1, int hRect1, int xRect2, int yRect2, int wRect2, int hRect2) {

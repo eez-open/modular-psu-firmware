@@ -596,14 +596,14 @@ void ChSettingsListsPage::nextPage() {
 
 bool ChSettingsListsPage::isFocusedValueEmpty() {
 	WidgetCursor widgetCursor;
-	widgetCursor = getCursorIndexWithinPage();
+	widgetCursor.cursor = getCursorIndexWithinPage();
     Value value = get(widgetCursor, getDataIdAtCursor());
     return value.getType() == VALUE_TYPE_STRING;
 }
 
 float ChSettingsListsPage::getFocusedValue() {
 	WidgetCursor widgetCursor;
-	widgetCursor = getCursorIndexWithinPage();
+	widgetCursor.cursor = getCursorIndexWithinPage();
 
 	Value value = get(widgetCursor, getDataIdAtCursor());
 
@@ -616,7 +616,7 @@ float ChSettingsListsPage::getFocusedValue() {
 
 void ChSettingsListsPage::setFocusedValue(float value) {
 	WidgetCursor widgetCursor;
-	widgetCursor = getCursorIndexWithinPage();
+	widgetCursor.cursor = getCursorIndexWithinPage();
 
     int16_t dataId = getDataIdAtCursor();
 
@@ -712,7 +712,7 @@ void ChSettingsListsPage::edit() {
 		options.subchannelIndex = g_channel->subchannelIndex;
 
 		WidgetCursor widgetCursor;
-		widgetCursor = getCursorIndexWithinPage();
+		widgetCursor.cursor = getCursorIndexWithinPage();
 
         int16_t dataId = getDataIdAtCursor();
 
@@ -898,7 +898,7 @@ void ChSettingsListsPage::set() {
 void ChSettingsListsPage::onEncoder(int counter) {
 #if OPTION_ENCODER
 	WidgetCursor widgetCursor;
-	widgetCursor = getCursorIndexWithinPage();
+	widgetCursor.cursor = getCursorIndexWithinPage();
 	
 	int16_t dataId = getDataIdAtCursor();
 
@@ -957,7 +957,7 @@ void ChSettingsListsPage::onEncoderClicked() {
 
 Unit ChSettingsListsPage::getEncoderUnit() {
 	WidgetCursor widgetCursor;
-	widgetCursor = getCursorIndexWithinPage();
+	widgetCursor.cursor = getCursorIndexWithinPage();
 
     Value value = get(widgetCursor, getDataIdAtCursor());
 

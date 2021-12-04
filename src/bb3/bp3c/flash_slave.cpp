@@ -297,6 +297,8 @@ void leaveBootloaderMode() {
 
     psu::initChannels();
     psu::testChannels();
+#else
+    g_bootloaderMode = false;
 #endif
 
     psu::profile::recallFromLocation(10);

@@ -485,7 +485,7 @@ void switchToNextEncoderMode() {
 		ChSettingsListsPage *page = (ChSettingsListsPage *)getPage(PAGE_ID_CH_SETTINGS_LISTS);
 		WidgetCursor widgetCursor;
 		if (page) {
-			widgetCursor = g_channel->channelIndex;
+			widgetCursor.cursor = g_channel->channelIndex;
 			setEncoderMode(widgetCursor, page->getDataIdAtCursor(), encoderMode);
 		} else {
 			widgetCursor = getFocusCursor();

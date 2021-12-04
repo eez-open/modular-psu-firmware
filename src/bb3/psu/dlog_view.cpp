@@ -2686,7 +2686,7 @@ void data_dlog_visible_value_offset(DataOperationEnum operation, const WidgetCur
     auto cursor = widgetCursor.cursor;
     auto &recording = dlog_view::getRecording();
 	WidgetCursor dlogValueOffsetWidgetCursor = widgetCursor;
-	dlogValueOffsetWidgetCursor = getSelectedDlogValueIndex(recording, cursor);
+	dlogValueOffsetWidgetCursor.cursor = getSelectedDlogValueIndex(recording, cursor);
 	data_dlog_value_offset(operation, dlogValueOffsetWidgetCursor, value);
 }
 
@@ -3099,13 +3099,13 @@ void data_dlog_y_value_is_selected(DataOperationEnum operation, const WidgetCurs
 
 void data_dlog_y_value_offset(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	WidgetCursor dlogValueOffsetWidgetCursor = widgetCursor;
-	dlogValueOffsetWidgetCursor = getRecording().selectedValueIndex;
+	dlogValueOffsetWidgetCursor.cursor = getRecording().selectedValueIndex;
 	data_dlog_value_offset(operation, dlogValueOffsetWidgetCursor, value);
 }
 
 void data_dlog_y_value_div(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	WidgetCursor dlogValueDivWidgetCursor = widgetCursor;
-	dlogValueDivWidgetCursor = getRecording().selectedValueIndex;
+	dlogValueDivWidgetCursor.cursor = getRecording().selectedValueIndex;
 	data_dlog_value_div(operation, dlogValueDivWidgetCursor, value);
 }
 

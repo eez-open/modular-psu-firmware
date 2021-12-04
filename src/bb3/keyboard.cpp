@@ -45,7 +45,6 @@ static void moveToPreviousFocusCursor();
 ////////////////////////////////////////////////////////////////////////////////
 
 bool isDisplayDirty() {
-
     if (g_lastFocusWidgetCursor != g_focusWidgetCursor) {
         g_lastFocusWidgetCursor = g_focusWidgetCursor;
     	return true;

@@ -406,7 +406,7 @@ bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
         }
     }
 
-    return AppContext::isActiveWidget(widgetCursor);
+    return false;
 }
 
 int PsuAppContext::getMainPageId() {
@@ -1493,7 +1493,7 @@ using namespace psu::gui;
 
 void setFocusCursor(const WidgetCursor &widgetCursor, int16_t dataId) {
     g_setFocusCursor = true;
-	g_focusCursorToSet = widgetCursor;
+    g_focusCursorToSet = widgetCursor;
 	g_focusDataIdToSet = dataId;
 }
 
@@ -1856,7 +1856,7 @@ void takeScreenshot() {
 ////////////////////////////////////////////////////////////////////////////////
 
 static int g_findNextFocusCursorState = 0; 
-static WidgetCursor g_nextFocusCursor = Cursor(0);
+static WidgetCursor g_nextFocusCursor = 0;
 static uint16_t g_nextFocusDataId = DATA_ID_CHANNEL_U_EDIT;
 
 bool findNextFocusCursor(const WidgetCursor &widgetCursor) {
@@ -1931,10 +1931,6 @@ void onEncoder(int counter, bool clicked) {
     Page *activePage = getActivePage();
 
     if (counter != 0) {
-        if (!isEnabledFocusCursor(g_focusCursor, g_focusDataId)) {
-            moveToNextFocusCursor();
-        }
-
 #if defined(EEZ_PLATFORM_SIMULATOR)
         if (g_focusCursorAction == ACTION_ID_SCROLL) {
             counter = -counter;

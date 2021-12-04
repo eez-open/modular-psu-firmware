@@ -46,8 +46,8 @@ static bool g_mouseWasDown;
 static int g_mouseWasCursorX;
 static int g_mouseWasCursorY;
 
-static WidgetCursor m_foundWidgetAtMouse;
-static OnTouchFunctionType m_onTouchFunctionAtMouse;
+static WidgetCursor g_foundWidgetAtMouse;
+static OnTouchFunctionType g_onTouchFunctionAtMouse;
 
 static bool g_lastMouseCursorVisible;
 static int g_lastMouseCursorX;
@@ -89,8 +89,8 @@ void getEvent(bool &mouseCursorVisible, EventType &mouseEventType, int &mouseX, 
 		g_mouseWasCursorX = g_mouseCursorX;
 		g_mouseWasCursorY = g_mouseCursorY;
 
-		m_foundWidgetAtMouse = findWidget(&getRootAppContext(), g_mouseCursorX, g_mouseCursorY, false);
-		m_onTouchFunctionAtMouse = getWidgetTouchFunction(m_foundWidgetAtMouse);
+		g_foundWidgetAtMouse = findWidget(&getRootAppContext(), g_mouseCursorX, g_mouseCursorY, false);
+		g_onTouchFunctionAtMouse = getWidgetTouchFunction(g_foundWidgetAtMouse);
 
 	    mouseCursorVisible = true;
 	    mouseX = g_mouseCursorX;
@@ -100,8 +100,8 @@ void getEvent(bool &mouseCursorVisible, EventType &mouseEventType, int &mouseX, 
 		g_mouseWasCursorX = 0;
 		g_mouseWasCursorY = 0;
 
-		m_foundWidgetAtMouse = 0;
-		m_onTouchFunctionAtMouse = 0;
+		g_foundWidgetAtMouse = 0;
+		g_onTouchFunctionAtMouse = 0;
 
 	    mouseCursorVisible = false;
 	    mouseX = 0;
@@ -114,14 +114,14 @@ bool isDisplayDirty() {
         g_lastMouseCursorVisible != g_mouseCursorVisible ||
         g_lastMouseCursorX != g_mouseCursorX ||
         g_lastMouseCursorY != g_mouseCursorY ||
-        g_lastFoundWidgetAtMouse != m_foundWidgetAtMouse ||
-        g_lastOnTouchFunctionAtMouse != m_onTouchFunctionAtMouse
+        g_lastFoundWidgetAtMouse != g_foundWidgetAtMouse ||
+        g_lastOnTouchFunctionAtMouse != g_onTouchFunctionAtMouse
     ) {
     	g_lastMouseCursorVisible = g_mouseCursorVisible;
     	g_lastMouseCursorX = g_mouseCursorX;
     	g_lastMouseCursorY = g_mouseCursorY;
-        g_lastFoundWidgetAtMouse = m_foundWidgetAtMouse;
-        g_lastOnTouchFunctionAtMouse = m_onTouchFunctionAtMouse;
+        g_lastFoundWidgetAtMouse = g_foundWidgetAtMouse;
+        g_lastOnTouchFunctionAtMouse = g_onTouchFunctionAtMouse;
 
     	return true;
     }
@@ -153,20 +153,20 @@ void updateDisplay() {
                 image.height = getDisplayHeight() - g_lastMouseCursorY;
             }
 
-            if (m_foundWidgetAtMouse && m_onTouchFunctionAtMouse) {
+            if (g_foundWidgetAtMouse && g_onTouchFunctionAtMouse) {
                 int16_t w;
                 int16_t h;
 
-                auto overlay = getOverlay(m_foundWidgetAtMouse);
+                auto overlay = getOverlay(g_foundWidgetAtMouse);
                 if (overlay && overlay->widgetOverrides) {
                     w = overlay->width;
                     h = overlay->height;
                 } else {
-                    w = m_foundWidgetAtMouse.widget->w;
-                    h = m_foundWidgetAtMouse.widget->h;
+                    w = g_foundWidgetAtMouse.widget->w;
+                    h = g_foundWidgetAtMouse.widget->h;
                 }
 
-                drawFocusFrame(m_foundWidgetAtMouse.x, m_foundWidgetAtMouse.y, w, h);
+                drawFocusFrame(g_foundWidgetAtMouse.x, g_foundWidgetAtMouse.y, w, h);
             }
 
             display::drawBitmap(&image, g_lastMouseCursorX, g_lastMouseCursorY);
@@ -175,8 +175,8 @@ void updateDisplay() {
 }
 
 void onPageChanged() {
-    m_foundWidgetAtMouse = 0;
-    m_onTouchFunctionAtMouse = 0;
+    g_foundWidgetAtMouse = 0;
+    g_onTouchFunctionAtMouse = 0;
 }
 
 void onMouseXMove(int x) {

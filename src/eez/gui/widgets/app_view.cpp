@@ -54,19 +54,23 @@ void AppViewWidgetState::draw() {
         WidgetState *endOfContainerInPreviousState = 0;
         if (widgetCursor.previousState) {
             endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
-        }
+		}
 
         for (int i = 0; i <= appContext->m_pageNavigationStackPointer; i++) {
-            appContext->updatePage(i, childWidgetCursor);
+			if (!appContext->isPageFullyCovered(i)) {
+				appContext->updatePage(i, childWidgetCursor);
 
-            if (childWidgetCursor.previousState) {
-                childWidgetCursor.previousState = nextWidgetState(childWidgetCursor.previousState);
-                if (childWidgetCursor.previousState > endOfContainerInPreviousState) {
-                    childWidgetCursor.previousState = 0;
-                }
+				if (childWidgetCursor.previousState) {
+					childWidgetCursor.previousState = nextWidgetState(childWidgetCursor.previousState);
+					if (childWidgetCursor.previousState > endOfContainerInPreviousState) {
+						childWidgetCursor.previousState = 0;
+					}
+				}
+
+				childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
+			} else {
+                appContext->m_pageNavigationStack[i].displayBufferIndex = -1;
             }
-
-            childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
         }
     } else {
         enumNoneWidget(childWidgetCursor);

@@ -30,7 +30,9 @@
         "list": "cpp",
         "xtree": "cpp",
         "cstdlib": "cpp",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "ios": "cpp",
+        "xhash": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": true

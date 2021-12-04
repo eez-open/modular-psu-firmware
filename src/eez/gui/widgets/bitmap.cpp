@@ -28,7 +28,7 @@ namespace gui {
 void BitmapWidgetState::draw() {
 	auto widget = (const BitmapWidget *)widgetCursor.widget;
 
-    data = widget->data ? getBitmapImage(widgetCursor.cursor, widget->data) : 0;
+    data = widget->data ? getBitmapImage(widgetCursor, widget->data) : 0;
 
     bool refresh = !widgetCursor.previousState ||
     		widgetCursor.previousState->flags.active != flags.active ||

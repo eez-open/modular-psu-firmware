@@ -41,7 +41,7 @@ namespace eez {
 namespace gui {
 
 static WidgetCursor m_foundWidgetAtDown;
-static WidgetCursor m_activeWidget;
+static WidgetCursor g_activeWidget;
 static bool m_touchActionExecuted;
 static bool m_touchActionExecutedAtDown;
 static OnTouchFunctionType m_onTouchFunction;
@@ -127,7 +127,7 @@ static void processTouchEvent(EventType type, int x, int y) {
             m_onTouchFunction = onPageTouch;
         }
     } else if (type == EVENT_TYPE_TOUCH_UP) {
-        m_activeWidget = 0;
+        g_activeWidget = 0;
     }
 
     if (m_onTouchFunction) {
@@ -186,15 +186,15 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
 
         if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
             dragOverlay(touchEvent);
-            m_activeWidget = widgetCursor;    
+            g_activeWidget = widgetCursor;
         } else if (widgetCursor.appContext->testExecuteActionOnTouchDown(action)) {
             executeAction(widgetCursor, action);
             m_touchActionExecutedAtDown = true;
             if (widgetCursor.appContext->isAutoRepeatAction(action)) {
-                m_activeWidget = widgetCursor;    
+                g_activeWidget = widgetCursor;
             }
         } else {
-            m_activeWidget = widgetCursor;
+            g_activeWidget = widgetCursor;
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
         if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
@@ -221,7 +221,7 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         if (!m_touchActionExecutedAtDown) {
-            m_activeWidget = 0;
+            g_activeWidget = 0;
             if (!m_touchActionExecuted) {
                 if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
                     dragOverlay(touchEvent);
@@ -244,14 +244,14 @@ void setFoundWidgetAtDown(WidgetCursor &widgetCursor) {
 }
 
 void clearFoundWidgetAtDown() {
-    m_foundWidgetAtDown = WidgetCursor();
+    m_foundWidgetAtDown = 0;
 }
 
 bool isActiveWidget(const WidgetCursor &widgetCursor) {
-    if (widgetCursor.appContext && widgetCursor.appContext->isActiveWidget(widgetCursor)) {
+    if (widgetCursor.appContext->isActiveWidget(widgetCursor)) {
         return true;
     }
-    return widgetCursor == m_activeWidget;
+    return widgetCursor == g_activeWidget;
 }
 
 bool isFocusWidget(const WidgetCursor &widgetCursor) {

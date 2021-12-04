@@ -1529,27 +1529,27 @@ static int16_t g_editValueDataId;
 void onSetFloatValue(float value) {
     popPage();
 	WidgetCursor widgetCursor;
-	widgetCursor = g_editValueCursor;
+	widgetCursor.cursor = g_editValueCursor;
     set(widgetCursor, g_editValueDataId, MakeValue(value, getUnit(widgetCursor, g_editValueDataId)));
 }
 
 void onSetInfinityValue() {
     popPage();
 	WidgetCursor widgetCursor;
-	widgetCursor = g_editValueCursor;
+	widgetCursor.cursor = g_editValueCursor;
 	set(widgetCursor, g_editValueDataId, MakeValue(INFINITY, getUnit(widgetCursor, g_editValueDataId)));
 }
 
 void onSetUInt16Value(float value) {
     popPage();
 	WidgetCursor widgetCursor;
-	widgetCursor = g_editValueCursor;
+	widgetCursor.cursor = g_editValueCursor;
 	set(widgetCursor, g_editValueDataId, Value((uint16_t)value, VALUE_TYPE_UINT16));
 }
 
 void onSetStringValue(char *value) {
 	WidgetCursor widgetCursor;
-	widgetCursor = g_editValueCursor;
+	widgetCursor.cursor = g_editValueCursor;
 	const char *errMessage = isValidValue(widgetCursor, g_editValueDataId, value);
     if (!errMessage) {
         popPage();
@@ -1562,7 +1562,7 @@ void onSetStringValue(char *value) {
 void editValue(int16_t dataId) {
     g_editValueDataId = dataId;
 	WidgetCursor widgetCursor;
-	widgetCursor = g_editValueCursor;
+	widgetCursor.cursor = g_editValueCursor;
 	Value value = get(widgetCursor, g_editValueDataId);
 
     if (value.getType() == VALUE_TYPE_FLOAT) {
@@ -4580,7 +4580,7 @@ void data_channel_list_voltage(DataOperationEnum operation, const WidgetCursor &
         StepValues *stepValues = value.getStepValues();
 
 		WidgetCursor uEditWidgetCursor = widgetCursor;
-		uEditWidgetCursor = g_channel->channelIndex;
+		uEditWidgetCursor.cursor = g_channel->channelIndex;
         data_channel_u_edit(operation, uEditWidgetCursor, value);
 
         stepValues->encoderSettings.range = g_channel->params.U_MAX;
