@@ -24,7 +24,7 @@
 namespace eez {
 namespace gui {
 
-void ButtonWidgetState::draw() {
+void ButtonWidgetState::draw(WidgetState *previousState) {
     auto widget = (const ButtonWidget *)widgetCursor.widget;
 
     auto enabled = get(widgetCursor, widget->enabled);
@@ -36,11 +36,11 @@ void ButtonWidgetState::draw() {
     data = widget->data ? get(widgetCursor, widget->data) : 0;
 
     bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != flags.active ||
-        widgetCursor.previousState->flags.enabled != flags.enabled ||
-        widgetCursor.previousState->flags.blinking != flags.blinking ||
-        widgetCursor.previousState->data != data;
+        !previousState ||
+        previousState->flags.active != flags.active ||
+        previousState->flags.enabled != flags.enabled ||
+        previousState->flags.blinking != flags.blinking ||
+        previousState->data != data;
 
 	static const size_t MAX_TEXT_LEN = 128;
 

@@ -33,7 +33,7 @@ struct GaugeWidget : public Widget {
 };
 
 struct GaugeWidgetState : public WidgetState {
-	void draw() override;
+	void draw(WidgetState *previousState) override;
 };
 
 } // namespace gui

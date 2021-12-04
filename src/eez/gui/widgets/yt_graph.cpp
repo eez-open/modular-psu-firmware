@@ -201,6 +201,7 @@ struct YTGraphDrawHelper {
 
 // used for YT_GRAPH_UPDATE_METHOD_STATIC
 struct YTGraphStaticDrawHelper {
+    YTGraphWidgetState *currentState;
     const WidgetCursor &widgetCursor;
     const Widget *widget;
 
@@ -231,7 +232,9 @@ struct YTGraphStaticDrawHelper {
     int xLabels[MAX_NUM_OF_Y_VALUES];
     int yLabels[MAX_NUM_OF_Y_VALUES];
 
-    YTGraphStaticDrawHelper(const WidgetCursor &widgetCursor_) : widgetCursor(widgetCursor_), widget(widgetCursor.widget) {
+    YTGraphStaticDrawHelper(YTGraphWidgetState *currentState_, const WidgetCursor &widgetCursor_) 
+        : currentState(currentState_), widgetCursor(widgetCursor_), widget(widgetCursor.widget) 
+    {
         ytDataGetValue = ytDataGetGetValueFunc(widgetCursor, widget->data);
     }
 
@@ -333,8 +336,6 @@ struct YTGraphStaticDrawHelper {
         yLabels[m_valueIndex] = INT_MIN;
 
         if (ytDataDataValueIsVisible(widgetCursor, widget->data, m_valueIndex)) {
-            YTGraphWidgetState *currentState = (YTGraphWidgetState *)widgetCursor.currentState;
-
             position = currentHistoryValuePosition;
 
             scale = (widget->h - 1) / currentState->valueDiv[m_valueIndex] / vertDivisions;
@@ -453,7 +454,7 @@ struct YTGraphStaticDrawHelper {
 
 			drawText(text, -1,
 				xCursorText, yCursorText, cursorTextWidth, cursorTextHeight,
-				style, widgetCursor.currentState->flags.focused, false, false, nullptr, nullptr, nullptr, nullptr
+				style, currentState->flags.focused, false, false, nullptr, nullptr, nullptr, nullptr
 			);
 		}
 		
@@ -480,10 +481,9 @@ struct YTGraphStaticDrawHelper {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void YTGraphWidgetState::draw() {
+void YTGraphWidgetState::draw(WidgetState *previousStateBase) {
+    YTGraphWidgetState *previousState = (YTGraphWidgetState *)previousStateBase;
     const Widget *widget = widgetCursor.widget;
-
-    YTGraphWidgetState *previousState = (YTGraphWidgetState *)widgetCursor.previousState;
 
     flags.focused = isFocusWidget(widgetCursor);
     data = get(widgetCursor, widget->data);
@@ -521,7 +521,7 @@ void YTGraphWidgetState::draw() {
     uint16_t graphWidth = (uint16_t)widget->w;
 
     uint32_t previousHistoryValuePosition;
-    if (widgetCursor.previousState &&
+    if (previousState &&
         previousState->iChannel == iChannel &&
         previousState->ytGraphUpdateMethod == ytGraphUpdateMethod &&
         previousState->refreshCounter == refreshCounter)
@@ -531,11 +531,11 @@ void YTGraphWidgetState::draw() {
         previousHistoryValuePosition = historyValuePosition - graphWidth;
     }
 
-    bool refreshBackground = !widgetCursor.previousState;
+    bool refreshBackground = !previousState;
 
     if (
         refreshBackground || 
-        widgetCursor.previousState->flags.focused != flags.focused ||
+        previousState->flags.focused != flags.focused ||
         showLabels != previousState->showLabels ||
         selectedValueIndex != previousState->selectedValueIndex ||
         visibleValuesChanged || 
@@ -548,7 +548,7 @@ void YTGraphWidgetState::draw() {
         )
     ) {
         if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
-            YTGraphStaticDrawHelper drawHelper(widgetCursor);
+            YTGraphStaticDrawHelper drawHelper(this, widgetCursor);
 
             drawHelper.cursorPosition = cursorPosition;
             drawHelper.bookmarks = bookmarks;

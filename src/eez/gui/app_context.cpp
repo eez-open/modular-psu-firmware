@@ -46,7 +46,6 @@ namespace gui {
 ////////////////////////////////////////////////////////////////////////////////
 
 AppContext::AppContext() {
-    m_updatePageIndex = -1;
 }
 
 void AppContext::stateManagment() {
@@ -88,25 +87,6 @@ bool AppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-int AppContext::getActivePageStackPointer() {
-    return m_updatePageIndex != -1 ? m_updatePageIndex : m_pageNavigationStackPointer;
-}
-
-int AppContext::getActivePageId() {
-    return m_pageNavigationStack[getActivePageStackPointer()].pageId;
-}
-
-Page *AppContext::getActivePage() {
-    return m_pageNavigationStack[getActivePageStackPointer()].page;
-}
-
-int AppContext::getPreviousPageId() {
-    if (getActivePageStackPointer() == 0) {
-        return PAGE_ID_NONE;
-    }
-    return m_pageNavigationStack[getActivePageStackPointer() - 1].pageId;
-}
 
 void AppContext::onPageChanged(int previousPageId, int activePageId) {
     display::turnOn();
@@ -307,15 +287,16 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
-    if (!widgetCursor.previousState || m_pageNavigationStack[i].displayBufferIndex == -1) {
+void AppContext::updatePage(int i, WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState) {
+    if (!previousState || m_pageNavigationStack[i].displayBufferIndex == -1) {
         m_pageNavigationStack[i].displayBufferIndex = display::allocBuffer();
-        widgetCursor.previousState = nullptr;
+        previousState = nullptr;
     }
 
     display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
 
-    m_updatePageIndex = i;
+    auto savedPageNavigationStackPointer = m_pageNavigationStackPointer;
+    m_pageNavigationStackPointer = i;
 
     int x;
     int y;
@@ -332,9 +313,9 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         height = internalPage->height;
         withShadow = true;
 
-        internalPage->updateInternalPage(widgetCursor);
+        internalPage->updateInternalPage(widgetCursor, currentState, previousState);
 
-        enumNoneWidget(widgetCursor);
+        enumNoneWidget(widgetCursor, currentState, previousState);
     } else {
         auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
 
@@ -345,12 +326,12 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         withShadow = page->x > 0;
 
         widgetCursor.widget = page;
-        enumWidget(widgetCursor);
+        enumWidget(widgetCursor, currentState, previousState);
     }
 
     display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
 
-    m_updatePageIndex = -1;
+    m_pageNavigationStackPointer = savedPageNavigationStackPointer;
 }
 
 bool isRect1FullyCoveredByRect2(int xRect1, int yRect1, int wRect1, int hRect1, int xRect2, int yRect2, int wRect2, int hRect2) {

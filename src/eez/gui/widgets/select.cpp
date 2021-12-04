@@ -22,7 +22,7 @@
 namespace eez {
 namespace gui {
 
-void SelectWidgetState::draw() {
+void SelectWidgetState::draw(WidgetState *previousState) {
     Value indexValue = get(widgetCursor, widgetCursor.widget->data);
     data = indexValue;
 
@@ -36,18 +36,20 @@ void SelectWidgetState::draw() {
 
 	    auto widgetIndex = index < 0 || index >= (int)selectWidget->widgets.count ? 0 : index;
 
-        WidgetCursor childWidgetCursor = getFirstChildWidgetCursor();
+        WidgetState *childCurrentState = this;
+        WidgetState *childPreviousState = previousState;
+        WidgetCursor childWidgetCursor = getFirstChildWidgetCursor(widgetCursor, childCurrentState, childPreviousState);
 
         childWidgetCursor.widget = selectWidget->widgets.item(widgetCursor.assets, widgetIndex);
 
-        if (widgetCursor.previousState && widgetCursor.previousState->data != data) {
-            childWidgetCursor.previousState = 0;
+        if (previousState && previousState->data != data) {
+            childPreviousState = 0;
         }
 
-        enumWidget(childWidgetCursor);
+        enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
 
-        childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
-        widgetStateSize = (uint8_t *)childWidgetCursor.currentState - (uint8_t *)this;
+        childCurrentState = nextWidgetState(childCurrentState);
+        widgetStateSize = (uint8_t *)childCurrentState - (uint8_t *)this;
     }
 }
 

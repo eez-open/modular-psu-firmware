@@ -34,7 +34,7 @@ struct ListGraphWidget : public Widget {
 struct ListGraphWidgetState : public WidgetState {
     Value cursorData;
 
-    void draw() override;
+    void draw(WidgetState *previousState) override;
 	bool hasOnTouch() override;
 	void onTouch(Event &touchEvent) override;
 };

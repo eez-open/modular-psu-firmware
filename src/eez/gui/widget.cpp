@@ -84,33 +84,31 @@ static size_t g_widgetStateSize[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-WidgetCursor WidgetState::getFirstChildWidgetCursor() {
-    WidgetCursor childWidgetCursor = widgetCursor;
-
+WidgetCursor WidgetState::getFirstChildWidgetCursor(WidgetCursor &widgetCursor, WidgetState *&currentState, WidgetState *&previousState) {
     auto widgetStateSize = g_widgetStateSize[widgetCursor.widget->type];
 
-    if (widgetCursor.previousState) {
-        childWidgetCursor.previousState = (WidgetState *)((uint8_t *)widgetCursor.previousState + widgetStateSize);
+    if (previousState) {
+        previousState = (WidgetState *)((uint8_t *)previousState + widgetStateSize);
     }
 
-    childWidgetCursor.currentState = (WidgetState *)((uint8_t *)widgetCursor.currentState + widgetStateSize);
+    currentState = (WidgetState *)((uint8_t *)currentState + widgetStateSize);
 
     //
-    auto stateSize = getCurrentStateBufferSize(childWidgetCursor);
+    uint32_t stateSize = (uint8_t *)currentState - (uint8_t *)g_currentState;
     assert(stateSize <= CONF_MAX_STATE_SIZE);
 
-	return childWidgetCursor;
+	return widgetCursor;
 }
 
-void WidgetState::draw() {
+void WidgetState::draw(WidgetState *previousState) {
     const Widget *widget = widgetCursor.widget;
 
     bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != widgetCursor.currentState->flags.active;
+        !previousState ||
+        previousState->flags.active != flags.active;
 
     if (refresh) {
-        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, getStyle(widget->style), widgetCursor.currentState->flags.active, false, true);
+        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, getStyle(widget->style), flags.active, false, true);
     }
 }
 
@@ -135,19 +133,21 @@ WidgetState *nextWidgetState(WidgetState *p) {
     return (WidgetState *)(((uint8_t *)p) + p->widgetStateSize);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 bool WidgetCursor::isPage() const {
     return widget->type == WIDGET_TYPE_CONTAINER && ((((ContainerWidget *)widget)->flags & PAGE_CONTAINER) != 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void enumWidget(WidgetCursor &widgetCursor) {
+void enumWidget(WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState) {
     const Widget *widget = widgetCursor.widget;
 
     bool savedIsActiveWidget = g_isActiveWidget;
     g_isActiveWidget = g_isActiveWidget || isActiveWidget(widgetCursor);
 
-    auto widgetState = widgetCursor.currentState;
+    auto widgetState = currentState;
 
 	g_widgetStatePlacementNewFunctions[widget->type](widgetState);
 
@@ -157,16 +157,16 @@ void enumWidget(WidgetCursor &widgetCursor) {
     widgetState->widgetCursor.x += widget->x;
     widgetState->widgetCursor.y += widget->y;
 
-    widgetState->draw();
+    widgetState->draw(previousState);
 
     g_isActiveWidget = savedIsActiveWidget;
 }
 
-void enumNoneWidget(WidgetCursor &widgetCursor) {
+void enumNoneWidget(WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState) {
 	static Widget g_noneWidget = { WIDGET_TYPE_NONE };
 	const Widget *widget = &g_noneWidget;
 
-	auto widgetState = widgetCursor.currentState;
+	auto widgetState = currentState;
 
 	g_widgetStatePlacementNewFunctions[widget->type](widgetState);
 
@@ -185,11 +185,28 @@ void forEachWidget(AppContext* appContext, EnumWidgetsCallback callback) {
     WidgetState *widgetState = g_currentState;
 	WidgetState *widgetStateEnd = nextWidgetState(g_currentState);
     while (widgetState != widgetStateEnd) {
-        if (!callback(widgetState->widgetCursor)) {
+        if (!callback(widgetState)) {
             break;
         }
         widgetState = (WidgetState *)((uint8_t*)widgetState + g_widgetStateSize[widgetState->widgetCursor.widget->type]);
     }
+}
+
+WidgetState *getWidgetState(const WidgetCursor &widgetCursor) {
+    if (!g_currentState) {
+        return nullptr;
+    }
+
+    WidgetState *widgetState = g_currentState;
+	WidgetState *widgetStateEnd = nextWidgetState(g_currentState);
+    while (widgetState != widgetStateEnd) {
+        if (widgetState->widgetCursor == widgetCursor) {
+            return widgetState;
+        }
+        widgetState = (WidgetState *)((uint8_t*)widgetState + g_widgetStateSize[widgetState->widgetCursor.widget->type]);
+    }    
+
+	return nullptr;
 }
 
 void freeWidgetStates(WidgetState *topWidgetState) {
@@ -214,7 +231,9 @@ static int g_xOverlayOffset = 0;
 static int g_yOverlayOffset = 0;
 static WidgetState *g_widgetStateAfterOverlay = nullptr;
 
-static bool findWidgetStep(const WidgetCursor &widgetCursor) {
+static bool findWidgetStep(WidgetState *widgetState) {
+    const WidgetCursor &widgetCursor = widgetState->widgetCursor;
+
 	if (widgetCursor.appContext->isActivePageInternal()) {
 		auto internalPage = ((InternalPage *)widgetCursor.appContext->getActivePage());
 
@@ -245,7 +264,7 @@ static bool findWidgetStep(const WidgetCursor &widgetCursor) {
 
     Overlay *overlay = getOverlay(widgetCursor);
 
-    if (widgetCursor.currentState == g_widgetStateAfterOverlay) {
+    if (widgetState == g_widgetStateAfterOverlay) {
         g_xOverlayOffset = 0;
         g_yOverlayOffset = 0;
         g_widgetStateAfterOverlay = nullptr;
@@ -253,7 +272,7 @@ static bool findWidgetStep(const WidgetCursor &widgetCursor) {
 
     if (overlay) {
         getOverlayOffset(widgetCursor, g_xOverlayOffset, g_yOverlayOffset);
-        g_widgetStateAfterOverlay = nextWidgetState(widgetCursor.currentState);
+        g_widgetStateAfterOverlay = nextWidgetState(widgetState);
     }
 
     static const int MIN_SIZE = 50;

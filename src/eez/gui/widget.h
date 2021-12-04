@@ -96,85 +96,58 @@ struct WidgetCursor {
     const Widget *widget;
     Cursor cursor;
 	int32_t iterators[MAX_ITERATORS];
-    WidgetState *previousState;
-    WidgetState *currentState;
     flow::FlowState *flowState;
     int16_t x;
     int16_t y;
 
-    WidgetCursor() 
+	WidgetCursor()
 		: assets(nullptr)
 		, appContext(nullptr)
-        , widget(nullptr)
-        , cursor(-1)
-        , previousState(nullptr)
-        , currentState(nullptr)
-        , flowState(0)
-        , x(0)
-        , y(0)
+		, widget(nullptr)
+		, cursor(-1)
+		, flowState(nullptr)
+		, x(0)
+		, y(0)
 	{
-		for (size_t i = 0; i < MAX_ITERATORS; i++) {
-			iterators[i] = -1;
-		}
-    }
+		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
+	}
 
-     WidgetCursor(
+    WidgetCursor(
 		Assets *assets_,
 		AppContext *appContext_,
 		const Widget *widget_,
-		const Cursor cursor_,
-		int32_t *iterators_,
-		WidgetState *previousState_,
-		WidgetState *currentState_,
-		flow::FlowState *flowState,
 		int16_t x_,
 		int16_t y_
-     )
+    )
 		: assets(assets_)
 		, appContext(appContext_)
 		, widget(widget_)
-		, cursor(cursor_)
-		, previousState(previousState_)
-		, currentState(currentState_)
-		, flowState(flowState)
+		, cursor(-1)
+		, flowState(nullptr)
 		, x(x_)
 		, y(y_)
-     {
-	 	if (iterators_) {
-	 		for (size_t i = 0; i < MAX_ITERATORS; i++) {
-	 			iterators[i] = iterators_[i];
-	 		}
-	 	} else {
-	 		for (size_t i = 0; i < MAX_ITERATORS; i++) {
-	 			iterators[i] = -1;
-	 		}
-	 	}
-	 }
+    {
+		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
+	}
 
 	WidgetCursor(Cursor cursor_)
 		: assets(nullptr)
 		, appContext(nullptr)
 		, widget(nullptr)
 		, cursor(cursor_)
-		, previousState(nullptr)
-		, currentState(nullptr)
-		, flowState(0)
+		, flowState(nullptr)
 		, x(0)
 		, y(0)
 	{
-		for (size_t i = 0; i < MAX_ITERATORS; i++) {
-			iterators[i] = -1;
-		}
+		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
 	}
 
     bool operator!=(const WidgetCursor &rhs) const {
 		if (widget != rhs.widget || cursor != rhs.cursor) {
 			return true;
 		}
-		for (size_t i = 0; i < MAX_ITERATORS; i++) {
-			if (iterators[i] != rhs.iterators[i]) {
-				return true;
-			}
+		if (iterators[0] != rhs.iterators[0] || iterators[1] != rhs.iterators[1] || iterators[2] != rhs.iterators[2] || iterators[3] != rhs.iterators[3]) {
+			return true;
 		}
 		return false;
 	}
@@ -188,17 +161,11 @@ struct WidgetCursor {
     }
 
 	void pushIterator(int32_t it) {
-		for (size_t i = MAX_ITERATORS - 1; i > 0; i--) {
-			iterators[i] = iterators[i - 1];
-		}
-		iterators[0] = it;
+		iterators[3] = iterators[2]; iterators[2] = iterators[1]; iterators[1] = iterators[0]; iterators[0] = it;
 	}
 
 	void popIterator() {
-		for (size_t i = 1; i < MAX_ITERATORS; i++) {
-			iterators[i - 1] = iterators[i];
-		}
-		iterators[MAX_ITERATORS - 1] = -1;
+		iterators[0] = iterators[1]; iterators[1] = iterators[2]; iterators[2] = iterators[3]; iterators[3] = -1;
 	}
 
 	bool isPage() const;
@@ -219,9 +186,9 @@ struct WidgetState {
 
 	virtual ~WidgetState() {}
 
-	WidgetCursor getFirstChildWidgetCursor();
+	WidgetCursor getFirstChildWidgetCursor(WidgetCursor &widgetCursor, WidgetState *&currentState, WidgetState *&previousState);
 
-	virtual void draw();
+	virtual void draw(WidgetState *previousState);
 	
 	virtual bool hasOnTouch();
 	virtual void onTouch(Event &touchEvent);
@@ -236,11 +203,12 @@ extern bool g_isActiveWidget;
 
 WidgetState *nextWidgetState(WidgetState *p);
 
-void enumWidget(WidgetCursor &widgetCursor);
-void enumNoneWidget(WidgetCursor &widgetCursor);
+void enumWidget(WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);
+void enumNoneWidget(WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);
 
-typedef bool (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
+typedef bool (*EnumWidgetsCallback)(WidgetState *widgetState);
 void forEachWidget(AppContext* appContext, EnumWidgetsCallback callback);
+WidgetState *getWidgetState(const WidgetCursor &widgetCursor);
 
 void freeWidgetStates(WidgetState *topWidgetState);
 

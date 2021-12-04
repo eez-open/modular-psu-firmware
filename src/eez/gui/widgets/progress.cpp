@@ -24,12 +24,12 @@
 namespace eez {
 namespace gui {
 
-void ProgressWidgetState::draw() {
+void ProgressWidgetState::draw(WidgetState *previousState) {
     auto widget = widgetCursor.widget;
 
     data = get(widgetCursor, widget->data);
 
-    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != data;
+    bool refresh = !previousState || previousState->data != data;
 
     if (refresh) {
         const Style* style = getStyle(widget->style);

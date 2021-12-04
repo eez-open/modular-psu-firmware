@@ -24,15 +24,15 @@
 namespace eez {
 namespace gui {
 
-void ToggleButtonWidgetState::draw() {
+void ToggleButtonWidgetState::draw(WidgetState *previousState) {
     auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
 
     flags.enabled = get(widgetCursor, widget->data).getInt() ? 1 : 0;
 
     bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != flags.active ||
-        widgetCursor.previousState->flags.enabled != flags.enabled;
+        !previousState ||
+        previousState->flags.active != flags.active ||
+        previousState->flags.enabled != flags.enabled;
 
     if (refresh) {
         const Style* style = getStyle(widget->style);

@@ -33,7 +33,7 @@ struct InputWidget : public Widget {
 };
 
 struct InputWidgetState : public WidgetState {
-	void draw() override;
+	void draw(WidgetState *previousState) override;
 };
 
 struct InputWidgetExecutionState : public flow::ComponenentExecutionState {

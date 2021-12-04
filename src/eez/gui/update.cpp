@@ -33,10 +33,6 @@ int getCurrentStateBufferIndex() {
     return (uint8_t *)g_currentState == g_stateBuffer ? 0 : 1;
 }
 
-size_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor) {
-    return (uint8_t *)widgetCursor.currentState - (uint8_t *)g_currentState;
-}
-
 void refreshScreen() {
     g_refreshScreen = true;
 }
@@ -76,10 +72,8 @@ void updateScreen() {
 	widgetCursor.assets = g_mainAssets;
 	widgetCursor.appContext = &getRootAppContext();
 	widgetCursor.widget = &widget;
-	widgetCursor.previousState = g_previousState;
-	widgetCursor.currentState = g_currentState;
 
-    enumWidget(widgetCursor);
+    enumWidget(widgetCursor, g_currentState, g_previousState);
 }
 
 } // namespace gui

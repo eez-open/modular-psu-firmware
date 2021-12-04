@@ -40,7 +40,7 @@ struct BarGraphWidgetState : public WidgetState {
     Value textData;
     uint32_t textDataRefreshLastTime;
 
-    void draw() override;
+    void draw(WidgetState *previousState) override;
 };
 
 } // namespace gui

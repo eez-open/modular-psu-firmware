@@ -24,12 +24,12 @@
 namespace eez {
 namespace gui {
 
-void CanvasWidgetState::draw() {
+void CanvasWidgetState::draw(WidgetState *previousState) {
     const Widget *widget = widgetCursor.widget;
 
     data = get(widgetCursor, widget->data);
 
-    bool refresh = !widgetCursor.previousState || widgetCursor.previousState->data != data;
+    bool refresh = !previousState || previousState->data != data;
 
     if (refresh) {
         Value value;

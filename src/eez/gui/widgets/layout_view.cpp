@@ -33,7 +33,7 @@ int getLayoutId(const WidgetCursor &widgetCursor) {
     return layoutView->layout;
 }
 
-void LayoutViewWidgetState::draw() {
+void LayoutViewWidgetState::draw(WidgetState *previousState) {
 	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
     Value oldContext;
@@ -48,10 +48,10 @@ void LayoutViewWidgetState::draw() {
     data = getLayoutId(widgetCursor);
 
     bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.active != flags.active ||
-        widgetCursor.previousState->data != data ||
-        ((LayoutViewWidgetState *)widgetCursor.previousState)->context != context;
+        !previousState ||
+        previousState->flags.active != flags.active ||
+        previousState->data != data ||
+        ((LayoutViewWidgetState *)previousState)->context != context;
 
     if (refresh) {
         const Style* style = getStyle(widget->style);
@@ -62,16 +62,18 @@ void LayoutViewWidgetState::draw() {
     auto layout = getPageAsset(layoutId, widgetCursor);
 
     if (layout) {
-        WidgetCursor childWidgetCursor = getFirstChildWidgetCursor();
+        WidgetState *childCurrentState = this;
+        WidgetState *childPreviousState = previousState;
+        WidgetCursor childWidgetCursor = getFirstChildWidgetCursor(widgetCursor, childCurrentState, childPreviousState);
         
         if (
-            widgetCursor.previousState && 
+            previousState && 
             (
-                widgetCursor.previousState->data != data || 
-                ((LayoutViewWidgetState *)widgetCursor.previousState)->context != context
+                previousState->data != data || 
+                ((LayoutViewWidgetState *)previousState)->context != context
             )
         ) {
-            childWidgetCursor.previousState = 0;
+            childPreviousState = 0;
         }
 
 		auto layoutView = (PageAsset *)layout;
@@ -79,26 +81,25 @@ void LayoutViewWidgetState::draw() {
         auto &widgets = layoutView->widgets;
 
         WidgetState *endOfContainerInPreviousState = 0;
-        if (widgetCursor.previousState) {
-            endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
+        if (previousState) {
+            endOfContainerInPreviousState = nextWidgetState(previousState);
         }
 
         for (uint32_t index = 0; index < widgets.count; ++index) {
             childWidgetCursor.widget = widgets.item(widgetCursor.assets, index);
 
-            enumWidget(childWidgetCursor);
+            enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
 
-            if (childWidgetCursor.previousState) {
-                childWidgetCursor.previousState = nextWidgetState(childWidgetCursor.previousState);
-                if (childWidgetCursor.previousState > endOfContainerInPreviousState) {
-                    childWidgetCursor.previousState = 0;
+            if (childPreviousState) {
+                childPreviousState = nextWidgetState(childPreviousState);
+                if (childPreviousState > endOfContainerInPreviousState) {
+                    childPreviousState = 0;
                 }
             }
-
-            childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
+            childCurrentState = nextWidgetState(childCurrentState);
         }
 
-        widgetStateSize = (uint8_t *)childWidgetCursor.currentState - (uint8_t *)this;
+        widgetStateSize = (uint8_t *)childCurrentState - (uint8_t *)this;
 	}
 }
 

@@ -76,7 +76,10 @@ void onKeyDown(uint16_t param) {
         bool handled = false;
 
         if (g_focusWidgetCursor) {
-            handled = g_focusWidgetCursor.currentState->onKeyboard(key, mod);
+            auto widgetState = getWidgetState(g_focusWidgetCursor);
+            if (widgetState) {
+                handled = widgetState->onKeyboard(key, mod);
+            }
         }
 
         if (!handled) {
@@ -195,8 +198,10 @@ void onKeyboardEvent(SDL_KeyboardEvent *key) {
 static int g_findFocusCursorState;
 static WidgetCursor g_focusWidgetCursorIter;
 
-static bool isKeyboardEnabledForWidget(const WidgetCursor &widgetCursor) {
-    Overlay *overlay = getOverlay(widgetCursor);
+static bool isKeyboardEnabledForWidget(WidgetState *widgetState) {
+	const WidgetCursor &widgetCursor = widgetState->widgetCursor;
+	
+	Overlay *overlay = getOverlay(widgetCursor);
     if (overlay && !overlay->state) {
         return false;
     }
@@ -206,15 +211,16 @@ static bool isKeyboardEnabledForWidget(const WidgetCursor &widgetCursor) {
         return true;
     }
 
-    if (widgetCursor.currentState->hasOnKeyboard()) {
+    if (widgetState->hasOnKeyboard()) {
         return true;
     }
 
     return false;
 }
 
-static bool findNextFocusCursor(const WidgetCursor &widgetCursor) {
-    if (isKeyboardEnabledForWidget(widgetCursor)) {
+static bool findNextFocusCursor(WidgetState *widgetState) {
+    const WidgetCursor &widgetCursor = widgetState->widgetCursor;
+    if (isKeyboardEnabledForWidget(widgetState)) {
         if (g_findFocusCursorState == 0) {
             g_focusWidgetCursorIter = widgetCursor;
             g_findFocusCursorState = 1;
@@ -246,8 +252,9 @@ static void moveToNextFocusCursor() {
     }
 }
 
-static bool findPreviousFocusCursor(const WidgetCursor &widgetCursor) {
-    if (isKeyboardEnabledForWidget(widgetCursor)) {
+static bool findPreviousFocusCursor(WidgetState *widgetState) {
+    const WidgetCursor &widgetCursor = widgetState->widgetCursor;
+    if (isKeyboardEnabledForWidget(widgetState)) {
         if (g_findFocusCursorState == 0) {
             g_focusWidgetCursorIter = widgetCursor;
             g_findFocusCursorState = 1;

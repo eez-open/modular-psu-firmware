@@ -27,7 +27,7 @@
 namespace eez {
 namespace gui {
 
-void ListGraphWidgetState::draw() {
+void ListGraphWidgetState::draw(WidgetState *previousState) {
     auto widget = (const ListGraphWidget *)widgetCursor.widget;
 
 	const Style* style = getStyle(widget->style);
@@ -39,15 +39,15 @@ void ListGraphWidgetState::draw() {
     cursorData = get(widgetCursor, widget->cursorData);
 
     int iPrevCursor = -1;
-    if (widgetCursor.previousState) {
-        iPrevCursor = ((ListGraphWidgetState *)widgetCursor.previousState)->cursorData.getInt();
+    if (previousState) {
+        iPrevCursor = ((ListGraphWidgetState *)previousState)->cursorData.getInt();
     }
 
     int iCursor = cursorData.getInt();
     int iRow = iCursor / 3;
 
-    bool refresh = !widgetCursor.previousState ||
-        widgetCursor.previousState->data != data ||
+    bool refresh = !previousState ||
+        previousState->data != data ||
         iCursor != iPrevCursor;
 
     if (refresh) {

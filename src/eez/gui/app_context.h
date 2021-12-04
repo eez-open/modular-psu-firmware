@@ -52,12 +52,19 @@ public:
     void popPage();
     void removePageFromStack(int pageId);
 
-    int getActivePageId();
-    Page *getActivePage();
+    int getActivePageId() {
+        return m_pageNavigationStack[m_pageNavigationStackPointer].pageId;
+    }
+
+    Page *getActivePage() {
+        return m_pageNavigationStack[m_pageNavigationStackPointer].page;
+    }
 
     bool isActivePageInternal();
 
-    int getPreviousPageId();
+    int getPreviousPageId() {
+        return m_pageNavigationStackPointer == 0 ? PAGE_ID_NONE : m_pageNavigationStack[m_pageNavigationStackPointer - 1].pageId;
+    }
 
     void replacePage(int pageId, Page *page = nullptr);
 
@@ -92,7 +99,6 @@ protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
     int m_activePageIndex;
-    int m_updatePageIndex;
 
     uint32_t m_showPageTime;
 
@@ -102,9 +108,7 @@ protected:
     void doShowPage(int index, Page *page, int previousPageId);
     void setPage(int pageId);
 
-    int getActivePageStackPointer();
-
-    virtual void updatePage(int i, WidgetCursor &widgetCursor);
+    virtual void updatePage(int i, WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);
 
     bool isPageFullyCovered(int pageNavigationStackIndex);
     

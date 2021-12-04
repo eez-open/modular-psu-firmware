@@ -43,7 +43,7 @@ struct ScrollBarWidgetState : public WidgetState {
     int pageSize;
     ScrollBarWidgetSegment segment;
 
-    void draw() override;
+    void draw(WidgetState *previousState) override;
 	bool hasOnTouch() override;
 	void onTouch(Event &touchEvent) override;
 	bool hasOnKeyboard() override;

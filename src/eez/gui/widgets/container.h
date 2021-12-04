@@ -31,7 +31,9 @@ struct ContainerWidgetState : public WidgetState {
     int overlayState;
     int displayBufferIndex;
 
-	void draw() override;
+	void draw(WidgetState *previousState) override;
+
+	void drawOverlay(WidgetState *previousState, Overlay *overlay);
 };
 
 } // namespace gui

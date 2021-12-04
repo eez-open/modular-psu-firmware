@@ -25,14 +25,14 @@
 namespace eez {
 namespace gui {
 
-void BitmapWidgetState::draw() {
+void BitmapWidgetState::draw(WidgetState *previousState) {
 	auto widget = (const BitmapWidget *)widgetCursor.widget;
 
     data = widget->data ? getBitmapImage(widgetCursor, widget->data) : 0;
 
-    bool refresh = !widgetCursor.previousState ||
-    		widgetCursor.previousState->flags.active != flags.active ||
-			data != widgetCursor.previousState->data;
+    bool refresh = !previousState ||
+    		previousState->flags.active != flags.active ||
+			data != previousState->data;
 
     if (refresh) {
         const Style* style = getStyle(widget->style);

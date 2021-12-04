@@ -1151,8 +1151,8 @@ bool PsuAppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, i
     return false;
 }
 
-void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
-    AppContext::updatePage(i, widgetCursor);
+void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState) {
+    AppContext::updatePage(i, widgetCursor, currentState, previousState);
 
     if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
         auto eventType = touch::getEventType();
@@ -1520,7 +1520,8 @@ static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
 static bool g_focusCursorIsEnabled;
 static int16_t g_focusCursorAction;
 
-bool isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
+bool isEnabledFocusCursorStep(WidgetState *widgetState) {
+    const WidgetCursor &widgetCursor = widgetState->widgetCursor;
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_focusCursor == widgetCursor && g_focusDataId == widgetCursor.widget->data) {
             g_focusCursorIsEnabled = true;
@@ -1538,7 +1539,8 @@ bool isEnabledFocusCursor(const WidgetCursor& cursor, int16_t dataId) {
     return g_focusCursorIsEnabled;
 }
 
-bool isEncoderEnabledInActivePageCheckWidget(const WidgetCursor &widgetCursor) {
+bool isEncoderEnabledInActivePageCheckWidget(WidgetState *widgetState) {
+    const WidgetCursor &widgetCursor = widgetState->widgetCursor;
     if (widgetCursor.isPage()) {
         g_isEncoderEnabledInActivePage = false;
     } else if (isEncoderEnabledForWidget(widgetCursor)) {
@@ -1859,7 +1861,8 @@ static int g_findNextFocusCursorState = 0;
 static WidgetCursor g_nextFocusCursor = 0;
 static uint16_t g_nextFocusDataId = DATA_ID_CHANNEL_U_EDIT;
 
-bool findNextFocusCursor(const WidgetCursor &widgetCursor) {
+bool findNextFocusCursor(WidgetState *widgetState) {
+    const WidgetCursor &widgetCursor = widgetState->widgetCursor;
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_findNextFocusCursorState == 0) {
             g_nextFocusCursor = widgetCursor;

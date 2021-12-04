@@ -50,10 +50,9 @@ int findStartOfUnit(char *text, int i) {
     return i;
 }
 
-void DisplayDataWidgetState::draw() {
+void DisplayDataWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (DisplayDataWidgetState *)previousStateBase;
     auto widget = (const DisplayDataWidget *)widgetCursor.widget;
-
-    auto previousState = (DisplayDataWidgetState *)widgetCursor.previousState;
 
     flags.focused = isFocusWidget(widgetCursor);
 
@@ -64,14 +63,14 @@ void DisplayDataWidgetState::draw() {
     uint32_t currentTime = millis();
 	data = get(widgetCursor, widget->data);
     bool refreshData = false;
-    if (widgetCursor.previousState) {
-        refreshData = data != widgetCursor.previousState->data;
+    if (previousState) {
+        refreshData = data != previousState->data;
         if (refreshData) {
             uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
             if (refreshRate != 0) {
                 refreshData = (currentTime - previousState->dataRefreshLastTime) > refreshRate;
                 if (!refreshData) {
-                    data = widgetCursor.previousState->data;
+                    data = previousState->data;
                 }
             }
         }
@@ -91,10 +90,10 @@ void DisplayDataWidgetState::draw() {
     xScroll = getXScroll(widgetCursor);
 
     bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.focused != flags.focused ||
-        widgetCursor.previousState->flags.active != flags.active ||
-        widgetCursor.previousState->flags.blinking != flags.blinking ||
+        !previousState ||
+        previousState->flags.focused != flags.focused ||
+        previousState->flags.active != flags.active ||
+        previousState->flags.blinking != flags.blinking ||
         refreshData ||
         color != previousState->color ||
         backgroundColor != previousState->backgroundColor ||

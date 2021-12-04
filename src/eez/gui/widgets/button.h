@@ -28,7 +28,7 @@ struct ButtonWidget : public Widget {
 };
 
 struct ButtonWidgetState : public WidgetState {
-    void draw() override;
+    void draw(WidgetState *previousState) override;
 };
 
 } // namespace gui

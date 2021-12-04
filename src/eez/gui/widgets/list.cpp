@@ -25,7 +25,7 @@ namespace gui {
 #define LIST_TYPE_VERTICAL 1
 #define LIST_TYPE_HORIZONTAL 2
 
-void ListWidgetState::draw() {
+void ListWidgetState::draw(WidgetState *previousState) {
     auto widget = (const ListWidget *)widgetCursor.widget;
 
     int startPosition = ytDataGetPosition(widgetCursor, widget->data);
@@ -36,15 +36,17 @@ void ListWidgetState::draw() {
     int count = eez::gui::count(widgetCursor, widget->data);
 
     if (count > 0) {
-		WidgetCursor childWidgetCursor = getFirstChildWidgetCursor();
+        WidgetState *childCurrentState = this;
+        WidgetState *childPreviousState = previousState;
+        WidgetCursor childWidgetCursor = getFirstChildWidgetCursor(widgetCursor, childCurrentState, childPreviousState);
 
-		if (widgetCursor.previousState && widgetCursor.previousState->data != data) {
-			childWidgetCursor.previousState = 0;
+		if (previousState && previousState->data != data) {
+			childPreviousState = 0;
 		}
 
 		WidgetState *endOfContainerInPreviousState = 0;
-        if (widgetCursor.previousState) {
-            endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
+        if (previousState) {
+            endOfContainerInPreviousState = nextWidgetState(previousState);
         }
 
         const Widget *childWidget = widget->itemWidget.ptr(widgetCursor.assets);
@@ -64,7 +66,7 @@ void ListWidgetState::draw() {
                 if (offset < widget->h) {
 					childWidgetCursor.y = savedY + offset;
 					childWidgetCursor.pushIterator(index);
-                    enumWidget(childWidgetCursor);
+                    enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
 					childWidgetCursor.popIterator();
                     offset += childWidget->h + widget->gap;
                 } else {
@@ -74,7 +76,7 @@ void ListWidgetState::draw() {
                 if (offset < widget->w) {
 					childWidgetCursor.x = savedX + offset;
 					childWidgetCursor.pushIterator(index);
-                    enumWidget(childWidgetCursor);
+                    enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
 					childWidgetCursor.popIterator();
                     offset += childWidget->w + widget->gap;
                 } else {
@@ -82,19 +84,18 @@ void ListWidgetState::draw() {
                 }
             }
 
-            if (childWidgetCursor.previousState) {
-                childWidgetCursor.previousState = nextWidgetState(childWidgetCursor.previousState);
-                if (childWidgetCursor.previousState > endOfContainerInPreviousState) {
-                    childWidgetCursor.previousState = 0;
+            if (childPreviousState) {
+                childPreviousState = nextWidgetState(childPreviousState);
+                if (childPreviousState > endOfContainerInPreviousState) {
+                    childPreviousState = 0;
                 }
             }
-
-            childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
+            childCurrentState = nextWidgetState(childCurrentState);
         }
 
         deselect(childWidgetCursor, widget->data, oldValue);
 	
-		widgetStateSize = (uint8_t *)childWidgetCursor.currentState - (uint8_t *)this;
+		widgetStateSize = (uint8_t *)childCurrentState - (uint8_t *)this;
 	}
 }
 

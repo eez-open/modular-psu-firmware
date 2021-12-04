@@ -51,7 +51,7 @@ public:
     void onEncoder(int counter);
     void onEncoderClicked();
 
-    void updateInternalPage(const WidgetCursor &widgetCursor);
+    void updateInternalPage(const WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);
     WidgetCursor findWidgetInternalPage(int x, int y, bool clicked);
     bool canClickPassThrough();
 
@@ -74,7 +74,6 @@ private:
     const char *actionLabel;
 
     Widget actionWidget;
-	WidgetState actionWidgetState;
     bool actionWidgetIsActive;
     void (*action)(int param);
     int actionParam;
@@ -109,7 +108,7 @@ public:
 
     void init();
 
-    void updateInternalPage(const WidgetCursor &widgetCursor);
+    void updateInternalPage(const WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);
     WidgetCursor findWidgetInternalPage(int x, int y, bool clicked);
 
     void selectEnumItem();
@@ -166,7 +165,7 @@ class MenuWithButtonsPage : public InternalPage {
 public:
     static MenuWithButtonsPage *create(AppContext *appContext, const char *message, const char **menuItems, void (*callback)(int));
 
-    void updateInternalPage(const WidgetCursor &widgetCursor);
+    void updateInternalPage(const WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);
     WidgetCursor findWidgetInternalPage(int x, int y, bool clicked);
 
     static void executeAction();
@@ -174,10 +173,8 @@ public:
 private:
     AppContext *m_appContext;
     RectangleWidget m_containerRectangleWidget;
-	RectangleWidgetState m_containerRectangleWidgetState;
     TextWidget m_messageTextWidget;
     TextWidget m_buttonTextWidgets[MAX_MENU_ITEMS];
-	TextWidgetState m_buttonTextWidgetStates[MAX_MENU_ITEMS];
     size_t m_numButtonTextWidgets;
     void (*m_callback)(int);
 

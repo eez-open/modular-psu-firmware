@@ -25,7 +25,7 @@ struct AppViewWidget : public Widget {
 };
 
 struct AppViewWidgetState : public WidgetState {
-	void draw() override;
+	void draw(WidgetState *previousState) override;
 };
 
 } // namespace gui

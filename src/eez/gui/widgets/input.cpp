@@ -141,7 +141,7 @@ Value getInputWidgetData(const gui::WidgetCursor &widgetCursor, const Value &dat
 	}
 }
 
-void InputWidgetState::draw() {
+void InputWidgetState::draw(WidgetState *previousState) {
 	auto widget = (const InputWidget*)widgetCursor.widget;
 
 	if (widgetCursor.flowState) {
@@ -167,11 +167,11 @@ void InputWidgetState::draw() {
 	data = get(widgetCursor, widget->data);
 
     bool refresh =
-		!widgetCursor.previousState ||
-        widgetCursor.previousState->flags.focused != flags.focused ||
-        widgetCursor.previousState->flags.active != flags.active ||
-        widgetCursor.previousState->flags.blinking != flags.blinking ||
-		widgetCursor.previousState->data != data;
+		!previousState ||
+        previousState->flags.focused != flags.focused ||
+        previousState->flags.active != flags.active ||
+        previousState->flags.blinking != flags.blinking ||
+		previousState->data != data;
 
     if (refresh) {
         uint16_t overrideColor = flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);

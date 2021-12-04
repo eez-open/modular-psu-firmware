@@ -24,7 +24,7 @@
 namespace eez {
 namespace gui {
 
-void AppViewWidgetState::draw() {
+void AppViewWidgetState::draw(WidgetState *previousState) {
     AppContext *appContext;
     if (widgetCursor.widget->data != DATA_ID_NONE) {
         Value appContextValue;
@@ -35,7 +35,7 @@ void AppViewWidgetState::draw() {
     }
 
     bool refresh =
-        !widgetCursor.previousState &&
+        !previousState &&
         !appContext->isActivePageInternal() &&
         appContext->getActivePageId() != PAGE_ID_NONE;
 
@@ -46,37 +46,38 @@ void AppViewWidgetState::draw() {
         appContext->rect.h = widgetCursor.widget->h;
     }
 
-    WidgetCursor childWidgetCursor = getFirstChildWidgetCursor();
+    WidgetState *childCurrentState = this;
+	WidgetState *childPreviousState = previousState;
+    WidgetCursor childWidgetCursor = getFirstChildWidgetCursor(widgetCursor, childCurrentState, childPreviousState);
 
     childWidgetCursor.appContext = appContext;
 
     if (appContext->getActivePageId() != PAGE_ID_NONE) {
         WidgetState *endOfContainerInPreviousState = 0;
-        if (widgetCursor.previousState) {
-            endOfContainerInPreviousState = nextWidgetState(widgetCursor.previousState);
+        if (previousState) {
+            endOfContainerInPreviousState = nextWidgetState(previousState);
 		}
 
         for (int i = 0; i <= appContext->m_pageNavigationStackPointer; i++) {
 			if (!appContext->isPageFullyCovered(i)) {
-				appContext->updatePage(i, childWidgetCursor);
+				appContext->updatePage(i, childWidgetCursor, childCurrentState, childPreviousState);
 
-				if (childWidgetCursor.previousState) {
-					childWidgetCursor.previousState = nextWidgetState(childWidgetCursor.previousState);
-					if (childWidgetCursor.previousState > endOfContainerInPreviousState) {
-						childWidgetCursor.previousState = 0;
+				if (childPreviousState) {
+					childPreviousState = nextWidgetState(childPreviousState);
+					if (childPreviousState > endOfContainerInPreviousState) {
+						childPreviousState = 0;
 					}
 				}
-
-				childWidgetCursor.currentState = nextWidgetState(childWidgetCursor.currentState);
+				childCurrentState = nextWidgetState(childCurrentState);
 			} else {
                 appContext->m_pageNavigationStack[i].displayBufferIndex = -1;
             }
         }
     } else {
-        enumNoneWidget(childWidgetCursor);
+        enumNoneWidget(childWidgetCursor, childCurrentState, childPreviousState);
     }
 
-    widgetStateSize = (uint8_t *)childWidgetCursor.currentState - (uint8_t *)this;
+    widgetStateSize = (uint8_t *)childCurrentState - (uint8_t *)this;
 }
 
 } // namespace gui

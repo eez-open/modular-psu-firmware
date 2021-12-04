@@ -72,7 +72,6 @@ int16_t getAppContextId(AppContext *pAppContext);
 AppContext *getAppContextFromId(int16_t id);
 
 int getCurrentStateBufferIndex();
-size_t getCurrentStateBufferSize(const WidgetCursor &widgetCursor);
 
 ////////////////////////////////////////////////////////////////////////////////
 

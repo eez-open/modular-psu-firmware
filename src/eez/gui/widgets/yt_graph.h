@@ -39,7 +39,7 @@ struct YTGraphWidgetState : public WidgetState {
     float valueDiv[MAX_NUM_OF_Y_VALUES];
     float valueOffset[MAX_NUM_OF_Y_VALUES];
 
-    void draw() override;
+    void draw(WidgetState *previousState) override;
 	bool hasOnTouch() override;
 	void onTouch(Event &touchEvent) override;
 };

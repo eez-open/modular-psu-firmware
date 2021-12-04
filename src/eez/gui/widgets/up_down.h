@@ -28,7 +28,7 @@ struct UpDownWidget : public Widget {
 };
 
 struct UpDownWidgetState : public WidgetState {
-    void draw() override;
+    void draw(WidgetState *previousState) override;
 	bool hasOnTouch() override;
 	void onTouch(Event &touchEvent) override;
 	bool hasOnKeyboard() override;

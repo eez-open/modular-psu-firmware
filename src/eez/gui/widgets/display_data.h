@@ -34,7 +34,7 @@ struct DisplayDataWidgetState : public WidgetState {
     int16_t cursorPosition;
     uint8_t xScroll;
 
-    void draw() override;
+    void draw(WidgetState *previousState) override;
 };
 
 int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCursor);

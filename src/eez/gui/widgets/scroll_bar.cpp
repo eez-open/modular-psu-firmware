@@ -66,13 +66,12 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
     xThumb = xTrack + (int)round(remap(position, 0, 0, size - pageSize, wTrack - widthThumb));
 }
 
-void ScrollBarWidgetState::draw() {
+void ScrollBarWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (ScrollBarWidgetState *)previousStateBase;
     auto widget = (const ScrollBarWidget *)widgetCursor.widget;
 
     flags.active = g_selectedWidget == widgetCursor;
     flags.focused = isFocusWidget(widgetCursor);
-
-    auto previousState = (ScrollBarWidgetState *)widgetCursor.previousState;
 
     size = getSize(widgetCursor);
     position = getPosition(widgetCursor);

@@ -35,7 +35,7 @@ void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
     widget.h = style->border_size_top + style->padding_top + font.getHeight() + style->border_size_bottom + style->padding_bottom;
 }
 
-void TextWidgetState::draw() {
+void TextWidgetState::draw(WidgetState *previousState) {
     auto widget = (const TextWidget *)widgetCursor.widget;
 
     flags.focused = isFocusWidget(widgetCursor);
@@ -48,11 +48,11 @@ void TextWidgetState::draw() {
     data = !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0;
 
     bool refresh =
-        !widgetCursor.previousState ||
-        widgetCursor.previousState->flags.focused != flags.focused ||
-        widgetCursor.previousState->flags.active != flags.active ||
-        widgetCursor.previousState->flags.blinking != flags.blinking ||
-        widgetCursor.previousState->data != data;
+        !previousState ||
+        previousState->flags.focused != flags.focused ||
+        previousState->flags.active != flags.active ||
+        previousState->flags.blinking != flags.blinking ||
+        previousState->data != data;
 
     static const size_t MAX_TEXT_LEN = 128;
 

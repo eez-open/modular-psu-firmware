@@ -85,7 +85,7 @@ float firstTick(float n) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void GaugeWidgetState::draw() {
+void GaugeWidgetState::draw(WidgetState *previousState) {
 	using namespace display;
 
 	auto widget = (const GaugeWidget*)widgetCursor.widget;
@@ -93,9 +93,9 @@ void GaugeWidgetState::draw() {
     data = get(widgetCursor, widget->data);
 
     bool refresh = 
-		!widgetCursor.previousState || 
-		widgetCursor.previousState->data != data ||
-		widgetCursor.previousState->flags.active != flags.active;
+		!previousState || 
+		previousState->data != data ||
+		previousState->flags.active != flags.active;
 
     if (refresh) {
 		float min = get(widgetCursor, widget->min).toFloat();

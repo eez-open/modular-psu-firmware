@@ -30,7 +30,7 @@ struct LayoutViewWidget : public Widget {
 struct LayoutViewWidgetState : public WidgetState {
     Value context;
 
-	void draw() override;
+	void draw(WidgetState *previousState) override;
 };
 
 } // namespace gui
