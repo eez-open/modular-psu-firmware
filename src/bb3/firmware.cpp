@@ -537,7 +537,7 @@ void shutdown() {
     channel_dispatcher::disableOutputForAllChannels();
     psu::tick();
 
-    if (psu::isPowerUp()) {
+    if (psu::g_powerIsUp) {
     	psu::changePowerState(false);
     }
 

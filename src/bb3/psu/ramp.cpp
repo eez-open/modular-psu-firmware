@@ -175,6 +175,7 @@ static void updateChannelsWithVisibleCountersList() {
 static void setActive(bool active, bool forceUpdate) {
     if (g_active != active) {
         g_active = active;
+        updateFastTickEnabled();
         updateChannelsWithVisibleCountersList();
     } else {
         if (forceUpdate) {

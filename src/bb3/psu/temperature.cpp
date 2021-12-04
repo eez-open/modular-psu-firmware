@@ -89,7 +89,7 @@ void tick() {
         }
 
         // check if max_channel_temperature is too high
-        if (isPowerUp() && maxChannelTemperature > FAN_MAX_TEMP) {
+        if (g_powerIsUp && maxChannelTemperature > FAN_MAX_TEMP) {
             if (g_lastMaxChannelTemperature <= FAN_MAX_TEMP) {
                 g_maxTempCheckStartTickMs = tickCountMs;
             }

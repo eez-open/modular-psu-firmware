@@ -206,7 +206,7 @@ void PsuAppContext::stateManagment() {
 #endif
 
     // turn the screen off if power is down and system is booted
-    if (!psu::isPowerUp()) {
+    if (!g_powerIsUp) {
     	if (g_isBooted && !g_shutdownInProgress && getActivePageId() != PAGE_ID_NONE) {
     		showPage(PAGE_ID_NONE);
     		eez::display::turnOff();
@@ -393,8 +393,6 @@ void PsuAppContext::stateManagment() {
 	}
 
     testIsEncoderEnabledInActivePage();
-
-    function_generator::tickGui();
 }
 
 bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {

@@ -1171,7 +1171,7 @@ void action_user_switch_clicked() {
         break;
 
     case persist_conf::USER_SWITCH_ACTION_STANDBY:
-    	changePowerState(isPowerUp() ? false : true);
+    	changePowerState(g_powerIsUp ? false : true);
     	break;
     }
 }

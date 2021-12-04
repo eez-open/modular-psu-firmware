@@ -181,7 +181,7 @@ extern "C" void PSU_IncTick() {
 
     using namespace eez;
     using namespace eez::psu;
-    if (ramp::isActive() || eez::dcp405::isDacRampActive() || function_generator::isActive()) {
+    if (g_fastTickEnabled) {
         sendMessageToPsu(PSU_MESSAGE_TICK, 0, 0);
     }
 }
@@ -193,7 +193,7 @@ namespace psu {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool g_powerIsUp;
+bool g_powerIsUp;
 static bool g_testPowerUpDelay;
 static uint32_t g_powerDownTime;
 
@@ -206,6 +206,14 @@ bool g_rprogAlarm = false;
 void (*g_diagCallback)();
 
 bool g_adcMeasureAllFinished = false;
+
+bool g_fastTickEnabled;
+
+////////////////////////////////////////////////////////////////////////////////
+
+void updateFastTickEnabled() {
+    g_fastTickEnabled = ramp::isActive() || eez::dcp405::isDacRampActive() || function_generator::isActive();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1307,10 +1315,6 @@ void powerDownChannels(bool onlyPowerChannels) {
     }
 }
 
-bool isPowerUp() {
-    return g_powerIsUp;
-}
-
 void changePowerState(bool up) {
     if (up == g_powerIsUp)
         return;
@@ -1355,7 +1359,7 @@ void powerDownBySensor() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void onProtectionTripped() {
-    if (isPowerUp()) {
+    if (g_powerIsUp) {
         if (persist_conf::isShutdownWhenProtectionTrippedEnabled()) {
             powerDownBySensor();
         } else {

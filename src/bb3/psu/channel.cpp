@@ -597,10 +597,6 @@ void Channel::clearProtectionConf() {
     temperature::sensors[temp_sensor::CH1 + channelIndex].prot_conf.delay = OTP_CH_DEFAULT_DELAY;
 }
 
-bool Channel::isPowerOk() {
-    return flags.powerOk;
-}
-
 TestResult Channel::getTestResult() {
     return g_slots[slotIndex]->getTestResult();
 }
@@ -614,7 +610,7 @@ bool Channel::isTestOk() {
 }
 
 bool Channel::isOk() {
-    return (g_slots[slotIndex]->enabled && isPowerUp() && isPowerOk() && isTestOk() && !bp3c::flash_slave::g_bootloaderMode) ||
+    return (g_slots[slotIndex]->enabled && g_powerIsUp && flags.powerOk && g_slots[slotIndex]->getTestResult() == TEST_OK && !bp3c::flash_slave::g_bootloaderMode) ||
     	(bp3c::flash_slave::g_bootloaderMode && bp3c::flash_slave::g_ate && channelIndex == 0);
 }
 
@@ -1052,7 +1048,7 @@ void Channel::doRemoteProgrammingEnable(bool enable) {
 }
 
 bool Channel::isOutputEnabled() {
-    return isPowerUp() && flags.outputEnabled;
+    return g_powerIsUp && flags.outputEnabled;
 }
 
 void Channel::doCalibrationEnable(bool enable) {

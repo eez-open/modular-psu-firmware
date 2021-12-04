@@ -167,7 +167,7 @@ void highPriorityThreadOneIter() {
         if (diffMs == 0) {
             return;
         }
-        if (psu::ramp::isActive() || eez::dcp405::isDacRampActive() || function_generator::isActive()) {
+        if (psu::g_fastTickEnabled) {
             return;
         }
 #endif

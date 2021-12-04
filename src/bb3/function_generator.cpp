@@ -1752,6 +1752,7 @@ void executionStart() {
 
 		if (triggerMode == TRIGGER_MODE_FUNCTION_GENERATOR) {
 			g_active = true;
+			updateFastTickEnabled();
 			reloadWaveformParameters();
 			return;
 		}
@@ -2005,13 +2006,12 @@ void tick() {
 			}
 		}
 	}
-
-	
 }
 
 void abort() {
 	if (g_active) {
 		g_active = false;
+		updateFastTickEnabled();
 
 		for (int i = 0; i < CH_NUM; i++) {
 			if (g_dprogStateModified[i]) {
@@ -2025,36 +2025,6 @@ void abort() {
 			}
 		}
 	}
-}
-
-void tickGui() {
-	// // change m_selectedItem to the currently selected channel in max view
-	// if (psu::gui::getActivePageId() == PAGE_ID_MAIN && persist_conf::isMaxView()) {
-	// 	int maxSlotIndex = persist_conf::getMaxSlotIndex();
-	// 	int maxSubchannelIndex = persist_conf::getMaxSubchannelIndex();
-
-	// 	auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[g_functionGeneratorPage.m_selectedItem];
-	// 	int slotIndex;
-	// 	int subchannelIndex;
-	// 	int resourceIndex;
-	// 	AllResources::findResource(waveformParameters.absoluteResourceIndex,
-	// 		slotIndex, subchannelIndex, resourceIndex);
-
-	// 	if (slotIndex != maxSlotIndex || (maxSubchannelIndex != -1 && subchannelIndex != maxSubchannelIndex)) {
-	// 		for (int i = 0; i < g_selectedResources.m_numResources; i++) {
-	// 			auto &waveformParameters = g_functionGeneratorPage.m_selectedResources.m_waveformParameters[i];
-	// 			int slotIndex;
-	// 			int subchannelIndex;
-	// 			int resourceIndex;
-	// 			AllResources::findResource(waveformParameters.absoluteResourceIndex,
-	// 				slotIndex, subchannelIndex, resourceIndex);
-	// 			if (slotIndex == maxSlotIndex && (maxSubchannelIndex == -1 || maxSubchannelIndex == subchannelIndex)) {
-	// 				g_functionGeneratorPage.m_selectedItem = i;
-	// 				break;
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 
 } // namespace function_generator

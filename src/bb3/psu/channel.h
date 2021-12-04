@@ -442,9 +442,6 @@ public:
 
     void initParams(uint16_t moduleRevision);
 
-    /// Is channel power ok (state of PWRGOOD bit in IO Expander)?
-    bool isPowerOk();
-
     /// Is channel test failed?
     bool isTestFailed();
 

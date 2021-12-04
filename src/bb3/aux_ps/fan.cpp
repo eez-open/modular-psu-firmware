@@ -454,7 +454,7 @@ int updateFanSpeed() {
         fanSpeed = psu::persist_conf::devConf.fanSpeedPWM;
     }
 
-    if (psu::isPowerUp() && fanMode == FAN_MODE_MANUAL) {
+    if (psu::g_powerIsUp && fanMode == FAN_MODE_MANUAL) {
         if (fanSpeed == 0) {
             newFanSpeedPWM = 0;
         } else {

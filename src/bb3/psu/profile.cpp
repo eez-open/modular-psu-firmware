@@ -726,7 +726,7 @@ static bool repositionChannelsInProfileToMatchCurrentChannelConfiguration(Parame
 
 static void saveState(Parameters &profile, List *lists) {
     profile.flags.couplingType = channel_dispatcher::getCouplingType();
-    profile.flags.powerIsUp = isPowerUp();
+    profile.flags.powerIsUp = g_powerIsUp;
 
     for (int i = 0; i < NUM_SLOTS; ++i) {
         profile.slots[i].moduleType = g_slots[i]->moduleType;

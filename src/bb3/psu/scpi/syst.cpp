@@ -92,7 +92,7 @@ scpi_result_t scpi_cmd_systemPower(scpi_t *context) {
 }
 
 scpi_result_t scpi_cmd_systemPowerQ(scpi_t *context) {
-    SCPI_ResultBool(context, isPowerUp());
+    SCPI_ResultBool(context, g_powerIsUp);
     return SCPI_RES_OK;
 }
 
@@ -2013,7 +2013,7 @@ scpi_result_t scpi_cmd_systemMeasureScalarTemperatureThermistorDcQ(scpi_t *conte
     }
 
     Channel *channel = temperature::sensors[sensor].getChannel();
-    if (channel && (!isPowerUp() || !channel->isPowerOk())) {
+    if (channel && (!g_powerIsUp || !channel->flags.powerOk)) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return SCPI_RES_ERR;
     }

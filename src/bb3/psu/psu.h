@@ -176,7 +176,7 @@ bool powerUp();
 void powerDown();
 void powerDownOnlyPowerChannels();
 void powerDownChannels(bool onlyPowerChannels = false);
-bool isPowerUp();
+extern bool g_powerIsUp;
 void changePowerState(bool up);
 void powerDownBySensor();
 
@@ -185,6 +185,9 @@ bool psuReset();
 bool autoRecall(int recallOptions = 0);
 
 void onProtectionTripped();
+
+extern bool g_fastTickEnabled;
+void updateFastTickEnabled();
 
 void tick();
 

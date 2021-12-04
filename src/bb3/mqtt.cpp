@@ -202,9 +202,9 @@ void onIncomingPublish(const char *topic, const char *payload) {
             char *endptr;
             int powerUp = strtol(payload, &endptr, 10);
             if (endptr > payload) {
-                if (powerUp && !isPowerUp()) {
+                if (powerUp && !g_powerIsUp) {
                     changePowerState(1);
-                } else if (!powerUp && isPowerUp()) {
+                } else if (!powerUp && g_powerIsUp) {
                     standBy();
                 }
             }
@@ -616,7 +616,7 @@ void tick() {
         uint32_t period = (uint32_t)roundf(persist_conf::devConf.mqttPeriod * 1000);
 
         // publish power state
-        int powState = isPowerUp() ? 1 : 0;
+        int powState = g_powerIsUp ? 1 : 0;
         if (powState != g_powState) {
             if (publish(PUB_TOPIC_SYSTEM_POW, powState, true)) {
                 g_powState = powState;

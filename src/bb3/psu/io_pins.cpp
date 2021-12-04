@@ -121,7 +121,7 @@ void ioPinWrite(int pin, int state) {
 
 uint8_t isOutputFault() {
 #if OPTION_FAN
-    if (isPowerUp()) {
+    if (g_powerIsUp) {
         if (aux_ps::fan::g_testResult == TEST_FAILED) {
             return 1;
         }
@@ -244,7 +244,7 @@ void updatePwmFrequency(int pin) {
 
     updatePwmDuty(pin);
 
-    if (isPowerUp() && frequency > 0) {
+    if (g_powerIsUp && frequency > 0) {
         if (!g_pwmStarted) {
             HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
             g_pwmStarted = true;

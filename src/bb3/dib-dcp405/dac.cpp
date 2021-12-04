@@ -140,6 +140,7 @@ void DigitalAnalogConverter::tick() {
         if (diff >= CONF_U_RAMP_DURATION_USEC) {
             value = m_uRampTargetValue;
             m_uIsRampActive = false;
+            updateFastTickEnabled();
         } else {
             value = m_uRampTargetValue * diff / CONF_U_RAMP_DURATION_USEC;
         }
@@ -156,6 +157,7 @@ void DigitalAnalogConverter::tick() {
         if (diff >= CONF_I_RAMP_DURATION_USEC) {
             value = m_iRampTargetValue;
             m_iIsRampActive = false;
+            updateFastTickEnabled();
         } else {
             value = m_iRampTargetValue * diff / CONF_I_RAMP_DURATION_USEC;
         }
@@ -233,6 +235,7 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
             !ramp::isActive(channel)
         ) {
             m_uIsRampActive = true;
+            updateFastTickEnabled();
             m_uRampTargetValue = value;
             value = 0;
             rampOption = FROM_RAMP;
@@ -243,6 +246,7 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
         
         if (rampOption != FROM_RAMP) {
             m_uIsRampActive = false;
+            updateFastTickEnabled();
         }
 
         m_uLastValue = value;
@@ -253,6 +257,7 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
             !ramp::isActive(channel)
         ) {
             m_iIsRampActive = true;
+            updateFastTickEnabled();
             m_iRampTargetValue = value;
             value = 0;
             rampOption = FROM_RAMP;
@@ -263,6 +268,7 @@ void DigitalAnalogConverter::set(uint8_t buffer, uint16_t value, RampOption ramp
         
         if (rampOption != FROM_RAMP) {
             m_iIsRampActive = false;
+            updateFastTickEnabled();
         }
 
         m_iLastValue = value;

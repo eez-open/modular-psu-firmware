@@ -320,7 +320,7 @@ bool checkPowerChannel(scpi_t *context, int channelIndex) {
         return false;
     }
 
-    if (!isPowerUp()) {
+    if (!g_powerIsUp) {
         SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
         return false;
     }
@@ -332,7 +332,7 @@ bool checkPowerChannel(scpi_t *context, int channelIndex) {
         return false;
     }
 
-    if (!channel.isPowerOk()) {
+    if (!channel.flags.powerOk) {
         if (channelIndex < 6) {
             SCPI_ErrorPush(context, SCPI_ERROR_CH1_FAULT_DETECTED - channelIndex);
         } else {
