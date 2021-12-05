@@ -55,8 +55,9 @@ void ContainerWidgetState::draw(WidgetState *previousStateBase) {
         endOfContainerInPreviousState = nextWidgetState(previousState);
     }
 
-    for (uint32_t index = 0; index < widgets.count; ++index) {
-        childWidgetCursor.widget = widgets.item(widgetCursor.assets, index);
+	auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
+	for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
+		childWidgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
 
         enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
 
@@ -129,23 +130,23 @@ void ContainerWidgetState::drawOverlay(WidgetState *previousStateBase, Overlay *
     }
 
     auto widgetOverrides = overlay->widgetOverrides;
-
-    for (uint32_t index = 0; index < widgets.count; ++index) {
-        if (!overlay->widgetOverrides[index].isVisible) {
+    auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
+    for (uint32_t index = 0; index < widgets.count; ++index, ++widgetOverrides, ++widgetPtr) {
+        if (!widgetOverrides->isVisible) {
             continue;
         }
 
-        childWidgetCursor.widget = widgets.item(widgetCursor.assets, index);
+        childWidgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
 
         int xSaved = childWidgetCursor.widget->x;
         int ySaved = childWidgetCursor.widget->y;
         int wSaved = childWidgetCursor.widget->w;
         int hSaved = childWidgetCursor.widget->h;
 
-        ((Widget*)childWidgetCursor.widget)->x = widgetOverrides[index].x;
-        ((Widget*)childWidgetCursor.widget)->y = widgetOverrides[index].y;
-        ((Widget*)childWidgetCursor.widget)->w = widgetOverrides[index].w;
-        ((Widget*)childWidgetCursor.widget)->h = widgetOverrides[index].h;
+        ((Widget*)childWidgetCursor.widget)->x = widgetOverrides->x;
+        ((Widget*)childWidgetCursor.widget)->y = widgetOverrides->y;
+        ((Widget*)childWidgetCursor.widget)->w = widgetOverrides->w;
+        ((Widget*)childWidgetCursor.widget)->h = widgetOverrides->h;
 
         enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
 

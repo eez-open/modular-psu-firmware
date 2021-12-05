@@ -302,7 +302,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			const char *resultText;
 			size_t resultTextLen;
-			int err;
+			int err = 0;
 			if (!getLatestScpiResult(&resultText, &resultTextLen, &err)) {
 				char errorMessage[300];
 				snprintf(errorMessage, sizeof(errorMessage), "%s\n", SCPI_ErrorTranslate(err));
@@ -364,7 +364,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			const char *resultText;
 			size_t resultTextLen;
-			int err;
+			int err = 0;
 			if (!getLatestScpiResult(&resultText, &resultTextLen, &err)) {
 				char errorMessage[300];
 				snprintf(errorMessage, sizeof(errorMessage), "%s\n", SCPI_ErrorTranslate(err));
@@ -392,7 +392,7 @@ void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
 
 			const char *resultText;
 			size_t resultTextLen;
-			int err;
+			int err = 0;
 			if (!getLatestScpiResult(&resultText, &resultTextLen, &err)) {
 				char errorMessage[300];
 				snprintf(errorMessage, sizeof(errorMessage), "%s\n", SCPI_ErrorTranslate(err));

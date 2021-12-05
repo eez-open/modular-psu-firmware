@@ -385,7 +385,7 @@ bool SdFat::getInfo(int diskDriveIndex, uint64_t &usedSpace, uint64_t &freeSpace
 
     path[0] = '0' + diskDriveIndex;
     path[1] = ':';
-    path[3] = 0;
+    path[2] = 0;
 
     DWORD freeClusters;
     FATFS *fs;

@@ -103,11 +103,8 @@ WidgetCursor WidgetState::getFirstChildWidgetCursor(WidgetCursor &widgetCursor, 
 void WidgetState::draw(WidgetState *previousState) {
     const Widget *widget = widgetCursor.widget;
 
-    bool refresh =
-        !previousState ||
-        previousState->flags.active != flags.active;
-
-    if (refresh) {
+    bool refresh = !previousState || previousState->flags.active != flags.active;
+	if (refresh) {
         drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, getStyle(widget->style), flags.active, false, true);
     }
 }
@@ -125,12 +122,6 @@ bool WidgetState::hasOnKeyboard() {
 
 bool WidgetState::onKeyboard(uint8_t key, uint8_t mod) { 
     return false; 
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-WidgetState *nextWidgetState(WidgetState *p) {
-    return (WidgetState *)(((uint8_t *)p) + p->widgetStateSize);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

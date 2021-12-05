@@ -554,8 +554,10 @@ uint32_t Reader::readUint32() {
 }
 
 float Reader::readFloat() {
+	float num;
 	uint32_t value = readUint32();
-	return *((float *)&value);
+	memcpy(&num, &value, sizeof(float));
+	return num;
 }
 
 double Reader::readDouble() {

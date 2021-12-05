@@ -85,8 +85,9 @@ void LayoutViewWidgetState::draw(WidgetState *previousState) {
             endOfContainerInPreviousState = nextWidgetState(previousState);
         }
 
-        for (uint32_t index = 0; index < widgets.count; ++index) {
-            childWidgetCursor.widget = widgets.item(widgetCursor.assets, index);
+        auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
+        for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
+            childWidgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
 
             enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
 

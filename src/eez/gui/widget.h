@@ -201,7 +201,7 @@ struct WidgetState {
 
 extern bool g_isActiveWidget;
 
-WidgetState *nextWidgetState(WidgetState *p);
+#define nextWidgetState(p) (WidgetState *)(((uint8_t *)p) + p->widgetStateSize)
 
 void enumWidget(WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);
 void enumNoneWidget(WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);

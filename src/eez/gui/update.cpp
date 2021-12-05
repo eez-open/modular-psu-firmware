@@ -24,7 +24,7 @@
 namespace eez {
 namespace gui {
 
-static uint8_t *g_stateBuffer = GUI_STATE_BUFFER;
+static uint8_t g_stateBuffer[GUI_STATE_BUFFER_SIZE];
 static WidgetState *g_previousState;
 WidgetState *g_currentState;
 static bool g_refreshScreen;

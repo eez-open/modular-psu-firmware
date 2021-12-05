@@ -98,7 +98,6 @@ public:
 protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
-    int m_activePageIndex;
 
     uint32_t m_showPageTime;
 

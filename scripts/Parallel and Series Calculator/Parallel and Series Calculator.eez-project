@@ -693,9 +693,6 @@
       "bpp": 16
     }
   ],
-  "micropython": {
-    "code": ""
-  },
   "colors": [],
   "themes": [
     {
